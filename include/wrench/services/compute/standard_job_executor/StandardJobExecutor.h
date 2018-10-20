@@ -53,7 +53,7 @@ namespace wrench {
                 std::string callback_mailbox,
                 std::string hostname,
                 StandardJob *job,
-                std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
+                std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
                 StorageService* scratch_space,
                 bool part_of_pilot_job,
                 PilotJob* parent_pilot_job,

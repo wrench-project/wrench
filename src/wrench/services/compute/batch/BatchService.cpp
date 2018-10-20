@@ -752,7 +752,7 @@ namespace wrench {
      * @param ram_per_node
      * @return
      */
-    std::set<std::tuple<std::string, unsigned long, double>>
+    std::map<std::string, std::tuple<unsigned long, double>>
     BatchService::scheduleOnHosts(std::string host_selection_algorithm,
                                   unsigned long num_nodes,
                                   unsigned long cores_per_node,
@@ -768,7 +768,7 @@ namespace wrench {
         throw std::runtime_error("BatchService::scheduleOnHosts(): Asking for too many cores per host");
       }
 
-      std::set<std::tuple<std::string, unsigned long, double>> resources = {};
+      std::map<std::string, std::tuple<unsigned long, double>> resources = {};
       std::vector<std::string> hosts_assigned = {};
       if (host_selection_algorithm == "FIRSTFIT") {
         std::map<std::string, unsigned long>::iterator map_it;
@@ -779,7 +779,7 @@ namespace wrench {
             //Remove that many cores from the available_nodes_to_core
             (*map_it).second -= cores_per_node;
             hosts_assigned.push_back((*map_it).first);
-            resources.insert(std::make_tuple((*map_it).first, cores_per_node, ram_per_node));
+            resources.insert(std::make_pair((*map_it).first, std::make_tuple(cores_per_node, ram_per_node)));
             if (++host_count >= num_nodes) {
               break;
             }
@@ -828,7 +828,7 @@ namespace wrench {
           }
           this->available_nodes_to_cores[target_host] -= cores_per_node;
           hosts_assigned.push_back(target_host);
-          resources.insert(std::make_tuple(target_host, cores_per_node, ComputeService::ALL_RAM));
+          resources.insert(std::make_pair(target_host, std::make_tuple(cores_per_node, ComputeService::ALL_RAM)));
         }
       } else if (host_selection_algorithm == "ROUNDROBIN") {
         static unsigned long round_robin_host_selector_idx = 0;
@@ -843,7 +843,7 @@ namespace wrench {
           if (num_available_cores >= cores_per_node) {
             available_nodes_to_cores[cur_host_name] -= cores_per_node;
             hosts_assigned.push_back(cur_host_name);
-            resources.insert(std::make_tuple(cur_host_name, cores_per_node, ram_per_node));
+            resources.insert(std::make_pair(cur_host_name, std::make_tuple(cores_per_node, ram_per_node)));
             if (++host_count >= num_nodes) {
               break;
             }
@@ -914,7 +914,7 @@ namespace wrench {
 
       //Try to schedule hosts based on host selection algorithm
       // Asking for the FULL RAM (TODO: Change this?)
-      std::set<std::tuple<std::string, unsigned long, double>> resources = this->scheduleOnHosts(
+      std::map<std::string, std::tuple<unsigned long, double>> resources = this->scheduleOnHosts(
               this->getPropertyValueAsString(BatchServiceProperty::HOST_SELECTION_ALGORITHM),
               num_nodes_asked_for, cores_per_node_asked_for, ComputeService::ALL_RAM);
 
@@ -1694,7 +1694,7 @@ namespace wrench {
      * @param cores_per_node_asked_for
      */
     void
-    BatchService::startJob(std::set<std::tuple<std::string, unsigned long, double>> resources,
+    BatchService::startJob(std::map<std::string, std::tuple<unsigned long, double>> resources,
                            WorkflowJob *workflow_job,
                            BatchJob *batch_job, unsigned long num_nodes_allocated,
                            double allocated_time,

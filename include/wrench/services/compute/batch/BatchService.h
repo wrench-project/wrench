@@ -234,7 +234,7 @@ namespace wrench {
 
         void terminateRunningStandardJob(StandardJob *job);
 
-        std::set<std::tuple<std::string, unsigned long, double>> scheduleOnHosts(std::string host_selection_algorithm,
+        std::map<std::string, std::tuple<unsigned long, double>> scheduleOnHosts(std::string host_selection_algorithm,
                                                                                  unsigned long, unsigned long, double);
 
         BatchJob *pickJobForScheduling(std::string);
@@ -280,7 +280,7 @@ namespace wrench {
 
 
         //start a job
-        void startJob(std::set<std::tuple<std::string, unsigned long, double>>, WorkflowJob *,
+        void startJob(std::map<std::string, std::tuple<unsigned long, double>>, WorkflowJob *,
                       BatchJob *, unsigned long, double, unsigned long);
 
 

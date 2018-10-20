@@ -14,13 +14,5 @@ namespace wrench {
 
     SET_PROPERTY_NAME(MultihostMulticoreComputeServiceProperty, THREAD_STARTUP_OVERHEAD);
 
-    SET_PROPERTY_NAME(MultihostMulticoreComputeServiceProperty, JOB_SELECTION_POLICY);
-    SET_PROPERTY_NAME(MultihostMulticoreComputeServiceProperty, RESOURCE_ALLOCATION_POLICY);
-
-    SET_PROPERTY_NAME(MultihostMulticoreComputeServiceProperty, TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM);
-    SET_PROPERTY_NAME(MultihostMulticoreComputeServiceProperty, TASK_SCHEDULING_TASK_SELECTION_ALGORITHM);
-    SET_PROPERTY_NAME(MultihostMulticoreComputeServiceProperty, TASK_SCHEDULING_HOST_SELECTION_ALGORITHM);
-
-
 };
 

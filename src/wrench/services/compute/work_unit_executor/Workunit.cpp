@@ -17,6 +17,7 @@ namespace wrench {
 
     /**
     * @brief Constructor
+    * @param job: the job this workunit belongs to
     * @param pre_file_copies: a set of file copy actions to perform in sequence first
     * @param task: a WorkflowTask
     * @param file_locations: locations where tasks should read/write files
@@ -24,6 +25,7 @@ namespace wrench {
     * @param cleanup_file_deletions: a set of file deletion actions to perform last
     */
     Workunit::Workunit(
+            StandardJob *job,
             std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
             WorkflowTask *task,
             std::map<WorkflowFile *, StorageService *> file_locations,
@@ -32,6 +34,7 @@ namespace wrench {
 
       this->num_pending_parents = 0;
 
+      this->job = job;
       this->pre_file_copies = pre_file_copies;
       this->task = task;
       this->file_locations = file_locations;

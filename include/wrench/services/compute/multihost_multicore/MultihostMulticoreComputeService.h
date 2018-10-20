@@ -44,11 +44,6 @@ namespace wrench {
                 {MultihostMulticoreComputeServiceProperty::SUPPORTS_STANDARD_JOBS,                         "true"},
                 {MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS,                            "true"},
                 {MultihostMulticoreComputeServiceProperty::THREAD_STARTUP_OVERHEAD,                        "0.0"},
-                {MultihostMulticoreComputeServiceProperty::JOB_SELECTION_POLICY,                           "FCFS"},
-                {MultihostMulticoreComputeServiceProperty::RESOURCE_ALLOCATION_POLICY,                     "aggressive"},
-                {MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM,      "maximum"},
-                {MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_TASK_SELECTION_ALGORITHM,       "maximum_flops"},
-                {MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_HOST_SELECTION_ALGORITHM,       "best_fit"},
         };
 
         std::map<std::string, std::string> default_messagepayload_values = {
@@ -77,7 +72,7 @@ namespace wrench {
 
         // Public Constructor
         MultihostMulticoreComputeService(const std::string &hostname,
-                                         const std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
+                                         const std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
                                          double scratch_space_size,
                                          std::map<std::string, std::string> property_list = {},
                                          std::map<std::string, std::string> messagepayload_list = {}
@@ -118,7 +113,7 @@ namespace wrench {
 
         // Low-level Constructor
         MultihostMulticoreComputeService(const std::string &hostname,
-                                         std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
+                                         std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
                                          std::map<std::string, std::string> property_list,
                                          std::map<std::string, std::string> messagepayload_list,
                                          double ttl,
@@ -127,20 +122,29 @@ namespace wrench {
 
         // Private Constructor
         MultihostMulticoreComputeService(const std::string &hostname,
-                                         std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
+                                         std::set<std::string> compute_hosts,
+                                         std::map<std::string, std::string> property_list,
+                                         std::map<std::string, std::string> messagepayload_list,
+                                         StorageService* scratch_space);
+
+
+        // Private Constructor
+        MultihostMulticoreComputeService(const std::string &hostname,
+                                         std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
                                          std::map<std::string, std::string> property_list,
                                          std::map<std::string, std::string> messagepayload_list,
                                          StorageService* scratch_space);
 
         // Low-level constructor helper method
         void initiateInstance(const std::string &hostname,
-                              std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
+                              std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
                               std::map<std::string, std::string> property_list,
                               std::map<std::string, std::string> messagepayload_list,
                               double ttl,
                               PilotJob *pj);
 
-        std::set<std::tuple<std::string, unsigned long, double>> compute_resources;
+
+        std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
 
         // Core availabilities (for each hosts, how many cores and how many bytes of RAM are currently available on it)
         std::map<std::string, std::pair<unsigned long, double>> core_and_ram_availabilities;
@@ -154,16 +158,14 @@ namespace wrench {
         PilotJob *containing_pilot_job; // In case this service is in fact a pilot job
         std::set<WorkflowFile*> files_in_scratch; // Files stored in scratch, here only used by a pilot job, because for standard jobs, they will be deleted inside standardjobs
 
-        // Set of current standard job executors
-        std::set<std::shared_ptr<StandardJobExecutor>> standard_job_executors;
-        // Set of completed standard job executors
-        std::set<std::shared_ptr<StandardJobExecutor>> completed_job_executors;
-
         // Set of running jobs
         std::set<WorkflowJob *> running_jobs;
 
-        // Queue of pending jobs (standard or pilot) that haven't begun executing
-        std::deque<WorkflowJob *> pending_jobs;
+        // Map of all Workunits
+        std::map<WorkflowJob *, std::set<std::unique_ptr<Workunit>>> all_workunits;
+
+        // Set of running WorkunitExecutors
+        std::map<WorkflowJob *, std::set<std::shared_ptr<WorkunitExecutor>>> workunit_executors;
 
         // Add the scratch files of one standardjob to the list of all the scratch files of all the standard jobs inside the pilot job
         void storeFilesStoredInScratch(std::set<WorkflowFile*> scratch_files);
@@ -177,8 +179,6 @@ namespace wrench {
 
         void terminate(bool notify_pilot_job_submitters);
 
-        void terminateAllPilotJobs();
-
         void failCurrentStandardJobs();
 
         void processStandardJobCompletion(StandardJobExecutor *executor, StandardJob *job);
@@ -191,22 +191,11 @@ namespace wrench {
 
         void processStandardJobTerminationRequest(StandardJob *job, const std::string &answer_mailbox);
 
-        void processPilotJobTerminationRequest(PilotJob *job, const std::string &answer_mailbox);
-
         bool processNextMessage();
 
-        bool dispatchNextPendingJob();
+        void dispatchReadyWorkunits();
 
-        bool dispatchStandardJob(StandardJob *job);
-
-        bool dispatchPilotJob(PilotJob *job);
-
-        std::set<std::tuple<std::string, unsigned long, double>> computeResourceAllocation(StandardJob *job);
-
-        std::set<std::tuple<std::string, unsigned long, double>> computeResourceAllocationAggressive(StandardJob *job);
-
-
-//        void createWorkForNewlyDispatchedJob(StandardJob *job);
+        void processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job, std::map<std::string, std::string> service_specific_args);
 
         /** @brief Reasons why a standard job could be terminated */
         enum JobTerminationCause {
@@ -219,10 +208,6 @@ namespace wrench {
 
         void terminateRunningStandardJob(StandardJob *job, JobTerminationCause termination_cause);
 
-        void terminateRunningPilotJob(PilotJob *job);
-
-        void failPendingStandardJob(StandardJob *job, std::shared_ptr<FailureCause> cause);
-
         void failRunningStandardJob(StandardJob *job, std::shared_ptr<FailureCause> cause);
 
         void processGetResourceInformation(const std::string &answer_mailbox);
@@ -230,7 +215,6 @@ namespace wrench {
         void processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
                                       std::map<std::string, std::string> &service_specific_arguments);
 
-        void processSubmitPilotJob(const std::string &answer_mailbox,  PilotJob *job);
     };
 };
 
