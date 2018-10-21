@@ -64,7 +64,7 @@ namespace wrench {
         void kill();
 
         StandardJob *getJob();
-        std::set<std::tuple<std::string, unsigned long, double>> getComputeResources();
+        std::map<std::string, std::tuple<unsigned long, double>> getComputeResources();
 
         // Get the set of files stored in scratch space by a standardjob job
         std::set<WorkflowFile*> getFilesInScratch();
@@ -76,7 +76,7 @@ namespace wrench {
 
         std::string callback_mailbox;
         StandardJob *job;
-        std::set<std::tuple<std::string, unsigned long, double>> compute_resources;
+        std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
         int total_num_cores;
         double total_ram;
         StorageService *scratch_space;

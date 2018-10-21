@@ -86,22 +86,22 @@ namespace wrench {
 
       // Create the cleanup workunit, if any
       if (not job->cleanup_file_deletions.empty()) {
-        cleanup_workunit = new Workunit({}, nullptr, {}, {}, job->cleanup_file_deletions);
+        cleanup_workunit = new Workunit(job, {}, nullptr, {}, {}, job->cleanup_file_deletions);
       }
 
       // Create the pre_file_copies work unit, if any
       if (not job->pre_file_copies.empty()) {
-        pre_file_copies_work_unit = new Workunit(job->pre_file_copies, nullptr, {}, {}, {});
+        pre_file_copies_work_unit = new Workunit(job, job->pre_file_copies, nullptr, {}, {}, {});
       }
 
       // Create the post_file_copies work unit, if any
       if (not job->post_file_copies.empty()) {
-        post_file_copies_work_unit = new Workunit({}, nullptr, {}, job->post_file_copies, {});
+        post_file_copies_work_unit = new Workunit(job, {}, nullptr, {}, job->post_file_copies, {});
       }
 
       // Create the task work units, if any
       for (auto const &task : job->tasks) {
-        task_work_units.push_back(new Workunit({}, task, job->file_locations, {}, {}));
+        task_work_units.push_back(new Workunit(job, {}, task, job->file_locations, {}, {}));
       }
 
       // Add dependencies between task work units, if any
@@ -160,6 +160,14 @@ namespace wrench {
 
       return all_work_units;
 
+    }
+
+    /**
+     * @brief Retrieve the standard job this workunit belongs to
+     * @return a standard job
+     */
+    StandardJob *Workunit::getJob() {
+      return this->job;
     }
 
 };

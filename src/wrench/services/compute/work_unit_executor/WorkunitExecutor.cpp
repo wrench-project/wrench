@@ -55,7 +55,7 @@ namespace wrench {
             std::string callback_mailbox,
             Workunit *workunit,
             StorageService *scratch_space,
-            WorkflowJob* job,
+            StandardJob* job,
             double thread_startup_overhead,
             bool simulate_computation_as_sleep) :
             Service(hostname, "workunit_multicore_executor", "workunit_multicore_executor") {
@@ -486,6 +486,14 @@ namespace wrench {
      */
     std::set<WorkflowFile *> WorkunitExecutor::getFilesStoredInScratch() {
       return this->files_stored_in_scratch;
+    }
+
+    /**
+     * @brief Retrieve the job the WorkunitExecutor is working for
+     * @return a job
+     */
+    StandardJob *WorkunitExecutor::getJob() {
+      return this->job;
     }
 
 };

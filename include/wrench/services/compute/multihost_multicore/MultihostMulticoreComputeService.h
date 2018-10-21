@@ -159,13 +159,13 @@ namespace wrench {
         std::set<WorkflowFile*> files_in_scratch; // Files stored in scratch, here only used by a pilot job, because for standard jobs, they will be deleted inside standardjobs
 
         // Set of running jobs
-        std::set<WorkflowJob *> running_jobs;
+        std::set<StandardJob *> running_jobs;
 
         // Map of all Workunits
-        std::map<WorkflowJob *, std::set<std::unique_ptr<Workunit>>> all_workunits;
+        std::map<StandardJob *, std::set<std::unique_ptr<Workunit>>> all_workunits;
 
         // Set of running WorkunitExecutors
-        std::map<WorkflowJob *, std::set<std::shared_ptr<WorkunitExecutor>>> workunit_executors;
+        std::map<StandardJob *, std::set<std::shared_ptr<WorkunitExecutor>>> workunit_executors;
 
         // Add the scratch files of one standardjob to the list of all the scratch files of all the standard jobs inside the pilot job
         void storeFilesStoredInScratch(std::set<WorkflowFile*> scratch_files);
@@ -181,13 +181,12 @@ namespace wrench {
 
         void failCurrentStandardJobs();
 
-        void processStandardJobCompletion(StandardJobExecutor *executor, StandardJob *job);
+        void processWorkunitExecutorCompletion(WorkunitExecutor *workunit_executor, Workunit *workunit);
 
-        void processStandardJobFailure(StandardJobExecutor *executor,
-                                       StandardJob *job,
-                                       std::shared_ptr<FailureCause> cause);
+        void processWorkunitExecutorFailure(WorkunitExecutor *workunit_executor, Workunit *workunit, std::shared_ptr<FailureCause> cause);
 
-        void processPilotJobCompletion(PilotJob *job);
+        void forgetWorkunitExecutor(WorkunitExecutor *workunit_executor);
+
 
         void processStandardJobTerminationRequest(StandardJob *job, const std::string &answer_mailbox);
 
@@ -195,7 +194,6 @@ namespace wrench {
 
         void dispatchReadyWorkunits();
 
-        void processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job, std::map<std::string, std::string> service_specific_args);
 
         /** @brief Reasons why a standard job could be terminated */
         enum JobTerminationCause {
@@ -211,6 +209,8 @@ namespace wrench {
         void failRunningStandardJob(StandardJob *job, std::shared_ptr<FailureCause> cause);
 
         void processGetResourceInformation(const std::string &answer_mailbox);
+
+        void processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job, std::map<std::string, std::string> service_specific_args);
 
         void processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
                                       std::map<std::string, std::string> &service_specific_arguments);
