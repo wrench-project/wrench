@@ -12,17 +12,6 @@ function parseFile(path) {
     
 }
 
-function prepareForGraph(data) {
-    var keys = ['read', 'compute', 'write', 'whole_task'];
-
-    data.forEach(function(task) {
-        task.start = task['whole_task'].start;
-        keys.forEach(function(k) {
-            task[k] = task[k].end - task[k].start;
-        });
-    });
-}
-
 function addToHTMLFile(data) {
     var fileContents = fs.readFileSync("scripts.js"); //read existing contents into data
     fileContents = fileContents.toString().split('\n').slice(1).join('\n'); //remove first line
@@ -38,8 +27,6 @@ function addToHTMLFile(data) {
 
 parseFile("gautam.json")
     .then(function(content) {
-        // prepareForGraph(content);
-        // console.log(content);
         addToHTMLFile(content);
     })
     .catch(function(err) {
