@@ -18,6 +18,7 @@
 #include <fstream>
 #include <algorithm>
 #include <vector>
+#include <cmath>
 
 namespace wrench {
 
@@ -106,14 +107,14 @@ namespace wrench {
     }
 
     /**
-     * @brief Determines if two line segments overlap
+     * @brief Determines if two line segments overlap along the x-axis and allows for a slight overlap.
      * @param segment1: first segment
      * @param segment2: second segment
      * @return bool
      */
-    bool isSegmentOverlapping(std::pair<unsigned long long, unsigned long long> segment1, std::pair<unsigned long long, unsigned long long> segment2) {
-        // segments can be touching at their endpoints
-        if (segment1.second == segment2.first or segment2.second == segment1.first) {
+    bool isSegmentOverlappingXAxis(std::pair<unsigned long long, unsigned long long> segment1, std::pair<unsigned long long, unsigned long long> segment2) {
+        const unsigned long long EPSILON = 1000 * 1000 * 10;
+        if (std::fabs(segment1.second - segment2.first) <= EPSILON or std::fabs(segment2.second -  segment1.first) <= EPSILON) {
             return false;
 
         // if any point of either segment lies within the other, we have overlap
@@ -122,6 +123,26 @@ namespace wrench {
             return true;
 
         // the two segments do not overlap
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * @brief Determines if two line segments overlap along the y-axis using exact values.
+     * @param segment1: first segment
+     * @param segment2: second segment
+     * @return bool
+     */
+    bool isSegmentOverlappingYAxis(std::pair<unsigned long long, unsigned long long> segment1, std::pair<unsigned long long, unsigned long long> segment2) {
+        if (segment1.second == segment2.first or segment2.second == segment1.first) {
+            return false;
+            // if any point of either segment lies within the other, we have overlap
+        } else if (isPointOnSegment(segment1, segment2.first) or isPointOnSegment(segment1, segment2.second) or
+                   isPointOnSegment(segment2, segment1.first) or isPointOnSegment(segment2, segment1.second)) {
+            return true;
+
+            // the two segments do not overlap
         } else {
             return false;
         }
@@ -139,7 +160,7 @@ namespace wrench {
      * @return bool
      */
     bool searchForLayout(std::vector<WorkflowTaskExecutionInstance> &data, std::size_t index) {
-        const unsigned long long PRECISION = 1000;
+        const unsigned long long PRECISION = 1000 * 1000 * 1000;
 
         WorkflowTaskExecutionInstance &current_execution_instance = data.at(index);
 
@@ -167,7 +188,6 @@ namespace wrench {
        * we have found a valid layout.
        */
         for (std::size_t vertical_position = 0; vertical_position < num_vertical_positions; ++vertical_position) {
-
             // Set the vertical positions as we go so the entire graph layout is set when the function returns
             current_execution_instance.vertical_position = vertical_position;
 
@@ -202,8 +222,8 @@ namespace wrench {
                      * Check overlap for the x_ranges first. If there is no overlap, we can guarantee that the rectangles
                      * will not overlap. If the x_ranges do overlap, then we need to evaluate the y_ranges for overlap.
                      */
-                    if (isSegmentOverlapping(current_rect_x_range, other_rect_x_range)) {
-                        if (isSegmentOverlapping(current_rect_y_range, other_rect_y_range)) {
+                    if (isSegmentOverlappingXAxis(current_rect_x_range, other_rect_x_range)) {
+                        if (isSegmentOverlappingYAxis(current_rect_y_range, other_rect_y_range)) {
                             has_overlap = true;
                             break;
                         }
