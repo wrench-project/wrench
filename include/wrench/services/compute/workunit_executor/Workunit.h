@@ -46,6 +46,8 @@ namespace wrench {
 
         static std::set<std::unique_ptr<Workunit>> createWorkunits(StandardJob *job);
 
+        StandardJob *getJob();
+
         /** @brief The StandardJob this Workunit belongs to */
         StandardJob *job;
 

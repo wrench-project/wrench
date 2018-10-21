@@ -164,7 +164,7 @@ namespace wrench {
      * @brief Get the resources allocated to this batch job
      * @return a list of resource, each as a <hostname, number of cores, bytes of RAM> tuple
      */
-    std::set<std::tuple<std::string, unsigned long, double>> BatchJob::getResourcesAllocated() {
+    std::map<std::string, std::tuple<unsigned long, double>> BatchJob::getResourcesAllocated() {
       return this->resources_allocated;
     }
 
@@ -172,7 +172,7 @@ namespace wrench {
      * @brief Set the resources allocated to this batch job
      * @param resources: a list of resource, each as a <hostname, number of cores, bytes of RAM> tuple
      */
-    void BatchJob::setAllocatedResources(std::set<std::tuple<std::string, unsigned long, double>> resources) {
+    void BatchJob::setAllocatedResources(std::map<std::string, std::tuple<unsigned long, double>> resources) {
       if (resources.empty()) {
         throw std::invalid_argument(
                 "BatchJob::setAllocatedResources(): Empty Resources allocated"

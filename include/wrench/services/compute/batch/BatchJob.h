@@ -32,8 +32,8 @@ namespace wrench {
         unsigned long getNumNodes();
         WorkflowJob* getWorkflowJob();
         void setEndingTimeStamp(double);
-        std::set<std::tuple<std::string,unsigned long, double>> getResourcesAllocated();
-        void setAllocatedResources(std::set<std::tuple<std::string,unsigned long, double>>);
+        std::map<std::string, std::tuple<unsigned long, double>> getResourcesAllocated();
+        void setAllocatedResources(std::map<std::string, std::tuple<unsigned long, double>>);
 
     private:
         unsigned long jobid;
@@ -44,7 +44,7 @@ namespace wrench {
         double begin_time_stamp;
         double ending_time_stamp;
         double arrival_time_stamp;
-        std::set<std::tuple<std::string,unsigned long, double>> resources_allocated;
+        std::map<std::string, std::tuple<unsigned long, double>> resources_allocated;
 
     public:
         // Variables below are for the BatSim-style CVS output log file (only ifdef ENABLED_BATSCHED)
