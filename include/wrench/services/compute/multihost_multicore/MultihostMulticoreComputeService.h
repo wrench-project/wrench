@@ -162,8 +162,17 @@ namespace wrench {
         // Set of running jobs
         std::set<StandardJob *> running_jobs;
 
+        // Job task execution specs
+        std::map<StandardJob *, std::map<WorkflowTask *, std::tuple<std::string, unsigned long>>> job_run_specs;
+
         // Map of all Workunits
         std::map<StandardJob *, std::set<std::unique_ptr<Workunit>>> all_workunits;
+
+        std::map<StandardJob *, std::set<Workunit *>> ready_workunits;
+        std::map<StandardJob *, std::set<Workunit *>> running_workunits;
+        std::map<StandardJob *, std::set<Workunit *>> completed_workunits;
+
+        std::map<std::string, double> ram_availabilities;
 
         // Set of running WorkunitExecutors
         std::map<StandardJob *, std::set<std::shared_ptr<WorkunitExecutor>>> workunit_executors;

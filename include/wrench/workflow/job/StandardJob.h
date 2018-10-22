@@ -88,6 +88,7 @@ namespace wrench {
     private:
 
         friend class StandardJobExecutor;
+        friend class MultihostMulticoreComputeService;
 
         void incrementNumCompletedTasks();
 
