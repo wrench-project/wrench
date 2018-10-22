@@ -32,6 +32,14 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(multicore_compute_service, "Log category for Multic
 namespace wrench {
 
     /**
+     * @brief Destructor
+     */
+    MultihostMulticoreComputeService::~MultihostMulticoreComputeService() {
+      this->default_property_values.clear();
+    }
+
+
+    /**
      * @brief Helper static function to parse resource specifications to the <cores,ram> format
      * @param spec: specification string
      * @return a <cores, ram> tuple
@@ -40,23 +48,46 @@ namespace wrench {
     static std::tuple<std::string, unsigned long> parseResourceSpec(std::string spec) {
       std::vector<std::string> tokens;
       boost::algorithm::split(tokens, spec, boost::is_any_of(":"));
-      if (tokens.size() != 2) {
-        throw std::invalid_argument("Invalid service-specific argument '" + spec +"'");
+      switch (tokens.size()) {
+        case 1: // "num_cores"
+        {
+          unsigned long num_threads;
+          if (sscanf(tokens[1].c_str(), "%lu", &num_threads) != 1) {
+            throw std::invalid_argument("Invalid service-specific argument '" + spec + "'");
+          }
+          return std::make_tuple(std::string(""), num_threads);
+        }
+        case 2: // "hostname:num_cores"
+        {
+          unsigned long num_threads;
+          if (sscanf(tokens[1].c_str(), "%lu", &num_threads) != 1) {
+            throw std::invalid_argument("Invalid service-specific argument '" + spec + "'");
+          }
+          return std::make_tuple(tokens[0], num_threads);
+        }
+        default:
+        {
+          throw std::invalid_argument("Invalid service-specific argument '" + spec +"'");
+        }
       }
-      std::string hostname = tokens[0];
-      unsigned long num_threads;
-
-      if (sscanf(tokens[1].c_str(), "%lu", &num_threads) != 1) {
-        throw std::invalid_argument("Invalid service-specific argument '" + spec + "'");
-      }
-      return std::make_tuple(hostname, num_threads);
     }
 
 
     /**
      * @brief Submit a standard job to the compute service
      * @param job: a standard job
-     * @param service_specific_args: service specific arguments ({} most likely)
+     * @param service_specific_args: optional service specific arguments
+     *
+     *    These arguments are provided as a map of strings, indexed by task IDs. These
+     *    strings are formatted as "[hostname:]num_cores" (e.g., "somehost:12", "6"). If this
+     *    argument is provided  for a task, this will enforce the execution of that task on that host with that
+     *    number of cores.  If the hostname is not provided, then the host will be chosen
+     *    arbitrarily by the compute service. If the specified number of cores is larger than
+     *    the maximum number of cores available on the host, then it will be capped to that number.
+     *    If the specified number of cores is larger than the maximum number of cores usable by the
+     *    task, then it will be capped to that number. If this argument is not provided at all for
+     *    a task, then that task will execute on an arbitrarily chosen host with as many
+     *    cores as possible on that host.
      *
      * @throw WorkflowExecutionException
      * @throw std::invalid_argument
@@ -69,31 +100,52 @@ namespace wrench {
         throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
       }
 
-      /* Check that the service-specific args are specific and well-formatted */
-      for (auto t : job->getTasks()) {
-        if (service_specific_args.find(t->getID()) == service_specific_args.end()) {
-          throw std::invalid_argument("Service-specific argument map should contain an entry for task '" + t->getID() + "'");
-        }
-        std::tuple<std::string, unsigned long> parsed_spec;
+      /* parse and update service-specific args are provided and well-formatted */
+      std::map<std::string, std::string> finalized_service_specific_arguments;
 
-        try {
-          parsed_spec = parseResourceSpec(service_specific_args[t->getID()]);
-        } catch (std::invalid_argument &e) {
-          throw;
-        }
-
-        std::string hostname = std::get<0>(parsed_spec);
-        unsigned long num_threads = std::get<1>(parsed_spec);
-
-        if (this->compute_resources.find(hostname) == this->compute_resources.end()) {
-          throw std::invalid_argument("Invalid service-specific argument '" + service_specific_args[t->getID()] + "' for task '" + t->getID() + "': no such host");
-        }
-
-        // At this point, there may still be insufficient resources to run the task, but that will
-        // be handled later (and a WorkflowExecutionError with a "not enough resources" FailureCause
-        // may be generated.
-
+      std::vector<std::string> available_hosts;
+      for (auto r: this->compute_resources) {
+        available_hosts.push_back(r.first);
       }
+      size_t current_picked_host = 0;
+      for (auto t : job->getTasks()) {
+        std::string target_host;
+        unsigned long target_num_cores;
+
+        if (service_specific_args.find(t->getID()) == service_specific_args.end()) {
+          // Pick a host
+          target_host = available_hosts.at(current_picked_host++);
+          // Pick a number of cores
+          target_num_cores =
+                  std::min<unsigned long>(t->getMaxNumCores(),
+                                          std::get<0>(this->compute_resources[target_host]));
+
+        } else {
+          std::tuple<std::string, unsigned long> parsed_spec;
+
+          try {
+            parsed_spec = parseResourceSpec(service_specific_args[t->getID()]);
+          } catch (std::invalid_argument &e) {
+            throw;
+          }
+
+          target_host = std::get<0>(parsed_spec);
+          if (target_host.empty()) {
+            target_host = available_hosts.at(current_picked_host++);
+          }
+
+          if (this->compute_resources.find(target_host) == this->compute_resources.end()) {
+            throw std::invalid_argument(
+                    "Invalid service-specific argument '" + service_specific_args[t->getID()] + "' for task '" +
+                    t->getID() + "': no such host");
+          }
+          target_num_cores = std::get<1>(parsed_spec);
+        }
+      }
+
+      // At this point, there may still be insufficient resources to run the task, but that will
+      // be handled later (and a WorkflowExecutionError with a "not enough resources" FailureCause
+      // may be generated.
 
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_standard_job");
 
@@ -128,12 +180,6 @@ namespace wrench {
     }
 
 
-    /**
-     * @brief Destructor
-     */
-    MultihostMulticoreComputeService::~MultihostMulticoreComputeService() {
-      this->default_property_values.clear();
-    }
 
     /**
      * @brief Asynchronously submit a pilot job to the compute service
@@ -859,10 +905,15 @@ namespace wrench {
                                                                              Workunit *workunit) {
       StandardJob *job = workunit_executor->getJob();
 
+      // Get the scratch files that executor may have generated
+      for (auto &f : workunit_executor->getFilesStoredInScratch()) {
+        this->files_in_scratch.insert(f);
+      }
       // Forget the workunit executor
       forgetWorkunitExecutor(workunit_executor);
 
       // TODO: DEAL WITH WORKUNIT
+
 
       // Send the callback to the originator
       try {
@@ -889,14 +940,15 @@ namespace wrench {
                                                                           std::shared_ptr<FailureCause> cause) {
       StandardJob *job = workunit_executor->getJob();
 
+      // Get the scratch files that executor may have generated
+      for (auto &f : workunit_executor->getFilesStoredInScratch()) {
+        this->files_in_scratch.insert(f);
+      }
       // Forget the workunit executor
       forgetWorkunitExecutor(workunit_executor);
 
-
-
       // Fail the job
       this->failRunningStandardJob(job, std::move(cause));
-
 
     }
 
@@ -1076,53 +1128,53 @@ namespace wrench {
  */
     void MultihostMulticoreComputeService::processGetResourceInformation(const std::string &answer_mailbox) {
       // Build a dictionary
-      std::map<std::string, std::vector<double>> dict;
+      std::map<std::string, std::map<std::string, double>> dict;
 
       // Num hosts
-      std::vector<double> num_hosts;
-      num_hosts.push_back((double) (this->compute_resources.size()));
+      std::map<std::string, double> num_hosts;
+      num_hosts.insert(std::make_pair(this->getName(), this->compute_resources.size()));
       dict.insert(std::make_pair("num_hosts", num_hosts));
 
       // Num cores per hosts
-      std::vector<double> num_cores;
+      std::map<std::string, double> num_cores;
       for (auto r : this->compute_resources) {
-        num_cores.push_back((double) (std::get<0>(r.second)));
+        num_cores.insert(std::make_pair(r.first, (double) (std::get<0>(r.second))));
       }
       dict.insert(std::make_pair("num_cores", num_cores));
 
       // Num idle cores per hosts
-      std::vector<double> num_idle_cores;
+      std::map<std::string, double> num_idle_cores;
       for (auto r : this->core_and_ram_availabilities) {
-        num_idle_cores.push_back(std::get<0>(r.second));
+        num_idle_cores.insert(std::make_pair(r.first, std::get<0>(r.second)));
       }
       dict.insert(std::make_pair("num_idle_cores", num_idle_cores));
 
       // Flop rate per host
-      std::vector<double> flop_rates;
+      std::map<std::string, double> flop_rates;
       for (auto h : this->compute_resources) {
-        flop_rates.push_back(S4U_Simulation::getHostFlopRate(std::get<0>(h)));
+        flop_rates.insert(std::make_pair(h.first, S4U_Simulation::getHostFlopRate(std::get<0>(h))));
       }
       dict.insert(std::make_pair("flop_rates", flop_rates));
 
       // RAM capacity per host
-      std::vector<double> ram_capacities;
+      std::map<std::string, double> ram_capacities;
       for (auto h : this->compute_resources) {
-        ram_capacities.push_back(S4U_Simulation::getHostMemoryCapacity(std::get<0>(h)));
+        ram_capacities.insert(std::make_pair(h.first, S4U_Simulation::getHostMemoryCapacity(std::get<0>(h))));
       }
       dict.insert(std::make_pair("ram_capacities", ram_capacities));
 
       // RAM availability per host
-      std::vector<double> ram_availabilities;
+      std::map<std::string, double> ram_availabilities;
       for (auto r : this->core_and_ram_availabilities) {
-        ram_availabilities.push_back(std::get<1>(r.second));
+        ram_availabilities.insert(std::make_pair(r.first, std::get<1>(r.second)));
       }
       dict.insert(std::make_pair("ram_availabilities", ram_availabilities));
 
-      std::vector<double> ttl;
+      std::map<std::string, double> ttl;
       if (this->has_ttl) {
-        ttl.push_back(this->death_date - S4U_Simulation::getClock());
+        ttl.insert(std::make_pair(this->getName(), this->death_date - S4U_Simulation::getClock()));
       } else {
-        ttl.push_back(ComputeService::ALL_RAM);
+        ttl.insert(std::make_pair(this->getName(), DBL_MAX));
       }
       dict.insert(std::make_pair("ttl", ttl));
 
@@ -1154,17 +1206,10 @@ namespace wrench {
  *        executed inside me
  */
     void MultihostMulticoreComputeService::cleanUpScratch() {
-      // First fetch all the files stored in scratch by all the workunit executors running inside a standardjob
-      // Files in scratch by finished workunit executors
-      for (const auto &completed_job_executor : this->completed_job_executors) {
-        auto files_in_scratch_by_single_workunit = completed_job_executor->getFilesInScratch();
-        this->files_in_scratch.insert(files_in_scratch_by_single_workunit.begin(),
-                                      files_in_scratch_by_single_workunit.end());
-      }
 
-      for (auto scratch_cleanup_file : this->files_in_scratch) {
+      for (auto &f : this->files_in_scratch) {
         try {
-          getScratch()->deleteFile(scratch_cleanup_file, this->containing_pilot_job, nullptr);
+          getScratch()->deleteFile(f, this->containing_pilot_job, nullptr);
         } catch (WorkflowExecutionException &e) {
           throw;
         }
@@ -1194,44 +1239,19 @@ namespace wrench {
                                     this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::THREAD_STARTUP_OVERHEAD));
       }
 
-      // Job selection policy
-      if (this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::JOB_SELECTION_POLICY) != "FCFS") {
-        throw std::invalid_argument("Invalid JOB_SELECTION_POLICY property specification: " +
-                                    this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::JOB_SELECTION_POLICY));
-      }
-
-      // Resource allocation policy
-      if (this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::RESOURCE_ALLOCATION_POLICY) != "aggressive") {
-        throw std::invalid_argument("Invalid RESOURCE_ALLOCATION_POLICY property specification: " +
-                                    this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::RESOURCE_ALLOCATION_POLICY));
-      }
-
-      // Core allocation algorithm
-      if ((this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM) != "maximum") and
-          (this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM) != "minimum")) {
-        throw std::invalid_argument("Invalid TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM property specification: " +
-                                    this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM));
-      }
-
-      // Task selection algorithm
-      if ((this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_TASK_SELECTION_ALGORITHM) != "maximum_flops") and
-          (this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_TASK_SELECTION_ALGORITHM) != "maximum_minimum_cores")) {
-        throw std::invalid_argument("Invalid TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM property specification: " +
-                                    this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_TASK_SELECTION_ALGORITHM));
-      }
-
-      // Host selection algorithm
-      if (this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_HOST_SELECTION_ALGORITHM) != "best_fit") {
-        throw std::invalid_argument("Invalid TASK_SCHEDULING_HOST_SELECTION_ALGORITHM property specification: " +
-                                    this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_HOST_SELECTION_ALGORITHM));
-      }
-
       // Supporting Pilot jobs
       if (this->getPropertyValueAsBoolean(MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS)) {
         throw std::invalid_argument("Invalid SUPPORTS_PILOT_JOBS property specification: a BareMetalService cannot support pilot jobs");
       }
 
-      return;
+    }
+
+    /**
+     * @brief non-implemented
+     * @param job: a pilot job to (supposedly) terminate
+     */
+    void MultihostMulticoreComputeService::terminatePilotJob(PilotJob *job) {
+      throw std::runtime_error("MultihostMulticoreComputeService::terminatePilotJob(): not implemented because MultihostMulticoreComputeService never supports pilot jobs");
     }
 
 

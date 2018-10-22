@@ -194,7 +194,7 @@ void SimpleStorageServicePerformanceTest::do_ConcurrentFileCopies_test() {
   // Create a (unused) Compute Service
   ASSERT_NO_THROW(compute_service = simulation->add(
                   new wrench::MultihostMulticoreComputeService("WMSHost",
-                                                               {std::make_tuple("WMSHost", wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)}, {})));
+                                                               {std::make_pair("WMSHost", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))}, {})));
 
   // Create Two Storage Services
   ASSERT_NO_THROW(storage_service_1 = simulation->add(

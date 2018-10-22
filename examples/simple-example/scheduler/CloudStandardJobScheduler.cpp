@@ -53,8 +53,10 @@ namespace wrench {
 
         // Check that it can run it right now in terms of idle cores
         try {
-          std::vector<unsigned long> num_idle_cores = compute_service->getNumIdleCores();
-          sum_num_idle_cores = (unsigned long) std::accumulate(num_idle_cores.begin(), num_idle_cores.end(), 0);
+          std::map<std::string, unsigned long> num_idle_cores = compute_service->getNumIdleCores();
+          for (auto const &ic : num_idle_cores) {
+            sum_num_idle_cores += ic.second;
+          }
         } catch (WorkflowExecutionException &e) {
           // The service has some problem, forget it
           throw std::runtime_error("Unable to get the number of idle cores.");

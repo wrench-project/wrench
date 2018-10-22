@@ -182,10 +182,10 @@ void HTCondorServiceTest::do_StandardJobTaskTest_test() {
   execution_hosts.push_back(execution_host);
   compute_services.insert(new wrench::MultihostMulticoreComputeService(
           execution_host,
-          {std::make_tuple(
+          {std::make_pair(
                   execution_host,
-                  wrench::Simulation::getHostNumCores(execution_host),
-                  wrench::Simulation::getHostMemoryCapacity(execution_host))},
+                  std::make_tuple(wrench::Simulation::getHostNumCores(execution_host),
+                  wrench::Simulation::getHostMemoryCapacity(execution_host)))},
           100000000000.0));
 
   // Create a HTCondor Service

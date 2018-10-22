@@ -60,7 +60,7 @@ namespace wrench {
       event_receiver->start(event_receiver, true); // Daemonize!
 
 
-      double core_flop_rate = *(this->batch_service->getCoreFlopRate().begin());
+      double core_flop_rate = (*(this->batch_service->getCoreFlopRate().begin())).second;
 
       unsigned long job_count = 0;
 

@@ -156,7 +156,8 @@ namespace wrench {
         std::shared_ptr<Alarm> death_alarm = nullptr;
 
         PilotJob *containing_pilot_job; // In case this service is in fact a pilot job
-        std::set<WorkflowFile*> files_in_scratch; // Files stored in scratch, here only used by a pilot job, because for standard jobs, they will be deleted inside standardjobs
+        std::set<WorkflowFile*> files_in_scratch; // Files stored in scratch, here only used by a pilot job, because for standard jobs,
+                                                  // they will be deleted as a matter of course
 
         // Set of running jobs
         std::set<StandardJob *> running_jobs;
