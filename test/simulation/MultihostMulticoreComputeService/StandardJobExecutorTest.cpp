@@ -630,7 +630,7 @@ private:
 
         // Doe the task-stored time information look good
         if (!StandardJobExecutorTest::isJustABitGreaterThanOrEqual(before, task->getStartDate())) {
-          std::cerr << "START: " << task->getStartDate() << std::endl;
+//          std::cerr << "START: " << task->getStartDate() << std::endl;
           throw std::runtime_error(
                   "Case 1: Unexpected task start date: " + std::to_string(task->getStartDate()) + "| " +
                   "before: " + std::to_string(before));
