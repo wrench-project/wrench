@@ -107,6 +107,7 @@ namespace wrench {
       for (auto r: this->compute_resources) {
         available_hosts.push_back(r.first);
       }
+
       size_t current_picked_host = 0;
       for (auto t : job->getTasks()) {
         std::string target_host;
@@ -141,6 +142,8 @@ namespace wrench {
           }
           target_num_cores = std::get<1>(parsed_spec);
         }
+        finalized_service_specific_arguments.insert(std::make_pair(t->getID(),
+                                                    target_host + " : " + std::to_string(target_num_cores)));
       }
 
       // At this point, there may still be insufficient resources to run the task, but that will
@@ -153,7 +156,7 @@ namespace wrench {
       try {
         S4U_Mailbox::putMessage(this->mailbox_name,
                                 new ComputeServiceSubmitStandardJobRequestMessage(
-                                        answer_mailbox, job, service_specific_args,
+                                        answer_mailbox, job, finalized_service_specific_arguments,
                                         this->getMessagePayloadValueAsDouble(
                                                 ComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
@@ -468,14 +471,12 @@ namespace wrench {
         this->compute_resources.insert(std::make_pair(hname, std::make_tuple(requested_cores, requested_ram)));
       }
 
-      // Compute the total number of cores and set initial core (and ram) availabilities
+      // Compute the total number of cores and set initial ram availabilities
       this->total_num_cores = 0;
       for (auto host : this->compute_resources) {
         this->total_num_cores += std::get<0>(host.second);
-        this->core_and_ram_availabilities.insert(std::make_pair(
-                host.first, std::make_pair(std::get<0>(host.second),
-                                           S4U_Simulation::getHostMemoryCapacity(
-                                                   host.first))));
+        this->ram_availabilities.insert(std::make_pair(
+                host.first, S4U_Simulation::getHostMemoryCapacity(host.first)));
       }
 
       this->ttl = ttl;
@@ -521,44 +522,33 @@ namespace wrench {
     }
 
     /**
-     *
+     * @brief: Dispatch ready work units
      */
     void MultihostMulticoreComputeService::dispatchReadyWorkunits() {
 
-      for (auto const &wus : this->all_workunits) {
-        StandardJob *job = wus.first;
-        for (auto const &wu: wus.second) {
+      // Don't kill me while I am doing this
+      this->acquireDaemonLock();
 
-          /** If the task is not ready, continue */
-          if (wu->num_pending_parents != 0) {
-            continue;
-          }
-
-          /** Figure out what resources it needs */
+      // TODO: TO IMPLEMENT
+      for (auto const &j : this->ready_workunits) {
+        StandardJob *job = j.first;
+        std::set<Workunit*> dispatched_wus_for_job;
+        for (auto const &wu : j.second) {
           std::string required_host;
           unsigned long required_num_cores;
           double required_ram;
-          // If it contains a task, then get the submitted service-specific argument
-          if (wu->task) {
-            if (job->getServiceSpecificArguments().find(wu->task->getID()) == job->getServiceSpecificArguments().end()) {
-              throw std::runtime_error("MultihostMulticoreComputeService::dispatchReadyWorkunits(): Invalid job-specific argument: no host found for task '" + wu->task->getID() + "'");
-            }
-            std::string resource_spec = job->getServiceSpecificArguments()[wu->task->getID()];
-            std::tuple<std::string, unsigned long> parsed_spec;
-
-            try {
-              parsed_spec = parseResourceSpec(resource_spec);
-            } catch (std::invalid_argument &e) {
-              throw;
-            }
-
-            required_host = std::get<0>(parsed_spec);
-            required_num_cores = std::get<1>(parsed_spec);
-            required_ram = wu->task->getMemoryRequirement();
-          } else {
-            required_host = (*(this->compute_resources.begin())).first;  // some arbitrary host for non-compute intentive stuff
+          if (wu->task == nullptr) {
+            required_host = (*(this->compute_resources.begin())).first;
             required_num_cores = 1;
-            required_ram = 0;
+            required_ram = 0.0;
+          } else {
+            required_host = std::get<0>(this->job_run_specs[job][wu->task]);
+            required_num_cores = std::get<1>(this->job_run_specs[job][wu->task]);
+            required_ram = wu->task->getMaxNumCores();
+          }
+          // Check that RAM is ok
+          if (this->ram_availabilities[required_host] < required_ram) {
+            continue;
           }
 
           /** Dispatch it */
@@ -568,7 +558,7 @@ namespace wrench {
                                        required_num_cores,
                                        required_ram,
                                        this->mailbox_name,
-                                       wu.get(),
+                                       wu,
                                        this->getScratch(),
                                        job,
                                        this->getPropertyValueAsDouble(
@@ -581,8 +571,20 @@ namespace wrench {
 
           // Keep track of this workunit executor
           this->workunit_executors[job].insert(workunit_executor);
+
+          // Update RAM availability
+          this->ram_availabilities[required_host] -= required_ram;
+
+          dispatched_wus_for_job.insert(wu);
+        }
+
+        // Remove the WUs from the ready queue
+        for (auto const &wu : dispatched_wus_for_job) {
+          this->ready_workunits[job].erase(wu);
         }
       }
+
+      this->releaseDaemonLock();
     }
 
 
@@ -705,13 +707,26 @@ namespace wrench {
 
       /** Kill all relevant work unit executors */
       for (auto const &wue : this->workunit_executors[job]) {
+        for (auto const &f : wue->getFilesStoredInScratch()) {
+          this->files_in_scratch.insert(f);
+        }
+        if (wue->workunit->task) {
+          this->ram_availabilities[wue->getHostname()] += wue->workunit->task->getMemoryRequirement();
+        }
         wue->kill();
       }
       this->workunit_executors[job].clear();
       this->workunit_executors.erase(job);
 
       /** Remove all relevant work units */
+      this->ready_workunits[job].clear();
+      this->ready_workunits.erase(job);
+      this->running_workunits[job].clear();
+      this->running_workunits.erase(job);
+      this->completed_workunits[job].clear();
+      this->completed_workunits.erase(job);
       this->all_workunits[job].clear();
+      this->all_workunits.erase(job);
 
       /** Deal with task states */
       for (auto &task : job->getTasks()) {
@@ -909,11 +924,62 @@ namespace wrench {
       for (auto &f : workunit_executor->getFilesStoredInScratch()) {
         this->files_in_scratch.insert(f);
       }
+      // Update RAM availabilities
+      if (workunit->task) {
+        this->ram_availabilities[workunit_executor->getHostname()] -= workunit->task->getMemoryRequirement();
+      }
       // Forget the workunit executor
       forgetWorkunitExecutor(workunit_executor);
 
-      // TODO: DEAL WITH WORKUNIT
+      // Don't kill me while I am doing this
+      this->acquireDaemonLock();
 
+      // Process task completions, if any
+      if (workunit->task != nullptr) {
+        WRENCH_INFO("A workunit executor completed task %s (and its state is: %s)", workunit->task->getID().c_str(),
+                    WorkflowTask::stateToString(workunit->task->getInternalState()).c_str());
+
+        // Increase the "completed tasks" count of the job
+        job->incrementNumCompletedTasks();
+      }
+
+      // Move the workunit from "running" to "completed"
+      this->running_workunits[job].erase(workunit);
+      this->completed_workunits[job].insert(workunit);
+
+      // Update workunit dependencies if any
+      for (auto child : workunit->children) {
+        child->num_pending_parents--;
+        if (child->num_pending_parents == 0) {
+          // Make sure the child's tasks ready (paranoid)
+          if (child->task != nullptr) {
+            if (child->task->getInternalState() != WorkflowTask::InternalState::TASK_READY) {
+              throw std::runtime_error("StandardJobExecutor::processWorkunitExecutorCompletion(): Weird task state " +
+                                       std::to_string(child->task->getInternalState()) + " for task " +
+                                       child->task->getID());
+            }
+          }
+          // Move the workunit to ready
+          this->ready_workunits[job].insert(child);
+        }
+      }
+
+      this->releaseDaemonLock();
+
+      // If the job not done, just return
+      if (this->completed_workunits[job].size() != this->all_workunits[job].size()) {
+        return;
+      }
+
+      // At this point, the job is done and we can get rid of workunits
+      this->completed_workunits[job].clear();
+      this->ready_workunits.erase(job);
+      this->running_workunits.erase(job);
+      this->completed_workunits.erase(job);
+      this->all_workunits[job].clear();
+      this->all_workunits.erase(job);
+
+      this->job_run_specs.erase(job);
 
       // Send the callback to the originator
       try {
@@ -944,12 +1010,17 @@ namespace wrench {
       for (auto &f : workunit_executor->getFilesStoredInScratch()) {
         this->files_in_scratch.insert(f);
       }
+      // Update RAM availabilities
+      if (workunit->task) {
+        this->ram_availabilities[workunit_executor->getHostname()] -= workunit->task->getMemoryRequirement();
+      }
       // Forget the workunit executor
       forgetWorkunitExecutor(workunit_executor);
 
       // Fail the job
       this->failRunningStandardJob(job, std::move(cause));
 
+      this->job_run_specs.erase(job);
     }
 
 
@@ -1045,14 +1116,17 @@ namespace wrench {
       }
 
       // Can we run each task in this job?
+      std::map<WorkflowTask *, std::tuple<std::string, unsigned long>> task_run_specs;
       bool enough_resources = true;
       for (auto t : job->getTasks()) {
         std::string spec = service_specific_arguments[t->getID()];
         std::tuple<std::string, unsigned long> parsed_spec = parseResourceSpec(spec);
+
         std::string required_host = std::get<0>(parsed_spec);
         unsigned long required_num_cores = std::get<1>(parsed_spec);
         double required_ram = t->getMemoryRequirement();
 
+        task_run_specs.insert(std::make_pair(t, std::make_tuple(required_host, required_num_cores)));
         if (std::get<0>(this->compute_resources[required_host]) < required_num_cores) {
           enough_resources = false;
         }
@@ -1076,7 +1150,17 @@ namespace wrench {
       }
 
       // We can now admit the job!
-      all_workunits.insert(std::make_pair(job, Workunit::createWorkunits(job)));
+      this->all_workunits.insert(std::make_pair(job, Workunit::createWorkunits(job)));
+      this->job_run_specs.insert(std::make_pair(job, task_run_specs));
+
+      // Add the ready ones to the ready list
+      std::set<Workunit*> ready;
+      for (auto const &wu: this->all_workunits[job]) {
+        if (wu->num_pending_parents == 0) {
+          ready.insert(wu.get());
+        }
+      }
+      this->ready_workunits.insert(std::make_pair(job, ready));
 
       // And send a reply!
       try {
@@ -1189,16 +1273,6 @@ namespace wrench {
       } catch (std::shared_ptr<NetworkError> &cause) {
         return;
       }
-    }
-
-/**
- * @brief Add the scratch files of one standardjob to the list of all the scratch files of all the standard jobs
- *        inside the pilot job
- *
- * @param scratch_files:
- */
-    void MultihostMulticoreComputeService::storeFilesStoredInScratch(std::set<WorkflowFile *> scratch_files) {
-      this->files_in_scratch.insert(scratch_files.begin(), scratch_files.end());
     }
 
 /**

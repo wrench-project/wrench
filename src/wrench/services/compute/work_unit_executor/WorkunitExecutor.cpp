@@ -20,7 +20,7 @@
 #include <wrench/workflow/job/StandardJob.h>
 #include <wrench/simulation/SimulationTimestampTypes.h>
 #include "wrench/services/compute/workunit_executor/Workunit.h"
-#include "services/compute/standard_job_executor/ComputeThread.h"
+#include "ComputeThread.h"
 #include "wrench/simulation/Simulation.h"
 
 #include <xbt.h>
