@@ -264,7 +264,7 @@ namespace wrench {
         void processPilotJobTimeout(PilotJob *job);
 
         //free up resources
-        void freeUpResources(std::set<std::tuple<std::string, unsigned long, double>> resources);
+        void freeUpResources(std::map<std::string, std::tuple<unsigned long, double>> resources);
 
         //send call back to the pilot job submitters
         void sendPilotJobExpirationNotification(PilotJob *job);

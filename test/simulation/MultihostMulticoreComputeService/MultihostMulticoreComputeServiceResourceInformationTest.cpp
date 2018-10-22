@@ -108,35 +108,43 @@ private:
 
 
       // Get number of Cores
-      std::vector<unsigned long> num_cores;
+      std::map<std::string, unsigned long> num_cores;
 
       num_cores = this->test->compute_service1->getNumCores();
-      if ((num_cores.size() != 2) or (num_cores[0] != 4) or (num_cores[1] != 4)) {
+      if ((num_cores.size() != 2) or ((*(num_cores.begin())).second != 4) or ((*(++num_cores.begin())).second != 4)) {
         throw std::runtime_error("getHostNumCores() should return {4,4} for compute service #1");
       }
 
       num_cores = this->test->compute_service2->getNumCores();
-      if ((num_cores.size() != 2) or (num_cores[0] != 8) or (num_cores[1] != 8)) {
+      if ((num_cores.size() != 2) or ((*(num_cores.begin())).second != 8) or ((*(++num_cores.begin())).second != 8)) {
         throw std::runtime_error("getHostNumCores() should return {8,8} for compute service #1");
       }
 
       // Get Ram capacities
-      std::vector<double> ram_capacities;
+      std::map<std::string, double> ram_capacities;
 
       ram_capacities = this->test->compute_service1->getMemoryCapacity();
-      std::sort(ram_capacities.begin(), ram_capacities.end());
-      if ((ram_capacities.size() != 2) or
-          (fabs(ram_capacities[0] - 1024) > EPSILON) or
-          (fabs(ram_capacities[1] - 2048) > EPSILON)) {
+      std::vector<double> sorted_ram_capacities;
+      for (auto const &r : ram_capacities) {
+        sorted_ram_capacities.push_back(r.second);
+      }
+      std::sort(sorted_ram_capacities.begin(), sorted_ram_capacities.end());
+      if ((sorted_ram_capacities.size() != 2) or
+          (fabs(sorted_ram_capacities.at(0) - 1024) > EPSILON) or
+          (fabs(sorted_ram_capacities.at(1) - 2048) > EPSILON)) {
         throw std::runtime_error("getHostMemoryCapacity() should return {1024,2048} or {2048,1024} for compute service #1");
       }
 
       // Get Core flop rates
-      std::vector<double> core_flop_rates = this->test->compute_service1->getCoreFlopRate();
-      std::sort(core_flop_rates.begin(), core_flop_rates.end());
-      if ((core_flop_rates.size() != 2) or
-          (fabs(core_flop_rates[0] - 1.0) > EPSILON) or
-          (fabs(core_flop_rates[1] - 1e+10) > EPSILON)) {
+      std::map<std::string, double> core_flop_rates = this->test->compute_service1->getCoreFlopRate();
+      std::vector<double> sorted_core_flop_rates;
+      for (auto const &f : core_flop_rates) {
+        sorted_core_flop_rates.push_back(f.second);
+      }
+      std::sort(sorted_core_flop_rates.begin(), sorted_core_flop_rates.end());
+      if ((sorted_core_flop_rates.size() != 2) or
+          (fabs(sorted_core_flop_rates.at(0) - 1.0) > EPSILON) or
+          (fabs(sorted_core_flop_rates.at(1) - 1e+10) > EPSILON)) {
         throw std::runtime_error("getCoreFlopRate() should return {1,10} or {10,1} for compute service #1");
 
       }
@@ -159,12 +167,16 @@ private:
       wrench::Simulation::sleep(1.0);
 
       // Get number of idle cores
-      std::vector<unsigned long> num_idle_cores = this->test->compute_service1->getNumIdleCores();
-      std::sort(num_idle_cores.begin(), num_idle_cores.end());
-      if ((num_idle_cores.size() != 2) or
-          (num_idle_cores[0] != 1) or
-          (num_idle_cores[1] != 2)) {
-        throw std::runtime_error("getNumIdleCores() should return {1,2} or {1,2} for compute service #1");
+      std::map<std::string, unsigned long> num_idle_cores = this->test->compute_service1->getNumIdleCores();
+      std::vector<unsigned long> idle_core_counts;
+      for (auto const &c : num_idle_cores) {
+        idle_core_counts.push_back(c.second);
+      }
+      std::sort(idle_core_counts.begin(), idle_core_counts.end());
+      if ((idle_core_counts.size() != 2) or
+          (idle_core_counts[0] != 1) or
+          (idle_core_counts[1] != 2)) {
+        throw std::runtime_error("getNumIdleCores() should return {1,2} or {2,1} for compute service #1");
       }
 
       // Wait for the workflow execution event
@@ -202,15 +214,15 @@ void MultihostMulticoreComputeServiceTestResourceInformation::do_ResourceInforma
   // Create 1 Compute Service that manages Host1 and Host2
   ASSERT_NO_THROW(compute_service1 = simulation->add(
                   new wrench::MultihostMulticoreComputeService("Host1",
-                                                               {{std::make_tuple("Host1", 4, wrench::ComputeService::ALL_RAM)},
-                                                                {std::make_tuple("Host2", 4, wrench::ComputeService::ALL_RAM)}}, 0
+                                                               {{std::make_pair("Host1", std::make_tuple(4, wrench::ComputeService::ALL_RAM))},
+                                                                {std::make_pair("Host2", std::make_tuple(4, wrench::ComputeService::ALL_RAM))}}, 0
                   )));
 
   // Create 1 Compute Service that manages Host3 and Host4
   ASSERT_NO_THROW(compute_service2 = simulation->add(
                   new wrench::MultihostMulticoreComputeService("Host1",
-                                                               {{std::make_tuple("Host3", 8, wrench::ComputeService::ALL_RAM)},
-                                                                {std::make_tuple("Host4", 8, wrench::ComputeService::ALL_RAM)}}, 0
+                                                               {{std::make_pair("Host3", std::make_tuple(8, wrench::ComputeService::ALL_RAM))},
+                                                                {std::make_pair("Host4", std::make_tuple(8, wrench::ComputeService::ALL_RAM))}}, 0
                   )));
   std::set<wrench::ComputeService *> compute_services;
   compute_services.insert(compute_service1);

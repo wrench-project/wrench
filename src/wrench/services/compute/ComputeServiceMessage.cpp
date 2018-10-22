@@ -354,6 +354,6 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     ComputeServiceResourceInformationAnswerMessage::ComputeServiceResourceInformationAnswerMessage(
-            std::map<std::string, std::vector<double>> info, double payload)
+            std::map<std::string, std::map<std::string, double>> info, double payload)
             : ComputeServiceMessage("RESOURCE_DESCRIPTION_ANSWER", payload), info(info) {}
 };

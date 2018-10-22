@@ -821,9 +821,11 @@ namespace wrench {
         if (vm->isRunning()) {
 
           ComputeService *cs = std::get<1>(vm_tuple.second).get();
-          std::vector<unsigned long> num_idle_cores = cs->getNumIdleCores();
-          unsigned long sum_idle_cores = (unsigned long) std::accumulate(num_idle_cores.begin(), num_idle_cores.end(),
-                                                                         0);
+          std::map<std::string, unsigned long> num_idle_cores = cs->getNumIdleCores();
+          unsigned long sum_idle_cores = 0;
+          for (auto h : num_idle_cores) {
+            sum_idle_cores += h.second;
+          }
 
           if (std::get<2>(vm_tuple.second) >= job->getMinimumRequiredNumCores() &&
               sum_idle_cores >= job->getMinimumRequiredNumCores()) {
@@ -947,35 +949,40 @@ namespace wrench {
      */
     void CloudService::processGetResourceInformation(const std::string &answer_mailbox) {
       // Build a dictionary
-      std::map<std::string, std::vector<double>> dict;
+      std::map<std::string, std::map<std::string, double>> dict;
 
       // Num hosts
-      std::vector<double> num_hosts;
-      num_hosts.push_back((double) (this->vm_list.size()));
+      std::map<std::string, double> num_hosts;
+      num_hosts.insert(std::make_pair(this->getName(), (double) (this->vm_list.size())));
       dict.insert(std::make_pair("num_hosts", num_hosts));
 
-      std::vector<double> num_cores;
-      std::vector<double> num_idle_cores;
-      std::vector<double> flop_rates;
-      std::vector<double> ram_capacities;
-      std::vector<double> ram_availabilities;
+      std::map<std::string, double> num_cores;
+      std::map<std::string, double> num_idle_cores;
+      std::map<std::string, double> flop_rates;
+      std::map<std::string, double> ram_capacities;
+      std::map<std::string, double> ram_availabilities;
 
       for (auto &vm : this->vm_list) {
+
         // Num cores per vm
-        num_cores.push_back(std::get<2>(vm.second));
+        num_cores.insert(std::make_pair(vm.first, (double) std::get<2>(vm.second)));
 
         // Num idle cores per vm
-        std::vector<unsigned long> idle_core_counts = std::get<1>(vm.second)->getNumIdleCores();
-        num_idle_cores.push_back(std::accumulate(idle_core_counts.begin(), idle_core_counts.end(), 0));
+        std::map<std::string, unsigned long> idle_core_counts = std::get<1>(vm.second)->getNumIdleCores();
+        unsigned long total_count = 0;
+        for (auto & c : idle_core_counts) {
+          total_count += c.second;
+        }
+        num_idle_cores.insert(std::make_pair(vm.first, (double)total_count));
 
         // Flop rate per vm
-        flop_rates.push_back(S4U_Simulation::getHostFlopRate(vm.first));
+        flop_rates.insert(std::make_pair(vm.first, S4U_Simulation::getHostFlopRate(vm.first)));
 
         // RAM capacity per host
-        ram_capacities.push_back(S4U_Simulation::getHostMemoryCapacity(vm.first));
+        ram_capacities.insert(std::make_pair(vm.first, S4U_Simulation::getHostMemoryCapacity(vm.first)));
 
         // RAM availability per
-        ram_availabilities.push_back(S4U_Simulation::getHostMemoryCapacity(vm.first));
+        ram_availabilities.insert(std::make_pair(vm.first, S4U_Simulation::getHostMemoryCapacity(vm.first)));
       }
 
       dict.insert(std::make_pair("num_cores", num_cores));
@@ -984,8 +991,8 @@ namespace wrench {
       dict.insert(std::make_pair("ram_capacities", ram_capacities));
       dict.insert(std::make_pair("ram_availabilities", ram_availabilities));
 
-      std::vector<double> ttl;
-      ttl.push_back(ComputeService::ALL_RAM);
+      std::map<std::string, double> ttl;
+      ttl.insert(std::make_pair(this->getName(), DBL_MAX));
       dict.insert(std::make_pair("ttl", ttl));
 
       // Send the reply

@@ -626,9 +626,9 @@ namespace wrench {
      *              - number of cores (unsigned long)
      *              - bytes of RAM (double)
      */
-    void BatchService::freeUpResources(std::set<std::tuple<std::string, unsigned long, double>> resources) {
+    void BatchService::freeUpResources(std::map<std::string, std::tuple<unsigned long, double>> resources) {
       for (auto r : resources) {
-        this->available_nodes_to_cores[std::get<0>(r)] += std::get<1>(r);
+        this->available_nodes_to_cores[r.first] += std::get<0>(r.second);
       }
     }
 
@@ -1494,9 +1494,9 @@ namespace wrench {
           job_id = std::to_string((*it1)->getJobID());
           this->processPilotJobTimeout((PilotJob *) (*it1)->getWorkflowJob());
           // Update the cores count in the available resources
-          std::set<std::tuple<std::string, unsigned long, double>> resources = (*it1)->getResourcesAllocated();
+          std::map<std::string, std::tuple<unsigned long, double>> resources = (*it1)->getResourcesAllocated();
           for (auto r : resources) {
-            this->available_nodes_to_cores[std::get<0>(r)] += std::get<1>(r);
+            this->available_nodes_to_cores[r.first] += std::get<0>(r.second);
           }
           ComputeServiceTerminatePilotJobAnswerMessage *answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
                   job, this, true, nullptr,
@@ -1825,53 +1825,54 @@ namespace wrench {
     */
     void BatchService::processGetResourceInformation(const std::string &answer_mailbox) {
       // Build a dictionary
-      std::map<std::string, std::vector<double>> dict;
+      std::map<std::string, std::map<std::string, double>> dict;
 
       // Num hosts
-      std::vector<double> num_hosts;
-      num_hosts.push_back((double) (this->nodes_to_cores_map.size()));
+      std::map<std::string, double> num_hosts;
+      num_hosts.insert(std::make_pair(this->getName(), (double) (this->nodes_to_cores_map.size())));
       dict.insert(std::make_pair("num_hosts", num_hosts));
 
       // Num cores per hosts
-      std::vector<double> num_cores;
+      std::map<std::string, double> num_cores;
       for (auto h : this->nodes_to_cores_map) {
-        num_cores.push_back((double) (h.second));
+        num_cores.insert(std::make_pair(h.first, (double) (h.second)));
       }
       dict.insert(std::make_pair("num_cores", num_cores));
 
       // Num idle cores per hosts
-      std::vector<double> num_idle_cores;
+      std::map<std::string, double> num_idle_cores;
       for (auto h : this->available_nodes_to_cores) {
-        num_idle_cores.push_back((double) (h.second));
+        num_idle_cores.insert(std::make_pair(h.first, (double) (h.second)));
       }
       dict.insert(std::make_pair("num_idle_cores", num_idle_cores));
 
       // Flop rate per host
-      std::vector<double> flop_rates;
+      std::map<std::string, double> flop_rates;
       for (auto h : this->nodes_to_cores_map) {
-        flop_rates.push_back(S4U_Simulation::getHostFlopRate(h.first));
+        flop_rates.insert(std::make_pair(h.first, S4U_Simulation::getHostFlopRate(h.first)));
       }
       dict.insert(std::make_pair("flop_rates", flop_rates));
 
       // RAM capacity per host
-      std::vector<double> ram_capacities;
+      std::map<std::string, double> ram_capacities;
       for (auto h : this->nodes_to_cores_map) {
-        ram_capacities.push_back(S4U_Simulation::getHostMemoryCapacity(h.first));
+        ram_capacities.insert(std::make_pair(h.first, S4U_Simulation::getHostMemoryCapacity(h.first)));
       }
       dict.insert(std::make_pair("ram_capacities", ram_capacities));
 
       // RAM availability per host  (0 if something is running, full otherwise)
-      std::vector<double> ram_availabilities;
+      std::map<std::string, double> ram_availabilities;
       for (auto h : this->available_nodes_to_cores) {
         if (h.second < S4U_Simulation::getHostMemoryCapacity(h.first)) {
-          ram_availabilities.push_back(0.0);
+          ram_availabilities.insert(std::make_pair(h.first, 0.0));
         } else {
-          ram_availabilities.push_back(S4U_Simulation::getHostMemoryCapacity(h.first));
+          ram_availabilities.insert(std::make_pair(h.first, S4U_Simulation::getHostMemoryCapacity(h.first)));
         }
       }
+      dict.insert(std::make_pair("ram_availabilities", ram_availabilities));
 
-      std::vector<double> ttl;
-      ttl.push_back(ComputeService::ALL_RAM);
+      std::map<std::string, double> ttl;
+      ttl.insert(std::make_pair(this->getName(), DBL_MAX));
       dict.insert(std::make_pair("ttl", ttl));
 
       // Send the reply
@@ -1943,9 +1944,9 @@ namespace wrench {
                                                     job->getAllocatedTime() -
                                                     this->simulation->getCurrentSimulatedDate());
         for (auto resource : job->getResourcesAllocated()) {
-          std::string hostname = std::get<0>(resource);
-          unsigned long num_cores = std::get<1>(resource);
-          double ram = std::get<2>(resource);
+          std::string hostname = resource.first;
+          unsigned long num_cores = std::get<0>(resource.second);
+          double ram = std::get<1>(resource.second);
           // Update available_times
           double new_available_time = *(core_available_times[hostname].begin() + num_cores - 1) + time_to_finish;
           for (unsigned int i = 0; i < num_cores; i++) {

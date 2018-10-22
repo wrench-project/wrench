@@ -554,11 +554,17 @@ private:
     int main() {
       try {
         // no VMs
-        std::vector<unsigned long> num_cores = this->test->compute_service->getNumCores();
+        std::map<std::string, unsigned long> num_cores = this->test->compute_service->getNumCores();
+        unsigned long sum_num_cores = 0;
+        for (auto const &c : num_cores) {
+          sum_num_cores += c.second;
+        }
 
-        unsigned long sum_num_cores = (unsigned long) std::accumulate(num_cores.begin(), num_cores.end(), 0);
-        std::vector<unsigned long> num_idle_cores = this->test->compute_service->getNumIdleCores();
-        unsigned long sum_num_idle_cores = (unsigned long) std::accumulate(num_idle_cores.begin(), num_cores.end(), 0);
+        std::map<std::string, unsigned long> num_idle_cores = this->test->compute_service->getNumIdleCores();
+        unsigned long sum_num_idle_cores = 0;
+        for (auto const &c : num_idle_cores) {
+          sum_num_idle_cores += c.second;
+        }
 
         if (sum_num_cores != 0 || sum_num_idle_cores != 0) {
           throw std::runtime_error("getHostNumCores() and getNumIdleCores() should be 0.");
@@ -568,10 +574,16 @@ private:
         auto cs = (wrench::CloudService *) this->test->compute_service;
         cs->createVM(0, 10);
         num_cores = cs->getNumCores();
-        sum_num_cores = (unsigned long) std::accumulate(num_cores.begin(), num_cores.end(), 0);
+        sum_num_cores = 0;
+        for (auto const &c : num_cores) {
+          sum_num_cores += c.second;
+        }
 
         num_idle_cores = cs->getNumIdleCores();
-        sum_num_idle_cores = (unsigned long) std::accumulate(num_idle_cores.begin(), num_idle_cores.end(), 0);
+        sum_num_idle_cores = 0;
+        for (auto const &c : num_idle_cores) {
+          sum_num_idle_cores += c.second;
+        }
 
         if (sum_num_cores != 4 || sum_num_idle_cores != 4) {
           throw std::runtime_error("getHostNumCores() and getNumIdleCores() should be 4.");
@@ -580,10 +592,15 @@ private:
         // create a VM with two cores
         cs->createVM(2, 10);
         num_cores = cs->getNumCores();
-        sum_num_cores = (unsigned long) std::accumulate(num_cores.begin(), num_cores.end(), 0);
-
+        sum_num_cores = 0;
+        for (auto const &c : num_cores) {
+          sum_num_cores += c.second;
+        }
         num_idle_cores = cs->getNumIdleCores();
-        sum_num_idle_cores = (unsigned long) std::accumulate(num_idle_cores.begin(), num_idle_cores.end(), 0);
+        sum_num_idle_cores = 0;
+        for (auto const &c : num_idle_cores) {
+          sum_num_idle_cores += c.second;
+        }
 
         if (sum_num_cores != 6 || sum_num_idle_cores != 6) {
           throw std::runtime_error("getHostNumCores() and getNumIdleCores() should be 6.");

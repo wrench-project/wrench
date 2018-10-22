@@ -282,10 +282,10 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
     std::string execution_host = simulation->getHostnameList()[0];
 
     ASSERT_NO_THROW(compute_service = simulation->add(new wrench::MultihostMulticoreComputeService(wms_host,
-                                                                                                   {std::make_tuple(
+                                                                                                   {std::make_pair(
                                                                                                            execution_host,
-                                                                                                           wrench::ComputeService::ALL_CORES,
-                                                                                                           wrench::ComputeService::ALL_RAM)},
+                                                                                                           std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                                           wrench::ComputeService::ALL_RAM))},
                                                                                                    {})));
 
     ASSERT_NO_THROW(storage_service = simulation->add(new wrench::SimpleStorageService(wms_host, 100000000000000.0)));

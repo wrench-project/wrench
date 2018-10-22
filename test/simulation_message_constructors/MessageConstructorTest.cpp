@@ -186,7 +186,7 @@ TEST_F(MessageConstructorTest, ComputeServiceMessages) {
   ASSERT_NO_THROW(new wrench::ComputeServiceResourceInformationRequestMessage("mailbox", 666));
   ASSERT_THROW(new wrench::ComputeServiceResourceInformationRequestMessage("", 666), std::invalid_argument);
 
-  ASSERT_NO_THROW(new wrench::ComputeServiceResourceInformationAnswerMessage({std::make_pair("something", std::vector<double>({2.3, 4.5}))}, 666));
+  ASSERT_NO_THROW(new wrench::ComputeServiceResourceInformationAnswerMessage({std::make_pair("something", std::map<std::string, double>({{"aa", 2.3}, {"bb", 4.5}}))}, 666));
 
 //  ASSERT_NO_THROW(new wrench::ComputeServiceInformationMessage(workflow_job, "info", 666));
 }

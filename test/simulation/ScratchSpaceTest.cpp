@@ -182,8 +182,8 @@ void ScratchSpaceTest::do_SimpleScratchSpace_test() {
   // Create a Compute Service
   ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname,
-                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES,
-                                                                        wrench::ComputeService::ALL_RAM)},
+                                                       {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                        wrench::ComputeService::ALL_RAM))},
                                                        1000000.0, {})));
 
   simulation->add(new wrench::FileRegistryService(hostname));
@@ -400,22 +400,22 @@ void ScratchSpaceTest::do_ScratchSpaceFailure_test() {
   // Create a Compute Service that does not have scratch space
   ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname,
-                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES,
-                                                                        wrench::ComputeService::ALL_RAM)},
+                                                       {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                        wrench::ComputeService::ALL_RAM))},
                                                        0)));
 
   // Create a Compute Service that has smaller scratch space than the files to be stored
   ASSERT_NO_THROW(compute_service1 = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname,
-                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES,
-                                                                        wrench::ComputeService::ALL_RAM)},
+                                                       {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                        wrench::ComputeService::ALL_RAM))},
                                                        100)));
 
   // Create a Compute Service that has enough scratch space to store the files
   ASSERT_NO_THROW(compute_service2 = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname,
-                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES,
-                                                                        wrench::ComputeService::ALL_RAM)},
+                                                       {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                        wrench::ComputeService::ALL_RAM))},
                                                        10000)));
 
   simulation->add(new wrench::FileRegistryService(hostname));
@@ -645,8 +645,8 @@ void ScratchSpaceTest::do_PilotJobScratchSpace_test() {
   // Create a Compute Service that does not have scratch space
   ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname,
-                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES,
-                                                                        wrench::ComputeService::ALL_RAM)},
+                                                       {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                        wrench::ComputeService::ALL_RAM))},
                                                        3000, {})));
 
   simulation->add(new wrench::FileRegistryService(hostname));

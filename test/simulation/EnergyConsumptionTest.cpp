@@ -140,7 +140,7 @@ private:
                         my_mailbox,
                         test->simulation->getHostnameList()[1],
                         job,
-                        {std::make_tuple(test->simulation->getHostnameList()[1], 1, wrench::ComputeService::ALL_RAM)},
+                        {std::make_pair(test->simulation->getHostnameList()[1], std::make_tuple(1, wrench::ComputeService::ALL_RAM))},
                         nullptr,
                         false,
                         nullptr,
@@ -326,7 +326,7 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionTests_test() {
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname,
-                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                                                       {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
                                                        10000000000000.0, {})));
 
   simulation->add(new wrench::FileRegistryService(hostname));
@@ -405,7 +405,8 @@ private:
                         my_mailbox,
                         test->simulation->getHostnameList()[1],
                         job,
-                        {std::make_tuple(test->simulation->getHostnameList()[1], 1, wrench::ComputeService::ALL_RAM)},
+                        {std::make_pair(test->simulation->getHostnameList()[1],
+                                        std::make_tuple(1, wrench::ComputeService::ALL_RAM))},
                         nullptr,
                         false,
                         nullptr,
@@ -480,7 +481,7 @@ void EnergyConsumptionTest::do_EnergyConsumption_test() {
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname,
-                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                                                       {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
                                                        10000000000000.0, {})));
 
   simulation->add(new wrench::FileRegistryService(hostname));
@@ -630,7 +631,7 @@ void EnergyConsumptionTest::do_SimpleApiChecksEnergy_test() {
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname,
-                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                                                       {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
                                                        10000000000000.0, {})));
 
   simulation->add(new wrench::FileRegistryService(hostname));
@@ -723,7 +724,7 @@ private:
                         my_mailbox,
                         test->simulation->getHostnameList()[1],
                         job1,
-                        {std::make_tuple(test->simulation->getHostnameList()[1], 1, wrench::ComputeService::ALL_RAM)},
+                        {std::make_pair(test->simulation->getHostnameList()[1], std::make_tuple(1, wrench::ComputeService::ALL_RAM))},
                         nullptr,
                         false,
                         nullptr,
@@ -775,7 +776,7 @@ private:
                         my_mailbox,
                         test->simulation->getHostnameList()[1],
                         job2,
-                        {std::make_tuple(test->simulation->getHostnameList()[1], 1, wrench::ComputeService::ALL_RAM)},
+                        {std::make_pair(test->simulation->getHostnameList()[1], std::make_tuple(1, wrench::ComputeService::ALL_RAM))},
                         nullptr,
                         false,
                         nullptr,
@@ -866,7 +867,7 @@ void EnergyConsumptionTest::do_EnergyConsumptionPStateChange_test() {
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname,
-                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                                                       {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
                                                        10000000000000.0, {})));
 
   simulation->add(new wrench::FileRegistryService(hostname));
