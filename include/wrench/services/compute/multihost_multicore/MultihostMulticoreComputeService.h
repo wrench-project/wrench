@@ -42,7 +42,7 @@ namespace wrench {
 
         std::map<std::string, std::string> default_property_values = {
                 {MultihostMulticoreComputeServiceProperty::SUPPORTS_STANDARD_JOBS,                         "true"},
-                {MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS,                            "true"},
+                {MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS,                            "false"},
                 {MultihostMulticoreComputeServiceProperty::THREAD_STARTUP_OVERHEAD,                        "0.0"},
         };
 
