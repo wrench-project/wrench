@@ -143,7 +143,7 @@ namespace wrench {
           target_num_cores = std::get<1>(parsed_spec);
         }
         finalized_service_specific_arguments.insert(std::make_pair(t->getID(),
-                                                    target_host + " : " + std::to_string(target_num_cores)));
+                                                    target_host + ":" + std::to_string(target_num_cores)));
       }
 
       // At this point, there may still be insufficient resources to run the task, but that will
@@ -475,8 +475,8 @@ namespace wrench {
       this->total_num_cores = 0;
       for (auto host : this->compute_resources) {
         this->total_num_cores += std::get<0>(host.second);
-        this->ram_availabilities.insert(std::make_pair(
-                host.first, S4U_Simulation::getHostMemoryCapacity(host.first)));
+        this->ram_availabilities.insert(std::make_pair(host.first, S4U_Simulation::getHostMemoryCapacity(host.first)));
+        this->running_thread_counts.insert(std::make_pair(host.first, 0));
       }
 
       this->ttl = ttl;
@@ -572,8 +572,9 @@ namespace wrench {
           // Keep track of this workunit executor
           this->workunit_executors[job].insert(workunit_executor);
 
-          // Update RAM availability
+          // Update core and RAM availability
           this->ram_availabilities[required_host] -= required_ram;
+          this->running_thread_counts[required_host] += required_num_cores;
 
           dispatched_wus_for_job.insert(wu);
         }
@@ -712,6 +713,7 @@ namespace wrench {
         }
         if (wue->workunit->task) {
           this->ram_availabilities[wue->getHostname()] += wue->workunit->task->getMemoryRequirement();
+          this->running_thread_counts[wue->getHostname()] -= wue->getNumCores();
         }
         wue->kill();
       }
@@ -924,9 +926,10 @@ namespace wrench {
       for (auto &f : workunit_executor->getFilesStoredInScratch()) {
         this->files_in_scratch.insert(f);
       }
-      // Update RAM availabilities
+      // Update RAM availabilities and running thread counts
       if (workunit->task) {
         this->ram_availabilities[workunit_executor->getHostname()] -= workunit->task->getMemoryRequirement();
+        this->running_thread_counts[workunit_executor->getHostname()] -= workunit_executor->getNumCores();
       }
       // Forget the workunit executor
       forgetWorkunitExecutor(workunit_executor);
@@ -1010,9 +1013,10 @@ namespace wrench {
       for (auto &f : workunit_executor->getFilesStoredInScratch()) {
         this->files_in_scratch.insert(f);
       }
-      // Update RAM availabilities
+      // Update RAM availabilities and running thread counts
       if (workunit->task) {
         this->ram_availabilities[workunit_executor->getHostname()] -= workunit->task->getMemoryRequirement();
+        this->running_thread_counts[workunit_executor->getHostname()] -= workunit_executor->getNumCores();
       }
       // Forget the workunit executor
       forgetWorkunitExecutor(workunit_executor);
@@ -1114,6 +1118,7 @@ namespace wrench {
         }
         return;
       }
+
 
       // Can we run each task in this job?
       std::map<WorkflowTask *, std::tuple<std::string, unsigned long>> task_run_specs;
@@ -1228,8 +1233,10 @@ namespace wrench {
 
       // Num idle cores per hosts
       std::map<std::string, double> num_idle_cores;
-      for (auto r : this->core_and_ram_availabilities) {
-        num_idle_cores.insert(std::make_pair(r.first, std::get<0>(r.second)));
+      for (auto r : this->running_thread_counts) {
+        unsigned long cores = std::get<0>(this->compute_resources[r.first]);
+        unsigned long running_threads = r.second;
+        num_idle_cores.insert(std::make_pair(r.first, (double) (std::max<unsigned long>(cores - running_threads, 0))));
       }
       dict.insert(std::make_pair("num_idle_cores", num_idle_cores));
 
@@ -1249,8 +1256,8 @@ namespace wrench {
 
       // RAM availability per host
       std::map<std::string, double> ram_availabilities;
-      for (auto r : this->core_and_ram_availabilities) {
-        ram_availabilities.insert(std::make_pair(r.first, std::get<1>(r.second)));
+      for (auto r : this->ram_availabilities) {
+        ram_availabilities.insert(std::make_pair(r.first, r.second));
       }
       dict.insert(std::make_pair("ram_availabilities", ram_availabilities));
 
@@ -1261,7 +1268,6 @@ namespace wrench {
         ttl.insert(std::make_pair(this->getName(), DBL_MAX));
       }
       dict.insert(std::make_pair("ttl", ttl));
-
 
       // Send the reply
       ComputeServiceResourceInformationAnswerMessage *answer_message = new ComputeServiceResourceInformationAnswerMessage(

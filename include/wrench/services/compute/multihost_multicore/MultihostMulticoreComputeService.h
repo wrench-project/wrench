@@ -147,7 +147,9 @@ namespace wrench {
         std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
 
         // Core availabilities (for each hosts, how many cores and how many bytes of RAM are currently available on it)
-        std::map<std::string, std::pair<unsigned long, double>> core_and_ram_availabilities;
+        std::map<std::string, double> ram_availabilities;
+        std::map<std::string, unsigned long> running_thread_counts;
+
         unsigned long total_num_cores;
 
         double ttl;
@@ -171,8 +173,6 @@ namespace wrench {
         std::map<StandardJob *, std::set<Workunit *>> ready_workunits;
         std::map<StandardJob *, std::set<Workunit *>> running_workunits;
         std::map<StandardJob *, std::set<Workunit *>> completed_workunits;
-
-        std::map<std::string, double> ram_availabilities;
 
         // Set of running WorkunitExecutors
         std::map<StandardJob *, std::set<std::shared_ptr<WorkunitExecutor>>> workunit_executors;
