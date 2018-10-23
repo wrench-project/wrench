@@ -411,7 +411,6 @@ namespace wrench {
             double ttl,
             PilotJob *pj) {
 
-      std::cerr << "IN INITATED INSTATSA\n";
       if (ttl < 0) {
         throw std::invalid_argument(
                 "MultihostMulticoreComputeService::initiateInstance(): invalid TTL value (must be >0)");
@@ -422,8 +421,6 @@ namespace wrench {
 
       // Validate that properties are correct
       this->validateProperties();
-
-      std::cerr << "HERE\n";
 
       // Set default and specified message payloads
       this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
@@ -473,8 +470,6 @@ namespace wrench {
 
         this->compute_resources.insert(std::make_pair(hname, std::make_tuple(requested_cores, requested_ram)));
       }
-
-      std::cerr << "HERE1000 \n";
 
       // Compute the total number of cores and set initial ram availabilities
       this->total_num_cores = 0;
@@ -1310,7 +1305,6 @@ namespace wrench {
 
       bool success = true;
 
-      std::cerr << "IN VALIDATE PROP\n";
       // Thread startup overhead
       double thread_startup_overhead = 0;
       success = true;
@@ -1320,13 +1314,11 @@ namespace wrench {
         success = false;
       }
 
-      std::cerr << "IN VALIDATE PROP\n";
       if ((!success) or (thread_startup_overhead < 0)) {
         throw std::invalid_argument("Invalid THREAD_STARTUP_OVERHEAD property specification: " +
                                     this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::THREAD_STARTUP_OVERHEAD));
       }
 
-      std::cerr << "IN VALIDATE PROP\n";
       // Supporting Pilot jobs
       if (this->getPropertyValueAsBoolean(MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS)) {
         throw std::invalid_argument("Invalid SUPPORTS_PILOT_JOBS property specification: a BareMetalService cannot support pilot jobs");
