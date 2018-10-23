@@ -123,6 +123,7 @@ private:
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       // Get the scheduler pointers just for coverage
+      // Get the scheduler pointers just for coverage
       if (this->getPilotJobScheduler() != nullptr) {
         throw std::runtime_error("getPilotJobScheduler() should return nullptr");
       }
