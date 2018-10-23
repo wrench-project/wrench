@@ -547,7 +547,7 @@ namespace wrench {
                   this->getPropertyValueAsDouble(CloudServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS));
           auto vm = std::make_shared<S4U_VirtualMachine>(vm_name, pm_hostname, num_cores, ram_memory);
 
-          // create a multihost multicore compute service for the VM
+          // create a MultihostMulticoreComputeService compute service for the VM
           std::map<std::string, std::tuple<unsigned long, double>> compute_resources = {
                   std::make_pair(vm_name, std::make_tuple(num_cores, ram_memory))};
 
@@ -555,6 +555,12 @@ namespace wrench {
           property_list.insert(this->property_list.begin(), this->property_list.end());
           messagepayload_list.insert(this->messagepayload_list.begin(), this->messagepayload_list.end());
 
+          // Make sure the MultihostMulticoreComputeService does not support pilot jobs
+          if (property_list.find(ComputeServiceProperty::SUPPORTS_PILOT_JOBS) != property_list.end()) {
+            if (property_list[ComputeServiceProperty::SUPPORTS_PILOT_JOBS] == "true") {
+              property_list[ComputeServiceProperty::SUPPORTS_PILOT_JOBS] = "false";
+            }
+          }
           std::shared_ptr<ComputeService> cs = std::shared_ptr<ComputeService>(
                   new MultihostMulticoreComputeService(vm_name,
                                                        compute_resources,
@@ -885,6 +891,7 @@ namespace wrench {
         }
         return;
       }
+
 
       std::map<std::string, std::tuple<std::shared_ptr<S4U_VirtualMachine>, std::shared_ptr<ComputeService>,
               unsigned long, unsigned long>> vm_local_list = this->vm_list;
