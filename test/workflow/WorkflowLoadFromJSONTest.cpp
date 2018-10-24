@@ -10,6 +10,7 @@
 #include <gtest/gtest.h>
 
 #include "wrench/workflow/Workflow.h"
+#include "../include/UniqueTmpPathPrefix.h"
 
 class WorkflowLoadFromJSONTest : public ::testing::Test {
 protected:
@@ -3180,7 +3181,7 @@ protected:
     }
 
     // data members
-    std::string json_file_path = "/tmp/workflow.json";
+    std::string json_file_path = UNIQUE_TMP_PATH_PREFIX + "workflow.json";
 };
 
 TEST_F(WorkflowLoadFromJSONTest, LoadValidJSON) {

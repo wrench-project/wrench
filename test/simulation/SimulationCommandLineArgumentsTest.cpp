@@ -11,6 +11,7 @@
 #include <wrench-dev.h>
 
 #include "../include/TestWithFork.h"
+#include "../include/UniqueTmpPathPrefix.h"
 
 class SimulationCommandLineArgumentsTest : public ::testing::Test {
 
@@ -48,7 +49,7 @@ protected:
       fclose(platform_file);
     }
 
-    std::string platform_file_path = "/tmp/platform.xml";
+    std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
 };
 
 class SimulationCommandLineArgumentsWMS : public wrench::WMS {
@@ -98,7 +99,7 @@ void SimulationCommandLineArgumentsTest::do_versionArgument_test() {
 
   if (pid == 0) { // Child
     close(1);
-    FILE *stdout_file = fopen("/tmp/unit_tests.stdout", "w");
+    FILE *stdout_file = fopen((UNIQUE_TMP_PATH_PREFIX + "unit_tests.stdout").c_str(), "w");
     ASSERT_NO_THROW(simulation->init(&argc, argv));
     // Will not get here
     fclose(stdout_file);
@@ -111,7 +112,7 @@ void SimulationCommandLineArgumentsTest::do_versionArgument_test() {
   ASSERT_EQ(exit_code, 0);
 
   // Check file content
-  FILE *stdout_file = fopen("/tmp/unit_tests.stdout", "r");
+  FILE *stdout_file = fopen((UNIQUE_TMP_PATH_PREFIX + "unit_tests.stdout").c_str(), "r");
   int linecount = 0;
   char *line = nullptr;
   ssize_t read;
@@ -161,7 +162,7 @@ void SimulationCommandLineArgumentsTest::do_HelpWrenchArgument_test() {
 
   if (pid == 0) { // Child
     close(1);
-    FILE *stdout_file = fopen("/tmp/unit_tests.stdout", "w");
+    FILE *stdout_file = fopen((UNIQUE_TMP_PATH_PREFIX + "unit_tests.stdout").c_str(), "w");
     ASSERT_NO_THROW(simulation->init(&argc, argv));
     // Doesn't get here
   }
@@ -173,7 +174,7 @@ void SimulationCommandLineArgumentsTest::do_HelpWrenchArgument_test() {
   ASSERT_EQ(exit_code, 0);
 
   // Check file content
-  FILE *stdout_file = fopen("/tmp/unit_tests.stdout", "r");
+  FILE *stdout_file = fopen((UNIQUE_TMP_PATH_PREFIX + "unit_tests.stdout").c_str(), "r");
   int linecount = 0;
   char *line = nullptr;
   ssize_t read;
@@ -217,7 +218,7 @@ void SimulationCommandLineArgumentsTest::do_HelpSimGridArgument_test() {
     // Create and initialize a simulation
 
     close(1);
-    FILE *stdout_file = fopen("/tmp/unit_tests.stdout", "w");
+    FILE *stdout_file = fopen((UNIQUE_TMP_PATH_PREFIX + "unit_tests.stdout").c_str(), "w");
     simulation->init(&argc, argv);
     // Will not get here
     fclose(stdout_file);
@@ -230,7 +231,7 @@ void SimulationCommandLineArgumentsTest::do_HelpSimGridArgument_test() {
   ASSERT_EQ(exit_code, 0);
 
   // Check file content
-  FILE *stdout_file = fopen("/tmp/unit_tests.stdout", "r");
+  FILE *stdout_file = fopen((UNIQUE_TMP_PATH_PREFIX + "unit_tests.stdout").c_str(), "r");
   int linecount = 0;
   char *line = nullptr;
   ssize_t read;
@@ -303,7 +304,7 @@ void SimulationCommandLineArgumentsTest::do_NoColorArgument_test() {
 
   // Redirecting to file, but this is complicated due to the simgrid logging...
   close(2);
-  FILE *stderr_file = fopen("/tmp/unit_tests.stderr", "w");
+  FILE *stderr_file = fopen((UNIQUE_TMP_PATH_PREFIX + "unit_tests.stderr").c_str(), "w");
 
   // Setting up the platform
   ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
@@ -320,7 +321,7 @@ void SimulationCommandLineArgumentsTest::do_NoColorArgument_test() {
   fclose(stderr_file);
 
   // Here we could programmatically check there are no colors.... yawn
-  stderr_file = fopen("/tmp/unit_tests.stderr", "r");
+  stderr_file = fopen((UNIQUE_TMP_PATH_PREFIX + "unit_tests.stderr").c_str(), "r");
   ssize_t read;
   char *line = nullptr;
   size_t linecapp;
@@ -380,7 +381,7 @@ void SimulationCommandLineArgumentsTest::do_NoLogArgument_test() {
 
   // Redirecting to file, but this is complicated due to the simgrid logging... 
   close(2);
-  FILE *stderr_file = fopen("/tmp/unit_tests.stderr", "w");
+  FILE *stderr_file = fopen((UNIQUE_TMP_PATH_PREFIX + "unit_tests.stderr").c_str(), "w");
 
   // Setting up the platform
   ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
@@ -397,7 +398,7 @@ void SimulationCommandLineArgumentsTest::do_NoLogArgument_test() {
   fclose(stderr_file);
 
   // Check file content
-  stderr_file = fopen("/tmp/unit_tests.stderr", "r");
+  stderr_file = fopen((UNIQUE_TMP_PATH_PREFIX + "unit_tests.stderr").c_str(), "r");
   int linecount = 0;
   char *line = nullptr;
   ssize_t read;
@@ -448,7 +449,7 @@ void SimulationCommandLineArgumentsTest::do_ActivateEnergyArgument_test() {
   if (pid == 0) { // Child
 
     close(2); // Mute it
-    stderr_file = fopen("/tmp/unit_tests.stderr", "w");
+    stderr_file = fopen((UNIQUE_TMP_PATH_PREFIX + "unit_tests.stderr").c_str(), "w");
 
     simulation->init(&argc, argv);
 
@@ -477,7 +478,7 @@ void SimulationCommandLineArgumentsTest::do_ActivateEnergyArgument_test() {
   ASSERT_NE(exit_code, 0);
 
   // Check that the error was what we thought it was (based on output!)
-  stderr_file = fopen("/tmp/unit_tests.stderr", "r");
+  stderr_file = fopen((UNIQUE_TMP_PATH_PREFIX + "unit_tests.stderr").c_str(), "r");
   char *line = nullptr;
   ssize_t read;
   size_t linecapp;

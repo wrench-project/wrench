@@ -14,6 +14,7 @@
 #include <nlohmann/json.hpp>
 
 #include "../../include/TestWithFork.h"
+#include "../../include/UniqueTmpPathPrefix.h"
 
 #include <fstream>
 
@@ -59,9 +60,9 @@ protected:
         workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
     }
 
-    std::string platform_file_path = "/tmp/platform.xml";
-    std::string execution_data_json_file_path = "/tmp/workflow_data.json";
-    std::string workflow_graph_json_file_path = "/tmp/workflow_graph_data.json";
+    std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
+    std::string execution_data_json_file_path = UNIQUE_TMP_PATH_PREFIX + "workflow_data.json";
+    std::string workflow_graph_json_file_path = UNIQUE_TMP_PATH_PREFIX + "workflow_graph_data.json";
     std::unique_ptr<wrench::Workflow> workflow;
 
 };
@@ -676,7 +677,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
 
     simulation->init(&argc, argv);
 
-    EXPECT_THROW(simulation->getOutput().dumpWorkflowGraphJSON(nullptr, "/tmp/file.json"), std::invalid_argument);
+    EXPECT_THROW(simulation->getOutput().dumpWorkflowGraphJSON(nullptr, UNIQUE_TMP_PATH_PREFIX + "file.json"), std::invalid_argument);
     EXPECT_THROW(simulation->getOutput().dumpWorkflowGraphJSON((wrench::Workflow *)&argc, ""), std::invalid_argument);
 
     std::ifstream graph_json_file;

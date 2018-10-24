@@ -14,6 +14,7 @@
 
 #include "wrench/workflow/job/PilotJob.h"
 #include "../../include/TestWithFork.h"
+#include "../../include/UniqueTmpPathPrefix.h"
 
 
 class MultihostMulticoreComputeServiceTestPilotJobs : public ::testing::Test {
@@ -78,7 +79,7 @@ protected:
 
     }
 
-    std::string platform_file_path = "/tmp/platform.xml";
+    std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
     wrench::Workflow *workflow;
 };
 
