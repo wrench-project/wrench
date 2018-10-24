@@ -10,6 +10,7 @@
 #include <gtest/gtest.h>
 
 #include "wrench/workflow/Workflow.h"
+#include "../include/UniqueTmpPathPrefix.h"
 
 class WorkflowLoadFromDAXTest : public ::testing::Test {
 protected:
@@ -345,9 +346,9 @@ protected:
     }
 
     // data members
-    std::string dax_file_path = "/tmp/workflow.dax";
-    std::string one_task_dax_file_path = "/tmp/one_task.dax";
-    std::string one_task_bad_attribute_file_path = "/tmp/one_task_bad_attribute.dax";
+    std::string dax_file_path = UNIQUE_TMP_PATH_PREFIX + "workflow.dax";
+    std::string one_task_dax_file_path = UNIQUE_TMP_PATH_PREFIX + "one_task.dax";
+    std::string one_task_bad_attribute_file_path = UNIQUE_TMP_PATH_PREFIX + "one_task_bad_attribute.dax";
 };
 
 TEST_F(WorkflowLoadFromDAXTest, LoadValidDAX) {
