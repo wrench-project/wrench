@@ -410,8 +410,7 @@ void SimulationCommandLineArgumentsTest::do_NoLogArgument_test() {
   }
   fclose(stderr_file);
 
-  // For some reason, there is a phantom line!
-  ASSERT_EQ(linecount, 1);
+  ASSERT_EQ(linecount, 0);
 
   // Just in case
   xbt_log_control_set("root.thresh:critical");
