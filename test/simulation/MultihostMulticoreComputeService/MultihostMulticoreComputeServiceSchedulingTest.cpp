@@ -699,16 +699,19 @@ private:
       std::vector<wrench::WorkflowTask *> tasks;
       tasks.push_back(this->getWorkflow()->addTask("task1", 60, 1, 1, 1.0, 500));
       tasks.push_back(this->getWorkflow()->addTask("task2", 60, 1, 1, 1.0, 600));
-      tasks.push_back(this->getWorkflow()->addTask("task3", 60, 1, 1, 1.0, 400));
+      tasks.push_back(this->getWorkflow()->addTask("task3", 60, 1, 1, 1.0, 500));
       tasks.push_back(this->getWorkflow()->addTask("task4", 60, 1, 1, 1.0, 000));
 
       // Submit them in order
       for (auto const & t : tasks) {
         wrench::StandardJob *j = job_manager->createStandardJob(t, {});
-        job_manager->submitJob(j, this->test->cs);
+        std::map<std::string, std::string> cs_specific_args;
+        cs_specific_args.insert(std::make_pair(t->getID(), "Host1:1"));
+        job_manager->submitJob(j, this->test->cs, cs_specific_args);
       }
 
       // Wait for completions
+      std::map<wrench::WorkflowTask*, std::tuple<double,double>> times;
       for (int i=0; i < 4; i++) {
         std::unique_ptr<wrench::WorkflowExecutionEvent> event;
         try {
@@ -716,11 +719,49 @@ private:
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
-        switch (event->type) {
-          case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-            // success, do nothing for now
-            break;
-          }      }
+        if (event->type != wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION) {
+          throw std::runtime_error("Unexpected execution event: " + std::to_string((int) (event->type)));
+        }
+
+        wrench::StandardJob *job = dynamic_cast<wrench::StandardJobCompletedEvent *>(event.get())->standard_job;
+        wrench::WorkflowTask *task = *(job->getTasks().begin());
+        double start_time = task->getStartDate();
+        double end_time = task->getEndDate();
+        times.insert(std::make_pair(task, std::make_tuple(start_time, end_time)));
+      }
+
+      // Inspect times
+      // TASK #1
+      if (std::get<0>(times[tasks.at(0)]) > 1.0) {
+        throw std::runtime_error("Unexpected start time for task1: " + std::to_string(std::get<0>(times[tasks.at(0)])));
+      }
+      if ((std::get<1>(times[tasks.at(0)]) < 60.0) || (std::get<1>(times[tasks.at(0)])  > 61.0)) {
+        throw std::runtime_error("Unexpected end time for task1: " + std::to_string(std::get<1>(times[tasks.at(0)])));
+      }
+      // TASK #4
+      if (std::get<0>(times[tasks.at(3)]) > 1.0) {
+        throw std::runtime_error("Unexpected start time for task4: " + std::to_string(std::get<0>(times[tasks.at(3)])));
+      }
+      if ((std::get<1>(times[tasks.at(3)]) < 60.0) || (std::get<1>(times[tasks.at(3)])  > 61.0)) {
+        throw std::runtime_error("Unexpected end time for task4: " + std::to_string(std::get<1>(times[tasks.at(3)])));
+      }
+      // TASK #2
+      if ((std::get<0>(times[tasks.at(1)]) < 60.0) || (std::get<0>(times[tasks.at(1)]) > 61.0)) {
+        throw std::runtime_error("Unexpected start time for task2: " + std::to_string(std::get<0>(times[tasks.at(1)])));
+      }
+      if ((std::get<1>(times[tasks.at(1)]) < 120.0) || (std::get<1>(times[tasks.at(1)])  > 121.0)) {
+        throw std::runtime_error("Unexpected end time for task2: " + std::to_string(std::get<1>(times[tasks.at(1)])));
+      }
+      // TASK #3
+      if ((std::get<0>(times[tasks.at(2)]) < 120.0) || (std::get<0>(times[tasks.at(2)]) > 121.0)) {
+        throw std::runtime_error("Unexpected start time for task3: " + std::to_string(std::get<0>(times[tasks.at(2)])));
+      }
+      if ((std::get<1>(times[tasks.at(2)]) < 180.0) || (std::get<1>(times[tasks.at(2)])  > 181.0)) {
+        throw std::runtime_error("Unexpected end time for task3: " + std::to_string(std::get<1>(times[tasks.at(2)])));
+      }
+
+
+
 
       return 0;
     }
