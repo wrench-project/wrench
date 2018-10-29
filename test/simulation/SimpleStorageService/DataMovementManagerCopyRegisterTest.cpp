@@ -3,6 +3,7 @@
 #include <wrench-dev.h>
 
 #include "../../include/TestWithFork.h"
+#include "../../include/UniqueTmpPathPrefix.h"
 
 #define FILE_SIZE 100000.00
 #define STORAGE_SIZE (100 * FILE_SIZE)
@@ -67,7 +68,7 @@ protected:
 
     }
 
-    std::string platform_file_path = "/tmp/platform.xml";
+    std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
     wrench::Workflow *workflow;
 };
 

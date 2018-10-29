@@ -227,6 +227,7 @@ set(SOURCE_FILES
 set(TEST_FILES
         test/main.cpp
         test/include/TestWithFork.h
+        test/include/UniqueTmpPathPrefix.h
         test/simulation_message_constructors/MessageConstructorTest.cpp
         test/failure_cause_constructor/FailureCauseConstructorTest.cpp
         test/workflow/WorkflowTest.cpp

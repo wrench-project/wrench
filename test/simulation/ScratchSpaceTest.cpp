@@ -17,6 +17,7 @@
 #include "wrench/workflow/job/PilotJob.h"
 
 #include "../include/TestWithFork.h"
+#include "../include/UniqueTmpPathPrefix.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(scratch_service_test, "Log category for ScratchServiceTest");
 
@@ -74,7 +75,7 @@ protected:
 
     }
 
-    std::string platform_file_path = "/tmp/platform.xml";
+    std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
     std::unique_ptr<wrench::Workflow> workflow;
 
 };

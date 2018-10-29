@@ -12,6 +12,7 @@
 
 #include <wrench-dev.h>
 #include "../../include/TestWithFork.h"
+#include "../../include/UniqueTmpPathPrefix.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(simple_storage_service_functional_test, "Log category for SimpleStorageServiceFunctionalTest");
 
@@ -71,7 +72,7 @@ protected:
 
     }
 
-    std::string platform_file_path = "/tmp/platform.xml";
+    std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
     std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
     wrench::Workflow *workflow;
 };

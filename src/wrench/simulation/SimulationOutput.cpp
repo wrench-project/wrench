@@ -18,6 +18,7 @@
 #include <fstream>
 #include <algorithm>
 #include <vector>
+#include <cmath>
 
 namespace wrench {
 
@@ -106,14 +107,14 @@ namespace wrench {
     }
 
     /**
-     * @brief Determines if two line segments overlap
+     * @brief Determines if two line segments overlap along the x-axis and allows for a slight overlap.
      * @param segment1: first segment
      * @param segment2: second segment
      * @return bool
      */
-    bool isSegmentOverlapping(std::pair<unsigned long long, unsigned long long> segment1, std::pair<unsigned long long, unsigned long long> segment2) {
-        // segments can be touching at their endpoints
-        if (segment1.second == segment2.first or segment2.second == segment1.first) {
+    bool isSegmentOverlappingXAxis(std::pair<unsigned long long, unsigned long long> segment1, std::pair<unsigned long long, unsigned long long> segment2) {
+        const unsigned long long EPSILON = 1000 * 1000 * 10;
+        if (std::fabs(segment1.second - segment2.first) <= EPSILON or std::fabs(segment2.second -  segment1.first) <= EPSILON) {
             return false;
 
         // if any point of either segment lies within the other, we have overlap
@@ -122,6 +123,26 @@ namespace wrench {
             return true;
 
         // the two segments do not overlap
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * @brief Determines if two line segments overlap along the y-axis using exact values.
+     * @param segment1: first segment
+     * @param segment2: second segment
+     * @return bool
+     */
+    bool isSegmentOverlappingYAxis(std::pair<unsigned long long, unsigned long long> segment1, std::pair<unsigned long long, unsigned long long> segment2) {
+        if (segment1.second == segment2.first or segment2.second == segment1.first) {
+            return false;
+            // if any point of either segment lies within the other, we have overlap
+        } else if (isPointOnSegment(segment1, segment2.first) or isPointOnSegment(segment1, segment2.second) or
+                   isPointOnSegment(segment2, segment1.first) or isPointOnSegment(segment2, segment1.second)) {
+            return true;
+
+            // the two segments do not overlap
         } else {
             return false;
         }
@@ -139,7 +160,7 @@ namespace wrench {
      * @return bool
      */
     bool searchForLayout(std::vector<WorkflowTaskExecutionInstance> &data, std::size_t index) {
-        const unsigned long long PRECISION = 1000;
+        const unsigned long long PRECISION = 1000 * 1000 * 1000;
 
         WorkflowTaskExecutionInstance &current_execution_instance = data.at(index);
 
@@ -167,7 +188,6 @@ namespace wrench {
        * we have found a valid layout.
        */
         for (std::size_t vertical_position = 0; vertical_position < num_vertical_positions; ++vertical_position) {
-
             // Set the vertical positions as we go so the entire graph layout is set when the function returns
             current_execution_instance.vertical_position = vertical_position;
 
@@ -202,8 +222,8 @@ namespace wrench {
                      * Check overlap for the x_ranges first. If there is no overlap, we can guarantee that the rectangles
                      * will not overlap. If the x_ranges do overlap, then we need to evaluate the y_ranges for overlap.
                      */
-                    if (isSegmentOverlapping(current_rect_x_range, other_rect_x_range)) {
-                        if (isSegmentOverlapping(current_rect_y_range, other_rect_y_range)) {
+                    if (isSegmentOverlappingXAxis(current_rect_x_range, other_rect_x_range)) {
+                        if (isSegmentOverlappingYAxis(current_rect_y_range, other_rect_y_range)) {
                             has_overlap = true;
                             break;
                         }
@@ -246,38 +266,50 @@ namespace wrench {
      */
 
     /**
-      * @brief Writes WorkflowTask execution history for each task to a file, formatted as a JSON array
+      * @brief Writes WorkflowTask execution history for each task to a file, formatted as a JSON array.
+      * @description The JSON array has the following format:
+      *
+      * <pre>
+      *    [
+      *      {
+      *          task_id: <string>,
+      *          execution_host: {
+      *              hostname: <string>,
+      *              flop_rate: <double>,
+      *              memory: <double>,
+      *              cores: <unsigned_long>
+      *          },
+      *          num_cores_allocated: <unsigned_long>,
+      *          vertical_position: <unsigned_long>,
+      *          whole_task: { start: <double>, end: <double> },
+      *          read:       { start: <double>, end: <double> },
+      *          compute:    { start: <double>, end: <double> },
+      *          write:      { start: <double>, end: <double> },
+      *          failed: <double>,
+      *          terminated: <double>
+      *      }, . . .
+      *    ]
+      * </pre>
+      *
+      *   If generate_host_utilization_layout is set to true, a recursive function searches for a possible host
+      *   utilization layout where tasks are assumed to use contiguous numbers of cores on their execution hosts.
+      *   Note that each ComputeService does not enforce this, and such a layout may not exist for some workflow executions.
+      *   In this situation, the function will go through the entire search space until all possible layouts are evaluated.
+      *   For a large Workflow, this may take a very long time.
+      *
+      *   If a host utilization layout is able to be generated, the 'vertical_position' values will be set for each task run,
+      *   and the task can be plotted as a rectangle on a graph where the y-axis denotes the number of cores - 1, and the x-axis denotes the
+      *   workflow execution timeline. The vertical_position specifies the bottom of the rectangle. num_cores_allocated specifies the height
+      *   of the rectangle.
+      *
       * @param workflow: a pointer to the Workflow
       * @param file_path: the path to write the file
+      * @param generate_host_utilization_layout: boolean specifying whether or not you would like a possible host utilization
+      *     layout to be generated
       *
       * @throws std::invalid_argument
       */
-    void SimulationOutput::dumpWorkflowExecutionJSON(Workflow *workflow, std::string file_path) {
-        /* schema
-         *  [
-         *      {
-         *          task_id: <id>,
-         *          execution_host: {
-         *              hostname: <hostname>,
-         *              flop_rate: <number>,
-         *              memory: <number>,
-         *              cores: <number>
-         *          },
-         *          num_cores_allocated: <number>,
-         *          vertical_position: <number>,
-         *          whole_task: { start: <number>, end: <number> },
-         *          read:       { start: <number>, end: <number> },
-         *          compute:    { start: <number>, end: <number> },
-         *          write:      { start: <number>, end: <number> },
-         *          failed: <number>,
-         *          terminated: <number>
-         *      },
-         *      .
-         *      .
-         *      .
-         * ]
-         */
-
+    void SimulationOutput::dumpWorkflowExecutionJSON(Workflow *workflow, std::string file_path, bool generate_host_utilization_layout) {
         if (workflow == nullptr || file_path.empty()) {
             throw std::invalid_argument("Simulation::dumpTaskDataJSON() requires a valid workflow and file_path");
         }
@@ -318,8 +350,10 @@ namespace wrench {
             }
         }
 
-        // Set the "vertical position" of each WorkflowExecutionInstance so we know where to plot each rectangle.
-        generateHostUtilizationGraphLayout(data);
+        // Set the "vertical position" of each WorkflowExecutionInstance so we know where to plot each rectangle
+        if (generate_host_utilization_layout) {
+            generateHostUtilizationGraphLayout(data);
+        }
 
         std::ofstream output(file_path);
         output << std::setw(4) << nlohmann::json(data) << std::endl;
@@ -327,8 +361,37 @@ namespace wrench {
     }
 
     /**
-     * @brief Writes a JSON graph representation of the Workflow to a file
-     * @description A node is added for each WorkflowFile and WorkflowTask. A directed link is added for each dependency in the Workflow.
+     * @brief Writes a JSON graph representation of the Workflow to a file.
+     * @description A node is added for each WorkflowTask and WorkflowFile. A WorkflowTask will have the type "task" and
+     *  a WorkflowFile will have the type "file". A directed link is added for each dependency in the Workflow.
+     *
+     * <pre>
+     * {
+     *      nodes: [
+     *          {
+     *              type: <"task">,
+     *              id: <string>,
+     *              flops: <double>,
+     *              min_cores: <unsigned_long>,
+     *              max_cores: <unsigned_long>,
+     *              parallel_efficiency: <double>,
+     *              memory: <double>,
+     *          },
+     *          {
+     *              type: <"file">,
+     *              id: <string>,
+     *              size: <double>
+     *          }, . . .
+     *      ],
+     *      links: [
+     *          {
+     *              source: <string>,
+     *              target: <string>
+     *          }, . . .
+     *      ]
+     *  }
+     *  </pre>
+     *
      * @param workflow: a pointer to the workflow
      * @param file_path: the path to write the file
      *
@@ -340,41 +403,7 @@ namespace wrench {
         }
 
         /* schema
-         *  {
-         *      "nodes": [
-         *          {
-         *              "type": <task>,
-         *              "id": <task id>,
-         *              "flops": <number>,
-         *              "min_cores": <number>,
-         *              "max_cores": <number>,
-         *              "parallel_efficiency": <number>,
-         *              "memory": <number>,
-         *          },
-         *          {
-         *              "type": <file>,
-         *              "id": <filename>,
-         *              "size": <number>
-         *          }
-         *          .
-         *          .
-         *          .
-         *      ],
          *
-         *      "links": [
-         *          {
-         *              "source": <id>,
-         *              "target": <id>
-         *          },
-         *          {
-         *              "source": <id>,
-         *              "target": <id>
-         *          },
-         *          .
-         *          .
-         *          .
-         *      ]
-         *  }
          */
         nlohmann::json nodes;
         nlohmann::json links;

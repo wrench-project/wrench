@@ -6,6 +6,7 @@
 #include <wrench-dev.h>
 
 #include "../../include/TestWithFork.h"
+#include "../../include/UniqueTmpPathPrefix.h"
 
 class SimulationTimestampTaskTest : public ::testing::Test {
 
@@ -48,7 +49,7 @@ protected:
         workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
     }
 
-    std::string platform_file_path = "/tmp/platform.xml";
+    std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
     std::unique_ptr<wrench::Workflow> workflow;
 
 };
