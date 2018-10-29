@@ -18,6 +18,7 @@
 #include "wrench/workflow/job/PilotJob.h"
 
 #include "../../include/TestWithFork.h"
+#include "../../include/UniqueTmpPathPrefix.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(batch_service_queue_wait_time_prediction_test, "Log category for BatchServiceTest");
 
@@ -70,7 +71,7 @@ protected:
 
     }
 
-    std::string platform_file_path = "/tmp/platform.xml";
+    std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
     std::unique_ptr<wrench::Workflow> workflow;
 
 };
