@@ -26,6 +26,9 @@ class MultihostMulticoreComputeServiceTestScheduling : public ::testing::Test {
 
 public:
     // Default
+    wrench::ComputeService *cs = nullptr;
+
+    // Old Default
     wrench::ComputeService *cs_fcfs_aggressive_maximum_maximum_flops_best_fit = nullptr;
     // "minimum" core allocation
     wrench::ComputeService *cs_fcfs_aggressive_minimum_maximum_flops_best_fit = nullptr;
@@ -33,8 +36,8 @@ public:
     wrench::ComputeService *cs_fcfs_aggressive_maximum_maximum_minimum_cores_best_fit = nullptr;
 
     void do_OneJob_test();
-
     void do_MultiJob_test();
+    void do_RAMPressure_test();
 
 
     static bool isJustABitGreater(double base, double variable) {
@@ -52,8 +55,12 @@ protected:
               "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
               "<platform version=\"4.1\"> "
               "   <zone id=\"AS0\" routing=\"Full\"> "
-              "       <host id=\"Host1\" speed=\"1f\" core=\"4\"/> "
-              "       <host id=\"Host2\" speed=\"1f\" core=\"4\"/> "
+              "       <host id=\"Host1\" speed=\"1f\" core=\"4\"> "
+              "            <prop id=\"ram\" value=\"1000\"/> "
+              "       </host> "
+              "       <host id=\"Host2\" speed=\"1f\" core=\"4\"> "
+              "            <prop id=\"ram\" value=\"1000\"/> "
+              "       </host> "
               "        <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
               "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"1\"/> </route>"
               "   </zone> "
@@ -382,7 +389,7 @@ private:
     }
 };
 
-TEST_F(MultihostMulticoreComputeServiceTestScheduling, OneJob) {
+TEST_F(MultihostMulticoreComputeServiceTestScheduling, DISABLED_OneJob) {
   DO_TEST_WITH_FORK(do_OneJob_test);
 }
 
@@ -620,7 +627,7 @@ private:
     }
 };
 
-TEST_F(MultihostMulticoreComputeServiceTestScheduling, MultiJob) {
+TEST_F(MultihostMulticoreComputeServiceTestScheduling, DISABLED_MultiJob) {
   DO_TEST_WITH_FORK(do_MultiJob_test);
 }
 
@@ -649,6 +656,81 @@ void MultihostMulticoreComputeServiceTestScheduling::do_MultiJob_test() {
   wrench::WMS *wms = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(
           new MultiJobTestWMS(
+                  this, compute_services, {}, "Host1")));
+
+  ASSERT_NO_THROW(wms->addWorkflow(workflow));
+
+  ASSERT_NO_THROW(simulation->launch());
+
+  delete simulation;
+
+  free(argv[0]);
+  free(argv);
+}
+
+
+
+/**********************************************************************/
+/**  RAM PRESSURE TEST                                               **/
+/**********************************************************************/
+
+class RAMPressureTestWMS : public wrench::WMS {
+
+public:
+    RAMPressureTestWMS(MultihostMulticoreComputeServiceTestScheduling *test,
+                    const std::set<wrench::ComputeService *> &compute_services,
+                    const std::set<wrench::StorageService *> &storage_services,
+                    std::string hostname) :
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
+      this->test = test;
+    }
+
+
+private:
+
+    MultihostMulticoreComputeServiceTestScheduling *test;
+
+    int main() {
+
+      // Create a job manager
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+
+
+      return 0;
+    }
+
+
+};
+
+TEST_F(MultihostMulticoreComputeServiceTestScheduling, RAMPressure) {
+  DO_TEST_WITH_FORK(do_RAMPressure_test);
+}
+
+void MultihostMulticoreComputeServiceTestScheduling::do_RAMPressure_test() {
+
+  // Create and initialize a simulation
+  auto *simulation = new wrench::Simulation();
+  int argc = 1;
+  auto **argv = (char **) calloc(1, sizeof(char *));
+  argv[0] = strdup("one_task_test");
+
+  simulation->init(&argc, argv);
+
+  // Setting up the platform
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+  // Create a Compute Service
+  ASSERT_NO_THROW(cs = simulation->add(
+          new wrench::MultihostMulticoreComputeService("Host1",
+                                                       (std::set<std::string>){"Host1", "Host2"}, 0.0,
+                                                       {}, {})));
+  std::set<wrench::ComputeService *> compute_services;
+  compute_services.insert(cs);
+
+  // Create a WMS
+  wrench::WMS *wms = nullptr;
+  ASSERT_NO_THROW(wms = simulation->add(
+          new RAMPressureTestWMS(
                   this, compute_services, {}, "Host1")));
 
   ASSERT_NO_THROW(wms->addWorkflow(workflow));
