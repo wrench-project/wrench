@@ -170,8 +170,8 @@ namespace wrench {
         // Map of all Workunits
         std::map<StandardJob *, std::set<std::unique_ptr<Workunit>>> all_workunits;
 
-        std::map<StandardJob *, std::set<Workunit *>> ready_workunits;
-        std::map<StandardJob *, std::set<Workunit *>> running_workunits;
+        std::deque<Workunit *> ready_workunits;
+//        std::map<StandardJob *, std::set<Workunit *>> running_workunits;
         std::map<StandardJob *, std::set<Workunit *>> completed_workunits;
 
         // Set of running WorkunitExecutors

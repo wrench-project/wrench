@@ -143,7 +143,7 @@ namespace wrench {
           target_num_cores = std::get<1>(parsed_spec);
         }
         finalized_service_specific_arguments.insert(std::make_pair(t->getID(),
-                                                    target_host + ":" + std::to_string(target_num_cores)));
+                                                                   target_host + ":" + std::to_string(target_num_cores)));
       }
 
       // At this point, there may still be insufficient resources to run the task, but that will
@@ -529,59 +529,80 @@ namespace wrench {
       // Don't kill me while I am doing this
       this->acquireDaemonLock();
 
-      // TODO: TO IMPLEMENT
-      for (auto const &j : this->ready_workunits) {
-        StandardJob *job = j.first;
-        std::set<Workunit*> dispatched_wus_for_job;
-        for (auto const &wu : j.second) {
-          std::string required_host;
-          unsigned long required_num_cores;
-          double required_ram;
-          if (wu->task == nullptr) {
-            required_host = (*(this->compute_resources.begin())).first;
-            required_num_cores = 1;
-            required_ram = 0.0;
-          } else {
-            required_host = std::get<0>(this->job_run_specs[job][wu->task]);
-            required_num_cores = std::get<1>(this->job_run_specs[job][wu->task]);
-            required_ram = wu->task->getMaxNumCores();
-          }
-          // Check that RAM is ok
-          if (this->ram_availabilities[required_host] < required_ram) {
-            continue;
-          }
+      std::set<Workunit *> dispatched_wus_for_job;
 
-          /** Dispatch it */
-          std::shared_ptr<WorkunitExecutor> workunit_executor = std::shared_ptr<WorkunitExecutor>(
-                  new WorkunitExecutor(this->simulation,
-                                       required_host,
-                                       required_num_cores,
-                                       required_ram,
-                                       this->mailbox_name,
-                                       wu,
-                                       this->getScratch(),
-                                       job,
-                                       this->getPropertyValueAsDouble(
-                                               MultihostMulticoreComputeServiceProperty::THREAD_STARTUP_OVERHEAD),
-                                       false
-                  ));
+      std::set<std::string> no_longer_considered_hosts;  // Due to a previously considered workunit not being
+      // able to run on that hsot due to RAM, and because we don't
+      // allow non-zero-ram tasks to jump ahead of other tasks
 
-          workunit_executor->simulation = this->simulation;
-          workunit_executor->start(workunit_executor, true);
-
-          // Keep track of this workunit executor
-          this->workunit_executors[job].insert(workunit_executor);
-
-          // Update core and RAM availability
-          this->ram_availabilities[required_host] -= required_ram;
-          this->running_thread_counts[required_host] += required_num_cores;
-
-          dispatched_wus_for_job.insert(wu);
+      for (auto const &wu : this->ready_workunits) {
+        StandardJob *job = wu->getJob();
+        std::string required_host;
+        unsigned long required_num_cores;
+        double required_ram;
+        if (wu->task == nullptr) {
+          required_host = (*(this->compute_resources.begin())).first;
+          required_num_cores = 1;
+          required_ram = 0.0;
+        } else {
+          required_host = std::get<0>(this->job_run_specs[job][wu->task]);
+          required_num_cores = std::get<1>(this->job_run_specs[job][wu->task]);
+          required_ram = wu->task->getMaxNumCores();
         }
 
-        // Remove the WUs from the ready queue
-        for (auto const &wu : dispatched_wus_for_job) {
-          this->ready_workunits[job].erase(wu);
+        // Check that RAM is ok
+
+        // If required_ram == 0, we're always find
+        if (required_ram != 0) {
+          // If not enough ram, continue, but add the host to the
+          // list of hosts to no longer be considered
+          if (this->ram_availabilities[required_host] < required_ram) {
+            no_longer_considered_hosts.insert(required_host);
+            continue;
+          }
+          // If the host should no longer be considered, continue
+          if (no_longer_considered_hosts.find(required_host) != no_longer_considered_hosts.end()) {
+            continue;
+          }
+        }
+
+        /** Dispatch it */
+        std::shared_ptr<WorkunitExecutor> workunit_executor = std::shared_ptr<WorkunitExecutor>(
+                new WorkunitExecutor(this->simulation,
+                                     required_host,
+                                     required_num_cores,
+                                     required_ram,
+                                     this->mailbox_name,
+                                     wu,
+                                     this->getScratch(),
+                                     job,
+                                     this->getPropertyValueAsDouble(
+                                             MultihostMulticoreComputeServiceProperty::THREAD_STARTUP_OVERHEAD),
+                                     false
+                ));
+
+        workunit_executor->simulation = this->simulation;
+        workunit_executor->start(workunit_executor, true);
+
+        // Keep track of this workunit executor
+        this->workunit_executors[job].insert(workunit_executor);
+
+        // Update core and RAM availability
+        this->ram_availabilities[required_host] -= required_ram;
+        this->running_thread_counts[required_host] += required_num_cores;
+
+        dispatched_wus_for_job.insert(wu);
+      }
+
+      // Remove the WUs from the ready queue (this is inefficient, better data structs would help)
+      while (dispatched_wus_for_job.size() > 0) {
+        Workunit *wu = *(dispatched_wus_for_job.begin());
+        for (auto it =this->ready_workunits.begin(); it != this->ready_workunits.end(); it++) {
+          if ((*it) == wu) {
+            this->ready_workunits.erase(it);
+            dispatched_wus_for_job.erase(wu);
+            break;
+          }
         }
       }
 
@@ -589,13 +610,13 @@ namespace wrench {
     }
 
 
-    /**
-     * @brief Wait for and react to any incoming message
-     *
-     * @return false if the daemon should terminate, true otherwise
-     *
-     * @throw std::runtime_error
-     */
+/**
+ * @brief Wait for and react to any incoming message
+ *
+ * @return false if the daemon should terminate, true otherwise
+ *
+ * @throw std::runtime_error
+ */
     bool MultihostMulticoreComputeService::processNextMessage() {
 
       S4U_Simulation::computeZeroFlop();
@@ -675,11 +696,11 @@ namespace wrench {
 
 
 
-    /**
-     * @brief fail a running standard job
-     * @param job: the job
-     * @param cause: the failure cause
-     */
+/**
+ * @brief fail a running standard job
+ * @param job: the job
+ * @param cause: the failure cause
+ */
     void
     MultihostMulticoreComputeService::failRunningStandardJob(StandardJob *job, std::shared_ptr<FailureCause> cause) {
 
@@ -700,10 +721,10 @@ namespace wrench {
       }
     }
 
-    /**
-    * @brief terminate a running standard job
-    * @param job: the job
-    */
+/**
+* @brief terminate a running standard job
+* @param job: the job
+*/
     void MultihostMulticoreComputeService::terminateRunningStandardJob(StandardJob *job, MultihostMulticoreComputeService::JobTerminationCause termination_cause) {
 
       /** Kill all relevant work unit executors */
@@ -721,10 +742,22 @@ namespace wrench {
       this->workunit_executors.erase(job);
 
       /** Remove all relevant work units */
-      this->ready_workunits[job].clear();
-      this->ready_workunits.erase(job);
-      this->running_workunits[job].clear();
-      this->running_workunits.erase(job);
+      std::set<Workunit *> to_remove;
+      for (auto const & wu : this->ready_workunits) {
+        if (wu->getJob() == job) {
+          to_remove.insert(wu);
+        }
+      }
+      // Really inefficient, Better data structures needed
+      while (to_remove.size() > 0) {
+        for (auto it = this->ready_workunits.begin(); it != this->ready_workunits.end(); it++) {
+          if ((*it) == (*(to_remove.begin()))) {
+            this->ready_workunits.erase(it);
+            to_remove.erase(to_remove.begin());
+            break;
+          }
+        }
+      }
       this->completed_workunits[job].clear();
       this->completed_workunits.erase(job);
       this->all_workunits[job].clear();
@@ -769,10 +802,10 @@ namespace wrench {
     }
 
 
-    /**
-    * @brief Declare all current jobs as failed (likely because the daemon is being terminated
-    * or has timed out (because it's in fact a pilot job))
-    */
+/**
+* @brief Declare all current jobs as failed (likely because the daemon is being terminated
+* or has timed out (because it's in fact a pilot job))
+*/
     void MultihostMulticoreComputeService::failCurrentStandardJobs() {
 
       for (auto job : this->running_jobs) {
@@ -833,11 +866,11 @@ namespace wrench {
 //
 //    }
 
-    /**
-     * @brief Terminate the daemon, dealing with pending/running jobs
-     *
-     * @param notify_pilot_job_submitters:
-     */
+/**
+ * @brief Terminate the daemon, dealing with pending/running jobs
+ *
+ * @param notify_pilot_job_submitters:
+ */
     void MultihostMulticoreComputeService::terminate(bool notify_pilot_job_submitters) {
 
       this->setStateToDown();
@@ -865,14 +898,14 @@ namespace wrench {
 
 
 
-    /**
-     * @brief Synchronously terminate a standard job previously submitted to the compute service
-     *
-     * @param job: a standard job
-     *
-     * @throw WorkflowExecutionException
-     * @throw std::runtime_error
-     */
+/**
+ * @brief Synchronously terminate a standard job previously submitted to the compute service
+ *
+ * @param job: a standard job
+ *
+ * @throw WorkflowExecutionException
+ * @throw std::runtime_error
+ */
     void MultihostMulticoreComputeService::terminateStandardJob(StandardJob *job) {
 
       if (this->state == Service::DOWN) {
@@ -912,11 +945,11 @@ namespace wrench {
     }
 
 
-    /**
-     * @brief Process a workunit executor completion
-     * @param workunit_executor: the workunit executor
-     * @param workunit: the workunit
-     */
+/**
+ * @brief Process a workunit executor completion
+ * @param workunit_executor: the workunit executor
+ * @param workunit: the workunit
+ */
 
     void MultihostMulticoreComputeService::processWorkunitExecutorCompletion(WorkunitExecutor *workunit_executor,
                                                                              Workunit *workunit) {
@@ -946,8 +979,7 @@ namespace wrench {
         job->incrementNumCompletedTasks();
       }
 
-      // Move the workunit from "running" to "completed"
-      this->running_workunits[job].erase(workunit);
+      // Set the workunig as completed
       this->completed_workunits[job].insert(workunit);
 
       // Update workunit dependencies if any
@@ -963,7 +995,7 @@ namespace wrench {
             }
           }
           // Move the workunit to ready
-          this->ready_workunits[job].insert(child);
+          this->ready_workunits.push_back(child);
         }
       }
 
@@ -976,8 +1008,6 @@ namespace wrench {
 
       // At this point, the job is done and we can get rid of workunits
       this->completed_workunits[job].clear();
-      this->ready_workunits.erase(job);
-      this->running_workunits.erase(job);
       this->completed_workunits.erase(job);
       this->all_workunits[job].clear();
       this->all_workunits.erase(job);
@@ -997,12 +1027,12 @@ namespace wrench {
     }
 
 
-    /**
-    * @brief Process a workunit executor failure
-    * @param workunit_executor: the workunit executor
-    * @param workunit: the workunit
-    * @param cause: the failure cause
-    */
+/**
+* @brief Process a workunit executor failure
+* @param workunit_executor: the workunit executor
+* @param workunit: the workunit
+* @param cause: the failure cause
+*/
 
     void MultihostMulticoreComputeService::processWorkunitExecutorFailure(WorkunitExecutor *workunit_executor,
                                                                           Workunit *workunit,
@@ -1028,10 +1058,10 @@ namespace wrench {
     }
 
 
-    /**
-     * @brief Helper function to "forget" a workunit executor (and free memory)
-     * @param workunit_executor: the workunit executor
-     */
+/**
+ * @brief Helper function to "forget" a workunit executor (and free memory)
+ * @param workunit_executor: the workunit executor
+ */
     void MultihostMulticoreComputeService::forgetWorkunitExecutor(WorkunitExecutor *workunit_executor) {
 
       StandardJob *job = workunit_executor->getJob();
@@ -1050,12 +1080,12 @@ namespace wrench {
 
 
 
-    /**
-     * @brief Process a standard job termination request
-     *
-     * @param job: the job to terminate
-     * @param answer_mailbox: the mailbox to which the answer message should be sent
-     */
+/**
+ * @brief Process a standard job termination request
+ *
+ * @param job: the job to terminate
+ * @param answer_mailbox: the mailbox to which the answer message should be sent
+ */
     void MultihostMulticoreComputeService::processStandardJobTerminationRequest(StandardJob *job,
                                                                                 const std::string &answer_mailbox) {
 
@@ -1159,13 +1189,11 @@ namespace wrench {
       this->job_run_specs.insert(std::make_pair(job, task_run_specs));
 
       // Add the ready ones to the ready list
-      std::set<Workunit*> ready;
       for (auto const &wu: this->all_workunits[job]) {
         if (wu->num_pending_parents == 0) {
-          ready.insert(wu.get());
+          this->ready_workunits.push_back(wu.get());
         }
       }
-      this->ready_workunits.insert(std::make_pair(job, ready));
 
       // And send a reply!
       try {
@@ -1326,10 +1354,10 @@ namespace wrench {
 
     }
 
-    /**
-     * @brief non-implemented
-     * @param job: a pilot job to (supposedly) terminate
-     */
+/**
+ * @brief non-implemented
+ * @param job: a pilot job to (supposedly) terminate
+ */
     void MultihostMulticoreComputeService::terminatePilotJob(PilotJob *job) {
       throw std::runtime_error("MultihostMulticoreComputeService::terminatePilotJob(): not implemented because MultihostMulticoreComputeService never supports pilot jobs");
     }
