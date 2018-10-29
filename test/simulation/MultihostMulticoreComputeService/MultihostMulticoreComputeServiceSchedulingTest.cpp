@@ -128,7 +128,7 @@ private:
         try {
           event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {
-          throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+          throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
         switch (event->type) {
           case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
@@ -200,7 +200,7 @@ private:
         try {
           event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {
-          throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+          throw std::runtime_error("Error while getting ecution event: " + e.getCause()->toString());
         }
         switch (event->type) {
           case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
@@ -270,7 +270,7 @@ private:
         try {
           event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {
-          throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+          throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
         switch (event->type) {
           case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
@@ -340,7 +340,7 @@ private:
         try {
           event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {
-          throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+          throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
         switch (event->type) {
           case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
@@ -520,7 +520,7 @@ private:
           try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
           } catch (wrench::WorkflowExecutionException &e) {
-            throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+            throw std::runtime_error("Error while getting ecution event: " + e.getCause()->toString());
           }
           switch (event->type) {
             case wrench::WorkflowExecutionEvent::PILOT_JOB_START: {
@@ -545,7 +545,7 @@ private:
           try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
           } catch (wrench::WorkflowExecutionException &e) {
-            throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+            throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
           }
           switch (event->type) {
             case wrench::WorkflowExecutionEvent::PILOT_JOB_EXPIRATION: {
@@ -570,7 +570,7 @@ private:
           try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
           } catch (wrench::WorkflowExecutionException &e) {
-            throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+            throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
           }
           switch (event->type) {
             case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
@@ -596,7 +596,7 @@ private:
           try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
           } catch (wrench::WorkflowExecutionException &e) {
-            throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+            throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
           }
           switch (event->type) {
             case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
@@ -695,6 +695,32 @@ private:
       // Create a job manager
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
+      // Create a few tasks
+      std::vector<wrench::WorkflowTask *> tasks;
+      tasks.push_back(this->getWorkflow()->addTask("task1", 60, 1, 1, 1.0, 500));
+      tasks.push_back(this->getWorkflow()->addTask("task2", 60, 1, 1, 1.0, 600));
+      tasks.push_back(this->getWorkflow()->addTask("task3", 60, 1, 1, 1.0, 400));
+      tasks.push_back(this->getWorkflow()->addTask("task4", 60, 1, 1, 1.0, 000));
+
+      // Submit them in order
+      for (auto const & t : tasks) {
+        wrench::StandardJob *j = job_manager->createStandardJob(t, {});
+        job_manager->submitJob(j, this->test->cs);
+      }
+
+      // Wait for completions
+      for (int i=0; i < 4; i++) {
+        std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+        try {
+          event = this->getWorkflow()->waitForNextExecutionEvent();
+        } catch (wrench::WorkflowExecutionException &e) {
+          throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
+        }
+        switch (event->type) {
+          case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
+            // success, do nothing for now
+            break;
+          }      }
 
       return 0;
     }
