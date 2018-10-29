@@ -530,6 +530,7 @@ namespace wrench {
       // Don't kill me while I am doing this
       this->acquireDaemonLock();
 
+
       std::set<Workunit *> dispatched_wus_for_job;
 
       std::set<std::string> no_longer_considered_hosts;  // Due to a previously considered workunit not being
@@ -548,24 +549,25 @@ namespace wrench {
         } else {
           required_host = std::get<0>(this->job_run_specs[job][wu->task]);
           required_num_cores = std::get<1>(this->job_run_specs[job][wu->task]);
-          required_ram = wu->task->getMaxNumCores();
+          required_ram = wu->task->getMemoryRequirement();
         }
 
         // Check that RAM is ok
-
         // If required_ram == 0, we're always find
         if (required_ram != 0) {
+          // If the host should no longer be considered, continue
+          if (no_longer_considered_hosts.find(required_host) != no_longer_considered_hosts.end()) {
+            continue;
+          }
           // If not enough ram, continue, but add the host to the
           // list of hosts to no longer be considered
           if (this->ram_availabilities[required_host] < required_ram) {
             no_longer_considered_hosts.insert(required_host);
             continue;
           }
-          // If the host should no longer be considered, continue
-          if (no_longer_considered_hosts.find(required_host) != no_longer_considered_hosts.end()) {
-            continue;
-          }
+
         }
+
 
         /** Dispatch it */
         std::shared_ptr<WorkunitExecutor> workunit_executor = std::shared_ptr<WorkunitExecutor>(
@@ -962,7 +964,7 @@ namespace wrench {
       }
       // Update RAM availabilities and running thread counts
       if (workunit->task) {
-        this->ram_availabilities[workunit_executor->getHostname()] -= workunit->task->getMemoryRequirement();
+        this->ram_availabilities[workunit_executor->getHostname()] += workunit->task->getMemoryRequirement();
         this->running_thread_counts[workunit_executor->getHostname()] -= workunit_executor->getNumCores();
       }
       // Forget the workunit executor
@@ -1046,7 +1048,7 @@ namespace wrench {
       }
       // Update RAM availabilities and running thread counts
       if (workunit->task) {
-        this->ram_availabilities[workunit_executor->getHostname()] -= workunit->task->getMemoryRequirement();
+        this->ram_availabilities[workunit_executor->getHostname()] += workunit->task->getMemoryRequirement();
         this->running_thread_counts[workunit_executor->getHostname()] -= workunit_executor->getNumCores();
       }
       // Forget the workunit executor
