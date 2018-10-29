@@ -427,6 +427,7 @@ namespace wrench {
 
       // Check that there is at least one core per host and that hosts have enough cores
       for (auto host : compute_resources) {
+
         std::string hname = host.first;
         unsigned long requested_cores = std::get<0>(host.second);
         unsigned long available_cores;
@@ -450,7 +451,7 @@ namespace wrench {
                   std::to_string(requested_cores) + " are requested");
         }
 
-        double requested_ram = std::get<0>(host.second);
+        double requested_ram = std::get<1>(host.second);
         double available_ram = S4U_Simulation::getHostMemoryCapacity(hname);
         if (requested_ram < 0) {
           throw std::invalid_argument(
@@ -1335,7 +1336,6 @@ namespace wrench {
 
       // Thread startup overhead
       double thread_startup_overhead = 0;
-      success = true;
       try {
         thread_startup_overhead = this->getPropertyValueAsDouble(MultihostMulticoreComputeServiceProperty::THREAD_STARTUP_OVERHEAD);
       } catch (std::invalid_argument &e) {

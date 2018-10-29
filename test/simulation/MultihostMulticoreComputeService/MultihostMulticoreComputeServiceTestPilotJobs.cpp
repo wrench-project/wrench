@@ -410,7 +410,7 @@ private:
     }
 };
 
-TEST_F(MultihostMulticoreComputeServiceTestPilotJobs, OnePilotJobNoTimeoutWaitForExpiration) {
+TEST_F(MultihostMulticoreComputeServiceTestPilotJobs, DISABLED_OnePilotJobNoTimeoutWaitForExpiration) {
   DO_TEST_WITH_FORK(do_OnePilotJobNoTimeoutWaitForExpiration_test);
 }
 
@@ -564,7 +564,7 @@ private:
     }
 };
 
-TEST_F(MultihostMulticoreComputeServiceTestPilotJobs, OnePilotJobNoTimeoutShutdownService) {
+TEST_F(MultihostMulticoreComputeServiceTestPilotJobs, DISABLED_OnePilotJobNoTimeoutShutdownService) {
   DO_TEST_WITH_FORK(do_OnePilotJobNoTimeoutShutdownService_test);
 }
 
@@ -676,7 +676,7 @@ private:
     }
 };
 
-TEST_F(MultihostMulticoreComputeServiceTestPilotJobs, NonSubmittedPilotJobTermination) {
+TEST_F(MultihostMulticoreComputeServiceTestPilotJobs, DISABLED_NonSubmittedPilotJobTermination) {
   DO_TEST_WITH_FORK(do_NonSubmittedPilotJobTermination_test);
 }
 
@@ -838,7 +838,7 @@ private:
     }
 };
 
-TEST_F(MultihostMulticoreComputeServiceTestPilotJobs, IdlePilotJobTermination) {
+TEST_F(MultihostMulticoreComputeServiceTestPilotJobs, DISABLED_IdlePilotJobTermination) {
   DO_TEST_WITH_FORK(do_IdlePilotJobTermination_test);
 }
 
@@ -1008,7 +1008,7 @@ private:
     }
 };
 
-TEST_F(MultihostMulticoreComputeServiceTestPilotJobs, NonIdlePilotJobTermination) {
+TEST_F(MultihostMulticoreComputeServiceTestPilotJobs, DISABLED_NonIdlePilotJobTermination) {
   DO_TEST_WITH_FORK(do_NonIdlePilotJobTermination_test);
 }
 
