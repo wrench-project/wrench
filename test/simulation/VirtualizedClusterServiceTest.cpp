@@ -830,7 +830,6 @@ private:
       this->simulation->sleep(1);
       // shutdown VMs
       try {
-
         for (auto &vm : vm_list) {
           if (!cs->shutdownVM(vm)) {
             throw std::runtime_error("Unable to shutdown VM");
@@ -840,8 +839,10 @@ private:
         throw std::runtime_error(e.what());
       }
 
-      // Create an empty job
-        wrench::StandardJob *job = job_manager->createStandardJob({},{},{},{},{});
+      // Create a one-task job
+      wrench::StandardJob *job = job_manager->createStandardJob(this->test->task1,
+                                                                {std::make_pair(this->test->input_file,
+                                                                                 this->test->storage_service)});
 
       // Submit a job
       try {
@@ -852,6 +853,8 @@ private:
       }
 
 
+      std::cerr << "STARTING VB AND SUBMITTING JOB\n";
+
       try {
         cs->startVM(vm_list[3]);
         job_manager->submitJob(job, this->test->compute_service);
@@ -859,14 +862,18 @@ private:
         throw std::runtime_error(e.what());
       }
 
+
       try {
+        std::cerr << "SUSPENDING VM\n";
         cs->suspendVM(vm_list[3]);
+        std::cerr << "SUBMITTING JOB\n";
         job_manager->submitJob(job, this->test->compute_service);
         throw std::runtime_error("should have thrown an exception since there are no resources available");
       } catch (wrench::WorkflowExecutionException &e) {
         // do nothing, should have thrown an exception since there are no resources available
       }
 
+      std::cerr << "HERE\n";
       try {
         if (!cs->resumeVM(vm_list[3])) {
           throw std::runtime_error("Could not resume the VM");
@@ -937,9 +944,13 @@ void VirtualizedClusterServiceTest::do_ShutdownVMTest_test() {
 
   // Create a Cloud Service
   std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
+  ASSERT_THROW(compute_service = simulation->add(
+          new wrench::VirtualizedClusterService(hostname, execution_hosts, 0,
+                                                {{wrench::VirtualizedClusterServiceProperty::SUPPORTS_PILOT_JOBS, "true"}})), std::invalid_argument);
+
   ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::VirtualizedClusterService(hostname, execution_hosts, 0,
-                                                {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}})));
+                                                {{wrench::VirtualizedClusterServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
