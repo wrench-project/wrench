@@ -115,7 +115,9 @@ namespace wrench {
 
         if (service_specific_args.find(t->getID()) == service_specific_args.end()) {
           // Pick a host
-          target_host = available_hosts.at(current_picked_host++);
+          target_host = available_hosts.at(current_picked_host);
+          // Next time will be the "next" host
+          current_picked_host = (current_picked_host + 1) % available_hosts.size();
           // Pick a number of cores
           target_num_cores =
                   std::min<unsigned long>(t->getMaxNumCores(),
