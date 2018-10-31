@@ -481,7 +481,7 @@ private:
     }
 };
 
-TEST_F(VirtualizedClusterServiceTest, CloudPilotJobTestWMS) {
+TEST_F(VirtualizedClusterServiceTest, DISABLED_CloudPilotJobTestWMS) {
   DO_TEST_WITH_FORK(do_PilotJobTaskTest_test);
 }
 
