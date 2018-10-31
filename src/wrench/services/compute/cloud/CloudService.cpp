@@ -993,4 +993,14 @@ namespace wrench {
                                     this->getPropertyValueAsString(CloudServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS));
       }
     }
+
+  /**
+   * @brief non-implemented
+   * @param job: a pilot job to (supposedly) terminate
+   */
+    void CloudService::terminatePilotJob(PilotJob *job) {
+      throw std::runtime_error("CloudService::terminatePilotJob(): not implemented because CloudService never supports pilot jobs");
+    }
+
+
 }
