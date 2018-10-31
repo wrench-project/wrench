@@ -52,7 +52,7 @@ namespace wrench {
         case 1: // "num_cores"
         {
           unsigned long num_threads;
-          if (sscanf(tokens[1].c_str(), "%lu", &num_threads) != 1) {
+          if (sscanf(tokens[0].c_str(), "%lu", &num_threads) != 1) {
             throw std::invalid_argument("Invalid service-specific argument '" + spec + "'");
           }
           return std::make_tuple(std::string(""), num_threads);
@@ -98,6 +98,21 @@ namespace wrench {
 
       if (this->state == Service::DOWN) {
         throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+      }
+
+      /* make sure that service arguments are provided for tasks in the jobs */
+      for (auto const &arg : service_specific_args) {
+        bool found = false;
+        for (auto const &task : job->getTasks()) {
+          if (task->getID() == arg.first) {
+            found = true;
+            break;
+          }
+        }
+        if (not found) {
+          throw std::invalid_argument("MultihostMulticoreComputeService::submitStandardJob(): Service-specific argument provided for task with ID '" +
+          arg.first + "' but there is no task with such ID in the job");
+        }
       }
 
       /* parse and update service-specific args are provided and well-formatted */
