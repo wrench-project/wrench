@@ -699,10 +699,7 @@ private:
       // Create a job manager
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
-      // Create a pilot job that requests 1 host, 1 code, 0 bytes, and 1 minute
-      wrench::PilotJob *pilot_job = job_manager->createPilotJob(1, 1, 0.0, 60.0);
-
-      // Submit the pilot job for execution
+      // Create a bunch of VMs
       try {
         auto cs = (wrench::VirtualizedClusterService *) this->test->compute_service;
         std::string execution_host = cs->getExecutionHosts()[0];
@@ -712,32 +709,11 @@ private:
         cs->createVM(execution_host, 1, 10);
         cs->createVM(execution_host, 1, 10);
 
-        job_manager->submitJob(pilot_job, this->test->compute_service);
-
       } catch (wrench::WorkflowExecutionException &e) {
         throw std::runtime_error(e.what());
       }
 
-      // Wait for a workflow execution event
-      std::unique_ptr<wrench::WorkflowExecutionEvent> event;
-      try {
-        event = this->getWorkflow()->waitForNextExecutionEvent();
-      } catch (wrench::WorkflowExecutionException &e) {
-        throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
-      }
-      switch (event->type) {
-        case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-          // success, do nothing for now
-          break;
-        }
-        case wrench::WorkflowExecutionEvent::PILOT_JOB_START: {
-          // success, do nothing for now
-          break;
-        }
-        default: {
-          throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
-        }
-      }
+      this->simulation->sleep(10);
 
       // stop all VMs
       this->test->compute_service->stop();
