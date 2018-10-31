@@ -418,8 +418,9 @@ private:
 
       double task3_end_date = this->test->task3->getEndDate();
       double task4_end_date = this->test->task4->getEndDate();
-      double delta = fabs(task3_end_date - task4_end_date);
-      if ((delta < 5.0) || (delta > 5.0 + EPSILON)) {
+      double delta_task3 = fabs(task3_end_date - 10.0);
+      double delta_task4 = fabs(task4_end_date - 10.0);
+      if ((delta_task3 > EPSILON) || (delta_task4 > EPSILON)) {
         throw std::runtime_error("Unexpected task completion times " + std::to_string(task3_end_date) + " and " +
                                  std::to_string(task4_end_date) + ".");
       }
@@ -456,7 +457,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase1_
   // Create a Compute Service
   ASSERT_NO_THROW(compute_service = simulation->add(
                   new wrench::MultihostMulticoreComputeService(hostname,
-                                                               {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                               {std::make_pair("DualCoreHost", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
                                                                100.0, {})));
 
   // Create a WMS
