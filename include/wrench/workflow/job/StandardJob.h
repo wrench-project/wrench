@@ -94,7 +94,7 @@ namespace wrench {
 
         friend class JobManager;
 
-        StandardJob(std::vector<WorkflowTask *> tasks, std::map<WorkflowFile *, StorageService *> &file_locations,
+        StandardJob(Workflow *workflow, std::vector<WorkflowTask *> tasks, std::map<WorkflowFile *, StorageService *> &file_locations,
                     std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> &pre_file_copies,
                     std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> &post_file_copies,
                     std::set<std::tuple<WorkflowFile *, StorageService *>> &cleanup_file_deletions);

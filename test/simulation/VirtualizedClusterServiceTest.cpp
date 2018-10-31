@@ -808,13 +808,13 @@ private:
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       // Create a pilot job that requests 1 host, 1 code, 0 bytes, and 1 minute
-      wrench::PilotJob *pilot_job = job_manager->createPilotJob(1, 1, 0.0, 60.0);
+//      wrench::PilotJob *pilot_job = job_manager->createPilotJob(1, 1, 0.0, 60.0);
 
       std::vector<std::string> vm_list;
 
       auto cs = (wrench::VirtualizedClusterService *) this->test->compute_service;
 
-      // Submit the pilot job for execution
+      // Create VMs
       try {
         std::string execution_host = cs->getExecutionHosts()[0];
 
@@ -827,6 +827,7 @@ private:
         throw std::runtime_error(e.what());
       }
 
+      this->simulation->sleep(1);
       // shutdown VMs
       try {
 
@@ -839,23 +840,28 @@ private:
         throw std::runtime_error(e.what());
       }
 
+      // Create an empty job
+        wrench::StandardJob *job = job_manager->createStandardJob({},{},{},{},{});
+
+      // Submit a job
       try {
-        job_manager->submitJob(pilot_job, this->test->compute_service);
+        job_manager->submitJob(job, this->test->compute_service);
         throw std::runtime_error("should have thrown an exception since there are no resources available");
       } catch (wrench::WorkflowExecutionException &e) {
         // do nothing, should have thrown an exception since there are no resources available
       }
 
+
       try {
         cs->startVM(vm_list[3]);
-        job_manager->submitJob(pilot_job, this->test->compute_service);
+        job_manager->submitJob(job, this->test->compute_service);
       } catch (std::runtime_error &e) {
         throw std::runtime_error(e.what());
       }
 
       try {
         cs->suspendVM(vm_list[3]);
-        job_manager->submitJob(pilot_job, this->test->compute_service);
+        job_manager->submitJob(job, this->test->compute_service);
         throw std::runtime_error("should have thrown an exception since there are no resources available");
       } catch (wrench::WorkflowExecutionException &e) {
         // do nothing, should have thrown an exception since there are no resources available
@@ -865,7 +871,7 @@ private:
         if (!cs->resumeVM(vm_list[3])) {
           throw std::runtime_error("Could not resume the VM");
         }
-        job_manager->submitJob(pilot_job, this->test->compute_service);
+        job_manager->submitJob(job, this->test->compute_service);
       } catch (std::runtime_error &e) {
         throw std::runtime_error(e.what());
       }
@@ -883,10 +889,6 @@ private:
       }
       switch (event->type) {
         case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-          // success, do nothing for now
-          break;
-        }
-        case wrench::WorkflowExecutionEvent::PILOT_JOB_START: {
           // success, do nothing for now
           break;
         }

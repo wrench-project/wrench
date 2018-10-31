@@ -163,7 +163,7 @@ namespace wrench {
         }
       }
 
-      StandardJob *raw_ptr = new StandardJob(tasks, file_locations, pre_file_copies, post_file_copies,
+      StandardJob *raw_ptr = new StandardJob(this->wms->getWorkflow(), tasks, file_locations, pre_file_copies, post_file_copies,
                                              cleanup_file_deletions);
       std::unique_ptr<WorkflowJob> job = std::unique_ptr<StandardJob>(raw_ptr);
 
