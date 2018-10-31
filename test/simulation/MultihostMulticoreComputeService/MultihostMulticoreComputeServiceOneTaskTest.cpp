@@ -1507,7 +1507,7 @@ private:
       }
 
       if (success) {
-        throw std::runtime_error("Should not be able to submit a job to a service without enough cores");
+        throw std::runtime_error("Should not be able to submit a job to a service without enough RAM");
       }
 
       return 0;
@@ -1550,7 +1550,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_ExecutionWithNotEnoughRAM_t
   // Create a Compute Service with no default Storage Service
   ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService("RAMHost",
-                                                       {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                       {std::make_pair("RAMHost", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
                                                        {})));
 
   // Create a WMS
