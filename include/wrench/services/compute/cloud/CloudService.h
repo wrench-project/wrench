@@ -38,7 +38,7 @@ namespace wrench {
 
     private:
         std::map<std::string, std::string> default_property_values = {
-                {CloudServiceProperty::SUPPORTS_PILOT_JOBS,         "true"},
+                {CloudServiceProperty::SUPPORTS_PILOT_JOBS,         "false"},
                 {CloudServiceProperty::SUPPORTS_STANDARD_JOBS,      "true"},
                 {CloudServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS, "0.0"}
         };
@@ -105,7 +105,7 @@ namespace wrench {
 
         void terminateStandardJob(StandardJob *job) override;
 
-        void terminatePilotJob(PilotJob *job) override;
+        void validateProperties();
 
         ~CloudService();
 
