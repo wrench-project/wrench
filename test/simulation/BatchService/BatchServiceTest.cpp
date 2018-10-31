@@ -2508,7 +2508,7 @@ private:
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       {
-        // Create a pilot job tbat needs 1 host, 1 core, 0 bytes of RAM, and 90 seconds
+        // Create a pilot job that needs 1 host, 1 core, 0 bytes of RAM, and 90 seconds
         wrench::PilotJob *pilot_job = job_manager->createPilotJob(1, 1, 0.0, 90);
 
         // Create a sequential task that lasts one min and requires 2 cores
@@ -2547,7 +2547,6 @@ private:
           }
         }
 
-
         // Create a StandardJob with some pre-copies and post-deletions
         wrench::StandardJob *job = job_manager->createStandardJob(
                 {task},
@@ -2562,12 +2561,8 @@ private:
                 {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->getWorkflow()->getFileByID("input_file"),
                                                                               this->test->storage_service2)});
 
-        std::map<std::string, std::string> standard_batch_job_args;
-        standard_batch_job_args["-N"] = "1";
-        standard_batch_job_args["-t"] = "1"; //time in minutes
-        standard_batch_job_args["-c"] = "2"; //number of cores per node
         try {
-          job_manager->submitJob(job, pilot_job->getComputeService(), standard_batch_job_args);
+          job_manager->submitJob(job, pilot_job->getComputeService(), {});
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error(
                   "Exception: " + std::string(e.what())
