@@ -2738,13 +2738,9 @@ private:
                 {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->getWorkflow()->getFileByID("input_file"),
                                                                               this->test->storage_service2)});
 
-        std::map<std::string, std::string> standard_batch_job_args;
-        standard_batch_job_args["-N"] = "1";
-        standard_batch_job_args["-t"] = "1"; //time in minutes
-        standard_batch_job_args["-c"] = "5"; //number of cores per node
         bool success = false;
         try {
-          job_manager->submitJob(job, pilot_job->getComputeService(), standard_batch_job_args);
+          job_manager->submitJob(job, pilot_job->getComputeService(), {{task->getID(), "5"}});
         } catch (wrench::WorkflowExecutionException e) {
           success = true;
         }
