@@ -52,6 +52,10 @@ namespace wrench {
 
       // Set default and specified properties
       this->setProperties(this->default_property_values, std::move(property_list));
+
+      // Validate Properties
+      validateProperties();
+
       // Set default and specified message payloads
       this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
     }
@@ -337,15 +341,6 @@ namespace wrench {
       throw std::runtime_error("CloudService::terminateStandardJob(): Not implemented yet!");
     }
 
-    /**
-     * @brief Terminate a pilot job to the compute service (virtual)
-     * @param job: the pilot job
-     *
-     * @throw std::runtime_error
-     */
-    void CloudService::terminatePilotJob(PilotJob *job) {
-      throw std::runtime_error("CloudService::terminatePilotJob(): Not implemented yet!");
-    }
 
     /**
      * @brief Main method of the daemon
@@ -381,7 +376,6 @@ namespace wrench {
 
       serviceSanityCheck();
 
-      // Send a "run a pilot job" message to the daemon's mailbox_name
       try {
         S4U_Mailbox::putMessage(this->mailbox_name, message);
       } catch (std::shared_ptr<NetworkError> &cause) {
@@ -555,12 +549,6 @@ namespace wrench {
           property_list.insert(this->property_list.begin(), this->property_list.end());
           messagepayload_list.insert(this->messagepayload_list.begin(), this->messagepayload_list.end());
 
-          // Make sure the MultihostMulticoreComputeService does not support pilot jobs
-          if (property_list.find(ComputeServiceProperty::SUPPORTS_PILOT_JOBS) != property_list.end()) {
-            if (property_list[ComputeServiceProperty::SUPPORTS_PILOT_JOBS] == "true") {
-              property_list[ComputeServiceProperty::SUPPORTS_PILOT_JOBS] = "false";
-            }
-          }
           std::shared_ptr<ComputeService> cs = std::shared_ptr<ComputeService>(
                   new MultihostMulticoreComputeService(vm_name,
                                                        compute_resources,
@@ -890,64 +878,10 @@ namespace wrench {
           return;
         }
         return;
+      } else {
+        throw std::runtime_error("CloudService::processSubmitPilotJob(): A Cloud service should never support pilot jobs");
       }
 
-
-      std::map<std::string, std::tuple<std::shared_ptr<S4U_VirtualMachine>, std::shared_ptr<ComputeService>,
-              unsigned long, unsigned long>> vm_local_list = this->vm_list;
-
-
-      // whether the job should be mapped to a particular VM
-      auto vm_it = service_specific_args.find("-vm");
-      if (vm_it != service_specific_args.end()) {
-        vm_local_list.clear();
-        auto vm_tuple_it = this->vm_list.find(vm_it->second);
-        if (vm_tuple_it != this->vm_list.end()) {
-          vm_local_list.insert(std::make_pair(vm_it->second, vm_tuple_it->second));
-        }
-      }
-
-      // count the number of hosts that have enough cores
-      bool available_host = false;
-
-      for (auto &vm_tuple : vm_local_list) {
-        std::shared_ptr<S4U_VirtualMachine> vm = std::get<0>(vm_tuple.second);
-        if (vm->isRunning()) {
-          if (std::get<2>(vm_tuple.second) >= job->getNumCoresPerHost()) {
-            std::map<std::string, std::string> service_specific_arguments;
-            ComputeService *cs = std::get<1>(vm_tuple.second).get();
-            cs->submitPilotJob(job, service_specific_arguments);
-            available_host = true;
-            break;
-          }
-        }
-      }
-
-      // Do we have enough hosts?
-      // currently, the cloud service cannot support the job
-      if (job->getNumHosts() > 1 || not available_host) {
-        try {
-          S4U_Mailbox::dputMessage(
-                  answer_mailbox, new ComputeServiceSubmitPilotJobAnswerMessage(
-                          job, this, false, std::shared_ptr<FailureCause>(new NotEnoughResources(job, this)),
-                          this->getMessagePayloadValueAsDouble(
-                                  CloudServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-          return;
-        }
-        return;
-      }
-
-      // success
-      try {
-        S4U_Mailbox::dputMessage(
-                answer_mailbox, new ComputeServiceSubmitPilotJobAnswerMessage(
-                        job, this, true, nullptr,
-                        this->getMessagePayloadValueAsDouble(
-                                CloudServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        return;
-      }
     }
 
     /**
@@ -1031,5 +965,32 @@ namespace wrench {
         std::get<0>(vm.second)->stop();
       }
       this->vm_list.clear();
+    }
+
+    /**
+     * @brief Validate the service's properties
+     *
+     * @throw std::invalid_argument
+     */
+    void CloudService::validateProperties() {
+
+      // Supporting Pilot jobs
+      if (this->getPropertyValueAsBoolean(CloudServiceProperty::SUPPORTS_PILOT_JOBS)) {
+        throw std::invalid_argument("Invalid SUPPORTS_PILOT_JOBS property specification: a CloudService cannot support pilot jobs");
+      }
+
+      // VM Boot overhead
+      bool success = true;
+      double vm_boot_overhead = 0;
+      try {
+        vm_boot_overhead = this->getPropertyValueAsDouble(CloudServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS);
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+
+      if ((!success) or (vm_boot_overhead < 0)) {
+        throw std::invalid_argument("Invalid THREAD_STARTUP_OVERHEAD property specification: " +
+                                    this->getPropertyValueAsString(CloudServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS));
+      }
     }
 }
