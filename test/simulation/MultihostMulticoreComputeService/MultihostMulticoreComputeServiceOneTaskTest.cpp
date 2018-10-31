@@ -1360,7 +1360,7 @@ private:
       // Submit the job
       success = true;
       try {
-        job_manager->submitJob(job, test->compute_service);
+        job_manager->submitJob(job, test->compute_service, {{"task2", "OneCoreHost:2"}});
       } catch (wrench::WorkflowExecutionException &e) {
         if (e.getCause()->getCauseType() != wrench::FailureCause::NOT_ENOUGH_RESOURCES) {
           throw std::runtime_error("Received the expected exception, but the failure cause is incorrect");
@@ -1422,7 +1422,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_ExecutionWithNotEnoughCores
   // Create a Compute Service with no default Storage Service
   ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService("OneCoreHost",
-                                                       {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                       {std::make_pair("OneCoreHost", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
                                                        {})));
 
   // Create a WMS
