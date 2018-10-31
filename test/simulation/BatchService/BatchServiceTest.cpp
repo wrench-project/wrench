@@ -2366,12 +2366,8 @@ private:
         wrench::StandardJob *job = job_manager->createStandardJob(
                 {task}, {{file1,this->test->storage_service1}}, {}, {}, {});
 
-        std::map<std::string, std::string> standard_batch_job_args;
-        standard_batch_job_args["-N"] = "1";
-        standard_batch_job_args["-t"] = "1"; //time in minutes
-        standard_batch_job_args["-c"] = "2"; //number of cores per node
         try {
-          job_manager->submitJob(job, pilot_job->getComputeService(), standard_batch_job_args);
+          job_manager->submitJob(job, pilot_job->getComputeService(), {});
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error(
                   "Exception: " + std::string(e.what())
