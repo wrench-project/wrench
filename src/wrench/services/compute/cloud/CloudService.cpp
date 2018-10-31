@@ -823,7 +823,8 @@ namespace wrench {
 
           if (std::get<2>(vm_tuple.second) >= job->getMinimumRequiredNumCores() &&
               sum_idle_cores >= job->getMinimumRequiredNumCores()) {
-            cs->submitStandardJob(job, service_specific_args);
+            std::map<std::string, std::string> empty_args;
+            cs->submitStandardJob(job, empty_args);
 
             try {
               S4U_Mailbox::dputMessage(
