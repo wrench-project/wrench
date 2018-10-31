@@ -104,6 +104,7 @@ namespace wrench {
         void submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_args) override;
 
         void terminateStandardJob(StandardJob *job) override;
+        void terminatePilotJob(PilotJob *job) override;
 
         void validateProperties();
 
