@@ -296,6 +296,7 @@ namespace wrench {
         }
       }
 
+
       // Submit the job to the service
       try {
         job->submit_date = this->simulation->getCurrentSimulatedDate();
