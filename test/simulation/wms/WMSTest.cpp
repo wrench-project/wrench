@@ -224,6 +224,9 @@ private:
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Get a "STANDARD JOB COMPLETION" event (default handler)
+      auto cloud = (wrench::CloudService *) (this->test->cs_cloud);
+      cloud->createVM(4, 0.0, {}, {});
+
       wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 10.0, 1, 1, 1.0, 0);
       wrench::StandardJob *job1 = job_manager->createStandardJob(task1, {});
       job_manager->submitJob(job1, this->test->cs_cloud);
@@ -232,9 +235,10 @@ private:
         throw std::runtime_error("Did not get expected 'STANDARD JOB COMPLETION' event");
       }
 
+
       // Get a "PILOT JOB STARTED" event (default handler)
       wrench::PilotJob *job2 = job_manager->createPilotJob(1,1,0,60);
-      job_manager->submitJob(job2, this->test->cs_batch);
+      job_manager->submitJob(job2, this->test->cs_batch, {{"-N","1"},{"-c","1"},{"-t","50"}});
       this->waitForAndProcessNextEvent();
       if (this->counter != 2) {
         throw std::runtime_error("Did not get expected 'PILOT JOB START' event");
@@ -315,8 +319,8 @@ void WMSTest::do_CustomHandlerWMS_test() {
   ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
-  std::string hostname1 = simulation->getHostnameList()[0];
-  std::string hostname2 = simulation->getHostnameList()[1];
+  std::string hostname1 = "Host1";
+  std::string hostname2 = "Host2";
 
   // Create a Storage Service
   ASSERT_NO_THROW(storage_service1 = simulation->add(
