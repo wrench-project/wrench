@@ -92,7 +92,7 @@ namespace wrench {
 
 				int main();
 
-				// Relevant workflow
+				// Relevant WMS
 				WMS *wms;
 
 				// Job map
