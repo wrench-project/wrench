@@ -1215,6 +1215,9 @@ namespace wrench {
         }
       }
 
+      // Add the job to the list of running this
+      this->running_jobs.insert(job);
+
       // And send a reply!
       try {
         S4U_Mailbox::dputMessage(
