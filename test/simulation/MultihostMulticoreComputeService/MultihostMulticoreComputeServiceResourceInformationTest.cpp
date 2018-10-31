@@ -157,13 +157,14 @@ private:
 
       // Create a job that will use cores on compute service #1
       wrench::WorkflowTask *t1 = this->getWorkflow()->addTask("task1", 60.0000, 3, 3, 1.0, 0);
-      wrench::WorkflowTask *t2 = this->getWorkflow()->addTask("task2", 60.0001, 2, 2, 1.0, 0);
+      wrench::WorkflowTask *t2 = this->getWorkflow()->addTask("task2", 60000000000.0001, 2, 2, 1.0, 0);
 
       std::vector<wrench::WorkflowTask *> tasks;
       tasks.push_back(t1);
       tasks.push_back(t2);
       wrench::StandardJob *job = job_manager->createStandardJob(tasks, {}, {}, {}, {});
-      job_manager->submitJob(job, this->test->compute_service1);
+
+      job_manager->submitJob(job, this->test->compute_service1, {{"task1", "Host1:3"},{"task2", "Host2:2"}});
 
       wrench::Simulation::sleep(1.0);
 
@@ -174,6 +175,7 @@ private:
         idle_core_counts.push_back(c.second);
       }
       std::sort(idle_core_counts.begin(), idle_core_counts.end());
+
       if ((idle_core_counts.size() != 2) or
           (idle_core_counts[0] != 1) or
           (idle_core_counts[1] != 2)) {

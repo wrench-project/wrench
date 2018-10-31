@@ -585,7 +585,6 @@ namespace wrench {
 
         }
 
-
         /** Dispatch it */
         std::shared_ptr<WorkunitExecutor> workunit_executor = std::shared_ptr<WorkunitExecutor>(
                 new WorkunitExecutor(this->simulation,
@@ -794,6 +793,7 @@ namespace wrench {
             task->setFailureDate(S4U_Simulation::getClock());
             this->simulation->getOutput().addTimestamp<SimulationTimestampTaskFailure>(new SimulationTimestampTaskFailure(task));
           }
+          task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
         }
       }
 

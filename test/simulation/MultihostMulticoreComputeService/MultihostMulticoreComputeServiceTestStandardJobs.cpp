@@ -702,7 +702,6 @@ private:
       }
 
 
-
       // Submit the 2-task job for execution
       job_manager->submitJob(two_task_job, this->test->compute_service,
                              {{"task_6_10s_1_to_2_cores","QuadCoreHost:2"},{"task_5_30s_1_to_3_cores","2"}});
