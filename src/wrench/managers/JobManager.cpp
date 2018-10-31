@@ -324,6 +324,25 @@ namespace wrench {
           }
         }
         throw;
+      } catch (std::invalid_argument &e) {
+        // "Undo" everything
+        job->popCallbackMailbox();
+        switch (job->getType()) {
+          case WorkflowJob::STANDARD: {
+            ((StandardJob *) job)->state = StandardJob::NOT_SUBMITTED;
+            for (auto t : ((StandardJob *) job)->tasks) {
+              t->setState(original_states[t]);
+            }
+            this->pending_standard_jobs.erase((StandardJob *) job);
+            break;
+          }
+          case WorkflowJob::PILOT: {
+            ((PilotJob *) job)->state = PilotJob::NOT_SUBMITTED;
+            this->pending_pilot_jobs.erase((PilotJob *) job);
+            break;
+          }
+        }
+        throw;
       }
 
     }
