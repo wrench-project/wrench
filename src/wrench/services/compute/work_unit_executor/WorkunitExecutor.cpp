@@ -345,7 +345,6 @@ namespace wrench {
         StorageService *storage_service = std::get<1>(cleanup);
         try {
           S4U_Simulation::sleep(this->thread_startup_overhead);
-          std::cerr << "DELETING FILE " << file->getID() << "\n";
           if (storage_service == this->scratch_space) {
             storage_service->deleteFile(file, job, nullptr);
           } else {
