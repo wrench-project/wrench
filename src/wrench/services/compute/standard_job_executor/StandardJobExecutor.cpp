@@ -660,13 +660,13 @@ namespace wrench {
             }
             if (!found_it) {
               throw std::runtime_error(
-                      "MultihostMulticoreComputeService::processWorkCompletion(): couldn't find non-ready child in non-ready set!");
+                      "BareMetalComputeService::processWorkCompletion(): couldn't find non-ready child in non-ready set!");
             }
 
 
 //            if (this->non_ready_workunits.find(child) == this->non_ready_workunits.end()) {
 //              throw std::runtime_error(
-//                      "MultihostMulticoreComputeService::processWorkCompletion(): can't find non-ready child in non-ready set!");
+//                      "BareMetalComputeService::processWorkCompletion(): can't find non-ready child in non-ready set!");
 //            }
 //            this->non_ready_workunits.erase(child);
 //            this->ready_workunits.insert(child);

@@ -15,7 +15,7 @@
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/compute/cloud/CloudService.h"
-#include "wrench/services/compute/multihost_multicore/MultihostMulticoreComputeService.h"
+#include "wrench/services/compute/bare_metal/BareMetalComputeService.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 
 
@@ -96,7 +96,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Create a MultihostMulticoreComputeService VM (balances load on execution hosts)
+     * @brief Create a BareMetalComputeService VM (balances load on execution hosts)
      *
      * @param num_cores: the number of cores the service can use (use ComputeService::ALL_CORES to use all cores
      *                   available on the host)
@@ -495,7 +495,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Create a MultihostMulticoreComputeService VM on a physical machine
+     * @brief Create a BareMetalComputeService VM on a physical machine
      *
      * @param answer_mailbox: the mailbox to which the answer message should be sent
      * @param pm_hostname: the name of the physical machine host
@@ -541,7 +541,7 @@ namespace wrench {
                   this->getPropertyValueAsDouble(CloudServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS));
           auto vm = std::make_shared<S4U_VirtualMachine>(vm_name, pm_hostname, num_cores, ram_memory);
 
-          // create a MultihostMulticoreComputeService compute service for the VM
+          // create a BareMetalComputeService compute service for the VM
           std::map<std::string, std::tuple<unsigned long, double>> compute_resources = {
                   std::make_pair(vm_name, std::make_tuple(num_cores, ram_memory))};
 
@@ -550,7 +550,7 @@ namespace wrench {
           messagepayload_list.insert(this->messagepayload_list.begin(), this->messagepayload_list.end());
 
           std::shared_ptr<ComputeService> cs = std::shared_ptr<ComputeService>(
-                  new MultihostMulticoreComputeService(vm_name,
+                  new BareMetalComputeService(vm_name,
                                                        compute_resources,
                                                        property_list,
                                                        messagepayload_list,
@@ -667,7 +667,7 @@ namespace wrench {
                   std::make_pair(vm_name, std::make_tuple(std::get<2>(vm_tuple->second), std::get<3>(vm_tuple->second)))};
 
           std::shared_ptr<ComputeService> cs = std::shared_ptr<ComputeService>(
-                  new MultihostMulticoreComputeService(vm_name,
+                  new BareMetalComputeService(vm_name,
                                                        compute_resources,
                                                        property_list,
                                                        messagepayload_list,

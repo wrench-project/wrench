@@ -540,13 +540,13 @@ void JobManagerTest::do_JobManagerResubmitJobTest_test() {
   wrench::ComputeService *cs1, *cs2;
 
   ASSERT_NO_THROW(cs1 = simulation->add(
-          new wrench::MultihostMulticoreComputeService("Host2",
+          new wrench::BareMetalComputeService("Host2",
                                                        {std::make_pair("Host2", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},100.0,
                                                        {{wrench::ComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}})));
 
   // Create a ComputeService that does support standard jobs
   ASSERT_NO_THROW(cs2 = simulation->add(
-          new wrench::MultihostMulticoreComputeService("Host3",
+          new wrench::BareMetalComputeService("Host3",
                                                        {std::make_pair("Host3", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},100.0,
                                                        {{wrench::ComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}})));
 
@@ -682,7 +682,7 @@ void JobManagerTest::do_JobManagerTerminateJobTest_test() {
   // Create a ComputeService that supports standard jobs
   wrench::ComputeService *cs = nullptr;
   ASSERT_NO_THROW(cs = simulation->add(
-          new wrench::MultihostMulticoreComputeService("Host3",
+          new wrench::BareMetalComputeService("Host3",
                                                        {std::make_pair("Host3", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},100.0,
                                                        {{wrench::ComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}})));
 

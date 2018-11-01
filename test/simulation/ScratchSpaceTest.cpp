@@ -182,7 +182,7 @@ void ScratchSpaceTest::do_SimpleScratchSpace_test() {
 
   // Create a Compute Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname,
+          new wrench::BareMetalComputeService(hostname,
                                                        {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
                                                                                                  wrench::ComputeService::ALL_RAM))},
                                                        1000000.0, {})));
@@ -400,21 +400,21 @@ void ScratchSpaceTest::do_ScratchSpaceFailure_test() {
 
   // Create a Compute Service that does not have scratch space
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname,
+          new wrench::BareMetalComputeService(hostname,
                                                        {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
                                                                                                  wrench::ComputeService::ALL_RAM))},
                                                        0)));
 
   // Create a Compute Service that has smaller scratch space than the files to be stored
   ASSERT_NO_THROW(compute_service1 = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname,
+          new wrench::BareMetalComputeService(hostname,
                                                        {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
                                                                                                  wrench::ComputeService::ALL_RAM))},
                                                        100)));
 
   // Create a Compute Service that has enough scratch space to store the files
   ASSERT_NO_THROW(compute_service2 = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname,
+          new wrench::BareMetalComputeService(hostname,
                                                        {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
                                                                                                  wrench::ComputeService::ALL_RAM))},
                                                        10000)));
@@ -792,7 +792,7 @@ void ScratchSpaceTest::do_RaceConditionTest_test() {
 
   // Create a Cloud Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname, {"Host1"}, 100, {}, {})));
+          new wrench::BareMetalComputeService(hostname, {"Host1"}, 100, {}, {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -1009,7 +1009,7 @@ void ScratchSpaceTest::do_PartitionsTest_test() {
 
   // Create a Cloud Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname, {"Host1"}, 100, {}, {})));
+          new wrench::BareMetalComputeService(hostname, {"Host1"}, 100, {}, {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;

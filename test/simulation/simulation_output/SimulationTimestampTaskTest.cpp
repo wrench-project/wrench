@@ -132,7 +132,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test(){
     std::string wms_host = simulation->getHostnameList()[1];
     std::string execution_host = simulation->getHostnameList()[0];
 
-    ASSERT_NO_THROW(compute_service = simulation->add(new wrench::MultihostMulticoreComputeService(wms_host,
+    ASSERT_NO_THROW(compute_service = simulation->add(new wrench::BareMetalComputeService(wms_host,
                                                                                                    {std::make_pair(
                                                                                                            execution_host,
                                                                                                            std::make_tuple(wrench::ComputeService::ALL_CORES,
@@ -311,7 +311,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
     std::string wms_host = simulation->getHostnameList()[1];
     std::string execution_host = simulation->getHostnameList()[0];
 
-    ASSERT_NO_THROW(compute_service = simulation->add(new wrench::MultihostMulticoreComputeService(wms_host,
+    ASSERT_NO_THROW(compute_service = simulation->add(new wrench::BareMetalComputeService(wms_host,
                                                                                                    {std::make_pair(
                                                                                                            execution_host,
                                                                                                            std::make_tuple(wrench::ComputeService::ALL_CORES,
@@ -504,7 +504,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskTerminateAndFail_tes
     std::string wms_host = simulation->getHostnameList()[1];
     std::string execution_host = simulation->getHostnameList()[0];
 
-    ASSERT_NO_THROW(compute_service = simulation->add(new wrench::MultihostMulticoreComputeService(execution_host,
+    ASSERT_NO_THROW(compute_service = simulation->add(new wrench::BareMetalComputeService(execution_host,
                                                                                                    {std::make_pair(
                                                                                                            execution_host,
                                                                                                            std::make_tuple(wrench::ComputeService::ALL_CORES,

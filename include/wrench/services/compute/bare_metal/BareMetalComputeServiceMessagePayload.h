@@ -8,8 +8,8 @@
  */
 
 
-#ifndef WRENCH_MULTIHOSTMULTICORECOMPUTESERVICEMESSAGEPAYLOAD_H
-#define WRENCH_MULTIHOSTMULTICORECOMPUTESERVICEMESSAGEPAYLOAD_H
+#ifndef WRENCH_BAREMETALCOMPUTESERVICEMESSAGEPAYLOAD_H
+#define WRENCH_BAREMETALCOMPUTESERVICEMESSAGEPAYLOAD_H
 
 #include <map>
 
@@ -20,7 +20,7 @@ namespace wrench {
    /**
     * @brief Configurable message payloads for a MultiHostMulticoreComputeService
     */
-    class MultihostMulticoreComputeServiceMessagePayload : public ComputeServiceMessagePayload {
+    class BareMetalComputeServiceMessagePayload : public ComputeServiceMessagePayload {
 
     public:
 
@@ -36,4 +36,4 @@ namespace wrench {
 };
 
 
-#endif //WRENCH_MULTIHOSTMULTICORECOMPUTESERVICEMESSAGEPAYLOAD_H
+#endif //WRENCH_BAREMETALCOMPUTESERVICEMESSAGEPAYLOAD_H

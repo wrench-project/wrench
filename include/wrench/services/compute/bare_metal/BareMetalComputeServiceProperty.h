@@ -8,8 +8,8 @@
  */
 
 
-#ifndef WRENCH_MULTIHOSTMULTICORECOMPUTESERVICEPROPERTY_H
-#define WRENCH_MULTIHOSTMULTICORECOMPUTESERVICEPROPERTY_H
+#ifndef WRENCH_BAREMETALCOMPUTESERVICEPROPERTY_H
+#define WRENCH_BAREMETALCOMPUTESERVICEPROPERTY_H
 
 #include <map>
 
@@ -20,7 +20,7 @@ namespace wrench {
    /**
     * @brief Configurable properties for a MultiHostMulticoreComputeService
     */
-    class MultihostMulticoreComputeServiceProperty : public ComputeServiceProperty {
+    class BareMetalComputeServiceProperty : public ComputeServiceProperty {
 
     public:
 
@@ -32,4 +32,4 @@ namespace wrench {
 };
 
 
-#endif //WRENCH_MULTIHOSTMULTICORECOMPUTESERVICEPROPERTY_H
+#endif //WRENCH_BAREMETALCOMPUTESERVICEPROPERTY_H
