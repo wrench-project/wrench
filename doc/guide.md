@@ -7,7 +7,7 @@ Guide                        {#guide}
 
 
 1. Compute Services
-    1. Bare-metal Servers
+    1. [Bare-metal Servers](@ref guide-baremetal)
     2. Cloud Platforms
     3. Virtual Cluster Platforms
     4. Batch-scheduled Clusters
