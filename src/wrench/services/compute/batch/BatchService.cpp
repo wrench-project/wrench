@@ -1761,14 +1761,14 @@ namespace wrench {
           //set the ending timestamp of the batchjob (pilotjob)
 
           // Create and launch a compute service for the pilot job
-          // (We don't use a TTL becuase an alarm will take care of this)
+          // (We use a TTL for user information purposes, but an alarm will take care of this)
           std::shared_ptr<ComputeService> cs = std::shared_ptr<ComputeService>(
                   new BareMetalComputeService(host_to_run_on,
-                                                       resources,
-                                                       {{BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"},
-                                                        {BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}},
-                                                       {},
-                                                       DBL_MAX,  job, "pilot_job", getScratch()
+                                              resources,
+                                              {{BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"},
+                                               {BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}},
+                                              {},
+                                              allocated_time,  job, "pilot_job", getScratch()
                   ));
           cs->simulation = this->simulation;
           job->setComputeService(cs);
