@@ -749,7 +749,7 @@ namespace wrench {
       /** Kill all relevant work unit executors */
       for (auto const &wue : this->workunit_executors[job]) {
         for (auto const &f : wue->getFilesStoredInScratch()) {
-          this->files_in_scratch.insert(f);
+          this->files_in_scratch[job].insert(f);
         }
         if (wue->workunit->task) {
           this->ram_availabilities[wue->getHostname()] += wue->workunit->task->getMemoryRequirement();
@@ -819,6 +819,15 @@ namespace wrench {
 
         }
       }
+
+      // Remove files from Scratch
+      if (this->containing_pilot_job == nullptr) {
+        for (auto const &f : this->files_in_scratch[job]) {
+          this->getScratch()->deleteFile(f, job, nullptr);
+        }
+        this->files_in_scratch[job].clear();
+        this->files_in_scratch.erase(job);
+      }
     }
 
 
@@ -828,6 +837,7 @@ namespace wrench {
 */
     void MultihostMulticoreComputeService::failCurrentStandardJobs() {
 
+
       for (auto job : this->running_jobs) {
         this->failRunningStandardJob(job, std::shared_ptr<FailureCause>(new JobKilled(job, this)));
       }
@@ -835,56 +845,6 @@ namespace wrench {
 
 
 
-//    /**
-//     * @brief Process a work failure
-//     * @param worker_thread: the worker thread that did the work
-//     * @param work: the work
-//     * @param cause: the cause of the failure
-//     */
-//    void MultihostMulticoreComputeService::processStandardJobFailure(StandardJobExecutor *executor,
-//                                                                     StandardJob *job,
-//                                                                     std::shared_ptr<FailureCause> cause) {
-//
-//      // Update core and ram availabilities
-//      for (auto r : executor->getComputeResources()) {
-//        std::string hostname = std::get<0>(r);
-//        unsigned long num_cores = std::get<1>(r);
-//        double ram = std::get<2>(r);
-//        std::get<0>(this->core_and_ram_availabilities[hostname]) += num_cores;
-//        std::get<1>(this->core_and_ram_availabilities[hostname]) += ram;
-//
-//      }
-//
-//      // Remove the executor from the executor list
-//      bool found_it = false;
-//      for (auto it = this->standard_job_executors.begin();
-//           it != this->standard_job_executors.end(); it++) {
-//        if ((*it).get() == executor) {
-//          PointerUtil::moveSharedPtrFromSetToSet(it, &(this->standard_job_executors), &(this->completed_job_executors));
-//          found_it = true;
-//          break;
-//        }
-//      }
-//
-//      // Remove the executor from the executor list
-//      if (!found_it) {
-//        throw std::runtime_error(
-//                "MultihostMulticoreComputeService::processStandardJobFailure(): Received a standard job completion, but the executor is not in the executor list");
-//      }
-//
-//      // Remove the job from the running job list
-//      if (this->running_jobs.find(job) == this->running_jobs.end()) {
-//        throw std::runtime_error(
-//                "MultihostMulticoreComputeService::processStandardJobFailure(): Received a standard job completion, but the job is not in the running job list");
-//      }
-//      this->running_jobs.erase(job);
-//
-//      WRENCH_INFO("A standard job executor has failed to perform job %s", job->getName().c_str());
-//
-//      // Fail the job
-//      this->failRunningStandardJob(job, std::move(cause));
-//
-//    }
 
 /**
  * @brief Terminate the daemon, dealing with pending/running jobs
@@ -975,12 +935,14 @@ namespace wrench {
                                                                              Workunit *workunit) {
       StandardJob *job = workunit_executor->getJob();
 
-      std::set<WorkflowFile *> files_stored_in_scrach_by_executor;
-
       // Get the scratch files that executor may have generated
       for (auto &f : workunit_executor->getFilesStoredInScratch()) {
-        files_stored_in_scrach_by_executor.insert(f);
+        if (this->files_in_scratch.find(job) == this->files_in_scratch.end()) {
+          this->files_in_scratch.insert(std::make_pair(job, (std::set<WorkflowFile*>){}));
+        }
+        this->files_in_scratch[job].insert(f);
       }
+
       // Update RAM availabilities and running thread counts
       if (workunit->task) {
         this->ram_availabilities[workunit_executor->getHostname()] += workunit->task->getMemoryRequirement();
@@ -1001,7 +963,7 @@ namespace wrench {
         job->incrementNumCompletedTasks();
       }
 
-      // Set the workunig as completed
+      // Set the workunit as completed
       this->completed_workunits[job].insert(workunit);
 
       // Update workunit dependencies if any
@@ -1037,18 +999,16 @@ namespace wrench {
       // Clean up run specs
       this->job_run_specs.erase(job);
 
+      // If not in a pilot job, remove all files in scratch
       if (this->containing_pilot_job == nullptr) {
-        WRENCH_INFO("I am not part of a pilot job, so I should clean up files in stratch!");
-        for (auto const &f : files_stored_in_scrach_by_executor) {
-          std::cerr << "REMOVING FILE " << f->getID() << " FROM SCRATCH\n";
-          this->getScratch()->deleteFile(f);
+        for (auto const &f : this->files_in_scratch[job]) {
+          this->getScratch()->deleteFile(f, job, nullptr);
         }
-      } else {
-        WRENCH_INFO("I am part of a pilot job, so I just keep track of files in scratch");
-        for (auto const &f : files_stored_in_scrach_by_executor) {
-          this->files_in_scratch.insert(f);
-        }
+        this->files_in_scratch[job].clear();
+        this->files_in_scratch.erase(job);
       }
+
+      this->running_jobs.erase(job);
 
       // Send the callback to the originator
       try {
@@ -1077,7 +1037,10 @@ namespace wrench {
 
       // Get the scratch files that executor may have generated
       for (auto &f : workunit_executor->getFilesStoredInScratch()) {
-        this->files_in_scratch.insert(f);
+        if (this->files_in_scratch.find(job) == this->files_in_scratch.end()) {
+          this->files_in_scratch.insert(std::make_pair(job, (std::set<WorkflowFile*>){}));
+        }
+        this->files_in_scratch[job].insert(f);
       }
       // Update RAM availabilities and running thread counts
       if (workunit->task) {
@@ -1091,6 +1054,7 @@ namespace wrench {
       this->failRunningStandardJob(job, std::move(cause));
 
       this->job_run_specs.erase(job);
+      this->running_jobs.erase(job);
     }
 
 
@@ -1354,12 +1318,13 @@ namespace wrench {
  */
     void MultihostMulticoreComputeService::cleanUpScratch() {
 
-      std::cerr << "IN CLEANUP SCRATCH\n";
-      for (auto &f : this->files_in_scratch) {
-        try {
-          getScratch()->deleteFile(f, this->containing_pilot_job, nullptr);
-        } catch (WorkflowExecutionException &e) {
-          throw;
+      for (auto const &j : this->files_in_scratch) {
+        for (auto const &f : j.second) {
+          try {
+            getScratch()->deleteFile(f, j.first, nullptr);
+          } catch (WorkflowExecutionException &e) {
+            throw;
+          }
         }
       }
     }

@@ -1761,11 +1761,14 @@ namespace wrench {
           //set the ending timestamp of the batchjob (pilotjob)
 
           // Create and launch a compute service for the pilot job
+          // (We don't use a TTL becuase an alarm will take care of this)
           std::shared_ptr<ComputeService> cs = std::shared_ptr<ComputeService>(
                   new MultihostMulticoreComputeService(host_to_run_on,
                                                        resources,
                                                        {{MultihostMulticoreComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"},
-                                                        {MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}}, {}, getScratch()
+                                                        {MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}},
+                                                       {},
+                                                       DBL_MAX,  job, "pilot_job", getScratch()
                   ));
           cs->simulation = this->simulation;
           job->setComputeService(cs);

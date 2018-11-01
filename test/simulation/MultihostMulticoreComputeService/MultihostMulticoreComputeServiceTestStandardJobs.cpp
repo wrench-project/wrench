@@ -332,8 +332,8 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_TwoSingleCoreTasks_tes
   // Create a Compute Service
   ASSERT_NO_THROW(compute_service = simulation->add(
                   new wrench::MultihostMulticoreComputeService(hostname,
-                                                               {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))}, 100.0,
-                                                               {}))); //scratch space of size 100
+                                                               {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))}, 101.0,
+                                                               {}))); //scratch space of size 101
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
