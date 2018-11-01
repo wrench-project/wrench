@@ -627,7 +627,7 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
 
   // Create a Compute Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname,
+          new wrench::BareMetalComputeService(hostname,
                                                        {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
                                                                         wrench::ComputeService::ALL_RAM))},
                                                        {})));
@@ -801,7 +801,7 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopy_test() {
 
   // Create a  Compute Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname,
+          new wrench::BareMetalComputeService(hostname,
                                                        {std::make_pair(hostname, std::make_tuple(1, 0))},
                                                        {})));
 
@@ -949,7 +949,7 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopy_test() {
 
   // Create a Compute Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname,
+          new wrench::BareMetalComputeService(hostname,
                                                        {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
                                                                         wrench::ComputeService::ALL_RAM))}, {})));
 
@@ -1161,7 +1161,7 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopyFailures_test() {
 
   // Create a Compute Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname,
+          new wrench::BareMetalComputeService(hostname,
                                                        {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
                                                                         wrench::ComputeService::ALL_RAM))}, {})));
 
@@ -1393,7 +1393,7 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopyFailures_test() 
 
   // Create a Compute Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname,
+          new wrench::BareMetalComputeService(hostname,
                                                        {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
                                                                         wrench::ComputeService::ALL_RAM))}, {})));
 

@@ -38,7 +38,11 @@ namespace wrench {
      * @brief Submit a job to the compute service
      * @param job: the job
      * @param service_specific_args: arguments specific to compute services when needed:
-     *      - to a MultihostMulticoreComputeService: {}
+     *      - to a BareMetalComputeService: {}
+     *          - If no entry is provided for a taskID, the service will pick on which host and with how many cores to run the task
+     *          - If a number of cores is provided (e.g., {"task1", "12"}), the service will pick the host on which to run the task
+     *          - If a hostname and a number of cores is provided (e.g., {"task1", "host1:12"}, the service will run the task on that host
+     *            with the specified number of cores
      *      - to a BatchService: {"-t":"<int>","-N":"<int>","-c":"<int>"} (SLURM-like)
      *         - "-t": number of requested job duration in minutes
      *         - "-N": number of requested compute hosts
@@ -373,7 +377,7 @@ namespace wrench {
 
       } else {
         throw std::runtime_error(
-                "MultihostMulticoreComputeService::getServiceResourceInformation(): unexpected [" + msg->getName() +
+                "BareMetalComputeService::getServiceResourceInformation(): unexpected [" + msg->getName() +
                 "] message");
       }
     }

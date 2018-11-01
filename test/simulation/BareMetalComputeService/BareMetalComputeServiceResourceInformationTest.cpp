@@ -18,7 +18,7 @@
 #define EPSILON 0.005
 
 
-class MultihostMulticoreComputeServiceTestResourceInformation : public ::testing::Test {
+class BareMetalComputeServiceTestResourceInformation : public ::testing::Test {
 
 
 public:
@@ -30,7 +30,7 @@ public:
     void do_ResourceInformation_test();
 
 protected:
-    MultihostMulticoreComputeServiceTestResourceInformation() {
+    BareMetalComputeServiceTestResourceInformation() {
 
       // Create the simplest workflow
       workflow = new wrench::Workflow();
@@ -75,7 +75,7 @@ protected:
 class ResourceInformationTestWMS : public wrench::WMS {
 
 public:
-    ResourceInformationTestWMS(MultihostMulticoreComputeServiceTestResourceInformation *test,
+    ResourceInformationTestWMS(BareMetalComputeServiceTestResourceInformation *test,
                                const std::set<wrench::ComputeService *> &compute_services,
                                const std::set<wrench::StorageService *> &storage_services,
                                std::string hostname) :
@@ -85,7 +85,7 @@ public:
 
 private:
 
-    MultihostMulticoreComputeServiceTestResourceInformation *test;
+    BareMetalComputeServiceTestResourceInformation *test;
 
     int main() {
 
@@ -197,11 +197,11 @@ private:
 };
 
 
-TEST_F(MultihostMulticoreComputeServiceTestResourceInformation, ResourceInformation) {
+TEST_F(BareMetalComputeServiceTestResourceInformation, ResourceInformation) {
   DO_TEST_WITH_FORK(do_ResourceInformation_test);
 }
 
-void MultihostMulticoreComputeServiceTestResourceInformation::do_ResourceInformation_test() {
+void BareMetalComputeServiceTestResourceInformation::do_ResourceInformation_test() {
 
   // Create and initialize a simulation
   auto simulation = new wrench::Simulation();
@@ -216,14 +216,14 @@ void MultihostMulticoreComputeServiceTestResourceInformation::do_ResourceInforma
 
   // Create 1 Compute Service that manages Host1 and Host2
   ASSERT_NO_THROW(compute_service1 = simulation->add(
-                  new wrench::MultihostMulticoreComputeService("Host1",
+                  new wrench::BareMetalComputeService("Host1",
                                                                {{std::make_pair("Host1", std::make_tuple(4, wrench::ComputeService::ALL_RAM))},
                                                                 {std::make_pair("Host2", std::make_tuple(4, wrench::ComputeService::ALL_RAM))}}, 0
                   )));
 
   // Create 1 Compute Service that manages Host3 and Host4
   ASSERT_NO_THROW(compute_service2 = simulation->add(
-                  new wrench::MultihostMulticoreComputeService("Host1",
+                  new wrench::BareMetalComputeService("Host1",
                                                                {{std::make_pair("Host3", std::make_tuple(8, wrench::ComputeService::ALL_RAM))},
                                                                 {std::make_pair("Host4", std::make_tuple(8, wrench::ComputeService::ALL_RAM))}}, 0
                   )));

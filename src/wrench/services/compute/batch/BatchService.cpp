@@ -17,7 +17,7 @@
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/compute/batch/BatchService.h"
 #include "wrench/services/compute/batch/BatchServiceMessage.h"
-#include "wrench/services/compute/multihost_multicore/MultihostMulticoreComputeService.h"
+#include "wrench/services/compute/bare_metal/BareMetalComputeService.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 #include "wrench/simulation/Simulation.h"
@@ -705,7 +705,7 @@ namespace wrench {
 
               default:
                 throw std::runtime_error(
-                        "MultihostMulticoreComputeService::terminateRunningStandardJob(): unexpected task state");
+                        "BareMetalComputeService::terminateRunningStandardJob(): unexpected task state");
 
             }
           }
@@ -1763,10 +1763,10 @@ namespace wrench {
           // Create and launch a compute service for the pilot job
           // (We don't use a TTL becuase an alarm will take care of this)
           std::shared_ptr<ComputeService> cs = std::shared_ptr<ComputeService>(
-                  new MultihostMulticoreComputeService(host_to_run_on,
+                  new BareMetalComputeService(host_to_run_on,
                                                        resources,
-                                                       {{MultihostMulticoreComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"},
-                                                        {MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}},
+                                                       {{BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"},
+                                                        {BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}},
                                                        {},
                                                        DBL_MAX,  job, "pilot_job", getScratch()
                   ));

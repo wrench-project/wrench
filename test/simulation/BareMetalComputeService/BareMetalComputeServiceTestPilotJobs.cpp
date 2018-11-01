@@ -17,7 +17,7 @@
 #include "../../include/UniqueTmpPathPrefix.h"
 
 
-class MultihostMulticoreComputeServiceTestPilotJobs : public ::testing::Test {
+class BareMetalComputeServiceTestPilotJobs : public ::testing::Test {
 
 public:
     wrench::WorkflowFile *input_file;
@@ -47,7 +47,7 @@ public:
 
 
 protected:
-    MultihostMulticoreComputeServiceTestPilotJobs() {
+    BareMetalComputeServiceTestPilotJobs() {
 
       // Create the simplest workflow
       workflow = new wrench::Workflow();
@@ -88,10 +88,10 @@ protected:
 /**  UNSUPPORTED PILOT JOB                                           **/
 /**********************************************************************/
 
-class MultihostMulticoreComputeServiceUnsupportedPilotJobsTestWMS : public wrench::WMS {
+class BareMetalComputeServiceUnsupportedPilotJobsTestWMS : public wrench::WMS {
 
 public:
-    MultihostMulticoreComputeServiceUnsupportedPilotJobsTestWMS(MultihostMulticoreComputeServiceTestPilotJobs *test,
+    BareMetalComputeServiceUnsupportedPilotJobsTestWMS(BareMetalComputeServiceTestPilotJobs *test,
                                                                 const std::set<wrench::ComputeService *> &compute_services,
                                                                 const std::set<wrench::StorageService *> &storage_services,
                                                                 std::string hostname) :
@@ -101,7 +101,7 @@ public:
 
 private:
 
-    MultihostMulticoreComputeServiceTestPilotJobs *test;
+    BareMetalComputeServiceTestPilotJobs *test;
 
     int main() {
 
@@ -138,11 +138,11 @@ private:
     }
 };
 
-TEST_F(MultihostMulticoreComputeServiceTestPilotJobs, UnsupportedPilotJobs) {
+TEST_F(BareMetalComputeServiceTestPilotJobs, UnsupportedPilotJobs) {
   DO_TEST_WITH_FORK(do_UnsupportedPilotJobs_test);
 }
 
-void MultihostMulticoreComputeServiceTestPilotJobs::do_UnsupportedPilotJobs_test() {
+void BareMetalComputeServiceTestPilotJobs::do_UnsupportedPilotJobs_test() {
 
   // Create and initialize a simulation
   wrench::Simulation *simulation = new wrench::Simulation();
@@ -164,15 +164,15 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_UnsupportedPilotJobs_test
 
   // Create a Compute Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname,
+          new wrench::BareMetalComputeService(hostname,
                                                        {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
                                                        0,
-                                                       {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
+                                                       {{wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
 
   // Create a WMS
   wrench::WMS *wms;
   ASSERT_NO_THROW(wms = simulation->add(
-          new MultihostMulticoreComputeServiceUnsupportedPilotJobsTestWMS(
+          new BareMetalComputeServiceUnsupportedPilotJobsTestWMS(
                   this,  {
                           compute_service
                   }, {
@@ -202,11 +202,11 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_UnsupportedPilotJobs_test
 /**  ONE PILOT JOB, NO TIMEOUT, WAIT FOR EXPIRATION                  **/
 /**********************************************************************/
 
-class MultihostMulticoreComputeServiceOnePilotJobNoTimeoutWaitForExpirationTestWMS : public wrench::WMS {
+class BareMetalComputeServiceOnePilotJobNoTimeoutWaitForExpirationTestWMS : public wrench::WMS {
 
 public:
-    MultihostMulticoreComputeServiceOnePilotJobNoTimeoutWaitForExpirationTestWMS(
-            MultihostMulticoreComputeServiceTestPilotJobs *test,
+    BareMetalComputeServiceOnePilotJobNoTimeoutWaitForExpirationTestWMS(
+            BareMetalComputeServiceTestPilotJobs *test,
             const std::set<wrench::ComputeService *> &compute_services,
             const std::set<wrench::StorageService *> &storage_services,
             std::string hostname) :
@@ -216,7 +216,7 @@ public:
 
 private:
 
-    MultihostMulticoreComputeServiceTestPilotJobs *test;
+    BareMetalComputeServiceTestPilotJobs *test;
 
     int main() {
 
@@ -410,11 +410,11 @@ private:
     }
 };
 
-TEST_F(MultihostMulticoreComputeServiceTestPilotJobs, DISABLED_OnePilotJobNoTimeoutWaitForExpiration) {
+TEST_F(BareMetalComputeServiceTestPilotJobs, DISABLED_OnePilotJobNoTimeoutWaitForExpiration) {
   DO_TEST_WITH_FORK(do_OnePilotJobNoTimeoutWaitForExpiration_test);
 }
 
-void MultihostMulticoreComputeServiceTestPilotJobs::do_OnePilotJobNoTimeoutWaitForExpiration_test() {
+void BareMetalComputeServiceTestPilotJobs::do_OnePilotJobNoTimeoutWaitForExpiration_test() {
 
   // Create and initialize a simulation
   auto *simulation = new wrench::Simulation();
@@ -436,14 +436,14 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_OnePilotJobNoTimeoutWaitF
 
   // Create a Compute Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname,
+          new wrench::BareMetalComputeService(hostname,
                                                        {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))}, 100.0,
-                                                       {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}})));
+                                                       {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(
-          new MultihostMulticoreComputeServiceOnePilotJobNoTimeoutWaitForExpirationTestWMS(
+          new BareMetalComputeServiceOnePilotJobNoTimeoutWaitForExpirationTestWMS(
                   this,  {
                           compute_service
                   }, {
@@ -471,11 +471,11 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_OnePilotJobNoTimeoutWaitF
 /**  ONE PILOT JOB, NO TIMEOUT, SHUTDOWN SERVICE                     **/
 /**********************************************************************/
 
-class MultihostMulticoreComputeServiceOnePilotJobNoTimeoutShutdownServiceTestWMS : public wrench::WMS {
+class BareMetalComputeServiceOnePilotJobNoTimeoutShutdownServiceTestWMS : public wrench::WMS {
 
 public:
-    MultihostMulticoreComputeServiceOnePilotJobNoTimeoutShutdownServiceTestWMS(
-            MultihostMulticoreComputeServiceTestPilotJobs *test,
+    BareMetalComputeServiceOnePilotJobNoTimeoutShutdownServiceTestWMS(
+            BareMetalComputeServiceTestPilotJobs *test,
             const std::set<wrench::ComputeService *> &compute_services,
             const std::set<wrench::StorageService *> &storage_services,
             std::string hostname) :
@@ -485,7 +485,7 @@ public:
 
 private:
 
-    MultihostMulticoreComputeServiceTestPilotJobs *test;
+    BareMetalComputeServiceTestPilotJobs *test;
 
     int main() {
 
@@ -564,11 +564,11 @@ private:
     }
 };
 
-TEST_F(MultihostMulticoreComputeServiceTestPilotJobs, DISABLED_OnePilotJobNoTimeoutShutdownService) {
+TEST_F(BareMetalComputeServiceTestPilotJobs, DISABLED_OnePilotJobNoTimeoutShutdownService) {
   DO_TEST_WITH_FORK(do_OnePilotJobNoTimeoutShutdownService_test);
 }
 
-void MultihostMulticoreComputeServiceTestPilotJobs::do_OnePilotJobNoTimeoutShutdownService_test() {
+void BareMetalComputeServiceTestPilotJobs::do_OnePilotJobNoTimeoutShutdownService_test() {
 
   // Create and initialize a simulation
   auto *simulation = new wrench::Simulation();
@@ -590,14 +590,14 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_OnePilotJobNoTimeoutShutd
 
   // Create a Compute Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname,
+          new wrench::BareMetalComputeService(hostname,
                                                        {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                       100.0, {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}})));
+                                                       100.0, {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(
-          new MultihostMulticoreComputeServiceOnePilotJobNoTimeoutShutdownServiceTestWMS(
+          new BareMetalComputeServiceOnePilotJobNoTimeoutShutdownServiceTestWMS(
                   this,  {
                           compute_service
                   }, {
@@ -626,11 +626,11 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_OnePilotJobNoTimeoutShutd
 /**  TERMINATE NON-SUBMITTED PILOT JOB                               **/
 /**********************************************************************/
 
-class MultihostMulticoreComputeServiceNonSubmittedPilotJobTerminationTestWMS : public wrench::WMS {
+class BareMetalComputeServiceNonSubmittedPilotJobTerminationTestWMS : public wrench::WMS {
 
 public:
-    MultihostMulticoreComputeServiceNonSubmittedPilotJobTerminationTestWMS(
-            MultihostMulticoreComputeServiceTestPilotJobs *test,
+    BareMetalComputeServiceNonSubmittedPilotJobTerminationTestWMS(
+            BareMetalComputeServiceTestPilotJobs *test,
             const std::set<wrench::ComputeService *> &compute_services,
             const std::set<wrench::StorageService *> &storage_services,
             std::string hostname) :
@@ -640,7 +640,7 @@ public:
 
 private:
 
-    MultihostMulticoreComputeServiceTestPilotJobs *test;
+    BareMetalComputeServiceTestPilotJobs *test;
 
     int main() {
 
@@ -676,11 +676,11 @@ private:
     }
 };
 
-TEST_F(MultihostMulticoreComputeServiceTestPilotJobs, DISABLED_NonSubmittedPilotJobTermination) {
+TEST_F(BareMetalComputeServiceTestPilotJobs, DISABLED_NonSubmittedPilotJobTermination) {
   DO_TEST_WITH_FORK(do_NonSubmittedPilotJobTermination_test);
 }
 
-void MultihostMulticoreComputeServiceTestPilotJobs::do_NonSubmittedPilotJobTermination_test() {
+void BareMetalComputeServiceTestPilotJobs::do_NonSubmittedPilotJobTermination_test() {
 
   // Create and initialize a simulation
   auto *simulation = new wrench::Simulation();
@@ -702,14 +702,14 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_NonSubmittedPilotJobTermi
 
   // Create a Compute Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname,
+          new wrench::BareMetalComputeService(hostname,
                                                        {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                       0, {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}})));
+                                                       0, {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(
-          new MultihostMulticoreComputeServiceNonSubmittedPilotJobTerminationTestWMS(
+          new BareMetalComputeServiceNonSubmittedPilotJobTerminationTestWMS(
                   this,  {
                           compute_service
                   }, {
@@ -738,11 +738,11 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_NonSubmittedPilotJobTermi
 /**  TERMINATE IDLE PILOT JOB                                        **/
 /**********************************************************************/
 
-class MultihostMulticoreComputeServiceIdlePilotJobTerminationTestWMS : public wrench::WMS {
+class BareMetalComputeServiceIdlePilotJobTerminationTestWMS : public wrench::WMS {
 
 public:
-    MultihostMulticoreComputeServiceIdlePilotJobTerminationTestWMS(
-            MultihostMulticoreComputeServiceTestPilotJobs *test,
+    BareMetalComputeServiceIdlePilotJobTerminationTestWMS(
+            BareMetalComputeServiceTestPilotJobs *test,
             const std::set<wrench::ComputeService *> &compute_services,
             const std::set<wrench::StorageService *> &storage_services,
             std::string hostname) :
@@ -752,7 +752,7 @@ public:
 
 private:
 
-    MultihostMulticoreComputeServiceTestPilotJobs *test;
+    BareMetalComputeServiceTestPilotJobs *test;
 
     int main() {
 
@@ -838,11 +838,11 @@ private:
     }
 };
 
-TEST_F(MultihostMulticoreComputeServiceTestPilotJobs, DISABLED_IdlePilotJobTermination) {
+TEST_F(BareMetalComputeServiceTestPilotJobs, DISABLED_IdlePilotJobTermination) {
   DO_TEST_WITH_FORK(do_IdlePilotJobTermination_test);
 }
 
-void MultihostMulticoreComputeServiceTestPilotJobs::do_IdlePilotJobTermination_test() {
+void BareMetalComputeServiceTestPilotJobs::do_IdlePilotJobTermination_test() {
 
   // Create and initialize a simulation
   auto *simulation = new wrench::Simulation();
@@ -864,14 +864,14 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_IdlePilotJobTermination_t
 
   // Create a Compute Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname,
+          new wrench::BareMetalComputeService(hostname,
                                                        {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                       100.0, {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}})));
+                                                       100.0, {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(
-          new MultihostMulticoreComputeServiceIdlePilotJobTerminationTestWMS(
+          new BareMetalComputeServiceIdlePilotJobTerminationTestWMS(
                   this,  {compute_service}, {storage_service}, hostname)));
 
   ASSERT_NO_THROW(wms->addWorkflow(workflow));
@@ -896,11 +896,11 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_IdlePilotJobTermination_t
 /**  TERMINATE NON-IDLE PILOT JOB                                    **/
 /**********************************************************************/
 
-class MultihostMulticoreComputeServiceNonIdlePilotJobTerminationTestWMS : public wrench::WMS {
+class BareMetalComputeServiceNonIdlePilotJobTerminationTestWMS : public wrench::WMS {
 
 public:
-    MultihostMulticoreComputeServiceNonIdlePilotJobTerminationTestWMS(
-            MultihostMulticoreComputeServiceTestPilotJobs *test,
+    BareMetalComputeServiceNonIdlePilotJobTerminationTestWMS(
+            BareMetalComputeServiceTestPilotJobs *test,
             const std::set<wrench::ComputeService *> &compute_services,
             const std::set<wrench::StorageService *> &storage_services,
             std::string hostname) :
@@ -910,7 +910,7 @@ public:
 
 private:
 
-    MultihostMulticoreComputeServiceTestPilotJobs *test;
+    BareMetalComputeServiceTestPilotJobs *test;
 
     int main() {
 
@@ -1008,11 +1008,11 @@ private:
     }
 };
 
-TEST_F(MultihostMulticoreComputeServiceTestPilotJobs, DISABLED_NonIdlePilotJobTermination) {
+TEST_F(BareMetalComputeServiceTestPilotJobs, DISABLED_NonIdlePilotJobTermination) {
   DO_TEST_WITH_FORK(do_NonIdlePilotJobTermination_test);
 }
 
-void MultihostMulticoreComputeServiceTestPilotJobs::do_NonIdlePilotJobTermination_test() {
+void BareMetalComputeServiceTestPilotJobs::do_NonIdlePilotJobTermination_test() {
 
   // Create and initialize a simulation
   auto *simulation = new wrench::Simulation();
@@ -1034,14 +1034,14 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_NonIdlePilotJobTerminatio
 
   // Create a Compute Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname,
+          new wrench::BareMetalComputeService(hostname,
                                                        {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                       100.0, {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}})));
+                                                       100.0, {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(
-          new MultihostMulticoreComputeServiceNonIdlePilotJobTerminationTestWMS(
+          new BareMetalComputeServiceNonIdlePilotJobTerminationTestWMS(
                   this,  {compute_service}, {storage_service}, hostname)));
 
   ASSERT_NO_THROW(wms->addWorkflow(workflow));

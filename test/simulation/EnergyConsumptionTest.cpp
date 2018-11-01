@@ -326,7 +326,7 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionTests_test() {
 
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname,
+          new wrench::BareMetalComputeService(hostname,
                                                        {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
                                                        10000000000000.0, {})));
 
@@ -481,7 +481,7 @@ void EnergyConsumptionTest::do_EnergyConsumption_test() {
 
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname,
+          new wrench::BareMetalComputeService(hostname,
                                                        {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
                                                        10000000000000.0, {})));
 
@@ -631,7 +631,7 @@ void EnergyConsumptionTest::do_SimpleApiChecksEnergy_test() {
 
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname,
+          new wrench::BareMetalComputeService(hostname,
                                                        {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
                                                        10000000000000.0, {})));
 
@@ -867,7 +867,7 @@ void EnergyConsumptionTest::do_EnergyConsumptionPStateChange_test() {
 
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname,
+          new wrench::BareMetalComputeService(hostname,
                                                        {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
                                                        10000000000000.0, {})));
 

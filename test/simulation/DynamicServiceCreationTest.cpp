@@ -141,7 +141,7 @@ private:
       std::vector<std::string> execution_hosts = {"QuadCoreHost"};
       auto dynamically_created_compute_service = (wrench::CloudService *) simulation->startNewService(
               new wrench::CloudService(hostname, execution_hosts, 100.0,
-                                       { {wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}}));
+                                       { {wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}}));
 
       std::vector<wrench::WorkflowTask *> tasks = this->test->workflow->getReadyTasks();
 
@@ -249,7 +249,7 @@ void DynamicServiceCreationTest::do_getReadyTasksTest_test() {
 //  std::vector<std::string> execution_hosts = {"QuadCoreHost"};
 //  compute_service = simulation->add(
 //          new wrench::CloudService(hostname, execution_hosts, 100.0,
-//                                   { {wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}}));
+//                                   { {wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}}));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;

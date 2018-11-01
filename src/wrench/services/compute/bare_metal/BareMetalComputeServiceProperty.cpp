@@ -7,12 +7,12 @@
  * (at your option) any later version.
  */
 
-#include "wrench/services/compute/multihost_multicore/MultihostMulticoreComputeServiceProperty.h"
+#include "wrench/services/compute/bare_metal/BareMetalComputeServiceProperty.h"
 
 namespace wrench {
 
 
-    SET_PROPERTY_NAME(MultihostMulticoreComputeServiceProperty, THREAD_STARTUP_OVERHEAD);
+    SET_PROPERTY_NAME(BareMetalComputeServiceProperty, THREAD_STARTUP_OVERHEAD);
 
 };
 

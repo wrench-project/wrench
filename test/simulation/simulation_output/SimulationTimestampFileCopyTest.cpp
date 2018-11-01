@@ -135,7 +135,7 @@ void SimulationTimestampFileCopyTest::do_SimulationTimestampFileCopyBasic_test()
     std::string host1 = simulation->getHostnameList()[0];
     std::string host2 = simulation->getHostnameList()[1];
 
-    ASSERT_NO_THROW(compute_service = simulation->add(new wrench::MultihostMulticoreComputeService(host1,
+    ASSERT_NO_THROW(compute_service = simulation->add(new wrench::BareMetalComputeService(host1,
                                                                                                    {std::make_pair(
                                                                                                            host1,
                                                                                                            std::make_tuple(wrench::ComputeService::ALL_CORES,

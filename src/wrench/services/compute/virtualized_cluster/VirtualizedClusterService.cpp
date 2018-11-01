@@ -51,7 +51,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Create a MultihostMulticoreComputeService VM on a physical machine
+     * @brief Create a BareMetalComputeService VM on a physical machine
      *
      * @param pm_hostname: the name of the physical machine host
      * @param num_cores: the number of cores the service can use (use ComputeService::ALL_CORES to use all cores

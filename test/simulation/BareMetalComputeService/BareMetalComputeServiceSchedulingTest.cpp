@@ -21,7 +21,7 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(test, "Log category for test");
 #define EPSILON 0.005
 
 
-class MultihostMulticoreComputeServiceTestScheduling : public ::testing::Test {
+class BareMetalComputeServiceTestScheduling : public ::testing::Test {
 
 
 public:
@@ -45,7 +45,7 @@ public:
     }
 
 protected:
-    MultihostMulticoreComputeServiceTestScheduling() {
+    BareMetalComputeServiceTestScheduling() {
 
       // Create the simplest workflow
       workflow = new wrench::Workflow();
@@ -83,7 +83,7 @@ protected:
 class OneJobTestWMS : public wrench::WMS {
 
 public:
-    OneJobTestWMS(MultihostMulticoreComputeServiceTestScheduling *test,
+    OneJobTestWMS(BareMetalComputeServiceTestScheduling *test,
                   const std::set<wrench::ComputeService *> &compute_services,
                   const std::set<wrench::StorageService *> &storage_services,
                   std::string hostname) :
@@ -94,7 +94,7 @@ public:
 
 private:
 
-    MultihostMulticoreComputeServiceTestScheduling *test;
+    BareMetalComputeServiceTestScheduling *test;
 
     int main() {
 
@@ -158,9 +158,9 @@ private:
 //        WRENCH_INFO("t1:%lf t2:%lf t3:%lf", task1_makespan, task2_makespan, task3_makespan);
 
 
-        if (!MultihostMulticoreComputeServiceTestScheduling::isJustABitGreater(30, task1_makespan) ||
-            !MultihostMulticoreComputeServiceTestScheduling::isJustABitGreater(30, task2_makespan) ||
-            !MultihostMulticoreComputeServiceTestScheduling::isJustABitGreater(15, task3_makespan)) {
+        if (!BareMetalComputeServiceTestScheduling::isJustABitGreater(30, task1_makespan) ||
+            !BareMetalComputeServiceTestScheduling::isJustABitGreater(30, task2_makespan) ||
+            !BareMetalComputeServiceTestScheduling::isJustABitGreater(15, task3_makespan)) {
           throw std::runtime_error("DEFAULT PROPERTIES / CASE 1: Unexpected task execution times "
                                            "t1: " + std::to_string(task1_makespan) +
                                    " t2: " + std::to_string(task2_makespan) +
@@ -229,9 +229,9 @@ private:
 
 //        WRENCH_INFO("t1:%lf t2:%lf t3:%lf", task1_makespan, task2_makespan, task3_makespan);
 
-        if (!MultihostMulticoreComputeServiceTestScheduling::isJustABitGreater(20, task1_makespan) ||
-            !MultihostMulticoreComputeServiceTestScheduling::isJustABitGreater(60, task2_makespan) ||
-            !MultihostMulticoreComputeServiceTestScheduling::isJustABitGreater(15, task3_makespan)) {
+        if (!BareMetalComputeServiceTestScheduling::isJustABitGreater(20, task1_makespan) ||
+            !BareMetalComputeServiceTestScheduling::isJustABitGreater(60, task2_makespan) ||
+            !BareMetalComputeServiceTestScheduling::isJustABitGreater(15, task3_makespan)) {
           throw std::runtime_error("DEFAULT PROPERTIES / CASE 2: Unexpected task execution times "
                                            "t1: " + std::to_string(task1_makespan) +
                                    " t2: " + std::to_string(task2_makespan) +
@@ -299,9 +299,9 @@ private:
 
 //        WRENCH_INFO("t1:%lf t2:%lf t3:%lf", task1_makespan, task2_makespan, task3_makespan);
 
-        if (!MultihostMulticoreComputeServiceTestScheduling::isJustABitGreater(30, task1_makespan) ||
-            !MultihostMulticoreComputeServiceTestScheduling::isJustABitGreater(60, task2_makespan) ||
-            !MultihostMulticoreComputeServiceTestScheduling::isJustABitGreater(30, task3_makespan)) {
+        if (!BareMetalComputeServiceTestScheduling::isJustABitGreater(30, task1_makespan) ||
+            !BareMetalComputeServiceTestScheduling::isJustABitGreater(60, task2_makespan) ||
+            !BareMetalComputeServiceTestScheduling::isJustABitGreater(30, task3_makespan)) {
           throw std::runtime_error(
                   "DEFAULT PROPERTIES BUT MINIMUM CORE ALLOCATION / CASE 1: Unexpected task execution times "
                           "t1: " + std::to_string(task1_makespan) +
@@ -369,9 +369,9 @@ private:
 
 //        WRENCH_INFO("t1:%lf t2:%lf t3:%lf", task1_makespan, task2_makespan, task3_makespan);
 
-        if (!MultihostMulticoreComputeServiceTestScheduling::isJustABitGreater(15, task1_makespan) ||
-            !MultihostMulticoreComputeServiceTestScheduling::isJustABitGreater(45, task2_makespan) ||
-            !MultihostMulticoreComputeServiceTestScheduling::isJustABitGreater(15, task3_makespan)) {
+        if (!BareMetalComputeServiceTestScheduling::isJustABitGreater(15, task1_makespan) ||
+            !BareMetalComputeServiceTestScheduling::isJustABitGreater(45, task2_makespan) ||
+            !BareMetalComputeServiceTestScheduling::isJustABitGreater(15, task3_makespan)) {
           throw std::runtime_error(
                   "DEFAULT PROPERTIES BUT MAX_MIN_CORES TASK SELECTION / CASE 1 : Unexpected task execution times "
                           "t1: " + std::to_string(task1_makespan) +
@@ -389,11 +389,11 @@ private:
     }
 };
 
-TEST_F(MultihostMulticoreComputeServiceTestScheduling, DISABLED_OneJob) {
+TEST_F(BareMetalComputeServiceTestScheduling, DISABLED_OneJob) {
   DO_TEST_WITH_FORK(do_OneJob_test);
 }
 
-void MultihostMulticoreComputeServiceTestScheduling::do_OneJob_test() {
+void BareMetalComputeServiceTestScheduling::do_OneJob_test() {
 
   // Create and initialize a simulation
   auto *simulation = new wrench::Simulation();
@@ -409,7 +409,7 @@ void MultihostMulticoreComputeServiceTestScheduling::do_OneJob_test() {
   std::set<wrench::ComputeService *> compute_services;
   // Create a Compute Service
   ASSERT_NO_THROW(cs_fcfs_aggressive_maximum_maximum_flops_best_fit = simulation->add(
-          new wrench::MultihostMulticoreComputeService(
+          new wrench::BareMetalComputeService(
                   "Host1",
                   (std::set<std::string>){"Host1", "Host2"},
                   0,
@@ -418,7 +418,7 @@ void MultihostMulticoreComputeServiceTestScheduling::do_OneJob_test() {
 
   // Create a Compute Service
   ASSERT_NO_THROW(cs_fcfs_aggressive_minimum_maximum_flops_best_fit = simulation->add(
-          new wrench::MultihostMulticoreComputeService(
+          new wrench::BareMetalComputeService(
                   "Host1",
                   (std::set<std::string>){"Host1","Host2"},
                   0,
@@ -427,7 +427,7 @@ void MultihostMulticoreComputeServiceTestScheduling::do_OneJob_test() {
 
   // Create a Compute Service
   ASSERT_NO_THROW(cs_fcfs_aggressive_maximum_maximum_minimum_cores_best_fit = simulation->add(
-          new wrench::MultihostMulticoreComputeService(
+          new wrench::BareMetalComputeService(
                   "Host1",
                   (std::set<std::string>){"Host1", "Host2"},
                   0,
@@ -458,7 +458,7 @@ void MultihostMulticoreComputeServiceTestScheduling::do_OneJob_test() {
 class MultiJobTestWMS : public wrench::WMS {
 
 public:
-    MultiJobTestWMS(MultihostMulticoreComputeServiceTestScheduling *test,
+    MultiJobTestWMS(BareMetalComputeServiceTestScheduling *test,
                     const std::set<wrench::ComputeService *> &compute_services,
                     const std::set<wrench::StorageService *> &storage_services,
                     std::string hostname) :
@@ -469,7 +469,7 @@ public:
 
 private:
 
-    MultihostMulticoreComputeServiceTestScheduling *test;
+    BareMetalComputeServiceTestScheduling *test;
 
     int main() {
 
@@ -532,7 +532,7 @@ private:
             }
           }
 
-          if (!MultihostMulticoreComputeServiceTestScheduling::isJustABitGreater(0,
+          if (!BareMetalComputeServiceTestScheduling::isJustABitGreater(0,
                                                                                  wrench::S4U_Simulation::getClock())) {
             throw std::runtime_error("Pilot job should startDaemon at time 0");
           }
@@ -557,7 +557,7 @@ private:
             }
           }
 
-          if (!MultihostMulticoreComputeServiceTestScheduling::isJustABitGreater(3600,
+          if (!BareMetalComputeServiceTestScheduling::isJustABitGreater(3600,
                                                                                  wrench::S4U_Simulation::getClock())) {
             throw std::runtime_error("Pilot job should expire at time 3600");
           }
@@ -584,7 +584,7 @@ private:
               throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
             }
           }
-          if (!MultihostMulticoreComputeServiceTestScheduling::isJustABitGreater(3600 + 60,
+          if (!BareMetalComputeServiceTestScheduling::isJustABitGreater(3600 + 60,
                                                                                  wrench::S4U_Simulation::getClock())) {
             throw std::runtime_error("Standard job #2 should complete at time 3600 + 60");
           }
@@ -611,7 +611,7 @@ private:
             }
           }
 
-          if (!MultihostMulticoreComputeServiceTestScheduling::isJustABitGreater(4000,
+          if (!BareMetalComputeServiceTestScheduling::isJustABitGreater(4000,
                                                                                  wrench::S4U_Simulation::getClock())) {
             throw std::runtime_error("Standard job #1 should complete at time 4000");
           }
@@ -627,11 +627,11 @@ private:
     }
 };
 
-TEST_F(MultihostMulticoreComputeServiceTestScheduling, DISABLED_MultiJob) {
+TEST_F(BareMetalComputeServiceTestScheduling, DISABLED_MultiJob) {
   DO_TEST_WITH_FORK(do_MultiJob_test);
 }
 
-void MultihostMulticoreComputeServiceTestScheduling::do_MultiJob_test() {
+void BareMetalComputeServiceTestScheduling::do_MultiJob_test() {
 
   // Create and initialize a simulation
   auto *simulation = new wrench::Simulation();
@@ -646,7 +646,7 @@ void MultihostMulticoreComputeServiceTestScheduling::do_MultiJob_test() {
 
   // Create a Compute Service
   ASSERT_NO_THROW(cs_fcfs_aggressive_maximum_maximum_flops_best_fit = simulation->add(
-          new wrench::MultihostMulticoreComputeService("Host1",
+          new wrench::BareMetalComputeService("Host1",
                                                        (std::set<std::string>){"Host1", "Host2"}, 0.0,
                                                        {})));
   std::set<wrench::ComputeService *> compute_services;
@@ -677,7 +677,7 @@ void MultihostMulticoreComputeServiceTestScheduling::do_MultiJob_test() {
 class RAMPressureTestWMS : public wrench::WMS {
 
 public:
-    RAMPressureTestWMS(MultihostMulticoreComputeServiceTestScheduling *test,
+    RAMPressureTestWMS(BareMetalComputeServiceTestScheduling *test,
                     const std::set<wrench::ComputeService *> &compute_services,
                     const std::set<wrench::StorageService *> &storage_services,
                     std::string hostname) :
@@ -688,7 +688,7 @@ public:
 
 private:
 
-    MultihostMulticoreComputeServiceTestScheduling *test;
+    BareMetalComputeServiceTestScheduling *test;
 
     int main() {
 
@@ -769,11 +769,11 @@ private:
 
 };
 
-TEST_F(MultihostMulticoreComputeServiceTestScheduling, RAMPressure) {
+TEST_F(BareMetalComputeServiceTestScheduling, RAMPressure) {
   DO_TEST_WITH_FORK(do_RAMPressure_test);
 }
 
-void MultihostMulticoreComputeServiceTestScheduling::do_RAMPressure_test() {
+void BareMetalComputeServiceTestScheduling::do_RAMPressure_test() {
 
   // Create and initialize a simulation
   auto *simulation = new wrench::Simulation();
@@ -788,7 +788,7 @@ void MultihostMulticoreComputeServiceTestScheduling::do_RAMPressure_test() {
 
   // Create a Compute Service
   ASSERT_NO_THROW(cs = simulation->add(
-          new wrench::MultihostMulticoreComputeService("Host1",
+          new wrench::BareMetalComputeService("Host1",
                                                        (std::set<std::string>){"Host1", "Host2"}, 0.0,
                                                        {}, {})));
   std::set<wrench::ComputeService *> compute_services;

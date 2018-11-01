@@ -246,10 +246,14 @@ namespace wrench {
      * @param job: a workflow job
      * @param compute_service: a compute service
      * @param service_specific_args: arguments specific for compute services:
-     *      - to a MultihostMulticoreComputeService: {}
-     *      - to a BatchService: {"-t":"<int>" (requested number of minutes),"-N":"<int>" (number of requested hosts),"-c":"<int>" (number of requestes cores per host)}
-     *      - to a VirtualizedClusterService: {} (in which case the service will pick the vm) or {"-vm":"<vm name>"}
-     *      - to a CloudService: {} (in which case the service will pick the vm) or {"-vm":"<vm name>"}
+     *      - to a BareMetalComputeService: {{"taskID", "[hostname:]num_cores}, ...}
+     *          - If no entry is provided for a taskID, the service will pick on which host and with how many cores to run the task
+     *          - If a number of cores is provided (e.g., {"task1", "12"}), the service will pick the host on which to run the task
+     *          - If a hostname and a number of cores is provided (e.g., {"task1", "host1:12"}, the service will run the task on that host
+     *            with the specified number of cores
+     *      - to a BatchService: {{"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requestes cores per host)}}
+     *      - to a VirtualizedClusterService: {} (in which case the service will pick the vm) or {{"-vm":"<vm name>"}}
+     *      - to a CloudService: {} (in which case the service will pick the vm) or {{"-vm":"<vm name>"}}
      *
      * @throw std::invalid_argument
      * @throw WorkflowExecutionException
