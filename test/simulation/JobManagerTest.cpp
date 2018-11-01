@@ -185,56 +185,24 @@ private:
       bool success;
 
 
-      success = true;
       try {
         job_manager->createStandardJob(nullptr, {});
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to create a standard job with a nullptr task in it");
+      } catch (std::invalid_argument &e) {
       }
 
 
-      success = true;
       try {
         job_manager->createStandardJob((std::vector<wrench::WorkflowTask *>) {nullptr}, {});
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to create a standard job with a nullptr task in it");
+      } catch (std::invalid_argument &e) {
       }
 
-      success = true;
       try {
         std::vector<wrench::WorkflowTask *> tasks; // empty
         job_manager->createStandardJob(tasks, {});
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to create a standard job with nothing in it");
-      }
-
-      success = true;
-      try {
-        job_manager->createPilotJob(10, 10, -12, 10);
       } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
-        throw std::runtime_error("Should not be able to create a standard job with a negative ram per host");
-      }
-
-      success = true;
-      try {
-        job_manager->createPilotJob(10, 10, 10, -12);
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
-        throw std::runtime_error("Should not be able to create a standard job with a negative duration");
       }
 
       wrench::WorkflowTask *t1 = this->getWorkflow()->addTask("t1", 1.0, 1, 1, 1.0, 0.0);
@@ -244,25 +212,17 @@ private:
       t2->addInputFile(f);
 
       // Create an "ok" job
-      success = true;
       try {
         job_manager->createStandardJob({t1, t2}, {});
       } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (!success) {
         throw std::runtime_error("Should be able to create a standard job with two dependent tasks");
       }
 
       // Create a "not ok" job
-      success = true;
       try {
         job_manager->createStandardJob((std::vector<wrench::WorkflowTask *>) {t2}, {});
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to create a standard job with a not-self-contained task");
+      } catch (std::invalid_argument &e) {
       }
 
       return 0;

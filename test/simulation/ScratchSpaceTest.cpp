@@ -477,7 +477,7 @@ private:
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Create a pilot job that requires 1 host, 1 core per host, 1 bytes of RAM per host, and 1 hour
-      wrench::PilotJob *pilot_job = job_manager->createPilotJob(1, 1, 1.0, 3600);
+      wrench::PilotJob *pilot_job = job_manager->createPilotJob();
 
       // Submit a pilot job
       try {

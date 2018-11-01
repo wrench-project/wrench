@@ -865,8 +865,7 @@ namespace wrench {
     void CloudService::processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job,
                                              std::map<std::string, std::string> &service_specific_args) {
 
-      WRENCH_INFO("Asked to run a pilot job with %ld hosts and %ld cores per host for %lf seconds",
-                  job->getNumHosts(), job->getNumCoresPerHost(), job->getDuration());
+      WRENCH_INFO("Asked to run a pilot job");
 
       if (not this->supportsPilotJobs()) {
         try {
