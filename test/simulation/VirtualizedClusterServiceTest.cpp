@@ -16,6 +16,10 @@
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
 
+XBT_LOG_NEW_DEFAULT_CATEGORY(virtualized_cluster_service_test, "Log category for VirtualizedClusterServiceTest");
+
+#define EPSILON 0.001
+
 class VirtualizedClusterServiceTest : public ::testing::Test {
 
 public:
@@ -842,7 +846,9 @@ private:
       // Create a one-task job
       wrench::StandardJob *job = job_manager->createStandardJob(this->test->task1,
                                                                 {std::make_pair(this->test->input_file,
-                                                                                 this->test->storage_service)});
+                                                                                 this->test->storage_service),
+                                                                 std::make_pair(this->test->output_file1,
+                                                                                this->test->storage_service)});
 
       // Submit a job
       try {
@@ -853,32 +859,24 @@ private:
       }
 
 
-      std::cerr << "STARTING VB AND SUBMITTING JOB\n";
-
       try {
         cs->startVM(vm_list[3]);
-        job_manager->submitJob(job, this->test->compute_service);
       } catch (std::runtime_error &e) {
         throw std::runtime_error(e.what());
       }
 
-
       try {
-        std::cerr << "SUSPENDING VM\n";
         cs->suspendVM(vm_list[3]);
-        std::cerr << "SUBMITTING JOB\n";
         job_manager->submitJob(job, this->test->compute_service);
         throw std::runtime_error("should have thrown an exception since there are no resources available");
       } catch (wrench::WorkflowExecutionException &e) {
         // do nothing, should have thrown an exception since there are no resources available
       }
 
-      std::cerr << "HERE\n";
       try {
         if (!cs->resumeVM(vm_list[3])) {
           throw std::runtime_error("Could not resume the VM");
         }
-        job_manager->submitJob(job, this->test->compute_service);
       } catch (std::runtime_error &e) {
         throw std::runtime_error(e.what());
       }
@@ -886,6 +884,8 @@ private:
       if (cs->resumeVM(vm_list[3])) {
         throw std::runtime_error("VM was already resumed, so an exception was expected!");
       }
+
+      job_manager->submitJob(job, this->test->compute_service);
 
       // Wait for a workflow execution event
       std::unique_ptr<wrench::WorkflowExecutionEvent> event;
@@ -903,6 +903,66 @@ private:
           throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
         }
       }
+
+      // Submit a job and suspend the VM before that job finishes
+      wrench::StandardJob *other_job = job_manager->createStandardJob(this->test->task2,
+                                                                {std::make_pair(this->test->input_file,
+                                                                                this->test->storage_service),
+                                                                 std::make_pair(this->test->output_file2,
+                                                                                this->test->storage_service)});
+
+      try {
+        WRENCH_INFO("Submitting a job");
+        job_manager->submitJob(other_job, this->test->compute_service);
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error("Should be able to submit the other job");
+      }
+      double job_start_date = this->simulation->getCurrentSimulatedDate();
+
+      WRENCH_INFO("Sleeping for 5 seconds");
+      this->simulation->sleep(5);
+
+      try {
+        WRENCH_INFO("Suspending the one running VM (which is thus running the job)");
+        cs->suspendVM(vm_list[3]);
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error("Should be able to suspend VM");
+      }
+
+
+      WRENCH_INFO("Sleeping for 100 seconds");
+      this->simulation->sleep(100);
+
+      try {
+        WRENCH_INFO("Resuming the VM");
+        cs->resumeVM(vm_list[3]);
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error("Should be able to resume VM");
+      }
+
+      // Wait for a workflow execution event
+      WRENCH_INFO("Waiting for job completion");
+      std::unique_ptr<wrench::WorkflowExecutionEvent> event2;
+      try {
+        event2 = this->getWorkflow()->waitForNextExecutionEvent();
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+      }
+      switch (event2->type) {
+        case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
+          // success, do nothing for now
+          break;
+        }
+        default: {
+          throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event2->type)));
+        }
+      }
+
+      double job_turnaround_time = this->simulation->getCurrentSimulatedDate() - job_start_date;
+      if (fabs(job_turnaround_time - 110) > EPSILON) {
+        throw std::runtime_error("Unexpected job turnaround time " + std::to_string(job_turnaround_time));
+      }
+
 
       // attempt to shutdown non-existent VM
       try {
@@ -1218,6 +1278,7 @@ private:
           throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
         }
       }
+
 
       return 0;
     }
