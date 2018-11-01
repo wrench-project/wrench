@@ -93,7 +93,7 @@ private:
       auto batch = (wrench::BatchService *) (this->test->cs_batch);
 
       // Get a "PILOT JOB STARTED" event (default handler)
-      wrench::PilotJob *job2 = job_manager->createPilotJob(1,1,0,60);
+      wrench::PilotJob *job2 = job_manager->createPilotJob();
       job_manager->submitJob(job2, batch, {{"-N", "1"}, {"-t", "50"}, {"-c", "1"}});
       this->waitForAndProcessNextEvent();
 
@@ -237,8 +237,8 @@ private:
 
 
       // Get a "PILOT JOB STARTED" event (default handler)
-      wrench::PilotJob *job2 = job_manager->createPilotJob(1,1,0,60);
-      job_manager->submitJob(job2, this->test->cs_batch, {{"-N","1"},{"-c","1"},{"-t","50"}});
+      wrench::PilotJob *job2 = job_manager->createPilotJob();
+      job_manager->submitJob(job2, this->test->cs_batch, {{"-N","1"},{"-c","1"},{"-t","1"}});
       this->waitForAndProcessNextEvent();
       if (this->counter != 2) {
         throw std::runtime_error("Did not get expected 'PILOT JOB START' event");

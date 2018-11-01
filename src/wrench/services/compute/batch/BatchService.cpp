@@ -1745,12 +1745,11 @@ namespace wrench {
 
           return;
         }
-          break;
 
         case WorkflowJob::PILOT: {
           PilotJob *job = (PilotJob *) workflow_job;
-          WRENCH_INFO("Allocating %ld nodes with %ld cores per node to a pilot job",
-                      num_nodes_allocated, cores_per_node_asked_for);
+          WRENCH_INFO("Allocating %ld nodes with %ld cores per node to a pilot job for %.2lf seconds",
+                      num_nodes_allocated, cores_per_node_asked_for, allocated_time);
 
           std::vector<std::string> nodes_for_pilot_job = {};
           for (auto r : resources) {
@@ -1776,7 +1775,7 @@ namespace wrench {
           try {
             cs->start(cs, true);
             batch_job->setBeginTimeStamp(S4U_Simulation::getClock());
-            double timeout_timestamp = std::min<double>(job->getDuration(), allocated_time);
+            double timeout_timestamp = allocated_time;
             batch_job->setEndingTimeStamp(S4U_Simulation::getClock() + timeout_timestamp);
           } catch (std::runtime_error &e) {
             throw;

@@ -115,7 +115,7 @@ private:
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Create a pilot job
-      wrench::PilotJob *pilot_job = job_manager->createPilotJob(1, 1, 0, 3600);  // Asking for 0 RAM
+      wrench::PilotJob *pilot_job = job_manager->createPilotJob();
 
       // Submit a pilot job
       bool success = true;
