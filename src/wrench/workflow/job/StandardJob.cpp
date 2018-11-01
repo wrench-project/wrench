@@ -20,7 +20,8 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @workflow: the workflow this job is for
+     * @param workflow: the workflow for which this job is
+     *
      * @param tasks: the tasks in the job (which must be either READY, or children of COMPLETED tasks or
      *                                   of tasks also included in the standard job)
      * @param file_locations: a map that specifies on which storage service input/output files should be read/written
