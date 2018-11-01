@@ -69,9 +69,10 @@ namespace wrench {
       double pilot_job_duration = 2.0 * flops / target_service->getCoreFlopRate()[0];
       WRENCH_INFO("Submitting a pilot job (1 host, 1 core, %lf seconds)", pilot_job_duration);
 
+      double pilot_job_duration_in_minutes = ceil(pilot_job_duration/60.0);
       //TODO: For now we are asking for a pilot job that requires no RAM
-      WorkflowJob *job = (WorkflowJob *) this->getJobManager()->createPilotJob(1, 1, 0.0, pilot_job_duration);
-      this->getJobManager()->submitJob(job, target_service);
+      WorkflowJob *job = (WorkflowJob *) this->getJobManager()->createPilotJob();
+      this->getJobManager()->submitJob(job, target_service, {{"-N","1"},{"-c","1"},{"-t",std::to_string(pilot_job_duration_in_minutes)}});
 
     }
 

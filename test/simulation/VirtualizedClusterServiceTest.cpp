@@ -889,7 +889,7 @@ private:
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       // Create a pilot job that requests 1 host, 1 code, 0 bytes, and 1 minute
-      wrench::PilotJob *pilot_job = job_manager->createPilotJob(1, 1, 0.0, 60.0);
+      wrench::PilotJob *pilot_job = job_manager->createPilotJob();
 
       std::vector<std::string> vm_list;
 

@@ -50,16 +50,6 @@ namespace wrench {
 
         PilotJob::State getState();
 
-        unsigned long getNumHosts() const;
-
-        unsigned long getNumCoresPerHost() const;
-
-        double getMemoryPerHost() const;
-
-        double getDuration() const;
-
-
-
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
@@ -75,13 +65,7 @@ namespace wrench {
 
         friend class JobManager;
 
-        PilotJob(Workflow *workflow, unsigned long num_hosts, unsigned long num_cores_per_host, double ram_per_host, double duration);
-
-        unsigned long num_hosts;
-        unsigned long num_cores_per_host;
-        double ram_per_host;
-        double duration;
-
+        PilotJob(Workflow *workflow);
 
         State state;
         std::shared_ptr<ComputeService> compute_service; // Associated compute service, i.e., the running pilot job
