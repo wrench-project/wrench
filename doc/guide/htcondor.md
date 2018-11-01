@@ -46,7 +46,7 @@ service requires the following parameters:
 The set of compute services may represent any of computing instance natively 
 provided by WRENCH (e.g., bare-metal servers, cloud platforms, batch-scheduled
 clusters, etc.) or additional services derived from the `wrench::ComputeService`
-base class. The example below how to create an instance of an HTCondor service
+base class. The example below shows how to create an instance of an HTCondor service
 with a pool of resources containing a bare-metal server and a cloud platform:
 
 ~~~~~~~~~~~~~{.cpp}
