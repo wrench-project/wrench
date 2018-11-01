@@ -48,9 +48,10 @@ namespace wrench {
         throw std::invalid_argument(
                 "TraceFileLoader::loadFromTraceFile(): batch workload trace file name must end with '.swf' or '.json'");
       }
-      if (tokens[tokens.size() - 1] == "swf") {
+      std::string extension = tokens[tokens.size() - 1];
+      if (extension == "swf") {
         return loadFromTraceFileSWF(filename, load_time_compensation);
-      } else if (tokens[tokens.size() - 1] == "json") {
+      } else if (extension == "json") {
         return loadFromTraceFileJSON(filename, load_time_compensation);
       } else {
         throw std::invalid_argument(
