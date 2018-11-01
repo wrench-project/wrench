@@ -975,9 +975,11 @@ namespace wrench {
                                                                              Workunit *workunit) {
       StandardJob *job = workunit_executor->getJob();
 
+      std::set<WorkflowFile *> files_stored_in_scrach_by_executor;
+
       // Get the scratch files that executor may have generated
       for (auto &f : workunit_executor->getFilesStoredInScratch()) {
-        this->files_in_scratch.insert(f);
+        files_stored_in_scrach_by_executor.insert(f);
       }
       // Update RAM availabilities and running thread counts
       if (workunit->task) {
@@ -1032,7 +1034,21 @@ namespace wrench {
       this->all_workunits[job].clear();
       this->all_workunits.erase(job);
 
+      // Clean up run specs
       this->job_run_specs.erase(job);
+
+      if (this->containing_pilot_job == nullptr) {
+        WRENCH_INFO("I am not part of a pilot job, so I should clean up files in stratch!");
+        for (auto const &f : files_stored_in_scrach_by_executor) {
+          std::cerr << "REMOVING FILE " << f->getID() << " FROM SCRATCH\n";
+          this->getScratch()->deleteFile(f);
+        }
+      } else {
+        WRENCH_INFO("I am part of a pilot job, so I just keep track of files in scratch");
+        for (auto const &f : files_stored_in_scrach_by_executor) {
+          this->files_in_scratch.insert(f);
+        }
+      }
 
       // Send the callback to the originator
       try {
@@ -1338,6 +1354,7 @@ namespace wrench {
  */
     void MultihostMulticoreComputeService::cleanUpScratch() {
 
+      std::cerr << "IN CLEANUP SCRATCH\n";
       for (auto &f : this->files_in_scratch) {
         try {
           getScratch()->deleteFile(f, this->containing_pilot_job, nullptr);

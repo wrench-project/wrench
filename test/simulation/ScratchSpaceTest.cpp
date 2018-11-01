@@ -173,11 +173,11 @@ void ScratchSpaceTest::do_SimpleScratchSpace_test() {
 
   // Create a Storage Service
   ASSERT_NO_THROW(storage_service1 = simulation->add(
-          new wrench::SimpleStorageService(hostname, 1000000.0)));
+          new wrench::SimpleStorageService(hostname, 2000000.0)));
 
   // Create a Storage Service
   ASSERT_NO_THROW(storage_service2 = simulation->add(
-          new wrench::SimpleStorageService(hostname, 1000000.0)));
+          new wrench::SimpleStorageService(hostname, 2000000.0)));
 
 
   // Create a Compute Service
