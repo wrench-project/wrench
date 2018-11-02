@@ -7,6 +7,7 @@
  * (at your option) any later version.
  */
 
+#include <simgrid/s4u.hpp>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/workflow/execution_events/FailureCause.h>
 #include <wrench-dev.h>
@@ -110,6 +111,30 @@ namespace wrench {
     bool NetworkConnection::hasFailed() {
       try {
         this->comm->comm_ptr->test();
+      } catch (simgrid::NetworkFailureException &e) {
+        if (this->type == NetworkConnection::OUTGOING_DATA) {
+          this->failure_cause = std::shared_ptr<NetworkError>(new NetworkError(NetworkError::SENDING, NetworkError::FAILURE, this->mailbox));
+        } else {
+          this->failure_cause = std::shared_ptr<NetworkError>(new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, this->mailbox));
+        }
+        return true;
+      } catch (simgrid::TimeoutError &e) {
+        if (this->type == NetworkConnection::OUTGOING_DATA) {
+          this->failure_cause = std::shared_ptr<NetworkError>(new NetworkError(NetworkError::SENDING, NetworkError::TIMEOUT, this->mailbox));
+        } else {
+          this->failure_cause = std::shared_ptr<NetworkError>(new NetworkError(NetworkError::RECEIVING, NetworkError::TIMEOUT, this->mailbox));
+        }
+        return true;
+      } catch (std::exception &e) {
+        // This is likely paranoid
+        if (this->type == NetworkConnection::OUTGOING_DATA) {
+          this->failure_cause = std::shared_ptr<NetworkError>(new NetworkError(NetworkError::SENDING, NetworkError::FAILURE, this->mailbox));
+        } else {
+          this->failure_cause = std::shared_ptr<NetworkError>(new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, this->mailbox));
+        }
+        return true;
+      }
+      /*
       } catch (xbt_ex &e) {
         if (e.category == network_error) {
           if (this->type == NetworkConnection::OUTGOING_DATA) {
@@ -127,6 +152,7 @@ namespace wrench {
           return true;
         }
       }
+        */
       return false;
     }
 

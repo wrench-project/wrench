@@ -103,6 +103,7 @@ namespace wrench {
         if (not strcmp(argv[i], "--wrench-no-color")) {
           TerminalOutput::disableColor();
         } else if (not strcmp(argv[i], "--wrench-no-log")) {
+          TerminalOutput::disableColor();
           wrench_no_log = true;
         } else if (not strcmp(argv[i], "--activate-energy")) {
           sg_host_energy_plugin_init();
