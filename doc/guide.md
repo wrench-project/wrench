@@ -14,4 +14,4 @@ Guide                        {#guide}
     5. [Workload Management System (HTCondor)](@ref guide-htcondor)
     
 2. Storage Services
-    1. Simple
+    1. [Simple](@ref guide-simplestorage)

@@ -1,4 +1,4 @@
-BareMetal                        {#guide-batch}
+Batch                        {#guide-batch}
 ============
 
 @WRENCHUserDoc <div class="doc-type">User Documentation</div><div class="doc-link">Other: <a href="../developer/wrench-101.html">Developer</a> - <a href="../internal/wrench-101.html">Internal</a></div> @endWRENCHDoc
