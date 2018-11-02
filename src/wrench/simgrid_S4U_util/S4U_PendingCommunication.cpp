@@ -34,6 +34,18 @@ namespace wrench {
         if (this->comm_ptr->get_state() != simgrid::s4u::Activity::State::FINISHED) {
           this->comm_ptr->wait();
         }
+      } catch (simgrid::NetworkFailureException &e) {
+        throw std::shared_ptr<NetworkError>(
+                new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, mailbox_name));
+      } catch (simgrid::TimeoutError &e) {
+        throw std::shared_ptr<NetworkError>(
+                new NetworkError(NetworkError::RECEIVING, NetworkError::TIMEOUT, mailbox_name));
+      } catch (std::exception &e) {
+        // This is likely paranoid
+        throw std::shared_ptr<NetworkError>(
+                new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, mailbox_name));
+      }
+      /*
       } catch (xbt_ex &e) {
         if (e.category == network_error) {
           throw std::shared_ptr<NetworkError>(
@@ -46,6 +58,7 @@ namespace wrench {
                   "S4U_PendingCommunication::wait(): Unexpected xbt_ex exception (" + std::to_string(e.category) + ")");
         }
       }
+       */
       return std::move(this->simulation_message);
     }
 
@@ -96,12 +109,9 @@ namespace wrench {
       try {
         index = (unsigned long) simgrid::s4u::Comm::wait_any(&pending_s4u_comms);
         MessageManager::removeReceivedMessages(pending_comms[index]->mailbox_name, pending_comms[index]->simulation_message.get());
-      } catch (xbt_ex &e) {
-        if (e.category != network_error) {
-          throw std::runtime_error(
-                  "S4U_PendingCommunication::waitForSomethingToHappen(): Unexpected xbt_ex exception (" +
-                  std::to_string(e.category) + ")");
-        }
+      } catch (simgrid::NetworkFailureException &e) {
+        one_comm_failed = true;
+      } catch (simgrid::TimeoutError &e) {
         one_comm_failed = true;
       } catch (std::exception &e) {
         throw std::runtime_error("S4U_PendingCommunication::waitForSomethingToHappen(): Unexpected std::exception  (" +
@@ -112,14 +122,10 @@ namespace wrench {
         for (index = 0; index < pending_s4u_comms.size(); index++) {
           try {
             pending_s4u_comms[index]->test();
-          } catch (xbt_ex &e) {
-            if (e.category == network_error) {
-              break;
-            } else {
-              throw std::runtime_error(
-                      "S4U_PendingCommunication::waitForSomethingToHappen(): Unexpected xbt_ex exception (" +
-                      std::to_string(e.category) + ")");
-            }
+          } catch (simgrid::NetworkFailureException &e) {
+            break;
+          } catch (simgrid::TimeoutError &e) {
+            break;
           } catch (std::exception &e) {
             throw std::runtime_error(
                     "S4U_PendingCommunication::waitForSomethingToHappen(): Unexpected std::exception  (" +
