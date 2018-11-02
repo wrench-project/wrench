@@ -15,6 +15,7 @@
 #include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
 
 #include "../../include/TestWithFork.h"
+#include "../../include/UniqueTmpPathPrefix.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(standard_job_executor_test, "Log category for Simple SandardJobExecutorTest");
 
@@ -92,7 +93,7 @@ protected:
 
     }
 
-    std::string platform_file_path = "/tmp/platform.xml";
+    std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
     std::unique_ptr<wrench::Workflow> workflow;
 
 };
@@ -630,7 +631,7 @@ private:
 
         // Doe the task-stored time information look good
         if (!StandardJobExecutorTest::isJustABitGreaterThanOrEqual(before, task->getStartDate())) {
-          std::cerr << "START: " << task->getStartDate() << std::endl;
+//          std::cerr << "START: " << task->getStartDate() << std::endl;
           throw std::runtime_error(
                   "Case 1: Unexpected task start date: " + std::to_string(task->getStartDate()) + "| " +
                   "before: " + std::to_string(before));
