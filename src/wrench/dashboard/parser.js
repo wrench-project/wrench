@@ -1,16 +1,23 @@
 var fs = require('fs');
 function parseFile(path) {
-    return new Promise(function(resolve, reject) {
-        fs.readFile(path, 'utf8', function(err, contents) {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(JSON.parse(contents));
-            }
-        });
+    fs.readFile(path, 'utf8', function(err, contents) {
+        if (err) {
+            return {err}
+        } else {
+            return JSON.parse(contents)
+        }
     });
-    
 }
+
+    // return new Promise(function(resolve, reject) {
+    //     fs.readFile(path, 'utf8', function(err, contents) {
+    //         if (err) {
+    //             reject(err);
+    //         } else {
+    //             resolve(JSON.parse(contents));
+    //         }
+    //     });
+    // });
 
 function addToHTMLFile(data) {
     var fileContents = fs.readFileSync("scripts.js"); //read existing contents into data
@@ -25,10 +32,28 @@ function addToHTMLFile(data) {
     fs.close(fd); 
 }
 
-parseFile("gautam.json")
+
+var result = {}
+function generateData(filename) {
+    parseFile(filename)
     .then(function(content) {
-        addToHTMLFile(content);
+        // console.log(content)
+        console.log(typeof(content))
+        // return {
+        //     content
+        // }
+        result.content = content;
+        return result;
+        // console.log(result)
     })
     .catch(function(err) {
-        console.log(err);
+        console.log(err)
+        result.err = err;
+        return result;
     });
+}
+
+module.exports = {
+    generateData,
+    parseFile
+}
