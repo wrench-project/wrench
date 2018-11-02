@@ -10,7 +10,7 @@ Guide                        {#guide}
     1. [Bare-metal Servers](@ref guide-baremetal)
     2. Cloud Platforms
     3. Virtual Cluster Platforms
-    4. Batch-scheduled Clusters
+    4. [Batch-scheduled Clusters](@ref guide-batch)
     5. [Workload Management System (HTCondor)](@ref guide-htcondor)
     
 2. Storage Services

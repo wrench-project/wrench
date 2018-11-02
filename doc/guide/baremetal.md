@@ -25,25 +25,28 @@ disallows swapping).
 # Creating a BareMetal compute service #        {#guide-baremetal-creating}
 
 In WRENCH, a BareMetal service represents a compute service
-(`wrench::ComputeService`), which is defined by the `wrench::BareMetal`
+(`wrench::ComputeService`), which is defined by the `wrench::BareMetalService`
 class. An instantiation of a BareMetal service requires the following
 parameters:
 
 - A hostname on which to start the service (this is the entry point to the service);
 - A set of compute hosts in a map (`std::map`), where each key is a hostname
   and each value is a tuple (`std::tuple`) with a number of cores and a RAM capacity. 
+- A scrach space size, i.e., the size in bytes of storage local to the Batch service (used to store
+  worfklow files, as needed, during job executions) 
 - Maps (`std::map`) of configurable properties (`wrench::BareMetalServiceProperty`) and configurable message 
   payloads (`wrench::BareMetalServiceMessagePayload`).
   
 The example below shows how to create an instance of a BareMetal service
-that runs on host "Gateway" and provides access to 4 cores and 1GiB of RAM on host "Node1"
-and to 8 cores and 4GiB of RAM on host "Node2". Furthermore, the thread startup overhed is
+that runs on host "Gateway", provides access to 4 cores and 1GiB of RAM on host "Node1"
+and to 8 cores and 4GiB of RAM on host "Node2", and has a scratch space of 1TiB. Furthermore, the thread startup overhead is
 configured to be one hundredth of a second:
 
 ~~~~~~~~~~~~~{.cpp}
 auto compute_service = simulation->add(
           new wrench::BareMetalService("Gateway", 
                                        {{"Node1", std::make_tuple(4, pow(2,30))}, {"Node2", std::make_tuple(8, pow(2,32)}},
+                                        pow(2,40),
                                        {{wrench::BareMetalServiceProperty::THREAD_STARTUP_OVERHEAD, "0.01"}}
                                       );
 ~~~~~~~~~~~~~
