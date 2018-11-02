@@ -14,6 +14,7 @@
 #include <nlohmann/json.hpp>
 
 #include "../../include/TestWithFork.h"
+#include "../../include/UniqueTmpPathPrefix.h"
 
 #include <fstream>
 
@@ -59,9 +60,9 @@ protected:
         workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
     }
 
-    std::string platform_file_path = "/tmp/platform.xml";
-    std::string execution_data_json_file_path = "/tmp/workflow_data.json";
-    std::string workflow_graph_json_file_path = "/tmp/workflow_graph_data.json";
+    std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
+    std::string execution_data_json_file_path = UNIQUE_TMP_PATH_PREFIX + "workflow_data.json";
+    std::string workflow_graph_json_file_path = UNIQUE_TMP_PATH_PREFIX + "workflow_graph_data.json";
     std::unique_ptr<wrench::Workflow> workflow;
 
 };
@@ -228,7 +229,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowExecutionJSON_test() {
     EXPECT_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(nullptr, execution_data_json_file_path), std::invalid_argument);
     EXPECT_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(workflow.get(), ""), std::invalid_argument);
 
-    EXPECT_NO_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(workflow.get(), execution_data_json_file_path));
+    EXPECT_NO_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(workflow.get(), execution_data_json_file_path, true));
 
     std::ifstream json_file(execution_data_json_file_path);
     nlohmann::json result_json;
@@ -352,7 +353,7 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
     )"_json;
 
 
-    EXPECT_NO_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(workflow.get(), execution_data_json_file_path));
+    EXPECT_NO_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(workflow.get(), execution_data_json_file_path, true));
 
     json_file = std::ifstream(execution_data_json_file_path);
     nlohmann::json result_json1;
@@ -450,7 +451,7 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
     )"_json;
 
 
-    EXPECT_NO_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(workflow.get(), execution_data_json_file_path));
+    EXPECT_NO_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(workflow.get(), execution_data_json_file_path, true));
 
     json_file = std::ifstream(execution_data_json_file_path);
     nlohmann::json result_json2;
@@ -620,7 +621,7 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
         ]
     )"_json;
 
-    EXPECT_NO_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(workflow.get(), execution_data_json_file_path));
+    EXPECT_NO_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(workflow.get(), execution_data_json_file_path, true));
 
     json_file = std::ifstream(execution_data_json_file_path);
     nlohmann::json result_json3;
@@ -653,7 +654,7 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
     t2->setExecutionHost("host1");
     t2->setNumCoresAllocated(10);
 
-    EXPECT_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(workflow.get(), execution_data_json_file_path), std::runtime_error);
+    EXPECT_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(workflow.get(), execution_data_json_file_path, true), std::runtime_error);
 
     free(argv[0]);
     free(argv);
@@ -676,7 +677,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
 
     simulation->init(&argc, argv);
 
-    EXPECT_THROW(simulation->getOutput().dumpWorkflowGraphJSON(nullptr, "/tmp/file.json"), std::invalid_argument);
+    EXPECT_THROW(simulation->getOutput().dumpWorkflowGraphJSON(nullptr, UNIQUE_TMP_PATH_PREFIX + "file.json"), std::invalid_argument);
     EXPECT_THROW(simulation->getOutput().dumpWorkflowGraphJSON((wrench::Workflow *)&argc, ""), std::invalid_argument);
 
     std::ifstream graph_json_file;

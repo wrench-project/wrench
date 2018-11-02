@@ -17,6 +17,7 @@
 #include "wrench/workflow/job/PilotJob.h"
 
 #include "../../include/TestWithFork.h"
+#include "../../include/UniqueTmpPathPrefix.h"
 
 #include <istream>
 #include <fstream>
@@ -66,7 +67,7 @@ protected:
 
     }
 
-    std::string platform_file_path = "/tmp/platform.xml";
+    std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
     std::unique_ptr<wrench::Workflow> workflow;
 
 };
@@ -198,7 +199,7 @@ void BatchServiceOutputCSVFileTest::do_SimpleOutputCSVFile_test() {
   std::string hostname = "Host1";
 
   // Create a Valid trace file
-  std::string trace_file_path = "/tmp/batch_trace.swf";
+  std::string trace_file_path = UNIQUE_TMP_PATH_PREFIX + "batch_trace.swf";
   FILE *trace_file = fopen(trace_file_path.c_str(), "w");
   fprintf(trace_file, "1 0 -1 60 -1 -1 -1 2 60 -1\n");  // job that takes 2 procs
   fprintf(trace_file, "2 1 -1 60 -1 -1 -1 1 60 -1\n");  // job that takes 1 proc
@@ -206,7 +207,7 @@ void BatchServiceOutputCSVFileTest::do_SimpleOutputCSVFile_test() {
 
 
   // Create a Batch Service
-  std::string output_csv_file = "/tmp/batch_log.csv";
+  std::string output_csv_file = UNIQUE_TMP_PATH_PREFIX + "batch_log.csv";
 
   // Bogus output file
   ASSERT_THROW(compute_service = simulation->add(

@@ -18,6 +18,7 @@
 #include "wrench/workflow/job/PilotJob.h"
 
 #include "../include/TestWithFork.h"
+#include "../include/UniqueTmpPathPrefix.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(job_manager_test, "Log category for JobManagerTest");
 
@@ -66,7 +67,7 @@ protected:
     }
 
     std::unique_ptr<wrench::Workflow> workflow;
-    std::string platform_file_path = "/tmp/platform.xml";
+    std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
 
 };
 

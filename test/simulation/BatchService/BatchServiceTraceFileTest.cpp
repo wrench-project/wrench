@@ -19,6 +19,7 @@
 #include <unistd.h>
 
 #include "../../include/TestWithFork.h"
+#include "../../include/UniqueTmpPathPrefix.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(batch_service_trace_file_test, "Log category for BatchServiceTest");
 
@@ -67,7 +68,7 @@ protected:
 
     }
 
-    std::string platform_file_path = "/tmp/platform.xml";
+    std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
     std::unique_ptr<wrench::Workflow> workflow;
 
 };
@@ -277,7 +278,7 @@ void BatchServiceTest::do_BatchTraceFileReplayTestWithFailedJob_test() {
   std::string hostname = "Host1";
 
   // Create a Valid trace file
-  std::string trace_file_path = "/tmp/swf_trace.swf";
+  std::string trace_file_path = UNIQUE_TMP_PATH_PREFIX + "swf_trace.swf";
 
   FILE *trace_file = fopen(trace_file_path.c_str(), "w");
   fprintf(trace_file, "1 0 -1 3600 -1 -1 -1 4 3600 -1\n");  // job that takes the whole machine
@@ -484,7 +485,7 @@ void BatchServiceTest::do_WorkloadTraceFileTestSWF_test() {
                                    {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, "/not_there.swf"}}
           )), std::invalid_argument);
 
-  std::string trace_file_path = "/tmp/swf_trace.swf";
+  std::string trace_file_path = UNIQUE_TMP_PATH_PREFIX + "swf_trace.swf";
   FILE *trace_file;
 
   // Create an invalid trace file
@@ -749,7 +750,7 @@ void BatchServiceTest::do_WorkloadTraceFileTestJSON_test() {
                                    {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, "/not_there.json"}}
           )), std::invalid_argument);
 
-  std::string trace_file_path = "/tmp/swf_trace.json";
+  std::string trace_file_path = UNIQUE_TMP_PATH_PREFIX + "swf_trace.json";
   FILE *trace_file;
 
 
