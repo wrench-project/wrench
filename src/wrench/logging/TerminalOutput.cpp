@@ -25,7 +25,7 @@ namespace wrench {
             "\033[1;37m",
     };
 
-    std::map<simgrid::s4u::ActorPtr, std::string> TerminalOutput::colormap;
+    std::map<simgrid::s4u::Actor *, std::string> TerminalOutput::colormap;
     bool TerminalOutput::color_enabled = true;
 
     /**
@@ -34,7 +34,7 @@ namespace wrench {
      * @param color: a terminal output color
      */
     void TerminalOutput::setThisProcessLoggingColor(Color color) {
-      TerminalOutput::colormap[simgrid::s4u::Actor::self()] = TerminalOutput::color_codes[color];
+      TerminalOutput::colormap[simgrid::s4u::Actor::self().get()] = TerminalOutput::color_codes[color];
     }
 
     /**
@@ -69,10 +69,10 @@ namespace wrench {
     std::string TerminalOutput::getThisProcessLoggingColor() {
 
       if (simgrid::s4u::this_actor::is_maestro() ||
-              (TerminalOutput::colormap.find(simgrid::s4u::Actor::self()) == TerminalOutput::colormap.end())) {
+              (TerminalOutput::colormap.find(simgrid::s4u::Actor::self().get()) == TerminalOutput::colormap.end())) {
         return "";
       } else {
-        return TerminalOutput::colormap[simgrid::s4u::Actor::self()];
+        return TerminalOutput::colormap[simgrid::s4u::Actor::self().get()];
       }
     }
 
