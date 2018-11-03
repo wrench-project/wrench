@@ -80,7 +80,7 @@ namespace wrench {
 
         static const char * color_codes[];
 
-        static std::map<simgrid::s4u::ActorPtr, std::string> colormap;
+        static std::map<simgrid::s4u::Actor *, std::string> colormap;
 
         static std::string getThisProcessLoggingColor();
 
