@@ -1446,7 +1446,6 @@ namespace wrench {
       for (auto it = this->pending_jobs.begin(); it != this->pending_jobs.end(); it++) {
         if ((*it)->getWorkflowJob() == job) {
           job_id = std::to_string((*it)->getJobID());
-          this->pending_jobs.erase(it);
           ComputeServiceTerminatePilotJobAnswerMessage *answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
                   job, this, true, nullptr,
                   this->getMessagePayloadValueAsDouble(
@@ -1461,7 +1460,9 @@ namespace wrench {
           this->notifyJobEventsToBatSched(job_id, "TIMEOUT", "NOT_SUBMITTED", "", "JOB_COMPLETED");
           this->appendJobInfoToCSVOutputFile(*it, "TERMINATED");
 #endif
-          this->freeJobFromJobsList(*it);
+          BatchJob *to_erase = *it;
+          this->pending_jobs.erase(it);
+          this->freeJobFromJobsList(to_erase);
           return;
         }
       }
@@ -1469,7 +1470,6 @@ namespace wrench {
       for (auto it2 = this->waiting_jobs.begin(); it2 != this->waiting_jobs.end(); it2++) {
         if ((*it2)->getWorkflowJob() == job) {
           job_id = std::to_string((*it2)->getJobID());
-          this->waiting_jobs.erase(it2);
           ComputeServiceTerminatePilotJobAnswerMessage *answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
                   job, this, true, nullptr,
                   this->getMessagePayloadValueAsDouble(
@@ -1484,7 +1484,9 @@ namespace wrench {
           this->notifyJobEventsToBatSched(job_id, "TIMEOUT", "NOT_SUBMITTED", "", "JOB_COMPLETED");
           this->appendJobInfoToCSVOutputFile(*it2, "TERMINATED");
 #endif
-          this->freeJobFromJobsList(*it2);
+          BatchJob *to_erase = *it2;
+          this->waiting_jobs.erase(it2);
+          this->freeJobFromJobsList(to_erase);
           return;
         }
       }
@@ -1509,16 +1511,16 @@ namespace wrench {
           }
           //this is the list of raw pointers
 
-          BatchJob *to_erase = *it1;
-          this->running_jobs.erase(it1);
 
 #ifdef ENABLE_BATSCHED
           // forward this notification to batsched
           this->notifyJobEventsToBatSched(job_id, "TIMEOUT", "COMPLETED_FAILED", "", "JOB_COMPLETED");
-          this->appendJobInfoToCSVOutputFile(to_erase, "TERMINATED");
+          this->appendJobInfoToCSVOutputFile(*it1, "TERMINATED");
 
 #endif
           //this is the list of unique pointers
+          BatchJob *to_erase = *it1;
+          this->running_jobs.erase(it1);
           this->freeJobFromJobsList(to_erase);
           return;
         } else {
