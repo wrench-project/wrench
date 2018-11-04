@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const fs = require("fs");
 const d3 = require("d3");
 const jsdom = require("jsdom");
+var pdf = require('html-pdf');
 const { JSDOM } = jsdom;
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
@@ -14,6 +15,7 @@ function parseFile(path) {
     return new Promise(function(resolve, reject) {
         fs.readFile(path, 'utf8', function(err, contents) {
             if (err) {
+                console.log(err)
                 reject({err});
             } else {
                 resolve(JSON.parse(contents));
@@ -21,6 +23,7 @@ function parseFile(path) {
         });
     });
 }
+
 
 function generateGraph(data) {
     const html = `
@@ -118,6 +121,18 @@ function generateGraph(data) {
                 .attr('width', xscale(d.write.end) - xscale(d.write.start))
                 .style('fill',write_color)
     })
+    fs.writeFile("./graph.html", html, function(err) {
+        if(err) {
+            console.log(err);
+        }
+        console.log("The file was saved!");
+    })
+    var options = { format: 'Letter' };
+    pdf.create(html, options).toFile('./businesscard.pdf', function(err, res) {
+        if (err) return console.log(err);
+        console.log(res); // { filename: '/app/businesscard.pdf' }
+      });
+    // var svg_xml = (new XMLSerializer).serializeToString(svg);
     return dom;
 }
 
@@ -131,9 +146,6 @@ app.get('/generate', async function(req, res) {
         .catch(function(err) {
             res.status(500).json({err})
         })
-    // fs.writeFile('index.html', topHalfOfFile, function(){
-
-    // })
 });
 
 const port = process.env.PORT || 5000;
