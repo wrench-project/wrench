@@ -60,14 +60,17 @@ namespace wrench {
       event_receiver->simulation = this->simulation;
       event_receiver->start(event_receiver, true); // Daemonize!
 
-
       double core_flop_rate = (*(this->batch_service->getCoreFlopRate().begin())).second;
 
       unsigned long job_count = 0;
 
+      // Record the start time of the current time (submission times will be just offsets from this time)
+      double real_start_time = S4U_Simulation::getClock();
+
       for (auto job : this->workload_trace) {
+
         // Sleep until the submission time
-        double sub_time = std::get<1>(job);
+        double sub_time = real_start_time + std::get<1>(job);
         double curtime = S4U_Simulation::getClock();
         double sleeptime = sub_time - curtime;
         if (sleeptime > 0)

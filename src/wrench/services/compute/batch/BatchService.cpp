@@ -2598,14 +2598,14 @@ namespace wrench {
       double time_in_seconds = batch_job->getAllocatedTime();
       unsigned long cores_per_node_asked_for = batch_job->getAllocatedCoresPerNode();
 
-      std::set<std::tuple<std::string, unsigned long, double>> resources = {};
+      std::map<std::string, std::tuple<unsigned long, double>> resources = {};
       std::vector<std::string> hosts_assigned = {};
       std::map<std::string, unsigned long>::iterator it;
 
       for (auto node:node_resources) {
         this->available_nodes_to_cores[this->host_id_to_names[node]] -= cores_per_node_asked_for;
-        resources.insert(std::make_tuple(this->host_id_to_names[node], cores_per_node_asked_for,
-                                         0)); // TODO: Is setting RAM to 0 ok here?
+        resources.insert(std::make_pair(this->host_id_to_names[node],std::make_tuple( cores_per_node_asked_for,
+                                         0))); // TODO: Is setting RAM to 0 ok here?
       }
 
       startJob(resources, workflow_job, batch_job, num_nodes_allocated, time_in_seconds,

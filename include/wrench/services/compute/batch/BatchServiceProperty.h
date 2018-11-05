@@ -62,7 +62,9 @@ namespace wrench {
          * case it must have extension ".swf", or in the JSON format as used in the BATSIM project
          * (see https://github.com/oar-team/batsim), in which case is must have the ".json" extension).
          * Note that jobs in the trace whose node/host/processor/core requirements exceed the capacity
-         * of the batch service will simply be capped at that capacity.
+         * of the batch service will simply be capped at that capacity. Job submission times in the trace files
+         * are relative to the BatchService's start time (i.e., all jobs in the trace files will be replayed
+         * no matter when the BatchService starts).
          */
         DECLARE_PROPERTY_NAME(SIMULATED_WORKLOAD_TRACE_FILE);
 
