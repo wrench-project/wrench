@@ -228,6 +228,10 @@ namespace wrench {
         std::tuple<std::string, unsigned long> pickAllocation(WorkflowTask *task,
                                                               std::string required_host, unsigned long required_num_cores, double required_ram,
                                                       std::set<std::string> &hosts_to_avoid);
+
+        bool jobCanRun(StandardJob *job, std::map<std::string, std::string> &service_specific_arguments);
+
+        bool isThereAtLeastOneHostWithResources(unsigned long num_cores, double ram);
     };
 };
 

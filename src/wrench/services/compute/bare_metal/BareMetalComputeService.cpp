@@ -117,8 +117,7 @@ namespace wrench {
         }
       }
 
-      /* check that service-specific args are provided and well-formatted */
-
+      // Check that service-specific args that are provided are well-formatted
       for (auto t : job->getTasks()) {
 
         if (service_specific_args.find(t->getID()) != service_specific_args.end()) {
@@ -131,6 +130,8 @@ namespace wrench {
           }
 
           std::string target_host = std::get<0>(parsed_spec);
+          unsigned long target_num_cores = std::get<1>(parsed_spec);
+
           if (not target_host.empty()) {
             if (this->compute_resources.find(target_host) == this->compute_resources.end()) {
               throw std::invalid_argument(
@@ -139,7 +140,6 @@ namespace wrench {
             }
           }
 
-          unsigned long target_num_cores = std::get<1>(parsed_spec);
           if (target_num_cores < t->getMinNumCores()) {
             throw std::invalid_argument(
                     "Invalid service-specific argument '" + service_specific_args[t->getID()] + "' for task '" +
@@ -562,6 +562,7 @@ namespace wrench {
             new_host_to_avoid_ram_capacity = this->ram_availabilities[r.first];
           } else {
             if (this->ram_availabilities[r.first] > new_host_to_avoid_ram_capacity) {
+              // Make sure we "Avoid" the host with the most RAM (as it might becomes usable sooner
               new_host_to_avoid = r.first;
               new_host_to_avoid_ram_capacity = this->ram_availabilities[r.first];
             }
@@ -591,10 +592,11 @@ namespace wrench {
         double flop_rate = S4U_Simulation::getHostFlopRate(h);
         unsigned long used_num_cores;
         if (required_num_cores == 0) {
-          used_num_cores = std::min(num_cores, task->getMaxNumCores());
+          used_num_cores = std::min(num_cores, task->getMaxNumCores()); // as many cores as possible
         } else {
           used_num_cores = required_num_cores;
         }
+        // A totally heuristic load estimate
         double load = ((double)((num_running_threads + used_num_cores) / num_cores)) / flop_rate;
         if (load < lowest_load) {
           lowest_load = load;
@@ -618,7 +620,7 @@ namespace wrench {
       std::set<Workunit *> dispatched_wus_for_job;
 
       std::set<std::string> no_longer_considered_hosts;  // Due to a previously considered workunit not being
-      // able to run on that hsot due to RAM, and because we don't
+      // able to run on that host due to RAM, and because we don't
       // allow non-zero-ram tasks to jump ahead of other tasks
 
       for (auto const &wu : this->ready_workunits) {
@@ -1176,6 +1178,75 @@ namespace wrench {
       return;
     }
 
+    /**
+     * @brief Helper function that determines whether there is at least one host with
+     *        some number of cores (or more) and some ram capacity (or more)
+     * @param num_cores: number of cores
+     * @param ram: ram capacity
+     * @return true is a host was found
+     */
+    bool BareMetalComputeService::isThereAtLeastOneHostWithResources(unsigned long num_cores, double ram) {
+
+      for (auto const &r : this->compute_resources) {
+        if ((std::get<0>(r.second) >= num_cores) and (std::get<1>(r.second) >= ram)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    /**
+     * @brief Helper function that determines wether a submitted job (with service-specific
+     *        arguments) can run given available  resources
+     *
+     * @param job: the standard job
+     * @param service_specific_arguments: the service-specific arguments
+     * @return true if the job can run
+     */
+    bool BareMetalComputeService::jobCanRun(StandardJob *job, std::map<std::string, std::string> &service_specific_arguments) {
+
+      for (auto t : job->getTasks()) {
+
+        // No service-specific argument
+        if ((service_specific_arguments.find(t->getID()) == service_specific_arguments.end()) or
+            (service_specific_arguments[t->getID()].empty())) {
+          if (not isThereAtLeastOneHostWithResources(t->getMinNumCores(), t->getMemoryRequirement())) {
+            return false;
+          }
+        }
+
+        // Parse the service-specific argument
+        std::tuple<std::string, unsigned long> parsed_spec = parseResourceSpec(service_specific_arguments[t->getID()]);
+        std::string desired_host = std::get<0>(parsed_spec);
+        unsigned long desired_num_cores = std::get<1>(parsed_spec);
+
+        if (desired_host.empty()) {
+          // At this point the desired num cores in non-zero
+          if (not isThereAtLeastOneHostWithResources(desired_num_cores, t->getMemoryRequirement())) {
+            return false;
+          } else {
+            continue;
+          }
+        }
+
+        // At this point the host is not empty
+        unsigned long minimum_required_num_cores;
+        if (desired_num_cores == 0) {
+          minimum_required_num_cores = t->getMinNumCores();
+        } else {
+          minimum_required_num_cores = desired_num_cores;
+        }
+        unsigned long num_cores_on_desired_host = std::get<0>(this->compute_resources[desired_host]);
+        double ram_on_desired_host = std::get<1>(this->compute_resources[desired_host]);
+        if ((num_cores_on_desired_host < minimum_required_num_cores) or (ram_on_desired_host < t->getMemoryRequirement())) {
+          return false;
+        } else {
+          continue;
+        }
+      }
+
+      return true;
+    }
 
 /**
  * @brief Process a submit standard job request
@@ -1206,59 +1277,8 @@ namespace wrench {
         return;
       }
 
-
-      // Can we run each task in this job?
-      std::map<WorkflowTask *, std::tuple<std::string, unsigned long>> task_run_specs;
-      bool enough_resources = true;
-      for (auto t : job->getTasks()) {
-        std::string target_host;
-        unsigned long required_num_cores;
-        double required_ram = t->getMemoryRequirement();
-
-        std::tuple<std::string, unsigned long> task_run_spec;
-
-        // Determine the target host and the required number of cores
-        if (service_specific_arguments.find(t->getID()) == service_specific_arguments.end()) {
-          task_run_spec = std::make_tuple("",0);
-          target_host = "";
-          required_num_cores = t->getMinNumCores();
-        } else {
-          std::string spec = service_specific_arguments[t->getID()];
-          std::tuple<std::string, unsigned long> parsed_spec = parseResourceSpec(spec);
-          task_run_spec = parsed_spec;
-          target_host = std::get<0>(parsed_spec);
-          required_num_cores = std::get<1>(parsed_spec);
-        }
-
-        // Check that the task can run
-        if (target_host.empty()) {
-          bool found_a_valid_host = false;
-          for (auto const &r : this->compute_resources) {
-            unsigned long num_cores_on_host = std::get<0>(r.second);
-            double memory_on_host = std::get<1>(r.second);
-            if ((num_cores_on_host >= required_num_cores) and (memory_on_host >= required_ram)) {
-              found_a_valid_host = true;
-              break;
-            }
-          }
-          if (not found_a_valid_host) {
-            enough_resources = false;
-            break;
-          }
-        } else {
-          unsigned long num_cores_on_host = std::get<0>((this->compute_resources[target_host]));
-          double memory_on_host = std::get<1>((this->compute_resources[target_host]));
-          if ((num_cores_on_host < required_num_cores) or (memory_on_host < required_ram)) {
-            enough_resources = false;
-            break;
-          }
-        }
-        // Update task run specs
-        task_run_specs.insert(std::make_pair(t, task_run_spec));
-      }
-
-
-      if (not enough_resources) {
+      // Can we run this job at all in terms of available resources?
+      if (not jobCanRun(job, service_specific_arguments)) {
         try {
           S4U_Mailbox::dputMessage(
                   answer_mailbox,
@@ -1270,6 +1290,18 @@ namespace wrench {
           return;
         }
         return;
+      }
+
+      // Construct the tark run spec (i.e., keep track of service-specific arguments for each task)
+      std::map<WorkflowTask *, std::tuple<std::string, unsigned long>> task_run_specs;
+      for (auto t : job->getTasks()) {
+        if ((service_specific_arguments.find(t->getID()) == service_specific_arguments.end()) or
+                (service_specific_arguments[t->getID()].empty())) {
+          task_run_specs.insert(std::make_pair(t, std::make_tuple("",0)));
+        } else {
+          std::string spec = service_specific_arguments[t->getID()];
+          task_run_specs.insert(std::make_pair(t, parseResourceSpec(spec)));
+        }
       }
 
       // We can now admit the job!
