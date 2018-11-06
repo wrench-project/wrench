@@ -236,11 +236,15 @@ namespace wrench {
      * @param job: a workflow job
      * @param compute_service: a compute service
      * @param service_specific_args: arguments specific for compute services:
-     *      - to a BareMetalComputeService: {{"taskID", "[hostname:]num_cores}, ...}
-     *          - If no entry is provided for a taskID, the service will pick on which host and with how many cores to run the task
-     *          - If a number of cores is provided (e.g., {"task1", "12"}), the service will pick the host on which to run the task
-     *          - If a hostname and a number of cores is provided (e.g., {"task1", "host1:12"}, the service will run the task on that host
-     *            with the specified number of cores
+     *      - to a BareMetalComputeService: {{"taskID", "[hostname:][num_cores]}, ...}
+     *           - If no value is not provided for a task, then the service will choose a host and use as many cores as possible on that host.
+     *           - If a "" value is provided for a task, then the service will choose a host and use as many cores as possible on that host.
+     *           - If a "hostname" value is provided for a task, then the service will run the task on that
+     *             host, using as many of its cores as possible
+     *           - If a "num_cores" value is provided for a task, then the service will run that task with
+     *             this many cores, but will choose the host on which to run it.
+     *           - If a "hostname:num_cores" value is provided for a task, then the service will run that
+     *             task with the specified number of cores on that host.
      *      - to a BatchService: {{"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requestes cores per host)}}
      *      - to a VirtualizedClusterService: {} (in which case the service will pick the vm) or {{"-vm":"<vm name>"}}
      *      - to a CloudService: {} (in which case the service will pick the vm) or {{"-vm":"<vm name>"}}
