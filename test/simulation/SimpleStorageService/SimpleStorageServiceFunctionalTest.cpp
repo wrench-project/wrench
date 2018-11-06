@@ -1038,7 +1038,7 @@ private:
         throw std::runtime_error("Should have gotten a 'not enough space' exception");
       }
 
-      // Fo a file copy from myself
+      // Do a file copy from myself
       success = true;
       try {
         data_movement_manager->doSynchronousFileCopy(this->test->file_500, this->test->storage_service_510,

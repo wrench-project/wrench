@@ -1214,15 +1214,12 @@ namespace wrench {
           auto *pilot_job = (PilotJob *) msg->job->getWorkflowJob();
           ComputeService *cs = pilot_job->getComputeService();
           try {
-            std::cerr << "2WTF?\n";
             cs->stop();
-            std::cerr << "2WTF?\n";
           } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error(
                     "BatchService::processNextMessage(): Not able to terminate the pilot job"
             );
           }
-          std::cerr << "CALLIN G PROCESS PILOT JB COMPETOPN\n";
           this->processPilotJobCompletion(pilot_job);
           return true;
         } else {
@@ -1400,7 +1397,6 @@ namespace wrench {
      */
     void BatchService::processPilotJobCompletion(PilotJob *job) {
 
-      std::cerr << "IN PROCESS PILOT JOB COMPLETION\n";
       // Remove the job from the running job list
       BatchJob *batch_job = nullptr;
       for (auto it = this->running_jobs.begin(); it != this->running_jobs.end(); it++) {
@@ -2244,12 +2240,10 @@ namespace wrench {
         (args = (char **)realloc(args, (num_args+1)*sizeof(char*)))[num_args] = strdup("--rjms_delay"); num_args++;
         (args = (char **)realloc(args, (num_args+1)*sizeof(char*)))[num_args] = strdup(rjms_delay.c_str()); num_args++;
 
-#if 0
         if (this->getPropertyValueAsBoolean(BatchServiceProperty::BATSCHED_LOGGING_MUTED)) {
           (args = (char **) realloc(args, (num_args + 1) * sizeof(char *)))[num_args] =
                   strdup("--verbosity=silent"); num_args++;
         }
-#endif
         if (this->getPropertyValueAsBoolean(BatchServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION)) {
           (args = (char **) realloc(args, (num_args + 1) * sizeof(char *)))[num_args] =
                   strdup("--policy=contiguous"); num_args++;
