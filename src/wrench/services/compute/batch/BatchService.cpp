@@ -2240,10 +2240,12 @@ namespace wrench {
         (args = (char **)realloc(args, (num_args+1)*sizeof(char*)))[num_args] = strdup("--rjms_delay"); num_args++;
         (args = (char **)realloc(args, (num_args+1)*sizeof(char*)))[num_args] = strdup(rjms_delay.c_str()); num_args++;
 
+#if 0
         if (this->getPropertyValueAsBoolean(BatchServiceProperty::BATSCHED_LOGGING_MUTED)) {
           (args = (char **) realloc(args, (num_args + 1) * sizeof(char *)))[num_args] =
                   strdup("--verbosity=silent"); num_args++;
         }
+#endif
         if (this->getPropertyValueAsBoolean(BatchServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION)) {
           (args = (char **) realloc(args, (num_args + 1) * sizeof(char *)))[num_args] =
                   strdup("--policy=contiguous"); num_args++;
