@@ -301,10 +301,10 @@ namespace wrench {
       }
 
       //get job time
-      unsigned long time_asked_for = 0;
+      unsigned long time_asked_for_in_minutes = 0;
       it = batch_job_args.find("-t");
       if (it != batch_job_args.end()) {
-        if (sscanf((*it).second.c_str(), "%lu", &time_asked_for) != 1) {
+        if (sscanf((*it).second.c_str(), "%lu", &time_asked_for_in_minutes) != 1) {
           throw std::invalid_argument(
                   "BatchService::submitStandardJob(): Invalid -t value '" + (*it).second + "'");
         }
@@ -319,7 +319,7 @@ namespace wrench {
 
       // Create a Batch Job
       unsigned long jobid = this->generateUniqueJobID();
-      auto *batch_job = new BatchJob(job, jobid, time_asked_for,
+      auto *batch_job = new BatchJob(job, jobid, time_asked_for_in_minutes,
                                      num_hosts, num_cores_per_host, -1, S4U_Simulation::getClock());
 
       // Set job display color
@@ -1214,12 +1214,15 @@ namespace wrench {
           auto *pilot_job = (PilotJob *) msg->job->getWorkflowJob();
           ComputeService *cs = pilot_job->getComputeService();
           try {
+            std::cerr << "2WTF?\n";
             cs->stop();
+            std::cerr << "2WTF?\n";
           } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error(
                     "BatchService::processNextMessage(): Not able to terminate the pilot job"
             );
           }
+          std::cerr << "CALLIN G PROCESS PILOT JB COMPETOPN\n";
           this->processPilotJobCompletion(pilot_job);
           return true;
         } else {
@@ -1397,6 +1400,7 @@ namespace wrench {
      */
     void BatchService::processPilotJobCompletion(PilotJob *job) {
 
+      std::cerr << "IN PROCESS PILOT JOB COMPLETION\n";
       // Remove the job from the running job list
       BatchJob *batch_job = nullptr;
       for (auto it = this->running_jobs.begin(); it != this->running_jobs.end(); it++) {

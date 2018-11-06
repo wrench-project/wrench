@@ -518,15 +518,16 @@ namespace wrench {
       // Set an alarm for my timely death, if necessary
       if (this->has_ttl) {
         this->death_date = S4U_Simulation::getClock() + this->ttl;
-        WRENCH_INFO("Will be terminating at date %lf", this->death_date);
-//        std::shared_ptr<SimulationMessage> msg = std::shared_ptr<SimulationMessage>(new ServiceTTLExpiredMessage(0));
-        SimulationMessage *msg = new ServiceTTLExpiredMessage(0);
-        this->death_alarm = Alarm::createAndStartAlarm(this->simulation, death_date, this->hostname, this->mailbox_name,
-                                                       msg, "service_string");
-      } else {
-        this->death_date = -1.0;
-        this->death_alarm = nullptr;
+//        WRENCH_INFO("Will be terminating at date %lf", this->death_date);
+////        std::shared_ptr<SimulationMessage> msg = std::shared_ptr<SimulationMessage>(new ServiceTTLExpiredMessage(0));
+//        SimulationMessage *msg = new ServiceTTLExpiredMessage(0);
+//        this->death_alarm = Alarm::createAndStartAlarm(this->simulation, death_date, this->hostname, this->mailbox_name,
+//                                                       msg, "service_string");
       }
+//      else {
+//        this->death_date = -1.0;
+////        this->death_alarm = nullptr;
+//      }
 
       /** Main loop **/
       while (this->processNextMessage()) {
@@ -657,18 +658,20 @@ namespace wrench {
 
       WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
-      if (auto msg = dynamic_cast<ServiceTTLExpiredMessage *>(message.get())) {
-        WRENCH_INFO("My TTL has expired, terminating and perhaps notify a pilot job submitted");
-        if (this->containing_pilot_job != nullptr) {
-          /*** Clean up everything in the scratch space ***/
-          cleanUpScratch();
-        }
+//      if (auto msg = dynamic_cast<ServiceTTLExpiredMessage *>(message.get())) {
+//        WRENCH_INFO("My TTL has expired, terminating and perhaps notify a pilot job submitted");
+//        if (this->containing_pilot_job != nullptr) {
+//          /*** Clean up everything in the scratch space ***/
+//          cleanUpScratch();
+//        }
+//
+//        this->terminate(true);
+//
+//        return false;
+//
+//      } else
+      if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
 
-        this->terminate(true);
-
-        return false;
-
-      } else if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
         if (this->containing_pilot_job != nullptr) {
           /*** Clean up everything in the scratch space ***/
           cleanUpScratch();
