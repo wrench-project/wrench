@@ -49,13 +49,14 @@ namespace wrench {
       std::vector<std::string> tokens;
       boost::algorithm::split(tokens, spec, boost::is_any_of(":"));
       switch (tokens.size()) {
-        case 1: // "num_cores"
+        case 1: // "num_cores" or "hostname"
         {
           unsigned long num_threads;
           if (sscanf(tokens[0].c_str(), "%lu", &num_threads) != 1) {
-            throw std::invalid_argument("Invalid service-specific argument '" + spec + "'");
+            return std::make_tuple(tokens[0], 0);
+          } else {
+            return std::make_tuple(std::string(""), num_threads);
           }
-          return std::make_tuple(std::string(""), num_threads);
         }
         case 2: // "hostname:num_cores"
         {
@@ -79,22 +80,23 @@ namespace wrench {
      * @param service_specific_args: optional service specific arguments
      *
      *    These arguments are provided as a map of strings, indexed by task IDs. These
-     *    strings are formatted as "[hostname:]num_cores" (e.g., "somehost:12", "6"). If this
-     *    argument is provided  for a task, this will enforce the execution of that task on that host with that
-     *    number of cores.  If the hostname is not provided, then the host will be chosen
-     *    arbitrarily by the compute service. If the specified number of cores is larger than
-     *    the maximum number of cores available on the host, then it will be capped to that number.
-     *    If the specified number of cores is larger than the maximum number of cores usable by the
-     *    task, then it will be capped to that number. If this argument is not provided at all for
-     *    a task, then that task will execute on an arbitrarily chosen host with as many
-     *    cores as possible on that host.
+     *    strings are formatted as "[hostname:][num_cores]" (e.g., "somehost:12", "somehost","6", "").
+     *
+     *      - If a value is not provided for a task, then the service will choose a host and use as many cores as possible on that host.
+     *      - If a "" value is provided for a task, then the service will choose a host and use as many cores as possible on that host.
+     *      - If a "hostname" value is provided for a task, then the service will run the task on that
+     *        host, using as many of its cores as possible
+     *      - If a "num_cores" value is provided for a task, then the service will run that task with
+     *        this many cores, but will choose the host on which to run it.
+     *      - If a "hostname:num_cores" value is provided for a task, then the service will run that
+     *        task with this many cores on that host.
      *
      * @throw WorkflowExecutionException
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
     void BareMetalComputeService::submitStandardJob(StandardJob *job,
-                                                             std::map<std::string, std::string> &service_specific_args) {
+                                                    std::map<std::string, std::string> &service_specific_args) {
 
       if (this->state == Service::DOWN) {
         throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
@@ -111,34 +113,15 @@ namespace wrench {
         }
         if (not found) {
           throw std::invalid_argument("BareMetalComputeService::submitStandardJob(): Service-specific argument provided for task with ID '" +
-          arg.first + "' but there is no task with such ID in the job");
+                                      arg.first + "' but there is no task with such ID in the job");
         }
       }
 
-      /* parse and update service-specific args are provided and well-formatted */
-      std::map<std::string, std::string> finalized_service_specific_arguments;
+      /* check that service-specific args are provided and well-formatted */
 
-      std::vector<std::string> available_hosts;
-      for (auto r: this->compute_resources) {
-        available_hosts.push_back(r.first);
-      }
-
-      size_t current_picked_host = 0;
       for (auto t : job->getTasks()) {
-        std::string target_host;
-        unsigned long target_num_cores;
 
-        if (service_specific_args.find(t->getID()) == service_specific_args.end()) {
-          // Pick a host
-          target_host = available_hosts.at(current_picked_host);
-          // Next time will be the "next" host
-          current_picked_host = (current_picked_host + 1) % available_hosts.size();
-          // Pick a number of cores
-          target_num_cores =
-                  std::min<unsigned long>(t->getMaxNumCores(),
-                                          std::get<0>(this->compute_resources[target_host]));
-
-        } else {
+        if (service_specific_args.find(t->getID()) != service_specific_args.end()) {
           std::tuple<std::string, unsigned long> parsed_spec;
 
           try {
@@ -147,25 +130,32 @@ namespace wrench {
             throw;
           }
 
-          target_host = std::get<0>(parsed_spec);
-          if (target_host.empty()) {
-            target_host = available_hosts.at(current_picked_host++);
+          std::string target_host = std::get<0>(parsed_spec);
+          if (not target_host.empty()) {
+            if (this->compute_resources.find(target_host) == this->compute_resources.end()) {
+              throw std::invalid_argument(
+                      "Invalid service-specific argument '" + service_specific_args[t->getID()] + "' for task '" +
+                      t->getID() + "': no such host");
+            }
           }
 
-          if (this->compute_resources.find(target_host) == this->compute_resources.end()) {
+          unsigned long target_num_cores = std::get<1>(parsed_spec);
+          if (target_num_cores < t->getMinNumCores()) {
             throw std::invalid_argument(
                     "Invalid service-specific argument '" + service_specific_args[t->getID()] + "' for task '" +
-                    t->getID() + "': no such host");
+                    t->getID() + "': the task requires at least " + std::to_string(t->getMinNumCores()) + " cores");
           }
-          target_num_cores = std::get<1>(parsed_spec);
+          if (target_num_cores > t->getMaxNumCores()) {
+            throw std::invalid_argument(
+                    "Invalid service-specific argument '" + service_specific_args[t->getID()] + "' for task '" +
+                    t->getID() + "': the task can use at most " + std::to_string(t->getMaxNumCores()) + " cores");
+          }
         }
-        finalized_service_specific_arguments.insert(std::make_pair(t->getID(),
-                                                                   target_host + ":" + std::to_string(target_num_cores)));
       }
 
       // At this point, there may still be insufficient resources to run the task, but that will
       // be handled later (and a WorkflowExecutionError with a "not enough resources" FailureCause
-      // may be generated.
+      // may be generated).
 
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_standard_job");
 
@@ -173,7 +163,7 @@ namespace wrench {
       try {
         S4U_Mailbox::putMessage(this->mailbox_name,
                                 new ComputeServiceSubmitStandardJobRequestMessage(
-                                        answer_mailbox, job, finalized_service_specific_arguments,
+                                        answer_mailbox, job, service_specific_args,
                                         this->getMessagePayloadValueAsDouble(
                                                 ComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
@@ -212,7 +202,7 @@ namespace wrench {
      */
     void
     BareMetalComputeService::submitPilotJob(PilotJob *job,
-                                                     std::map<std::string, std::string> &service_specific_args) {
+                                            std::map<std::string, std::string> &service_specific_args) {
 
       if (this->state == Service::DOWN) {
         throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
@@ -296,10 +286,10 @@ namespace wrench {
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      */
     BareMetalComputeService::BareMetalComputeService(const std::string &hostname,
-                                                                       const std::set<std::string> compute_hosts,
-                                                                       double scratch_space_size,
-                                                                       std::map<std::string, std::string> property_list,
-                                                                       std::map<std::string, std::string> messagepayload_list
+                                                     const std::set<std::string> compute_hosts,
+                                                     double scratch_space_size,
+                                                     std::map<std::string, std::string> property_list,
+                                                     std::map<std::string, std::string> messagepayload_list
     ) :
             ComputeService(hostname,
                            "bare_metal",
@@ -361,10 +351,10 @@ namespace wrench {
     * @param scratch_space: the scratch space for this compute service
     */
     BareMetalComputeService::BareMetalComputeService(const std::string &hostname,
-                                                                       const std::set<std::string> compute_hosts,
-                                                                       std::map<std::string, std::string> property_list,
-                                                                       std::map<std::string, std::string> messagepayload_list,
-                                                                       StorageService *scratch_space) :
+                                                     const std::set<std::string> compute_hosts,
+                                                     std::map<std::string, std::string> property_list,
+                                                     std::map<std::string, std::string> messagepayload_list,
+                                                     StorageService *scratch_space) :
             ComputeService(hostname,
                            "bare_metal",
                            "bare_metal",
@@ -392,10 +382,10 @@ namespace wrench {
      * @param scratch_space: the scratch space for this compute service
      */
     BareMetalComputeService::BareMetalComputeService(const std::string &hostname,
-                                                                       const std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
-                                                                       std::map<std::string, std::string> property_list,
-                                                                       std::map<std::string, std::string> messagepayload_list,
-                                                                       StorageService *scratch_space) :
+                                                     const std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
+                                                     std::map<std::string, std::string> property_list,
+                                                     std::map<std::string, std::string> messagepayload_list,
+                                                     StorageService *scratch_space) :
             ComputeService(hostname,
                            "bare_metal",
                            "bare_metal",
@@ -518,16 +508,7 @@ namespace wrench {
       // Set an alarm for my timely death, if necessary
       if (this->has_ttl) {
         this->death_date = S4U_Simulation::getClock() + this->ttl;
-//        WRENCH_INFO("Will be terminating at date %lf", this->death_date);
-////        std::shared_ptr<SimulationMessage> msg = std::shared_ptr<SimulationMessage>(new ServiceTTLExpiredMessage(0));
-//        SimulationMessage *msg = new ServiceTTLExpiredMessage(0);
-//        this->death_alarm = Alarm::createAndStartAlarm(this->simulation, death_date, this->hostname, this->mailbox_name,
-//                                                       msg, "service_string");
       }
-//      else {
-//        this->death_date = -1.0;
-////        this->death_alarm = nullptr;
-//      }
 
       /** Main loop **/
       while (this->processNextMessage()) {
@@ -541,13 +522,98 @@ namespace wrench {
     }
 
     /**
+     * @brief helper function to figure out where/how a task should run
+     *
+     * @param task: the workflow task for which this allocation is being computed (if nullptr: none)
+     * @param required_host: the required host per service-specific arguments ("" means: choose one)
+     * @param required_num_cores: the required number of cores per service-specific arguments (0 means: choose a number)
+     * @param required_ram: the required number of bytes of RAM
+     * @param hosts_to_avoid: a list of hosts to not even consider
+     * @return
+     */
+    std::tuple<std::string, unsigned long> BareMetalComputeService::pickAllocation(WorkflowTask *task,
+                                                                                   std::string required_host,
+                                                                                   unsigned long required_num_cores,
+                                                                                   double required_ram,
+                                                                                   std::set<std::string> &hosts_to_avoid) {
+
+      // Compute possible hosts
+      std::set<std::string> possible_hosts;
+      std::string new_host_to_avoid = "";
+      double new_host_to_avoid_ram_capacity = 0;
+      for (auto const &r : this->compute_resources) {
+        // If there is a required host, then don't even look at others
+        if (not required_host.empty() and (r.first != required_host)) {
+          continue;
+        }
+
+        if ((required_num_cores == 0) and (std::get<0>(r.second) < task->getMinNumCores())) {
+          continue;
+        }
+        if ((required_num_cores != 0) and (std::get<0>(r.second) < required_num_cores)) {
+          continue;
+        }
+        if ((required_ram > 0) and (hosts_to_avoid.find(r.first) != hosts_to_avoid.end())) {
+          continue;
+        }
+        if ((required_ram > 0) and (this->ram_availabilities[r.first] < required_ram)) {
+          if (new_host_to_avoid.empty()) {
+            new_host_to_avoid = r.first;
+            new_host_to_avoid_ram_capacity = this->ram_availabilities[r.first];
+          } else {
+            if (this->ram_availabilities[r.first] > new_host_to_avoid_ram_capacity) {
+              new_host_to_avoid = r.first;
+              new_host_to_avoid_ram_capacity = this->ram_availabilities[r.first];
+            }
+          }
+          continue;
+        }
+
+        possible_hosts.insert(r.first);
+      }
+
+      // If none, then reply with an empty tuple
+      if (possible_hosts.empty()) {
+        // Host to avoid is the one with the lowest ram availabiliey
+        if (not new_host_to_avoid.empty()) {
+          hosts_to_avoid.insert(new_host_to_avoid);
+        }
+        return std::make_tuple(std::string(),0);
+      }
+
+      // Select the "best" host
+      double lowest_load = DBL_MAX;
+      std::string picked_host = "";
+      unsigned long picked_num_cores = 0;
+      for (auto const &h : possible_hosts) {
+        unsigned long num_running_threads = this->running_thread_counts[h];
+        unsigned long num_cores = std::get<0>(this->compute_resources[h]);
+        double flop_rate = S4U_Simulation::getHostFlopRate(h);
+        unsigned long used_num_cores;
+        if (required_num_cores == 0) {
+          used_num_cores = std::min(num_cores, task->getMaxNumCores());
+        } else {
+          used_num_cores = required_num_cores;
+        }
+        double load = ((double)((num_running_threads + used_num_cores) / num_cores)) / flop_rate;
+        if (load < lowest_load) {
+          lowest_load = load;
+          picked_host = h;
+          picked_num_cores = used_num_cores;
+        }
+      }
+      return std::make_tuple(picked_host, picked_num_cores);
+
+    }
+
+
+    /**
      * @brief: Dispatch ready work units
      */
     void BareMetalComputeService::dispatchReadyWorkunits() {
 
       // Don't kill me while I am doing this
       this->acquireDaemonLock();
-
 
       std::set<Workunit *> dispatched_wus_for_job;
 
@@ -556,41 +622,42 @@ namespace wrench {
       // allow non-zero-ram tasks to jump ahead of other tasks
 
       for (auto const &wu : this->ready_workunits) {
+
+        std::string picked_host;
+
         StandardJob *job = wu->getJob();
-        std::string required_host;
-        unsigned long required_num_cores;
+        std::string target_host;
+        unsigned long target_num_cores;
         double required_ram;
         if (wu->task == nullptr) {
-          required_host = (*(this->compute_resources.begin())).first;
-          required_num_cores = 1;
+          // Always run on the first host
+          std::tuple<std::string, unsigned long> allocation =
+                  pickAllocation(nullptr, "", 1, 0.0, no_longer_considered_hosts);
           required_ram = 0.0;
+          target_host = std::get<0>(allocation);
+          target_num_cores = std::get<1>(allocation);
         } else {
-          required_host = std::get<0>(this->job_run_specs[job][wu->task]);
-          required_num_cores = std::get<1>(this->job_run_specs[job][wu->task]);
+          std::tuple<std::string, unsigned long> allocation =
+                  pickAllocation(wu->task,
+                                 std::get<0>(this->job_run_specs[job][wu->task]),
+                                 std::get<1>(this->job_run_specs[job][wu->task]),
+                                 wu->task->getMemoryRequirement(),
+                                 no_longer_considered_hosts);
           required_ram = wu->task->getMemoryRequirement();
+          target_host = std::get<0>(allocation);
+          target_num_cores = std::get<1>(allocation);
         }
 
-        // Check that RAM is ok
-        // If required_ram == 0, we're always find
-        if (required_ram != 0) {
-          // If the host should no longer be considered, continue
-          if (no_longer_considered_hosts.find(required_host) != no_longer_considered_hosts.end()) {
-            continue;
-          }
-          // If not enough ram, continue, but add the host to the
-          // list of hosts to no longer be considered
-          if (this->ram_availabilities[required_host] < required_ram) {
-            no_longer_considered_hosts.insert(required_host);
-            continue;
-          }
-
+        // If we didn't find a host, forget it
+        if (target_host.empty()) {
+          continue;
         }
 
         /** Dispatch it */
         std::shared_ptr<WorkunitExecutor> workunit_executor = std::shared_ptr<WorkunitExecutor>(
                 new WorkunitExecutor(this->simulation,
-                                     required_host,
-                                     required_num_cores,
+                                     target_host,
+                                     target_num_cores,
                                      required_ram,
                                      this->mailbox_name,
                                      wu,
@@ -608,8 +675,8 @@ namespace wrench {
         this->workunit_executors[job].insert(workunit_executor);
 
         // Update core and RAM availability
-        this->ram_availabilities[required_host] -= required_ram;
-        this->running_thread_counts[required_host] += required_num_cores;
+        this->ram_availabilities[target_host] -= required_ram;
+        this->running_thread_counts[target_host] += target_num_cores;
 
         dispatched_wus_for_job.insert(wu);
       }
@@ -658,18 +725,6 @@ namespace wrench {
 
       WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
-//      if (auto msg = dynamic_cast<ServiceTTLExpiredMessage *>(message.get())) {
-//        WRENCH_INFO("My TTL has expired, terminating and perhaps notify a pilot job submitted");
-//        if (this->containing_pilot_job != nullptr) {
-//          /*** Clean up everything in the scratch space ***/
-//          cleanUpScratch();
-//        }
-//
-//        this->terminate(true);
-//
-//        return false;
-//
-//      } else
       if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
 
         if (this->containing_pilot_job != nullptr) {
@@ -935,7 +990,7 @@ namespace wrench {
  */
 
     void BareMetalComputeService::processWorkunitExecutorCompletion(WorkunitExecutor *workunit_executor,
-                                                                             Workunit *workunit) {
+                                                                    Workunit *workunit) {
       StandardJob *job = workunit_executor->getJob();
 
       // Get the scratch files that executor may have generated
@@ -947,10 +1002,9 @@ namespace wrench {
       }
 
       // Update RAM availabilities and running thread counts
-      if (workunit->task) {
-        this->ram_availabilities[workunit_executor->getHostname()] += workunit->task->getMemoryRequirement();
-        this->running_thread_counts[workunit_executor->getHostname()] -= workunit_executor->getNumCores();
-      }
+      this->ram_availabilities[workunit_executor->getHostname()] += workunit_executor->getMemoryUtilization();
+      this->running_thread_counts[workunit_executor->getHostname()] -= workunit_executor->getNumCores();
+
       // Forget the workunit executor
       forgetWorkunitExecutor(workunit_executor);
 
@@ -1034,8 +1088,8 @@ namespace wrench {
 */
 
     void BareMetalComputeService::processWorkunitExecutorFailure(WorkunitExecutor *workunit_executor,
-                                                                          Workunit *workunit,
-                                                                          std::shared_ptr<FailureCause> cause) {
+                                                                 Workunit *workunit,
+                                                                 std::shared_ptr<FailureCause> cause) {
       StandardJob *job = workunit_executor->getJob();
 
       // Get the scratch files that executor may have generated
@@ -1090,7 +1144,7 @@ namespace wrench {
  * @param answer_mailbox: the mailbox to which the answer message should be sent
  */
     void BareMetalComputeService::processStandardJobTerminationRequest(StandardJob *job,
-                                                                                const std::string &answer_mailbox) {
+                                                                       const std::string &answer_mailbox) {
 
       // If the job doesn't exit, we reply right away
       if (this->all_workunits.find(job) == this->all_workunits.end()) {
@@ -1157,23 +1211,54 @@ namespace wrench {
       std::map<WorkflowTask *, std::tuple<std::string, unsigned long>> task_run_specs;
       bool enough_resources = true;
       for (auto t : job->getTasks()) {
-        std::string spec = service_specific_arguments[t->getID()];
-        std::tuple<std::string, unsigned long> parsed_spec = parseResourceSpec(spec);
-
-        std::string required_host = std::get<0>(parsed_spec);
-        unsigned long required_num_cores = std::get<1>(parsed_spec);
+        std::string target_host;
+        unsigned long required_num_cores;
         double required_ram = t->getMemoryRequirement();
 
-        task_run_specs.insert(std::make_pair(t, std::make_tuple(required_host, required_num_cores)));
-        if (std::get<0>(this->compute_resources[required_host]) < required_num_cores) {
-          enough_resources = false;
+        std::tuple<std::string, unsigned long> task_run_spec;
+
+        // Determine the target host and the required number of cores
+        if (service_specific_arguments.find(t->getID()) == service_specific_arguments.end()) {
+          task_run_spec = std::make_tuple("",0);
+          target_host = "";
+          required_num_cores = t->getMinNumCores();
+        } else {
+          std::string spec = service_specific_arguments[t->getID()];
+          std::tuple<std::string, unsigned long> parsed_spec = parseResourceSpec(spec);
+          task_run_spec = parsed_spec;
+          target_host = std::get<0>(parsed_spec);
+          required_num_cores = std::get<1>(parsed_spec);
         }
-        if (std::get<1>(this->compute_resources[required_host]) < required_ram) {
-          enough_resources = false;
+
+        // Check that the task can run
+        if (target_host.empty()) {
+          bool found_a_valid_host = false;
+          for (auto const &r : this->compute_resources) {
+            unsigned long num_cores_on_host = std::get<0>(r.second);
+            double memory_on_host = std::get<1>(r.second);
+            if ((num_cores_on_host >= required_num_cores) and (memory_on_host >= required_ram)) {
+              found_a_valid_host = true;
+              break;
+            }
+          }
+          if (not found_a_valid_host) {
+            enough_resources = false;
+            break;
+          }
+        } else {
+          unsigned long num_cores_on_host = std::get<0>((this->compute_resources[target_host]));
+          double memory_on_host = std::get<1>((this->compute_resources[target_host]));
+          if ((num_cores_on_host < required_num_cores) or (memory_on_host < required_ram)) {
+            enough_resources = false;
+            break;
+          }
         }
+        // Update task run specs
+        task_run_specs.insert(std::make_pair(t, task_run_spec));
       }
 
-      if (!enough_resources) {
+
+      if (not enough_resources) {
         try {
           S4U_Mailbox::dputMessage(
                   answer_mailbox,
@@ -1223,8 +1308,8 @@ namespace wrench {
  * @throw std::runtime_error
  */
     void BareMetalComputeService::processSubmitPilotJob(const std::string &answer_mailbox,
-                                                                 PilotJob *job,
-                                                                 std::map<std::string, std::string> service_specific_args) {
+                                                        PilotJob *job,
+                                                        std::map<std::string, std::string> service_specific_args) {
       WRENCH_INFO("Asked to run a pilot job");
 
       if (not this->supportsPilotJobs()) {
