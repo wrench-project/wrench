@@ -238,14 +238,14 @@ private:
 
       // Get a "PILOT JOB STARTED" event (default handler)
       wrench::PilotJob *job2 = job_manager->createPilotJob();
-      job_manager->submitJob(job2, this->test->cs_batch, {{"-N","1"},{"-c","1"},{"-t","1"}});
+      job_manager->submitJob(job2, this->test->cs_batch, {{"-N","1"},{"-c","1"},{"-t","2"}});
       this->waitForAndProcessNextEvent();
       if (this->counter != 2) {
         throw std::runtime_error("Did not get expected 'PILOT JOB START' event");
       }
 
       // Get a "STANDARD JOB FAILED" and "PILOT JOB EXPIRED" event (default handler)
-      wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task2", 100.0, 1, 1, 1.0, 0);
+      wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task2", 200.0, 1, 1, 1.0, 0);
       wrench::StandardJob *job3 = job_manager->createStandardJob(task2, {});
       job_manager->submitJob(job3, job2->getComputeService());
       this->waitForAndProcessNextEvent();
