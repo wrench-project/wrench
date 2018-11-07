@@ -508,6 +508,18 @@ span.SRScope {
     color: #666;
 }
 
+.doc-breadcrumb {
+    float: left;
+    position: relative;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: #f7f7f7;
+    border: 1px solid #ccc;
+    padding: 0.5em;
+    margin-bottom: 1em;
+}
+
 .contents h1 {
     font-size: 22px;
     font-weight: 700 !important;
