@@ -120,7 +120,8 @@ namespace wrench {
       // Check that service-specific args that are provided are well-formatted
       for (auto t : job->getTasks()) {
 
-        if (service_specific_args.find(t->getID()) != service_specific_args.end()) {
+        if ((service_specific_args.find(t->getID()) != service_specific_args.end()) and
+                (not service_specific_args[t->getID()].empty())) {
           std::tuple<std::string, unsigned long> parsed_spec;
 
           try {
