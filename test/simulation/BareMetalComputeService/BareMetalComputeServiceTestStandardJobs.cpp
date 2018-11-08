@@ -732,8 +732,16 @@ private:
       double task5_end_date = this->test->task5->getEndDate();
       double task6_end_date = this->test->task6->getEndDate();
 
+      // Check the each task ran using 2 cores
+      if (this->test->task5->getNumCoresAllocated() != 2) {
+        throw std::runtime_error("It looks like task5 didn't run with 2 cores accroding to in-task info");
+      }
+      if (this->test->task6->getNumCoresAllocated() != 2) {
+        throw std::runtime_error("It looks like task6 didn't run with 2 cores accroding to in-task info");
+      }
+
       /*
-       * Each task is happy on 2 cores
+       * Check that each task was happy on 2 cores
        */
       double delta_task5 = fabs(task5_end_date - 15.00);
       double delta_task6 = fabs(task6_end_date - 6.00);
@@ -745,6 +753,7 @@ private:
       if (delta_task6 > EPSILON) {
         throw std::runtime_error("Unexpected task6 end date " + std::to_string(task6_end_date) + " (should be 12.0)");
       }
+
 
       return 0;
     }
