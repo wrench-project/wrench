@@ -37,6 +37,7 @@ public:
 
     void do_RAMPressure_test();
     void do_LoadBalancing1_test();
+    void do_LoadBalancing2_test();
 
 
     static bool isJustABitGreater(double base, double variable) {
@@ -60,8 +61,13 @@ protected:
               "       <host id=\"Host2\" speed=\"1f\" core=\"4\"> "
               "            <prop id=\"ram\" value=\"1000\"/> "
               "       </host> "
+              "       <host id=\"Host3\" speed=\"3f\" core=\"4\"> "
+              "            <prop id=\"ram\" value=\"1000\"/> "
+              "       </host> "
               "        <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
               "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"1\"/> </route>"
+              "       <route src=\"Host1\" dst=\"Host3\"> <link_ctn id=\"1\"/> </route>"
+              "       <route src=\"Host2\" dst=\"Host3\"> <link_ctn id=\"1\"/> </route>"
               "   </zone> "
               "</platform>";
       FILE *platform_file = fopen(platform_file_path.c_str(), "w");
@@ -283,7 +289,6 @@ private:
       }
 
       // Inspect hosts
-      // TASK #1
       std::vector<std::string> hosts;
       hosts.push_back(tasks.at(0)->getExecutionHost());
       hosts.push_back(tasks.at(1)->getExecutionHost());
@@ -340,6 +345,138 @@ void BareMetalComputeServiceTestScheduling::do_LoadBalancing1_test() {
   wrench::WMS *wms = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(
           new LoadBalancing1TestWMS(
+                  this, compute_services, {}, "Host1")));
+
+  ASSERT_NO_THROW(wms->addWorkflow(workflow));
+
+  ASSERT_NO_THROW(simulation->launch());
+
+  delete simulation;
+
+  free(argv[0]);
+  free(argv);
+}
+
+
+
+
+/**********************************************************************/
+/**  LOAD-BALANCING  TEST  #2 (HETEROGENEOUS: 1 1x host, 1 3x host)  **/
+/**********************************************************************/
+
+class LoadBalancing2TestWMS : public wrench::WMS {
+
+public:
+    LoadBalancing2TestWMS(BareMetalComputeServiceTestScheduling *test,
+                       const std::set<wrench::ComputeService *> &compute_services,
+                       const std::set<wrench::StorageService *> &storage_services,
+                       std::string hostname) :
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
+      this->test = test;
+    }
+
+
+private:
+
+    BareMetalComputeServiceTestScheduling *test;
+
+    int main() {
+
+      // Create a job manager
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+
+      // Create a few tasks
+      std::vector<wrench::WorkflowTask *> tasks;
+      tasks.push_back(this->getWorkflow()->addTask("task1", 100, 4, 4, 1.0, 100));
+      tasks.push_back(this->getWorkflow()->addTask("task2", 100, 4, 4, 1.0, 100));
+      tasks.push_back(this->getWorkflow()->addTask("task3", 100, 4, 4, 1.0, 100));
+      tasks.push_back(this->getWorkflow()->addTask("task4", 100, 4, 4, 1.0, 100));
+
+      // Submit them in order
+      for (auto const & t : tasks) {
+        wrench::StandardJob *j = job_manager->createStandardJob(t, {});
+        std::map<std::string, std::string> cs_specific_args;
+        cs_specific_args.insert(std::make_pair(t->getID(), ""));
+        job_manager->submitJob(j, this->test->cs, cs_specific_args);
+      }
+
+      // Wait for completions
+      std::map<wrench::WorkflowTask*, std::tuple<double,double>> times;
+      for (int i=0; i < 4; i++) {
+        std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+        try {
+          event = this->getWorkflow()->waitForNextExecutionEvent();
+        } catch (wrench::WorkflowExecutionException &e) {
+          throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
+        }
+        if (event->type != wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION) {
+          throw std::runtime_error("Unexpected execution event: " + std::to_string((int) (event->type)));
+        }
+
+        wrench::StandardJob *job = dynamic_cast<wrench::StandardJobCompletedEvent *>(event.get())->standard_job;
+        wrench::WorkflowTask *task = *(job->getTasks().begin());
+        double start_time = task->getStartDate();
+        double end_time = task->getEndDate();
+        times.insert(std::make_pair(task, std::make_tuple(start_time, end_time)));
+      }
+
+      // Inspect hosts
+      std::vector<std::string> hosts;
+      hosts.push_back(tasks.at(0)->getExecutionHost());
+      hosts.push_back(tasks.at(1)->getExecutionHost());
+      hosts.push_back(tasks.at(2)->getExecutionHost());
+      hosts.push_back(tasks.at(3)->getExecutionHost());
+
+      int host1_count = 0;
+      int host3_count = 0;
+      for (auto const &h : hosts) {
+        if (h == "Host1") {
+          host1_count++;
+        }
+        if (h == "Host3") {
+          host3_count++;
+        }
+      }
+      if ((host1_count != 1) or (host3_count != 3)) {
+        throw std::runtime_error("Unexpecting execution hosts: " + hosts.at(0) + ", " +
+                                         hosts.at(1) + ", " + hosts.at(2) + ", " + hosts.at(3));
+      }
+
+      return 0;
+    }
+
+
+};
+
+TEST_F(BareMetalComputeServiceTestScheduling, LoadBalancing2) {
+  DO_TEST_WITH_FORK(do_LoadBalancing2_test);
+}
+
+void BareMetalComputeServiceTestScheduling::do_LoadBalancing2_test() {
+
+  // Create and initialize a simulation
+  auto *simulation = new wrench::Simulation();
+  int argc = 1;
+  auto **argv = (char **) calloc(1, sizeof(char *));
+  argv[0] = strdup("one_task_test");
+
+  simulation->init(&argc, argv);
+
+  // Setting up the platform
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+  // Create a Compute Service
+  ASSERT_NO_THROW(cs = simulation->add(
+          new wrench::BareMetalComputeService("Host1",
+                                              (std::set<std::string>){"Host1", "Host3"}, 0.0,
+                                              {}, {})));
+  std::set<wrench::ComputeService *> compute_services;
+  compute_services.insert(cs);
+
+  // Create a WMS
+  wrench::WMS *wms = nullptr;
+  ASSERT_NO_THROW(wms = simulation->add(
+          new LoadBalancing2TestWMS(
                   this, compute_services, {}, "Host1")));
 
   ASSERT_NO_THROW(wms->addWorkflow(workflow));
