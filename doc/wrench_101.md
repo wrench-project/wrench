@@ -107,7 +107,7 @@ simulated platform:
 
 
 - **Compute Services** (classes that derive `wrench::ComputeService`): These are services
-  that know how to compute workflow tasks. These include bare-metal servers (`wrench::MultihostMulticoreComputeService`), cloud
+  that know how to compute workflow tasks. These include bare-metal servers (`wrench::BareMetalComputeService`), cloud
   platforms (`wrench::CloudService`), virtualized cluster platforms (`wrench::VirtualizedClusterService`), 
   batch-scheduled clusters (`wrench::BatchService`).
   It is not technically required to instantiate a compute service, but then no workflow task

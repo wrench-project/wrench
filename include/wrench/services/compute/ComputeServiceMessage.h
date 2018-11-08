@@ -252,10 +252,10 @@ namespace wrench {
      */
     class ComputeServiceResourceInformationAnswerMessage : public ComputeServiceMessage {
     public:
-        ComputeServiceResourceInformationAnswerMessage(std::map<std::string, std::vector<double>> info, double payload);
+        ComputeServiceResourceInformationAnswerMessage(std::map<std::string, std::map<std::string, double>> info, double payload);
 
         /** @brief The resource information map */
-        std::map<std::string, std::vector<double>> info;
+        std::map<std::string, std::map<std::string, double>> info;
     };
 
 

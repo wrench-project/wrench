@@ -55,6 +55,8 @@ namespace wrench {
 
         void loadFromJSON(const std::string &filename, const std::string &reference_flop_rate);
 
+        void loadFromDAXorJSON(const std::string &filename, const std::string &reference_flop_rate);
+
         unsigned long getNumberOfTasks();
 
         unsigned long getNumLevels();

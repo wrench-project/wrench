@@ -184,8 +184,9 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
 
   // Create a Compute Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname,
-                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+          new wrench::BareMetalComputeService(hostname,
+                                                       {std::make_pair(hostname,
+                                                                       std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
                                                        {})));
   // Create a Storage Service
   ASSERT_NO_THROW(storage_service1 = simulation->add(
@@ -386,8 +387,9 @@ void NetworkProximityTest::do_CompareNetworkProximity_Test() {
 
   // Create a Compute Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname,
-                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+          new wrench::BareMetalComputeService(hostname,
+                                                       {std::make_pair(hostname,
+                                                                       std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
                                                        {})));
 
   // Create a Storage Service
@@ -569,8 +571,9 @@ void NetworkProximityTest::do_VivaldiConverge_Test() {
 
   // Create a Compute Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname,
-                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+          new wrench::BareMetalComputeService(hostname,
+                                                       {std::make_pair(hostname,
+                                                                       std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
                                                        {})));
   // Create a Storage Service
   ASSERT_NO_THROW(storage_service1 = simulation->add(
@@ -677,8 +680,9 @@ void NetworkProximityTest::do_ValidateProperties_Test() {
 
   // Create a Compute Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname,
-                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+          new wrench::BareMetalComputeService(hostname,
+                                                       {std::make_pair(hostname,
+                                                                       std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
                                                        {})));
   // Create a Storage Service
   ASSERT_NO_THROW(storage_service1 = simulation->add(

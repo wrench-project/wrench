@@ -52,23 +52,23 @@ protected:
 
       // Create a four-host 10-core platform file
       std::string xml = "<?xml version='1.0'?>"
-                        "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
-                        "<platform version=\"4.1\"> "
-                        "   <zone id=\"AS0\" routing=\"Full\"> "
-                        "       <host id=\"Host1\" speed=\"1f\" core=\"10\"/> "
-                        "       <host id=\"Host2\" speed=\"1f\" core=\"10\"/> "
-                        "       <host id=\"Host3\" speed=\"1f\" core=\"10\"/> "
-                        "       <host id=\"Host4\" speed=\"1f\" core=\"10\"/> "
-                        "       <link id=\"1\" bandwidth=\"50000GBps\" latency=\"0us\"/>"
-                        "       <link id=\"2\" bandwidth=\"0.0001MBps\" latency=\"1000000us\"/>"
-                        "       <link id=\"3\" bandwidth=\"0.0001MBps\" latency=\"1000000us\"/>"
-                        "       <route src=\"Host3\" dst=\"Host1\"> <link_ctn id=\"1\"/> </route>"
-                        "       <route src=\"Host3\" dst=\"Host4\"> <link_ctn id=\"1\"/> </route>"
-                        "       <route src=\"Host4\" dst=\"Host1\"> <link_ctn id=\"1\"/> </route>"
-                        "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"1\""
-                        "/> </route>"
-                        "   </zone> "
-                        "</platform>";
+              "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+              "<platform version=\"4.1\"> "
+              "   <zone id=\"AS0\" routing=\"Full\"> "
+              "       <host id=\"Host1\" speed=\"1f\" core=\"10\"/> "
+              "       <host id=\"Host2\" speed=\"1f\" core=\"10\"/> "
+              "       <host id=\"Host3\" speed=\"1f\" core=\"10\"/> "
+              "       <host id=\"Host4\" speed=\"1f\" core=\"10\"/> "
+              "       <link id=\"1\" bandwidth=\"50000GBps\" latency=\"0us\"/>"
+              "       <link id=\"2\" bandwidth=\"0.0001MBps\" latency=\"1000000us\"/>"
+              "       <link id=\"3\" bandwidth=\"0.0001MBps\" latency=\"1000000us\"/>"
+              "       <route src=\"Host3\" dst=\"Host1\"> <link_ctn id=\"1\"/> </route>"
+              "       <route src=\"Host3\" dst=\"Host4\"> <link_ctn id=\"1\"/> </route>"
+              "       <route src=\"Host4\" dst=\"Host1\"> <link_ctn id=\"1\"/> </route>"
+              "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"1\""
+              "/> </route>"
+              "   </zone> "
+              "</platform>";
       FILE *platform_file = fopen(platform_file_path.c_str(), "w");
       fprintf(platform_file, "%s", xml.c_str());
       fclose(platform_file);
@@ -173,18 +173,18 @@ void ScratchSpaceTest::do_SimpleScratchSpace_test() {
 
   // Create a Storage Service
   ASSERT_NO_THROW(storage_service1 = simulation->add(
-          new wrench::SimpleStorageService(hostname, 1000000.0)));
+          new wrench::SimpleStorageService(hostname, 2000000.0)));
 
   // Create a Storage Service
   ASSERT_NO_THROW(storage_service2 = simulation->add(
-          new wrench::SimpleStorageService(hostname, 1000000.0)));
+          new wrench::SimpleStorageService(hostname, 2000000.0)));
 
 
   // Create a Compute Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname,
-                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES,
-                                                                        wrench::ComputeService::ALL_RAM)},
+          new wrench::BareMetalComputeService(hostname,
+                                                       {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                                 wrench::ComputeService::ALL_RAM))},
                                                        1000000.0, {})));
 
   simulation->add(new wrench::FileRegistryService(hostname));
@@ -400,23 +400,23 @@ void ScratchSpaceTest::do_ScratchSpaceFailure_test() {
 
   // Create a Compute Service that does not have scratch space
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname,
-                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES,
-                                                                        wrench::ComputeService::ALL_RAM)},
+          new wrench::BareMetalComputeService(hostname,
+                                                       {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                                 wrench::ComputeService::ALL_RAM))},
                                                        0)));
 
   // Create a Compute Service that has smaller scratch space than the files to be stored
   ASSERT_NO_THROW(compute_service1 = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname,
-                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES,
-                                                                        wrench::ComputeService::ALL_RAM)},
+          new wrench::BareMetalComputeService(hostname,
+                                                       {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                                 wrench::ComputeService::ALL_RAM))},
                                                        100)));
 
   // Create a Compute Service that has enough scratch space to store the files
   ASSERT_NO_THROW(compute_service2 = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname,
-                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES,
-                                                                        wrench::ComputeService::ALL_RAM)},
+          new wrench::BareMetalComputeService(hostname,
+                                                       {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                                 wrench::ComputeService::ALL_RAM))},
                                                        10000)));
 
   simulation->add(new wrench::FileRegistryService(hostname));
@@ -470,143 +470,140 @@ private:
     ScratchSpaceTest *test;
 
     int main() {
-      // Create a job manager
+
+      // Create a job  manager
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
-      {
-        // Create a job  manager
-        std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
-        wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
+      wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
-        // Create a pilot job that requires 1 host, 1 core per host, 1 bytes of RAM per host, and 1 hour
-        wrench::PilotJob *pilot_job = job_manager->createPilotJob(1, 1, 1.0, 3600);
+      // Create a pilot job that requires 1 host, 1 core per host, 1 bytes of RAM per host, and 1 hour
+      wrench::PilotJob *pilot_job = job_manager->createPilotJob();
 
-
-        // Submit a pilot job
-        try {
-          job_manager->submitJob(pilot_job, this->test->compute_service);
-        } catch (wrench::WorkflowExecutionException &e) {
-          throw std::runtime_error("Unexpected exception: " + e.getCause()->toString());
-        }
-
-        // Wait for the pilot job start
-        std::unique_ptr<wrench::WorkflowExecutionEvent> event;
-        try {
-          event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
-          throw std::runtime_error(
-                  "Error while getting and execution event: " + std::to_string(e.getCause()->getCauseType()));
-        }
-        switch (event->type) {
-          case wrench::WorkflowExecutionEvent::PILOT_JOB_START: {
-            // success, do nothing for now
-            break;
-          }
-          default: {
-            throw std::runtime_error("Unexpected workflow execution event: " + std::to_string(event->type));
-          }
-        }
-
-        // Create a sequential task that lasts one min and requires 1 cores
-        wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 60, 1, 1, 1.0, 0);
-        task1->addInputFile(this->getWorkflow()->getFileByID("input_file1"));
-
-        // Create a sequential task that lasts one min and requires 1 cores
-        wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task2", 360, 1, 1, 1.0, 0);
-        task2->addInputFile(this->getWorkflow()->getFileByID("input_file2"));
-
-        // Create a sequential task that lasts one min and requires 1 cores
-        wrench::WorkflowTask *task3 = this->getWorkflow()->addTask("task3", 600, 1, 1, 1.0, 0);
-        task3->addInputFile(this->getWorkflow()->getFileByID("input_file3"));
-
-        // Create a StandardJob with SOME pre-copies from public storage to scratch
-        wrench::StandardJob *job1 = job_manager->createStandardJob(
-                {task1},
-                {},
-                {std::make_tuple(this->getWorkflow()->getFileByID("input_file1"), this->test->storage_service1,
-                                 wrench::ComputeService::SCRATCH)},
-                {},
-                {});
-
-        // Create a StandardJob with SOME pre-copies from public storage to scratch
-        wrench::StandardJob *job2 = job_manager->createStandardJob(
-                {task2},
-                {},
-                {std::make_tuple(this->getWorkflow()->getFileByID("input_file2"), this->test->storage_service1,
-                                 wrench::ComputeService::SCRATCH)},
-                {},
-                {});
-
-        // Create a StandardJob with SOME pre-copies from public storage to scratch
-        wrench::StandardJob *job3 = job_manager->createStandardJob(
-                {task3},
-                {},
-                {std::make_tuple(this->getWorkflow()->getFileByID("input_file3"), this->test->storage_service1,
-                                 wrench::ComputeService::SCRATCH)},
-                {},
-                {});
-
-
-        // Submit the standard job for execution
-        try {
-          job_manager->submitJob(job1, pilot_job->getComputeService());
-          job_manager->submitJob(job2, pilot_job->getComputeService());
-          job_manager->submitJob(job3, pilot_job->getComputeService());
-        } catch (std::exception &e) {
-          throw std::runtime_error(
-                  "Unexpected exception while submitting standard job to pilot job: " + std::string(e.what()));
-        }
-
-        int i = 0;
-        while (i < 3) {
-          // Wait for the standard job completion
-          try {
-            event = this->getWorkflow()->waitForNextExecutionEvent();
-          } catch (wrench::WorkflowExecutionException &e) {
-            throw std::runtime_error(
-                    "Error while getting and execution event: " + std::to_string(e.getCause()->getCauseType()));
-          }
-          switch (event->type) {
-            case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-              // success, check if the scratch space size is not full again or not, it should not be
-              double free_space_size = pilot_job->getComputeService()->getFreeScratchSpaceSize();
-              if (free_space_size == 3000.0) {
-                throw std::runtime_error(
-                        "Pilot Job is expected to clear its scratch space only after all the standard job finishes");
-              }
-              break;
-            }
-            default: {
-              throw std::runtime_error("Unexpected workflow execution event: " + std::to_string(event->type));
-            }
-          }
-          i++;
-        }
-
-        // Wait for the pilot job expiration
-        try {
-          event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
-          throw std::runtime_error(
-                  "Error while getting and execution event: " + std::to_string(e.getCause()->getCauseType()));
-        }
-        switch (event->type) {
-          case wrench::WorkflowExecutionEvent::PILOT_JOB_EXPIRATION: {
-            // success, check if the scratch space size is full again or not, it should be full
-            wrench::S4U_Simulation::sleep(10); //sleep for some time to ensure everything is deleted
-            double free_space_size = pilot_job->getComputeService()->getFreeScratchSpaceSize();
-            if (free_space_size != 3000.0) {
-              throw std::runtime_error(
-                      "Scratch space should be full after this pilot job expires but it is not now");
-            }
-            break;
-          }
-          default: {
-            throw std::runtime_error("Unexpected workflow execution event: " + std::to_string(event->type));
-          }
-        }
-
+      // Submit a pilot job
+      try {
+        job_manager->submitJob(pilot_job, this->test->compute_service, {{"-N","1"}, {"-c","1"}, {"-t","60"}});
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error("Unexpected exception: " + e.getCause()->toString());
       }
+
+      // Wait for the pilot job start
+      std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+      try {
+        event = this->getWorkflow()->waitForNextExecutionEvent();
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error(
+                "Error while getting and execution event: " + std::to_string(e.getCause()->getCauseType()));
+      }
+      switch (event->type) {
+        case wrench::WorkflowExecutionEvent::PILOT_JOB_START: {
+          // success, do nothing for now
+          break;
+        }
+        default: {
+          throw std::runtime_error("Unexpected workflow execution event: " + std::to_string(event->type));
+        }
+      }
+
+      // Create a sequential task that lasts one min and requires 1 cores
+      wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 60, 1, 1, 1.0, 0);
+      task1->addInputFile(this->getWorkflow()->getFileByID("input_file1"));
+
+      // Create a sequential task that lasts one min and requires 1 cores
+      wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task2", 360, 1, 1, 1.0, 0);
+      task2->addInputFile(this->getWorkflow()->getFileByID("input_file2"));
+
+      // Create a sequential task that lasts one min and requires 1 cores
+      wrench::WorkflowTask *task3 = this->getWorkflow()->addTask("task3", 600, 1, 1, 1.0, 0);
+      task3->addInputFile(this->getWorkflow()->getFileByID("input_file3"));
+
+      // Create a StandardJob with SOME pre-copies from public storage to scratch
+      wrench::StandardJob *job1 = job_manager->createStandardJob(
+              {task1},
+              {},
+              {std::make_tuple(this->getWorkflow()->getFileByID("input_file1"), this->test->storage_service1,
+                               wrench::ComputeService::SCRATCH)},
+              {},
+              {});
+
+      // Create a StandardJob with SOME pre-copies from public storage to scratch
+      wrench::StandardJob *job2 = job_manager->createStandardJob(
+              {task2},
+              {},
+              {std::make_tuple(this->getWorkflow()->getFileByID("input_file2"), this->test->storage_service1,
+                               wrench::ComputeService::SCRATCH)},
+              {},
+              {});
+
+      // Create a StandardJob with SOME pre-copies from public storage to scratch
+      wrench::StandardJob *job3 = job_manager->createStandardJob(
+              {task3},
+              {},
+              {std::make_tuple(this->getWorkflow()->getFileByID("input_file3"), this->test->storage_service1,
+                               wrench::ComputeService::SCRATCH)},
+              {},
+              {});
+
+
+      // Submit the standard job for execution
+      try {
+        job_manager->submitJob(job1, pilot_job->getComputeService());
+        job_manager->submitJob(job2, pilot_job->getComputeService());
+        job_manager->submitJob(job3, pilot_job->getComputeService());
+      } catch (std::exception &e) {
+        throw std::runtime_error(
+                "Unexpected exception while submitting standard job to pilot job: " + std::string(e.what()));
+      }
+
+      int i = 0;
+      while (i < 3) {
+        // Wait for the standard job completion
+        try {
+          event = this->getWorkflow()->waitForNextExecutionEvent();
+        } catch (wrench::WorkflowExecutionException &e) {
+          throw std::runtime_error(
+                  "Error while getting and execution event: " + std::to_string(e.getCause()->getCauseType()));
+        }
+        switch (event->type) {
+          case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
+            // success, check if the scratch space size is not full again or not, it should not be
+            double free_space_size = pilot_job->getComputeService()->getFreeScratchSpaceSize();
+            if (free_space_size == 3000.0) {
+              throw std::runtime_error(
+                      "Pilot Job is expected to clear its scratch space only after all the standard job finishes");
+            }
+            break;
+          }
+          default: {
+            throw std::runtime_error("Unexpected workflow execution event: " + std::to_string(event->type));
+          }
+        }
+        i++;
+      }
+
+      // Wait for the pilot job expiration
+      try {
+        event = this->getWorkflow()->waitForNextExecutionEvent();
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error(
+                "Error while getting and execution event: " + std::to_string(e.getCause()->getCauseType()));
+      }
+      switch (event->type) {
+        case wrench::WorkflowExecutionEvent::PILOT_JOB_EXPIRATION: {
+          // success, check if the scratch space size is full again or not, it should be full
+          wrench::S4U_Simulation::sleep(10); //sleep for some time to ensure everything is deleted
+          double free_space_size = pilot_job->getComputeService()->getFreeScratchSpaceSize();
+          if (free_space_size != 3000.0) {
+            throw std::runtime_error(
+                    "Scratch space should be full after this pilot job expires but it is not now");
+          }
+          break;
+        }
+        default: {
+          throw std::runtime_error("Unexpected workflow execution event: " + std::to_string(event->type));
+        }
+      }
+
+
 
       return 0;
     }
@@ -645,10 +642,8 @@ void ScratchSpaceTest::do_PilotJobScratchSpace_test() {
 
   // Create a Compute Service that does not have scratch space
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname,
-                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES,
-                                                                        wrench::ComputeService::ALL_RAM)},
-                                                       3000, {})));
+          new wrench::BatchService(hostname,
+                                   {hostname}, 3000, {})));
 
   simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -797,7 +792,7 @@ void ScratchSpaceTest::do_RaceConditionTest_test() {
 
   // Create a Cloud Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname, {"Host1"}, 100, {}, {})));
+          new wrench::BareMetalComputeService(hostname, {"Host1"}, 100, {}, {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -834,9 +829,9 @@ class ScratchNonScratchPartitionsTestWMS : public wrench::WMS {
 
 public:
     ScratchNonScratchPartitionsTestWMS(ScratchSpaceTest *test,
-                                     const std::set<wrench::ComputeService *> &compute_services,
-                                     const std::set<wrench::StorageService *> &storage_services,
-                                     std::string &hostname) :
+                                       const std::set<wrench::ComputeService *> &compute_services,
+                                       const std::set<wrench::StorageService *> &storage_services,
+                                       std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
     }
@@ -863,9 +858,9 @@ private:
 
       //check if this file is staged in / partition of non-scratch
       if(!test->storage_service1->lookupFile(file1, nullptr)) { //nullptr is referring to no job's partition
-          throw std::runtime_error(
-                  "The file1 was supposed to be staged in / partition but is not"
-          );
+        throw std::runtime_error(
+                "The file1 was supposed to be staged in / partition but is not"
+        );
       }
       //check if this file is staged in / partition of non-scratch
       if(!test->storage_service2->lookupFile(file2, nullptr)) { //nullptr is referring to no job's partition
@@ -1014,7 +1009,7 @@ void ScratchSpaceTest::do_PartitionsTest_test() {
 
   // Create a Cloud Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname, {"Host1"}, 100, {}, {})));
+          new wrench::BareMetalComputeService(hostname, {"Host1"}, 100, {}, {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;

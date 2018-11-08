@@ -281,9 +281,9 @@ void DataMovementManagerCopyRegisterTest::do_CopyRegister_test() {
 
   // Create a (unused) Compute Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService("WMSHost",
-                                                       {std::make_tuple("WMSHost", wrench::ComputeService::ALL_CORES,
-                                                                        wrench::ComputeService::ALL_RAM)}, {})));
+          new wrench::BareMetalComputeService("WMSHost",
+                                                       {std::make_pair("WMSHost", std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                        wrench::ComputeService::ALL_RAM))}, {})));
 
   // Create src and dst storage services
   ASSERT_NO_THROW(src_storage_service = simulation->add(

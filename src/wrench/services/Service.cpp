@@ -198,10 +198,12 @@ namespace wrench {
      */
     void Service::stop() {
 
+
       // Do nothing if the service is already down
-      if (this->state == Service::DOWN) {
+      if ((this->state == Service::DOWN) or (this->shutting_down)) {
         return;
       }
+      this->shutting_down = true; // This is to avoid another process calling stop() and being stuck
 
       WRENCH_INFO("Telling the daemon listening on (%s) to terminate", this->mailbox_name.c_str());
 

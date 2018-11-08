@@ -218,22 +218,12 @@ namespace wrench {
     /**
      * @brief Create a pilot job
      *
-     * @param num_hosts: the number of hosts required by the pilot job
-     * @param num_cores_per_host: the number of cores per host required by the pilot job
-     * @param ram_per_host: the number of bytes of RAM required by the pilot job on each host
-     * @param duration: the pilot job's duration in seconds
      * @return the pilot job
      *
      * @throw std::invalid_argument
      */
-    PilotJob *JobManager::createPilotJob(unsigned long num_hosts,
-                                         unsigned long num_cores_per_host,
-                                         double ram_per_host,
-                                         double duration) {
-      if ((ram_per_host < 0) || (duration <= 0.0)) {
-        throw std::invalid_argument("JobManager::createPilotJob(): Invalid arguments");
-      }
-      PilotJob *raw_ptr = new PilotJob(this->wms->workflow, num_hosts, num_cores_per_host, ram_per_host, duration);
+    PilotJob *JobManager::createPilotJob() {
+      PilotJob *raw_ptr = new PilotJob(this->wms->workflow);
       std::unique_ptr<WorkflowJob> job = std::unique_ptr<PilotJob>(raw_ptr);
       this->jobs[raw_ptr] = std::move(job);
       return raw_ptr;
@@ -246,10 +236,18 @@ namespace wrench {
      * @param job: a workflow job
      * @param compute_service: a compute service
      * @param service_specific_args: arguments specific for compute services:
-     *      - to a MultihostMulticoreComputeService: {}
-     *      - to a BatchService: {"-t":"<int>" (requested number of minutes),"-N":"<int>" (number of requested hosts),"-c":"<int>" (number of requestes cores per host)}
-     *      - to a VirtualizedClusterService: {} (in which case the service will pick the vm) or {"-vm":"<vm name>"}
-     *      - to a CloudService: {} (in which case the service will pick the vm) or {"-vm":"<vm name>"}
+     *      - to a BareMetalComputeService: {{"taskID", "[hostname:][num_cores]}, ...}
+     *           - If no value is not provided for a task, then the service will choose a host and use as many cores as possible on that host.
+     *           - If a "" value is provided for a task, then the service will choose a host and use as many cores as possible on that host.
+     *           - If a "hostname" value is provided for a task, then the service will run the task on that
+     *             host, using as many of its cores as possible
+     *           - If a "num_cores" value is provided for a task, then the service will run that task with
+     *             this many cores, but will choose the host on which to run it.
+     *           - If a "hostname:num_cores" value is provided for a task, then the service will run that
+     *             task with the specified number of cores on that host.
+     *      - to a BatchService: {{"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requestes cores per host)}}
+     *      - to a VirtualizedClusterService: {} (in which case the service will pick the vm) or {{"-vm":"<vm name>"}}
+     *      - to a CloudService: {} (in which case the service will pick the vm) or {{"-vm":"<vm name>"}}
      *
      * @throw std::invalid_argument
      * @throw WorkflowExecutionException
@@ -305,6 +303,25 @@ namespace wrench {
 
       } catch (WorkflowExecutionException &e) {
 
+        // "Undo" everything
+        job->popCallbackMailbox();
+        switch (job->getType()) {
+          case WorkflowJob::STANDARD: {
+            ((StandardJob *) job)->state = StandardJob::NOT_SUBMITTED;
+            for (auto t : ((StandardJob *) job)->tasks) {
+              t->setState(original_states[t]);
+            }
+            this->pending_standard_jobs.erase((StandardJob *) job);
+            break;
+          }
+          case WorkflowJob::PILOT: {
+            ((PilotJob *) job)->state = PilotJob::NOT_SUBMITTED;
+            this->pending_pilot_jobs.erase((PilotJob *) job);
+            break;
+          }
+        }
+        throw;
+      } catch (std::invalid_argument &e) {
         // "Undo" everything
         job->popCallbackMailbox();
         switch (job->getType()) {

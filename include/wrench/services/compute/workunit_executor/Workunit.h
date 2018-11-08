@@ -35,13 +35,21 @@ namespace wrench {
 
     public:
 
-        Workunit(std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
+        Workunit(StandardJob *job,
+                 std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
                  WorkflowTask * task,
                  std::map<WorkflowFile *, StorageService *> file_locations,
                  std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
                  std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions);
 
         static void addDependency(Workunit *parent, Workunit *child);
+
+        static std::set<std::unique_ptr<Workunit>> createWorkunits(StandardJob *job);
+
+        StandardJob *getJob();
+
+        /** @brief The StandardJob this Workunit belongs to */
+        StandardJob *job;
 
         /** @brief The Workunits that depend on this Workunit */
         std::set<Workunit*> children;

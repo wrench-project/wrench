@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include <wrench/services/compute/multihost_multicore/MultihostMulticoreComputeService.h>
+#include <wrench/services/compute/bare_metal/BareMetalComputeService.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>

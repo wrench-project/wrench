@@ -124,6 +124,7 @@ private:
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       // Get the scheduler pointers just for coverage
+      // Get the scheduler pointers just for coverage
       if (this->getPilotJobScheduler() != nullptr) {
         throw std::runtime_error("getPilotJobScheduler() should return nullptr");
       }
@@ -341,7 +342,7 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
   std::vector<std::string> execution_hosts = {"QuadCoreHost"};
   ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::CloudService(hostname, execution_hosts, 100.0,
-                                   { {wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
+                                   { {wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
 
   // Try to get the message payload as a string, just for kicks
   ASSERT_NO_THROW(compute_service->getMessagePayloadValueAsString(wrench::ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD));

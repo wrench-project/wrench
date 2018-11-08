@@ -9,8 +9,8 @@
 
 #include <cfloat>
 #include "wrench/services/compute/standard_job_executor/StandardJobExecutor.h"
-#include "wrench/services/compute/standard_job_executor/WorkunitMulticoreExecutor.h"
-#include "wrench/services/compute/standard_job_executor/Workunit.h"
+#include "wrench/services/compute/workunit_executor/WorkunitExecutor.h"
+#include "wrench/services/compute/workunit_executor/Workunit.h"
 #include "wrench/simulation/Simulation.h"
 #include "wrench/workflow/job/StandardJob.h"
 
@@ -44,7 +44,7 @@ namespace wrench {
      * @param callback_mailbox: the mailbox to which a reply will be sent
      * @param hostname: the name of the host on which this service will run (could be the first compute resources - see below)
      * @param job: the standard job to execute
-     * @param compute_resources: a non-empty list of <hostname, num_cores, memory> tuples, which represent
+     * @param compute_resources: a non-empty map of <num_cores, memory> tuples, indexed by hostname, which represent
      *           the compute resources the job should execute on
      *              - If num_cores == ComputeService::ALL_CORES, then ALL the cores of the host are used
      *              - If memory == ComputeService::ALL_RAM, then ALL the ram of the host is used
@@ -60,7 +60,7 @@ namespace wrench {
                                              std::string callback_mailbox,
                                              std::string hostname,
                                              StandardJob *job,
-                                             std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
+                                             std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
                                              StorageService* scratch_space,
                                              bool part_of_pilot_job,
                                              PilotJob* parent_pilot_job,
@@ -82,35 +82,35 @@ namespace wrench {
 
       // Check that there is at least one core per host but not too many cores
       for (auto host : compute_resources) {
-        if (std::get<1>(host) == 0) {
+        if (std::get<0>(host.second) == 0) {
           throw std::invalid_argument("StandardJobExecutor::StandardJobExecutor(): there should be at least one core per host");
         }
-        if (std::get<1>(host) < ComputeService::ALL_CORES) {
-          if (std::get<1>(host) > S4U_Simulation::getHostNumCores(std::get<0>(host))) {
-            throw std::invalid_argument("StandardJobExecutor::StandardJobExecutor(): host " + std::get<0>(host) +
-                                        " has only " + std::to_string(S4U_Simulation::getHostNumCores(std::get<0>(host))) + " cores");
+        if (std::get<0>(host.second) < ComputeService::ALL_CORES) {
+          if (std::get<0>(host.second) > S4U_Simulation::getHostNumCores(host.first)) {
+            throw std::invalid_argument("StandardJobExecutor::StandardJobExecutor(): host " + host.first +
+                                        " has only " + std::to_string(S4U_Simulation::getHostNumCores(host.first)) + " cores");
           }
         } else {
           // Set the num_cores to the maximum
-          std::get<1>(host) = S4U_Simulation::getHostNumCores(std::get<0>(host));
+          std::get<0>(host.second) = S4U_Simulation::getHostNumCores(host.first);
         }
       }
 
       // Check that there is at least zero byte of memory per host, but not too many bytes
       for (auto host : compute_resources) {
-        if (std::get<2>(host) < 0) {
+        if (std::get<1>(host.second) < 0) {
           throw std::invalid_argument("StandardJobExecutor::StandardJobExecutor(): the number of bytes per host should be non-negative");
         }
-        if (std::get<2>(host) < ComputeService::ALL_RAM) {
-          double host_memory_capacity = S4U_Simulation::getHostMemoryCapacity(std::get<0>(host));
-          if (std::get<2>(host) > host_memory_capacity) {
-            throw std::invalid_argument("StandardJobExecutor::StandardJobExecutor(): host " + std::get<0>(host) +
+        if (std::get<1>(host.second) < ComputeService::ALL_RAM) {
+          double host_memory_capacity = S4U_Simulation::getHostMemoryCapacity(host.first);
+          if (std::get<1>(host.second) > host_memory_capacity) {
+            throw std::invalid_argument("StandardJobExecutor::StandardJobExecutor(): host " + host.first +
                                         " has only " + std::to_string(
-                    S4U_Simulation::getHostMemoryCapacity(std::get<0>(host))) + " bytes of RAM");
+                    S4U_Simulation::getHostMemoryCapacity(host.first)) + " bytes of RAM");
           }
         } else {
           // Set the memory to the maximum
-          std::get<2>(host) = S4U_Simulation::getHostMemoryCapacity(std::get<0>(host));
+          std::get<1>(host.second) = S4U_Simulation::getHostMemoryCapacity(host.first);
         }
       }
 
@@ -123,9 +123,9 @@ namespace wrench {
 
       bool enough_cores = false;
       for (auto host : compute_resources) {
-        unsigned long num_cores_on_hosts = std::get<1>(host);
+        unsigned long num_cores_on_hosts = std::get<0>(host.second);
         if (num_cores_on_hosts == ComputeService::ALL_CORES) {
-          num_cores_on_hosts = S4U_Simulation::getHostNumCores(std::get<0>(host));
+          num_cores_on_hosts = S4U_Simulation::getHostNumCores(host.first);
         }
 
         if (num_cores_on_hosts >= max_min_required_num_cores) {
@@ -148,7 +148,7 @@ namespace wrench {
 
       bool enough_ram = false;
       for (auto host : compute_resources) {
-        if (std::get<2>(host) >= max_required_ram) {
+        if (std::get<1>(host.second) >= max_required_ram) {
           enough_ram = true;
           break;
         }
@@ -176,36 +176,36 @@ namespace wrench {
       // Compute the total number of cores and set initial core availabilities
       this->total_num_cores = 0;
       for (auto host : compute_resources) {
-        unsigned long num_cores = std::get<1>(host);
+        unsigned long num_cores = std::get<0>(host.second);
         if (num_cores == ComputeService::ALL_CORES) {
-          num_cores = simulation->getHostNumCores(std::get<0>(host));
+          num_cores = simulation->getHostNumCores(host.first);
         }
         this->total_num_cores += num_cores;
-        this->core_availabilities.insert(std::make_pair(std::get<0>(host), num_cores));
+        this->core_availabilities.insert(std::make_pair(host.first, num_cores));
       }
 
       // Compute the total ram and set initial ram availabilities
       this->total_ram = 0.0;
       for (auto host : compute_resources) {
-        double ram = std::get<2>(host);
+        double ram = std::get<1>(host.second);
         if (ram == ComputeService::ALL_RAM) {
-          ram = simulation->getHostMemoryCapacity(std::get<0>(host));
+          ram = simulation->getHostMemoryCapacity(host.first);
         }
         this->total_ram += ram;
-        this->ram_availabilities.insert(std::make_pair(std::get<0>(host),  ram));
+        this->ram_availabilities.insert(std::make_pair(host.first,  ram));
       }
 
       // Create my compute resources record
       for (auto host : compute_resources) {
-        unsigned long num_cores = std::get<1>(host);
+        unsigned long num_cores = std::get<0>(host.second);
         if (num_cores == ComputeService::ALL_CORES) {
-          num_cores = simulation->getHostNumCores(std::get<0>(host));
+          num_cores = simulation->getHostNumCores(host.first);
         }
-        double ram = std::get<2>(host);
+        double ram = std::get<1>(host.second);
         if (ram == ComputeService::ALL_RAM) {
           ram = simulation->getHostMemoryCapacity(std::get<0>(host));
         }
-        this->compute_resources.insert(std::make_tuple(std::get<0>(host), num_cores, ram));
+        this->compute_resources.insert(std::make_pair(host.first, std::make_tuple(num_cores, ram)));
       }
 
     }
@@ -262,7 +262,17 @@ namespace wrench {
       }
 
       /** Create all Workunits **/
-      createWorkunits();
+      std::set<std::unique_ptr<Workunit>> all_work_units = Workunit::createWorkunits(this->job);
+
+      /** Put each workunit either in the "non-ready" list or the "ready" list **/
+      while (not all_work_units.empty()) {
+        auto wu = all_work_units.begin();
+        if ((*wu)->num_pending_parents == 0) {
+          PointerUtil::moveUniquePtrFromSetToSet<Workunit>(wu, &all_work_units, &(this->ready_workunits));
+        } else {
+          PointerUtil::moveUniquePtrFromSetToSet<Workunit>(wu, &all_work_units, &(this->non_ready_workunits));
+        }
+      }
 
       /** Main loop **/
       while (true) {
@@ -462,19 +472,22 @@ namespace wrench {
 
 //        std::cerr << "CREATING A WORKUNIT EXECUTOR\n";
 
-        WorkflowJob* workflow_job = job;
-        if (this->part_of_pilot_job) {
-          workflow_job = this->parent_pilot_job;
-        }
-        std::shared_ptr<WorkunitMulticoreExecutor> workunit_executor = std::shared_ptr<WorkunitMulticoreExecutor>(
-                new WorkunitMulticoreExecutor(this->simulation,
+        // TODO: WAS THIS USEFUL????
+
+//        WorkflowJob* workflow_job = job;
+//        if (this->part_of_pilot_job) {
+//          workflow_job = this->parent_pilot_job;s
+//        }
+
+        std::shared_ptr<WorkunitExecutor> workunit_executor = std::shared_ptr<WorkunitExecutor>(
+                new WorkunitExecutor(this->simulation,
                                               target_host,
                                               target_num_cores,
                                               required_ram,
                                               this->mailbox_name,
                                               wu,
                                               this->scratch_space,
-                                              workflow_job,
+                                              job,
                                               this->getPropertyValueAsDouble(
                                                       StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD),
                                               this->getPropertyValueAsBoolean(
@@ -564,7 +577,7 @@ namespace wrench {
  * @throw std::runtime_error
  */
     void StandardJobExecutor::processWorkunitExecutorCompletion(
-            WorkunitMulticoreExecutor *workunit_executor,
+            WorkunitExecutor *workunit_executor,
             Workunit *workunit) {
 
       // Don't kill me while I am doing this
@@ -647,13 +660,13 @@ namespace wrench {
             }
             if (!found_it) {
               throw std::runtime_error(
-                      "MultihostMulticoreComputeService::processWorkCompletion(): couldn't find non-ready child in non-ready set!");
+                      "BareMetalComputeService::processWorkCompletion(): couldn't find non-ready child in non-ready set!");
             }
 
 
 //            if (this->non_ready_workunits.find(child) == this->non_ready_workunits.end()) {
 //              throw std::runtime_error(
-//                      "MultihostMulticoreComputeService::processWorkCompletion(): can't find non-ready child in non-ready set!");
+//                      "BareMetalComputeService::processWorkCompletion(): can't find non-ready child in non-ready set!");
 //            }
 //            this->non_ready_workunits.erase(child);
 //            this->ready_workunits.insert(child);
@@ -674,7 +687,7 @@ namespace wrench {
  */
 
     void StandardJobExecutor::processWorkunitExecutorFailure(
-            WorkunitMulticoreExecutor *workunit_executor,
+            WorkunitExecutor *workunit_executor,
             Workunit *workunit,
             std::shared_ptr<FailureCause> cause) {
 
@@ -744,104 +757,7 @@ namespace wrench {
 
 
 
-/**
- * @brief Create all work for a newly dispatched job
- * @param job: the job
- */
-    void StandardJobExecutor::createWorkunits() {
 
-      Workunit *pre_file_copies_work_unit = nullptr;
-      std::vector<Workunit *> task_work_units;
-      Workunit *post_file_copies_work_unit = nullptr;
-      Workunit *cleanup_workunit = nullptr;
-
-      // Create the cleanup workunit, if any
-      if (not job->cleanup_file_deletions.empty()) {
-        cleanup_workunit = new Workunit({}, nullptr, {}, {}, job->cleanup_file_deletions);
-      }
-
-      // Create the pre_file_copies work unit, if any
-      if (not job->pre_file_copies.empty()) {
-        pre_file_copies_work_unit = new Workunit(job->pre_file_copies, nullptr, {}, {}, {});
-      }
-
-      // Create the post_file_copies work unit, if any
-      if (not job->post_file_copies.empty()) {
-        post_file_copies_work_unit = new Workunit({}, nullptr, {}, job->post_file_copies, {});
-      }
-
-      // Create the task work units, if any
-      for (auto const &task : job->tasks) {
-        task_work_units.push_back(new Workunit({}, task, job->file_locations, {}, {}));
-      }
-
-      // Add dependencies between task work units, if any
-      for (auto const &task_work_unit : task_work_units) {
-        const WorkflowTask *task = task_work_unit->task;
-
-        if (task->getInternalState() != WorkflowTask::InternalState::TASK_READY) {
-          std::vector<WorkflowTask *> current_task_parents = task->getWorkflow()->getTaskParents(task);
-
-          for (auto const &potential_parent_task_work_unit : task_work_units) {
-            if (std::find(current_task_parents.begin(), current_task_parents.end(), potential_parent_task_work_unit->task) != current_task_parents.end()) {
-              Workunit::addDependency(potential_parent_task_work_unit, task_work_unit);
-            }
-          }
-        }
-      }
-
-      // Add dependencies from pre copies to possible successors
-      if (pre_file_copies_work_unit != nullptr) {
-        if (not task_work_units.empty()) {
-          for (auto const &twu: task_work_units) {
-            Workunit::addDependency(pre_file_copies_work_unit, twu);
-          }
-        } else if (post_file_copies_work_unit != nullptr) {
-          Workunit::addDependency(pre_file_copies_work_unit, post_file_copies_work_unit);
-        } else if (cleanup_workunit != nullptr) {
-          Workunit::addDependency(pre_file_copies_work_unit, cleanup_workunit);
-        }
-      }
-
-      // Add dependencies from tasks to possible successors
-      for (auto const &twu: task_work_units) {
-        if (post_file_copies_work_unit != nullptr) {
-          Workunit::addDependency(twu, post_file_copies_work_unit);
-        } else if (cleanup_workunit != nullptr) {
-          Workunit::addDependency(twu, cleanup_workunit);
-        }
-      }
-
-      // Add dependencies from post copies to possible successors
-      if (post_file_copies_work_unit != nullptr) {
-        if (cleanup_workunit != nullptr) {
-          Workunit::addDependency(post_file_copies_work_unit, cleanup_workunit);
-        }
-      }
-
-      // Create a list of all work units
-      std::vector<Workunit*> all_work_units;
-      if (pre_file_copies_work_unit) all_work_units.push_back(pre_file_copies_work_unit);
-      for (auto const &twu : task_work_units) {
-        all_work_units.push_back(twu);
-      }
-      if (post_file_copies_work_unit) all_work_units.push_back(post_file_copies_work_unit);
-      if (cleanup_workunit) all_work_units.push_back(cleanup_workunit);
-
-      task_work_units.clear();
-
-      // Insert work units in the ready or non-ready queues
-      for (auto const &wu : all_work_units) {
-        if (wu->num_pending_parents == 0) {
-          this->ready_workunits.insert(std::unique_ptr<Workunit>(wu));
-        } else {
-          this->non_ready_workunits.insert(std::unique_ptr<Workunit>(wu));
-        }
-      }
-
-      all_work_units.clear();
-
-    }
 
 
 /**
@@ -963,7 +879,7 @@ namespace wrench {
  * @brief Get the executor's compute resources
  * @return a set of compute resources as <hostname, num cores, bytes of RAM> tuples
  */
-    std::set<std::tuple<std::string, unsigned long, double>>  StandardJobExecutor::getComputeResources() {
+    std::map<std::string, std::tuple<unsigned long, double>>  StandardJobExecutor::getComputeResources() {
       return this->compute_resources;
     }
 

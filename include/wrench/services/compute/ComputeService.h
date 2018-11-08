@@ -83,13 +83,13 @@ namespace wrench {
 
         unsigned long getNumHosts();
 
-        std::vector<unsigned long> getNumCores();
+        std::map<std::string, unsigned long> getNumCores();
 
-        std::vector<unsigned long> getNumIdleCores();
+        std::map<std::string, unsigned long> getNumIdleCores();
 
-        std::vector<double> getMemoryCapacity();
+        std::map<std::string, double> getMemoryCapacity();
 
-        std::vector<double> getCoreFlopRate();
+        std::map<std::string, double> getCoreFlopRate();
 
         double getTTL();
 
@@ -149,7 +149,7 @@ namespace wrench {
 
     private:
 
-        std::map<std::string, std::vector<double>> getServiceResourceInformation();
+        std::map<std::string, std::map<std::string, double>> getServiceResourceInformation();
 
     };
 

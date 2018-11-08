@@ -119,6 +119,13 @@ namespace wrench {
 
       while (should_continue) {
 
+//        WRENCH_INFO("NUM FILES: %lu", this->stored_files.size());
+//        for (auto const &part : this->stored_files) {
+//          WRENCH_INFO("PARTITION: %s", part.first.c_str());
+//          for (auto const &f : part.second) {
+//            WRENCH_INFO("----> %s", f->getID().c_str());
+//          }
+//        }
 
 
         // Post a recv on my standard mailbox_name in case there is none pending
