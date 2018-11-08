@@ -15,3 +15,10 @@ Guide                        {#guide}
     
 2. Storage Services
     1. [Simple](@ref guide-simplestorage)
+
+3. File Registry Services
+    1. [File Registry Service](@ref guide-fileregistry)
+
+4. Network Proximity Services
+    1. [Network Proximity Service](@ref guide-networkproximity)
+
