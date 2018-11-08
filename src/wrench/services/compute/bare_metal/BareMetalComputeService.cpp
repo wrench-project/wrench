@@ -193,10 +193,11 @@ namespace wrench {
 
 
     /**
-     * @brief Asynchronously submit a pilot job to the compute service
+     * @brief Asynchronously submit a pilot job to the compute service. This will raise
+     *        a WorkflowExecutionException as this service does not support pilot jobs.
      *
      * @param job: a pilot job
-     * @param service_specific_args: service specific arguments ({} most likely)
+     * @param service_specific_args: service specific arguments (only {} is supported)
      *
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
