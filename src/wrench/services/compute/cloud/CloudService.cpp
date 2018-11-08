@@ -661,8 +661,8 @@ namespace wrench {
           auto vm = std::get<0>(vm_tuple->second);
           vm->start();
 
-          // TODO: creating a MHMC would not be necessary once auto_restart will be available
-          // create a multihost multicore compute service for the VM
+          // TODO: creating a BareMetal service would not be necessary once auto_restart will be available
+          // create a BareNetak compute service for the VM
           std::map<std::string, std::tuple<unsigned long, double>> compute_resources = {
                   std::make_pair(vm_name, std::make_tuple(std::get<2>(vm_tuple->second), std::get<3>(vm_tuple->second)))};
 
