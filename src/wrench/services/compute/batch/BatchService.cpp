@@ -17,7 +17,7 @@
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/compute/batch/BatchService.h"
 #include "wrench/services/compute/batch/BatchServiceMessage.h"
-#include "wrench/services/compute/multihost_multicore/MultihostMulticoreComputeService.h"
+#include "wrench/services/compute/bare_metal/BareMetalComputeService.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 #include "wrench/simulation/Simulation.h"
@@ -301,10 +301,10 @@ namespace wrench {
       }
 
       //get job time
-      unsigned long time_asked_for = 0;
+      unsigned long time_asked_for_in_minutes = 0;
       it = batch_job_args.find("-t");
       if (it != batch_job_args.end()) {
-        if (sscanf((*it).second.c_str(), "%lu", &time_asked_for) != 1) {
+        if (sscanf((*it).second.c_str(), "%lu", &time_asked_for_in_minutes) != 1) {
           throw std::invalid_argument(
                   "BatchService::submitStandardJob(): Invalid -t value '" + (*it).second + "'");
         }
@@ -319,7 +319,7 @@ namespace wrench {
 
       // Create a Batch Job
       unsigned long jobid = this->generateUniqueJobID();
-      auto *batch_job = new BatchJob(job, jobid, time_asked_for,
+      auto *batch_job = new BatchJob(job, jobid, time_asked_for_in_minutes,
                                      num_hosts, num_cores_per_host, -1, S4U_Simulation::getClock());
 
       // Set job display color
@@ -626,9 +626,9 @@ namespace wrench {
      *              - number of cores (unsigned long)
      *              - bytes of RAM (double)
      */
-    void BatchService::freeUpResources(std::set<std::tuple<std::string, unsigned long, double>> resources) {
+    void BatchService::freeUpResources(std::map<std::string, std::tuple<unsigned long, double>> resources) {
       for (auto r : resources) {
-        this->available_nodes_to_cores[std::get<0>(r)] += std::get<1>(r);
+        this->available_nodes_to_cores[r.first] += std::get<0>(r.second);
       }
     }
 
@@ -705,7 +705,7 @@ namespace wrench {
 
               default:
                 throw std::runtime_error(
-                        "MultihostMulticoreComputeService::terminateRunningStandardJob(): unexpected task state");
+                        "BareMetalComputeService::terminateRunningStandardJob(): unexpected task state");
 
             }
           }
@@ -752,7 +752,7 @@ namespace wrench {
      * @param ram_per_node
      * @return
      */
-    std::set<std::tuple<std::string, unsigned long, double>>
+    std::map<std::string, std::tuple<unsigned long, double>>
     BatchService::scheduleOnHosts(std::string host_selection_algorithm,
                                   unsigned long num_nodes,
                                   unsigned long cores_per_node,
@@ -768,7 +768,7 @@ namespace wrench {
         throw std::runtime_error("BatchService::scheduleOnHosts(): Asking for too many cores per host");
       }
 
-      std::set<std::tuple<std::string, unsigned long, double>> resources = {};
+      std::map<std::string, std::tuple<unsigned long, double>> resources = {};
       std::vector<std::string> hosts_assigned = {};
       if (host_selection_algorithm == "FIRSTFIT") {
         std::map<std::string, unsigned long>::iterator map_it;
@@ -779,7 +779,7 @@ namespace wrench {
             //Remove that many cores from the available_nodes_to_core
             (*map_it).second -= cores_per_node;
             hosts_assigned.push_back((*map_it).first);
-            resources.insert(std::make_tuple((*map_it).first, cores_per_node, ram_per_node));
+            resources.insert(std::make_pair((*map_it).first, std::make_tuple(cores_per_node, ram_per_node)));
             if (++host_count >= num_nodes) {
               break;
             }
@@ -828,7 +828,7 @@ namespace wrench {
           }
           this->available_nodes_to_cores[target_host] -= cores_per_node;
           hosts_assigned.push_back(target_host);
-          resources.insert(std::make_tuple(target_host, cores_per_node, ComputeService::ALL_RAM));
+          resources.insert(std::make_pair(target_host, std::make_tuple(cores_per_node, ComputeService::ALL_RAM)));
         }
       } else if (host_selection_algorithm == "ROUNDROBIN") {
         static unsigned long round_robin_host_selector_idx = 0;
@@ -843,7 +843,7 @@ namespace wrench {
           if (num_available_cores >= cores_per_node) {
             available_nodes_to_cores[cur_host_name] -= cores_per_node;
             hosts_assigned.push_back(cur_host_name);
-            resources.insert(std::make_tuple(cur_host_name, cores_per_node, ram_per_node));
+            resources.insert(std::make_pair(cur_host_name, std::make_tuple(cores_per_node, ram_per_node)));
             if (++host_count >= num_nodes) {
               break;
             }
@@ -914,7 +914,7 @@ namespace wrench {
 
       //Try to schedule hosts based on host selection algorithm
       // Asking for the FULL RAM (TODO: Change this?)
-      std::set<std::tuple<std::string, unsigned long, double>> resources = this->scheduleOnHosts(
+      std::map<std::string, std::tuple<unsigned long, double>> resources = this->scheduleOnHosts(
               this->getPropertyValueAsString(BatchServiceProperty::HOST_SELECTION_ALGORITHM),
               num_nodes_asked_for, cores_per_node_asked_for, ComputeService::ALL_RAM);
 
@@ -1496,9 +1496,9 @@ namespace wrench {
           job_id = std::to_string((*it1)->getJobID());
           this->processPilotJobTimeout((PilotJob *) (*it1)->getWorkflowJob());
           // Update the cores count in the available resources
-          std::set<std::tuple<std::string, unsigned long, double>> resources = (*it1)->getResourcesAllocated();
+          std::map<std::string, std::tuple<unsigned long, double>> resources = (*it1)->getResourcesAllocated();
           for (auto r : resources) {
-            this->available_nodes_to_cores[std::get<0>(r)] += std::get<1>(r);
+            this->available_nodes_to_cores[r.first] += std::get<0>(r.second);
           }
           ComputeServiceTerminatePilotJobAnswerMessage *answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
                   job, this, true, nullptr,
@@ -1696,7 +1696,7 @@ namespace wrench {
      * @param cores_per_node_asked_for
      */
     void
-    BatchService::startJob(std::set<std::tuple<std::string, unsigned long, double>> resources,
+    BatchService::startJob(std::map<std::string, std::tuple<unsigned long, double>> resources,
                            WorkflowJob *workflow_job,
                            BatchJob *batch_job, unsigned long num_nodes_allocated,
                            double allocated_time,
@@ -1747,12 +1747,11 @@ namespace wrench {
 
           return;
         }
-          break;
 
         case WorkflowJob::PILOT: {
           PilotJob *job = (PilotJob *) workflow_job;
-          WRENCH_INFO("Allocating %ld nodes with %ld cores per node to a pilot job",
-                      num_nodes_allocated, cores_per_node_asked_for);
+          WRENCH_INFO("Allocating %ld nodes with %ld cores per node to a pilot job for %.2lf seconds",
+                      num_nodes_allocated, cores_per_node_asked_for, allocated_time);
 
           std::vector<std::string> nodes_for_pilot_job = {};
           for (auto r : resources) {
@@ -1763,11 +1762,14 @@ namespace wrench {
           //set the ending timestamp of the batchjob (pilotjob)
 
           // Create and launch a compute service for the pilot job
+          // (We use a TTL for user information purposes, but an alarm will take care of this)
           std::shared_ptr<ComputeService> cs = std::shared_ptr<ComputeService>(
-                  new MultihostMulticoreComputeService(host_to_run_on,
-                                                       resources,
-                                                       {{MultihostMulticoreComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"},
-                                                        {MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}}, {}, getScratch()
+                  new BareMetalComputeService(host_to_run_on,
+                                              resources,
+                                              {{BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"},
+                                               {BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}},
+                                              {},
+                                              allocated_time,  job, "pilot_job", getScratch()
                   ));
           cs->simulation = this->simulation;
           job->setComputeService(cs);
@@ -1775,7 +1777,7 @@ namespace wrench {
           try {
             cs->start(cs, true);
             batch_job->setBeginTimeStamp(S4U_Simulation::getClock());
-            double timeout_timestamp = std::min<double>(job->getDuration(), allocated_time);
+            double timeout_timestamp = allocated_time;
             batch_job->setEndingTimeStamp(S4U_Simulation::getClock() + timeout_timestamp);
           } catch (std::runtime_error &e) {
             throw;
@@ -1827,53 +1829,54 @@ namespace wrench {
     */
     void BatchService::processGetResourceInformation(const std::string &answer_mailbox) {
       // Build a dictionary
-      std::map<std::string, std::vector<double>> dict;
+      std::map<std::string, std::map<std::string, double>> dict;
 
       // Num hosts
-      std::vector<double> num_hosts;
-      num_hosts.push_back((double) (this->nodes_to_cores_map.size()));
+      std::map<std::string, double> num_hosts;
+      num_hosts.insert(std::make_pair(this->getName(), (double) (this->nodes_to_cores_map.size())));
       dict.insert(std::make_pair("num_hosts", num_hosts));
 
       // Num cores per hosts
-      std::vector<double> num_cores;
+      std::map<std::string, double> num_cores;
       for (auto h : this->nodes_to_cores_map) {
-        num_cores.push_back((double) (h.second));
+        num_cores.insert(std::make_pair(h.first, (double) (h.second)));
       }
       dict.insert(std::make_pair("num_cores", num_cores));
 
       // Num idle cores per hosts
-      std::vector<double> num_idle_cores;
+      std::map<std::string, double> num_idle_cores;
       for (auto h : this->available_nodes_to_cores) {
-        num_idle_cores.push_back((double) (h.second));
+        num_idle_cores.insert(std::make_pair(h.first, (double) (h.second)));
       }
       dict.insert(std::make_pair("num_idle_cores", num_idle_cores));
 
       // Flop rate per host
-      std::vector<double> flop_rates;
+      std::map<std::string, double> flop_rates;
       for (auto h : this->nodes_to_cores_map) {
-        flop_rates.push_back(S4U_Simulation::getHostFlopRate(h.first));
+        flop_rates.insert(std::make_pair(h.first, S4U_Simulation::getHostFlopRate(h.first)));
       }
       dict.insert(std::make_pair("flop_rates", flop_rates));
 
       // RAM capacity per host
-      std::vector<double> ram_capacities;
+      std::map<std::string, double> ram_capacities;
       for (auto h : this->nodes_to_cores_map) {
-        ram_capacities.push_back(S4U_Simulation::getHostMemoryCapacity(h.first));
+        ram_capacities.insert(std::make_pair(h.first, S4U_Simulation::getHostMemoryCapacity(h.first)));
       }
       dict.insert(std::make_pair("ram_capacities", ram_capacities));
 
       // RAM availability per host  (0 if something is running, full otherwise)
-      std::vector<double> ram_availabilities;
+      std::map<std::string, double> ram_availabilities;
       for (auto h : this->available_nodes_to_cores) {
         if (h.second < S4U_Simulation::getHostMemoryCapacity(h.first)) {
-          ram_availabilities.push_back(0.0);
+          ram_availabilities.insert(std::make_pair(h.first, 0.0));
         } else {
-          ram_availabilities.push_back(S4U_Simulation::getHostMemoryCapacity(h.first));
+          ram_availabilities.insert(std::make_pair(h.first, S4U_Simulation::getHostMemoryCapacity(h.first)));
         }
       }
+      dict.insert(std::make_pair("ram_availabilities", ram_availabilities));
 
-      std::vector<double> ttl;
-      ttl.push_back(ComputeService::ALL_RAM);
+      std::map<std::string, double> ttl;
+      ttl.insert(std::make_pair(this->getName(), DBL_MAX));
       dict.insert(std::make_pair("ttl", ttl));
 
       // Send the reply
@@ -1945,9 +1948,9 @@ namespace wrench {
                                                     job->getAllocatedTime() -
                                                     this->simulation->getCurrentSimulatedDate());
         for (auto resource : job->getResourcesAllocated()) {
-          std::string hostname = std::get<0>(resource);
-          unsigned long num_cores = std::get<1>(resource);
-          double ram = std::get<2>(resource);
+          std::string hostname = resource.first;
+          unsigned long num_cores = std::get<0>(resource.second);
+          double ram = std::get<1>(resource.second);
           // Update available_times
           double new_available_time = *(core_available_times[hostname].begin() + num_cores - 1) + time_to_finish;
           for (unsigned int i = 0; i < num_cores; i++) {
@@ -2595,14 +2598,14 @@ namespace wrench {
       double time_in_seconds = batch_job->getAllocatedTime();
       unsigned long cores_per_node_asked_for = batch_job->getAllocatedCoresPerNode();
 
-      std::set<std::tuple<std::string, unsigned long, double>> resources = {};
+      std::map<std::string, std::tuple<unsigned long, double>> resources = {};
       std::vector<std::string> hosts_assigned = {};
       std::map<std::string, unsigned long>::iterator it;
 
       for (auto node:node_resources) {
         this->available_nodes_to_cores[this->host_id_to_names[node]] -= cores_per_node_asked_for;
-        resources.insert(std::make_tuple(this->host_id_to_names[node], cores_per_node_asked_for,
-                                         0)); // TODO: Is setting RAM to 0 ok here?
+        resources.insert(std::make_pair(this->host_id_to_names[node],std::make_tuple( cores_per_node_asked_for,
+                                         0))); // TODO: Is setting RAM to 0 ok here?
       }
 
       startJob(resources, workflow_job, batch_job, num_nodes_allocated, time_in_seconds,

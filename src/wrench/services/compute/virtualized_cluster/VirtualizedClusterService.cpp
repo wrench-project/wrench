@@ -46,10 +46,12 @@ namespace wrench {
       this->setProperties(this->default_property_values, std::move(property_list));
       // Set default and specified message payloads
       this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
+      // Validate Properties (the method from the super class)
+      validateProperties();
     }
 
     /**
-     * @brief Create a MultihostMulticoreComputeService VM on a physical machine
+     * @brief Create a BareMetalComputeService VM on a physical machine
      *
      * @param pm_hostname: the name of the physical machine host
      * @param num_cores: the number of cores the service can use (use ComputeService::ALL_CORES to use all cores
@@ -275,4 +277,6 @@ namespace wrench {
         return;
       }
     }
+
+
 }

@@ -15,7 +15,7 @@
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/compute/cloud/CloudService.h"
-#include "wrench/services/compute/multihost_multicore/MultihostMulticoreComputeService.h"
+#include "wrench/services/compute/bare_metal/BareMetalComputeService.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 
 
@@ -52,6 +52,10 @@ namespace wrench {
 
       // Set default and specified properties
       this->setProperties(this->default_property_values, std::move(property_list));
+
+      // Validate Properties
+      validateProperties();
+
       // Set default and specified message payloads
       this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
     }
@@ -92,7 +96,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Create a MultihostMulticoreComputeService VM (balances load on execution hosts)
+     * @brief Create a BareMetalComputeService VM (balances load on execution hosts)
      *
      * @param num_cores: the number of cores the service can use (use ComputeService::ALL_CORES to use all cores
      *                   available on the host)
@@ -337,15 +341,6 @@ namespace wrench {
       throw std::runtime_error("CloudService::terminateStandardJob(): Not implemented yet!");
     }
 
-    /**
-     * @brief Terminate a pilot job to the compute service (virtual)
-     * @param job: the pilot job
-     *
-     * @throw std::runtime_error
-     */
-    void CloudService::terminatePilotJob(PilotJob *job) {
-      throw std::runtime_error("CloudService::terminatePilotJob(): Not implemented yet!");
-    }
 
     /**
      * @brief Main method of the daemon
@@ -381,7 +376,6 @@ namespace wrench {
 
       serviceSanityCheck();
 
-      // Send a "run a pilot job" message to the daemon's mailbox_name
       try {
         S4U_Mailbox::putMessage(this->mailbox_name, message);
       } catch (std::shared_ptr<NetworkError> &cause) {
@@ -501,7 +495,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Create a MultihostMulticoreComputeService VM on a physical machine
+     * @brief Create a BareMetalComputeService VM on a physical machine
      *
      * @param answer_mailbox: the mailbox to which the answer message should be sent
      * @param pm_hostname: the name of the physical machine host
@@ -547,16 +541,16 @@ namespace wrench {
                   this->getPropertyValueAsDouble(CloudServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS));
           auto vm = std::make_shared<S4U_VirtualMachine>(vm_name, pm_hostname, num_cores, ram_memory);
 
-          // create a multihost multicore compute service for the VM
-          std::set<std::tuple<std::string, unsigned long, double>> compute_resources = {
-                  std::make_tuple(vm_name, num_cores, ram_memory)};
+          // create a BareMetalComputeService compute service for the VM
+          std::map<std::string, std::tuple<unsigned long, double>> compute_resources = {
+                  std::make_pair(vm_name, std::make_tuple(num_cores, ram_memory))};
 
           // Merge the compute service property and message payload lists
           property_list.insert(this->property_list.begin(), this->property_list.end());
           messagepayload_list.insert(this->messagepayload_list.begin(), this->messagepayload_list.end());
 
           std::shared_ptr<ComputeService> cs = std::shared_ptr<ComputeService>(
-                  new MultihostMulticoreComputeService(vm_name,
+                  new BareMetalComputeService(vm_name,
                                                        compute_resources,
                                                        property_list,
                                                        messagepayload_list,
@@ -667,13 +661,13 @@ namespace wrench {
           auto vm = std::get<0>(vm_tuple->second);
           vm->start();
 
-          // TODO: creating a MHMC would not be necessary once auto_restart will be available
-          // create a multihost multicore compute service for the VM
-          std::set<std::tuple<std::string, unsigned long, double>> compute_resources = {
-                  std::make_tuple(vm_name, std::get<2>(vm_tuple->second), std::get<3>(vm_tuple->second))};
+          // TODO: creating a BareMetal service would not be necessary once auto_restart will be available
+          // create a BareNetak compute service for the VM
+          std::map<std::string, std::tuple<unsigned long, double>> compute_resources = {
+                  std::make_pair(vm_name, std::make_tuple(std::get<2>(vm_tuple->second), std::get<3>(vm_tuple->second)))};
 
           std::shared_ptr<ComputeService> cs = std::shared_ptr<ComputeService>(
-                  new MultihostMulticoreComputeService(vm_name,
+                  new BareMetalComputeService(vm_name,
                                                        compute_resources,
                                                        property_list,
                                                        messagepayload_list,
@@ -821,13 +815,16 @@ namespace wrench {
         if (vm->isRunning()) {
 
           ComputeService *cs = std::get<1>(vm_tuple.second).get();
-          std::vector<unsigned long> num_idle_cores = cs->getNumIdleCores();
-          unsigned long sum_idle_cores = (unsigned long) std::accumulate(num_idle_cores.begin(), num_idle_cores.end(),
-                                                                         0);
+          std::map<std::string, unsigned long> num_idle_cores = cs->getNumIdleCores();
+          unsigned long sum_idle_cores = 0;
+          for (auto h : num_idle_cores) {
+            sum_idle_cores += h.second;
+          }
 
           if (std::get<2>(vm_tuple.second) >= job->getMinimumRequiredNumCores() &&
               sum_idle_cores >= job->getMinimumRequiredNumCores()) {
-            cs->submitStandardJob(job, service_specific_args);
+            std::map<std::string, std::string> empty_args;
+            cs->submitStandardJob(job, empty_args);
 
             try {
               S4U_Mailbox::dputMessage(
@@ -868,8 +865,7 @@ namespace wrench {
     void CloudService::processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job,
                                              std::map<std::string, std::string> &service_specific_args) {
 
-      WRENCH_INFO("Asked to run a pilot job with %ld hosts and %ld cores per host for %lf seconds",
-                  job->getNumHosts(), job->getNumCoresPerHost(), job->getDuration());
+      WRENCH_INFO("Asked to run a pilot job");
 
       if (not this->supportsPilotJobs()) {
         try {
@@ -882,63 +878,10 @@ namespace wrench {
           return;
         }
         return;
+      } else {
+        throw std::runtime_error("CloudService::processSubmitPilotJob(): A Cloud service should never support pilot jobs");
       }
 
-      std::map<std::string, std::tuple<std::shared_ptr<S4U_VirtualMachine>, std::shared_ptr<ComputeService>,
-              unsigned long, unsigned long>> vm_local_list = this->vm_list;
-
-
-      // whether the job should be mapped to a particular VM
-      auto vm_it = service_specific_args.find("-vm");
-      if (vm_it != service_specific_args.end()) {
-        vm_local_list.clear();
-        auto vm_tuple_it = this->vm_list.find(vm_it->second);
-        if (vm_tuple_it != this->vm_list.end()) {
-          vm_local_list.insert(std::make_pair(vm_it->second, vm_tuple_it->second));
-        }
-      }
-
-      // count the number of hosts that have enough cores
-      bool available_host = false;
-
-      for (auto &vm_tuple : vm_local_list) {
-        std::shared_ptr<S4U_VirtualMachine> vm = std::get<0>(vm_tuple.second);
-        if (vm->isRunning()) {
-          if (std::get<2>(vm_tuple.second) >= job->getNumCoresPerHost()) {
-            std::map<std::string, std::string> service_specific_arguments;
-            ComputeService *cs = std::get<1>(vm_tuple.second).get();
-            cs->submitPilotJob(job, service_specific_arguments);
-            available_host = true;
-            break;
-          }
-        }
-      }
-
-      // Do we have enough hosts?
-      // currently, the cloud service cannot support the job
-      if (job->getNumHosts() > 1 || not available_host) {
-        try {
-          S4U_Mailbox::dputMessage(
-                  answer_mailbox, new ComputeServiceSubmitPilotJobAnswerMessage(
-                          job, this, false, std::shared_ptr<FailureCause>(new NotEnoughResources(job, this)),
-                          this->getMessagePayloadValueAsDouble(
-                                  CloudServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-          return;
-        }
-        return;
-      }
-
-      // success
-      try {
-        S4U_Mailbox::dputMessage(
-                answer_mailbox, new ComputeServiceSubmitPilotJobAnswerMessage(
-                        job, this, true, nullptr,
-                        this->getMessagePayloadValueAsDouble(
-                                CloudServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        return;
-      }
     }
 
     /**
@@ -947,35 +890,40 @@ namespace wrench {
      */
     void CloudService::processGetResourceInformation(const std::string &answer_mailbox) {
       // Build a dictionary
-      std::map<std::string, std::vector<double>> dict;
+      std::map<std::string, std::map<std::string, double>> dict;
 
       // Num hosts
-      std::vector<double> num_hosts;
-      num_hosts.push_back((double) (this->vm_list.size()));
+      std::map<std::string, double> num_hosts;
+      num_hosts.insert(std::make_pair(this->getName(), (double) (this->vm_list.size())));
       dict.insert(std::make_pair("num_hosts", num_hosts));
 
-      std::vector<double> num_cores;
-      std::vector<double> num_idle_cores;
-      std::vector<double> flop_rates;
-      std::vector<double> ram_capacities;
-      std::vector<double> ram_availabilities;
+      std::map<std::string, double> num_cores;
+      std::map<std::string, double> num_idle_cores;
+      std::map<std::string, double> flop_rates;
+      std::map<std::string, double> ram_capacities;
+      std::map<std::string, double> ram_availabilities;
 
       for (auto &vm : this->vm_list) {
+
         // Num cores per vm
-        num_cores.push_back(std::get<2>(vm.second));
+        num_cores.insert(std::make_pair(vm.first, (double) std::get<2>(vm.second)));
 
         // Num idle cores per vm
-        std::vector<unsigned long> idle_core_counts = std::get<1>(vm.second)->getNumIdleCores();
-        num_idle_cores.push_back(std::accumulate(idle_core_counts.begin(), idle_core_counts.end(), 0));
+        std::map<std::string, unsigned long> idle_core_counts = std::get<1>(vm.second)->getNumIdleCores();
+        unsigned long total_count = 0;
+        for (auto & c : idle_core_counts) {
+          total_count += c.second;
+        }
+        num_idle_cores.insert(std::make_pair(vm.first, (double)total_count));
 
         // Flop rate per vm
-        flop_rates.push_back(S4U_Simulation::getHostFlopRate(vm.first));
+        flop_rates.insert(std::make_pair(vm.first, S4U_Simulation::getHostFlopRate(vm.first)));
 
         // RAM capacity per host
-        ram_capacities.push_back(S4U_Simulation::getHostMemoryCapacity(vm.first));
+        ram_capacities.insert(std::make_pair(vm.first, S4U_Simulation::getHostMemoryCapacity(vm.first)));
 
         // RAM availability per
-        ram_availabilities.push_back(S4U_Simulation::getHostMemoryCapacity(vm.first));
+        ram_availabilities.insert(std::make_pair(vm.first, S4U_Simulation::getHostMemoryCapacity(vm.first)));
       }
 
       dict.insert(std::make_pair("num_cores", num_cores));
@@ -984,8 +932,8 @@ namespace wrench {
       dict.insert(std::make_pair("ram_capacities", ram_capacities));
       dict.insert(std::make_pair("ram_availabilities", ram_availabilities));
 
-      std::vector<double> ttl;
-      ttl.push_back(ComputeService::ALL_RAM);
+      std::map<std::string, double> ttl;
+      ttl.insert(std::make_pair(this->getName(), DBL_MAX));
       dict.insert(std::make_pair("ttl", ttl));
 
       // Send the reply
@@ -1018,4 +966,41 @@ namespace wrench {
       }
       this->vm_list.clear();
     }
+
+    /**
+     * @brief Validate the service's properties
+     *
+     * @throw std::invalid_argument
+     */
+    void CloudService::validateProperties() {
+
+      // Supporting Pilot jobs
+      if (this->getPropertyValueAsBoolean(CloudServiceProperty::SUPPORTS_PILOT_JOBS)) {
+        throw std::invalid_argument("Invalid SUPPORTS_PILOT_JOBS property specification: a CloudService cannot support pilot jobs");
+      }
+
+      // VM Boot overhead
+      bool success = true;
+      double vm_boot_overhead = 0;
+      try {
+        vm_boot_overhead = this->getPropertyValueAsDouble(CloudServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS);
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+
+      if ((!success) or (vm_boot_overhead < 0)) {
+        throw std::invalid_argument("Invalid THREAD_STARTUP_OVERHEAD property specification: " +
+                                    this->getPropertyValueAsString(CloudServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS));
+      }
+    }
+
+  /**
+   * @brief non-implemented
+   * @param job: a pilot job to (supposedly) terminate
+   */
+    void CloudService::terminatePilotJob(PilotJob *job) {
+      throw std::runtime_error("CloudService::terminatePilotJob(): not implemented because CloudService never supports pilot jobs");
+    }
+
+
 }

@@ -171,9 +171,9 @@ void WMSOptimizationsTest::do_staticOptimization_test() {
   // Create a MHMC Service
   std::set<std::string> execution_hosts = {simulation->getHostnameList()[1]};
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(
+          new wrench::BareMetalComputeService(
                   hostname, execution_hosts, 100.0,
-                  {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
+                  {{wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
 
   // Create a WMS
   wrench::Workflow *workflow = this->createWorkflow();
@@ -306,9 +306,9 @@ void WMSOptimizationsTest::do_dynamicOptimization_test() {
   // Create a MHMC Service
   std::set<std::string> execution_hosts = {simulation->getHostnameList()[1]};
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(
+          new wrench::BareMetalComputeService(
                   hostname, execution_hosts, 100.0,
-                  {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
+                  {{wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
 
   // Create a WMS
   wrench::Workflow *workflow = this->createWorkflow();

@@ -169,9 +169,11 @@ namespace wrench {
           }
 
           // set the number of available cores
-          unsigned long sum_num_idle_cores;
-          std::vector<unsigned long> num_idle_cores = cs->getNumIdleCores();
-          sum_num_idle_cores = std::accumulate(num_idle_cores.begin(), num_idle_cores.end(), 0ul);
+          std::map<std::string, unsigned long> num_idle_cores = cs->getNumIdleCores();
+          unsigned long sum_num_idle_cores = 0;
+          for (auto h : num_idle_cores) {
+            sum_num_idle_cores += h.second;
+          }
           this->compute_resources_map.insert(std::make_pair(cs, sum_num_idle_cores));
         }
       } catch (std::runtime_error &e) {

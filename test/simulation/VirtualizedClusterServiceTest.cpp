@@ -16,6 +16,10 @@
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
 
+XBT_LOG_NEW_DEFAULT_CATEGORY(virtualized_cluster_service_test, "Log category for VirtualizedClusterServiceTest");
+
+#define EPSILON 0.001
+
 class VirtualizedClusterServiceTest : public ::testing::Test {
 
 public:
@@ -199,7 +203,7 @@ void VirtualizedClusterServiceTest::do_StandardJobTaskTest_test() {
   std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
   ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::CloudService(hostname, execution_hosts, 100,
-                                   {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
+                                   {{wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -319,14 +323,14 @@ void VirtualizedClusterServiceTest::do_VMMigrationTest_test() {
   std::vector<std::string> nothing;
   ASSERT_THROW(compute_service = simulation->add(
           new wrench::VirtualizedClusterService(hostname, nothing, 100.0,
-                                                {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS,
+                                                {{wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS,
                                                          "false"}})), std::invalid_argument);
 
   // Create a Virtualized Cluster Service
   std::vector<std::string> execution_hosts = simulation->getHostnameList();
   ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::VirtualizedClusterService(hostname, execution_hosts, 100.0,
-                                                {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS,
+                                                {{wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS,
                                                          "false"}})));
 
   // Create a WMS
@@ -351,187 +355,6 @@ void VirtualizedClusterServiceTest::do_VMMigrationTest_test() {
 }
 
 
-/**********************************************************************/
-/**  PILOT JOB SUBMISSION TASK SIMULATION TEST ON ONE HOST           **/
-/**********************************************************************/
-
-class CloudPilotJobTestWMS : public wrench::WMS {
-
-public:
-    CloudPilotJobTestWMS(VirtualizedClusterServiceTest *test,
-                         const std::set<wrench::ComputeService *> &compute_services,
-                         const std::set<wrench::StorageService *> &storage_services,
-                         std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
-      this->test = test;
-    }
-
-private:
-
-    VirtualizedClusterServiceTest *test;
-
-    int main() {
-      // Create a data movement manager
-      std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
-
-      // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
-
-
-      // Create VMs
-      auto cs = (wrench::CloudService *) this->test->compute_service;
-      std::string specific_vm;
-
-      try {
-//        std::string execution_host = cs->getExecutionHosts()[0];
-
-        specific_vm = cs->createVM(1, 10);
-        cs->createVM(1, 10);
-        cs->createVM(1, 10);
-        cs->createVM(1, 10);
-      } catch (wrench::WorkflowExecutionException &e) {
-        throw std::runtime_error(e.what());
-      }
-
-      // Submit a pilot job for execution (1 host, 1 core, 0 bytes, and 1 minute)
-      wrench::PilotJob *pilot_job = job_manager->createPilotJob(1, 1, 0.0, 60.0);
-      try {
-        job_manager->submitJob(pilot_job, this->test->compute_service);
-
-      } catch (wrench::WorkflowExecutionException &e) {
-        throw std::runtime_error(e.what());
-      }
-
-      // Wait for a workflow execution event (PILOT JOB START)
-      std::unique_ptr<wrench::WorkflowExecutionEvent> event;
-      try {
-        event = this->getWorkflow()->waitForNextExecutionEvent();
-      } catch (wrench::WorkflowExecutionException &e) {
-        throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
-      }
-      switch (event->type) {
-        case wrench::WorkflowExecutionEvent::PILOT_JOB_START: {
-          // success, do nothing for now
-          break;
-        }
-        default: {
-          throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
-        }
-      }
-      // Wait for a workflow execution event (PILOT JOB EXPIRATION)
-      try {
-        event = this->getWorkflow()->waitForNextExecutionEvent();
-      } catch (wrench::WorkflowExecutionException &e) {
-        throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
-      }
-      switch (event->type) {
-        case wrench::WorkflowExecutionEvent::PILOT_JOB_EXPIRATION: {
-          // success, do nothing for now
-          break;
-        }
-        default: {
-          throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
-        }
-      }
-
-      // Submit a pilot job for execution on a BOGUS VM (1 host, 1 core, 0 bytes, and 1 minute)
-      job_manager->forgetJob(pilot_job);
-      pilot_job = job_manager->createPilotJob(1, 1, 0.0, 60.0);
-      bool success = true;
-      try {
-        std::map<std::string, std::string> invalid_properties_map;
-        invalid_properties_map.insert(std::make_pair("-vm", "non-existent-vm"));
-        job_manager->submitJob(pilot_job, this->test->compute_service, invalid_properties_map);
-      } catch (wrench::WorkflowExecutionException &e) {
-        success = false;
-      }
-      if (success) {
-        throw std::runtime_error("Should not be able to submit a job to a bogus VM");
-      }
-
-      // Submit a pilot job for execution on a specific VM (1 host, 1 core, 0 bytes, and 1 minute)
-      job_manager->forgetJob(pilot_job);
-      pilot_job = job_manager->createPilotJob(1, 1, 0.0, 60.0);
-      try {
-        std::map<std::string, std::string> invalid_properties_map;
-        invalid_properties_map.insert(std::make_pair("-vm", specific_vm));
-        job_manager->submitJob(pilot_job, this->test->compute_service, invalid_properties_map);
-      } catch (wrench::WorkflowExecutionException &e) {
-        throw std::runtime_error(e.what());
-      }
-
-
-      // Wait for a workflow execution event (PILOT JOB START)
-      try {
-        event = this->getWorkflow()->waitForNextExecutionEvent();
-      } catch (wrench::WorkflowExecutionException &e) {
-        throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
-      }
-      switch (event->type) {
-        case wrench::WorkflowExecutionEvent::PILOT_JOB_START: {
-          // success, do nothing for now
-          break;
-        }
-        default: {
-          throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
-        }
-      }
-
-      return 0;
-    }
-};
-
-TEST_F(VirtualizedClusterServiceTest, CloudPilotJobTestWMS) {
-  DO_TEST_WITH_FORK(do_PilotJobTaskTest_test);
-}
-
-void VirtualizedClusterServiceTest::do_PilotJobTaskTest_test() {
-
-  // Create and initialize a simulation
-  auto *simulation = new wrench::Simulation();
-  int argc = 1;
-  auto argv = (char **) calloc(1, sizeof(char *));
-  argv[0] = strdup("cloud_service_test");
-
-  ASSERT_NO_THROW(simulation->init(&argc, argv));
-
-  // Setting up the platform
-  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
-
-  // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
-
-  // Create a Storage Service
-  ASSERT_NO_THROW(storage_service = simulation->add(
-          new wrench::SimpleStorageService(hostname, 100.0)));
-
-  // Create a Cloud Service
-  std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
-  ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::CloudService(hostname, execution_hosts, 0,
-                                   {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}})));
-
-  // Create a WMS
-  wrench::WMS *wms = nullptr;
-  ASSERT_NO_THROW(wms = simulation->add(
-          new CloudPilotJobTestWMS(this, {compute_service}, {storage_service}, hostname)));
-
-  ASSERT_NO_THROW(wms->addWorkflow(workflow));
-
-  // Create a file registry
-  ASSERT_NO_THROW(simulation->add(
-          new wrench::FileRegistryService(hostname)));
-
-  // Staging the input_file on the storage service
-  ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
-
-  // Running a "run a single task" simulation
-  ASSERT_NO_THROW(simulation->launch());
-
-  delete simulation;
-  free(argv[0]);
-  free(argv);
-}
 
 /**********************************************************************/
 /**  NUM CORES TEST                                                  **/
@@ -555,11 +378,17 @@ private:
     int main() {
       try {
         // no VMs
-        std::vector<unsigned long> num_cores = this->test->compute_service->getNumCores();
+        std::map<std::string, unsigned long> num_cores = this->test->compute_service->getNumCores();
+        unsigned long sum_num_cores = 0;
+        for (auto const &c : num_cores) {
+          sum_num_cores += c.second;
+        }
 
-        unsigned long sum_num_cores = (unsigned long) std::accumulate(num_cores.begin(), num_cores.end(), 0);
-        std::vector<unsigned long> num_idle_cores = this->test->compute_service->getNumIdleCores();
-        unsigned long sum_num_idle_cores = (unsigned long) std::accumulate(num_idle_cores.begin(), num_cores.end(), 0);
+        std::map<std::string, unsigned long> num_idle_cores = this->test->compute_service->getNumIdleCores();
+        unsigned long sum_num_idle_cores = 0;
+        for (auto const &c : num_idle_cores) {
+          sum_num_idle_cores += c.second;
+        }
 
         if (sum_num_cores != 0 || sum_num_idle_cores != 0) {
           throw std::runtime_error("getHostNumCores() and getNumIdleCores() should be 0.");
@@ -569,10 +398,16 @@ private:
         auto cs = (wrench::CloudService *) this->test->compute_service;
         cs->createVM(0, 10);
         num_cores = cs->getNumCores();
-        sum_num_cores = (unsigned long) std::accumulate(num_cores.begin(), num_cores.end(), 0);
+        sum_num_cores = 0;
+        for (auto const &c : num_cores) {
+          sum_num_cores += c.second;
+        }
 
         num_idle_cores = cs->getNumIdleCores();
-        sum_num_idle_cores = (unsigned long) std::accumulate(num_idle_cores.begin(), num_idle_cores.end(), 0);
+        sum_num_idle_cores = 0;
+        for (auto const &c : num_idle_cores) {
+          sum_num_idle_cores += c.second;
+        }
 
         if (sum_num_cores != 4 || sum_num_idle_cores != 4) {
           throw std::runtime_error("getHostNumCores() and getNumIdleCores() should be 4.");
@@ -581,10 +416,15 @@ private:
         // create a VM with two cores
         cs->createVM(2, 10);
         num_cores = cs->getNumCores();
-        sum_num_cores = (unsigned long) std::accumulate(num_cores.begin(), num_cores.end(), 0);
-
+        sum_num_cores = 0;
+        for (auto const &c : num_cores) {
+          sum_num_cores += c.second;
+        }
         num_idle_cores = cs->getNumIdleCores();
-        sum_num_idle_cores = (unsigned long) std::accumulate(num_idle_cores.begin(), num_idle_cores.end(), 0);
+        sum_num_idle_cores = 0;
+        for (auto const &c : num_idle_cores) {
+          sum_num_idle_cores += c.second;
+        }
 
         if (sum_num_cores != 6 || sum_num_idle_cores != 6) {
           throw std::runtime_error("getHostNumCores() and getNumIdleCores() should be 6.");
@@ -626,7 +466,7 @@ void VirtualizedClusterServiceTest::do_NumCoresTest_test() {
   std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
   ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::CloudService(hostname, execution_hosts, 0,
-                                   {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
+                                   {{wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -682,10 +522,7 @@ private:
       // Create a job manager
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
-      // Create a pilot job that requests 1 host, 1 code, 0 bytes, and 1 minute
-      wrench::PilotJob *pilot_job = job_manager->createPilotJob(1, 1, 0.0, 60.0);
-
-      // Submit the pilot job for execution
+      // Create a bunch of VMs
       try {
         auto cs = (wrench::VirtualizedClusterService *) this->test->compute_service;
         std::string execution_host = cs->getExecutionHosts()[0];
@@ -695,32 +532,11 @@ private:
         cs->createVM(execution_host, 1, 10);
         cs->createVM(execution_host, 1, 10);
 
-        job_manager->submitJob(pilot_job, this->test->compute_service);
-
       } catch (wrench::WorkflowExecutionException &e) {
         throw std::runtime_error(e.what());
       }
 
-      // Wait for a workflow execution event
-      std::unique_ptr<wrench::WorkflowExecutionEvent> event;
-      try {
-        event = this->getWorkflow()->waitForNextExecutionEvent();
-      } catch (wrench::WorkflowExecutionException &e) {
-        throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
-      }
-      switch (event->type) {
-        case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-          // success, do nothing for now
-          break;
-        }
-        case wrench::WorkflowExecutionEvent::PILOT_JOB_START: {
-          // success, do nothing for now
-          break;
-        }
-        default: {
-          throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
-        }
-      }
+      this->simulation->sleep(10);
 
       // stop all VMs
       this->test->compute_service->stop();
@@ -757,7 +573,7 @@ void VirtualizedClusterServiceTest::do_StopAllVMsTest_test() {
   std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
   ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::VirtualizedClusterService(hostname, execution_hosts, 0,
-                                                {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}})));
+                                                {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -815,13 +631,13 @@ private:
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       // Create a pilot job that requests 1 host, 1 code, 0 bytes, and 1 minute
-      wrench::PilotJob *pilot_job = job_manager->createPilotJob(1, 1, 0.0, 60.0);
+//      wrench::PilotJob *pilot_job = job_manager->createPilotJob(1, 1, 0.0, 60.0);
 
       std::vector<std::string> vm_list;
 
       auto cs = (wrench::VirtualizedClusterService *) this->test->compute_service;
 
-      // Submit the pilot job for execution
+      // Create VMs
       try {
         std::string execution_host = cs->getExecutionHosts()[0];
 
@@ -834,9 +650,9 @@ private:
         throw std::runtime_error(e.what());
       }
 
+      this->simulation->sleep(1);
       // shutdown VMs
       try {
-
         for (auto &vm : vm_list) {
           if (!cs->shutdownVM(vm)) {
             throw std::runtime_error("Unable to shutdown VM");
@@ -846,23 +662,31 @@ private:
         throw std::runtime_error(e.what());
       }
 
+      // Create a one-task job
+      wrench::StandardJob *job = job_manager->createStandardJob(this->test->task1,
+                                                                {std::make_pair(this->test->input_file,
+                                                                                 this->test->storage_service),
+                                                                 std::make_pair(this->test->output_file1,
+                                                                                this->test->storage_service)});
+
+      // Submit a job
       try {
-        job_manager->submitJob(pilot_job, this->test->compute_service);
+        job_manager->submitJob(job, this->test->compute_service);
         throw std::runtime_error("should have thrown an exception since there are no resources available");
       } catch (wrench::WorkflowExecutionException &e) {
         // do nothing, should have thrown an exception since there are no resources available
       }
 
+
       try {
         cs->startVM(vm_list[3]);
-        job_manager->submitJob(pilot_job, this->test->compute_service);
       } catch (std::runtime_error &e) {
         throw std::runtime_error(e.what());
       }
 
       try {
         cs->suspendVM(vm_list[3]);
-        job_manager->submitJob(pilot_job, this->test->compute_service);
+        job_manager->submitJob(job, this->test->compute_service);
         throw std::runtime_error("should have thrown an exception since there are no resources available");
       } catch (wrench::WorkflowExecutionException &e) {
         // do nothing, should have thrown an exception since there are no resources available
@@ -872,7 +696,6 @@ private:
         if (!cs->resumeVM(vm_list[3])) {
           throw std::runtime_error("Could not resume the VM");
         }
-        job_manager->submitJob(pilot_job, this->test->compute_service);
       } catch (std::runtime_error &e) {
         throw std::runtime_error(e.what());
       }
@@ -880,6 +703,8 @@ private:
       if (cs->resumeVM(vm_list[3])) {
         throw std::runtime_error("VM was already resumed, so an exception was expected!");
       }
+
+      job_manager->submitJob(job, this->test->compute_service);
 
       // Wait for a workflow execution event
       std::unique_ptr<wrench::WorkflowExecutionEvent> event;
@@ -893,14 +718,70 @@ private:
           // success, do nothing for now
           break;
         }
-        case wrench::WorkflowExecutionEvent::PILOT_JOB_START: {
-          // success, do nothing for now
-          break;
-        }
         default: {
           throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
         }
       }
+
+      // Submit a job and suspend the VM before that job finishes
+      wrench::StandardJob *other_job = job_manager->createStandardJob(this->test->task2,
+                                                                {std::make_pair(this->test->input_file,
+                                                                                this->test->storage_service),
+                                                                 std::make_pair(this->test->output_file2,
+                                                                                this->test->storage_service)});
+
+      try {
+        WRENCH_INFO("Submitting a job");
+        job_manager->submitJob(other_job, this->test->compute_service);
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error("Should be able to submit the other job");
+      }
+      double job_start_date = this->simulation->getCurrentSimulatedDate();
+
+      WRENCH_INFO("Sleeping for 5 seconds");
+      this->simulation->sleep(5);
+
+      try {
+        WRENCH_INFO("Suspending the one running VM (which is thus running the job)");
+        cs->suspendVM(vm_list[3]);
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error("Should be able to suspend VM");
+      }
+
+
+      WRENCH_INFO("Sleeping for 100 seconds");
+      this->simulation->sleep(100);
+
+      try {
+        WRENCH_INFO("Resuming the VM");
+        cs->resumeVM(vm_list[3]);
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error("Should be able to resume VM");
+      }
+
+      // Wait for a workflow execution event
+      WRENCH_INFO("Waiting for job completion");
+      std::unique_ptr<wrench::WorkflowExecutionEvent> event2;
+      try {
+        event2 = this->getWorkflow()->waitForNextExecutionEvent();
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+      }
+      switch (event2->type) {
+        case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
+          // success, do nothing for now
+          break;
+        }
+        default: {
+          throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event2->type)));
+        }
+      }
+
+      double job_turnaround_time = this->simulation->getCurrentSimulatedDate() - job_start_date;
+      if (fabs(job_turnaround_time - 110) > EPSILON) {
+        throw std::runtime_error("Unexpected job turnaround time " + std::to_string(job_turnaround_time));
+      }
+
 
       // attempt to shutdown non-existent VM
       try {
@@ -942,9 +823,13 @@ void VirtualizedClusterServiceTest::do_ShutdownVMTest_test() {
 
   // Create a Cloud Service
   std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
+  ASSERT_THROW(compute_service = simulation->add(
+          new wrench::VirtualizedClusterService(hostname, execution_hosts, 0,
+                                                {{wrench::VirtualizedClusterServiceProperty::SUPPORTS_PILOT_JOBS, "true"}})), std::invalid_argument);
+
   ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::VirtualizedClusterService(hostname, execution_hosts, 0,
-                                                {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}})));
+                                                {{wrench::VirtualizedClusterServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -1004,7 +889,7 @@ private:
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       // Create a pilot job that requests 1 host, 1 code, 0 bytes, and 1 minute
-      wrench::PilotJob *pilot_job = job_manager->createPilotJob(1, 1, 0.0, 60.0);
+      wrench::PilotJob *pilot_job = job_manager->createPilotJob();
 
       std::vector<std::string> vm_list;
 
@@ -1073,7 +958,7 @@ void VirtualizedClusterServiceTest::do_ShutdownVMAndThenShutdownServiceTest_test
   std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
   ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::VirtualizedClusterService(hostname, execution_hosts, 0,
-                                                {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}})));
+                                                {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -1212,6 +1097,7 @@ private:
           throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
         }
       }
+
 
       return 0;
     }

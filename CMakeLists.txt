@@ -64,14 +64,14 @@ set(HEADER_FILES
         include/wrench/services/compute/ComputeServiceProperty.h
         include/wrench/services/compute/ComputeServiceMessagePayload.h
         include/wrench/services/compute/ComputeServiceMessage.h
-        include/wrench/services/compute/standard_job_executor/Workunit.h
-        include/wrench/services/compute/standard_job_executor/WorkunitMulticoreExecutor.h
+        include/wrench/services/compute/workunit_executor/Workunit.h
+        include/wrench/services/compute/workunit_executor/WorkunitExecutor.h
         include/wrench/services/compute/standard_job_executor/StandardJobExecutor.h
         include/wrench/services/compute/standard_job_executor/StandardJobExecutorProperty.h
         include/wrench/services/compute/standard_job_executor/StandardJobExecutorMessagePayload.h
-        include/wrench/services/compute/multihost_multicore/MultihostMulticoreComputeService.h
-        include/wrench/services/compute/multihost_multicore/MultihostMulticoreComputeServiceProperty.h
-        include/wrench/services/compute/multihost_multicore/MultihostMulticoreComputeServiceMessagePayload.h
+        include/wrench/services/compute/bare_metal/BareMetalComputeService.h
+        include/wrench/services/compute/bare_metal/BareMetalComputeServiceProperty.h
+        include/wrench/services/compute/bare_metal/BareMetalComputeServiceMessagePayload.h
         include/wrench/services/compute/virtualized_cluster/VirtualizedClusterService.h
         include/wrench/services/compute/virtualized_cluster/VirtualizedClusterServiceProperty.h
         include/wrench/services/compute/virtualized_cluster/VirtualizedClusterServiceMessagePayload.h
@@ -140,7 +140,7 @@ set(SOURCE_FILES
         src/wrench/wms/WMSMessage.h
         src/wrench/wms/WMSMessage.cpp
         src/wrench/services/compute/ComputeService.cpp
-        src/wrench/services/compute/multihost_multicore/MultihostMulticoreComputeService.cpp
+        src/wrench/services/compute/bare_metal/BareMetalComputeService.cpp
         src/wrench/workflow/job/PilotJob.cpp
         src/wrench/managers/JobManager.cpp
         src/wrench/managers/DataMovementManager.cpp
@@ -162,8 +162,8 @@ set(SOURCE_FILES
         src/wrench/services/storage/StorageServiceMessagePayload.cpp
         src/wrench/services/file_registry/FileRegistryServiceProperty.cpp
         src/wrench/services/file_registry/FileRegistryServiceMessagePayload.cpp
-        src/wrench/services/compute/multihost_multicore/MultihostMulticoreComputeServiceProperty.cpp
-        src/wrench/services/compute/multihost_multicore/MultihostMulticoreComputeServiceMessagePayload.cpp
+        src/wrench/services/compute/bare_metal/BareMetalComputeServiceProperty.cpp
+        src/wrench/services/compute/bare_metal/BareMetalComputeServiceMessagePayload.cpp
         src/wrench/services/storage/simple/SimpleStorageServiceProperty.cpp
         src/wrench/services/storage/simple/SimpleStorageServiceMessagePayload.cpp
         src/wrench/workflow/execution_events/FailureCause.cpp
@@ -185,10 +185,10 @@ set(SOURCE_FILES
         src/wrench/services/compute/cloud/CloudServiceMessagePayload.cpp
         src/wrench/services/compute/cloud/CloudServiceMessage.h
         src/wrench/services/compute/cloud/CloudServiceMessage.cpp
-        src/wrench/services/compute/standard_job_executor/ComputeThread.h
-        src/wrench/services/compute/standard_job_executor/ComputeThread.cpp
-        src/wrench/services/compute/standard_job_executor/Workunit.cpp
-        src/wrench/services/compute/standard_job_executor/WorkunitMulticoreExecutor.cpp
+        src/wrench/services/compute/work_unit_executor/ComputeThread.h
+        src/wrench/services/compute/work_unit_executor/ComputeThread.cpp
+        src/wrench/services/compute/work_unit_executor/Workunit.cpp
+        src/wrench/services/compute/work_unit_executor/WorkunitExecutor.cpp
         src/wrench/services/compute/standard_job_executor/StandardJobExecutorMessage.h
         src/wrench/services/compute/standard_job_executor/StandardJobExecutorMessage.cpp
         src/wrench/services/compute/standard_job_executor/StandardJobExecutor.cpp
@@ -235,7 +235,7 @@ set(TEST_FILES
         test/workflow/WorkflowTaskTest.cpp
         test/workflow/WorkflowLoadFromDAXTest.cpp
         test/workflow/WorkflowLoadFromJSONTest.cpp
-        test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceOneTaskTest.cpp
+        test/simulation/BareMetalComputeService/BareMetalComputeServiceOneTaskTest.cpp
         test/simulation/SimpleStorageService/InternalNetworkConnectionTest.cpp
         test/simulation/SimpleStorageService/SimpleStorageServiceFunctionalTest.cpp
         test/simulation/SimpleStorageService/SimpleStorageServicePerformanceTest.cpp
@@ -243,11 +243,11 @@ set(TEST_FILES
         test/simulation/SimpleStorageService/StorageServiceDeleteRegisterTest.cpp
         test/simulation/SimpleStorageService/DataMovementManagerCopyRegisterTest.cpp
         test/simulation/SimpleStorageService/ZeroSizeFileTest.cpp
-        test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceTestStandardJobs.cpp
-        test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceTestPilotJobs.cpp
-        test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceSchedulingTest.cpp
-        test/simulation/MultihostMulticoreComputeService/StandardJobExecutorTest.cpp
-        test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceResourceInformationTest.cpp
+        test/simulation/BareMetalComputeService/BareMetalComputeServiceTestStandardJobs.cpp
+        test/simulation/BareMetalComputeService/BareMetalComputeServiceTestPilotJobs.cpp
+        test/simulation/BareMetalComputeService/BareMetalComputeServiceSchedulingTest.cpp
+        test/simulation/BareMetalComputeService/StandardJobExecutorTest.cpp
+        test/simulation/BareMetalComputeService/BareMetalComputeServiceResourceInformationTest.cpp
         test/simulation/BatchService/BatchServiceTest.cpp
         test/simulation/BatchService/BatchServiceFCFSTest.cpp
         test/simulation/BatchService/BatchServiceTraceFileTest.cpp

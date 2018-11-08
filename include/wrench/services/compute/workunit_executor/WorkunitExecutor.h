@@ -35,11 +35,11 @@ namespace wrench {
     /**
      * @brief An service that performs a WorkUnit
      */
-    class WorkunitMulticoreExecutor : public Service {
+    class WorkunitExecutor : public Service {
 
     public:
 
-        WorkunitMulticoreExecutor(
+        WorkunitExecutor(
                      Simulation *simulation,
                      std::string hostname,
                      unsigned long num_cores,
@@ -47,13 +47,14 @@ namespace wrench {
                      std::string callback_mailbox,
                      Workunit *workunit,
                      StorageService *scratch_space,
-                     WorkflowJob* job,
+                     StandardJob* job,
                      double thread_startup_overhead,
                      bool simulate_computation_as_sleep);
 
         void kill();
 
         unsigned long getNumCores();
+        StandardJob *getJob();
         double getMemoryUtilization();
         std::set<WorkflowFile*> getFilesStoredInScratch();
 
@@ -80,7 +81,7 @@ namespace wrench {
         std::vector<std::shared_ptr<ComputeThread>> compute_threads;
 
         // a reference to the job it is a part of (currently required for creating the /tmp directory in scratch space)
-        WorkflowJob* job;
+        StandardJob* job;
 
     };
 

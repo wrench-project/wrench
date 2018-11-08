@@ -197,10 +197,11 @@ void SimpleStorageServiceLimitedConnectionsTest::do_ConcurrencyFileCopies_test()
 
   // Create a (unused) Compute Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-                  new wrench::MultihostMulticoreComputeService("WMSHost",
-                                                               {std::make_tuple("WMSHost", wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                  new wrench::BareMetalComputeService("WMSHost",
+                                                               {std::make_pair("WMSHost",
+                                                                               std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
                                                                0,
-                                                               {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}, {wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS, "true"}})));
+                                                               {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}, {wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
 
   // Create a Local storage service with unlimited connections
   ASSERT_NO_THROW(storage_service_wms = simulation->add(

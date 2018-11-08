@@ -118,6 +118,9 @@ namespace wrench {
          */
         double network_timeout = 30.0;
 
+    private:
+        bool shutting_down = false;
+
         /***********************/
         /** \endcond           */
         /***********************/

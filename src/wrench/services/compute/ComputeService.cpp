@@ -38,7 +38,11 @@ namespace wrench {
      * @brief Submit a job to the compute service
      * @param job: the job
      * @param service_specific_args: arguments specific to compute services when needed:
-     *      - to a MultihostMulticoreComputeService: {}
+     *      - to a BareMetalComputeService: {}
+     *          - If no entry is provided for a taskID, the service will pick on which host and with how many cores to run the task
+     *          - If a number of cores is provided (e.g., {"task1", "12"}), the service will pick the host on which to run the task
+     *          - If a hostname and a number of cores is provided (e.g., {"task1", "host1:12"}, the service will run the task on that host
+     *            with the specified number of cores
      *      - to a BatchService: {"-t":"<int>","-N":"<int>","-c":"<int>"} (SLURM-like)
      *         - "-t": number of requested job duration in minutes
      *         - "-N": number of requested compute hosts
@@ -188,7 +192,7 @@ namespace wrench {
      */
     unsigned long ComputeService::getNumHosts() {
 
-      std::map<std::string, std::vector<double>> dict;
+      std::map<std::string, std::map<std::string, double>> dict;
       try {
         dict = this->getServiceResourceInformation();
       } catch (WorkflowExecutionException &e) {
@@ -198,7 +202,7 @@ namespace wrench {
       }
 
       if (dict.find("num_hosts") != dict.end()) {
-        return (unsigned long) (*(dict["num_hosts"].begin()));
+        return (unsigned long) (*(dict["num_hosts"].begin())).second;
       } else {
         return 0;
       }
@@ -207,14 +211,14 @@ namespace wrench {
 
     /**
       * @brief Get core counts for each of the compute service's host
-      * @return the core counts
+      * @return a map of core counts, indexed by hostnames
       *
       * @throw WorkflowExecutionException
       * @throw std::runtime_error
       */
-    std::vector<unsigned long> ComputeService::getNumCores() {
+    std::map<std::string, unsigned long> ComputeService::getNumCores() {
 
-      std::map<std::string, std::vector<double>> dict;
+      std::map<std::string, std::map<std::string, double>> dict;
       try {
         dict = this->getServiceResourceInformation();
       } catch (WorkflowExecutionException &e) {
@@ -223,11 +227,11 @@ namespace wrench {
         throw;
       }
 
-      std::vector<unsigned long> to_return;
+      std::map<std::string, unsigned long> to_return;
 
       if (dict.find("num_cores") != dict.end()) {
         for (auto x : dict["num_cores"]) {
-          to_return.push_back((unsigned long) x);
+          to_return.insert(std::make_pair(x.first, (unsigned long) x.second));
         }
       }
 
@@ -241,9 +245,9 @@ namespace wrench {
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
      */
-    std::vector<unsigned long> ComputeService::getNumIdleCores() {
+    std::map<std::string, unsigned long> ComputeService::getNumIdleCores() {
 
-      std::map<std::string, std::vector<double>> dict;
+      std::map<std::string, std::map<std::string, double>> dict;
       try {
         dict = this->getServiceResourceInformation();
       } catch (WorkflowExecutionException &e) {
@@ -252,11 +256,11 @@ namespace wrench {
         throw;
       }
 
-      std::vector<unsigned long> to_return;
+      std::map<std::string, unsigned long> to_return;
 
       if (dict.find("num_idle_cores") != dict.end()) {
         for (auto x : dict["num_idle_cores"]) {
-          to_return.push_back((unsigned long) x);
+          to_return.insert(std::make_pair(x.first, (unsigned long) x.second));
         }
       }
 
@@ -269,9 +273,9 @@ namespace wrench {
     *
     * @throw std::runtime_error
     */
-    std::vector<double> ComputeService::getCoreFlopRate() {
+    std::map<std::string, double> ComputeService::getCoreFlopRate() {
 
-      std::map<std::string, std::vector<double>> dict;
+      std::map<std::string, std::map<std::string, double>> dict;
       try {
         dict = this->getServiceResourceInformation();
       } catch (WorkflowExecutionException &e) {
@@ -280,10 +284,10 @@ namespace wrench {
         throw;
       }
 
-      std::vector<double> to_return;
+      std::map<std::string, double> to_return;
       if (dict.find("flop_rates") != dict.end()) {
         for (auto x : dict["flop_rates"]) {
-          to_return.push_back(x);
+          to_return.insert(std::make_pair(x.first, x.second));
         }
       }
 
@@ -292,13 +296,13 @@ namespace wrench {
 
     /**
     * @brief Get the RAM capacities for each of the compute service's hosts
-    * @return a vector of RAM capacities
+    * @return a map of RAM capacities, indexed by hostname
     *
     * @throw std::runtime_error
     */
-    std::vector<double> ComputeService::getMemoryCapacity() {
+    std::map<std::string, double> ComputeService::getMemoryCapacity() {
 
-      std::map<std::string, std::vector<double>> dict;
+      std::map<std::string, std::map<std::string, double>> dict;
       try {
         dict = this->getServiceResourceInformation();
       } catch (WorkflowExecutionException &e) {
@@ -307,11 +311,11 @@ namespace wrench {
         throw;
       }
 
-      std::vector<double> to_return;
+      std::map<std::string, double> to_return;
 
       if (dict.find("ram_capacities") != dict.end()) {
         for (auto x : dict["ram_capacities"]) {
-          to_return.push_back(x);
+          to_return.insert(std::make_pair(x.first, x.second));
         }
       }
 
@@ -326,7 +330,7 @@ namespace wrench {
      */
     double ComputeService::getTTL() {
 
-      std::map<std::string, std::vector<double>> dict;
+      std::map<std::string, std::map<std::string, double>> dict;
       try {
         dict = this->getServiceResourceInformation();
       } catch (WorkflowExecutionException &e) {
@@ -335,14 +339,14 @@ namespace wrench {
         throw;
       }
 
-      return dict["ttl"][0];
+      return (*(dict["ttl"].begin())).second;
     }
 
     /**
      * @brief Get information about the compute service as a dictionary of vectors
      * @return service information
      */
-    std::map<std::string, std::vector<double>> ComputeService::getServiceResourceInformation() {
+    std::map<std::string, std::map<std::string, double>> ComputeService::getServiceResourceInformation() {
 
       if (this->state == Service::DOWN) {
         throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
@@ -373,7 +377,7 @@ namespace wrench {
 
       } else {
         throw std::runtime_error(
-                "MultihostMulticoreComputeService::getServiceResourceInformation(): unexpected [" + msg->getName() +
+                "BareMetalComputeService::getServiceResourceInformation(): unexpected [" + msg->getName() +
                 "] message");
       }
     }

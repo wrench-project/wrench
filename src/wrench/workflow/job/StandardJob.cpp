@@ -21,6 +21,7 @@ namespace wrench {
      * @brief Constructor
      *
      * @param workflow: the workflow for which this job is
+     *
      * @param tasks: the tasks in the job (which must be either READY, or children of COMPLETED tasks or
      *                                   of tasks also included in the standard job)
      * @param file_locations: a map that specifies on which storage service input/output files should be read/written
@@ -35,8 +36,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    StandardJob::StandardJob(Workflow *workflow,
-                             std::vector<WorkflowTask *> tasks,
+    StandardJob::StandardJob(Workflow *workflow, std::vector<WorkflowTask *> tasks,
                              std::map<WorkflowFile *, StorageService *> &file_locations,
                              std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> &pre_file_copies,
                              std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> &post_file_copies,

@@ -52,7 +52,9 @@ protected:
               "   <zone id=\"AS0\" routing=\"Full\"> "
               "       <host id=\"Host1\" speed=\"1f\" core=\"10\"/> "
               "       <host id=\"Host2\" speed=\"1f\" core=\"10\"/> "
-              "       <host id=\"Host3\" speed=\"1f\" core=\"10\"/> "
+              "       <host id=\"Host3\" speed=\"1f\" core=\"10\"> "
+              "          <prop id=\"ram\" value=\"100\" />"
+              "       </host> "
               "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"1us\"/>"
               "       <link id=\"2\" bandwidth=\"5000GBps\" latency=\"1us\"/>"
               "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"1\"/> </route>"
@@ -183,56 +185,24 @@ private:
       bool success;
 
 
-      success = true;
       try {
         job_manager->createStandardJob(nullptr, {});
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to create a standard job with a nullptr task in it");
+      } catch (std::invalid_argument &e) {
       }
 
 
-      success = true;
       try {
         job_manager->createStandardJob((std::vector<wrench::WorkflowTask *>) {nullptr}, {});
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to create a standard job with a nullptr task in it");
+      } catch (std::invalid_argument &e) {
       }
 
-      success = true;
       try {
         std::vector<wrench::WorkflowTask *> tasks; // empty
         job_manager->createStandardJob(tasks, {});
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to create a standard job with nothing in it");
-      }
-
-      success = true;
-      try {
-        job_manager->createPilotJob(10, 10, -12, 10);
       } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
-        throw std::runtime_error("Should not be able to create a standard job with a negative ram per host");
-      }
-
-      success = true;
-      try {
-        job_manager->createPilotJob(10, 10, 10, -12);
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
-        throw std::runtime_error("Should not be able to create a standard job with a negative duration");
       }
 
       wrench::WorkflowTask *t1 = this->getWorkflow()->addTask("t1", 1.0, 1, 1, 1.0, 0.0);
@@ -242,25 +212,17 @@ private:
       t2->addInputFile(f);
 
       // Create an "ok" job
-      success = true;
       try {
         job_manager->createStandardJob({t1, t2}, {});
       } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (!success) {
         throw std::runtime_error("Should be able to create a standard job with two dependent tasks");
       }
 
       // Create a "not ok" job
-      success = true;
       try {
         job_manager->createStandardJob((std::vector<wrench::WorkflowTask *>) {t2}, {});
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to create a standard job with a not-self-contained task");
+      } catch (std::invalid_argument &e) {
       }
 
       return 0;
@@ -538,14 +500,14 @@ void JobManagerTest::do_JobManagerResubmitJobTest_test() {
   wrench::ComputeService *cs1, *cs2;
 
   ASSERT_NO_THROW(cs1 = simulation->add(
-          new wrench::MultihostMulticoreComputeService("Host2",
-                                                       {std::make_tuple("Host2", wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},100.0,
+          new wrench::BareMetalComputeService("Host2",
+                                                       {std::make_pair("Host2", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},100.0,
                                                        {{wrench::ComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}})));
 
   // Create a ComputeService that does support standard jobs
   ASSERT_NO_THROW(cs2 = simulation->add(
-          new wrench::MultihostMulticoreComputeService("Host3",
-                                                       {std::make_tuple("Host3", wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},100.0,
+          new wrench::BareMetalComputeService("Host3",
+                                                       {std::make_pair("Host3", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},100.0,
                                                        {{wrench::ComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}})));
 
   // Create a WMS
@@ -601,10 +563,12 @@ private:
       wrench::ComputeService *cs = *(this->getAvailableComputeServices().begin());
 
       // Add tasks to the workflow
-      wrench::WorkflowTask *t1 = this->getWorkflow()->addTask("task1", 600, 10, 10, 1.0, 0);
-      wrench::WorkflowTask *t2 = this->getWorkflow()->addTask("task2", 600, 10, 10, 1.0, 0);
+      wrench::WorkflowTask *t1 = this->getWorkflow()->addTask("task1", 600, 10, 10, 1.0, 80);
+      wrench::WorkflowTask *t2 = this->getWorkflow()->addTask("task2", 600, 10, 10, 1.0, 80);
       wrench::WorkflowTask *t3 = this->getWorkflow()->addTask("task3", 600, 10, 10, 1.0, 0);
       wrench::WorkflowTask *t4 = this->getWorkflow()->addTask("task4", 600, 10, 10, 1.0, 0);
+
+      /* t1 and t2 can't run at the same time in this example, due to RAM */
 
       this->getWorkflow()->addControlDependency(t1, t3);
       this->getWorkflow()->addControlDependency(t2, t3);
@@ -643,7 +607,7 @@ private:
       if (not t1_and_t2_valid_states) {
         throw std::runtime_error("Unexpected task1 and task 2 states (" +
                                  wrench::WorkflowTask::stateToString(t1->getState()) + " and " +
-                                 wrench::WorkflowTask::stateToString(t2->getState()));
+                                 wrench::WorkflowTask::stateToString(t2->getState()) + ")");
       }
       if (t3->getState() != wrench::WorkflowTask::State::NOT_READY) {
         throw std::runtime_error("Unexpected task1 state (should be NOT_READY but is " +
@@ -678,8 +642,8 @@ void JobManagerTest::do_JobManagerTerminateJobTest_test() {
   // Create a ComputeService that supports standard jobs
   wrench::ComputeService *cs = nullptr;
   ASSERT_NO_THROW(cs = simulation->add(
-          new wrench::MultihostMulticoreComputeService("Host3",
-                                                       {std::make_tuple("Host3", wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},100.0,
+          new wrench::BareMetalComputeService("Host3",
+                                                       {std::make_pair("Host3", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},100.0,
                                                        {{wrench::ComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}})));
 
   // Create a WMS

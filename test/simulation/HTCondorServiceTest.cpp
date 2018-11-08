@@ -181,18 +181,18 @@ void HTCondorServiceTest::do_StandardJobTaskTest_test() {
   std::string execution_host = simulation->getHostnameList()[1];
   std::vector<std::string> execution_hosts;
   execution_hosts.push_back(execution_host);
-  compute_services.insert(new wrench::MultihostMulticoreComputeService(
+  compute_services.insert(new wrench::BareMetalComputeService(
           execution_host,
-          {std::make_tuple(
+          {std::make_pair(
                   execution_host,
-                  wrench::Simulation::getHostNumCores(execution_host),
-                  wrench::Simulation::getHostMemoryCapacity(execution_host))},
+                  std::make_tuple(wrench::Simulation::getHostNumCores(execution_host),
+                  wrench::Simulation::getHostMemoryCapacity(execution_host)))},
           100000000000.0));
 
   // Create a HTCondor Service
   ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::HTCondorService(hostname, "local", std::move(compute_services),
-                                      {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
+                                      {{wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;

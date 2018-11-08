@@ -17,7 +17,8 @@
 class WMSTest : public ::testing::Test {
 
 public:
-    wrench::ComputeService *compute_service = nullptr;
+    wrench::ComputeService *cs_cloud = nullptr;
+    wrench::ComputeService *cs_batch = nullptr;
     wrench::StorageService *storage_service1 = nullptr;
     wrench::StorageService *storage_service2 = nullptr;
     wrench::WorkflowFile *small_file = nullptr;
@@ -33,10 +34,10 @@ protected:
               "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
               "<platform version=\"4.1\"> "
               "   <zone id=\"AS0\" routing=\"Full\"> "
-              "       <host id=\"DualCoreHost\" speed=\"1f\" core=\"2\"/> "
-              "       <host id=\"QuadCoreHost\" speed=\"1f\" core=\"4\"/> "
+              "       <host id=\"Host1\" speed=\"1f\" core=\"4\"/> "
+              "       <host id=\"Host2\" speed=\"1f\" core=\"4\"/> "
               "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
-              "       <route src=\"DualCoreHost\" dst=\"QuadCoreHost\"> <link_ctn id=\"1\"/> </route>"
+              "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"1\"/> </route>"
               "   </zone> "
               "</platform>";
       FILE *platform_file = fopen(platform_file_path.c_str(), "w");
@@ -79,15 +80,21 @@ private:
       // Get the file registry service
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
+      // Create a VM on the cloud service
+      auto cloud = (wrench::CloudService *) (this->test->cs_cloud);
+      cloud->createVM(4, 0.0, {}, {});
+
       // Get a "STANDARD JOB COMPLETION" event (default handler)
       wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 10.0, 1, 1, 1.0, 0);
       wrench::StandardJob *job1 = job_manager->createStandardJob(task1, {});
-      job_manager->submitJob(job1, this->test->compute_service);
+      job_manager->submitJob(job1, cloud);
       this->waitForAndProcessNextEvent();
 
+      auto batch = (wrench::BatchService *) (this->test->cs_batch);
+
       // Get a "PILOT JOB STARTED" event (default handler)
-      wrench::PilotJob *job2 = job_manager->createPilotJob(1,1,0,60);
-      job_manager->submitJob(job2, this->test->compute_service);
+      wrench::PilotJob *job2 = job_manager->createPilotJob();
+      job_manager->submitJob(job2, batch, {{"-N", "1"}, {"-t", "50"}, {"-c", "1"}});
       this->waitForAndProcessNextEvent();
 
       // Get a "STANDARD JOB FAILED" and "PILOT JOB EXPIRED" event (default handler)
@@ -128,8 +135,8 @@ void WMSTest::do_DefaultHandlerWMS_test() {
   ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
-  std::string hostname1 = simulation->getHostnameList()[0];
-  std::string hostname2 = simulation->getHostnameList()[1];
+  std::string hostname1 = "Host1";
+  std::string hostname2 = "Host2";
 
   // Create a Storage Service
   ASSERT_NO_THROW(storage_service1 = simulation->add(
@@ -139,17 +146,24 @@ void WMSTest::do_DefaultHandlerWMS_test() {
   ASSERT_NO_THROW(storage_service2 = simulation->add(
           new wrench::SimpleStorageService(hostname2, 100.0)));
 
-  // Create a Compute Service
-  std::set<std::string> execution_hosts = {simulation->getHostnameList()[1]};
-  ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname1, execution_hosts, 100.0, {})));
+  // Create a Cloud Service
+  std::vector<std::string> cloud_hosts;
+  cloud_hosts.push_back(hostname1);
+  ASSERT_NO_THROW(cs_cloud = simulation->add(
+          new wrench::CloudService(hostname1, cloud_hosts, 100.0, {}, {})));
+
+  // Create a Batch Service
+  std::vector<std::string> batch_hosts;
+  batch_hosts.push_back(hostname2);
+  ASSERT_NO_THROW(cs_batch = simulation->add(
+          new wrench::BatchService(hostname2, batch_hosts, 100.0, {}, {})));
 
 
   // Create a WMS
   auto *workflow = new wrench::Workflow();
   wrench::WMS *wms = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(
-          new TestDefaultHandlerWMS(this,  {compute_service}, {storage_service1, storage_service2}, hostname1)));
+          new TestDefaultHandlerWMS(this,  {cs_cloud, cs_batch}, {storage_service1, storage_service2}, hostname1)));
 
   ASSERT_NO_THROW(wms->addWorkflow(workflow, 100));
 
@@ -210,24 +224,28 @@ private:
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Get a "STANDARD JOB COMPLETION" event (default handler)
+      auto cloud = (wrench::CloudService *) (this->test->cs_cloud);
+      cloud->createVM(4, 0.0, {}, {});
+
       wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 10.0, 1, 1, 1.0, 0);
       wrench::StandardJob *job1 = job_manager->createStandardJob(task1, {});
-      job_manager->submitJob(job1, this->test->compute_service);
+      job_manager->submitJob(job1, this->test->cs_cloud);
       this->waitForAndProcessNextEvent();
       if (this->counter != 1) {
         throw std::runtime_error("Did not get expected 'STANDARD JOB COMPLETION' event");
       }
 
+
       // Get a "PILOT JOB STARTED" event (default handler)
-      wrench::PilotJob *job2 = job_manager->createPilotJob(1,1,0,60);
-      job_manager->submitJob(job2, this->test->compute_service);
+      wrench::PilotJob *job2 = job_manager->createPilotJob();
+      job_manager->submitJob(job2, this->test->cs_batch, {{"-N","1"},{"-c","1"},{"-t","2"}});
       this->waitForAndProcessNextEvent();
       if (this->counter != 2) {
         throw std::runtime_error("Did not get expected 'PILOT JOB START' event");
       }
 
       // Get a "STANDARD JOB FAILED" and "PILOT JOB EXPIRED" event (default handler)
-      wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task2", 100.0, 1, 1, 1.0, 0);
+      wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task2", 200.0, 1, 1, 1.0, 0);
       wrench::StandardJob *job3 = job_manager->createStandardJob(task2, {});
       job_manager->submitJob(job3, job2->getComputeService());
       this->waitForAndProcessNextEvent();
@@ -301,8 +319,8 @@ void WMSTest::do_CustomHandlerWMS_test() {
   ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
-  std::string hostname1 = simulation->getHostnameList()[0];
-  std::string hostname2 = simulation->getHostnameList()[1];
+  std::string hostname1 = "Host1";
+  std::string hostname2 = "Host2";
 
   // Create a Storage Service
   ASSERT_NO_THROW(storage_service1 = simulation->add(
@@ -312,16 +330,24 @@ void WMSTest::do_CustomHandlerWMS_test() {
   ASSERT_NO_THROW(storage_service2 = simulation->add(
           new wrench::SimpleStorageService(hostname2, 100.0)));
 
-  // Create a Compute Service
-  std::set<std::string> execution_hosts = {simulation->getHostnameList()[1]};
-  ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname1, execution_hosts, 100.0, {})));
+  // Create a Cloud Service
+  std::vector<std::string> cloud_hosts;
+  cloud_hosts.push_back(hostname1);
+  ASSERT_NO_THROW(cs_cloud = simulation->add(
+          new wrench::CloudService(hostname1, cloud_hosts, 100.0, {}, {})));
+
+  // Create a Batch Service
+  std::vector<std::string> batch_hosts;
+  batch_hosts.push_back(hostname1);
+  ASSERT_NO_THROW(cs_batch = simulation->add(
+          new wrench::BatchService(hostname2, batch_hosts, 100.0, {}, {})));
+
 
   // Create a WMS
   auto *workflow = new wrench::Workflow();
   wrench::WMS *wms = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(
-          new TestCustomHandlerWMS(this,  {compute_service}, {storage_service1, storage_service2}, hostname1)));
+          new TestCustomHandlerWMS(this,  {cs_cloud, cs_batch}, {storage_service1, storage_service2}, hostname1)));
 
   ASSERT_NO_THROW(wms->addWorkflow(workflow, 100));
 
