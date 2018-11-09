@@ -600,7 +600,7 @@ namespace wrench {
             try {
               JobManagerStandardJobDoneMessage *augmented_msg = new JobManagerStandardJobDoneMessage(
                       job, msg->compute_service, necessary_state_changes);
-              S4U_Mailbox::dputMessage(job->popCallbackMailbox(), augmented_msg);
+              S4U_Mailbox::dputMessage(callback_mailbox, augmented_msg);
             } catch (std::shared_ptr<NetworkError> &cause) {
               // ignore
             }
