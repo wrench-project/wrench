@@ -5,10 +5,10 @@
             "start": 3
         },
         "execution_host": "Host1",
-        "failed": -1.0,
+        "failed": 2,
         "num_cores_allocated": 1,
         "read": {
-            "end": 3,
+            "end": -1,
             "start": 0
         },
         "task_id": "ID00000",
@@ -24,7 +24,7 @@
     },
     {
         "compute": {
-            "end": 16,
+            "end": -1,
             "start": 13
         },
         "execution_host": "Host1",
@@ -35,7 +35,7 @@
             "start": 10
         },
         "task_id": "ID00001",
-        "terminated": -1.0,
+        "terminated": 14,
         "whole_task": {
             "end": 19,
             "start": 10
@@ -58,13 +58,13 @@
             "start": 20
         },
         "task_id": "ID00002",
-        "terminated": -1.0,
+        "terminated": 28,
         "whole_task": {
             "end": 29,
             "start": 20
         },
         "write": {
-            "end": 29,
+            "end": -1,
             "start": 26
         }
     }
