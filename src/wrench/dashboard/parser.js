@@ -5,7 +5,16 @@ function parseFile(path) {
             if (err) {
                 reject(err);
             } else {
-                resolve(JSON.parse(contents));
+                fs.stat(path, function(err, stats) {
+                    if (err) {
+                        reject(err)
+                    } else {
+                        resolve({
+                            "modified": stats.mtime,
+                            "contents": JSON.parse(contents)
+                        })
+                    }
+                })
             }
         });
     });    
@@ -24,10 +33,14 @@ function addToHTMLFile(data) {
     fs.close(fd); 
 }
 
-parseFile("gautam.json")
-    .then(function(content) {
-        addToHTMLFile(content);
-    })
-    .catch(function(err) {
-        console.log(err);
-    });
+if (process.argv.length == 2) {
+    console.log("Please provide the file name that holds the data as a command line argument")
+} else {
+    parseFile(process.argv[2])
+        .then(function(content) {
+            addToHTMLFile(content);
+        })
+        .catch(function(err) {
+            console.log(err);
+        });
+}
