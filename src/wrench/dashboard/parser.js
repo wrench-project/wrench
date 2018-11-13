@@ -11,6 +11,7 @@ function parseFile(path) {
                     } else {
                         resolve({
                             "modified": stats.mtime,
+                            "file": path,
                             "contents": JSON.parse(contents)
                         })
                     }
