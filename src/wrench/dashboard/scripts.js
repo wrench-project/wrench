@@ -17,6 +17,13 @@ function findDuration(data, id, section) {
     for (var i = 0; i < data.length; i++) {
         var currData = data[i]
         if (currData.task_id == id) {
+            if (currData[section].end == -1) {
+                if (currData.terminated == -1) {
+                    return currData.failed - currData[section].start
+                } else if (currData.failed == -1) {
+                    return currData.terminated - currData[section].start
+                }
+            }
             return currData[section].end - currData[section].start
         }
     }

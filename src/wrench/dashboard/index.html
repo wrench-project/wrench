@@ -41,6 +41,26 @@
         #info-container {
             text-align: center;
         }
+        #workflow-execution-chart-legend-read-input {
+            border-left: 15px solid #cbb5dd;
+        }
+
+        #workflow-execution-chart-legend-computation {
+            border-left: 15px solid #f7daad;
+        }
+
+        #workflow-execution-chart-legend-write-output {
+            border-left: 15px solid #abdcf4;
+        }
+        .legend {
+            text-align: center;
+        }
+        .legend small {
+            margin: auto;
+            padding-left: 3px;
+            margin-right: 5px;
+            border-radius: 3px;
+        }
     </style>
 </head>
 <body>
@@ -49,6 +69,12 @@
             <img src='logo-vertical.png' id=logo>
             <h3>Wrench Dashboard</h3>
             <p id='updated'></p>
+        </div>
+        <div class="container legend" id="workflow-execution-chart-legend">
+            <small>Legend:</small> 
+            <small class="inline-block" id="workflow-execution-chart-legend-read-input">Reading Input</small>
+            <small class="inline-block" id="workflow-execution-chart-legend-computation">Performing Computation</small>
+            <small class="inline-block" id="workflow-execution-chart-legend-write-output">Writing Output</small>
         </div>
         <div id="graph-container" style="height:1000px;">
             <div class="text-left" id="tooltip-container">
