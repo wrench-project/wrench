@@ -21,9 +21,9 @@
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 
 
-    /***********************/
-    /** \cond INTERNAL     */
-    /***********************/
+/***********************/
+/** \cond INTERNAL     */
+/***********************/
 
 namespace wrench {
 
@@ -56,6 +56,10 @@ namespace wrench {
           } catch (std::exception &e) {
             throw;
           }
+          // Avoid a memory leak on the actor!
+          simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::by_name(this->daemon->mailbox_name);
+          mailbox->set_receiver(nullptr);
+
           this->daemon->setTerminated();
         }
 
