@@ -168,8 +168,8 @@ namespace wrench {
         this->s4u_actor->on_exit(daemon_goodbye, (void *) (this));
 
         // Set the mailbox_name receiver (causes memory leak)
-//        simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::by_name(this->mailbox_name);
-//        mailbox->set_receiver(this->s4u_actor);
+        simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::by_name(this->mailbox_name);
+        mailbox->set_receiver(this->s4u_actor);
       }
     }
 
