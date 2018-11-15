@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="scripts.js"></script>
     <link rel="stylesheet" href="bootstrap.min.css">
+    <link rel="stylesheet" href="styles.css">
     <script src="d3.min.js" type="text/javascript"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.4.1/jspdf.debug.js" integrity="sha384-THVO/sM0mFD9h7dfSndI6TS0PgAGavwKvB5hAxRRvc0o9cPLohB0wb/PTA7LdUHs" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
@@ -14,60 +15,6 @@
         src="https://code.jquery.com/jquery-3.3.1.min.js"
         integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
         crossorigin="anonymous"></script>
-    <style>
-        body {
-            padding: 20px;
-        }
-        #tooltip-container {
-            position: absolute;
-            width: auto;
-            padding: 10px;
-            background-color: #f2f2f2;
-            border-radius: 2px;
-            border: 0px solid #000;
-            display: none;
-            pointer-events: none;
-            font-family: sans-serif;
-            font-size: 12px;
-        }
-        #logo {
-            width: 150px;
-            margin-bottom: 20px;
-        }
-        #overall-container {
-            width: 1000px;
-            margin: auto;
-        }
-        #info-container {
-            text-align: center;
-        }
-        #workflow-execution-chart-legend-read-input {
-            border-left: 15px solid #cbb5dd;
-        }
-
-        #workflow-execution-chart-legend-computation {
-            border-left: 15px solid #f7daad;
-        }
-
-        #workflow-execution-chart-legend-write-output {
-            border-left: 15px solid #abdcf4;
-        }
-        #workflow-execution-chart-legend-failed {
-            border-left: 15px solid orange;
-        }
-        #workflow-execution-chart-legend-terminated {
-            border-left: 15px solid red;
-        }
-        .legend {
-            text-align: center;
-        }
-        .legend small {
-            margin: auto;
-            padding-left: 3px;
-            margin-right: 5px;
-            border-radius: 3px;
-        }
-    </style>
 </head>
 <body>
     <div id='overall-container'>
