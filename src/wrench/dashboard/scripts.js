@@ -56,15 +56,17 @@ function determineFailedOrTerminatedPoint(d) {
     }
 }
 
-function generateGraph() {
+function populateMetadata() {
     var modified = data.modified
     var file = data.file
     document.getElementById('updated').innerHTML = `Data from file "${file}" was last updated on ${new Date(modified)}`
-    data = data.contents
+}
+
+function generateGraph(data, containerId) {
     var read_color    = '#cbb5dd';
     var compute_color = '#f7daad';
     var write_color   = '#abdcf4';
-    var container = d3.select("#graph-container");
+    var container = d3.select(`#${containerId}`);
     const CONTAINER_WIDTH = container.style("width").slice(0, -2); // returns "XXXXpx" so need to remove "px"
     const CONTAINER_HEIGHT = container.style("height").slice(0, -2);
     const PADDING = 60;
@@ -121,16 +123,15 @@ function generateGraph() {
         var ft_point = determineFailedOrTerminatedPoint(d)
         if (ft_point != "none") {
             var x_ft = xscale(d.terminated == -1 ? d.failed : d.terminated)
-            var full_height_ft = yscale(data[0].task_id)-yscale(data[1].task_id)
-            var height_ft = full_height_ft/15
-            var y_ft = yscale(d.task_id) + (full_height_ft/2) - height_ft/2
+            var height_ft = yscale(data[0].task_id)-yscale(data[1].task_id)
+            var y_ft = yscale(d.task_id)
             var colour_ft = d.terminated == -1 ? 'orange' : 'red'
             var class_ft = d.terminated == -1 ? 'failed' : 'terminated'
             group.append('rect')
                 .attr('x', x_ft)
                 .attr('y', y_ft)
                 .attr('height', height_ft)
-                .attr('width', xscale(d.whole_task.end) - xscale(d.terminated == -1 ? d.failed : d.terminated))
+                .attr('width', '5px')
                 .style('fill', colour_ft)
                 .attr('class', class_ft)
         }
@@ -159,7 +160,6 @@ function generateGraph() {
                 .style('fill',write_color)
                 .attr('class','write')
         }
-        // var tooltip = d3.select('tooltip-container')
         var tooltip = document.getElementById('tooltip-container')
         var tooltip_task_id                 = d3.select('#tooltip-task-id');
         var tooltip_task_operation          = d3.select('#tooltip-task-operation');
