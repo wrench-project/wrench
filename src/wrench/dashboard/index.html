@@ -52,6 +52,12 @@
         #workflow-execution-chart-legend-write-output {
             border-left: 15px solid #abdcf4;
         }
+        #workflow-execution-chart-legend-failed {
+            border-left: 15px solid orange;
+        }
+        #workflow-execution-chart-legend-terminated {
+            border-left: 15px solid red;
+        }
         .legend {
             text-align: center;
         }
@@ -75,6 +81,8 @@
             <small class="inline-block" id="workflow-execution-chart-legend-read-input">Reading Input</small>
             <small class="inline-block" id="workflow-execution-chart-legend-computation">Performing Computation</small>
             <small class="inline-block" id="workflow-execution-chart-legend-write-output">Writing Output</small>
+            <small class="inline-block" id="workflow-execution-chart-legend-failed">Failed During Execution</small>
+            <small class="inline-block" id="workflow-execution-chart-legend-terminated">Terminated by User</small>
         </div>
         <div id="graph-container" style="height:1000px;">
             <div class="text-left" id="tooltip-container">
