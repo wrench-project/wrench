@@ -1,3 +1,3 @@
-<img src="doc/images/logo-vertical.png" width="100" />
+<img src="public/logo-vertical.png" width="100" />
 
-**_Wrench Dashboard_**
+## Wrench Dashboard 
