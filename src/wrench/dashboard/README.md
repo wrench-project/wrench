@@ -16,7 +16,7 @@ Welcome to the Wrench Dashboard! This is where you can fulfill all of your data 
 
 ## Instructions to run
 
-The dashboard works by parsing a json dump file from a simulation and outputting graphs onto a local HTML file that you can then view in your browser. Here are the steps to run the program
+The dashboard works by parsing a json dump file from a simulation and outputting graphs onto a local HTML file that you can then view in your browser. Here are the steps to run the program.
 
 Whenever you want to read data from a new JSON file or your current JSON file has been updated, run `node parser.js path/to/json/file`. This will automatically open the HTML file in your default browser. The HTML file is called `index.html` and is located in this directory, you can open it at any time in your browser of choice.
 
