@@ -1,20 +1,20 @@
 <img src="public/logo-vertical.png" width="100" />
 
-## Wrench Dashboard 
+# Wrench Dashboard 
 
 Welcome to the Wrench Dashboard! This is where you can fulfill all of your data visualisation needs.
 
-# Required Dependancies
+## Required Dependancies
 
 - [Node.js](https://nodejs.org/en/)
 - [npm](https://www.npmjs.com/)
 
-#Initial Setup
+## Initial Setup
 
 1. Intall the above dependancies
 2. Run `npm install` in this directory
 
-# Instructions to run
+## Instructions to run
 
 The dashboard works by parsing a json dump file from a simulation and outputting graphs onto a local HTML file that you can then view in your browser. Here are the steps to run the program
 
