@@ -1,4 +1,4 @@
-var data={"modified":"2018-11-11T08:58:37.419Z","file":"test_data.json","contents":[{"compute":{"end":6,"start":3},"execution_host":"Host1","failed":2,"num_cores_allocated":1,"read":{"end":-1,"start":0},"task_id":"ID00000","terminated":-1,"whole_task":{"end":9,"start":0},"write":{"end":9,"start":6}},{"compute":{"end":-1,"start":13},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":13,"start":10},"task_id":"ID00001","terminated":14,"whole_task":{"end":19,"start":10},"write":{"end":19,"start":16}},{"compute":{"end":26,"start":23},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":23,"start":20},"task_id":"ID00002","terminated":28,"whole_task":{"end":29,"start":20},"write":{"end":-1,"start":26}}]}
+var data={"modified":"2018-11-16T19:14:39.764Z","file":"test_data.json","contents":[{"compute":{"end":-1,"start":-1},"execution_host":"Host1","failed":2,"num_cores_allocated":1,"read":{"end":-1,"start":0},"task_id":"ID00000","terminated":-1,"whole_task":{"end":-1,"start":0},"write":{"end":-1,"start":-1}},{"compute":{"end":-1,"start":13},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":13,"start":10},"task_id":"ID00001","terminated":14,"whole_task":{"end":-1,"start":10},"write":{"end":-1,"start":-1}},{"compute":{"end":26,"start":23},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":23,"start":20},"task_id":"ID00002","terminated":28,"whole_task":{"end":-1,"start":20},"write":{"end":-1,"start":26}}]}
 
 /**
  * Helper function used to get the position of the mouse within the browser window
@@ -30,15 +30,18 @@ function findDuration(data, id, section) {
 }
 
 function getBoxWidth(d, section, scale) {
-    if (d[section].end == -1) {
-        if (d.terminated != -1) {
-            return scale(d.terminated) - scale(d[section].start)
-        } else if (d.failed != -1){
-            return scale(d.failed) - scale(d[section].start)
+    if (d[section].start != -1) {
+        if (d[section].end == -1) {
+            if (d.terminated != -1) {
+                return scale(d.terminated) - scale(d[section].start)
+            } else if (d.failed != -1){
+                return scale(d.failed) - scale(d[section].start)
+            }
+        } else {
+            return scale(d[section].end) - scale(d[section].start)
         }
-    } else {
-        return scale(d[section].end) - scale(d[section].start)
     }
+    return scale(0) //Box shouldn't be displayed if start is -1
 }
 
 function determineFailedOrTerminatedPoint(d) {
@@ -78,8 +81,7 @@ function generateGraph(data, containerId) {
         .attr('id', 'graph')
     var xscale = d3.scaleLinear()
         .domain([0, d3.max(data, function(d) {
-            return d['whole_task'].end;
-           
+            return Math.max(d['whole_task'].end, d['failed'], d['terminated'])
         })])
         .range([PADDING, CONTAINER_WIDTH - PADDING]);
 
@@ -166,7 +168,6 @@ function generateGraph(data, containerId) {
         var tooltip_task_operation_duration = d3.select('#tooltip-task-operation-duration');
         group.selectAll('rect')
             .on('mouseover', function() {
-                // tooltip.style('display', 'inline');
                 tooltip.style.display = 'inline'
 
                 d3.select(this)

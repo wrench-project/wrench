@@ -1,4 +1,5 @@
-var fs = require('fs');
+const fs = require('fs');
+const opn = require('opn') 
 function parseFile(path) {
     return new Promise(function(resolve, reject) {
         fs.readFile(path, 'utf8', function(err, contents) {
@@ -40,6 +41,8 @@ if (process.argv.length == 2) {
     parseFile(process.argv[2])
         .then(function(content) {
             addToHTMLFile(content);
+            opn('index.html')
+            process.exit()
         })
         .catch(function(err) {
             console.log(err);
