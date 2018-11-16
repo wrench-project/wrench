@@ -23,7 +23,7 @@ function parseFile(path) {
 }
 
 function addToHTMLFile(data) {
-    var fileContents = fs.readFileSync("scripts.js"); //read existing contents into data
+    var fileContents = fs.readFileSync("public/scripts.js"); //read existing contents into data
     fileContents = fileContents.toString().split('\n').slice(1).join('\n'); //remove first line
     fileContents = Buffer.from(fileContents, 'utf8');
     var fd = fs.openSync("scripts.js", 'w+');
