@@ -100,37 +100,24 @@ private:
       wrench::WorkflowFile *file2 = this->getWorkflow()->addFile("file2", 100.0);
       wrench::FileRegistryService *frs = this->getAvailableFileRegistryService();
 
-      bool success;
       std::set<wrench::StorageService *> locations;
 
-      success = true;
       try {
         frs->addEntry(nullptr, this->test->storage_service1);
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to add an entry with a nullptr file");
+      } catch (std::invalid_argument &e) {
       }
 
-      success = true;
       try {
         frs->addEntry(file1, nullptr);
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to add an entry with a nullptr storage service");
+      } catch (std::invalid_argument &e) {
       }
 
-      success = true;
       try {
         frs->lookupEntry(nullptr);
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to lookup an entry with a nullptr file");
+      } catch (std::invalid_argument &e) {
       }
 
       // Adding twice file1
@@ -165,24 +152,16 @@ private:
         throw std::runtime_error("Got the wrong locations for file 1");
       }
 
-      success = true;
       try {
         frs->removeEntry(nullptr, this->test->storage_service1);
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to remove an entry with a nullptr file");
+      } catch (std::invalid_argument &e) {
       }
 
-      success = true;
       try {
         frs->removeEntry(file1, nullptr);
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to remove an entry with a nullptr storage service");
+      } catch (std::invalid_argument &e) {
       }
 
       frs->removeEntry(file1, this->test->storage_service1);
@@ -207,11 +186,10 @@ private:
       frs->stop();
 
       // Trying a removeEntry
-      success = true;
       try {
         frs->removeEntry(file1, this->test->storage_service1);
+        throw std::runtime_error("Should not be able to remove an entry from a service that is down");
       } catch (wrench::WorkflowExecutionException &e) {
-        success = false;
         // Check Exception
         if (e.getCause()->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
           throw std::runtime_error("Got an exception, as expected, but of the unexpected type " +
@@ -223,9 +201,6 @@ private:
           throw std::runtime_error(
                   "Got the expected 'service is down' exception, but the failure cause does not point to the correct service");
         }
-      }
-      if (success) {
-        throw std::runtime_error("Should not be able to remove an entry from a service that is down");
       }
 
       return 0;
@@ -327,14 +302,10 @@ private:
       std::vector<std::string> file1_locations(3);
       std::map<double, wrench::StorageService *> file1_locations_by_proximity;
 
-      bool success = true;
       try {
         frs->lookupEntry(nullptr_file, "Host3", nps);
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to lookup a nullptr file");
+      } catch (std::invalid_argument &e) {
       }
 
       try {
@@ -366,24 +337,19 @@ private:
 
 
       // Use a bogus host
-      success = true;
       try {
         frs->lookupEntry(file1, "BogusHost", nps);
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to lookup a file by proximity with a bogus reference host");
+      } catch (std::invalid_argument &e) {
       }
 
       // shutdown service
       frs->stop();
 
-      success = true;
       try {
         frs->lookupEntry(file1);
+        throw std::runtime_error("Should not be able to lookup a file when the service is down");
       } catch (wrench::WorkflowExecutionException &e) {
-        success = false;
         // Check Exception
         if (e.getCause()->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
           throw std::runtime_error("Got an exception, as expected, but of the unexpected type " +
@@ -396,15 +362,11 @@ private:
                   "Got the expected 'service is down' exception, but the failure cause does not point to the correct service");
         }
       }
-      if (success) {
-        throw std::runtime_error("Should not be able to lookup a file when the service is down");
-      }
 
-      success = true;
       try {
         file1_locations_by_proximity = frs->lookupEntry(file1, "Host3", nps);
+        throw std::runtime_error("Should not be able to lookup a file when the service is down");
       } catch (wrench::WorkflowExecutionException &e) {
-        success = false;
         // Check Exception
         if (e.getCause()->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
           throw std::runtime_error("Got an exception, as expected, but of the unexpected type " +
@@ -417,10 +379,6 @@ private:
                   "Got the expected 'service is down' exception, but the failure cause does not point to the correct service");
         }
       }
-      if (success) {
-        throw std::runtime_error("Should not be able to lookup a file when the service is down");
-      }
-
 
       return 0;
     }

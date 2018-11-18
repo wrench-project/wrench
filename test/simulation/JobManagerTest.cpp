@@ -182,9 +182,6 @@ private:
       // Create a job manager
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
-      bool success;
-
-
       try {
         job_manager->createStandardJob(nullptr, {});
         throw std::runtime_error("Should not be able to create a standard job with a nullptr task in it");
@@ -290,48 +287,29 @@ private:
       // Create a job manager
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
-      bool success;
-
-      success = true;
       try {
         job_manager->submitJob(nullptr, (wrench::ComputeService *) (1234), {});
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to submit a job with a nullptr job");
+      } catch (std::invalid_argument &e) {
       }
 
-      success = true;
       try {
         job_manager->submitJob((wrench::WorkflowJob *) (1234), nullptr, {});
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to submit a job with a nullptr compute service");
+      } catch (std::invalid_argument &e) {
       }
 
-      success = true;
       try {
         job_manager->terminateJob(nullptr);
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to terminate a nullptr job");
+      } catch (std::invalid_argument &e) {
       }
 
-      success = true;
       try {
         job_manager->forgetJob(nullptr);
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to forget a nullptr job");
+      } catch (std::invalid_argument &e) {
       }
-
 
       return 0;
     }
@@ -415,11 +393,10 @@ private:
       wrench::StandardJob *job = job_manager->createStandardJob(this->getWorkflow()->getTasks(), {});
 
       // Try to submit a standard job to the wrong service
-      bool success = true;
       try {
         job_manager->submitJob(job, cs_does_not_support_standard_jobs);
+        throw std::runtime_error("Should not be able to submit a standard job to a service that does not support them");
       } catch (wrench::WorkflowExecutionException &e) {
-        success = false;
         if (e.getCause()->getCauseType() != wrench::FailureCause::JOB_TYPE_NOT_SUPPORTED) {
           throw std::runtime_error("Got expected exception, but cause type is wrong");
         }
@@ -432,9 +409,6 @@ private:
           throw std::runtime_error(
                   "Got expected execption and failure cause, but the failure cause does not point to the correct compute service");
         }
-      }
-      if (success) {
-        throw std::runtime_error("Should not be able to submit a standard job to a service that does not support them");
       }
 
       // Check task states

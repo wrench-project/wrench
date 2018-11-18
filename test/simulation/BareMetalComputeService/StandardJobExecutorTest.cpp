@@ -150,10 +150,7 @@ private:
       double before = wrench::S4U_Simulation::getClock();
       double thread_startup_overhead = 10.0;
 
-      bool success;
-
       // Create a bogus StandardJobExecutor (invalid host)
-      success = true;
       try {
         executor = std::shared_ptr<wrench::StandardJobExecutor>(
                 new wrench::StandardJobExecutor(
@@ -168,15 +165,11 @@ private:
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                                 thread_startup_overhead)}}, {}
                 ));
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to create a standard job executor with a bogus host");
+      } catch (std::invalid_argument &e) {
       }
 
       // Create a bogus StandardJobExecutor (nullptr job)
-      success = true;
       try {
         executor = std::shared_ptr<wrench::StandardJobExecutor>(
                 new wrench::StandardJobExecutor(
@@ -191,15 +184,11 @@ private:
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                                 thread_startup_overhead)}}, {}
                 ));
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to create a standard job executor with a nullptr job");
+      } catch (std::invalid_argument &e) {
       }
 
       // Create a bogus StandardJobExecutor (no compute resources specified)
-      success = true;
       try {
         executor = std::shared_ptr<wrench::StandardJobExecutor>(
                 new wrench::StandardJobExecutor(
@@ -214,15 +203,11 @@ private:
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                                 thread_startup_overhead)}}, {}
                 ));
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to create a standard job executor with no compute resources");
+      } catch (std::invalid_argument &e) {
       }
 
       // Create a bogus StandardJobExecutor (no cores resources specified)
-      success = true;
       try {
         executor = std::shared_ptr<wrench::StandardJobExecutor>(
                 new wrench::StandardJobExecutor(
@@ -237,15 +222,11 @@ private:
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                                 thread_startup_overhead)}}, {}
                 ));
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to create a standard job executor with zero cores on a resource");
+      } catch (std::invalid_argument &e) {
       }
 
       // Create a bogus StandardJobExecutor (too many cores specified)
-      success = true;
       try {
         executor = std::shared_ptr<wrench::StandardJobExecutor>(
                 new wrench::StandardJobExecutor(
@@ -260,16 +241,11 @@ private:
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                                 thread_startup_overhead)}}, {}
                 ));
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to create a standard job executor with more cores than available on a resource");
+      } catch (std::invalid_argument &e) {
       }
-
 
       // Create a bogus StandardJobExecutor (negative RAM specified)
-      success = true;
       try {
         executor = std::shared_ptr<wrench::StandardJobExecutor>(
                 new wrench::StandardJobExecutor(
@@ -284,15 +260,11 @@ private:
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                                 thread_startup_overhead)}}, {}
                 ));
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to create a standard job executor with negative RAM on a resource");
+      } catch (std::invalid_argument &e) {
       }
 
       // Create a bogus StandardJobExecutor (too much RAM specified)
-      success = true;
       try {
         executor = std::shared_ptr<wrench::StandardJobExecutor>(
                 new wrench::StandardJobExecutor(
@@ -307,11 +279,8 @@ private:
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                                 thread_startup_overhead)}}, {}
                 ));
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to create a standard job executor with more RAM than available on a resource");
+      } catch (std::invalid_argument &e) {
       }
 
 
@@ -337,7 +306,6 @@ private:
               {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->getWorkflow()->getFileByID("output_file"),
                                                                             this->test->storage_service2)});
 
-      success = true;
       try {
         executor = std::shared_ptr<wrench::StandardJobExecutor>(
                 new wrench::StandardJobExecutor(
@@ -352,17 +320,13 @@ private:
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                                 thread_startup_overhead)}}, {}
                 ));
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to create a standard job executor with insufficient RAM to run the job");
+      } catch (std::invalid_argument &e) {
       }
 
 
       // Create a bogus StandardJobExecutor (not enough RAM specified)
 
-      success = true;
 
       wrench::WorkflowTask *task_too_much_ram = this->getWorkflow()->addTask("task_too_much_ram", 3600, 1, 1, 1.0, 500.00);
       task_too_much_ram->addInputFile(this->getWorkflow()->getFileByID("input_file"));
@@ -399,11 +363,8 @@ private:
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                                 thread_startup_overhead)}}, {}
                 ));
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to create a standard job executor with insufficient RAM to run the job");
+      } catch (std::invalid_argument &e) {
       }
 
       // Finally do one that works
@@ -425,7 +386,6 @@ private:
               {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->getWorkflow()->getFileByID("output_file"),
                                                                             this->test->storage_service2)});
 
-      success = true;
       try {
         executor = std::shared_ptr<wrench::StandardJobExecutor>(
                 new wrench::StandardJobExecutor(
@@ -441,10 +401,7 @@ private:
                                 thread_startup_overhead)}}, {}
                 ));
       } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (not success) {
-        throw std::runtime_error("Should  be able to create a valid standard job executor!");
+        throw std::runtime_error("Should be able to create a valid standard job executor!");
       }
 
       executor->start(executor, true);
@@ -784,7 +741,6 @@ private:
 
         // Create a StandardJobExecutor that will run stuff on one host and two core
         double thread_startup_overhead = 10.0;
-        bool success = true;
         try {
           executor = std::shared_ptr<wrench::StandardJobExecutor>(new wrench::StandardJobExecutor(
                   test->simulation,
@@ -963,7 +919,6 @@ private:
 
         // Create a StandardJobExecutor that will run stuff on one host and two core
         double thread_startup_overhead = 10.0;
-        bool success = true;
 
         try {
           executor = std::shared_ptr<wrench::StandardJobExecutor>(new wrench::StandardJobExecutor(
@@ -1138,7 +1093,6 @@ private:
         t4->addInputFile(f3);
 
         // Create a BOGUS StandardJob (just for testing)
-        bool success = true;
         try {
           wrench::StandardJob *job = job_manager->createStandardJob(
                   {t1, t2, t4},
@@ -1146,11 +1100,8 @@ private:
                   {},
                   {},
                   {});
-        } catch (std::invalid_argument &e) {
-          success = false;
-        }
-        if (success) {
           throw std::runtime_error("Should not be able to create a standard job with t1, t2, t3 only");
+        } catch (std::invalid_argument &e) {
         }
 
 

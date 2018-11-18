@@ -147,11 +147,10 @@ private:
 
         std::map<std::string,double> jobs_estimated_start_times;
 
-        bool success = true;
         try {
           jobs_estimated_start_times = batch_service->getStartTimeEstimates(set_of_jobs);
+          throw std::runtime_error("Should not be able to get a queue waiting time estimate");
         } catch (wrench::WorkflowExecutionException &e) {
-          success = false;
           if (e.getCause()->getCauseType() != wrench::FailureCause::FUNCTIONALITY_NOT_AVAILABLE) {
             throw std::runtime_error("Got an exception, as expected, but not the right failure cause");
           }
@@ -161,9 +160,6 @@ private:
                     "Got the expected exception, but the failure cause does not point to the right service");
           }
           WRENCH_INFO("toString: %s", real_cause->toString().c_str());  // for coverage
-        }
-        if (success) {
-          throw std::runtime_error("Should not be able to get a queue waiting time estimate");
         }
 
         // Wait for a workflow execution event

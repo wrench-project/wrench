@@ -460,12 +460,11 @@ private:
       };
 
 
-      bool success = true;
       try {
         std::map<std::string,double> jobs_estimated_start_times =
                 ((wrench::BatchService *)this->test->compute_service)->getStartTimeEstimates(set_of_jobs);
+        throw std::runtime_error("Should not have been able to get prediction for BESTFIT algorithm");
       } catch (wrench::WorkflowExecutionException &e) {
-        success = false;
         if (e.getCause()->getCauseType() != wrench::FailureCause::FUNCTIONALITY_NOT_AVAILABLE) {
           throw std::runtime_error("Got expected exception, but failure cause type of wrong (" +
                                    std::to_string(e.getCause()->getCauseType()) + ")");
@@ -480,10 +479,6 @@ private:
         }
         WRENCH_INFO("toString: %s", real_cause->toString().c_str());  // for coverage
 
-      }
-
-      if (success) {
-        throw std::runtime_error("Should not have been able to get prediction for BESTFIT algorithm");
       }
 
       return 0;

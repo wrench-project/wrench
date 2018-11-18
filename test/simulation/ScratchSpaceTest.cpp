@@ -912,52 +912,36 @@ private:
       }
 
       //try to copy file1 from job1's partition of storage service1 into storage service2 in / partition, this should fail
-      bool success = false;
       try {
         this->test->storage_service2->copyFile(file1, this->test->storage_service1, job1, nullptr);
-      }catch(wrench::WorkflowExecutionException) {
-        success = true;
-      }
-      if(!success) {
         throw std::runtime_error(
                 "Non-scratch space have / partition unless created by copying something into a new partition name"
         );
+      } catch(wrench::WorkflowExecutionException) {
       }
 
       //try to copy file1 from / partition of storage service1 into storage service2 in job1's partition, this should succeed
-      success = true;
       try {
         this->test->storage_service2->copyFile(file1, this->test->storage_service1, nullptr, job1);
       }catch(wrench::WorkflowExecutionException) {
-        success = false;
-      }
-      if(!success) {
         throw std::runtime_error(
                 "We should have been able to copy from / partition of non-scratch to a new partition into another non-scratch space"
         );
       }
 
       //try to copy file2 from / partition of stroage service2 into storage service1 in / partition, it should succeed
-      success = true;
       try {
         this->test->storage_service1->copyFile(file2, this->test->storage_service2, nullptr, nullptr);
       }catch(wrench::WorkflowExecutionException) {
-        success = false;
-      }
-      if(!success) {
         throw std::runtime_error(
                 "We should have been able to copy from / of one non-scratch space to / of another non-scratch space"
         );
       }
 
       //try to copy file2 from / partition of stroage service2 into storage service2 in /test partition, it should succeed
-      success = true;
       try {
         this->test->storage_service2->copyFile(file2, this->test->storage_service2, "/", "/test");
       }catch(wrench::WorkflowExecutionException) {
-        success = false;
-      }
-      if(!success) {
         throw std::runtime_error(
                 "We should have been able to copy from one partition to another partition of the same storage service"
         );

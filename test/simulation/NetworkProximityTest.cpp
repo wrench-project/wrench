@@ -135,12 +135,10 @@ private:
       // Shutodown the proximity service
       (*network_proximity_service)->stop();
 
-      bool success = true;
-
       try {
         (*network_proximity_service)->query(hosts_to_compute_proximity);
+        throw std::runtime_error("Should not be able to query a service that is down");
       } catch (wrench::WorkflowExecutionException &e) {
-        success = false;
         // Check Exception
         if (e.getCause()->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
           throw std::runtime_error("Got an exception, as expected, but of the unexpected type " +
@@ -152,10 +150,6 @@ private:
           throw std::runtime_error(
                   "Got the expected 'service is down' exception, but the failure cause does not point to the correct service");
         }
-      }
-
-      if (success) {
-        throw std::runtime_error("Should not be able to query a service that is down");
       }
 
       return 0;
@@ -185,9 +179,9 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
   // Create a Compute Service
   ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::BareMetalComputeService(hostname,
-                                                       {std::make_pair(hostname,
-                                                                       std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                       {})));
+                                              {std::make_pair(hostname,
+                                                              std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                              {})));
   // Create a Storage Service
   ASSERT_NO_THROW(storage_service1 = simulation->add(
           new wrench::SimpleStorageService(hostname, 10000000000000.0)));
@@ -388,9 +382,9 @@ void NetworkProximityTest::do_CompareNetworkProximity_Test() {
   // Create a Compute Service
   ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::BareMetalComputeService(hostname,
-                                                       {std::make_pair(hostname,
-                                                                       std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                       {})));
+                                              {std::make_pair(hostname,
+                                                              std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                              {})));
 
   // Create a Storage Service
   ASSERT_NO_THROW(storage_service1 = simulation->add(
@@ -510,24 +504,19 @@ private:
       }
 
       // Try to get coordinates from a service that does not support coordinates
-      bool success = true;
       try {
         coordinates = alltoall_service->getCoordinate(target_host);
-      } catch (std::runtime_error &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error(
                 "Should not be able to get coordinates from an all-to-all proximity service");
+      } catch (std::runtime_error &e) {
       }
 
       // stop the service
       vivaldi_service->stop();
-      success = true;
       try {
         coordinates = vivaldi_service->getCoordinate(target_host);
+        throw std::runtime_error("Should not be able to get coordinates from a service that is down");
       } catch (wrench::WorkflowExecutionException &e) {
-        success = false;
         // Check Exception
         if (e.getCause()->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
           throw std::runtime_error("Got an exception, as expected, but of the unexpected type " +
@@ -540,11 +529,6 @@ private:
                   "Got the expected 'service is down' exception, but the failure cause does not point to the correct service");
         }
       }
-
-      if (success) {
-        throw std::runtime_error("Should not be able to get coordinates from a service that is down");
-      }
-
 
       return 0;
     }
@@ -572,9 +556,9 @@ void NetworkProximityTest::do_VivaldiConverge_Test() {
   // Create a Compute Service
   ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::BareMetalComputeService(hostname,
-                                                       {std::make_pair(hostname,
-                                                                       std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                       {})));
+                                              {std::make_pair(hostname,
+                                                              std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                              {})));
   // Create a Storage Service
   ASSERT_NO_THROW(storage_service1 = simulation->add(
           new wrench::SimpleStorageService(hostname, 10000000000000.0)));
@@ -681,9 +665,9 @@ void NetworkProximityTest::do_ValidateProperties_Test() {
   // Create a Compute Service
   ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::BareMetalComputeService(hostname,
-                                                       {std::make_pair(hostname,
-                                                                       std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                       {})));
+                                              {std::make_pair(hostname,
+                                                              std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                              {})));
   // Create a Storage Service
   ASSERT_NO_THROW(storage_service1 = simulation->add(
           new wrench::SimpleStorageService(hostname, 10000000000000.0)));
@@ -704,7 +688,7 @@ void NetworkProximityTest::do_ValidateProperties_Test() {
 
   wrench::NetworkProximityService* nps = nullptr;
   ASSERT_NO_THROW(nps = simulation->add(new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
-                                                            {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"}})));
+                                                                            {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"}})));
 
   ASSERT_THROW(nps = simulation->add(
           new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
@@ -791,7 +775,7 @@ void NetworkProximityTest::do_ValidateProperties_Test() {
 
           )));
 
-   //Create a WMS
+  //Create a WMS
   wrench::WMS *wms = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(
           new ValidatePropertiesWMS(

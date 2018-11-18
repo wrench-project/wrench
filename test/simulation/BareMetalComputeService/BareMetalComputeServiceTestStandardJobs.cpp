@@ -36,6 +36,8 @@ public:
     wrench::ComputeService *compute_service = nullptr;
 
     void do_UnsupportedStandardJobs_test();
+    
+    void do_BogusNumCores_test();
 
     void do_TwoSingleCoreTasks_test();
 
@@ -151,9 +153,10 @@ private:
                                                                          {}, {});
 
       // Submit the 2-task job for execution
-      bool success = true;
       try {
         job_manager->submitJob(two_task_job, this->test->compute_service);
+        throw std::runtime_error(
+                "Should not be able to submit a pilot job to a compute service that does not support them");
       } catch (wrench::WorkflowExecutionException &e) {
         if (e.getCause()->getCauseType() != wrench::FailureCause::JOB_TYPE_NOT_SUPPORTED) {
           throw std::runtime_error("Didn't get the expected exception");
@@ -168,12 +171,6 @@ private:
                   "Got the expected exception and failure cause, but the failure cause does not point to the right compute service");
         }
         std::string error_msg = real_cause->toString();
-
-        success = false;
-      }
-      if (success) {
-        throw std::runtime_error(
-                "Should not be able to submit a pilot job to a compute service that does not support them");
       }
 
       return 0;
@@ -232,6 +229,113 @@ void BareMetalComputeServiceTestStandardJobs::do_UnsupportedStandardJobs_test() 
   free(argv[0]);
   free(argv);
 }
+
+/**********************************************************************/
+/**  TWO BOGUS NUM CORES TEST                                        **/
+/**********************************************************************/
+
+class MulticoreComputeServiceBogusNumCoresTestWMS : public wrench::WMS {
+
+public:
+    MulticoreComputeServiceBogusNumCoresTestWMS(BareMetalComputeServiceTestStandardJobs *test,
+                                                     const std::set<wrench::ComputeService *> &compute_services,
+                                                     const std::set<wrench::StorageService *> &storage_services,
+                                                     std::string hostname) :
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
+      this->test = test;
+    }
+
+private:
+
+    BareMetalComputeServiceTestStandardJobs *test;
+
+    int main() {
+
+      // Create a data movement manager
+      std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
+
+      // Create a job  manager
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+
+      // Create a 1-task job
+      wrench::StandardJob *two_core_task_job = job_manager->createStandardJob({this->test->task3}, {},
+                                                                         {std::make_tuple(this->test->input_file, this->test->storage_service, wrench::ComputeService::SCRATCH)},
+                                                                         {}, {});
+
+      // Submit the 1-task job for execution with too few cores
+      try {
+        job_manager->submitJob(two_core_task_job, this->test->compute_service,
+                               {{"task_3_10s_2cores", "1"}});
+        throw std::runtime_error("Should not be able to submit a job asking for 1 core for a 2-core tasks");
+      } catch (std::invalid_argument &e) {
+      }
+
+      // Submit the 1-task job for execution with too many cores
+      try {
+        job_manager->submitJob(two_core_task_job, this->test->compute_service,
+                               {{"task_3_10s_2cores", "3"}});
+        throw std::runtime_error("Should not be able to submit a job asking for 3 core for a 2-core tasks");
+      } catch (std::invalid_argument &e) {
+      }
+
+
+      return 0;
+    }
+};
+
+TEST_F(BareMetalComputeServiceTestStandardJobs, BogusNumCores) {
+  DO_TEST_WITH_FORK(do_BogusNumCores_test);
+}
+
+void BareMetalComputeServiceTestStandardJobs::do_BogusNumCores_test() {
+
+  // Create and initialize a simulation
+  wrench::Simulation *simulation = new wrench::Simulation();
+  int argc = 1;
+  char **argv = (char **) calloc(1, sizeof(char *));
+  argv[0] = strdup("capacity_test");
+
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+  // Setting up the platform
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+  // Get a hostname
+  std::string hostname = simulation->getHostnameList()[0];
+
+  // Create A Storage Services
+  ASSERT_NO_THROW(storage_service = simulation->add(
+          new wrench::SimpleStorageService(hostname, 100.0)));
+
+  // Create a Compute Service
+  ASSERT_NO_THROW(compute_service = simulation->add(
+          new wrench::BareMetalComputeService(hostname,
+                                              {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))}, 101.0,
+                                              {}))); //scratch space of size 101
+
+  // Create a WMS
+  wrench::WMS *wms = nullptr;
+  ASSERT_NO_THROW(wms = simulation->add(
+          new MulticoreComputeServiceBogusNumCoresTestWMS(
+                  this, {compute_service}, {storage_service}, hostname)));
+
+  ASSERT_NO_THROW(wms->addWorkflow(workflow));
+
+  // Create a file registry
+  simulation->add(new wrench::FileRegistryService(hostname));
+
+
+  // Staging the input file on the storage service
+  ASSERT_NO_THROW(simulation->stageFiles({{input_file->getID(), input_file}}, storage_service));
+
+  // Running a "run a single task" simulation
+  ASSERT_NO_THROW(simulation->launch());
+
+  delete simulation;
+  free(argv[0]);
+  free(argv);
+}
+
 
 /**********************************************************************/
 /**  TWO SINGLE CORE TASKS TEST                                      **/
@@ -666,39 +770,27 @@ private:
 
 
       // Submit the 2-task job for execution (WRONG CS-specific arguments)
-      bool success = true;
       try {
         job_manager->submitJob(two_task_job, this->test->compute_service,
                                {{"whatever", "QuadCoreHost:2"}});
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to use wrongly formatted service-specific arguments");
+      } catch (std::invalid_argument &e) {
       }
 
       // Submit the 2-task job for execution (WRONG CS-specific arguments)
-      success = true;
       try {
         job_manager->submitJob(two_task_job, this->test->compute_service,
                                {{"task_6_10s_1_to_2_cores", "QuadCoreHost:whatever"}});
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to use wrongly formatted service-specific arguments");
+      } catch (std::invalid_argument &e) {
       }
 
       // Submit the 2-task job for execution (WRONG CS-specific arguments)
-      success = true;
       try {
         job_manager->submitJob(two_task_job, this->test->compute_service,
                                {{"task_6_10s_1_to_2_cores", "whatever"}});
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to use wrongly formatted service-specific arguments");
+      } catch (std::invalid_argument &e) {
       }
 
 
@@ -969,11 +1061,10 @@ private:
                                                                          {}, {});
 
       // Try to terminate it now (which is stupid)
-      bool success = true;
       try {
         job_manager->terminateJob(two_task_job);
+        throw std::runtime_error("Trying to terminate a non-submitted job should have raised an exception!");
       } catch (wrench::WorkflowExecutionException &e) {
-        success = false;
         if (e.getCause()->getCauseType() != wrench::FailureCause::JOB_CANNOT_BE_TERMINATED) {
           throw std::runtime_error(
                   "Got an exception, as expected, but it does not have the correct failure cause type");
@@ -983,9 +1074,6 @@ private:
           throw std::runtime_error(
                   "Got the expected exception and failure cause, but the failure cause does not point to the right job");
         }
-      }
-      if (success) {
-        throw std::runtime_error("Trying to terminate a non-submitted job should have raised an exception!");
       }
 
       return 0;
@@ -1108,14 +1196,10 @@ private:
       }
 
       // Try to terminate it now (which is stupid)
-      bool success = true;
       try {
         job_manager->terminateJob(two_task_job);
-      } catch (std::exception &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Trying to terminate a non-submitted job should have raised an exception!");
+      } catch (std::exception &e) {
       }
 
       return 0;

@@ -100,45 +100,31 @@ private:
 
     int main() {
 
-      bool success;
-
       std::shared_ptr<Sleep100Daemon> daemon =
               std::shared_ptr<Sleep100Daemon>(new Sleep100Daemon("Host1"));
 
       // Start the daemon without a life saver
-      success = true;
       try {
         daemon->startDaemon(false);
-      } catch (std::runtime_error &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to start a lifesaver-less daemon");
+      } catch (std::runtime_error &e) {
       }
 
       // Create the life saver
       daemon->createLifeSaver(std::shared_ptr<Sleep100Daemon>(daemon));
 
       // Create the life saver again (which is bogus)
-      success = true;
       try {
         daemon->createLifeSaver(std::shared_ptr<Sleep100Daemon>(daemon));
-      } catch (std::runtime_error &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to create a second life saver");
+      } catch (std::runtime_error &e) {
       }
 
       // Start a daemon without a simulation pointer
-      success = true;
       try {
         daemon->startDaemon(false);
-      } catch (std::runtime_error &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to start a simulation-less daemon");
+      } catch (std::runtime_error &e) {
       }
 
       // Start the daemon for real

@@ -146,14 +146,10 @@ private:
       }
 
       // Create a bogus standard job with an empty task list for coverage
-      bool success = true;
       try {
         wrench::StandardJob *bogus_job = job_manager->createStandardJob({}, {});
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to create a job with an empty task list");
+      } catch (std::invalid_argument &e) {
       }
 
       wrench::StandardJob *one_task_jobs[5];
@@ -179,14 +175,10 @@ private:
         }
 
         // Try to forget this job, which should NOT be fine
-        success = true;
         try {
           job_manager->forgetJob(one_task_jobs[job_index]);
-        } catch (wrench::WorkflowExecutionException &e) {
-          success = false;
-        }
-        if (success) {
           throw std::runtime_error("Should not be able to forget a pending/running job");
+        } catch (wrench::WorkflowExecutionException &e) {
         }
 
         // Get the job's service-specific arguments (coverage)
@@ -203,15 +195,11 @@ private:
 
       {
         // Try to create and submit a job with tasks that are pending, which should fail
-        success = true;
         wrench::StandardJob *bogus_job = job_manager->createStandardJob({*(tasks.begin())}, {}, {}, {}, {});
         try {
           job_manager->submitJob(bogus_job, this->test->compute_service);
-        } catch (std::invalid_argument &e) {
-          success = false;
-        }
-        if (success) {
           throw std::runtime_error("Should not be able to create a job with PENDING tasks");
+        } catch (std::invalid_argument &e) {
         }
       }
 
@@ -244,23 +232,17 @@ private:
 
       {
         // Try to create and submit a job with tasks that are completed, which should fail
-        success = true;
         wrench::StandardJob *bogus_job = job_manager->createStandardJob({*(++tasks.begin())}, {}, {}, {}, {});
         try {
           job_manager->submitJob(bogus_job, this->test->compute_service);
-        } catch (std::invalid_argument &e) {
-          success = false;
-        }
-        if (success) {
           throw std::runtime_error("Should not be able to create a job with PENDING tasks");
+        } catch (std::invalid_argument &e) {
         }
       }
 
-      {
-        // Try to forget the completed jobs
-        for (int i=0; i < 5; i++) {
-          job_manager->forgetJob(one_task_jobs[i]);
-        }
+      // Try to forget the completed jobs
+      for (int i=0; i < 5; i++) {
+        job_manager->forgetJob(one_task_jobs[i]);
       }
 
       // For coverage,
@@ -307,7 +289,7 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
           new wrench::NetworkProximityService("DualCoreHost", hosts)), std::runtime_error);
   ASSERT_THROW(simulation->add(
           new wrench::FileRegistryService("DualCoreHost")), std::runtime_error);
-  
+
   ASSERT_NO_THROW(simulation->init(&argc, argv));
 
   // Setting up the platform
