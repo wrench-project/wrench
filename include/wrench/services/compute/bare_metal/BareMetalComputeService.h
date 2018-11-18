@@ -130,14 +130,6 @@ namespace wrench {
 
         // Private Constructor
         BareMetalComputeService(const std::string &hostname,
-                                         std::set<std::string> compute_hosts,
-                                         std::map<std::string, std::string> property_list,
-                                         std::map<std::string, std::string> messagepayload_list,
-                                         StorageService* scratch_space);
-
-
-        // Private Constructor
-        BareMetalComputeService(const std::string &hostname,
                                          std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
                                          std::map<std::string, std::string> property_list,
                                          std::map<std::string, std::string> messagepayload_list,

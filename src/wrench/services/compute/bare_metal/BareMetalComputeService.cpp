@@ -341,37 +341,6 @@ namespace wrench {
                        pj);
     }
 
-    /**
-    * @brief Internal constructor
-    *
-    * @param hostname: the name of the host on which the job executor should be started
-    * @param compute_hosts:: a list of <hostname, num_cores, memory> tuples, which represent
-    *        the compute resources available to this service
-    * @param property_list: a property list ({} means "use all defaults")
-    * @param messagepayload_list: a message payload list ({} means "use all defaults")
-    * @param scratch_space: the scratch space for this compute service
-    */
-    BareMetalComputeService::BareMetalComputeService(const std::string &hostname,
-                                                     const std::set<std::string> compute_hosts,
-                                                     std::map<std::string, std::string> property_list,
-                                                     std::map<std::string, std::string> messagepayload_list,
-                                                     StorageService *scratch_space) :
-            ComputeService(hostname,
-                           "bare_metal",
-                           "bare_metal",
-                           scratch_space) {
-
-      std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
-      for (auto h : compute_hosts) {
-        compute_resources.insert(
-                std::make_pair(h, std::make_tuple(ComputeService::ALL_CORES, ComputeService::ALL_RAM)));
-      }
-
-      initiateInstance(hostname,
-                       compute_resources,
-                       std::move(property_list), std::move(messagepayload_list), DBL_MAX, nullptr);
-
-    }
 
     /**
      * @brief Internal constructor
@@ -1476,7 +1445,7 @@ namespace wrench {
       // Supporting Pilot jobs
       if (this->getPropertyValueAsBoolean(BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS)) {
         throw std::invalid_argument(
-                "Invalid SUPPORTS_PILOT_JOBS property specification: a BareMetalService cannot support pilot jobs");
+                "Invalid SUPPORTS_PILOT_JOBS property specification: a BareMetal Compute Service cannot support pilot jobs");
       }
 
     }
