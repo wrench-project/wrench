@@ -99,29 +99,19 @@ private:
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // try synchronous copy and register
-      bool success = true;
-      bool is_registered_at_dst = true;
 
       try {
         data_movement_manager->doSynchronousFileCopy(this->test->src_file_1, this->test->src_storage_service,
                                                      this->test->dst_storage_service, file_registry_service);
 
       } catch (wrench::WorkflowExecutionEvent) {
-        success = false;
+        throw std::runtime_error("Synchronous file copy failed");
       }
 
       std::set<wrench::StorageService *> src_file_1_locations = file_registry_service->lookupEntry(this->test->src_file_1);
       auto dst_search = src_file_1_locations.find(this->test->dst_storage_service);
 
       if (dst_search == src_file_1_locations.end()) {
-        is_registered_at_dst = false;
-      }
-
-      if (!success) {
-        throw std::runtime_error("Synchronous file copy failed");
-      }
-
-      if (!is_registered_at_dst) {
         throw std::runtime_error("Synchronous file copy succeeded but file was not registered at DstHost");
       }
 

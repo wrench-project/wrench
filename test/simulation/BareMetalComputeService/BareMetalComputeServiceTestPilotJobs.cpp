@@ -118,20 +118,14 @@ private:
       wrench::PilotJob *pilot_job = job_manager->createPilotJob();
 
       // Submit a pilot job
-      bool success = true;
       try {
         job_manager->submitJob(pilot_job, this->test->compute_service);
+        throw std::runtime_error(
+                "Should not be able to submit a pilot job to a compute service that does not support them");
       } catch (wrench::WorkflowExecutionException &e) {
         if (e.getCause()->getCauseType() != wrench::FailureCause::JOB_TYPE_NOT_SUPPORTED) {
           throw std::runtime_error("Didn't get the expected exception");
         }
-        success = false;
-      }
-
-
-      if (success) {
-        throw std::runtime_error(
-                "Should not be able to submit a pilot job to a compute service that does not support them");
       }
 
       return 0;

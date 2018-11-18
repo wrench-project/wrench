@@ -1100,20 +1100,14 @@ private:
         batch_job_args["-t"] = "2"; //time in minutes
         batch_job_args["-c"] = "12"; //number of cores per node, which is too many!
 
-        bool success = true;
         try {
           job_manager->submitJob(job, this->test->compute_service, batch_job_args);
+          throw std::runtime_error("Job Submission should have generated an exception");
         } catch (wrench::WorkflowExecutionException &e) {
-          success = false;
           if (e.getCause()->getCauseType() != wrench::FailureCause::NOT_ENOUGH_RESOURCES) {
             throw std::runtime_error("Got an exception, as expected, but the failure cause seems wrong");
           }
         }
-
-        if (success) {
-          throw std::runtime_error("Job Submission should have generated an exception");
-        }
-
 
         this->getWorkflow()->removeTask(task);
       }
@@ -1232,16 +1226,12 @@ private:
                                                                               this->test->storage_service2)});
 
         std::map<std::string, std::string> batch_job_args;
-        bool success = false;
         try {
           job_manager->submitJob(job, this->test->compute_service, batch_job_args);
-        } catch (std::invalid_argument &e) {
-          success = true;
-        }
-        if (not success) {
           throw std::runtime_error(
-                  "Expecting a runtime error of not arguments but did not get any such exceptions"
+                  "Should not have been able to submit jobs without service-specific args"
           );
+        } catch (std::invalid_argument &e) {
         }
         this->getWorkflow()->removeTask(task);
       }
@@ -2573,19 +2563,13 @@ private:
           throw std::runtime_error(
                   "Error while getting and execution event: " + std::to_string(e.getCause()->getCauseType()));
         }
-        bool success = false;
         switch (event->type) {
           case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-            success = true;
             break;
           }
           default: {
-            success = false;
+            throw std::runtime_error("Unexpected workflow execution event: " + std::to_string(event->type));
           }
-        }
-
-        if (not success) {
-          throw std::runtime_error("Unexpected workflow execution event: " + std::to_string(event->type));
         }
 
         this->getWorkflow()->removeTask(task);
@@ -2738,17 +2722,12 @@ private:
                 {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->getWorkflow()->getFileByID("input_file"),
                                                                               this->test->storage_service2)});
 
-        bool success = false;
         try {
           job_manager->submitJob(job, pilot_job->getComputeService(), {{task->getID(), "5"}});
-        } catch (wrench::WorkflowExecutionException e) {
-          success = true;
-        }
-
-        if (not success) {
           throw std::runtime_error(
                   "Expected a runtime error of insufficient cores in pilot job"
           );
+        } catch (wrench::WorkflowExecutionException e) {
         }
 
         this->getWorkflow()->removeTask(task);
@@ -3185,7 +3164,6 @@ private:
 
       // Wait for workflow execution events
       for (int i=0; i < 3; i++) {
-        bool success = true;
         std::unique_ptr<wrench::WorkflowExecutionEvent> event;
         try {
           event = this->getWorkflow()->waitForNextExecutionEvent();
@@ -3194,15 +3172,12 @@ private:
         }
         switch (event->type) {
           case wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
-            success = false;
             break;
           }
           default: {
-            throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+            throw std::runtime_error("Should have received a STANDARD_JOB_FAILURE event (received " +
+                                             std::to_string((int) (event->type)));
           }
-        }
-        if (success) {
-          throw std::runtime_error("Should have received a STANDARD_JOB_FAILURE event");
         }
 
         auto real_event = dynamic_cast<wrench::StandardJobFailedEvent*>(event.get());

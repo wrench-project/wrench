@@ -164,128 +164,75 @@ private:
           throw std::runtime_error("Unexpected '" + message->getName() + "' message");
         }
 
-        bool success = false;
         try {
           double value = this->simulation->getEnergyConsumedByHost("dummy_unavailable_host");
-          success = false;
-        } catch (std::exception e) {
+          throw std::runtime_error("Should not have been able to read the energy for dummy hosts");
+        } catch (std::exception &e) {
           WRENCH_INFO("Expected exception as we were trying to measure the energy for a dummy host that is not available");
-          success = true;
         }
 
-        if (!success) {
-          throw std::runtime_error(
-                  "Something is wrong. Should not have been able to read the energy for dummy hosts"
-          );
-        }
-
-        success = false;
         try {
           double value = this->simulation->getTotalEnergyConsumed({"dummy_unavailable_host"});
-          success = false;
-        } catch (std::exception e) {
-          WRENCH_INFO("Expected exception as we were trying to measure the energy for a dummy host that is not available");
-          success = true;
-        }
-
-        if (!success) {
           throw std::runtime_error(
-                  "Something is wrong. Should not have been able to read the energy for dummy hosts"
+                  "Should not have been able to read the energy for dummy hosts"
           );
+        } catch (std::exception &e) {
+          WRENCH_INFO("Expected exception as we were trying to measure the energy for a dummy host that is not available");
         }
 
-        success = false;
         try {
           double value = this->simulation->getNumberofPstates("dummy_unavailable_host");
-          success = false;
+          throw std::runtime_error(
+                  "Should not have been able to read the energy for dummy hosts"
+          );
         } catch (std::exception e) {
           WRENCH_INFO("Expected exception as we were trying to measure the energy for a dummy host that is not available");
-          success = true;
         }
 
-        if (!success) {
-          throw std::runtime_error(
-                  "Something is wrong. Should not have been able to read the energy for dummy hosts"
-          );
-        }
-
-        success = false;
         try {
           double value = this->simulation->getCurrentPstate("dummy_unavailable_host");
-          success = false;
+          throw std::runtime_error(
+                  "Should not have been able to read the energy for dummy hosts"
+          );
         } catch (std::exception e) {
           WRENCH_INFO("Expected exception as we were trying to measure the energy for a dummy host that is not available");
-          success = true;
         }
 
-        if (!success) {
-          throw std::runtime_error(
-                  "Something is wrong. Should not have been able to read the energy for dummy hosts"
-          );
-        }
-
-        success = false;
         try {
           double value = this->simulation->getMinPowerAvailable("dummy_unavailable_host");
-          success = false;
+          throw std::runtime_error(
+                  "Should not have been able to read the energy for dummy hosts"
+          );
         } catch (std::exception e) {
           WRENCH_INFO("Expected exception as we were trying to measure the energy for a dummy host that is not available");
-          success = true;
         }
 
-        if (!success) {
-          throw std::runtime_error(
-                  "Something is wrong. Should not have been able to read the energy for dummy hosts"
-          );
-        }
-
-        success = false;
         try {
           double value = this->simulation->getMaxPowerPossible("dummy_unavailable_host");
-          success = false;
+          throw std::runtime_error(
+                  "Should not have been able to read the energy for dummy hosts"
+          );
         } catch (std::exception e) {
           WRENCH_INFO("Expected exception as we were trying to access energy plugin for a dummy host that is not available");
-          success = true;
         }
 
-        if (!success) {
-          throw std::runtime_error(
-                  "Something is wrong. Should not have been able to read the energy for dummy hosts"
-          );
-        }
-
-        success = false;
         try {
           this->simulation->setPstate("dummy_unavailable_host",1);
-          success = false;
+          throw std::runtime_error(
+                  "Should not have been able to read the energy for dummy hosts"
+          );
         } catch (std::exception e) {
           WRENCH_INFO("Expected exception as we were trying to access energy plugin for a dummy host that is not available");
-          success = true;
         }
 
-        if (!success) {
-          throw std::runtime_error(
-                  "Something is wrong. Should not have been able to read the energy for dummy hosts"
-          );
-        }
-
-        success = false;
         try {
           this->simulation->setPstate(simulation_hosts[1],2);
-          success = true;
+          throw std::runtime_error(
+                  "Should not have been able to read the energy for dummy hosts"
+          );
         } catch (std::exception e) {
           WRENCH_INFO("Unexpected exception as we were trying to access energy plugin for a correct host that is available");
-          success = false;
         }
-
-        if (!success) {
-          throw std::runtime_error(
-                  "Something is wrong. Should not have been able to read the energy for dummy hosts"
-          );
-        }
-
-
-
       }
 
       return 0;

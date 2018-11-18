@@ -102,14 +102,10 @@ private:
     int main() {
 
       // Bogus staging (can only be done in maestro)
-      bool success = true;
       try {
         this->simulation->stageFile(this->test->file_1, this->test->storage_service_100);
-      } catch (std::runtime_error &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be possible to call stageFile() from a non-maestro process");
+      } catch (std::runtime_error &e) {
       }
 
       // Create a data movement manager
@@ -129,14 +125,10 @@ private:
       }
 
       // Do a bogus lookup
-      success = true;
       try {
         this->test->storage_service_1000->lookupFile(nullptr, nullptr);
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to lookup a nullptr file!");
+      } catch (std::invalid_argument &e) {
       }
 
       // Do a few queries to storage services
@@ -149,58 +141,35 @@ private:
       }
 
       // Do a couple of bogus copies
-      success = true;
       try {
         this->test->storage_service_100->copyFile(nullptr, this->test->storage_service_1000);
+        throw std::runtime_error("Should not be able to store a nullptr to a storage service!");
       } catch (std::invalid_argument &) {
-        success = false;
-      }
-      if (success) {
-        throw std::runtime_error(
-                "Should not be able to store a nullptr to a storage service!");
       }
 
-      success = true;
       try {
         this->test->storage_service_100->copyFile(this->test->file_500, nullptr);
+        throw std::runtime_error("Should not be able to store a file to a nullptr storage service!");
       } catch (std::invalid_argument &) {
-        success = false;
-      }
-      if (success) {
-        throw std::runtime_error(
-                "Should not be able to store a file to a nullptr storage service!");
       }
 
       // Copy a file to a storage service that doesn't have enough space
-      success = true;
       try {
         this->test->storage_service_100->copyFile(this->test->file_500, this->test->storage_service_1000);
-      } catch (wrench::WorkflowExecutionException &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error(
                 "Should not be able to store a file to a storage service that doesn't have enough capacity");
+      } catch (wrench::WorkflowExecutionException &e) {
       }
-
 
       // Make sure the copy didn't happen
-      success = false;
       if (this->test->storage_service_100->lookupFile(this->test->file_500, nullptr)) {
-        success = true;
-      }
-      if (success) {
         throw std::runtime_error("File copy to a storage service without enough space shouldn't have succeeded");
       }
 
       // Copy a file to a storage service that has enough space
-      success = true;
       try {
         this->test->storage_service_100->copyFile(this->test->file_10, this->test->storage_service_1000);
       } catch (wrench::WorkflowExecutionException &e) {
-        success = false;
-      }
-      if (!success) {
         throw std::runtime_error("Should be able to store a file to a storage service that has enough capacity");
       }
 
@@ -220,14 +189,10 @@ private:
       }
 
       // Bogus read
-      success = true;
       try {
         this->test->storage_service_100->readFile(nullptr);
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to read nullptr file");
+      } catch (std::invalid_argument &e) {
       }
 
       // Read a file on a storage service
@@ -238,22 +203,17 @@ private:
       }
 
       // Read a file on a storage service that doesn't have that file
-      success = true;
       try {
         this->test->storage_service_100->readFile(this->test->file_100);
-      } catch (wrench::WorkflowExecutionException &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to read a file unavailable a storage service");
+      } catch (wrench::WorkflowExecutionException &e) {
       }
 
       // Delete a file on a storage service that doesnt' have it
-      success = true;
       try {
         this->test->storage_service_100->deleteFile(this->test->file_100);
+        throw std::runtime_error("Should not be able to delete a file unavailable a storage service");
       } catch (wrench::WorkflowExecutionException &e) {
-        success = false;
         if (e.getCause()->getCauseType() != wrench::FailureCause::FILE_NOT_FOUND) {
           throw std::runtime_error("Got an expected exception, but not the expected failure cause type");
         }
@@ -268,16 +228,12 @@ private:
         }
 
       }
-      if (success) {
-        throw std::runtime_error("Should not be able to delete a file unavailable a storage service");
-      }
 
       // Delete a file in a bogus partition
-      success = true;
       try {
         this->test->storage_service_100->deleteFile(this->test->file_100, "bogus");
+        throw std::runtime_error("Should not be able to delete a file unavailable a storage service");
       } catch (wrench::WorkflowExecutionException &e) {
-        success = false;
         if (e.getCause()->getCauseType() != wrench::FailureCause::FILE_NOT_FOUND) {
           throw std::runtime_error("Got an expected 'file not found' exception, but not the expected failure cause type");
         }
@@ -292,11 +248,6 @@ private:
         }
 
       }
-      if (success) {
-        throw std::runtime_error("Should not be able to delete a file unavailable a storage service");
-      }
-
-
 
       // Delete a file on a storage service that has it
       try {
@@ -316,46 +267,31 @@ private:
                 "Free space on storage service is wrong (" + std::to_string(free_space) + ") instead of 100.0");
       }
 
-
-
       // Do a bogus asynchronous file copy (file = nullptr);
-      success = true;
       try {
         data_movement_manager->initiateAsynchronousFileCopy(nullptr,
                                                             this->test->storage_service_1000,
                                                             this->test->storage_service_100);
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Shouldn't be able to do an initiateAsynchronousFileCopy with a nullptr file");
+      } catch (std::invalid_argument &e) {
       }
       // Do a bogus asynchronous file copy (src = nullptr);
-      success = true;
       try {
         data_movement_manager->initiateAsynchronousFileCopy(this->test->file_1,
                                                             nullptr,
                                                             this->test->storage_service_100);
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Shouldn't be able to do an initiateAsynchronousFileCopy with a nullptr src");
+      } catch (std::invalid_argument &e) {
       }
 
       // Do a bogus asynchronous file copy (dst = nullptr);
-      success = true;
       try {
         data_movement_manager->initiateAsynchronousFileCopy(this->test->file_1,
                                                             this->test->storage_service_1000,
                                                             nullptr);
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Shouldn't be able to do an initiateAsynchronousFileCopy with a nullptr dst");
+      } catch (std::invalid_argument &e) {
       }
-
 
       // Do a valid asynchronous file copy
       try {
@@ -400,8 +336,6 @@ private:
         throw std::runtime_error(
                 "Free space on storage service is wrong (" + std::to_string(free_space) + ") instead of 99.0");
       }
-
-
 
       // Do an INVALID asynchronous file copy (file too big)
       try {
@@ -460,26 +394,20 @@ private:
       }
 
       // Do a really bogus file removal
-      success = true;
       try {
         this->test->storage_service_100->deleteFile(nullptr);
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to delete a nullptr file from a storage service");
+      } catch (std::invalid_argument &e) {
       }
-
 
       // Shutdown the service
       this->test->storage_service_100->stop();
 
       // Try to do stuff with a shutdown service
-      success = true;
       try {
         this->test->storage_service_100->lookupFile(this->test->file_1);
+        throw std::runtime_error("Should not be able to lookup a file from a DOWN service");
       } catch (wrench::WorkflowExecutionException &e) {
-        success = false;
         // Check Exception
         if (e.getCause()->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
           throw std::runtime_error("Got an exception, as expected, but of the unexpected type " +
@@ -492,15 +420,11 @@ private:
                   "Got the expected 'service is down' exception, but the failure cause does not point to the correct storage service");
         }
       }
-      if (success) {
-        throw std::runtime_error("Should not be able to lookup a file from a DOWN service");
-      }
 
-      success = true;
       try {
         this->test->storage_service_100->lookupFile(this->test->file_1, "/");
+        throw std::runtime_error("Should not be able to lookup a file from a DOWN service");
       } catch (wrench::WorkflowExecutionException &e) {
-        success = false;
         // Check Exception
         if (e.getCause()->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
           throw std::runtime_error("Got an exception, as expected, but of the unexpected type " +
@@ -513,15 +437,11 @@ private:
                   "Got the expected 'service is down' exception, but the failure cause does not point to the correct storage service");
         }
       }
-      if (success) {
-        throw std::runtime_error("Should not be able to lookup a file from a DOWN service");
-      }
 
-      success = true;
       try {
         this->test->storage_service_100->lookupFile(this->test->file_1, nullptr);
+        throw std::runtime_error("Should not be able to lookup a file from a DOWN service");
       } catch (wrench::WorkflowExecutionException &e) {
-        success = false;
         // Check Exception
         if (e.getCause()->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
           throw std::runtime_error("Got an exception, as expected, but of the unexpected type " +
@@ -534,15 +454,11 @@ private:
                   "Got the expected 'service is down' exception, but the failure cause does not point to the correct storage service");
         }
       }
-      if (success) {
-        throw std::runtime_error("Should not be able to lookup a file from a DOWN service");
-      }
 
-      success = true;
       try {
         this->test->storage_service_100->readFile(this->test->file_1, nullptr);
+        throw std::runtime_error("Should not be able to lookup a file from a down service");
       } catch (wrench::WorkflowExecutionException &e) {
-        success = false;
         // Check Exception
         if (e.getCause()->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
           throw std::runtime_error("Got an exception, as expected, but of the unexpected type " +
@@ -555,15 +471,11 @@ private:
                   "Got the expected 'service is down' exception, but the failure cause does not point to the correct storage service");
         }
       }
-      if (success) {
-        throw std::runtime_error("Should not be able to lookup a file from a down service");
-      }
 
-      success = true;
       try {
         this->test->storage_service_100->writeFile(this->test->file_1, nullptr);
+        throw std::runtime_error("Should not be able to lookup a file from a DOWN service");
       } catch (wrench::WorkflowExecutionException &e) {
-        success = false;
         // Check Exception
         if (e.getCause()->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
           throw std::runtime_error("Got an exception, as expected, but of the unexpected type " +
@@ -575,16 +487,12 @@ private:
           throw std::runtime_error(
                   "Got the expected 'service is down' exception, but the failure cause does not point to the correct storage service");
         }
-      }
-      if (success) {
-        throw std::runtime_error("Should not be able to lookup a file from a DOWN service");
       }
 
-      success = true;
       try {
         free_space = this->test->storage_service_100->getFreeSpace();
+        throw std::runtime_error("Should not be able to get free space info from a DOWN service");
       } catch (wrench::WorkflowExecutionException &e) {
-        success = false;
         // Check Exception
         if (e.getCause()->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
           throw std::runtime_error("Got an exception, as expected, but of the unexpected type " +
@@ -596,9 +504,6 @@ private:
           throw std::runtime_error(
                   "Got the expected 'service is down' exception, but the failure cause does not point to the correct storage service");
         }
-      }
-      if (success) {
-        throw std::runtime_error("Should not be able to get free space info from a DOWN service");
       }
 
       return 0;
@@ -710,41 +615,28 @@ private:
 
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
-      bool success;
       // Do a bogus file copy (file = nullptr)
-      success = true;
       try {
         data_movement_manager->doSynchronousFileCopy(nullptr, this->test->storage_service_1000,
                                                      this->test->storage_service_510);
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Shouldn't be able to do a synchronous file copy with a nullptr file");
+      } catch (std::invalid_argument &e) {
       }
 
       // Do a bogus file copy (src = nullptr)
-      success = true;
       try {
         data_movement_manager->doSynchronousFileCopy(this->test->file_500, nullptr,
                                                      this->test->storage_service_510);
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Shouldn't be able to do a synchronous file copy with a nullptr src");
+      } catch (std::invalid_argument &e) {
       }
 
       // Do a bogus file copy (dst = nullptr)
-      success = true;
       try {
         data_movement_manager->doSynchronousFileCopy(this->test->file_500, this->test->storage_service_1000,
                                                      nullptr);
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Shouldn't be able to do a synchronous file copy with a nullptr src");
+      } catch (std::invalid_argument &e) {
       }
 
       // Do the file copy
@@ -756,15 +648,11 @@ private:
       }
 
       // Do the file copy again, which should fail
-      success = false;
       try {
         data_movement_manager->doSynchronousFileCopy(this->test->file_500, this->test->storage_service_1000,
                                                      this->test->storage_service_510);
-      } catch (wrench::WorkflowExecutionException &e) {
-        success = true;
-      }
-      if (!success) {
         throw std::runtime_error("Should not be able to write a file beyond the storage capacity");
+      } catch (wrench::WorkflowExecutionException &e) {
       }
 
       // Do another file copy with empty src partition and empty dst partition
@@ -875,12 +763,11 @@ private:
       }
 
       // Initiate it again which should fail
-      bool success = true;
       try {
         data_movement_manager->initiateAsynchronousFileCopy(this->test->file_500, this->test->storage_service_1000,
                                                             this->test->storage_service_510);
+        throw std::runtime_error("A duplicate asynchronous file copy should fail!");
       } catch (wrench::WorkflowExecutionException &e) {
-        success = false;
         if (e.getCause()->getCauseType() != wrench::FailureCause::FILE_ALREADY_BEING_COPIED) {
           throw std::runtime_error("Got expected exception, but unexpected failure cause " +
                                            e.getCause()->toString() +
@@ -897,10 +784,6 @@ private:
           throw std::runtime_error("Got expected failure cause, but failure cause does not point to the right partition");
         }
         real_cause->toString(); // for coverage
-
-      }
-      if (success) {
-        throw std::runtime_error("A duplicate asynchronous file copy should fail!");
       }
 
       // Wait for the next execution event
@@ -1011,12 +894,11 @@ private:
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Do the file copy while space doesn't fit
-      bool success = true;
       try {
         data_movement_manager->doSynchronousFileCopy(this->test->file_500, this->test->storage_service_1000,
                                                      this->test->storage_service_100);
+        throw std::runtime_error("Should have gotten a 'not enough space' exception");
       } catch (wrench::WorkflowExecutionException &e) {
-        success = false;
         // Check Exception
         if (e.getCause()->getCauseType() != wrench::FailureCause::STORAGE_NOT_ENOUGH_SPACE) {
           throw std::runtime_error("Got an exception, as expected, but of the unexpected type " +
@@ -1034,35 +916,25 @@ private:
                   "Got the expected 'not enough space' exception, but the failure cause does not point to the correct storage service");
         }
       }
-      if (success) {
-        throw std::runtime_error("Should have gotten a 'not enough space' exception");
-      }
 
       // Do a file copy from myself
-      success = true;
       try {
         data_movement_manager->doSynchronousFileCopy(this->test->file_500, this->test->storage_service_510,
                                                      this->test->storage_service_510);
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should have gotten a 'can't copy from myself' exception");
+      } catch (std::invalid_argument &e) {
       }
-
-
 
       // Do the file copy for a file that's not there
 
       // First delete the file (we used to have an "already there" error)
       this->test->storage_service_1000->deleteFile(this->test->file_500);
 
-      success = true;
       try {
         data_movement_manager->doSynchronousFileCopy(this->test->file_500, this->test->storage_service_510,
                                                      this->test->storage_service_1000);
+        throw std::runtime_error("Should have gotten a 'file not found' exception");
       } catch (wrench::WorkflowExecutionException &e) {
-        success = false;
         // Check Exception
         if (e.getCause()->getCauseType() != wrench::FailureCause::FILE_NOT_FOUND) {
           throw std::runtime_error("XXX Got an exception, as expected, but of the unexpected type " +
@@ -1079,20 +951,15 @@ private:
                   "Got the expected 'file not found' exception, but the failure cause does not point to the correct storage service");
         }
       }
-      if (success) {
-        throw std::runtime_error("Should have gotten a 'file not found' exception");
-      }
-
 
       // Do the file copy from a dst storage service that's down
       this->test->storage_service_1000->stop();
 
-      success = true;
       try {
         data_movement_manager->doSynchronousFileCopy(this->test->file_500, this->test->storage_service_1000,
                                                      this->test->storage_service_510);
+        throw std::runtime_error("Should have gotten a 'service is down' exception");
       } catch (wrench::WorkflowExecutionException &e) {
-        success = false;
         // Check Exception
         if (e.getCause()->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
           throw std::runtime_error("Got an exception, as expected, but of the unexpected type " +
@@ -1105,20 +972,15 @@ private:
                   "Got the expected 'service is down' exception, but the failure cause does not point to the correct storage service");
         }
       }
-      if (success) {
-        throw std::runtime_error("Should have gotten a 'service is down' exception");
-      }
-
 
       // Do the file copy from a src storage service that's down
       this->test->storage_service_510->stop();
 
-      success = true;
       try {
         data_movement_manager->doSynchronousFileCopy(this->test->file_500, this->test->storage_service_1000,
                                                      this->test->storage_service_510);
+        throw std::runtime_error("Should have gotten a 'service is down' exception");
       } catch (wrench::WorkflowExecutionException &e) {
-        success = false;
         // Check Exception
         if (e.getCause()->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
           throw std::runtime_error("Got an exception, as expected, but of the unexpected type " +
@@ -1130,9 +992,6 @@ private:
           throw std::runtime_error(
                   "Got the expected 'service is down' exception, but the failure cause does not point to the correct storage service");
         }
-      }
-      if (success) {
-        throw std::runtime_error("Should have gotten a 'service is down' exception");
       }
 
       return 0;
@@ -1345,12 +1204,11 @@ private:
       // Do the file copy from a dst storage service that's down
       this->test->storage_service_510->stop();
 
-      bool success = true;
       try {
         data_movement_manager->initiateAsynchronousFileCopy(this->test->file_500, this->test->storage_service_1000,
                                                             this->test->storage_service_510);
+        throw std::runtime_error("Should have gotten a 'service is down' exception");
       } catch (wrench::WorkflowExecutionException &e) {
-        success = false;
         // Check Exception
         if (e.getCause()->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
           throw std::runtime_error("Got an exception, as expected, but of the unexpected type " +
@@ -1362,9 +1220,6 @@ private:
           throw std::runtime_error(
                   "Got the expected 'service is down' exception, but the failure cause does not point to the correct storage service");
         }
-      }
-      if (success) {
-        throw std::runtime_error("Should have gotten a 'service is down' exception");
       }
 
       return 0;
@@ -1597,16 +1452,11 @@ private:
 
 
       // Copy storage_service_510:foo:file_10 to storage_service_510:foo    SHOULD NOT WORK
-      bool success = false;
       try {
         data_movement_manager->initiateAsynchronousFileCopy(this->test->file_10, this->test->storage_service_510, "foo",
                                                             this->test->storage_service_510, "foo");
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-
-      if (success) {
         throw std::runtime_error("Should not be able to copy a file onto itself");
+      } catch (std::invalid_argument &e) {
       }
 
       // Check all lookups
@@ -1628,24 +1478,16 @@ private:
 
 
       // Bogus lookup
-      success = true;
       try {
         this->test->storage_service_1000->lookupFile(nullptr);
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to lookup a nullptr file");
+      } catch (std::invalid_argument &e) {
       }
 
-      success = true;
       try {
         this->test->storage_service_1000->lookupFile(nullptr, "/");
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to lookup a nullptr file");
+      } catch (std::invalid_argument &e) {
       }
 
       // File copy from oneself to oneself!
@@ -1759,21 +1601,16 @@ private:
 
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
-      bool success = true;
       try {
         this->test->storage_service_100->writeFile(nullptr, "/");
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to write a nullptr file to a service");
+      } catch (std::invalid_argument &e) {
       }
 
-      success = true;
       try {
         this->test->storage_service_100->writeFile(this->test->file_500);
+        throw std::runtime_error("Should not be able to write to a storage service with not enough space");
       } catch (wrench::WorkflowExecutionException &e) {
-        success = false;
         if (e.getCause()->getCauseType() != wrench::FailureCause::STORAGE_NOT_ENOUGH_SPACE) {
           throw std::runtime_error("Got an expected exception, but not the expected failure cause type");
         }
@@ -1788,15 +1625,10 @@ private:
         }
       }
 
-      if (success) {
-        throw std::runtime_error("Should not be able to write to a storage service with not enough space");
-      }
-
-      success = true;
       try {
         this->test->storage_service_100->writeFile(this->test->file_500, "");
+        throw std::runtime_error("Should not be able to write to a storage service with not enough space");
       } catch (wrench::WorkflowExecutionException &e) {
-        success = false;
         if (e.getCause()->getCauseType() != wrench::FailureCause::STORAGE_NOT_ENOUGH_SPACE) {
           throw std::runtime_error("Got an expected exception, but not the expected failure cause type");
         }
@@ -1809,10 +1641,6 @@ private:
           throw std::runtime_error(
                   "Got the expected 'not enough space' exception, but the failure cause does not point to the correct file");
         }
-      }
-
-      if (success) {
-        throw std::runtime_error("Should not be able to write to a storage service with not enough space");
       }
 
       return 0;

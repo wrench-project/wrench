@@ -48,6 +48,7 @@ public:
     void do_ExecutionWithDownService_test();
 
 
+
 protected:
     BareMetalComputeServiceOneTaskTest() {
 
@@ -376,82 +377,58 @@ private:
       // Create a job manager
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
-      bool success;
-
       wrench::StandardJob *job = nullptr;
 
       // Create a job with nullptr task (and no file copies)
-      success = true;
       try {
         job = job_manager->createStandardJob(nullptr,
                                              {{test->input_file,  test->storage_service1},
                                               {test->output_file, test->storage_service1}});
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-
-      if (success) {
         throw std::runtime_error("Should not be able to create a job with an empty task");
+      } catch (std::invalid_argument &e) {
       }
 
       // Create a job with an empty vector of tasks (and no file copies)
-      success = true;
       try {
         job = job_manager->createStandardJob({},
                                              {{test->input_file,  test->storage_service1},
                                               {test->output_file, test->storage_service1}});
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to create a job with an empty task vector");
+      } catch (std::invalid_argument &e) {
       }
 
       // Create a job with a vector of empty tasks (and no file copies)
-      success = true;
       try {
         job = job_manager->createStandardJob({nullptr, nullptr},
                                              {{test->input_file,  test->storage_service1},
                                               {test->output_file, test->storage_service1}});
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to create a job with a vector of empty tasks");
+      } catch (std::invalid_argument &e) {
       }
 
       // Create another task
       wrench::WorkflowTask *task_big = this->getWorkflow()->addTask("task2", 3600, 2, 2, 1.0, 2048);
 
       // Create a job with nullptrs in file locations
-      success = true;
       try {
 
         job = job_manager->createStandardJob({test->task, task_big},
                                              {{nullptr,  test->storage_service1},
                                               {test->output_file, test->storage_service1}});
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to create a job with an nullptr file in file locations");
+      } catch (std::invalid_argument &e) {
       }
 
       // Create a job with nullptrs in file locations
-      success = true;
       try {
         job = job_manager->createStandardJob({test->task, task_big},
                                              {{test->input_file,  nullptr},
                                               {test->output_file, test->storage_service1}});
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to create a job with an nullptr storage service in file locations");
+      } catch (std::invalid_argument &e) {
       }
 
       // Create a job with nullptrs in pre file copies
-      success = true;
       try {
         job = job_manager->createStandardJob({test->task},
                                              {{test->input_file,  test->storage_service1},
@@ -461,15 +438,11 @@ private:
                                              {},
                                              {}
         );
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to create a job with a nullptr file in pre file copies");
+      } catch (std::invalid_argument &e) {
       }
 
       // Create a job with nullptrs in pre file copies
-      success = true;
       try {
         job = job_manager->createStandardJob({test->task},
                                              {{test->input_file,  test->storage_service1},
@@ -479,15 +452,11 @@ private:
                                              {},
                                              {}
         );
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to create a job with a nullptr src storage service in pre file copies");
+      } catch (std::invalid_argument &e) {
       }
 
       // Create a job with nullptrs in pre file copies
-      success = true;
       try {
         job = job_manager->createStandardJob({test->task},
                                              {{test->input_file,  test->storage_service1},
@@ -496,15 +465,11 @@ private:
                                              {},
                                              {}
         );
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to create a job with a nullptr dst storage service in pre file copies");
+      } catch (std::invalid_argument &e) {
       }
 
       // Create a job with nullptrs in post file copies
-      success = true;
       try {
         job = job_manager->createStandardJob({test->task},
                                              {{test->input_file,  test->storage_service1},
@@ -513,15 +478,11 @@ private:
                                              {std::make_tuple(nullptr, test->storage_service1, test->storage_service2)},
                                              {}
         );
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to create a job with a nullptr file in post file copies");
+      } catch (std::invalid_argument &e) {
       }
 
       // Create a job with nullptrs in post file copies
-      success = true;
       try {
         job = job_manager->createStandardJob({test->task},
                                              {{test->input_file,  test->storage_service1},
@@ -530,15 +491,11 @@ private:
                                              {std::make_tuple(test->output_file, nullptr, test->storage_service2)},
                                              {}
         );
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to create a job with a nullptr src storage service in post file copies");
+      } catch (std::invalid_argument &e) {
       }
 
       // Create a job with nullptrs in post file copies
-      success = true;
       try {
         job = job_manager->createStandardJob({test->task},
                                              {{test->input_file,  test->storage_service1},
@@ -548,15 +505,11 @@ private:
                                              },
                                              {}
         );
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to create a job with a nullptr dst storage service in post file copies");
+      } catch (std::invalid_argument &e) {
       }
 
       // Create a job with nullptrs in post file deletions
-      success = true;
       try {
         job = job_manager->createStandardJob({test->task},
                                              {{test->input_file,  test->storage_service1},
@@ -565,16 +518,12 @@ private:
                                              {},
                                              {std::make_tuple(nullptr, test->storage_service1)}
         );
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to create a job with a nullptr file in file deletions");
+      } catch (std::invalid_argument &e) {
       }
 
 
       // Create a job with nullptrs in post file deletions
-      success = true;
       try {
         job = job_manager->createStandardJob({test->task},
                                              {{test->input_file,  test->storage_service1},
@@ -583,11 +532,8 @@ private:
                                              {},
                                              {std::make_tuple(test->input_file, nullptr)}
         );
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Should not be able to create a job with a nullptr storage service in file deletions");
+      } catch (std::invalid_argument &e) {
       }
 
       if (job) {
@@ -788,9 +734,6 @@ private:
 
       wrench::StandardJob *job = nullptr;
 
-      bool success;
-
-
       // Create a job
       job = job_manager->createStandardJob(test->task,
                                            {{test->input_file,  test->storage_service1},
@@ -817,36 +760,24 @@ private:
 
 
       /* Do a bogus lookup of the file registry service */
-      success = true;
       try {
         this->getAvailableFileRegistryService()->lookupEntry(nullptr);
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Shouldn't be able to lookup a nullptr entry in the File Registry Service");
+      } catch (std::invalid_argument &e) {
       }
 
       /* Do a bogus add entry of the file registry service */
-      success = true;
       try {
         this->getAvailableFileRegistryService()->addEntry(nullptr, nullptr);
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Shouldn't be able to add nullptr entry in the File Registry Service");
+      } catch (std::invalid_argument &e) {
       }
 
       /* Do a bogus remove entry of the file registry service */
-      success = true;
       try {
         this->getAvailableFileRegistryService()->removeEntry(nullptr, nullptr);
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
         throw std::runtime_error("Shouldn't be able to remove nullptr entry in the File Registry Service");
+      } catch (std::invalid_argument &e) {
       }
 
       return 0;
@@ -1235,7 +1166,6 @@ private:
       std::unique_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
       switch (event->type) {
         case wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
-          bool success = false;
           if (dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())->failure_cause->getCauseType() != wrench::FailureCause::NO_STORAGE_SERVICE_FOR_FILE) {
             throw std::runtime_error(
                     "Got an Standard Job Failure as expected, but it does not have the correct failure cause type");
@@ -1348,8 +1278,6 @@ private:
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
 
-      bool success;
-
       // Create another task
       wrench::WorkflowTask *task_big = this->getWorkflow()->addTask("task2", 3600, 2, 2, 1.0, 2048);
 
@@ -1358,9 +1286,9 @@ private:
                                                                 {},
                                                                 {}, {}, {});
       // Submit the job
-      success = true;
       try {
         job_manager->submitJob(job, test->compute_service, {{"task2", "OneCoreHost:2"}});
+        throw std::runtime_error("Should not be able to submit a job to a service without enough cores");
       } catch (wrench::WorkflowExecutionException &e) {
         if (e.getCause()->getCauseType() != wrench::FailureCause::NOT_ENOUGH_RESOURCES) {
           throw std::runtime_error("Received the expected exception, but the failure cause is incorrect");
@@ -1375,11 +1303,6 @@ private:
           throw std::runtime_error(
                   "Got the expected failure, but the failure cause does not point to the right compute service");
         }
-        success = false;
-      }
-
-      if (success) {
-        throw std::runtime_error("Should not be able to submit a job to a service without enough cores");
       }
 
       return 0;
@@ -1476,9 +1399,6 @@ private:
       // Create a job manager
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
-
-      bool success;
-
       wrench::WorkflowTask *task_big = this->getWorkflow()->addTask("task2", 3600, 2, 2, 1.0, 2048);
 
       // Create a job
@@ -1486,9 +1406,9 @@ private:
                                                                 {},
                                                                 {}, {}, {});
       // Submit the job
-      success = true;
       try {
         job_manager->submitJob(job, test->compute_service);
+        throw std::runtime_error("Should not be able to submit a job to a service without enough RAM");
       } catch (wrench::WorkflowExecutionException &e) {
         if (e.getCause()->getCauseType() != wrench::FailureCause::NOT_ENOUGH_RESOURCES) {
           throw std::runtime_error("Received the expected exception, but the failure cause is incorrect");
@@ -1503,11 +1423,6 @@ private:
           throw std::runtime_error(
                   "Got the expected failure, but the failure cause does not point to the right compute service");
         }
-        success = false;
-      }
-
-      if (success) {
-        throw std::runtime_error("Should not be able to submit a job to a service without enough RAM");
       }
 
       return 0;
@@ -1606,8 +1521,6 @@ private:
 
       wrench::StandardJob *job = nullptr;
 
-      bool success;
-
       // Shutdown the service
       test->compute_service->stop();
 
@@ -1617,11 +1530,10 @@ private:
                                             {test->output_file, test->storage_service1}});
 
       // Submit the job
-      success = true;
       try {
         job_manager->submitJob(job, test->compute_service);
+        throw std::runtime_error("Should not be able to submit a job to a service that is down");
       } catch (wrench::WorkflowExecutionException &e) {
-        success = false;
         if (e.getCause()->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
           throw std::runtime_error("Got the expected exception, but the failure cause is wrong");
         }
@@ -1631,10 +1543,6 @@ private:
           throw std::runtime_error(
                   "Got the expected failure, but the failure cause does not point to the right compute service");
         }
-      }
-
-      if (success) {
-        throw std::runtime_error("Should not be able to submit a job to a service that is down");
       }
 
       return 0;
