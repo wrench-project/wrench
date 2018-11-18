@@ -666,7 +666,6 @@ namespace wrench {
           std::map<std::string, std::tuple<unsigned long, double>> compute_resources = {
                   std::make_pair(vm_name, std::make_tuple(std::get<2>(vm_tuple->second), std::get<3>(vm_tuple->second)))};
 
-          std::cerr << "ABOUT TO CALL CONSTRUCTOR\n";
           std::shared_ptr<ComputeService> cs = std::shared_ptr<ComputeService>(
                   new BareMetalComputeService(vm_name,
                                                        compute_resources,
