@@ -27,7 +27,7 @@
 #include "wrench/workflow/job/StandardJob.h"
 #include "wrench/workflow/job/PilotJob.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(multicore_compute_service, "Log category for Multicore Compute Service");
+XBT_LOG_NEW_DEFAULT_CATEGORY(baremetal_compute_service, "Log category for Multicore Compute Service");
 
 namespace wrench {
 

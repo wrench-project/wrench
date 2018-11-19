@@ -253,6 +253,7 @@ set(TEST_FILES
         test/simulation/BatchService/BatchServiceTraceFileTest.cpp
         test/simulation/BatchService/BatchServiceOutputCSVFileTest.cpp
         test/simulation/BatchService/BatchServiceBatschedQueueWaitTimePredictionTest.cpp
+        test/simulation/BatchService/BatchServiceBatschedContiguityTest.cpp
         test/simulation/wms/WMSTest.cpp
         test/simulation/wms/MultipleWMSTest.cpp
         test/simulation/wms/WMSOptimizationsTest.cpp
