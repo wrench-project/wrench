@@ -210,7 +210,7 @@ private:
 #ifdef ENABLE_BATSCHED
 TEST_F(BatchServiceBatschedContiguityTest, BatchJobContiguousAllocationTest)
 #else
-TEST_F(BatchServiceTest, DISABLED_BatchJobContiguousAllocationTest)
+TEST_F(BatchServiceBatschedContiguityTest, DISABLED_BatchJobContiguousAllocationTest)
 #endif
 {
   DO_TEST_WITH_FORK(do_BatchJobContiguousAllocationTest_test);
