@@ -65,6 +65,7 @@ after_success:
 #deploy:
 #  provider: pages
 #  skip_cleanup: true
+#  keep-history: true
 #  github_token: $GITHUB_TOKEN
 #  local_dir: ./docs/gh-pages
 #  on:
