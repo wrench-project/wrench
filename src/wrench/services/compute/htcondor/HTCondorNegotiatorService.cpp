@@ -87,17 +87,6 @@ namespace wrench {
       // TODO: check how to pass the service specific arguments
       std::map<std::string, std::string> specific_args;
       std::vector<StandardJob *> scheduled_jobs;
-//          unsigned long total_idle_cores = 0;
-//
-//          if (HTCondorNegotiatorService::cs_map.empty()) {
-//            for (auto &&cs : this->compute_resources) {
-//              unsigned long sum_num_idle_cores;
-//              std::vector<unsigned long> num_idle_cores = cs->getNumIdleCores();
-//              sum_num_idle_cores = std::accumulate(num_idle_cores.begin(), num_idle_cores.end(), 0ul);
-//              total_idle_cores += sum_num_idle_cores;
-//              HTCondorNegotiatorService::cs_map.insert(std::make_pair(cs, sum_num_idle_cores));
-//            }
-//          }
 
       // sort tasks by priority
       std::sort(this->pending_jobs.begin(), this->pending_jobs.end(), JobPriorityComparator());
