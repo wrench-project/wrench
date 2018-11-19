@@ -186,7 +186,7 @@ void HTCondorServiceTest::do_StandardJobTaskTest_test() {
           {std::make_pair(
                   execution_host,
                   std::make_tuple(wrench::Simulation::getHostNumCores(execution_host),
-                  wrench::Simulation::getHostMemoryCapacity(execution_host)))},
+                                  wrench::Simulation::getHostMemoryCapacity(execution_host)))},
           100000000000.0));
 
   // Create a HTCondor Service
