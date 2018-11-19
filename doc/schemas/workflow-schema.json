@@ -152,7 +152,10 @@
                   }
                 }
               }
-            }
+            },
+            "required": [
+              "nodeName"
+            ]
           }
         },
         "jobs": {
