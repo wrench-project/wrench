@@ -1,9 +1,9 @@
 BareMetal                        {#guide-baremetal}
 ============
 
-@WRENCHUserDoc <div class="doc-type">User Documentation</div><div class="doc-link">Other: <a href="../developer/wrench-101.html">Developer</a> - <a href="../internal/wrench-101.html">Internal</a></div> @endWRENCHDoc
-@WRENCHDeveloperDoc  <div class="doc-type">Developer Documentation</div><div class="doc-link">Other: <a href="../user/wrench-101.html">User</a> - <a href="../internal/wrench-101.html">Internal</a></div> @endWRENCHDoc
-@WRENCHInternalDoc  <div class="doc-type">Internal Documentation</div><div class="doc-link">Other: <a href="../user/wrench-101.html">User</a> -  <a href="../developer/wrench-101.html">Developer</a></div> @endWRENCHDoc
+@WRENCHUserDoc <div class="doc-type">User Documentation</div><div class="doc-link">Other: <a href="../developer/guide-baremetal.html">Developer</a> - <a href="../internal/guide-baremetal.html">Internal</a></div> @endWRENCHDoc
+@WRENCHDeveloperDoc  <div class="doc-type">Developer Documentation</div><div class="doc-link">Other: <a href="../user/guide-baremetal.html">User</a> - <a href="../internal/guide-baremetal.html">Internal</a></div> @endWRENCHDoc
+@WRENCHInternalDoc  <div class="doc-type">Internal Documentation</div><div class="doc-link">Other: <a href="../user/guide-baremetal.html">User</a> -  <a href="../developer/guide-baremetal.html">Developer</a></div> @endWRENCHDoc
 
 [TOC]
 
