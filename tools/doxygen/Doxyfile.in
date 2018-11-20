@@ -805,6 +805,7 @@ INPUT                  = @CMAKE_HOME_DIRECTORY@/doc/index.md \
                          @CMAKE_HOME_DIRECTORY@/doc/guide.md \
                          @CMAKE_HOME_DIRECTORY@/doc/guide/baremetal.md \
                          @CMAKE_HOME_DIRECTORY@/doc/guide/batch.md \
+                         @CMAKE_HOME_DIRECTORY@/doc/guide/cloud.md \
                          @CMAKE_HOME_DIRECTORY@/doc/guide/htcondor.md \
                          @CMAKE_HOME_DIRECTORY@/doc/guide/simplestorage.md \
                          @CMAKE_HOME_DIRECTORY@/src \

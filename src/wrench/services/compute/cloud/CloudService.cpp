@@ -551,10 +551,10 @@ namespace wrench {
 
           std::shared_ptr<ComputeService> cs = std::shared_ptr<ComputeService>(
                   new BareMetalComputeService(vm_name,
-                                                       compute_resources,
-                                                       property_list,
-                                                       messagepayload_list,
-                                                       getScratch()));
+                                              compute_resources,
+                                              property_list,
+                                              messagepayload_list,
+                                              getScratch()));
           cs->simulation = this->simulation;
 
           this->cs_available_ram[pm_hostname] -= ram_memory;
@@ -664,14 +664,15 @@ namespace wrench {
           // TODO: creating a BareMetal service would not be necessary once auto_restart will be available
           // create a BareNetak compute service for the VM
           std::map<std::string, std::tuple<unsigned long, double>> compute_resources = {
-                  std::make_pair(vm_name, std::make_tuple(std::get<2>(vm_tuple->second), std::get<3>(vm_tuple->second)))};
+                  std::make_pair(vm_name,
+                                 std::make_tuple(std::get<2>(vm_tuple->second), std::get<3>(vm_tuple->second)))};
 
           std::shared_ptr<ComputeService> cs = std::shared_ptr<ComputeService>(
                   new BareMetalComputeService(vm_name,
-                                                       compute_resources,
-                                                       property_list,
-                                                       messagepayload_list,
-                                                       getScratch()));
+                                              compute_resources,
+                                              property_list,
+                                              messagepayload_list,
+                                              getScratch()));
           cs->simulation = this->simulation;
           cs->start(cs, true); // Daemonize!
           std::get<1>(vm_tuple->second) = cs;
@@ -809,7 +810,6 @@ namespace wrench {
         }
       }
 
-
       for (auto vm_tuple : vm_local_list) {
         std::shared_ptr<S4U_VirtualMachine> vm = std::get<0>(vm_tuple.second);
         if (vm->isRunning()) {
@@ -879,7 +879,8 @@ namespace wrench {
         }
         return;
       } else {
-        throw std::runtime_error("CloudService::processSubmitPilotJob(): A Cloud service should never support pilot jobs");
+        throw std::runtime_error(
+                "CloudService::processSubmitPilotJob(): A Cloud service should never support pilot jobs");
       }
 
     }
@@ -911,10 +912,10 @@ namespace wrench {
         // Num idle cores per vm
         std::map<std::string, unsigned long> idle_core_counts = std::get<1>(vm.second)->getNumIdleCores();
         unsigned long total_count = 0;
-        for (auto & c : idle_core_counts) {
+        for (auto &c : idle_core_counts) {
           total_count += c.second;
         }
-        num_idle_cores.insert(std::make_pair(vm.first, (double)total_count));
+        num_idle_cores.insert(std::make_pair(vm.first, (double) total_count));
 
         // Flop rate per vm
         flop_rates.insert(std::make_pair(vm.first, S4U_Simulation::getHostFlopRate(vm.first)));
@@ -976,7 +977,8 @@ namespace wrench {
 
       // Supporting Pilot jobs
       if (this->getPropertyValueAsBoolean(CloudServiceProperty::SUPPORTS_PILOT_JOBS)) {
-        throw std::invalid_argument("Invalid SUPPORTS_PILOT_JOBS property specification: a CloudService cannot support pilot jobs");
+        throw std::invalid_argument(
+                "Invalid SUPPORTS_PILOT_JOBS property specification: a CloudService cannot support pilot jobs");
       }
 
       // VM Boot overhead
@@ -994,12 +996,13 @@ namespace wrench {
       }
     }
 
-  /**
-   * @brief non-implemented
-   * @param job: a pilot job to (supposedly) terminate
-   */
+    /**
+     * @brief non-implemented
+     * @param job: a pilot job to (supposedly) terminate
+     */
     void CloudService::terminatePilotJob(PilotJob *job) {
-      throw std::runtime_error("CloudService::terminatePilotJob(): not implemented because CloudService never supports pilot jobs");
+      throw std::runtime_error(
+              "CloudService::terminatePilotJob(): not implemented because CloudService never supports pilot jobs");
     }
 
 
