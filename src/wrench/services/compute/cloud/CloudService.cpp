@@ -98,7 +98,7 @@ namespace wrench {
     /**
      * @brief Create a BareMetalComputeService VM (balances load on execution hosts)
      *
-     * @param num_cores: the number of cores the service can use (use ComputeService::ALL_CORES to use all cores
+     * @param num_cores: the number of cores the VM can use (use ComputeService::ALL_CORES to use all cores
      *                   available on the host)
      * @param ram_memory: the VM's RAM memory capacity (use ComputeService::ALL_RAM to use all RAM available on the
      *                    host, this can be lead to an out of memory issue)
