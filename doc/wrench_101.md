@@ -332,7 +332,7 @@ typically follows the following steps:
 
 # Interacting with services  #                  {#wrench-101-WMS-services}
 
-Each service provides its own API. For instance, a network proximity service provides methods to query the service's
+Each service type provides its own API. For instance, a network proximity service provides methods to query the service's
 host distance databases. The [API Reference](./annotated.html) provides all necessary
 documentation, which also explains which methods are synchronous and which are asynchronous (in which
 case some [event](#wrench-101-WMS-events) will likely occur in the future).
