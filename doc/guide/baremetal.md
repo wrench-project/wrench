@@ -51,9 +51,17 @@ auto baremetal_cs = simulation->add(
                                        {});
 ~~~~~~~~~~~~~
 
+## Bare-metal service properties             {#guide-baremetal-creating-properties}
+
+In addition to properties inherited from `wrench::ComputeServiceProperty`, a bare-metal
+service supports the following properties:
+
+- `wrench::BareMetalComputeServiceProperty::THREAD_STARTUP_OVERHEAD`
+
+
 @WRENCHNotUserDoc
 
-# Submitting Jobs to a BareMetal compute service #        {#guide-baremetal-using}
+# Submitting jobs to a bare-metal compute service #        {#guide-baremetal-using}
 
 As expected, a bare-metal service provides implementations of the methods  in the
 `wrench::ComputeService` base class. The `wrench::ComputeService::submitJob()` method

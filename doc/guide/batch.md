@@ -61,9 +61,27 @@ auto batch_cs = simulation->add(
                                    {});
 ~~~~~~~~~~~~~
 
+
+## Batch compute service properties             {#guide-baremetal-creating-properties}
+
+In addition to properties inherited from `wrench::ComputeServiceProperty`, a batch compute
+service supports the following properties:
+
+- `wrench::BatchServiceProperty::THREAD_STARTUP_OVERHEAD`
+- `wrench::BatchServiceProperty::HOST_SELECTION_ALGORITHM` 
+- `wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM` 
+- `wrench::BatchServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM`
+- `wrench::BatchServiceProperty::BATCH_RJMS_DELAY`
+- `wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE`
+- `wrench::BatchServiceProperty::OUTPUT_CSV_JOB_LOG`
+- `wrench::BatchServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP`
+- `wrench::BatchServiceProperty::BATSCHED_LOGGING_MUTED`
+- `wrench::BatchServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION`
+
+
 @WRENCHNotUserDoc
 
-# Submitting Jobs to a batch compute service #        {#guide-batch-using}
+# Submitting jobs to a batch compute service #        {#guide-batch-using}
 
 As expected, a batch service provides implementations of the methods
 in the `wrench::ComputeService` base class. The

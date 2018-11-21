@@ -9,30 +9,36 @@ Cloud                        {#guide-cloud}
 
 # Overview #            {#guide-cloud-overview}
 
-A Cloud service is an abstraction of a compute service that corresponds to a
-Cloud platform that provides access to virtualized compute resources, i.e., 
-virtual machines (VMs). The Cloud service provides all necessary abstractions 
+A cloud service is an abstraction of a compute service that corresponds to a
+cloud platform that provides access to virtualized compute resources, i.e., 
+virtual machines (VMs). The cloud service provides all necessary abstractions 
 to manage VMs, including creation, suspension, resume, etc. Compute jobs 
-submitted to the Cloud service run on VMs previously instantiated during the
-simulation. If a VM that meets a job's requirements cannot be found, the 
-service will throw an exception. In the Cloud service, a VM denotes a
-[Bare-metal](@ref guide-baremetal) service instantiated at an execution host. 
+submitted to the cloud service run on previously created VM instances.
+If a VM that meets a job's requirements cannot be found, the 
+service will throw an exception. In the cloud service, a VM instance behaves as a
+[bare-metal](@ref guide-baremetal) service.
+
+The main difference between a cloud service and a [virtualized cluster
+service](@ref guide-virtualizedcluster) is that the latter does expose the underlying
+physical infrastructure (e.g., it is possible to instantiate a VM on a
+particular physical host, or to migrate a VM between two particular
+physical hosts).
 
 
-# Creating a Cloud compute service #        {#guide-cloud-creating}
+# Creating a cloud compute service #        {#guide-cloud-creating}
 
-In WRENCH, a Cloud service represents a compute service (wrench::ComputeService), 
-which is defined by the wrench::CloudService class. An instantiation of a Cloud 
+In WRENCH, a cloud service represents a compute service (wrench::ComputeService), 
+which is defined by the wrench::CloudService class. An instantiation of a cloud 
 service requires the following parameters:
 
 - A hostname on which to start the service (this is the entry point to the service)
-- A list (`std::vector`) of hostnames (all cores and all RAM of each host is available to the Cloud service) 
-- A scratch space size, i.e., the size in bytes of storage local to the Cloud service (used to store
+- A list (`std::vector`) of hostnames (all cores and all RAM of each host is available to the cloud service) 
+- A scratch space size, i.e., the size in bytes of storage local to the cloud service (used to store
   workflow files, as needed, during job executions) 
 - Maps (`std::map`) of configurable properties (`wrench::CloudServiceProperty`) and configurable message 
   payloads (`wrench::CloudServiceMessagePayload`).
 
-The example below shows how to create an instance of a Cloud service that runs 
+The example below shows how to create an instance of a cloud service that runs 
 on host "cloud_gateway", provides access to 4 execution hosts, and has a scratch 
 space of 1TiB:
 
@@ -42,20 +48,19 @@ auto cloud_cs = simulation.add(
                                    {{wrench::CloudServiceProperty::SUPPORTS_PILOT_JOBS, "false"}}));
 ~~~~~~~~~~~~~
 
-## Cloud Service Properties             {#guide-cloud-creating-properties}
+## Cloud service properties             {#guide-cloud-creating-properties}
 
-In addition to properties inherited from wrench::ComputeServiceProperty, the Cloud 
+In addition to properties inherited from `wrench::ComputeServiceProperty`, a cloud 
 service supports the following properties:
 
-- `wrench::CloudServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS`: The overhead, in seconds, to boot a VM 
-
+- `wrench::CloudServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS`
 
 @WRENCHNotUserDoc  
 
-# Managing a Cloud compute service #        {#guide-cloud-managing}
+# Managing a cloud compute service #        {#guide-cloud-managing}
 
-The Cloud service provides several mechanisms to manage the set of VMs instantiated
-on the execution hosts. Currently, WRENCH users are able to create, shutdown, start,
+The cloud service provides several mechanisms to manage the set of VMs instantiated
+on the execution hosts. Currently, it is possible to create, shutdown, start,
 suspend, and resume VMs (see a complete list of functions available in the 
 wrench::CloudService API documentation). The figure below shows the different states
 a VM can be:
@@ -63,6 +68,7 @@ a VM can be:
 ![](images/wrench-guide-cloud-state-diagram.png)
 <br/>
 
+# Submitting Jobs to a batch compute service #        {#guide-cloud-using}
 
 As expected, a cloud service provides implementations of the methods
 in the `wrench::ComputeService` base class. The
