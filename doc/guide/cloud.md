@@ -65,7 +65,7 @@ a VM can be:
 
 When submitting a wrench::StandardJob to run on the Cloud service, the 
 `wrench::CloudService::submitStandardJob` function receives an `std::map` of key-value
-pairs properties. The current set of properties available include:
+pairs service-specific arguments. The current set of arguments includes:
 
 - `-vm`: requires a particular VM to execute the job (if not provided, the service 
   will pick the vm). The value for this property should be the VM name returned by
