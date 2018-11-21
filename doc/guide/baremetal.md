@@ -9,9 +9,9 @@ BareMetal                        {#guide-baremetal}
 
 # Overview #            {#guide-baremetal-overview}
 
-A BareMetal service is a service that makes it possible to run workflow
-jobs on hardware resources. Think of it as a set of multi-core hosts on
-which multi-threaded processes can be started using something like Ssh. The
+A BareMetal service is a service that makes it possible to run jobs on
+hardware resources. Think of it as a set of multi-core hosts on which
+multi-threaded processes can be started using something like Ssh. The
 service does not perform any space-sharing among the jobs. In other words,
 jobs submitted to the service execute concurrently in a time-shared manner.
 It is the responsibility of the job submitter to pick hosts and/or numbers
@@ -20,22 +20,22 @@ resource allocation performed by the service is that it ensures that the
 RAM capacity of a host is not exceeded. Workflow tasks that have non-zero
 RAM requirements are queued in FCFS fashion at each host until there is
 enough RAM to execute them (think of this as each host running an OS that
-disallows swapping).
+disallows swapping and implements a FCFS access policy for RAM allocation).
 
 # Creating a BareMetal compute service #        {#guide-baremetal-creating}
 
 In WRENCH, a BareMetal service represents a compute service
-(`wrench::ComputeService`), which is defined by the `wrench::BareMetalService`
+(`wrench::ComputeService`), which is defined by the `wrench::BareMetalComputeService`
 class. An instantiation of a BareMetal service requires the following
 parameters:
 
-- A hostname on which to start the service (this is the entry point to the service);
+- The name of a host on which to start the service (this is the entry point to the service);
 - A set of compute hosts in a map (`std::map`), where each key is a hostname
   and each value is a tuple (`std::tuple`) with a number of cores and a RAM capacity. 
-- A scrach space size, i.e., the size in bytes of storage local to the Batch service (used to store
-  worfklow files, as needed, during job executions) 
-- Maps (`std::map`) of configurable properties (`wrench::BareMetalServiceProperty`) and configurable message 
-  payloads (`wrench::BareMetalServiceMessagePayload`).
+- A scratch space size, i.e., the size in bytes of storage local to the Batch service (used to store
+  workflow files, as needed, during job executions) 
+- Maps (`std::map`) of configurable properties (`wrench::BareMetalComputeServiceProperty`) and configurable message 
+  payloads (`wrench::BareMetalComputeServiceMessagePayload`).
   
 The example below shows how to create an instance of a BareMetal service
 that runs on host "Gateway", provides access to 4 cores and 1GiB of RAM on host "Node1"
@@ -44,10 +44,68 @@ configured to be one hundredth of a second:
 
 ~~~~~~~~~~~~~{.cpp}
 auto compute_service = simulation->add(
-          new wrench::BareMetalService("Gateway", 
+          new wrench::BareMetalComputeService("Gateway", 
                                        {{"Node1", std::make_tuple(4, pow(2,30))}, {"Node2", std::make_tuple(8, pow(2,32)}},
                                         pow(2,40),
-                                       {{wrench::BareMetalServiceProperty::THREAD_STARTUP_OVERHEAD, "0.01"}}
+                                       {{wrench::BareMetalComputeServiceProperty::THREAD_STARTUP_OVERHEAD, "0.01"}}
                                       );
 ~~~~~~~~~~~~~
 
+@WRENCHNotUserDoc
+
+# Submitting Jobs to a BareMetal compute service #        {#guide-baremetal-using}
+
+As expected, a BareMetal service provides implementations of the methods  in the
+`wrench::ComputeService` base class. The `wrench::ComputeService::submitJob()` method
+takes as argument service-specific arguments as a `std::map<std::string,
+std::string>` of key-value pairs. The key is a task ID, and the value is
+the service-specific argument for that task.  When submitting a job to a
+BareMetal service, arguments can be specified a follows.
+
+For each task, an optional argument can be provided as a string formatted
+as "hostname:num_cores", "hostname", or "num_cores", where "hostname" is the name
+of one of the service's compute hosts and "num_cores" is an integer (e.g., "host1:10",
+"host1", "10"):
+
+  - If no value is provided for a task, or if the value is the empty string, then the BareMetal
+    service will choose the host on which the task should be executed (typically the host with
+    the lowest current load), and will execute the task with as many cores as possible on that host. 
+  
+  - If a "hostname" value is provided for a task, then the BareMetal service will execute the
+    task on that host, and will execute the task with as many cores as possible on that host.
+
+  - If a "num_cores" value is provided for a task, then the BareMetal
+    service will choose the host on which the task should be executed (typically the host with
+    the lowest current load), and will execute the task with the specified number of cores. 
+
+ - If a "hostname:num_cores" value is provided for a task, then the BareMetal service
+   will execute the task on that host with the specified number of cores.
+
+Here is an example job submission for a 4-task job for tasks with IDs "task1", "task2", "task3", and "task4":
+
+```
+// Create a job manager
+auto job_manager = this->createJobManager();
+
+// Create a job
+auto job = job_manager->createStandardJob(
+                 {this->getWorklow()->getTaskByID("task1"),
+                  this->getWorklow()->getTaskByID("task2"),
+                  this->getWorklow()->getTaskByID("task3"),
+                  this->getWorklow()->getTaskByID("task4")}, {});
+
+// Create service-specific arguments so that:
+//   task1 will run on host1 with as many cores as possible
+//   task2 will run on host2 with 16 cores
+//   task3 will run on some host with as many cores as possible
+//   task4 will run on some host with 4 cores
+std::map<std::string, std::string> service_specific_args;
+service_specific_args["task1"] = "host1";
+service_specific_args["task2"] = "host2:16";
+service_specific_args["task4"] = "4";
+
+// Submit the job
+job_manager->submitJob(job, bare_metal_cs, service_specific_args);
+```
+
+@endWRENCHDoc

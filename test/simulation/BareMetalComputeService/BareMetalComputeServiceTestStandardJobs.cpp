@@ -252,13 +252,13 @@ private:
     int main() {
 
       // Create a data movement manager
-      std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
+      auto data_movement_manager = this->createDataMovementManager();
 
       // Create a job  manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       // Create a 1-task job
-      wrench::StandardJob *two_core_task_job = job_manager->createStandardJob({this->test->task3}, {},
+      auto two_core_task_job = job_manager->createStandardJob({this->test->task3}, {},
                                                                          {std::make_tuple(this->test->input_file, this->test->storage_service, wrench::ComputeService::SCRATCH)},
                                                                          {}, {});
 
