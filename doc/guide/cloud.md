@@ -32,12 +32,43 @@ service requires the following parameters:
 - Maps (`std::map`) of configurable properties (`wrench::CloudServiceProperty`) and configurable message 
   payloads (`wrench::CloudServiceMessagePayload`).
 
+The example below shows how to create an instance of a Cloud service that runs 
+on host "cloud_gateway", provides access to 4 execution hosts, and has a scratch 
+space of 1TiB:
+
 ~~~~~~~~~~~~~{.cpp}
 auto cloud_service = simulation.add(
-          new wrench::CloudService("cloud_gateway", {"host1", "host2", "host3", "host4"}, pow(2,42),
+          new wrench::CloudService("cloud_gateway", {"host1", "host2", "host3", "host4"}, pow(2,40),
                                    {{wrench::CloudServiceProperty::SUPPORTS_PILOT_JOBS, "false"}}));
 ~~~~~~~~~~~~~
 
+## Cloud Service Properties             {#guide-cloud-creating-properties}
+
+In addition to properties inherited from wrench::ComputeServiceProperty, the Cloud 
+service supports the following properties:
+
+- `wrench::CloudServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS`: The overhead, in seconds, to boot a VM 
+
+
+@WRENCHNotUserDoc  
 
 # Managing a Cloud compute service #        {#guide-cloud-managing}
 
+The Cloud service provides several mechanisms to manage the set of VMs instantiated
+on the execution hosts. Currently, WRENCH users are able to create, shutdown, start,
+suspend, and resume VMs (see a complete list of functions available in the 
+wrench::CloudService API documentation). The figure below shows the different states
+a VM can be:
+
+![](images/wrench-guide-cloud-state-diagram.png)
+<br/>
+
+When submitting a wrench::StandardJob to run on the Cloud service, the 
+`wrench::CloudService::submitStandardJob` function receives an `std::map` of key-value
+pairs properties. The current set of properties available include:
+
+- `-vm`: requires a particular VM to execute the job (if not provided, the service 
+  will pick the vm). The value for this property should be the VM name returned by
+  wrench::CloudService::createVM.
+
+@endWRENCHDoc
