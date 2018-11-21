@@ -37,7 +37,7 @@ on host "cloud_gateway", provides access to 4 execution hosts, and has a scratch
 space of 1TiB:
 
 ~~~~~~~~~~~~~{.cpp}
-auto cloud_service = simulation.add(
+auto cloud_cs = simulation.add(
           new wrench::CloudService("cloud_gateway", {"host1", "host2", "host3", "host4"}, pow(2,40),
                                    {{wrench::CloudServiceProperty::SUPPORTS_PILOT_JOBS, "false"}}));
 ~~~~~~~~~~~~~
@@ -63,12 +63,39 @@ a VM can be:
 ![](images/wrench-guide-cloud-state-diagram.png)
 <br/>
 
-When submitting a wrench::StandardJob to run on the Cloud service, the 
-`wrench::CloudService::submitStandardJob` function receives an `std::map` of key-value
-pairs service-specific arguments. The current set of arguments includes:
 
-- `-vm`: requires a particular VM to execute the job (if not provided, the service 
-  will pick the vm). The value for this property should be the VM name returned by
-  wrench::CloudService::createVM.
+As expected, a cloud service provides implementations of the methods
+in the `wrench::ComputeService` base class. The
+`wrench::ComputeService::submitJob()` method takes as argument
+service-specific arguments as a `std::map<std::string, std::string>` of
+key-value pairs.  For a cloud service, these arguments are optional and to be specified as follows:
+
+  - key: "-vm"; value: a VM name (as returned by wrench::CloudService::createVM)  on which the job will be executed. 
+
+If no argument is specified, the cloud service will pick the VM on which to execute
+the job. 
+
+Here is an example job submission to the cloud service:
+
+~~~~~~~~~~~~~{.cpp}
+// Create a VM with 2 cores and 1 GiB of RAM
+auto vm1 = cloud_cs->createVM(2, pow(2,30));
+// Create a VM with 4 cores and 2 GiB of RAM
+auto vm2 = cloud_cs->createVM(4, pow(2,31));
+
+// Create a job manager
+auto job_manager = this->createJobManager();
+
+// Create a job
+auto job = job_manager->createStandardJob(tasks, {});
+
+// Create service-specific arguments so that the job will run on the second vm
+std::map<std::string, std::string> service_specific_args;
+service_specific_args["-vm"] = vm2;
+
+// Submit the job
+job_manager->submitJob(job, batch_cs, service_specific_args);
+~~~~~~~~~~~~~
+
 
 @endWRENCHDoc
