@@ -18,8 +18,9 @@ If a VM that meets a job's requirements cannot be found, the
 service will throw an exception. In the cloud service, a VM instance behaves as a
 [bare-metal](@ref guide-baremetal) service.
 
-The main difference between a cloud service and a [virtualized cluster
-service](@ref guide-virtualizedcluster) is that the latter does expose the underlying
+The main difference between a cloud service and a 
+[virtualized cluster service](@ref guide-virtualizedcluster) 
+is that the latter does expose the underlying
 physical infrastructure (e.g., it is possible to instantiate a VM on a
 particular physical host, or to migrate a VM between two particular
 physical hosts).
@@ -76,7 +77,7 @@ in the `wrench::ComputeService` base class. The
 service-specific arguments as a `std::map<std::string, std::string>` of
 key-value pairs.  For a cloud service, these arguments are optional and to be specified as follows:
 
-  - key: "-vm"; value: a VM name (as returned by wrench::CloudService::createVM)  on which the job will be executed. 
+  - key: `-vm`; value: a VM name (as returned by wrench::CloudService::createVM)  on which the job will be executed. 
 
 If no argument is specified, the cloud service will pick the VM on which to execute
 the job. 

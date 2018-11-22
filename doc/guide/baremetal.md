@@ -1,4 +1,4 @@
-BareMetal                        {#guide-baremetal}
+Bare-Metal                        {#guide-baremetal}
 ============
 
 @WRENCHUserDoc <div class="doc-type">User Documentation</div><div class="doc-link">Other: <a href="../developer/guide-baremetal.html">Developer</a> - <a href="../internal/guide-baremetal.html">Internal</a></div> @endWRENCHDoc
