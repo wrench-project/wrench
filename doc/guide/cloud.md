@@ -68,7 +68,7 @@ a VM can be:
 ![](images/wrench-guide-cloud-state-diagram.png)
 <br/>
 
-# Submitting Jobs to a batch compute service #        {#guide-cloud-using}
+# Submitting Jobs to a cloud compute service #        {#guide-cloud-using}
 
 As expected, a cloud service provides implementations of the methods
 in the `wrench::ComputeService` base class. The
@@ -100,7 +100,7 @@ std::map<std::string, std::string> service_specific_args;
 service_specific_args["-vm"] = vm2;
 
 // Submit the job
-job_manager->submitJob(job, batch_cs, service_specific_args);
+job_manager->submitJob(job, cloud_cs, service_specific_args);
 ~~~~~~~~~~~~~
 
 
