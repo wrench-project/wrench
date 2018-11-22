@@ -9,10 +9,19 @@ Virtualized Cluster                        {#guide-virtualizedcluster}
 
 # Overview #            {#guide-virtualizedcluster-overview}
 
-A virtualized cluster service is an abstraction of a 
-[cloud service](@ref guide-cloud) that corresponds to a
-virtual cluster platform that provides access to virtualized compute 
-resources, i.e., virtual machines (VMs).
+A virtualized cluster service is an abstraction of
+a compute service that
+corresponds to a platform of physical resources on which Virtual Machine
+(VM) instances can be created.  The virtualized cluster service provides
+all necessary abstractions to manage VMs and their allocation to physical
+resources, including creation on specific physical hosts, suspend/resume,
+migration, etc. Compute jobs submitted to the virtualized cluster service
+run on previously created VM instances.  If a VM that meets a job's
+requirements cannot be found, the service will throw an exception.  In the
+virtualized cluster service, a VM behaves as a [bare-metal](@ref
+guide-baremetal) service.
+
+
 The main difference between a [cloud service](@ref guide-cloud) and 
 a virtualized cluster service is that the latter does expose the 
 underlying physical infrastructure (e.g., it is possible to instantiate 
@@ -49,7 +58,6 @@ auto virtualized_cluster_cs = simulation.add(
 All properties for a virtualized cluster service are inherited from `wrench::CloudServiceProperty` 
 (see the [Cloud service properties](@ref guide-cloud-creating-properties) section).
 
-
 @WRENCHNotUserDoc
 
 # Migrating a VM to another execution host #        {#guide-virtualizedcluster-migrating}  
@@ -74,6 +82,12 @@ virtualized_cluster_cs->migrateVM(vm1, "host3");
 // Migrating vm2 to host4
 virtualized_cluster_cs->migrateVM(vm2, "host4");
 ~~~~~~~~~~~~~
+
+# Submitting jobs to a virtualized cluster compute service #        {#guide-virtualizedcluster-using}
+
+See the [cloud service](@ref guide-cloud) page for an example of how to submit a job to
+a VM instance (as both the cloud service and virtualized cluster service
+operate in the same way).
 
 
 @endWRENCHDoc
