@@ -9,7 +9,7 @@ Guide                        {#guide}
 1. Compute Services
     1. [Bare-metal Servers](@ref guide-baremetal)
     2. [Cloud Platforms](@ref guide-cloud)
-    3. [Virtual Cluster Platforms](@ref guide-virtualcluster)
+    3. [Virtualized Cluster Platforms](@ref guide-virtualizedcluster)
     4. [Batch-scheduled Clusters](@ref guide-batch)
     5. [Workload Management System (HTCondor)](@ref guide-htcondor)
     
