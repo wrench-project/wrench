@@ -41,6 +41,10 @@ body {
 #workflow-execution-chart-legend-terminated {
     border-left: 15px solid red;
 }
+.task-details-table {
+    display: table;
+    width: 100%;
+}
 .legend {
     text-align: center;
 }
@@ -49,4 +53,15 @@ body {
     padding-left: 3px;
     margin-right: 5px;
     border-radius: 3px;
+}
+.read-col {
+    background-color: #efe8f4;
+} 
+  
+.compute-col {
+    background-color: #f9eedb;
+}
+  
+.write-col {
+    background-color: #e2f5ff;
 }

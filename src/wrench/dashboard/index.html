@@ -39,11 +39,45 @@
                 </div>
             </div>
         </div>
-        
-    
+        <table class="task-details-table">
+            <colgroup>
+                <col span="1"></col>
+                <col span="3" class="read-col"></col>
+                <col span="3" class="compute-col"></col>
+                <col span="3" class="write-col"></col>
+                <col span="1"></col>
+            </colgroup>
+            <thead class="task-details-table">
+                <tr>
+                    <td></td>
+                    <td colspan="3" class="text-center">Read Input</td>
+                    <td colspan="3" class="text-center">Computation</td>
+                    <td colspan="3" class="text-center">Write Output</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th scope="col">TaskID</th>
+                    <th scope="col">Start Time</th>
+                    <th scope="col">End Time</th>
+                    <th scope="col">Duration</th>
+                    <th scope="col">Start Time</th>
+                    <th scope="col">End Time</th>
+                    <th scope="col">Duration</th>
+                    <th scope="col">Start Time</th>
+                    <th scope="col">End Time</th>
+                    <th scope="col">Duration</th>
+                    <th scope="col">Task Duration</th>
+                </tr>
+            </thead>
+
+            <tbody class="task-details-table">
+
+            </tbody>
+        </table>
     </body>
     <script>
         populateMetadata()
         generateGraph(data.contents, "graph-container")
+        populateWorkflowTaskDataTable(data.contents)
     </script>
 </html>

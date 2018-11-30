@@ -218,17 +218,10 @@ function generateGraph(data, containerId) {
 
 function populateWorkflowTaskDataTable(data) {
 
-    var toFiveDecimalPlaces = d3.format('.5f');
-
     // Reveal the Workflow Data table
-    // document.getElementById("task-details-table").css('display', 'block');
-    d3.select("#task-details-table")
-        .style('display', 'block');
+    $("#task-details-table").css('display', 'block');
 
-    // let task_details_table_body = d3.select("#task-details-table > tbody").empty();
-
-    // d3.select("#task-details-table > tbody").empty();
-    let task_details_table_body = d3.select("#task-details-table > tbody")
+    let task_details_table_body = $("#task-details-table > tbody").empty();
 
     const TASK_DATA = Object.assign([], data).sort(function(lhs, rhs) {
         return parseInt(lhs.task_id.slice(4)) - parseInt(rhs.task_id.slice(4));
@@ -252,35 +245,20 @@ function populateWorkflowTaskDataTable(data) {
 
         var task_duration    = toFiveDecimalPlaces(write_end - read_start);
 
-        var tr = task_details_table_body
-            .append("tr")
-            .attr("id", task_id)
-
-        tr.append("td").html(task_id)
-        tr.append("td").html(read_start)
-        tr.append("td").html(read_end)
-        tr.append("td").html(read_duration)
-        tr.append("td").html(compute_start)
-        tr.append("td").html(compute_end)
-        tr.append("td").html(compute_duration)
-        tr.append("td").html(write_start)
-        tr.append("td").html(write_end)
-        tr.append("td").html(write_duration)
-        tr.append("td").html(task_duration)
-        // task_details_table.append(
-        //     '<tr id=' + task_id + '>'
-        //     + '<td>' + task_id +'</td>'
-        //     + '<td>' + read_start +'</td>'
-        //     + '<td>' + read_end +'</td>'
-        //     + '<td>' + read_duration +'</td>'
-        //     + '<td>' + compute_start +'</td>'
-        //     + '<td>' + compute_end +'</td>'
-        //     + '<td>' + compute_duration +'</td>'
-        //     + '<td>' + write_start +'</td>'
-        //     + '<td>' + write_end +'</td>'
-        //     + '<td>' + write_duration +'</td>'
-        //     + '<td>' + task_duration +'</td>'
-        //     + '</tr>'
-        // );
+        task_details_table_body.append(
+            '<tr id=' + task_id + '>'
+            + '<td>' + task_id +'</td>'
+            + '<td>' + read_start +'</td>'
+            + '<td>' + read_end +'</td>'
+            + '<td>' + read_duration +'</td>'
+            + '<td>' + compute_start +'</td>'
+            + '<td>' + compute_end +'</td>'
+            + '<td>' + compute_duration +'</td>'
+            + '<td>' + write_start +'</td>'
+            + '<td>' + write_end +'</td>'
+            + '<td>' + write_duration +'</td>'
+            + '<td>' + task_duration +'</td>'
+            + '</tr>'
+        );
     });
 }
