@@ -448,7 +448,7 @@ as parameters two objects (or null pointers if not needed):
      method (to be overwritten) that can be invoked at any time by the WMS to submit tasks (inside standard jobs) to compute services. 
 
 Although not required, it is possible to implement most (or even all) decision-making in these two methods so at to have a clean
-separation of concern between the decision-making part of the WMS and the rest of its functionality.  This kind o design is used
+separation of concern between the decision-making part of the WMS and the rest of its functionality.  This kind of design is used
 in the simple example provided in the `examples/simple-example` directory. 
 
 
@@ -491,7 +491,7 @@ wrench::TerminalOutput::COLOR_WHITE
 @WRENCHInternalDoc
 
 
-This **Internal 101** guide is intend to users who want to contribute code to WRENCH to
+This **Internal 101** guide is intended for users who want to contribute code to WRENCH to
 extend its capabilities. 
 
 ---
@@ -510,12 +510,12 @@ Here is a in-progress misc item list of interest:
   
   - Most (soon to be all) interaction with SimGrid is done by the classes in the
       `src/simgrid_S4U_util` directory
-  - A WRENCH simulation, list any SimGrid simulation, is comprised of simulated processes
+  - A WRENCH simulation, like any SimGrid simulation, is comprised of simulated processes
     that communicate via messages with put/get-like operations into mailboxes. These
     processes are essentially implemented as threads, but they are not scheduled by the OS. Instead,
     they are scheduled by SimGrid in round-robin fashion. Each thread runs without interruption in between
     two SimGrid API calls. Therefore, although in principle WRENCH is massively multi-threaded, there are
-    _almost_ no needs to locks when sharing data among threads. 
+    _almost_ no need for locks when sharing data among threads.
   
 
 
