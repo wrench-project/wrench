@@ -18,8 +18,8 @@ resources, including creation on specific physical hosts, suspend/resume,
 migration, etc. Compute jobs submitted to the virtualized cluster service
 run on previously created VM instances.  If a VM that meets a job's
 requirements cannot be found, the service will throw an exception.  In the
-virtualized cluster service, a VM behaves as a [bare-metal](@ref
-guide-baremetal) service.
+virtualized cluster service, a VM behaves as a [bare-metal](@ref guide-baremetal) 
+service.
 
 
 The main difference between a [cloud service](@ref guide-cloud) and 
