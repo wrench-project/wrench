@@ -1,0 +1,139 @@
+#!/usr/bin/env python
+#
+# Copyright (c) 2018. The WRENCH Team.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+
+import argparse
+import logging
+import os
+
+__author__ = "Rafael Ferreira da Silva"
+
+logger = logging.getLogger(__name__)
+
+
+def _configure_logging(debug):
+    """
+    Configure the application's logging.
+    :param debug: whether debugging is enabled
+    """
+    if debug:
+        logger.setLevel(logging.DEBUG)
+    else:
+        logger.setLevel(logging.INFO)
+
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s [%(levelname)s] %(message)s')
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
+
+
+def main():
+    # Application's arguments
+    parser = argparse.ArgumentParser(description='Create a skeleton for a WRENCH-based project.')
+    parser.add_argument('project_dir', metavar='PROJECT_DIR', help='Project directory name')
+    parser.add_argument('-d', '--debug', action='store_true', help='Print debug messages to stderr')
+    parser.add_argument('-f', '--force', action='store_true',
+                        help='Overwrites existing project directory (use sparingly)')
+    args = parser.parse_args()
+
+    # Configure logging
+    _configure_logging(args.debug)
+
+    # Sanity check
+    if os.path.isdir(args.project_dir) and not args.force:
+        logger.error('The provided project directory already exists:\n\t%s\nUse --force to overwrite the directory' \
+                     % args.project_dir)
+        exit(1)
+
+    logger.info('Creating WRENCH skeleton project at: %s' % args.project_dir)
+
+    if not os.path.isdir(args.project_dir):
+        os.mkdir(args.project_dir)
+
+    # subdirectories structure
+    logger.debug('Creating subdirectories structure')
+    sub_dirs = ['src', 'test', 'doc', 'build', 'data', 'data/platform-files', 'data/workflow-files']
+    for sub_dir in sub_dirs:
+        if not os.path.isdir(args.project_dir + '/' + sub_dir):
+            os.mkdir(args.project_dir + '/' + sub_dir)
+            logger.debug('  Created subdirectory: %s' % args.project_dir + '/' + sub_dir)
+
+    # write CMakeLists.txt
+    logger.debug('Writing CMakeLists.txt file')
+    with open(args.project_dir + '/CMakeLists.txt', 'w') as cmake_file:
+        cmake_file.write(
+            'cmake_minimum_required(VERSION 3.2)\n'
+            'message(STATUS "Cmake version ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION}")\n'
+            '\n'
+            'project(%s)\n'
+            '\n'
+            'add_definitions("-Wall -Wno-unused-variable -Wno-unused-private-field")\n'
+            '\n'
+            'set(CMAKE_CXX_STANDARD 11)\n'
+            '\n'
+            '# include directories for dependencies and WRENCH libraries\n'
+            'include_directories(src/ /usr/local/include /usr/local/include/wrench)\n'
+            '\n'
+            '# source files\n'
+            'set(SOURCE_FILES\n'
+            '       src/main.cpp\n'
+            '       )\n'
+            '\n'
+            '# test files\n'
+            'set(TEST_FILES\n'
+            '       )\n'
+            '\n'
+            '# wrench library and dependencies\n'
+            'find_library(WRENCH_LIBRARY NAMES wrench)\n'
+            'find_library(SIMGRID_LIBRARY NAMES simgrid)\n'
+            'find_library(PUGIXML_LIBRARY NAMES pugixml)\n'
+            'find_library(LEMON_LIBRARY NAMES emon)\n'
+            'find_library(GTEST_LIBRARY NAMES gtest)\n'
+            '\n'
+            '# generating the executable\n'
+            'add_executable(my-executable ${SOURCE_FILES})\n'
+            'target_link_libraries(my-executable\n'
+            '                       ${WRENCH_LIBRARY}\n'
+            '                       ${SIMGRID_LIBRARY}\n'
+            '                       ${PUGIXML_LIBRARY}\n'
+            '                       ${LEMON_LIBRARY}\n'
+            '                      )\n'
+            '\n'
+            'install(TARGETS my-executable DESTINATION bin)\n'
+            '\n'
+            '# generating unit tests\n'
+            'add_executable(unit_tests EXCLUDE_FROM_ALL\n'
+            '                   ${SOURCE_FILES}\n'
+            '                   ${TEST_FILES}\n'
+            '               )\n'
+            'target_link_libraries(unit_tests\n'
+            '                       ${GTEST_LIBRARY} wrench -lpthread -lm\n'
+            '                      )\n'
+            % args.project_dir
+        )
+
+    # create main.cpp
+    logger.debug('Writing src/main.cpp example file')
+    with open(args.project_dir + '/src/main.cpp', 'w') as main_file:
+        main_file.write(
+            '/**\n'
+            ' * ADD A HEADER TO YOUR WRENCH SIMULATOR\n'
+            ' */\n'
+            '\n'
+            '#include <wrench.h>\n'
+            '\n'
+            'int main(int argc, char **argv) {\n'
+            '  return 0;\n'
+            '}\n'
+        )
+
+
+if __name__ == '__main__':
+    main()
