@@ -32,6 +32,8 @@ public:
     wrench::WorkflowTask *task4;
     wrench::WorkflowTask *task5;
     wrench::WorkflowTask *task6;
+    wrench::WorkflowTask *task7;
+    wrench::WorkflowTask *task8;
 
     wrench::ComputeService *compute_service = nullptr;
 
@@ -78,6 +80,8 @@ protected:
       task4 = workflow->addTask("task_4_10s_2cores", 10.0, 2, 2, 1.0, 0);
       task5 = workflow->addTask("task_5_30s_1_to_3_cores", 30.0, 1, 3, 1.0, 0);
       task6 = workflow->addTask("task_6_10s_1_to_2_cores", 12.0, 1, 2, 1.0, 0);
+      task7 = workflow->addTask("task_7_8s_1_to_4_cores", 8.0, 1, 4, 1.0, 0);
+      task8 = workflow->addTask("task_8_8s_2_to_4_cores", 8.0, 2, 4, 1.0, 0);
 
       // Add file-task dependencies
       task1->addInputFile(input_file);
@@ -86,6 +90,8 @@ protected:
       task4->addInputFile(input_file);
       task5->addInputFile(input_file);
       task6->addInputFile(input_file);
+      task7->addInputFile(input_file);
+      task8->addInputFile(input_file);
 
 
       task1->addOutputFile(output_file1);
@@ -738,10 +744,10 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase2_test() {
 /**  TWO DUAL-CORE TASKS TEST #3                                     **/
 /**********************************************************************/
 
-class MulticoreComputeServiceTwoDualCoreTasksCase3TestWMS : public wrench::WMS {
+class BareMetalComputeServiceTwoDualCoreTasksCase3TestWMS : public wrench::WMS {
 
 public:
-    MulticoreComputeServiceTwoDualCoreTasksCase3TestWMS(BareMetalComputeServiceTestStandardJobs *test,
+    BareMetalComputeServiceTwoDualCoreTasksCase3TestWMS(BareMetalComputeServiceTestStandardJobs *test,
                                                         const std::set<wrench::ComputeService *> compute_services,
                                                         const std::set<wrench::StorageService *> &storage_services,
                                                         std::string hostname) :
@@ -764,14 +770,13 @@ private:
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Create a 2-task job
-      wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task5, this->test->task6}, {},
+      wrench::StandardJob *two_task_job_1 = job_manager->createStandardJob({this->test->task5, this->test->task6}, {},
                                                                          {std::make_tuple(this->test->input_file, this->test->storage_service, wrench::ComputeService::SCRATCH)},
                                                                          {}, {});
 
-
       // Submit the 2-task job for execution (WRONG CS-specific arguments)
       try {
-        job_manager->submitJob(two_task_job, this->test->compute_service,
+        job_manager->submitJob(two_task_job_1, this->test->compute_service,
                                {{"whatever", "QuadCoreHost:2"}});
         throw std::runtime_error("Should not be able to use wrongly formatted service-specific arguments");
       } catch (std::invalid_argument &e) {
@@ -779,7 +784,7 @@ private:
 
       // Submit the 2-task job for execution (WRONG CS-specific arguments)
       try {
-        job_manager->submitJob(two_task_job, this->test->compute_service,
+        job_manager->submitJob(two_task_job_1, this->test->compute_service,
                                {{"task_6_10s_1_to_2_cores", "QuadCoreHost:whatever"}});
         throw std::runtime_error("Should not be able to use wrongly formatted service-specific arguments");
       } catch (std::invalid_argument &e) {
@@ -787,7 +792,7 @@ private:
 
       // Submit the 2-task job for execution (WRONG CS-specific arguments)
       try {
-        job_manager->submitJob(two_task_job, this->test->compute_service,
+        job_manager->submitJob(two_task_job_1, this->test->compute_service,
                                {{"task_6_10s_1_to_2_cores", "whatever"}});
         throw std::runtime_error("Should not be able to use wrongly formatted service-specific arguments");
       } catch (std::invalid_argument &e) {
@@ -795,7 +800,9 @@ private:
 
 
       // Submit the 2-task job for execution
-      job_manager->submitJob(two_task_job, this->test->compute_service,
+      // service-specific args format testing: "hostname:num_cores", and "num_cores"
+      // both tasks should run in parallel, using 2 of the 4 cores each
+      job_manager->submitJob(two_task_job_1, this->test->compute_service,
                              {{"task_6_10s_1_to_2_cores","QuadCoreHost:2"},{"task_5_30s_1_to_3_cores","2"}});
 
       // Wait for the job completion
@@ -826,10 +833,10 @@ private:
 
       // Check the each task ran using 2 cores
       if (this->test->task5->getNumCoresAllocated() != 2) {
-        throw std::runtime_error("It looks like task5 didn't run with 2 cores accroding to in-task info");
+        throw std::runtime_error("It looks like task5 didn't run with 2 cores according to in-task info");
       }
       if (this->test->task6->getNumCoresAllocated() != 2) {
-        throw std::runtime_error("It looks like task6 didn't run with 2 cores accroding to in-task info");
+        throw std::runtime_error("It looks like task6 didn't run with 2 cores according to in-task info");
       }
 
       /*
@@ -844,6 +851,50 @@ private:
 
       if (delta_task6 > EPSILON) {
         throw std::runtime_error("Unexpected task6 end date " + std::to_string(task6_end_date) + " (should be 12.0)");
+      }
+
+
+    // create and submit another 2-task job for execution
+    // service-specific args format testing: "hostname", "" <- that's an empty string
+    // both tasks should run in parallel, use 4 cores each, thus oversubscribing
+    wrench::StandardJob *two_task_job_2 = job_manager->createStandardJob({this->test->task7, this->test->task8}, {},
+                                                                         {std::make_tuple(this->test->input_file, this->test->storage_service, wrench::ComputeService::SCRATCH)},
+                                                                         {}, {});
+
+      job_manager->submitJob(two_task_job_2, this->test->compute_service,
+                             {{"task_7_8s_1_to_4_cores","QuadCoreHost"},{"task_8_8s_2_to_4_cores",""}});
+
+      // Wait for the job completion
+      double two_task_job_2_completion_date = 0;
+      try {
+        event = this->getWorkflow()->waitForNextExecutionEvent();
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+      }
+      switch (event->type) {
+        case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
+          two_task_job_2_completion_date = simulation->getCurrentSimulatedDate();
+          // success, do nothing for now
+          break;
+        }
+        default: {
+          throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+        }
+      }
+
+      // Check that each task ran using 4 cores
+      if (this->test->task7->getNumCoresAllocated() != 4) {
+        throw std::runtime_error("It looks like task7 didn't run with 4 cores according to in-task info");
+      }
+      if (this->test->task8->getNumCoresAllocated() != 4) {
+        throw std::runtime_error("It looks like task8 didn't run with 4 cores according to in-task info");
+      }
+
+      // the standard job is expected take about 4 seconds, since each task would run for 2 seconds if the
+      // compute host wasn't oversubscribed
+      double two_task_job_2_duration = two_task_job_2_completion_date - two_task_job_2->getSubmitDate();
+      if (two_task_job_2_duration < (4.0 - EPSILON) || two_task_job_2_duration > (4.0 + EPSILON)) {
+        throw std::runtime_error("two_task_job_2 should have taken about 4 seconds, but did not");
       }
 
 
@@ -885,7 +936,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase3_test() {
   // Create a WMS
   wrench::WMS *wms = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(
-          new MulticoreComputeServiceTwoDualCoreTasksCase3TestWMS(
+          new BareMetalComputeServiceTwoDualCoreTasksCase3TestWMS(
                   this,  {compute_service}, {storage_service}, hostname)));
 
   ASSERT_NO_THROW(wms->addWorkflow(workflow));
@@ -910,10 +961,10 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase3_test() {
 /**  JOB TERMINATION TEST                                            **/
 /**********************************************************************/
 
-class MulticoreComputeServiceJobTerminationTestWMS : public wrench::WMS {
+class BareMetalComputeServiceJobTerminationTestWMS : public wrench::WMS {
 
 public:
-    MulticoreComputeServiceJobTerminationTestWMS(BareMetalComputeServiceTestStandardJobs *test,
+    BareMetalComputeServiceJobTerminationTestWMS(BareMetalComputeServiceTestStandardJobs *test,
                                                  const std::set<wrench::ComputeService *> &compute_services,
                                                  const std::set<wrench::StorageService *> &storage_services,
                                                  std::string hostname) :
@@ -1000,7 +1051,7 @@ void BareMetalComputeServiceTestStandardJobs::do_JobTermination_test() {
   // Create a WMS
   wrench::WMS *wms = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(
-          new MulticoreComputeServiceJobTerminationTestWMS(
+          new BareMetalComputeServiceJobTerminationTestWMS(
                   this, {compute_service}, {storage_service}, hostname)));
 
   ASSERT_NO_THROW(wms->addWorkflow(workflow));
@@ -1031,10 +1082,10 @@ void BareMetalComputeServiceTestStandardJobs::do_JobTermination_test() {
 /**  NOT SUBMITTED JOB TERMINATION TEST                              **/
 /**********************************************************************/
 
-class MulticoreComputeServiceNonSubmittedJobTerminationTestWMS : public wrench::WMS {
+class BareMetalComputeServiceNonSubmittedJobTerminationTestWMS : public wrench::WMS {
 
 public:
-    MulticoreComputeServiceNonSubmittedJobTerminationTestWMS(BareMetalComputeServiceTestStandardJobs *test,
+    BareMetalComputeServiceNonSubmittedJobTerminationTestWMS(BareMetalComputeServiceTestStandardJobs *test,
                                                              const std::set<wrench::ComputeService *> compute_services,
                                                              const std::set<wrench::StorageService *> &storage_services,
                                                              std::string hostname) :
@@ -1113,7 +1164,7 @@ void BareMetalComputeServiceTestStandardJobs::do_NonSubmittedJobTermination_test
   // Create a WMS
   wrench::WMS *wms = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(
-          new MulticoreComputeServiceNonSubmittedJobTerminationTestWMS(
+          new BareMetalComputeServiceNonSubmittedJobTerminationTestWMS(
                   this,  {compute_service}, {storage_service}, hostname)));
 
   ASSERT_NO_THROW(wms->addWorkflow(workflow));
@@ -1145,10 +1196,10 @@ void BareMetalComputeServiceTestStandardJobs::do_NonSubmittedJobTermination_test
 /**  COMPLETED JOB TERMINATION TEST                                  **/
 /**********************************************************************/
 
-class MulticoreComputeServiceCompletedJobTerminationTestWMS : public wrench::WMS {
+class BareMetalComputeServiceCompletedJobTerminationTestWMS : public wrench::WMS {
 
 public:
-    MulticoreComputeServiceCompletedJobTerminationTestWMS(BareMetalComputeServiceTestStandardJobs *test,
+    BareMetalComputeServiceCompletedJobTerminationTestWMS(BareMetalComputeServiceTestStandardJobs *test,
                                                           const std::set<wrench::ComputeService *> &compute_services,
                                                           const std::set<wrench::StorageService *> &storage_services,
                                                           std::string hostname) :
@@ -1239,7 +1290,7 @@ void BareMetalComputeServiceTestStandardJobs::do_CompletedJobTermination_test() 
   // Create a WMS
   wrench::WMS *wms = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(
-          new MulticoreComputeServiceCompletedJobTerminationTestWMS(
+          new BareMetalComputeServiceCompletedJobTerminationTestWMS(
                   this,  {compute_service}, {storage_service}, hostname)));
 
   ASSERT_NO_THROW(wms->addWorkflow(workflow));
@@ -1271,10 +1322,10 @@ void BareMetalComputeServiceTestStandardJobs::do_CompletedJobTermination_test() 
 /**  COMPUTE SERVICE SHUTDOWN WHILE JOB IS RUNNING TEST              **/
 /**********************************************************************/
 
-class MulticoreComputeServiceShutdownComputeServiceWhileJobIsRunningTestWMS : public wrench::WMS {
+class BareMetalComputeServiceShutdownComputeServiceWhileJobIsRunningTestWMS : public wrench::WMS {
 
 public:
-    MulticoreComputeServiceShutdownComputeServiceWhileJobIsRunningTestWMS(
+    BareMetalComputeServiceShutdownComputeServiceWhileJobIsRunningTestWMS(
             BareMetalComputeServiceTestStandardJobs *test,
             const std::set<wrench::ComputeService *> compute_services,
             const std::set<wrench::StorageService *> &storage_services,
@@ -1374,7 +1425,7 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownComputeServiceWhileJobI
   // Create a WMS
   wrench::WMS *wms = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(
-                  new MulticoreComputeServiceShutdownComputeServiceWhileJobIsRunningTestWMS(
+                  new BareMetalComputeServiceShutdownComputeServiceWhileJobIsRunningTestWMS(
                           this, {compute_service}, {storage_service}, hostname)));
 
   ASSERT_NO_THROW(wms->addWorkflow(workflow));
@@ -1406,10 +1457,10 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownComputeServiceWhileJobI
 /**  STORAGE SERVICE SHUTDOWN BEFORE JOB IS SUBMITTED TEST           **/
 /**********************************************************************/
 
-class MulticoreComputeServiceShutdownStorageServiceBeforeJobIsSubmittedTestWMS : public wrench::WMS {
+class BareMetalComputeServiceShutdownStorageServiceBeforeJobIsSubmittedTestWMS : public wrench::WMS {
 
 public:
-    MulticoreComputeServiceShutdownStorageServiceBeforeJobIsSubmittedTestWMS(
+    BareMetalComputeServiceShutdownStorageServiceBeforeJobIsSubmittedTestWMS(
             BareMetalComputeServiceTestStandardJobs *test,
             const std::set<wrench::ComputeService *> &compute_services,
             const std::set<wrench::StorageService *> &storage_services,
@@ -1503,7 +1554,7 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownStorageServiceBeforeJob
   // Create a WMS
   wrench::WMS *wms = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(
-                  new MulticoreComputeServiceShutdownStorageServiceBeforeJobIsSubmittedTestWMS(
+                  new BareMetalComputeServiceShutdownStorageServiceBeforeJobIsSubmittedTestWMS(
                           this,  {compute_service}, {storage_service}, hostname)));
 
   ASSERT_NO_THROW(wms->addWorkflow(workflow));

@@ -35,10 +35,10 @@ namespace wrench {
      *
      *        One can think of this as a simple service that allows the user to
      *        run tasks and to specify for each task on which host it should run
-     *        and with how many cores. If no host is specified, service will pick
+     *        and with how many cores. If no host is specified, the service will pick
      *        the least loaded host. If no number of cores is specified, the service
-     *        will pick the service will use as many cores as possible.  The service
-     *        will ake sure that the RAM capacity of a host is not exceeded by possibly
+     *        will use as many cores as possible.  The service
+     *        will make sure that the RAM capacity of a host is not exceeded by possibly
      *        delaying task executions until enough RAM is available.
      */
     class BareMetalComputeService : public ComputeService {

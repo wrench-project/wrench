@@ -97,62 +97,70 @@ namespace wrench {
     void BareMetalComputeService::submitStandardJob(StandardJob *job,
                                                     std::map<std::string, std::string> &service_specific_args) {
 
-      if (this->state == Service::DOWN) {
-        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-      }
-
-      /* make sure that service arguments are provided for tasks in the jobs */
-      for (auto const &arg : service_specific_args) {
-        bool found = false;
-        for (auto const &task : job->getTasks()) {
-          if (task->getID() == arg.first) {
-            found = true;
-            break;
-          }
+        if (this->state == Service::DOWN) {
+            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
         }
-        if (not found) {
-          throw std::invalid_argument(
-                  "BareMetalComputeService::submitStandardJob(): Service-specific argument provided for task with ID '" +
-                  arg.first + "' but there is no task with such ID in the job");
-        }
-      }
 
-      // Check that service-specific args that are provided are well-formatted
-      for (auto t : job->getTasks()) {
-
-        if ((service_specific_args.find(t->getID()) != service_specific_args.end()) and
-            (not service_specific_args[t->getID()].empty())) {
-          std::tuple<std::string, unsigned long> parsed_spec;
-
-          try {
-            parsed_spec = parseResourceSpec(service_specific_args[t->getID()]);
-          } catch (std::invalid_argument &e) {
-            throw;
-          }
-
-          std::string target_host = std::get<0>(parsed_spec);
-          unsigned long target_num_cores = std::get<1>(parsed_spec);
-
-          if (not target_host.empty()) {
-            if (this->compute_resources.find(target_host) == this->compute_resources.end()) {
-              throw std::invalid_argument(
-                      "Invalid service-specific argument '" + service_specific_args[t->getID()] + "' for task '" +
-                      t->getID() + "': no such host");
+        /* make sure that service arguments are provided for tasks in the jobs */
+        for (auto const &arg : service_specific_args) {
+            bool found = false;
+            for (auto const &task : job->getTasks()) {
+                if (task->getID() == arg.first) {
+                    found = true;
+                    break;
+                }
             }
-          }
-
-          if (target_num_cores < t->getMinNumCores()) {
-            throw std::invalid_argument(
-                    "Invalid service-specific argument '" + service_specific_args[t->getID()] + "' for task '" +
-                    t->getID() + "': the task requires at least " + std::to_string(t->getMinNumCores()) + " cores");
-          }
-          if (target_num_cores > t->getMaxNumCores()) {
-            throw std::invalid_argument(
-                    "Invalid service-specific argument '" + service_specific_args[t->getID()] + "' for task '" +
-                    t->getID() + "': the task can use at most " + std::to_string(t->getMaxNumCores()) + " cores");
-          }
+            if (not found) {
+                throw std::invalid_argument(
+                        "BareMetalComputeService::submitStandardJob(): Service-specific argument provided for task with ID '" +
+                        arg.first + "' but there is no task with such ID in the job");
+            }
         }
-      }
+
+        // Check that service-specific args that are provided are well-formatted
+        for (auto t : job->getTasks()) {
+
+            if ((service_specific_args.find(t->getID()) != service_specific_args.end()) and
+                (not service_specific_args[t->getID()].empty())) {
+                std::tuple<std::string, unsigned long> parsed_spec;
+
+                try {
+                    parsed_spec = parseResourceSpec(service_specific_args[t->getID()]);
+                } catch (std::invalid_argument &e) {
+                    throw;
+                }
+
+                std::string target_host = std::get<0>(parsed_spec);
+                unsigned long target_num_cores = std::get<1>(parsed_spec);
+
+
+                if (not target_host.empty()) {
+                    if (this->compute_resources.find(target_host) == this->compute_resources.end()) {
+                        throw std::invalid_argument(
+                                "Invalid service-specific argument '" + service_specific_args[t->getID()] +
+                                "' for task '" +
+                                t->getID() + "': no such host");
+                    }
+                }
+
+                if (target_num_cores > 0) {
+                    if (target_num_cores < t->getMinNumCores()) {
+                        throw std::invalid_argument(
+                                "Invalid service-specific argument '" + service_specific_args[t->getID()] +
+                                "' for task '" +
+                                t->getID() + "': the task requires at least " + std::to_string(t->getMinNumCores()) +
+                                " cores");
+                    }
+                    if (target_num_cores > t->getMaxNumCores()) {
+                        throw std::invalid_argument(
+                                "Invalid service-specific argument '" + service_specific_args[t->getID()] +
+                                "' for task '" +
+                                t->getID() + "': the task can use at most " + std::to_string(t->getMaxNumCores()) +
+                                " cores");
+                    }
+                }
+            }
+        }
 
       // At this point, there may still be insufficient resources to run the task, but that will
       // be handled later (and a WorkflowExecutionError with a "not enough resources" FailureCause
