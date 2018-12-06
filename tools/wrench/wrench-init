@@ -47,115 +47,175 @@ def _create_subdirectories(project_dir):
             logger.debug('  Created subdirectory: %s' % project_dir + '/' + sub_dir)
 
 
+def _write_contents(filename, contents):
+    '''
+    Write a list of strings to a file
+    :param filename: name of the file
+    :param contents: list of strings
+    '''
+    with open(filename, 'w') as f:
+        for line in contents:
+            f.write(line + '\n')
+
+
 def _write_cmakelists(project_dir):
     '''
     Write the CMakeLists.txt file
     :param project_dir: project directory
     '''
     logger.debug('Writing CMakeLists.txt file')
-    with open(project_dir + '/CMakeLists.txt', 'w') as cmake_file:
-        cmake_file.write(
-            'cmake_minimum_required(VERSION 3.2)\n'
-            'message(STATUS "Cmake version ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION}")\n'
-            '\n'
-            'project(%s)\n'
-            '\n'
-            'add_definitions("-Wall -Wno-unused-variable -Wno-unused-private-field")\n'
-            '\n'
-            'set(CMAKE_CXX_STANDARD 11)\n'
-            '\n'
-            '# include directories for dependencies and WRENCH libraries\n'
-            'include_directories(src/ /usr/local/include /usr/local/include/wrench)\n'
-            '\n'
-            '# source files\n'
-            'set(SOURCE_FILES\n'
-            '       src/main.cpp\n'
-            '       )\n'
-            '\n'
-            '# test files\n'
-            'set(TEST_FILES\n'
-            '       )\n'
-            '\n'
-            '# wrench library and dependencies\n'
-            'find_library(WRENCH_LIBRARY NAMES wrench)\n'
-            'find_library(SIMGRID_LIBRARY NAMES simgrid)\n'
-            'find_library(PUGIXML_LIBRARY NAMES pugixml)\n'
-            'find_library(LEMON_LIBRARY NAMES emon)\n'
-            'find_library(GTEST_LIBRARY NAMES gtest)\n'
-            '\n'
-            '# generating the executable\n'
-            'add_executable(my-executable ${SOURCE_FILES})\n'
-            'target_link_libraries(my-executable\n'
-            '                       ${WRENCH_LIBRARY}\n'
-            '                       ${SIMGRID_LIBRARY}\n'
-            '                       ${PUGIXML_LIBRARY}\n'
-            '                       ${LEMON_LIBRARY}\n'
-            '                      )\n'
-            '\n'
-            'install(TARGETS my-executable DESTINATION bin)\n'
-            '\n'
-            '# generating unit tests\n'
-            'add_executable(unit_tests EXCLUDE_FROM_ALL\n'
-            '                   ${SOURCE_FILES}\n'
-            '                   ${TEST_FILES}\n'
-            '               )\n'
-            'target_link_libraries(unit_tests\n'
-            '                       ${GTEST_LIBRARY} wrench -lpthread -lm\n'
-            '                      )\n'
-            % project_dir
-        )
+    _write_contents(project_dir + '/CMakeLists.txt', [
+        'cmake_minimum_required(VERSION 3.2)',
+        'message(STATUS "Cmake version ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION}")',
+        '',
+        'project(%s)',
+        '',
+        'add_definitions("-Wall -Wno-unused-variable -Wno-unused-private-field")',
+        '',
+        'set(CMAKE_CXX_STANDARD 11)',
+        '',
+        '# include directories for dependencies and WRENCH libraries',
+        'include_directories(src/ /usr/local/include /usr/local/include/wrench)',
+        '',
+        '# source files',
+        'set(SOURCE_FILES',
+        '       src/main.cpp',
+        '       )',
+        '',
+        '# test files',
+        'set(TEST_FILES',
+        '       )',
+        '',
+        '# wrench library and dependencies',
+        'find_library(WRENCH_LIBRARY NAMES wrench)',
+        'find_library(SIMGRID_LIBRARY NAMES simgrid)',
+        'find_library(PUGIXML_LIBRARY NAMES pugixml)',
+        'find_library(LEMON_LIBRARY NAMES emon)',
+        'find_library(GTEST_LIBRARY NAMES gtest)',
+        '',
+        '# generating the executable',
+        'add_executable(my-executable ${SOURCE_FILES})',
+        'target_link_libraries(my-executable',
+        '                       ${WRENCH_LIBRARY}',
+        '                       ${SIMGRID_LIBRARY}',
+        '                       ${PUGIXML_LIBRARY}',
+        '                       ${LEMON_LIBRARY}',
+        '                      )',
+        '',
+        'install(TARGETS my-executable DESTINATION bin)',
+        '',
+        '# generating unit tests',
+        'add_executable(unit_tests EXCLUDE_FROM_ALL',
+        '                   ${SOURCE_FILES}',
+        '                   ${TEST_FILES}',
+        '               )',
+        'target_link_libraries(unit_tests',
+        '                       ${GTEST_LIBRARY} wrench -lpthread -lm',
+        '                      )'
+    ])
 
 
 def _write_main(project_dir):
     logger.debug('Writing src/main.cpp example file')
-    with open(project_dir + '/src/main.cpp', 'w') as main_file:
-        main_file.write(
-            '/**\n'
-            ' * ADD A HEADER TO YOUR WRENCH SIMULATOR\n'
-            ' */\n'
-            '\n'
-            '#include <wrench.h>\n'
-            '\n'
-            'int main(int argc, char **argv) {\n'
-            '\n'
-            '  // Declaration of the top-level WRENCH simulation object\n'
-            '  wrench::Simulation simulation;\n'
-            '\n'
-            '  // Initialization of the simulation\n'
-            '  simulation.init(&argc, argv);\n'
-            '\n'
-            '  // Parsing of the command-line arguments for this WRENCH simulation\n'
-            '  if (argc != 3) {\n'
-            '    std::cerr << "Usage: " << argv[0] << " <xml platform file> <workflow file>" << std::endl;\n'
-            '    exit(1);\n'
-            '  }\n'
-            '\n'
-            '  // The first argument is the platform description file, written in XML following the SimGrid-defined DTD\n'
-            '  char *platform_file = argv[1];\n'
-            '  // The second argument is the workflow description file, written in XML using the DAX DTD\n'
-            '  char *workflow_file = argv[2];\n'
-            '\n'
-            '  // Reading and parsing the workflow description file to create a wrench::Workflow object\n'
-            '  wrench::Workflow workflow;\n'
-            '  workflow.loadFromDAXorJSON(workflow_file, "1000Gf");\n'
-            '\n'
-            '  // Reading and parsing the platform description file to instantiate a simulated platform\n'
-            '  simulation.instantiatePlatform(platform_file);\n'
-            '\n'
-            '  // Get a vector of all the hosts in the simulated platform\n'
-            '  std::vector<std::string> hostname_list = simulation.getHostnameList();\n'
-            '\n'
-            '  // Instantiate a storage service\n'
-            '  std::string storage_host = hostname_list[(hostname_list.size() > 2) ? 2 : 1];\n'
-            '  wrench::StorageService *storage_service = simulation.add(new wrench::SimpleStorageService(storage_host, 10000000000000.0));\n'
-            '\n'
-            '  // Construct a list of hosts (in this example only one host)\n'
-            '  std::string executor_host = hostname_list[(hostname_list.size() > 1) ? 1 : 0];\n'
-            '  std::vector<std::string> execution_hosts = {executor_host};\n'
-            '\n'
-            '  return 0;\n'
-            '}\n'
-        )
+    _write_contents(project_dir + '/src/main.cpp', [
+        '/**',
+        ' * ADD A HEADER TO YOUR WRENCH SIMULATOR',
+        ' */',
+        '',
+        '#include <wrench.h>',
+        '',
+        'int main(int argc, char **argv) {',
+        '',
+        '  // Declaration of the top-level WRENCH simulation object',
+        '  wrench::Simulation simulation;',
+        '',
+        '  // Initialization of the simulation',
+        '  simulation.init(&argc, argv);',
+        '',
+        '  // Parsing of the command-line arguments for this WRENCH simulation',
+        '  if (argc != 3) {',
+        '    std::cerr << "Usage: " << argv[0] << " <xml platform file> <workflow file>" << std::endl;',
+        '    exit(1);',
+        '  }',
+        '',
+        '  // The first argument is the platform description file, written in XML following the SimGrid-defined DTD',
+        '  char *platform_file = argv[1];',
+        '  // The second argument is the workflow description file, written in XML using the DAX DTD',
+        '  char *workflow_file = argv[2];',
+        '',
+        '  // Reading and parsing the workflow description file to create a wrench::Workflow object',
+        '  wrench::Workflow workflow;',
+        '  workflow.loadFromDAXorJSON(workflow_file, "1000Gf");',
+        '',
+        '  // Reading and parsing the platform description file to instantiate a simulated platform',
+        '  simulation.instantiatePlatform(platform_file);',
+        '',
+        '  // Get a vector of all the hosts in the simulated platform',
+        '  std::vector<std::string> hostname_list = simulation.getHostnameList();',
+        '',
+        '  // Instantiate a storage service',
+        '  std::string storage_host = hostname_list[(hostname_list.size() > 2) ? 2 : 1];',
+        '  wrench::StorageService *storage_service = simulation.add(new wrench::SimpleStorageService(storage_host, 10000000000000.0));',
+        '',
+        '  // Construct a list of hosts (in this example only one host)',
+        '  std::string executor_host = hostname_list[(hostname_list.size() > 1) ? 1 : 0];',
+        '  std::vector<std::string> execution_hosts = {executor_host};',
+        '',
+        '  // Instantiate a cloud service',
+        '  std::string wms_host = hostname_list[0];',
+        '  wrench::CloudService *cloud_service = new wrench::CloudService(',
+        '          wms_host, execution_hosts, 0, {},',
+        '          {{wrench::CloudServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, "1024"}});',
+        '',
+        '  // Add the cloud service to the simulation',
+        '  try {',
+        '    simulation.add(cloud_service);',
+        '  } catch (std::invalid_argument &e) {',
+        '    std::cerr << "Error: " << e.what() << std::endl;',
+        '    std::exit(1);',
+        '  }',
+        '',
+        '  // Create a list of compute services that will be used by the WMS',
+        '  std::set<wrench::ComputeService *> compute_services;',
+        '  compute_services.insert(cloud_service);',
+        '',
+        '  // Create a list of storage services that will be used by the WMS',
+        '  std::set<wrench::StorageService *> storage_services;',
+        '  storage_services.insert(storage_service);',
+        '',
+        '  // Instantiate a WMS',
+        '  wrench::WMS *wms = simulation.add(',
+        '                  new SimpleWMS(std::unique_ptr<wrench::CloudStandardJobScheduler>(',
+        '                                       new wrench::CloudStandardJobScheduler(storage_service)),',
+        '                                nullptr, compute_services, storage_services, wms_host));',
+        '  wms->addWorkflow(&workflow);',
+        '',
+        '  // Instantiate a file registry service',
+        '  std::string file_registry_service_host = hostname_list[(hostname_list.size() > 2) ? 1 : 0];',
+        '  wrench::FileRegistryService * file_registry_service =',
+        '          new wrench::FileRegistryService(file_registry_service_host);',
+        '  simulation.add(file_registry_service);',
+        '',
+        '  // It is necessary to store, or "stage", input files',
+        '  std::map<std::string, wrench::WorkflowFile *> input_files = workflow.getInputFiles();',
+        '  try {',
+        '    simulation.stageFiles(input_files, storage_service);',
+        '  } catch (std::runtime_error &e) {',
+        '    std::cerr << "Exception: " << e.what() << std::endl;',
+        '    return 0;',
+        '  }',
+        '',
+        '  // Launch the simulation',
+        '  try {',
+        '    simulation.launch();',
+        '  } catch (std::runtime_error &e) {',
+        '    std::cerr << "Exception: " << e.what() << std::endl;',
+        '    return 0;',
+        '  }',
+        '',
+        '  return 0;',
+        '}'
+    ])
 
 
 def main():
