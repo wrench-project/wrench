@@ -34,40 +34,26 @@ def _configure_logging(debug):
     logger.addHandler(ch)
 
 
-def main():
-    # Application's arguments
-    parser = argparse.ArgumentParser(description='Create a skeleton for a WRENCH-based project.')
-    parser.add_argument('project_dir', metavar='PROJECT_DIR', help='Project directory name')
-    parser.add_argument('-d', '--debug', action='store_true', help='Print debug messages to stderr')
-    parser.add_argument('-f', '--force', action='store_true',
-                        help='Overwrites existing project directory (use sparingly)')
-    args = parser.parse_args()
-
-    # Configure logging
-    _configure_logging(args.debug)
-
-    # Sanity check
-    if os.path.isdir(args.project_dir) and not args.force:
-        logger.error('The provided project directory already exists:\n\t%s\nUse --force to overwrite the directory' \
-                     % args.project_dir)
-        exit(1)
-
-    logger.info('Creating WRENCH skeleton project at: %s' % args.project_dir)
-
-    if not os.path.isdir(args.project_dir):
-        os.mkdir(args.project_dir)
-
-    # subdirectories structure
+def _create_subdirectories(project_dir):
+    '''
+    Create the subdirectories for the project
+    :param project_dir: project directory
+    '''
     logger.debug('Creating subdirectories structure')
     sub_dirs = ['src', 'test', 'doc', 'build', 'data', 'data/platform-files', 'data/workflow-files']
     for sub_dir in sub_dirs:
-        if not os.path.isdir(args.project_dir + '/' + sub_dir):
-            os.mkdir(args.project_dir + '/' + sub_dir)
-            logger.debug('  Created subdirectory: %s' % args.project_dir + '/' + sub_dir)
+        if not os.path.isdir(project_dir + '/' + sub_dir):
+            os.mkdir(project_dir + '/' + sub_dir)
+            logger.debug('  Created subdirectory: %s' % project_dir + '/' + sub_dir)
 
-    # write CMakeLists.txt
+
+def _write_cmakelists(project_dir):
+    '''
+    Write the CMakeLists.txt file
+    :param project_dir: project directory
+    '''
     logger.debug('Writing CMakeLists.txt file')
-    with open(args.project_dir + '/CMakeLists.txt', 'w') as cmake_file:
+    with open(project_dir + '/CMakeLists.txt', 'w') as cmake_file:
         cmake_file.write(
             'cmake_minimum_required(VERSION 3.2)\n'
             'message(STATUS "Cmake version ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION}")\n'
@@ -116,12 +102,13 @@ def main():
             'target_link_libraries(unit_tests\n'
             '                       ${GTEST_LIBRARY} wrench -lpthread -lm\n'
             '                      )\n'
-            % args.project_dir
+            % project_dir
         )
 
-    # create main.cpp
+
+def _write_main(project_dir):
     logger.debug('Writing src/main.cpp example file')
-    with open(args.project_dir + '/src/main.cpp', 'w') as main_file:
+    with open(project_dir + '/src/main.cpp', 'w') as main_file:
         main_file.write(
             '/**\n'
             ' * ADD A HEADER TO YOUR WRENCH SIMULATOR\n'
@@ -155,9 +142,53 @@ def main():
             '  // Reading and parsing the platform description file to instantiate a simulated platform\n'
             '  simulation.instantiatePlatform(platform_file);\n'
             '\n'
+            '  // Get a vector of all the hosts in the simulated platform\n'
+            '  std::vector<std::string> hostname_list = simulation.getHostnameList();\n'
+            '\n'
+            '  // Instantiate a storage service\n'
+            '  std::string storage_host = hostname_list[(hostname_list.size() > 2) ? 2 : 1];\n'
+            '  wrench::StorageService *storage_service = simulation.add(new wrench::SimpleStorageService(storage_host, 10000000000000.0));\n'
+            '\n'
+            '  // Construct a list of hosts (in this example only one host)\n'
+            '  std::string executor_host = hostname_list[(hostname_list.size() > 1) ? 1 : 0];\n'
+            '  std::vector<std::string> execution_hosts = {executor_host};\n'
+            '\n'
             '  return 0;\n'
             '}\n'
         )
+
+
+def main():
+    # Application's arguments
+    parser = argparse.ArgumentParser(description='Create a skeleton for a WRENCH-based project.')
+    parser.add_argument('project_dir', metavar='PROJECT_DIR', help='Project directory name')
+    parser.add_argument('-d', '--debug', action='store_true', help='Print debug messages to stderr')
+    parser.add_argument('-f', '--force', action='store_true',
+                        help='Overwrites existing project directory (use sparingly)')
+    args = parser.parse_args()
+
+    # Configure logging
+    _configure_logging(args.debug)
+
+    # Sanity check
+    if os.path.isdir(args.project_dir) and not args.force:
+        logger.error('The provided project directory already exists:\n\t%s\nUse --force to overwrite the directory' \
+                     % args.project_dir)
+        exit(1)
+
+    logger.info('Creating WRENCH skeleton project at: %s' % args.project_dir)
+
+    if not os.path.isdir(args.project_dir):
+        os.mkdir(args.project_dir)
+
+    # subdirectories structure
+    _create_subdirectories(args.project_dir)
+
+    # write CMakeLists.txt
+    _write_cmakelists(args.project_dir)
+
+    # create main.cpp
+    _write_main(args.project_dir)
 
 
 if __name__ == '__main__':
