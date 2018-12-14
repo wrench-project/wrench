@@ -70,8 +70,10 @@ function generateGraph(data, containerId) {
     var compute_color = '#f7daad'
     var write_color   = '#abdcf4'
     var container = d3.select(`#${containerId}`)
-    const CONTAINER_WIDTH = container.style("width").slice(0, -2) // returns "XXXXpx" so need to remove "px"
-    const CONTAINER_HEIGHT = container.style("height").slice(0, -2)
+    // const CONTAINER_WIDTH = container.style("width").slice(0, -2) // returns "XXXXpx" so need to remove "px"
+    // const CONTAINER_HEIGHT = container.style("height").slice(0, -2)
+    const CONTAINER_WIDTH = 1000
+    const CONTAINER_HEIGHT = 1000
     const PADDING = 60
     var toFiveDecimalPlaces = d3.format('.5f')
     var svg = container
@@ -214,6 +216,7 @@ function generateGraph(data, containerId) {
                     .attr('stroke', 'none')
             })
     })
+    // svg.attr('class', 'hidden')
 }
 
 function convertToTableFormat(d, section, startEnd) {
@@ -253,7 +256,6 @@ function populateWorkflowTaskDataTable(data) {
     })
 
     TASK_DATA.forEach(function(task) {
-        console.log(task)
         var task_id = task['task_id']
 
         var read_start       = convertToTableFormat(task, "read", "start")
@@ -308,4 +310,37 @@ function populateWorkflowTaskDataTable(data) {
             .html(task_duration)
             .attr("class", "task-details-table-td")
     })
+}
+
+function toggle(selector) {
+    var element = $(selector)
+    var hidden = element.hasClass('hidden')
+    if (hidden) {
+        element.hide()
+        element.removeClass('hidden')
+        element.slideDown('slow')
+    } else {
+        element.slideUp('slow', function() {
+            element.addClass('hidden');
+            element.show();
+        })
+    }
+}
+
+function showHide(id) {
+    var element = document.getElementById(id)
+    var hidden = element.classList.contains('hidden')
+    if (hidden) {
+        $(`#${id}`).slideDown()
+        element.classList.remove('hidden')
+    } else {
+        $(`#${id}`).slideUp()
+        element.classList.add('hidden')
+    }
+}
+
+window.onload = function() {
+    var taskDetailsTable = document.getElementById('task-details-table')
+    taskDetailsTable.classList.add('hidden')
+    taskDetailsTable.style.display = 'none'
 }

@@ -20,6 +20,7 @@ body {
 #overall-graph-container {
     width: 1000px;
     margin: auto;
+    display: inline-block;
 }
 #info-container {
     text-align: center;
@@ -45,6 +46,7 @@ body {
     width: 1000px;
     margin: auto;
     text-align: center;
+    table-layout: fixed;
 }
 .legend {
     text-align: center;
@@ -74,4 +76,33 @@ body {
 
 .task-details-table-header {
     border-top: 1px solid #dee2e6;
+}
+
+.title-container {
+    width: 1000px;
+    margin: auto;
+    cursor: pointer;
+    background-color: #DCDCDC;
+    display: inline-block;
+    height: 50px;
+    margin-bottom: 20px;
+}
+
+.title-text {
+    line-height: 50px;
+    margin-left: 5px;
+}
+
+.hidden {
+    display: none
+}
+
+.element-and-title-container {
+    width: 1000px;
+    margin: auto;
+}
+
+td {
+    word-wrap: break-word; 
+    word-break: break-all;
 }
