@@ -17,7 +17,7 @@ body {
     width: 150px;
     margin-bottom: 20px;
 }
-#overall-container {
+#overall-graph-container {
     width: 1000px;
     margin: auto;
 }
@@ -42,8 +42,9 @@ body {
     border-left: 15px solid red;
 }
 .task-details-table {
-    display: table;
-    width: 100%;
+    width: 1000px;
+    margin: auto;
+    text-align: center;
 }
 .legend {
     text-align: center;
@@ -64,4 +65,13 @@ body {
   
 .write-col {
     background-color: #e2f5ff;
+}
+
+.task-details-table-td {
+    padding: .75rem;
+    border-top: 1px solid #dee2e6;
+}
+
+.task-details-table-header {
+    border-top: 1px solid #dee2e6;
 }
