@@ -85,7 +85,6 @@ body {
     background-color: #DCDCDC;
     display: inline-block;
     height: 50px;
-    margin-bottom: 20px;
 }
 
 .title-text {
@@ -100,6 +99,7 @@ body {
 .element-and-title-container {
     width: 1000px;
     margin: auto;
+    margin-bottom: 20px;
 }
 
 td {

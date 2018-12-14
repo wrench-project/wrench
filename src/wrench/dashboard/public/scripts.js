@@ -70,8 +70,6 @@ function generateGraph(data, containerId) {
     var compute_color = '#f7daad'
     var write_color   = '#abdcf4'
     var container = d3.select(`#${containerId}`)
-    // const CONTAINER_WIDTH = container.style("width").slice(0, -2) // returns "XXXXpx" so need to remove "px"
-    // const CONTAINER_HEIGHT = container.style("height").slice(0, -2)
     const CONTAINER_WIDTH = 1000
     const CONTAINER_HEIGHT = 1000
     const PADDING = 60
@@ -216,7 +214,6 @@ function generateGraph(data, containerId) {
                     .attr('stroke', 'none')
             })
     })
-    // svg.attr('class', 'hidden')
 }
 
 function convertToTableFormat(d, section, startEnd) {
@@ -312,6 +309,125 @@ function populateWorkflowTaskDataTable(data) {
     })
 }
 
+function getOverallWorkflowMetrics(data) {
+    var toFiveDecimalPlaces = d3.format('.5f')
+
+    var hosts = new Set()
+    var noFailed = 0
+    var noTerminated = 0
+    var overallStartTime = data[0].whole_task.start
+    var overallEndTime = 0
+    var noTasks = data.length
+    var averageReadDuration
+    var averageComputeDuration
+    var averageWriteDuration
+
+    data.forEach(function(d) {
+        var currHost = d.execution_host
+        hosts.add(currHost)
+
+        if (d.failed != -1) {
+            noFailed++
+        }
+
+        if (d.terminated != -1) {
+            noTerminated++
+        }
+    
+        var whole_task = d.whole_task
+        if (whole_task.start < overallStartTime) {
+            overallStartTime = whole_task.start
+        }
+        if (whole_task.end > overallEndTime) {
+            overallEndTime = whole_task.end
+        }
+
+        var read = d.read
+        var compute = d.compute
+        var write = d.write
+
+        var totalReadDuration = 0
+        var totalComputeDuration = 0
+        var totalWriteDuration = 0
+
+        var readDuration = getDuration(read.start, read.end)
+        if (readDuration !== read.start && readDuration !== read.end) {
+            totalReadDuration += readDuration
+        }
+
+        var computeDuration = getDuration(compute.start, compute.end)
+        if (computeDuration !== compute.start && computeDuration !== compute.end) {
+            totalComputeDuration += computeDuration
+        }
+
+        var writeDuration = getDuration(write.start, write.end)
+        if (writeDuration !== write.start && writeDuration !== write.end) {
+            totalWriteDuration == writeDuration
+        }
+
+        averageReadDuration = totalReadDuration / noTasks
+        averageComputeDuration = totalComputeDuration / noTasks
+        averageWriteDuration = totalWriteDuration / noTasks
+    })
+
+    var totalHosts = hosts.size
+    var noSuccesful = noTasks - (noFailed + noTerminated)
+    var totalDuration = overallEndTime - overallStartTime
+
+    var metrics = {
+        totalHosts: {
+            value: toFiveDecimalPlaces(totalHosts),
+            display: 'Total Hosts Utilised'
+        },
+        totalDuration: {
+            value: toFiveDecimalPlaces(totalDuration),
+            display: 'Total Workflow Duration'
+        },
+        noTasks: {
+            value: toFiveDecimalPlaces(noTasks),
+            display: 'Number of Tasks'
+        },
+        noFailed: {
+            value: toFiveDecimalPlaces(noFailed),
+            display: 'Failed Tasks'
+        },
+        noTerminated: {
+            value: toFiveDecimalPlaces(noTerminated),
+            display: 'Terminated Tasks'
+        },
+        noSuccesful: {
+            value: toFiveDecimalPlaces(noSuccesful),
+            display: 'Succesful Tasks'
+        },
+        averageReadDuration: {
+            value: toFiveDecimalPlaces(averageReadDuration),
+            display: 'Average Read Duration'
+        },
+        averageComputeDuration: {
+            value: toFiveDecimalPlaces(averageComputeDuration),
+            display: 'Average Compute Duration'
+        },
+        averageWriteDuration: {
+            value: toFiveDecimalPlaces(averageWriteDuration),
+            display: 'Average Write Duration'
+        }
+    }
+
+    for (var key in metrics) {
+        var table = d3.select('#overall-metrics-table')
+        var tr = table.append('tr')
+
+        var currMetric = metrics[key]
+        var value = currMetric.value
+        var display = currMetric.display
+
+        tr.append('td')
+            .html(display)
+        tr.append('td')
+            .html(value)
+    }
+}
+
 function toggle(selector) {
     var element = $(selector)
     var hidden = element.hasClass('hidden')
@@ -331,6 +447,7 @@ function showHide(id) {
     var element = document.getElementById(id)
     var hidden = element.classList.contains('hidden')
     if (hidden) {
+        console.log($(`#${id}`))
         $(`#${id}`).slideDown()
         element.classList.remove('hidden')
     } else {
