@@ -89,6 +89,7 @@ body {
 .title-text {
     line-height: 50px;
     margin-left: 5px;
+    display: inline-block;
 }
 
 .hidden {
@@ -104,4 +105,31 @@ body {
 td {
     word-wrap: break-word; 
     word-break: break-all;
+}
+
+.overall-metrics-table-col {
+    width: 500px;
+}
+
+#overall-metrics-table {
+    text-align: center;
+}
+
+.arrow-div {
+    width: 50px;
+    height: 50px;
+    display: inline-block;
+    text-align: center;
+    float: right;
+}
+
+.arrow-helper {
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+}
+
+.arrow-img {
+    vertical-align: middle;
+    height: 20px;
 }

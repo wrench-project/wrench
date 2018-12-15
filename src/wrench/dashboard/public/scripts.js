@@ -381,7 +381,8 @@ function getOverallWorkflowMetrics(data) {
         },
         totalDuration: {
             value: toFiveDecimalPlaces(totalDuration),
-            display: 'Total Workflow Duration'
+            display: 'Total Workflow Duration',
+            unit: 's'
         },
         noTasks: {
             value: toFiveDecimalPlaces(noTasks),
@@ -401,15 +402,18 @@ function getOverallWorkflowMetrics(data) {
         },
         averageReadDuration: {
             value: toFiveDecimalPlaces(averageReadDuration),
-            display: 'Average Read Duration'
+            display: 'Average Read Duration',
+            unit: 's'
         },
         averageComputeDuration: {
             value: toFiveDecimalPlaces(averageComputeDuration),
-            display: 'Average Compute Duration'
+            display: 'Average Compute Duration',
+            unit: 's'
         },
         averageWriteDuration: {
             value: toFiveDecimalPlaces(averageWriteDuration),
-            display: 'Average Write Duration'
+            display: 'Average Write Duration',
+            unit: 's'
         }
     }
 
@@ -420,14 +424,29 @@ function getOverallWorkflowMetrics(data) {
         var currMetric = metrics[key]
         var value = currMetric.value
         var display = currMetric.display
+        var unit = currMetric.unit
+        if (unit === undefined) {
+            unit = ''
+        }
 
         tr.append('td')
             .html(display)
+            .attr('class', 'task-details-table-td')
         tr.append('td')
-            .html(value)
+            .html(`${value} ${unit}`)
+            .attr('class', 'task-details-table-td')
     }
 }
 
-function showHide(id) {
-    $(`#${id}`).slideToggle()
+function showHide(id, arrowId) {
+    var overallDiv = $(`#${id}`)
+    var arrow = $(`#${arrowId}`)
+    overallDiv.slideToggle()
+    if (overallDiv.hasClass('hidden')) {
+        arrow.rotate({animateTo: 180})
+        overallDiv.removeClass('hidden')
+    } else {
+        arrow.rotate({animateTo: 0})
+        overallDiv.addClass('hidden')
+    }
 }

@@ -12,6 +12,7 @@
         <link rel="stylesheet" href="public/styles.css">
         <link rel="icon" href="public/favicon.ico" />
         <script src="public/d3.min.js" type="text/javascript"></script>
+        <script src="public/jQueryRotate.js" type="text/javascript"></script>
     </head>
     <body>
         <div id='info-container'>
@@ -21,23 +22,37 @@
         </div>
 
         <div class='element-and-title-container'>
-            <div class='title-container' onclick='showHide("overall-metrics-table-container")'>
+            <div class='title-container' onclick='showHide("overall-metrics-table-container", "overall-metrics-arrow")'>
                 <h6 class='title-text'>Overall Simulation Metrics</h6>
+                <div class='arrow-div'>
+                    <span class='arrow-helper'></span>
+                    <img id='overall-metrics-arrow' class='arrow-img' src='public/expand-arrow.png'/>
+                </div>
             </div>
             
-            <div id='overall-metrics-table-container'>
+            <div class='hidden' id='overall-metrics-table-container'>
                 <table id='overall-metrics-table'>
-                    <tr>
-                        <th>Metric</th>
-                        <th>Value</th>
-                    </tr>
+                    <colgroup>
+                        <col span="1" class='overall-metrics-table-col read-col'></col>
+                        <col span="1" class='overall-metrics-table-col write-col'></col>
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th class='task-details-table-td'>Metric</th>
+                            <th class='task-details-table-td'>Value</th>
+                        </tr>
+                    </thead>
                 </table>
             </div>
         </div>
 
         <div class='element-and-title-container'>
-            <div class='title-container' onclick='showHide("overall-graph-container")'>
+            <div class='title-container' onclick='showHide("overall-graph-container", "simulation-graph-arrow")'>
                 <h6 class='title-text'>Simulation Graph</h6>
+                <div class='arrow-div'>
+                    <span class='arrow-helper'></span>
+                    <img id='simulation-graph-arrow' class='arrow-img' src='public/expand-arrow.png'/>
+                </div>
             </div>
             
             <div class='hidden' id='overall-graph-container'>
@@ -60,8 +75,12 @@
         </div>
 
         <div class='element-and-title-container'>
-            <div class='title-container' onclick='showHide("task-details-table-container")'>
-                <h6 class='title-text'>Task Details</h6>
+            <div class='title-container' onclick='showHide("task-details-table-container", "simulation-details-arrow")'>
+                <h6 class='title-text'>Simulation Details</h6>
+                <div class='arrow-div'>
+                    <span class='arrow-helper'></span>
+                    <img id='simulation-details-arrow' class='arrow-img' src='public/expand-arrow.png'/>
+                </div>
             </div>
 
             <div class='hidden' id='task-details-table-container'>
