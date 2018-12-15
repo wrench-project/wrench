@@ -428,36 +428,6 @@ function getOverallWorkflowMetrics(data) {
     }
 }
 
-function toggle(selector) {
-    var element = $(selector)
-    var hidden = element.hasClass('hidden')
-    if (hidden) {
-        element.hide()
-        element.removeClass('hidden')
-        element.slideDown('slow')
-    } else {
-        element.slideUp('slow', function() {
-            element.addClass('hidden');
-            element.show();
-        })
-    }
-}
-
 function showHide(id) {
-    var element = document.getElementById(id)
-    var hidden = element.classList.contains('hidden')
-    if (hidden) {
-        console.log($(`#${id}`))
-        $(`#${id}`).slideDown()
-        element.classList.remove('hidden')
-    } else {
-        $(`#${id}`).slideUp()
-        element.classList.add('hidden')
-    }
-}
-
-window.onload = function() {
-    var taskDetailsTable = document.getElementById('task-details-table')
-    taskDetailsTable.classList.add('hidden')
-    taskDetailsTable.style.display = 'none'
+    $(`#${id}`).slideToggle()
 }

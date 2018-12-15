@@ -21,16 +21,18 @@
         </div>
 
         <div class='element-and-title-container'>
-            <div class='title-container' onclick='showHide("overall-metrics-table")'>
+            <div class='title-container' onclick='showHide("overall-metrics-table-container")'>
                 <h6 class='title-text'>Overall Simulation Metrics</h6>
             </div>
-
-            <table id='overall-metrics-table'>
-                <tr>
-                    <th>Metric</th>
-                    <th>Value</th>
-                </tr>
-            </table>
+            
+            <div id='overall-metrics-table-container'>
+                <table id='overall-metrics-table'>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Value</th>
+                    </tr>
+                </table>
+            </div>
         </div>
 
         <div class='element-and-title-container'>
@@ -38,7 +40,7 @@
                 <h6 class='title-text'>Simulation Graph</h6>
             </div>
             
-            <div id='overall-graph-container'>
+            <div class='hidden' id='overall-graph-container'>
                 <div class="container legend" id="workflow-execution-chart-legend">
                     <small>Legend:</small> 
                     <small class="inline-block" id="workflow-execution-chart-legend-read-input">Reading Input</small>
@@ -62,7 +64,7 @@
                 <h6 class='title-text'>Task Details</h6>
             </div>
 
-            <div id='task-details-table-container'>
+            <div class='hidden' id='task-details-table-container'>
                 <table class="task-details-table" id='task-details-table'>
                     <colgroup>
                         <col span="1"></col>
