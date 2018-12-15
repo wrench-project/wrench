@@ -114,8 +114,7 @@ int main(int argc, char **argv) {
   wrench::WMS *wms = simulation.add(
           new wrench::SimpleWMS(std::unique_ptr<wrench::BatchStandardJobScheduler>(
                   new wrench::BatchStandardJobScheduler(storage_service)),
-                                nullptr,
-                                compute_services, storage_services, wms_host));
+                                nullptr, compute_services, storage_services, wms_host));
 
   wms->addWorkflow(&workflow);
 

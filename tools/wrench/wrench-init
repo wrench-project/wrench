@@ -35,10 +35,10 @@ def _configure_logging(debug):
 
 
 def _create_subdirectories(project_dir):
-    '''
+    """
     Create the subdirectories for the project
     :param project_dir: project directory
-    '''
+    """
     logger.debug('Creating subdirectories structure')
     sub_dirs = ['src', 'test', 'doc', 'build', 'data', 'data/platform-files', 'data/workflow-files']
     for sub_dir in sub_dirs:
@@ -48,21 +48,21 @@ def _create_subdirectories(project_dir):
 
 
 def _write_contents(filename, contents):
-    '''
+    """
     Write a list of strings to a file
     :param filename: name of the file
     :param contents: list of strings
-    '''
+    """
     with open(filename, 'w') as f:
         for line in contents:
             f.write(line + '\n')
 
 
 def _write_cmakelists(project_dir):
-    '''
+    """
     Write the CMakeLists.txt file
     :param project_dir: project directory
-    '''
+    """
     logger.debug('Writing CMakeLists.txt file')
     _write_contents(project_dir + '/CMakeLists.txt', [
         'cmake_minimum_required(VERSION 3.2)',
@@ -79,8 +79,11 @@ def _write_cmakelists(project_dir):
         '',
         '# source files',
         'set(SOURCE_FILES',
-        '       src/SimpleWMS.cpp'
-        '       src/main.cpp',
+        '       src/SimpleWMS.h',
+        '       src/SimpleWMS.cpp',
+        '       src/SimpleStandardJobScheduler.h',
+        '       src/SimpleStandardJobScheduler.cpp',
+        '       src/SimpleSimulator.cpp',
         '       )',
         '',
         '# test files',
@@ -116,9 +119,13 @@ def _write_cmakelists(project_dir):
     ])
 
 
-def _write_main(project_dir):
-    logger.debug('Writing src/main.cpp example file')
-    _write_contents(project_dir + '/src/main.cpp', [
+def _write_main(project_dir, compute_service):
+    """
+    Write the SimpleSimulator.cpp file
+    :param project_dir:
+    :param compute_service:
+    """
+    file_contents = [
         '/**',
         ' * ADD A HEADER TO YOUR WRENCH SIMULATOR',
         ' */',
@@ -163,33 +170,58 @@ def _write_main(project_dir):
         '  std::string executor_host = hostname_list[(hostname_list.size() > 1) ? 1 : 0];',
         '  std::vector<std::string> execution_hosts = {executor_host};',
         '',
-        '  // Instantiate a cloud service',
-        '  std::string wms_host = hostname_list[0];',
-        '  wrench::CloudService *cloud_service = new wrench::CloudService(',
-        '          wms_host, execution_hosts, 0, {},',
-        '          {{wrench::CloudServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, "1024"}});',
-        '',
-        '  // Add the cloud service to the simulation',
-        '  try {',
-        '    simulation.add(cloud_service);',
-        '  } catch (std::invalid_argument &e) {',
-        '    std::cerr << "Error: " << e.what() << std::endl;',
-        '    std::exit(1);',
-        '  }',
-        '',
-        '  // Create a list of compute services that will be used by the WMS',
-        '  std::set<wrench::ComputeService *> compute_services;',
-        '  compute_services.insert(cloud_service);',
-        '',
         '  // Create a list of storage services that will be used by the WMS',
         '  std::set<wrench::StorageService *> storage_services;',
         '  storage_services.insert(storage_service);',
         '',
+        '  // Create a list of compute services that will be used by the WMS',
+        '  std::set<wrench::ComputeService *> compute_services;',
+        ''
+    ]
+
+    if compute_service == 'cloud':
+        file_contents.extend([
+            '  // Instantiate a cloud service',
+            '  std::string wms_host = hostname_list[0];',
+            '  wrench::CloudService *cloud_service = new wrench::CloudService(',
+            '          wms_host, execution_hosts, 0, {},',
+            '          {{wrench::CloudServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, "1024"}});',
+            '',
+            '  // Add the cloud service to the simulation',
+            '  try {',
+            '    simulation.add(cloud_service);',
+            '  } catch (std::invalid_argument &e) {',
+            '    std::cerr << "Error: " << e.what() << std::endl;',
+            '    std::exit(1);',
+            '  }',
+            '  compute_services.insert(cloud_service);',
+            ''
+        ])
+
+    elif compute_service == 'batch':
+        file_contents.extend([
+            '  // Instantiate a batch service',
+            '  wrench::ComputeService *batch_service = new wrench::BatchService(',
+            '          wms_host, hostname_list, 0, {},',
+            '          {{wrench::BatchServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, "2048"}});',
+            '',
+            '  // Add the batch service to the simulation',
+            '  try {',
+            '    simulation.add(batch_service);',
+            '  } catch (std::invalid_argument &e) {',
+            '    std::cerr << "Error: " << e.what() << std::endl;',
+            '    std::exit(1);',
+            '  }',
+            '  compute_services.insert(batch_service);',
+            ''
+        ])
+
+    file_contents.extend([
         '  // Instantiate a WMS',
         '  wrench::WMS *wms = simulation.add(',
-        '                  new SimpleWMS(std::unique_ptr<wrench::CloudStandardJobScheduler>(',
-        '                                       new wrench::CloudStandardJobScheduler(storage_service)),',
-        '                                nullptr, compute_services, storage_services, wms_host));',
+        '          new SimpleWMS(std::unique_ptr<SimpleStandardJobScheduler>(',
+        '                  new SimpleStandardJobScheduler(storage_service)),',
+        '                        nullptr, compute_services, storage_services, wms_host));',
         '  wms->addWorkflow(&workflow);',
         '',
         '  // Instantiate a file registry service',
@@ -217,11 +249,18 @@ def _write_main(project_dir):
         '',
         '  return 0;',
         '}',
-        ''
+        '',
     ])
+
+    logger.debug('Writing src/SimpleSimulator.cpp example file')
+    _write_contents(project_dir + '/src/SimpleSimulator.cpp', file_contents)
 
 
 def _write_simple_wms(project_dir):
+    """
+    Write the SimpleWMS.h and SimpleWMS.cpp files
+    :param project_dir: project directory
+    """
     logger.debug('Writing src/SimpleWMS.h example file')
     _write_contents(project_dir + '/src/SimpleWMS.h', [
         '/**',
@@ -341,9 +380,18 @@ def _write_simple_wms(project_dir):
     ])
 
 
-def _write_simple_scheduler(project_dir):
+def _write_simple_scheduler(project_dir, compute_service):
+    """
+    Write Scheduler files
+    :param project_dir: project directory
+    :param compute_service: compute service to which the scheduler will be generated
+    """
     logger.debug('Writing src/SimpleScheduler.h example file')
-    _write_contents(project_dir + '/src/SimpleScheduler.h', [
+    _write_contents(project_dir + '/src/SimpleStandardJobScheduler.h', [
+    ])
+
+    logger.debug('Writing src/SimpleScheduler.cpp example file')
+    _write_contents(project_dir + '/src/SimpleStandardJobScheduler.cpp', [
     ])
 
 
@@ -351,6 +399,8 @@ def main():
     # Application's arguments
     parser = argparse.ArgumentParser(description='Create a skeleton for a WRENCH-based project.')
     parser.add_argument('project_dir', metavar='PROJECT_DIR', help='Project directory name')
+    parser.add_argument('-c', '--compute_service', action='store', metavar='COMPUTE_SERVICE',
+                        help='Specify a Compute Service (cloud or batch)', default='cloud')
     parser.add_argument('-d', '--debug', action='store_true', help='Print debug messages to stderr')
     parser.add_argument('-f', '--force', action='store_true',
                         help='Overwrites existing project directory (use sparingly)')
@@ -364,6 +414,12 @@ def main():
         logger.error('The provided project directory already exists:\n\t%s\nUse --force to overwrite the directory' \
                      % args.project_dir)
         exit(1)
+
+    if args.compute_service:
+        args.compute_service = args.compute_service.lower()
+        if args.compute_service not in ['cloud', 'batch']:
+            logger.error('Invalid Compute Service type: %s' % args.compute_service)
+            exit(1)
 
     logger.info('Creating WRENCH skeleton project at: %s' % args.project_dir)
 
@@ -380,10 +436,10 @@ def main():
     _write_simple_wms(args.project_dir)
 
     # create SimpleScheduler
-    _write_simple_scheduler(args.project_dir)
+    _write_simple_scheduler(args.project_dir, args.compute_service)
 
-    # create main.cpp
-    _write_main(args.project_dir)
+    # create SimpleSimulator.cpp
+    _write_main(args.project_dir, args.compute_service)
 
 
 if __name__ == '__main__':
