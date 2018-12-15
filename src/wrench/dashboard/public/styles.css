@@ -121,6 +121,10 @@ td {
     display: inline-block;
     text-align: center;
     float: right;
+    /* prevent highlighting with double click */
+    -webkit-user-select: none; /* Chrome/Safari */        
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE10+ */
 }
 
 .arrow-helper {
