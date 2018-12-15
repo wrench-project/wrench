@@ -73,7 +73,8 @@ int main(int argc, char **argv) {
    */
   std::string storage_host = hostname_list[(hostname_list.size() > 2) ? 2 : 1];
   std::cerr << "Instantiating a SimpleStorageService on " << storage_host << "..." << std::endl;
-  wrench::StorageService *storage_service = simulation.add(new wrench::SimpleStorageService(storage_host, 10000000000000.0));
+  wrench::StorageService *storage_service = simulation.add(
+          new wrench::SimpleStorageService(storage_host, 10000000000000.0));
 
   /* Construct a list of hosts (in the example only one host) on which the
    * cloud service will be able to run tasks
@@ -122,9 +123,9 @@ int main(int argc, char **argv) {
    */
   std::cerr << "Instantiating a WMS on " << wms_host << "..." << std::endl;
   wrench::WMS *wms = simulation.add(
-                  new wrench::SimpleWMS(std::unique_ptr<wrench::CloudStandardJobScheduler>(
-                                                new wrench::CloudStandardJobScheduler(storage_service)),
-                                        nullptr, compute_services, storage_services, wms_host));
+          new wrench::SimpleWMS(std::unique_ptr<wrench::CloudStandardJobScheduler>(
+                  new wrench::CloudStandardJobScheduler(storage_service)),
+                                nullptr, compute_services, storage_services, wms_host));
 
   wms->addWorkflow(&workflow);
 
@@ -134,7 +135,7 @@ int main(int argc, char **argv) {
    */
   std::string file_registry_service_host = hostname_list[(hostname_list.size() > 2) ? 1 : 0];
   std::cerr << "Instantiating a FileRegistryService on " << file_registry_service_host << "..." << std::endl;
-  wrench::FileRegistryService * file_registry_service =
+  wrench::FileRegistryService *file_registry_service =
           new wrench::FileRegistryService(file_registry_service_host);
   simulation.add(file_registry_service);
 
@@ -142,9 +143,9 @@ int main(int argc, char **argv) {
   std::vector<std::string> hostname_list_copy(hostname_list);
   std::string hostname_copy(hostname_list[0]);
   wrench::NetworkProximityService *NPS = new wrench::NetworkProximityService(hostname_copy, hostname_list_copy, {
-          {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "alltoall"},
-          {wrench::NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE, "1.0"},
-          {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD, "600"},
+          {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE,                 "alltoall"},
+          {wrench::NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE,          "1.0"},
+          {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD,           "600"},
           {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE, "10"}});
 
   simulation.add(NPS);
