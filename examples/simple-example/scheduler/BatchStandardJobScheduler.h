@@ -11,7 +11,6 @@
 #ifndef WRENCH_BATCHSCHEDULER_H
 #define WRENCH_BATCHSCHEDULER_H
 
-
 #include <wrench-dev.h>
 
 namespace wrench {
@@ -23,16 +22,15 @@ namespace wrench {
 
     public:
 
+        BatchStandardJobScheduler(StorageService *default_storage_service) :
+                default_storage_service(default_storage_service) {}
+
         /***********************/
         /** \cond DEVELOPER    */
         /***********************/
 
         void scheduleTasks(const std::set<ComputeService *> &compute_services,
                            const std::vector<WorkflowTask *> &tasks);
-
-
-        BatchStandardJobScheduler(StorageService *default_storage_service) :
-                StandardJobScheduler(), default_storage_service(default_storage_service) {}
 
         /***********************/
         /** \endcond           */

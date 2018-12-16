@@ -58,6 +58,21 @@ def _write_contents(filename, contents):
             f.write(line + '\n')
 
 
+def _add_header():
+    return [
+        '/**',
+        ' * Copyright (c) 2019. <ADD YOUR HEADER INFORMATION>.',
+        ' * Generated with the wrench-init tool.',
+        ' *',
+        ' * This program is free software: you can redistribute it and/or modify',
+        ' * it under the terms of the GNU General Public License as published by',
+        ' * the Free Software Foundation, either version 3 of the License, or',
+        ' * (at your option) any later version.',
+        ' */'
+        ''
+    ]
+
+
 def _write_cmakelists(project_dir):
     """
     Write the CMakeLists.txt file
@@ -125,12 +140,10 @@ def _write_main(project_dir, compute_service):
     :param project_dir:
     :param compute_service:
     """
-    file_contents = [
-        '/**',
-        ' * ADD A HEADER TO YOUR WRENCH SIMULATOR',
-        ' */',
-        '',
+    file_contents = _add_header()
+    file_contents.extend([
         '#include <wrench.h>',
+        '#include "SimpleStandardJobScheduler.h"',
         '#include "SimpleWMS.h"',
         '',
         'int main(int argc, char **argv) {',
@@ -176,13 +189,13 @@ def _write_main(project_dir, compute_service):
         '',
         '  // Create a list of compute services that will be used by the WMS',
         '  std::set<wrench::ComputeService *> compute_services;',
-        ''
-    ]
+        '',
+        '  std::string wms_host = hostname_list[0];'
+    ])
 
     if compute_service == 'cloud':
         file_contents.extend([
             '  // Instantiate a cloud service',
-            '  std::string wms_host = hostname_list[0];',
             '  wrench::CloudService *cloud_service = new wrench::CloudService(',
             '          wms_host, execution_hosts, 0, {},',
             '          {{wrench::CloudServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, "1024"}});',
@@ -262,13 +275,10 @@ def _write_simple_wms(project_dir):
     :param project_dir: project directory
     """
     logger.debug('Writing src/SimpleWMS.h example file')
-    _write_contents(project_dir + '/src/SimpleWMS.h', [
-        '/**',
-        ' * ADD A HEADER TO YOUR WRENCH WMS',
-        ' */',
-        '',
-        '#ifndef WRENCH_SIMPLEWMS_H',
-        '#define WRENCH_SIMPLEWMS_H',
+    file_contents = _add_header()
+    file_contents.extend([
+        '#ifndef MY_SIMPLEWMS_H',
+        '#define MY_SIMPLEWMS_H',
         '',
         '#include <wrench-dev.h>',
         '',
@@ -292,16 +302,14 @@ def _write_simple_wms(project_dir):
         '    std::shared_ptr<wrench::JobManager> job_manager;',
         '};',
         '',
-        '#endif //WRENCH_SIMPLEWMS_H',
+        '#endif //MY_SIMPLEWMS_H',
         ''
     ])
+    _write_contents(project_dir + '/src/SimpleWMS.h', file_contents)
 
     logger.debug('Writing src/SimpleWMS.cpp example file')
-    _write_contents(project_dir + '/src/SimpleWMS.cpp', [
-        '/**',
-        ' * ADD A HEADER TO YOUR WRENCH WMS',
-        ' */',
-        '',
+    file_contents = _add_header()
+    file_contents.extend([
         '#include <iostream>',
         '',
         '#include "SimpleWMS.h"',
@@ -378,6 +386,7 @@ def _write_simple_wms(project_dir):
         '  return 0;',
         '}'
     ])
+    _write_contents(project_dir + '/src/SimpleWMS.cpp', file_contents)
 
 
 def _write_simple_scheduler(project_dir, compute_service):
@@ -386,13 +395,145 @@ def _write_simple_scheduler(project_dir, compute_service):
     :param project_dir: project directory
     :param compute_service: compute service to which the scheduler will be generated
     """
-    logger.debug('Writing src/SimpleScheduler.h example file')
-    _write_contents(project_dir + '/src/SimpleStandardJobScheduler.h', [
+    logger.debug('Writing src/SimpleStandardJobScheduler.h example file')
+    file_contents = _add_header()
+    file_contents.extend([
+        '#ifndef MY_SIMPLESCHEDULER_H',
+        '#define MY_SIMPLESCHEDULER_H',
+        '',
+        '#include <wrench-dev.h>',
+        '',
+        'class SimpleStandardJobScheduler : public wrench::StandardJobScheduler {',
+        'public:',
+        '  SimpleStandardJobScheduler(wrench::StorageService *default_storage_service) :',
+        '          default_storage_service(default_storage_service) {}',
+        '',
+        '  void scheduleTasks(const std::set<wrench::ComputeService *> &compute_services,',
+        '                     const std::vector<wrench::WorkflowTask *> &tasks);',
+        '',
+        'private:',
+        '  wrench::StorageService *default_storage_service;',
     ])
 
-    logger.debug('Writing src/SimpleScheduler.cpp example file')
-    _write_contents(project_dir + '/src/SimpleStandardJobScheduler.cpp', [
+    if compute_service == 'cloud':
+        file_contents.append('  std::vector<std::string> execution_hosts;')
+
+    file_contents.extend([
+        '};',
+        '',
+        '#endif //MY_SIMPLESCHEDULER_H',
+        ''
     ])
+
+    _write_contents(project_dir + '/src/SimpleStandardJobScheduler.h', file_contents)
+
+    logger.debug('Writing src/SimpleStandardJobScheduler.cpp example file')
+    file_contents = _add_header()
+    file_contents.extend([
+        '#include "SimpleStandardJobScheduler.h"',
+        '',
+        'XBT_LOG_NEW_DEFAULT_CATEGORY(simple_scheduler, "Log category for Simple Scheduler");',
+        '',
+        '/**',
+        ' * @brief Schedule and run a set of ready tasks on available cloud resources',
+        ' *',
+        ' * @param compute_services: a set of compute services available to run jobs',
+        ' * @param tasks: a map of (ready) workflow tasks',
+        ' *',
+        ' * @throw std::runtime_error',
+        ' */',
+        'void SimpleStandardJobScheduler::scheduleTasks(const std::set<wrench::ComputeService *> &compute_services,',
+        '                                               const std::vector<wrench::WorkflowTask *> &tasks) {',
+        '',
+        '  // Check that the right compute_services is passed',
+        '  if (compute_services.size() != 1) {',
+        '    throw std::runtime_error("This example Simple Scheduler requires a single compute service");',
+        '  }',
+        '',
+        '  wrench::ComputeService *compute_service = *compute_services.begin();'
+    ])
+
+    if compute_service == 'cloud':
+        file_contents.extend([
+            '  wrench::CloudService *cloud_service;',
+            '  if (not(cloud_service = dynamic_cast<wrench::CloudService *>(compute_service))) {',
+            '    throw std::runtime_error("This example Cloud Scheduler can only handle a cloud service");',
+            '  }',
+            '',
+            '  // obtain list of execution hosts, if not already done',
+            '  if (this->execution_hosts.empty()) {',
+            '  this->execution_hosts = cloud_service->getExecutionHosts();',
+            '  }',
+            '',
+            '  WRENCH_INFO("There are %ld ready tasks to schedule", tasks.size());',
+            '  for (auto task : tasks) {',
+            '    unsigned long sum_num_idle_cores = 0;',
+            '',
+            '    // Check that it can run it right now in terms of idle cores',
+            '    try {',
+            '      std::map<std::string, unsigned long> num_idle_cores = compute_service->getNumIdleCores();',
+            '      for (auto const &ic : num_idle_cores) {',
+            '        sum_num_idle_cores += ic.second;',
+            '      }',
+            '    } catch (wrench::WorkflowExecutionException &e) {',
+            '      throw std::runtime_error("Unable to get the number of idle cores.");',
+            '    }',
+            '',
+            '    std::map<wrench::WorkflowFile *, wrench::StorageService *> file_locations;',
+            '    for (auto f : task->getInputFiles()) {',
+            '      file_locations.insert(std::make_pair(f, default_storage_service));',
+            '    }',
+            '    for (auto f : task->getOutputFiles()) {',
+            '      file_locations.insert(std::make_pair(f, default_storage_service));',
+            '    }',
+            '',
+            '    // Decision making',
+            '    wrench::WorkflowJob *job = (wrench::WorkflowJob *) this->getJobManager()->createStandardJob(task, file_locations);',
+            '    unsigned long mim_num_cores = ((wrench::StandardJob *) (job))->getMinimumRequiredNumCores();'
+            '',
+            '    if (sum_num_idle_cores < mim_num_cores) {',
+            '      try {',
+            '        std::string vm_host = cloud_service->createVM(mim_num_cores, task->getMemoryRequirement());',
+            '      } catch (wrench::WorkflowExecutionException &e) {',
+            '        return;',
+            '      }',
+            '    }',
+            '    this->getJobManager()->submitJob(job, cloud_service);',
+            '  }'
+        ])
+
+    elif compute_service == 'batch':
+        file_contents.extend([
+            '  wrench::BatchService *batch_service;',
+            '  if (not(batch_service = dynamic_cast<wrench::BatchService *>(compute_service))) {',
+            '    throw std::runtime_error("This example Batch Scheduler can only handle a batch service");',
+            '  }',
+            '',
+            '  WRENCH_INFO("There are %ld ready tasks to schedule", tasks.size());',
+            '  for (auto task : tasks) {',
+            '    std::map<wrench::WorkflowFile *, wrench::StorageService *> file_locations;',
+            '    for (auto f : task->getInputFiles()) {',
+            '      file_locations.insert(std::make_pair(f, default_storage_service));',
+            '    }',
+            '    for (auto f : task->getOutputFiles()) {',
+            '      file_locations.insert(std::make_pair(f, default_storage_service));',
+            '    }',
+            '',
+            '    wrench::WorkflowJob *job = (wrench::WorkflowJob *) this->getJobManager()->createStandardJob(task, file_locations);',
+            '    std::map<std::string, std::string> batch_job_args;',
+            '    batch_job_args["-N"] = "1";',
+            '    batch_job_args["-t"] = "2000000"; //time in minutes',
+            '    batch_job_args["-c"] = "1"; //number of cores per node',
+            '    this->getJobManager()->submitJob(job, batch_service, batch_job_args);',
+            '  }'
+        ])
+
+    file_contents.extend([
+        '  WRENCH_INFO("Done with scheduling tasks as standard jobs");',
+        '}',
+        ''
+    ])
+    _write_contents(project_dir + '/src/SimpleStandardJobScheduler.cpp', file_contents)
 
 
 def main():
@@ -440,6 +581,9 @@ def main():
 
     # create SimpleSimulator.cpp
     _write_main(args.project_dir, args.compute_service)
+
+    logger.info('A WRENCH-based skeleton project with a "%s" compute service has been created at: %s' % (
+    args.compute_service, args.project_dir))
 
 
 if __name__ == '__main__':
