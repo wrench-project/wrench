@@ -315,3 +315,6 @@ include(${CMAKE_HOME_DIRECTORY}/tools/cmake/Examples.cmake)
 
 # build documentation
 include(${CMAKE_HOME_DIRECTORY}/tools/cmake/Documentation.cmake)
+
+# build tools
+include(${CMAKE_HOME_DIRECTORY}/tools/cmake/Tools.cmake)
