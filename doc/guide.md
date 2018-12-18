@@ -11,7 +11,7 @@ Guide                        {#guide}
     2. [Cloud Platforms](@ref guide-cloud)
     3. [Virtualized Cluster Platforms](@ref guide-virtualizedcluster)
     4. [Batch-scheduled Clusters](@ref guide-batch)
-    5. [Workload Management System (HTCondor)](@ref guide-htcondor)
+    5. [HTCondor Workload Management System](@ref guide-htcondor)
     
 2. Storage Services
     1. [Simple](@ref guide-simplestorage)
