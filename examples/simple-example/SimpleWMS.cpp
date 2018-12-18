@@ -57,7 +57,6 @@ namespace wrench {
       WRENCH_INFO("About to execute a workflow with %lu tasks", this->getWorkflow()->getNumberOfTasks());
 
       // Create a job manager
-
       this->job_manager = this->createJobManager();
 
       // Create a data movement manager
@@ -82,8 +81,7 @@ namespace wrench {
         // Submit pilot jobs
         if (this->getPilotJobScheduler()) {
           WRENCH_INFO("Scheduling pilot jobs...");
-          this->getPilotJobScheduler()->schedulePilotJobs(
-                                                    this->getAvailableComputeServices());
+          this->getPilotJobScheduler()->schedulePilotJobs(this->getAvailableComputeServices());
         }
 
         // Perform dynamic optimizations
@@ -91,9 +89,7 @@ namespace wrench {
 
         // Run ready tasks with defined scheduler implementation
         WRENCH_INFO("Scheduling tasks...");
-        this->getStandardJobScheduler()->scheduleTasks(
-                                       this->getAvailableComputeServices(),
-                                       ready_tasks);
+        this->getStandardJobScheduler()->scheduleTasks(this->getAvailableComputeServices(), ready_tasks);
 
         // Wait for a workflow execution event, and process it
         try {

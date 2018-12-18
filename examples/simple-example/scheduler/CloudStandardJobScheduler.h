@@ -15,8 +15,6 @@
 
 namespace wrench {
 
-    class Simulation;
-
     /**
      * @brief A cloud Scheduler
      */
@@ -31,8 +29,8 @@ namespace wrench {
         /** \cond DEVELOPER    */
         /***********************/
 
-        void scheduleTasks(const std::set<wrench::ComputeService *> &compute_services,
-                           const std::vector<wrench::WorkflowTask *> &tasks);
+        void scheduleTasks(const std::set<ComputeService *> &compute_services,
+                           const std::vector<WorkflowTask *> &tasks);
 
         /***********************/
         /** \endcond           */
@@ -40,8 +38,6 @@ namespace wrench {
 
     private:
         std::vector<std::string> execution_hosts;
-        std::map<std::string, std::vector<std::string>> vm_list;
-        Simulation *simulation;
         StorageService *default_storage_service;
     };
 }
