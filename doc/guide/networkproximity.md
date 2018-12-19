@@ -17,8 +17,8 @@ between hosts, keeping a record of observed network transfer times, and computin
 # Creating a network proximity service #        {#guide-networkproximity-creating}
 
 In WRENCH, a network proximity service is defined by the
-`wrench::NetworkProximityService` class. An instantiation of a network
-proximity service requires the following parameters:
+`wrench::NetworkProximityService` class, an instantiation of which
+requires the following parameters:
 
 - The name of a host on which to start the service (this is the entry point to the service);
 - A set of hosts names in a vector (`std::vector`), which define which hosts are monitored by the service;
