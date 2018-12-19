@@ -7,13 +7,13 @@ SimpleStorage                        {#guide-simplestorage}
 
 [TOC]
 
-# Overview #            {#guide-batch-overview}
+# Overview #            {#guide-simplestorage-overview}
 
-A Simple storage service is the simplest possible abstration for a 
+A Simple storage service is the simplest possible abstraction for a 
 service that can store and provide workflow files. It has a certain storage
 capacity, and provides write, read, and delete operations on files. Writes
 and Reads can be done synchronously or asynchronously. In addition, higher-level
-semantices such as copying a file directly from a storage service to another
+semantics such as copying a file directly from a storage service to another
 are provided. 
 
 # Creating a Simple storage service #        {#guide-simplestorage-creating}
@@ -23,7 +23,7 @@ In WRENCH, a Simple storage service represents a storage service
 class. An instantiation of a Simple storage service requires the following
 parameters:
 
-- A hostname on which to start the service (this is the entry point to the service);
+- The name of a host on which to start the service (this is the entry point to the service);
 - A capacity in bytes;
 - Maps (`std::map`) of configurable properties (`wrench::BatchServiceProperty`) and configurable message 
   payloads (`wrench::BatchServiceMessagePayload`).
@@ -40,4 +40,69 @@ auto storage_service = simulation->add(
                                        {{wrench::SimpleStorageProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "8"}}
                                       );
 ~~~~~~~~~~~~~
+
+
+@WRENCHNotUserDoc
+
+# Using a simple storage service #        {#guide-simplestorage-using}
+
+One can interact directly with a simple storage service to check whether
+the service hosts a particular file or to delete a file:
+
+~~~~~~~~~~~~~{.cpp}
+wrench::WorkflowFile *some_file;
+
+[...]
+
+if (storage_service->lookupFile(some_file)) {
+  std::cerr << "File is there! Let's delete it...\n";
+  storage_service->deleteFile(some_file);
+}
+~~~~~~~~~~~~~
+
+While there are few other direct interactions are possible 
+(see the documentation of the `wrench::StorageService` and `wrench::SimpleStorageService` classes), many interactions are via a data movement manager (an instance of the `wrench::DataMovementManager` class).  This is a helper process that makes it possible interact asynchronously and transparently with storage services.
+For instance, here is an example of a synchronous file copy:
+
+~~~~~~~~~~~~~{.cpp}
+wrench::WorkflowFile *some_file;
+wrench::StorageService *src, *dst;
+
+[...]
+
+// Create a job manager
+auto job_manager = this->createJobManager();
+
+job_manager->doSynchronousFileCopy(some_file, src, dst);
+~~~~~~~~~~~~~
+
+The above call blocks until the file copy has completed. An asynchronous file copy would work as follows:
+
+~~~~~~~~~~~~~{.cpp}
+wrench::WorkflowFile *some_file;
+wrench::StorageService *src, *dst;
+
+[...]
+
+// Create a job manager
+auto job_manager = this->createJobManager();
+
+job_manager->initiateAsynchronousFileCopy(some_file, src, dst);
+
+[...]
+
+// Wait for a workflow execution event
+auto event = this->getWorkflow()->waitForNextExecutionEvent();
+
+if (event->type == wrench::WorkflowExecutionEvent::FILE_COPY_COMPLETION) {
+  std::cerr << "Success!\n";
+} else if (event->type == wrench::WorkflowExecutionEvent::FILE_COPY_COMPLETION) {
+  std::cerr << "Failure!\n";
+}
+~~~~~~~~~~~~~
+
+See the documentation of the `wrench::DataMovementManager` class for all available API methods.
+
+
+@endWRENCHDoc
 
