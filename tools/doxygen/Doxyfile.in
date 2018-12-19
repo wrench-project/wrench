@@ -809,6 +809,7 @@ INPUT                  = @CMAKE_HOME_DIRECTORY@/doc/index.md \
                          @CMAKE_HOME_DIRECTORY@/doc/guide/virtualizedcluster.md \
                          @CMAKE_HOME_DIRECTORY@/doc/guide/htcondor.md \
                          @CMAKE_HOME_DIRECTORY@/doc/guide/simplestorage.md \
+                         @CMAKE_HOME_DIRECTORY@/doc/guide/fileregistry.md \
                          @CMAKE_HOME_DIRECTORY@/doc/guide/networkproximity.md \
                          @CMAKE_HOME_DIRECTORY@/src \
                          @CMAKE_HOME_DIRECTORY@/include
