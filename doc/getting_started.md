@@ -81,6 +81,50 @@ The source file for the cloud-based simulator is at `examples/simple-example/Sim
 This simple example can be used as a blueprint for starting a large WRENCH-based
 simulation project. The next section provides further details about this process.
 
+
+@WRENCHNotInternalDoc
+# WRENCH Initialization Tool #      {#getting-started-wrench-init}
+
+The `wrench-init` tool is a project generator built with WRENCH, which creates a simple
+project structure with example class files, as follows:
+
+```
+project-folder/
+├── CMakeLists.txt
+├── README.md
+├── src/
+│   ├── SimpleSimulator.cpp
+│   ├── SimpleStandardJobScheduler.cpp
+│   ├── SimpleStandardJobScheduler.h
+│   ├── SimpleWMS.cpp
+│   └── SimpleWMS.h 
+├── test/
+├── doc/
+├── build/
+└── data/
+    ├── platform-files/
+    └── workflow-files/
+``` 
+
+The `SimpleSimulator.cpp` source file contains the class representing the simulator 
+(either cloud or batch). `SimpleStandardJobScheduler.h` and `SimpleStandardJobScheduler.cpp`
+contain a simple implementation for a `wrench::StandardJobScheduler`; `SimpleWMS.h`
+and `SimpleWMS.cpp` denote the implementation of a simple workflow management system.
+Example platform and workflow files are also generated into the `data` folder. These
+files provide the minimum necessary implementation for a WRENCH-enabled simulator.
+
+The `wrench-init` tool only requires a single argument, the name of the folder where
+the project skeleton will be generated: 
+
+~~~~~~~~~~~~~{.sh}
+$ wrench-init <PROJECT_FOLDER>
+~~~~~~~~~~~~~
+ 
+Additional options supported by the tool can be found by using the `wrench-init --help` 
+command.
+@endWRENCHDoc
+
+
 # Preparing the Environment #         {#getting-started-prep}
 
 @WRENCHNotInternalDoc
