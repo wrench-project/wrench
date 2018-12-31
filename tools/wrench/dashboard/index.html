@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type='text/javascript' src='public/jquery-3.3.1.min.js'></script>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Wrench Dashboard</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script src="public/scripts.js"></script>
+        <script src="public/bootstrap.min.css"></script>
+        <link rel="stylesheet" href="public/bootstrap.min.css">
+        <link rel="stylesheet" href="public/styles.css">
+        <link rel="icon" href="public/favicon.ico" />
+        <script src="public/d3.min.js" type="text/javascript"></script>
+        <script src="public/jQueryRotate.js" type="text/javascript"></script>
+    </head>
+    <body>
+        <div id='info-container'>
+            <img src='public/logo-vertical.png' id=logo>
+            <h3>Wrench Dashboard</h3>
+            <p id='updated'></p>
+        </div>
+
+        <div class='element-and-title-container'>
+            <div class='title-container' onclick='showHide("overall-metrics-table-container", "overall-metrics-arrow")'>
+                <h6 class='title-text'>Overall Simulation Metrics</h6>
+                <div class='arrow-div'>
+                    <span class='arrow-helper'></span>
+                    <img id='overall-metrics-arrow' class='arrow-img' src='public/expand-arrow.png'/>
+                </div>
+            </div>
+            
+            <div class='hidden' id='overall-metrics-table-container'>
+                <table id='overall-metrics-table'>
+                    <colgroup>
+                        <col span="1" class='overall-metrics-table-col read-col'></col>
+                        <col span="1" class='overall-metrics-table-col write-col'></col>
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th class='task-details-table-td'>Metric</th>
+                            <th class='task-details-table-td'>Value</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+
+        <div class='element-and-title-container'>
+            <div class='title-container' onclick='showHide("overall-graph-container", "simulation-graph-arrow")'>
+                <h6 class='title-text'>Simulation Graph</h6>
+                <div class='arrow-div'>
+                    <span class='arrow-helper'></span>
+                    <img id='simulation-graph-arrow' class='arrow-img' src='public/expand-arrow.png'/>
+                </div>
+            </div>
+            
+            <div class='hidden' id='overall-graph-container'>
+                <div class="container legend" id="workflow-execution-chart-legend">
+                    <small>Legend:</small> 
+                    <small class="inline-block" id="workflow-execution-chart-legend-read-input">Reading Input</small>
+                    <small class="inline-block" id="workflow-execution-chart-legend-computation">Performing Computation</small>
+                    <small class="inline-block" id="workflow-execution-chart-legend-write-output">Writing Output</small>
+                    <small class="inline-block" id="workflow-execution-chart-legend-failed">Failed During Execution</small>
+                    <small class="inline-block" id="workflow-execution-chart-legend-terminated">Terminated by User</small>
+                </div>
+                <div id="graph-container">
+                    <div class="text-left" id="tooltip-container">
+                        <span id="tooltip-task-id"></span><br>
+                        <span id="tooltip-task-operation"></span><br>
+                        <span id="tooltip-task-operation-duration"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class='element-and-title-container'>
+            <div class='title-container' onclick='showHide("task-details-table-container", "simulation-details-arrow")'>
+                <h6 class='title-text'>Simulation Details</h6>
+                <div class='arrow-div'>
+                    <span class='arrow-helper'></span>
+                    <img id='simulation-details-arrow' class='arrow-img' src='public/expand-arrow.png'/>
+                </div>
+            </div>
+
+            <div class='hidden' id='task-details-table-container'>
+                <table class="task-details-table" id='task-details-table'>
+                    <colgroup>
+                        <col span="1"></col>
+                        <col span="3" class="read-col"></col>
+                        <col span="3" class="compute-col"></col>
+                        <col span="3" class="write-col"></col>
+                        <col span="1"></col>
+                    </colgroup>
+                    <thead class="task-details-table">
+                        <tr>
+                            <td></td>
+                            <td colspan="3" class="text-center task-details-table-td">Read Input</td>
+                            <td colspan="3" class="text-center task-details-table-td">Computation</td>
+                            <td colspan="3" class="text-center task-details-table-td">Write Output</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <th scope="col" class="task-details-table-header">TaskID</th>
+                            <th scope="col" class="task-details-table-header">Start Time</th>
+                            <th scope="col" class="task-details-table-header">End Time</th>
+                            <th scope="col" class="task-details-table-header">Duration</th>
+                            <th scope="col" class="task-details-table-header">Start Time</th>
+                            <th scope="col" class="task-details-table-header">End Time</th>
+                            <th scope="col" class="task-details-table-header">Duration</th>
+                            <th scope="col" class="task-details-table-header">Start Time</th>
+                            <th scope="col" class="task-details-table-header">End Time</th>
+                            <th scope="col" class="task-details-table-header">Duration</th>
+                            <th scope="col" class="task-details-table-header">Task Duration</th>
+                        </tr>
+                    </thead>
+
+                    <tbody class="task-details-table" id="task-details-table-body">
+
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </body>
+    <script>
+        populateMetadata()
+        generateGraph(data.contents, "graph-container")
+        populateWorkflowTaskDataTable(data.contents)
+        getOverallWorkflowMetrics(data.contents)
+    </script>
+</html>
