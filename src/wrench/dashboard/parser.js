@@ -26,7 +26,7 @@ function addToHTMLFile(data) {
     var fileContents = fs.readFileSync("public/scripts.js"); //read existing contents into data
     fileContents = fileContents.toString().split('\n').slice(1).join('\n'); //remove first line
     fileContents = Buffer.from(fileContents, 'utf8');
-    var fd = fs.openSync("scripts.js", 'w+');
+    var fd = fs.openSync("public/scripts.js", 'w+');
     var buffer = new Buffer("var data=" + JSON.stringify(data) + "\n");
 
     fs.writeSync(fd, buffer, 0, buffer.length, 0); //write new data

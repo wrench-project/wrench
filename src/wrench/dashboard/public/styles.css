@@ -17,7 +17,7 @@ body {
     width: 150px;
     margin-bottom: 20px;
 }
-#overall-container {
+#overall-graph-container {
     width: 1000px;
     margin: auto;
 }
@@ -41,6 +41,12 @@ body {
 #workflow-execution-chart-legend-terminated {
     border-left: 15px solid red;
 }
+.task-details-table {
+    width: 1000px;
+    margin: auto;
+    text-align: center;
+    table-layout: fixed;
+}
 .legend {
     text-align: center;
 }
@@ -49,4 +55,85 @@ body {
     padding-left: 3px;
     margin-right: 5px;
     border-radius: 3px;
+}
+.read-col {
+    background-color: #efe8f4;
+} 
+  
+.compute-col {
+    background-color: #f9eedb;
+}
+  
+.write-col {
+    background-color: #e2f5ff;
+}
+
+.task-details-table-td {
+    padding: .75rem;
+    border-top: 1px solid #dee2e6;
+}
+
+.task-details-table-header {
+    border-top: 1px solid #dee2e6;
+}
+
+.title-container {
+    width: 1000px;
+    margin: auto;
+    cursor: pointer;
+    background-color: #DCDCDC;
+    display: inline-block;
+    height: 50px;
+}
+
+.title-text {
+    line-height: 50px;
+    margin-left: 5px;
+    display: inline-block;
+}
+
+.hidden {
+    display: none
+}
+
+.element-and-title-container {
+    width: 1000px;
+    margin: auto;
+    margin-bottom: 20px;
+}
+
+td {
+    word-wrap: break-word; 
+    word-break: break-all;
+}
+
+.overall-metrics-table-col {
+    width: 500px;
+}
+
+#overall-metrics-table {
+    text-align: center;
+}
+
+.arrow-div {
+    width: 50px;
+    height: 50px;
+    display: inline-block;
+    text-align: center;
+    float: right;
+    /* prevent highlighting with double click */
+    -webkit-user-select: none; /* Chrome/Safari */        
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE10+ */
+}
+
+.arrow-helper {
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+}
+
+.arrow-img {
+    vertical-align: middle;
+    height: 20px;
 }
