@@ -72,16 +72,17 @@ namespace wrench {
     }
 
     /**
-     * @brief Initialize the simulated platform. Must only be called once.
+     * @brief Initialize the simulated platform. Must only be called once. Due to
+     *        the current SimGrid implementation, if the file is not readable or
+     *        not correctly formatted, this method will call exit() instead of throwing
+     *        an exception.
      *
      * @param filename: the path to an XML platform description file
      */
     void S4U_Simulation::setupPlatform(std::string &filename) {
-      try {
-        this->engine->load_platform(filename.c_str());
-      } catch (xbt_ex &e) {
-        // TODO: S4U doesn't throw for this
-      }
+
+      // TODO: One day, perhaps SimGrid will throw an exception here...
+      this->engine->load_platform(filename.c_str());
       this->platform_setup = true;
     }
 

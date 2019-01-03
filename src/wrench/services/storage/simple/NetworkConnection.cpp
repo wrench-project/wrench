@@ -134,25 +134,6 @@ namespace wrench {
         }
         return true;
       }
-      /*
-      } catch (xbt_ex &e) {
-        if (e.category == network_error) {
-          if (this->type == NetworkConnection::OUTGOING_DATA) {
-            this->failure_cause = std::shared_ptr<NetworkError>(new NetworkError(NetworkError::SENDING, NetworkError::FAILURE, this->mailbox));
-          } else {
-            this->failure_cause = std::shared_ptr<NetworkError>(new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, this->mailbox));
-          }
-          return true;
-        } else if (e.category == timeout_error) {
-          if (this->type == NetworkConnection::OUTGOING_DATA) {
-            this->failure_cause = std::shared_ptr<NetworkError>(new NetworkError(NetworkError::SENDING, NetworkError::TIMEOUT, this->mailbox));
-          } else {
-            this->failure_cause = std::shared_ptr<NetworkError>(new NetworkError(NetworkError::RECEIVING, NetworkError::TIMEOUT, this->mailbox));
-          }
-          return true;
-        }
-      }
-        */
       return false;
     }
 
