@@ -45,20 +45,6 @@ namespace wrench {
         throw std::shared_ptr<NetworkError>(
                 new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, mailbox_name));
       }
-      /*
-      } catch (xbt_ex &e) {
-        if (e.category == network_error) {
-          throw std::shared_ptr<NetworkError>(
-                  new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, this->mailbox_name));
-        } else if (e.category == timeout_error) {
-          throw std::shared_ptr<NetworkError>(
-                  new NetworkError(NetworkError::RECEIVING, NetworkError::TIMEOUT, this->mailbox_name));
-        } else {
-          throw std::runtime_error(
-                  "S4U_PendingCommunication::wait(): Unexpected xbt_ex exception (" + std::to_string(e.category) + ")");
-        }
-      }
-       */
       return std::move(this->simulation_message);
     }
 
