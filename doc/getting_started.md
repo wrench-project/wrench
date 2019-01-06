@@ -88,7 +88,7 @@ simulation project. The next section provides further details about this process
 The `wrench-init` tool is a project generator built with WRENCH, which creates a simple
 project structure with example class files, as follows:
 
-```
+~~~~~~~~~~~~~{.sh}
 project-folder/
 ├── CMakeLists.txt
 ├── README.md
@@ -104,7 +104,7 @@ project-folder/
 └── data/
     ├── platform-files/
     └── workflow-files/
-``` 
+~~~~~~~~~~~~~
 
 The `SimpleSimulator.cpp` source file contains the class representing the simulator 
 (either cloud or batch). `SimpleStandardJobScheduler.h` and `SimpleStandardJobScheduler.cpp`
