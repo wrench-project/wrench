@@ -2470,7 +2470,9 @@ namespace wrench {
       compute_resources_map["events"][0]["type"] = "SIMULATION_BEGINS";
       compute_resources_map["events"][0]["data"]["nb_resources"] = this->nodes_to_cores_map.size();
       compute_resources_map["events"][0]["data"]["allow_time_sharing"] = false;
-      compute_resources_map["events"][0]["data"]["config"]["redis"]["enabled"] = false;
+//    This was the "old" batsched up until commit 39a30d83
+//      compute_resources_map["events"][0]["data"]["config"]["redis"]["enabled"] = false;
+      compute_resources_map["events"][0]["data"]["config"]["redis-enabled"] = false;
       std::map<std::string, unsigned long>::iterator it;
       int count = 0;
       for (it = this->nodes_to_cores_map.begin(); it != this->nodes_to_cores_map.end(); it++) {
