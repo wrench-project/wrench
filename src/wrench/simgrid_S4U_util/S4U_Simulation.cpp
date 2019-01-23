@@ -321,7 +321,7 @@ namespace wrench {
         simgrid::s4u::Host::by_name(hostname)->set_pstate(pstate);
       } catch (std::exception& e) {
         throw std::runtime_error(
-                "S4U_Simulation::setPstate(): Was not able to set the pstate of the. Make sure energy is plugin is enabled and "
+                "S4U_Simulation::setPstate(): Was not able to set the pstate of the host. Make sure energy is plugin is enabled and "
                         "the host name is correct and the pstate is within range of pstates available to the host"
         );
       }
@@ -373,7 +373,7 @@ namespace wrench {
                                       (simgrid::s4u::Host::by_name(hostname))->get_pstate());
       } catch (std::exception& e) {
         throw std::runtime_error(
-                "S4U_Simulation::getMinPowerAvailable(): Was not able to get the min power avaiable to the host. Make sure energy plugin is enabled and "
+                "S4U_Simulation::getMinPowerAvailable(): Was not able to get the min power available to the host. Make sure energy plugin is enabled and "
                         "the host name is correct"
         );
       }
