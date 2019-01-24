@@ -518,7 +518,7 @@ private:
             }
             prev_max_power = this->simulation->getMaxPowerPossible(host);
 
-            //check if the min power is diffrent in all the states as is in xml
+            //check if the min power is different in all the states as is in xml
             this->simulation->setPstate(host,state);
             if (prev_min_power == this->simulation->getMinPowerAvailable(host)) {
               throw std::runtime_error(
