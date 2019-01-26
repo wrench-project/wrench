@@ -17,36 +17,40 @@ namespace wrench {
     class WorkflowTask;
     class StorageService;
 
+    class SimulationTimestampType {
+    public:
+        SimulationTimestampType();
+        double getDate();
+
+    private:
+        double date = -0.1;
+    };
+
     /**
      * @brief A base class for simulation timestamps
      */
-    class SimulationTimestampType {
+    class SimulationTimestampPair : public SimulationTimestampType {
     public:
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        SimulationTimestampType();
-        SimulationTimestampType(SimulationTimestampType *endpoint);
-        virtual ~SimulationTimestampType() {}
+        SimulationTimestampPair();
+        SimulationTimestampPair(SimulationTimestampPair *endpoint);
+        virtual ~SimulationTimestampPair() {}
         /***********************/
         /** \endcond           */
         /***********************/
 
-        double getDate();
-        virtual SimulationTimestampType *getEndpoint();
-
+        virtual SimulationTimestampPair *getEndpoint();
 
     protected:
-        SimulationTimestampType *endpoint = nullptr;
-
-    private:
-        double date = -1.0;
+        SimulationTimestampPair *endpoint = nullptr;
     };
 
     /**
     * @brief A base class for simulation timestamps regarding workflow tasks
     */
-    class SimulationTimestampTask : public SimulationTimestampType {
+    class SimulationTimestampTask : public SimulationTimestampPair {
 
     public:
 
@@ -132,7 +136,7 @@ namespace wrench {
     /**
      * @brief A base class for simulation timestamps regarding file copies
      */
-    class SimulationTimestampFileCopy : public SimulationTimestampType {
+    class SimulationTimestampFileCopy : public SimulationTimestampPair {
     public:
 
         /***********************/
@@ -228,6 +232,44 @@ namespace wrench {
         /***********************/
         /** \endcond           */
         /***********************/
+    };
+
+    /**
+     * @brief A simulation timestamp class for changes in a host's pstate
+     */
+    class SimulationTimestampPstateSet : public SimulationTimestampType {
+    public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        SimulationTimestampPstateSet(std::string hostname, int pstate);
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
+        std::string getHostname();
+        int getPstate();
+    private:
+        std::string hostname;
+        int pstate;
+    };
+
+    class SimulationTimestampEnergyConsumption: public SimulationTimestampType {
+    public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        SimulationTimestampEnergyConsumption(std::string hostname, double joules);
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
+        std::string getHostname();
+        double getConsumption();
+
+    private:
+        std::string hostname;
+        double joules;
     };
 };
 
