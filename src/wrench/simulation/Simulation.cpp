@@ -240,6 +240,15 @@ namespace wrench {
         throw std::runtime_error("Simulation::launch(): " + std::string(e.what()));
       }
 
+      // Before starting the simulation, obtain the initial pstate of each host.
+      // By default, it will be 0 if it is not explicitly set in the platform file.
+      // Even if the energy-plugin is not activated, getCurrentPstate(hostname) can
+      // still be called.
+      for (const auto &hostname: this->getHostnameList()) {
+          this->getOutput().addTimestamp<SimulationTimestampPstateSet>(
+                  new SimulationTimestampPstateSet(hostname, getCurrentPstate(hostname))
+                  );
+      }
 
       // Start all services (and the WMS)
       try {
@@ -698,7 +707,7 @@ namespace wrench {
      * @param pstate: the power state index (the power state index is specified in the platform xml description file)
      */
     void Simulation::setPstate(const std::string &hostname, int pstate) {
-      S4U_Simulation::setPstate(hostname, pstate);
+        S4U_Simulation::setPstate(hostname, pstate);
     }
 
     /**
