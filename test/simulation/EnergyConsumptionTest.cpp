@@ -165,14 +165,14 @@ private:
         }
 
         try {
-          double value = this->simulation->getEnergyConsumedByHost("dummy_unavailable_host");
+          double value = this->simulation->getEnergyConsumed("dummy_unavailable_host");
           throw std::runtime_error("Should not have been able to read the energy for dummy hosts");
         } catch (std::exception &e) {
           WRENCH_INFO("Expected exception as we were trying to measure the energy for a dummy host that is not available");
         }
 
         try {
-          double value = this->simulation->getTotalEnergyConsumed({"dummy_unavailable_host"});
+          std::map<std::string, double> value = this->simulation->getEnergyConsumed(std::vector<std::string>({"dummy_unavailable_host"}));
           throw std::runtime_error(
                   "Should not have been able to read the energy for dummy hosts"
           );
@@ -529,9 +529,12 @@ private:
           }
         }
         //lets check if the energy consumed by host1 is less than the energy consumed by host1 + host2
-        double energy_consumed_1 = this->simulation->getEnergyConsumedByHost(simulation_hosts[1]);
-        double energy_consumed_2 = this->simulation->getTotalEnergyConsumed({simulation_hosts[1],simulation_hosts[2]});
-
+        double energy_consumed_1 = this->simulation->getEnergyConsumed(simulation_hosts[1]);
+        std::map<std::string, double> energy_consumed_2_map = this->simulation->getEnergyConsumed(std::vector<std::string>({simulation_hosts[1],simulation_hosts[2]}));
+        double energy_consumed_2 = 0.0;
+        for (auto const &h : energy_consumed_2_map) {
+            energy_consumed_2 += h.second;
+        }
         if (energy_consumed_1 > energy_consumed_2) {
           throw std::runtime_error(
                   "Energy consumed by host X is greater than the combined energy consumed by host X and host Y"
@@ -660,7 +663,7 @@ private:
 
 
         //First energy consumption test
-        double before_current_energy_consumed_by_host1 = this->simulation->getEnergyConsumedByHost(simulation_hosts[1]);
+        double before_current_energy_consumed_by_host1 = this->simulation->getEnergyConsumed(simulation_hosts[1]);
         //run a new job
         //let's execute the job, this should take ~100 sec based on the 100MF speed
         std::string my_mailbox = "test_callback_mailbox";
@@ -696,7 +699,7 @@ private:
           throw std::runtime_error("Unexpected '" + message->getName() + "' message");
         }
 
-        double after_current_energy_consumed_by_host1 = this->simulation->getEnergyConsumedByHost(simulation_hosts[1]);
+        double after_current_energy_consumed_by_host1 = this->simulation->getEnergyConsumed(simulation_hosts[1]);
         double energy_consumed_while_running_with_higher_speed = after_current_energy_consumed_by_host1 - before_current_energy_consumed_by_host1;
         double higher_speed_compuation_time = wrench::S4U_Simulation::getClock();
 
@@ -712,7 +715,7 @@ private:
         this->simulation->setPstate(simulation_hosts[1],pstate);
 
         //Second energy consumption test
-        double before_current_energy_consumed_by_host2 = this->simulation->getEnergyConsumedByHost(simulation_hosts[1]);
+        double before_current_energy_consumed_by_host2 = this->simulation->getEnergyConsumed(simulation_hosts[1]);
         //run a new job
         //let's execute the job, this should take ~100 sec based on the 100MF speed
         my_mailbox = "test_callback_mailbox";
@@ -746,7 +749,7 @@ private:
           throw std::runtime_error("Unexpected '" + message->getName() + "' message");
         }
 
-        double after_current_energy_consumed_by_host2 = this->simulation->getEnergyConsumedByHost(simulation_hosts[1]);
+        double after_current_energy_consumed_by_host2 = this->simulation->getEnergyConsumed(simulation_hosts[1]);
         double energy_consumed_while_running_with_lower_speed = after_current_energy_consumed_by_host2 - before_current_energy_consumed_by_host2;
         double lower_speed_compuation_time = wrench::S4U_Simulation::getClock() - higher_speed_compuation_time;
 
