@@ -708,6 +708,7 @@ namespace wrench {
      */
     void Simulation::setPstate(const std::string &hostname, int pstate) {
         S4U_Simulation::setPstate(hostname, pstate);
+        this->getOutput().addTimestamp<SimulationTimestampPstateSet>(new SimulationTimestampPstateSet(hostname, pstate));
     }
 
     /**
@@ -726,6 +727,29 @@ namespace wrench {
      */
     int Simulation::getCurrentPstate(const std::string &hostname) {
       return S4U_Simulation::getCurrentPstate(hostname);
+    }
+
+    /**
+     * @brief Obtains the current energy consumption of a host and will add SimulationTimestampEnergyConsumption to
+     *          simulation output if can_record is set to true
+     * @param hostname: the host name
+     * @param can_record: bool signaling whether or not to record a SimulationTimestampEnergyConsumption object
+     * @return current energy consumption in joules
+     * @throws std::invalid_argument
+     */
+    double Simulation::getEnergyTimestamp(std::string &hostname, bool can_record) {
+        if (hostname.empty()) {
+            throw std::invalid_argument("Simulation::getEnergyTimestamp() requires a valid hostname");
+        }
+
+        double time_now = getCurrentSimulatedDate();
+        double consumption = getEnergyConsumedByHost(hostname);
+
+        if (can_record) {
+            this->getOutput().addTimestamp<SimulationTimestampEnergyConsumption>(new SimulationTimestampEnergyConsumption(hostname, consumption));
+        }
+
+        return consumption;
     }
 
     /**
