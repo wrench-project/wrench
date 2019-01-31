@@ -153,13 +153,13 @@ private:
     int main() {
         const double MEGAFLOP = 1000.0 * 1000.0;
         wrench::S4U_Simulation::compute(100.0 * MEGAFLOP); // compute for 1 second
-        auto c1 = this->simulation->getEnergyTimestamp(this->getHostname(), true); // 200 joules
+        auto c1 = this->simulation->getEnergyConsumed(this->getHostname(), true); // 200 joules
         wrench::S4U_Simulation::compute(100.0 * MEGAFLOP); // compute for 1 second
-        auto c2 = this->simulation->getEnergyTimestamp(this->getHostname(), true); // now 400 joules
+        auto c2 = this->simulation->getEnergyConsumed(this->getHostname(), true); // now 400 joules
 
         // following two calls should not add any timestamps
-        this->simulation->getEnergyTimestamp(this->getHostname());
-        this->simulation->getEnergyTimestamp(this->getHostname(), false);
+        this->simulation->getEnergyConsumed(this->getHostname());
+        this->simulation->getEnergyConsumed(this->getHostname(), false);
 
         return 0;
     }
