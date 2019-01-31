@@ -70,16 +70,17 @@ namespace wrench {
         static double getHostFlopRate(std::string hostname);
 
         //start energy related calls
-        static double getEnergyConsumedByHost(const std::string &hostname);
-        static double getTotalEnergyConsumed(const std::vector<std::string> &hostnames);
+        double getEnergyConsumed(const std::string &hostname, bool record_as_time_stamp = false);
+        std::map<std::string, double> getEnergyConsumed(const std::vector<std::string> &hostnames, bool record_as_time_stamps = false);
+//        double getEnergyTimestamp(const std::string &hostname, bool can_record = false);
 
+        // pstate related calls
         void setPstate(const std::string &hostname, int pstate);
         static int getNumberofPstates(const std::string &hostname);
         static int getCurrentPstate(const std::string &hostname);
         static double getMinPowerAvailable(const std::string &hostname);
         static double getMaxPowerPossible(const std::string &hostname);
         static std::vector<int> getListOfPstates(const std::string &hostname);
-        //end energy related calls
 
 
         /***********************/
@@ -98,7 +99,7 @@ namespace wrench {
         static double getFlopRate();
 
         static double getCurrentSimulatedDate();
-        double getEnergyTimestamp(const std::string &hostname, bool can_record = false);
+
 
 
         static void sleep(double duration);
