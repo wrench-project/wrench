@@ -6,13 +6,10 @@
 
 class SimulationTimestampEnergyTest: public ::testing::Test {
 public:
-    wrench::WorkflowTask *task1 = nullptr;
     std::unique_ptr<wrench::Workflow> workflow;
 
-    wrench::ComputeService *compute_service = nullptr;
-
     void do_SimulationTimestampPstateSet_test();
-    //void do_SimulationTimestampEnergyConsumption_test();
+    void do_SimulationTimestampEnergyConsumption_test();
 
 protected:
 
@@ -102,7 +99,7 @@ void SimulationTimestampEnergyTest::do_SimulationTimestampPstateSet_test() {
 
     EXPECT_NO_THROW(simulation->launch());
 
-    // Check constructors for SimulationTimestampPstateSet timestamps
+    // Check constructor for SimulationTimestampPstateSet timestamps
     EXPECT_THROW(new wrench::SimulationTimestampPstateSet("", 0), std::invalid_argument);
 
     // Check that the expected SimulationTimestampPstateSet timestamps have been added to simulation output
@@ -126,6 +123,95 @@ void SimulationTimestampEnergyTest::do_SimulationTimestampPstateSet_test() {
     ASSERT_EQ(20, ts3->getDate());
     ASSERT_EQ(2, ts3->getContent()->getPstate());
     ASSERT_EQ("host1", ts3->getContent()->getHostname());
+
+    delete simulation;
+    free(argv[0]);
+    free(argv[1]);
+    free(argv);
+}
+
+/**********************************************************************/
+/**            SimulationTimestampEnergyConsumption                  **/
+/**********************************************************************/
+
+/*
+ * Testing the basic functionality of the SimulationTimestampEnergyConsumption class.
+ * This test assures that the timestamps are added to simulation output when
+ * getEnergyTimestamp("hostname", true) is called.
+ */
+class SimulationTimestampEnergyConsumptionTestWMS : public wrench::WMS {
+public:
+    SimulationTimestampEnergyConsumptionTestWMS(SimulationTimestampEnergyTest *test,
+            std::string &hostname) :
+                wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+        this->test = test;
+    }
+
+private:
+    SimulationTimestampEnergyTest *test;
+
+    int main() {
+        const double MEGAFLOP = 1000.0 * 1000.0;
+        wrench::S4U_Simulation::compute(100.0 * MEGAFLOP); // compute for 1 second
+        auto c1 = this->simulation->getEnergyTimestamp(this->getHostname(), true); // 200 joules
+        wrench::S4U_Simulation::compute(100.0 * MEGAFLOP); // compute for 1 second
+        auto c2 = this->simulation->getEnergyTimestamp(this->getHostname(), true); // now 400 joules
+
+        // following two calls should not add any timestamps
+        this->simulation->getEnergyTimestamp(this->getHostname());
+        this->simulation->getEnergyTimestamp(this->getHostname(), false);
+
+        return 0;
+    }
+};
+
+TEST_F(SimulationTimestampEnergyTest, SimulationTimestampEnergyConsumptionTest) {
+    DO_TEST_WITH_FORK(do_SimulationTimestampEnergyConsumption_test);
+}
+
+void SimulationTimestampEnergyTest::do_SimulationTimestampEnergyConsumption_test() {
+    auto simulation = new wrench::Simulation();
+    int argc = 2;
+    auto argv = (char **)calloc(argc, sizeof(char *));
+    argv[0] = strdup("simulation_timestamp_energy_consumption_test");
+    argv[1] = strdup("--activate-energy");
+
+    EXPECT_NO_THROW(simulation->init(&argc, argv));
+
+    EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    // get the single host
+    std::string host = simulation->getHostnameList()[0];
+
+    wrench::WMS *wms = nullptr;
+    EXPECT_NO_THROW(wms = simulation->add(
+            new SimulationTimestampEnergyConsumptionTestWMS(
+                    this, host
+            )
+    ));
+
+    EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
+
+    EXPECT_NO_THROW(simulation->launch());
+
+    // Check constructor for SimulationTimestampEnergyConsumption timestamp
+    EXPECT_THROW(new wrench::SimulationTimestampEnergyConsumption("", 1.0), std::invalid_argument);
+
+    // Check that the expected SimulationTimestampEnergyConsumption timestamps have been added to simulation output
+    auto energy_consumption_timestamps = simulation->getOutput().getTrace<wrench::SimulationTimestampEnergyConsumption>();
+    ASSERT_EQ(2, energy_consumption_timestamps.size());
+
+    // timestamp added after first call to getEnergyTimestamp()
+    auto ts1 = energy_consumption_timestamps[0];
+    ASSERT_DOUBLE_EQ(1.0, ts1->getDate());
+    ASSERT_EQ("host1", ts1->getContent()->getHostname());
+    ASSERT_DOUBLE_EQ(200.0, ts1->getContent()->getConsumption());
+
+    // timestamp added after second call to getEnergyTimestamp()
+    auto ts2 = energy_consumption_timestamps[1];
+    ASSERT_DOUBLE_EQ(2.0, ts2->getDate());
+    ASSERT_EQ("host1", ts2->getContent()->getHostname());
+    ASSERT_DOUBLE_EQ(400.0, ts2->getContent()->getConsumption());
 
     delete simulation;
     free(argv[0]);

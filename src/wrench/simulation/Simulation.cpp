@@ -737,7 +737,7 @@ namespace wrench {
      * @return current energy consumption in joules
      * @throws std::invalid_argument
      */
-    double Simulation::getEnergyTimestamp(std::string &hostname, bool can_record) {
+    double Simulation::getEnergyTimestamp(const std::string &hostname, bool can_record) {
         if (hostname.empty()) {
             throw std::invalid_argument("Simulation::getEnergyTimestamp() requires a valid hostname");
         }

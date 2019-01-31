@@ -98,7 +98,7 @@ namespace wrench {
         static double getFlopRate();
 
         static double getCurrentSimulatedDate();
-        double getEnergyTimestamp(std::string &hostname, bool can_record = false);
+        double getEnergyTimestamp(const std::string &hostname, bool can_record = false);
 
 
         static void sleep(double duration);
