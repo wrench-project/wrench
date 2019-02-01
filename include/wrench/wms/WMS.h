@@ -10,6 +10,7 @@
 #ifndef WRENCH_WMS_H
 #define WRENCH_WMS_H
 
+#include <wrench/managers/EnergyMeter.h>
 #include "wrench/simgrid_S4U_util/S4U_Daemon.h"
 #include "wrench/services/Service.h"
 #include "wrench/wms/DynamicOptimization.h"
@@ -61,8 +62,9 @@ namespace wrench {
         void checkDeferredStart();
 
         std::shared_ptr<JobManager> createJobManager();
-
         std::shared_ptr<DataMovementManager> createDataMovementManager();
+        std::shared_ptr<EnergyMeter> createEnergyMeter(const std::map<std::string, double> &measurement_periods);
+        std::shared_ptr<EnergyMeter> createEnergyMeter(const std::vector<std::string> &hostnames, double measurement_period);
 
         void runDynamicOptimizations();
 
