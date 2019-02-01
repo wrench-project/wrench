@@ -324,6 +324,36 @@ namespace wrench {
       return data_movement_manager;
     }
 
+    /**
+     * @brief Instantiate and start an energy meter
+     *
+     * @paqram measurement_periods: the measurement period for each metered host
+     *
+     * @return an energy meter
+     */
+    std::shared_ptr<EnergyMeter> WMS::createEnergyMeter(const std::map<std::string, double> &measurement_periods) {
+        auto energy_meter_raw_ptr = new EnergyMeter(this, measurement_periods);
+        std::shared_ptr<EnergyMeter> energy_meter = std::shared_ptr<EnergyMeter>(energy_meter_raw_ptr);
+        energy_meter->simulation = this->simulation;
+        energy_meter->start(energy_meter, true); // Always daemonize
+        return energy_meter;
+    }
+
+    /**
+     * @brief Instantiate and start an energy meter
+     * @param hostnames: the list of metered hosts, as hostnames
+     * @param measurement_period: the measurement period
+     * @return an energy meter
+     */
+    std::shared_ptr<EnergyMeter> WMS::createEnergyMeter(const std::vector<std::string> &hostnames, double measurement_period) {
+        auto energy_meter_raw_ptr = new EnergyMeter(this, hostnames, measurement_period);
+        std::shared_ptr<EnergyMeter> energy_meter = std::shared_ptr<EnergyMeter>(energy_meter_raw_ptr);
+        energy_meter->simulation = this->simulation;
+        energy_meter->start(energy_meter, true); // Always daemonize
+        return energy_meter;
+    }
+
+
     /** @brief Get the WMS's pilot scheduler
      * 
      * @return the pilot scheduler, or nullptr if none
