@@ -276,7 +276,7 @@ set(TEST_FILES
         test/simulation/ScratchSpaceTest.cpp test/simulation/EnergyConsumptionTest.cpp
         test/simulation/simulation_output/SimulationDumpJSONTest.cpp
         test/simulation/HTCondorServiceTest.cpp
-        )
+        src/wrench/managers/EnergyMeter.cpp include/wrench/managers/EnergyMeter.h)
 
 # wrench library
 find_library(SIMGRID_LIBRARY NAMES simgrid)
@@ -284,7 +284,7 @@ find_library(PUGIXML_LIBRARY NAMES pugixml)
 find_library(LEMON_LIBRARY NAMES emon)
 find_library(GTEST_LIBRARY NAMES gtest)
 
-add_library(wrench STATIC ${SOURCE_FILES})
+add_library(wrench STATIC ${SOURCE_FILES} src/wrench/managers/EnergyMeter.cpp include/wrench/managers/EnergyMeter.h)
 set_target_properties(wrench PROPERTIES VERSION ${WRENCH_RELEASE_VERSION})
 target_link_libraries(wrench ${SIMGRID_LIBRARY} ${PUGIXML_LIBRARY} ${LEMON_LIBRARY})
 
