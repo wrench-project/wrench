@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2019. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -215,15 +215,6 @@ namespace wrench {
      */
     std::map<std::string, std::vector<std::string>> Simulation::getHostnameListByCluster() {
         return this->s4u_simulation->getAllHostnamesByCluster();
-    }
-
-    /**
-     * @brief Check that a hostname exists in the platform
-     * @param hostname: a host name
-     * @return true or false
-     */
-    bool Simulation::hostExists(std::string hostname) {
-        return this->s4u_simulation->hostExists(std::move(hostname));
     }
 
     /**
