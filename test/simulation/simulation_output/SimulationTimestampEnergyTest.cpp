@@ -1,3 +1,6 @@
+#include <algorithm>
+#include <vector>
+
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
 
@@ -11,6 +14,9 @@ public:
     void do_SimulationTimestampPstateSet_test();
     void do_SimulationTimestampEnergyConsumption_test();
 
+    void do_EnergyMeterSingleMeasurementPeriod_test();
+    void do_EnergyMeterMultipleMeasurementPeriod_test();
+
 protected:
 
     SimulationTimestampEnergyTest() : workflow(std::unique_ptr<wrench::Workflow>(new wrench::Workflow())) {
@@ -21,6 +27,11 @@ protected:
                           "<zone id=\"AS0\" routing=\"Full\">"
 
                           "<host id=\"host1\" speed=\"100.0Mf,50.0Mf,20.0Mf\" pstate=\"0\" core=\"1\" >"
+                          "<prop id=\"watt_per_state\" value=\"100.0:200.0, 93.0:170.0, 90.0:150.0\" />"
+                          "<prop id=\"watt_off\" value=\"10\" />"
+                          "</host>"
+
+                          "<host id=\"host2\" speed=\"100.0Mf,50.0Mf,20.0Mf\" pstate=\"0\" core=\"1\" >"
                           "<prop id=\"watt_per_state\" value=\"100.0:200.0, 93.0:170.0, 90.0:150.0\" />"
                           "<prop id=\"watt_off\" value=\"10\" />"
                           "</host>"
@@ -104,7 +115,7 @@ void SimulationTimestampEnergyTest::do_SimulationTimestampPstateSet_test() {
 
     // Check that the expected SimulationTimestampPstateSet timestamps have been added to simulation output
     auto set_pstate_timestamps = simulation->getOutput().getTrace<wrench::SimulationTimestampPstateSet>();
-    ASSERT_EQ(3, set_pstate_timestamps.size());
+    ASSERT_EQ(4, set_pstate_timestamps.size());
 
     // pstate timestamp added prior to the simulation starting
     auto ts1 = set_pstate_timestamps[0];
@@ -113,13 +124,13 @@ void SimulationTimestampEnergyTest::do_SimulationTimestampPstateSet_test() {
     ASSERT_EQ("host1", ts1->getContent()->getHostname());
 
     // pstate timestamp added from wms first call of setPstate()
-    auto ts2 = set_pstate_timestamps[1];
+    auto ts2 = set_pstate_timestamps[2];
     ASSERT_EQ(10, ts2->getDate());
     ASSERT_EQ(1, ts2->getContent()->getPstate());
     ASSERT_EQ("host1", ts2->getContent()->getHostname());
 
     // pstate timestamp added from wms second call of setPstate()
-    auto ts3 = set_pstate_timestamps[2];
+    auto ts3 = set_pstate_timestamps[3];
     ASSERT_EQ(20, ts3->getDate());
     ASSERT_EQ(2, ts3->getContent()->getPstate());
     ASSERT_EQ("host1", ts3->getContent()->getHostname());
@@ -212,6 +223,191 @@ void SimulationTimestampEnergyTest::do_SimulationTimestampEnergyConsumption_test
     ASSERT_DOUBLE_EQ(2.0, ts2->getDate());
     ASSERT_EQ("host1", ts2->getContent()->getHostname());
     ASSERT_DOUBLE_EQ(400.0, ts2->getContent()->getConsumption());
+
+    delete simulation;
+    free(argv[0]);
+    free(argv[1]);
+    free(argv);
+}
+
+/**********************************************************************/
+/**            ENERGY METER SINGLE MEASUREMENT PERIOD TEST           **/
+/**********************************************************************/
+
+/*
+ * Testing the basic functionality of the EnergyMeter class. Ensures that
+ * SimulationTimestampEnergyConsumption timestamps are created for a vector
+ * of hosts, all with the same measurement period.
+ */
+class EnergyMeterTestWMS : public wrench::WMS {
+public:
+    EnergyMeterTestWMS(SimulationTimestampEnergyTest *test,
+            std::string &hostname) :
+            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+        this->test = test;
+    }
+
+private:
+    SimulationTimestampEnergyTest *test;
+
+    int main() {
+
+        // EnergyMeter constructor tests
+        bool threw_exception = false;
+        try {
+            auto fail_em1 = this->createEnergyMeter(std::vector<std::string>(), 1.0);
+        } catch (std::invalid_argument &e) {
+            threw_exception = true;
+        }
+
+        if (not threw_exception) {
+            throw std::runtime_error("createEnergyMeter should have thrown invalid argument if given an empty hostname list");
+        }
+
+        threw_exception = false;
+        try {
+            auto fail_em2 = this->createEnergyMeter({"a", "b", "c"}, 0.0);
+        } catch(std::invalid_argument &e) {
+            threw_exception = true;
+        }
+
+        if (not threw_exception) {
+            throw std::runtime_error("createEnergyMeter should have thrown invalid argument if given a measurement period less than 1.0");
+        }
+
+        // EnergyMeter constructor tests
+        threw_exception = false;
+        try {
+            auto fail_em3 = this->createEnergyMeter(std::map<std::string, double>());
+        } catch(std::invalid_argument &e) {
+            threw_exception = true;
+        }
+
+        if (not threw_exception) {
+            throw std::runtime_error("createEnergyMeter requires a non-empty map of (hostname, measurement period) pairs");
+        }
+
+        try {
+            auto fail_em4 = this->createEnergyMeter({{"host1", 0.0}});
+        } catch(std::invalid_argument &e) {
+            threw_exception = true;
+        }
+
+        if (not threw_exception) {
+            throw std::runtime_error("createEnergyMeter requires that measurement periods be 1.0 or greater");
+        }
+
+        // EnergyMeter functionality tests
+        const std::vector<std::string> hostnames = this->simulation->getHostnameList();
+        const double TEN_SECOND_PERIOD = 10.0;
+
+        auto em = this->createEnergyMeter(hostnames, TEN_SECOND_PERIOD);
+
+        const double MEGAFLOP = 1000.0 * 1000.0;
+        wrench::S4U_Simulation::compute(100.0 * 100.0 * MEGAFLOP); // compute for 100 seconds
+
+        return 0;
+    }
+};
+
+TEST_F(SimulationTimestampEnergyTest, EnergyMeterSingleMeasurementPeriodTest) {
+    DO_TEST_WITH_FORK(do_EnergyMeterSingleMeasurementPeriod_test);
+}
+
+void SimulationTimestampEnergyTest::do_EnergyMeterSingleMeasurementPeriod_test() {
+    auto simulation = new wrench::Simulation();
+    int argc = 2;
+    auto argv = (char **)calloc(argc, sizeof(char *));
+    argv[0] = strdup("energy_meter_single_measurement_period_test");
+    argv[1] = strdup("--activate-energy");
+
+    EXPECT_NO_THROW(simulation->init(&argc, argv));
+
+    EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    // get the single host
+    std::string host = simulation->getHostnameList()[0];
+
+    wrench::WMS *wms = nullptr;
+    EXPECT_NO_THROW(wms = simulation->add(
+            new EnergyMeterTestWMS(
+                    this, host
+            )
+    ));
+
+    EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
+
+    EXPECT_NO_THROW(simulation->launch());
+
+    auto energy_consumption_timestamps = simulation->getOutput().getTrace<wrench::SimulationTimestampEnergyConsumption>();
+
+    // test values for timestamps associated with host1
+    std::vector<wrench::SimulationTimestamp<wrench::SimulationTimestampEnergyConsumption> *> host1_timestamps;
+    std::copy_if(
+            energy_consumption_timestamps.begin(),
+            energy_consumption_timestamps.end(),
+            std::back_inserter(host1_timestamps),
+            [](wrench::SimulationTimestamp<wrench::SimulationTimestampEnergyConsumption> *ts) -> bool {
+        return (ts->getContent()->getHostname() == "host1" ? true : false);
+    });
+
+    // host1 computes for 100 seconds, and records timestamps in 10 second intevals, so
+    // we should end up with 11 timestamps (starting with time 0)
+    ASSERT_EQ(11, host1_timestamps.size());
+
+    // expected values (timestamp, consumption)
+    std::vector<std::pair<double, double>> host1_expected_timestamps = {
+            {0,    0},
+            {10,   2000},
+            {20,   4000},
+            {30,   6000},
+            {40,   8000},
+            {50,   10000},
+            {60,   12000},
+            {70,   14000},
+            {80,   16000},
+            {90,   18000},
+            {100,  20000}
+    };
+
+    for (size_t i = 0; i < host1_timestamps.size(); ++i) {
+        ASSERT_DOUBLE_EQ(host1_expected_timestamps[i].first, host1_timestamps[i]->getDate());
+        ASSERT_DOUBLE_EQ(host1_expected_timestamps[i].second, host1_timestamps[i]->getContent()->getConsumption());
+    }
+
+    // test values for timestamps associated with host2
+    std::vector<wrench::SimulationTimestamp<wrench::SimulationTimestampEnergyConsumption> *> host2_timestamps;
+    std::copy_if(
+            energy_consumption_timestamps.begin(),
+            energy_consumption_timestamps.end(),
+            std::back_inserter(host2_timestamps),
+            [](wrench::SimulationTimestamp<wrench::SimulationTimestampEnergyConsumption> *ts) -> bool {
+                return (ts->getContent()->getHostname() == "host2" ? true : false);
+            });
+
+    // host2 is idle for 100 seconds, and records timestamps in 10 second intevals, so
+    // we should end up with 11 timestamps (starting with time 0)
+    ASSERT_EQ(11, host2_timestamps.size());
+
+    // expected values (timestamp, consumption)
+    std::vector<std::pair<double, double>> host2_expected_timestamps = {
+            {0,    0},
+            {10,   1000},
+            {20,   2000},
+            {30,   3000},
+            {40,   4000},
+            {50,   5000},
+            {60,   6000},
+            {70,   7000},
+            {80,   8000},
+            {90,   9000},
+            {100,  10000}
+    };
+
+    for (size_t i = 0; i < host2_timestamps.size(); ++i) {
+        ASSERT_DOUBLE_EQ(host2_expected_timestamps[i].first, host2_timestamps[i]->getDate());
+        ASSERT_DOUBLE_EQ(host2_expected_timestamps[i].second, host2_timestamps[i]->getContent()->getConsumption());
+    }
 
     delete simulation;
     free(argv[0]);
