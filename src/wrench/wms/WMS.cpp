@@ -327,7 +327,7 @@ namespace wrench {
     /**
      * @brief Instantiate and start an energy meter
      *
-     * @paqram measurement_periods: the measurement period for each metered host
+     * @param measurement_periods: the measurement period for each metered host
      *
      * @return an energy meter
      */
