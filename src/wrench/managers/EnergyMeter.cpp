@@ -131,12 +131,12 @@ namespace wrench {
         }
 
         // Update time-to-next-measurement for all hosts
-        for (auto h : this->time_to_next_measurement) {
+        for (auto &h : this->time_to_next_measurement) {
           h.second = std::max<double>(0, h.second - (Simulation::getCurrentSimulatedDate() - before));
         }
 
         // Take measurements
-        for (auto h : this->time_to_next_measurement) {
+        for (auto &h : this->time_to_next_measurement) {
           if (h.second < EPSILON) {
             this->simulation->getEnergyConsumed(h.first, true);
             this->time_to_next_measurement[h.first] = this->measurement_periods[h.first];
