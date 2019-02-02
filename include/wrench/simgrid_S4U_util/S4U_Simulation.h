@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2019. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ namespace wrench {
 				void runSimulation();
 				static double getClock();
 				static std::string getHostName();
-				bool hostExists(std::string hostname);
+				static bool hostExists(std::string hostname);
 				static unsigned int getHostNumCores(std::string hostname);
 				static double getHostFlopRate(std::string hostname);
 				static double getFlopRate();
