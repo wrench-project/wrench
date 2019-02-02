@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2019. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,8 +44,6 @@ namespace wrench {
 
         std::vector<std::string> getHostnameList();
         std::map<std::string, std::vector<std::string>> getHostnameListByCluster();
-
-        bool hostExists(std::string hostname);
 
         void launch();
 
