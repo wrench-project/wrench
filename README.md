@@ -14,6 +14,10 @@ abstractions to provide the **building blocks** for developing custom simulators
 
 More information and Documentation: [WRENCH Project Website](http://wrench-project.org)
 
+**WRENCH Research Paper:**
+- H. Casanova, S. Pandey, J. Oeth, R. Tanaka, F. Suter, and R. Ferreira da Silva, “[WRENCH: A Framework for Simulating Workflow Management Systems](http://rafaelsilva.com/wp-content/papercite-data/pdf/casanova-works-2018.pdf),” in 13th Workshop on Workflows in Support of Large-Scale Science (WORKS’18), 2018, p. 74–85. 
+
+
 ## Prerequisites
 
 WRENCH is fully developed in C++. The code follows the C++11 standard, and thus older 
@@ -25,6 +29,7 @@ users to satisfy the following requirements:
 And, one of the following:
 - **g++** - version 5.0 or higher
 - **clang** - version 3.6 or higher
+
 
 ## Dependencies
 
