@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2019. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -91,6 +91,18 @@ namespace wrench {
 
         long getPriority() const;
 
+        void setAverageCPU(double);
+
+        double getAverageCPU() const;
+
+        void setBytesRead(unsigned long);
+
+        unsigned long getBytesRead() const;
+
+        void setBytesWritten(unsigned long);
+
+        unsigned long getBytesWritten() const;
+
         std::set<WorkflowFile *> getInputFiles();
 
         std::set<WorkflowFile *> getOutputFiles();
@@ -120,6 +132,7 @@ namespace wrench {
         unsigned long getNumCoresAllocated();
 
         struct WorkflowTaskExecution;
+
         std::stack<WorkflowTaskExecution> getExecutionHistory();
 
         std::string getExecutionHost();
@@ -155,7 +168,9 @@ namespace wrench {
         void setInternalState(WorkflowTask::InternalState);
 
         void setState(WorkflowTask::State);
+
         void setUpcomingState(WorkflowTask::State);
+
         WorkflowTask::State getUpcomingState() const;
 
         WorkflowTask::InternalState getInternalState() const;
@@ -189,16 +204,16 @@ namespace wrench {
         void setNumCoresAllocated(unsigned long num_cores);
 
         struct WorkflowTaskExecution {
-            double task_start =         -1.0;
-            double read_input_start =   -1.0;
-            double read_input_end =     -1.0;
-            double computation_start =  -1.0;
-            double computation_end =    -1.0;
+            double task_start = -1.0;
+            double read_input_start = -1.0;
+            double read_input_end = -1.0;
+            double computation_start = -1.0;
+            double computation_end = -1.0;
             double write_output_start = -1.0;
-            double write_output_end =   -1.0;
-            double task_end =           -1.0;
-            double task_failed =        -1.0;
-            double task_terminated =    -1.0;
+            double write_output_end = -1.0;
+            double task_end = -1.0;
+            double task_failed = -1.0;
+            double task_terminated = -1.0;
 
             std::string execution_host = "";
             unsigned long num_cores_allocated = 0;
@@ -208,39 +223,36 @@ namespace wrench {
             }
         };
 
-
         /***********************/
         /** \endcond           */
         /***********************/
 
     private:
-
         friend class Workflow;
 
         std::string id;                    // Task ID
         std::string cluster_id;            // ID for clustered task
         TaskType task_type;                // Task type
         double flops;                      // Number of flops
+        double average_cpu;                // Average CPU utilization
+        unsigned long bytes_read;          // Total bytes read in KB
+        unsigned long bytes_written;       // Total bytes written in KB
         unsigned long min_num_cores;
         unsigned long max_num_cores;
         double parallel_efficiency;
         double memory_requirement;
-        long priority = 0;
-
-        unsigned long toplevel;           // 0 if entry task
-        
+        long priority = 0;                 // Task priority
+        unsigned long toplevel;            // 0 if entry task
         unsigned int failure_count = 0;    // Number of times the tasks has failed
         std::string execution_host;        // Host on which the task executed ("" if not executed successfully - yet)
+        State visible_state;               // To be exposed to developer level
+        State upcoming_visible_state;      // A visible state that will become active once a WMS has process a previously sent workflow execution event
+        InternalState internal_state;      // Not to be exposed to developer level
 
-        State visible_state;              // To be exposed to developer level
-        State upcoming_visible_state;     // A visible state that will become active once a WMS has
-                                          // process a previously sent workflow execution event
-        InternalState internal_state;     // Not to be exposed to developer level
-
-        Workflow *workflow;                                    // Containing workflow
+        Workflow *workflow;                                   // Containing workflow
         lemon::ListDigraph *DAG;                              // Containing workflow
         lemon::ListDigraph::Node DAG_node;                    // pointer to the underlying DAG node
-        std::map<std::string, WorkflowFile *> output_files;    // List of output files
+        std::map<std::string, WorkflowFile *> output_files;   // List of output files
         std::map<std::string, WorkflowFile *> input_files;    // List of input files
         std::map<WorkflowFile *, std::pair<std::string, std::string>> fileTransfers;  // Map of transfer files and hosts
 
