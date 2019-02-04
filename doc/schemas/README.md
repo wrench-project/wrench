@@ -48,6 +48,7 @@ This property lists all jobs of the workflow describing their characteristics an
 - [ ] `memory`: Memory (resident set) size of the process in KB.
 - [ ] `energy`: Total energy consumption in kWh.
 - [ ] `avgPower`: Average power consumption in W.
+- [ ] `priority`: Job priority.
 - [ ] `machine`: Node name of machine on which job was run.
 
 #### Files Property

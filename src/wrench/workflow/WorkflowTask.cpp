@@ -253,7 +253,7 @@ namespace wrench {
      */
     void WorkflowTask::setInternalState(WorkflowTask::InternalState state) {
 //      WRENCH_INFO("SETTING %s's INTERNAL STATE TO %s", this->getID().c_str(), WorkflowTask::stateToString(state).c_str());
-        this->internal_state = state;
+      this->internal_state = state;
     }
 
     /**
@@ -382,6 +382,54 @@ namespace wrench {
     }
 
     /**
+     * @brief Get the task average CPU usage
+     * @return the task average CPU usage
+     */
+    double WorkflowTask::getAverageCPU() const {
+      return this->average_cpu;
+    }
+
+    /**
+     * @brief Set the task average CPU usage
+     * @param average_cpu: task average CPU usage
+     */
+    void WorkflowTask::setAverageCPU(double average_cpu) {
+      this->average_cpu = average_cpu;
+    }
+
+    /**
+     * @brief Get the amount of bytes read by the task
+     * @return bytes read by the task in KB
+     */
+    unsigned long WorkflowTask::getBytesRead() const {
+      return this->bytes_read;
+    }
+
+    /**
+     * @brief Set the amount of bytes read by the task
+     * @param bytes_read: bytes read by the task in KB
+     */
+    void WorkflowTask::setBytesRead(unsigned long bytes_read) {
+      this->bytes_read = bytes_read;
+    }
+
+    /**
+     * @brief Set the amount of bytes written by the task
+     * @return bytes written by the task in KB
+     */
+    unsigned long WorkflowTask::getBytesWritten() const {
+      return this->bytes_written;
+    }
+
+    /**
+     * @brief Set the amount of bytes written by the task
+     * @param bytes_read: bytes read by the task in KB
+     */
+    void WorkflowTask::setBytesWritten(unsigned long bytes_written) {
+      this->bytes_written = bytes_written;
+    }
+
+    /**
      * @brief Set the task's start date.
      *
      * @param date: the start date
@@ -397,11 +445,11 @@ namespace wrench {
      * @throws std::runtime_error
      */
     void WorkflowTask::setEndDate(double date) {
-        if (not this->execution_history.empty()) {
-            this->execution_history.top().task_end = date;
-        } else {
-            throw std::runtime_error("WorkflowTask::setEndDate() cannot be called before WorkflowTask::setStartDate()");
-        }
+      if (not this->execution_history.empty()) {
+        this->execution_history.top().task_end = date;
+      } else {
+        throw std::runtime_error("WorkflowTask::setEndDate() cannot be called before WorkflowTask::setStartDate()");
+      }
     }
 
     /**
@@ -411,11 +459,12 @@ namespace wrench {
      * @throws std::runtime_error
      */
     void WorkflowTask::setComputationStartDate(double date) {
-        if (not this->execution_history.empty()) {
-            this->execution_history.top().computation_start = date;
-        } else {
-            throw std::runtime_error("WorkflowTask::setComputationStartDate() cannot be called before WorkflowTask::setStartDate()");
-        }
+      if (not this->execution_history.empty()) {
+        this->execution_history.top().computation_start = date;
+      } else {
+        throw std::runtime_error(
+                "WorkflowTask::setComputationStartDate() cannot be called before WorkflowTask::setStartDate()");
+      }
     }
 
     /**
@@ -425,11 +474,12 @@ namespace wrench {
      * @throws std::runtime_error
      */
     void WorkflowTask::setComputationEndDate(double date) {
-        if (not this->execution_history.empty()) {
-            this->execution_history.top().computation_end = date;
-        } else {
-            throw std::runtime_error("WorkflowTask::setComputationEndDate() cannot be called before WorkflowTask::setStartDate()");
-        }
+      if (not this->execution_history.empty()) {
+        this->execution_history.top().computation_end = date;
+      } else {
+        throw std::runtime_error(
+                "WorkflowTask::setComputationEndDate() cannot be called before WorkflowTask::setStartDate()");
+      }
     }
 
     /**
@@ -439,11 +489,12 @@ namespace wrench {
      * @throws std::runtime_error
      */
     void WorkflowTask::setReadInputStartDate(double date) {
-        if (not this->execution_history.empty()) {
-            this->execution_history.top().read_input_start = date;
-        } else {
-            throw std::runtime_error("WorkflowTask::setReadInputStartDate() cannot be called before WorkflowTask::setStartDate()");
-        }
+      if (not this->execution_history.empty()) {
+        this->execution_history.top().read_input_start = date;
+      } else {
+        throw std::runtime_error(
+                "WorkflowTask::setReadInputStartDate() cannot be called before WorkflowTask::setStartDate()");
+      }
     }
 
     /**
@@ -453,11 +504,12 @@ namespace wrench {
      * @throws std::runtime_error
      */
     void WorkflowTask::setReadInputEndDate(double date) {
-        if (not this->execution_history.empty()) {
-            this->execution_history.top().read_input_end = date;
-        } else {
-            throw std::runtime_error("WorkflowTask::setReadInputEndDate() cannot be called before WorkflowTask::setStartDate()");
-        }
+      if (not this->execution_history.empty()) {
+        this->execution_history.top().read_input_end = date;
+      } else {
+        throw std::runtime_error(
+                "WorkflowTask::setReadInputEndDate() cannot be called before WorkflowTask::setStartDate()");
+      }
     }
 
     /**
@@ -467,11 +519,12 @@ namespace wrench {
      * @throws std::runtime_error
      */
     void WorkflowTask::setWriteOutputStartDate(double date) {
-        if (not this->execution_history.empty()) {
-            this->execution_history.top().write_output_start = date;
-        } else {
-            throw std::runtime_error("WorkflowTask::setWriteOutputStartDate() cannot be called before WorkflowTask::setStartDate()");
-        }
+      if (not this->execution_history.empty()) {
+        this->execution_history.top().write_output_start = date;
+      } else {
+        throw std::runtime_error(
+                "WorkflowTask::setWriteOutputStartDate() cannot be called before WorkflowTask::setStartDate()");
+      }
     }
 
     /**
@@ -481,11 +534,12 @@ namespace wrench {
      * @throws std::runtime_error
      */
     void WorkflowTask::setWriteOutputEndDate(double date) {
-        if (not this->execution_history.empty()) {
-            this->execution_history.top().write_output_end = date;
-        } else {
-            throw std::runtime_error("WorkflowTask::setWriteOutputEndDate() cannot be called before WorkflowTask::setStartDate()");
-        }
+      if (not this->execution_history.empty()) {
+        this->execution_history.top().write_output_end = date;
+      } else {
+        throw std::runtime_error(
+                "WorkflowTask::setWriteOutputEndDate() cannot be called before WorkflowTask::setStartDate()");
+      }
     }
 
     /**
@@ -494,11 +548,11 @@ namespace wrench {
      * @param date: the date when the task has failed
      */
     void WorkflowTask::setFailureDate(double date) {
-        if (not this->execution_history.empty()) {
-            this->execution_history.top().task_failed = date;
-        } else {
-            throw std::runtime_error("WorkflowTask::setFailureDate() cannot be called before WorkflowTask::setStartDate()");
-        }
+      if (not this->execution_history.empty()) {
+        this->execution_history.top().task_failed = date;
+      } else {
+        throw std::runtime_error("WorkflowTask::setFailureDate() cannot be called before WorkflowTask::setStartDate()");
+      }
     }
 
     /**
@@ -506,13 +560,14 @@ namespace wrench {
      *
      * @param date: the date when the task was terminated
      */
-     void WorkflowTask::setTerminationDate(double date) {
-         if (not this->execution_history.empty()) {
-             this->execution_history.top().task_terminated = date;
-         } else {
-             throw std::runtime_error("WorkflowTask::setTerminationDate() cannot be called before WorkflowTask::setStartDate()");
-         }
-     }
+    void WorkflowTask::setTerminationDate(double date) {
+      if (not this->execution_history.empty()) {
+        this->execution_history.top().task_terminated = date;
+      } else {
+        throw std::runtime_error(
+                "WorkflowTask::setTerminationDate() cannot be called before WorkflowTask::setStartDate()");
+      }
+    }
 
     /**
      * @brief Get the execution history of this task
@@ -520,7 +575,7 @@ namespace wrench {
      * @return a stack of WorkflowTaskExecution objects, one for each attempted execution of the task
      */
     std::stack<WorkflowTask::WorkflowTaskExecution> WorkflowTask::getExecutionHistory() {
-        return this->execution_history;
+      return this->execution_history;
     }
 
     /**
@@ -601,72 +656,72 @@ namespace wrench {
      * @return a end date (-1 if task has not completed yet or if no execution history exists for this task yet)
      */
     double WorkflowTask::getEndDate() {
-        return (not this->execution_history.empty()) ? this->execution_history.top().task_end: -1.0;
+      return (not this->execution_history.empty()) ? this->execution_history.top().task_end : -1.0;
     }
 
     /**
      * @brief Get the tasks's most recent computation start date
      * @return the date when the computation portion of a task started (-1 if computation has not started yet or if no execution history exists for this task yet)
      */
-     double WorkflowTask::getComputationStartDate() {
-         return (not this->execution_history.empty()) ? this->execution_history.top().computation_start : -1.0;
-     }
+    double WorkflowTask::getComputationStartDate() {
+      return (not this->execution_history.empty()) ? this->execution_history.top().computation_start : -1.0;
+    }
 
-     /**
-      * @brief Get the task's most recent computation end date
-      * @return the date when the computation portion of a task ended (-1 if computation has not ended yet or if no execution history exists for this task yet)
-      */
-      double WorkflowTask::getComputationEndDate() {
-        return (not this->execution_history.empty()) ? this->execution_history.top().computation_end : -1.0;
-      }
+    /**
+     * @brief Get the task's most recent computation end date
+     * @return the date when the computation portion of a task ended (-1 if computation has not ended yet or if no execution history exists for this task yet)
+     */
+    double WorkflowTask::getComputationEndDate() {
+      return (not this->execution_history.empty()) ? this->execution_history.top().computation_end : -1.0;
+    }
 
-      /**
-       * @brief Get the task's most recent read input start date
-       * @return the date when the read input portion of the task has begun (-1 if it has not yet begun or if no execution history exists for this task yet)
-       */
-      double WorkflowTask::getReadInputStartDate() {
-          return (not this->execution_history.empty()) ? this->execution_history.top().read_input_start : -1.0;
-      }
+    /**
+     * @brief Get the task's most recent read input start date
+     * @return the date when the read input portion of the task has begun (-1 if it has not yet begun or if no execution history exists for this task yet)
+     */
+    double WorkflowTask::getReadInputStartDate() {
+      return (not this->execution_history.empty()) ? this->execution_history.top().read_input_start : -1.0;
+    }
 
-      /**
-       * @brief Get the task's most recent read input end date
-       * @return the date when the read input portion of the task has completed (-1 if it has not begun or if no execution history exists for this task yet)
-       */
-      double WorkflowTask::getReadInputEndDate() {
-          return (not this->execution_history.empty()) ? this->execution_history.top().read_input_end : -1.0;
-      }
+    /**
+     * @brief Get the task's most recent read input end date
+     * @return the date when the read input portion of the task has completed (-1 if it has not begun or if no execution history exists for this task yet)
+     */
+    double WorkflowTask::getReadInputEndDate() {
+      return (not this->execution_history.empty()) ? this->execution_history.top().read_input_end : -1.0;
+    }
 
-      /**
-       * @brief Get the task's most recent write output start date
-       * @return the date when the write output portion of a task has begun (-1 if it has not yet started or if no execution history exists for this task yet)
-       */
-      double WorkflowTask::getWriteOutputStartDate() {
-          return (not this->execution_history.empty()) ? this->execution_history.top().write_output_start : -1.0;
-      }
+    /**
+     * @brief Get the task's most recent write output start date
+     * @return the date when the write output portion of a task has begun (-1 if it has not yet started or if no execution history exists for this task yet)
+     */
+    double WorkflowTask::getWriteOutputStartDate() {
+      return (not this->execution_history.empty()) ? this->execution_history.top().write_output_start : -1.0;
+    }
 
-      /**
-       * @brief Get the task's most recent write output end date
-       * @return the date when the write output portion of a task has completed (-1 if it has not completed yet or if no execution history exists for this task yet)
-       */
-      double WorkflowTask::getWriteOutputEndDate() {
-          return (not this->execution_history.empty()) ? this->execution_history.top().write_output_end : -1.0;
-      }
+    /**
+     * @brief Get the task's most recent write output end date
+     * @return the date when the write output portion of a task has completed (-1 if it has not completed yet or if no execution history exists for this task yet)
+     */
+    double WorkflowTask::getWriteOutputEndDate() {
+      return (not this->execution_history.empty()) ? this->execution_history.top().write_output_end : -1.0;
+    }
 
-      /**
-       * @brief Get the task's most recent failure date
-       * @return the date when the task failed (-1 if it didn't fail or if no execution history exists for this task yet)
-       */
-      double WorkflowTask::getFailureDate() {
-          return (not this->execution_history.empty()) ? this->execution_history.top().task_failed : -1.0;
-      }
+    /**
+     * @brief Get the task's most recent failure date
+     * @return the date when the task failed (-1 if it didn't fail or if no execution history exists for this task yet)
+     */
+    double WorkflowTask::getFailureDate() {
+      return (not this->execution_history.empty()) ? this->execution_history.top().task_failed : -1.0;
+    }
 
-      /**
-       * @brief Get the tasks's most recent termination date (when it was explicitly requested to be terminated by the WMS)
-       * @return the date when the task was terminated (-1 if it wasn't terminated or if not execution history exists for this task yet)
-       */
-      double WorkflowTask::getTerminationDate() {
-          return (not this->execution_history.empty()) ? this->execution_history.top().task_terminated : -1.0;
-      }
+    /**
+     * @brief Get the tasks's most recent termination date (when it was explicitly requested to be terminated by the WMS)
+     * @return the date when the task was terminated (-1 if it wasn't terminated or if not execution history exists for this task yet)
+     */
+    double WorkflowTask::getTerminationDate() {
+      return (not this->execution_history.empty()) ? this->execution_history.top().task_terminated : -1.0;
+    }
 
     /**
      * @brief Update the task's top level (looking only at the parents, and updating children)
@@ -705,16 +760,16 @@ namespace wrench {
      * @return hostname
      */
     std::string WorkflowTask::getExecutionHost() {
-        return (not this->execution_history.empty()) ? this->execution_history.top().execution_host : "";
+      return (not this->execution_history.empty()) ? this->execution_history.top().execution_host : "";
     }
 
     /**
      * @brief Returns the number of cores allocated for this task's most recent execution or 0 if an execution attempt was never made
      * @return number of cores
      */
-     unsigned long WorkflowTask::getNumCoresAllocated() {
-         return (not this->execution_history.empty()) ? this->execution_history.top().num_cores_allocated : 0;
-     }
+    unsigned long WorkflowTask::getNumCoresAllocated() {
+      return (not this->execution_history.empty()) ? this->execution_history.top().num_cores_allocated : 0;
+    }
 
     /**
      * @brief Sets the host on which this task is running
@@ -722,24 +777,26 @@ namespace wrench {
      * @param hostname: the host name
      */
     void WorkflowTask::setExecutionHost(std::string hostname) {
-        if (not this->execution_history.empty()) {
-            this->execution_history.top().execution_host = hostname;
-        } else {
-            throw std::runtime_error("WorkflowTask::setExecutionHost() cannot be called before WorkflowTask::setStartDate()");
-        }
+      if (not this->execution_history.empty()) {
+        this->execution_history.top().execution_host = hostname;
+      } else {
+        throw std::runtime_error(
+                "WorkflowTask::setExecutionHost() cannot be called before WorkflowTask::setStartDate()");
+      }
     }
 
     /**
      * @brief Sets the number of cores allocated for this task
      * @param num_cores: the number of cores allocated to this task
      */
-     void WorkflowTask::setNumCoresAllocated(unsigned long num_cores) {
-         if (not this->execution_history.empty()) {
-             this->execution_history.top().num_cores_allocated = num_cores;
-         } else {
-             throw std::runtime_error("WorkflowTask::setNumCoresAllocated() cannot be called before WorkflowTask::setStartDate()");
-         }
-     }
+    void WorkflowTask::setNumCoresAllocated(unsigned long num_cores) {
+      if (not this->execution_history.empty()) {
+        this->execution_history.top().num_cores_allocated = num_cores;
+      } else {
+        throw std::runtime_error(
+                "WorkflowTask::setNumCoresAllocated() cannot be called before WorkflowTask::setStartDate()");
+      }
+    }
 
     /**
      * @brief Get a map of src and dst hosts for file transfers
