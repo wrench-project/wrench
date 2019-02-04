@@ -661,6 +661,27 @@ namespace wrench {
               // do nothing
             }
 
+            // task average CPU
+            try {
+              task->setAverageCPU(job.at("avgCPU"));
+            } catch (nlohmann::json::out_of_range &e) {
+              // do nothing
+            }
+
+            // task bytes read
+            try {
+              task->setBytesRead(job.at("bytesRead"));
+            } catch (nlohmann::json::out_of_range &e) {
+              // do nothing
+            }
+
+            // task bytes written
+            try {
+              task->setBytesWritten(job.at("bytesWritten"));
+            } catch (nlohmann::json::out_of_range &e) {
+              // do nothing
+            }
+
             // task type
             std::string type = job.at("type");
             if (type == "transfer") {
