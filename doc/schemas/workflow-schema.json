@@ -263,6 +263,10 @@
                 "description": "Average power consumption in W",
                 "type": "number"
               },
+              "priority": {
+                "description": "Job priority",
+                "type": "number"
+              },
               "machine": {
                 "description": "Machine name used",
                 "type": "string",
