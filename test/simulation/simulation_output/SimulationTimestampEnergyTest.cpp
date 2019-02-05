@@ -251,51 +251,29 @@ private:
     SimulationTimestampEnergyTest *test;
 
     int main() {
-
         // EnergyMeter constructor tests
-        bool threw_exception = false;
         try {
             auto fail_em1 = this->createEnergyMeter(std::vector<std::string>(), 1.0);
-        } catch (std::invalid_argument &e) {
-            threw_exception = true;
-        }
-
-        if (not threw_exception) {
             throw std::runtime_error("createEnergyMeter should have thrown invalid argument if given an empty hostname list");
-        }
+        } catch (std::invalid_argument &e) { }
 
-        threw_exception = false;
         try {
             auto fail_em2 = this->createEnergyMeter({"a", "b", "c"}, 0.0);
-        } catch(std::invalid_argument &e) {
-            threw_exception = true;
-        }
-
-        if (not threw_exception) {
             throw std::runtime_error("createEnergyMeter should have thrown invalid argument if given a measurement period less than 1.0");
-        }
 
-        // EnergyMeter constructor tests
-        threw_exception = false;
+        } catch(std::invalid_argument &e) { }
+
         try {
             auto fail_em3 = this->createEnergyMeter(std::map<std::string, double>());
-        } catch(std::invalid_argument &e) {
-            threw_exception = true;
-        }
-
-        if (not threw_exception) {
             throw std::runtime_error("createEnergyMeter requires a non-empty map of (hostname, measurement period) pairs");
-        }
+        } catch(std::invalid_argument &e) { }
 
         try {
-            auto fail_em4 = this->createEnergyMeter({{"host1", 0.0}});
-        } catch(std::invalid_argument &e) {
-            threw_exception = true;
-        }
-
-        if (not threw_exception) {
+            std::map<std::string, double> mp = {{"host1", 0.0}};
+            auto fail_em4 = this->createEnergyMeter(mp);
             throw std::runtime_error("createEnergyMeter requires that measurement periods be 1.0 or greater");
-        }
+        } catch(std::invalid_argument &e) { }
+
 
         // EnergyMeter functionality tests
         const std::vector<std::string> hostnames = this->simulation->getHostnameList();
@@ -351,7 +329,7 @@ void SimulationTimestampEnergyTest::do_EnergyMeterSingleMeasurementPeriod_test()
         return (ts->getContent()->getHostname() == "host1" ? true : false);
     });
 
-    // host1 computes for 100 seconds, and records timestamps in 10 second intevals, so
+    // host1 computes for 100 seconds, and records timestamps in 10 second intervals, so
     // we should end up with 11 timestamps (starting with time 0)
     ASSERT_EQ(11, host1_timestamps.size());
 
@@ -385,7 +363,7 @@ void SimulationTimestampEnergyTest::do_EnergyMeterSingleMeasurementPeriod_test()
                 return (ts->getContent()->getHostname() == "host2" ? true : false);
             });
 
-    // host2 is idle for 100 seconds, and records timestamps in 10 second intevals, so
+    // host2 is idle for 100 seconds, and records timestamps in 10 second intervals, so
     // we should end up with 11 timestamps (starting with time 0)
     ASSERT_EQ(11, host2_timestamps.size());
 
@@ -402,6 +380,133 @@ void SimulationTimestampEnergyTest::do_EnergyMeterSingleMeasurementPeriod_test()
             {80,   8000},
             {90,   9000},
             {100,  10000}
+    };
+
+    for (size_t i = 0; i < host2_timestamps.size(); ++i) {
+        ASSERT_DOUBLE_EQ(host2_expected_timestamps[i].first, host2_timestamps[i]->getDate());
+        ASSERT_DOUBLE_EQ(host2_expected_timestamps[i].second, host2_timestamps[i]->getContent()->getConsumption());
+    }
+
+    delete simulation;
+    free(argv[0]);
+    free(argv[1]);
+    free(argv);
+}
+
+/**********************************************************************/
+/**            ENERGY METER MULTIPLE MEASUREMENT PERIOD TEST         **/
+/**********************************************************************/
+
+/**
+ * Testing the EnergyMeter class to ensure that it correctly
+ * records SimulationTimestampEnergyConsumption timestamps when given
+ * a map of (hostname, measurement_period) pairs.
+ */
+
+class EnergyMeterMultipleMeasurementPeriodTestWMS : public wrench::WMS {
+public:
+    EnergyMeterMultipleMeasurementPeriodTestWMS(SimulationTimestampEnergyTest *test,
+                                                std::string &hostname) :
+            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+        this->test = test;
+    }
+
+private:
+    SimulationTimestampEnergyTest *test;
+
+    int main() {
+
+        const std::map<std::string, double> measurement_periods = {
+                {"host1", 2.0},
+                {"host2", 3.0}
+        };
+
+        auto em = this->createEnergyMeter(measurement_periods);
+
+        const double MEGAFLOP = 1000.0 * 1000.0;
+        wrench::S4U_Simulation::compute(6.0 * 100.0 * MEGAFLOP); // compute for 6 seconds
+
+        return 0;
+    }
+};
+
+TEST_F(SimulationTimestampEnergyTest, EnergyMeterMultipleMeasurmentPeriodTest) {
+    DO_TEST_WITH_FORK(do_EnergyMeterMultipleMeasurementPeriod_test);
+}
+
+void SimulationTimestampEnergyTest::do_EnergyMeterMultipleMeasurementPeriod_test() {
+    auto simulation = new wrench::Simulation();
+    int argc = 2;
+    auto argv = (char **)calloc(argc, sizeof(char *));
+    argv[0] = strdup("energy_meter_multiple_measurement_period_test");
+    argv[1] = strdup("--activate-energy");
+
+    EXPECT_NO_THROW(simulation->init(&argc, argv));
+
+    EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    // get the single host
+    std::string host = simulation->getHostnameList()[0];
+
+    wrench::WMS *wms = nullptr;
+    EXPECT_NO_THROW(wms = simulation->add(
+            new EnergyMeterMultipleMeasurementPeriodTestWMS(
+                    this, host
+            )
+    ));
+
+    EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
+
+    EXPECT_NO_THROW(simulation->launch());
+
+    auto energy_consumption_timestamps = simulation->getOutput().getTrace<wrench::SimulationTimestampEnergyConsumption>();
+
+    // test values for timestamps associated with host1
+    std::vector<wrench::SimulationTimestamp<wrench::SimulationTimestampEnergyConsumption> *> host1_timestamps;
+    std::copy_if(
+            energy_consumption_timestamps.begin(),
+            energy_consumption_timestamps.end(),
+            std::back_inserter(host1_timestamps),
+            [](wrench::SimulationTimestamp<wrench::SimulationTimestampEnergyConsumption> *ts) -> bool {
+                return (ts->getContent()->getHostname() == "host1" ? true : false);
+            });
+
+    // host1 computes for 6 seconds and records timestamps in 2.0 second intervals
+    // we should end up with 4 timestamps
+    ASSERT_EQ(4, host1_timestamps.size());
+
+    // expected values (timestamp, consumption)
+    std::vector<std::pair<double, double>> host1_expected_timestamps = {
+            {0.0, 0.0},
+            {2.0, 400.0},
+            {4.0, 800.0},
+            {6.0, 1200.0}
+    };
+
+    for (size_t i = 0; i < host1_timestamps.size(); ++i) {
+        ASSERT_DOUBLE_EQ(host1_expected_timestamps[i].first, host1_timestamps[i]->getDate());
+        ASSERT_DOUBLE_EQ(host1_expected_timestamps[i].second, host1_timestamps[i]->getContent()->getConsumption());
+    }
+
+    // test values for timestamps associated with host2
+    std::vector<wrench::SimulationTimestamp<wrench::SimulationTimestampEnergyConsumption> *> host2_timestamps;
+    std::copy_if(
+            energy_consumption_timestamps.begin(),
+            energy_consumption_timestamps.end(),
+            std::back_inserter(host2_timestamps),
+            [](wrench::SimulationTimestamp<wrench::SimulationTimestampEnergyConsumption> *ts) -> bool {
+                return (ts->getContent()->getHostname() == "host2" ? true : false);
+            });
+
+    // host2 is idle for 6 seconds and records timestamps in 3.0 second intervals
+    // we should end up with 3 timestamps
+    ASSERT_EQ(3, host2_timestamps.size());
+
+    // expected values (timestamp, consumption)
+    std::vector<std::pair<double, double>> host2_expected_timestamps = {
+            {0.0, 0.0},
+            {3.0, 300.0},
+            {6.0, 600.0}
     };
 
     for (size_t i = 0; i < host2_timestamps.size(); ++i) {
