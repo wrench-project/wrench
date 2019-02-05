@@ -33,11 +33,11 @@ namespace wrench {
 
       this->wms = wms;
 
-      for (auto const &h : this->measurement_periods) {
+      for (auto &h : measurement_periods) {
         if (not S4U_Simulation::hostExists(h.first)) {
           throw std::invalid_argument("EnergyMeter::EnergyMeter(): unknown host " + h.first);
         }
-        if (h.second < 1) {
+        if (h.second < 1.0) {
           throw std::invalid_argument(
                   "EnergyMeter::EnergyMeter(): measurement period must be at least 1 second (host " + h.first + ")");
         }
@@ -160,7 +160,7 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
-        message = S4U_Mailbox::getMessage(this->mailbox_name, timeout);
+          message = S4U_Mailbox::getMessage(this->mailbox_name, timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
         return true;
       }
