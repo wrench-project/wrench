@@ -476,7 +476,45 @@ namespace wrench {
 
 
     /**
-     * @brief Writes a JSON file containing host energy consumption information.
+     * @brief Writes a JSON file containing host energy consumption information as a JSON array.
+     * @description The JSON array has the following format:
+     *
+     * <pre>
+     * [
+     *      {
+     *          hostname: <string>,
+     *          pstates: [                 <-- if this host is a single core host, items in this list will be formatted as
+     *              {                          the first item, else if this is a multi core host, items will be formatted as
+     *                  pstate: <int>,         the second item
+     *                  idle: <double>,
+     *                  running: <double>,   <-- if single core host
+     *                  speed: <double>
+     *              },
+     *              {
+     *                  pstate: <int>,
+     *                  idle: <double>,
+     *                  one_core: <double>,  <-- if multi core host
+     *                  all_cores: <double>, <-- if multi core host
+     *                  speed: <double>
+     *              } ...
+     *          ],
+     *          watts_off: <double>,
+     *          pstate_trace: [
+     *              {
+     *                  time: <double>,
+     *                  pstate: <int>
+     *              }, ...
+     *          ],
+     *          consumed_energy_trace: [
+     *              {
+     *                  time: <double>,
+     *                  watts: <double>
+     *              }, ...
+     *          ]
+     *      }, ...
+     * ]
+     * </pre>
+     *
      * @param file_path: the path to write the file
      *
      * @throws std::invalid_argument
@@ -534,24 +572,33 @@ namespace wrench {
                     datum["watt_off"] = std::string(watt_off_value);
                 }
 
-                datum["consumed_energy"].push_back({
-                                                           {"time",  "end"},
-                                                           {"watts", sg_host_get_consumed_energy(host)}
-                });
+                for (const auto &pstate_timestamp : this->getTrace<SimulationTimestampPstateSet>()) {
+                    if (host->get_name() == pstate_timestamp->getContent()->getHostname()) {
+                        datum["pstate_trace"].push_back({
+                                                                {"time", pstate_timestamp->getDate()},
+                                                                {"pstate", pstate_timestamp->getContent()->getPstate()}
+                                                        });
+                    }
 
-                datum["pstate_trace"].push_back({
-                                                        {"time", "end"},
-                                                        {"pstate", sg_host_get_pstate(host)}
-                });
+                }
+
+                for (const auto &energy_consumption_timestamp : this->getTrace<SimulationTimestampEnergyConsumption>()) {
+                    if (host->get_name() == energy_consumption_timestamp->getContent()->getHostname()) {
+                        datum["consumed_energy_trace"].push_back({
+                                                                         {"time", energy_consumption_timestamp->getDate()},
+                                                                         {"watts", energy_consumption_timestamp->getContent()->getConsumption()}
+                                                                 });
+                    }
+                }
 
                 hosts_energy_consumption_information.push_back(datum);
-
-                // TODO: get initial pstate from host (if possible) and add start and end pstates
             }
 
-            std::cerr << hosts_energy_consumption_information.dump(4);
+            // std::cerr << hosts_energy_consumption_information.dump(4);
 
-            // TODO: write file instead of print output
+            std::ofstream output(file_path);
+            output << std::setw(4) << hosts_energy_consumption_information << std::endl;
+            output.close();
 
         } catch (std::runtime_error &e) {
             // the functions that get energy information catch any exceptions then throw runtime_errors
