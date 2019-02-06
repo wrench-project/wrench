@@ -35,10 +35,12 @@ public:
     void do_SimulationDumpWorkflowExecutionJSON_test();
     void do_SimulationDumpWorkflowGraphJSON_test();
     void do_SimulationSearchForHostUtilizationGraphLayout_test();
+    void do_SimulationDumpHostEnergyConsumptionJSON_test();
 
 protected:
     SimulationDumpJSONTest() {
 
+        // platform without energy consumption information
         std::string xml = "<?xml version='1.0'?>"
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
@@ -57,12 +59,37 @@ protected:
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
 
+        // platform with energy consumption information
+        std::string xml2 = "<?xml version='1.0'?>"
+                          "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                          "<platform version=\"4.1\">"
+                          "<zone id=\"AS0\" routing=\"Full\">"
+
+                          "<host id=\"host1\" speed=\"100.0Mf,50.0Mf,20.0Mf\" pstate=\"1\" core=\"1\" >"
+                          "<prop id=\"watt_per_state\" value=\"100.0:200.0, 93.0:170.0, 90.0:150.0\" />"
+                          "<prop id=\"watt_off\" value=\"10\" />"
+                          "</host>"
+
+                          "<host id=\"host2\" speed=\"100.0Mf,50.0Mf,20.0Mf\" pstate=\"0\" core=\"1\" >"
+                          "<prop id=\"watt_per_state\" value=\"100.0:200.0, 93.0:170.0, 90.0:150.0\" />"
+                          "<prop id=\"watt_off\" value=\"10\" />"
+                          "</host>"
+
+                          "</zone>"
+                          "</platform>";
+
+        FILE *platform_file2 = fopen(platform_file_path2.c_str(), "w");
+        fprintf(platform_file2, "%s", xml2.c_str());
+        fclose(platform_file2);
+
         workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
+    std::string platform_file_path2 = UNIQUE_TMP_PATH_PREFIX + "platform2.xml";
     std::string execution_data_json_file_path = UNIQUE_TMP_PATH_PREFIX + "workflow_data.json";
     std::string workflow_graph_json_file_path = UNIQUE_TMP_PATH_PREFIX + "workflow_graph_data.json";
+    std::string energy_consumption_data_file_path = UNIQUE_TMP_PATH_PREFIX + "energy_consumption.json";
     std::unique_ptr<wrench::Workflow> workflow;
 
 };
@@ -1058,4 +1085,212 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
 
 TEST_F(SimulationDumpJSONTest, SimulationDumpWorkflowGraphJSONTest) {
     DO_TEST_WITH_FORK(do_SimulationDumpWorkflowGraphJSON_test);
+}
+
+/**********************************************************************/
+/**         SimulationDumpHostEnergyConsumptionJSONTest              **/
+/**********************************************************************/
+class SimulationOutputDumpEnergyConsumptionTestWMS : public wrench::WMS {
+public:
+    SimulationOutputDumpEnergyConsumptionTestWMS(SimulationDumpJSONTest *test,
+                                        std::string &hostname) :
+            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+        this->test = test;
+    }
+
+private:
+    SimulationDumpJSONTest *test;
+
+    int main() {
+
+        // default pstate is set to 1, change it back to 0 so another timestamp is added
+        this->simulation->setPstate(this->getHostname(), 0);
+
+        const std::vector<std::string> hostnames = this->simulation->getHostnameList();
+        const double TWO_SECOND_PERIOD = 2.0;
+
+        auto em = this->createEnergyMeter(hostnames, TWO_SECOND_PERIOD);
+
+        const double MEGAFLOP = 1000.0 * 1000.0;
+        wrench::S4U_Simulation::compute(6.0 * 100.0 * MEGAFLOP); // compute for 6 seconds
+
+        return 0;
+    }
+
+};
+
+TEST_F(SimulationDumpJSONTest, SimulationDumpEnergyConsumptionTest) {
+    DO_TEST_WITH_FORK(do_SimulationDumpHostEnergyConsumptionJSON_test);
+}
+
+// some comparison functions to be used when sorting lists of JSON objects so that the tests are deterministic
+bool comparePstate(const nlohmann::json &lhs, const nlohmann::json &rhs) {
+    return lhs["pstate"] < rhs["pstate"];
+}
+
+bool compareTime(const nlohmann::json &lhs, const nlohmann::json &rhs) {
+    return lhs["time"] < rhs["time"];
+}
+
+bool compareHostname(const nlohmann::json &lhs, const nlohmann::json &rhs) {
+    return lhs["hostname"] < rhs["hostname"];
+}
+
+void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
+    auto simulation = new wrench::Simulation();
+    int argc = 2;
+    auto argv = (char **)calloc(argc, sizeof(char *));
+    argv[0] = strdup("simulation_dump_host_energy_consumption_test");
+    argv[1] = strdup("--activate-energy");
+
+    EXPECT_NO_THROW(simulation->init(&argc, argv));
+
+    EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path2));
+
+    // get the single host
+    std::string host = simulation->getHostnameList()[0];
+
+    wrench::WMS *wms = nullptr;
+    EXPECT_NO_THROW(wms = simulation->add(
+            new SimulationOutputDumpEnergyConsumptionTestWMS(
+                    this, host
+            )
+    ));
+
+    EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
+
+    EXPECT_NO_THROW(simulation->launch());
+
+    EXPECT_THROW(simulation->getOutput().dumpHostEnergyConsumptionJSON(""), std::invalid_argument);
+
+    EXPECT_NO_THROW(simulation->getOutput().dumpHostEnergyConsumptionJSON(this->energy_consumption_data_file_path));
+
+    nlohmann::json expected_json = R"(
+        [
+            {
+                "consumed_energy_trace": [
+                    {
+                        "time": 0.0,
+                        "watts": 0.0
+                    },
+                    {
+                        "time": 2.0,
+                        "watts": 400.0
+                    },
+                    {
+                        "time": 4.0,
+                        "watts": 800.0
+                    },
+                    {
+                        "time": 6.0,
+                        "watts": 1200.0
+                    }
+                ],
+                "hostname": "host1",
+                "pstate_trace": [
+                    {
+                        "pstate": 1,
+                        "time": 0.0
+                    },
+                    {
+                        "pstate": 0,
+                        "time": 0.0
+                    }
+                ],
+                "pstates": [
+                    {
+                        "idle": "100.0",
+                        "pstate": 0,
+                        "running": "200.0",
+                        "speed": 100000000.0
+                    },
+                    {
+                        "idle": " 93.0",
+                        "pstate": 1,
+                        "running": "170.0",
+                        "speed": 50000000.0
+                    },
+                    {
+                        "idle": " 90.0",
+                        "pstate": 2,
+                        "running": "150.0",
+                        "speed": 20000000.0
+                    }
+                ],
+                "watt_off": "10"
+            },
+            {
+                "consumed_energy_trace": [
+                    {
+                        "time": 0.0,
+                        "watts": 0.0
+                    },
+                    {
+                        "time": 2.0,
+                        "watts": 200.0
+                    },
+                    {
+                        "time": 4.0,
+                        "watts": 400.0
+                    },
+                    {
+                        "time": 6.0,
+                        "watts": 600.0
+                    }
+                ],
+                "hostname": "host2",
+                "pstate_trace": [
+                    {
+                        "pstate": 0,
+                        "time": 0.0
+                    }
+                ],
+                "pstates": [
+                    {
+                        "idle": "100.0",
+                        "pstate": 0,
+                        "running": "200.0",
+                        "speed": 100000000.0
+                    },
+                    {
+                        "idle": " 93.0",
+                        "pstate": 1,
+                        "running": "170.0",
+                        "speed": 50000000.0
+                    },
+                    {
+                        "idle": " 90.0",
+                        "pstate": 2,
+                        "running": "150.0",
+                        "speed": 20000000.0
+                    }
+                ],
+                "watt_off": "10"
+            }
+        ])"_json;
+
+    std::sort(expected_json.begin(), expected_json.end(), compareHostname);
+    for (size_t i = 0; i < expected_json.size(); ++i) {
+        std::sort(expected_json[i]["consumed_energy_trace"].begin(), expected_json[i]["consumed_energy_trace"].end(), compareTime);
+        std::sort(expected_json[i]["pstates"].begin(), expected_json[i]["pstates"].end(), comparePstate);
+        std::sort(expected_json[i]["pstate_trace"].begin(), expected_json[i]["pstate_trace"].end(), comparePstate);
+    }
+
+    std::ifstream json_file(this->energy_consumption_data_file_path);
+    nlohmann::json result_json;
+    json_file >> result_json;
+
+    std::sort(result_json.begin(), result_json.end(), compareHostname);
+    for (size_t i = 0; i < expected_json.size(); ++i) {
+        std::sort(result_json[i]["consumed_energy_trace"].begin(), result_json[i]["consumed_energy_trace"].end(), compareTime);
+        std::sort(result_json[i]["pstates"].begin(), result_json[i]["pstates"].end(), comparePstate);
+        std::sort(result_json[i]["pstate_trace"].begin(), result_json[i]["pstate_trace"].end(), comparePstate);
+    }
+
+    EXPECT_TRUE(expected_json == result_json);
+
+    delete simulation;
+    free(argv[0]);
+    free(argv[1]);
+    free(argv);
 }
