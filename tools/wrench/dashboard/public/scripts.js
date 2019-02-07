@@ -1,4 +1,4 @@
-var data={"modified":"2018-11-30T09:00:16.782Z","file":"gautam.json","contents":[{"compute":{"end":35.790446376852096,"start":0.0002512268520923695},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":0.0002512268520923695,"start":0.00019726981948412205},"task_id":"ID00000","terminated":-1,"whole_task":{"end":35.790500336988345,"start":0.00019726981948412205},"write":{"end":35.790500336988345,"start":35.790446376852096}},{"compute":{"end":38.611684255207564,"start":35.79148910520756},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":35.79148910520756,"start":35.791482446446814},"task_id":"ID00001","terminated":-1,"whole_task":{"end":38.61169091441169,"start":35.791482446446814},"write":{"end":38.61169091441169,"start":38.611684255207564}},{"compute":{"end":38.47207886985551,"start":35.791883719855505},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":35.791883719855505,"start":35.79187698608579},"task_id":"ID00002","terminated":-1,"whole_task":{"end":38.4720856040686,"start":35.79187698608579},"write":{"end":38.4720856040686,"start":38.47207886985551}},{"compute":{"end":38.54247328432496,"start":35.79227813432496},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":35.79227813432496,"start":35.792271525724765},"task_id":"ID00003","terminated":-1,"whole_task":{"end":38.54247989336853,"start":35.792271525724765},"write":{"end":38.54247989336853,"start":38.54247328432496}},{"compute":{"end":40.35286789674193,"start":35.79267274674192},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":35.79267274674192,"start":35.79266606536374},"task_id":"ID00004","terminated":-1,"whole_task":{"end":40.35287457856349,"start":35.79266606536374},"write":{"end":40.35287457856349,"start":40.35286789674193}},{"compute":{"end":39.913262764860086,"start":35.793067614860085},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":35.793067614860085,"start":35.793060605002715},"task_id":"ID00005","terminated":-1,"whole_task":{"end":39.913269775160835,"start":35.793060605002715},"write":{"end":39.913269775160835,"start":39.913262764860086}},{"compute":{"end":41.30365714285166,"start":35.79346199285167},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":35.79346199285167,"start":35.79345514464169},"task_id":"ID00006","terminated":-1,"whole_task":{"end":41.30366399150502,"start":35.79345514464169},"write":{"end":41.30366399150502,"start":41.30365714285166}},{"compute":{"end":38.34405181944918,"start":35.79385666944918},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":35.79385666944918,"start":35.793849684280666},"task_id":"ID00007","terminated":-1,"whole_task":{"end":38.34405880506107,"start":35.793849684280666},"write":{"end":38.34405880506107,"start":38.34405181944918}},{"compute":{"end":39.444445808311194,"start":35.79425065831119},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":35.79425065831119,"start":35.79424422391964},"task_id":"ID00008","terminated":-1,"whole_task":{"end":39.444452243146124,"start":35.79424422391964},"write":{"end":39.444452243146124,"start":39.444445808311194}},{"compute":{"end":39.70287154109849,"start":38.61267639109848},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":38.61267639109848,"start":38.61267302387016},"task_id":"ID00009","terminated":-1,"whole_task":{"end":39.70287384586667,"start":38.61267302387016},"write":{"end":39.70287384586667,"start":39.70287154109849}},{"compute":{"end":39.753266219899054,"start":38.47307106989905},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":38.47307106989905,"start":38.47306771352707},"task_id":"ID00010","terminated":-1,"whole_task":{"end":39.753268512400425,"start":38.47306771352707},"write":{"end":39.753268512400425,"start":39.753266219899054}},{"compute":{"end":39.36366044908269,"start":38.54346529908268},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":38.54346529908268,"start":38.543462002827},"task_id":"ID00011","terminated":-1,"whole_task":{"end":39.36366287836506,"start":38.543462002827},"write":{"end":39.36366287836506,"start":39.36366044908269}},{"compute":{"end":41.474055038652956,"start":40.353859888652956},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":40.353859888652956,"start":40.353856688021956},"task_id":"ID00012","terminated":-1,"whole_task":{"end":41.474057418085664,"start":40.353856688021956},"write":{"end":41.474057418085664,"start":41.474055038652956}},{"compute":{"end":40.824450383622015,"start":39.914255233622015},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":39.914255233622015,"start":39.914251884619304},"task_id":"ID00013","terminated":-1,"whole_task":{"end":40.82445239285676,"start":39.914251884619304},"write":{"end":40.82445239285676,"start":40.824450383622015}},{"compute":{"end":42.704844622438365,"start":41.30464947243836},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":41.30464947243836,"start":41.30464610096349},"task_id":"ID00014","terminated":-1,"whole_task":{"end":42.70484655256308,"start":41.30464610096349},"write":{"end":42.70484655256308,"start":42.704844622438365}},{"compute":{"end":39.54523938705446,"start":38.34504423705445},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":38.34504423705445,"start":38.34504091451954},"task_id":"ID00015","terminated":-1,"whole_task":{"end":39.54524258501867,"start":38.34504091451954},"write":{"end":39.54524258501867,"start":39.54523938705446}},{"compute":{"end":40.34563282132768,"start":39.44543767132768},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":39.44543767132768,"start":39.44543435260459},"task_id":"ID00016","terminated":-1,"whole_task":{"end":40.34563717978004,"start":39.44543435260459},"write":{"end":40.34563717978004,"start":40.34563282132768}},{"compute":{"end":41.18405341009332,"start":39.70385826009332},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":39.70385826009332,"start":39.70385595532514},"task_id":"ID00017","terminated":-1,"whole_task":{"end":41.18405399244908,"start":39.70385595532514},"write":{"end":41.18405399244908,"start":41.18405341009332}},{"compute":{"end":41.78444806436027,"start":39.754252914360265},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":39.754252914360265,"start":39.754250621858894},"task_id":"ID00018","terminated":-1,"whole_task":{"end":41.784448644007895,"start":39.754250621858894},"write":{"end":41.784448644007895,"start":41.78444806436027}},{"compute":{"end":40.884842567105906,"start":39.36464741710591},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":39.36464741710591,"start":39.36464498782353},"task_id":"ID00019","terminated":-1,"whole_task":{"end":40.8848431624598,"start":39.36464498782353},"write":{"end":40.8848431624598,"start":40.884842567105906}},{"compute":{"end":42.865237056976845,"start":41.47504190697684},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":41.47504190697684,"start":41.47503952754413},"task_id":"ID00020","terminated":-1,"whole_task":{"end":42.86523761934147,"start":41.47503952754413},"write":{"end":42.86523761934147,"start":42.865237056976845}},{"compute":{"end":42.315631661549986,"start":40.82543651154998},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":40.82543651154998,"start":40.82543450231523},"task_id":"ID00021","terminated":-1,"whole_task":{"end":42.31563225161859,"start":40.82543450231523},"write":{"end":42.31563225161859,"start":42.315631661549986}},{"compute":{"end":44.40602574214628,"start":42.70583059214627},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":42.70583059214627,"start":42.70582866202155},"task_id":"ID00022","terminated":-1,"whole_task":{"end":44.40602620726575,"start":42.70582866202155},"write":{"end":44.40602620726575,"start":44.40602574214628}},{"compute":{"end":41.85642304244136,"start":39.54622789244135},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":39.54622789244135,"start":39.54622469447714},"task_id":"ID00023","terminated":-1,"whole_task":{"end":41.85642368280886,"start":39.54622469447714},"write":{"end":41.85642368280886,"start":41.85642304244136}},{"compute":{"end":43.566818797690864,"start":40.34662364769087},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":40.34662364769087,"start":40.34661928923851},"task_id":"ID00024","terminated":-1,"whole_task":{"end":43.56681977948589,"start":40.34661928923851},"write":{"end":43.56681977948589,"start":43.566818797690864}},{"compute":{"end":12556.4463316142,"start":41.18613646423874},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":41.18613646423874,"start":41.18503610190755},"task_id":"ID00025","terminated":-1,"whole_task":{"end":12556.446332247157,"start":41.18503610190755},"write":{"end":12556.446332247157,"start":12556.4463316142}},{"compute":{"end":11348.516726263062,"start":41.786531113089424},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":41.786531113089424,"start":41.785430753466365},"task_id":"ID00026","terminated":-1,"whole_task":{"end":11348.516726893076,"start":41.785430753466365},"write":{"end":11348.516726893076,"start":11348.516726263062}},{"compute":{"end":11119.287120797206,"start":40.8869256472476},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":40.8869256472476,"start":40.88582527191827},"task_id":"ID00027","terminated":-1,"whole_task":{"end":11119.287121444291,"start":40.88582527191827},"write":{"end":11119.287121444291,"start":11119.287120797206}},{"compute":{"end":17545.277515221132,"start":42.86732007114},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":42.86732007114,"start":42.86621972879994},"task_id":"ID00028","terminated":-1,"whole_task":{"end":17545.27751583236,"start":42.86621972879994},"write":{"end":17545.27751583236,"start":17545.277515221132}},{"compute":{"end":11752.597909881104,"start":42.31771473112109},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":42.31771473112109,"start":42.31661436107706},"task_id":"ID00029","terminated":-1,"whole_task":{"end":11752.597910522445,"start":42.31661436107706},"write":{"end":11752.597910522445,"start":11752.597909881104}},{"compute":{"end":9781.87830371182,"start":44.40810856181912},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":44.40810856181912,"start":44.407008316724216},"task_id":"ID00030","terminated":-1,"whole_task":{"end":9781.878304217345,"start":44.407008316724216},"write":{"end":9781.878304217345,"start":9781.87830371182}},{"compute":{"end":15312.168701362587,"start":41.858506212610266},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":41.858506212610266,"start":41.85740579226733},"task_id":"ID00031","terminated":-1,"whole_task":{"end":15312.1687020586,"start":41.85740579226733},"write":{"end":15312.1687020586,"start":15312.168701362587}},{"compute":{"end":18962.25909780072,"start":43.56890265071482},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":43.56890265071482,"start":43.56780188894436},"task_id":"ID00032","terminated":-1,"whole_task":{"end":18962.259098867853,"start":43.56780188894436},"write":{"end":18962.259098867853,"start":18962.25909780072}},{"compute":{"end":18974.300281558626,"start":18962.260086408623},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":18962.260086408623,"start":18962.260080977325},"task_id":"ID00033","terminated":-1,"whole_task":{"end":18974.300286859925,"start":18962.260080977325},"write":{"end":18974.300286859925,"start":18974.300281558626}},{"compute":{"end":18974.321469240356,"start":18974.301274090354},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":18974.301274090354,"start":18974.301268969397},"task_id":"ID00034","terminated":-1,"whole_task":{"end":18974.321469317118,"start":18974.301268969397},"write":{"end":18974.321469317118,"start":18974.321469240356}},{"compute":{"end":24633.783746433328,"start":18974.323551283327},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":18974.323551283327,"start":18974.32245142659},"task_id":"ID00035","terminated":-1,"whole_task":{"end":24633.783746756326,"start":18974.32245142659},"write":{"end":24633.783746756326,"start":24633.783746433328}}]}
+var data={"modified":"2019-02-07T22:55:33.993Z","file":"test_data/workflow_data.json","contents":[{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_1","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task0","terminated":-1,"vertical_position":0,"whole_task":{"end":3827.6378817372047,"start":0.007199838144329895},"write":{"end":3827.6378817372047,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_1","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task1","terminated":-1,"vertical_position":1,"whole_task":{"end":3827.635010247309,"start":0.007199838144329895},"write":{"end":3827.635010247309,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_1","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task10","terminated":-1,"vertical_position":2,"whole_task":{"end":3827.639191182566,"start":0.007199838144329895},"write":{"end":3827.639191182566,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_2","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task11","terminated":-1,"vertical_position":0,"whole_task":{"end":3827.6411369314314,"start":0.007199838144329895},"write":{"end":3827.6411369314314,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_2","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task12","terminated":-1,"vertical_position":1,"whole_task":{"end":3827.641331233935,"start":0.007199838144329895},"write":{"end":3827.641331233935,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_2","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task13","terminated":-1,"vertical_position":2,"whole_task":{"end":3827.6414647120796,"start":0.007199838144329895},"write":{"end":3827.6414647120796,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_3","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task14","terminated":-1,"vertical_position":0,"whole_task":{"end":3827.641553979021,"start":0.007199838144329895},"write":{"end":3827.641553979021,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_3","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task15","terminated":-1,"vertical_position":1,"whole_task":{"end":3827.641607708093,"start":0.007199838144329895},"write":{"end":3827.641607708093,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_3","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task16","terminated":-1,"vertical_position":2,"whole_task":{"end":3827.6416322071746,"start":0.007199838144329895},"write":{"end":3827.6416322071746,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_4","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task17","terminated":-1,"vertical_position":0,"whole_task":{"end":3827.640506539679,"start":0.007199838144329895},"write":{"end":3827.640506539679,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_4","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task18","terminated":-1,"vertical_position":1,"whole_task":{"end":3827.6399793833903,"start":0.007199838144329895},"write":{"end":3827.6399793833903,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_4","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task19","terminated":-1,"vertical_position":2,"whole_task":{"end":3827.6408767314315,"start":0.007199838144329895},"write":{"end":3827.6408767314315,"start":3807.8470265752576}},{"compute":{"end":7566.212108144485,"start":3966.2118479444844},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_1","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":3966.2118479444844,"start":3827.6507028638657},"task_id":"task2","terminated":-1,"vertical_position":0,"whole_task":{"end":7579.408645646651,"start":3827.6507028638657},"write":{"end":7579.408645646651,"start":7566.212108144485}},{"compute":{"end":7912.423338350066,"start":7612.4230781500655},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_1","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":7612.4230781500655,"start":7579.417740802427},"task_id":"task20","terminated":-1,"vertical_position":0,"whole_task":{"end":7929.747237014191,"start":7579.417740802427},"write":{"end":7929.747237014191,"start":7912.423338350066}},{"compute":{"end":7566.212108144485,"start":3966.2118479444844},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_1","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":3966.2118479444844,"start":3827.6507028638657},"task_id":"task3","terminated":-1,"vertical_position":1,"whole_task":{"end":7579.408772085021,"start":3827.6507028638657},"write":{"end":7579.408772085021,"start":7566.212108144485}},{"compute":{"end":7566.212108144485,"start":3966.2118479444844},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_1","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":3966.2118479444844,"start":3827.6507028638657},"task_id":"task4","terminated":-1,"vertical_position":2,"whole_task":{"end":7579.408734069057,"start":3827.6507028638657},"write":{"end":7579.408734069057,"start":7566.212108144485}},{"compute":{"end":7566.212108144485,"start":3966.2118479444844},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_2","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":3966.2118479444844,"start":3827.6507028638657},"task_id":"task5","terminated":-1,"vertical_position":0,"whole_task":{"end":7579.405173391115,"start":3827.6507028638657},"write":{"end":7579.405173391115,"start":7566.212108144485}},{"compute":{"end":7566.212108144485,"start":3966.2118479444844},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_2","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":3966.2118479444844,"start":3827.6507028638657},"task_id":"task6","terminated":-1,"vertical_position":1,"whole_task":{"end":7579.4070007028695,"start":3827.6507028638657},"write":{"end":7579.4070007028695,"start":7566.212108144485}},{"compute":{"end":7566.212108144485,"start":3966.2118479444844},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_2","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":3966.2118479444844,"start":3827.6507028638657},"task_id":"task7","terminated":-1,"vertical_position":2,"whole_task":{"end":7579.407786370086,"start":3827.6507028638657},"write":{"end":7579.407786370086,"start":7566.212108144485}},{"compute":{"end":7566.212108144485,"start":3966.2118479444844},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_3","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":3966.2118479444844,"start":3827.6507028638657},"task_id":"task8","terminated":-1,"vertical_position":0,"whole_task":{"end":7579.408224259434,"start":3827.6507028638657},"write":{"end":7579.408224259434,"start":7566.212108144485}},{"compute":{"end":7566.212108144485,"start":3966.2118479444844},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_3","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":3966.2118479444844,"start":3827.6507028638657},"task_id":"task9","terminated":-1,"vertical_position":1,"whole_task":{"end":7579.4084844594345,"start":3827.6507028638657},"write":{"end":7579.4084844594345,"start":7566.212108144485}}]}
 
 /**
  * Helper function used to get the position of the mouse within the browser window
@@ -213,6 +213,161 @@ function generateGraph(data, containerId) {
                 d3.select(this)
                     .attr('stroke', 'none')
             })
+    })
+}
+
+function generateHostGraph(data, containerId) {
+    var read_color    = '#cbb5dd'
+    var compute_color = '#f7daad'
+    var write_color   = '#abdcf4'
+    var container = d3.select(`#${containerId}`);
+    const CONTAINER_WIDTH = container.style("width").slice(0, -2); // returns "XXXXpx" so need to remove "px"
+    const CONTAINER_HEIGHT = container.style("height").slice(0, -2);
+    console.log(container.style("width"))
+    console.log(CONTAINER_HEIGHT)
+    const PADDING = 60;
+    var toFiveDecimalPlaces = d3.format('.5f');
+    var svg = container
+        .append("svg")
+        .attr('width', CONTAINER_WIDTH)
+        .attr('height', CONTAINER_HEIGHT)
+        .attr('id', 'host-graph')
+    var xscale = d3.scaleLinear()
+        .domain([0, d3.max(data, function(d) {
+            return Math.max(d['whole_task'].end, d['failed'], d['terminated'])
+        })])
+        .range([PADDING, CONTAINER_WIDTH - PADDING])
+
+    var hostNames = new Set();
+    data.forEach(function(task) {
+        hostNames.add(task.execution_host.hostname)
+    });
+
+    hostNames = Array.from(hostNames)
+
+    hostNames.sort(function(lhs, rhs) {
+       return lhs - rhs
+    });
+
+    var yscale = d3.scaleBand()
+        .domain(hostNames)
+        .range([CONTAINER_HEIGHT - PADDING, 30])
+        .padding(0.1);
+
+    var x_axis = d3.axisBottom()
+        .scale(xscale);
+
+    var y_axis = d3.axisLeft()
+        .scale(yscale);
+
+    svg.append('g')
+        .attr('class', 'y-axis')
+        .attr('transform',
+            'translate(' + PADDING + ',0)')
+        .call(y_axis);
+
+    svg.append('g')
+        .attr('class', 'x-axis')
+        .attr('transform',
+            'translate(0,' + (CONTAINER_HEIGHT - PADDING) + ')')
+        .call(x_axis);
+    data.forEach(function(d) {
+        var group = svg.append('g')
+           .attr('id', d.execution_host.hostname + " " + d.task_id)
+        var readTime = getBoxWidth(d, "read", xscale)
+        var computeTime = getBoxWidth(d, "compute", xscale)
+        var writeTime = getBoxWidth(d, "write", xscale)
+        var ft_point = determineFailedOrTerminatedPoint(d)
+        if (ft_point != "none") {
+            var x_ft = xscale(d.terminated == -1 ? d.failed : d.terminated)
+            var height_ft = yscale(data[0].task_id)-yscale(data[1].task_id)
+            var y_ft = yscale(d.execution_host.hostname)
+            var colour_ft = d.terminated == -1 ? 'orange' : 'red'
+            var class_ft = d.terminated == -1 ? 'failed' : 'terminated'
+            group.append('rect')
+                .attr('x', x_ft)
+                .attr('y', y_ft)
+                .attr('height', height_ft)
+                .attr('width', '5px')
+                .style('fill', colour_ft)
+                .attr('class', class_ft)
+        }
+        group.append('rect')
+            .attr('x', xscale(d.read.start))
+            .attr('y', yscale(d.execution_host.hostname))
+            .attr('height', yscale(data[0].task_id)-yscale(data[1].task_id))
+            .attr('width', readTime)
+            .style('fill',read_color)
+            .attr('class','read')
+        if (ft_point != "read" || ft_point == "none") {
+            group.append('rect')
+                .attr('x', xscale(d.compute.start))
+                .attr('y', yscale(d.execution_host.hostname))
+                .attr('height', yscale(data[0].task_id)-yscale(data[1].task_id))
+                .attr('width', computeTime)
+                .style('fill',compute_color)
+                .attr('class','compute')
+        }
+        if ((ft_point != "read" && ft_point != "compute" )|| ft_point == "none") {
+            group.append('rect')
+                .attr('x', xscale(d.write.start))
+                .attr('y', yscale(d.execution_host.hostname))
+                .attr('height', yscale(data[0].task_id)-yscale(data[1].task_id))
+                .attr('width', writeTime)
+                .style('fill',write_color)
+                .attr('class','write')
+        }
+        // var tooltip = document.getElementById('tooltip-container')
+        // var tooltip_task_id                 = d3.select('#tooltip-task-id');
+        // var tooltip_task_operation          = d3.select('#tooltip-task-operation');
+        // var tooltip_task_operation_duration = d3.select('#tooltip-task-operation-duration');
+        // group.selectAll('rect')
+        //     .on('mouseover', function() {
+        //         tooltip.style.display = 'inline'
+
+        //         d3.select(this)
+        //             .attr('stroke', 'gray')
+        //             .style('stroke-width', '1');
+        //     })
+        //     .on('mousemove', function() {
+        //         var offset = getOffset(document.getElementById("graph-container"), d3.mouse(this));
+        //         var x = window.scrollX + offset.left + 20;
+        //         var y = window.scrollY + offset.top - 30; // 20 seems to account for the padding of the chart-block
+                
+        //         tooltip.style.left = x + 'px'
+        //         tooltip.style.top = y + 'px'
+
+        //         tooltip_task_id.text('TaskID: ' + d.task_id);
+
+        //         var parent_group = d3.select(this).attr('class');
+
+        //         if (parent_group == 'read') {
+        //             tooltip_task_operation.text('Read Input');
+        //         } else if (parent_group == 'compute') {
+        //             tooltip_task_operation.text('Computation');
+        //         } else if (parent_group == 'write') {
+        //             tooltip_task_operation.text('Write Output');
+        //         } else if (parent_group == "terminated") {
+        //             tooltip_task_operation.text('Terminated');
+        //         } else if (parent_group == "failed") {
+        //             tooltip_task_operation.text('Failed');
+        //         }
+
+        //         var durationFull = findDuration(data, d.task_id, parent_group)
+        //         if (parent_group != "failed" && parent_group != "terminated") {
+        //             var duration = toFiveDecimalPlaces(durationFull);
+        //             tooltip_task_operation_duration.text('Duration: ' + duration + 's');
+        //         } else {
+        //             tooltip_task_operation_duration.text('');
+        //         }
+                
+        //     })
+        //     .on('mouseout', function() {
+        //         tooltip.style.display = 'none'
+
+        //         d3.select(this)
+        //             .attr('stroke', 'none')
+        //     });
     })
 }
 

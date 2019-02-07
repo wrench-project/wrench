@@ -21,6 +21,13 @@ body {
     width: 1000px;
     margin: auto;
 }
+
+#host-graph-container {
+    width: 1000px;
+    height: 1000px;
+    margin: auto;
+}
+
 #info-container {
     text-align: center;
 }
