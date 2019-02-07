@@ -508,7 +508,7 @@ namespace wrench {
      *          consumed_energy_trace: [
      *              {
      *                  time: <double>,
-     *                  watts: <double>
+     *                  joules: <double>
      *              }, ...
      *          ]
      *      }, ...
@@ -586,7 +586,7 @@ namespace wrench {
                     if (host->get_name() == energy_consumption_timestamp->getContent()->getHostname()) {
                         datum["consumed_energy_trace"].push_back({
                                                                          {"time", energy_consumption_timestamp->getDate()},
-                                                                         {"watts", energy_consumption_timestamp->getContent()->getConsumption()}
+                                                                         {"joules", energy_consumption_timestamp->getContent()->getConsumption()}
                                                                  });
                     }
                 }

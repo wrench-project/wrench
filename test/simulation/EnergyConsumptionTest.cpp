@@ -199,7 +199,7 @@ private:
         }
 
         try {
-          double value = this->simulation->getMinPowerAvailable("dummy_unavailable_host");
+          double value = this->simulation->getMinPowerConsumption("dummy_unavailable_host");
           throw std::runtime_error(
                   "Should not have been able to read the energy for dummy hosts"
           );
@@ -208,7 +208,7 @@ private:
         }
 
         try {
-          double value = this->simulation->getMaxPowerPossible("dummy_unavailable_host");
+          double value = this->simulation->getMaxPowerConsumption("dummy_unavailable_host");
           throw std::runtime_error(
                   "Should not have been able to read the energy for dummy hosts"
           );
@@ -488,8 +488,8 @@ private:
         std::vector<std::string> simulation_hosts = test->simulation->getHostnameList();
 
         int cur_pstate = this->simulation->getCurrentPstate(simulation_hosts[1]);
-        double cur_max_possible = this->simulation->getMaxPowerPossible(simulation_hosts[1]);
-        double cur_min_possible = this->simulation->getMinPowerAvailable(simulation_hosts[1]);
+        double cur_max_possible = this->simulation->getMaxPowerConsumption(simulation_hosts[1]);
+        double cur_min_possible = this->simulation->getMinPowerConsumption(simulation_hosts[1]);
         //switch pstates right off the bat
         std::vector<int> list_of_pstates = this->simulation->getListOfPstates(simulation_hosts[1]);
         int max_num_pstate = list_of_pstates.size();
@@ -511,21 +511,21 @@ private:
           for (auto state:states) {
             //check if max power is different in all the states as is in xml
             this->simulation->setPstate(host,state);
-            if (prev_max_power == this->simulation->getMaxPowerPossible(host)) {
+            if (prev_max_power == this->simulation->getMaxPowerConsumption(host)) {
               throw std::runtime_error(
                       "The max power from the xml and the APIs do not match"
               );
             }
-            prev_max_power = this->simulation->getMaxPowerPossible(host);
+            prev_max_power = this->simulation->getMaxPowerConsumption(host);
 
             //check if the min power is different in all the states as is in xml
             this->simulation->setPstate(host,state);
-            if (prev_min_power == this->simulation->getMinPowerAvailable(host)) {
+            if (prev_min_power == this->simulation->getMinPowerConsumption(host)) {
               throw std::runtime_error(
                       "The min power from the xml and the APIs do not match"
               );
             }
-            prev_min_power = this->simulation->getMinPowerAvailable(host);
+            prev_min_power = this->simulation->getMinPowerConsumption(host);
           }
         }
         //lets check if the energy consumed by host1 is less than the energy consumed by host1 + host2
@@ -751,7 +751,7 @@ private:
 
         double after_current_energy_consumed_by_host2 = this->simulation->getEnergyConsumed(simulation_hosts[1]);
         double energy_consumed_while_running_with_lower_speed = after_current_energy_consumed_by_host2 - before_current_energy_consumed_by_host2;
-        double lower_speed_compuation_time = wrench::S4U_Simulation::getClock() - higher_speed_compuation_time;
+        double lower_speed_computation_time = wrench::S4U_Simulation::getClock() - higher_speed_compuation_time;
 
         if (energy_consumed_while_running_with_lower_speed <= 0) {
           throw std::runtime_error("Unexpectedly the energy consumed is less than 0 for a lower speed ??");
@@ -762,13 +762,13 @@ private:
         //in pstate 0, the min_power, according to xml is 100.0 and the max power is 200.0
         //in pstate 2, the min_power, according to xml is 90.0 and the max power is 150.0
         //so, energy_consumed/time_taken might give us an approximate wattage power which should be in between these ranges
-        //infact, we are using these hosts to the full power, so the power wattage should be near to max values
+        //in fact, we are using these hosts to the full power, so the power wattage should be near the max values
 
-        double exact_max_wattage_power_1 = this->simulation->getMaxPowerPossible(simulation_hosts[1]);
-        double exact_max_wattage_power_2 = this->simulation->getMaxPowerPossible(simulation_hosts[1]);
+        double exact_max_wattage_power_1 = this->simulation->getMaxPowerConsumption(simulation_hosts[1]);
+        double exact_max_wattage_power_2 = this->simulation->getMaxPowerConsumption(simulation_hosts[1]);
         double EPSILON = 1.0;
         double computed_wattage_power_1 = energy_consumed_while_running_with_higher_speed/higher_speed_compuation_time;
-        double computed_wattage_power_2 = energy_consumed_while_running_with_lower_speed/lower_speed_compuation_time;
+        double computed_wattage_power_2 = energy_consumed_while_running_with_lower_speed/lower_speed_computation_time;
 
         if (abs(exact_max_wattage_power_1-computed_wattage_power_1) > EPSILON && abs(exact_max_wattage_power_2-computed_wattage_power_2) > EPSILON) {
           throw std::runtime_error(

@@ -362,12 +362,12 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the minimum power available for a host
+     * @brief Get the minimum power consumption (i.e., idling) for a host at its current pstate
      * @param hostname: the host name
-     * @return The minimum power available for the host (as specified in the platform xml description file)
+     * @return The power consumption for this host if idle (as specified in the platform xml description file)
      * @throw std::runtime_error
      */
-    double S4U_Simulation::getMinPowerAvailable(const std::string &hostname) {
+    double S4U_Simulation::getMinPowerConsumption(const std::string &hostname) {
       try {
         return sg_host_get_wattmin_at(simgrid::s4u::Host::by_name(hostname),
                                       (simgrid::s4u::Host::by_name(hostname))->get_pstate());
@@ -380,12 +380,12 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the maximum power available for a host
+     * @brief Get the maximum power consumption (i.e., 100% load) for a host at its current pstate
      * @param hostname: the host name
-     * @return The maximum power available for the host (as specified in the platform xml description file)
+     * @return The power consumption for this host if 100% used (as specified in the platform xml description file)
      * @throw std::runtime_error
      */
-    double S4U_Simulation::getMaxPowerPossible(const std::string &hostname) {
+    double S4U_Simulation::getMaxPowerConsumption(const std::string &hostname) {
       try {
         return sg_host_get_wattmax_at(simgrid::s4u::Host::by_name(hostname),
                                       (simgrid::s4u::Host::by_name(hostname))->get_pstate());

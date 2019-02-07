@@ -1171,19 +1171,19 @@ void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
                 "consumed_energy_trace": [
                     {
                         "time": 0.0,
-                        "watts": 0.0
+                        "joules": 0.0
                     },
                     {
                         "time": 2.0,
-                        "watts": 400.0
+                        "joules": 400.0
                     },
                     {
                         "time": 4.0,
-                        "watts": 800.0
+                        "joules": 800.0
                     },
                     {
                         "time": 6.0,
-                        "watts": 1200.0
+                        "joules": 1200.0
                     }
                 ],
                 "hostname": "host1",
@@ -1223,19 +1223,19 @@ void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
                 "consumed_energy_trace": [
                     {
                         "time": 0.0,
-                        "watts": 0.0
+                        "joules": 0.0
                     },
                     {
                         "time": 2.0,
-                        "watts": 200.0
+                        "joules": 200.0
                     },
                     {
                         "time": 4.0,
-                        "watts": 400.0
+                        "joules": 400.0
                     },
                     {
                         "time": 6.0,
-                        "watts": 600.0
+                        "joules": 600.0
                     }
                 ],
                 "hostname": "host2",
