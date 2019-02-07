@@ -674,24 +674,6 @@ namespace wrench {
         return this->output;
     }
 
-//    /**
-//     * @brief Get the energy consumed by the host up to now
-//     * @param hostname the host name
-//     * @return the energy consumed by the host in Joules
-//     */
-//    double Simulation::getEnergyConsumedByHost(const std::string &hostname) {
-//        return S4U_Simulation::getEnergyConsumedByHost(hostname);
-//    }
-//
-//    /**
-//     * @brief Get the total energy consumed by a set of hosts
-//     * @param the list of hostnames
-//     * @return The total energy consumed by all the hosts in Joules
-//     */
-//    double Simulation::getTotalEnergyConsumed(const std::vector<std::string> &hostnames) {
-//        return S4U_Simulation::getTotalEnergyConsumed(hostnames);
-//    }
-
     /**
      * @brief Obtains the current energy consumption of a host and will add SimulationTimestampEnergyConsumption to
      *          simulation output if can_record is set to true
@@ -719,7 +701,7 @@ namespace wrench {
     * @brief Obtains the current energy consumption of a host and will add SimulationTimestampEnergyConsumption to
     *          simulation output if can_record is set to true
     * @param hostnames: the list of hostnames
-    * @param record_as_time_stamps: bool signaling whether or not to record a SimulationTimestampEnergyConsumption object for each host
+    * @param record_as_time_stamps: whether or not to record a SimulationTimestampEnergyConsumption object for each host when this method is called
     * @return current energy consumption in joules for each host, as a map indexed by hostnames
     * @throws std::invalid_argument
     */
@@ -738,7 +720,7 @@ namespace wrench {
     /**
      * @brief Set the power state of the host
      * @param hostname: the host name
-     * @param pstate: the power state index (the power state index is specified in the platform xml description file)
+     * @param pstate: the power state index (as specified in the platform xml description file)
      */
     void Simulation::setPstate(const std::string &hostname, int pstate) {
         S4U_Simulation::setPstate(hostname, pstate);
@@ -763,26 +745,6 @@ namespace wrench {
         return S4U_Simulation::getCurrentPstate(hostname);
     }
 
-
-
-    /**
-     * @brief Get the minimum power available for a host
-     * @param hostname: the host name
-     * @return The minimum power available for the host (as specified in the platform xml description file)
-     */
-    double Simulation::getMinPowerAvailable(const std::string &hostname) {
-        return S4U_Simulation::getMinPowerAvailable(hostname);
-    }
-
-    /**
-     * @brief Get the maximum power available for a host
-     * @param hostname: the host name
-     * @return The maximum power available for the host (as specified in the platform xml description file)
-     */
-    double Simulation::getMaxPowerPossible(const std::string &hostname) {
-        return S4U_Simulation::getMaxPowerPossible(hostname);
-    }
-
     /**
      * @brief Get the list of power states available for a host
      * @param hostname: the host name
@@ -791,6 +753,26 @@ namespace wrench {
     std::vector<int> Simulation::getListOfPstates(const std::string &hostname) {
         return S4U_Simulation::getListOfPstates(hostname);
     }
+
+
+    /**
+     * @brief Get the minimum power consumption for the host (i.e., idling) at its current pstate
+     * @param hostname: the host name
+     * @return The "idling" power consumption (as specified in the platform xml description file)
+     */
+    double Simulation::getMinPowerConsumption(const std::string &hostname) {
+        return S4U_Simulation::getMinPowerConsumption(hostname);
+    }
+
+    /**
+     * @brief Get the maximum power consumption for the host (i.e., 100% utilization) at its current pstate
+     * @param hostname: the host name
+     * @return The "100% used" power consumption (as specified in the platform xml description file)
+     */
+    double Simulation::getMaxPowerConsumption(const std::string &hostname) {
+        return S4U_Simulation::getMaxPowerConsumption(hostname);
+    }
+
 
     /**
      * @brief Starts a new compute service during WMS execution (i.e., one that was not passed to Simulation::add() before
