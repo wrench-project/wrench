@@ -2202,7 +2202,10 @@ namespace wrench {
      */
     void BatchService::startBatsched() {
 
-      this->batsched_port = 28000 + S4U_Mailbox::generateUniqueSequenceNumber();
+        // The "mod by 1500" below is totally ad-hoc, but not modding seemed
+        // to lead to weird zmq "address already in use" errors...
+      this->batsched_port = 28000 + (getpid() % 1500) +
+                            S4U_Mailbox::generateUniqueSequenceNumber();
       this->pid = getpid();
 
 
