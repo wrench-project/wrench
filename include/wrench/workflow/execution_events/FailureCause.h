@@ -73,7 +73,9 @@ namespace wrench {
             /** @brief A functionality is not available */
                     FUNCTIONALITY_NOT_AVAILABLE,
             /** @brief A job was terminated due to a timeout */
-                    JOB_TIMEOUT
+                    JOB_TIMEOUT,
+            /** @brief The host went down (while computing, while sleeping) **/
+                    HOST_ERROR
 
         };
 
@@ -382,6 +384,25 @@ namespace wrench {
         NetworkError::ErrorType error_type;
         bool while_sending = false;
         std::string mailbox = "";
+    };
+
+    /**
+ * @brief A "host error" failure cause
+ */
+    class HostError : public FailureCause {
+    public:
+
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        HostError();
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
+        std::string toString();
+
+    private:
     };
 
 
