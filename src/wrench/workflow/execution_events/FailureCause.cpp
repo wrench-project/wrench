@@ -7,6 +7,8 @@
  * (at your option) any later version.
  */
 
+#include <wrench/workflow/execution_events/FailureCause.h>
+
 #include "wrench/workflow/execution_events/FailureCause.h"
 #include "wrench/workflow/WorkflowFile.h"
 #include "wrench/workflow/job/WorkflowJob.h"
@@ -630,4 +632,16 @@ namespace wrench {
       return "Job has timed out - likely not enough time was requested from a (batch-scheduled?) compute service";
     };
 
+    /**
+     * @brief Constructor
+     */
+    HostError::HostError() : FailureCause(HOST_ERROR) {
+    }
+
+    /** @brief Get the human-readable failure message
+     * @return the message
+     */
+     std::string HostError::toString() {
+         return "The host has failed";
+     }
 };
