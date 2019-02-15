@@ -276,7 +276,7 @@ set(TEST_FILES
         test/simulation/ScratchSpaceTest.cpp test/simulation/EnergyConsumptionTest.cpp
         test/simulation/simulation_output/SimulationDumpJSONTest.cpp
         test/simulation/HTCondorServiceTest.cpp
-        src/wrench/managers/EnergyMeter.cpp include/wrench/managers/EnergyMeter.h)
+        src/wrench/managers/EnergyMeter.cpp include/wrench/managers/EnergyMeter.h test/simulated_failures/ExceptionsDueToSimulatedFailures.cpp)
 
 # wrench library
 find_library(SIMGRID_LIBRARY NAMES simgrid)
