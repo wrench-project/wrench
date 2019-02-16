@@ -20,6 +20,8 @@ More information and Documentation: [WRENCH Project Website](http://wrench-proje
 
 ## Prerequisites
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/212b95f0b0954fb8b49ab3b90ed0df60)](https://app.codacy.com/app/WRENCH/wrench?utm_source=github.com&utm_medium=referral&utm_content=wrench-project/wrench&utm_campaign=Badge_Grade_Dashboard)
+
 WRENCH is fully developed in C++. The code follows the C++11 standard, and thus older 
 compilers tend to fail the compilation process. Therefore, we strongly recommend
 users to satisfy the following requirements:
