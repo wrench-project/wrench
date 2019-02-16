@@ -73,6 +73,7 @@ The main channel to reach the WRENCH team is via the support email:
 WRENCH's [Github Issues Track](https://github.com/wrench-project/wrench/issues).
 
 
+
 [travis-badge]:             https://travis-ci.org/wrench-project/wrench.svg?branch=master
 [travis-link]:              https://travis-ci.org/wrench-project/wrench
 [license-badge]:            https://img.shields.io/badge/License-LGPL%20v3-blue.svg
@@ -80,7 +81,7 @@ WRENCH's [Github Issues Track](https://github.com/wrench-project/wrench/issues).
 [coveralls-link]:           https://coveralls.io/github/wrench-project/wrench?branch=master
 [release-badge]:            https://img.shields.io/github/release/wrench-project/wrench/all.svg
 [release-link]:             https://github.com/wrench-project/wrench/releases
-[codacy-badge]:             https://api.codacy.com/project/badge/Grade/aef324ea84474fff979a8ff19a4e4681
+[codacy-badge]:             https://api.codacy.com/project/badge/Grade/212b95f0b0954fb8b49ab3b90ed0df60
 [codacy-link]:              https://www.codacy.com/app/WRENCH/wrench?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=wrench-project/wrench&amp;utm_campaign=Badge_Grade
 [sonarcloud-badge]:         https://sonarcloud.io/api/project_badges/measure?project=wrench&metric=ncloc
 [sonarcloud-link]:          https://sonarcloud.io/dashboard?id=wrench
