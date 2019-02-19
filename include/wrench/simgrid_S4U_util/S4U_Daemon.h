@@ -67,7 +67,7 @@ namespace wrench {
 
         void setTerminated();
 
-        void join();
+        bool join();
 
         void suspend();
 
@@ -92,8 +92,8 @@ namespace wrench {
         // Lock use typically to prevent kill() from killing the actor
         // while it's in the middle of doing something critical
         simgrid::s4u::MutexPtr daemon_lock;
-        bool terminated;
         simgrid::s4u::ActorPtr s4u_actor;
+        bool terminated; // Set to true after main returns
 
 #ifdef ACTOR_TRACKING_OUTPUT
         std::string process_name_prefix;
