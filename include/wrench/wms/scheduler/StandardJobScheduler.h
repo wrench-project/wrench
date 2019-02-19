@@ -97,7 +97,6 @@ namespace wrench {
         /** \endcond           */
         /***********************/
 
-
     private:
         DataMovementManager *data_movement_manager;
         JobManager *job_manager;

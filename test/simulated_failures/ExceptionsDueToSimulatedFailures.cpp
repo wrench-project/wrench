@@ -9,9 +9,16 @@
 
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
+#include <wrench/services/helpers/ServiceFailureDetectorMessage.h>
 
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
+#include "HostKiller.h"
+#include "wrench/services/helpers/ServiceFailureDetector.h"
+#include "Victim.h"
+
+XBT_LOG_NEW_DEFAULT_CATEGORY(simulated_failures_test, "Log category for SimulatedFailuresTests");
+
 
 class ExceptionsDueToSimulatedFailuresTest : public ::testing::Test {
 
@@ -32,7 +39,7 @@ public:
     wrench::StorageService *storage_service = nullptr;
     std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
 
-    void do_HostFailureDuringSleep_test();
+    void do_FailureDetectorTest_test();
 
 protected:
 
@@ -40,6 +47,18 @@ protected:
         // Create the simplest workflow
         workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
         workflow = workflow_unique_ptr.get();
+
+//        // up from 0 to 100, down from 100 to 200, up from 200 to 300, etc.
+//        std::string trace_file_content = "PERIODICITY 100\n"
+//                                         " 0 1\n"
+//                                         " 100 0";
+//
+//        std::string trace_file_name = "host.trace";
+//        std::string trace_file_path = "/tmp/"+trace_file_name;
+//
+//        FILE *trace_file = fopen(trace_file_path.c_str(), "w");
+//        fprintf(trace_file, "%s", trace_file_content.c_str());
+//        fclose(trace_file);
 
         // Create the files
 //        input_file = workflow->addFile("input_file", 10.0);
@@ -83,10 +102,12 @@ protected:
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
-                          "       <host id=\"DualCoreHost\" speed=\"1f\" core=\"2\"/> "
-                          "       <host id=\"QuadCoreHost\" speed=\"1f\" core=\"4\"/> "
-                          "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
-                          "       <route src=\"DualCoreHost\" dst=\"QuadCoreHost\"> <link_ctn id=\"1\"/> </route>"
+                          "       <host id=\"FailedHost\" speed=\"1f\" core=\"1\"/> "
+                          "       <host id=\"StableHost\" speed=\"1f\" core=\"1\"/> "
+                          "       <link id=\"link1\" bandwidth=\"100kBps\" latency=\"0\"/>"
+                          "       <route src=\"FailedHost\" dst=\"StableHost\">"
+                          "           <link_ctn id=\"link1\"/>"
+                          "       </route>"
                           "   </zone> "
                           "</platform>";
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
@@ -116,21 +137,84 @@ private:
 
     int main() {
 
-        wrench::Simulation::sleep(10);
+        /** TEST THAT SHOULD DETECT A FAILURE **/
+
+        // Starting a victim (that will reply with a bogus TTL Expiration message)
+        auto victim = std::shared_ptr<wrench::Victim>(new wrench::Victim("FailedHost", 100, new wrench::ServiceTTLExpiredMessage(1), this->mailbox_name));
+        victim->simulation = this->simulation;
+        victim->start(victim, true);
+
+        // Starting its nemesis!
+        auto murderer = std::shared_ptr<wrench::HostKiller>(new wrench::HostKiller("StableHost", 50, "FailedHost"));
+        murderer->simulation = this->simulation;
+        murderer->start(murderer, true);
+
+        // Starting the failure detector!
+        auto failure_detector = std::shared_ptr<wrench::ServiceFailureDetector>(new wrench::ServiceFailureDetector("StableHost", victim.get(), this->mailbox_name));
+        failure_detector->simulation = this->simulation;
+        failure_detector->start(failure_detector, true);
+
+        // Waiting for a message
+        std::unique_ptr<wrench::SimulationMessage> message;
+        try {
+            message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
+        } catch (std::shared_ptr<wrench::NetworkError> &cause) {
+            throw std::runtime_error("Network error while getting a message!" + cause->toString());
+        }
+
+        if (dynamic_cast<wrench::ServiceTTLExpiredMessage *>(message.get())) {
+            throw std::runtime_error("Failure should have been detected!");
+        } else if (dynamic_cast<wrench::ServiceHasFailedMessage *>(message.get())) {
+            // All good
+        } else {
+            throw std::runtime_error("Unexpected " + message->getName() + " message");
+        }
+
+        // Wait for the host killer to finish, and turn the host back on
+        murderer->join();
+        simgrid::s4u::Host::by_name("FailedHost")->turn_on();
+
+        /** TEST THAT SHOULD NOT DETECT A FAILURE **/
+
+        // Starting a victim (that will reply with a bogus TTL Expiration message)
+        victim = std::shared_ptr<wrench::Victim>(new wrench::Victim("FailedHost", 100, new wrench::ServiceTTLExpiredMessage(1), this->mailbox_name));
+        victim->simulation = this->simulation;
+        victim->start(victim, true);
+
+        // Starting its nemesis!
+        murderer = std::shared_ptr<wrench::HostKiller>(new wrench::HostKiller("StableHost", 110, "FailedHost"));
+        murderer->simulation = this->simulation;
+        murderer->start(murderer, true);
+
+        // Starting the failure detector!
+        failure_detector = std::shared_ptr<wrench::ServiceFailureDetector>(new wrench::ServiceFailureDetector("StableHost", victim.get(), this->mailbox_name));
+        failure_detector->simulation = this->simulation;
+        failure_detector->start(failure_detector, true);
+
+        // Waiting for a message
+        try {
+            message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
+        } catch (std::shared_ptr<wrench::NetworkError> &cause) {
+            throw std::runtime_error("Network error while getting a message!" + cause->toString());
+        }
+
+        if (dynamic_cast<wrench::ServiceTTLExpiredMessage *>(message.get())) {
+            // All good
+        } else if (dynamic_cast<wrench::ServiceHasFailedMessage *>(message.get())) {
+            throw std::runtime_error("Failure should not have been detected!");
+        } else {
+            throw std::runtime_error("Unexpected " + message->getName() + " message");
+        }
 
         return 0;
     }
 };
 
-#if ((SIMGRID_VERSION_MAJOR == 3) && (SIMGRID_VERSION_MINOR == 21) && (SIMGRID_VERSION_PATCH > 0))
-TEST_F(ExceptionsDueToSimulatedFailuresTest, HostFailureDuringSleep) {
-#else
-TEST_F(ExceptionsDueToSimulatedFailuresTest, DISABLED_HostFailureDuringSleep) {
-#endif
-    DO_TEST_WITH_FORK(do_HostFailureDuringSleep_test);
+TEST_F(ExceptionsDueToSimulatedFailuresTest, FailureDetectorTest) {
+    DO_TEST_WITH_FORK(do_FailureDetectorTest_test);
 }
 
-void ExceptionsDueToSimulatedFailuresTest::do_HostFailureDuringSleep_test() {
+void ExceptionsDueToSimulatedFailuresTest::do_FailureDetectorTest_test() {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
@@ -145,8 +229,7 @@ void ExceptionsDueToSimulatedFailuresTest::do_HostFailureDuringSleep_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = "DualCoreHost";
-
+    std::string hostname = "StableHost";
 
     // Create a WMS
     wrench::WMS *wms = nullptr;

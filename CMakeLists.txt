@@ -111,6 +111,8 @@ set(HEADER_FILES
         include/wrench/services/compute/batch/BatchServiceMessagePayload.h
         include/wrench/services/compute/batch/BatschedNetworkListener.h
         include/wrench/services/helpers/Alarm.h
+        include/wrench/services/helpers/ServiceFailureDetector.h
+        include/wrench/services/helpers/ServiceFailureDetectorMessage.h
         include/wrench/util/PointerUtil.h
         include/wrench/util/MessageManager.h
         include/wrench/util/TraceFileLoader.h
@@ -214,6 +216,8 @@ set(SOURCE_FILES
         src/wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessagePayload.cpp
         src/wrench/services/compute/htcondor/HTCondorNegotiatorService.cpp
         src/wrench/services/helpers/Alarm.cpp
+        src/wrench/services/helpers/ServiceFailureDetector.cpp
+        src/wrench/services/helpers/ServiceFailureDetectorMessage.cpp
         src/wrench/util/PointerUtil.cpp
         src/wrench/util/MessageManager.cpp
         src/wrench/services/compute/batch/TraceFileLoader.cpp
@@ -276,7 +280,12 @@ set(TEST_FILES
         test/simulation/ScratchSpaceTest.cpp test/simulation/EnergyConsumptionTest.cpp
         test/simulation/simulation_output/SimulationDumpJSONTest.cpp
         test/simulation/HTCondorServiceTest.cpp
-        src/wrench/managers/EnergyMeter.cpp include/wrench/managers/EnergyMeter.h test/simulated_failures/ExceptionsDueToSimulatedFailures.cpp)
+        src/wrench/managers/EnergyMeter.cpp include/wrench/managers/EnergyMeter.h
+        test/simulated_failures/ExceptionsDueToSimulatedFailures.cpp
+        test/simulated_failures/HostKiller.cpp test/simulated_failures/HostKiller.h
+        test/simulated_failures/Victim.cpp
+        test/simulated_failures/Victim.h
+        )
 
 # wrench library
 find_library(SIMGRID_LIBRARY NAMES simgrid)

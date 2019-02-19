@@ -116,9 +116,9 @@ namespace wrench {
         FileRegistryService * file_registry_service;
 
         /** @brief The standard job scheduler */
-        std::unique_ptr<StandardJobScheduler> standard_job_scheduler = nullptr;
+        std::unique_ptr<StandardJobScheduler> standard_job_scheduler;
         /** @brief The standard job scheduler */
-        std::unique_ptr<PilotJobScheduler> pilot_job_scheduler = nullptr;
+        std::unique_ptr<PilotJobScheduler> pilot_job_scheduler;
 
         /** @brief The enabled dynamic optimizations */
         std::vector<std::unique_ptr<DynamicOptimization>> dynamic_optimizations;
