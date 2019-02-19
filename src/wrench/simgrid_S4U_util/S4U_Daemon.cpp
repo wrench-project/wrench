@@ -230,9 +230,14 @@ namespace wrench {
 
     /**
      * @brief Join (i.e., wait for) the daemon.
+     *
+     * @return true if the daemon terminated cleanly (i.e., main() returned), or false otherwise
      */
-    void S4U_Daemon::join() {
-      if ((this->s4u_actor != nullptr) && (not this->terminated)) {
+    bool S4U_Daemon::join() {
+        if (this->terminated) {
+            return true;
+        }
+      if (this->s4u_actor != nullptr) {
         try {
           this->s4u_actor->join();
         } catch (xbt_ex &e) {
@@ -241,6 +246,7 @@ namespace wrench {
           throw std::shared_ptr<FatalFailure>(new FatalFailure());
         }
       }
+      return this->terminated;
     }
 
     /**

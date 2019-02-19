@@ -52,6 +52,7 @@ namespace wrench {
           try {
             S4U_Simulation::computeZeroFlop();
             this->daemon->main();
+            this->daemon->setTerminated();
             wrench::S4U_Simulation::sleep(0.001);
           } catch (std::exception &e) {
             throw;
@@ -60,7 +61,6 @@ namespace wrench {
           simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::by_name(this->daemon->mailbox_name);
           mailbox->set_receiver(nullptr);
 
-          this->daemon->setTerminated();
         }
 
     private:
