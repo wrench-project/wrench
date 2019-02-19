@@ -79,7 +79,7 @@ namespace wrench {
 
         };
 
-        FailureCause(CauseType cause);
+        explicit FailureCause(CauseType cause);
 
 
         /**
@@ -243,13 +243,13 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        ServiceIsDown(Service *service);
+        explicit ServiceIsDown(Service *service);
         /***********************/
         /** \endcond           */
         /***********************/
 
         Service *getService();
-        std::string toString();
+        std::string toString() override;
 
     private:
         Service *service;
