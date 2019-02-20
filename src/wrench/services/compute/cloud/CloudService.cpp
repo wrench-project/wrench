@@ -359,7 +359,7 @@ namespace wrench {
         // no specific action
       }
 
-      WRENCH_INFO("Cloud Service on host %s terminated!", S4U_Simulation::getHostName().c_str());
+      WRENCH_INFO("Cloud Service on host %s terminating cleanly!", S4U_Simulation::getHostName().c_str());
       return 0;
     }
 
@@ -561,7 +561,7 @@ namespace wrench {
 
           // starting the service
           try {
-            cs->start(cs, true); // Daemonize!
+            cs->start(cs, true, false); // Daemonized, no auto-restart
           } catch (std::runtime_error &e) {
             throw;
           }
@@ -674,7 +674,7 @@ namespace wrench {
                                               messagepayload_list,
                                               getScratch()));
           cs->simulation = this->simulation;
-          cs->start(cs, true); // Daemonize!
+          cs->start(cs, true, false); // Daemonized, no auto-restart
           std::get<1>(vm_tuple->second) = cs;
 
         } catch (std::runtime_error &e) {

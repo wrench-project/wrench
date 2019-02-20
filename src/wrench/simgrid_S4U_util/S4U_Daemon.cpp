@@ -75,7 +75,7 @@ namespace wrench {
         unsigned long seq = S4U_Mailbox::generateUniqueSequenceNumber();
         this->mailbox_name = mailbox_prefix + "_" + std::to_string(seq);
         this->process_name = process_name_prefix + "_" + std::to_string(seq);
-        this->terminated = false;
+        this->cleanly_terminated = false;
     }
 
 //     NOT NEEDED?
@@ -93,14 +93,14 @@ namespace wrench {
 //      this->hostname = hostname;
 //      this->process_name = process_name_prefix + "_" + std::to_string(S4U_Mailbox::generateUniqueSequenceNumber());
 //      this->mailbox_name = "";
-//      this->terminated = false;
+//      this->cleanly_terminated = false;
 //    }
 
     S4U_Daemon::~S4U_Daemon() {
 #ifdef ACTOR_TRACKING_OUTPUT
         num_actors[this->process_name_prefix]--;
 #endif
-      std::cerr << "### DESTRUCTOR OF DAEMON " << this->getName() << "\n";
+//        std::cerr << "### DESTRUCTOR OF DAEMON " << this->getName() << "\n";
     }
 
     /**
@@ -114,22 +114,21 @@ namespace wrench {
      * \cond
      */
     static int daemon_goodbye(int x, void *service_instance) {
-        WRENCH_INFO("IN DAEMON GOODBYE: TERMINATED = %d", reinterpret_cast<S4U_Daemon *>(service_instance)->isTerminated());
         WRENCH_INFO("Terminating");
-	if (service_instance == nullptr) {
-		return 0;
-	}
+        if (service_instance == nullptr) {
+            return 0;
+        }
         auto service = reinterpret_cast<S4U_Daemon *>(service_instance);
-	if (service->isTerminated()) {
-	    // Clean termination
+        if (service->hasCleanlyTerminated() or (not service->isSetToAutoRestart())) {
+            // Clean termination
             service->cleanup();
             delete service->life_saver;
-	} else {
-	    // Unclean termination
-	    // Do nothing...the service will restart with its state!
-	    // It's the job of the service to check left-over state in case
+        } else {
+            // Unclean termination
+            // Do nothing...the service will restart with its state!
+            // It's the job of the service to check left-over state in case
             // Of a restart
-	}
+        }
         return 0;
     }
 
@@ -141,8 +140,9 @@ namespace wrench {
      * @brief Start the daemon
      *
      * @param daemonized: whether the S4U actor should be daemonized
+     * @param auto_restart: whether the S4U actor should automatically restart after a host reboot
      */
-    void S4U_Daemon::startDaemon(bool daemonized) {
+    void S4U_Daemon::startDaemon(bool daemonized, bool auto_restart) {
 
         // Check that there is a lifesaver
         if (not this->life_saver) {
@@ -171,35 +171,40 @@ namespace wrench {
         // right away, in which case calling daemonize() on it cases the calling actor to
         // terminate immediately. This is a weird simgrid::s4u behavior/bug, that may be
         // fixed at some point, but this test saves us for now.
-        if (not this->terminated) {
+        if (not this->cleanly_terminated) {
             if (daemonized) {
                 this->s4u_actor->daemonize();
             }
-            // TODO: TODO TODO
-            if (true) {
-                if (this->getName() == "victim_2") {
-                    std::cerr << "SETTING AUTO RESTART: " << this->getName() << "\n";
-                    this->s4u_actor->set_auto_restart(true);
-                }
+            this->auto_restart = auto_restart;
+            if (this->auto_restart) {
+                this->s4u_actor->set_auto_restart(true);
             }
             this->s4u_actor->on_exit(daemon_goodbye, (void *) (this));
-
-            // Set the mailbox_name receiver (causes memory leak)
-            simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::by_name(this->mailbox_name);
-            mailbox->set_receiver(this->s4u_actor);
         }
+
+        // Set the mailbox_name receiver (causes memory leak)
+        simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::by_name(this->mailbox_name);
+        mailbox->set_receiver(this->s4u_actor);
     }
 
-    /**
-     * @brief Method that run's the user-defined main method (that's called by the S4U actor class)
-     */
+
+/**
+ * @brief Return the auto-restart status of the daemon
+ * @return true or false
+ */
+    bool S4U_Daemon::isSetToAutoRestart() {
+        return this->auto_restart;
+    }
+
+/**
+ * @brief Method that run's the user-defined main method (that's called by the S4U actor class)
+ */
     void S4U_Daemon::runMainMethod() {
         try {
             S4U_Simulation::computeZeroFlop();
             this->num_starts++;
-	    WRENCH_INFO("CALLING MAIN FOR %s", this->getName().c_str());
             this->main();
-            this->setTerminated();
+            this->setCleanlyTerminated();
             wrench::S4U_Simulation::sleep(0.001);
         } catch (std::exception &e) {
             throw;
@@ -207,15 +212,14 @@ namespace wrench {
         // Avoid a memory leak on the actor!
         simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::by_name(this->mailbox_name);
         mailbox->set_receiver(nullptr);
-        WRENCH_INFO("RETURNING FROM RUN MAIN METHOD");
     }
 
 
-    /**
-     * @brief Kill the daemon/actor.
-     */
+/**
+ * @brief Kill the daemon/actor.
+ */
     void S4U_Daemon::killActor() {
-        if ((this->s4u_actor != nullptr) && (not this->terminated)) {
+        if ((this->s4u_actor != nullptr) && (not this->cleanly_terminated)) {
             try {
                 // Sleeping a tiny bit to avoid the following behavior:
                 // Actor A creates Actor B.
@@ -232,15 +236,15 @@ namespace wrench {
             } catch (std::exception &e) {
                 throw std::shared_ptr<FatalFailure>(new FatalFailure());
             }
-            this->terminated = true;
+            this->cleanly_terminated = true;
         }
     }
 
-    /**
-    * @brief Suspend the daemon/actor.
-    */
+/**
+* @brief Suspend the daemon/actor.
+*/
     void S4U_Daemon::suspend() {
-        if ((this->s4u_actor != nullptr) && (not this->terminated)) {
+        if ((this->s4u_actor != nullptr) && (not this->cleanly_terminated)) {
             try {
                 this->s4u_actor->suspend();
             } catch (xbt_ex &e) {
@@ -251,11 +255,11 @@ namespace wrench {
         }
     }
 
-    /**
-    * @brief Resume the daemon/actor.
-    */
+/**
+* @brief Resume the daemon/actor.
+*/
     void S4U_Daemon::resume() {
-        if ((this->s4u_actor != nullptr) && (not this->terminated)) {
+        if ((this->s4u_actor != nullptr) && (not this->cleanly_terminated)) {
             try {
                 this->s4u_actor->resume();
             } catch (xbt_ex &e) {
@@ -266,13 +270,13 @@ namespace wrench {
         }
     }
 
-    /**
-     * @brief Join (i.e., wait for) the daemon.
-     *
-     * @return true if the daemon terminated cleanly (i.e., main() returned), or false otherwise
-     */
+/**
+ * @brief Join (i.e., wait for) the daemon.
+ *
+ * @return true if the daemon terminated cleanly (i.e., main() returned), or false otherwise
+ */
     bool S4U_Daemon::join() {
-        if (this->terminated) {
+        if (this->cleanly_terminated) {
             return true;
         }
         if (this->s4u_actor != nullptr) {
@@ -284,36 +288,36 @@ namespace wrench {
                 throw std::shared_ptr<FatalFailure>(new FatalFailure());
             }
         }
-        return this->terminated;
+        return this->cleanly_terminated;
     }
 
-    /**
-     * @brief Returned the terminated status of the daemon/actor
-     */
-    bool S4U_Daemon::isTerminated() {
-        return this->terminated;
+/**
+ * @brief Returned the terminated status of the daemon/actor
+ */
+    bool S4U_Daemon::hasCleanlyTerminated() {
+        return this->cleanly_terminated;
     }
 
-    /**
-     * @brief Set the terminated status of the daemon/actor
-     */
-    void S4U_Daemon::setTerminated() {
-        this->terminated = true;
+/**
+ * @brief Set the terminated status of the daemon/actor
+ */
+    void S4U_Daemon::setCleanlyTerminated() {
+        this->cleanly_terminated = true;
     }
 
-    /**
-     * @brief Retrieve the process name
-     *
-     * @return the name
-     */
+/**
+ * @brief Retrieve the process name
+ *
+ * @return the name
+ */
     std::string S4U_Daemon::getName() {
         return this->process_name;
     }
 
-    /**
-     * @brief Create a life saver for the daemon
-     * @param reference
-     */
+/**
+ * @brief Create a life saver for the daemon
+ * @param reference
+ */
     void S4U_Daemon::createLifeSaver(std::shared_ptr<S4U_Daemon> reference) {
         if (this->life_saver) {
             throw std::runtime_error("S4U_Daemon::createLifeSaver(): Lifesaver already created!");
@@ -321,16 +325,16 @@ namespace wrench {
         this->life_saver = new S4U_Daemon::LifeSaver(reference);
     }
 
-    /**
-     * @brief Lock the daemon's lock
-     */
+/**
+ * @brief Lock the daemon's lock
+ */
     void S4U_Daemon::acquireDaemonLock() {
         this->daemon_lock->lock();
     }
 
-    /**
-     * @brief Unlock the daemon's lock
-     */
+/**
+ * @brief Unlock the daemon's lock
+ */
     void S4U_Daemon::releaseDaemonLock() {
         this->daemon_lock->unlock();
     }

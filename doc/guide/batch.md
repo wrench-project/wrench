@@ -18,7 +18,7 @@ requested compute resources in a space-sharing manner. Therefore, a job
 submitted to the service experiences a "queue waiting time" period (the
 length of which depends on the load on the service) followed by an
 "execution time" period.  In typical batch-scheduler fashion, a running job
-is terminated when it reaches its requested duration, which may cause the
+is cleanly_terminated when it reaches its requested duration, which may cause the
 job to fail. If, instead, the job completes before the requested duration
 the job succeeds. In both cases, the job's allocated compute resources are
 reclaimed by the batch scheduler.
@@ -89,7 +89,7 @@ in the `wrench::ComputeService` base class. The
 service-specific arguments as a `std::map<std::string, std::string>` of
 key-value pairs.  These **required** arguments are to be specified as follows:
 
-  - key: `-t`; value: a requested runtime in minutes (if the job execution exceeds this limit, then the job is terminated)
+  - key: `-t`; value: a requested runtime in minutes (if the job execution exceeds this limit, then the job is cleanly_terminated)
   - key: `-N`; value: a requested number of compute nodes
   - key: `-c`; value: a requested number of cores per compute nodes
 
