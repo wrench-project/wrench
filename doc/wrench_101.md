@@ -255,8 +255,8 @@ list of current available information provided by the plugin:
 - `wrench::Simulation::setPstate()`
 - `wrench::Simulation::getNumberofPstates()`
 - `wrench::Simulation::getCurrentPstate()`
-- `wrench::Simulation::getMinPowerAvailable()`
-- `wrench::Simulation::getMaxPowerPossible()`
+- `wrench::Simulation::getMinPowerConsumption()`
+- `wrench::Simulation::getMaxPowerConsumption()`
 - `wrench::Simulation::getListOfPstates()`
 
 **Note:** The energy plugin is NOT enabled by default in WRENCH simulation. To enable the plugin, the 
