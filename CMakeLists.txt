@@ -281,7 +281,7 @@ set(TEST_FILES
         test/simulation/simulation_output/SimulationDumpJSONTest.cpp
         test/simulation/HTCondorServiceTest.cpp
         src/wrench/managers/EnergyMeter.cpp include/wrench/managers/EnergyMeter.h
-        test/simulated_failures/ExceptionsDueToSimulatedFailures.cpp
+        test/simulated_failures/SimulatedFailures.cpp
         test/simulated_failures/HostKiller.cpp test/simulated_failures/HostKiller.h
         test/simulated_failures/Victim.cpp
         test/simulated_failures/Victim.h

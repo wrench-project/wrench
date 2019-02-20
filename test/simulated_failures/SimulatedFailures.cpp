@@ -20,30 +20,32 @@
 XBT_LOG_NEW_DEFAULT_CATEGORY(simulated_failures_test, "Log category for SimulatedFailuresTests");
 
 
-class ExceptionsDueToSimulatedFailuresTest : public ::testing::Test {
+class SimulatedFailuresTest : public ::testing::Test {
 
 public:
     wrench::Workflow *workflow;
-    wrench::WorkflowFile *input_file;
-    wrench::WorkflowFile *output_file1;
-    wrench::WorkflowFile *output_file2;
-    wrench::WorkflowFile *output_file3;
-    wrench::WorkflowFile *output_file4;
-    wrench::WorkflowTask *task1;
-    wrench::WorkflowTask *task2;
-    wrench::WorkflowTask *task3;
-    wrench::WorkflowTask *task4;
-    wrench::WorkflowTask *task5;
-    wrench::WorkflowTask *task6;
-    wrench::ComputeService *compute_service = nullptr;
-    wrench::StorageService *storage_service = nullptr;
     std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
+
+//    wrench::WorkflowFile *input_file;
+//    wrench::WorkflowFile *output_file1;
+//    wrench::WorkflowFile *output_file2;
+//    wrench::WorkflowFile *output_file3;
+
+//    wrench::WorkflowFile *output_file4;
+//    wrench::WorkflowTask *task1;
+//    wrench::WorkflowTask *task2;
+//    wrench::WorkflowTask *task3;
+//    wrench::WorkflowTask *task4;
+//    wrench::WorkflowTask *task5;
+//    wrench::WorkflowTask *task6;
+//    wrench::ComputeService *compute_service = nullptr;
+//    wrench::StorageService *storage_service = nullptr;
 
     void do_FailureDetectorTest_test();
 
 protected:
 
-    ExceptionsDueToSimulatedFailuresTest() {
+    SimulatedFailuresTest() {
         // Create the simplest workflow
         workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
         workflow = workflow_unique_ptr.get();
@@ -125,7 +127,7 @@ protected:
 class HostFailureDuringSleepWMS : public wrench::WMS {
 
 public:
-    HostFailureDuringSleepWMS(ExceptionsDueToSimulatedFailuresTest *test,
+    HostFailureDuringSleepWMS(SimulatedFailuresTest *test,
                                       std::string &hostname) :
             wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -133,9 +135,9 @@ public:
 
 private:
 
-    ExceptionsDueToSimulatedFailuresTest *test;
+    SimulatedFailuresTest *test;
 
-    int main() {
+    int main() override {
 
         /** TEST THAT SHOULD DETECT A FAILURE **/
 
@@ -182,7 +184,7 @@ private:
         victim->start(victim, true);
 
         // Starting its nemesis!
-        murderer = std::shared_ptr<wrench::HostKiller>(new wrench::HostKiller("StableHost", 110, "FailedHost"));
+        murderer = std::shared_ptr<wrench::HostKiller>(new wrench::HostKiller("StableHost", 101, "FailedHost"));
         murderer->simulation = this->simulation;
         murderer->start(murderer, true);
 
@@ -210,11 +212,11 @@ private:
     }
 };
 
-TEST_F(ExceptionsDueToSimulatedFailuresTest, FailureDetectorTest) {
+TEST_F(SimulatedFailuresTest, FailureDetectorTest) {
     DO_TEST_WITH_FORK(do_FailureDetectorTest_test);
 }
 
-void ExceptionsDueToSimulatedFailuresTest::do_FailureDetectorTest_test() {
+void SimulatedFailuresTest::do_FailureDetectorTest_test() {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
