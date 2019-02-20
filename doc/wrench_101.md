@@ -49,7 +49,7 @@ i.e., a user that has used the Developer API).  The set of input files to the wo
 staged on the platform at particular storage locations. 
  
 The simulation is then launched via a single call. When this call returns, the WMS
-has terminated (typically after completing the execution of the workflow, or failing to executed it) 
+has cleanly_terminated (typically after completing the execution of the workflow, or failing to executed it)
 and the simulation output can be analyzed. 
 
 
