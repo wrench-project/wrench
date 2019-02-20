@@ -29,4 +29,6 @@ int wrench::Victim::main() {
     wrench::Simulation::sleep(this->seconds_of_life);
     S4U_Mailbox::dputMessage(this->mailbox_to_notify, this->msg);
 
+    return 0;
+
 }
