@@ -100,7 +100,7 @@ namespace wrench {
 #ifdef ACTOR_TRACKING_OUTPUT
         num_actors[this->process_name_prefix]--;
 #endif
-//      std::cerr << "### DESTRUCTOR OF DAEMON " << this->getName() << "\n";
+      std::cerr << "### DESTRUCTOR OF DAEMON " << this->getName() << "\n";
     }
 
     /**
@@ -114,12 +114,22 @@ namespace wrench {
      * \cond
      */
     static int daemon_goodbye(int x, void *service_instance) {
+        WRENCH_INFO("IN DAEMON GOODBYE: TERMINATED = %d", reinterpret_cast<S4U_Daemon *>(service_instance)->isTerminated());
         WRENCH_INFO("Terminating");
-        if (service_instance) {
-            auto service = reinterpret_cast<S4U_Daemon *>(service_instance);
+	if (service_instance == nullptr) {
+		return 0;
+	}
+        auto service = reinterpret_cast<S4U_Daemon *>(service_instance);
+	if (service->isTerminated()) {
+	    // Clean termination
             service->cleanup();
             delete service->life_saver;
-        }
+	} else {
+	    // Unclean termination
+	    // Do nothing...the service will restart with its state!
+	    // It's the job of the service to check left-over state in case
+            // Of a restart
+	}
         return 0;
     }
 
@@ -187,6 +197,7 @@ namespace wrench {
         try {
             S4U_Simulation::computeZeroFlop();
             this->num_starts++;
+	    WRENCH_INFO("CALLING MAIN FOR %s", this->getName().c_str());
             this->main();
             this->setTerminated();
             wrench::S4U_Simulation::sleep(0.001);
@@ -196,6 +207,7 @@ namespace wrench {
         // Avoid a memory leak on the actor!
         simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::by_name(this->mailbox_name);
         mailbox->set_receiver(nullptr);
+        WRENCH_INFO("RETURNING FROM RUN MAIN METHOD");
     }
 
 
@@ -272,6 +284,13 @@ namespace wrench {
                 throw std::shared_ptr<FatalFailure>(new FatalFailure());
             }
         }
+        return this->terminated;
+    }
+
+    /**
+     * @brief Returned the terminated status of the daemon/actor
+     */
+    bool S4U_Daemon::isTerminated() {
         return this->terminated;
     }
 

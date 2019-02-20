@@ -66,6 +66,7 @@ namespace wrench {
         virtual int main() = 0;
 
         void setTerminated();
+        bool isTerminated();
 
         bool join();
 
