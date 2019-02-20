@@ -302,7 +302,7 @@ namespace wrench {
         cleanUpScratch();
       }
 
-      WRENCH_INFO("Standard Job Executor on host %s terminated!", S4U_Simulation::getHostName().c_str());
+      WRENCH_INFO("Standard Job Executor on host %s cleanly terminating!", S4U_Simulation::getHostName().c_str());
       return 0;
     }
 
@@ -495,7 +495,7 @@ namespace wrench {
         ));
 
         workunit_executor->simulation = this->simulation;
-        workunit_executor->start(workunit_executor, true);
+        workunit_executor->start(workunit_executor, true, false); // Daemonized, no auto-restart
 
         // Update core availabilities
         this->core_availabilities[target_host] -= target_num_cores;

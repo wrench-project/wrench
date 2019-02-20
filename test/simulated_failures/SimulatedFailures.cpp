@@ -145,17 +145,17 @@ private:
         // Starting a victim (that will reply with a bogus TTL Expiration message)
         auto victim = std::shared_ptr<wrench::Sleeper>(new wrench::Sleeper("FailedHost", 100, new wrench::ServiceTTLExpiredMessage(1), this->mailbox_name));
         victim->simulation = this->simulation;
-        victim->start(victim, true);
+        victim->start(victim, true, false); // Daemonized, no auto-restart
 
         // Starting its nemesis!
         auto murderer = std::shared_ptr<wrench::HostSwitch>(new wrench::HostSwitch("StableHost", 50, "FailedHost", wrench::HostSwitch::Action::TURN_OFF));
         murderer->simulation = this->simulation;
-        murderer->start(murderer, true);
+        murderer->start(murderer, true, false); // Daemonized, no auto-restart
 
         // Starting the failure detector!
         auto failure_detector = std::shared_ptr<wrench::ServiceFailureDetector>(new wrench::ServiceFailureDetector("StableHost", victim.get(), this->mailbox_name));
         failure_detector->simulation = this->simulation;
-        failure_detector->start(failure_detector, true);
+        failure_detector->start(failure_detector, true, false); // Daemonized, no auto-restart
 
         // Waiting for a message
         std::unique_ptr<wrench::SimulationMessage> message;
@@ -182,17 +182,17 @@ private:
         // Starting a victim (that will reply with a bogus TTL Expiration message)
         victim = std::shared_ptr<wrench::Sleeper>(new wrench::Sleeper("FailedHost", 100, new wrench::ServiceTTLExpiredMessage(1), this->mailbox_name));
         victim->simulation = this->simulation;
-        victim->start(victim, true);
+        victim->start(victim, true, false); // Daemonized, no auto-restart
 
         // Starting its nemesis!
         murderer = std::shared_ptr<wrench::HostSwitch>(new wrench::HostSwitch("StableHost", 101, "FailedHost", wrench::HostSwitch::Action::TURN_OFF));
         murderer->simulation = this->simulation;
-        murderer->start(murderer, true);
+        murderer->start(murderer, true, false); // Daemonized, no auto-restart
 
         // Starting the failure detector!
         failure_detector = std::shared_ptr<wrench::ServiceFailureDetector>(new wrench::ServiceFailureDetector("StableHost", victim.get(), this->mailbox_name));
         failure_detector->simulation = this->simulation;
-        failure_detector->start(failure_detector, true);
+        failure_detector->start(failure_detector, true, false); // Daemonized, no auto-restart
 
         // Waiting for a message
         try {
@@ -272,17 +272,17 @@ private:
         // Starting a sleeper (that will reply with a bogus TTL Expiration message)
         auto sleeper = std::shared_ptr<wrench::Sleeper>(new wrench::Sleeper("FailedHost", 100, new wrench::ServiceTTLExpiredMessage(1), this->mailbox_name));
         sleeper->simulation = this->simulation;
-        sleeper->start(sleeper, true);
+        sleeper->start(sleeper, true, true); // Daemonized, auto-restart!!
 
         // Starting a host-switcher-offer
         auto death = std::shared_ptr<wrench::HostSwitch>(new wrench::HostSwitch("StableHost", 10, "FailedHost", wrench::HostSwitch::Action::TURN_OFF));
         death->simulation = this->simulation;
-        death->start(death, true);
+        death->start(death, true, false); // Daemonized, no auto-restart
 
         // Starting a host-switcher-oner
         auto life = std::shared_ptr<wrench::HostSwitch>(new wrench::HostSwitch("StableHost", 30, "FailedHost", wrench::HostSwitch::Action::TURN_ON));
         life->simulation = this->simulation;
-        life->start(life, true);
+        life->start(life, true, false); // Daemonized, no auto-restart
 
         // Waiting for a message
         std::unique_ptr<wrench::SimulationMessage> message;

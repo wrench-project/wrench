@@ -362,7 +362,7 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
     ASSERT_DOUBLE_EQ(t4_unsuccessful_execution.write_output_end, -1.0);
     ASSERT_DOUBLE_EQ(t4_unsuccessful_execution.task_end, -1.0);
 
-    // t5 should have ran then been terminated right after computation started
+    // t5 should have ran then been cleanly_terminated right after computation started
     auto t5_history = t5->getExecutionHistory();
     ASSERT_EQ(t5_history.size(), 1);
 

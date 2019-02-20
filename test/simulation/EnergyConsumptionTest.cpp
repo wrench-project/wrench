@@ -148,7 +148,7 @@ private:
                         {},
                         {}
                 ));
-        executor->start(executor, true);
+        executor->start(executor, true, false); // Daemonized, no auto-restart
 
         // Wait for a message on my mailbox_name
         std::unique_ptr<wrench::SimulationMessage> message;
@@ -361,7 +361,7 @@ private:
                         {},
                         {}
                 ));
-        executor->start(executor, true);
+        executor->start(executor, true, false); // Daemonized, no auto-restart
 
         // Wait for a message on my mailbox_name
         std::unique_ptr<wrench::SimulationMessage> message;
@@ -682,7 +682,7 @@ private:
                         {},
                         {}
                 ));
-        executor->start(executor, true);
+        executor->start(executor, true, false); // Daemonized, no auto-restart
 
         // Wait for a message on my mailbox_name
         std::unique_ptr<wrench::SimulationMessage> message;
@@ -734,7 +734,7 @@ private:
                         {},
                         {}
                 ));
-        executor->start(executor, true);
+        executor->start(executor, true, false); // Daemonized, no auto-restart
 
         try {
           message = wrench::S4U_Mailbox::getMessage(my_mailbox);
