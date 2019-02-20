@@ -85,3 +85,20 @@ WRENCH's [Github Issues Track](https://github.com/wrench-project/wrench/issues).
 [codacy-link]:              https://www.codacy.com/app/WRENCH/wrench?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=wrench-project/wrench&amp;utm_campaign=Badge_Grade
 [sonarcloud-badge]:         https://sonarcloud.io/api/project_badges/measure?project=wrench&metric=ncloc
 [sonarcloud-link]:          https://sonarcloud.io/dashboard?id=wrench
+
+
+## Citing WRENCH
+
+When citing WRENCH, please use the following paper. You should also actually read that paper, as 
+it provides a recent and general overview on the framework.
+
+```
+@inproceedings{wrench,
+  title = {WRENCH: A Framework for Simulating Workflow Management Systems},
+  author = {Casanova, Henri and Pandey, Suraj and Oeth, James and Tanaka, Ryan and Suter, Frederic and Ferreira da Silva, Rafael},
+  booktitle = {13th Workshop on Workflows in Support of Large-Scale Science (WORKS'18)},
+  year = {2018},
+  pages = {74--85},
+  doi = {10.1109/WORKS.2018.00013}
+}
+```
