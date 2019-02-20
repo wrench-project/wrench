@@ -82,12 +82,16 @@ namespace wrench {
         Simulation *simulation;
     protected:
 
+        friend class S4U_DaemonActor;
+        void runMainMethod();
+
         void killActor();
 
         void acquireDaemonLock();
 
         void releaseDaemonLock();
 
+        unsigned int num_starts = 0;
     private:
         // Lock use typically to prevent kill() from killing the actor
         // while it's in the middle of doing something critical

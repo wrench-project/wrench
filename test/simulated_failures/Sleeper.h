@@ -7,31 +7,30 @@
  * (at your option) any later version.
  */
 
-#ifndef WRENCH_HOSTKILLER_H
-#define WRENCH_HOSTKILLER_H
+#ifndef WRENCH_VICTIM_H
+#define WRENCH_VICTIM_H
 
 #include <wrench/services/Service.h>
+#include <wrench/simulation/SimulationMessage.h>
 #include "wrench/simgrid_S4U_util/S4U_Daemon.h"
 
 namespace wrench {
 
-class HostKiller : public Service {
+    class Sleeper : public Service {
 
     public:
 
-//        void stop();
-//        void kill();
-        explicit HostKiller(std::string host_on_which_to_run, double sleep_time, std::string host_to_kill);
+        explicit Sleeper(std::string host_on_which_to_run, double seconds_of_life, SimulationMessage *msg, std::string mailbox_to_notify);
 
         /***********************/
         /** \endcond           */
         /***********************/
 
     private:
-
-        double sleep_time;
-        std::string host_to_kill;
-        int main();
+        double seconds_of_life;
+        SimulationMessage *msg;
+        std::string mailbox_to_notify;
+        int main() override;
 
     };
 
@@ -43,8 +42,4 @@ class HostKiller : public Service {
 };
 
 
-
-
-
-
-#endif //WRENCH_HOSTKILLER_H
+#endif //WRENCH_VICTIM_H
