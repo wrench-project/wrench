@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
    xbt_log_control_set("root.thresh:critical");
 
 //   Example selective log enabling
-//   xbt_log_control_set("multicore_compute_service.thresh:info");
+   xbt_log_control_set("multicore_compute_service.thresh:info");
 
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
