@@ -298,6 +298,7 @@ private:
             throw std::runtime_error("Unexpected " + message->getName() + " message");
         }
 
+	return 0;
     }
 };
 
