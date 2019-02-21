@@ -1,13 +1,11 @@
-
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2019. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-
 
 #include <nlohmann/json.hpp>
 #include <boost/algorithm/string.hpp>
@@ -187,7 +185,7 @@ namespace wrench {
           ((ram_per_host != ComputeService::ALL_RAM) and (ram_per_host != ram_available))) {
         throw std::invalid_argument(
                 "BatchService::BatchService(): A Batch Service must be given ALL core and RAM resources of hosts "
-                        "(e.g., passing ComputeService::ALL_CORES and ComputeService::ALL_RAM)");
+                "(e.g., passing ComputeService::ALL_CORES and ComputeService::ALL_RAM)");
       }
 
       //create a map for host to cores
@@ -243,7 +241,8 @@ namespace wrench {
         }
       }
 #else
-      if (this->scheduling_algorithms.find(this->getPropertyValueAsString(BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM))
+      if (this->scheduling_algorithms.find(
+              this->getPropertyValueAsString(BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM))
           == this->scheduling_algorithms.end()) {
         throw std::invalid_argument(" BatchService::BatchService(): unsupported scheduling algorithm " +
                                     this->getPropertyValueAsString(BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM));
@@ -517,7 +516,6 @@ namespace wrench {
       }
 
 
-
     }
 
     /**
@@ -567,7 +565,6 @@ namespace wrench {
       }
 
 
-
       return 0;
     }
 
@@ -591,13 +588,14 @@ namespace wrench {
      * @brief Send back notification that a standard job has failed
      * @param job
      */
-    void BatchService::sendStandardJobFailureNotification(StandardJob *job, std::string job_id, std::shared_ptr<FailureCause> cause) {
+    void BatchService::sendStandardJobFailureNotification(StandardJob *job, std::string job_id,
+                                                          std::shared_ptr<FailureCause> cause) {
       WRENCH_INFO("A standard job executor has failed because of timeout %s", job->getName().c_str());
 
 #ifdef ENABLE_BATSCHED
       this->notifyJobEventsToBatSched(job_id, "TIMEOUT", "COMPLETED_FAILED", "", "JOB_COMPLETED");
       BatchJob *batch_job = nullptr;
-      for (auto it = this->all_jobs.begin(); it != this->all_jobs.end(); it++) {
+      for (auto it = this->all_jobs.begin(); it != this->all_jobs.end(); ++it) {
         if ((*it)->getWorkflowJob() == job) {
           batch_job = (*it).get();
           break;
@@ -684,7 +682,7 @@ namespace wrench {
     void BatchService::processStandardJobTimeout(StandardJob *job) {
       std::set<std::shared_ptr<StandardJobExecutor>>::iterator it;
 
-      for (it = this->running_standard_job_executors.begin(); it != this->running_standard_job_executors.end(); it++) {
+      for (it = this->running_standard_job_executors.begin(); it != this->running_standard_job_executors.end(); ++it) {
         if (((*it).get())->getJob() == job) {
           ((*it).get())->kill();
           // Make failed tasks ready again
@@ -697,7 +695,7 @@ namespace wrench {
 
               case WorkflowTask::InternalState::TASK_RUNNING:
                 throw std::runtime_error("BatchService::processStandardJobTimeout: task state shouldn't be 'RUNNING'"
-                                                 "after a StandardJobExecutor was killed!");
+                                         "after a StandardJobExecutor was killed!");
               case WorkflowTask::InternalState::TASK_FAILED:
                 // Making failed task READY again
                 task->setInternalState(WorkflowTask::InternalState::TASK_READY);
@@ -727,7 +725,7 @@ namespace wrench {
       StandardJobExecutor *executor = nullptr;
       std::set<std::shared_ptr<StandardJobExecutor>>::iterator it;
       for (it = this->running_standard_job_executors.begin();
-           it != this->running_standard_job_executors.end(); it++) {
+           it != this->running_standard_job_executors.end(); ++it) {
         if (((*it))->getJob() == job) {
           executor = (it->get());
         }
@@ -774,7 +772,7 @@ namespace wrench {
         std::map<std::string, unsigned long>::iterator map_it;
         unsigned long host_count = 0;
         for (map_it = this->available_nodes_to_cores.begin();
-             map_it != this->available_nodes_to_cores.end(); map_it++) {
+             map_it != this->available_nodes_to_cores.end(); ++map_it) {
           if ((*map_it).second >= cores_per_node) {
             //Remove that many cores from the available_nodes_to_core
             (*map_it).second -= cores_per_node;
@@ -788,7 +786,7 @@ namespace wrench {
         if (resources.size() < num_nodes) {
           resources = {};
           std::vector<std::string>::iterator vector_it;
-          for (vector_it = hosts_assigned.begin(); vector_it != hosts_assigned.end(); vector_it++) {
+          for (vector_it = hosts_assigned.begin(); vector_it != hosts_assigned.end(); ++vector_it) {
             available_nodes_to_cores[*vector_it] += cores_per_node;
           }
         }
@@ -821,7 +819,7 @@ namespace wrench {
             WRENCH_INFO("Didn't find a suitable host");
             resources = {};
             std::vector<std::string>::iterator it;
-            for (it = hosts_assigned.begin(); it != hosts_assigned.end(); it++) {
+            for (it = hosts_assigned.begin(); it != hosts_assigned.end(); ++it) {
               available_nodes_to_cores[*it] += cores_per_node;
             }
             break;
@@ -852,7 +850,7 @@ namespace wrench {
         if (resources.size() < num_nodes) {
           resources = {};
           std::vector<std::string>::iterator it;
-          for (it = hosts_assigned.begin(); it != hosts_assigned.end(); it++) {
+          for (it = hosts_assigned.begin(); it != hosts_assigned.end(); ++it) {
             available_nodes_to_cores[*it] += cores_per_node;
           }
         } else {
@@ -927,7 +925,7 @@ namespace wrench {
       WRENCH_INFO("Running job %s", workflow_job->getName().c_str());
 
       // Remove it from the pending list
-      for (auto it = this->pending_jobs.begin(); it != this->pending_jobs.end(); it++) {
+      for (auto it = this->pending_jobs.begin(); it != this->pending_jobs.end(); ++it) {
         if ((*it) == batch_job) {
           this->pending_jobs.erase(it);
           break;
@@ -977,7 +975,7 @@ namespace wrench {
       {
         std::vector<std::deque<BatchJob *>::iterator> to_erase;
 
-        for (auto it1 = this->pending_jobs.begin(); it1 != this->pending_jobs.end(); it1++) {
+        for (auto it1 = this->pending_jobs.begin(); it1 != this->pending_jobs.end(); ++it1) {
           WorkflowJob *workflow_job = (*it1)->getWorkflowJob();
           if (workflow_job->getType() == WorkflowJob::STANDARD) {
             to_erase.push_back(it1);
@@ -997,7 +995,7 @@ namespace wrench {
       {
         std::vector<BatchJob *> to_erase;
 
-        for (auto it2 = this->waiting_jobs.begin(); it2 != this->waiting_jobs.end(); it2++) {
+        for (auto it2 = this->waiting_jobs.begin(); it2 != this->waiting_jobs.end(); ++it2) {
           WorkflowJob *workflow_job = (*it2)->getWorkflowJob();
           if (workflow_job->getType() == WorkflowJob::STANDARD) {
             to_erase.push_back(*it2);
@@ -1207,7 +1205,8 @@ namespace wrench {
           this->freeUpResources(msg->job->getResourcesAllocated());
           this->sendStandardJobFailureNotification((StandardJob *) msg->job->getWorkflowJob(),
                                                    std::to_string(msg->job->getJobID()),
-                                                   std::shared_ptr<FailureCause>(new JobTimeout(msg->job->getWorkflowJob())));
+                                                   std::shared_ptr<FailureCause>(
+                                                           new JobTimeout(msg->job->getWorkflowJob())));
           return true;
         } else if (msg->job->getWorkflowJob()->getType() == WorkflowJob::PILOT) {
           WRENCH_INFO("Terminating pilot job %s", msg->job->getWorkflowJob()->getName().c_str());
@@ -1260,10 +1259,11 @@ namespace wrench {
 
       WRENCH_INFO("Asked to run a batch job with id %ld", job->getJobID());
 
-      auto unique_ref_to_batch_job  = std::unique_ptr<BatchJob>(job); // for freeing upon return
+      auto unique_ref_to_batch_job = std::unique_ptr<BatchJob>(job); // for freeing upon return
 
       // Check whether the job type is supported
-      if ((job->getWorkflowJob()->getType() == WorkflowJob::STANDARD) and (not getPropertyValueAsBoolean(BatchServiceProperty::SUPPORTS_STANDARD_JOBS))) {
+      if ((job->getWorkflowJob()->getType() == WorkflowJob::STANDARD) and
+          (not getPropertyValueAsBoolean(BatchServiceProperty::SUPPORTS_STANDARD_JOBS))) {
         try {
           S4U_Mailbox::dputMessage(answer_mailbox,
                                    new ComputeServiceSubmitStandardJobAnswerMessage(
@@ -1280,8 +1280,9 @@ namespace wrench {
           return;
         }
         return;
-      } else if ((job->getWorkflowJob()->getType() == WorkflowJob::PILOT) and (not getPropertyValueAsBoolean(BatchServiceProperty::SUPPORTS_PILOT_JOBS)
-      )) {
+      } else if ((job->getWorkflowJob()->getType() == WorkflowJob::PILOT) and
+                 (not getPropertyValueAsBoolean(BatchServiceProperty::SUPPORTS_PILOT_JOBS)
+                 )) {
         try {
           S4U_Mailbox::dputMessage(answer_mailbox,
                                    new ComputeServiceSubmitPilotJobAnswerMessage(
@@ -1399,7 +1400,7 @@ namespace wrench {
 
       // Remove the job from the running job list
       BatchJob *batch_job = nullptr;
-      for (auto it = this->running_jobs.begin(); it != this->running_jobs.end(); it++) {
+      for (auto it = this->running_jobs.begin(); it != this->running_jobs.end(); ++it) {
         if ((*it)->getWorkflowJob() == job) {
           batch_job = (*it);
           break;
@@ -1443,7 +1444,7 @@ namespace wrench {
     void BatchService::processPilotJobTerminationRequest(PilotJob *job, std::string answer_mailbox) {
 
       std::string job_id;
-      for (auto it = this->pending_jobs.begin(); it != this->pending_jobs.end(); it++) {
+      for (auto it = this->pending_jobs.begin(); it != this->pending_jobs.end(); ++it) {
         if ((*it)->getWorkflowJob() == job) {
           job_id = std::to_string((*it)->getJobID());
           ComputeServiceTerminatePilotJobAnswerMessage *answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
@@ -1467,7 +1468,7 @@ namespace wrench {
         }
       }
 
-      for (auto it2 = this->waiting_jobs.begin(); it2 != this->waiting_jobs.end(); it2++) {
+      for (auto it2 = this->waiting_jobs.begin(); it2 != this->waiting_jobs.end(); ++it2) {
         if ((*it2)->getWorkflowJob() == job) {
           job_id = std::to_string((*it2)->getJobID());
           ComputeServiceTerminatePilotJobAnswerMessage *answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
@@ -1551,7 +1552,7 @@ namespace wrench {
     void BatchService::processStandardJobCompletion(StandardJobExecutor *executor, StandardJob *job) {
       bool executor_on_the_list = false;
       std::set<std::shared_ptr<StandardJobExecutor>>::iterator it;
-      for (it = this->running_standard_job_executors.begin(); it != this->running_standard_job_executors.end(); it++) {
+      for (it = this->running_standard_job_executors.begin(); it != this->running_standard_job_executors.end(); ++it) {
         if ((*it).get() == executor) {
           PointerUtil::moveSharedPtrFromSetToSet(it, &(this->running_standard_job_executors),
                                                  &(this->finished_standard_job_executors));
@@ -1628,7 +1629,7 @@ namespace wrench {
 
       bool executor_on_the_list = false;
       std::set<std::shared_ptr<StandardJobExecutor>>::iterator it;
-      for (it = this->running_standard_job_executors.begin(); it != this->running_standard_job_executors.end(); it++) {
+      for (it = this->running_standard_job_executors.begin(); it != this->running_standard_job_executors.end(); ++it) {
         if ((*it).get() == executor) {
           PointerUtil::moveSharedPtrFromSetToSet(it, &(this->running_standard_job_executors),
                                                  &(this->finished_standard_job_executors));
@@ -1767,9 +1768,9 @@ namespace wrench {
                   new BareMetalComputeService(host_to_run_on,
                                               resources,
                                               {{BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"},
-                                               {BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}},
+                                               {BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS,    "false"}},
                                               {},
-                                              allocated_time,  job, "pilot_job", getScratch()
+                                              allocated_time, job, "pilot_job", getScratch()
                   ));
           cs->simulation = this->simulation;
           job->setComputeService(cs);
@@ -2097,13 +2098,13 @@ namespace wrench {
     void BatchService::processStandardJobTerminationRequest(StandardJob *job,
                                                             std::string answer_mailbox) {
 
-      BatchJob* batch_job = nullptr;
+      BatchJob *batch_job = nullptr;
       std::string job_id = "";
       // Is it running?
       bool is_running = false;
-      for (auto const & j : this->running_jobs) {
+      for (auto const &j : this->running_jobs) {
         WorkflowJob *workflow_job = j->getWorkflowJob();
-        if ((workflow_job->getType() == WorkflowJob::STANDARD) and ((StandardJob *)workflow_job == job)) {
+        if ((workflow_job->getType() == WorkflowJob::STANDARD) and ((StandardJob *) workflow_job == job)) {
           batch_job = j;
           job_id = std::to_string(j->getJobID());
           is_running = true;
@@ -2114,9 +2115,9 @@ namespace wrench {
       std::deque<BatchJob *>::iterator batch_pending_it = this->pending_jobs.end();
       if (batch_job == nullptr) {
         // Is it pending?
-        for (auto it1 = this->pending_jobs.begin(); it1 != this->pending_jobs.end(); it1++) {
+        for (auto it1 = this->pending_jobs.begin(); it1 != this->pending_jobs.end(); ++it1) {
           WorkflowJob *workflow_job = (*it1)->getWorkflowJob();
-          if ((workflow_job->getType() == WorkflowJob::STANDARD) and ((StandardJob *)workflow_job == job)) {
+          if ((workflow_job->getType() == WorkflowJob::STANDARD) and ((StandardJob *) workflow_job == job)) {
             batch_pending_it = it1;
             job_id = std::to_string((*it1)->getJobID());
             is_pending = true;
@@ -2127,9 +2128,9 @@ namespace wrench {
       bool is_waiting = false;
       if (batch_job == nullptr && batch_pending_it == this->pending_jobs.end()) {
         // Is it waiting?
-        for (auto const & j : this->waiting_jobs) {
+        for (auto const &j : this->waiting_jobs) {
           WorkflowJob *workflow_job = j->getWorkflowJob();
-          if ((workflow_job->getType() == WorkflowJob::STANDARD) and ((StandardJob *)workflow_job == job)) {
+          if ((workflow_job->getType() == WorkflowJob::STANDARD) and ((StandardJob *) workflow_job == job)) {
             batch_job = j;
             job_id = std::to_string(j->getJobID());
             is_waiting = true;
@@ -2478,7 +2479,7 @@ namespace wrench {
       compute_resources_map["events"][0]["data"]["config"]["redis-enabled"] = false;
       std::map<std::string, unsigned long>::iterator it;
       int count = 0;
-      for (it = this->nodes_to_cores_map.begin(); it != this->nodes_to_cores_map.end(); it++) {
+      for (it = this->nodes_to_cores_map.begin(); it != this->nodes_to_cores_map.end(); ++it) {
         compute_resources_map["events"][0]["data"]["resources_data"][count]["id"] = std::to_string(count);
         compute_resources_map["events"][0]["data"]["resources_data"][count]["name"] = it->first;
         compute_resources_map["events"][0]["data"]["resources_data"][count]["core"] = it->second;
@@ -2516,7 +2517,7 @@ namespace wrench {
       batch_submission_data["events"] = nlohmann::json::array();
       size_t i;
       std::deque<BatchJob *>::iterator it;
-      for (i = 0, it = this->pending_jobs.begin(); i < this->pending_jobs.size(); i++, it++) {
+      for (i = 0, it = this->pending_jobs.begin(); i < this->pending_jobs.size(); ++i, ++it) {
 
         BatchJob *batch_job = *it;
 
@@ -2557,7 +2558,7 @@ namespace wrench {
       nlohmann::json execute_events = nlohmann::json::parse(bat_sched_reply);
       WorkflowJob *workflow_job = nullptr;
       BatchJob *batch_job = nullptr;
-      for (auto it1 = this->waiting_jobs.begin(); it1 != this->waiting_jobs.end(); it1++) {
+      for (auto it1 = this->waiting_jobs.begin(); it1 != this->waiting_jobs.end(); ++it1) {
         if (std::to_string((*it1)->getJobID()) == execute_events["job_id"]) {
           batch_job = (*it1);
           workflow_job = batch_job->getWorkflowJob();
