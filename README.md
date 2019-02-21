@@ -15,7 +15,7 @@ abstractions to provide the **building blocks** for developing custom simulators
 More information and Documentation: [WRENCH Project Website](http://wrench-project.org)
 
 **WRENCH Research Paper:**
-  - H. Casanova, S. Pandey, J. Oeth, R. Tanaka, F. Suter, and R. Ferreira da Silva, “[WRENCH: A Framework for Simulating Workflow Management Systems](http://rafaelsilva.com/wp-content/papercite-data/pdf/casanova-works-2018.pdf),” in 13th Workshop on Workflows in Support of Large-Scale Science (WORKS’18), 2018, p. 74–85. 
+- H. Casanova, S. Pandey, J. Oeth, R. Tanaka, F. Suter, and R. Ferreira da Silva, “[WRENCH: A Framework for Simulating Workflow Management Systems](http://rafaelsilva.com/wp-content/papercite-data/pdf/casanova-works-2018.pdf),” in 13th Workshop on Workflows in Support of Large-Scale Science (WORKS’18), 2018, p. 74–85. 
 
 ## Prerequisites
 
@@ -23,25 +23,25 @@ WRENCH is fully developed in C++. The code follows the C++11 standard, and thus 
 compilers tend to fail the compilation process. Therefore, we strongly recommend
 users to satisfy the following requirements:
 
-  - **CMake** - version 3.2.3 or higher
+- **CMake** - version 3.2.3 or higher
   
 And, one of the following:
-  - **g++** - version 5.0 or higher
-  - **clang** - version 3.6 or higher
+- **g++** - version 5.0 or higher
+- **clang** - version 3.6 or higher
 
 ## Dependencies
 
 ### Required Dependencies
 
-  - [SimGrid](http://simgrid.gforge.inria.fr/) - version 3.21
-  - [Lemon C++ library](http://lemon.cs.elte.hu/) - version 1.3.1 or higher 
-  - [PugiXML](http://pugixml.org/) - version 1.8 or higher 
-  - [JSON for Modern C++](https://github.com/nlohmann/json) - version 3.1.0 or higher 
+- [SimGrid](http://simgrid.gforge.inria.fr/) - version 3.21
+- [Lemon C++ library](http://lemon.cs.elte.hu/) - version 1.3.1 or higher 
+- [PugiXML](http://pugixml.org/) - version 1.8 or higher 
+- [JSON for Modern C++](https://github.com/nlohmann/json) - version 3.1.0 or higher 
 
 ### Optional Dependencies
-  - [Google Test](https://github.com/google/googletest) - version 1.8 or higher (only required for running test cases)
-  - [Doxygen](http://www.doxygen.org) - version 1.8 or higher (only required for generating documentation)
-  - [Batsched](https://gitlab.inria.fr/batsim/batsched) - only needed for batch-scheduled resource simulation
+- [Google Test](https://github.com/google/googletest) - version 1.8 or higher (only required for running test cases)
+- [Doxygen](http://www.doxygen.org) - version 1.8 or higher (only required for generating documentation)
+- [Batsched](https://gitlab.inria.fr/batsim/batsched) - only needed for batch-scheduled resource simulation
 
 ## Building From Source
 

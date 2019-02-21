@@ -234,7 +234,7 @@ namespace wrench {
         std::string cluster_id;            // ID for clustered task
         TaskType task_type;                // Task type
         double flops;                      // Number of flops
-        double average_cpu;                // Average CPU utilization
+        double average_cpu = -1;           // Average CPU utilization
         unsigned long bytes_read = -1;     // Total bytes read in KB
         unsigned long bytes_written = -1;  // Total bytes written in KB
         unsigned long min_num_cores;
