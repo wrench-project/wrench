@@ -33,6 +33,7 @@ protected:
 
       t1 = workflow->addTask("task-01", 100000, 1, 1, 1.0, 0);
       t2 = workflow->addTask("task-02", 100, 2, 4, 0.5, 0);
+      t2->setAverageCPU(90.2);
 
       workflow->addControlDependency(t1, t2);
 
@@ -49,6 +50,7 @@ protected:
       t4->addOutputFile(t4_output_file);
       t4->setBytesRead(1000010);
       t4->setBytesWritten(1000);
+      t4->setAverageCPU(50.5);
 
       t5 = workflow->addTask("task-05", 100, 1, 2, 1.0, 0);
       t6 = workflow->addTask("task-06", 100, 1, 3, 1.0, 0);
@@ -183,6 +185,10 @@ TEST_F(WorkflowTaskTest, GetSet) {
   ASSERT_EQ(t1->getBytesWritten(), -1);
   ASSERT_EQ(t4->getBytesRead(), 1000010);
   ASSERT_EQ(t4->getBytesWritten(), 1000);
+
+  ASSERT_EQ(t1->getAverageCPU(), -1.0);
+  ASSERT_EQ(t2->getAverageCPU(), 90.2);
+  ASSERT_EQ(t4->getAverageCPU(), 50.5);
 }
 
 TEST_F(WorkflowTaskTest, InputOutputFile) {
