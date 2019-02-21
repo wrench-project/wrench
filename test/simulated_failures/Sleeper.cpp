@@ -7,15 +7,15 @@
  * (at your option) any later version.
  */
 
-#include "Victim.h"
+#include "Sleeper.h"
 
 #include <wrench/simulation/Simulation.h>
 #include <wrench-dev.h>
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(victim, "Log category for Victim");
+XBT_LOG_NEW_DEFAULT_CATEGORY(victim, "Log category for Sleeper");
 
 
-wrench::Victim::Victim(std::string host_on_which_to_run, double seconds_of_life, SimulationMessage *msg, std::string mailbox_to_notify)
+wrench::Sleeper::Sleeper(std::string host_on_which_to_run, double seconds_of_life, SimulationMessage *msg, std::string mailbox_to_notify)
         : Service(host_on_which_to_run, "victim", "victim") {
     this->seconds_of_life = seconds_of_life;
     this->msg = msg;
@@ -23,9 +23,9 @@ wrench::Victim::Victim(std::string host_on_which_to_run, double seconds_of_life,
 }
 
 
-int wrench::Victim::main() {
+int wrench::Sleeper::main() {
 
-    WRENCH_INFO("Starting");
+    WRENCH_INFO("Starting  (%u)", this->num_starts);
     wrench::Simulation::sleep(this->seconds_of_life);
     S4U_Mailbox::dputMessage(this->mailbox_to_notify, this->msg);
 
