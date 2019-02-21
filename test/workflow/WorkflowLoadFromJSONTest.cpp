@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2019. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -3186,9 +3186,9 @@ protected:
 
 TEST_F(WorkflowLoadFromJSONTest, LoadValidJSON) {
 
-      std::unique_ptr<wrench::Workflow> workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+  std::unique_ptr<wrench::Workflow> workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
 
-      auto *workflow = workflow_unique_ptr.get();
+  auto *workflow = workflow_unique_ptr.get();
 
   ASSERT_THROW(workflow->loadFromJSON("bogus", "1f"), std::invalid_argument);
   ASSERT_NO_THROW(workflow->loadFromJSON(this->json_file_path, "1f"));
