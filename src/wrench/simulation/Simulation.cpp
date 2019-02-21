@@ -334,35 +334,35 @@ namespace wrench {
         try {
             // Start the WMSes
             for (const auto &wms : this->wmses) {
-                wms->start(wms, false);
+                wms->start(wms, false, false);  // Not daemonized, no auto-restart
             }
 
             // Start the compute services
             for (const auto &compute_service : this->compute_services) {
-                compute_service->start(compute_service, true);
+                compute_service->start(compute_service, true, false); // Daemonized, no auto-restart
             }
 
             // Start the storage services
             for (const auto &storage_service : this->storage_services) {
-                storage_service->start(storage_service, true);
+                storage_service->start(storage_service, true, false); // Daemonized, no auto-restart
             }
 
             // Start the scratch services
             for (const auto &compute_service : this->compute_services) {
                 if (compute_service->hasScratch()) {
                     compute_service->getScratch()->simulation = this;
-                    compute_service->getScratch()->start(compute_service->getScratchSharedPtr(), true);
+                    compute_service->getScratch()->start(compute_service->getScratchSharedPtr(), true, false); // Daemonized, no auto-restart
                 }
             }
 
             // Start the network proximity services
             for (const auto &network_proximity_service : this->network_proximity_services) {
-                network_proximity_service->start(network_proximity_service, true);
+                network_proximity_service->start(network_proximity_service, true, false); // Daemonized, no auto-restart
             }
 
             // Start the file registry services
             for (const auto &frs : this->file_registry_services) {
-                frs->start(frs, true);
+                frs->start(frs, true, false); // Daemonized, no auto-restart
             }
 
         } catch (std::runtime_error &e) {
@@ -797,10 +797,10 @@ namespace wrench {
         service->simulation = this;
         std::shared_ptr<ComputeService> shared_ptr = std::shared_ptr<ComputeService>(service);
         this->compute_services.insert(shared_ptr);
-        shared_ptr->start(shared_ptr, true);
+        shared_ptr->start(shared_ptr, true, false); // Daemonized, no auto-restart
         if (service->hasScratch()) {
             service->getScratch()->simulation = this;
-            service->getScratch()->start(service->getScratchSharedPtr(), true);
+            service->getScratch()->start(service->getScratchSharedPtr(), true, false); // Daemonized, no auto-restart
         }
 
         return shared_ptr.get();
@@ -829,7 +829,7 @@ namespace wrench {
         service->simulation = this;
         std::shared_ptr<StorageService> shared_ptr = std::shared_ptr<StorageService>(service);
         this->storage_services.insert(shared_ptr);
-        shared_ptr->start(shared_ptr, true);
+        shared_ptr->start(shared_ptr, true, false); // Daemonized, no auto-restart
 
         return shared_ptr.get();
     }
@@ -857,7 +857,7 @@ namespace wrench {
         service->simulation = this;
         std::shared_ptr<NetworkProximityService> shared_ptr = std::shared_ptr<NetworkProximityService>(service);
         this->network_proximity_services.insert(shared_ptr);
-        shared_ptr->start(shared_ptr, true);
+        shared_ptr->start(shared_ptr, true, false); // Daemonized, no auto-restart
 
         return shared_ptr.get();
     }
@@ -885,7 +885,7 @@ namespace wrench {
         service->simulation = this;
         std::shared_ptr<FileRegistryService> shared_ptr = std::shared_ptr<FileRegistryService>(service);
         this->file_registry_services.insert(shared_ptr);
-        shared_ptr->start(shared_ptr, true);
+        shared_ptr->start(shared_ptr, true, false); // Daemonized, no auto-restart
 
         return shared_ptr.get();
     }

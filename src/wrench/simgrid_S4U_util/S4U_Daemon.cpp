@@ -38,16 +38,16 @@ namespace wrench {
      */
     S4U_Daemon::S4U_Daemon(std::string hostname, std::string process_name_prefix, std::string mailbox_prefix) {
 
-      if (not simgrid::s4u::Engine::is_initialized()) {
-        throw std::runtime_error("Simulation must be initialized before services can be created");
-      }
+        if (not simgrid::s4u::Engine::is_initialized()) {
+            throw std::runtime_error("Simulation must be initialized before services can be created");
+        }
 
-      if (simgrid::s4u::Host::by_name_or_null(hostname) == nullptr) {
-        throw std::invalid_argument("S4U_Daemon::S4U_Daemon(): Unknown host '" + hostname + "'");
-      }
+        if (simgrid::s4u::Host::by_name_or_null(hostname) == nullptr) {
+            throw std::invalid_argument("S4U_Daemon::S4U_Daemon(): Unknown host '" + hostname + "'");
+        }
 
-      #ifdef ACTOR_TRACKING_OUTPUT
-      this->process_name_prefix = "";
+#ifdef ACTOR_TRACKING_OUTPUT
+        this->process_name_prefix = "";
       std::vector<std::string> tokens;
       boost::split(tokens, process_name_prefix, boost::is_any_of("_"));
       for (auto t : tokens) {
@@ -66,16 +66,16 @@ namespace wrench {
         std::cerr << a.first << ":" << a.second << "\n";
       }
       std::cerr << "---------------\n";
-      #endif
+#endif
 
 
-      this->daemon_lock = simgrid::s4u::Mutex::create();
-      this->hostname = hostname;
-      this->simulation = nullptr;
-      unsigned long seq = S4U_Mailbox::generateUniqueSequenceNumber();
-      this->mailbox_name = mailbox_prefix + "_" + std::to_string(seq);
-      this->process_name = process_name_prefix + "_" + std::to_string(seq);
-      this->terminated = false;
+        this->daemon_lock = simgrid::s4u::Mutex::create();
+        this->hostname = hostname;
+        this->simulation = nullptr;
+        unsigned long seq = S4U_Mailbox::generateUniqueSequenceNumber();
+        this->mailbox_name = mailbox_prefix + "_" + std::to_string(seq);
+        this->process_name = process_name_prefix + "_" + std::to_string(seq);
+        this->cleanly_terminated = false;
     }
 
 //     NOT NEEDED?
@@ -93,14 +93,14 @@ namespace wrench {
 //      this->hostname = hostname;
 //      this->process_name = process_name_prefix + "_" + std::to_string(S4U_Mailbox::generateUniqueSequenceNumber());
 //      this->mailbox_name = "";
-//      this->terminated = false;
+//      this->cleanly_terminated = false;
 //    }
 
     S4U_Daemon::~S4U_Daemon() {
-      #ifdef ACTOR_TRACKING_OUTPUT
-      num_actors[this->process_name_prefix]--;
-      #endif
-//      std::cerr << "### DESTRUCTOR OF DAEMON " << this->getName() << "\n";
+#ifdef ACTOR_TRACKING_OUTPUT
+        num_actors[this->process_name_prefix]--;
+#endif
+//        std::cerr << "### DESTRUCTOR OF DAEMON " << this->getName() << "\n";
     }
 
     /**
@@ -114,13 +114,22 @@ namespace wrench {
      * \cond
      */
     static int daemon_goodbye(int x, void *service_instance) {
-      WRENCH_INFO("Terminating");
-      if (service_instance) {
+        WRENCH_INFO("Terminating");
+        if (service_instance == nullptr) {
+            return 0;
+        }
         auto service = reinterpret_cast<S4U_Daemon *>(service_instance);
-        service->cleanup();
-        delete service->life_saver;
-      }
-      return 0;
+        if (service->hasCleanlyTerminated() or (not service->isSetToAutoRestart())) {
+            // Clean termination
+            service->cleanup();
+            delete service->life_saver;
+        } else {
+            // Unclean termination
+            // Do nothing...the service will restart with its state!
+            // It's the job of the service to check left-over state in case
+            // Of a restart
+        }
+        return 0;
     }
 
     /**
@@ -131,162 +140,202 @@ namespace wrench {
      * @brief Start the daemon
      *
      * @param daemonized: whether the S4U actor should be daemonized
+     * @param auto_restart: whether the S4U actor should automatically restart after a host reboot
      */
-    void S4U_Daemon::startDaemon(bool daemonized) {
+    void S4U_Daemon::startDaemon(bool daemonized, bool auto_restart) {
 
-      // Check that there is a lifesaver
-      if (not this->life_saver) {
-        throw std::runtime_error(
-                "S4U_Daemon::startDaemon(): You must call createLifeSaver() before calling startDaemon()");
-      }
-
-      // Check that the simulation pointer is set
-      if (not this->simulation) {
-        throw std::runtime_error(
-                "S4U_Daemon::startDaemon(): You must set the simulation field before calling startDaemon() (" +
-                this->getName() + ")");
-      }
-
-      // Create the s4u_actor
-      try {
-        this->s4u_actor = simgrid::s4u::Actor::create(this->process_name.c_str(),
-                                                      simgrid::s4u::Host::by_name(hostname),
-                                                      S4U_DaemonActor(this));
-      } catch (std::exception &e) {
-        // Some internal SimGrid exceptions...
-        std::abort();
-      }
-
-      // This test here is critical. It's possible that the created actor above returns
-      // right away, in which case calling daemonize() on it cases the calling actor to
-      // terminate immediately. This is a weird simgrid::s4u behavior/bug, that may be
-      // fixed at some point, but this test saves us for now.
-      if (not this->terminated) {
-        if (daemonized) {
-          this->s4u_actor->daemonize();
+        // Check that there is a lifesaver
+        if (not this->life_saver) {
+            throw std::runtime_error(
+                    "S4U_Daemon::startDaemon(): You must call createLifeSaver() before calling startDaemon()");
         }
-        this->s4u_actor->on_exit(daemon_goodbye, (void *) (this));
+
+        // Check that the simulation pointer is set
+        if (not this->simulation) {
+            throw std::runtime_error(
+                    "S4U_Daemon::startDaemon(): You must set the simulation field before calling startDaemon() (" +
+                    this->getName() + ")");
+        }
+
+        // Create the s4u_actor
+        try {
+            this->s4u_actor = simgrid::s4u::Actor::create(this->process_name.c_str(),
+                                                          simgrid::s4u::Host::by_name(hostname),
+                                                          S4U_DaemonActor(this));
+        } catch (std::exception &e) {
+            // Some internal SimGrid exceptions...
+            std::abort();
+        }
+
+        // This test here is critical. It's possible that the created actor above returns
+        // right away, in which case calling daemonize() on it cases the calling actor to
+        // terminate immediately. This is a weird simgrid::s4u behavior/bug, that may be
+        // fixed at some point, but this test saves us for now.
+        if (not this->cleanly_terminated) {
+            if (daemonized) {
+                this->s4u_actor->daemonize();
+            }
+            this->auto_restart = auto_restart;
+            if (this->auto_restart) {
+                this->s4u_actor->set_auto_restart(true);
+            }
+            this->s4u_actor->on_exit(daemon_goodbye, (void *) (this));
+        }
 
         // Set the mailbox_name receiver (causes memory leak)
         simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::by_name(this->mailbox_name);
         mailbox->set_receiver(this->s4u_actor);
-      }
     }
 
-    /**
-     * @brief Kill the daemon/actor.
-     */
+
+/**
+ * @brief Return the auto-restart status of the daemon
+ * @return true or false
+ */
+    bool S4U_Daemon::isSetToAutoRestart() {
+        return this->auto_restart;
+    }
+
+/**
+ * @brief Method that run's the user-defined main method (that's called by the S4U actor class)
+ */
+    void S4U_Daemon::runMainMethod() {
+        try {
+            S4U_Simulation::computeZeroFlop();
+            this->num_starts++;
+            this->main();
+            this->setCleanlyTerminated();
+            wrench::S4U_Simulation::sleep(0.001);
+        } catch (std::exception &e) {
+            throw;
+        }
+        // Avoid a memory leak on the actor!
+        simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::by_name(this->mailbox_name);
+        mailbox->set_receiver(nullptr);
+    }
+
+
+/**
+ * @brief Kill the daemon/actor.
+ */
     void S4U_Daemon::killActor() {
-      if ((this->s4u_actor != nullptr) && (not this->terminated)) {
-        try {
-          // Sleeping a tiny bit to avoid the following behavior:
-          // Actor A creates Actor B.
-          // Actor C kills actor A at the same time
-          // At that point, all references to Actor B are lost
-          // (Actor A could have set a reference to B, and that reference
-          // would be available on A's object, which then C can look at to
-          // say "since I killed A, I should kill at its children as well"
+        if ((this->s4u_actor != nullptr) && (not this->cleanly_terminated)) {
+            try {
+                // Sleeping a tiny bit to avoid the following behavior:
+                // Actor A creates Actor B.
+                // Actor C kills actor A at the same time
+                // At that point, all references to Actor B are lost
+                // (Actor A could have set a reference to B, and that reference
+                // would be available on A's object, which then C can look at to
+                // say "since I killed A, I should kill at its children as well"
 //          S4U_Simulation::sleep(0.0001);
-          this->s4u_actor->kill();
+                this->s4u_actor->kill();
 
-        } catch (xbt_ex &e) {
-          throw std::shared_ptr<FatalFailure>(new FatalFailure());
-        } catch (std::exception &e) {
-          throw std::shared_ptr<FatalFailure>(new FatalFailure());
+            } catch (xbt_ex &e) {
+                throw std::shared_ptr<FatalFailure>(new FatalFailure());
+            } catch (std::exception &e) {
+                throw std::shared_ptr<FatalFailure>(new FatalFailure());
+            }
+            this->cleanly_terminated = true;
         }
-        this->terminated = true;
-      }
     }
 
-    /**
-    * @brief Suspend the daemon/actor.
-    */
+/**
+* @brief Suspend the daemon/actor.
+*/
     void S4U_Daemon::suspend() {
-      if ((this->s4u_actor != nullptr) && (not this->terminated)) {
-        try {
-          this->s4u_actor->suspend();
-        } catch (xbt_ex &e) {
-          throw std::shared_ptr<FatalFailure>(new FatalFailure());
-        } catch (std::exception &e) {
-          throw std::shared_ptr<FatalFailure>(new FatalFailure());
+        if ((this->s4u_actor != nullptr) && (not this->cleanly_terminated)) {
+            try {
+                this->s4u_actor->suspend();
+            } catch (xbt_ex &e) {
+                throw std::shared_ptr<FatalFailure>(new FatalFailure());
+            } catch (std::exception &e) {
+                throw std::shared_ptr<FatalFailure>(new FatalFailure());
+            }
         }
-      }
     }
 
-    /**
-    * @brief Resume the daemon/actor.
-    */
+/**
+* @brief Resume the daemon/actor.
+*/
     void S4U_Daemon::resume() {
-      if ((this->s4u_actor != nullptr) && (not this->terminated)) {
-        try {
-          this->s4u_actor->resume();
-        } catch (xbt_ex &e) {
-          throw std::shared_ptr<FatalFailure>(new FatalFailure());
-        } catch (std::exception &e) {
-          throw std::shared_ptr<FatalFailure>(new FatalFailure());
+        if ((this->s4u_actor != nullptr) && (not this->cleanly_terminated)) {
+            try {
+                this->s4u_actor->resume();
+            } catch (xbt_ex &e) {
+                throw std::shared_ptr<FatalFailure>(new FatalFailure());
+            } catch (std::exception &e) {
+                throw std::shared_ptr<FatalFailure>(new FatalFailure());
+            }
         }
-      }
     }
 
-    /**
-     * @brief Join (i.e., wait for) the daemon.
-     *
-     * @return true if the daemon terminated cleanly (i.e., main() returned), or false otherwise
-     */
+/**
+ * @brief Join (i.e., wait for) the daemon.
+ *
+ * @return true if the daemon terminated cleanly (i.e., main() returned), or false otherwise
+ */
     bool S4U_Daemon::join() {
-        if (this->terminated) {
+        if (this->cleanly_terminated) {
             return true;
         }
-      if (this->s4u_actor != nullptr) {
-        try {
-          this->s4u_actor->join();
-        } catch (xbt_ex &e) {
-          throw std::shared_ptr<FatalFailure>(new FatalFailure());
-        } catch (std::exception &e) {
-          throw std::shared_ptr<FatalFailure>(new FatalFailure());
+        if (this->s4u_actor != nullptr) {
+            try {
+                this->s4u_actor->join();
+            } catch (xbt_ex &e) {
+                throw std::shared_ptr<FatalFailure>(new FatalFailure());
+            } catch (std::exception &e) {
+                throw std::shared_ptr<FatalFailure>(new FatalFailure());
+            }
         }
-      }
-      return this->terminated;
+        return this->cleanly_terminated;
     }
 
-    /**
-     * @brief Set the terminated status of the daemon/actor
-     */
-    void S4U_Daemon::setTerminated() {
-      this->terminated = true;
+/**
+ * @brief Returned the terminated status of the daemon/actor
+ */
+    bool S4U_Daemon::hasCleanlyTerminated() {
+        return this->cleanly_terminated;
     }
 
-    /**
-     * @brief Retrieve the process name
-     *
-     * @return the name
-     */
+/**
+ * @brief Set the terminated status of the daemon/actor
+ */
+    void S4U_Daemon::setCleanlyTerminated() {
+        this->cleanly_terminated = true;
+    }
+
+/**
+ * @brief Retrieve the process name
+ *
+ * @return the name
+ */
     std::string S4U_Daemon::getName() {
-      return this->process_name;
+        return this->process_name;
     }
 
-    /**
-     * @brief Create a life saver for the daemon
-     * @param reference
-     */
+/**
+ * @brief Create a life saver for the daemon
+ * @param reference
+ */
     void S4U_Daemon::createLifeSaver(std::shared_ptr<S4U_Daemon> reference) {
-      if (this->life_saver) {
-        throw std::runtime_error("S4U_Daemon::createLifeSaver(): Lifesaver already created!");
-      }
-      this->life_saver = new S4U_Daemon::LifeSaver(reference);
+        if (this->life_saver) {
+            throw std::runtime_error("S4U_Daemon::createLifeSaver(): Lifesaver already created!");
+        }
+        this->life_saver = new S4U_Daemon::LifeSaver(reference);
     }
 
-    /**
-     * @brief Lock the daemon's lock
-     */
+/**
+ * @brief Lock the daemon's lock
+ */
     void S4U_Daemon::acquireDaemonLock() {
-      this->daemon_lock->lock();
+        this->daemon_lock->lock();
     }
 
-    /**
-     * @brief Unlock the daemon's lock
-     */
+/**
+ * @brief Unlock the daemon's lock
+ */
     void S4U_Daemon::releaseDaemonLock() {
-      this->daemon_lock->unlock();
+        this->daemon_lock->unlock();
     }
 };

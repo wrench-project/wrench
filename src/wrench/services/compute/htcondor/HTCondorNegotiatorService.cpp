@@ -120,7 +120,7 @@ namespace wrench {
         return 1;
       }
 
-      WRENCH_INFO("HTCondorNegotiator Service on host %s terminated!", S4U_Simulation::getHostName().c_str());
+      WRENCH_INFO("HTCondorNegotiator Service on host %s cleanly terminating!", S4U_Simulation::getHostName().c_str());
       return 0;
     }
 

@@ -215,7 +215,7 @@ namespace wrench {
       // Start all network daemons
       try {
         for (auto &network_daemon : this->network_daemons) {
-          network_daemon->start(network_daemon, true); // daemonized
+          network_daemon->start(network_daemon, true, false); // Daemonized, no auto-restart
         }
       } catch (std::runtime_error &e) {
         throw;
@@ -226,7 +226,7 @@ namespace wrench {
 
       }
 
-      WRENCH_INFO("Network Proximity Service on host %s terminated!", S4U_Simulation::getHostName().c_str());
+      WRENCH_INFO("Network Proximity Service on host %s cleanly terminating!", S4U_Simulation::getHostName().c_str());
       return 0;
     }
 
