@@ -235,8 +235,8 @@ namespace wrench {
         TaskType task_type;                // Task type
         double flops;                      // Number of flops
         double average_cpu;                // Average CPU utilization
-        unsigned long bytes_read;          // Total bytes read in KB
-        unsigned long bytes_written;       // Total bytes written in KB
+        unsigned long bytes_read = -1;     // Total bytes read in KB
+        unsigned long bytes_written = -1;  // Total bytes written in KB
         unsigned long min_num_cores;
         unsigned long max_num_cores;
         double parallel_efficiency;
