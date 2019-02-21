@@ -496,7 +496,7 @@ namespace wrench {
         this->dispatchReadyWorkunits();
       }
 
-      WRENCH_INFO("Multicore Job Executor on host %s terminated!", S4U_Simulation::getHostName().c_str());
+      WRENCH_INFO("Multicore Job Executor on host %s terminating cleanly!", S4U_Simulation::getHostName().c_str());
       return 0;
     }
 
@@ -650,7 +650,7 @@ namespace wrench {
                 ));
 
         workunit_executor->simulation = this->simulation;
-        workunit_executor->start(workunit_executor, true);
+        workunit_executor->start(workunit_executor, true, false); // Daemonized, no auto-restart
 
         // Keep track of this workunit executor
         this->workunit_executors[job].insert(workunit_executor);

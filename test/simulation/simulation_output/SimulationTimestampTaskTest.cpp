@@ -450,7 +450,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
  * running tasks.
  *
  * Also testing that SimulationTimestampTaskTerminated timestamps get created when
- * tasks are deliberately terminated by the WMS.
+ * tasks are deliberately cleanly_terminated by the WMS.
  */
 
 class SimulationTimestampTaskTerminateAndFailTestWMS : public wrench::WMS {

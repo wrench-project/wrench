@@ -404,7 +404,7 @@ namespace wrench {
           try {
             compute_thread = std::shared_ptr<ComputeThread>(
                     new ComputeThread(this->simulation, S4U_Simulation::getHostName(), effective_flops, tmp_mailbox));
-            compute_thread->start(compute_thread, true);
+            compute_thread->start(compute_thread, true, false); // Daemonized, no auto-restart
           } catch (std::exception &e) {
             // Some internal SimGrid exceptions...????
             WRENCH_INFO("Could not create compute thread... perhaps I am being killed?");
