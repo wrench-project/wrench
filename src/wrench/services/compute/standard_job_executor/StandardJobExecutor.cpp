@@ -813,6 +813,11 @@ namespace wrench {
                       }
                       return (wu1->task->getMinNumCores() >= wu2->task->getMinNumCores());
 
+                    } else if (selection_algorithm == "minimum_top_level") {
+                      if (wu1->task->getTopLevel() == wu2->task->getTopLevel()) {
+                        return ((uintptr_t) wu1 > (uintptr_t) wu2);
+                      }
+                      return (wu1->task->getTopLevel() <= wu2->task->getTopLevel());
                     } else {
                       throw std::runtime_error("Unknown StandardJobExecutorProperty::TASK_SELECTION_ALGORITHM property '"
                                                + selection_algorithm + "'");
