@@ -370,9 +370,6 @@ namespace wrench {
 
       std::string tmp_mailbox = S4U_Mailbox::generateUniqueMailboxName("workunit_executor");
 
-      // Nobody kills me while I am starting compute threads!
-      this->acquireDaemonLock();
-
       if (simulate_computation_as_sleep) {
 
         /** Simulate computation as sleep **/
@@ -386,6 +383,9 @@ namespace wrench {
 
       } else {
         /** Simulate computation with actual compute threads **/
+
+        // Nobody kills me while I am starting compute threads!
+        this->acquireDaemonLock();
 
         WRENCH_INFO("Simulating %ld compute threads", this->num_cores);
 

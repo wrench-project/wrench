@@ -56,6 +56,16 @@ namespace wrench {
          **/
         DECLARE_PROPERTY_NAME(HOST_SELECTION_ALGORITHM);
 
+        /** @brief The algorithm that decides which ready computational task (within a standard job
+         *         executed by the batch service), in case multiple tasks are ready, should run first. This is typically
+         *         not managed by a batch scheduler, but by some application-level script that executes
+         *         a set of tasks within compute resources allocated by the batch scheduler. Possible values are:
+         *                  - maximum_flops (default)
+         *                  - maximum_minimum_cores
+         *                  - minimum_top_level
+         **/
+        DECLARE_PROPERTY_NAME(TASK_SELECTION_ALGORITHM);
+
         /**
          * @brief Path to a workload trace file to be replayed. The trace file can be
          * be in the SWF format (see http://www.cs.huji.ac.il/labs/parallel/workload/swf.html), in which
@@ -114,6 +124,7 @@ namespace wrench {
         *            have no effect in some cases).
         */
         DECLARE_PROPERTY_NAME(BATSCHED_CONTIGUOUS_ALLOCATION);
+
 
         /***********************/
         /** \cond INTERNAL     */
