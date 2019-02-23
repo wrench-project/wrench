@@ -17,7 +17,6 @@ More information and Documentation: [WRENCH Project Website](http://wrench-proje
 **WRENCH Research Paper:**
 - H. Casanova, S. Pandey, J. Oeth, R. Tanaka, F. Suter, and R. Ferreira da Silva, “[WRENCH: A Framework for Simulating Workflow Management Systems](http://rafaelsilva.com/wp-content/papercite-data/pdf/casanova-works-2018.pdf),” in 13th Workshop on Workflows in Support of Large-Scale Science (WORKS’18), 2018, p. 74–85. 
 
-
 ## Prerequisites
 
 WRENCH is fully developed in C++. The code follows the C++11 standard, and thus older 
@@ -29,7 +28,6 @@ users to satisfy the following requirements:
 And, one of the following:
 - **g++** - version 5.0 or higher
 - **clang** - version 3.6 or higher
-
 
 ## Dependencies
 
@@ -44,7 +42,6 @@ And, one of the following:
 - [Google Test](https://github.com/google/googletest) - version 1.8 or higher (only required for running test cases)
 - [Doxygen](http://www.doxygen.org) - version 1.8 or higher (only required for generating documentation)
 - [Batsched](https://gitlab.inria.fr/batsim/batsched) - only needed for batch-scheduled resource simulation
-
 
 ## Building From Source
 
@@ -63,7 +60,6 @@ make
 make install  # try "sudo make install" if you don't have the permission to write
 ```
 
-
 ## Get in Touch
 
 The main channel to reach the WRENCH team is via the support email: 
@@ -72,7 +68,21 @@ The main channel to reach the WRENCH team is via the support email:
 **Bug Report / Feature Request:** our preferred channel to report a bug or request a feature is via  
 WRENCH's [Github Issues Track](https://github.com/wrench-project/wrench/issues).
 
+## Citing WRENCH
 
+When citing WRENCH, please use the following paper. You should also actually read that paper, as 
+it provides a recent and general overview on the framework.
+
+```latex
+@inproceedings{wrench,
+  title = {WRENCH: A Framework for Simulating Workflow Management Systems},
+  author = {Casanova, Henri and Pandey, Suraj and Oeth, James and Tanaka, Ryan and Suter, Frederic and Ferreira da Silva, Rafael},
+  booktitle = {13th Workshop on Workflows in Support of Large-Scale Science (WORKS'18)},
+  year = {2018},
+  pages = {74--85},
+  doi = {10.1109/WORKS.2018.00013}
+}
+```
 
 [travis-badge]:             https://travis-ci.org/wrench-project/wrench.svg?branch=master
 [travis-link]:              https://travis-ci.org/wrench-project/wrench
@@ -85,20 +95,3 @@ WRENCH's [Github Issues Track](https://github.com/wrench-project/wrench/issues).
 [codacy-link]:              https://www.codacy.com/app/WRENCH/wrench?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=wrench-project/wrench&amp;utm_campaign=Badge_Grade
 [sonarcloud-badge]:         https://sonarcloud.io/api/project_badges/measure?project=wrench&metric=ncloc
 [sonarcloud-link]:          https://sonarcloud.io/dashboard?id=wrench
-
-
-## Citing WRENCH
-
-When citing WRENCH, please use the following paper. You should also actually read that paper, as 
-it provides a recent and general overview on the framework.
-
-```
-@inproceedings{wrench,
-  title = {WRENCH: A Framework for Simulating Workflow Management Systems},
-  author = {Casanova, Henri and Pandey, Suraj and Oeth, James and Tanaka, Ryan and Suter, Frederic and Ferreira da Silva, Rafael},
-  booktitle = {13th Workshop on Workflows in Support of Large-Scale Science (WORKS'18)},
-  year = {2018},
-  pages = {74--85},
-  doi = {10.1109/WORKS.2018.00013}
-}
-```
