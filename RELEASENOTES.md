@@ -13,7 +13,6 @@ WRENCH Release Notes
 
 **Note**: WRENCH 1.2 requires [SimGrid 3.21](https://simgrid.org).
 
-
 ### WRENCH 1.2
 
 (_Nov 6, 2018_) This release includes a series of new features and bug fixes, including:
@@ -25,7 +24,6 @@ WRENCH Release Notes
 - Bug fixes: #67, #69, #79, #80
 
 **Note**: WRENCH 1.2 requires [SimGrid 3.21](https://simgrid.org).
-
 
 ### WRENCH 1.1
 
@@ -40,7 +38,6 @@ WRENCH Release Notes
 
 **Note**: WRENCH 1.1 requires [SimGrid 3.20](https://simgrid.org)
 
-
 ### WRENCH 1.0.1
 
 (_Aug 14, 2018_) On this minor bug fix and small improvements release, we provide:
@@ -50,7 +47,6 @@ WRENCH Release Notes
 - Bug fixes: #51, #53, #54, #56, and #57
 
 **Note**: WRENCH 1.0.1 requires [SimGrid 3.20](https://simgrid.org)
-
 
 ### WRENCH 1.0
 
