@@ -211,7 +211,7 @@ namespace wrench {
             simgrid::s4u::this_actor::execute(flops);
         } catch (simgrid::HostFailureException& e) {
             throw std::shared_ptr<HostError>(
-                    new HostError());
+                    new HostError(S4U_Simulation::getHostName()));
         }
     }
 
@@ -226,7 +226,7 @@ namespace wrench {
             simgrid::s4u::this_actor::sleep_for(duration);
         } catch (simgrid::HostFailureException& e) {
             throw std::shared_ptr<HostError>(
-                    new HostError());
+                    new HostError(S4U_Simulation::getHostName()));
         }
     }
 

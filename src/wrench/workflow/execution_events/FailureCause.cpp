@@ -634,14 +634,16 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     * @param hostname: the name of the host that experienced the error
      */
-    HostError::HostError() : FailureCause(HOST_ERROR) {
+    HostError::HostError(std::string hostname) : FailureCause(HOST_ERROR) {
+        this->hostname = hostname;
     }
 
     /** @brief Get the human-readable failure message
      * @return the message
      */
      std::string HostError::toString() {
-         return "The host has failed";
+         return "The host (" + this->hostname + ") has failed or is down";
      }
 };

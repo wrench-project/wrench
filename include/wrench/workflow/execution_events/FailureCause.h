@@ -395,7 +395,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        HostError();
+        HostError(std::string hostname);
         /***********************/
         /** \endcond           */
         /***********************/
@@ -403,6 +403,7 @@ namespace wrench {
         std::string toString();
 
     private:
+        std::string hostname;
     };
 
 
