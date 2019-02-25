@@ -163,8 +163,12 @@ namespace wrench {
                                                           simgrid::s4u::Host::by_name(hostname),
                                                           S4U_DaemonActor(this));
         } catch (std::exception &e) {
-            // Some internal SimGrid exceptions...
-            std::abort();
+            throw std::shared_ptr<HostError>(new HostError(hostname));
+        }
+
+        // nullptr is returned if the host is off (perhaps)
+        if (this->s4u_actor == nullptr) {
+            throw std::shared_ptr<HostError>(new HostError(hostname));
         }
 
         // This test here is critical. It's possible that the created actor above returns
