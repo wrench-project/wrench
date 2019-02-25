@@ -55,5 +55,5 @@ TEST_F(FailureCauseConstructorTest, NetworkError) {
 
 TEST_F(FailureCauseConstructorTest, HostError) {
   wrench::HostError *cause = nullptr;
-  ASSERT_NO_THROW(cause = new wrench::HostError());
+  ASSERT_NO_THROW(cause = new wrench::HostError("hostname"));
 }
