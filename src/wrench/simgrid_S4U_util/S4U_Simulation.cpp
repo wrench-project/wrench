@@ -16,9 +16,13 @@
 #include <wrench/util/UnitParser.h>
 #include <simgrid/plugins/energy.h>
 #include <wrench/workflow/execution_events/FailureCause.h>
-
+#include "wrench/logging/TerminalOutput.h"
 
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
+
+XBT_LOG_NEW_DEFAULT_CATEGORY(s4u_simulation, "Log category for S4U_"
+                                             "Simulation");
+
 
 namespace wrench {
 
@@ -210,6 +214,7 @@ namespace wrench {
         try{
             simgrid::s4u::this_actor::execute(flops);
         } catch (simgrid::HostFailureException& e) {
+            WRENCH_INFO("XXXXX THROWING IN COMPUTE");
             throw std::shared_ptr<HostError>(
                     new HostError(S4U_Simulation::getHostName()));
         }
@@ -225,6 +230,7 @@ namespace wrench {
         try {
             simgrid::s4u::this_actor::sleep_for(duration);
         } catch (simgrid::HostFailureException& e) {
+            WRENCH_INFO("THROWING IN SLEEP");
             throw std::shared_ptr<HostError>(
                     new HostError(S4U_Simulation::getHostName()));
         }
