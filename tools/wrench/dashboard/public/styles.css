@@ -13,6 +13,18 @@ body {
     font-family: sans-serif;
     font-size: 12px;
 }
+#host-tooltip-container {
+    position: absolute;
+    width: auto;
+    padding: 10px;
+    background-color: #f2f2f2;
+    border-radius: 2px;
+    border: 0px solid #000;
+    display: none;
+    pointer-events: none;
+    font-family: sans-serif;
+    font-size: 12px;
+}
 #logo {
     width: 150px;
     margin-bottom: 20px;
@@ -143,4 +155,11 @@ td {
 .arrow-img {
     vertical-align: middle;
     height: 20px;
+}
+
+.host-graph-box {
+    /* stroke: #646464;
+    stroke-width: 1px;
+    stroke-dasharray: 2,2;
+    stroke-linejoin: round; */
 }
