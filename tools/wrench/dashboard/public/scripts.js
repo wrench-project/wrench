@@ -239,8 +239,16 @@ function generateHostGraph(data, containerId) {
         .range([PADDING, CONTAINER_WIDTH - PADDING])
 
     var hostNames = new Set();
+
+    var hostNameAppearanceCount = {}
     data.forEach(function(task) {
-        hostNames.add(task.execution_host.hostname)
+        var hostName = task.execution_host.hostname
+        hostNames.add(hostName)
+        if (hostNameAppearanceCount[hostName] === undefined) {
+            hostNameAppearanceCount[hostName] = 1
+        } else {
+            hostNameAppearanceCount[hostName]++
+        }
     });
 
     hostNames = Array.from(hostNames)
@@ -271,52 +279,63 @@ function generateHostGraph(data, containerId) {
         .attr('transform',
             'translate(0,' + (CONTAINER_HEIGHT - PADDING) + ')')
         .call(x_axis);
+
+    var hostCount = {}
+
     data.forEach(function(d) {
+        if (hostCount[d.execution_host.hostname] === undefined) {
+            hostCount[d.execution_host.hostname] = 0
+        } else {
+            hostCount[d.execution_host.hostname]++
+        }
         var group = svg.append('g')
            .attr('id', d.execution_host.hostname + " " + d.task_id)
-        var readTime = getBoxWidth(d, "read", xscale)
-        var computeTime = getBoxWidth(d, "compute", xscale)
-        var writeTime = getBoxWidth(d, "write", xscale)
-        var ft_point = determineFailedOrTerminatedPoint(d)
-        if (ft_point != "none") {
-            var x_ft = xscale(d.terminated == -1 ? d.failed : d.terminated)
-            var height_ft = yscale(data[0].task_id)-yscale(data[1].task_id)
-            var y_ft = yscale(d.execution_host.hostname)
-            var colour_ft = d.terminated == -1 ? 'orange' : 'red'
-            var class_ft = d.terminated == -1 ? 'failed' : 'terminated'
-            group.append('rect')
-                .attr('x', x_ft)
-                .attr('y', y_ft)
-                .attr('height', height_ft)
-                .attr('width', '5px')
-                .style('fill', colour_ft)
-                .attr('class', class_ft)
-        }
         group.append('rect')
-            .attr('x', xscale(d.read.start))
-            .attr('y', yscale(d.execution_host.hostname))
-            .attr('height', yscale(data[0].task_id)-yscale(data[1].task_id))
-            .attr('width', readTime)
-            .style('fill',read_color)
-            .attr('class','read')
-        if (ft_point != "read" || ft_point == "none") {
-            group.append('rect')
-                .attr('x', xscale(d.compute.start))
-                .attr('y', yscale(d.execution_host.hostname))
-                .attr('height', yscale(data[0].task_id)-yscale(data[1].task_id))
-                .attr('width', computeTime)
-                .style('fill',compute_color)
-                .attr('class','compute')
-        }
-        if ((ft_point != "read" && ft_point != "compute" )|| ft_point == "none") {
-            group.append('rect')
-                .attr('x', xscale(d.write.start))
-                .attr('y', yscale(d.execution_host.hostname))
-                .attr('height', yscale(data[0].task_id)-yscale(data[1].task_id))
-                .attr('width', writeTime)
-                .style('fill',write_color)
-                .attr('class','write')
-        }
+            .attr('x', xscale(d.whole_task.start))
+            .attr('y', yscale(d.execution_host.hostname) + (((yscale(hostNames[0])-yscale(hostNames[1])) / hostNameAppearanceCount[d.execution_host.hostname]) * hostCount[d.execution_host.hostname]))
+            .attr('height', (yscale(hostNames[0])-yscale(hostNames[1])) / hostNameAppearanceCount[d.execution_host.hostname])
+            .attr('width', xscale(d.whole_task.end) - xscale(d.whole_task.start))
+            .style('fill',compute_color)
+            .attr('class','compute')
+        // if (ft_point != "none") {
+        //     var x_ft = xscale(d.terminated == -1 ? d.failed : d.terminated)
+        //     var height_ft = yscale(data[0].execution_host.hostname)-yscale(data[1].execution_host.hostname)
+        //     var y_ft = yscale(d.execution_host.hostname)
+        //     var colour_ft = d.terminated == -1 ? 'orange' : 'red'
+        //     var class_ft = d.terminated == -1 ? 'failed' : 'terminated'
+        //     group.append('rect')
+        //         .attr('x', x_ft)
+        //         .attr('y', y_ft)
+        //         .attr('height', height_ft)
+        //         .attr('width', '5px')
+        //         .style('fill', colour_ft)
+        //         .attr('class', class_ft)
+        // }
+        // group.append('rect')
+        //     .attr('x', xscale(d.read.start))
+        //     .attr('y', yscale(d.execution_host.hostname))
+        //     .attr('height', yscale(data[0].execution_host.hostname)-yscale(data[1].execution_host.hostname))
+        //     .attr('width', readTime)
+        //     .style('fill',read_color)
+        //     .attr('class','read')
+        // if (ft_point != "read" || ft_point == "none") {
+        //     group.append('rect')
+        //         .attr('x', xscale(d.compute.start))
+        //         .attr('y', yscale(d.execution_host.hostname))
+        //         .attr('height', yscale(data[0].execution_host.hostname)-yscale(data[1].execution_host.hostname))
+        //         .attr('width', computeTime)
+        //         .style('fill',compute_color)
+        //         .attr('class','compute')
+        // }
+        // if ((ft_point != "read" && ft_point != "compute" )|| ft_point == "none") {
+        //     group.append('rect')
+        //         .attr('x', xscale(d.write.start))
+        //         .attr('y', yscale(d.execution_host.hostname))
+        //         .attr('height', yscale(data[0].execution_host.hostname)-yscale(data[1].execution_host.hostname))
+        //         .attr('width', writeTime)
+        //         .style('fill',write_color)
+        //         .attr('class','write')
+        // }
         // var tooltip = document.getElementById('tooltip-container')
         // var tooltip_task_id                 = d3.select('#tooltip-task-id');
         // var tooltip_task_operation          = d3.select('#tooltip-task-operation');
@@ -406,7 +425,6 @@ function populateWorkflowTaskDataTable(data) {
     const TASK_DATA = Object.assign([], data).sort(function(lhs, rhs) {
         return parseInt(lhs.task_id.slice(4)) - parseInt(rhs.task_id.slice(4))
     })
-
     TASK_DATA.forEach(function(task) {
         var task_id = task['task_id']
 
