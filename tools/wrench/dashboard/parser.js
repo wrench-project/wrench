@@ -27,12 +27,13 @@ function addToHTMLFile(data) {
     fileContents = fileContents.toString().split('\n').slice(1).join('\n'); //remove first line
     fileContents = Buffer.from(fileContents, 'utf8');
     var fd = fs.openSync("public/scripts.js", 'w+');
-    var buffer = new Buffer("var data=" + JSON.stringify(data) + "\n");
+    // var buffer = new Buffer("var data=" + JSON.stringify(data) + "\n");
+    var buffer = Buffer.from("var data=" + JSON.stringify(data) + "\n", 'utf8')
 
     fs.writeSync(fd, buffer, 0, buffer.length, 0); //write new data
     fs.writeSync(fd, fileContents, 0, fileContents.length, buffer.length); //append old data
     // or fs.appendFile(fd, data);
-    fs.close(fd); 
+    fs.closeSync(fd); 
 }
 
 if (process.argv.length == 2) {
