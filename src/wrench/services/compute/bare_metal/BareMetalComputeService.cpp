@@ -1270,7 +1270,7 @@ namespace wrench {
         return;
       }
 
-      // Construct the tark run spec (i.e., keep track of service-specific arguments for each task)
+      // Construct the task run spec (i.e., keep track of service-specific arguments for each task)
       std::map<WorkflowTask *, std::tuple<std::string, unsigned long>> task_run_specs;
       for (auto t : job->getTasks()) {
         if ((service_specific_arguments.find(t->getID()) == service_specific_arguments.end()) or
