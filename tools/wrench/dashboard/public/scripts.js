@@ -59,6 +59,15 @@ function determineFailedOrTerminatedPoint(d) {
     }
 }
 
+function getRandomColour() {
+    var letters = '0123456789ABCDEF';
+    var color = '#';
+    for (var i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
+
 function populateMetadata() {
     var modified = data.modified
     var file = data.file
@@ -240,22 +249,45 @@ function generateHostGraph(data, containerId) {
 
     var hostNames = new Set();
 
-    var hostNameAppearanceCount = {}
+    var hostTasks = {}
+    console.log(data)
     data.forEach(function(task) {
         var hostName = task.execution_host.hostname
         hostNames.add(hostName)
-        if (hostNameAppearanceCount[hostName] === undefined) {
-            hostNameAppearanceCount[hostName] = 1
+        var whole_task = task.whole_task
+        if (hostTasks[hostName] === undefined) {
+            var toAdd = {}
+            toAdd[task.task_id] = {whole_task, yIndex: 0}
+            hostTasks[hostName] = [{whole_task, id: task.task_id, yIndex: 0}]
         } else {
-            hostNameAppearanceCount[hostName]++
+            var currHost = hostTasks[hostName]
+            var currStart = whole_task.start
+            var currEnd = whole_task.end
+            var yIndex = 0
+            currHost.forEach(function(hostTask) {
+                if ((currStart >= hostTask.whole_task.start && currStart <= hostTask.whole_task.end) || (currEnd >= hostTask.whole_task.start && currEnd <= hostTask.whole_task.end)) {
+                    yIndex = hostTask.yIndex + 1
+                    return
+                }
+            })
+            currHost.push({whole_task, id: task.task_id, yIndex})
+            hostTasks[hostName] = currHost
         }
-    });
+    })
+
+    console.log(hostTasks)
 
     hostNames = Array.from(hostNames)
 
     hostNames.sort(function(lhs, rhs) {
        return lhs - rhs
     });
+
+    var colours = {}
+
+    hostNames.forEach(function(host) {
+        colours[host] = getRandomColour()
+    })
 
     var yscale = d3.scaleBand()
         .domain(hostNames)
@@ -282,6 +314,30 @@ function generateHostGraph(data, containerId) {
 
     var hostCount = {}
 
+    var dataWithYIndex = data
+    dataWithYIndex.forEach(function(task, i) {
+        // hostTasks.forEach(function(host) {
+        for (var key in hostTasks) {
+            var maxYIndex = 0
+            if (hostTasks.hasOwnProperty(key)) {
+                hostTasks[key].forEach(function(hostTask) {
+                    if (hostTask.yIndex > maxYIndex) {
+                        maxYIndex = hostTask.yIndex
+                    }
+                    if (task.task_id === hostTask.id) {
+                        dataWithYIndex[i] = {
+                            ...task,
+                            yIndex: hostTask.yIndex
+                        }
+                    }
+                })
+            }
+            hostTasks[key].maxYIndex = maxYIndex
+        }
+    })
+
+    console.log(hostTasks)
+
     data.forEach(function(d) {
         if (hostCount[d.execution_host.hostname] === undefined) {
             hostCount[d.execution_host.hostname] = 0
@@ -292,101 +348,47 @@ function generateHostGraph(data, containerId) {
            .attr('id', d.execution_host.hostname + " " + d.task_id)
         group.append('rect')
             .attr('x', xscale(d.whole_task.start))
-            .attr('y', yscale(d.execution_host.hostname) + (((yscale(hostNames[0])-yscale(hostNames[1])) / hostNameAppearanceCount[d.execution_host.hostname]) * hostCount[d.execution_host.hostname]))
-            .attr('height', (yscale(hostNames[0])-yscale(hostNames[1])) / hostNameAppearanceCount[d.execution_host.hostname])
+            .attr('y', yscale(d.execution_host.hostname) + (((yscale(hostNames[0])-yscale(hostNames[1])) / (hostTasks[d.execution_host.hostname].maxYIndex + 1)) * d.yIndex)) //y-position + (width / total-count) * y-index
+            .attr('height', (yscale(hostNames[0])-yscale(hostNames[1])) / (hostTasks[d.execution_host.hostname].maxYIndex + 1))
             .attr('width', xscale(d.whole_task.end) - xscale(d.whole_task.start))
-            .style('fill',compute_color)
-            .attr('class','compute')
-        // if (ft_point != "none") {
-        //     var x_ft = xscale(d.terminated == -1 ? d.failed : d.terminated)
-        //     var height_ft = yscale(data[0].execution_host.hostname)-yscale(data[1].execution_host.hostname)
-        //     var y_ft = yscale(d.execution_host.hostname)
-        //     var colour_ft = d.terminated == -1 ? 'orange' : 'red'
-        //     var class_ft = d.terminated == -1 ? 'failed' : 'terminated'
-        //     group.append('rect')
-        //         .attr('x', x_ft)
-        //         .attr('y', y_ft)
-        //         .attr('height', height_ft)
-        //         .attr('width', '5px')
-        //         .style('fill', colour_ft)
-        //         .attr('class', class_ft)
-        // }
-        // group.append('rect')
-        //     .attr('x', xscale(d.read.start))
-        //     .attr('y', yscale(d.execution_host.hostname))
-        //     .attr('height', yscale(data[0].execution_host.hostname)-yscale(data[1].execution_host.hostname))
-        //     .attr('width', readTime)
-        //     .style('fill',read_color)
-        //     .attr('class','read')
-        // if (ft_point != "read" || ft_point == "none") {
-        //     group.append('rect')
-        //         .attr('x', xscale(d.compute.start))
-        //         .attr('y', yscale(d.execution_host.hostname))
-        //         .attr('height', yscale(data[0].execution_host.hostname)-yscale(data[1].execution_host.hostname))
-        //         .attr('width', computeTime)
-        //         .style('fill',compute_color)
-        //         .attr('class','compute')
-        // }
-        // if ((ft_point != "read" && ft_point != "compute" )|| ft_point == "none") {
-        //     group.append('rect')
-        //         .attr('x', xscale(d.write.start))
-        //         .attr('y', yscale(d.execution_host.hostname))
-        //         .attr('height', yscale(data[0].execution_host.hostname)-yscale(data[1].execution_host.hostname))
-        //         .attr('width', writeTime)
-        //         .style('fill',write_color)
-        //         .attr('class','write')
-        // }
-        // var tooltip = document.getElementById('tooltip-container')
-        // var tooltip_task_id                 = d3.select('#tooltip-task-id');
-        // var tooltip_task_operation          = d3.select('#tooltip-task-operation');
-        // var tooltip_task_operation_duration = d3.select('#tooltip-task-operation-duration');
-        // group.selectAll('rect')
-        //     .on('mouseover', function() {
-        //         tooltip.style.display = 'inline'
+            .style('fill', colours[d.execution_host.hostname])
+            .attr('class','host-graph-box')
+        var tooltip = document.getElementById('host-tooltip-container')
+        var tooltip_task_id                 = d3.select('#host-tooltip-task-id')
+        var tooltip_task_duration = d3.select('#host-tooltip-task-duration')
+        group.selectAll('rect')
+            .on('mouseover', function() {
+                tooltip.style.display = 'inline'
 
-        //         d3.select(this)
-        //             .attr('stroke', 'gray')
-        //             .style('stroke-width', '1');
-        //     })
-        //     .on('mousemove', function() {
-        //         var offset = getOffset(document.getElementById("graph-container"), d3.mouse(this));
-        //         var x = window.scrollX + offset.left + 20;
-        //         var y = window.scrollY + offset.top - 30; // 20 seems to account for the padding of the chart-block
+                d3.select(this)
+                    .attr('stroke', 'gray')
+                    .style('stroke-width', '1');
+            })
+            .on('mousemove', function() {
+                var offset = getOffset(document.getElementById("host-graph-container"), d3.mouse(this));
+                var x = window.scrollX + offset.left + 20;
+                var y = window.scrollY + offset.top - 30; // 20 seems to account for the padding of the chart-block
                 
-        //         tooltip.style.left = x + 'px'
-        //         tooltip.style.top = y + 'px'
+                tooltip.style.left = x + 'px'
+                tooltip.style.top = y + 'px'
 
-        //         tooltip_task_id.text('TaskID: ' + d.task_id);
+                tooltip_task_id.text('TaskID: ' + d.task_id);
 
-        //         var parent_group = d3.select(this).attr('class');
-
-        //         if (parent_group == 'read') {
-        //             tooltip_task_operation.text('Read Input');
-        //         } else if (parent_group == 'compute') {
-        //             tooltip_task_operation.text('Computation');
-        //         } else if (parent_group == 'write') {
-        //             tooltip_task_operation.text('Write Output');
-        //         } else if (parent_group == "terminated") {
-        //             tooltip_task_operation.text('Terminated');
-        //         } else if (parent_group == "failed") {
-        //             tooltip_task_operation.text('Failed');
-        //         }
-
-        //         var durationFull = findDuration(data, d.task_id, parent_group)
-        //         if (parent_group != "failed" && parent_group != "terminated") {
-        //             var duration = toFiveDecimalPlaces(durationFull);
-        //             tooltip_task_operation_duration.text('Duration: ' + duration + 's');
-        //         } else {
-        //             tooltip_task_operation_duration.text('');
-        //         }
+                var durationFull = findDuration(data, d.task_id, "whole_task")
+                if (d.whole_task.start != -1 && d.whole_task.end != -1) {
+                    var duration = toFiveDecimalPlaces(durationFull)
+                    tooltip_task_duration.text('Duration: ' + duration + 's')
+                } else {
+                    tooltip_task_duration.text('')
+                }
                 
-        //     })
-        //     .on('mouseout', function() {
-        //         tooltip.style.display = 'none'
+            })
+            .on('mouseout', function() {
+                tooltip.style.display = 'none'
 
-        //         d3.select(this)
-        //             .attr('stroke', 'none')
-        //     });
+                d3.select(this)
+                    .attr('stroke', 'none')
+            });
     })
 }
 
