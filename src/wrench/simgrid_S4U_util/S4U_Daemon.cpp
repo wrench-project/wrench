@@ -157,16 +157,21 @@ namespace wrench {
                     this->getName() + ")");
         }
 
+        // Check that the host is up!
+        if (simgrid::s4u::Host::by_name(hostname)->is_off()) {
+            throw std::shared_ptr<HostError>(new HostError(hostname));
+        }
+
         // Create the s4u_actor
         try {
             this->s4u_actor = simgrid::s4u::Actor::create(this->process_name.c_str(),
                                                           simgrid::s4u::Host::by_name(hostname),
                                                           S4U_DaemonActor(this));
         } catch (std::exception &e) {
-            throw std::shared_ptr<HostError>(new HostError(hostname));
+            throw std::shared_ptr<FatalFailure>(new FatalFailure());
         }
 
-        // nullptr is returned if the host is off (perhaps)
+        // nullptr is returned if the host is off (not the current behavior in SimGrid... just paranoid here)
         if (this->s4u_actor == nullptr) {
             throw std::shared_ptr<HostError>(new HostError(hostname));
         }
