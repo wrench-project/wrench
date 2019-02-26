@@ -113,7 +113,7 @@ private:
     }
 };
 
-TEST_F(SimulatedFailuresTest, DISABLED_StartServiceOnDownHostTest) {
+TEST_F(SimulatedFailuresTest, StartServiceOnDownHostTest) {
     DO_TEST_WITH_FORK(do_StartServiceOnDownHostTest_test);
 }
 
