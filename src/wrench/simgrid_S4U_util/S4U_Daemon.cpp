@@ -159,7 +159,6 @@ namespace wrench {
 
         // Check that the host is up!
         if (simgrid::s4u::Host::by_name(hostname)->is_off()) {
-            WRENCH_INFO("XXXXX THROWING IN CREATE");
             throw std::shared_ptr<HostError>(new HostError(hostname));
         }
 
@@ -174,7 +173,6 @@ namespace wrench {
 
         // nullptr is returned if the host is off (not the current behavior in SimGrid... just paranoid here)
         if (this->s4u_actor == nullptr) {
-            WRENCH_INFO("XXXXX THROWING IN CREATE");
             throw std::shared_ptr<HostError>(new HostError(hostname));
         }
 
@@ -214,9 +212,11 @@ namespace wrench {
         try {
             S4U_Simulation::computeZeroFlop();
             this->num_starts++;
-            this->main();
-            this->setCleanlyTerminated();
-            wrench::S4U_Simulation::sleep(0.001);
+            int exit_code =this->main();
+            if (not exit_code) {
+                this->setCleanlyTerminated();
+                wrench::S4U_Simulation::sleep(0.001);
+            }
         } catch (std::exception &e) {
             throw;
         }

@@ -15,7 +15,8 @@
 #include "../include/UniqueTmpPathPrefix.h"
 #include "HostSwitch.h"
 #include "wrench/services/helpers/ServiceFailureDetector.h"
-#include "Sleeper.h"
+#include "SleeperVictim.h"
+#include "ComputerVictim.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(simulated_failures_test, "Log category for SimulatedFailuresTests");
 
@@ -27,7 +28,8 @@ public:
     std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
 
     void do_StartServiceOnDownHostTest_test();
-    void do_FailureDetectorTest_test();
+    void do_FailureDetectorForSleeperTest_test();
+    void do_FailureDetectorForComputerTest_test();
     void do_ServiceRestartTest_test();
 
 protected:
@@ -99,7 +101,7 @@ private:
         simgrid::s4u::Host::by_name("FailedHost")->turn_off();
 
         // Starting a sleeper (that will reply with a bogus TTL Expiration message)
-        auto sleeper = std::shared_ptr<wrench::Sleeper>(new wrench::Sleeper("FailedHost", 100, new wrench::ServiceTTLExpiredMessage(1), this->mailbox_name));
+        auto sleeper = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHost", 100, new wrench::ServiceTTLExpiredMessage(1), this->mailbox_name));
         sleeper->simulation = this->simulation;
         try {
             sleeper->start(sleeper, true, true); // Daemonized, auto-restart!!
@@ -152,13 +154,13 @@ void SimulatedFailuresTest::do_StartServiceOnDownHostTest_test() {
 
 
 /**********************************************************************/
-/**                    FAILURE DETECTOR TEST                         **/
+/**              FAILURE DETECTOR FOR SLEEPER TEST                   **/
 /**********************************************************************/
 
-class FailureDetectorTestWMS : public wrench::WMS {
+class FailureDetectorForSleeperTestWMS : public wrench::WMS {
 
 public:
-    FailureDetectorTestWMS(SimulatedFailuresTest *test,
+    FailureDetectorForSleeperTestWMS(SimulatedFailuresTest *test,
                                       std::string &hostname) :
             wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -173,7 +175,7 @@ private:
         /** TEST THAT SHOULD DETECT A FAILURE (using a victim host) **/
 
         // Starting a victim on the FailedHost (that will reply with a bogus TTL Expiration message)
-        auto victim = std::shared_ptr<wrench::Sleeper>(new wrench::Sleeper("FailedHost", 100, new wrench::ServiceTTLExpiredMessage(1), this->mailbox_name));
+        auto victim = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHost", 100, new wrench::ServiceTTLExpiredMessage(1), this->mailbox_name));
         victim->simulation = this->simulation;
         victim->start(victim, true, false); // Daemonized, no auto-restart
 
@@ -197,7 +199,7 @@ private:
 
         if (dynamic_cast<wrench::ServiceTTLExpiredMessage *>(message.get())) {
             throw std::runtime_error("Failure should have been detected!");
-        } else if (dynamic_cast<wrench::ServiceHasFailedMessage *>(message.get())) {
+        } else if (dynamic_cast<wrench::ServiceHaCrashedeMessage *>(message.get())) {
             // All good
         } else {
             throw std::runtime_error("Unexpected " + message->getName() + " message");
@@ -210,7 +212,7 @@ private:
         /** TEST THAT SHOULD DETECT A FAILURE (using a failure trace) **/
 
         // Starting a victim on the FailedHost (that will reply with a bogus TTL Expiration message)
-        victim = std::shared_ptr<wrench::Sleeper>(new wrench::Sleeper("FailedHostTrace", 100, new wrench::ServiceTTLExpiredMessage(1), this->mailbox_name));
+        victim = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHostTrace", 100, new wrench::ServiceTTLExpiredMessage(1), this->mailbox_name));
         victim->simulation = this->simulation;
         victim->start(victim, true, false); // Daemonized, no auto-restart
 
@@ -228,7 +230,7 @@ private:
 
         if (dynamic_cast<wrench::ServiceTTLExpiredMessage *>(message.get())) {
             throw std::runtime_error("Failure should have been detected!");
-        } else if (dynamic_cast<wrench::ServiceHasFailedMessage *>(message.get())) {
+        } else if (dynamic_cast<wrench::ServiceHaCrashedeMessage *>(message.get())) {
             // All good
         } else {
             throw std::runtime_error("Unexpected " + message->getName() + " message");
@@ -238,7 +240,7 @@ private:
         /** TEST THAT SHOULD NOT DETECT A FAILURE (on a victim host) **/
 
         // Starting a victim (that will reply with a bogus TTL Expiration message)
-        victim = std::shared_ptr<wrench::Sleeper>(new wrench::Sleeper("FailedHost", 100, new wrench::ServiceTTLExpiredMessage(1), this->mailbox_name));
+        victim = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHost", 100, new wrench::ServiceTTLExpiredMessage(1), this->mailbox_name));
         victim->simulation = this->simulation;
         victim->start(victim, true, false); // Daemonized, no auto-restart
 
@@ -261,7 +263,7 @@ private:
 
         if (dynamic_cast<wrench::ServiceTTLExpiredMessage *>(message.get())) {
             // All good
-        } else if (dynamic_cast<wrench::ServiceHasFailedMessage *>(message.get())) {
+        } else if (dynamic_cast<wrench::ServiceHaCrashedeMessage *>(message.get())) {
             throw std::runtime_error("Failure should not have been detected!");
         } else {
             throw std::runtime_error("Unexpected " + message->getName() + " message");
@@ -273,7 +275,7 @@ private:
         wrench::Simulation::sleep(401 - wrench::Simulation::getCurrentSimulatedDate());
 
         // Starting a victim (that will reply with a bogus TTL Expiration message)
-        victim = std::shared_ptr<wrench::Sleeper>(new wrench::Sleeper("FailedHostTrace", 50, new wrench::ServiceTTLExpiredMessage(1), this->mailbox_name));
+        victim = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHostTrace", 50, new wrench::ServiceTTLExpiredMessage(1), this->mailbox_name));
         victim->simulation = this->simulation;
         victim->start(victim, true, false); // Daemonized, no auto-restart
 
@@ -291,7 +293,7 @@ private:
 
         if (dynamic_cast<wrench::ServiceTTLExpiredMessage *>(message.get())) {
             // All good
-        } else if (dynamic_cast<wrench::ServiceHasFailedMessage *>(message.get())) {
+        } else if (dynamic_cast<wrench::ServiceHaCrashedeMessage *>(message.get())) {
             throw std::runtime_error("Failure should not have been detected!");
         } else {
             throw std::runtime_error("Unexpected " + message->getName() + " message");
@@ -302,11 +304,11 @@ private:
     }
 };
 
-TEST_F(SimulatedFailuresTest, FailureDetectorTest) {
-    DO_TEST_WITH_FORK(do_FailureDetectorTest_test);
+TEST_F(SimulatedFailuresTest, FailureDetectorForSleeperTest) {
+    DO_TEST_WITH_FORK(do_FailureDetectorForSleeperTest_test);
 }
 
-void SimulatedFailuresTest::do_FailureDetectorTest_test() {
+void SimulatedFailuresTest::do_FailureDetectorForSleeperTest_test() {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
@@ -326,7 +328,7 @@ void SimulatedFailuresTest::do_FailureDetectorTest_test() {
     // Create a WMS
     wrench::WMS *wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new FailureDetectorTestWMS(this, hostname)));
+            new FailureDetectorForSleeperTestWMS(this, hostname)));
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
@@ -338,6 +340,197 @@ void SimulatedFailuresTest::do_FailureDetectorTest_test() {
     free(argv);
 }
 
+
+/**********************************************************************/
+/**              FAILURE DETECTOR FOR COMPUTER TEST                  **/
+/**********************************************************************/
+
+class FailureDetectorForComputerTestWMS : public wrench::WMS {
+
+public:
+    FailureDetectorForComputerTestWMS(SimulatedFailuresTest *test,
+                                     std::string &hostname) :
+            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+        this->test = test;
+    }
+
+private:
+
+    SimulatedFailuresTest *test;
+
+    int main() override {
+
+        /** TEST THAT SHOULD DETECT A FAILURE (using a victim host) **/
+
+        // Starting a victim on the FailedHost (that will reply with a bogus TTL Expiration message)
+        auto victim = std::shared_ptr<wrench::ComputerVictim>(new wrench::ComputerVictim("FailedHost", 100, new wrench::ServiceTTLExpiredMessage(1), this->mailbox_name));
+        victim->simulation = this->simulation;
+        victim->start(victim, true, false); // Daemonized, no auto-restart
+
+        // Starting its nemesis!
+        auto murderer = std::shared_ptr<wrench::HostSwitch>(new wrench::HostSwitch("StableHost", 50, "FailedHost", wrench::HostSwitch::Action::TURN_OFF));
+        murderer->simulation = this->simulation;
+        murderer->start(murderer, true, false); // Daemonized, no auto-restart
+
+        // Starting the failure detector!
+        auto failure_detector = std::shared_ptr<wrench::ServiceFailureDetector>(new wrench::ServiceFailureDetector("StableHost", victim.get(), this->mailbox_name));
+        failure_detector->simulation = this->simulation;
+        failure_detector->start(failure_detector, true, false); // Daemonized, no auto-restart
+
+        // Waiting for a message
+        std::unique_ptr<wrench::SimulationMessage> message;
+        try {
+            message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
+        } catch (std::shared_ptr<wrench::NetworkError> &cause) {
+            throw std::runtime_error("Network error while getting a message!" + cause->toString());
+        }
+
+        if (dynamic_cast<wrench::ServiceTTLExpiredMessage *>(message.get())) {
+            throw std::runtime_error("Failure should have been detected!");
+        } else if (dynamic_cast<wrench::ServiceHaCrashedeMessage *>(message.get())) {
+            // All good
+        } else {
+            throw std::runtime_error("Unexpected " + message->getName() + " message");
+        }
+
+        // Wait for the host killer to finish, and turn the host back on
+        murderer->join();
+        simgrid::s4u::Host::by_name("FailedHost")->turn_on();
+
+        /** TEST THAT SHOULD DETECT A FAILURE (using a failure trace) **/
+
+        // Starting a victim on the FailedHost (that will reply with a bogus TTL Expiration message)
+        victim = std::shared_ptr<wrench::ComputerVictim>(new wrench::ComputerVictim("FailedHostTrace", 100, new wrench::ServiceTTLExpiredMessage(1), this->mailbox_name));
+        victim->simulation = this->simulation;
+        victim->start(victim, true, false); // Daemonized, no auto-restart
+
+        // Starting the failure detector!
+        failure_detector = std::shared_ptr<wrench::ServiceFailureDetector>(new wrench::ServiceFailureDetector("StableHost", victim.get(), this->mailbox_name));
+        failure_detector->simulation = this->simulation;
+        failure_detector->start(failure_detector, true, false); // Daemonized, no auto-restart
+
+        // Waiting for a message
+        try {
+            message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
+        } catch (std::shared_ptr<wrench::NetworkError> &cause) {
+            throw std::runtime_error("Network error while getting a message!" + cause->toString());
+        }
+
+        if (dynamic_cast<wrench::ServiceTTLExpiredMessage *>(message.get())) {
+            throw std::runtime_error("Failure should have been detected!");
+        } else if (dynamic_cast<wrench::ServiceHaCrashedeMessage *>(message.get())) {
+            // All good
+        } else {
+            throw std::runtime_error("Unexpected " + message->getName() + " message");
+        }
+
+
+        /** TEST THAT SHOULD NOT DETECT A FAILURE (on a victim host) **/
+
+        // Starting a victim (that will reply with a bogus TTL Expiration message)
+        victim = std::shared_ptr<wrench::ComputerVictim>(new wrench::ComputerVictim("FailedHost", 100, new wrench::ServiceTTLExpiredMessage(1), this->mailbox_name));
+        victim->simulation = this->simulation;
+        victim->start(victim, true, false); // Daemonized, no auto-restart
+
+        // Starting its nemesis!
+        murderer = std::shared_ptr<wrench::HostSwitch>(new wrench::HostSwitch("StableHost", 101, "FailedHost", wrench::HostSwitch::Action::TURN_OFF));
+        murderer->simulation = this->simulation;
+        murderer->start(murderer, true, false); // Daemonized, no auto-restart
+
+        // Starting the failure detector!
+        failure_detector = std::shared_ptr<wrench::ServiceFailureDetector>(new wrench::ServiceFailureDetector("StableHost", victim.get(), this->mailbox_name));
+        failure_detector->simulation = this->simulation;
+        failure_detector->start(failure_detector, true, false); // Daemonized, no auto-restart
+
+        // Waiting for a message
+        try {
+            message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
+        } catch (std::shared_ptr<wrench::NetworkError> &cause) {
+            throw std::runtime_error("Network error while getting a message!" + cause->toString());
+        }
+
+        if (dynamic_cast<wrench::ServiceTTLExpiredMessage *>(message.get())) {
+            // All good
+        } else if (dynamic_cast<wrench::ServiceHaCrashedeMessage *>(message.get())) {
+            throw std::runtime_error("Failure should not have been detected!");
+        } else {
+            throw std::runtime_error("Unexpected " + message->getName() + " message");
+        }
+
+        /** TEST THAT SHOULD NOT DETECT A FAILURE (using a failure trace) **/
+
+        // sleep until FailedHostTrace is upo
+        wrench::Simulation::sleep(401 - wrench::Simulation::getCurrentSimulatedDate());
+
+        // Starting a victim (that will reply with a bogus TTL Expiration message)
+        victim = std::shared_ptr<wrench::ComputerVictim>(new wrench::ComputerVictim("FailedHostTrace", 50, new wrench::ServiceTTLExpiredMessage(1), this->mailbox_name));
+        victim->simulation = this->simulation;
+        victim->start(victim, true, false); // Daemonized, no auto-restart
+
+        // Starting the failure detector!
+        failure_detector = std::shared_ptr<wrench::ServiceFailureDetector>(new wrench::ServiceFailureDetector("StableHost", victim.get(), this->mailbox_name));
+        failure_detector->simulation = this->simulation;
+        failure_detector->start(failure_detector, true, false); // Daemonized, no auto-restart
+
+        // Waiting for a message
+        try {
+            message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
+        } catch (std::shared_ptr<wrench::NetworkError> &cause) {
+            throw std::runtime_error("Network error while getting a message!" + cause->toString());
+        }
+
+        if (dynamic_cast<wrench::ServiceTTLExpiredMessage *>(message.get())) {
+            // All good
+        } else if (dynamic_cast<wrench::ServiceHaCrashedeMessage *>(message.get())) {
+            throw std::runtime_error("Failure should not have been detected!");
+        } else {
+            throw std::runtime_error("Unexpected " + message->getName() + " message");
+        }
+
+
+        return 0;
+    }
+};
+
+#if ((SIMGRID_VERSION_MAJOR == 3) && (SIMGRID_VERSION_MINOR == 22)) || ((SIMGRID_VERSION_MAJOR == 3) && (SIMGRID_VERSION_MINOR == 21) && (SIMGRID_VERSION_PATCH > 0))
+TEST_F(SimulatedFailuresTest, FailureDetectorForComputerTest) {
+#else
+TEST_F(SimulatedFailuresTest, DISABLED_FailureDetectorForComputerTest) {
+#endif
+    DO_TEST_WITH_FORK(do_FailureDetectorForComputerTest_test);
+}
+
+void SimulatedFailuresTest::do_FailureDetectorForComputerTest_test() {
+
+    // Create and initialize a simulation
+    auto *simulation = new wrench::Simulation();
+    int argc = 1;
+    auto argv = (char **) calloc(1, sizeof(char *));
+    argv[0] = strdup("failure_test");
+
+
+    ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+    // Setting up the platform
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    // Get a hostname
+    std::string hostname = "StableHost";
+
+    // Create a WMS
+    wrench::WMS *wms = nullptr;
+    ASSERT_NO_THROW(wms = simulation->add(
+            new FailureDetectorForComputerTestWMS(this, hostname)));
+
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+
+    // Running a "run a single task" simulation
+    ASSERT_NO_THROW(simulation->launch());
+
+    delete simulation;
+    free(argv[0]);
+    free(argv);
+}
 
 /**********************************************************************/
 /**                    SERVICE RESTART TEST                          **/
@@ -359,7 +552,7 @@ private:
     int main() override {
 
         // Starting a sleeper (that will reply with a bogus TTL Expiration message)
-        auto sleeper = std::shared_ptr<wrench::Sleeper>(new wrench::Sleeper("FailedHost", 100, new wrench::ServiceTTLExpiredMessage(1), this->mailbox_name));
+        auto sleeper = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHost", 100, new wrench::ServiceTTLExpiredMessage(1), this->mailbox_name));
         sleeper->simulation = this->simulation;
         sleeper->start(sleeper, true, true); // Daemonized, auto-restart!!
 
