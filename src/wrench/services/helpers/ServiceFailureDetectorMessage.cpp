@@ -26,7 +26,7 @@ namespace wrench {
      *
      * @param service: the service that has failed
      */
-    ServiceHasFailedMessage::ServiceHasFailedMessage(Service *service) :
+    ServiceHaCrashedeMessage::ServiceHaCrashedeMessage(Service *service) :
             ServiceFailureDetectorMessage("FailureDetectorServiceHasFailedMessage") {
       this->service = service;
     }

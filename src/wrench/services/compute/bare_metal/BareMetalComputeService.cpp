@@ -12,10 +12,13 @@
 #include <wrench/util/PointerUtil.h>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
+#include <wrench/services/compute/bare_metal/BareMetalComputeService.h>
+
 
 #include "wrench/services/ServiceMessage.h"
 #include "wrench/services/compute/ComputeServiceMessage.h"
 #include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
+#include "wrench/services/helpers/ServiceFailureDetectorMessage.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
@@ -754,6 +757,15 @@ namespace wrench {
             processWorkunitExecutorFailure(msg->workunit_executor, msg->workunit, msg->cause);
             return true;
 
+        } else if (auto msg = dynamic_cast<ServiceHaCrashedeMessage *>(message.get())) {
+            Service *service = msg->service;
+            auto workunit_executor = dynamic_cast<WorkunitExecutor *>(service);
+            if (not workunit_executor) {
+                throw std::runtime_error("Received a FailureDetectorServiceHasFailedMessage message, but that service is not WorkUnitExecutor!");
+            }
+            processWorkunitExecutorCrash(workunit_executor);
+            return true;
+
         } else {
             throw std::runtime_error("Unexpected [" + message->getName() + "] message");
         }
@@ -1475,6 +1487,21 @@ namespace wrench {
     void BareMetalComputeService::terminatePilotJob(PilotJob *job) {
         throw std::runtime_error(
                 "BareMetalComputeService::terminatePilotJob(): not implemented because BareMetalComputeService never supports pilot jobs");
+    }
+
+
+    /**
+     * @brief Process a crash of a WorkunitExecutor
+     *
+     * @param workunitExecutor: the workunit executor that has crashed
+     */
+    void BareMetalComputeService::processWorkunitExecutorCrash(WorkunitExecutor *workunit_executor) {
+        WRENCH_INFO("CRAP!!!! A WORKUNIT EXECUTOR HAS CRASHED!!! I SHOULD DO SOMETHIONG!!!");
+        Workunit *workunit = workunit_executor->workunit;
+
+        // Determine what part of the work has been done?? 
+
+
     }
 
 

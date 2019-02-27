@@ -24,7 +24,7 @@ wrench::HostSwitch::HostSwitch(std::string host_on_which_to_run, double sleep_ti
 
 int wrench::HostSwitch::main() {
 
-    WRENCH_INFO("Starting");
+    WRENCH_INFO("Starting and sleeping for %.3lf seconds...", sleep_time);
     wrench::Simulation::sleep(sleep_time);
     if (this->action == HostSwitch::Action::TURN_OFF) {
         WRENCH_INFO("Turning OFF host %s", this->host_to_switch.c_str());

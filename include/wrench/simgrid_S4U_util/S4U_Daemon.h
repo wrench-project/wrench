@@ -61,7 +61,7 @@ namespace wrench {
 
         /**
          * @brief The daemon's main method, to be overridden
-         * @return 0 on success
+         * @return 0 on success, non-0 on failure!
          */
         virtual int main() = 0;
 
