@@ -195,6 +195,8 @@ namespace wrench {
 
         void processWorkunitExecutorFailure(WorkunitExecutor *workunit_executor, Workunit *workunit, std::shared_ptr<FailureCause> cause);
 
+        void processWorkunitExecutorCrash(WorkunitExecutor *workunit_executor);
+
         void forgetWorkunitExecutor(WorkunitExecutor *workunit_executor);
 
 

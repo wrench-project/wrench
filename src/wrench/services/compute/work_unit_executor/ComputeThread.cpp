@@ -42,16 +42,20 @@ namespace wrench {
             WRENCH_INFO("New compute thread (%.2f flops, will report to %s)", this->flops, reply_mailbox.c_str());
             S4U_Simulation::compute(this->flops);
         } catch (std::exception &e) {
-            WRENCH_INFO("Probably got killed while I was computing");
-            return 0;
+            WRENCH_INFO("Probably got killed while I was  computing");
+            return 1;
         } catch (std::shared_ptr<HostError> &e) {
             WRENCH_INFO("Probably got killed while I was computing");
-            return 0;
+            return 1;
         }
         try {
             S4U_Mailbox::putMessage(this->reply_mailbox, new ComputeThreadDoneMessage());
         } catch (std::shared_ptr<NetworkError> &e) {
-            WRENCH_INFO("Couldn't report on my completion to my parent");
+            WRENCH_INFO("Couldn't report on my completion to my parent [ignoring and returning as if everything's ok]");
+            return 0;
+        } catch (std::shared_ptr<HostError> &e) {
+            WRENCH_INFO("Probably got killed while I was communicating");
+            return 1;
         }
 
         return 0;

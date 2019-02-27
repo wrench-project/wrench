@@ -16,11 +16,11 @@
 
 namespace wrench {
 
-    class Sleeper : public Service {
+    class SleeperVictim : public Service {
 
     public:
 
-        explicit Sleeper(std::string host_on_which_to_run, double seconds_of_life, SimulationMessage *msg, std::string mailbox_to_notify);
+        explicit SleeperVictim(std::string host_on_which_to_run, double seconds_of_life, SimulationMessage *msg, std::string mailbox_to_notify);
 
         /***********************/
         /** \endcond           */

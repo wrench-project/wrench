@@ -285,8 +285,10 @@ set(TEST_FILES
         test/simulated_failures/BareMetalComputeServiceFailures.cpp
         test/simulated_failures/HostSwitch.cpp
         test/simulated_failures/HostSwitch.h
-        test/simulated_failures/Sleeper.cpp
-        test/simulated_failures/Sleeper.h
+        test/simulated_failures/SleeperVictim.cpp
+        test/simulated_failures/SleeperVictim.h
+        test/simulated_failures/ComputerVictim.cpp
+        test/simulated_failures/ComputerVictim.h
         )
 
 # wrench library
