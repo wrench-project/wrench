@@ -1,4 +1,4 @@
-var data={"modified":"2019-02-07T22:55:33.993Z","file":"test_data/workflow_data.json","contents":[{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_1","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task0","terminated":-1,"vertical_position":0,"whole_task":{"end":3827.6378817372047,"start":0.007199838144329895},"write":{"end":3827.6378817372047,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_1","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task1","terminated":-1,"vertical_position":1,"whole_task":{"end":3827.635010247309,"start":0.007199838144329895},"write":{"end":3827.635010247309,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_1","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task10","terminated":-1,"vertical_position":2,"whole_task":{"end":3827.639191182566,"start":0.007199838144329895},"write":{"end":3827.639191182566,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_2","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task11","terminated":-1,"vertical_position":0,"whole_task":{"end":3827.6411369314314,"start":0.007199838144329895},"write":{"end":3827.6411369314314,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_2","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task12","terminated":-1,"vertical_position":1,"whole_task":{"end":3827.641331233935,"start":0.007199838144329895},"write":{"end":3827.641331233935,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_2","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task13","terminated":-1,"vertical_position":2,"whole_task":{"end":3827.6414647120796,"start":0.007199838144329895},"write":{"end":3827.6414647120796,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_3","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task14","terminated":-1,"vertical_position":0,"whole_task":{"end":3827.641553979021,"start":0.007199838144329895},"write":{"end":3827.641553979021,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_3","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task15","terminated":-1,"vertical_position":1,"whole_task":{"end":3827.641607708093,"start":0.007199838144329895},"write":{"end":3827.641607708093,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_3","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task16","terminated":-1,"vertical_position":2,"whole_task":{"end":3827.6416322071746,"start":0.007199838144329895},"write":{"end":3827.6416322071746,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_4","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task17","terminated":-1,"vertical_position":0,"whole_task":{"end":3827.640506539679,"start":0.007199838144329895},"write":{"end":3827.640506539679,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_4","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task18","terminated":-1,"vertical_position":1,"whole_task":{"end":3827.6399793833903,"start":0.007199838144329895},"write":{"end":3827.6399793833903,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_4","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task19","terminated":-1,"vertical_position":2,"whole_task":{"end":3827.6408767314315,"start":0.007199838144329895},"write":{"end":3827.6408767314315,"start":3807.8470265752576}},{"compute":{"end":7566.212108144485,"start":3966.2118479444844},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_1","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":3966.2118479444844,"start":3827.6507028638657},"task_id":"task2","terminated":-1,"vertical_position":0,"whole_task":{"end":7579.408645646651,"start":3827.6507028638657},"write":{"end":7579.408645646651,"start":7566.212108144485}},{"compute":{"end":7912.423338350066,"start":7612.4230781500655},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_1","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":7612.4230781500655,"start":7579.417740802427},"task_id":"task20","terminated":-1,"vertical_position":0,"whole_task":{"end":7929.747237014191,"start":7579.417740802427},"write":{"end":7929.747237014191,"start":7912.423338350066}},{"compute":{"end":7566.212108144485,"start":3966.2118479444844},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_1","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":3966.2118479444844,"start":3827.6507028638657},"task_id":"task3","terminated":-1,"vertical_position":1,"whole_task":{"end":7579.408772085021,"start":3827.6507028638657},"write":{"end":7579.408772085021,"start":7566.212108144485}},{"compute":{"end":7566.212108144485,"start":3966.2118479444844},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_1","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":3966.2118479444844,"start":3827.6507028638657},"task_id":"task4","terminated":-1,"vertical_position":2,"whole_task":{"end":7579.408734069057,"start":3827.6507028638657},"write":{"end":7579.408734069057,"start":7566.212108144485}},{"compute":{"end":7566.212108144485,"start":3966.2118479444844},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_2","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":3966.2118479444844,"start":3827.6507028638657},"task_id":"task5","terminated":-1,"vertical_position":0,"whole_task":{"end":7579.405173391115,"start":3827.6507028638657},"write":{"end":7579.405173391115,"start":7566.212108144485}},{"compute":{"end":7566.212108144485,"start":3966.2118479444844},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_2","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":3966.2118479444844,"start":3827.6507028638657},"task_id":"task6","terminated":-1,"vertical_position":1,"whole_task":{"end":7579.4070007028695,"start":3827.6507028638657},"write":{"end":7579.4070007028695,"start":7566.212108144485}},{"compute":{"end":7566.212108144485,"start":3966.2118479444844},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_2","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":3966.2118479444844,"start":3827.6507028638657},"task_id":"task7","terminated":-1,"vertical_position":2,"whole_task":{"end":7579.407786370086,"start":3827.6507028638657},"write":{"end":7579.407786370086,"start":7566.212108144485}},{"compute":{"end":7566.212108144485,"start":3966.2118479444844},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_3","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":3966.2118479444844,"start":3827.6507028638657},"task_id":"task8","terminated":-1,"vertical_position":0,"whole_task":{"end":7579.408224259434,"start":3827.6507028638657},"write":{"end":7579.408224259434,"start":7566.212108144485}},{"compute":{"end":7566.212108144485,"start":3966.2118479444844},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_3","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":3966.2118479444844,"start":3827.6507028638657},"task_id":"task9","terminated":-1,"vertical_position":1,"whole_task":{"end":7579.4084844594345,"start":3827.6507028638657},"write":{"end":7579.4084844594345,"start":7566.212108144485}}]}
+var data={"modified":"2019-02-28T22:40:26.507Z","file":"test_data/test_data_host.json","contents":[{"compute":{"end":-1,"start":-1},"execution_host":{"hostname":"Host1"},"failed":2,"num_cores_allocated":1,"read":{"end":-1,"start":0},"task_id":"ID00000","terminated":-1,"whole_task":{"end":-1,"start":0},"write":{"end":-1,"start":-1}},{"compute":{"end":-1,"start":13},"execution_host":{"hostname":"Host2"},"failed":-1,"num_cores_allocated":1,"read":{"end":13,"start":10},"task_id":"ID00001","terminated":14,"whole_task":{"end":-1,"start":10},"write":{"end":-1,"start":-1}},{"compute":{"end":26,"start":23},"execution_host":{"hostname":"Host3"},"failed":-1,"num_cores_allocated":1,"read":{"end":23,"start":20},"task_id":"ID00002","terminated":28,"whole_task":{"end":-1,"start":20},"write":{"end":-1,"start":26}}]}
 
 /**
  * Helper function used to get the position of the mouse within the browser window
@@ -226,14 +226,9 @@ function generateGraph(data, containerId) {
 }
 
 function generateHostGraph(data, containerId) {
-    var read_color    = '#cbb5dd'
-    var compute_color = '#f7daad'
-    var write_color   = '#abdcf4'
     var container = d3.select(`#${containerId}`);
     const CONTAINER_WIDTH = container.style("width").slice(0, -2); // returns "XXXXpx" so need to remove "px"
     const CONTAINER_HEIGHT = container.style("height").slice(0, -2);
-    console.log(container.style("width"))
-    console.log(CONTAINER_HEIGHT)
     const PADDING = 60;
     var toFiveDecimalPlaces = d3.format('.5f');
     var svg = container
@@ -250,7 +245,6 @@ function generateHostGraph(data, containerId) {
     var hostNames = new Set();
 
     var hostTasks = {}
-    console.log(data)
     data.forEach(function(task) {
         var hostName = task.execution_host.hostname
         hostNames.add(hostName)
@@ -274,8 +268,6 @@ function generateHostGraph(data, containerId) {
             hostTasks[hostName] = currHost
         }
     })
-
-    console.log(hostTasks)
 
     hostNames = Array.from(hostNames)
 
@@ -316,7 +308,6 @@ function generateHostGraph(data, containerId) {
 
     var dataWithYIndex = data
     dataWithYIndex.forEach(function(task, i) {
-        // hostTasks.forEach(function(host) {
         for (var key in hostTasks) {
             var maxYIndex = 0
             if (hostTasks.hasOwnProperty(key)) {
@@ -336,8 +327,6 @@ function generateHostGraph(data, containerId) {
         }
     })
 
-    console.log(hostTasks)
-
     data.forEach(function(d) {
         if (hostCount[d.execution_host.hostname] === undefined) {
             hostCount[d.execution_host.hostname] = 0
@@ -346,11 +335,26 @@ function generateHostGraph(data, containerId) {
         }
         var group = svg.append('g')
            .attr('id', d.execution_host.hostname + " " + d.task_id)
+        var width
+        if (d.failed != -1) {
+            width = xscale(d.failed) - xscale(d.whole_task.start)
+        } else if (d.terminated != -1) {
+            width = xscale(d.terminated) - xscale(d.whole_task.start)
+        } else {
+            width = xscale(d.whole_task.end) - xscale(d.whole_task.start)
+        }
+        var height
+        if (hostNames.length == 1) {
+            height = yscale(hostNames[0])
+        } else {
+            height = yscale(hostNames[0])-yscale(hostNames[1])
+        }
+        console.log(height)
         group.append('rect')
             .attr('x', xscale(d.whole_task.start))
-            .attr('y', yscale(d.execution_host.hostname) + (((yscale(hostNames[0])-yscale(hostNames[1])) / (hostTasks[d.execution_host.hostname].maxYIndex + 1)) * d.yIndex)) //y-position + (width / total-count) * y-index
-            .attr('height', (yscale(hostNames[0])-yscale(hostNames[1])) / (hostTasks[d.execution_host.hostname].maxYIndex + 1))
-            .attr('width', xscale(d.whole_task.end) - xscale(d.whole_task.start))
+            .attr('y', yscale(d.execution_host.hostname) + ((height / (hostTasks[d.execution_host.hostname].maxYIndex + 1)) * d.yIndex)) //y-position + (width / total-count) * y-index
+            .attr('height', height / (hostTasks[d.execution_host.hostname].maxYIndex + 1))
+            .attr('width', width)
             .style('fill', colours[d.execution_host.hostname])
             .attr('class','host-graph-box')
         var tooltip = document.getElementById('host-tooltip-container')
@@ -375,11 +379,14 @@ function generateHostGraph(data, containerId) {
                 tooltip_task_id.text('TaskID: ' + d.task_id);
 
                 var durationFull = findDuration(data, d.task_id, "whole_task")
+                var duration = toFiveDecimalPlaces(durationFull)
                 if (d.whole_task.start != -1 && d.whole_task.end != -1) {
-                    var duration = toFiveDecimalPlaces(durationFull)
+                    
                     tooltip_task_duration.text('Duration: ' + duration + 's')
-                } else {
-                    tooltip_task_duration.text('')
+                } else if (d.failed != -1) {
+                    tooltip_task_duration.text('Failed at ' + duration + 's')
+                } else if (d.terminated != -1) {
+                    tooltip_task_duration.text('Terminated at ' + duration + 's')
                 }
                 
             })
