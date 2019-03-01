@@ -103,6 +103,11 @@ private:
         murderer->simulation = this->simulation;
         murderer->start(murderer, true, false); // Daemonized, no auto-restart
 
+        // Starting a FailedHost1 resurector!!
+        auto resurector = std::shared_ptr<wrench::HostSwitch>(new wrench::HostSwitch("StableHost", 1000, "FailedHost1", wrench::HostSwitch::Action::TURN_ON));
+        resurector->simulation = this->simulation;
+        resurector->start(resurector, true, false); // Daemonized, no auto-restart
+
 
         // Create a job manager
         std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();

@@ -63,7 +63,8 @@ namespace wrench {
 
     private:
 
-        int main();
+        int main() override;
+        void cleanup(bool has_returned_from_main, int return_value) override;
 
         void performWork(Workunit *work);
 

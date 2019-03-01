@@ -199,7 +199,7 @@ private:
 
         if (dynamic_cast<wrench::ServiceTTLExpiredMessage *>(message.get())) {
             throw std::runtime_error("Failure should have been detected!");
-        } else if (dynamic_cast<wrench::ServiceHaCrashedeMessage *>(message.get())) {
+        } else if (dynamic_cast<wrench::ServiceHasCrashedMessage *>(message.get())) {
             // All good
         } else {
             throw std::runtime_error("Unexpected " + message->getName() + " message");
@@ -230,7 +230,7 @@ private:
 
         if (dynamic_cast<wrench::ServiceTTLExpiredMessage *>(message.get())) {
             throw std::runtime_error("Failure should have been detected!");
-        } else if (dynamic_cast<wrench::ServiceHaCrashedeMessage *>(message.get())) {
+        } else if (dynamic_cast<wrench::ServiceHasCrashedMessage *>(message.get())) {
             // All good
         } else {
             throw std::runtime_error("Unexpected " + message->getName() + " message");
@@ -263,7 +263,7 @@ private:
 
         if (dynamic_cast<wrench::ServiceTTLExpiredMessage *>(message.get())) {
             // All good
-        } else if (dynamic_cast<wrench::ServiceHaCrashedeMessage *>(message.get())) {
+        } else if (dynamic_cast<wrench::ServiceHasCrashedMessage *>(message.get())) {
             throw std::runtime_error("Failure should not have been detected!");
         } else {
             throw std::runtime_error("Unexpected " + message->getName() + " message");
@@ -293,7 +293,7 @@ private:
 
         if (dynamic_cast<wrench::ServiceTTLExpiredMessage *>(message.get())) {
             // All good
-        } else if (dynamic_cast<wrench::ServiceHaCrashedeMessage *>(message.get())) {
+        } else if (dynamic_cast<wrench::ServiceHasCrashedMessage *>(message.get())) {
             throw std::runtime_error("Failure should not have been detected!");
         } else {
             throw std::runtime_error("Unexpected " + message->getName() + " message");
@@ -387,7 +387,7 @@ private:
 
         if (dynamic_cast<wrench::ServiceTTLExpiredMessage *>(message.get())) {
             throw std::runtime_error("Failure should have been detected!");
-        } else if (dynamic_cast<wrench::ServiceHaCrashedeMessage *>(message.get())) {
+        } else if (dynamic_cast<wrench::ServiceHasCrashedMessage *>(message.get())) {
             // All good
         } else {
             throw std::runtime_error("Unexpected " + message->getName() + " message");
@@ -418,7 +418,7 @@ private:
 
         if (dynamic_cast<wrench::ServiceTTLExpiredMessage *>(message.get())) {
             throw std::runtime_error("Failure should have been detected!");
-        } else if (dynamic_cast<wrench::ServiceHaCrashedeMessage *>(message.get())) {
+        } else if (dynamic_cast<wrench::ServiceHasCrashedMessage *>(message.get())) {
             // All good
         } else {
             throw std::runtime_error("Unexpected " + message->getName() + " message");
@@ -451,7 +451,7 @@ private:
 
         if (dynamic_cast<wrench::ServiceTTLExpiredMessage *>(message.get())) {
             // All good
-        } else if (dynamic_cast<wrench::ServiceHaCrashedeMessage *>(message.get())) {
+        } else if (dynamic_cast<wrench::ServiceHasCrashedMessage *>(message.get())) {
             throw std::runtime_error("Failure should not have been detected!");
         } else {
             throw std::runtime_error("Unexpected " + message->getName() + " message");
@@ -481,12 +481,11 @@ private:
 
         if (dynamic_cast<wrench::ServiceTTLExpiredMessage *>(message.get())) {
             // All good
-        } else if (dynamic_cast<wrench::ServiceHaCrashedeMessage *>(message.get())) {
+        } else if (dynamic_cast<wrench::ServiceHasCrashedMessage *>(message.get())) {
             throw std::runtime_error("Failure should not have been detected!");
         } else {
             throw std::runtime_error("Unexpected " + message->getName() + " message");
         }
-
 
         return 0;
     }

@@ -113,6 +113,8 @@ set(HEADER_FILES
         include/wrench/services/helpers/Alarm.h
         include/wrench/services/helpers/ServiceFailureDetector.h
         include/wrench/services/helpers/ServiceFailureDetectorMessage.h
+        include/wrench/services/helpers/HostStateChangeDetector.h
+        include/wrench/services/helpers/HostStateChangeDetectorMessage.h
         include/wrench/util/PointerUtil.h
         include/wrench/util/MessageManager.h
         include/wrench/util/TraceFileLoader.h
@@ -218,6 +220,8 @@ set(SOURCE_FILES
         src/wrench/services/helpers/Alarm.cpp
         src/wrench/services/helpers/ServiceFailureDetector.cpp
         src/wrench/services/helpers/ServiceFailureDetectorMessage.cpp
+        src/wrench/services/helpers/HostStateChangeDetector.cpp
+        src/wrench/services/helpers/HostStateChangeDetectorMessage.cpp
         src/wrench/util/PointerUtil.cpp
         src/wrench/util/MessageManager.cpp
         src/wrench/services/compute/batch/TraceFileLoader.cpp

@@ -241,7 +241,7 @@ namespace wrench {
         BatchJob *pickJobForScheduling(std::string);
 
         //Terminate the batch service (this is usually for pilot jobs when they act as a batch service)
-        void cleanup() override;
+        void cleanup(bool has_returned_from_main, int return_value) override;
 
         // Terminate currently running pilot jobs
         void terminateRunningPilotJobs();
