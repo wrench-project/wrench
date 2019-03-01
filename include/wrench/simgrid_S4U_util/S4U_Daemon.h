@@ -57,7 +57,7 @@ namespace wrench {
 
         void createLifeSaver(std::shared_ptr<S4U_Daemon> reference);
 
-        virtual void cleanup();
+        virtual void cleanup(bool has_returned_from_main, int return_value);
 
         /**
          * @brief The daemon's main method, to be overridden
@@ -65,11 +65,11 @@ namespace wrench {
          */
         virtual int main() = 0;
 
-        void setCleanlyTerminated();
-        bool hasCleanlyTerminated();
+        bool hasReturnedFromMain();
+        bool getReturnValue();
         bool isSetToAutoRestart();
 
-        bool join();
+        std::pair<bool, int> join();
 
         void suspend();
 
@@ -101,7 +101,8 @@ namespace wrench {
         
         simgrid::s4u::ActorPtr s4u_actor;
         
-        bool cleanly_terminated; // Set to true after main returns
+        bool has_returned_from_main = false; // Set to true after main returns
+        int return_value = 0; // Set to the value returned by main
         bool auto_restart; // Set to true if daemon is supposed to auto-restart
 
 #ifdef ACTOR_TRACKING_OUTPUT

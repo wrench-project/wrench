@@ -206,6 +206,9 @@ namespace wrench {
 
         void dispatchReadyWorkunits();
 
+        void someHostIsBackOn(simgrid::s4u::Host & h);
+        bool host_back_on = false;
+
 
         /** @brief Reasons why a standard job could be terminated */
         enum JobTerminationCause {

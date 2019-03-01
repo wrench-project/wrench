@@ -681,7 +681,7 @@ namespace wrench {
             }
           }
 
-          // remove the job from the "pending" list
+          // remove the job from the "pending" listf
           this->pending_standard_jobs.erase(job);
           // put it in the "failed" list
           this->failed_standard_jobs.insert(job);

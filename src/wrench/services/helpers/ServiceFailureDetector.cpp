@@ -16,8 +16,8 @@
 XBT_LOG_NEW_DEFAULT_CATEGORY(failure_detector, "Log category for ServiceFailureDetector");
 
 wrench::ServiceFailureDetector::ServiceFailureDetector(std::string host_on_which_to_run,
-                                         Service *service_to_monitor,
-                                         std::string mailbox_to_notify) :
+                                                       Service *service_to_monitor,
+                                                       std::string mailbox_to_notify) :
         Service(host_on_which_to_run, "failure_detector_for_" + service_to_monitor->getName(), "failure_detector_for" + service_to_monitor->getName()){
     this->service_to_monitor = service_to_monitor;
     this->mailbox_to_notify = mailbox_to_notify;
@@ -27,16 +27,15 @@ wrench::ServiceFailureDetector::ServiceFailureDetector(std::string host_on_which
 int wrench::ServiceFailureDetector::main() {
 
     WRENCH_INFO("Starting");
-    bool terminated_cleanly;
-    try {
-        terminated_cleanly = this->service_to_monitor->join();
-    } catch (std::exception &e) {
-    } catch (std::shared_ptr<FatalFailure> &e) {
-    }
-    if (not terminated_cleanly) {
+    std::pair<bool, int> return_values_from_join;
+    return_values_from_join = this->service_to_monitor->join();
+    bool service_has_returned_from_main = std::get<0>(return_values_from_join);
+    int service_return_value = std::get<1>(return_values_from_join);
+
+    if ((not service_has_returned_from_main) or (service_return_value != 0)) {
         // Failure detected!
         WRENCH_INFO("Detected failure of service %s", this->service_to_monitor->getName().c_str());
-        S4U_Mailbox::dputMessage(this->mailbox_to_notify, new ServiceHaCrashedeMessage(this->service_to_monitor));
+        S4U_Mailbox::dputMessage(this->mailbox_to_notify, new ServiceHasCrashedMessage(this->service_to_monitor));
     }
     return 0;
 }

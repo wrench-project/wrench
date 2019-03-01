@@ -75,7 +75,7 @@ namespace wrench {
         unsigned long seq = S4U_Mailbox::generateUniqueSequenceNumber();
         this->mailbox_name = mailbox_prefix + "_" + std::to_string(seq);
         this->process_name = process_name_prefix + "_" + std::to_string(seq);
-        this->cleanly_terminated = false;
+        this->has_returned_from_main = false;
     }
 
 //     NOT NEEDED?
@@ -97,6 +97,7 @@ namespace wrench {
 //    }
 
     S4U_Daemon::~S4U_Daemon() {
+        WRENCH_INFO("IN DAEMON DESTRICTOR");
 #ifdef ACTOR_TRACKING_OUTPUT
         num_actors[this->process_name_prefix]--;
 #endif
@@ -105,8 +106,12 @@ namespace wrench {
 
     /**
      * @brief Cleanup function called when the daemon terminates (for whatever reason)
+     *
+     * @param has_terminated_cleanly: whether the daemon returned from main() by itself
+     * @param exit_code: the return value from main (if has_terminated_cleanly is true)
      */
-    void S4U_Daemon::cleanup() {
+    void S4U_Daemon::cleanup(bool has_terminated_cleanly, int return_value) {
+        WRENCH_INFO("IN BASED CLEANUP");
 //      WRENCH_INFO("Cleaning Up (default: nothing to do)");
     }
 
@@ -119,15 +124,14 @@ namespace wrench {
             return 0;
         }
         auto service = reinterpret_cast<S4U_Daemon *>(service_instance);
-        if (service->hasCleanlyTerminated() or (not service->isSetToAutoRestart())) {
-            // Clean termination
-            service->cleanup();
+
+        // Call cleanup
+        service->cleanup(service->hasReturnedFromMain(), service->getReturnValue());
+
+        // Free memory for the object unless the service is set to auto-restart
+        if (not service->isSetToAutoRestart()) {
+            WRENCH_INFO("REMOVING LIFE_SAVER");
             delete service->life_saver;
-        } else {
-            // Unclean termination
-            // Do nothing...the service will restart with its state!
-            // It's the job of the service to check left-over state in case
-            // Of a restart
         }
         return 0;
     }
@@ -158,7 +162,7 @@ namespace wrench {
         }
 
         // Check that the host is up!
-        if (simgrid::s4u::Host::by_name(hostname)->is_off()) {
+        if (not simgrid::s4u::Host::by_name(hostname)->is_on()) {
             throw std::shared_ptr<HostError>(new HostError(hostname));
         }
 
@@ -180,7 +184,7 @@ namespace wrench {
         // right away, in which case calling daemonize() on it cases the calling actor to
         // terminate immediately. This is a weird simgrid::s4u behavior/bug, that may be
         // fixed at some point, but this test saves us for now.
-        if (not this->cleanly_terminated) {
+        if (not this->has_returned_from_main) {
             if (daemonized) {
                 this->s4u_actor->daemonize();
             }
@@ -210,13 +214,21 @@ namespace wrench {
  */
     void S4U_Daemon::runMainMethod() {
         try {
-            S4U_Simulation::computeZeroFlop();
             this->num_starts++;
-            int exit_code =this->main();
-            if (not exit_code) {
-                this->setCleanlyTerminated();
-                wrench::S4U_Simulation::sleep(0.001);
+            int return_value;
+            try {
+                S4U_Simulation::computeZeroFlop();
+                this->return_value = this->main();
+                this->has_returned_from_main = true;
+                WRENCH_INFO("MAIN RETURNED WITH RETURN VALUE %d", this->return_value);
+            } catch (std::shared_ptr<HostError> &e) {
+                // In case the main() didn't to that catch
+                WRENCH_INFO("CAUGHT HOST ERROR");
+            } catch (simgrid::HostFailureException &e) {
+                WRENCH_INFO("CAUGHT SIMGRID HOST ERROR");
+                // In case the main() didn't to that catch
             }
+            wrench::S4U_Simulation::sleep(0.001);
         } catch (std::exception &e) {
             throw;
         }
@@ -230,7 +242,7 @@ namespace wrench {
  * @brief Kill the daemon/actor.
  */
     void S4U_Daemon::killActor() {
-        if ((this->s4u_actor != nullptr) && (not this->cleanly_terminated)) {
+        if ((this->s4u_actor != nullptr) && (not this->has_returned_from_main)) {
             try {
                 // Sleeping a tiny bit to avoid the following behavior:
                 // Actor A creates Actor B.
@@ -247,7 +259,7 @@ namespace wrench {
             } catch (std::exception &e) {
                 throw std::shared_ptr<FatalFailure>(new FatalFailure());
             }
-            this->cleanly_terminated = true;
+            this->has_returned_from_main = true;
         }
     }
 
@@ -255,7 +267,7 @@ namespace wrench {
 * @brief Suspend the daemon/actor.
 */
     void S4U_Daemon::suspend() {
-        if ((this->s4u_actor != nullptr) && (not this->cleanly_terminated)) {
+        if ((this->s4u_actor != nullptr) && (not this->has_returned_from_main)) {
             try {
                 this->s4u_actor->suspend();
             } catch (xbt_ex &e) {
@@ -270,7 +282,7 @@ namespace wrench {
 * @brief Resume the daemon/actor.
 */
     void S4U_Daemon::resume() {
-        if ((this->s4u_actor != nullptr) && (not this->cleanly_terminated)) {
+        if ((this->s4u_actor != nullptr) && (not this->has_returned_from_main)) {
             try {
                 this->s4u_actor->resume();
             } catch (xbt_ex &e) {
@@ -286,10 +298,11 @@ namespace wrench {
  *
  * @return true if the daemon terminated cleanly (i.e., main() returned), or false otherwise
  */
-    bool S4U_Daemon::join() {
-        if (this->cleanly_terminated) {
-            return true;
+    std::pair<bool, int> S4U_Daemon::join() {
+        if (this->hasReturnedFromMain()) {
+            return std::make_pair(this->hasReturnedFromMain(), this->getReturnValue());
         }
+
         if (this->s4u_actor != nullptr) {
             try {
                 this->s4u_actor->join();
@@ -299,21 +312,22 @@ namespace wrench {
                 throw std::shared_ptr<FatalFailure>(new FatalFailure());
             }
         }
-        return this->cleanly_terminated;
+        WRENCH_INFO("HAS RETURNED FROM JOIN: %d %d", this->hasReturnedFromMain(), this->getReturnValue());
+        return std::make_pair(this->hasReturnedFromMain(), this->getReturnValue());
     }
 
 /**
- * @brief Returned the terminated status of the daemon/actor
+ * @brief Returns true if the daemon has returned from main() (i.e., not brutally killed)
  */
-    bool S4U_Daemon::hasCleanlyTerminated() {
-        return this->cleanly_terminated;
+    bool S4U_Daemon::hasReturnedFromMain() {
+        return this->has_returned_from_main;
     }
 
 /**
- * @brief Set the terminated status of the daemon/actor
+ * @brief Returns the value returned by main() (if the daemon has returned from main)
  */
-    void S4U_Daemon::setCleanlyTerminated() {
-        this->cleanly_terminated = true;
+    bool S4U_Daemon::getReturnValue() {
+        return this->return_value;
     }
 
 /**
