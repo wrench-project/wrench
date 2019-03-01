@@ -709,7 +709,7 @@ namespace wrench {
 
             // Start a failure detector for this workunit executor (which will send me a message in case the
             // work unit executor has died)
-            auto failure_detector = std::shared_ptr<ServiceFailureDetector>(new ServiceFailureDetector(this->hostname, workunit_executor.get(), this->mailbox_name));
+            auto failure_detector = std::shared_ptr<ServiceFailureDetector>(new ServiceFailureDetector(this->hostname, workunit_executor, this->mailbox_name));
             failure_detector->simulation = this->simulation;
             failure_detector->start(failure_detector, true, false); // Daemonized, no auto-restart
 

@@ -184,7 +184,7 @@ private:
         murderer->start(murderer, true, false); // Daemonized, no auto-restart
 
         // Starting the failure detector!
-        auto failure_detector1 = std::shared_ptr<wrench::ServiceFailureDetector>(new wrench::ServiceFailureDetector("StableHost", victim1.get(), this->mailbox_name));
+        auto failure_detector1 = std::shared_ptr<wrench::ServiceFailureDetector>(new wrench::ServiceFailureDetector("StableHost", victim1, this->mailbox_name));
         failure_detector1->simulation = this->simulation;
         failure_detector1->start(failure_detector1, true, false); // Daemonized, no auto-restart
 
@@ -194,7 +194,7 @@ private:
         victim2->start(victim2, true, false); // Daemonized, no auto-restart
 
         // Starting the failure detector!
-        auto failure_detector2 = std::shared_ptr<wrench::ServiceFailureDetector>(new wrench::ServiceFailureDetector("StableHost", victim2.get(), this->mailbox_name));
+        auto failure_detector2 = std::shared_ptr<wrench::ServiceFailureDetector>(new wrench::ServiceFailureDetector("StableHost", victim2, this->mailbox_name));
         failure_detector2->simulation = this->simulation;
         failure_detector2->start(failure_detector2, true, false); // Daemonized, no auto-restart
 
@@ -308,7 +308,7 @@ private:
         murderer->start(murderer, true, false); // Daemonized, no auto-restart
 
         // Starting the failure detector!
-        auto failure_detector1 = std::shared_ptr<wrench::ServiceFailureDetector>(new wrench::ServiceFailureDetector("StableHost", victim1.get(), this->mailbox_name));
+        auto failure_detector1 = std::shared_ptr<wrench::ServiceFailureDetector>(new wrench::ServiceFailureDetector("StableHost", victim1, this->mailbox_name));
         failure_detector1->simulation = this->simulation;
         failure_detector1->start(failure_detector1, true, false); // Daemonized, no auto-restart
 
@@ -318,7 +318,7 @@ private:
         victim2->start(victim2, true, false); // Daemonized, no auto-restart
 
         // Starting the failure detector!
-        auto failure_detector2 = std::shared_ptr<wrench::ServiceFailureDetector>(new wrench::ServiceFailureDetector("StableHost", victim2.get(), this->mailbox_name));
+        auto failure_detector2 = std::shared_ptr<wrench::ServiceFailureDetector>(new wrench::ServiceFailureDetector("StableHost", victim2, this->mailbox_name));
         failure_detector2->simulation = this->simulation;
         failure_detector2->start(failure_detector2, true, false); // Daemonized, no auto-restart
 

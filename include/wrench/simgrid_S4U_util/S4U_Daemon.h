@@ -100,7 +100,7 @@ namespace wrench {
         simgrid::s4u::MutexPtr daemon_lock;
         
         simgrid::s4u::ActorPtr s4u_actor;
-        
+
         bool has_returned_from_main = false; // Set to true after main returns
         int return_value = 0; // Set to the value returned by main
         bool auto_restart; // Set to true if daemon is supposed to auto-restart
