@@ -202,7 +202,10 @@ private:
         // Waiting for a message
         std::unique_ptr<wrench::SimulationMessage> message;
 
+
         try {
+            WRENCH_INFO("GETTING A MESSAGE 1");
+
             message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
         } catch (std::shared_ptr<wrench::NetworkError> &cause) {
             throw std::runtime_error("Network error while getting a message!" + cause->toString());
@@ -219,12 +222,14 @@ private:
         }
 
         // And again...
+
         try {
+            WRENCH_INFO("GETTING A MESSAGE 1");
             message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
         } catch (std::shared_ptr<wrench::NetworkError> &cause) {
             throw std::runtime_error("Network error while getting a message!" + cause->toString());
         }
-        WRENCH_INFO("FOT ANOTHER!");
+        WRENCH_INFO("FOR ANOTHER!");
 
         real_msg = dynamic_cast<wrench::ServiceHasCrashedMessage *>(message.get());
         if (not real_msg) {
@@ -323,13 +328,15 @@ private:
         failure_detector2->start(failure_detector2, true, false); // Daemonized, no auto-restart
 
 
+
         // Waiting for a message
         std::unique_ptr<wrench::SimulationMessage> message;
 
         try {
+            WRENCH_INFO("GETTING A MESSAGE 1");
             message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
         } catch (std::shared_ptr<wrench::NetworkError> &cause) {
-            throw std::runtime_error("Network error while getting a message!" + cause->toString());
+            throw std::runtime_error("Network error while getting a message! " + cause->toString());
         }
 
         WRENCH_INFO("GOT A MESSAGE!");
@@ -344,6 +351,7 @@ private:
 
         // And again...
         try {
+            WRENCH_INFO("GETTING A MESSAGE 1");
             message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
         } catch (std::shared_ptr<wrench::NetworkError> &cause) {
             throw std::runtime_error("Network error while getting a message!" + cause->toString());

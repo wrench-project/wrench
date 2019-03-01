@@ -78,17 +78,18 @@ namespace wrench {
       this->files_stored_in_scratch = {};
       this->job = job;
 
+
     }
 
     void WorkunitExecutor::cleanup(bool has_returned_from_main, int return_value) {
         WRENCH_INFO("IN CLEANUP!: has_returned_from_main = %d, return_value = %d", has_returned_from_main, return_value);
-        if (not has_returned_from_main) {
+        if ((not has_returned_from_main) or (return_value != 0)) {
             if (this->workunit->task != nullptr) {
                 WorkflowTask *task = this->workunit->task;
                 task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
                 task->setFailureDate(S4U_Simulation::getClock());
-                new SimulationTimestampTaskFailure(task);
-//                this->simulation->getOutput().addTimestamp<SimulationTimestampTaskFailure>(new SimulationTimestampTaskFailure(task));
+                auto ts = new SimulationTimestampTaskFailure(task);
+                this->simulation->getOutput().addTimestamp<SimulationTimestampTaskFailure>(ts);
             }
         }
     }
@@ -168,13 +169,22 @@ namespace wrench {
                     this->callback_mailbox.c_str());
       }
 
+      WRENCH_INFO("ABOUT TO SEND NOTIFICATION!");
 
       try {
         S4U_Mailbox::putMessage(this->callback_mailbox, msg_to_send_back);
       } catch (std::shared_ptr<NetworkError> &cause) {
         WRENCH_INFO("Work unit executor on can't report back due to network error.. aborting!");
         this->workunit = nullptr; // To decrease the ref count
+        WRENCH_INFO("HERE1: RETURNING 0");
         return 0;
+      } catch (std::shared_ptr<HostError> &e) {
+          WRENCH_INFO("Work unit executor on can't report back due to network error.. aborting!");
+          this->workunit = nullptr; // To decrease the ref count
+          WRENCH_INFO("HERE2: RETURNING 0");
+          return 0;
+      } catch (simgrid::HostFailureException &e) {
+          WRENCH_INFO("CRAAAAAAP");
       }
 
       WRENCH_INFO("Work unit executor on host %s terminating!", S4U_Simulation::getHostName().c_str());

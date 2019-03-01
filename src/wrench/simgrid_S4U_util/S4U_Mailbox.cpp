@@ -9,7 +9,6 @@
 
 #include <iostream>
 #include <memory>
-//#include <xbt/ex.hpp>
 #include <simgrid/s4u/Mailbox.hpp>
 #include <simgrid/s4u.hpp>
 #include <wrench/util/MessageManager.h>

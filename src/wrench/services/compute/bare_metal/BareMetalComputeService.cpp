@@ -33,7 +33,7 @@
 #include "wrench/services/helpers/ServiceFailureDetector.h"
 #include "wrench/services/helpers/HostStateChangeDetector.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(baremetal_compute_service, "Log category for Multicore Compute Service");
+XBT_LOG_NEW_DEFAULT_CATEGORY(baremetal_compute_service, "Log category for BareMetalComputeService");
 
 namespace wrench {
 
