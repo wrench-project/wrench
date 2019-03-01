@@ -428,6 +428,7 @@ void SimulationCommandLineArgumentsTest::do_NoLogArgument_test() {
 /**********************************************************************/
 
 
+// THIS TEST IS BROKEN
 TEST_F(SimulationCommandLineArgumentsTest, ActivateEnergyArgument) {
   DO_TEST_WITH_FORK(do_ActivateEnergyArgument_test);
 }
@@ -454,8 +455,12 @@ void SimulationCommandLineArgumentsTest::do_ActivateEnergyArgument_test() {
 
     // Setting up the platform
     // TODO: This should really throw something (due to no pstates in XML),
-    // But SimGrid doesn't throw...
-    simulation->instantiatePlatform(platform_file_path);
+    try {
+      simulation->instantiatePlatform(platform_file_path);
+    } catch (simgrid::Exception &e) {
+        // So sad we never get here
+      exit(1);
+    }
 
     // Create a WMS
     wrench::WMS *wms = nullptr;
@@ -466,7 +471,7 @@ void SimulationCommandLineArgumentsTest::do_ActivateEnergyArgument_test() {
 
     simulation->launch();
 
-    exit(0); // doesn't get here
+    exit(0); // Should not doesn't get here
   }
 
 
@@ -476,6 +481,7 @@ void SimulationCommandLineArgumentsTest::do_ActivateEnergyArgument_test() {
   // Check exit code
   ASSERT_NE(exit_code, 0);
 
+  std::cerr << "hERE\n";
   // Check that the error was what we thought it was (based on output!)
   stderr_file = fopen((UNIQUE_TMP_PATH_PREFIX + "unit_tests.stderr").c_str(), "r");
   char *line = nullptr;

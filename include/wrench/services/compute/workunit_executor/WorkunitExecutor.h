@@ -27,6 +27,7 @@ namespace wrench {
     class Workunit;
     class ComputeThread;
     class WorkflowJob;
+    class SimulationTimestampTaskFailure;
 
     /***********************/
     /** \cond INTERNAL     */
@@ -63,6 +64,7 @@ namespace wrench {
 
     private:
 
+        SimulationTimestampTaskFailure *foo;
         int main() override;
         void cleanup(bool has_returned_from_main, int return_value) override;
 
