@@ -80,6 +80,19 @@ namespace wrench {
 
     }
 
+    void WorkunitExecutor::cleanup(bool has_returned_from_main, int return_value) {
+        WRENCH_INFO("IN CLEANUP!: has_returned_from_main = %d, return_value = %d", has_returned_from_main, return_value);
+        if (not has_returned_from_main) {
+            if (this->workunit->task != nullptr) {
+                WorkflowTask *task = this->workunit->task;
+                task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
+                task->setFailureDate(S4U_Simulation::getClock());
+                this->simulation->getOutput().addTimestamp<SimulationTimestampTaskFailure>(
+                        new SimulationTimestampTaskFailure(task));
+            }
+        }
+    }
+
     /**
      * @brief Kill the worker thread
      */
@@ -113,7 +126,6 @@ namespace wrench {
 
 
       TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_BLUE);
-
       WRENCH_INFO("New work_unit_executor starting (%s) to do: %ld pre file copies, %d tasks, %ld post file copies",
                   this->mailbox_name.c_str(),
                   this->workunit->pre_file_copies.size(),
@@ -180,6 +192,7 @@ namespace wrench {
 
 //      std::set<WorkflowFile* > files_stored_in_scratch = {};
 
+WRENCH_INFO("IN PERFORM WORK");
       /** Perform all pre file copies operations */
       for (auto file_copy : work->pre_file_copies) {
         WorkflowFile *file = std::get<0>(file_copy);
@@ -225,7 +238,7 @@ namespace wrench {
         }
       }
 
-      /** Perform all tasks **/
+      /** Perform the computationa task if any **/
       if (this->workunit->task != nullptr) {
         auto task = this->workunit->task;
 
@@ -306,7 +319,7 @@ namespace wrench {
         }
       }
 
-      WRENCH_INFO("Done with all tasks");
+      WRENCH_INFO("Done with the task's computation");
 
 
       /** Perform all post file copies operations */

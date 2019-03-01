@@ -13,6 +13,7 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <wrench/services/compute/bare_metal/BareMetalComputeService.h>
+#include <wrench/services/helpers/HostStateChangeDetectorMessage.h>
 
 
 #include "wrench/services/ServiceMessage.h"
@@ -30,6 +31,7 @@
 #include "wrench/workflow/job/StandardJob.h"
 #include "wrench/workflow/job/PilotJob.h"
 #include "wrench/services/helpers/ServiceFailureDetector.h"
+#include "wrench/services/helpers/HostStateChangeDetector.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(baremetal_compute_service, "Log category for Multicore Compute Service");
 
@@ -44,7 +46,7 @@ namespace wrench {
 
 
     /**
-     * @brief Helper static function to parse resource specifications to the <cores,ram> format
+     * @brief Helper static method to parse resource specifications to the <cores,ram> format
      * @param spec: specification string
      * @return a <cores, ram> tuple
      * @throw std::invalid_argument
@@ -380,6 +382,17 @@ namespace wrench {
 
     }
 
+    void BareMetalComputeService::someHostIsBackOn(simgrid::s4u::Host &h) {
+        for (auto const &c : this->compute_resources) {
+            if ((c.first == h.get_name()) and (h.is_on())) {
+                WRENCH_INFO("HOST %s CAME BACK ON!!!", h.get_cname());
+                this->host_back_on = true;
+                break;
+            }
+        }
+    }
+
+
     /**
      * @brief Helper method called by all constructors to initiate object instance
      *
@@ -470,11 +483,14 @@ namespace wrench {
             this->running_thread_counts.insert(std::make_pair(host.first, 0));
         }
 
+
         this->ttl = ttl;
         this->has_ttl = (this->ttl != DBL_MAX);
         this->containing_pilot_job = pj;
 
     }
+
+
 
     /**
      * @brief Main method of the daemon
@@ -488,6 +504,22 @@ namespace wrench {
         WRENCH_INFO("New BareMetal Compute Service starting (%s) on %ld hosts with a total of %ld cores",
                     this->mailbox_name.c_str(), this->compute_resources.size(), this->total_num_cores);
 
+        {
+            // Create the host state monitor
+            std::vector<std::string> hosts_to_monitor;
+            for (auto const &h : this->compute_resources) {
+                hosts_to_monitor.push_back(h.first);
+            }
+            auto host_state_monitor = std::shared_ptr<HostStateChangeDetector>(
+                    new HostStateChangeDetector(this->hostname, hosts_to_monitor, true, false, this->mailbox_name));
+            host_state_monitor->simulation = this->simulation;
+            host_state_monitor->start(host_state_monitor, true, false); // Daemonized, no auto-restart
+        }
+
+        std::function<void(simgrid::s4u::Host &h)> host_back_on_function = std::bind(&BareMetalComputeService::someHostIsBackOn, this, std::placeholders::_1);
+        simgrid::s4u::Host::on_state_change.connect(host_back_on_function);
+
+
         // Set an alarm for my timely death, if necessary
         if (this->has_ttl) {
             this->death_date = S4U_Simulation::getClock() + this->ttl;
@@ -495,6 +527,8 @@ namespace wrench {
 
         /** Main loop **/
         while (this->processNextMessage()) {
+
+            WRENCH_INFO("DISPATCHING READY WORK UNITS");
 
             /** Dispatch ready work units **/
             this->dispatchReadyWorkunits();
@@ -525,8 +559,14 @@ namespace wrench {
         std::string new_host_to_avoid = "";
         double new_host_to_avoid_ram_capacity = 0;
         for (auto const &r : this->compute_resources) {
+            WRENCH_INFO("LOOKING AT HOST %s", r.first.c_str());
             // If there is a required host, then don't even look at others
             if (not required_host.empty() and (r.first != required_host)) {
+                continue;
+            }
+
+            // If the host is down, then don't look at it
+            if (not simgrid::s4u::Host::by_name(r.first)->is_on()) {
                 continue;
             }
 
@@ -606,7 +646,9 @@ namespace wrench {
         // able to run on that host due to RAM, and because we don't
         // allow non-zero-ram tasks to jump ahead of other tasks
 
+        WRENCH_INFO("THERE ARE %lu READY WUs", this->ready_workunits.size());
         for (auto const &wu : this->ready_workunits) {
+            WRENCH_INFO("LOOKING AT A WORKUNIt");
 
             std::string picked_host;
 
@@ -635,10 +677,12 @@ namespace wrench {
 
             // If we didn't find a host, forget it
             if (target_host.empty()) {
+                WRENCH_INFO("DIDN'T FIND A HOST");
                 continue;
             }
 
             /** Dispatch it **/
+            WRENCH_INFO("DISPATCHING ON HOST %s", target_host.c_str());
             // Create a workunit executor on the target host
             std::shared_ptr<WorkunitExecutor> workunit_executor = std::shared_ptr<WorkunitExecutor>(
                     new WorkunitExecutor(this->simulation,
@@ -655,7 +699,13 @@ namespace wrench {
                     ));
 
             workunit_executor->simulation = this->simulation;
-            workunit_executor->start(workunit_executor, true, false); // Daemonized, no auto-restart
+            try {
+                workunit_executor->start(workunit_executor, true, false); // Daemonized, no auto-restart
+            } catch (std::shared_ptr<HostError> &e) {
+                // This is an error on the target host!!
+                throw std::runtime_error("BareMetalComputeService::dispatchReadyWorkunits(): got a host error on the target host - this shouldn't happen");
+            }
+
 
             // Start a failure detector for this workunit executor (which will send me a message in case the
             // work unit executor has died)
@@ -702,10 +752,9 @@ namespace wrench {
 
         // Wait for a message
         std::unique_ptr<SimulationMessage> message;
-
         try {
             message = S4U_Mailbox::getMessage(this->mailbox_name);
-        } catch (std::shared_ptr<NetworkError> &cause) {
+        } catch (std::shared_ptr<NetworkError> &error) {
             WRENCH_INFO("Got a network error while getting some message... ignoring");
             return true;
         }
@@ -717,7 +766,10 @@ namespace wrench {
 
         WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
-        if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+        if (auto msg = dynamic_cast<HostHasTurnedOnMessage *>(message.get())) {
+            // Do nothing, just wake up
+            return true;
+        } else if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
 
             if (this->containing_pilot_job != nullptr) {
                 /*** Clean up everything in the scratch space ***/
@@ -757,7 +809,7 @@ namespace wrench {
             processWorkunitExecutorFailure(msg->workunit_executor, msg->workunit, msg->cause);
             return true;
 
-        } else if (auto msg = dynamic_cast<ServiceHaCrashedeMessage *>(message.get())) {
+        } else if (auto msg = dynamic_cast<ServiceHasCrashedMessage *>(message.get())) {
             Service *service = msg->service;
             auto workunit_executor = dynamic_cast<WorkunitExecutor *>(service);
             if (not workunit_executor) {
@@ -1193,7 +1245,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Helper function that determines wether a submitted job (with service-specific
+     * @brief Helper method that determines wether a submitted job (with service-specific
      *        arguments) can run given available  resources
      *
      * @param job: the standard job
@@ -1491,7 +1543,8 @@ namespace wrench {
 
 
     /**
-     * @brief Process a crash of a WorkunitExecutor
+     * @brief Process a crash of a WorkunitExecutor (although some work may has been done, we'll just
+     *        re-do the workunit from scratch)
      *
      * @param workunitExecutor: the workunit executor that has crashed
      */
@@ -1499,9 +1552,32 @@ namespace wrench {
         WRENCH_INFO("CRAP!!!! A WORKUNIT EXECUTOR HAS CRASHED!!! I SHOULD DO SOMETHIONG!!!");
         Workunit *workunit = workunit_executor->workunit;
 
-        // Determine what part of the work has been done?? 
+        // TODO: WHAT SHOULD WE DO HERE FOR LOGGING!!
 
+        // Get the scratch files that executor may have generated
+        StandardJob *job = workunit_executor->getJob();
+        for (auto &f : workunit_executor->getFilesStoredInScratch()) {
+            if (this->files_in_scratch.find(job) == this->files_in_scratch.end()) {
+                this->files_in_scratch.insert(std::make_pair(job, (std::set<WorkflowFile *>) {}));
+            }
+            this->files_in_scratch[job].insert(f);
+        }
 
+        // Update RAM availabilities and running thread counts
+        if (workunit->task) {
+            this->ram_availabilities[workunit_executor->getHostname()] += workunit->task->getMemoryRequirement();
+            this->running_thread_counts[workunit_executor->getHostname()] -= workunit_executor->getNumCores();
+        }
+        // Forget the workunit executor
+        forgetWorkunitExecutor(workunit_executor);
+
+        WRENCH_INFO("DONE SOME CLEANUP, PUTTING THE TASK BACK IN READY QUEUE");
+
+        // Reset the internal task state to READY (it may have been completed actually, but we just redo the whole workunit)
+        workunit->task->setInternalState(WorkflowTask::InternalState::TASK_READY);
+        // Put the WorkUnit back in the ready list (at the end)
+        this->ready_workunits.push_back(workunit);
+        WRENCH_INFO("DONE HANDLING WUE FAILURE!");
     }
 
 

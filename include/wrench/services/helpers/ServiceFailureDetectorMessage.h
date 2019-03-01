@@ -30,9 +30,9 @@ namespace wrench {
         ServiceFailureDetectorMessage(std::string name);
     };
 
-    class ServiceHaCrashedeMessage : public ServiceFailureDetectorMessage {
+    class ServiceHasCrashedMessage : public ServiceFailureDetectorMessage {
     public:
-        ServiceHaCrashedeMessage(Service *service);
+        ServiceHasCrashedMessage(Service *service);
 
         Service *service;
     };

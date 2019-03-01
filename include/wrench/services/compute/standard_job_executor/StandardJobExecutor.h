@@ -72,7 +72,7 @@ namespace wrench {
     private:
 
         friend class Simulation;
-        void cleanup() override;
+        void cleanup(bool has_returned_from_main, int return_value) override;
 
         std::string callback_mailbox;
         StandardJob *job;

@@ -210,20 +210,19 @@ namespace wrench {
 
     }
 
-    void StandardJobExecutor::cleanup() {
-      for (auto wue: this->running_workunit_executors) {
-        Workunit *wu = wue->workunit;
-        if (wu->task != nullptr) {
-          if (wu->task->getInternalState() == WorkflowTask::InternalState::TASK_RUNNING) {
-            wu->task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
+    void StandardJobExecutor::cleanup(bool has_returned_from_main, int return_value) {
+        for (auto wue: this->running_workunit_executors) {
+          Workunit *wu = wue->workunit;
+          if (wu->task != nullptr) {
+            if (wu->task->getInternalState() == WorkflowTask::InternalState::TASK_RUNNING) {
+              wu->task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
+            }
           }
         }
-      }
-      this->non_ready_workunits.clear();
-      this->ready_workunits.clear();
-      this->running_workunits.clear();
-      this->completed_workunits.clear();
-
+        this->non_ready_workunits.clear();
+        this->ready_workunits.clear();
+        this->running_workunits.clear();
+        this->completed_workunits.clear();
     }
 
 

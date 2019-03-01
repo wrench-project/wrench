@@ -241,7 +241,7 @@ namespace wrench {
             }
         }
 #else
-      if (this->scheduling_algorithms.find(
+        if (this->scheduling_algorithms.find(
               this->getPropertyValueAsString(BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM))
           == this->scheduling_algorithms.end()) {
         throw std::invalid_argument(" BatchService::BatchService(): unsupported scheduling algorithm " +
@@ -1069,12 +1069,10 @@ namespace wrench {
     /**
     * @brief Terminate the daemon, dealing with pending/running jobs
     */
-    void BatchService::cleanup() {
+    void BatchService::cleanup(bool has_returned_from_main, int return_value) {
 
 #ifdef ENABLE_BATSCHED
-        if (this->isUp()) {  // the service hasn't already been stopped via stop()
-            this->stopBatsched();
-        }
+        this->stopBatsched();
 #endif
 
     }
@@ -1150,7 +1148,7 @@ namespace wrench {
             this->setStateToDown();
             this->failCurrentStandardJobs();
             this->terminateRunningPilotJobs();
-            this->cleanup();
+            //this->cleanup(true, 0);
             // Send back a synchronous reply!
             try {
                 S4U_Mailbox::putMessage(msg->ack_mailbox,
