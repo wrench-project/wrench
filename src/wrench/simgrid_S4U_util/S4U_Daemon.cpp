@@ -135,7 +135,7 @@ namespace wrench {
             //  One day, all Daemon stuff will be simply std::shared_ptr
             WRENCH_INFO("ABOUT TO SLEEP BEFORE I DELETE MY OBJECT");
 //            S4U_Simulation::sleep(1.0);
-            WRENCH_INFO("REMOVING LIFE_SAVER");
+            WRENCH_INFO("REMOVING  LIFE_SAVER");
             delete service->life_saver;
         }
         return 0;
