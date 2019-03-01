@@ -130,11 +130,6 @@ namespace wrench {
 
         // Free memory for the object unless the service is set to auto-restart
         if (not service->isSetToAutoRestart()) {
-            // This sleep is so that all other actors who are doing a join
-            // can do their stuff and still look at the service
-            //  One day, all Daemon stuff will be simply std::shared_ptr
-            WRENCH_INFO("ABOUT TO SLEEP BEFORE I DELETE MY OBJECT");
-//            S4U_Simulation::sleep(1.0);
             WRENCH_INFO("REMOVING  LIFE_SAVER");
             delete service->life_saver;
         }
