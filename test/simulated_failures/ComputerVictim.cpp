@@ -31,7 +31,11 @@ int wrench::ComputerVictim::main() {
         WRENCH_INFO("Computing %.3lf flops...", this->flops);
         wrench::Simulation::compute(this->flops);
     } catch (std::shared_ptr<wrench::HostError> &e) {
-        return 1;
+        /** ON MAC I GET IN THIS!! ON LINUX I DON'T!!! SINCE THE INTEND BEHAVIOR IN
+         * SIMGRID WILL LIKELY BE TO NEVER BE ABLE TO CATCH THIS EXCEPTION, LET JUST
+         * DIRECTLY TO TO THE ON_EXIT()
+         **/
+       simgrid::s4u::this_actor::exit();
     }
     S4U_Mailbox::dputMessage(this->mailbox_to_notify, this->msg);
 
