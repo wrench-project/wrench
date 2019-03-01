@@ -1,5 +1,9 @@
 #include "wrench/simulation/SimulationTimestampTypes.h"
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
+#include <wrench-dev.h>
+
+XBT_LOG_NEW_DEFAULT_CATEGORY(simulatation_timestamps, "Log category for SimulationTimeStamps");
+
 
 namespace wrench {
 
@@ -75,6 +79,7 @@ namespace wrench {
      * @brief Sets the endpoint of the calling object (SimulationTimestampTaskFailure, SimulationTimestampTaskTerminated, SimulationTimestampTaskStart) with a SimulationTimestampTaskStart object
      */
     void SimulationTimestampTask::setEndpoints() {
+        WRENCH_INFO("In setEndPoints");
         // find the SimulationTimestampTaskStart object containing the same task
         auto pending_tasks_itr = pending_task_timestamps.find(this->task->getID());
         if (pending_tasks_itr != pending_task_timestamps.end()) {

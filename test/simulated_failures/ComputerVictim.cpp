@@ -37,7 +37,7 @@ int wrench::ComputerVictim::main() {
          **/
        simgrid::s4u::this_actor::exit();
     }
-    S4U_Mailbox::dputMessage(this->mailbox_to_notify, this->msg);
+    S4U_Mailbox::putMessage(this->mailbox_to_notify, this->msg);
 
     return 0;
 

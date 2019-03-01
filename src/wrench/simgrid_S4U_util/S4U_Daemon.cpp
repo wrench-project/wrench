@@ -78,30 +78,23 @@ namespace wrench {
         this->has_returned_from_main = false;
     }
 
-//     NOT NEEDED?
-//    /**
-//     * @brief Constructor (daemon without a mailbox)
-//     *
-//     * @param hostname: the name of the host on which the daemon will run
-//     * @param process_name_prefix: the prefix of the name of the simulated process/actor
-//     */
-//    S4U_Daemon::S4U_Daemon(std::string hostname, std::string process_name_prefix) {
-//      if (simgrid::s4u::Host::by_name_or_null(hostname) == nullptr) {
-//        throw std::invalid_argument("S4U_Daemon::S4U_Daemon(): Unknown host '" + hostname + "'");
-//      }
-//
-//      this->hostname = hostname;
-//      this->process_name = process_name_prefix + "_" + std::to_string(S4U_Mailbox::generateUniqueSequenceNumber());
-//      this->mailbox_name = "";
-//      this->cleanly_terminated = false;
-//    }
+
+#define CLEAN_UP_MAILBOX_TO_AVOID_MEMORY_LEAK 0
 
     S4U_Daemon::~S4U_Daemon() {
-        WRENCH_INFO("IN DAEMON DESTRICTOR");
+        WRENCH_DEBUG("IN DAEMON DESTRUCTOR (%s)'", this->getName().c_str());
+        /** The code below was to avoid a memory leak on the actor! However, weirdly,
+         *  it now causes problems due to SimGrid complaining that on_exit() functions
+         *  shouldn't do blocking things.... So it's commented-out for now
+         */
+#if (CLEAN_UP_MAILBOX_TO_AVOID_MEMORY_LEAK == 1)
+         simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::by_name(this->mailbox_name);
+         mailbox->set_receiver(nullptr);
+#endif
+
 #ifdef ACTOR_TRACKING_OUTPUT
         num_actors[this->process_name_prefix]--;
 #endif
-//        std::cerr << "### DESTRUCTOR OF DAEMON " << this->getName() << "\n";
     }
 
     /**
@@ -130,7 +123,8 @@ namespace wrench {
 
         // Free memory for the object unless the service is set to auto-restart
         if (not service->isSetToAutoRestart()) {
-            WRENCH_INFO("REMOVING  LIFE_SAVER");
+
+            WRENCH_INFO("REMOVING  LIFE_SAVER for '%s'", service->getName().c_str());
             delete service->life_saver;
         }
         return 0;
@@ -215,7 +209,6 @@ namespace wrench {
     void S4U_Daemon::runMainMethod() {
         try {
             this->num_starts++;
-            int return_value;
             try {
                 S4U_Simulation::computeZeroFlop();
                 this->return_value = this->main();
@@ -228,13 +221,20 @@ namespace wrench {
                 WRENCH_INFO("CAUGHT SIMGRID HOST ERROR");
                 // In case the main() didn't to that catch
             }
-            wrench::S4U_Simulation::sleep(0.001);
+            WRENCH_INFO("SLEEPING FOR 0.0000 seconds");
+            wrench::S4U_Simulation::sleep(0.000);
+            WRENCH_INFO("DONE SLEEPING FOR 0.0001 seconds");
         } catch (std::exception &e) {
             throw;
         }
+
+//        WRENCH_INFO("CLEANING UP MAILBOX:");
         // Avoid a memory leak on the actor!
-        simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::by_name(this->mailbox_name);
-        mailbox->set_receiver(nullptr);
+//        simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::by_name(this->mailbox_name);
+//        WRENCH_INFO("CLEANING UP MAILBOX 2:");
+//        mailbox->set_receiver(nullptr);
+
+        WRENCH_INFO("REETURNING FROM runMainMethod()");
     }
 
 

@@ -32,7 +32,7 @@ int wrench::SleeperVictim::main() {
     } catch (std::shared_ptr<wrench::HostError> &e) {
         return 1;
     }
-    S4U_Mailbox::dputMessage(this->mailbox_to_notify, this->msg);
+    S4U_Mailbox::putMessage(this->mailbox_to_notify, this->msg);
 
     return 0;
 
