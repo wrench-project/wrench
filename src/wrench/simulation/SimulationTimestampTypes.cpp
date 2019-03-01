@@ -27,7 +27,7 @@ namespace wrench {
      * @param endpoint: an corresponding "end" timestamp or "start" timestamp
      */
     SimulationTimestampPair::SimulationTimestampPair(SimulationTimestampPair *endpoint)
-        : endpoint(endpoint) {
+            : endpoint(endpoint) {
 
     }
 
@@ -141,14 +141,14 @@ namespace wrench {
      * @brief Constructor
      * @param task: the WorkflowTask associated with this timestamp
      */
-     SimulationTimestampTaskTerminated::SimulationTimestampTaskTerminated(WorkflowTask *task) : SimulationTimestampTask(task) {
-         if (task == nullptr) {
-             throw std::invalid_argument("SimulationTimestampTaskTerminated::SimulationTimestampTaskTerminated() requires a valid pointer to a WorkflowTask object");
-         }
+    SimulationTimestampTaskTerminated::SimulationTimestampTaskTerminated(WorkflowTask *task) : SimulationTimestampTask(task) {
+        if (task == nullptr) {
+            throw std::invalid_argument("SimulationTimestampTaskTerminated::SimulationTimestampTaskTerminated() requires a valid pointer to a WorkflowTask object");
+        }
 
-         // match this timestamp with a SimulationTimestampTaskStart
-         setEndpoints();
-     }
+        // match this timestamp with a SimulationTimestampTaskStart
+        setEndpoints();
+    }
 
     /**
      * @brief Constructor
@@ -230,7 +230,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     SimulationTimestampFileCopyFailure::SimulationTimestampFileCopyFailure(SimulationTimestampFileCopyStart *start_timestamp) :
-           SimulationTimestampFileCopy(nullptr, nullptr, "", nullptr, "", start_timestamp) {
+            SimulationTimestampFileCopy(nullptr, nullptr, "", nullptr, "", start_timestamp) {
 
         // a corresponding start timestamp must be passed
         if (start_timestamp == nullptr) {
@@ -273,7 +273,7 @@ namespace wrench {
      * @param pstate: the pstate that is being set on this host
      */
     SimulationTimestampPstateSet::SimulationTimestampPstateSet(std::string hostname, int pstate) :
-        hostname(hostname), pstate(pstate) {
+            hostname(hostname), pstate(pstate) {
 
         if (hostname.empty()) {
             throw std::invalid_argument("SimulationTimestampPstateSet::SimulationTimestampPstateSet() requires a valid hostname");
@@ -302,7 +302,7 @@ namespace wrench {
      * @param joules: the energy consumption in joules 
      */
     SimulationTimestampEnergyConsumption::SimulationTimestampEnergyConsumption(std::string hostname, double joules)
-        : hostname(hostname), joules(joules) {
+            : hostname(hostname), joules(joules) {
 
         if (hostname.empty() || joules < 0.0) {
             throw std::invalid_argument(

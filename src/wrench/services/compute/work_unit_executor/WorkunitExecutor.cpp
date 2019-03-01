@@ -87,8 +87,8 @@ namespace wrench {
                 WorkflowTask *task = this->workunit->task;
                 task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
                 task->setFailureDate(S4U_Simulation::getClock());
-                this->simulation->getOutput().addTimestamp<SimulationTimestampTaskFailure>(
-                        new SimulationTimestampTaskFailure(task));
+                new SimulationTimestampTaskFailure(task);
+//                this->simulation->getOutput().addTimestamp<SimulationTimestampTaskFailure>(new SimulationTimestampTaskFailure(task));
             }
         }
     }

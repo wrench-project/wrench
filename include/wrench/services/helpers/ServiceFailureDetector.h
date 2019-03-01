@@ -19,7 +19,7 @@ namespace wrench {
 
     public:
 
-        explicit ServiceFailureDetector(std::string host_on_which_to_run, Service *service_to_monitor, std::string mailbox_to_notify);
+        explicit ServiceFailureDetector(std::string host_on_which_to_run, std::shared_ptr<Service> service_to_monitor, std::string mailbox_to_notify);
 
         /***********************/
         /** \endcond           */
@@ -27,7 +27,7 @@ namespace wrench {
 
     private:
 
-        Service *service_to_monitor;
+        std::shared_ptr<Service> service_to_monitor;
         std::string mailbox_to_notify;
         int main() override;
 
