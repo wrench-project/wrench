@@ -170,9 +170,9 @@ namespace wrench {
         // Map of all Workunits
         std::map<StandardJob *, std::set<std::shared_ptr<Workunit>>> all_workunits;
 
-        std::deque<Workunit *> ready_workunits;
+        std::deque<std::shared_ptr<Workunit>> ready_workunits;
 //        std::map<StandardJob *, std::set<Workunit *>> running_workunits;
-        std::map<StandardJob *, std::set<Workunit *>> completed_workunits;
+        std::map<StandardJob *, std::set<std::shared_ptr<Workunit>>> completed_workunits;
 
         // Set of running WorkunitExecutors
         std::map<StandardJob *, std::set<std::shared_ptr<WorkunitExecutor>>> workunit_executors;
@@ -191,9 +191,9 @@ namespace wrench {
 
         void failCurrentStandardJobs();
 
-        void processWorkunitExecutorCompletion(WorkunitExecutor *workunit_executor, Workunit *workunit);
+        void processWorkunitExecutorCompletion(WorkunitExecutor *workunit_executor, std::shared_ptr<Workunit> workunit);
 
-        void processWorkunitExecutorFailure(WorkunitExecutor *workunit_executor, Workunit *workunit, std::shared_ptr<FailureCause> cause);
+        void processWorkunitExecutorFailure(WorkunitExecutor *workunit_executor, std::shared_ptr<Workunit> workunit, std::shared_ptr<FailureCause> cause);
 
         void processWorkunitExecutorCrash(WorkunitExecutor *workunit_executor);
 

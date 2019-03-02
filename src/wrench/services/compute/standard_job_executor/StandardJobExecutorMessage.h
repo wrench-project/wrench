@@ -43,13 +43,13 @@ namespace wrench {
     public:
         WorkunitExecutorDoneMessage(
                 WorkunitExecutor *workunit_executor,
-                Workunit *workunit,
+                std::shared_ptr<Workunit> workunit,
                 double payload);
 
         /** @brief The work unit executor that has completed the work unit */
         WorkunitExecutor *workunit_executor;
         /** @brief The work unit that has completed */
-        Workunit *workunit;
+        std::shared_ptr<Workunit> workunit;
     };
 
     /**
@@ -59,14 +59,14 @@ namespace wrench {
     public:
         WorkunitExecutorFailedMessage(
                 WorkunitExecutor *workunit_executor,
-                Workunit *workunit,
+                std::shared_ptr<Workunit> workunit,
                 std::shared_ptr<FailureCause> cause,
                 double payload);
 
         /** @brief The worker unit executor that has failed to perform the work unit */
         WorkunitExecutor *workunit_executor;
         /** @brief The work unit that has failed */
-        Workunit *workunit;
+        std::shared_ptr<Workunit> workunit;
         /** @brief The cause of the failure */
         std::shared_ptr<FailureCause> cause;
     };

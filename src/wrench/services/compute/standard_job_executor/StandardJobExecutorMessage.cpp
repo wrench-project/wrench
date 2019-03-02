@@ -32,7 +32,7 @@ namespace wrench {
      */
     WorkunitExecutorDoneMessage::WorkunitExecutorDoneMessage(
             WorkunitExecutor *workunit_executor,
-            Workunit *workunit,
+            std::shared_ptr<Workunit> workunit,
             double payload) :
             StandardJobExecutorMessage("WORK_UNIT_EXECUTOR_DONE", payload) {
       this->workunit_executor = workunit_executor;
@@ -48,7 +48,7 @@ namespace wrench {
      */
     WorkunitExecutorFailedMessage::WorkunitExecutorFailedMessage(
             WorkunitExecutor *workunit_executor,
-            Workunit *workunit,
+            std::shared_ptr<Workunit> workunit,
             std::shared_ptr<FailureCause> cause,
             double payload):
             StandardJobExecutorMessage("WORK_UNIT_EXECUTOR_FAILED", payload) {

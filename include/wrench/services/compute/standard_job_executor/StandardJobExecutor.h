@@ -128,10 +128,10 @@ namespace wrench {
 //        double getPropertyValueAsDouble(std::string property);
 
         void processWorkunitExecutorCompletion(WorkunitExecutor *workunit_executor,
-                                               Workunit *workunit);
+                                               std::shared_ptr<Workunit> workunit);
 
         void processWorkunitExecutorFailure(WorkunitExecutor *workunit_executor,
-                                            Workunit *workunit,
+                                            std::shared_ptr<Workunit> workunit,
                                             std::shared_ptr<FailureCause> cause);
 
         bool processNextMessage();
@@ -144,7 +144,7 @@ namespace wrench {
 
         void createWorkunits();
 
-        std::vector<Workunit*> sortReadyWorkunits();
+        std::vector<std::shared_ptr<Workunit>> sortReadyWorkunits();
 
         //Clean up scratch
         void cleanUpScratch();
