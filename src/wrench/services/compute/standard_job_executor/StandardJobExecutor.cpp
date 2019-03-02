@@ -211,18 +211,18 @@ namespace wrench {
     }
 
     void StandardJobExecutor::cleanup(bool has_returned_from_main, int return_value) {
-        for (auto wue: this->running_workunit_executors) {
-          Workunit *wu = wue->workunit;
-          if (wu->task != nullptr) {
-            if (wu->task->getInternalState() == WorkflowTask::InternalState::TASK_RUNNING) {
-              wu->task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
-            }
+      for (auto wue: this->running_workunit_executors) {
+        std::shared_ptr<Workunit> wu = wue->workunit;
+        if (wu->task != nullptr) {
+          if (wu->task->getInternalState() == WorkflowTask::InternalState::TASK_RUNNING) {
+            wu->task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
           }
         }
-        this->non_ready_workunits.clear();
-        this->ready_workunits.clear();
-        this->running_workunits.clear();
-        this->completed_workunits.clear();
+      }
+      this->non_ready_workunits.clear();
+      this->ready_workunits.clear();
+      this->running_workunits.clear();
+      this->completed_workunits.clear();
     }
 
 
@@ -379,7 +379,7 @@ namespace wrench {
 
 
       // Get an ordered (by the task selection algorithm) list of the ready workunits
-      std::vector<Workunit *> sorted_ready_workunits = sortReadyWorkunits();
+      std::vector<std::shared_ptr<Workunit>> sorted_ready_workunits = sortReadyWorkunits();
 
 //      std::cerr << "** SORTED\n";
 //      for (auto wu : sorted_ready_workunits) {
@@ -399,9 +399,9 @@ namespace wrench {
         double required_ram;
 
         try {
-          minimum_num_cores = computeWorkUnitMinNumCores(wu);
-          desired_num_cores = computeWorkUnitDesiredNumCores(wu);
-          required_ram = computeWorkUnitMinMemory(wu);
+          minimum_num_cores = computeWorkUnitMinNumCores(wu.get());
+          desired_num_cores = computeWorkUnitDesiredNumCores(wu.get());
+          required_ram = computeWorkUnitMinMemory(wu.get());
         } catch (std::runtime_error &e) {
           this->releaseDaemonLock();
           throw;
@@ -484,18 +484,18 @@ namespace wrench {
 
         std::shared_ptr<WorkunitExecutor> workunit_executor = std::shared_ptr<WorkunitExecutor>(
                 new WorkunitExecutor(this->simulation,
-                                              target_host,
-                                              target_num_cores,
-                                              required_ram,
-                                              this->mailbox_name,
-                                              wu,
-                                              this->scratch_space,
-                                              job,
-                                              this->getPropertyValueAsDouble(
-                                                      StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD),
-                                              this->getPropertyValueAsBoolean(
-                                                      StandardJobExecutorProperty::SIMULATE_COMPUTATION_AS_SLEEP)
-        ));
+                                     target_host,
+                                     target_num_cores,
+                                     required_ram,
+                                     this->mailbox_name,
+                                     wu,
+                                     this->scratch_space,
+                                     job,
+                                     this->getPropertyValueAsDouble(
+                                             StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD),
+                                     this->getPropertyValueAsBoolean(
+                                             StandardJobExecutorProperty::SIMULATE_COMPUTATION_AS_SLEEP)
+                ));
 
         workunit_executor->simulation = this->simulation;
         workunit_executor->start(workunit_executor, true, false); // Daemonized, no auto-restart
@@ -511,7 +511,7 @@ namespace wrench {
 
         for (auto it = this->ready_workunits.begin();
              it != this->ready_workunits.end(); it++) {
-          if ((*it).get() == wu) {
+          if ((*it) == wu) {
             this->ready_workunits.erase(it);
             this->running_workunits.insert(*it);
 //            PointerUtil::moveUniquePtrFromSetToSet(it, &(this->ready_workunits), &(this->running_workunits));
@@ -583,7 +583,7 @@ namespace wrench {
  */
     void StandardJobExecutor::processWorkunitExecutorCompletion(
             WorkunitExecutor *workunit_executor,
-            Workunit *workunit) {
+            std::shared_ptr<Workunit> workunit) {
 
       // Don't kill me while I am doing this
       this->acquireDaemonLock();
@@ -604,7 +604,7 @@ namespace wrench {
       // Find the workunit in the running workunit queue
       bool found_it = false;
       for (auto it = this->running_workunits.begin(); it != this->running_workunits.end(); it++) {
-        if ((*it).get() == workunit) {
+        if ((*it) == workunit) {
           this->running_workunits.erase(it);
           this->completed_workunits.insert(*it);
 //          PointerUtil::moveUniquePtrFromSetToSet(it, &(this->running_workunits), &(this->completed_workunits));
@@ -658,7 +658,7 @@ namespace wrench {
             // Find the child working in the non-ready  queue
             found_it = false;
             for (auto it = this->non_ready_workunits.begin(); it != this->non_ready_workunits.end(); it++) {
-              if ((*it).get() == child) {
+              if ((*it) == child) {
                 // Move it to the ready  queue
                 this->non_ready_workunits.erase(it);
                 this->ready_workunits.insert(*it);
@@ -697,7 +697,7 @@ namespace wrench {
 
     void StandardJobExecutor::processWorkunitExecutorFailure(
             WorkunitExecutor *workunit_executor,
-            Workunit *workunit,
+            std::shared_ptr<Workunit> workunit,
             std::shared_ptr<FailureCause> cause) {
 
 
@@ -722,7 +722,7 @@ namespace wrench {
       // Remove the work from the running work queue
       bool found_it = false;
       for (auto it = this->running_workunits.begin(); it != this->running_workunits.end(); it++) {
-        if ((*it).get() == workunit) {
+        if ((*it) == workunit) {
           this->running_workunits.erase(it);
           found_it = true;
           break;
@@ -742,7 +742,7 @@ namespace wrench {
         }
         // find the workunit executor  that's doing the work and kill it (lame iteration)
         for (auto const &wue : this->running_workunit_executors) {
-          if (wue->workunit == wu.get()) {
+          if (wue->workunit == wu) {
             WRENCH_INFO("KILLING WORKUNIT EXECUTOR %s", wue->getName().c_str());
             wue->kill();
             break;
@@ -774,14 +774,14 @@ namespace wrench {
  *
  * @return a sorted vector of ready tasks
  */
-    std::vector<Workunit*> StandardJobExecutor::sortReadyWorkunits() {
+    std::vector<std::shared_ptr<Workunit>> StandardJobExecutor::sortReadyWorkunits() {
 
 //      std::cerr << "In sortReadyWorkunits()\n";
 
-      std::vector<Workunit *> sorted_workunits;
+      std::vector<std::shared_ptr<Workunit>> sorted_workunits;
 
       for (auto const &wu : this->ready_workunits) {
-        sorted_workunits.push_back(wu.get());
+        sorted_workunits.push_back(wu);
 //        std::cerr << "WORKUNITS.GET = " << wu.get () << ": " << wu.get()->tasks.size() << "\n";
       }
 
@@ -794,14 +794,14 @@ namespace wrench {
 
       // using function as comp
       std::sort(sorted_workunits.begin(), sorted_workunits.end(),
-                [selection_algorithm](const Workunit*  wu1, const Workunit*  wu2) -> bool
+                [selection_algorithm](const std::shared_ptr<Workunit>  wu1, const std::shared_ptr<Workunit>  wu2) -> bool
                 {
 //                    std::cerr << "IN LAMBDA1: " << wu1 << "  " << wu2 << "\n";
 //                    std::cerr << "IN LAMBDA2: " << wu1->tasks.size() << "  " << wu2->tasks.size() << "\n";
                     // Non-computational workunits have higher priority
 
                     if (wu1->task == nullptr and wu2->task == nullptr) {
-                      return ((uintptr_t) wu1 > (uintptr_t) wu2);
+                      return ((uintptr_t) wu1.get() > (uintptr_t) wu2.get());
                     }
                     if (wu1->task == nullptr) {
                       return true;
@@ -812,19 +812,19 @@ namespace wrench {
 
                     if (selection_algorithm == "maximum_flops") {
                       if (wu1->task->getFlops() == wu2->task->getFlops()) {
-                        return ((uintptr_t) wu1 > (uintptr_t) wu2);
+                        return ((uintptr_t) wu1.get() > (uintptr_t) wu2.get());
                       }
                       return (wu1->task->getFlops() >= wu2->task->getFlops());
 
                     } else if (selection_algorithm == "maximum_minimum_cores") {
                       if (wu1->task->getMinNumCores() == wu2->task->getMinNumCores()) {
-                        return ((uintptr_t) wu1 > (uintptr_t) wu2);
+                        return ((uintptr_t) wu1.get() > (uintptr_t) wu2.get());
                       }
                       return (wu1->task->getMinNumCores() >= wu2->task->getMinNumCores());
 
                     } else if (selection_algorithm == "minimum_top_level") {
                       if (wu1->task->getTopLevel() == wu2->task->getTopLevel()) {
-                        return ((uintptr_t) wu1 > (uintptr_t) wu2);
+                        return ((uintptr_t) wu1.get() > (uintptr_t) wu2.get());
                       }
                       return (wu1->task->getTopLevel() <= wu2->task->getTopLevel());
                     } else {
@@ -881,10 +881,10 @@ namespace wrench {
     }
 
 
-  /**
-   * @brief Get the executor's job
-   * @return a standard job
-   */
+    /**
+     * @brief Get the executor's job
+     * @return a standard job
+     */
     StandardJob *StandardJobExecutor::getJob() {
       return this->job;
     }
