@@ -607,8 +607,9 @@ namespace wrench {
       bool found_it = false;
       for (auto it = this->running_workunits.begin(); it != this->running_workunits.end(); it++) {
         if ((*it) == workunit) {
+          auto tomove = *it;
           this->running_workunits.erase(it);
-          this->completed_workunits.insert(*it);
+          this->completed_workunits.insert(tomove);
 //          PointerUtil::moveUniquePtrFromSetToSet(it, &(this->running_workunits), &(this->completed_workunits));
           found_it = true;
           break;
