@@ -88,7 +88,7 @@ namespace wrench {
          *  shouldn't do blocking things.... So it's commented-out for now
          */
 #if (CLEAN_UP_MAILBOX_TO_AVOID_MEMORY_LEAK == 1)
-         simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::by_name(this->mailbox_name);
+        simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::by_name(this->mailbox_name);
          mailbox->set_receiver(nullptr);
 #endif
 
@@ -104,7 +104,6 @@ namespace wrench {
      * @param exit_code: the return value from main (if has_terminated_cleanly is true)
      */
     void S4U_Daemon::cleanup(bool has_terminated_cleanly, int return_value) {
-        WRENCH_INFO("IN BASED CLEANUP");
 //      WRENCH_INFO("Cleaning Up (default: nothing to do)");
     }
 
@@ -123,8 +122,6 @@ namespace wrench {
 
         // Free memory for the object unless the service is set to auto-restart
         if (not service->isSetToAutoRestart()) {
-
-            WRENCH_INFO("REMOVING  LIFE_SAVER for '%s'", service->getName().c_str());
             delete service->life_saver;
         }
         return 0;
@@ -213,26 +210,17 @@ namespace wrench {
                 S4U_Simulation::computeZeroFlop();
                 this->return_value = this->main();
                 this->has_returned_from_main = true;
-                WRENCH_INFO("MAIN RETURNED WITH RETURN VALUE %d", this->return_value);
             } catch (std::shared_ptr<HostError> &e) {
                 // In case the main() didn't to that catch
             } catch (simgrid::HostFailureException &e) {
                 // In case the main() didn't to that catch
             }
-            WRENCH_INFO("SLEEPING FOR 0.0001 seconds (WHY?)");
+//            WRENCH_INFO("SLEEPING FOR 0.0001 seconds (WHY?)");
             wrench::S4U_Simulation::sleep(0.001);
-            WRENCH_INFO("DONE SLEEPING FOR 0.0001 seconds");
         } catch (std::exception &e) {
             throw;
         }
 
-//        WRENCH_INFO("CLEANING UP MAILBOX:");
-        // Avoid a memory leak on the actor!
-//        simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::by_name(this->mailbox_name);
-//        WRENCH_INFO("CLEANING UP MAILBOX 2:");
-//        mailbox->set_receiver(nullptr);
-
-        WRENCH_INFO("REETURNING FROM runMainMethod()");
     }
 
 
@@ -301,7 +289,6 @@ namespace wrench {
             return std::make_pair(this->hasReturnedFromMain(), this->getReturnValue());
         }
 
-        WRENCH_INFO("CALLING JOIN");
         if (this->s4u_actor != nullptr) {
             try {
                 this->s4u_actor->join();
@@ -311,8 +298,8 @@ namespace wrench {
                 throw std::shared_ptr<FatalFailure>(new FatalFailure());
             }
         }
-        WRENCH_INFO("RETURNING FROM JOIN");
-        WRENCH_INFO("HAS RETURNED FROM JOIN: %d %d", this->hasReturnedFromMain(), this->getReturnValue());
+        WRENCH_INFO("JOIN ON '%s' HAS RETURNED: %d %d",
+                    this->getName().c_str(), this->hasReturnedFromMain(), this->getReturnValue());
         return std::make_pair(this->hasReturnedFromMain(), this->getReturnValue());
     }
 
@@ -326,7 +313,7 @@ namespace wrench {
 /**
  * @brief Returns the value returned by main() (if the daemon has returned from main)
  */
-    bool S4U_Daemon::getReturnValue() {
+    int S4U_Daemon::getReturnValue() {
         return this->return_value;
     }
 

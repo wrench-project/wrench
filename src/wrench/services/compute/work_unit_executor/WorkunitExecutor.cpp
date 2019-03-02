@@ -82,24 +82,16 @@ namespace wrench {
     }
 
     void WorkunitExecutor::cleanup(bool has_returned_from_main, int return_value) {
-        WRENCH_INFO("IN CLEANUP!: has_returned_from_main = %d, return_value = %d", has_returned_from_main, return_value);
+        WRENCH_INFO("IN CLEANUP!: %s has_returned_from_main = %d, return_value = %d", this->getName().c_str(), has_returned_from_main, return_value);
         if ((not has_returned_from_main) or (return_value != 0)) {
-            WRENCH_INFO("WRTF");
-            WRENCH_INFO("WRTF1 %p", this);
-            WRENCH_INFO("WRTF2 %p", this->workunit.get());
             if (this->workunit->task != nullptr) {
-            WRENCH_INFO("WRTF3 %p", this->workunit->task);
-
-                WRENCH_INFO("HERE");
                 WorkflowTask *task = this->workunit->task;
+                WRENCH_INFO("      %s", task->getID().c_str());
                 task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
-                WRENCH_INFO("HERE");
                 task->setFailureDate(S4U_Simulation::getClock());
-                WRENCH_INFO("HERE");
                 auto ts = new SimulationTimestampTaskFailure(task);
-                WRENCH_INFO("HERE");
+                WRENCH_INFO("ADDING A TIMESTAMPTASKFAILURE FOR %'s'", task->getID().c_str());
                 this->simulation->getOutput().addTimestamp<SimulationTimestampTaskFailure>(ts);
-                WRENCH_INFO("HERE");
             }
         }
     }

@@ -646,9 +646,8 @@ namespace wrench {
         // able to run on that host due to RAM, and because we don't
         // allow non-zero-ram tasks to jump ahead of other tasks
 
-        WRENCH_INFO("THERE ARE %lu READY WUs", this->ready_workunits.size());
+//        WRENCH_INFO("THERE ARE %lu READY WUs", this->ready_workunits.size());
         for (auto const &wu : this->ready_workunits) {
-            WRENCH_INFO("LOOKING AT A WORKUNIt");
 
             std::string picked_host;
 
@@ -901,6 +900,7 @@ namespace wrench {
                             new SimulationTimestampTaskTerminated(task));
 
                 } else if (termination_cause == BareMetalComputeService::JobTerminationCause::COMPUTE_SERVICE_KILLED) {
+                    // TODO: THIS LIKELY DUPLICATES THE STUFF DONE IN CLEANUP
                     task->setFailureDate(S4U_Simulation::getClock());
                     this->simulation->getOutput().addTimestamp<SimulationTimestampTaskFailure>(
                             new SimulationTimestampTaskFailure(task));
@@ -1172,6 +1172,7 @@ namespace wrench {
  */
     void BareMetalComputeService::forgetWorkunitExecutor(WorkunitExecutor *workunit_executor) {
 
+        WRENCH_INFO("IN FORGET WU EXECUTOR");
         StandardJob *job = workunit_executor->getJob();
         std::shared_ptr<WorkunitExecutor> found_it;
         for (auto const wue : this->workunit_executors[job]) {
@@ -1562,6 +1563,8 @@ namespace wrench {
             }
             this->files_in_scratch[job].insert(f);
         }
+
+        WRENCH_INFO("HERE");
 
         // Update RAM availabilities and running thread counts
         if (workunit->task) {

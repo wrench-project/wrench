@@ -66,7 +66,7 @@ namespace wrench {
         virtual int main() = 0;
 
         bool hasReturnedFromMain();
-        bool getReturnValue();
+        int getReturnValue();
         bool isSetToAutoRestart();
 
         std::pair<bool, int> join();
