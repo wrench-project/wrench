@@ -2509,10 +2509,10 @@ private:
 
         /**  Create a 4-task job and kill it **/
         {
-          wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1." + std::to_string(trial), 3600, 6, 6, 1.0, 0);
-          wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task1." + std::to_string(trial), 1000, 2, 2, 1.0, 0);
-          wrench::WorkflowTask *task3 = this->getWorkflow()->addTask("task1." + std::to_string(trial), 800, 7, 7, 1.0, 0);
-          wrench::WorkflowTask *task4 = this->getWorkflow()->addTask("task1." + std::to_string(trial), 600, 2, 2, 1.0, 0);
+          wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task" + std::to_string(trial) + ".1", 3600, 6, 6, 1.0, 0);
+          wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task" + std::to_string(trial) + ".2", 1000, 2, 2, 1.0, 0);
+          wrench::WorkflowTask *task3 = this->getWorkflow()->addTask("task" + std::to_string(trial) + ".3", 800, 7, 7, 1.0, 0);
+          wrench::WorkflowTask *task4 = this->getWorkflow()->addTask("task" + std::to_string(trial) + ".4", 600, 2, 2, 1.0, 0);
 
           task1->addInputFile(this->getWorkflow()->getFileByID("input_file"));
 //          task1->addOutputFile(workflow->getFileByID("output_file"));
