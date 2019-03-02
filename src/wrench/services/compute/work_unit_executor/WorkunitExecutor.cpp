@@ -53,7 +53,7 @@ namespace wrench {
             unsigned long num_cores,
             double ram_utilization,
             std::string callback_mailbox,
-            Workunit *workunit,
+            std::shared_ptr<Workunit> workunit,
             StorageService *scratch_space,
             StandardJob* job,
             double thread_startup_overhead,
@@ -86,7 +86,7 @@ namespace wrench {
         if ((not has_returned_from_main) or (return_value != 0)) {
             WRENCH_INFO("WRTF");
             WRENCH_INFO("WRTF1 %p", this);
-            WRENCH_INFO("WRTF2 %p", this->workunit);
+            WRENCH_INFO("WRTF2 %p", this->workunit.get());
             if (this->workunit->task != nullptr) {
             WRENCH_INFO("WRTF3 %p", this->workunit->task);
 
@@ -149,7 +149,7 @@ namespace wrench {
       try {
         S4U_Simulation::computeZeroFlop();
 
-        performWork(this->workunit);
+        performWork(this->workunit.get());
 
         // build "success!" message
         success = true;

@@ -640,7 +640,7 @@ namespace wrench {
         // Don't kill me while I am doing this
         this->acquireDaemonLock();
 
-        std::set<Workunit *> dispatched_wus_for_job;
+        std::set<std::shared_ptr<Workunit>> dispatched_wus_for_job;
 
         std::set<std::string> no_longer_considered_hosts;  // Due to a previously considered workunit not being
         // able to run on that host due to RAM, and because we don't
@@ -725,7 +725,7 @@ namespace wrench {
 
         // Remove the WUs from the ready queue (this is inefficient, better data structs would help)
         while (dispatched_wus_for_job.size() > 0) {
-            Workunit *wu = *(dispatched_wus_for_job.begin());
+            std::shared_ptr<Workunit> wu = *(dispatched_wus_for_job.begin());
             for (auto it = this->ready_workunits.begin(); it != this->ready_workunits.end(); it++) {
                 if ((*it) == wu) {
                     this->ready_workunits.erase(it);
@@ -871,7 +871,7 @@ namespace wrench {
         this->workunit_executors.erase(job);
 
         /** Remove all relevant work units */
-        std::set<Workunit *> to_remove;
+        std::set<std::shared_ptr<Workunit>> to_remove;
         for (auto const &wu : this->ready_workunits) {
             if (wu->getJob() == job) {
                 to_remove.insert(wu);
@@ -1041,7 +1041,7 @@ namespace wrench {
  */
 
     void BareMetalComputeService::processWorkunitExecutorCompletion(WorkunitExecutor *workunit_executor,
-                                                                    Workunit *workunit) {
+                                                                    std::shared_ptr<Workunit> workunit) {
         StandardJob *job = workunit_executor->getJob();
 
         // Get the scratch files that executor may have generated
@@ -1139,7 +1139,7 @@ namespace wrench {
 */
 
     void BareMetalComputeService::processWorkunitExecutorFailure(WorkunitExecutor *workunit_executor,
-                                                                 Workunit *workunit,
+                                                                 std::shared_ptr<Workunit> workunit,
                                                                  std::shared_ptr<FailureCause> cause) {
         StandardJob *job = workunit_executor->getJob();
 
@@ -1361,7 +1361,7 @@ namespace wrench {
         // Add the ready ones to the ready list
         for (auto const &wu: this->all_workunits[job]) {
             if (wu->num_pending_parents == 0) {
-                this->ready_workunits.push_back(wu.get());
+                this->ready_workunits.push_back(wu);
             }
         }
 
@@ -1550,7 +1550,7 @@ namespace wrench {
      */
     void BareMetalComputeService::processWorkunitExecutorCrash(WorkunitExecutor *workunit_executor) {
         WRENCH_INFO("CRAP!!!! A WORKUNIT EXECUTOR HAS CRASHED!!! I SHOULD DO SOMETHIONG!!!");
-        Workunit *workunit = workunit_executor->workunit;
+        std::shared_ptr<Workunit> workunit = workunit_executor->workunit;
 
         // TODO: WHAT SHOULD WE DO HERE FOR LOGGING!!
 

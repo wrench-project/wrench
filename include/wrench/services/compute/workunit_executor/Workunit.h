@@ -42,7 +42,7 @@ namespace wrench {
                  std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
                  std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions);
 
-        static void addDependency(Workunit *parent, Workunit *child);
+        static void addDependency(std::shared_ptr<Workunit> parent, std::shared_ptr<Workunit> child);
 
         static std::set<std::shared_ptr<Workunit>> createWorkunits(StandardJob *job);
 
@@ -52,7 +52,7 @@ namespace wrench {
         StandardJob *job;
 
         /** @brief The Workunits that depend on this Workunit */
-        std::set<Workunit*> children;
+        std::set<std::shared_ptr<Workunit>> children;
         /** @brief The number of Workunits this Workunit depends on */
         unsigned long num_pending_parents;
 

@@ -46,7 +46,7 @@ namespace wrench {
                      unsigned long num_cores,
                      double ram_utilization,
                      std::string callback_mailbox,
-                     Workunit *workunit,
+                     std::shared_ptr<Workunit> workunit,
                      StorageService *scratch_space,
                      StandardJob* job,
                      double thread_startup_overhead,
@@ -60,7 +60,7 @@ namespace wrench {
         std::set<WorkflowFile*> getFilesStoredInScratch();
 
         /** @brief The Workunit this WorkunitExecutor is supposed to perform */
-        Workunit *workunit;
+        std::shared_ptr<Workunit> workunit;
 
     private:
 
