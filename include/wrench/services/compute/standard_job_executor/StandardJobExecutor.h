@@ -100,10 +100,10 @@ namespace wrench {
         std::set<std::shared_ptr<WorkunitExecutor>> failed_workunit_executors;
 
         // Work units
-        std::set<std::unique_ptr<Workunit>> non_ready_workunits;
-        std::set<std::unique_ptr<Workunit>> ready_workunits;
-        std::set<std::unique_ptr<Workunit>> running_workunits;
-        std::set<std::unique_ptr<Workunit>> completed_workunits;
+        std::set<std::shared_ptr<Workunit>> non_ready_workunits;
+        std::set<std::shared_ptr<Workunit>> ready_workunits;
+        std::set<std::shared_ptr<Workunit>> running_workunits;
+        std::set<std::shared_ptr<Workunit>> completed_workunits;
 
         // Property list
         std::map<std::string, std::string> property_list;

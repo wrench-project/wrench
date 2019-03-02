@@ -219,7 +219,7 @@ namespace wrench {
             } catch (simgrid::HostFailureException &e) {
                 // In case the main() didn't to that catch
             }
-            WRENCH_INFO("SLEEPING FOR 0.0001 seconds (WHYY????)");
+            WRENCH_INFO("SLEEPING FOR 0.0001 seconds (WHY?)");
             wrench::S4U_Simulation::sleep(0.001);
             WRENCH_INFO("DONE SLEEPING FOR 0.0001 seconds");
         } catch (std::exception &e) {
