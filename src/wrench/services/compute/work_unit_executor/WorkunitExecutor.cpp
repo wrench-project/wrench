@@ -87,8 +87,9 @@ namespace wrench {
             WRENCH_INFO("WRTF");
             WRENCH_INFO("WRTF1 %p", this);
             WRENCH_INFO("WRTF2 %p", this->workunit);
-            WRENCH_INFO("WRTF3 %p", this->workunit->task);
             if (this->workunit->task != nullptr) {
+            WRENCH_INFO("WRTF3 %p", this->workunit->task);
+
                 WRENCH_INFO("HERE");
                 WorkflowTask *task = this->workunit->task;
                 task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
