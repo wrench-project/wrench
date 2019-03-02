@@ -72,7 +72,9 @@ private:
       // Create a job manager
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
-      // Do nothing
+      // Sleep for 1 second
+      wrench::Simulation::sleep(1.0);
+
       return 0;
     }
 };

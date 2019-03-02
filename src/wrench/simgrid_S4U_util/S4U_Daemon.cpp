@@ -216,13 +216,11 @@ namespace wrench {
                 WRENCH_INFO("MAIN RETURNED WITH RETURN VALUE %d", this->return_value);
             } catch (std::shared_ptr<HostError> &e) {
                 // In case the main() didn't to that catch
-                WRENCH_INFO("CAUGHT HOST ERROR");
             } catch (simgrid::HostFailureException &e) {
-                WRENCH_INFO("CAUGHT SIMGRID HOST ERROR");
                 // In case the main() didn't to that catch
             }
-            WRENCH_INFO("SLEEPING FOR 0.0000 seconds");
-            wrench::S4U_Simulation::sleep(0.000);
+            WRENCH_INFO("SLEEPING FOR 0.0001 seconds (WHYY????)");
+            wrench::S4U_Simulation::sleep(0.001);
             WRENCH_INFO("DONE SLEEPING FOR 0.0001 seconds");
         } catch (std::exception &e) {
             throw;
