@@ -663,8 +663,9 @@ namespace wrench {
             for (auto it = this->non_ready_workunits.begin(); it != this->non_ready_workunits.end(); it++) {
               if ((*it) == child) {
                 // Move it to the ready  queue
+                auto tomove = *it;
                 this->non_ready_workunits.erase(it);
-                this->ready_workunits.insert(*it);
+                this->ready_workunits.insert(tomove);
 //                PointerUtil::moveUniquePtrFromSetToSet(it, &(this->non_ready_workunits), &(this->ready_workunits));
                 found_it = true;
                 break;
