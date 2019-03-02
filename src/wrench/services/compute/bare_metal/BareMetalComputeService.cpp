@@ -864,7 +864,7 @@ namespace wrench {
                 this->ram_availabilities[wue->getHostname()] += wue->workunit->task->getMemoryRequirement();
                 this->running_thread_counts[wue->getHostname()] -= wue->getNumCores();
             }
-            wue->kill();
+            wue->kill(termination_cause == BareMetalComputeService::JobTerminationCause::TERMINATED);
         }
         this->workunit_executors[job].clear();
         this->workunit_executors.erase(job);
@@ -895,17 +895,18 @@ namespace wrench {
         for (auto &task : job->getTasks()) {
             if (task->getInternalState() == WorkflowTask::InternalState::TASK_RUNNING) {
                 if (termination_cause == BareMetalComputeService::JobTerminationCause::TERMINATED) {
-                    task->setTerminationDate(S4U_Simulation::getClock());
-                    this->simulation->getOutput().addTimestamp<SimulationTimestampTaskTerminated>(
-                            new SimulationTimestampTaskTerminated(task));
+//                    task->setTerminationDate(S4U_Simulation::getClock());
+//                    this->simulation->getOutput().addTimestamp<SimulationTimestampTaskTerminated>(
+//                            new SimulationTimestampTaskTerminated(task));
 
                 } else if (termination_cause == BareMetalComputeService::JobTerminationCause::COMPUTE_SERVICE_KILLED) {
                     // TODO: THIS LIKELY DUPLICATES THE STUFF DONE IN CLEANUP
-                    task->setFailureDate(S4U_Simulation::getClock());
-                    this->simulation->getOutput().addTimestamp<SimulationTimestampTaskFailure>(
-                            new SimulationTimestampTaskFailure(task));
+//                    task->setFailureDate(S4U_Simulation::getClock());
+//                    this->simulation->getOutput().addTimestamp<SimulationTimestampTaskFailure>(
+//                            new SimulationTimestampTaskFailure(task));
                 }
-                task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
+                // TODO: HOW DO WE KNOW THIS IS DONEE BEFORE WE GET HERE
+//                task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
             }
         }
 
