@@ -265,14 +265,16 @@ namespace wrench {
 
       /** Put each workunit either in the "non-ready" list or the "ready" list **/
       while (not all_work_units.empty()) {
-        auto wu = all_work_units.begin();
-        if ((*wu)->num_pending_parents == 0) {
-          all_work_units.erase(wu);
-          this->ready_workunits.insert(*wu);
+        auto wu_it = all_work_units.begin();
+        if ((*wu_it)->num_pending_parents == 0) {
+          auto wu = *wu_it;
+          all_work_units.erase(wu_it);
+          this->ready_workunits.insert(wu);
 //          PointerUtil::moveUniquePtrFromSetToSet<Workunit>(wu, &all_work_units, &(this->ready_workunits));
         } else {
-          all_work_units.erase(wu);
-          this->non_ready_workunits.insert(*wu);
+          auto wu = *wu_it;
+          all_work_units.erase(wu_it);
+          this->non_ready_workunits.insert(wu);
 //          PointerUtil::moveUniquePtrFromSetToSet<Workunit>(wu, &all_work_units, &(this->non_ready_workunits));
         }
       }
