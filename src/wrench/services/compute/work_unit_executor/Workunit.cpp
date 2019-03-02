@@ -72,7 +72,6 @@ namespace wrench {
     }
 
     Workunit::~Workunit() {
-WRENCH_INFO("IN WORKUNIG DESTRUCTOR");
     }
 
     /**
