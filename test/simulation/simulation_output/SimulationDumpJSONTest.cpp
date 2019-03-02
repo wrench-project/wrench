@@ -1232,10 +1232,6 @@ void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
                     {
                         "time": 4.0,
                         "joules": 400.0
-                    },
-                    {
-                        "time": 6.0,
-                        "joules": 600.0
                     }
                 ],
                 "hostname": "host2",
@@ -1286,6 +1282,9 @@ void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
         std::sort(result_json[i]["pstates"].begin(), result_json[i]["pstates"].end(), comparePstate);
         std::sort(result_json[i]["pstate_trace"].begin(), result_json[i]["pstate_trace"].end(), comparePstate);
     }
+
+    std::cerr << expected_json << "\n";
+    std::cerr << result_json << "\n";
 
     EXPECT_TRUE(expected_json == result_json);
 
