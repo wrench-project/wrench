@@ -64,6 +64,8 @@ namespace wrench {
 
     private:
 
+        bool failure_timestamp_should_be_generated = false;
+
         SimulationTimestampTaskFailure *foo;
         int main() override;
         void cleanup(bool has_returned_from_main, int return_value) override;

@@ -84,12 +84,21 @@ namespace wrench {
     void WorkunitExecutor::cleanup(bool has_returned_from_main, int return_value) {
         WRENCH_INFO("IN CLEANUP!: has_returned_from_main = %d, return_value = %d", has_returned_from_main, return_value);
         if ((not has_returned_from_main) or (return_value != 0)) {
+            WRENCH_INFO("WRTF");
+            WRENCH_INFO("WRTF1 %p", this);
+            WRENCH_INFO("WRTF2 %p", this->workunit);
+            WRENCH_INFO("WRTF3 %p", this->workunit->task);
             if (this->workunit->task != nullptr) {
+                WRENCH_INFO("HERE");
                 WorkflowTask *task = this->workunit->task;
                 task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
+                WRENCH_INFO("HERE");
                 task->setFailureDate(S4U_Simulation::getClock());
+                WRENCH_INFO("HERE");
                 auto ts = new SimulationTimestampTaskFailure(task);
+                WRENCH_INFO("HERE");
                 this->simulation->getOutput().addTimestamp<SimulationTimestampTaskFailure>(ts);
+                WRENCH_INFO("HERE");
             }
         }
     }
@@ -119,7 +128,7 @@ namespace wrench {
     /**
     * @brief Main method of the worker thread daemon
     *
-    * @return 0 on termination
+    * @return 1 if a task failure timestamp should be generated, 0 otherwise
     *
     * @throw std::runtime_error
     */
@@ -174,21 +183,20 @@ namespace wrench {
       try {
         S4U_Mailbox::putMessage(this->callback_mailbox, msg_to_send_back);
       } catch (std::shared_ptr<NetworkError> &cause) {
-        WRENCH_INFO("Work unit executor on can't report back due to network error.. aborting!");
-        this->workunit = nullptr; // To decrease the ref count
-        WRENCH_INFO("HERE1: RETURNING 0");
-        return 0;
+        WRENCH_INFO("Work unit executor on can't report back due to network error.. oh well!");
       } catch (std::shared_ptr<HostError> &e) {
-          WRENCH_INFO("Work unit executor on can't report back due to network error.. aborting!");
-          this->workunit = nullptr; // To decrease the ref count
-          WRENCH_INFO("HERE2: RETURNING 0");
-          return 0;
+        WRENCH_INFO("Work unit executor on can't report back due to hosterror error.. oh well!");
       } catch (simgrid::HostFailureException &e) {
-          WRENCH_INFO("CRAAAAAAP");
+        WRENCH_INFO("Work unit executor on can't report back due to SimGrid HostFailureException error.. oh well!");
       }
 
       WRENCH_INFO("Work unit executor on host %s terminating!", S4U_Simulation::getHostName().c_str());
-      return 0;
+      if (this->failure_timestamp_should_be_generated) {
+        return 1;
+      } else {
+        return 0;
+      }
+
     }
 
 
@@ -196,6 +204,7 @@ namespace wrench {
      * @brief Simulate work execution
      *
      * @param work: the work to perform
+     *
      */
     void
     WorkunitExecutor::performWork(Workunit *work) {
@@ -240,6 +249,7 @@ WRENCH_INFO("IN PERFORM WORK");
             dst->copyFile(file, src, nullptr, nullptr); // if there is no scratch space, then there is no notion of job's partition, it is always to / partition in such case
           }
         } catch (WorkflowExecutionException &e) {
+
           throw;
         }
 
@@ -248,7 +258,7 @@ WRENCH_INFO("IN PERFORM WORK");
         }
       }
 
-      /** Perform the computationa task if any **/
+      /** Perform the computational task if any **/
       if (this->workunit->task != nullptr) {
         auto task = this->workunit->task;
 
@@ -270,10 +280,7 @@ WRENCH_INFO("IN PERFORM WORK");
                                       this->scratch_space, files_stored_in_scratch, job);
             task->setReadInputEndDate(S4U_Simulation::getClock());
         } catch (WorkflowExecutionException &e) {
-          task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
-          task->setFailureDate(S4U_Simulation::getClock());
-          this->simulation->getOutput().addTimestamp<SimulationTimestampTaskFailure>(
-                  new SimulationTimestampTaskFailure(task));
+          this->failure_timestamp_should_be_generated = true;
           throw;
         }
 
@@ -285,10 +292,8 @@ WRENCH_INFO("IN PERFORM WORK");
           runMulticoreComputation(task->getFlops(), task->getParallelEfficiency(), this->simulate_computation_as_sleep);
           task->setComputationEndDate(S4U_Simulation::getClock());
         } catch (WorkflowExecutionEvent &e) {
-          task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
-          task->setFailureDate(S4U_Simulation::getClock());
-          this->simulation->getOutput().addTimestamp<SimulationTimestampTaskFailure>(
-                  new SimulationTimestampTaskFailure(task));
+          this->failure_timestamp_should_be_generated = true;
+
           throw;
         }
 
@@ -301,10 +306,8 @@ WRENCH_INFO("IN PERFORM WORK");
                                        files_stored_in_scratch, job);
             task->setWriteOutputEndDate(S4U_Simulation::getClock());
         } catch (WorkflowExecutionException &e) {
-          task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
-          task->setFailureDate(S4U_Simulation::getClock());
-          this->simulation->getOutput().addTimestamp<SimulationTimestampTaskFailure>(
-                  new SimulationTimestampTaskFailure(task));
+          this->failure_timestamp_should_be_generated = true;
+
           throw;
         }
 

@@ -79,7 +79,6 @@ namespace wrench {
      * @brief Sets the endpoint of the calling object (SimulationTimestampTaskFailure, SimulationTimestampTaskTerminated, SimulationTimestampTaskStart) with a SimulationTimestampTaskStart object
      */
     void SimulationTimestampTask::setEndpoints() {
-        WRENCH_INFO("In setEndPoints");
         // find the SimulationTimestampTaskStart object containing the same task
         auto pending_tasks_itr = pending_task_timestamps.find(this->task->getID());
         if (pending_tasks_itr != pending_task_timestamps.end()) {
