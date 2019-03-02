@@ -511,11 +511,11 @@ namespace wrench {
         // Update data structures
         this->running_workunit_executors.insert(workunit_executor);
 
-        for (auto it = this->ready_workunits.begin();
-             it != this->ready_workunits.end(); it++) {
-          if ((*it) == wu) {
-            this->ready_workunits.erase(it);
-            this->running_workunits.insert(*it);
+        for (auto wu_it = this->ready_workunits.begin(); wu_it != this->ready_workunits.end(); wu_it++) {
+          if ((*wu_it) == wu) {
+            auto tomove = *wu_it;
+            this->ready_workunits.erase(wu_it);
+            this->running_workunits.insert(tomove);
 //            PointerUtil::moveUniquePtrFromSetToSet(it, &(this->ready_workunits), &(this->running_workunits));
             break;
           }
