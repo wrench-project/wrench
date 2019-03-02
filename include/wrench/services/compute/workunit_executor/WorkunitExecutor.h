@@ -53,7 +53,7 @@ namespace wrench {
                      double thread_startup_overhead,
                      bool simulate_computation_as_sleep);
 
-        void kill();
+        void kill(bool job_termination);
 
         unsigned long getNumCores();
         StandardJob *getJob();
@@ -66,6 +66,8 @@ namespace wrench {
     private:
 
         bool failure_timestamp_should_be_generated = false;
+        bool terminated_due_job_being_forcefully_terminated = false;
+        bool task_failure_time_stamp_has_already_been_generated = false;
 
         SimulationTimestampTaskFailure *foo;
         int main() override;
