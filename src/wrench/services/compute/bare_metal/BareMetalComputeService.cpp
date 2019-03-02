@@ -869,6 +869,9 @@ namespace wrench {
         this->workunit_executors[job].clear();
         this->workunit_executors.erase(job);
 
+        /** Sleep for 0.001 seconds, so that all working_executors have a chance to do their cleanup, etc. */
+        Simulation::sleep(0.001);
+
         /** Remove all relevant work units */
         std::set<std::shared_ptr<Workunit>> to_remove;
         for (auto const &wu : this->ready_workunits) {
