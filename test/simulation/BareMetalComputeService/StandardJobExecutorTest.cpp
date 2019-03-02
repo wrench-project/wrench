@@ -2007,10 +2007,10 @@ public:
 
       /** Case 2: Create 4 tasks that will run in best fit manner **/
       {
-        wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1.1", 3600, 6, 6, 1.0, 0);
-        wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task1.2", 1000, 2, 2, 1.0, 0);
-        wrench::WorkflowTask *task3 = this->getWorkflow()->addTask("task1.3", 800, 7, 7, 1.0, 0);
-        wrench::WorkflowTask *task4 = this->getWorkflow()->addTask("task1.4", 600, 2, 2, 1.0, 0);
+        wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task2.1", 3600, 6, 6, 1.0, 0);
+        wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task2.2", 1000, 2, 2, 1.0, 0);
+        wrench::WorkflowTask *task3 = this->getWorkflow()->addTask("task2.3", 800, 7, 7, 1.0, 0);
+        wrench::WorkflowTask *task4 = this->getWorkflow()->addTask("task2.4", 600, 2, 2, 1.0, 0);
         task1->addInputFile(this->getWorkflow()->getFileByID("input_file"));
         task1->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
         task2->addInputFile(this->getWorkflow()->getFileByID("input_file"));
