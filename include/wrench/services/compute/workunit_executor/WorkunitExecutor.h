@@ -14,6 +14,7 @@
 
 #include "wrench/services/Service.h"
 #include <set>
+#include "wrench/services/compute/workunit_executor/Workunit.h"
 
 namespace wrench {
 
