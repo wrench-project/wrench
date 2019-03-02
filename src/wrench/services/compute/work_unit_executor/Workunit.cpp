@@ -75,14 +75,14 @@ namespace wrench {
  * @brief Create all work for a newly dispatched job
  * @param job: the job
  */
-    std::set<std::unique_ptr<Workunit>> Workunit::createWorkunits(StandardJob *job) {
+    std::set<std::shared_ptr<Workunit>> Workunit::createWorkunits(StandardJob *job) {
 
       Workunit *pre_file_copies_work_unit = nullptr;
       std::vector<Workunit *> task_work_units;
       Workunit *post_file_copies_work_unit = nullptr;
       Workunit *cleanup_workunit = nullptr;
 
-      std::set<std::unique_ptr<Workunit>> all_work_units;
+      std::set<std::shared_ptr<Workunit>> all_work_units;
 
       // Create the cleanup workunit, if any
       if (not job->cleanup_file_deletions.empty()) {
@@ -149,7 +149,7 @@ namespace wrench {
       }
 
       // Create a list of all work units
-      if (pre_file_copies_work_unit) all_work_units.insert(std::unique_ptr<Workunit>(pre_file_copies_work_unit));
+      if (pre_file_copies_work_unit) all_work_units.insert(std::shared_ptr<Workunit>(pre_file_copies_work_unit));
       for (auto const &twu : task_work_units) {
         all_work_units.insert(std::unique_ptr<Workunit>(twu));
       }

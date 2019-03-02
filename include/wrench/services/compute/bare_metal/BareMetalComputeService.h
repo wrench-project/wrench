@@ -168,7 +168,7 @@ namespace wrench {
         std::map<StandardJob *, std::map<WorkflowTask *, std::tuple<std::string, unsigned long>>> job_run_specs;
 
         // Map of all Workunits
-        std::map<StandardJob *, std::set<std::unique_ptr<Workunit>>> all_workunits;
+        std::map<StandardJob *, std::set<std::shared_ptr<Workunit>>> all_workunits;
 
         std::deque<Workunit *> ready_workunits;
 //        std::map<StandardJob *, std::set<Workunit *>> running_workunits;

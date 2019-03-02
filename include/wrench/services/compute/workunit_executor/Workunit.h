@@ -44,7 +44,7 @@ namespace wrench {
 
         static void addDependency(Workunit *parent, Workunit *child);
 
-        static std::set<std::unique_ptr<Workunit>> createWorkunits(StandardJob *job);
+        static std::set<std::shared_ptr<Workunit>> createWorkunits(StandardJob *job);
 
         StandardJob *getJob();
 

@@ -261,15 +261,19 @@ namespace wrench {
       }
 
       /** Create all Workunits **/
-      std::set<std::unique_ptr<Workunit>> all_work_units = Workunit::createWorkunits(this->job);
+      std::set<std::shared_ptr<Workunit>> all_work_units = Workunit::createWorkunits(this->job);
 
       /** Put each workunit either in the "non-ready" list or the "ready" list **/
       while (not all_work_units.empty()) {
         auto wu = all_work_units.begin();
         if ((*wu)->num_pending_parents == 0) {
-          PointerUtil::moveUniquePtrFromSetToSet<Workunit>(wu, &all_work_units, &(this->ready_workunits));
+          all_work_units.erase(wu);
+          this->ready_workunits.insert(*wu);
+//          PointerUtil::moveUniquePtrFromSetToSet<Workunit>(wu, &all_work_units, &(this->ready_workunits));
         } else {
-          PointerUtil::moveUniquePtrFromSetToSet<Workunit>(wu, &all_work_units, &(this->non_ready_workunits));
+          all_work_units.erase(wu);
+          this->non_ready_workunits.insert(*wu);
+//          PointerUtil::moveUniquePtrFromSetToSet<Workunit>(wu, &all_work_units, &(this->non_ready_workunits));
         }
       }
 
@@ -508,7 +512,9 @@ namespace wrench {
         for (auto it = this->ready_workunits.begin();
              it != this->ready_workunits.end(); it++) {
           if ((*it).get() == wu) {
-            PointerUtil::moveUniquePtrFromSetToSet(it, &(this->ready_workunits), &(this->running_workunits));
+            this->ready_workunits.erase(it);
+            this->running_workunits.insert(*it);
+//            PointerUtil::moveUniquePtrFromSetToSet(it, &(this->ready_workunits), &(this->running_workunits));
             break;
           }
         }
@@ -599,7 +605,9 @@ namespace wrench {
       bool found_it = false;
       for (auto it = this->running_workunits.begin(); it != this->running_workunits.end(); it++) {
         if ((*it).get() == workunit) {
-          PointerUtil::moveUniquePtrFromSetToSet(it, &(this->running_workunits), &(this->completed_workunits));
+          this->running_workunits.erase(it);
+          this->completed_workunits.insert(*it);
+//          PointerUtil::moveUniquePtrFromSetToSet(it, &(this->running_workunits), &(this->completed_workunits));
           found_it = true;
           break;
         }
@@ -652,7 +660,9 @@ namespace wrench {
             for (auto it = this->non_ready_workunits.begin(); it != this->non_ready_workunits.end(); it++) {
               if ((*it).get() == child) {
                 // Move it to the ready  queue
-                PointerUtil::moveUniquePtrFromSetToSet(it, &(this->non_ready_workunits), &(this->ready_workunits));
+                this->non_ready_workunits.erase(it);
+                this->ready_workunits.insert(*it);
+//                PointerUtil::moveUniquePtrFromSetToSet(it, &(this->non_ready_workunits), &(this->ready_workunits));
                 found_it = true;
                 break;
               }
