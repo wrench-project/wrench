@@ -89,22 +89,41 @@ namespace wrench {
 
       // Create the cleanup workunit, if any
       if (not job->cleanup_file_deletions.empty()) {
-        cleanup_workunit = std::shared_ptr<Workunit>(new Workunit(job, {}, nullptr, {}, {}, job->cleanup_file_deletions));
+        cleanup_workunit = std::make_shared<Workunit>(job,
+                                                      (std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>>){},
+                                                      nullptr,
+                                                      (std::map<WorkflowFile *, StorageService *>){},
+                                                      (std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>>){}, job->cleanup_file_deletions);
       }
 
       // Create the pre_file_copies work unit, if any
       if (not job->pre_file_copies.empty()) {
-        pre_file_copies_work_unit = std::shared_ptr<Workunit>(new Workunit(job, job->pre_file_copies, nullptr, {}, {}, {}));
+        pre_file_copies_work_unit = std::make_shared<Workunit>(job,
+                                                               job->pre_file_copies,
+                                                               nullptr,
+                                                               (std::map<WorkflowFile *, StorageService *>){},
+                                                               (std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>>){},
+                                                               (std::set<std::tuple<WorkflowFile *, StorageService *>>){});
       }
 
       // Create the post_file_copies work unit, if any
       if (not job->post_file_copies.empty()) {
-        post_file_copies_work_unit = std::shared_ptr<Workunit>(new Workunit(job, {}, nullptr, {}, job->post_file_copies, {}));
+        post_file_copies_work_unit = std::make_shared<Workunit>(job,
+                                                                (std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>>){},
+                                                                nullptr,
+                                                                (std::map<WorkflowFile *, StorageService *>){},
+                                                                job->post_file_copies,
+                                                                (std::set<std::tuple<WorkflowFile *, StorageService *>>){});
       }
 
       // Create the task work units, if any
       for (auto const &task : job->tasks) {
-        task_work_units.push_back(std::shared_ptr<Workunit>(new Workunit(job, {}, task, job->file_locations, {}, {})));
+        task_work_units.push_back(std::make_shared<Workunit>(job,
+                                                             (std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>>){},
+                                                             task,
+                                                             job->file_locations,
+                                                             (std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>>){},
+                                                             (std::set<std::tuple<WorkflowFile *, StorageService *>>){}));
       }
 
       // Add dependencies between task work units, if any
@@ -152,12 +171,12 @@ namespace wrench {
       }
 
       // Create a list of all work units
-      if (pre_file_copies_work_unit) all_work_units.insert(std::shared_ptr<Workunit>(pre_file_copies_work_unit));
+      if (pre_file_copies_work_unit) all_work_units.insert(pre_file_copies_work_unit);
       for (auto const &twu : task_work_units) {
-        all_work_units.insert(std::shared_ptr<Workunit>(twu));
+        all_work_units.insert(twu);
       }
-      if (post_file_copies_work_unit) all_work_units.insert(std::shared_ptr<Workunit>(post_file_copies_work_unit));
-      if (cleanup_workunit) all_work_units.insert(std::shared_ptr<Workunit>(cleanup_workunit));
+      if (post_file_copies_work_unit) all_work_units.insert(post_file_copies_work_unit);
+      if (cleanup_workunit) all_work_units.insert(cleanup_workunit);
 
       task_work_units.clear();
 

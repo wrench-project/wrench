@@ -17,6 +17,8 @@
 #include "wrench/services/compute/standard_job_executor/StandardJobExecutor.h"
 #include "BareMetalComputeServiceProperty.h"
 #include "BareMetalComputeServiceMessagePayload.h"
+#include "wrench/services/compute/workunit_executor/Workunit.h"
+
 
 namespace wrench {
 
