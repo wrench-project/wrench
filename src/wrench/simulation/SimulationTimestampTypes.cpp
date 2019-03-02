@@ -101,6 +101,8 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     SimulationTimestampTaskStart::SimulationTimestampTaskStart(WorkflowTask *task) : SimulationTimestampTask(task) {
+        std::cerr << "***       START TIMESTAMP FOR TASK: " << task->getID() << "\n";
+
         if (task == nullptr) {
             throw std::invalid_argument("SimulationTimestampTaskStart::SimulationTimestampTaskStart() requires a valid pointer to a WorkflowTask object");
         }
@@ -119,6 +121,8 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     SimulationTimestampTaskFailure::SimulationTimestampTaskFailure(WorkflowTask *task) : SimulationTimestampTask(task) {
+        std::cerr << "***       FAIL TIMESTAMP FOR TASK: " << task->getID() << "\n";
+
         if (task == nullptr) {
             throw std::invalid_argument("SimulationTimestampTaskFailure::SimulationTimestampTaskFailure() requires a valid pointer to a WorkflowTask object");
         }
@@ -133,6 +137,8 @@ namespace wrench {
      */
     SimulationTimestampTaskCompletion::SimulationTimestampTaskCompletion(WorkflowTask *task) : SimulationTimestampTask(
             task) {
+        std::cerr << "***       COMPLETION TIMESTAMP FOR TASK: " << task->getID() << "\n";
+
         if (task == nullptr) {
             throw std::invalid_argument("SimulationTimestampTaskCompletion::SimulationTimestampTaskCompletion() requires a valid pointer to a WorkflowTask object");
         }

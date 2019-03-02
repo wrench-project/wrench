@@ -33,7 +33,8 @@ int wrench::ServiceFailureDetector::main() {
     int service_return_value = std::get<1>(return_values_from_join);
     WRENCH_INFO("JOIN HAS RETURNED: %d %d", service_has_returned_from_main, service_return_value);
 
-    if ((not service_has_returned_from_main) or (service_return_value != 0)) {
+//    if ((not service_has_returned_from_main) or (service_return_value != 0)) {
+    if (not service_has_returned_from_main) {
         // Failure detected!
         WRENCH_INFO("Detected failure of service %s", this->service_to_monitor->getName().c_str());
         WRENCH_INFO("PUTTINg MESSAGE");

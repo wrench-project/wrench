@@ -782,7 +782,7 @@ namespace wrench {
 
       for (auto const &wu : this->ready_workunits) {
         sorted_workunits.push_back(wu);
-//        std::cerr << "WORKUNITS.GET = " << wu.get () << ": " << wu.get()->tasks.size() << "\n";
+//        std::cerr << "WORKUNITS.GET = " << wu.get() << ": " << wu.get()->tasks.size() << "\n";
       }
 
 //      std::cerr << "SORTED LENGTH = " << sorted_workunits.size() << "\n";
