@@ -2245,7 +2245,7 @@ private:
         wrench::Simulation::sleep(5);
 
         // Terminate the job
-        executor->kill();
+        executor->kill(true);
 
         // We should be good now, with nothing running
 
@@ -2398,7 +2398,7 @@ private:
         wrench::Simulation::sleep(48.20);
 
         // Terminate the job
-        executor->kill();
+        executor->kill(true);
 
         // We should be good now, with nothing running
 
@@ -2569,7 +2569,7 @@ private:
 
           // Terminate the executor
           WRENCH_INFO("Killing the standard executor");
-          executor->kill();
+          executor->kill(true);
 
           // We should be good now, with nothing running
 //          this->getWorkflow()->removeTask(task1);

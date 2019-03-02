@@ -683,7 +683,7 @@ namespace wrench {
 
         for (it = this->running_standard_job_executors.begin(); it != this->running_standard_job_executors.end(); it++) {
             if (((*it).get())->getJob() == job) {
-                ((*it).get())->kill();
+                ((*it).get())->kill(false);
                 // Make failed tasks ready again
                 for (auto task : job->tasks) {
                     switch (task->getInternalState()) {
@@ -736,7 +736,7 @@ namespace wrench {
 
         // Terminate the executor
         WRENCH_INFO("Terminating a standard job executor");
-        executor->kill();
+        executor->kill(true);
         // Do not update the resource availability, because this is done at a higher level
 
     }

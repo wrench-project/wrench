@@ -152,6 +152,8 @@ namespace wrench {
      * @param task: the WorkflowTask associated with this timestamp
      */
     SimulationTimestampTaskTerminated::SimulationTimestampTaskTerminated(WorkflowTask *task) : SimulationTimestampTask(task) {
+        std::cerr << "***       TERMINATION TIMESTAMP FOR TASK: " << task->getID() << "\n";
+
         if (task == nullptr) {
             throw std::invalid_argument("SimulationTimestampTaskTerminated::SimulationTimestampTaskTerminated() requires a valid pointer to a WorkflowTask object");
         }

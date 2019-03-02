@@ -61,7 +61,7 @@ namespace wrench {
                 std::map<std::string, std::string> messagepayload_list
         );
 
-        void kill();
+        void kill(bool job_termination);
 
         StandardJob *getJob();
         std::map<std::string, std::tuple<unsigned long, double>> getComputeResources();

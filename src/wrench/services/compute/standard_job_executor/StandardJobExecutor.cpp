@@ -229,13 +229,13 @@ namespace wrench {
     /**
      * @brief Kill the executor
      */
-    void StandardJobExecutor::kill() {
+    void StandardJobExecutor::kill(bool job_termination) {
 
       this->acquireDaemonLock();
 
       // Kill all Workunit executors
       for (auto const &wue : this->running_workunit_executors) {
-        wue->kill();
+        wue->kill(job_termination);
       }
 
       // Then kill the actor
@@ -748,7 +748,7 @@ namespace wrench {
         for (auto const &wue : this->running_workunit_executors) {
           if (wue->workunit == wu) {
             WRENCH_INFO("KILLING WORKUNIT EXECUTOR %s", wue->getName().c_str());
-            wue->kill();
+            wue->kill(false);
             break;
           }
         }
