@@ -131,8 +131,8 @@ private:
       }
       std::sort(sorted_ram_capacities.begin(), sorted_ram_capacities.end());
       if ((sorted_ram_capacities.size() != 2) or
-          (fabs(sorted_ram_capacities.at(0) - 1024) > EPSILON) or
-          (fabs(sorted_ram_capacities.at(1) - 2048) > EPSILON)) {
+          (std::abs(sorted_ram_capacities.at(0) - 1024) > EPSILON) or
+          (std::abs(sorted_ram_capacities.at(1) - 2048) > EPSILON)) {
         throw std::runtime_error("getHostMemoryCapacity() should return {1024,2048} or {2048,1024} for compute service #1");
       }
 
@@ -144,8 +144,8 @@ private:
       }
       std::sort(sorted_core_flop_rates.begin(), sorted_core_flop_rates.end());
       if ((sorted_core_flop_rates.size() != 2) or
-          (fabs(sorted_core_flop_rates.at(0) - 1.0) > EPSILON) or
-          (fabs(sorted_core_flop_rates.at(1) - 1e+10) > EPSILON)) {
+          (std::abs(sorted_core_flop_rates.at(0) - 1.0) > EPSILON) or
+          (std::abs(sorted_core_flop_rates.at(1) - 1e+10) > EPSILON)) {
         throw std::runtime_error("getCoreFlopRate() should return {1,10} or {10,1} for compute service #1");
 
       }

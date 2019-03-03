@@ -643,7 +643,7 @@ private:
       if (ram_capacity == wrench::ComputeService::ALL_RAM) {
         throw std::runtime_error("RAM Capacity of RAMHost should not be +infty");
       }
-      if (fabs(ram_capacity - 1024) > 0.01) {
+      if (std::abs(ram_capacity - 1024) > 0.01) {
         throw std::runtime_error("RAM Capacity of RAMHost should  be 1024");
       }
 

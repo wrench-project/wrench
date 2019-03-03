@@ -178,7 +178,7 @@ private:
 
       // Check
       for (int i=0; i < 8; i++) {
-        double delta = fabs(actual_completion_times[i] - expected_completion_times[i]);
+        double delta = std::abs(actual_completion_times[i] - expected_completion_times[i]);
         if (delta > EPSILON) {
           throw std::runtime_error("Unexpected job completion time for the job containing task " +
                                    tasks[i]->getID() +
@@ -367,7 +367,7 @@ private:
         std::string id = std::get<0>(job);
         double estimated = jobs_estimated_start_times[id];
         double expected = expectations[id];
-        if (fabs(estimated - expected) > 1.0) {
+        if (std::abs(estimated - expected) > 1.0) {
           throw std::runtime_error("invalid prediction for job '" + id + "': got " +
                                    std::to_string(estimated) + " but expected is " + std::to_string(expected));
         }

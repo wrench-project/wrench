@@ -142,16 +142,16 @@ private:
       double transfer_time_3 = event3_arrival - copy3_start;
 
       // Do relative checks
-      if (fabs(copy2_start - copy3_start) > 0.1) {
+      if (std::abs(copy2_start - copy3_start) > 0.1) {
         throw std::runtime_error("Time between two asynchronous operations is too big");
       }
 
-      if ((fabs(transfer_time_2 / transfer_time_1 - 2.0) > 0.001) ||
-          (fabs(transfer_time_3 / transfer_time_1 - 2.0) > 0.001)) {
+      if ((std::abs(transfer_time_2 / transfer_time_1 - 2.0) > 0.001) ||
+          (std::abs(transfer_time_3 / transfer_time_1 - 2.0) > 0.001)) {
         throw std::runtime_error("Concurrent transfers should be roughly twice slower");
       }
 
-      if (fabs(event2_arrival - event3_arrival) > 0.1) {
+      if (std::abs(event2_arrival - event3_arrival) > 0.1) {
         throw std::runtime_error("Time between two asynchronous operation completions is too big");
       }
 
@@ -159,14 +159,14 @@ private:
       // Do absolute checks
       double expected_transfer_time_1 =  FILE_SIZE / (0.92 * MBPS_BANDWIDTH*1000*1000);
 
-      if (fabs(transfer_time_1 - expected_transfer_time_1) > 1.0) {
+      if (std::abs(transfer_time_1 - expected_transfer_time_1) > 1.0) {
         throw std::runtime_error("Unexpected transfer time #1 " + std::to_string(transfer_time_1) +
                                          " (should be around " + std::to_string(expected_transfer_time_1) + ")");
       }
 
       double expected_transfer_time_2 =  FILE_SIZE / (0.5 * 0.92 * MBPS_BANDWIDTH*1000*1000);
 
-      if (fabs(transfer_time_2 - expected_transfer_time_2) > 1.0) {
+      if (std::abs(transfer_time_2 - expected_transfer_time_2) > 1.0) {
         throw std::runtime_error("Unexpected transfer time #2 " + std::to_string(transfer_time_2) +
                                  " (should be around " + std::to_string(expected_transfer_time_2) + ")");
       }
@@ -266,7 +266,7 @@ private:
 
       double expected_elapsed = this->test->file_1->getSize() / effecive_bandwidth;
 
-      if (fabs(elapsed - expected_elapsed) > 1.0) {
+      if (std::abs(elapsed - expected_elapsed) > 1.0) {
         throw std::runtime_error("Incorrect file read time " + std::to_string(elapsed) + " (expected: " + std::to_string(expected_elapsed) + ")");
       }
 

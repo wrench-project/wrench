@@ -778,7 +778,7 @@ private:
       }
 
       double job_turnaround_time = this->simulation->getCurrentSimulatedDate() - job_start_date;
-      if (fabs(job_turnaround_time - 110) > EPSILON) {
+      if (std::abs(job_turnaround_time - 110) > EPSILON) {
         throw std::runtime_error("Unexpected job turnaround time " + std::to_string(job_turnaround_time));
       }
 
