@@ -492,7 +492,7 @@ private:
       // Check values
       double epsilon = 0.1;
 
-      if (fabs(vivaldi_proximity - alltoall_proximity) > epsilon) {
+      if (std::abs(vivaldi_proximity - alltoall_proximity) > epsilon) {
         throw std::runtime_error("Vivaldi algorithm did not converge");
       }
 

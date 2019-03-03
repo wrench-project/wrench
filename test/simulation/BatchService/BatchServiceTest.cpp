@@ -634,7 +634,7 @@ private:
         } else {
           throw std::runtime_error("Phantom job completion!");
         }
-        double delta = fabs(expected_completion_time - completion_time);
+        double delta = std::abs(expected_completion_time - completion_time);
         double tolerance = 2;
         if (delta > tolerance) {
           throw std::runtime_error("Unexpected job completion time for job " + job->getName() + ": " +
@@ -2127,7 +2127,7 @@ private:
 
         double EPSILON = 1.0;
         double not_expected_date = 60; //FIRSTFIT and BESTFIT would complete in ~60 seconds but ROUNDROBIN would finish, in this case, in ~90 seconds
-        if (fabs(this->simulation->getCurrentSimulatedDate() - not_expected_date) <= EPSILON) {
+        if (std::abs(this->simulation->getCurrentSimulatedDate() - not_expected_date) <= EPSILON) {
           throw std::runtime_error(
                   "BatchServiceTest::ROUNDROBINTEST():: The tasks did not finish on time: Simulation Date > Expected Date"
           );

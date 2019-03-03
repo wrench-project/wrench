@@ -147,7 +147,7 @@ private:
       daemon->join();
 
       double now = simulation->getCurrentSimulatedDate();
-      if (fabs(now - 120) > 1) {
+      if (std::abs(now - 120) > 1) {
         throw std::runtime_error("Joining at time " + std::to_string(now) + " instead of expected 120");
       }
 

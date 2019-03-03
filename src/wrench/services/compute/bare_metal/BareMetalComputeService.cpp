@@ -385,7 +385,7 @@ namespace wrench {
     void BareMetalComputeService::someHostIsBackOn(simgrid::s4u::Host &h) {
         for (auto const &c : this->compute_resources) {
             if ((c.first == h.get_name()) and (h.is_on())) {
-                WRENCH_INFO("HOST %s CAME BACK ON!!!", h.get_cname());
+//                WRENCH_INFO("HOST %s CAME BACK ON!!!", h.get_cname());
                 this->host_back_on = true;
                 break;
             }
@@ -557,7 +557,6 @@ namespace wrench {
         std::string new_host_to_avoid = "";
         double new_host_to_avoid_ram_capacity = 0;
         for (auto const &r : this->compute_resources) {
-            WRENCH_INFO("LOOKING AT HOST %s", r.first.c_str());
             // If there is a required host, then don't even look at others
             if (not required_host.empty() and (r.first != required_host)) {
                 continue;
@@ -1550,11 +1549,9 @@ namespace wrench {
      * @param workunitExecutor: the workunit executor that has crashed
      */
     void BareMetalComputeService::processWorkunitExecutorCrash(WorkunitExecutor *workunit_executor) {
-        WRENCH_INFO("CRAP!!!! A WORKUNIT EXECUTOR HAS CRASHED!!! I SHOULD DO SOMETHIONG!!!");
         std::shared_ptr<Workunit> workunit = workunit_executor->workunit;
 
-        // TODO: WHAT SHOULD WE DO HERE FOR LOGGING!!
-
+        WRENCH_INFO("Handling a WorkunitExecutor crash!");
         // Get the scratch files that executor may have generated
         StandardJob *job = workunit_executor->getJob();
         for (auto &f : workunit_executor->getFilesStoredInScratch()) {
@@ -1564,23 +1561,21 @@ namespace wrench {
             this->files_in_scratch[job].insert(f);
         }
 
-        WRENCH_INFO("HERE");
 
         // Update RAM availabilities and running thread counts
         if (workunit->task) {
             this->ram_availabilities[workunit_executor->getHostname()] += workunit->task->getMemoryRequirement();
             this->running_thread_counts[workunit_executor->getHostname()] -= workunit_executor->getNumCores();
         }
+
         // Forget the workunit executor
         forgetWorkunitExecutor(workunit_executor);
-
-        WRENCH_INFO("DONE SOME CLEANUP, PUTTING THE TASK BACK IN READY QUEUE");
 
         // Reset the internal task state to READY (it may have been completed actually, but we just redo the whole workunit)
         workunit->task->setInternalState(WorkflowTask::InternalState::TASK_READY);
         // Put the WorkUnit back in the ready list (at the end)
+        WRENCH_INFO("Putting task back in the ready queue");
         this->ready_workunits.push_back(workunit);
-        WRENCH_INFO("DONE HANDLING WUE FAILURE!");
     }
 
 

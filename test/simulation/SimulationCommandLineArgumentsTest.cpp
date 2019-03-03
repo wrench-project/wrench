@@ -483,7 +483,6 @@ void SimulationCommandLineArgumentsTest::do_ActivateEnergyArgument_test() {
   // Check exit code
   ASSERT_NE(exit_code, 0);
 
-  std::cerr << "hERE\n";
   // Check that the error was what we thought it was (based on output!)
   stderr_file = fopen((UNIQUE_TMP_PATH_PREFIX + "unit_tests.stderr").c_str(), "r");
   char *line = nullptr;

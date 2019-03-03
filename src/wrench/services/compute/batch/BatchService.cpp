@@ -160,12 +160,12 @@ namespace wrench {
 
         for (auto const &h : compute_hosts) {
             // Compute speed
-            if (fabs(speed - Simulation::getHostFlopRate(h)) > DBL_EPSILON) {
+            if (std::abs(speed - Simulation::getHostFlopRate(h)) > DBL_EPSILON) {
                 throw std::invalid_argument(
                         "BatchService::BatchService(): Compute hosts for a batch service need to be homogeneous (different flop rates detected)");
             }
             // RAM
-            if (fabs(ram_available - Simulation::getHostMemoryCapacity(h)) > DBL_EPSILON) {
+            if (std::abs(ram_available - Simulation::getHostMemoryCapacity(h)) > DBL_EPSILON) {
 
                 throw std::invalid_argument(
                         "BatchService::BatchService(): Compute hosts for a batch service need to be homogeneous (different RAM capacities detected)");
