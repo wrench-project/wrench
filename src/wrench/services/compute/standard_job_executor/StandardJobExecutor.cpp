@@ -747,7 +747,6 @@ namespace wrench {
         // find the workunit executor  that's doing the work and kill it (lame iteration)
         for (auto const &wue : this->running_workunit_executors) {
           if (wue->workunit == wu) {
-            WRENCH_INFO("KILLING WORKUNIT EXECUTOR %s", wue->getName().c_str());
             wue->kill(false);
             break;
           }

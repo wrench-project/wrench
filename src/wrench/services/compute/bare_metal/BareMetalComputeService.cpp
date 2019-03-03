@@ -528,8 +528,6 @@ namespace wrench {
         /** Main loop **/
         while (this->processNextMessage()) {
 
-            WRENCH_INFO("DISPATCHING READY WORK UNITS");
-
             /** Dispatch ready work units **/
             this->dispatchReadyWorkunits();
         }
@@ -676,12 +674,10 @@ namespace wrench {
 
             // If we didn't find a host, forget it
             if (target_host.empty()) {
-                WRENCH_INFO("DIDN'T FIND A HOST");
                 continue;
             }
 
             /** Dispatch it **/
-            WRENCH_INFO("DISPATCHING ON HOST %s", target_host.c_str());
             // Create a workunit executor on the target host
             std::shared_ptr<WorkunitExecutor> workunit_executor = std::shared_ptr<WorkunitExecutor>(
                     new WorkunitExecutor(this->simulation,
@@ -869,8 +865,8 @@ namespace wrench {
         this->workunit_executors[job].clear();
         this->workunit_executors.erase(job);
 
-        /** Sleep for 0.001 seconds, so that all working_executors have a chance to do their cleanup, etc. */
-        Simulation::sleep(0.001);
+        /** Yield, so that all working_executors have a chance to do their cleanup, etc. */
+        simgrid::s4u::this_actor::yield();
 
         /** Remove all relevant work units */
         std::set<std::shared_ptr<Workunit>> to_remove;
@@ -894,24 +890,25 @@ namespace wrench {
         this->all_workunits[job].clear();
         this->all_workunits.erase(job);
 
-        /** Deal with task states */
-        for (auto &task : job->getTasks()) {
-            if (task->getInternalState() == WorkflowTask::InternalState::TASK_RUNNING) {
-                if (termination_cause == BareMetalComputeService::JobTerminationCause::TERMINATED) {
-//                    task->setTerminationDate(S4U_Simulation::getClock());
-//                    this->simulation->getOutput().addTimestamp<SimulationTimestampTaskTerminated>(
-//                            new SimulationTimestampTaskTerminated(task));
+        /** Deal with task states (NO LONGER NECESSARY AS WUEs HAVE CLEANUP() FUNCTION!! */
+//        for (auto &task : job->getTasks()) {
+//            if (task->getInternalState() == WorkflowTask::InternalState::TASK_RUNNING) {
+//                if (termination_cause == BareMetalComputeService::JobTerminationCause::TERMINATED) {
+////                    task->setTerminationDate(S4U_Simulation::getClock());
+////                    this->simulation->getOutput().addTimestamp<SimulationTimestampTaskTerminated>(
+////                            new SimulationTimestampTaskTerminated(task));
+//
+//                } else if (termination_cause == BareMetalComputeService::JobTerminationCause::COMPUTE_SERVICE_KILLED) {
+//                    // TODO: THIS LIKELY DUPLICATES THE STUFF DONE IN CLEANUP
+////                    task->setFailureDate(S4U_Simulation::getClock());
+////                    this->simulation->getOutput().addTimestamp<SimulationTimestampTaskFailure>(
+////                            new SimulationTimestampTaskFailure(task));
+//                }
+//                // TODO: HOW DO WE KNOW THIS IS DONE BEFORE WE GET HERE
+////                task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
+//            }
+//        }
 
-                } else if (termination_cause == BareMetalComputeService::JobTerminationCause::COMPUTE_SERVICE_KILLED) {
-                    // TODO: THIS LIKELY DUPLICATES THE STUFF DONE IN CLEANUP
-//                    task->setFailureDate(S4U_Simulation::getClock());
-//                    this->simulation->getOutput().addTimestamp<SimulationTimestampTaskFailure>(
-//                            new SimulationTimestampTaskFailure(task));
-                }
-                // TODO: HOW DO WE KNOW THIS IS DONEE BEFORE WE GET HERE
-//                task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
-            }
-        }
 
         for (auto failed_task: job->getTasks()) {
             switch (failed_task->getInternalState()) {
@@ -1176,7 +1173,6 @@ namespace wrench {
  */
     void BareMetalComputeService::forgetWorkunitExecutor(WorkunitExecutor *workunit_executor) {
 
-        WRENCH_INFO("IN FORGET WU EXECUTOR");
         StandardJob *job = workunit_executor->getJob();
         std::shared_ptr<WorkunitExecutor> found_it;
         for (auto const wue : this->workunit_executors[job]) {

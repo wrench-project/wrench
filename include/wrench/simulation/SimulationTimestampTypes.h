@@ -120,12 +120,12 @@ namespace wrench {
     /**
      * @brief A simulation timestamp class for WorkflowTask termination times
      */
-     class SimulationTimestampTaskTerminated : public SimulationTimestampTask {
+     class SimulationTimestampTaskTermination : public SimulationTimestampTask {
      public:
          /***********************/
          /** \cond INTERNAL     */
          /***********************/
-         SimulationTimestampTaskTerminated(WorkflowTask *);
+         SimulationTimestampTaskTermination(WorkflowTask *);
          /***********************/
          /** \endcond           */
          /***********************/
