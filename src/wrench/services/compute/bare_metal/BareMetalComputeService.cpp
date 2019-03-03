@@ -595,7 +595,7 @@ namespace wrench {
 
         // If none, then reply with an empty tuple
         if (possible_hosts.empty()) {
-            // Host to avoid is the one with the lowest ram availabiliey
+            // Host to avoid is the one with the lowest ram availability
             if (not new_host_to_avoid.empty()) {
                 hosts_to_avoid.insert(new_host_to_avoid);
             }
@@ -875,7 +875,7 @@ namespace wrench {
             }
         }
         // Really inefficient, Better data structures needed
-        while (to_remove.size() > 0) {
+        while (not to_remove.empty()) {
             for (auto it = this->ready_workunits.begin(); it != this->ready_workunits.end(); it++) {
                 if ((*it) == (*(to_remove.begin()))) {
                     this->ready_workunits.erase(it);
@@ -1075,7 +1075,7 @@ namespace wrench {
         this->completed_workunits[job].insert(workunit);
 
         // Update workunit dependencies if any
-        for (auto child : workunit->children) {
+        for (auto const &child : workunit->children) {
             child->num_pending_parents--;
             if (child->num_pending_parents == 0) {
                 // Make sure the child's tasks ready (paranoid)
@@ -1174,7 +1174,7 @@ namespace wrench {
 
         StandardJob *job = workunit_executor->getJob();
         std::shared_ptr<WorkunitExecutor> found_it;
-        for (auto const wue : this->workunit_executors[job]) {
+        for (auto const &wue : this->workunit_executors[job]) {
             if (wue.get() == workunit_executor) {
                 found_it = wue;
             }

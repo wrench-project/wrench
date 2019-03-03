@@ -30,9 +30,7 @@ int wrench::ServiceFailureDetector::main() {
     std::pair<bool, int> return_values_from_join;
     return_values_from_join = this->service_to_monitor->join();
     bool service_has_returned_from_main = std::get<0>(return_values_from_join);
-    int service_return_value = std::get<1>(return_values_from_join);
 
-//    if ((not service_has_returned_from_main) or (service_return_value != 0)) {
     if (not service_has_returned_from_main) {
         // Failure detected!
         WRENCH_INFO("Detected failure of service %s", this->service_to_monitor->getName().c_str());
