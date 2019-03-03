@@ -105,10 +105,9 @@ namespace wrench {
 
       WRENCH_INFO("New Energy Meter Manager starting (%s)", this->mailbox_name.c_str());
 
-      bool life = true;
 
       /** Main loop **/
-      while (life) {
+      while (true) {
         S4U_Simulation::computeZeroFlop();
 
         // Find the minimum of the times to next measurements
@@ -124,10 +123,9 @@ namespace wrench {
         double before = Simulation::getCurrentSimulatedDate();
 
         if (time_to_next_measurement > 0) {
-          life = this->processNextMessage(time_to_next_measurement);
-        }
-        if (not life) {
-          break;
+          if (not processNextMessage(time_to_next_measurement)) {
+            break;
+          }
         }
 
         // Update time-to-next-measurement for all hosts
@@ -160,7 +158,7 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
-          message = S4U_Mailbox::getMessage(this->mailbox_name, timeout);
+        message = S4U_Mailbox::getMessage(this->mailbox_name, timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
         return true;
       }

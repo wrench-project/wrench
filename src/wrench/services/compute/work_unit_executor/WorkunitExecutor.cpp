@@ -80,21 +80,20 @@ namespace wrench {
     }
 
     void WorkunitExecutor::cleanup(bool has_returned_from_main, int return_value) {
-        WRENCH_INFO("IN CLEANUP!: %s has_returned_from_main = %d, return_value = %d  (job terminated = %d)",
+        WRENCH_DEBUG("In on_exit.cleanup(): WorkunitExecutor: %s has_returned_from_main = %d (return_value = %d, job terminated = %d)",
                 this->getName().c_str(), has_returned_from_main, return_value, this->terminated_due_job_being_forcefully_terminated);
         if ((not has_returned_from_main) and (not this->task_failure_time_stamp_has_already_been_generated)) {
             if (this->workunit->task != nullptr) {
                 WorkflowTask *task = this->workunit->task;
-                if (not this->terminated_due_job_being_forcefully_terminated) {
                     task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
+                if (not this->terminated_due_job_being_forcefully_terminated) {
                     task->setFailureDate(S4U_Simulation::getClock());
                     this->simulation->getOutput().addTimestamp<SimulationTimestampTaskFailure>(
                             new SimulationTimestampTaskFailure(task));
                 } else {
-                    task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
                     task->setTerminationDate(S4U_Simulation::getClock());
-                    this->simulation->getOutput().addTimestamp<SimulationTimestampTaskTerminated>(
-                            new SimulationTimestampTaskTerminated(task));
+                    this->simulation->getOutput().addTimestamp<SimulationTimestampTaskTermination>(
+                            new SimulationTimestampTaskTermination(task));
                 }
             }
         }
@@ -120,7 +119,6 @@ namespace wrench {
 
         this->terminated_due_job_being_forcefully_terminated = job_termination;
         this->killActor();
-        WRENCH_INFO("THE WUE HAS BEEN KILLEED");
 
         this->releaseDaemonLock();
 
@@ -177,11 +175,9 @@ namespace wrench {
             if (this->workunit->task != nullptr) {
                 this->task_failure_time_stamp_has_already_been_generated = true;
                 WorkflowTask *task = this->workunit->task;
-                WRENCH_INFO("      %s", task->getID().c_str());
                 task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
                 task->setFailureDate(S4U_Simulation::getClock());
                 auto ts = new SimulationTimestampTaskFailure(task);
-                WRENCH_INFO("ADDING A TIMESTAMPTASKFAILURE FOR %'s'", task->getID().c_str());
                 this->simulation->getOutput().addTimestamp<SimulationTimestampTaskFailure>(ts);
             }
         }
@@ -194,8 +190,6 @@ namespace wrench {
             WRENCH_INFO("Notifying mailbox_name %s that work has failed",
                         this->callback_mailbox.c_str());
         }
-
-        WRENCH_INFO("ABOUT TO SEND NOTIFICATION!");
 
         try {
             S4U_Mailbox::putMessage(this->callback_mailbox, msg_to_send_back);
@@ -223,7 +217,6 @@ namespace wrench {
 
 //      std::set<WorkflowFile* > files_stored_in_scratch = {};
 
-        WRENCH_INFO("IN PERFORM WORK");
         /** Perform all pre file copies operations */
         for (auto file_copy : work->pre_file_copies) {
             WorkflowFile *file = std::get<0>(file_copy);

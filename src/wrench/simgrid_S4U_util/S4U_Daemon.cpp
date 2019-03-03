@@ -215,12 +215,10 @@ namespace wrench {
             } catch (simgrid::HostFailureException &e) {
                 // In case the main() didn't to that catch
             }
-
 //            wrench::S4U_Simulation::sleep(0.0000);
         } catch (std::exception &e) {
             throw;
         }
-
     }
 
 
@@ -298,8 +296,7 @@ namespace wrench {
                 throw std::shared_ptr<FatalFailure>(new FatalFailure());
             }
         }
-        WRENCH_INFO("JOIN ON '%s' HAS RETURNED: %d %d",
-                    this->getName().c_str(), this->hasReturnedFromMain(), this->getReturnValue());
+//        WRENCH_INFO("JOIN ON '%s' HAS RETURNED: %d %d", this->getName().c_str(), this->hasReturnedFromMain(), this->getReturnValue());
         return std::make_pair(this->hasReturnedFromMain(), this->getReturnValue());
     }
 
