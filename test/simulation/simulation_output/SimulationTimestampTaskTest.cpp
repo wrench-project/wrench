@@ -532,7 +532,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskTerminateAndFail_tes
      *  - failed_task fails (SimulationTimestampTaskFailure should be generated)
      */
      auto start_timestamps = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskStart>();
-     auto terminated_timestamps = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskTerminated>();
+     auto terminated_timestamps = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskTermination>();
      auto failure_timestamps = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskFailure>();
 
      // check the number of timestamps

@@ -101,7 +101,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     SimulationTimestampTaskStart::SimulationTimestampTaskStart(WorkflowTask *task) : SimulationTimestampTask(task) {
-        std::cerr << "***       START TIMESTAMP FOR TASK: " << task->getID() << "\n";
+        WRENCH_DEBUG("Inserting a Taskstart timestamp for task '%s'", task->getID().c_str());
 
         if (task == nullptr) {
             throw std::invalid_argument("SimulationTimestampTaskStart::SimulationTimestampTaskStart() requires a valid pointer to a WorkflowTask object");
@@ -121,7 +121,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     SimulationTimestampTaskFailure::SimulationTimestampTaskFailure(WorkflowTask *task) : SimulationTimestampTask(task) {
-        std::cerr << "***       FAIL TIMESTAMP FOR TASK: " << task->getID() << "\n";
+        WRENCH_DEBUG("Inserting a TaskFailure timestamp for task '%s'", task->getID().c_str());
 
         if (task == nullptr) {
             throw std::invalid_argument("SimulationTimestampTaskFailure::SimulationTimestampTaskFailure() requires a valid pointer to a WorkflowTask object");
@@ -137,7 +137,7 @@ namespace wrench {
      */
     SimulationTimestampTaskCompletion::SimulationTimestampTaskCompletion(WorkflowTask *task) : SimulationTimestampTask(
             task) {
-        std::cerr << "***       COMPLETION TIMESTAMP FOR TASK: " << task->getID() << "\n";
+        WRENCH_DEBUG("Inserting a TaskCompletion timestamp for task '%s'", task->getID().c_str());
 
         if (task == nullptr) {
             throw std::invalid_argument("SimulationTimestampTaskCompletion::SimulationTimestampTaskCompletion() requires a valid pointer to a WorkflowTask object");
@@ -151,8 +151,8 @@ namespace wrench {
      * @brief Constructor
      * @param task: the WorkflowTask associated with this timestamp
      */
-    SimulationTimestampTaskTerminated::SimulationTimestampTaskTerminated(WorkflowTask *task) : SimulationTimestampTask(task) {
-        std::cerr << "***       TERMINATION TIMESTAMP FOR TASK: " << task->getID() << "\n";
+    SimulationTimestampTaskTermination::SimulationTimestampTaskTermination(WorkflowTask *task) : SimulationTimestampTask(task) {
+        WRENCH_DEBUG("Inserting a TaskTerminated timestamp for task '%s'", task->getID().c_str());
 
         if (task == nullptr) {
             throw std::invalid_argument("SimulationTimestampTaskTerminated::SimulationTimestampTaskTerminated() requires a valid pointer to a WorkflowTask object");
