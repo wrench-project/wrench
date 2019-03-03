@@ -405,7 +405,7 @@ private:
 
       double task1_end_date = this->test->task1->getEndDate();
       double task2_end_date = this->test->task2->getEndDate();
-      double delta = fabs(task1_end_date - task2_end_date);
+      double delta = std::abs(task1_end_date - task2_end_date);
       if (delta > 0.1) {
         throw std::runtime_error("Task completion times should be about 0.0 seconds apart but they are " +
                                  std::to_string(delta) + " apart.");
@@ -530,8 +530,8 @@ private:
 
       double task3_end_date = this->test->task3->getEndDate();
       double task4_end_date = this->test->task4->getEndDate();
-      double delta_task3 = fabs(task3_end_date - 10.0);
-      double delta_task4 = fabs(task4_end_date - 10.0);
+      double delta_task3 = std::abs(task3_end_date - 10.0);
+      double delta_task4 = std::abs(task4_end_date - 10.0);
       if ((delta_task3 > EPSILON) || (delta_task4 > EPSILON)) {
         throw std::runtime_error("Unexpected task completion times " + std::to_string(task3_end_date) + " and " +
                                  std::to_string(task4_end_date) + ".");
@@ -664,8 +664,8 @@ private:
        * Started at time 7.50, task5 is alone and has 10-6=4 seconds of work
        * left with each thread getting a core, so it completes at time 11.50.
        */
-      double delta_task5 = fabs(task5_end_date - 11.50);
-      double delta_task6 = fabs(task6_end_date - 7.50);
+      double delta_task5 = std::abs(task5_end_date - 11.50);
+      double delta_task6 = std::abs(task6_end_date - 7.50);
 
 
 //      task5 = workflow->addTask("task_5_30s_1_to_3_cores", 30.0, 1, 3, 1.0, 0);
@@ -842,8 +842,8 @@ private:
       /*
        * Check that each task was happy on 2 cores
        */
-      double delta_task5 = fabs(task5_end_date - 15.00);
-      double delta_task6 = fabs(task6_end_date - 6.00);
+      double delta_task5 = std::abs(task5_end_date - 15.00);
+      double delta_task6 = std::abs(task6_end_date - 6.00);
 
       if (delta_task5 > EPSILON) {
         throw std::runtime_error("Unexpected task5 end date " + std::to_string(task5_end_date) + " (should be 10.0)");

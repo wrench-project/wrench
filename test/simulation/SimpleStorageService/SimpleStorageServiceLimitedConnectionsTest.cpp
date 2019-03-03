@@ -133,7 +133,7 @@ private:
           if (dst_storage_service == this->test->storage_service_1) {
             double baseline_elapsed = completion_dates[0] - start;
             for (int i=1; i < 10; i++) {
-              if (fabs(baseline_elapsed - (completion_dates[i] - start)) > 1) {
+              if (std::abs(baseline_elapsed - (completion_dates[i] - start)) > 1) {
                 throw std::runtime_error("Incoherent transfer elapsed times for the unlimited storage service");
               }
             }
@@ -143,12 +143,12 @@ private:
           if (dst_storage_service == this->test->storage_service_2) {
             bool success = true;
 
-            if ((fabs(completion_dates[0] - completion_dates[1]) > 1) ||
-                (fabs(completion_dates[2] - completion_dates[1]) > 1) ||
-                (fabs(completion_dates[4] - completion_dates[3]) > 1) ||
-                (fabs(completion_dates[5] - completion_dates[4]) > 1) ||
-                (fabs(completion_dates[7] - completion_dates[6]) > 1) ||
-                (fabs(completion_dates[8] - completion_dates[7]) > 1)) {
+            if ((std::abs(completion_dates[0] - completion_dates[1]) > 1) ||
+                (std::abs(completion_dates[2] - completion_dates[1]) > 1) ||
+                (std::abs(completion_dates[4] - completion_dates[3]) > 1) ||
+                (std::abs(completion_dates[5] - completion_dates[4]) > 1) ||
+                (std::abs(completion_dates[7] - completion_dates[6]) > 1) ||
+                (std::abs(completion_dates[8] - completion_dates[7]) > 1)) {
               success = false;
             }
 
@@ -157,12 +157,12 @@ private:
             double elapsed_3 = completion_dates[6] - completion_dates[3];
             double elapsed_4 = completion_dates[9] - completion_dates[8];
 
-            if ((fabs(elapsed_2 - elapsed_1) > 1) ||
-                (fabs(elapsed_3 - elapsed_2) > 1)) {
+            if ((std::abs(elapsed_2 - elapsed_1) > 1) ||
+                (std::abs(elapsed_3 - elapsed_2) > 1)) {
               success = false;
             }
 
-            if (fabs(3.0 * elapsed_4 - elapsed_3) > 1) {
+            if (std::abs(3.0 * elapsed_4 - elapsed_3) > 1) {
               success = false;
             }
 

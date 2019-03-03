@@ -386,8 +386,6 @@ namespace wrench {
             }
         }
 
-        WRENCH_INFO("Done with my work");
-
     }
 
 
@@ -418,7 +416,7 @@ namespace wrench {
             // Nobody kills me while I am starting compute threads!
             this->acquireDaemonLock();
 
-            WRENCH_INFO("Simulating %ld compute threads", this->num_cores);
+            WRENCH_INFO("Launching %ld compute threads", this->num_cores);
 
             // Create a compute thread to run the computation on each core
             bool success = true;
@@ -442,7 +440,7 @@ namespace wrench {
                     success = false;
                     break;
                 }
-                WRENCH_INFO("Launched compute thread [%s]", compute_thread->getName().c_str());
+//                WRENCH_INFO("Launched compute thread [%s]", compute_thread->getName().c_str());
                 this->compute_threads.push_back(compute_thread);
             }
 

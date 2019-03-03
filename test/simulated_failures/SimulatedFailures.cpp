@@ -327,19 +327,15 @@ private:
         failure_detector2->simulation = this->simulation;
         failure_detector2->start(failure_detector2, true, false); // Daemonized, no auto-restart
 
-
-
         // Waiting for a message
         std::unique_ptr<wrench::SimulationMessage> message;
 
         try {
-            WRENCH_INFO("GETTING A MESSAGE 1");
             message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
         } catch (std::shared_ptr<wrench::NetworkError> &cause) {
             throw std::runtime_error("Network error while getting a message! " + cause->toString());
         }
 
-        WRENCH_INFO("GOT A MESSAGE!");
         auto real_msg = dynamic_cast<wrench::ServiceHasCrashedMessage *>(message.get());
         if (not real_msg) {
             throw std::runtime_error("Unexpected " + message->getName() + " message");
@@ -351,12 +347,10 @@ private:
 
         // And again...
         try {
-            WRENCH_INFO("GETTING A MESSAGE 1");
             message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
         } catch (std::shared_ptr<wrench::NetworkError> &cause) {
             throw std::runtime_error("Network error while getting a message!" + cause->toString());
         }
-        WRENCH_INFO("FOT ANOTHER!");
 
         real_msg = dynamic_cast<wrench::ServiceHasCrashedMessage *>(message.get());
         if (not real_msg) {
@@ -366,8 +360,6 @@ private:
                 throw std::runtime_error("Got a failure notification, but not for the right service!");
             }
         }
-
-        WRENCH_INFO("WOOHOO!");
 
         return 0;
     }

@@ -343,7 +343,7 @@ private:
         }
         double expected_wait_time = 300 - first_job_running;
         double tolerance = 1; // in seconds
-        double delta = fabs(expected_wait_time - (jobs_estimated_start_times[job_id] - tolerance));
+        double delta = std::abs(expected_wait_time - (jobs_estimated_start_times[job_id] - tolerance));
         if (delta > 1) {
           throw std::runtime_error("Estimated start time incorrect (expected: " + std::to_string(expected_wait_time) + ", got: " + std::to_string(jobs_estimated_start_times[job_id]) + ")");
         }
@@ -517,7 +517,7 @@ private:
         std::set<std::tuple<std::string,unsigned int,unsigned int,double>> set_of_jobs = {my_job};
         std::map<std::string,double> jobs_estimated_start_times = batch_service->getStartTimeEstimates(set_of_jobs);
         double expected_start_time = 300 - first_job_running; // in seconds
-        double delta = fabs(expected_start_time - (jobs_estimated_start_times[job_id] - 1));
+        double delta = std::abs(expected_start_time - (jobs_estimated_start_times[job_id] - 1));
         if (delta > 1) { // 1 second accuracy threshold
           throw std::runtime_error("Estimated start time incorrect (expected: " + std::to_string(expected_start_time) + ", got: " + std::to_string(jobs_estimated_start_times[job_id]) + ")");
         }
@@ -834,7 +834,7 @@ private:
         set_of_jobs = {my_job};
         jobs_estimated_start_times = batch_service->getStartTimeEstimates(set_of_jobs);
 
-        if (fabs(jobs_estimated_start_times[job_id] - 300) > 1) {
+        if (std::abs(jobs_estimated_start_times[job_id] - 300) > 1) {
           throw std::runtime_error("Estimated start time incorrect (expected: " + std::to_string(300) + ", got: " + std::to_string(jobs_estimated_start_times[job_id]) + ")");
         }
 
@@ -846,7 +846,7 @@ private:
         set_of_jobs = {my_job};
         jobs_estimated_start_times = batch_service->getStartTimeEstimates(set_of_jobs);
 
-        if (fabs(jobs_estimated_start_times[job_id] - 300) > 1) {
+        if (std::abs(jobs_estimated_start_times[job_id] - 300) > 1) {
           throw std::runtime_error("Estimated start time incorrect (expected: " + std::to_string(300) + ", got: " + std::to_string(jobs_estimated_start_times[job_id]) + ")");
         }
 
@@ -858,7 +858,7 @@ private:
         set_of_jobs = {my_job};
         jobs_estimated_start_times = batch_service->getStartTimeEstimates(set_of_jobs);
 
-        if (fabs(jobs_estimated_start_times[job_id] - 900) > 1) {
+        if (std::abs(jobs_estimated_start_times[job_id] - 900) > 1) {
           throw std::runtime_error("Estimated start time incorrect (expected: " + std::to_string(900) + ", got: " + std::to_string(jobs_estimated_start_times[job_id]) + ")");
         }
 

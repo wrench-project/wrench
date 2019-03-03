@@ -431,7 +431,7 @@ private:
         } else {
           throw std::runtime_error("Phantom job completion!");
         }
-        double delta = fabs(expected_completion_time - completion_time);
+        double delta = std::abs(expected_completion_time - completion_time);
         double tolerance = 5;
         if (delta > tolerance) {
           throw std::runtime_error("Unexpected job completion time for job " + job->getName() + ": " +
@@ -695,7 +695,7 @@ private:
         } else {
           throw std::runtime_error("Phantom job completion!");
         }
-        double delta = fabs(expected_completion_time - completion_time);
+        double delta = std::abs(expected_completion_time - completion_time);
         double tolerance = 5;
         if (delta > tolerance) {
           throw std::runtime_error("Unexpected job completion time for job " + job->getName() + ": " +
