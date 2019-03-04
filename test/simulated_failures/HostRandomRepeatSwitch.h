@@ -7,31 +7,34 @@
  * (at your option) any later version.
  */
 
-#ifndef WRENCH_COMPUTER_H
-#define WRENCH_COMPUTER_H
+#ifndef WRENCH_HOSTRANDOMREPEATSWITCH_H
+#define WRENCH_HOSTRANDOMREPEATSWITCH_H
 
 #include <wrench/services/Service.h>
-#include <wrench/simulation/SimulationMessage.h>
 #include "wrench/simgrid_S4U_util/S4U_Daemon.h"
 
 namespace wrench {
 
-    class ComputerVictim
-            : public Service {
+class HostRandomRepeatSwitch : public Service {
 
     public:
 
-        explicit ComputerVictim(std::string host_on_which_to_run, double flops, SimulationMessage *msg, std::string mailbox_to_notify);
+
+        explicit HostRandomRepeatSwitch(std::string host_on_which_to_run, double seed, double min_sleep_time, double max_sleep_time, std::string host_to_switch);
+
+        void kill();
 
         /***********************/
         /** \endcond           */
         /***********************/
 
     private:
-        double flops;
-        SimulationMessage *msg;
-        std::string mailbox_to_notify;
-        int main() override;
+
+        double seed;
+        double min_sleep_time;
+        double max_sleep_time;
+        std::string host_to_switch;
+        int main();
 
     };
 
@@ -43,4 +46,4 @@ namespace wrench {
 };
 
 
-#endif //WRENCH_COMPUTER_H
+#endif //WRENCH_HOSTRANDOMREPEATSWITCH_H

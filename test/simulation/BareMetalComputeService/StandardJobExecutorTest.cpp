@@ -2501,8 +2501,11 @@ private:
       std::uniform_real_distribution<double> dist(0, 600);  //(min, max)
       //Mersenne Twister: Good quality random number generator
       std::mt19937 rng;
-      //Initialize with non-deterministic seeds
-      rng.seed(std::random_device{}());
+
+      // Initialize with non-deterministic seed
+      // rng.seed(std::random_device{}());
+      // Initialize with deterministic seed!
+      rng.seed(666);
 
       for (int trial = 0; trial < 500; trial++) {
         WRENCH_INFO("Trial %d", trial);

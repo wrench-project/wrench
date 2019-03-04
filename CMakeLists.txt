@@ -293,6 +293,8 @@ set(TEST_FILES
         test/simulated_failures/SleeperVictim.h
         test/simulated_failures/ComputerVictim.cpp
         test/simulated_failures/ComputerVictim.h
+        test/simulated_failures/HostRandomRepeatSwitch.cpp
+        test/simulated_failures/HostRandomRepeatSwitch.h
         )
 
 # wrench library

@@ -154,7 +154,7 @@ void SimulatedFailuresTest::do_StartServiceOnDownHostTest_test() {
 
 
 /**********************************************************************/
-/**              FAILURE DETECTOR FOR SLEEPER TEST                   **/
+/**              FAILURE DETECTOR FOR COMPUTER TEST                   **/
 /**********************************************************************/
 
 class FailureDetectorForSleeperTestWMS : public wrench::WMS {

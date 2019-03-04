@@ -27,7 +27,7 @@
 #include <wrench/services/compute/ComputeService.h>
 
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(workunit_multicore_executor, "Log category for Multicore Workunit Executor");
+XBT_LOG_NEW_DEFAULT_CATEGORY(workunit_executor, "Log category for Multicore Workunit Executor");
 
 //#define S4U_KILL_JOIN_WORKS
 
@@ -58,7 +58,7 @@ namespace wrench {
             StandardJob* job,
             double thread_startup_overhead,
             bool simulate_computation_as_sleep) :
-            Service(hostname, "workunit_multicore_executor", "workunit_multicore_executor") {
+            Service(hostname, "workunit_executor", "workunit_executor") {
 
         if (thread_startup_overhead < 0) {
             throw std::invalid_argument("WorkunitExecutor::WorkunitExecutor(): thread_startup_overhead must be >= 0");
@@ -285,6 +285,8 @@ namespace wrench {
                                           this->scratch_space, files_stored_in_scratch, job);
                 task->setReadInputEndDate(S4U_Simulation::getClock());
             } catch (WorkflowExecutionException &e) {
+                // TODO: ASK RYAN IF THIS IS RIGHT!
+                WRENCH_INFO("I AM HERE AND IT'S UNCLEAR WHAT TO DO");
                 this->failure_timestamp_should_be_generated = true;
                 throw;
             }
