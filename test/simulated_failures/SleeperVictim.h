@@ -7,8 +7,8 @@
  * (at your option) any later version.
  */
 
-#ifndef WRENCH_VICTIM_H
-#define WRENCH_VICTIM_H
+#ifndef WRENCH_SLEEPER_H
+#define WRENCH_SLEEPER_H
 
 #include <wrench/services/Service.h>
 #include <wrench/simulation/SimulationMessage.h>
@@ -42,4 +42,4 @@ namespace wrench {
 };
 
 
-#endif //WRENCH_VICTIM_H
+#endif //WRENCH_SLEEPER_H

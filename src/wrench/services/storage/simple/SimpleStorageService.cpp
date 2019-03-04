@@ -84,7 +84,7 @@ namespace wrench {
             std::map<std::string, std::string> property_list,
             std::map<std::string, std::string> messagepayload_list,
             std::string suffix) :
-            StorageService(std::move(hostname), "simple" + suffix, "simple" + suffix, capacity) {
+            StorageService(std::move(hostname), "simple_storage" + suffix, "simple_storage" + suffix, capacity) {
 
       this->setProperties(this->default_property_values, property_list);
       this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
