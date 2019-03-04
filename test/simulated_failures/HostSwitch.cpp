@@ -12,7 +12,7 @@
 #include <wrench/simulation/Simulation.h>
 #include <wrench-dev.h>
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(host_killer, "Log category for HostSwitch");
+XBT_LOG_NEW_DEFAULT_CATEGORY(host_switch, "Log category for HostSwitch");
 
 
 wrench::HostSwitch::HostSwitch(std::string host_on_which_to_run, double sleep_time, std::string host_to_switch, Action action) :

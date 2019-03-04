@@ -7,8 +7,8 @@
  * (at your option) any later version.
  */
 
-#ifndef WRENCH_HOSTKILLER_H
-#define WRENCH_HOSTKILLER_H
+#ifndef WRENCH_HOSTSWITCH_H
+#define WRENCH_HOSTSWITCH_H
 
 #include <wrench/services/Service.h>
 #include "wrench/simgrid_S4U_util/S4U_Daemon.h"
@@ -51,4 +51,4 @@ class HostSwitch : public Service {
 
 
 
-#endif //WRENCH_HOSTKILLER_H
+#endif //WRENCH_HOSTSWITCH_H

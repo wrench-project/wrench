@@ -16,6 +16,7 @@
 #include "HostSwitch.h"
 #include "wrench/services/helpers/ServiceFailureDetector.h"
 #include "SleeperVictim.h"
+#include "HostRandomRepeatSwitch.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(bare_metal_compute_service_simulated_failures_test, "Log category for BareMetalComputeServiceSimulatedFailuresTests");
 
@@ -34,6 +35,7 @@ public:
 
     void do_OneFailureCausingWorkUnitRestartOnAnotherHost_test();
     void do_OneFailureCausingWorkUnitRestartOnSameHost_test();
+    void do_RandomFailures_test();
 
 protected:
 
@@ -295,6 +297,134 @@ void BareMetalComputeServiceSimulatedFailuresTest::do_OneFailureCausingWorkUnitR
     // Create a WMS
     wrench::WMS *wms = nullptr;
     wms = simulation->add(new OneFailureCausingWorkUnitRestartOnSameHostTestWMS(this, stable_host, compute_service, storage_service));
+
+    wms->addWorkflow(workflow);
+
+    // Staging the input_file on the storage service
+    // Create a File Registry Service
+    ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(stable_host)));
+    ASSERT_NO_THROW(simulation->stageFiles({{input_file->getID(), input_file}}, storage_service));
+
+    // Running a "run a single task" simulation
+    ASSERT_NO_THROW(simulation->launch());
+
+    delete simulation;
+    free(argv[0]);
+    free(argv);
+}
+
+
+/**********************************************************************/
+/**                    RANDOM FAILURES                               **/
+/**********************************************************************/
+
+class RandomFailuresTestWMS : public wrench::WMS {
+
+public:
+    RandomFailuresTestWMS(BareMetalComputeServiceSimulatedFailuresTest *test,
+                                                      std::string &hostname, wrench::ComputeService *cs, wrench::StorageService *ss) :
+            wrench::WMS(nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
+        this->test = test;
+    }
+
+private:
+
+    BareMetalComputeServiceSimulatedFailuresTest *test;
+
+    int main() override {
+
+        // Create a job manager
+        std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+
+        for (int trial=0; trial < 100; trial++) {
+
+            double now = wrench::Simulation::getCurrentSimulatedDate();
+            // Starting a FailedHost1 random repeat switch!!
+            auto switch1 = std::shared_ptr<wrench::HostRandomRepeatSwitch>(
+                    new wrench::HostRandomRepeatSwitch("StableHost", trial*2+37, 10, 100, "FailedHost1"));
+            switch1->simulation = this->simulation;
+            switch1->start(switch1, true, false); // Daemonized, no auto-restart
+
+            // Starting a FailedHost2 random repeat switch!!
+            auto switch2 = std::shared_ptr<wrench::HostRandomRepeatSwitch>(
+                    new wrench::HostRandomRepeatSwitch("StableHost", trial*7+417, 10, 100, "FailedHost2"));
+            switch2->simulation = this->simulation;
+            switch2->start(switch2, true, false); // Daemonized, no auto-restart
+
+            // Add a task to the workflow
+            auto task = this->test->workflow->addTask("task_" + std::to_string(trial), 80, 1, 1, 1.0, 0);
+            task->addInputFile(this->test->input_file);
+            task->addOutputFile(this->test->output_file);
+
+            // Create a standard job
+            auto job = job_manager->createStandardJob(task, {{this->test->input_file, this->test->storage_service},
+                                                             {this->test->output_file, this->test->storage_service}});
+
+            // Submit the standard job to the compute service, making it sure it runs on FailedHost1
+            job_manager->submitJob(job, this->test->compute_service, {});
+
+            // Wait for a workflow execution event
+            std::unique_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
+            if (event->type != wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION) {
+                throw std::runtime_error("Unexpected workflow execution event!");
+            }
+
+            switch1->kill();
+            switch2->kill();
+            std::cerr << "######### " << (wrench::Simulation::getCurrentSimulatedDate() - now) << "\n";
+
+            wrench::Simulation::sleep(10.0);
+            this->test->workflow->removeTask(task);
+
+        }
+
+
+
+        return 0;
+    }
+};
+
+#if ((SIMGRID_VERSION_MAJOR == 3) && (SIMGRID_VERSION_MINOR == 22)) || ((SIMGRID_VERSION_MAJOR == 3) && (SIMGRID_VERSION_MINOR == 21) && (SIMGRID_VERSION_PATCH > 0))
+TEST_F(BareMetalComputeServiceSimulatedFailuresTest, RandomFailures) {
+#else
+    TEST_F(BareMetalComputeServiceSimulatedFailuresTest, DISABLED_RandomFailures) {
+#endif
+    DO_TEST_WITH_FORK(do_RandomFailures_test);
+}
+
+void BareMetalComputeServiceSimulatedFailuresTest::do_RandomFailures_test() {
+
+    // Create and initialize a simulation
+    auto *simulation = new wrench::Simulation();
+    int argc = 1;
+    auto argv = (char **) calloc(1, sizeof(char *));
+    argv[0] = strdup("failure_test");
+
+
+    simulation->init(&argc, argv);
+
+    // Setting up the platform
+    simulation->instantiatePlatform(platform_file_path);
+
+    // Get a hostname
+    std::string stable_host = "StableHost";
+
+    // Create a Compute Service that has access to two hosts
+    compute_service = simulation->add(
+            new wrench::BareMetalComputeService(stable_host,
+                                                (std::map<std::string, std::tuple<unsigned long, double>>){
+                                                        std::make_pair("FailedHost1", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)),
+                                                        std::make_pair("FailedHost2", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)),
+                                                },
+                                                100.0,
+                                                {}));
+
+    // Create a Storage Service
+    storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, 10000000000000.0));
+
+    // Create a WMS
+    wrench::WMS *wms = nullptr;
+    wms = simulation->add(new RandomFailuresTestWMS(this, stable_host, compute_service, storage_service));
 
     wms->addWorkflow(workflow);
 
