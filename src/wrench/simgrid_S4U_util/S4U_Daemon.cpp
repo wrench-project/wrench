@@ -110,22 +110,22 @@ namespace wrench {
     /**
      * \cond
      */
-    static int daemon_goodbye(int x, void *service_instance) {
-        WRENCH_INFO("Terminating");
-        if (service_instance == nullptr) {
-            return 0;
-        }
-        auto service = reinterpret_cast<S4U_Daemon *>(service_instance);
-
-        // Call cleanup
-        service->cleanup(service->hasReturnedFromMain(), service->getReturnValue());
-
-        // Free memory for the object unless the service is set to auto-restart
-        if (not service->isSetToAutoRestart()) {
-            delete service->life_saver;
-        }
-        return 0;
-    }
+//    static int daemon_goodbye(int x, void *service_instance) {
+//        WRENCH_INFO("Terminating");
+//        if (service_instance == nullptr) {
+//            return 0;
+//        }
+//        auto service = reinterpret_cast<S4U_Daemon *>(service_instance);
+//
+//        // Call cleanup
+//        service->cleanup(service->hasReturnedFromMain(), service->getReturnValue());
+//
+//        // Free memory for the object unless the service is set to auto-restart
+//        if (not service->isSetToAutoRestart()) {
+//            delete service->life_saver;
+//        }
+//        return 0;
+//    }
 
     /**
      * \endcond
@@ -183,7 +183,19 @@ namespace wrench {
             if (this->auto_restart) {
                 this->s4u_actor->set_auto_restart(true);
             }
-            this->s4u_actor->on_exit(daemon_goodbye, (void *) (this));
+//            this->s4u_actor->on_exit(daemon_goodbye, (void *) (this));
+            auto daemon_object = this;
+            this->s4u_actor->on_exit([daemon_object](bool failed) {
+                WRENCH_INFO("Terminating");
+                // Call cleanup
+                daemon_object->cleanup(daemon_object->hasReturnedFromMain(), daemon_object->getReturnValue());
+
+                // Free memory for the object unless the service is set to auto-restart
+                if (not daemon_object->isSetToAutoRestart()) {
+                    delete daemon_object->life_saver;
+                }
+                return 0;
+            });
         }
 
         // Set the mailbox_name receiver (causes memory leak)

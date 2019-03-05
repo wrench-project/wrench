@@ -24,7 +24,7 @@ namespace wrench {
     S4U_VirtualMachine::S4U_VirtualMachine(const std::string &vm_hostname, const std::string &pm_hostname,
                                            unsigned long num_cores, double ram_memory) {
 
-      this->vm = new simgrid::s4u::VirtualMachine(vm_hostname.c_str(),
+      this->vm = new simgrid::s4u::VirtualMachine(vm_hostname,
                                                   simgrid::s4u::Host::by_name(pm_hostname),
                                                   (int)num_cores,
                                                   (size_t)ram_memory);

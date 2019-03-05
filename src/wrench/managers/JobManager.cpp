@@ -223,8 +223,8 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     PilotJob *JobManager::createPilotJob() {
-      PilotJob *raw_ptr = new PilotJob(this->wms->workflow);
-      std::unique_ptr<WorkflowJob> job = std::unique_ptr<PilotJob>(raw_ptr);
+      auto raw_ptr = new PilotJob(this->wms->workflow);
+      auto job = std::unique_ptr<PilotJob>(raw_ptr);
       this->jobs[raw_ptr] = std::move(job);
       return raw_ptr;
     }

@@ -87,7 +87,7 @@ namespace wrench {
     void S4U_Simulation::setupPlatform(std::string &filename) {
 
         // TODO: One day, perhaps SimGrid will throw an exception here...
-        this->engine->load_platform(filename.c_str());
+        this->engine->load_platform(filename);
         this->platform_setup = true;
     }
 
@@ -264,7 +264,7 @@ namespace wrench {
         double capacity_value = ComputeService::ALL_RAM;
 
         for (auto const &tag : tags) {
-            const char *capacity_string = host->get_property(tag.c_str());
+            const char *capacity_string = host->get_property(tag);
             if (capacity_string) {
                 if (capacity_value != ComputeService::ALL_RAM) {
                     throw std::invalid_argument("S4U_Simulation::getHostMemoryCapacity(): Host '" + std::string(host->get_cname()) + "' has multiple memory capacity specifications");
@@ -287,7 +287,7 @@ namespace wrench {
      */
     std::string S4U_Simulation::getHostProperty(std::string hostname, std::string property_name) {
         std::cerr << "The host is " << hostname << " and the property to look for is " << property_name << "\n";
-        return simgrid::s4u::Host::by_name(hostname)->get_property(property_name.c_str());
+        return simgrid::s4u::Host::by_name(hostname)->get_property(property_name);
     }
 
     /**

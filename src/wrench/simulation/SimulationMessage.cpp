@@ -20,7 +20,7 @@ namespace wrench {
      * @param payload: message size in bytes
      */
     SimulationMessage::SimulationMessage(std::string name, double payload) {
-      if ((name == "") || (payload < 0)) {
+      if ((name.empty()) || (payload < 0)) {
         throw std::invalid_argument("SimulationMessage::SimulationMessage(): Invalid arguments");
       }
       this->name = name;
