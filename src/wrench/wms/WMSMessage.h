@@ -32,7 +32,7 @@ namespace wrench {
      */
     class AlarmWMSDeferredStartMessage : public WMSMessage {
     public:
-        AlarmWMSDeferredStartMessage(double payload);
+        explicit AlarmWMSDeferredStartMessage(double payload);
 
     };
 
