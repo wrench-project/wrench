@@ -516,8 +516,9 @@ namespace wrench {
             host_state_monitor->start(host_state_monitor, true, false); // Daemonized, no auto-restart
         }
 
-        std::function<void(simgrid::s4u::Host &h)> host_back_on_function = std::bind(&BareMetalComputeService::someHostIsBackOn, this, std::placeholders::_1);
-        simgrid::s4u::Host::on_state_change.connect(host_back_on_function);
+//        std::function<void(simgrid::s4u::Host &h)> host_back_on_function = std::bind(&BareMetalComputeService::someHostIsBackOn, this, std::placeholders::_1);
+//        simgrid::s4u::Host::on_state_change.connect(host_back_on_function);
+        simgrid::s4u::Host::on_state_change.connect([this](simgrid::s4u::Host &h) { this->someHostIsBackOn(h);});
 
 
         // Set an alarm for my timely death, if necessary

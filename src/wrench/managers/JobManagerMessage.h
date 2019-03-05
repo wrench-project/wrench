@@ -28,7 +28,7 @@ namespace wrench {
      */
     class JobManagerMessage : public SimulationMessage {
     protected:
-        JobManagerMessage(std::string name);
+        explicit JobManagerMessage(std::string name);
     };
 
     class JobManagerStandardJobDoneMessage : public JobManagerMessage {

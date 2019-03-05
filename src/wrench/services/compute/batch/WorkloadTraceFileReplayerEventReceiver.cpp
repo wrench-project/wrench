@@ -36,7 +36,7 @@ namespace wrench {
           event = this->getWorkflow()->waitForNextExecutionEvent();
           switch (event->type) {
             case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-              wrench::StandardJobCompletedEvent *real_event = dynamic_cast<wrench::StandardJobCompletedEvent *>(event.get());
+              auto real_event = dynamic_cast<wrench::StandardJobCompletedEvent *>(event.get());
               job = real_event->standard_job;
               // success, do nothing
               WRENCH_INFO("Received job completion notification");
@@ -44,7 +44,7 @@ namespace wrench {
             }
             case wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
               // failure, do nothing
-              wrench::StandardJobFailedEvent *real_event = dynamic_cast<wrench::StandardJobFailedEvent *>(event.get());
+              auto real_event = dynamic_cast<wrench::StandardJobFailedEvent *>(event.get());
               job = real_event->standard_job;
               WRENCH_INFO("Received job failure notification: %s",
                           real_event->failure_cause->toString().c_str());
@@ -58,6 +58,8 @@ namespace wrench {
           }
         } catch (wrench::WorkflowExecutionException &e) {
           //ignore (network error or something)
+          return 0;
+
         }
 
         // Remove tasks that correspond to the job
@@ -67,6 +69,7 @@ namespace wrench {
 
         this->job_manager->forgetJob(job);
       }
+      return 0;
 
     }
 };

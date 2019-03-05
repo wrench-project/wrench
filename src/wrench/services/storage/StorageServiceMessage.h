@@ -266,7 +266,7 @@ namespace wrench {
     */
     class StorageServiceFileContentMessage : public StorageServiceMessage {
     public:
-        StorageServiceFileContentMessage(WorkflowFile *file);
+        explicit StorageServiceFileContentMessage(WorkflowFile *file);
 
         /** @brief The file */
         WorkflowFile *file;

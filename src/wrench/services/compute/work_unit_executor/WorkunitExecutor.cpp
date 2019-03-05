@@ -285,8 +285,8 @@ namespace wrench {
                                           this->scratch_space, files_stored_in_scratch, job);
                 task->setReadInputEndDate(S4U_Simulation::getClock());
             } catch (WorkflowExecutionException &e) {
+                WRENCH_INFO("I AM HERE AND IT'S UNCLEAR WHAT TO DO (I SHOULD BE IN ON_EXIT!!");
                 // TODO: ASK RYAN IF THIS IS RIGHT!
-                WRENCH_INFO("I AM HERE AND IT'S UNCLEAR WHAT TO DO");
                 this->failure_timestamp_should_be_generated = true;
                 throw;
             }
@@ -449,8 +449,8 @@ namespace wrench {
 
             if (!success) {
                 WRENCH_INFO("Failed to create some compute threads...");
-                // TODO: Dangerous to kill these now? (this was commented out below)
-                for (auto ct : this->compute_threads) {
+                // TODO: Dangerous to kill these now? (this was commented out before, but seems legit)
+                for (auto const &ct : this->compute_threads) {
                     ct->kill();
                 }
                 this->releaseDaemonLock();
