@@ -47,6 +47,14 @@ namespace wrench {
         /** \endcond           */
         /***********************/
 
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        virtual ~StandardJobScheduler() = default;
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
         /**
          * @brief A method that schedules tasks (as part of standard jobs), according to whatever decision algorithm
          *        it implements, over a set of compute services
