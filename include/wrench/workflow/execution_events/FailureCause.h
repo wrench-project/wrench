@@ -81,6 +81,14 @@ namespace wrench {
 
         explicit FailureCause(CauseType cause);
 
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        virtual ~FailureCause() = default;
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
 
         /**
          * @brief Return an error message that describes the failure cause (to be overridden)

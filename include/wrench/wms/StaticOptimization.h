@@ -15,7 +15,7 @@ namespace wrench {
     class Workflow;
 
     /***********************/
-    /** \cond DEVELOPER */
+    /** \cond DEVELOPER    */
     /***********************/
 
     /**
