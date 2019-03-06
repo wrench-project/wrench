@@ -55,14 +55,6 @@ namespace wrench {
          */
         virtual void schedulePilotJobs(const std::set<ComputeService *> &compute_services) = 0;
 
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
-        virtual ~PilotJobScheduler() = default;
-        /***********************/
-        /** \endcond           */
-        /***********************/
-
         /**
          * @brief Get the data movement manager to be used by this scheduler (nullptr: none is used)
          * @return a data movement manager
