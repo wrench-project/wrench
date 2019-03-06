@@ -32,7 +32,13 @@ namespace wrench {
          * @param workflow: the workflow
          */
         virtual void process(Workflow *workflow) = 0;
-    };
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        virtual ~DynamicOptimization() = default;
+        /***********************/
+        /** \endcond           */
+        /***********************/    };
 
     /***********************/
     /** \endcond           */

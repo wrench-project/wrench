@@ -89,6 +89,14 @@ namespace wrench {
          */
         virtual std::string toString() = 0;
 
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        virtual ~FailureCause() = default;
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
         CauseType getCauseType();
 
     private:
@@ -396,6 +404,7 @@ namespace wrench {
         /** \cond INTERNAL     */
         /***********************/
         HostError(std::string hostname);
+
         /***********************/
         /** \endcond           */
         /***********************/
