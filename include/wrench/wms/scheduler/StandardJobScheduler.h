@@ -39,6 +39,13 @@ namespace wrench {
           this->data_movement_manager = nullptr;
           this->job_manager = nullptr;
         }
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        virtual ~StandardJobScheduler() = default;
+        /***********************/
+        /** \endcond           */
+        /***********************/
 
         /**
          * @brief A method that schedules tasks (as part of standard jobs), according to whatever decision algorithm
