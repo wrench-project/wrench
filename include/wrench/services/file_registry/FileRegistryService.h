@@ -83,7 +83,7 @@ namespace wrench {
         /** \cond INTERNAL          */
         /****************************/
 
-        ~FileRegistryService();
+        ~FileRegistryService() override;
         /****************************/
         /** \endcond                */
         /****************************/
@@ -102,7 +102,7 @@ namespace wrench {
 
         bool removeEntryFromDatabase(WorkflowFile *file, StorageService *storage_service);
 
-        int main();
+        int main() override;
 
         bool processNextMessage();
 

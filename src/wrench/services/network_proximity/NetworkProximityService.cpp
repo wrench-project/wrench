@@ -434,7 +434,7 @@ namespace wrench {
 
       // if both coordinates are at the origin, we need a random direction vector
       if (estimated_distance == 0.0) {
-        // TODO: maybe use time(0) from <ctime> as seed
+        // TODO: maybe use time(0) from <ctime> as seed: This is just done once! Or just use master_rng?
         static std::default_random_engine direction_rng(0);
         static std::uniform_real_distribution<double> dir_dist(-0.00000000001, 0.00000000001);
 

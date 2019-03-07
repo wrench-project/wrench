@@ -68,7 +68,7 @@ namespace wrench {
         /** \cond INTERNAL    **/
         /***********************/
 
-        ~SimpleStorageService();
+        ~SimpleStorageService() override;
 
         /***********************/
         /** \endcond          **/

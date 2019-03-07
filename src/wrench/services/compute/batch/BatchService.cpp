@@ -594,9 +594,9 @@ namespace wrench {
 #ifdef ENABLE_BATSCHED
         this->notifyJobEventsToBatSched(job_id, "TIMEOUT", "COMPLETED_FAILED", "", "JOB_COMPLETED");
         BatchJob *batch_job = nullptr;
-        for (auto it = this->all_jobs.begin(); it != this->all_jobs.end(); it++) {
-            if ((*it)->getWorkflowJob() == job) {
-                batch_job = (*it).get();
+        for (auto const &j : this->all_jobs) {
+            if (j->getWorkflowJob() == job) {
+                batch_job = j.get();
                 break;
             }
         }
@@ -814,7 +814,7 @@ namespace wrench {
                         target_slack = tentative_target_slack;
                     }
                 }
-                if (target_host == "") {
+                if (target_host.empty()) {
                     WRENCH_INFO("Didn't find a suitable host");
                     resources = {};
                     std::vector<std::string>::iterator it;
@@ -994,12 +994,12 @@ namespace wrench {
         {
             std::vector<BatchJob *> to_erase;
 
-            for (auto it2 = this->waiting_jobs.begin(); it2 != this->waiting_jobs.end(); it2++) {
-                WorkflowJob *workflow_job = (*it2)->getWorkflowJob();
+            for (auto const &wj : this->waiting_jobs) {
+                WorkflowJob *workflow_job = wj->getWorkflowJob();
                 if (workflow_job->getType() == WorkflowJob::STANDARD) {
-                    to_erase.push_back(*it2);
+                    to_erase.push_back(wj);
                     auto *job = (StandardJob *) workflow_job;
-                    this->sendStandardJobFailureNotification(job, std::to_string((*it2)->getJobID()),
+                    this->sendStandardJobFailureNotification(job, std::to_string(wj->getJobID()),
                                                              std::shared_ptr<FailureCause>(new JobKilled(workflow_job, this)));
                 }
             }
@@ -1394,9 +1394,9 @@ namespace wrench {
 
         // Remove the job from the running job list
         BatchJob *batch_job = nullptr;
-        for (auto it = this->running_jobs.begin(); it != this->running_jobs.end(); it++) {
-            if ((*it)->getWorkflowJob() == job) {
-                batch_job = (*it);
+        for (auto const &rj : this->running_jobs) {
+            if (rj->getWorkflowJob() == job) {
+                batch_job = rj;
                 break;
             }
         }
@@ -1747,7 +1747,7 @@ namespace wrench {
             }
 
             case WorkflowJob::PILOT: {
-                PilotJob *job = (PilotJob *) workflow_job;
+                auto job = (PilotJob *) workflow_job;
                 WRENCH_INFO("Allocating %ld nodes with %ld cores per node to a pilot job for %.2lf seconds",
                             num_nodes_allocated, cores_per_node_asked_for, allocated_time);
 
@@ -2249,7 +2249,7 @@ namespace wrench {
                 (args = (char **) realloc(args, (num_args + 1) * sizeof(char *)))[num_args] =
                         strdup("--policy=contiguous"); num_args++;
             }
-            (args = (char **)realloc(args, (num_args+1)*sizeof(char*)))[num_args] = NULL;
+            (args = (char **)realloc(args, (num_args+1)*sizeof(char*)))[num_args] = nullptr;
 
             if (execvp(args[0], (char **) args) == -1) {
                 exit(3);
@@ -2283,7 +2283,7 @@ namespace wrench {
                     } else if (nested_pid == 0) {
                         char foo;
                         close(tether[1]); // closing write end
-                        int returned = read(tether[0], &foo, 1); // blocking read which returns when the parent dies
+                        read(tether[0], &foo, 1); // blocking read which returns when the parent dies
                         //check if the child that forked batsched is still running
                         if (getpgid(top_pid)) {
                             kill(top_pid, SIGKILL); //kill the other child that has fork-exec'd batsched

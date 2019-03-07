@@ -60,7 +60,7 @@ namespace wrench{
          */
         static constexpr double NOT_AVAILABLE = DBL_MAX;
 
-        ~NetworkProximityService();
+        ~NetworkProximityService() override;
 
         /***********************/
         /** \endcond           */
@@ -97,7 +97,7 @@ namespace wrench{
 
         std::default_random_engine master_rng;
 
-        int main();
+        int main() override;
 
         bool processNextMessage();
 
