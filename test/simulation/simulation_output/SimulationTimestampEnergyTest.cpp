@@ -7,6 +7,9 @@
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
 
+XBT_LOG_NEW_DEFAULT_CATEGORY(test_energy, "Log category for SimulationTimestampEnergyTest");
+
+
 class SimulationTimestampEnergyTest: public ::testing::Test {
 public:
     std::unique_ptr<wrench::Workflow> workflow;
@@ -284,6 +287,9 @@ private:
         const double MEGAFLOP = 1000.0 * 1000.0;
         wrench::S4U_Simulation::compute(100.0 * 100.0 * MEGAFLOP); // compute for 100 seconds
 
+        // Sleep 1 second to avoid having the power meters dying right when
+        // The WMS is dying to, i.e., right when the simulation is terminating.
+        wrench::Simulation::sleep(1.0);
         return 0;
     }
 };
@@ -365,7 +371,7 @@ void SimulationTimestampEnergyTest::do_EnergyMeterSingleMeasurementPeriod_test()
 
     // host2 is idle for 100 seconds, and records timestamps in 10 second intervals, so
     // we should end up with 10 timestamps (starting with time 0)
-    ASSERT_EQ(10, host2_timestamps.size());
+    ASSERT_EQ(11, host2_timestamps.size());
 
     // expected values (timestamp, consumption)
     std::vector<std::pair<double, double>> host2_expected_timestamps = {
@@ -378,7 +384,8 @@ void SimulationTimestampEnergyTest::do_EnergyMeterSingleMeasurementPeriod_test()
             {60,   6000},
             {70,   7000},
             {80,   8000},
-            {90,   9000}
+            {90,   9000},
+            {100,   10000}
     };
 
     for (size_t i = 0; i < host2_timestamps.size(); ++i) {
