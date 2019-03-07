@@ -42,7 +42,7 @@ namespace wrench {
 		public:
 
 
-				void stop();
+				void stop() override;
 
 				void kill();
 
@@ -75,13 +75,13 @@ namespace wrench {
 				/** \cond INTERNAL    */
 				/***********************/
 
-				~JobManager();
+				~JobManager() override;
 
 		protected:
 
 				friend class WMS;
 
-				JobManager(WMS *wms);
+				explicit JobManager(WMS *wms);
 
 				/***********************/
 				/** \endcond           */
@@ -89,7 +89,7 @@ namespace wrench {
 
 		private:
 
-				int main();
+				int main() override;
 
 				// Relevant WMS
 				WMS *wms;

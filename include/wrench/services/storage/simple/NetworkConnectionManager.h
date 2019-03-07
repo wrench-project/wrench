@@ -27,7 +27,7 @@ namespace wrench {
     class NetworkConnectionManager {
 
     public:
-        NetworkConnectionManager(unsigned long max_num_data_connections);
+        explicit NetworkConnectionManager(unsigned long max_num_data_connections);
 
         void addConnection(std::unique_ptr<NetworkConnection> connection);
 

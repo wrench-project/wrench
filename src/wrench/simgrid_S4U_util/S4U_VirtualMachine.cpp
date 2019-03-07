@@ -24,14 +24,14 @@ namespace wrench {
     S4U_VirtualMachine::S4U_VirtualMachine(const std::string &vm_hostname, const std::string &pm_hostname,
                                            unsigned long num_cores, double ram_memory) {
 
-      this->vm = new simgrid::s4u::VirtualMachine(vm_hostname,
-                                                  simgrid::s4u::Host::by_name(pm_hostname),
-                                                  (int)num_cores,
-                                                  (size_t)ram_memory);
+        this->vm = new simgrid::s4u::VirtualMachine(vm_hostname,
+                                                    simgrid::s4u::Host::by_name(pm_hostname),
+                                                    (int)num_cores,
+                                                    (size_t)ram_memory);
 
-      // TODO: Why is this call below needed? The RAM size is passed to the constructor above...
-      this->vm->set_ramsize((size_t)ram_memory);
-      start();
+        // Henri commented out the call below because The RAM size is passed to the constructor above...
+        // this->vm->set_ramsize((size_t)ram_memory);
+        start();
     }
 
     /**
@@ -40,7 +40,7 @@ namespace wrench {
      * @return a pointer to the simgrid::s4u::VirtualMachine object
      */
     simgrid::s4u::VirtualMachine *S4U_VirtualMachine::get() {
-      return this->vm;
+        return this->vm;
     }
 
     /**
@@ -48,42 +48,42 @@ namespace wrench {
      * @return a pointer to the physical machine host
      */
     simgrid::s4u::Host *S4U_VirtualMachine::getPm() {
-      return this->vm->get_pm();
+        return this->vm->get_pm();
     }
 
     /**
      * @brief Start the virtual machine
      */
     void S4U_VirtualMachine::start() {
-      this->vm->start();
+        this->vm->start();
     }
 
     /**
      * @brief Suspend the virtual machine
      */
     void S4U_VirtualMachine::suspend() {
-      this->vm->suspend();
+        this->vm->suspend();
     }
 
     /**
      * @brief Resume the virtual machine
      */
     void S4U_VirtualMachine::resume() {
-      this->vm->resume();
+        this->vm->resume();
     }
 
     /**
      * @brief Shutdown the virtual machine
      */
     void S4U_VirtualMachine::shutdown() {
-      this->vm->shutdown();
+        this->vm->shutdown();
     }
 
     /**
      * @brief Stop the virtual machine
      */
     void S4U_VirtualMachine::stop() {
-      this->vm->destroy();
+        this->vm->destroy();
     }
 
     /**
@@ -91,7 +91,7 @@ namespace wrench {
      * @return True if the VM is running, false otherwise
      */
     bool S4U_VirtualMachine::isRunning() {
-      return this->vm->get_state() == simgrid::s4u::VirtualMachine::state::RUNNING;
+        return this->vm->get_state() == simgrid::s4u::VirtualMachine::state::RUNNING;
     }
 
     /**
@@ -99,6 +99,6 @@ namespace wrench {
      * @return True if the VM is suspended, false otherwise
      */
     bool S4U_VirtualMachine::isSuspended() {
-      return this->vm->get_state() == simgrid::s4u::VirtualMachine::state::SUSPENDED;
+        return this->vm->get_state() == simgrid::s4u::VirtualMachine::state::SUSPENDED;
     }
 }

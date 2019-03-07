@@ -53,7 +53,7 @@ namespace wrench {
         std::string next_host_to_send;
         std::string network_proximity_service_mailbox;
 
-        int main();
+        int main() override;
 
         double getTimeUntilNextMeasurement();
 
