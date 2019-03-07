@@ -80,12 +80,13 @@ namespace wrench {
     }
 
     void WorkunitExecutor::cleanup(bool has_returned_from_main, int return_value) {
-        WRENCH_DEBUG("In on_exit.cleanup(): WorkunitExecutor: %s has_returned_from_main = %d (return_value = %d, job terminated = %d)",
-                this->getName().c_str(), has_returned_from_main, return_value, this->terminated_due_job_being_forcefully_terminated);
-        if ((not has_returned_from_main) and (not this->task_failure_time_stamp_has_already_been_generated)) {
+        WRENCH_INFO("In on_exit.cleanup(): WorkunitExecutor: %s has_returned_from_main = %d (return_value = %d, job terminated = %d)",
+                     this->getName().c_str(), has_returned_from_main, return_value, this->terminated_due_job_being_forcefully_terminated);
+        if ((not has_returned_from_main) and (this->task_start_timestamp_has_been_inserted) and
+            (not this->task_failure_time_stamp_has_already_been_generated)) {
             if (this->workunit->task != nullptr) {
                 WorkflowTask *task = this->workunit->task;
-                    task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
+                task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
                 if (not this->terminated_due_job_being_forcefully_terminated) {
                     task->setFailureDate(S4U_Simulation::getClock());
                     this->simulation->getOutput().addTimestamp<SimulationTimestampTaskFailure>(
@@ -173,12 +174,12 @@ namespace wrench {
         WRENCH_INFO("Work unit executor on host %s terminating!", S4U_Simulation::getHostName().c_str());
         if (this->failure_timestamp_should_be_generated) {
             if (this->workunit->task != nullptr) {
-                this->task_failure_time_stamp_has_already_been_generated = true;
                 WorkflowTask *task = this->workunit->task;
                 task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
                 task->setFailureDate(S4U_Simulation::getClock());
                 auto ts = new SimulationTimestampTaskFailure(task);
                 this->simulation->getOutput().addTimestamp<SimulationTimestampTaskFailure>(ts);
+                this->task_failure_time_stamp_has_already_been_generated = true;
             }
         }
 
@@ -275,6 +276,7 @@ namespace wrench {
 
             this->simulation->getOutput().addTimestamp<SimulationTimestampTaskStart>(new
                                                                                              SimulationTimestampTaskStart(task));
+            this->task_start_timestamp_has_been_inserted = true;
 
             // Read  all input files
             WRENCH_INFO("Reading the %ld input files for task %s", task->getInputFiles().size(), task->getID().c_str());
@@ -285,14 +287,14 @@ namespace wrench {
                                           this->scratch_space, files_stored_in_scratch, job);
                 task->setReadInputEndDate(S4U_Simulation::getClock());
             } catch (WorkflowExecutionException &e) {
-                WRENCH_INFO("I AM HERE AND IT'S UNCLEAR WHAT TO DO (I SHOULD BE IN ON_EXIT!!");
-                // TODO: ASK RYAN IF THIS IS RIGHT!
+                WRENCH_INFO("I AM HERE AND IT'S UNCLEAR WHAT TO DO (SIMGRID BUG: I SHOULD BE IN ON_EXIT AND NOT IN HERE!!");
                 this->failure_timestamp_should_be_generated = true;
                 throw;
             }
 
             // Run the task's computation (which can be multicore)
-            WRENCH_INFO("Executing task %s (%lf flops) on %ld cores (%s)", task->getID().c_str(), task->getFlops(), this->num_cores, S4U_Simulation::getHostName().c_str());
+            WRENCH_INFO("Executing task %s (%lf flops) on %ld cores (%s)", task->getID().c_str(), task->getFlops(),
+                        this->num_cores, S4U_Simulation::getHostName().c_str());
 
             try {
                 task->setComputationStartDate(S4U_Simulation::getClock());
@@ -314,7 +316,6 @@ namespace wrench {
                 task->setWriteOutputEndDate(S4U_Simulation::getClock());
             } catch (WorkflowExecutionException &e) {
                 this->failure_timestamp_should_be_generated = true;
-
                 throw;
             }
 
@@ -449,7 +450,7 @@ namespace wrench {
 
             if (!success) {
                 WRENCH_INFO("Failed to create some compute threads...");
-                // TODO: Dangerous to kill these now? (this was commented out before, but seems legit)
+                // TODO: Dangerous to kill these now? (this was commented out before, but seems legit, so Henri uncommented them)
                 for (auto const &ct : this->compute_threads) {
                     ct->kill();
                 }

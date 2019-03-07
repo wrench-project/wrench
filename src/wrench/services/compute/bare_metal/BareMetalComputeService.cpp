@@ -890,7 +890,7 @@ namespace wrench {
         this->all_workunits[job].clear();
         this->all_workunits.erase(job);
 
-        /** Deal with task states (NO LONGER NECESSARY AS WUEs HAVE CLEANUP() FUNCTION!! */
+        /** Deal with task states (note that simulation timestamps are set in the clean() function) */
 //        for (auto &task : job->getTasks()) {
 //            if (task->getInternalState() == WorkflowTask::InternalState::TASK_RUNNING) {
 //                if (termination_cause == BareMetalComputeService::JobTerminationCause::TERMINATED) {
@@ -899,12 +899,10 @@ namespace wrench {
 ////                            new SimulationTimestampTaskTerminated(task));
 //
 //                } else if (termination_cause == BareMetalComputeService::JobTerminationCause::COMPUTE_SERVICE_KILLED) {
-//                    // TODO: THIS LIKELY DUPLICATES THE STUFF DONE IN CLEANUP
 ////                    task->setFailureDate(S4U_Simulation::getClock());
 ////                    this->simulation->getOutput().addTimestamp<SimulationTimestampTaskFailure>(
 ////                            new SimulationTimestampTaskFailure(task));
 //                }
-//                // TODO: HOW DO WE KNOW THIS IS DONE BEFORE WE GET HERE
 ////                task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
 //            }
 //        }

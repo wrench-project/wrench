@@ -106,7 +106,7 @@ namespace wrench {
             double sub_time = -1;
             int requested_num_nodes = -1;
             int num_nodes = -1;
-            for (auto item:tokens) {
+            for (auto const &item : tokens) {
               switch (itemnum) {
                 case 0: // Job ID
                   id = item;

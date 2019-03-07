@@ -21,7 +21,7 @@ namespace wrench {
 
     public:
 
-        void stop();
+        void stop() override;
         void kill();
 
     protected:
@@ -33,7 +33,7 @@ namespace wrench {
 
 
     private:
-        int main();
+        int main() override;
         bool processNextMessage(double timeout);
 
 

@@ -477,8 +477,7 @@ namespace wrench {
 
 //        std::cerr << "CREATING A WORKUNIT EXECUTOR\n";
 
-        // TODO: WAS THIS USEFUL????
-
+        // TODO: WAS THIS USEFUL BELOW? Henri has commented it out for now
 //        WorkflowJob* workflow_job = job;
 //        if (this->part_of_pilot_job) {
 //          workflow_job = this->parent_pilot_job;s
