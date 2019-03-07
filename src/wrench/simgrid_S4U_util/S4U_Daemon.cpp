@@ -219,6 +219,8 @@ namespace wrench {
         try {
             this->num_starts++;
             try {
+                // Compute zero flop so that nothing happens
+                // until the host has a >0 pstate
                 S4U_Simulation::computeZeroFlop();
                 this->return_value = this->main();
                 this->has_returned_from_main = true;
@@ -227,7 +229,6 @@ namespace wrench {
             } catch (simgrid::HostFailureException &e) {
                 // In case the main() didn't to that catch
             }
-//            wrench::S4U_Simulation::sleep(0.0000);
         } catch (std::exception &e) {
             throw;
         }
