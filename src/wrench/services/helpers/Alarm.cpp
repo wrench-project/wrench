@@ -47,7 +47,7 @@ namespace wrench {
      */
     int Alarm::main() {
       TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
-      WRENCH_INFO("Alarm Service starting on host %s!", S4U_Simulation::getHostName().c_str());
+      WRENCH_INFO("Alarm Service starting");
 
       double time_to_sleep = this->date - S4U_Simulation::getClock();
 
@@ -62,7 +62,6 @@ namespace wrench {
         }
       }
 
-      WRENCH_INFO("Alarm Service on host %s terminated!", S4U_Simulation::getHostName().c_str());
       this->setStateToDown();
       return 0;
     }
@@ -88,7 +87,7 @@ namespace wrench {
               new Alarm(date, hostname, reply_mailbox_name, msg, suffix));
       alarm_ptr->simulation = simulation;
       try {
-        alarm_ptr->start(alarm_ptr, true); // daemonize
+        alarm_ptr->start(alarm_ptr, true, false); // Daemonized, no auto-restart
       } catch (std::invalid_argument &e) {
         throw;
       }

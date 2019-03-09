@@ -189,11 +189,11 @@ namespace wrench {
                                                                         this->running_jobs,
                                                                         this->pending_jobs, this->mailbox_name);
           negotiator->simulation = this->simulation;
-          negotiator->start(negotiator, true);
+          negotiator->start(negotiator, true, false); // Daemonized, no auto-restart
         }
       }
 
-      WRENCH_INFO("HTCondorCentralManager Service on host %s terminated!", S4U_Simulation::getHostName().c_str());
+      WRENCH_INFO("HTCondorCentralManager Service on host %s cleanly terminating!", S4U_Simulation::getHostName().c_str());
       return 0;
     }
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2019. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,12 +32,12 @@ namespace wrench {
      * \cond
      */
     void signal_handler(int signal) {
-      if (signal == SIGABRT) {
-        std::cerr << "[ ABORTING ]" << std::endl;
-        std::_Exit(EXIT_FAILURE);
-      } else {
-        std::cerr << "Unexpected signal " << signal << " received\n";
-      }
+        if (signal == SIGABRT) {
+            std::cerr << "[ ABORTING ]" << std::endl;
+            std::_Exit(EXIT_FAILURE);
+        } else {
+            std::cerr << "Unexpected signal " << signal << " received\n";
+        }
     }
     /**
      * \endcond
@@ -48,17 +48,17 @@ namespace wrench {
      */
     Simulation::Simulation() {
 
-      // Customize the logging format
-      xbt_log_control_set("root.fmt:[%d][%h:%t(%i)]%e%m%n");
+        // Customize the logging format
+        xbt_log_control_set("root.fmt:[%d][%h:%t(%i)]%e%m%n");
 
-      // Setup the SIGABRT handler
-      auto previous_handler = std::signal(SIGABRT, signal_handler);
-      if (previous_handler == SIG_ERR) {
-        std::cerr << "SIGABRT handler setup failed... uncaught exceptions will lead to unclean terminations\n";
-      }
+        // Setup the SIGABRT handler
+        auto previous_handler = std::signal(SIGABRT, signal_handler);
+        if (previous_handler == SIG_ERR) {
+            std::cerr << "SIGABRT handler setup failed... uncaught exceptions will lead to unclean terminations\n";
+        }
 
-      // Create the S4U simulation wrapper
-      this->s4u_simulation = std::unique_ptr<S4U_Simulation>(new S4U_Simulation());
+        // Create the S4U simulation wrapper
+        this->s4u_simulation = std::unique_ptr<S4U_Simulation>(new S4U_Simulation());
 
     }
 
@@ -66,8 +66,8 @@ namespace wrench {
      * @brief Destructor
      */
     Simulation::~Simulation() {
-      MessageManager::cleanUpAllMessages();
-      this->s4u_simulation->shutdown();
+        MessageManager::cleanUpAllMessages();
+        this->s4u_simulation->shutdown();
     }
 
     /**
@@ -81,99 +81,99 @@ namespace wrench {
      */
     void Simulation::init(int *argc, char **argv) {
 
-      if (*argc < 1) {
-        throw std::invalid_argument("Simulation::init(): Invalid argc argument (must be >= 1)");
-      }
-      if ((argv == nullptr) || (*argv == nullptr)) {
-        throw std::invalid_argument("Simulation::init(): Invalid argument argv (nullptr)");
-      }
-
-
-      // Extract WRENCH-specific argument
-      int i;
-      bool simgrid_help_requested = false;
-      bool wrench_help_requested = false;
-      bool simulator_help_requested = false;
-      bool version_requested = false;
-      bool wrench_no_log = false;
-
-      std::vector<std::string> cleanedup_args;
-
-      for (i = 0; i < *argc; i++) {
-        if (not strcmp(argv[i], "--wrench-no-color")) {
-          TerminalOutput::disableColor();
-        } else if (not strcmp(argv[i], "--wrench-no-log")) {
-          TerminalOutput::disableColor();
-          wrench_no_log = true;
-        } else if (not strcmp(argv[i], "--activate-energy")) {
-          sg_host_energy_plugin_init();
-        } else if (not strcmp(argv[i], "--help-wrench")) {
-          wrench_help_requested = true;
-        } else if (not strcmp(argv[i], "--help")) {
-          simulator_help_requested = true;
-        } else if (not strcmp(argv[i], "--help-simgrid")) {
-          simgrid_help_requested = true;
-        } else if (not strcmp(argv[i], "--version")) {
-          version_requested = true;
-        } else {
-          cleanedup_args.push_back(std::string(argv[i]));
+        if (*argc < 1) {
+            throw std::invalid_argument("Simulation::init(): Invalid argc argument (must be >= 1)");
         }
-      }
+        if ((argv == nullptr) || (*argv == nullptr)) {
+            throw std::invalid_argument("Simulation::init(): Invalid argument argv (nullptr)");
+        }
 
-      // Always activate VM migration plugin
-      sg_vm_live_migration_plugin_init();
 
-      if (wrench_help_requested) {
-        std::cout << "General WRENCH command-line arguments:\n";
-        std::cout << "   --wrench-no-color: disables colored terminal output\n";
-        std::cout << "   --wrench-no-log: disables logging\n";
-        std::cout << "     (use --help-logs for detailed help on SimGrid's logging options/syntax)\n";
-        std::cout << "   --activate-energy: activates SimGrid's energy plugin\n";
-        std::cout << "     (requires host pstate definitions in XML platform description file)\n";
-        std::cout << "   --help-simgrid: show full help on general Simgrid command-line arguments\n";
-        std::cout << "   --help-wrench: displays this help message\n";
-        std::cerr << "\n";
-      }
+        // Extract WRENCH-specific argument
+        int i;
+        bool simgrid_help_requested = false;
+        bool wrench_help_requested = false;
+        bool simulator_help_requested = false;
+        bool version_requested = false;
+        bool wrench_no_log = false;
 
-      *argc = 0;
-      for (auto a : cleanedup_args) {
-        argv[*argc] = strdup(a.c_str());
-        (*argc)++;
-      }
+        std::vector<std::string> cleanedup_args;
 
-      // If version requested, put back the "--version" argument
-      if (version_requested) {
-        std::cout << "WRENCH version " << getWRENCHVersionString() << "\n";
-        argv[*argc] = strdup("--version");
-        (*argc)++;
-      }
+        for (i = 0; i < *argc; i++) {
+            if (not strcmp(argv[i], "--wrench-no-color")) {
+                TerminalOutput::disableColor();
+            } else if (not strcmp(argv[i], "--wrench-no-log")) {
+                TerminalOutput::disableColor();
+                wrench_no_log = true;
+            } else if (not strcmp(argv[i], "--activate-energy")) {
+                sg_host_energy_plugin_init();
+            } else if (not strcmp(argv[i], "--help-wrench")) {
+                wrench_help_requested = true;
+            } else if (not strcmp(argv[i], "--help")) {
+                simulator_help_requested = true;
+            } else if (not strcmp(argv[i], "--help-simgrid")) {
+                simgrid_help_requested = true;
+            } else if (not strcmp(argv[i], "--version")) {
+                version_requested = true;
+            } else {
+                cleanedup_args.push_back(std::string(argv[i]));
+            }
+        }
 
-      // reconstruct argc/argv
+        // Always activate VM migration plugin
+        sg_vm_live_migration_plugin_init();
 
-      // If SimGrid help is requested, put back in a "--help" argument
-      if (simgrid_help_requested) {
-        argv[*argc] = strdup("--help");
-        (*argc)++;
-        std::cout << "\nSimgrid command-line arguments:\n\n";
-      }
+        if (wrench_help_requested) {
+            std::cout << "General WRENCH command-line arguments:\n";
+            std::cout << "   --wrench-no-color: disables colored terminal output\n";
+            std::cout << "   --wrench-no-log: disables logging\n";
+            std::cout << "     (use --help-logs for detailed help on SimGrid's logging options/syntax)\n";
+            std::cout << "   --activate-energy: activates SimGrid's energy plugin\n";
+            std::cout << "     (requires host pstate definitions in XML platform description file)\n";
+            std::cout << "   --help-simgrid: show full help on general Simgrid command-line arguments\n";
+            std::cout << "   --help-wrench: displays this help message\n";
+            std::cerr << "\n";
+        }
 
-      // If WRENCH no logging is requested, put back and convert it to a SimGrid argument
-      if (wrench_no_log) {
-        argv[*argc] = strdup("--log=root.threshold:critical");
-        (*argc)++;
-      }
+        *argc = 0;
+        for (auto a : cleanedup_args) {
+            argv[*argc] = strdup(a.c_str());
+            (*argc)++;
+        }
 
-      this->s4u_simulation->initialize(argc, argv);
+        // If version requested, put back the "--version" argument
+        if (version_requested) {
+            std::cout << "WRENCH version " << getWRENCHVersionString() << "\n";
+            argv[*argc] = strdup("--version");
+            (*argc)++;
+        }
 
-      if (wrench_help_requested) {
-        exit(0);
-      }
+        // reconstruct argc/argv
 
-      // If simulator help requested, put back in the "--help" argument that was passed down
-      if (simulator_help_requested) {
-        argv[*argc] = strdup("--help");
-        (*argc)++;
-      }
+        // If SimGrid help is requested, put back in a "--help" argument
+        if (simgrid_help_requested) {
+            argv[*argc] = strdup("--help");
+            (*argc)++;
+            std::cout << "\nSimgrid command-line arguments:\n\n";
+        }
+
+        // If WRENCH no logging is requested, put back and convert it to a SimGrid argument
+        if (wrench_no_log) {
+            argv[*argc] = strdup("--log=root.threshold:critical");
+            (*argc)++;
+        }
+
+        this->s4u_simulation->initialize(argc, argv);
+
+        if (wrench_help_requested) {
+            exit(0);
+        }
+
+        // If simulator help requested, put back in the "--help" argument that was passed down
+        if (simulator_help_requested) {
+            argv[*argc] = strdup("--help");
+            (*argc)++;
+        }
 
     }
 
@@ -185,16 +185,16 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void Simulation::instantiatePlatform(std::string filename) {
-      static bool already_setup = false;
+        static bool already_setup = false;
 
-      if (not this->s4u_simulation->isInitialized()) {
-        throw std::runtime_error("Simulation::instantiatePlatform(): Simulation is not initialized");
-      }
-      if (already_setup) {
-        throw std::runtime_error("Simulation::instantiatePlatform(): Platform already setup");
-      }
-      this->s4u_simulation->setupPlatform(filename);
-      already_setup = true;
+        if (not this->s4u_simulation->isInitialized()) {
+            throw std::runtime_error("Simulation::instantiatePlatform(): Simulation is not initialized");
+        }
+        if (already_setup) {
+            throw std::runtime_error("Simulation::instantiatePlatform(): Platform already setup");
+        }
+        this->s4u_simulation->setupPlatform(filename);
+        already_setup = true;
     }
 
     /**
@@ -204,7 +204,7 @@ namespace wrench {
      *
      */
     std::vector<std::string> Simulation::getHostnameList() {
-      return this->s4u_simulation->getAllHostnames();
+        return this->s4u_simulation->getAllHostnames();
     }
 
     /**
@@ -214,16 +214,7 @@ namespace wrench {
      *
      */
     std::map<std::string, std::vector<std::string>> Simulation::getHostnameListByCluster() {
-      return this->s4u_simulation->getAllHostnamesByCluster();
-    }
-
-    /**
-     * @brief Check that a hostname exists in the platform
-     * @param hostname: a host name
-     * @return true or false
-     */
-    bool Simulation::hostExists(std::string hostname) {
-      return this->s4u_simulation->hostExists(std::move(hostname));
+        return this->s4u_simulation->getAllHostnamesByCluster();
     }
 
     /**
@@ -233,29 +224,38 @@ namespace wrench {
 		 */
     void Simulation::launch() {
 
-      // Check that the simulation is correctly initialized
-      try {
-        this->checkSimulationSetup();
-      } catch (std::runtime_error &e) {
-        throw std::runtime_error("Simulation::launch(): " + std::string(e.what()));
-      }
+        // Check that the simulation is correctly initialized
+        try {
+            this->checkSimulationSetup();
+        } catch (std::runtime_error &e) {
+            throw std::runtime_error("Simulation::launch(): " + std::string(e.what()));
+        }
 
+        // Before starting the simulation, obtain the initial pstate of each host.
+        // By default, it will be 0 if it is not explicitly set in the platform file.
+        // Even if the energy-plugin is not activated, getCurrentPstate(hostname) can
+        // still be called.
+        for (const auto &hostname: this->getHostnameList()) {
+            this->getOutput().addTimestamp<SimulationTimestampPstateSet>(
+                    new SimulationTimestampPstateSet(hostname, getCurrentPstate(hostname))
+            );
+        }
 
-      // Start all services (and the WMS)
-      try {
-        this->startAllProcesses();
-      } catch (std::runtime_error &e) {
-        throw std::runtime_error("Simulation::launch(): " + std::string(e.what()));
-      }
+        // Start all services (and the WMS)
+        try {
+            this->startAllProcesses();
+        } catch (std::runtime_error &e) {
+            throw std::runtime_error("Simulation::launch(): " + std::string(e.what()));
+        }
 
-      this->is_running = true;
+        this->is_running = true;
 
-      // Run the simulation
-      try {
-        this->s4u_simulation->runSimulation();
-      } catch (std::runtime_error &e) {
-        throw;
-      }
+        // Run the simulation
+        try {
+            this->s4u_simulation->runSimulation();
+        } catch (std::runtime_error &e) {
+            throw;
+        }
     }
 
     /**
@@ -265,63 +265,63 @@ namespace wrench {
      */
     void Simulation::checkSimulationSetup() {
 
-      // Check that the simulation is initialized
-      if (not this->s4u_simulation->isInitialized()) {
-        throw std::runtime_error("Simulation is not initialized");
-      }
-
-      // Check that a platform has been setup
-      if (not this->s4u_simulation->isPlatformSetup()) {
-        throw std::runtime_error("Simulation platform has not been setup");
-      }
-
-      // Check that there is a WMS
-      if (this->wmses.empty()) {
-        throw std::runtime_error(
-                "A WMS should have been instantiated and passed to Simulation.setWMS()");
-      }
-
-      for (const auto &wms : this->wmses) {
-        if (wms->getWorkflow() == nullptr) {
-          throw std::runtime_error("The WMS on host '" + wms->getHostname() + "' was not given a workflow to execute");
+        // Check that the simulation is initialized
+        if (not this->s4u_simulation->isInitialized()) {
+            throw std::runtime_error("Simulation is not initialized");
         }
-      }
 
-      for (auto &wms : this->wmses) {
-        // Check that at least one StorageService is running (only needed if there are files in the workflow),
-        if (not wms->workflow->getFiles().empty()) {
-          bool one_storage_service_running = false;
-          for (const auto &storage_service : this->storage_services) {
-            if (storage_service->state == Service::UP) {
-              one_storage_service_running = true;
-              break;
-            }
-          }
-          if (not one_storage_service_running) {
+        // Check that a platform has been setup
+        if (not this->s4u_simulation->isPlatformSetup()) {
+            throw std::runtime_error("Simulation platform has not been setup");
+        }
+
+        // Check that there is a WMS
+        if (this->wmses.empty()) {
             throw std::runtime_error(
-                    "At least one StorageService should have been instantiated add passed to Simulation.add()");
-          }
+                    "A WMS should have been instantiated and passed to Simulation.setWMS()");
         }
 
-        // Check that a FileRegistryService is running if needed
-        if (not wms->workflow->getInputFiles().empty()) {
-          if (this->file_registry_services.empty()) {
-            throw std::runtime_error(
-                    "At least one FileRegistryService should have been instantiated and passed to Simulation.add()"
-                    "because there are workflow input files to be staged.");
-          }
-        }
-
-        // Check that each input file is staged on the file registry services
-        for (auto f : wms->workflow->getInputFiles()) {
-          for (auto frs : this->file_registry_services) {
-            if (frs->entries.find(f.second) == frs->entries.end()) {
-              throw std::runtime_error(
-                      "Workflow input file " + f.second->getID() + " is not staged on any storage service!");
+        for (const auto &wms : this->wmses) {
+            if (wms->getWorkflow() == nullptr) {
+                throw std::runtime_error("The WMS on host '" + wms->getHostname() + "' was not given a workflow to execute");
             }
-          }
         }
-      }
+
+        for (auto &wms : this->wmses) {
+            // Check that at least one StorageService is running (only needed if there are files in the workflow),
+            if (not wms->workflow->getFiles().empty()) {
+                bool one_storage_service_running = false;
+                for (const auto &storage_service : this->storage_services) {
+                    if (storage_service->state == Service::UP) {
+                        one_storage_service_running = true;
+                        break;
+                    }
+                }
+                if (not one_storage_service_running) {
+                    throw std::runtime_error(
+                            "At least one StorageService should have been instantiated add passed to Simulation.add()");
+                }
+            }
+
+            // Check that a FileRegistryService is running if needed
+            if (not wms->workflow->getInputFiles().empty()) {
+                if (this->file_registry_services.empty()) {
+                    throw std::runtime_error(
+                            "At least one FileRegistryService should have been instantiated and passed to Simulation.add()"
+                            "because there are workflow input files to be staged.");
+                }
+            }
+
+            // Check that each input file is staged on the file registry services
+            for (auto f : wms->workflow->getInputFiles()) {
+                for (auto frs : this->file_registry_services) {
+                    if (frs->entries.find(f.second) == frs->entries.end()) {
+                        throw std::runtime_error(
+                                "Workflow input file " + f.second->getID() + " is not staged on any storage service!");
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -331,43 +331,43 @@ namespace wrench {
      */
     void Simulation::startAllProcesses() {
 
-      try {
-        // Start the WMSes
-        for (const auto &wms : this->wmses) {
-          wms->start(wms, false);
-        }
+        try {
+            // Start the WMSes
+            for (const auto &wms : this->wmses) {
+                wms->start(wms, false, false);  // Not daemonized, no auto-restart
+            }
 
-        // Start the compute services
-        for (const auto &compute_service : this->compute_services) {
-          compute_service->start(compute_service, true);
-        }
+            // Start the compute services
+            for (const auto &compute_service : this->compute_services) {
+                compute_service->start(compute_service, true, false); // Daemonized, no auto-restart
+            }
 
-        // Start the storage services
-        for (const auto &storage_service : this->storage_services) {
-          storage_service->start(storage_service, true);
-        }
+            // Start the storage services
+            for (const auto &storage_service : this->storage_services) {
+                storage_service->start(storage_service, true, false); // Daemonized, no auto-restart
+            }
 
-        // Start the scratch services
-        for (const auto &compute_service : this->compute_services) {
-          if (compute_service->hasScratch()) {
-            compute_service->getScratch()->simulation = this;
-            compute_service->getScratch()->start(compute_service->getScratchSharedPtr(), true);
-          }
-        }
+            // Start the scratch services
+            for (const auto &compute_service : this->compute_services) {
+                if (compute_service->hasScratch()) {
+                    compute_service->getScratch()->simulation = this;
+                    compute_service->getScratch()->start(compute_service->getScratchSharedPtr(), true, false); // Daemonized, no auto-restart
+                }
+            }
 
-        // Start the network proximity services
-        for (const auto &network_proximity_service : this->network_proximity_services) {
-          network_proximity_service->start(network_proximity_service, true);
-        }
+            // Start the network proximity services
+            for (const auto &network_proximity_service : this->network_proximity_services) {
+                network_proximity_service->start(network_proximity_service, true, false); // Daemonized, no auto-restart
+            }
 
-        // Start the file registry services
-        for (const auto &frs : this->file_registry_services) {
-          frs->start(frs, true);
-        }
+            // Start the file registry services
+            for (const auto &frs : this->file_registry_services) {
+                frs->start(frs, true, false); // Daemonized, no auto-restart
+            }
 
-      } catch (std::runtime_error &e) {
-        throw;
-      }
+        } catch (std::runtime_error &e) {
+            throw;
+        }
     }
 
     /**
@@ -382,12 +382,12 @@ namespace wrench {
      * @throw std::runtime_error
      */
     ComputeService *Simulation::add(ComputeService *service) {
-      if (service == nullptr) {
-        throw std::invalid_argument("Simulation::add(): invalid argument (nullptr service)");
-      }
-      service->simulation = this;
-      this->compute_services.insert(std::shared_ptr<ComputeService>(service));
-      return service;
+        if (service == nullptr) {
+            throw std::invalid_argument("Simulation::add(): invalid argument (nullptr service)");
+        }
+        service->simulation = this;
+        this->compute_services.insert(std::shared_ptr<ComputeService>(service));
+        return service;
     }
 
     /**
@@ -402,12 +402,12 @@ namespace wrench {
      * @throw std::runtime_error
      */
     NetworkProximityService *Simulation::add(NetworkProximityService *service) {
-      if (service == nullptr) {
-        throw std::invalid_argument("Simulation::add(): invalid argument (nullptr service)");
-      }
-      service->simulation = this;
-      this->network_proximity_services.insert(std::shared_ptr<NetworkProximityService>(service));
-      return service;
+        if (service == nullptr) {
+            throw std::invalid_argument("Simulation::add(): invalid argument (nullptr service)");
+        }
+        service->simulation = this;
+        this->network_proximity_services.insert(std::shared_ptr<NetworkProximityService>(service));
+        return service;
     }
 
 
@@ -423,12 +423,12 @@ namespace wrench {
     * @throw std::runtime_error
     */
     StorageService *Simulation::add(StorageService *service) {
-      if (service == nullptr) {
-        throw std::invalid_argument("Simulation::add(): invalid argument (nullptr service)");
-      }
-      service->simulation = this;
-      this->storage_services.insert(std::shared_ptr<StorageService>(service));
-      return service;
+        if (service == nullptr) {
+            throw std::invalid_argument("Simulation::add(): invalid argument (nullptr service)");
+        }
+        service->simulation = this;
+        this->storage_services.insert(std::shared_ptr<StorageService>(service));
+        return service;
     }
 
     /**
@@ -443,12 +443,12 @@ namespace wrench {
      * @throw std::runtime_error
      */
     WMS *Simulation::add(WMS *wms) {
-      if (wms == nullptr) {
-        throw std::invalid_argument("Simulation::add(): invalid argument (nullptr wms)");
-      }
-      wms->simulation = this;
-      this->wmses.insert(std::shared_ptr<WMS>(wms));
-      return wms;
+        if (wms == nullptr) {
+            throw std::invalid_argument("Simulation::add(): invalid argument (nullptr wms)");
+        }
+        wms->simulation = this;
+        this->wmses.insert(std::shared_ptr<WMS>(wms));
+        return wms;
     }
 
     /**
@@ -462,12 +462,12 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     FileRegistryService *Simulation::add(FileRegistryService *file_registry_service) {
-      if (file_registry_service == nullptr) {
-        throw std::invalid_argument("Simulation::add(): invalid arguments");
-      }
-      file_registry_service->simulation = this;
-      this->file_registry_services.insert(std::shared_ptr<FileRegistryService>(file_registry_service));
-      return file_registry_service;
+        if (file_registry_service == nullptr) {
+            throw std::invalid_argument("Simulation::add(): invalid arguments");
+        }
+        file_registry_service->simulation = this;
+        this->file_registry_services.insert(std::shared_ptr<FileRegistryService>(file_registry_service));
+        return file_registry_service;
     }
 
     /**
@@ -480,13 +480,13 @@ namespace wrench {
         * @throw std::invalid_argument
         */
     void Simulation::stageFile(WorkflowFile *file, StorageService *storage_service) {
-      try {
-        this->stageFile(file, storage_service, "/");
-      } catch (std::runtime_error &e) {
-        throw;
-      } catch (std::invalid_argument &e) {
-        throw;
-      }
+        try {
+            this->stageFile(file, storage_service, "/");
+        } catch (std::runtime_error &e) {
+            throw;
+        } catch (std::invalid_argument &e) {
+            throw;
+        }
     }
 
     /**
@@ -500,38 +500,38 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     void Simulation::stageFile(WorkflowFile *file, StorageService *storage_service, std::string partition) {
-      if ((file == nullptr) || (storage_service == nullptr)) {
-        throw std::invalid_argument("Simulation::stageFile(): Invalid arguments");
-      }
+        if ((file == nullptr) || (storage_service == nullptr)) {
+            throw std::invalid_argument("Simulation::stageFile(): Invalid arguments");
+        }
 
-      // Check that a FileRegistryService has been set
-      if (this->file_registry_services.empty()) {
-        throw std::runtime_error(
-                "Simulation::stageFile(): At least one FileRegistryService must be instantiated and passed to Simulation.add() before files can be staged on storage services");
-      }
+        // Check that a FileRegistryService has been set
+        if (this->file_registry_services.empty()) {
+            throw std::runtime_error(
+                    "Simulation::stageFile(): At least one FileRegistryService must be instantiated and passed to Simulation.add() before files can be staged on storage services");
+        }
 
-      // Check that the file is not the output of anything
-      if (file->isOutput()) {
-        throw std::runtime_error(
-                "Simulation::stageFile(): Cannot stage a file that's the output of task that hasn't executed yet");
-      }
+        // Check that the file is not the output of anything
+        if (file->isOutput()) {
+            throw std::runtime_error(
+                    "Simulation::stageFile(): Cannot stage a file that's the output of task that hasn't executed yet");
+        }
 
-      if (partition.empty()) {
-        partition = "/";
-      }
+        if (partition.empty()) {
+            partition = "/";
+        }
 
-      XBT_INFO("Staging file %s (%lf)", file->getID().c_str(), file->getSize());
-      // Put the file on the storage service (not via the service daemon)
-      try {
-        storage_service->stageFile(file);
-      } catch (std::runtime_error &e) {
-        throw;
-      }
+        XBT_INFO("Staging file %s (%lf)", file->getID().c_str(), file->getSize());
+        // Put the file on the storage service (not via the service daemon)
+        try {
+            storage_service->stageFile(file);
+        } catch (std::runtime_error &e) {
+            throw;
+        }
 
-      // Update all file registry services
-      for (auto frs : this->file_registry_services) {
-        frs->addEntryToDatabase(file, storage_service);
-      }
+        // Update all file registry services
+        for (auto frs : this->file_registry_services) {
+            frs->addEntryToDatabase(file, storage_service);
+        }
     }
 
     /**
@@ -544,13 +544,13 @@ namespace wrench {
    * @throw std::invalid_argument
    */
     void Simulation::stageFiles(std::map<std::string, WorkflowFile *> files, StorageService *storage_service) {
-      try {
-        this->stageFiles(files, storage_service, "/");
-      } catch (std::runtime_error &e) {
-        throw e;
-      } catch (std::invalid_argument &e) {
-        throw e;
-      }
+        try {
+            this->stageFiles(files, storage_service, "/");
+        } catch (std::runtime_error &e) {
+            throw e;
+        } catch (std::invalid_argument &e) {
+            throw e;
+        }
     }
 
 /**
@@ -565,29 +565,29 @@ namespace wrench {
   */
     void Simulation::stageFiles(std::map<std::string, WorkflowFile *> files, StorageService *storage_service, std::string partition) {
 
-      if (storage_service == nullptr) {
-        throw std::invalid_argument("Simulation::stageFiles(): Invalid arguments");
-      }
-
-      // Check that at least one  FileRegistryService has been set
-      if (this->file_registry_services.empty()) {
-        throw std::runtime_error(
-                "Simulation::stageFiles(): A FileRegistryService must be instantiated and passed to Simulation.add() before files can be staged on storage services");
-      }
-
-      if (partition.empty()) {
-        partition = "/";
-      }
-
-      try {
-        for (auto const &f : files) {
-          this->stageFile(f.second, storage_service, partition);
+        if (storage_service == nullptr) {
+            throw std::invalid_argument("Simulation::stageFiles(): Invalid arguments");
         }
-      } catch (std::runtime_error &e) {
-        throw;
-      } catch (std::invalid_argument &e) {
-        throw;
-      }
+
+        // Check that at least one  FileRegistryService has been set
+        if (this->file_registry_services.empty()) {
+            throw std::runtime_error(
+                    "Simulation::stageFiles(): A FileRegistryService must be instantiated and passed to Simulation.add() before files can be staged on storage services");
+        }
+
+        if (partition.empty()) {
+            partition = "/";
+        }
+
+        try {
+            for (auto const &f : files) {
+                this->stageFile(f.second, storage_service, partition);
+            }
+        } catch (std::runtime_error &e) {
+            throw;
+        } catch (std::invalid_argument &e) {
+            throw;
+        }
     }
 
     /**
@@ -595,7 +595,7 @@ namespace wrench {
      * @return a date
      */
     double Simulation::getCurrentSimulatedDate() {
-      return S4U_Simulation::getClock();
+        return S4U_Simulation::getClock();
     }
 
     /**
@@ -604,7 +604,7 @@ namespace wrench {
      * @return a memory capacity in bytes
      */
     double Simulation::getHostMemoryCapacity(std::string hostname) {
-      return S4U_Simulation::getHostMemoryCapacity(hostname);
+        return S4U_Simulation::getHostMemoryCapacity(hostname);
     }
 
     /**
@@ -613,7 +613,7 @@ namespace wrench {
     * @return a number of cores
     */
     unsigned long Simulation::getHostNumCores(std::string hostname) {
-      return S4U_Simulation::getHostNumCores(hostname);
+        return S4U_Simulation::getHostNumCores(hostname);
     }
 
     /**
@@ -622,7 +622,7 @@ namespace wrench {
      * @return a flop rate (flop / sec)
      */
     double Simulation::getHostFlopRate(std::string hostname) {
-      return S4U_Simulation::getHostFlopRate(hostname);
+        return S4U_Simulation::getHostFlopRate(hostname);
     }
 
     /**
@@ -630,7 +630,7 @@ namespace wrench {
      * @return a memory capacity in bytes
      */
     double Simulation::getMemoryCapacity() {
-      return S4U_Simulation::getHostMemoryCapacity(S4U_Simulation::getHostName());
+        return S4U_Simulation::getHostMemoryCapacity(S4U_Simulation::getHostName());
     }
 
     /**
@@ -638,7 +638,7 @@ namespace wrench {
      * @return a number of cores
      */
     unsigned long Simulation::getNumCores() {
-      return S4U_Simulation::getHostNumCores(S4U_Simulation::getHostName());
+        return S4U_Simulation::getHostNumCores(S4U_Simulation::getHostName());
     }
 
     /**
@@ -646,7 +646,7 @@ namespace wrench {
      * @return a flop rate
      */
     double Simulation::getFlopRate() {
-      return S4U_Simulation::getHostFlopRate(S4U_Simulation::getHostName());
+        return S4U_Simulation::getHostFlopRate(S4U_Simulation::getHostName());
     }
 
 
@@ -655,7 +655,7 @@ namespace wrench {
      * @param duration: a number of seconds
      */
     void Simulation::sleep(double duration) {
-      S4U_Simulation::sleep(duration);
+        S4U_Simulation::sleep(duration);
     }
 
     /**
@@ -663,7 +663,11 @@ namespace wrench {
      * @param duration: a number of floating point operations
      */
     void Simulation::compute(double flops) {
-      S4U_Simulation::compute(flops);
+        try {
+            S4U_Simulation::compute(flops);
+        } catch (std::shared_ptr<HostError> &e) {
+            throw;
+        }
     }
 
     /**
@@ -671,34 +675,60 @@ namespace wrench {
      * @return simulation output object
      */
     SimulationOutput &Simulation::getOutput() {
-      return this->output;
+        return this->output;
     }
 
     /**
-     * @brief Get the energy consumed by the host up to now
-     * @param hostname the host name
-     * @return the energy consumed by the host in Joules
+     * @brief Obtains the current energy consumption of a host and will add SimulationTimestampEnergyConsumption to
+     *          simulation output if can_record is set to true
+     * @param hostname: the host name
+     * @param record_as_time_stamp: bool signaling whether or not to record a SimulationTimestampEnergyConsumption object
+     * @return current energy consumption in joules
+     * @throws std::invalid_argument
      */
-    double Simulation::getEnergyConsumedByHost(const std::string &hostname) {
-      return S4U_Simulation::getEnergyConsumedByHost(hostname);
+    double Simulation::getEnergyConsumed(const std::string &hostname, bool record_as_time_stamp) {
+        if (hostname.empty()) {
+            throw std::invalid_argument("Simulation::getEnergyConsumed() requires a valid hostname");
+        }
+
+        double time_now = getCurrentSimulatedDate();
+        double consumption = S4U_Simulation::getEnergyConsumedByHost(hostname);
+
+        if (record_as_time_stamp) {
+            this->getOutput().addTimestamp<SimulationTimestampEnergyConsumption>(new SimulationTimestampEnergyConsumption(hostname, consumption));
+        }
+
+        return consumption;
     }
 
     /**
-     * @brief Get the total energy consumed by a set of hosts
-     * @param the list of hostnames
-     * @return The total energy consumed by all the hosts in Joules
-     */
-    double Simulation::getTotalEnergyConsumed(const std::vector<std::string> &hostnames) {
-      return S4U_Simulation::getTotalEnergyConsumed(hostnames);
+    * @brief Obtains the current energy consumption of a host and will add SimulationTimestampEnergyConsumption to
+    *          simulation output if can_record is set to true
+    * @param hostnames: the list of hostnames
+    * @param record_as_time_stamps: whether or not to record a SimulationTimestampEnergyConsumption object for each host when this method is called
+    * @return current energy consumption in joules for each host, as a map indexed by hostnames
+    * @throws std::invalid_argument
+    */
+    std::map<std::string, double> Simulation::getEnergyConsumed(const std::vector<std::string> &hostnames, bool record_as_time_stamps) {
+        if (hostnames.empty()) {
+            throw std::invalid_argument("Simulation::getEnergyConsumed() requires a valid hostname");
+        }
+
+        std::map<std::string, double> energy_consumptions;
+        for (auto const &h : hostnames) {
+            energy_consumptions[h] = Simulation::getEnergyConsumed(h, record_as_time_stamps);
+        }
+        return energy_consumptions;
     }
 
     /**
      * @brief Set the power state of the host
      * @param hostname: the host name
-     * @param pstate: the power state index (the power state index is specified in the platform xml description file)
+     * @param pstate: the power state index (as specified in the platform xml description file)
      */
     void Simulation::setPstate(const std::string &hostname, int pstate) {
-      S4U_Simulation::setPstate(hostname, pstate);
+        S4U_Simulation::setPstate(hostname, pstate);
+        this->getOutput().addTimestamp<SimulationTimestampPstateSet>(new SimulationTimestampPstateSet(hostname, pstate));
     }
 
     /**
@@ -707,7 +737,7 @@ namespace wrench {
      * @return The number of power states available for the host (as specified in the platform xml description file)
      */
     int Simulation::getNumberofPstates(const std::string &hostname) {
-      return S4U_Simulation::getNumberofPstates(hostname);
+        return S4U_Simulation::getNumberofPstates(hostname);
     }
 
     /**
@@ -716,25 +746,7 @@ namespace wrench {
      * @return The index of the current pstate of the host (as specified in the platform xml description file)
      */
     int Simulation::getCurrentPstate(const std::string &hostname) {
-      return S4U_Simulation::getCurrentPstate(hostname);
-    }
-
-    /**
-     * @brief Get the minimum power available for a host
-     * @param hostname: the host name
-     * @return The minimum power available for the host (as specified in the platform xml description file)
-     */
-    double Simulation::getMinPowerAvailable(const std::string &hostname) {
-      return S4U_Simulation::getMinPowerAvailable(hostname);
-    }
-
-    /**
-     * @brief Get the maximum power available for a host
-     * @param hostname: the host name
-     * @return The maximum power available for the host (as specified in the platform xml description file)
-     */
-    double Simulation::getMaxPowerPossible(const std::string &hostname) {
-      return S4U_Simulation::getMaxPowerPossible(hostname);
+        return S4U_Simulation::getCurrentPstate(hostname);
     }
 
     /**
@@ -743,8 +755,28 @@ namespace wrench {
      * @return a list of power states available for the host (as specified in the platform xml description file)
      */
     std::vector<int> Simulation::getListOfPstates(const std::string &hostname) {
-      return S4U_Simulation::getListOfPstates(hostname);
+        return S4U_Simulation::getListOfPstates(hostname);
     }
+
+
+    /**
+     * @brief Get the minimum power consumption for the host (i.e., idling) at its current pstate
+     * @param hostname: the host name
+     * @return The "idling" power consumption (as specified in the platform xml description file)
+     */
+    double Simulation::getMinPowerConsumption(const std::string &hostname) {
+        return S4U_Simulation::getMinPowerConsumption(hostname);
+    }
+
+    /**
+     * @brief Get the maximum power consumption for the host (i.e., 100% utilization) at its current pstate
+     * @param hostname: the host name
+     * @return The "100% used" power consumption (as specified in the platform xml description file)
+     */
+    double Simulation::getMaxPowerConsumption(const std::string &hostname) {
+        return S4U_Simulation::getMaxPowerConsumption(hostname);
+    }
+
 
     /**
      * @brief Starts a new compute service during WMS execution (i.e., one that was not passed to Simulation::add() before
@@ -758,24 +790,24 @@ namespace wrench {
      */
     ComputeService *Simulation::startNewService(ComputeService *service) {
 
-      if (service == nullptr) {
-        throw std::invalid_argument("Simulation::startNewService(): invalid argument (nullptr service)");
-      }
+        if (service == nullptr) {
+            throw std::invalid_argument("Simulation::startNewService(): invalid argument (nullptr service)");
+        }
 
-      if (not this->is_running) {
-        throw std::runtime_error("Simulation::startNewService(): simulation is not running yet");
-      }
+        if (not this->is_running) {
+            throw std::runtime_error("Simulation::startNewService(): simulation is not running yet");
+        }
 
-      service->simulation = this;
-      std::shared_ptr<ComputeService> shared_ptr = std::shared_ptr<ComputeService>(service);
-      this->compute_services.insert(shared_ptr);
-      shared_ptr->start(shared_ptr, true);
-      if (service->hasScratch()) {
-        service->getScratch()->simulation = this;
-        service->getScratch()->start(service->getScratchSharedPtr(), true);
-      }
+        service->simulation = this;
+        std::shared_ptr<ComputeService> shared_ptr = std::shared_ptr<ComputeService>(service);
+        this->compute_services.insert(shared_ptr);
+        shared_ptr->start(shared_ptr, true, false); // Daemonized, no auto-restart
+        if (service->hasScratch()) {
+            service->getScratch()->simulation = this;
+            service->getScratch()->start(service->getScratchSharedPtr(), true, false); // Daemonized, no auto-restart
+        }
 
-      return shared_ptr.get();
+        return shared_ptr.get();
     }
 
     /**
@@ -790,20 +822,20 @@ namespace wrench {
      */
     StorageService *Simulation::startNewService(StorageService *service) {
 
-      if (service == nullptr) {
-        throw std::invalid_argument("Simulation::startNewService(): invalid argument (nullptr service)");
-      }
+        if (service == nullptr) {
+            throw std::invalid_argument("Simulation::startNewService(): invalid argument (nullptr service)");
+        }
 
-      if (not this->is_running) {
-        throw std::runtime_error("Simulation::startNewService(): simulation is not running yet");
-      }
+        if (not this->is_running) {
+            throw std::runtime_error("Simulation::startNewService(): simulation is not running yet");
+        }
 
-      service->simulation = this;
-      std::shared_ptr<StorageService> shared_ptr = std::shared_ptr<StorageService>(service);
-      this->storage_services.insert(shared_ptr);
-      shared_ptr->start(shared_ptr, true);
+        service->simulation = this;
+        std::shared_ptr<StorageService> shared_ptr = std::shared_ptr<StorageService>(service);
+        this->storage_services.insert(shared_ptr);
+        shared_ptr->start(shared_ptr, true, false); // Daemonized, no auto-restart
 
-      return shared_ptr.get();
+        return shared_ptr.get();
     }
 
     /**
@@ -818,20 +850,20 @@ namespace wrench {
      */
     NetworkProximityService *Simulation::startNewService(NetworkProximityService *service) {
 
-      if (service == nullptr) {
-        throw std::invalid_argument("Simulation::startNewService(): invalid argument (nullptr service)");
-      }
+        if (service == nullptr) {
+            throw std::invalid_argument("Simulation::startNewService(): invalid argument (nullptr service)");
+        }
 
-      if (not this->is_running) {
-        throw std::runtime_error("Simulation::startNewService(): simulation is not running yet");
-      }
+        if (not this->is_running) {
+            throw std::runtime_error("Simulation::startNewService(): simulation is not running yet");
+        }
 
-      service->simulation = this;
-      std::shared_ptr<NetworkProximityService> shared_ptr = std::shared_ptr<NetworkProximityService>(service);
-      this->network_proximity_services.insert(shared_ptr);
-      shared_ptr->start(shared_ptr, true);
+        service->simulation = this;
+        std::shared_ptr<NetworkProximityService> shared_ptr = std::shared_ptr<NetworkProximityService>(service);
+        this->network_proximity_services.insert(shared_ptr);
+        shared_ptr->start(shared_ptr, true, false); // Daemonized, no auto-restart
 
-      return shared_ptr.get();
+        return shared_ptr.get();
     }
 
     /**
@@ -846,20 +878,20 @@ namespace wrench {
      */
     FileRegistryService *Simulation::startNewService(FileRegistryService *service) {
 
-      if (service == nullptr) {
-        throw std::invalid_argument("Simulation::startNewService(): invalid argument (nullptr service)");
-      }
+        if (service == nullptr) {
+            throw std::invalid_argument("Simulation::startNewService(): invalid argument (nullptr service)");
+        }
 
-      if (not this->is_running) {
-        throw std::runtime_error("Simulation::startNewService(): simulation is not running yet");
-      }
+        if (not this->is_running) {
+            throw std::runtime_error("Simulation::startNewService(): simulation is not running yet");
+        }
 
-      service->simulation = this;
-      std::shared_ptr<FileRegistryService> shared_ptr = std::shared_ptr<FileRegistryService>(service);
-      this->file_registry_services.insert(shared_ptr);
-      shared_ptr->start(shared_ptr, true);
+        service->simulation = this;
+        std::shared_ptr<FileRegistryService> shared_ptr = std::shared_ptr<FileRegistryService>(service);
+        this->file_registry_services.insert(shared_ptr);
+        shared_ptr->start(shared_ptr, true, false); // Daemonized, no auto-restart
 
-      return shared_ptr.get();
+        return shared_ptr.get();
     }
 
 

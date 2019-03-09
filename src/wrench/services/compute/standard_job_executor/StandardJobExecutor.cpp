@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2019. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,13 +13,13 @@
 #include "wrench/services/compute/workunit_executor/Workunit.h"
 #include "wrench/simulation/Simulation.h"
 #include "wrench/workflow/job/StandardJob.h"
-
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/simulation/SimulationMessage.h"
 #include "wrench/services/storage/StorageService.h"
 #include "wrench/services/ServiceMessage.h"
 #include "wrench/services/compute/ComputeServiceMessage.h"
+#include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/workflow/job/PilotJob.h"
 #include "StandardJobExecutorMessage.h"
@@ -75,7 +75,7 @@ namespace wrench {
 
       // Check that hosts exist!
       for (auto h : compute_resources) {
-        if (not simulation->hostExists(std::get<0>(h))) {
+        if (not S4U_Simulation::hostExists(std::get<0>(h))) {
           throw std::invalid_argument("StandardJobExecutor::StandardJobExecutor(): Host '" + std::get<0>(h) + "' does not exit!");
         }
       }
@@ -302,7 +302,7 @@ namespace wrench {
         cleanUpScratch();
       }
 
-      WRENCH_INFO("Standard Job Executor on host %s terminated!", S4U_Simulation::getHostName().c_str());
+      WRENCH_INFO("Standard Job Executor on host %s cleanly terminating!", S4U_Simulation::getHostName().c_str());
       return 0;
     }
 
@@ -495,7 +495,7 @@ namespace wrench {
         ));
 
         workunit_executor->simulation = this->simulation;
-        workunit_executor->start(workunit_executor, true);
+        workunit_executor->start(workunit_executor, true, false); // Daemonized, no auto-restart
 
         // Update core availabilities
         this->core_availabilities[target_host] -= target_num_cores;
@@ -813,6 +813,11 @@ namespace wrench {
                       }
                       return (wu1->task->getMinNumCores() >= wu2->task->getMinNumCores());
 
+                    } else if (selection_algorithm == "minimum_top_level") {
+                      if (wu1->task->getTopLevel() == wu2->task->getTopLevel()) {
+                        return ((uintptr_t) wu1 > (uintptr_t) wu2);
+                      }
+                      return (wu1->task->getTopLevel() <= wu2->task->getTopLevel());
                     } else {
                       throw std::runtime_error("Unknown StandardJobExecutorProperty::TASK_SELECTION_ALGORITHM property '"
                                                + selection_algorithm + "'");
