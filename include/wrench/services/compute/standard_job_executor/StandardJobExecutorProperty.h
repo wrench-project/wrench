@@ -44,6 +44,7 @@ namespace wrench {
          *         in case multiple tasks are ready, should run first. Possible values are:
          *                  - maximum_flops (default)
          *                  - maximum_minimum_cores
+         *                  - minimum_top_level
          **/
         DECLARE_PROPERTY_NAME(TASK_SELECTION_ALGORITHM);
 

@@ -56,6 +56,7 @@ namespace wrench {
                 {BatchServiceProperty::SUPPORTS_STANDARD_JOBS,                      "true"},
                 {BatchServiceProperty::THREAD_STARTUP_OVERHEAD,                     "0"},
                 {BatchServiceProperty::HOST_SELECTION_ALGORITHM,                    "FIRSTFIT"},
+                {BatchServiceProperty::TASK_SELECTION_ALGORITHM,                    "maximum_flops"},
         #ifdef ENABLE_BATSCHED
                 {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "easy_bf"},
                 {BatchServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM,              "fcfs"},

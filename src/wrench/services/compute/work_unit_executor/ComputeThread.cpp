@@ -28,9 +28,9 @@ namespace wrench {
      */
     ComputeThread::ComputeThread(Simulation *simulation, std::string hostname, double flops, std::string reply_mailbox) :
             Service(hostname, "compute_thread", "compute_thread") {
-      this->simulation = simulation;
-      this->flops = flops;
-      this->reply_mailbox = reply_mailbox;
+        this->simulation = simulation;
+        this->flops = flops;
+        this->reply_mailbox = reply_mailbox;
     }
 
     /**
@@ -38,31 +38,38 @@ namespace wrench {
      * @return
      */
     int ComputeThread::main() {
-      try {
-        WRENCH_INFO("New compute thread (%.2f flops, will report to %s)", this->flops, reply_mailbox.c_str());
-        S4U_Simulation::compute(this->flops);
-      } catch (std::exception &e) {
-        WRENCH_INFO("Probably got killed while I was computing");
-        return 0;
-      }
-      try {
-        S4U_Mailbox::putMessage(this->reply_mailbox, new ComputeThreadDoneMessage());
-      } catch (std::shared_ptr<NetworkError> &e) {
-        WRENCH_INFO("Couldn't report on my completion to my parent");
-      }
+        try {
+            WRENCH_INFO("New compute thread (%.2f flops, will report to %s)", this->flops, reply_mailbox.c_str());
+            S4U_Simulation::compute(this->flops);
+        } catch (std::exception &e) {
+            WRENCH_INFO("Probably got killed while I was  computing");
+            return 1;
+        } catch (std::shared_ptr<HostError> &e) {
+            WRENCH_INFO("Probably got killed while I was computing");
+            return 1;
+        }
+        try {
+            S4U_Mailbox::putMessage(this->reply_mailbox, new ComputeThreadDoneMessage());
+        } catch (std::shared_ptr<NetworkError> &e) {
+            WRENCH_INFO("Couldn't report on my completion to my parent [ignoring and returning as if everything's ok]");
+            return 0;
+        } catch (std::shared_ptr<HostError> &e) {
+            WRENCH_INFO("Probably got killed while I was communicating");
+            return 1;
+        }
 
-      return 0;
+        return 0;
     }
 
     /**
      * @brief Terminate (brutally) the compute thread
      */
     void ComputeThread::kill() {
-      try {
-        this->killActor();
-      } catch (std::shared_ptr<FatalFailure> &e) {
-        WRENCH_INFO("Failed to kill a compute thread.. .perhaps it's already dead... nevermind");
-      }
+        try {
+            this->killActor();
+        } catch (std::shared_ptr<FatalFailure> &e) {
+            WRENCH_INFO("Failed to kill a compute thread.. .perhaps it's already dead... nevermind");
+        }
     }
 
 };

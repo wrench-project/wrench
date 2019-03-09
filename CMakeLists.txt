@@ -111,6 +111,8 @@ set(HEADER_FILES
         include/wrench/services/compute/batch/BatchServiceMessagePayload.h
         include/wrench/services/compute/batch/BatschedNetworkListener.h
         include/wrench/services/helpers/Alarm.h
+        include/wrench/services/helpers/ServiceFailureDetector.h
+        include/wrench/services/helpers/ServiceFailureDetectorMessage.h
         include/wrench/util/PointerUtil.h
         include/wrench/util/MessageManager.h
         include/wrench/util/TraceFileLoader.h
@@ -214,6 +216,8 @@ set(SOURCE_FILES
         src/wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessagePayload.cpp
         src/wrench/services/compute/htcondor/HTCondorNegotiatorService.cpp
         src/wrench/services/helpers/Alarm.cpp
+        src/wrench/services/helpers/ServiceFailureDetector.cpp
+        src/wrench/services/helpers/ServiceFailureDetectorMessage.cpp
         src/wrench/util/PointerUtil.cpp
         src/wrench/util/MessageManager.cpp
         src/wrench/services/compute/batch/TraceFileLoader.cpp
@@ -228,8 +232,8 @@ set(TEST_FILES
         test/main.cpp
         test/include/TestWithFork.h
         test/include/UniqueTmpPathPrefix.h
-        test/simulation_message_constructors/MessageConstructorTest.cpp
-        test/failure_cause_constructor/FailureCauseConstructorTest.cpp
+        test/constructors/simulation_message_constructors/MessageConstructorTest.cpp
+        test/constructors/failure_cause_constructor/FailureCauseConstructorTest.cpp
         test/workflow/WorkflowTest.cpp
         test/workflow/WorkflowFileTest.cpp
         test/workflow/WorkflowTaskTest.cpp
@@ -267,6 +271,7 @@ set(TEST_FILES
         test/simulation/simulation_output/SimulationOutputTest.cpp
         test/simulation/simulation_output/SimulationTimestampTaskTest.cpp
         test/simulation/simulation_output/SimulationTimestampFileCopyTest.cpp
+        test/simulation/simulation_output/SimulationTimestampEnergyTest.cpp
         test/simulation/ScratchSpaceTest.cpp
         test/simulation/S4U_DaemonTest.cpp
         test/pilot_job/CriticalPathSchedulerTest.cpp
@@ -275,6 +280,15 @@ set(TEST_FILES
         test/simulation/ScratchSpaceTest.cpp test/simulation/EnergyConsumptionTest.cpp
         test/simulation/simulation_output/SimulationDumpJSONTest.cpp
         test/simulation/HTCondorServiceTest.cpp
+        src/wrench/managers/EnergyMeter.cpp include/wrench/managers/EnergyMeter.h
+        test/simulated_failures/SimulatedFailures.cpp
+        test/simulated_failures/BareMetalComputeServiceFailures.cpp
+        test/simulated_failures/HostSwitch.cpp
+        test/simulated_failures/HostSwitch.h
+        test/simulated_failures/SleeperVictim.cpp
+        test/simulated_failures/SleeperVictim.h
+        test/simulated_failures/ComputerVictim.cpp
+        test/simulated_failures/ComputerVictim.h
         )
 
 # wrench library
@@ -283,7 +297,7 @@ find_library(PUGIXML_LIBRARY NAMES pugixml)
 find_library(LEMON_LIBRARY NAMES emon)
 find_library(GTEST_LIBRARY NAMES gtest)
 
-add_library(wrench STATIC ${SOURCE_FILES})
+add_library(wrench STATIC ${SOURCE_FILES} src/wrench/managers/EnergyMeter.cpp include/wrench/managers/EnergyMeter.h)
 set_target_properties(wrench PROPERTIES VERSION ${WRENCH_RELEASE_VERSION})
 target_link_libraries(wrench ${SIMGRID_LIBRARY} ${PUGIXML_LIBRARY} ${LEMON_LIBRARY})
 

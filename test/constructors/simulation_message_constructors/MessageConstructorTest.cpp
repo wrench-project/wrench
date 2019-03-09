@@ -12,12 +12,12 @@
 #include <wrench/services/compute/batch/BatchServiceMessage.h>
 
 #include "wrench/workflow/Workflow.h"
-#include "../../src/wrench/services/file_registry/FileRegistryMessage.h"
+#include "services/file_registry/FileRegistryMessage.h"
 #include "wrench/services/compute/ComputeServiceMessage.h"
-#include "../../src/wrench/services/storage/StorageServiceMessage.h"
-#include "../../src/wrench/services/compute/cloud/CloudServiceMessage.h"
-#include "../../src/wrench/services/compute/virtualized_cluster/VirtualizedClusterServiceMessage.h"
-#include "../../src/wrench/services/network_proximity/NetworkProximityMessage.h"
+#include "services/storage/StorageServiceMessage.h"
+#include "services/compute/cloud/CloudServiceMessage.h"
+#include "services/compute/virtualized_cluster/VirtualizedClusterServiceMessage.h"
+#include "services/network_proximity/NetworkProximityMessage.h"
 #include "wrench/workflow/execution_events/FailureCause.h"
 
 class MessageConstructorTest : public ::testing::Test {

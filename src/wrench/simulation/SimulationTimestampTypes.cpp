@@ -3,17 +3,7 @@
 
 namespace wrench {
 
-    /**
-     * @brief Constructor
-     */
-    SimulationTimestampType::SimulationTimestampType() : SimulationTimestampType(nullptr) {
-
-    }
-
-    /**
-     *  @brief Constructor
-     */
-    SimulationTimestampType::SimulationTimestampType(wrench::SimulationTimestampType *endpoint) : endpoint(endpoint){
+    SimulationTimestampType::SimulationTimestampType(){
         this->date = S4U_Simulation::getClock();
     }
 
@@ -26,10 +16,26 @@ namespace wrench {
     }
 
     /**
+     * @brief Constructor
+     */
+    SimulationTimestampPair::SimulationTimestampPair() : endpoint(nullptr){
+
+    }
+
+    /**
+     * @brief Constructor
+     * @param endpoint: an corresponding "end" timestamp or "start" timestamp
+     */
+    SimulationTimestampPair::SimulationTimestampPair(SimulationTimestampPair *endpoint)
+        : endpoint(endpoint) {
+
+    }
+
+    /**
      * @brief Retrieves the corresponding start/end SimulationTimestampType associated with this timestamp
      * @return A pointer to a start SimulationTimestampType if this is a failure/completion timestamp or vise versa
      */
-    SimulationTimestampType *SimulationTimestampType::getEndpoint() {
+    SimulationTimestampPair *SimulationTimestampPair::getEndpoint() {
         return this->endpoint;
     }
 
@@ -153,7 +159,7 @@ namespace wrench {
      * @param dst_partition: the partition in the destination StorageService where this file will be copied
      */
     SimulationTimestampFileCopy::SimulationTimestampFileCopy(WorkflowFile *file, StorageService *src, std::string src_partition, StorageService *dst, std::string dst_partition, SimulationTimestampFileCopyStart *start_timestamp) :
-            SimulationTimestampType(start_timestamp), file(file), source(FileLocation(src, src_partition)), destination(FileLocation(dst, dst_partition)) {
+            SimulationTimestampPair(start_timestamp), file(file), source(FileLocation(src, src_partition)), destination(FileLocation(dst, dst_partition)) {
     }
 
     /**
@@ -260,5 +266,65 @@ namespace wrench {
             start_timestamp->endpoint = this;
         }
     }
+
+    /**
+     * @brief Constructor
+     * @param hostname: the host on which a pstate is being set
+     * @param pstate: the pstate that is being set on this host
+     */
+    SimulationTimestampPstateSet::SimulationTimestampPstateSet(std::string hostname, int pstate) :
+        hostname(hostname), pstate(pstate) {
+
+        if (hostname.empty()) {
+            throw std::invalid_argument("SimulationTimestampPstateSet::SimulationTimestampPstateSet() requires a valid hostname");
+        }
+    }
+
+    /**
+     * @brief Get the hostname associated with this timestamp
+     * @return the hostname associated with this timestamp
+     */
+    std::string SimulationTimestampPstateSet::getHostname() {
+        return this->hostname;
+    }
+
+    /**
+     * @brief Get the pstate associated with this timestamp
+     * @return the pstate associated with this timestamp
+     */
+    int SimulationTimestampPstateSet::getPstate() {
+        return this->pstate;
+    }
+
+    /**
+     * @brief Constructor
+     * @param hostname: the host on which this energy consumption timestamp applies to
+     * @param joules: the energy consumption in joules 
+     */
+    SimulationTimestampEnergyConsumption::SimulationTimestampEnergyConsumption(std::string hostname, double joules)
+        : hostname(hostname), joules(joules) {
+
+        if (hostname.empty() || joules < 0.0) {
+            throw std::invalid_argument(
+                    "SimulationTimestampEnergyConsumption::SimulationTimestampEnergyConsumption() requires a valid hostname and an energy usage amount >= 0.0");
+        }
+    }
+
+    /**
+     * @brief Get the hostname associated with this timestamp
+     * @return the hostname associated with this timestamp
+     */
+    std::string SimulationTimestampEnergyConsumption::getHostname() {
+        return this->hostname;
+    }
+
+    /**
+     * @brief Get the energy consumption in joules
+     * @return energy consumed by this host in joules
+     */
+    double SimulationTimestampEnergyConsumption::getConsumption() {
+        return this->joules;
+    }
+
 }
 

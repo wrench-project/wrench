@@ -73,11 +73,21 @@ namespace wrench {
             /** @brief A functionality is not available */
                     FUNCTIONALITY_NOT_AVAILABLE,
             /** @brief A job was terminated due to a timeout */
-                    JOB_TIMEOUT
+                    JOB_TIMEOUT,
+            /** @brief The host went down (while computing, while sleeping) **/
+                    HOST_ERROR
 
         };
 
-        FailureCause(CauseType cause);
+        explicit FailureCause(CauseType cause);
+
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        virtual ~FailureCause() = default;
+        /***********************/
+        /** \endcond           */
+        /***********************/
 
 
         /**
@@ -241,13 +251,13 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        ServiceIsDown(Service *service);
+        explicit ServiceIsDown(Service *service);
         /***********************/
         /** \endcond           */
         /***********************/
 
         Service *getService();
-        std::string toString();
+        std::string toString() override;
 
     private:
         Service *service;
@@ -382,6 +392,26 @@ namespace wrench {
         NetworkError::ErrorType error_type;
         bool while_sending = false;
         std::string mailbox = "";
+    };
+
+    /**
+ * @brief A "host error" failure cause
+ */
+    class HostError : public FailureCause {
+    public:
+
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        HostError(std::string hostname);
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
+        std::string toString();
+
+    private:
+        std::string hostname;
     };
 
 

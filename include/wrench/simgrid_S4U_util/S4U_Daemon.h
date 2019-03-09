@@ -53,7 +53,7 @@ namespace wrench {
 
         virtual ~S4U_Daemon();
 
-        void startDaemon(bool daemonized);
+        void startDaemon(bool daemonized, bool auto_restart);
 
         void createLifeSaver(std::shared_ptr<S4U_Daemon> reference);
 
@@ -61,13 +61,15 @@ namespace wrench {
 
         /**
          * @brief The daemon's main method, to be overridden
-         * @return 0 on success
+         * @return 0 on success, non-0 on failure!
          */
         virtual int main() = 0;
 
-        void setTerminated();
+        void setCleanlyTerminated();
+        bool hasCleanlyTerminated();
+        bool isSetToAutoRestart();
 
-        void join();
+        bool join();
 
         void suspend();
 
@@ -82,18 +84,25 @@ namespace wrench {
         Simulation *simulation;
     protected:
 
+        friend class S4U_DaemonActor;
+        void runMainMethod();
+
         void killActor();
 
         void acquireDaemonLock();
 
         void releaseDaemonLock();
 
+        unsigned int num_starts = 0;
     private:
         // Lock use typically to prevent kill() from killing the actor
         // while it's in the middle of doing something critical
         simgrid::s4u::MutexPtr daemon_lock;
-        bool terminated;
+        
         simgrid::s4u::ActorPtr s4u_actor;
+        
+        bool cleanly_terminated; // Set to true after main returns
+        bool auto_restart; // Set to true if daemon is supposed to auto-restart
 
 #ifdef ACTOR_TRACKING_OUTPUT
         std::string process_name_prefix;

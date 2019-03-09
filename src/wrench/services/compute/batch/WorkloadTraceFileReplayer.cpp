@@ -58,7 +58,7 @@ namespace wrench {
       // Start the WorkloadTraceFileReplayerEventReceiver
       event_receiver->addWorkflow(workflow, S4U_Simulation::getClock());
       event_receiver->simulation = this->simulation;
-      event_receiver->start(event_receiver, true); // Daemonize!
+      event_receiver->start(event_receiver, true, false); // Daemonized, no auto-restart
 
       double core_flop_rate = (*(this->batch_service->getCoreFlopRate().begin())).second;
 

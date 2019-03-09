@@ -11,14 +11,18 @@
 #include "wrench/simulation/Simulation.h"
 #include "wrench/simulation/SimulationOutput.h"
 #include "wrench/workflow/Workflow.h"
+#include "simgrid/s4u.hpp"
+#include "simgrid/plugins/energy.h"
 
 #include <nlohmann/json.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include <iomanip>
 #include <fstream>
 #include <algorithm>
 #include <vector>
 #include <cmath>
+#include <string>
 
 namespace wrench {
 
@@ -311,7 +315,7 @@ namespace wrench {
       */
     void SimulationOutput::dumpWorkflowExecutionJSON(Workflow *workflow, std::string file_path, bool generate_host_utilization_layout) {
         if (workflow == nullptr || file_path.empty()) {
-            throw std::invalid_argument("Simulation::dumpTaskDataJSON() requires a valid workflow and file_path");
+            throw std::invalid_argument("SimulationOutput::dumpTaskDataJSON() requires a valid workflow and file_path");
         }
 
         auto tasks = workflow->getTasks();
@@ -399,7 +403,7 @@ namespace wrench {
      */
     void SimulationOutput::dumpWorkflowGraphJSON(wrench::Workflow *workflow, std::string file_path) {
         if (workflow == nullptr || file_path.empty()) {
-            throw std::invalid_argument("Simulation::dumpTaskDataJSON() requires a valid workflow and file_path");
+            throw std::invalid_argument("SimulationOutput::dumpTaskDataJSON() requires a valid workflow and file_path");
         }
 
         /* schema
@@ -468,5 +472,137 @@ namespace wrench {
         std::ofstream output(file_path);
         output << std::setw(4) << workflow_task_graph << std::endl;
         output.close();
+    }
+
+
+    /**
+     * @brief Writes a JSON file containing host energy consumption information as a JSON array.
+     * @description The JSON array has the following format:
+     *
+     * <pre>
+     * [
+     *      {
+     *          hostname: <string>,
+     *          pstates: [                 <-- if this host is a single core host, items in this list will be formatted as
+     *              {                          the first item, else if this is a multi core host, items will be formatted as
+     *                  pstate: <int>,         the second item
+     *                  idle: <double>,
+     *                  running: <double>,   <-- if single core host
+     *                  speed: <double>
+     *              },
+     *              {
+     *                  pstate: <int>,
+     *                  idle: <double>,
+     *                  one_core: <double>,  <-- if multi core host
+     *                  all_cores: <double>, <-- if multi core host
+     *                  speed: <double>
+     *              } ...
+     *          ],
+     *          watts_off: <double>,
+     *          pstate_trace: [
+     *              {
+     *                  time: <double>,
+     *                  pstate: <int>
+     *              }, ...
+     *          ],
+     *          consumed_energy_trace: [
+     *              {
+     *                  time: <double>,
+     *                  joules: <double>
+     *              }, ...
+     *          ]
+     *      }, ...
+     * ]
+     * </pre>
+     *
+     * @param file_path: the path to write the file
+     *
+     * @throws std::invalid_argument
+     * @throws std::runtime_error
+     */
+    void SimulationOutput::dumpHostEnergyConsumptionJSON(std::string file_path) {
+
+        if (file_path.empty()) {
+            throw std::invalid_argument("SimulationOutput::dumpHostEnergyConsumptionJSON() requires a valid file_path");
+        }
+
+        try {
+
+            simgrid::s4u::Engine *simgrid_engine = simgrid::s4u::Engine::get_instance();
+            std::vector<simgrid::s4u::Host *> hosts = simgrid_engine->get_all_hosts();
+
+            nlohmann::json hosts_energy_consumption_information;
+            for (const auto &host : hosts) {
+                nlohmann::json datum;
+
+                datum["hostname"] = host->get_name();
+
+                // for each pstate, we need to record the following:
+                //     in the case of a single core hosts, then "Idle:Running"
+                //     in the case of multi-core hosts, then "Idle:OneCore:AllCores"
+                std::string watts_per_state_property_string = host->get_property("watt_per_state");
+                std::vector<std::string> watts_per_state;
+                boost::split(watts_per_state, watts_per_state_property_string, boost::is_any_of(","));
+
+                for (size_t pstate = 0; pstate < watts_per_state.size(); ++pstate) {
+                    std::vector<std::string> current_state_watts;
+                    boost::split(current_state_watts, watts_per_state.at(pstate), boost::is_any_of(":"));
+
+                    if (host->get_core_count() == 1) {
+                        datum["pstates"].push_back({
+                                                           {"pstate",  pstate},
+                                                           {"speed",   host->get_pstate_speed(pstate)},
+                                                           {"idle",    current_state_watts.at(0)},
+                                                           {"running", current_state_watts.at(1)}
+                                                   });
+                    } else {
+                        datum["pstates"].push_back({
+                                                           {"pstate",    pstate},
+                                                           {"speed",     host->get_pstate_speed(pstate)},
+                                                           {"idle",      current_state_watts.at(0)},
+                                                           {"one_core",  current_state_watts.at(1)},
+                                                           {"all_cores", current_state_watts.at(2)}
+                                                   });
+                    }
+                }
+
+                const char *watt_off_value = host->get_property("watt_off");
+
+                if (watt_off_value != nullptr) {
+                    datum["watt_off"] = std::string(watt_off_value);
+                }
+
+                for (const auto &pstate_timestamp : this->getTrace<SimulationTimestampPstateSet>()) {
+                    if (host->get_name() == pstate_timestamp->getContent()->getHostname()) {
+                        datum["pstate_trace"].push_back({
+                                                                {"time", pstate_timestamp->getDate()},
+                                                                {"pstate", pstate_timestamp->getContent()->getPstate()}
+                                                        });
+                    }
+
+                }
+
+                for (const auto &energy_consumption_timestamp : this->getTrace<SimulationTimestampEnergyConsumption>()) {
+                    if (host->get_name() == energy_consumption_timestamp->getContent()->getHostname()) {
+                        datum["consumed_energy_trace"].push_back({
+                                                                         {"time", energy_consumption_timestamp->getDate()},
+                                                                         {"joules", energy_consumption_timestamp->getContent()->getConsumption()}
+                                                                 });
+                    }
+                }
+
+                hosts_energy_consumption_information.push_back(datum);
+            }
+
+            // std::cerr << hosts_energy_consumption_information.dump(4);
+
+            std::ofstream output(file_path);
+            output << std::setw(4) << hosts_energy_consumption_information << std::endl;
+            output.close();
+
+        } catch (std::runtime_error &e) {
+            // the functions that get energy information catch any exceptions then throw runtime_errors
+            std::cerr << e.what() << std::endl;
+        }
     }
 };

@@ -166,14 +166,15 @@ namespace wrench {
 
       // start the central manager service
       this->central_manager->simulation = this->simulation;
-      this->central_manager->start(this->central_manager, true);
+      this->central_manager->start(this->central_manager, true, false); // Daemonized, no auto-restart
+
 
       // main loop
       while (this->processNextMessage()) {
         // no specific action
       }
 
-      WRENCH_INFO("HTCondor Service on host %s terminated!", S4U_Simulation::getHostName().c_str());
+      WRENCH_INFO("HTCondor Service on host %s cleanly terminating!", S4U_Simulation::getHostName().c_str());
       return 0;
     }
 

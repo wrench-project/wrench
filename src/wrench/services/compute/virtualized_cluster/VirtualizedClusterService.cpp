@@ -139,7 +139,7 @@ namespace wrench {
         // no specific action
       }
 
-      WRENCH_INFO("Virtualized Cluster Service on host %s terminated!", S4U_Simulation::getHostName().c_str());
+      WRENCH_INFO("Virtualized Cluster Service on host %s cleanly terminating!", S4U_Simulation::getHostName().c_str());
       return 0;
     }
 

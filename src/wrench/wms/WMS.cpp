@@ -308,7 +308,7 @@ namespace wrench {
       auto job_manager_raw_ptr = new JobManager(this);
       std::shared_ptr<JobManager> job_manager = std::shared_ptr<JobManager>(job_manager_raw_ptr);
       job_manager->simulation = this->simulation;
-      job_manager->start(job_manager, true); // Always daemonize
+      job_manager->start(job_manager, true, false); // Always daemonize, no auto-restart
       return job_manager;
     }
 
@@ -320,9 +320,39 @@ namespace wrench {
       auto data_movement_manager_raw_ptr = new DataMovementManager(this);
       std::shared_ptr<DataMovementManager> data_movement_manager = std::shared_ptr<DataMovementManager>(data_movement_manager_raw_ptr);
       data_movement_manager->simulation = this->simulation;
-      data_movement_manager->start(data_movement_manager, true); // Always daemonize
+      data_movement_manager->start(data_movement_manager, true, false); // Always daemonize, no auto-restart
       return data_movement_manager;
     }
+
+    /**
+     * @brief Instantiate and start an energy meter
+     *
+     * @param measurement_periods: the measurement period for each metered host
+     *
+     * @return an energy meter
+     */
+    std::shared_ptr<EnergyMeter> WMS::createEnergyMeter(const std::map<std::string, double> &measurement_periods) {
+        auto energy_meter_raw_ptr = new EnergyMeter(this, measurement_periods);
+        std::shared_ptr<EnergyMeter> energy_meter = std::shared_ptr<EnergyMeter>(energy_meter_raw_ptr);
+        energy_meter->simulation = this->simulation;
+        energy_meter->start(energy_meter, true, false); // Always daemonize, no auto-restart
+        return energy_meter;
+    }
+
+    /**
+     * @brief Instantiate and start an energy meter
+     * @param hostnames: the list of metered hosts, as hostnames
+     * @param measurement_period: the measurement period
+     * @return an energy meter
+     */
+    std::shared_ptr<EnergyMeter> WMS::createEnergyMeter(const std::vector<std::string> &hostnames, double measurement_period) {
+        auto energy_meter_raw_ptr = new EnergyMeter(this, hostnames, measurement_period);
+        std::shared_ptr<EnergyMeter> energy_meter = std::shared_ptr<EnergyMeter>(energy_meter_raw_ptr);
+        energy_meter->simulation = this->simulation;
+        energy_meter->start(energy_meter, true, false); // Always daemonize, no auto-restart
+        return energy_meter;
+    }
+
 
     /** @brief Get the WMS's pilot scheduler
      * 
