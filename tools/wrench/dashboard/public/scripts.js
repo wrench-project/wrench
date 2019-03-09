@@ -567,12 +567,12 @@ function toggleView() {
     if (currGraphState === "taskView") {
         switchToHostView(data.contents)
         populateLegend("hostView")
-        d3.select("#toggle-view-button").text("Task View")
+        d3.select("#toggle-view-button").text("Switch to Task View")
         currGraphState = "hostView"
     } else if (currGraphState === "hostView") {
         generateGraph(data.contents, "graph-container")
         populateLegend("taskView")
-        d3.select("#toggle-view-button").text("Host View")
+        d3.select("#toggle-view-button").text("Switch to Host View")
         currGraphState = "taskView"
     }
 }
