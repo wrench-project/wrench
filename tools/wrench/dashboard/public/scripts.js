@@ -534,6 +534,14 @@ function populateLegend(currView) {
                     .text(hostName)
             }
         }
+        legend.append("small")
+            .attr("class", "inline-block")
+            .attr("id","workflow-execution-chart-legend-failed")
+            .text("Failed During Execution")
+        legend.append("small")
+            .attr("class", "inline-block")
+            .attr("id","workflow-execution-chart-legend-terminated")
+            .text("Terminated During Execution")
     }
 }
 
