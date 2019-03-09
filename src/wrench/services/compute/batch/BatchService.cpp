@@ -903,7 +903,7 @@ namespace wrench {
         /* Get the nodes and cores per nodes asked for */
         unsigned long cores_per_node_asked_for = batch_job->getAllocatedCoresPerNode();
         unsigned long num_nodes_asked_for = batch_job->getNumNodes();
-        double allocated_time = batch_job->getAllocatedTime();
+        unsigned long allocated_time = batch_job->getAllocatedTime();
 
 //      WRENCH_INFO("Trying to see if I can run job (batch_job = %ld)(%s)",
 //                  (unsigned long)batch_job,
@@ -1694,7 +1694,7 @@ namespace wrench {
     BatchService::startJob(std::map<std::string, std::tuple<unsigned long, double>> resources,
                            WorkflowJob *workflow_job,
                            BatchJob *batch_job, unsigned long num_nodes_allocated,
-                           double allocated_time,
+                           unsigned long allocated_time,
                            unsigned long cores_per_node_asked_for) {
         switch (workflow_job->getType()) {
             case WorkflowJob::STANDARD: {
@@ -1748,7 +1748,7 @@ namespace wrench {
 
             case WorkflowJob::PILOT: {
                 auto job = (PilotJob *) workflow_job;
-                WRENCH_INFO("Allocating %ld nodes with %ld cores per node to a pilot job for %.2lf seconds",
+                WRENCH_INFO("Allocating %ld nodes with %ld cores per node to a pilot job for %lu seconds",
                             num_nodes_allocated, cores_per_node_asked_for, allocated_time);
 
                 std::vector<std::string> nodes_for_pilot_job = {};
@@ -1775,7 +1775,7 @@ namespace wrench {
                 try {
                     cs->start(cs, true, false); // Daemonized, no auto-restart
                     batch_job->setBeginTimeStamp(S4U_Simulation::getClock());
-                    double timeout_timestamp = allocated_time;
+                    double timeout_timestamp = (double)allocated_time;
                     batch_job->setEndingTimeStamp(S4U_Simulation::getClock() + timeout_timestamp);
                 } catch (std::runtime_error &e) {
                     throw;
@@ -1811,9 +1811,6 @@ namespace wrench {
                                                                               "batch_pilot");
 
                 this->pilot_job_alarms[job->getName()] = alarm_ptr;
-
-                // Push my own mailbox_name onto the pilot job!
-//          job->pushCallbackMailbox(this->mailbox_name);
 
                 return;
             }
@@ -2424,7 +2421,7 @@ namespace wrench {
     }
 
     /**
-   * @brief Notify a job even to BATSCHED (BATSCHED ONLY)
+   * @brief Notify a job event to BATSCHED (BATSCHED ONLY)
    * @param job_id the id of the job to be processed
    * @param status the status of the job
    * @param job_state current state of the job
