@@ -45,9 +45,7 @@ namespace wrench {
      * @brief Destructor
      */
     BatchService::~BatchService() {
-        MessageManager::cleanUpMessages(this->mailbox_name);
     }
-
 
     /**
      * @brief Retrieve start time estimates for a set of job configurations
