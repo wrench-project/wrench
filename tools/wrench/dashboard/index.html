@@ -22,7 +22,7 @@
         </div>
 
         <div class='element-and-title-container'>
-            <div class='title-container' onclick='showHide("overall-metrics-table-container", "overall-metrics-arrow")'>
+            <div class='title-container' onclick='showHideArrow("overall-metrics-table-container", "overall-metrics-arrow")'>
                 <h6 class='title-text'>Overall Simulation Metrics</h6>
                 <div class='arrow-div'>
                     <span class='arrow-helper'></span>
@@ -47,7 +47,7 @@
         </div>
 
         <div class='element-and-title-container'>
-            <div class='title-container' onclick='showHide("overall-graph-container", "simulation-graph-arrow")'>
+            <div class='title-container' onclick='showHideArrow("overall-graph-container", "simulation-graph-arrow")'>
                 <h6 class='title-text'>Simulation Graph</h6>
                 <div class='arrow-div'>
                     <span class='arrow-helper'></span>
@@ -56,53 +56,15 @@
             </div>
             
             <div class='hidden' id='overall-graph-container'>
-                <div class="container legend" id="workflow-execution-chart-legend">
-                    <small>Legend:</small> 
-                    <small class="inline-block" id="workflow-execution-chart-legend-read-input">Reading Input</small>
-                    <small class="inline-block" id="workflow-execution-chart-legend-computation">Performing Computation</small>
-                    <small class="inline-block" id="workflow-execution-chart-legend-write-output">Writing Output</small>
-                    <small class="inline-block" id="workflow-execution-chart-legend-failed">Failed During Execution</small>
-                    <small class="inline-block" id="workflow-execution-chart-legend-terminated">Terminated by User</small>
-                </div>
-                <div id="graph-container">
-                    <div class="text-left" id="tooltip-container">
-                        <span id="tooltip-task-id"></span><br>
-                        <span id="tooltip-task-operation"></span><br>
-                        <span id="tooltip-task-operation-duration"></span>
-                    </div>
+                <div class="container legend" id="workflow-execution-chart-legend"></div>
+                <div id="graph-container"></div>
+                <div>
+                    <button id="toggle-view-button" onclick="toggleView()">Host View</button>
                 </div>
             </div>
         </div>
- 
         <div class='element-and-title-container'>
-            <div class='title-container' onclick='showHide("overall-host-graph-container", "host-graph-arrow")'>
-                <h6 class='title-text'>Simulation Graph (Host View)</h6>
-                <div class='arrow-div'>
-                    <span class='arrow-helper'></span>
-                    <img id='host-graph-arrow' class='arrow-img' src='public/expand-arrow.png'/>
-                </div>
-            </div>
-            
-            <div class='hidden' id='overall-host-graph-container'>
-                <!-- <div class="container legend" id="workflow-execution-chart-legend">
-                    <small>Legend:</small> 
-                    <small class="inline-block" id="workflow-execution-chart-legend-read-input">Reading Input</small>
-                    <small class="inline-block" id="workflow-execution-chart-legend-computation">Performing Computation</small>
-                    <small class="inline-block" id="workflow-execution-chart-legend-write-output">Writing Output</small>
-                    <small class="inline-block" id="workflow-execution-chart-legend-failed">Failed During Execution</small>
-                    <small class="inline-block" id="workflow-execution-chart-legend-terminated">Terminated by User</small>
-                </div> -->
-                <div id="host-graph-container">
-                    <div class="text-left" id="host-tooltip-container">
-                        <span id="host-tooltip-task-id"></span><br>
-                        <span id="host-tooltip-task-duration"></span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class='element-and-title-container'>
-            <div class='title-container' onclick='showHide("task-details-table-container", "simulation-details-arrow")'>
+            <div class='title-container' onclick='showHideArrow("task-details-table-container", "simulation-details-arrow")'>
                 <h6 class='title-text'>Simulation Details</h6>
                 <div class='arrow-div'>
                     <span class='arrow-helper'></span>
@@ -149,11 +111,12 @@
             </div>
 
         </div>
+    
     </body>
     <script>
         populateMetadata()
         generateGraph(data.contents, "graph-container")
-        generateHostGraph(data.contents, "host-graph-container")
+        populateLegend("taskView")
         populateWorkflowTaskDataTable(data.contents)
         getOverallWorkflowMetrics(data.contents)
     </script>

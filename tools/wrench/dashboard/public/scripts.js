@@ -1,5 +1,6 @@
 var data={"modified":"2019-02-28T22:40:26.507Z","file":"test_data/test_data_host.json","contents":[{"compute":{"end":-1,"start":-1},"execution_host":{"hostname":"Host1"},"failed":2,"num_cores_allocated":1,"read":{"end":-1,"start":0},"task_id":"ID00000","terminated":-1,"whole_task":{"end":-1,"start":0},"write":{"end":-1,"start":-1}},{"compute":{"end":-1,"start":13},"execution_host":{"hostname":"Host2"},"failed":-1,"num_cores_allocated":1,"read":{"end":13,"start":10},"task_id":"ID00001","terminated":14,"whole_task":{"end":-1,"start":10},"write":{"end":-1,"start":-1}},{"compute":{"end":26,"start":23},"execution_host":{"hostname":"Host3"},"failed":-1,"num_cores_allocated":1,"read":{"end":23,"start":20},"task_id":"ID00002","terminated":28,"whole_task":{"end":-1,"start":20},"write":{"end":-1,"start":26}}]}
-
+var currGraphState = "taskView"
+var hostColours = {}
 /**
  * Helper function used to get the position of the mouse within the browser window
  * so that we can have nice moving tooltips. The input is the DOM element we are
@@ -61,11 +62,11 @@ function determineFailedOrTerminatedPoint(d) {
 
 function getRandomColour() {
     var letters = '0123456789ABCDEF';
-    var color = '#';
+    var colour = '#';
     for (var i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
+      colour += letters[Math.floor(Math.random() * 16)];
     }
-    return color;
+    return colour;
 }
 
 function populateMetadata() {
@@ -75,6 +76,14 @@ function populateMetadata() {
 }
 
 function generateGraph(data, containerId) {
+    document.getElementById(containerId).innerHTML = //reset graph
+        `<div class="text-left" id="tooltip-container">
+            <span id="tooltip-task-id"></span><br>
+            <span id="tooltip-host"></span><br>
+            <span id="tooltip-task-operation"></span><br>
+            <span id="tooltip-task-operation-duration"></span>
+        </div>`
+    
     var read_color    = '#cbb5dd'
     var compute_color = '#f7daad'
     var write_color   = '#abdcf4'
@@ -173,6 +182,7 @@ function generateGraph(data, containerId) {
         }
         var tooltip = document.getElementById('tooltip-container')
         var tooltip_task_id                 = d3.select('#tooltip-task-id')
+        var tooltip_host                    = d3.select('#tooltip-host')
         var tooltip_task_operation          = d3.select('#tooltip-task-operation')
         var tooltip_task_operation_duration = d3.select('#tooltip-task-operation-duration')
         group.selectAll('rect')
@@ -192,6 +202,8 @@ function generateGraph(data, containerId) {
                 tooltip.style.top = y + 'px'
 
                 tooltip_task_id.text('TaskID: ' + d.task_id)
+
+                tooltip_host.text('Host Name: ' + d.execution_host.hostname)
 
                 var parent_group = d3.select(this).attr('class')
 
@@ -222,180 +234,6 @@ function generateGraph(data, containerId) {
                 d3.select(this)
                     .attr('stroke', 'none')
             })
-    })
-}
-
-function generateHostGraph(data, containerId) {
-    var container = d3.select(`#${containerId}`);
-    const CONTAINER_WIDTH = container.style("width").slice(0, -2); // returns "XXXXpx" so need to remove "px"
-    const CONTAINER_HEIGHT = container.style("height").slice(0, -2);
-    const PADDING = 60;
-    var toFiveDecimalPlaces = d3.format('.5f');
-    var svg = container
-        .append("svg")
-        .attr('width', CONTAINER_WIDTH)
-        .attr('height', CONTAINER_HEIGHT)
-        .attr('id', 'host-graph')
-    var xscale = d3.scaleLinear()
-        .domain([0, d3.max(data, function(d) {
-            return Math.max(d['whole_task'].end, d['failed'], d['terminated'])
-        })])
-        .range([PADDING, CONTAINER_WIDTH - PADDING])
-
-    var hostNames = new Set();
-
-    var hostTasks = {}
-    data.forEach(function(task) {
-        var hostName = task.execution_host.hostname
-        hostNames.add(hostName)
-        var whole_task = task.whole_task
-        if (hostTasks[hostName] === undefined) {
-            var toAdd = {}
-            toAdd[task.task_id] = {whole_task, yIndex: 0}
-            hostTasks[hostName] = [{whole_task, id: task.task_id, yIndex: 0}]
-        } else {
-            var currHost = hostTasks[hostName]
-            var currStart = whole_task.start
-            var currEnd = whole_task.end
-            var yIndex = 0
-            currHost.forEach(function(hostTask) {
-                if ((currStart >= hostTask.whole_task.start && currStart <= hostTask.whole_task.end) || (currEnd >= hostTask.whole_task.start && currEnd <= hostTask.whole_task.end)) {
-                    yIndex = hostTask.yIndex + 1
-                    return
-                }
-            })
-            currHost.push({whole_task, id: task.task_id, yIndex})
-            hostTasks[hostName] = currHost
-        }
-    })
-
-    hostNames = Array.from(hostNames)
-
-    hostNames.sort(function(lhs, rhs) {
-       return lhs - rhs
-    });
-
-    var colours = {}
-
-    hostNames.forEach(function(host) {
-        colours[host] = getRandomColour()
-    })
-
-    var yscale = d3.scaleBand()
-        .domain(hostNames)
-        .range([CONTAINER_HEIGHT - PADDING, 30])
-        .padding(0.1);
-
-    var x_axis = d3.axisBottom()
-        .scale(xscale);
-
-    var y_axis = d3.axisLeft()
-        .scale(yscale);
-
-    svg.append('g')
-        .attr('class', 'y-axis')
-        .attr('transform',
-            'translate(' + PADDING + ',0)')
-        .call(y_axis);
-
-    svg.append('g')
-        .attr('class', 'x-axis')
-        .attr('transform',
-            'translate(0,' + (CONTAINER_HEIGHT - PADDING) + ')')
-        .call(x_axis);
-
-    var hostCount = {}
-
-    var dataWithYIndex = data
-    dataWithYIndex.forEach(function(task, i) {
-        for (var key in hostTasks) {
-            var maxYIndex = 0
-            if (hostTasks.hasOwnProperty(key)) {
-                hostTasks[key].forEach(function(hostTask) {
-                    if (hostTask.yIndex > maxYIndex) {
-                        maxYIndex = hostTask.yIndex
-                    }
-                    if (task.task_id === hostTask.id) {
-                        dataWithYIndex[i] = {
-                            ...task,
-                            yIndex: hostTask.yIndex
-                        }
-                    }
-                })
-            }
-            hostTasks[key].maxYIndex = maxYIndex
-        }
-    })
-
-    data.forEach(function(d) {
-        if (hostCount[d.execution_host.hostname] === undefined) {
-            hostCount[d.execution_host.hostname] = 0
-        } else {
-            hostCount[d.execution_host.hostname]++
-        }
-        var group = svg.append('g')
-           .attr('id', d.execution_host.hostname + " " + d.task_id)
-        var width
-        if (d.failed != -1) {
-            width = xscale(d.failed) - xscale(d.whole_task.start)
-        } else if (d.terminated != -1) {
-            width = xscale(d.terminated) - xscale(d.whole_task.start)
-        } else {
-            width = xscale(d.whole_task.end) - xscale(d.whole_task.start)
-        }
-        var height
-        if (hostNames.length == 1) {
-            height = yscale(hostNames[0])
-        } else {
-            height = yscale(hostNames[0])-yscale(hostNames[1])
-        }
-        console.log(height)
-        group.append('rect')
-            .attr('x', xscale(d.whole_task.start))
-            .attr('y', yscale(d.execution_host.hostname) + ((height / (hostTasks[d.execution_host.hostname].maxYIndex + 1)) * d.yIndex)) //y-position + (width / total-count) * y-index
-            .attr('height', height / (hostTasks[d.execution_host.hostname].maxYIndex + 1))
-            .attr('width', width)
-            .style('fill', colours[d.execution_host.hostname])
-            .attr('class','host-graph-box')
-        var tooltip = document.getElementById('host-tooltip-container')
-        var tooltip_task_id                 = d3.select('#host-tooltip-task-id')
-        var tooltip_task_duration = d3.select('#host-tooltip-task-duration')
-        group.selectAll('rect')
-            .on('mouseover', function() {
-                tooltip.style.display = 'inline'
-
-                d3.select(this)
-                    .attr('stroke', 'gray')
-                    .style('stroke-width', '1');
-            })
-            .on('mousemove', function() {
-                var offset = getOffset(document.getElementById("host-graph-container"), d3.mouse(this));
-                var x = window.scrollX + offset.left + 20;
-                var y = window.scrollY + offset.top - 30; // 20 seems to account for the padding of the chart-block
-                
-                tooltip.style.left = x + 'px'
-                tooltip.style.top = y + 'px'
-
-                tooltip_task_id.text('TaskID: ' + d.task_id);
-
-                var durationFull = findDuration(data, d.task_id, "whole_task")
-                var duration = toFiveDecimalPlaces(durationFull)
-                if (d.whole_task.start != -1 && d.whole_task.end != -1) {
-                    
-                    tooltip_task_duration.text('Duration: ' + duration + 's')
-                } else if (d.failed != -1) {
-                    tooltip_task_duration.text('Failed at ' + duration + 's')
-                } else if (d.terminated != -1) {
-                    tooltip_task_duration.text('Terminated at ' + duration + 's')
-                }
-                
-            })
-            .on('mouseout', function() {
-                tooltip.style.display = 'none'
-
-                d3.select(this)
-                    .attr('stroke', 'none')
-            });
     })
 }
 
@@ -620,7 +458,7 @@ function getOverallWorkflowMetrics(data) {
     }
 }
 
-function showHide(id, arrowId) {
+function showHideArrow(id, arrowId) {
     var overallDiv = $(`#${id}`)
     var arrow = $(`#${arrowId}`)
     overallDiv.slideToggle()
@@ -630,5 +468,85 @@ function showHide(id, arrowId) {
     } else {
         arrow.rotate({animateTo: 0})
         overallDiv.addClass('hidden')
+    }
+}
+
+function getHostNames(data) {
+    var hostNames = new Set();
+
+    data.forEach(function(task) {
+        var hostName = task.execution_host.hostname
+        hostNames.add(hostName)
+    })
+
+    hostNames = Array.from(hostNames)
+    return hostNames
+}
+
+function hostColoursJSONPopulated() {
+    for (var key in hostColours) {
+        return true
+    }
+    return false
+}
+
+function switchToHostView(data) {
+    var hostNames = getHostNames(data)
+
+    if (!hostColoursJSONPopulated()) {
+        hostNames.forEach(function(hostName) {
+            hostColours[hostName] = getRandomColour()
+        })
+    }
+    
+
+    data.forEach(function(task) {
+        var hostName = task.execution_host.hostname
+        var taskRead = d3.select(`#${task.task_id} .read`)
+        var taskCompute = d3.select(`#${task.task_id} .compute`)
+        var taskWrite = d3.select(`#${task.task_id} .write`)
+
+        taskRead.style("fill", hostColours[hostName])
+        taskCompute.style("fill", hostColours[hostName])
+        taskWrite.style("fill", hostColours[hostName])
+    })
+}
+
+function populateLegend(currView) {
+    if (currView === "taskView") {
+        document.getElementById("workflow-execution-chart-legend").innerHTML = `
+        <small>Legend:</small> 
+        <small class="inline-block" id="workflow-execution-chart-legend-read-input">Reading Input</small>
+        <small class="inline-block" id="workflow-execution-chart-legend-computation">Performing Computation</small>
+        <small class="inline-block" id="workflow-execution-chart-legend-write-output">Writing Output</small>
+        <small class="inline-block" id="workflow-execution-chart-legend-failed">Failed During Execution</small>
+        <small class="inline-block" id="workflow-execution-chart-legend-terminated">Terminated by User</small>`
+    } else if (currView === "hostView") {
+        document.getElementById("workflow-execution-chart-legend").innerHTML = ``
+        var legend = d3.select("#workflow-execution-chart-legend")
+        legend.append("small")
+            .text("Legend:")
+        for (var hostName in hostColours) {
+            if (hostColours.hasOwnProperty(hostName)) {
+                legend.append("small")
+                    .attr("class", "inline-block")
+                    .style("border-left", `15px solid ${hostColours[hostName]}`)
+                    .text(hostName)
+            }
+        }
+    }
+}
+
+function toggleView() {
+    if (currGraphState === "taskView") {
+        switchToHostView(data.contents)
+        populateLegend("hostView")
+        d3.select("#toggle-view-button").text("Task View")
+        currGraphState = "hostView"
+    } else if (currGraphState === "hostView") {
+        generateGraph(data.contents, "graph-container")
+        populateLegend("taskView")
+        d3.select("#toggle-view-button").text("Host View")
+        currGraphState = "taskView"
     }
 }
