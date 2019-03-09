@@ -282,7 +282,7 @@ namespace wrench {
 
         //start a job
         void startJob(std::map<std::string, std::tuple<unsigned long, double>>, WorkflowJob *,
-                      BatchJob *, unsigned long, double, unsigned long);
+                      BatchJob *, unsigned long, unsigned long, unsigned long);
 
 
 

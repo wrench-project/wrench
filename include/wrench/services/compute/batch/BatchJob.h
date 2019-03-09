@@ -21,8 +21,8 @@ namespace wrench {
 
 
         unsigned long getJobID();
-        double getAllocatedTime();
-        void setAllocatedTime(double);
+        unsigned long getAllocatedTime();
+        void setAllocatedTime(unsigned long);
         unsigned long getAllocatedCoresPerNode();
         double getMemoryRequirement();
         double getBeginTimeStamp();
@@ -37,7 +37,7 @@ namespace wrench {
 
     private:
         unsigned long jobid;
-        double  allocated_time;
+        unsigned long  allocated_time;
         WorkflowJob* job;
         unsigned long num_nodes;
         unsigned long cores_per_node;
