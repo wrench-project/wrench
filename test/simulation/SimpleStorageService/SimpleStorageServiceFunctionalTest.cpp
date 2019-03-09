@@ -174,8 +174,6 @@ private:
       }
 
 
-      // TODO: Make sure that the file registry service has been updated?
-
       // Send a free space request
       double free_space;
       try {
