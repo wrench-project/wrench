@@ -2617,15 +2617,6 @@ namespace wrench {
     }
 
 
-//    void BatchService::setBatschedReady(bool v) {
-//      this->is_bat_sched_ready = v;
-//    }
-//
-//    bool BatchService::isBatschedReady() {
-//      return this->is_bat_sched_ready;
-//    }
-
-
     /**
      * @brief Appends a job to the CSV Output file
      *

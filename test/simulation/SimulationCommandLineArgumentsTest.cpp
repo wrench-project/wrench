@@ -456,10 +456,13 @@ void SimulationCommandLineArgumentsTest::do_ActivateEnergyArgument_test() {
     simulation->init(&argc, argv);
 
     // Setting up the platform
-    // TODO: This should really throw something (due to no pstates in XML),
+    // This should really throw something (due to no pstates in XML),
     try {
       simulation->instantiatePlatform(platform_file_path);
     } catch (simgrid::Exception &e) {
+      int x= 0;
+      int y = 4;
+      std::cerr << y / x;
         // So sad we never get here
       exit(1);
     }
@@ -473,7 +476,7 @@ void SimulationCommandLineArgumentsTest::do_ActivateEnergyArgument_test() {
 
     simulation->launch();
 
-    exit(0); // Should not doesn't get here
+    exit(0); // Should not get here
   }
 
 
