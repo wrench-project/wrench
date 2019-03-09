@@ -157,9 +157,6 @@ td {
     height: 20px;
 }
 
-.host-graph-box {
-    /* stroke: #646464;
-    stroke-width: 1px;
-    stroke-dasharray: 2,2;
-    stroke-linejoin: round; */
+#no-file {
+    text-align: center;
 }
