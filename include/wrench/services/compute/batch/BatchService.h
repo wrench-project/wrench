@@ -129,6 +129,11 @@ namespace wrench {
                      std::string suffix
         );
 
+        // helper function
+        static unsigned long parseUnsignedLongServiceSpecificArgument(std::string key, std::map<std::string, std::string> &args);
+
+        // helper function
+        void submitWorkflowJob(WorkflowJob *job, std::map<std::string, std::string> &batch_job_args);
 
         //submits a standard job
         void submitStandardJob(StandardJob *job, std::map<std::string, std::string> &batch_job_args) override;
