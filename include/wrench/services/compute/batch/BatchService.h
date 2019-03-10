@@ -141,6 +141,9 @@ namespace wrench {
         //submits a standard job
         void submitPilotJob(PilotJob *job, std::map<std::string, std::string> &batch_job_args) override;
 
+        // helper function
+        void terminateWorkflowJob(WorkflowJob *job);
+
         // terminate a standard job
         void terminateStandardJob(StandardJob *job) override;
 
