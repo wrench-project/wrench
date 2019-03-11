@@ -25,8 +25,6 @@ namespace wrench {
 
     class S4U_PendingCommunication;
 
-    class IncomingFile;
-
     /**
      * @brief A storage service that provides direct
      *        access to some storage resource (e.g., a disk)

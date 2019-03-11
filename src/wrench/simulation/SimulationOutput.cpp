@@ -260,7 +260,7 @@ namespace wrench {
      * @throws std::runtime_error
      */
     void generateHostUtilizationGraphLayout(std::vector<WorkflowTaskExecutionInstance> &data) {
-        if (searchForLayout(data, 0) == false) {
+        if (not searchForLayout(data, 0)) {
             throw std::runtime_error("SimulationOutput::generateHostUtilizationGraphLayout() could not find a valid layout.");
         }
     }
@@ -445,8 +445,8 @@ namespace wrench {
             }
 
 
-            bool has_output_files = (task->getOutputFiles().size() > 0) ? true : false;
-            bool has_children = (task->getNumberOfChildren() > 0) ? true : false;
+            bool has_output_files = not task->getOutputFiles().empty();
+            bool has_children = task->getNumberOfChildren() > 0;
 
             if (has_output_files) {
                 // create the links between current task and its output files (if any)
@@ -551,14 +551,14 @@ namespace wrench {
                     if (host->get_core_count() == 1) {
                         datum["pstates"].push_back({
                                                            {"pstate",  pstate},
-                                                           {"speed",   host->get_pstate_speed(pstate)},
+                                                           {"speed",   host->get_pstate_speed((int)pstate)},
                                                            {"idle",    current_state_watts.at(0)},
                                                            {"running", current_state_watts.at(1)}
                                                    });
                     } else {
                         datum["pstates"].push_back({
                                                            {"pstate",    pstate},
-                                                           {"speed",     host->get_pstate_speed(pstate)},
+                                                           {"speed",     host->get_pstate_speed((int)pstate)},
                                                            {"idle",      current_state_watts.at(0)},
                                                            {"one_core",  current_state_watts.at(1)},
                                                            {"all_cores", current_state_watts.at(2)}
