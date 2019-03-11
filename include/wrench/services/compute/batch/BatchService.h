@@ -59,6 +59,8 @@ namespace wrench {
                 {BatchServiceProperty::TASK_SELECTION_ALGORITHM,                    "maximum_flops"},
         #ifdef ENABLE_BATSCHED
                 {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "conservative_bf"},
+//                {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "easy_bf"},
+//                {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "easy_bf_fast"},
                 {BatchServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM,              "fcfs"},
         #else
                 {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,            "FCFS"},
