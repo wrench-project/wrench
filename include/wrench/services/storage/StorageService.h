@@ -40,7 +40,7 @@ namespace wrench {
         /** \cond DEVELOPER   **/
         /***********************/
 
-        void stop();
+        void stop() override;
 
         virtual double getFreeSpace();
 
