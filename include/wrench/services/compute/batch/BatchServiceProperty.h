@@ -32,7 +32,8 @@ namespace wrench {
          *      - "FCFS": First Come First Serve
          *    - If ENABLE_BATSCHED is set to on:
          *      - whatever scheduling algorithm is supported by Batsched
-         *                  (by default: "conservative_bf")
+         *        (by default: "conservative_bf", other options include
+         *        "easy_bf" and "easy_bf_fast")
          *
          **/
         DECLARE_PROPERTY_NAME(BATCH_SCHEDULING_ALGORITHM);
