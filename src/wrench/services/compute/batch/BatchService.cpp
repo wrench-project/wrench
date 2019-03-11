@@ -554,7 +554,6 @@ namespace wrench {
 #endif
         }
 
-
         return 0;
     }
 
@@ -1845,7 +1844,9 @@ namespace wrench {
         // Create the trace replayer process
         this->workload_trace_replayer = std::shared_ptr<WorkloadTraceFileReplayer>(
                 new WorkloadTraceFileReplayer(this->simulation, S4U_Simulation::getHostName(), this,
-                                              this->num_cores_per_node, this->workload_trace)
+                                              this->num_cores_per_node,
+                                              this->getPropertyValueAsBoolean(BatchServiceProperty::USE_REAL_RUNTIMES_AS_REQUESTED_RUNTIMES),
+                                              this->workload_trace)
         );
         try {
             this->workload_trace_replayer->simulation = this->simulation;
