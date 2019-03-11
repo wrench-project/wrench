@@ -91,7 +91,6 @@ namespace wrench {
 
       WRENCH_INFO("Starting");
 
-      /** Main loop **/
       if (this->data_to_send.empty()) {
         throw std::runtime_error(
                 "BatschedNetworkListener::BatschedNetworkListener():Network sending process has no data to send"
@@ -176,8 +175,9 @@ namespace wrench {
 
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("batch_network_listener_mailbox");
       for (auto decisions:decision_events) {
+
         std::string decision_type = decisions["type"];
-        double decision_timestamp = decisions["timestamp"];
+          double decision_timestamp = decisions["timestamp"];
         double time_to_sleep = S4U_Simulation::getClock() - decision_timestamp;
         nlohmann::json execute_json_data = decisions["data"];
         std::string job_reply_data = execute_json_data.dump();

@@ -35,6 +35,7 @@ public:
     void do_BatchTraceFileReplayTest_test();
 
     void do_WorkloadTraceFileTestSWF_test();
+    void do_WorkloadTraceFileRequestedTimesTestSWF_test();
     void do_BatchTraceFileReplayTestWithFailedJob_test();
     void do_WorkloadTraceFileTestJSON_test();
 
@@ -97,8 +98,7 @@ private:
     int main() {
       // Create a job manager
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
-
-
+      
       // Submit the jobs
       unsigned long num_submitted_jobs = 0;
       {
@@ -282,7 +282,7 @@ void BatchServiceTest::do_BatchTraceFileReplayTestWithFailedJob_test() {
 
   FILE *trace_file = fopen(trace_file_path.c_str(), "w");
   fprintf(trace_file, "1 0 -1 3600 -1 -1 -1 4 3600 -1\n");  // job that takes the whole machine
-  fprintf(trace_file, "2 1 -1 3600 -1 -1 -1 2 1000 -1\n");  // job that takes half the machine
+  fprintf(trace_file, "2 1 -1 3600 -1 -1 -1 2 3600 -1\n");  // job that takes half the machine
   fclose(trace_file);
 
 
@@ -328,7 +328,6 @@ public:
                         hostname, "test") {
       this->test = test;
     }
-
 
 private:
 
@@ -447,7 +446,6 @@ TEST_F(BatchServiceTest, WorkloadTraceFileSWFTest) {
   DO_TEST_WITH_FORK(do_WorkloadTraceFileTestSWF_test);
 }
 
-
 void BatchServiceTest::do_WorkloadTraceFileTestSWF_test() {
 
   // Create and initialize a simulation
@@ -543,10 +541,11 @@ void BatchServiceTest::do_WorkloadTraceFileTestSWF_test() {
           )), std::invalid_argument);
 
 
-  // Create a Valid trace file
+  // Create a Valid trace file (not the "wrong" estimates, which are ignored due to
+  // passing the correct option to the BatchService constructor
   trace_file = fopen(trace_file_path.c_str(), "w");
-  fprintf(trace_file, "1 0 -1 3600 -1 -1 -1 4 3600 -1\n");  // job that takes the whole machine
-  fprintf(trace_file, "2 1 -1 3600 -1 -1 -1 2 3600 -1\n");  // job that takes half the machine (and times out, for coverage)
+  fprintf(trace_file, "1 0 -1 3600 -1 -1 -1 4 5600 -1\n");  // job that takes the whole machine
+  fprintf(trace_file, "2 1 -1 3600 -1 -1 -1 2 8666 -1\n");  // job that takes half the machine (and times out, for coverage)
   fclose(trace_file);
 
 
@@ -554,7 +553,10 @@ void BatchServiceTest::do_WorkloadTraceFileTestSWF_test() {
   ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, 0,
-                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
+                                   {
+              {wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path},
+              {wrench::BatchServiceProperty::USE_REAL_RUNTIMES_AS_REQUESTED_RUNTIMES, "true"}
+                                   }
           )));
 
 
@@ -575,6 +577,201 @@ void BatchServiceTest::do_WorkloadTraceFileTestSWF_test() {
   free(argv[0]);
   free(argv);
 }
+
+
+
+
+
+
+
+/**********************************************************************/
+/**  WORKLOAD TRACE FILE TEST SWF: REQUESTED != ACTUAL               **/
+/**********************************************************************/
+
+class WorkloadTraceFileSWFRequestedTimesTestWMS : public wrench::WMS {
+
+public:
+    WorkloadTraceFileSWFRequestedTimesTestWMS(BatchServiceTest *test,
+                                const std::set<wrench::ComputeService *> &compute_services,
+                                const std::set<wrench::StorageService *> &storage_services,
+                                std::string hostname) :
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
+                        hostname, "test") {
+      this->test = test;
+    }
+
+
+private:
+
+    BatchServiceTest *test;
+
+    int main() {
+      // Create a job manager
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+
+      wrench::Simulation::sleep(10);
+
+      std::vector<wrench::WorkflowTask *> tasks;
+      std::map<std::string, std::string> batch_job_args;
+
+      // Create and submit a job that needs 2 nodes and 10 minutes
+      for (size_t i = 0; i < 2; i++) {
+        double time_fudge = 1; // 1 second seems to make it all work!
+        double task_flops = 10 * (1 * (600 - time_fudge));
+        int num_cores = 10;
+        double parallel_efficiency = 1.0;
+        tasks.push_back(this->getWorkflow()->addTask("test_job_1_task_" + std::to_string(i),
+                                                     task_flops,
+                                                     num_cores, num_cores, parallel_efficiency,
+                                                     0.0));
+      }
+
+      // Create a Standard Job with only the tasks
+      wrench::StandardJob *standard_job_2_nodes;
+      standard_job_2_nodes = job_manager->createStandardJob(tasks, {});
+
+      // Create the batch-specific argument
+      batch_job_args["-N"] = std::to_string(2);     // Number of nodes/tasks
+      batch_job_args["-t"] = std::to_string(10);  // Time in minutes (at least 1 minute)
+      batch_job_args["-c"] = std::to_string(10);  //number of cores per task
+
+      // Submit this job to the batch service
+      job_manager->submitJob(standard_job_2_nodes, *(this->getAvailableComputeServices().begin()), batch_job_args);
+
+
+      // Wait for the two execution events
+      for (auto job : {standard_job_2_nodes}) {
+        // Wait for the workflow execution event
+        WRENCH_INFO("Waiting for job completion of job %s", job->getName().c_str());
+        std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+        try {
+          event = this->getWorkflow()->waitForNextExecutionEvent();
+          switch (event->type) {
+            case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
+              if (dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())->standard_job != job) {
+                throw std::runtime_error("Wrong job completion order: got " +
+                                         dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())->standard_job->getName() + " but expected " + job->getName());
+              }
+              break;
+            }
+            default: {
+              throw std::runtime_error(
+                      "Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+            }
+          }
+        } catch (wrench::WorkflowExecutionException &e) {
+          //ignore (network error or something)
+        }
+
+        double completion_time = wrench::Simulation::getCurrentSimulatedDate();
+        double expected_completion_time;
+        if (job == standard_job_2_nodes) {
+          expected_completion_time = 100 + 600;
+        } else {
+          throw std::runtime_error("Phantom job completion!");
+        }
+        double delta = fabs(expected_completion_time - completion_time);
+        double tolerance = 5;
+        if (delta > tolerance) {
+          throw std::runtime_error("Unexpected job completion time for job " + job->getName() + ": " +
+                                   std::to_string(completion_time) + " (expected: " + std::to_string(expected_completion_time) + ")");
+        }
+
+      }
+      return 0;
+    }
+};
+
+#ifdef ENABLE_BATSCHED
+TEST_F(BatchServiceTest, WorkloadTraceFileSWFRequestedTimesTest) {
+#else
+TEST_F(BatchServiceTest, DISABLED_WorkloadTraceFileSWFRequestedTimesTest) {
+#endif
+  DO_TEST_WITH_FORK(do_WorkloadTraceFileRequestedTimesTestSWF_test);
+}
+
+
+void BatchServiceTest::do_WorkloadTraceFileRequestedTimesTestSWF_test() {
+
+  // Create and initialize a simulation
+  auto simulation = new wrench::Simulation();
+  int argc = 1;
+  auto argv = (char **) calloc(1, sizeof(char *));
+  argv[0] = strdup("batch_service_test");
+
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+  // Setting up the platform
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+  // Get a hostname
+  std::string hostname = "Host1";
+
+  // Create a Valid trace file
+  std::string trace_file_path = UNIQUE_TMP_PATH_PREFIX + "swf_trace.swf";
+  FILE *trace_file;
+  trace_file = fopen(trace_file_path.c_str(), "w");
+  fprintf(trace_file, "1 0 -1 100 -1 -1 -1 2 1800 -1\n");
+  fprintf(trace_file, "2 1 -1 1800 -1 -1 -1 2 1800 -1\n");
+  fprintf(trace_file, "3 2 -1 3600 -1 -1 -1 4 3600 -1\n");
+  fclose(trace_file);
+
+  // Create a Batch Service with a the valid trace file
+  ASSERT_NO_THROW(compute_service = simulation->add(
+          new wrench::BatchService(hostname,
+                                   {"Host1", "Host2", "Host3", "Host4"}, 0,
+                                   {
+            {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "easy_bf"},
+            {wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path},
+            {wrench::BatchServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP, "true"},
+            {wrench::BatchServiceProperty::BATSCHED_LOGGING_MUTED, "true"},
+            {wrench::BatchServiceProperty::USE_REAL_RUNTIMES_AS_REQUESTED_RUNTIMES, "false"}
+                                   }
+          )));
+
+
+  // Create a WMS
+  wrench::WMS *wms = nullptr;
+  ASSERT_NO_THROW(wms = simulation->add(new WorkloadTraceFileSWFRequestedTimesTestWMS(
+          this, {compute_service}, {}, hostname)));
+
+  ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+
+  // Running a "run a single task" simulation
+  // Note that in these tests the WMS creates workflow tasks, which a user would
+  // of course not be likely to do
+  ASSERT_NO_THROW(simulation->launch());
+
+  delete simulation;
+
+  free(argv[0]);
+  free(argv);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /**********************************************************************/
@@ -686,7 +883,7 @@ private:
           //ignore (network error or something)
         }
 
-        double completion_time = this->simulation->getCurrentSimulatedDate();
+        double completion_time = wrench::Simulation::getCurrentSimulatedDate();
         double expected_completion_time;
         if (job == standard_job_2_nodes) {
           expected_completion_time = 3600  + 1800;
@@ -710,7 +907,6 @@ private:
 TEST_F(BatchServiceTest, WorkloadTraceFileJSONTest) {
   DO_TEST_WITH_FORK(do_WorkloadTraceFileTestJSON_test);
 }
-
 
 void BatchServiceTest::do_WorkloadTraceFileTestJSON_test() {
 
@@ -1058,4 +1254,3 @@ void BatchServiceTest::do_WorkloadTraceFileTestJSON_test() {
   free(argv[0]);
   free(argv);
 }
-
