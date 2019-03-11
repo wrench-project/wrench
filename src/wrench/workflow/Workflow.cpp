@@ -96,7 +96,7 @@ namespace wrench {
 
       std::vector<wrench::WorkflowTask *> children = this->getTaskChildren(task);
 
-      DAG.get()->erase(task->DAG_node);
+      DAG->erase(task->DAG_node);
       tasks.erase(tasks.find(task->id));
 
       // Brute-force a top-level update all all the children of the removed task
@@ -479,7 +479,7 @@ namespace wrench {
     std::map<std::string, WorkflowFile *> Workflow::getInputFiles() {
       std::map<std::string, WorkflowFile *> input_files;
       for (auto const &x : this->files) {
-        if ((x.second->output_of == nullptr) && (x.second->input_of.size() > 0)) {
+        if ((x.second->output_of == nullptr) && (not x.second->input_of.empty())) {
           input_files.insert({x.first, x.second.get()});
         }
       }
@@ -539,7 +539,7 @@ namespace wrench {
         // Get the job attributes
         std::string id = job.attribute("id").value();
         std::string name = job.attribute("name").value();
-        double runtime = std::strtod(job.attribute("runtime").value(), NULL);
+        double runtime = std::strtod(job.attribute("runtime").value(), nullptr);
         int num_procs = 1;
         bool found_one = false;
         for (std::string tag : {"numprocs", "num_procs", "numcores", "num_cores"}) {
@@ -565,7 +565,7 @@ namespace wrench {
           // TODO: There are several attributes that we're ignoring for now...
           std::string id = uses.attribute("file").value();
 
-          double size = std::strtod(uses.attribute("size").value(), NULL);
+          double size = std::strtod(uses.attribute("size").value(), nullptr);
           std::string link = uses.attribute("link").value();
           // Check whether the file already exists
           WorkflowFile *file = nullptr;
