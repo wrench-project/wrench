@@ -27,7 +27,7 @@ namespace wrench {
      */
     class HostStateChangeDetectorMessage : public SimulationMessage {
     protected:
-        HostStateChangeDetectorMessage(std::string name);
+        eHostStateChangeDetectorMessage(std::string name);
     };
 
     class HostHasTurnedOnMessage : public HostStateChangeDetectorMessage {
