@@ -410,7 +410,7 @@ namespace wrench {
             S4U_Simulation::sleep(this->num_cores * this->thread_startup_overhead);
 
             // Then sleep for the computation duration
-            double sleep_time = flops / Simulation::getFlopRate();
+            double sleep_time = (flops / (this->num_cores  * parallel_efficiency)) / Simulation::getFlopRate();
             Simulation::sleep(sleep_time);
 
         } else {
