@@ -1,4 +1,23 @@
-var data={"modified":"2018-11-30T09:00:16.782Z","file":"gautam.json","contents":[{"compute":{"end":35.790446376852096,"start":0.0002512268520923695},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":0.0002512268520923695,"start":0.00019726981948412205},"task_id":"ID00000","terminated":-1,"whole_task":{"end":35.790500336988345,"start":0.00019726981948412205},"write":{"end":35.790500336988345,"start":35.790446376852096}},{"compute":{"end":38.611684255207564,"start":35.79148910520756},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":35.79148910520756,"start":35.791482446446814},"task_id":"ID00001","terminated":-1,"whole_task":{"end":38.61169091441169,"start":35.791482446446814},"write":{"end":38.61169091441169,"start":38.611684255207564}},{"compute":{"end":38.47207886985551,"start":35.791883719855505},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":35.791883719855505,"start":35.79187698608579},"task_id":"ID00002","terminated":-1,"whole_task":{"end":38.4720856040686,"start":35.79187698608579},"write":{"end":38.4720856040686,"start":38.47207886985551}},{"compute":{"end":38.54247328432496,"start":35.79227813432496},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":35.79227813432496,"start":35.792271525724765},"task_id":"ID00003","terminated":-1,"whole_task":{"end":38.54247989336853,"start":35.792271525724765},"write":{"end":38.54247989336853,"start":38.54247328432496}},{"compute":{"end":40.35286789674193,"start":35.79267274674192},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":35.79267274674192,"start":35.79266606536374},"task_id":"ID00004","terminated":-1,"whole_task":{"end":40.35287457856349,"start":35.79266606536374},"write":{"end":40.35287457856349,"start":40.35286789674193}},{"compute":{"end":39.913262764860086,"start":35.793067614860085},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":35.793067614860085,"start":35.793060605002715},"task_id":"ID00005","terminated":-1,"whole_task":{"end":39.913269775160835,"start":35.793060605002715},"write":{"end":39.913269775160835,"start":39.913262764860086}},{"compute":{"end":41.30365714285166,"start":35.79346199285167},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":35.79346199285167,"start":35.79345514464169},"task_id":"ID00006","terminated":-1,"whole_task":{"end":41.30366399150502,"start":35.79345514464169},"write":{"end":41.30366399150502,"start":41.30365714285166}},{"compute":{"end":38.34405181944918,"start":35.79385666944918},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":35.79385666944918,"start":35.793849684280666},"task_id":"ID00007","terminated":-1,"whole_task":{"end":38.34405880506107,"start":35.793849684280666},"write":{"end":38.34405880506107,"start":38.34405181944918}},{"compute":{"end":39.444445808311194,"start":35.79425065831119},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":35.79425065831119,"start":35.79424422391964},"task_id":"ID00008","terminated":-1,"whole_task":{"end":39.444452243146124,"start":35.79424422391964},"write":{"end":39.444452243146124,"start":39.444445808311194}},{"compute":{"end":39.70287154109849,"start":38.61267639109848},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":38.61267639109848,"start":38.61267302387016},"task_id":"ID00009","terminated":-1,"whole_task":{"end":39.70287384586667,"start":38.61267302387016},"write":{"end":39.70287384586667,"start":39.70287154109849}},{"compute":{"end":39.753266219899054,"start":38.47307106989905},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":38.47307106989905,"start":38.47306771352707},"task_id":"ID00010","terminated":-1,"whole_task":{"end":39.753268512400425,"start":38.47306771352707},"write":{"end":39.753268512400425,"start":39.753266219899054}},{"compute":{"end":39.36366044908269,"start":38.54346529908268},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":38.54346529908268,"start":38.543462002827},"task_id":"ID00011","terminated":-1,"whole_task":{"end":39.36366287836506,"start":38.543462002827},"write":{"end":39.36366287836506,"start":39.36366044908269}},{"compute":{"end":41.474055038652956,"start":40.353859888652956},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":40.353859888652956,"start":40.353856688021956},"task_id":"ID00012","terminated":-1,"whole_task":{"end":41.474057418085664,"start":40.353856688021956},"write":{"end":41.474057418085664,"start":41.474055038652956}},{"compute":{"end":40.824450383622015,"start":39.914255233622015},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":39.914255233622015,"start":39.914251884619304},"task_id":"ID00013","terminated":-1,"whole_task":{"end":40.82445239285676,"start":39.914251884619304},"write":{"end":40.82445239285676,"start":40.824450383622015}},{"compute":{"end":42.704844622438365,"start":41.30464947243836},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":41.30464947243836,"start":41.30464610096349},"task_id":"ID00014","terminated":-1,"whole_task":{"end":42.70484655256308,"start":41.30464610096349},"write":{"end":42.70484655256308,"start":42.704844622438365}},{"compute":{"end":39.54523938705446,"start":38.34504423705445},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":38.34504423705445,"start":38.34504091451954},"task_id":"ID00015","terminated":-1,"whole_task":{"end":39.54524258501867,"start":38.34504091451954},"write":{"end":39.54524258501867,"start":39.54523938705446}},{"compute":{"end":40.34563282132768,"start":39.44543767132768},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":39.44543767132768,"start":39.44543435260459},"task_id":"ID00016","terminated":-1,"whole_task":{"end":40.34563717978004,"start":39.44543435260459},"write":{"end":40.34563717978004,"start":40.34563282132768}},{"compute":{"end":41.18405341009332,"start":39.70385826009332},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":39.70385826009332,"start":39.70385595532514},"task_id":"ID00017","terminated":-1,"whole_task":{"end":41.18405399244908,"start":39.70385595532514},"write":{"end":41.18405399244908,"start":41.18405341009332}},{"compute":{"end":41.78444806436027,"start":39.754252914360265},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":39.754252914360265,"start":39.754250621858894},"task_id":"ID00018","terminated":-1,"whole_task":{"end":41.784448644007895,"start":39.754250621858894},"write":{"end":41.784448644007895,"start":41.78444806436027}},{"compute":{"end":40.884842567105906,"start":39.36464741710591},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":39.36464741710591,"start":39.36464498782353},"task_id":"ID00019","terminated":-1,"whole_task":{"end":40.8848431624598,"start":39.36464498782353},"write":{"end":40.8848431624598,"start":40.884842567105906}},{"compute":{"end":42.865237056976845,"start":41.47504190697684},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":41.47504190697684,"start":41.47503952754413},"task_id":"ID00020","terminated":-1,"whole_task":{"end":42.86523761934147,"start":41.47503952754413},"write":{"end":42.86523761934147,"start":42.865237056976845}},{"compute":{"end":42.315631661549986,"start":40.82543651154998},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":40.82543651154998,"start":40.82543450231523},"task_id":"ID00021","terminated":-1,"whole_task":{"end":42.31563225161859,"start":40.82543450231523},"write":{"end":42.31563225161859,"start":42.315631661549986}},{"compute":{"end":44.40602574214628,"start":42.70583059214627},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":42.70583059214627,"start":42.70582866202155},"task_id":"ID00022","terminated":-1,"whole_task":{"end":44.40602620726575,"start":42.70582866202155},"write":{"end":44.40602620726575,"start":44.40602574214628}},{"compute":{"end":41.85642304244136,"start":39.54622789244135},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":39.54622789244135,"start":39.54622469447714},"task_id":"ID00023","terminated":-1,"whole_task":{"end":41.85642368280886,"start":39.54622469447714},"write":{"end":41.85642368280886,"start":41.85642304244136}},{"compute":{"end":43.566818797690864,"start":40.34662364769087},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":40.34662364769087,"start":40.34661928923851},"task_id":"ID00024","terminated":-1,"whole_task":{"end":43.56681977948589,"start":40.34661928923851},"write":{"end":43.56681977948589,"start":43.566818797690864}},{"compute":{"end":12556.4463316142,"start":41.18613646423874},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":41.18613646423874,"start":41.18503610190755},"task_id":"ID00025","terminated":-1,"whole_task":{"end":12556.446332247157,"start":41.18503610190755},"write":{"end":12556.446332247157,"start":12556.4463316142}},{"compute":{"end":11348.516726263062,"start":41.786531113089424},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":41.786531113089424,"start":41.785430753466365},"task_id":"ID00026","terminated":-1,"whole_task":{"end":11348.516726893076,"start":41.785430753466365},"write":{"end":11348.516726893076,"start":11348.516726263062}},{"compute":{"end":11119.287120797206,"start":40.8869256472476},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":40.8869256472476,"start":40.88582527191827},"task_id":"ID00027","terminated":-1,"whole_task":{"end":11119.287121444291,"start":40.88582527191827},"write":{"end":11119.287121444291,"start":11119.287120797206}},{"compute":{"end":17545.277515221132,"start":42.86732007114},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":42.86732007114,"start":42.86621972879994},"task_id":"ID00028","terminated":-1,"whole_task":{"end":17545.27751583236,"start":42.86621972879994},"write":{"end":17545.27751583236,"start":17545.277515221132}},{"compute":{"end":11752.597909881104,"start":42.31771473112109},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":42.31771473112109,"start":42.31661436107706},"task_id":"ID00029","terminated":-1,"whole_task":{"end":11752.597910522445,"start":42.31661436107706},"write":{"end":11752.597910522445,"start":11752.597909881104}},{"compute":{"end":9781.87830371182,"start":44.40810856181912},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":44.40810856181912,"start":44.407008316724216},"task_id":"ID00030","terminated":-1,"whole_task":{"end":9781.878304217345,"start":44.407008316724216},"write":{"end":9781.878304217345,"start":9781.87830371182}},{"compute":{"end":15312.168701362587,"start":41.858506212610266},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":41.858506212610266,"start":41.85740579226733},"task_id":"ID00031","terminated":-1,"whole_task":{"end":15312.1687020586,"start":41.85740579226733},"write":{"end":15312.1687020586,"start":15312.168701362587}},{"compute":{"end":18962.25909780072,"start":43.56890265071482},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":43.56890265071482,"start":43.56780188894436},"task_id":"ID00032","terminated":-1,"whole_task":{"end":18962.259098867853,"start":43.56780188894436},"write":{"end":18962.259098867853,"start":18962.25909780072}},{"compute":{"end":18974.300281558626,"start":18962.260086408623},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":18962.260086408623,"start":18962.260080977325},"task_id":"ID00033","terminated":-1,"whole_task":{"end":18974.300286859925,"start":18962.260080977325},"write":{"end":18974.300286859925,"start":18974.300281558626}},{"compute":{"end":18974.321469240356,"start":18974.301274090354},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":18974.301274090354,"start":18974.301268969397},"task_id":"ID00034","terminated":-1,"whole_task":{"end":18974.321469317118,"start":18974.301268969397},"write":{"end":18974.321469317118,"start":18974.321469240356}},{"compute":{"end":24633.783746433328,"start":18974.323551283327},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":18974.323551283327,"start":18974.32245142659},"task_id":"ID00035","terminated":-1,"whole_task":{"end":24633.783746756326,"start":18974.32245142659},"write":{"end":24633.783746756326,"start":24633.783746433328}}]}
+var data={}
+var currGraphState = "taskView"
+var hostColours = {}
+
+function initialise() {
+    var noFileDiv = document.getElementById("no-file")
+    var mainBodyDiv = document.getElementById("main-body")
+    if (data.file === undefined) {
+        noFileDiv.style.display = "block"
+        mainBodyDiv.style.display = "none"
+    } else {
+        noFileDiv.style.display = "none"
+        mainBodyDiv.style.display = "block"
+        populateMetadata()
+        generateGraph(data.contents, "graph-container")
+        populateLegend("taskView")
+        populateWorkflowTaskDataTable(data.contents)
+        getOverallWorkflowMetrics(data.contents)
+    }
+}
 
 /**
  * Helper function used to get the position of the mouse within the browser window
@@ -59,6 +78,15 @@ function determineFailedOrTerminatedPoint(d) {
     }
 }
 
+function getRandomColour() {
+    var letters = '0123456789ABCDEF';
+    var colour = '#';
+    for (var i = 0; i < 6; i++) {
+      colour += letters[Math.floor(Math.random() * 16)];
+    }
+    return colour;
+}
+
 function populateMetadata() {
     var modified = data.modified
     var file = data.file
@@ -66,6 +94,14 @@ function populateMetadata() {
 }
 
 function generateGraph(data, containerId) {
+    document.getElementById(containerId).innerHTML = //reset graph
+        `<div class="text-left" id="tooltip-container">
+            <span id="tooltip-task-id"></span><br>
+            <span id="tooltip-host"></span><br>
+            <span id="tooltip-task-operation"></span><br>
+            <span id="tooltip-task-operation-duration"></span>
+        </div>`
+    
     var read_color    = '#cbb5dd'
     var compute_color = '#f7daad'
     var write_color   = '#abdcf4'
@@ -164,6 +200,7 @@ function generateGraph(data, containerId) {
         }
         var tooltip = document.getElementById('tooltip-container')
         var tooltip_task_id                 = d3.select('#tooltip-task-id')
+        var tooltip_host                    = d3.select('#tooltip-host')
         var tooltip_task_operation          = d3.select('#tooltip-task-operation')
         var tooltip_task_operation_duration = d3.select('#tooltip-task-operation-duration')
         group.selectAll('rect')
@@ -183,6 +220,8 @@ function generateGraph(data, containerId) {
                 tooltip.style.top = y + 'px'
 
                 tooltip_task_id.text('TaskID: ' + d.task_id)
+
+                tooltip_host.text('Host Name: ' + d.execution_host.hostname)
 
                 var parent_group = d3.select(this).attr('class')
 
@@ -251,7 +290,6 @@ function populateWorkflowTaskDataTable(data) {
     const TASK_DATA = Object.assign([], data).sort(function(lhs, rhs) {
         return parseInt(lhs.task_id.slice(4)) - parseInt(rhs.task_id.slice(4))
     })
-
     TASK_DATA.forEach(function(task) {
         var task_id = task['task_id']
 
@@ -438,7 +476,7 @@ function getOverallWorkflowMetrics(data) {
     }
 }
 
-function showHide(id, arrowId) {
+function showHideArrow(id, arrowId) {
     var overallDiv = $(`#${id}`)
     var arrow = $(`#${arrowId}`)
     overallDiv.slideToggle()
@@ -448,5 +486,93 @@ function showHide(id, arrowId) {
     } else {
         arrow.rotate({animateTo: 0})
         overallDiv.addClass('hidden')
+    }
+}
+
+function getHostNames(data) {
+    var hostNames = new Set();
+
+    data.forEach(function(task) {
+        var hostName = task.execution_host.hostname
+        hostNames.add(hostName)
+    })
+
+    hostNames = Array.from(hostNames)
+    return hostNames
+}
+
+function hostColoursJSONPopulated() {
+    for (var key in hostColours) {
+        return true
+    }
+    return false
+}
+
+function switchToHostView(data) {
+    var hostNames = getHostNames(data)
+
+    if (!hostColoursJSONPopulated()) {
+        hostNames.forEach(function(hostName) {
+            hostColours[hostName] = getRandomColour()
+        })
+    }
+    
+
+    data.forEach(function(task) {
+        var hostName = task.execution_host.hostname
+        var taskRead = d3.select(`#${task.task_id} .read`)
+        var taskCompute = d3.select(`#${task.task_id} .compute`)
+        var taskWrite = d3.select(`#${task.task_id} .write`)
+
+        taskRead.style("fill", hostColours[hostName])
+        taskCompute.style("fill", hostColours[hostName])
+        taskWrite.style("fill", hostColours[hostName])
+    })
+}
+
+function populateLegend(currView) {
+    if (currView === "taskView") {
+        document.getElementById("workflow-execution-chart-legend").innerHTML = `
+        <small>Legend:</small> 
+        <small class="inline-block" id="workflow-execution-chart-legend-read-input">Reading Input</small>
+        <small class="inline-block" id="workflow-execution-chart-legend-computation">Performing Computation</small>
+        <small class="inline-block" id="workflow-execution-chart-legend-write-output">Writing Output</small>
+        <small class="inline-block" id="workflow-execution-chart-legend-failed">Failed During Execution</small>
+        <small class="inline-block" id="workflow-execution-chart-legend-terminated">Terminated by User</small>`
+    } else if (currView === "hostView") {
+        document.getElementById("workflow-execution-chart-legend").innerHTML = ``
+        var legend = d3.select("#workflow-execution-chart-legend")
+        legend.append("small")
+            .text("Legend:")
+        for (var hostName in hostColours) {
+            if (hostColours.hasOwnProperty(hostName)) {
+                legend.append("small")
+                    .attr("class", "inline-block")
+                    .style("border-left", `15px solid ${hostColours[hostName]}`)
+                    .text(hostName)
+            }
+        }
+        legend.append("small")
+            .attr("class", "inline-block")
+            .attr("id","workflow-execution-chart-legend-failed")
+            .text("Failed During Execution")
+        legend.append("small")
+            .attr("class", "inline-block")
+            .attr("id","workflow-execution-chart-legend-terminated")
+            .text("Terminated During Execution")
+    }
+}
+
+function toggleView() {
+    if (currGraphState === "taskView") {
+        switchToHostView(data.contents)
+        populateLegend("hostView")
+        d3.select("#toggle-view-button").text("Switch to Task View")
+        currGraphState = "hostView"
+    } else if (currGraphState === "hostView") {
+        generateGraph(data.contents, "graph-container")
+        populateLegend("taskView")
+        d3.select("#toggle-view-button").text("Switch to Host View")
+        currGraphState = "taskView"
     }
 }
