@@ -29,7 +29,8 @@
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(batch_network_listener_service, "Log category for Batch Network Listener Service");
 
-class context_t;
+//class context_t;
+
 namespace wrench {
 
     #ifdef ENABLE_BATSCHED

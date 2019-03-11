@@ -1317,7 +1317,7 @@ namespace wrench {
 
         // Add the RJMS delay to the job's requested time
         job->setAllocatedTime(job->getAllocatedTime() +
-                              this->getPropertyValueAsDouble(BatchServiceProperty::BATCH_RJMS_DELAY));
+                              this->getPropertyValueAsUnsignedLong(BatchServiceProperty::BATCH_RJMS_DELAY));
         this->all_jobs.insert(std::move(unique_ref_to_batch_job));
         this->pending_jobs.push_back(job);
     }
@@ -1835,7 +1835,7 @@ namespace wrench {
 
         // Create the trace replayer process
         this->workload_trace_replayer = std::shared_ptr<WorkloadTraceFileReplayer>(
-                new WorkloadTraceFileReplayer(this->simulation, S4U_Simulation::getHostName(), this,
+                new WorkloadTraceFileReplayer(S4U_Simulation::getHostName(), this,
                                               this->num_cores_per_node,
                                               this->getPropertyValueAsBoolean(BatchServiceProperty::USE_REAL_RUNTIMES_AS_REQUESTED_RUNTIMES),
                                               this->workload_trace)
@@ -2187,7 +2187,7 @@ namespace wrench {
             }
             (args = (char **)realloc(args, (num_args+1)*sizeof(char*)))[num_args] = nullptr;
 
-            if (execvp(args[0], (char **) args) == -1) {
+            if (execvp(args[0], args) == -1) {
                 exit(3);
             }
 
@@ -2535,7 +2535,7 @@ namespace wrench {
         }
 
         unsigned long num_nodes_allocated = node_resources.size();
-        double time_in_seconds = batch_job->getAllocatedTime();
+        unsigned long time_in_seconds = batch_job->getAllocatedTime();
         unsigned long cores_per_node_asked_for = batch_job->getAllocatedCoresPerNode();
 
         std::map<std::string, std::tuple<unsigned long, double>> resources = {};

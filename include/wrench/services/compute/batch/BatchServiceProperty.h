@@ -103,7 +103,7 @@ namespace wrench {
 
 
         /**
-         * @brief Number of seconds that the Batch Scheduler adds to the runtime of each incoming
+         * @brief Integral number of seconds that the Batch Scheduler adds to the runtime of each incoming
          *        job. This is something production batch systems do to avoid too aggressive job
          *        terminations. For instance,
          *        if a job says it wants to run for (at most) 60 seconds, the system
@@ -111,7 +111,7 @@ namespace wrench {
          */
         DECLARE_PROPERTY_NAME(BATCH_RJMS_DELAY);
 
-        /** @brief Simulate computation as just a sleep instead of an actual comput thread. This is for scalability reason,
+        /** @brief Simulate computation as just a sleep instead of an actual compute thread. This is for scalability reason,
          *        and only simulation-valid
         *         if one is sure that cores are space shared (i.e., only a single compute thread can ever
         *         run on a core at once). Since space-sharing at the core level is typically the case in batch-scheduled
