@@ -27,12 +27,12 @@ namespace wrench {
      */
     class ServiceFailureDetectorMessage : public SimulationMessage {
     protected:
-        ServiceFailureDetectorMessage(std::string name);
+        explicit ServiceFailureDetectorMessage(std::string name);
     };
 
     class ServiceHasCrashedMessage : public ServiceFailureDetectorMessage {
     public:
-        ServiceHasCrashedMessage(Service *service);
+        explicit ServiceHasCrashedMessage(Service *service);
 
         Service *service;
     };
