@@ -58,17 +58,18 @@ namespace wrench {
                 {BatchServiceProperty::HOST_SELECTION_ALGORITHM,                    "FIRSTFIT"},
                 {BatchServiceProperty::TASK_SELECTION_ALGORITHM,                    "maximum_flops"},
         #ifdef ENABLE_BATSCHED
-                {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "easy_bf"},
+                {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "conservative_bf"},
                 {BatchServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM,              "fcfs"},
         #else
                 {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,            "FCFS"},
         #endif
                 {BatchServiceProperty::BATCH_RJMS_DELAY,                            "0"},
                 {BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE,               ""},
+                {BatchServiceProperty::USE_REAL_RUNTIMES_AS_REQUESTED_RUNTIMES,     "false"},
                 {BatchServiceProperty::OUTPUT_CSV_JOB_LOG,                          ""},
-                {BatchServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP,           "false"},
-                {BatchServiceProperty::BATSCHED_LOGGING_MUTED,                  "true"},
-                {BatchServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION,          "false"}
+                {BatchServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP,               "false"},
+                {BatchServiceProperty::BATSCHED_LOGGING_MUTED,                      "true"},
+                {BatchServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION,              "false"}
         };
 
         std::map<std::string, std::string> default_messagepayload_values = {
