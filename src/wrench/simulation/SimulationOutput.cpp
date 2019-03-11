@@ -605,4 +605,178 @@ namespace wrench {
             std::cerr << e.what() << std::endl;
         }
     }
+
+    /**
+     * @brief Writes a JSON file containing all hosts, network links, and the routes between each host.
+     * @description The JSON array has the following format:
+     *
+     * <pre>
+     * {
+     *    nodes: [
+     *        {
+     *            type: <"host">,
+     *            id: <string>,
+     *            flop_rate: <double (flops per second)>,
+     *            memory: <double (bytes)>,
+     *            cores: <unsigned_long>
+     *        },
+     *        {
+     *            type: <"link">,
+     *            id: <string>,
+     *            bandwidth: <double (bytes per second)>,
+     *            latency: <double (in seconds)>
+     *        }, . . .
+     *    ],
+     *    links: [
+     *        {
+     *            source: {
+     *                type: <string>,
+     *                id: <string>
+     *            }
+     *            target: {
+     *                type: <string>,
+     *                id: <string>
+     *           }
+     *        }, . . .
+     *    ],
+     *   routes: [
+     *       {
+     *           source: <string>,
+     *           target: <string>,
+     *           latency: <double (in seconds)>
+     *           route: [
+     *               link_id, ...
+     *           ]
+     *       }
+     *   ],
+     * }
+     * </pre>
+     *
+     * @param file_path: the path to write the file
+     *
+     * @throws std::invalid_argument
+     */
+    void SimulationOutput::dumpPlatformGraphJSON(std::string file_path) {
+        if (file_path.empty()) {
+            throw std::invalid_argument("SimulationOutput::dumpPlatformGraphJSON() requires a valid file_path");
+        }
+
+        nlohmann::json platform_graph_json;
+
+        simgrid::s4u::Engine *simgrid_engine = simgrid::s4u::Engine::get_instance();
+
+        // add all hosts to the list of nodes
+        std::vector<simgrid::s4u::Host *> hosts = simgrid_engine->get_all_hosts();
+        for (const auto &host : hosts) {
+            platform_graph_json["nodes"].push_back({
+                                                           {"type", "host"},
+                                                           {"id", host->get_name()},
+                                                           {"flop_rate", host->get_speed()},
+                                                           {"memory", Simulation::getHostMemoryCapacity(host->get_name())},
+                                                           {"cores", host->get_core_count()}
+            });
+        }
+
+        // add all network links to the list of nodes
+        // TODO: what are the links showing up that aren't explicitly stated in the platform? (such as "__loopback__")
+        std::vector<simgrid::s4u::Link *> links = simgrid_engine->get_all_links();
+        for (const auto &link : links) {
+            platform_graph_json["nodes"].push_back({
+                                                           {"type", "link"},
+                                                           {"id", link->get_name()},
+                                                           {"bandwidth", link->get_bandwidth()},
+                                                           {"latency", link->get_latency()}
+            });
+        }
+
+
+        // add all routes to the list of routes
+        std::vector<simgrid::s4u::Link *> route;
+        double route_latency = 0;
+
+        // for every pair of hosts
+        for (auto target = hosts.begin(); target != hosts.end(); ++target) {
+            for (auto source = hosts.begin(); source != target; ++source) {
+                nlohmann::json route_json;
+
+                // populate "route" with an ordered list of network links along
+                // the route between src and dst
+                (*source)->route_to(*target, route, &route_latency);
+
+                route_json["source"] = (*source)->get_name();
+                route_json["target"] = (*target)->get_name();
+                route_json["latency"] = route_latency;
+
+                for (const auto &link : route) {
+                    route_json["route"].push_back(link->get_name());
+                }
+
+                // reset these values
+                route.clear();
+                route_latency = 0;
+
+                platform_graph_json["routes"].push_back(route_json);
+            }
+        }
+
+        // for each route, add "host<-->link" and "link<-->link" connections
+        for (nlohmann::json::iterator route_itr = platform_graph_json["routes"].begin(); route_itr != platform_graph_json["routes"].end(); ++route_itr) {
+            // add a graph link from the source host the first network link
+            platform_graph_json["links"].push_back({
+                                                           {"source", {
+                                                                              {"type", "host"},
+                                                                              {"id", (*route_itr)["source"]}
+                                                                      }
+
+                                                           },
+                                                           {"target", {
+                                                                              {"type", "link"},
+                                                                              {"id", (*route_itr)["route"].at(0)}
+                                                                      }
+                                                           }
+                                                   });
+
+            // add graph links connecting the network links
+            for (nlohmann::json::iterator link_itr = (*route_itr)["route"].begin(); link_itr != (*route_itr)["route"].end(); ++link_itr) {
+                auto next_link_itr = link_itr + 1;
+
+                if (next_link_itr != (*route_itr)["route"].end()) {
+                    platform_graph_json["links"].push_back({
+                                                                   {"source", {
+                                                                                      {"type", "link"},
+                                                                                      {"id", *link_itr}
+                                                                              }
+                                                                   },
+                                                                   {"target", {
+                                                                                      {"type", "link"},
+                                                                                      {"id", *next_link_itr}
+                                                                              }
+                                                                   }
+                                                           });
+                }
+            }
+
+            // add a graph link from the last link to the target host
+            platform_graph_json["links"].push_back({
+                                                           {"source", {
+                                                                              {"type", "link"},
+                                                                              {"id", (*route_itr)["route"].at(
+                                                                                      (*route_itr)["route"].size() - 1)}
+                                                                      }
+                                                           },
+                                                           {"target", {
+                                                                              {"type", "host"},
+                                                                              {"id", (*route_itr)["target"]}
+                                                                      }
+                                                           }
+                                                   });
+        }
+
+
+        //std::cerr << platform_graph_json.dump(4) << std::endl;
+
+        std::ofstream output(file_path);
+        output << std::setw(4) << platform_graph_json << std::endl;
+        output.close();
+    }
 };
