@@ -1003,7 +1003,6 @@ namespace wrench {
     }
 
 
-
     /**
     * @brief Terminate the daemon, dealing with pending/running jobs
     */
@@ -1017,7 +1016,7 @@ namespace wrench {
 
 
 /**
- * @brief
+ * @brief Terminate all running pilot jobs
  */
     void BatchService::terminateRunningPilotJobs() {
         if (getPropertyValueAsBoolean(BatchServiceProperty::SUPPORTS_PILOT_JOBS)) {
@@ -1057,8 +1056,8 @@ namespace wrench {
     }
 
 /**
- * @brief
- * @return
+ * @brief Wait for and procress the next message
+ * @return true if the service should keep going, false otherwise
  */
     bool BatchService::processNextMessage() {
 
