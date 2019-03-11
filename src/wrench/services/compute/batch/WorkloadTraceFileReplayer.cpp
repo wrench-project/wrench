@@ -20,15 +20,13 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param simulation: a pointer to the simulation object
      * @param hostname: the name of the host on which the trace file replayer will be started
      * @param batch_service: the batch service to which it submits jobs
      * @param num_cores_per_node: the number of cores per host on the batch service
      * @param use_actual_runtimes_as_requested_runtimes: if true, use actual runtimes as requested runtimes
      * @param workload_trace: the workload trace to be replayed
      */
-    WorkloadTraceFileReplayer::WorkloadTraceFileReplayer(Simulation *simulation,
-                                                         std::string hostname,
+    WorkloadTraceFileReplayer::WorkloadTraceFileReplayer(std::string hostname,
                                                          BatchService *batch_service,
                                                          unsigned long num_cores_per_node,
                                                          bool use_actual_runtimes_as_requested_runtimes,

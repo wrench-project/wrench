@@ -58,7 +58,7 @@ namespace wrench {
           }
         } catch (wrench::WorkflowExecutionException &e) {
           //ignore (network error or something)
-          return 0;
+          break;
 
         }
 

@@ -28,8 +28,7 @@ namespace wrench {
     class WorkloadTraceFileReplayer : public WMS {
 
     public:
-        WorkloadTraceFileReplayer(Simulation *simulation,
-                                  std::string hostname,
+        WorkloadTraceFileReplayer(std::string hostname,
                                   BatchService *batch_service,
                                   unsigned long num_cores_per_node,
                                   bool use_actual_runtimes_as_requested_runtimes,

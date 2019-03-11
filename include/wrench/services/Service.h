@@ -48,13 +48,11 @@ namespace wrench {
         bool isUp();
 
         std::string getPropertyValueAsString(std::string);
-
         double getPropertyValueAsDouble(std::string);
-        
+        double getPropertyValueAsUnsignedLong(std::string);
         bool getPropertyValueAsBoolean(std::string);
 
         double getNetworkTimeoutValue();
-
         void setNetworkTimeoutValue(double value);
 
         /***********************/

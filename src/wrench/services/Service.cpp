@@ -123,6 +123,29 @@ namespace wrench {
     }
 
     /**
+    * @brief Get a property of the Service as an unsigned long
+    * @param property: the property
+    * @return the property value as an unsigned long
+    *
+    * @throw std::invalid_argument
+    */
+    double Service::getPropertyValueAsUnsignedLong(std::string property) {
+        unsigned long value;
+        std::string string_value;
+        try {
+            string_value = this->getPropertyValueAsString(property);
+        } catch (std::invalid_argument &e) {
+            throw;
+        }
+        if (sscanf(string_value.c_str(), "%lu", &value) != 1) {
+            throw std::invalid_argument(
+                    "Service::getPropertyValueAsUnsignedLong(): Invalid unsigned long property value " + property + " " +
+                    this->getPropertyValueAsString(property));
+        }
+        return value;
+    }
+
+    /**
      * @brief Get a message payload of the Service as a double
      * @param message_payload: the message payload
      * @return the message payload value as a double
