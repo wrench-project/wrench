@@ -43,6 +43,9 @@ body {
 #info-container {
     text-align: center;
 }
+#workflow-execution-chart-legend {
+    overflow-wrap: break-word;
+}
 #workflow-execution-chart-legend-read-input {
     border-left: 15px solid #cbb5dd;
 }
