@@ -201,7 +201,8 @@ namespace wrench {
         }
 
         // Set the mailbox_name receiver (causes memory leak)
-        simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::by_name(this->mailbox_name);
+//        simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::by_name(this->mailbox_name);
+        simgrid::s4u::Mailbox *mailbox = simgrid::s4u::Mailbox::by_name(this->mailbox_name);
         mailbox->set_receiver(this->s4u_actor);
     }
 
