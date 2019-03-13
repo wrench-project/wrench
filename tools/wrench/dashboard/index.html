@@ -60,15 +60,18 @@
                 </div>
                 
                 <div class='hidden' id='overall-graph-container'>
-                    <img id='information-img' src='public/information.png'/>
+                    <div id='button-and-information-container'>
+                        <button id='toggle-view-button' onclick="toggleView()">Switch to Host View</button>
+                        <img id='information-img' src='public/information.png' onclick='showHostInstructions()'/>
+                    </div>
                     <div id='host-instructions'>
+                        <div id='host-instructions-close-button-container'>
+                            <img id='host-instructions-close-button' src='public/close-button.png' onclick='hideHostInstructions()'/>
+                        </div>
                         <p id='host-instructions-text'>Hover over or click on a host on the legend to isolate that host on the graph. Click on a selected host to deselect it. or just select a different host on the legend</p>
                     </div>
                     <div class="container legend" id="workflow-execution-chart-legend"></div>
                     <div id="graph-container"></div>
-                    <div>
-                        <button id="toggle-view-button" onclick="toggleView()">Switch to Host View</button>
-                    </div>
                 </div>
             </div>
             <div class='element-and-title-container'>
