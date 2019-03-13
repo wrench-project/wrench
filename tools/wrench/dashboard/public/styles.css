@@ -163,3 +163,14 @@ td {
 #no-file {
     text-align: center;
 }
+
+#host-instructions {
+    display: none;
+    background-color: rgba(0, 255, 204, 0.2);
+    text-align: center;
+}
+
+#information-img {
+    display: none;
+    width: 25px;
+}
