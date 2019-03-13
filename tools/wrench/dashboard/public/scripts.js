@@ -513,7 +513,11 @@ function switchToHostView(data) {
 
     if (!hostColoursJSONPopulated()) {
         hostNames.forEach(function(hostName) {
-            hostColours[hostName] = getRandomColour()
+            var colour = getRandomColour()
+            while (colour === '#FF0000' || colour === '#FFA500') {
+                colour = getRandomColour()
+            }
+            hostColours[hostName] = colour
         })
     }
     
