@@ -2,10 +2,15 @@ var data={"modified":"2019-03-12T10:28:22.009Z","file":"test_data/workflow_data.
 var currGraphState = "taskView"
 var hostColours = {}
 var currentlySelectedHost = {hostName: "", id: ""}
+var firstVisit
 
 function initialise() {
     var noFileDiv = document.getElementById("no-file")
     var mainBodyDiv = document.getElementById("main-body")
+    if (localStorage.getItem("firstVisit") === "null") {
+        localStorage.setItem("firstVisit", true)
+        firstVisit = true
+    }
     if (data.file === undefined) {
         noFileDiv.style.display = "block"
         mainBodyDiv.style.display = "none"
@@ -567,7 +572,7 @@ function legendHover(hostName, id, alreadySelected) {
 function legendClick(hostName, id) {
     var legendElement = d3.select(`#${id}`)
     if (hostName === currentlySelectedHost.hostName) {
-        // deselect
+        // deselect same host
         currentlySelectedHost.hostName = ""
         currentlySelectedHost.id = ""
         legendElement.style("font-weight", "normal")
@@ -575,7 +580,7 @@ function legendClick(hostName, id) {
         return
     } 
     if (currentlySelectedHost.hostName !== "" && hostName !== currentlySelectedHost.hostName) {
-        // deselect existing host
+        // deselect different host
         var currentlySelectedLegendElement = d3.select(`#${currentlySelectedHost.id}`)
         currentlySelectedLegendElement.style("font-weight", "normal")
     }
@@ -625,6 +630,15 @@ function populateLegend(currView) {
 }
 
 function toggleView() {
+    var hostInstructions = document.getElementById("host-instructions")
+    var informationImg = document.getElementById("information-img")
+    if (firstVisit) {
+        hostInstructions.style.display = "block"
+        informationImg.style.display = "none"
+    } else {
+        hostInstructions.style.display = "none"
+        informationImg.style.display = "block"
+    }
     if (currGraphState === "taskView") {
         switchToHostView(data.contents, '')
         populateLegend("hostView")
