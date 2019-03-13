@@ -629,25 +629,41 @@ function populateLegend(currView) {
     }
 }
 
+function showHostInstructions() {
+    var hostInstructions = document.getElementById("host-instructions")
+    var informationImg = document.getElementById("information-img")
+    hostInstructions.style.display = "block"
+    informationImg.style.display = "none"
+}
+
+function hideHostInstructions() {
+    var hostInstructions = document.getElementById("host-instructions")
+    var informationImg = document.getElementById("information-img")
+    hostInstructions.style.display = "none"
+    informationImg.style.display = "inline-block"
+}
+
 function toggleView() {
     var hostInstructions = document.getElementById("host-instructions")
     var informationImg = document.getElementById("information-img")
-    if (firstVisit) {
-        hostInstructions.style.display = "block"
-        informationImg.style.display = "none"
-    } else {
-        hostInstructions.style.display = "none"
-        informationImg.style.display = "block"
-    }
     if (currGraphState === "taskView") {
         switchToHostView(data.contents, '')
         populateLegend("hostView")
         d3.select("#toggle-view-button").text("Switch to Task View")
+        if (firstVisit) {
+            hostInstructions.style.display = "block"
+            informationImg.style.display = "none"
+        } else {
+            hostInstructions.style.display = "none"
+            informationImg.style.display = "inline-block"
+        }
         currGraphState = "hostView"
     } else if (currGraphState === "hostView") {
         generateGraph(data.contents, "graph-container")
         populateLegend("taskView")
         d3.select("#toggle-view-button").text("Switch to Host View")
+        hostInstructions.style.display = "none"
+        informationImg.style.display = "none"
         currGraphState = "taskView"
     }
 }
