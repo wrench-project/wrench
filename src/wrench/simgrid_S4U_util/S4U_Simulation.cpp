@@ -123,7 +123,9 @@ namespace wrench {
         std::map<std::string, std::vector<std::string>> result;
         std::vector<simgrid::kernel::routing::ClusterZone*>clusters;
 
-        clusters = this->engine->get_filtered_netzones<simgrid::kernel::routing::ClusterZone>();
+        auto simgrid_engine = simgrid::s4u::Engine::get_instance();
+
+        clusters = simgrid_engine->get_filtered_netzones<simgrid::kernel::routing::ClusterZone>();
         for (auto c : clusters) {
             std::vector<simgrid::s4u::Host*> host_list = c->get_all_hosts();
             std::vector<std::string> hostname_list;
