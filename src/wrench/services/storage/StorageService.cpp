@@ -368,7 +368,7 @@ namespace wrench {
         try {
           file_content_message = S4U_Mailbox::getMessage(answer_mailbox);
         } catch (std::shared_ptr<NetworkError> &cause) {
-            std::cerr << "THROWING DUE TO NETWORK ERROR(3)\n";
+            WRENCH_INFO("THROWING DUE TO NETWORK ERROR(3)");
           throw WorkflowExecutionException(cause);
         }
 
