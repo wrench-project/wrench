@@ -36,6 +36,7 @@ public:
     void do_SimulationDumpWorkflowGraphJSON_test();
     void do_SimulationSearchForHostUtilizationGraphLayout_test();
     void do_SimulationDumpHostEnergyConsumptionJSON_test();
+    void do_SimulationDumpPlatformGraphJSON_test();
 
 protected:
     SimulationDumpJSONTest() {
@@ -82,14 +83,78 @@ protected:
         fprintf(platform_file2, "%s", xml2.c_str());
         fclose(platform_file2);
 
+        // 3 host platform with an asymmetrical route between host1 and host3
+        std::string xml3 = "<?xml version='1.0'?>"
+                          "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                          "<platform version=\"4.1\"> "
+                          "   <zone id=\"AS0\" routing=\"Full\"> "
+                          "       <host id=\"host1\" speed=\"1f\" core=\"10\"> "
+                          "         <prop id=\"ram\" value=\"10\"/>"
+                          "       </host>"
+                          "       <host id=\"host2\" speed=\"1f\" core=\"20\"> "
+                          "          <prop id=\"ram\" value=\"20\"/> "
+                          "       </host> "
+                          "       <host id=\"host3\" speed=\"1f\" core=\"20\"> "
+                          "          <prop id=\"ram\" value=\"20\"/> "
+                          "       </host> "
+                          "       <link id=\"1\" bandwidth=\"1Gbps\" latency=\"1us\"/>"
+                          "       <link id=\"2\" bandwidth=\"1Gbps\" latency=\"1us\"/>"
+                          "       <link id=\"3\" bandwidth=\"1Gbps\" latency=\"1us\"/>"
+                          "       <route src=\"host1\" dst=\"host2\"> <link_ctn id=\"1\"/> </route>"
+                          "       <route src=\"host2\" dst=\"host3\"> <link_ctn id=\"2\"/> </route>"
+                          "       <route src=\"host1\" dst=\"host3\" symmetrical=\"NO\"> <link_ctn id=\"1\"/> <link_ctn id=\"2\"/> </route>"
+                          "       <route src=\"host3\" dst=\"host1\" symmetrical=\"NO\"> <link_ctn id=\"3\"/> </route>"
+                          "   </zone> "
+                          "</platform>";
+        FILE *platform_file3 = fopen(platform_file_path3.c_str(), "w");
+        fprintf(platform_file3, "%s", xml3.c_str());
+        fclose(platform_file3);
+
+        // platform with cluster
+        std::string xml4 = "<?xml version='1.0'?>"
+                          "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                          "<platform version=\"4.1\">"
+                          "   <zone id=\"AS0\" routing=\"Full\">"
+                          "     <!-- effective bandwidth = 1250 MBps -->"
+                          "     <cluster id=\"hpc.edu\" prefix=\"hpc.edu/node_\" suffix=\"\" radical=\"0-3"
+                        "\" core=\"1\" speed=\"1000Gf\" bw=\"1288.6597MBps\" lat=\"10us\" router_id=\"hpc_gateway\">"
+                        "         <prop id=\"ram\" value=\"80000000000\"/>"
+                        "        </cluster>"
+                        "      <zone id=\"AS2\" routing=\"Full\">"
+                        "          <host id=\"storage_db.edu\" speed=\"1000Gf\"/>"
+                        "      </zone>"
+                        "      <zone id=\"AS3\" routing=\"Full\">"
+                        "          <host id=\"my_lab_computer.edu\" speed=\"1000Gf\" core=\"1\"/>"
+                        "      </zone>"
+                        "      <!-- effective bandwidth = 125 MBps -->"
+                        "      <link id=\"link1\" bandwidth=\"128.8659MBps\" latency=\"100us\"/>"
+                        "      <zoneRoute src=\"AS2\" dst=\"hpc.edu\" gw_src=\"storage_db.edu\" gw_dst=\"hpc_gateway\">"
+                        "        <link_ctn id=\"link1\"/>"
+                        "      </zoneRoute>"
+                        "      <zoneRoute src=\"AS3\" dst=\"hpc.edu\" gw_src=\"my_lab_computer.edu\" gw_dst=\"hpc_gateway\">"
+                        "        <link_ctn id=\"link1\"/>"
+                        "      </zoneRoute>"
+                        "      <zoneRoute src=\"AS3\" dst=\"AS2\" gw_src=\"my_lab_computer.edu\" gw_dst=\"storage_db.edu\">"
+                        "        <link_ctn id=\"link1\"/>"
+                        "      </zoneRoute>"
+                        "   </zone>"
+                        "</platform>";
+
+        FILE *platform_file4 = fopen(platform_file_path4.c_str(), "w");
+        fprintf(platform_file4, "%s", xml4.c_str());
+        fclose(platform_file4);
+
         workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
     std::string platform_file_path2 = UNIQUE_TMP_PATH_PREFIX + "platform2.xml";
+    std::string platform_file_path3 = UNIQUE_TMP_PATH_PREFIX + "platform3.xml";
+    std::string platform_file_path4 = UNIQUE_TMP_PATH_PREFIX + "platform4.xml";
     std::string execution_data_json_file_path = UNIQUE_TMP_PATH_PREFIX + "workflow_data.json";
     std::string workflow_graph_json_file_path = UNIQUE_TMP_PATH_PREFIX + "workflow_graph_data.json";
     std::string energy_consumption_data_file_path = UNIQUE_TMP_PATH_PREFIX + "energy_consumption.json";
+    std::string platform_graph_json_file_path = UNIQUE_TMP_PATH_PREFIX + "platform_graph.json";
     std::unique_ptr<wrench::Workflow> workflow;
 
 };
@@ -1292,5 +1357,218 @@ void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
     delete simulation;
     free(argv[0]);
     free(argv[1]);
+    free(argv);
+}
+
+// some comparison functions to be used when sorting lists of JSON objects so that the tests are deterministic
+bool compareEdges(const nlohmann::json &lhs, const nlohmann::json &rhs) {
+    return (lhs["source"]["type"].get<std::string>() + ":" + lhs["source"]["id"].get<std::string>() + "-" + lhs["target"]["type"].get<std::string>() + ":" + lhs["target"]["id"].get<std::string>()) <
+            (rhs["source"]["type"].get<std::string>() + ":" + rhs["source"]["id"].get<std::string>() + "-" + rhs["target"]["type"].get<std::string>() + ":" + rhs["target"]["id"].get<std::string>());
+}
+
+bool compareRoutes(const nlohmann::json &lhs, const nlohmann::json &rhs) {
+    return (lhs["source"].get<std::string>() + "-" + lhs["target"].get<std::string>()) <
+            (rhs["source"].get<std::string>() + "-" + rhs["target"].get<std::string>());
+}
+
+/**********************************************************************/
+/**         SimulationDumpPlatformGraphJSONTest                      **/
+/**********************************************************************/
+
+TEST_F(SimulationDumpJSONTest, SimulationDumpPlatformGraphJSONTest) {
+    DO_TEST_WITH_FORK(do_SimulationDumpPlatformGraphJSON_test);
+}
+
+void SimulationDumpJSONTest::do_SimulationDumpPlatformGraphJSON_test() {
+    auto simulation = new wrench::Simulation();
+    int argc = 1;
+    auto argv = (char **)calloc(argc, sizeof(char *));
+    argv[0] = strdup("simulation_dump_platform_graph_test");
+
+    EXPECT_NO_THROW(simulation->init(&argc, argv));
+    EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path3));
+
+    EXPECT_THROW(simulation->getOutput().dumpPlatformGraphJSON(""), std::invalid_argument);
+    EXPECT_NO_THROW(simulation->getOutput().dumpPlatformGraphJSON(this->platform_graph_json_file_path));
+
+    nlohmann::json expected_json = R"(
+        {
+            "links": [
+                {
+                    "source": {
+                        "id": "host1",
+                                "type": "host"
+                    },
+                    "target": {
+                        "id": "1",
+                                "type": "link"
+                    }
+                },
+                {
+                    "source": {
+                        "id": "1",
+                                "type": "link"
+                    },
+                    "target": {
+                        "id": "host2",
+                                "type": "host"
+                    }
+                },
+                {
+                    "source": {
+                        "id": "1",
+                                "type": "link"
+                    },
+                    "target": {
+                        "id": "2",
+                                "type": "link"
+                    }
+                },
+                {
+                    "source": {
+                        "id": "2",
+                                "type": "link"
+                    },
+                    "target": {
+                        "id": "host3",
+                                "type": "host"
+                    }
+                },
+                {
+                    "source": {
+                        "id": "host3",
+                                "type": "host"
+                    },
+                    "target": {
+                        "id": "3",
+                                "type": "link"
+                    }
+                },
+                {
+                    "source": {
+                        "id": "3",
+                                "type": "link"
+                    },
+                    "target": {
+                        "id": "host1",
+                                "type": "host"
+                    }
+                },
+                {
+                    "source": {
+                        "id": "host2",
+                                "type": "host"
+                    },
+                    "target": {
+                        "id": "2",
+                                "type": "link"
+                    }
+                }
+            ],
+            "nodes": [
+                {
+                    "cores": 10,
+                            "flop_rate": 1.0,
+                            "id": "host1",
+                            "memory": 10.0,
+                            "type": "host"
+                },
+                {
+                    "cores": 20,
+                            "flop_rate": 1.0,
+                            "id": "host2",
+                            "memory": 20.0,
+                            "type": "host"
+                },
+                {
+                    "cores": 20,
+                            "flop_rate": 1.0,
+                            "id": "host3",
+                            "memory": 20.0,
+                            "type": "host"
+                },
+                {
+                    "bandwidth": 125000000.0,
+                            "id": "1",
+                            "latency": 1e-06,
+                            "type": "link"
+                },
+                {
+                    "bandwidth": 125000000.0,
+                            "id": "2",
+                            "latency": 1e-06,
+                            "type": "link"
+                },
+                {
+                    "bandwidth": 125000000.0,
+                            "id": "3",
+                            "latency": 1e-06,
+                            "type": "link"
+                },
+                {
+                    "bandwidth": 498000000.0,
+                            "id": "__loopback__",
+                            "latency": 1.5e-05,
+                            "type": "link"
+                }
+            ],
+            "routes": [
+                {
+                    "latency": 1e-06,
+                            "route": [
+                    "1"
+                    ],
+                    "source": "host1",
+                            "target": "host2"
+                },
+                {
+                    "latency": 2e-06,
+                            "route": [
+                    "1",
+                            "2"
+                    ],
+                    "source": "host1",
+                            "target": "host3"
+                },
+                {
+                    "latency": 1e-06,
+                            "route": [
+                    "3"
+                    ],
+                    "source": "host3",
+                            "target": "host1"
+                },
+                {
+                    "latency": 1e-06,
+                            "route": [
+                    "2"
+                    ],
+                    "source": "host2",
+                    "target": "host3"
+                }
+            ]
+        }
+    )"_json;
+
+    std::ifstream json_file = std::ifstream(platform_graph_json_file_path);
+    nlohmann::json result_json;
+    json_file >> result_json;
+
+    // sort the links (edges)
+    std::sort(result_json["links"].begin(), result_json["links"].end(), compareEdges);
+    std::sort(expected_json["links"].begin(), expected_json["links"].end(), compareEdges);
+
+    // sort the nodes
+    std::sort(result_json["nodes"].begin(), result_json["nodes"].end(), compareNodes);
+    std::sort(expected_json["nodes"].begin(), expected_json["nodes"].end(), compareNodes);
+
+    // sort the routes
+    std::sort(result_json["routes"].begin(), result_json["routes"].end(), compareRoutes);
+    std::sort(expected_json["routes"].begin(), expected_json["routes"].end(), compareRoutes);
+
+    EXPECT_TRUE(result_json == expected_json);
+    
+    delete simulation;
+    free(argv[0]);
     free(argv);
 }
