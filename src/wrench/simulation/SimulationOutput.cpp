@@ -23,6 +23,7 @@
 #include <vector>
 #include <cmath>
 #include <string>
+#include <unordered_set>
 
 namespace wrench {
 
@@ -678,7 +679,7 @@ namespace wrench {
         }
 
         // add all network links to the list of nodes
-        // TODO: what are the links showing up that aren't explicitly stated in the platform? (such as "__loopback__")
+        // TODO: what are the links showing up that aren't explicitly stated in the platform? (such as "__loopback__"), and do we include this?
         std::vector<simgrid::s4u::Link *> links = simgrid_engine->get_all_links();
         for (const auto &link : links) {
             platform_graph_json["nodes"].push_back({
@@ -690,90 +691,184 @@ namespace wrench {
         }
 
 
-        // add all routes to the list of routes
-        std::vector<simgrid::s4u::Link *> route;
-        double route_latency = 0;
+        // add each route to the list of routes
+        std::vector<simgrid::s4u::Link *> route_forward;
+        std::vector<simgrid::s4u::Link *> route_backward;
+        double route_forward_latency = 0;
+        double route_backward_latency = 0;
 
-        // for every pair of hosts
+        // for every combination of host pairs
         for (auto target = hosts.begin(); target != hosts.end(); ++target) {
             for (auto source = hosts.begin(); source != target; ++source) {
-                nlohmann::json route_json;
+                nlohmann::json route_forward_json;
 
-                // populate "route" with an ordered list of network links along
-                // the route between src and dst
-                (*source)->route_to(*target, route, &route_latency);
+                // populate "route_forward" with an ordered list of network links along
+                // the route between source and target
+                (*source)->route_to(*target, route_forward, &route_forward_latency);
 
-                route_json["source"] = (*source)->get_name();
-                route_json["target"] = (*target)->get_name();
-                route_json["latency"] = route_latency;
+                // add the route from source to target to the json
+                route_forward_json["source"] = (*source)->get_name();
+                route_forward_json["target"] = (*target)->get_name();
+                route_forward_json["latency"] = route_forward_latency;
 
-                for (const auto &link : route) {
-                    route_json["route"].push_back(link->get_name());
+                for (const auto &link : route_forward) {
+                    route_forward_json["route"].push_back(link->get_name());
+                }
+
+                platform_graph_json["routes"].push_back(route_forward_json);
+
+                // populate "route_backward" with an ordered list of network links along
+                // the route between target and source; the "route_backward" could be different
+                // so we need to add it if it is in fact different
+                nlohmann::json route_backward_json;
+                (*target)->route_to(*source, route_backward, &route_backward_latency);
+
+                // check to see if the route from source to target is the same as from target to source
+                bool is_route_equal = true;
+                if (route_forward.size() == route_backward.size()) {
+                    for (size_t i = 0; i < route_forward.size(); ++i) {
+                        if (route_forward.at(i)->get_name() != route_backward.at(route_backward.size() - 1 - i)->get_name()) {
+                            is_route_equal = false;
+                            break;
+                        }
+                    }
+                } else {
+                    is_route_equal = false;
+                }
+
+                if (not is_route_equal) {
+                    // add the route from target to source to the json
+                    route_backward_json["source"] = (*target)->get_name();
+                    route_backward_json["target"] = (*source)->get_name();
+                    route_backward_json["latency"] = route_backward_latency;
+
+                    for (const auto &link : route_backward) {
+                        route_backward_json["route"].push_back(link->get_name());
+                    }
+
+                    platform_graph_json["routes"].push_back(route_backward_json);
                 }
 
                 // reset these values
-                route.clear();
-                route_latency = 0;
+                route_forward.clear();
+                route_backward.clear();
 
-                platform_graph_json["routes"].push_back(route_json);
+                // reset these values
+                route_forward_latency = 0;
+                route_backward_latency = 0;
             }
         }
 
+        // maintain a unique list of edges where edges are represented using the following string format:
+        // <source_type>:<source_id>-<target_type>:<target_id> where type could be 'host' or 'link'
+        std::unordered_set<std::string> edges;
+        const std::string HOST("host");
+        const std::string LINK("link");
+
+        std::string source_string;
+        std::string target_string;
+
+        std::string source_id;
+        std::string target_id;
+
         // for each route, add "host<-->link" and "link<-->link" connections
         for (nlohmann::json::iterator route_itr = platform_graph_json["routes"].begin(); route_itr != platform_graph_json["routes"].end(); ++route_itr) {
-            // add a graph link from the source host the first network link
-            platform_graph_json["links"].push_back({
-                                                           {"source", {
-                                                                              {"type", "host"},
-                                                                              {"id", (*route_itr)["source"]}
-                                                                      }
 
-                                                           },
-                                                           {"target", {
-                                                                              {"type", "link"},
-                                                                              {"id", (*route_itr)["route"].at(0)}
-                                                                      }
-                                                           }
-                                                   });
+            source_id = (*route_itr)["source"].get<std::string>();
+            source_string = HOST + ":" + source_id;
 
-            // add graph links connecting the network links
+            target_id = (*route_itr)["route"].at(0).get<std::string>();
+            target_string = LINK + ":" + target_id;
+
+            // check that the undirected edge doesn't already exist in set of edges
+            if (edges.find(source_string + "-" + target_string) == edges.end() and
+                edges.find(target_string + "-" + source_string) == edges.end()) {
+
+                edges.insert(source_string + "-" + target_string);
+
+                // add a graph link from the source host to the first network link
+                platform_graph_json["links"].push_back({
+                                                               {"source", {
+                                                                                  {"type", HOST},
+                                                                                  {"id", source_id}
+                                                                          }
+
+                                                               },
+                                                               {"target", {
+                                                                                  {"type", LINK},
+                                                                                  {"id", target_id}
+                                                                          }
+                                                               }
+                                                       });
+            }
+
+
+
+            // add graph edges comprising only network links
             for (nlohmann::json::iterator link_itr = (*route_itr)["route"].begin(); link_itr != (*route_itr)["route"].end(); ++link_itr) {
                 auto next_link_itr = link_itr + 1;
 
                 if (next_link_itr != (*route_itr)["route"].end()) {
-                    platform_graph_json["links"].push_back({
-                                                                   {"source", {
-                                                                                      {"type", "link"},
-                                                                                      {"id", *link_itr}
-                                                                              }
-                                                                   },
-                                                                   {"target", {
-                                                                                      {"type", "link"},
-                                                                                      {"id", *next_link_itr}
-                                                                              }
-                                                                   }
-                                                           });
+
+                    source_id = (*link_itr).get<std::string>();
+                    source_string = LINK + ":" + source_id;
+
+                    target_id = (*next_link_itr).get<std::string>();
+                    target_string = LINK + ":" + target_id;
+
+                    // check that the undirected edge doesn't already exist in set of edges
+                    if (edges.find(source_string + "-" + target_string) == edges.end() and
+                        edges.find(target_string + "-" + source_string) == edges.end()) {
+
+                        edges.insert(source_string + "-" + target_string);
+
+                        platform_graph_json["links"].push_back({
+                                                                       {"source", {
+                                                                                          {"type", LINK},
+                                                                                          {"id", source_id}
+                                                                                  }
+                                                                       },
+                                                                       {"target", {
+                                                                                          {"type", LINK},
+                                                                                          {"id", target_id}
+                                                                                  }
+                                                                       }
+                                                               });
+                    }
                 }
             }
 
-            // add a graph link from the last link to the target host
-            platform_graph_json["links"].push_back({
-                                                           {"source", {
-                                                                              {"type", "link"},
-                                                                              {"id", (*route_itr)["route"].at(
-                                                                                      (*route_itr)["route"].size() - 1)}
-                                                                      }
-                                                           },
-                                                           {"target", {
-                                                                              {"type", "host"},
-                                                                              {"id", (*route_itr)["target"]}
-                                                                      }
-                                                           }
-                                                   });
+            source_id = (*route_itr)["route"].at(((*route_itr)["route"].size()) - 1).get<std::string>();
+            source_string = LINK + ":" + source_id;
+
+            target_id = (*route_itr)["target"].get<std::string>();
+            target_string = HOST + ":" + target_id;
+
+            // check that the undirected edge doesn't already exist in set of edges
+            if (edges.find(source_string + "-" + target_string) == edges.end() and
+                edges.find(target_string + "-" + source_string) == edges.end()) {
+
+                edges.insert(source_string + "-" + target_string);
+
+                // add a graph link from the last link to the target host
+                platform_graph_json["links"].push_back({
+                                                               {"source", {
+                                                                                  {"type", "link"},
+                                                                                  {"id", source_id}
+                                                                          }
+                                                               },
+                                                               {"target", {
+                                                                                  {"type", "host"},
+                                                                                  {"id", target_id}
+                                                                          }
+                                                               }
+                                                       });
+
+            }
         }
 
-
         //std::cerr << platform_graph_json.dump(4) << std::endl;
+
 
         std::ofstream output(file_path);
         output << std::setw(4) << platform_graph_json << std::endl;
