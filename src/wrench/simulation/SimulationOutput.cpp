@@ -372,7 +372,7 @@ namespace wrench {
      *
      * <pre>
      * {
-     *      nodes: [
+     *      vertices: [
      *          {
      *              type: <"task">,
      *              id: <string>,
@@ -388,7 +388,7 @@ namespace wrench {
      *              size: <double>
      *          }, . . .
      *      ],
-     *      links: [
+     *      edges: [
      *          {
      *              source: <string>,
      *              target: <string>
@@ -410,12 +410,12 @@ namespace wrench {
         /* schema
          *
          */
-        nlohmann::json nodes;
-        nlohmann::json links;
+        nlohmann::json vertices;
+        nlohmann::json edges;
 
-        // add the task nodes
+        // add the task vertices
         for (const auto &task : workflow->getTasks()) {
-            nodes.push_back({
+            vertices.push_back({
                                     {"type", "task"},
                                     {"id", task->getID()},
                                     {"flops", task->getFlops()},
@@ -426,20 +426,20 @@ namespace wrench {
                             });
         }
 
-        // add the file nodes
+        // add the file vertices
         for (const auto &file : workflow->getFiles()) {
-            nodes.push_back({
+            vertices.push_back({
                                     {"type", "file"},
                                     {"id", file->getID()},
                                     {"size", file->getSize()}
                             });
         }
 
-        // add the links
+        // add the edges
         for (const auto &task : workflow->getTasks()) {
-            // create links between input files (if any) and the current task
+            // create edges between input files (if any) and the current task
             for (const auto &input_file : task->getInputFiles()) {
-                links.push_back({
+                edges.push_back({
                                         {"source", input_file->getID()},
                                         {"target", task->getID()}
                                 });
@@ -450,15 +450,15 @@ namespace wrench {
             bool has_children = (task->getNumberOfChildren() > 0) ? true : false;
 
             if (has_output_files) {
-                // create the links between current task and its output files (if any)
+                // create the edges between current task and its output files (if any)
                 for (const auto &output_file : task->getOutputFiles()) {
-                    links.push_back({{"source", task->getID()},
+                    edges.push_back({{"source", task->getID()},
                                      {"target", output_file->getID()}});
                 }
             } else if (has_children) {
-                // then create the links from the current task to its children tasks (if it has not output files)
+                // then create the edges from the current task to its children tasks (if it has not output files)
                 for (const auto & child : workflow->getTaskChildren(task)) {
-                    links.push_back({
+                    edges.push_back({
                                             {"source", task->getID()},
                                             {"target", child->getID()}});
                 }
@@ -466,8 +466,8 @@ namespace wrench {
         }
 
         nlohmann::json workflow_task_graph;
-        workflow_task_graph["nodes"] = nodes;
-        workflow_task_graph["links"] = links;
+        workflow_task_graph["vertices"] = vertices;
+        workflow_task_graph["edges"] = edges;
 
 
         std::ofstream output(file_path);
@@ -613,7 +613,7 @@ namespace wrench {
      *
      * <pre>
      * {
-     *    nodes: [
+     *    vertices: [
      *        {
      *            type: <"host">,
      *            id: <string>,
@@ -628,7 +628,7 @@ namespace wrench {
      *            latency: <double (in seconds)>
      *        }, . . .
      *    ],
-     *    links: [
+     *    edges: [
      *        {
      *            source: {
      *                type: <string>,
@@ -666,28 +666,48 @@ namespace wrench {
 
         simgrid::s4u::Engine *simgrid_engine = simgrid::s4u::Engine::get_instance();
 
-        // add all hosts to the list of nodes
-        std::vector<simgrid::s4u::Host *> hosts = simgrid_engine->get_all_hosts();
+        // Get all the hosts
+        auto hosts = simgrid_engine->get_all_hosts();
+
+        // get the by-cluster host information
+        std::map<std::string, std::vector<std::string>> cluster_to_hosts = S4U_Simulation::getAllHostnamesByCluster();
+
+        // Build a host-to-cluster map initialized with hostnames as cluster_ids
+        std::map<std::string, std::string> host_to_cluster;
+        for (auto const &h : hosts) {
+            host_to_cluster[h->get_name()] = h->get_name();
+        }
+        // Update cluster_id value for those hosts that are in an actual cluster
+        for (auto const &c : cluster_to_hosts) {
+            std::string cluster_id = c.first;
+            for (auto const &h : c.second) {
+                host_to_cluster[h] = cluster_id;
+            }
+        }
+
+        // add all hosts to the list of vertices
         for (const auto &host : hosts) {
-            platform_graph_json["nodes"].push_back({
+            platform_graph_json["vertices"].push_back({
                                                            {"type", "host"},
                                                            {"id", host->get_name()},
+                                                           {"cluster_id", host_to_cluster[host->get_name()]},
                                                            {"flop_rate", host->get_speed()},
                                                            {"memory", Simulation::getHostMemoryCapacity(host->get_name())},
                                                            {"cores", host->get_core_count()}
             });
         }
 
-        // add all network links to the list of nodes
-        // TODO: what are the links showing up that aren't explicitly stated in the platform? (such as "__loopback__"), and do we include this?
+        // add all network links to the list of vertices
         std::vector<simgrid::s4u::Link *> links = simgrid_engine->get_all_links();
         for (const auto &link : links) {
-            platform_graph_json["nodes"].push_back({
-                                                           {"type", "link"},
-                                                           {"id", link->get_name()},
-                                                           {"bandwidth", link->get_bandwidth()},
-                                                           {"latency", link->get_latency()}
-            });
+            if (not (link->get_name() == "__loopback__")) { // Ignore loopback link
+                platform_graph_json["vertices"].push_back({
+                                                               {"type",      "link"},
+                                                               {"id",        link->get_name()},
+                                                               {"bandwidth", link->get_bandwidth()},
+                                                               {"latency",   link->get_latency()}
+                                                       });
+            }
         }
 
 
@@ -782,12 +802,13 @@ namespace wrench {
 
             // check that the undirected edge doesn't already exist in set of edges
             if (edges.find(source_string + "-" + target_string) == edges.end() and
-                edges.find(target_string + "-" + source_string) == edges.end()) {
+                edges.find(target_string + "-" + source_string) == edges.end())
+            {
 
                 edges.insert(source_string + "-" + target_string);
 
                 // add a graph link from the source host to the first network link
-                platform_graph_json["links"].push_back({
+                platform_graph_json["edges"].push_back({
                                                                {"source", {
                                                                                   {"type", HOST},
                                                                                   {"id", source_id}
@@ -822,7 +843,7 @@ namespace wrench {
 
                         edges.insert(source_string + "-" + target_string);
 
-                        platform_graph_json["links"].push_back({
+                        platform_graph_json["edges"].push_back({
                                                                        {"source", {
                                                                                           {"type", LINK},
                                                                                           {"id", source_id}
@@ -851,7 +872,7 @@ namespace wrench {
                 edges.insert(source_string + "-" + target_string);
 
                 // add a graph link from the last link to the target host
-                platform_graph_json["links"].push_back({
+                platform_graph_json["edges"].push_back({
                                                                {"source", {
                                                                                   {"type", "link"},
                                                                                   {"id", source_id}
