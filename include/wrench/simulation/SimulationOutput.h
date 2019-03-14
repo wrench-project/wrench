@@ -54,6 +54,7 @@ namespace wrench {
         void dumpWorkflowExecutionJSON(Workflow *workflow, std::string file_path, bool generate_host_utilization_layout = false);
         void dumpWorkflowGraphJSON(wrench::Workflow *workflow, std::string file_path);
         void dumpHostEnergyConsumptionJSON(std::string file_path);
+        void dumpPlatformGraphJSON(std::string file_path);
 
         /***********************/
         /** \cond DEVELOPER    */
