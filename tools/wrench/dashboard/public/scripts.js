@@ -442,7 +442,7 @@ function getOverallWorkflowMetrics(data) {
     var metrics = {
         totalHosts: {
             value: toFiveDecimalPlaces(totalHosts),
-            display: 'Total Hosts Utilised'
+            display: 'Total Hosts Utilized'
         },
         totalDuration: {
             value: toFiveDecimalPlaces(totalDuration),
