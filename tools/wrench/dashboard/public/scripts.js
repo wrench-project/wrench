@@ -158,6 +158,27 @@ function generateGraph(data, containerId) {
         .attr('transform',
             'translate(0,' + (CONTAINER_HEIGHT - PADDING) + ')')
         .call(x_axis)
+
+    // text label for the x axis
+    svg.append("text")
+        .attr("class", "x label")
+        .attr("text-anchor", "end")
+        .attr("x", CONTAINER_WIDTH/2)
+        .attr("y", CONTAINER_HEIGHT - 6)
+        .text("Time (seconds)")
+
+    var yAxisText = currGraphState === "taskView" ? "TaskID" : "Host Name"
+
+    // text label for the y axis
+    svg.append("text")
+        .attr("id", "y-axis-label")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 0)
+        .attr("x",0 - (CONTAINER_HEIGHT / 2))
+        .attr("dy", "1em")
+        .style("text-anchor", "middle")
+        .text(yAxisText)
+
     data.forEach(function(d) {
         var group = svg.append('g')
            .attr('id', d.task_id)
@@ -648,6 +669,7 @@ function toggleView() {
     var informationImg = document.getElementById("information-img")
     if (currGraphState === "taskView") {
         switchToHostView(data.contents, '')
+        d3.select("#y-axis-label").text("Host Name")
         populateLegend("hostView")
         d3.select("#toggle-view-button").text("Switch to Task View")
         if (firstVisit) {
@@ -660,6 +682,7 @@ function toggleView() {
         currGraphState = "hostView"
     } else if (currGraphState === "hostView") {
         generateGraph(data.contents, "graph-container")
+        d3.select("#y-axis-label").text("TaskID")
         populateLegend("taskView")
         d3.select("#toggle-view-button").text("Switch to Host View")
         hostInstructions.style.display = "none"
