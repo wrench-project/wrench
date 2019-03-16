@@ -93,6 +93,7 @@ body {
 .task-details-table-td {
     padding: .75rem;
     border-top: 1px solid #dee2e6;
+    font-size: 12px;
 }
 
 .task-details-table-header {
