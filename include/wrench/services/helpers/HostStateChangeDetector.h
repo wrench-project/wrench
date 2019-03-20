@@ -27,7 +27,7 @@ namespace wrench {
 
     private:
 
-        void hostChangeCallback(simgrid::s4u::Host &h);
+        void hostChangeCallback(simgrid::s4u::Host const &h);
 
         std::vector<std::string> hosts_to_monitor;
         bool notify_when_turned_on;

@@ -287,7 +287,6 @@ namespace wrench {
                                           this->scratch_space, files_stored_in_scratch, job);
                 task->setReadInputEndDate(S4U_Simulation::getClock());
             } catch (WorkflowExecutionException &e) {
-                WRENCH_INFO("I AM HERE AND IT'S UNCLEAR WHAT TO DO (SIMGRID BUG: I SHOULD BE IN ON_EXIT AND NOT IN HERE!!");
                 this->failure_timestamp_should_be_generated = true;
                 throw;
             }
