@@ -90,13 +90,18 @@ namespace wrench {
      */
     void NetworkConnectionManager::startQueuedDataConnections() {
 
+        WRENCH_INFO("IN STARTQUEUEDDATACONNECTIONS: %ld QUEUED DATA connections", this->queued_data_connections.size());
+        WRENCH_INFO("IN STARTQUEUEDDATACONNECTIONS: %ld RUNNING DATA connections", this->running_data_connections.size());
+
       while ((this->running_data_connections.size() < this->max_num_data_connections) and
               (not this->queued_data_connections.empty())) {
         // Extract the next connection that should be started
         std::unique_ptr<NetworkConnection> next_connection = std::move(this->queued_data_connections.back());
         this->queued_data_connections.pop_back();
         // Start that connection
+        WRENCH_INFO("STARTING CONNECTION");
         if (not next_connection->start()) {
+            WRENCH_INFO("GIVING UP ON CONNECTION");
           continue; // Just give up on that connection (freeing it) if it cannot be started
         }
         // Put that connection into the running list

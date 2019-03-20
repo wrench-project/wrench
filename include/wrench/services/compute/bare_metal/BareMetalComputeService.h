@@ -208,7 +208,7 @@ namespace wrench {
 
         void dispatchReadyWorkunits();
 
-        void someHostIsBackOn(simgrid::s4u::Host & h);
+        void someHostIsBackOn(simgrid::s4u::Host const &h);
         bool host_back_on = false;
 
 

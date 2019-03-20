@@ -144,7 +144,7 @@ private:
 #if ((SIMGRID_VERSION_MAJOR == 3) && (SIMGRID_VERSION_MINOR == 22)) || ((SIMGRID_VERSION_MAJOR == 3) && (SIMGRID_VERSION_MINOR == 21) && (SIMGRID_VERSION_PATCH > 0))
 TEST_F(BareMetalComputeServiceSimulatedFailuresTest, OneFailureCausingWorkUnitRestartOnAnotherHost) {
 #else
-TEST_F(BareMetalComputeServiceSimulatedFailuresTest, DISABLED_OneFailureCausingWorkUnitRestartOnAnotherHost) {
+    TEST_F(BareMetalComputeServiceSimulatedFailuresTest, DISABLED_OneFailureCausingWorkUnitRestartOnAnotherHost) {
 #endif
     DO_TEST_WITH_FORK(do_OneFailureCausingWorkUnitRestartOnAnotherHost_test);
 }
@@ -208,7 +208,7 @@ class OneFailureCausingWorkUnitRestartOnSameHostTestWMS : public wrench::WMS {
 
 public:
     OneFailureCausingWorkUnitRestartOnSameHostTestWMS(BareMetalComputeServiceSimulatedFailuresTest *test,
-                                                         std::string &hostname, wrench::ComputeService *cs, wrench::StorageService *ss) :
+                                                      std::string &hostname, wrench::ComputeService *cs, wrench::StorageService *ss) :
             wrench::WMS(nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -322,7 +322,7 @@ class RandomFailuresTestWMS : public wrench::WMS {
 
 public:
     RandomFailuresTestWMS(BareMetalComputeServiceSimulatedFailuresTest *test,
-                                                      std::string &hostname, wrench::ComputeService *cs, wrench::StorageService *ss) :
+                          std::string &hostname, wrench::ComputeService *cs, wrench::StorageService *ss) :
             wrench::WMS(nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -336,18 +336,24 @@ private:
         // Create a job manager
         std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
-        for (int trial=0; trial < 100; trial++) {
+        unsigned long NUM_TRIALS = 250;
 
-            double now = wrench::Simulation::getCurrentSimulatedDate();
+        for (unsigned long trial=0; trial < NUM_TRIALS; trial++) {
+
+            WRENCH_INFO("*** Trial %ld", trial);
+
+//            std::cerr << "\n\n*******\nTRIAL: " << trial << "\n********\n\n";
             // Starting a FailedHost1 random repeat switch!!
+            unsigned long seed1 = trial * 2 + 37;
             auto switch1 = std::shared_ptr<wrench::HostRandomRepeatSwitch>(
-                    new wrench::HostRandomRepeatSwitch("StableHost", trial*2+37, 10, 100, "FailedHost1"));
+                    new wrench::HostRandomRepeatSwitch("StableHost", seed1, 10, 100, "FailedHost1"));
             switch1->simulation = this->simulation;
             switch1->start(switch1, true, false); // Daemonized, no auto-restart
 
             // Starting a FailedHost2 random repeat switch!!
+            unsigned long seed2 = trial * 7 + 417;
             auto switch2 = std::shared_ptr<wrench::HostRandomRepeatSwitch>(
-                    new wrench::HostRandomRepeatSwitch("StableHost", trial*7+417, 10, 100, "FailedHost2"));
+                    new wrench::HostRandomRepeatSwitch("StableHost", seed2, 10, 100, "FailedHost2"));
             switch2->simulation = this->simulation;
             switch2->start(switch2, true, false); // Daemonized, no auto-restart
 
@@ -371,14 +377,11 @@ private:
 
             switch1->kill();
             switch2->kill();
-            std::cerr << "######### " << (wrench::Simulation::getCurrentSimulatedDate() - now) << "\n";
 
             wrench::Simulation::sleep(10.0);
             this->test->workflow->removeTask(task);
 
         }
-
-
 
         return 0;
     }

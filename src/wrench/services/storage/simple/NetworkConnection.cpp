@@ -67,6 +67,7 @@ namespace wrench {
      * @return true if start was successful, false otherwise
      */
     bool NetworkConnection::start() {
+
       switch (this->type) {
         case NetworkConnection::INCOMING_DATA:
         WRENCH_INFO("Asynchronously receiving file %s...",

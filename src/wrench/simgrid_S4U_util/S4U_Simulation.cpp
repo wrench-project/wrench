@@ -195,8 +195,6 @@ namespace wrench {
         return simgrid::s4u::Host::current()->get_speed(); // changed it to speed of the current pstate
     }
 
-
-
     /**
      * @brief Get the current simulation date
      *
@@ -208,35 +206,18 @@ namespace wrench {
 
     /**
      * @brief Simulates a computation on host on which the calling actor is running
-     *
      * @param flops: the number of flops
-     * @throw std::shared_ptr<HostError>
      */
     void S4U_Simulation::compute(double flops) {
-        try{
-            simgrid::s4u::this_actor::execute(flops);
-        } catch (simgrid::HostFailureException& e) {
-            WRENCH_INFO("THROWING WHILE COMPUTE!");
-            throw std::shared_ptr<HostError>(
-                    new HostError(S4U_Simulation::getHostName()));
-        }
+        simgrid::s4u::this_actor::execute(flops);
     }
 
     /**
      * @brief Simulates a sleep
      * @param duration: the number of seconds to sleep
-     *
-     * @throw std::shared_ptr<HostError>
      */
     void S4U_Simulation::sleep(double duration ) {
-        try {
             simgrid::s4u::this_actor::sleep_for(duration);
-        } catch (simgrid::HostFailureException& e) {
-            WRENCH_INFO("THROWING WHILE SLEEP!");
-
-            throw std::shared_ptr<HostError>(
-                    new HostError(S4U_Simulation::getHostName()));
-        }
     }
 
     /**
