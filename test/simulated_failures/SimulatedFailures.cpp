@@ -204,14 +204,11 @@ private:
 
 
         try {
-            WRENCH_INFO("GETTING A MESSAGE 1");
-
             message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
         } catch (std::shared_ptr<wrench::NetworkError> &cause) {
             throw std::runtime_error("Network error while getting a message!" + cause->toString());
         }
 
-        WRENCH_INFO("GOT A MESSAGE!");
         auto real_msg = dynamic_cast<wrench::ServiceHasCrashedMessage *>(message.get());
         if (not real_msg) {
             throw std::runtime_error("Unexpected " + message->getName() + " message");
@@ -224,12 +221,10 @@ private:
         // And again...
 
         try {
-            WRENCH_INFO("GETTING A MESSAGE 1");
             message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
         } catch (std::shared_ptr<wrench::NetworkError> &cause) {
             throw std::runtime_error("Network error while getting a message!" + cause->toString());
         }
-        WRENCH_INFO("FOR ANOTHER!");
 
         real_msg = dynamic_cast<wrench::ServiceHasCrashedMessage *>(message.get());
         if (not real_msg) {
@@ -239,8 +234,6 @@ private:
                 throw std::runtime_error("Got a failure notification, but not for the right service!");
             }
         }
-
-        WRENCH_INFO("WOOHOO!");
 
         return 0;
     }

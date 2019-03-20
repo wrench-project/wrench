@@ -382,7 +382,7 @@ namespace wrench {
 
     }
 
-    void BareMetalComputeService::someHostIsBackOn(simgrid::s4u::Host &h) {
+    void BareMetalComputeService::someHostIsBackOn(simgrid::s4u::Host const &h) {
         for (auto const &c : this->compute_resources) {
             if ((c.first == h.get_name()) and (h.is_on())) {
 //                WRENCH_INFO("HOST %s CAME BACK ON!!!", h.get_cname());
@@ -491,7 +491,6 @@ namespace wrench {
     }
 
 
-
     /**
      * @brief Main method of the daemon
      *
@@ -516,9 +515,7 @@ namespace wrench {
             host_state_monitor->start(host_state_monitor, true, false); // Daemonized, no auto-restart
         }
 
-//        std::function<void(simgrid::s4u::Host &h)> host_back_on_function = std::bind(&BareMetalComputeService::someHostIsBackOn, this, std::placeholders::_1);
-//        simgrid::s4u::Host::on_state_change.connect(host_back_on_function);
-        simgrid::s4u::Host::on_state_change.connect([this](simgrid::s4u::Host &h) { this->someHostIsBackOn(h);});
+        simgrid::s4u::Host::on_state_change.connect( [this] (simgrid::s4u::Host const &h) { this->someHostIsBackOn(h);});
 
 
         // Set an alarm for my timely death, if necessary

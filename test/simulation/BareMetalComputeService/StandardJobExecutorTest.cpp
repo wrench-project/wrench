@@ -2719,7 +2719,6 @@ private:
                 std::string my_mailbox = "test_callback_mailbox";
 
                 double before = wrench::S4U_Simulation::getClock();
-                WRENCH_INFO("BEFORE = %lf", before);
 
                 // Create a StandardJobExecutor that will run stuff on one host and all 10 cores
                 std::shared_ptr<wrench::StandardJobExecutor> executor = std::unique_ptr<wrench::StandardJobExecutor>(

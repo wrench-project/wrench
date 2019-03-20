@@ -329,6 +329,7 @@ namespace wrench {
         src_partition = "/";
       }
 
+
       // Send a message to the daemon
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("read_file");
       try {
@@ -341,7 +342,7 @@ namespace wrench {
                                         this->getMessagePayloadValueAsDouble(
                                                 StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
-        std::cerr << "THROWING DUE TO NETWORK ERROR!\n";
+        WRENCH_INFO("THROWING DUE TO NETWORK ERROR!");
         throw WorkflowExecutionException(cause);
       }
 
@@ -351,7 +352,8 @@ namespace wrench {
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
-        std::cerr << "THROWING DUE TO NETWORK ERROR (2)!\n";
+        WRENCH_INFO("THROWING DUE TO NETWORK ERROR (2)!");
+        WRENCH_INFO("CAUSE: %s", cause->toString().c_str());
 
         throw WorkflowExecutionException(cause);
       }
@@ -501,13 +503,11 @@ namespace wrench {
                                    std::set<WorkflowFile *> &files_in_scratch,
                                    WorkflowJob *job) {
       try {
-          WRENCH_INFO("ABOUT TO CALL READ OF WRITE FILES");
         StorageService::writeOrReadFiles(READ, std::move(files), std::move(file_locations), default_storage_service,
                                          files_in_scratch, job);
       } catch (std::runtime_error &e) {
         throw;
       } catch (WorkflowExecutionException &e) {
-          WRENCH_INFO("THROWING IN readFiles()");
         throw;
       }
     }

@@ -26,12 +26,10 @@ wrench::HostStateChangeDetector::HostStateChangeDetector(std::string host_on_whi
     this->mailbox_to_notify = mailbox_to_notify;
 
     // Connect my member method to the on_state_change signal from SimGrid
-//    std::function<void(simgrid::s4u::Host &h)> host_back_on_function = std::bind(&HostStateChangeDetector::hostChangeCallback, this, std::placeholders::_1);
-//    simgrid::s4u::Host::on_state_change.connect(host_back_on_function);
-    simgrid::s4u::Host::on_state_change.connect([this](simgrid::s4u::Host &h){this->hostChangeCallback(h);});
+    simgrid::s4u::Host::on_state_change.connect([this](simgrid::s4u::Host const &h) {this->hostChangeCallback(h);});
 }
 
-void wrench::HostStateChangeDetector::hostChangeCallback(simgrid::s4u::Host &h) {
+void wrench::HostStateChangeDetector::hostChangeCallback(simgrid::s4u::Host const &h) {
     // If this is not a host I care about, whatever
     if (std::find(this->hosts_to_monitor.begin(), this->hosts_to_monitor.end(), h.get_name()) == this->hosts_to_monitor.end()) {
         return;
