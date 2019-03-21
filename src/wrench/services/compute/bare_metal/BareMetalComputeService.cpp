@@ -888,23 +888,6 @@ namespace wrench {
         this->all_workunits.erase(job);
 
         /** Deal with task states (note that simulation timestamps are set in the clean() function) */
-//        for (auto &task : job->getTasks()) {
-//            if (task->getInternalState() == WorkflowTask::InternalState::TASK_RUNNING) {
-//                if (termination_cause == BareMetalComputeService::JobTerminationCause::TERMINATED) {
-////                    task->setTerminationDate(S4U_Simulation::getClock());
-////                    this->simulation->getOutput().addTimestamp<SimulationTimestampTaskTerminated>(
-////                            new SimulationTimestampTaskTerminated(task));
-//
-//                } else if (termination_cause == BareMetalComputeService::JobTerminationCause::COMPUTE_SERVICE_KILLED) {
-////                    task->setFailureDate(S4U_Simulation::getClock());
-////                    this->simulation->getOutput().addTimestamp<SimulationTimestampTaskFailure>(
-////                            new SimulationTimestampTaskFailure(task));
-//                }
-////                task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
-//            }
-//        }
-
-
         for (auto failed_task: job->getTasks()) {
             switch (failed_task->getInternalState()) {
                 case WorkflowTask::InternalState::TASK_NOT_READY:
@@ -915,7 +898,7 @@ namespace wrench {
                 case WorkflowTask::InternalState::TASK_RUNNING:
                     throw std::runtime_error(
                             "BareMetalComputeService::terminateRunningStandardJob(): task state shouldn't be 'RUNNING'"
-                            "after a StandardJobExecutor was killed!");
+                            "after a WorkUnitExecutor was killed!");
                 case WorkflowTask::InternalState::TASK_FAILED:
                     // Making failed task READY again!!!
                     failed_task->setInternalState(WorkflowTask::InternalState::TASK_READY);
@@ -924,7 +907,6 @@ namespace wrench {
                 default:
                     throw std::runtime_error(
                             "BareMetalComputeService::terminateRunningStandardJob(): unexpected task state");
-
             }
         }
 
@@ -1077,7 +1059,7 @@ namespace wrench {
                 // Make sure the child's tasks ready (paranoid)
                 if (child->task != nullptr) {
                     if (child->task->getInternalState() != WorkflowTask::InternalState::TASK_READY) {
-                        throw std::runtime_error("StandardJobExecutor::processWorkunitExecutorCompletion(): Weird task state " +
+                        throw std::runtime_error("BareMetalComputeService::processWorkunitExecutorCompletion(): Weird task state " +
                                                  std::to_string(child->task->getInternalState()) + " for task " +
                                                  child->task->getID());
                     }
