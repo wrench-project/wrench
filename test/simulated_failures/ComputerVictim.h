@@ -23,9 +23,7 @@ namespace wrench {
 
         explicit ComputerVictim(std::string host_on_which_to_run, double flops, SimulationMessage *msg, std::string mailbox_to_notify);
 
-        /***********************/
-        /** \endcond           */
-        /***********************/
+        void cleanup(bool has_terminated_cleanly, int return_value) override;
 
     private:
         double flops;
@@ -34,10 +32,6 @@ namespace wrench {
         int main() override;
 
     };
-
-    /***********************/
-    /** \endcond            */
-    /***********************/
 
 
 };
