@@ -19,7 +19,6 @@
 
 namespace wrench {
 
-
     /**
      * @brief Configurable properties for a Service
      */

@@ -100,38 +100,23 @@ namespace wrench {
     }
 
     /**
-     * @brief Cleanup function called when the daemon terminates (for whatever reason)
+     * @brief Cleanup function called when the daemon terminates (for whatever reason). The
+     *        default behavior is to throw an exception if the host is off. This method
+     *        should be overriden in a daemons implements some fault-tolerant behavior, or
+     *        is naturally tolerant.
      *
      * @param has_terminated_cleanly: whether the daemon returned from main() by itself
      * @param exit_code: the return value from main (if has_terminated_cleanly is true)
+     *
+     * @throw std::runtime_error
      */
     void S4U_Daemon::cleanup(bool has_terminated_cleanly, int return_value) {
-//      WRENCH_INFO("Cleaning Up (default: nothing to do)");
+      if ((not has_terminated_cleanly) and (not simgrid::s4u::Host::by_name(hostname)->is_on())) {
+          throw std::runtime_error("S4U_Daemon::cleanup(): This daemon has died due to a failure of its host, but does not override cleanup() "
+                                   "(so that is can implement fault-tolerance or explicitly ignore fault) ");
+      }
     }
 
-    /**
-     * \cond
-     */
-//    static int daemon_goodbye(int x, void *service_instance) {
-//        WRENCH_INFO("Terminating");
-//        if (service_instance == nullptr) {
-//            return 0;
-//        }
-//        auto service = reinterpret_cast<S4U_Daemon *>(service_instance);
-//
-//        // Call cleanup
-//        service->cleanup(service->hasReturnedFromMain(), service->getReturnValue());
-//
-//        // Free memory for the object unless the service is set to auto-restart
-//        if (not service->isSetToAutoRestart()) {
-//            delete service->life_saver;
-//        }
-//        return 0;
-//    }
-
-    /**
-     * \endcond
-     */
 
     /**
      * @brief Start the daemon

@@ -342,7 +342,6 @@ private:
 
             WRENCH_INFO("*** Trial %ld", trial);
 
-//            std::cerr << "\n\n*******\nTRIAL: " << trial << "\n********\n\n";
             // Starting a FailedHost1 random repeat switch!!
             unsigned long seed1 = trial * 2 + 37;
             auto switch1 = std::shared_ptr<wrench::HostRandomRepeatSwitch>(
@@ -402,7 +401,6 @@ void BareMetalComputeServiceSimulatedFailuresTest::do_RandomFailures_test() {
     int argc = 1;
     auto argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("failure_test");
-
 
     simulation->init(&argc, argv);
 
