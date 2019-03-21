@@ -111,10 +111,10 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void S4U_Daemon::cleanup(bool has_terminated_cleanly, int return_value) {
-      if ((not has_terminated_cleanly) and (not simgrid::s4u::Host::by_name(hostname)->is_on())) {
-          throw std::runtime_error("S4U_Daemon::cleanup(): This daemon has died due to a failure of its host, but does not override cleanup() "
-                                   "(so that is can implement fault-tolerance or explicitly ignore fault) ");
-      }
+        if ((not has_terminated_cleanly) and (not simgrid::s4u::Host::by_name(hostname)->is_on())) {
+            throw std::runtime_error("S4U_Daemon::cleanup(): This daemon has died due to a failure of its host, but does not override cleanup() "
+                                     "(so that is can implement fault-tolerance or explicitly ignore fault) ");
+        }
     }
 
 
@@ -176,7 +176,6 @@ namespace wrench {
                 WRENCH_INFO("Terminating");
                 // Call cleanup
                 daemon_object->cleanup(daemon_object->hasReturnedFromMain(), daemon_object->getReturnValue());
-
                 // Free memory for the object unless the service is set to auto-restart
                 if (not daemon_object->isSetToAutoRestart()) {
                     delete daemon_object->life_saver;
@@ -204,22 +203,12 @@ namespace wrench {
  * @brief Method that run's the user-defined main method (that's called by the S4U actor class)
  */
     void S4U_Daemon::runMainMethod() {
-        try {
-            this->num_starts++;
-            try {
-                // Compute zero flop so that nothing happens
-                // until the host has a >0 pstate
-                S4U_Simulation::computeZeroFlop();
-                this->return_value = this->main();
-                this->has_returned_from_main = true;
-            } catch (std::shared_ptr<HostError> &e) {
-                // In case the main() didn't to that catch
-            } catch (simgrid::HostFailureException &e) {
-                // In case the main() didn't to that catch
-            }
-        } catch (std::exception &e) {
-            throw;
-        }
+        this->num_starts++;
+        // Compute zero flop so that nothing happens
+        // until the host has a >0 pstate
+        S4U_Simulation::computeZeroFlop();
+        this->return_value = this->main();
+        this->has_returned_from_main = true;
     }
 
 

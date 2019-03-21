@@ -395,7 +395,7 @@ namespace wrench {
     };
 
     /**
- * @brief A "host error" failure cause
+ * @brief A "host error" failure cause (e.g., attempted to start a daemon on a host that is off)
  */
     class HostError : public FailureCause {
     public:
