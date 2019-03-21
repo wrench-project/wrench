@@ -7,15 +7,15 @@
  * (at your option) any later version.
  */
 
-#include "HostRandomRepeatSwitch.h"
+#include "HostRandomRepeatSwitcher.h"
 
 #include <wrench/simulation/Simulation.h>
 #include <wrench-dev.h>
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(host_random_repeat_switch, "Log category for HostRandomRepeatSwitch");
+XBT_LOG_NEW_DEFAULT_CATEGORY(host_random_repeat_switcher, "Log category for HostRandomRepeatSwitcher");
 
 
-wrench::HostRandomRepeatSwitch::HostRandomRepeatSwitch(std::string host_on_which_to_run, double seed, double min_sleep_time, double max_sleep_time, std::string host_to_switch) :
+wrench::HostRandomRepeatSwitcher::HostRandomRepeatSwitcher(std::string host_on_which_to_run, double seed, double min_sleep_time, double max_sleep_time, std::string host_to_switch) :
         Service(host_on_which_to_run, "host_switcher", "host_switcher"){
     this->seed = seed;
     this->min_sleep_time = min_sleep_time;
@@ -23,13 +23,13 @@ wrench::HostRandomRepeatSwitch::HostRandomRepeatSwitch(std::string host_on_which
     this->host_to_switch = host_to_switch;
 }
 
-void wrench::HostRandomRepeatSwitch::kill() {
+void wrench::HostRandomRepeatSwitcher::kill() {
 
     this->killActor();
 }
 
 
-int wrench::HostRandomRepeatSwitch::main() {
+int wrench::HostRandomRepeatSwitcher::main() {
 
     //Type of random number distribution
     std::uniform_real_distribution<double> dist(this->min_sleep_time, this->max_sleep_time);

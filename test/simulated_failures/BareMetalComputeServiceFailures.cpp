@@ -13,10 +13,10 @@
 
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
-#include "test_util/HostSwitch.h"
+#include "test_util/HostSwitcher.h"
 #include "wrench/services/helpers/ServiceFailureDetector.h"
 #include "test_util/SleeperVictim.h"
-#include "test_util/HostRandomRepeatSwitch.h"
+#include "test_util/HostRandomRepeatSwitcher.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(bare_metal_compute_service_simulated_failures_test, "Log category for BareMetalComputeServiceSimulatedFailuresTests");
 
@@ -33,9 +33,9 @@ public:
     wrench::StorageService *storage_service = nullptr;
     wrench::ComputeService *compute_service = nullptr;
 
-    void do_OneFailureCausingWorkUnitRestartOnAnotherHost_test();
-    void do_OneFailureCausingWorkUnitRestartOnSameHost_test();
-    void do_RandomFailures_test();
+    void do_BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnAnotherHost_test();
+    void do_BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnSameHost_test();
+    void do_BareMetalComputeServiceRandomFailures_test();
 
 protected:
 
@@ -86,10 +86,10 @@ protected:
 /**                FAIL OVER TO SECOND HOST  TEST                    **/
 /**********************************************************************/
 
-class OneFailureCausingWorkUnitRestartOnAnotherHostTestWMS : public wrench::WMS {
+class BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnAnotherHostTestWMS : public wrench::WMS {
 
 public:
-    OneFailureCausingWorkUnitRestartOnAnotherHostTestWMS(BareMetalComputeServiceSimulatedFailuresTest *test,
+    BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnAnotherHostTestWMS(BareMetalComputeServiceSimulatedFailuresTest *test,
                                                          std::string &hostname, wrench::ComputeService *cs, wrench::StorageService *ss) :
             wrench::WMS(nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -102,12 +102,12 @@ private:
     int main() override {
 
         // Starting a FailedHost1 murderer!!
-        auto murderer = std::shared_ptr<wrench::HostSwitch>(new wrench::HostSwitch("StableHost", 100, "FailedHost1", wrench::HostSwitch::Action::TURN_OFF));
+        auto murderer = std::shared_ptr<wrench::HostSwitcher>(new wrench::HostSwitcher("StableHost", 100, "FailedHost1", wrench::HostSwitcher::Action::TURN_OFF));
         murderer->simulation = this->simulation;
         murderer->start(murderer, true, false); // Daemonized, no auto-restart
 
         // Starting a FailedHost1 resurector!!
-        auto resurector = std::shared_ptr<wrench::HostSwitch>(new wrench::HostSwitch("StableHost", 1000, "FailedHost1", wrench::HostSwitch::Action::TURN_ON));
+        auto resurector = std::shared_ptr<wrench::HostSwitcher>(new wrench::HostSwitcher("StableHost", 1000, "FailedHost1", wrench::HostSwitcher::Action::TURN_ON));
         resurector->simulation = this->simulation;
         resurector->start(resurector, true, false); // Daemonized, no auto-restart
 
@@ -146,10 +146,10 @@ TEST_F(BareMetalComputeServiceSimulatedFailuresTest, OneFailureCausingWorkUnitRe
 #else
     TEST_F(BareMetalComputeServiceSimulatedFailuresTest, DISABLED_OneFailureCausingWorkUnitRestartOnAnotherHost) {
 #endif
-    DO_TEST_WITH_FORK(do_OneFailureCausingWorkUnitRestartOnAnotherHost_test);
+    DO_TEST_WITH_FORK(do_BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnAnotherHost_test);
 }
 
-void BareMetalComputeServiceSimulatedFailuresTest::do_OneFailureCausingWorkUnitRestartOnAnotherHost_test() {
+void BareMetalComputeServiceSimulatedFailuresTest::do_BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnAnotherHost_test() {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
@@ -181,7 +181,7 @@ void BareMetalComputeServiceSimulatedFailuresTest::do_OneFailureCausingWorkUnitR
 
     // Create a WMS
     wrench::WMS *wms = nullptr;
-    wms = simulation->add(new OneFailureCausingWorkUnitRestartOnAnotherHostTestWMS(this, stable_host, compute_service, storage_service));
+    wms = simulation->add(new BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnAnotherHostTestWMS(this, stable_host, compute_service, storage_service));
 
     wms->addWorkflow(workflow);
 
@@ -204,10 +204,10 @@ void BareMetalComputeServiceSimulatedFailuresTest::do_OneFailureCausingWorkUnitR
 /**                    RESTART ON SAME HOST                          **/
 /**********************************************************************/
 
-class OneFailureCausingWorkUnitRestartOnSameHostTestWMS : public wrench::WMS {
+class BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnSameHostTestWMS : public wrench::WMS {
 
 public:
-    OneFailureCausingWorkUnitRestartOnSameHostTestWMS(BareMetalComputeServiceSimulatedFailuresTest *test,
+    BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnSameHostTestWMS(BareMetalComputeServiceSimulatedFailuresTest *test,
                                                       std::string &hostname, wrench::ComputeService *cs, wrench::StorageService *ss) :
             wrench::WMS(nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -220,12 +220,12 @@ private:
     int main() override {
 
         // Starting a FailedHost1 murderer!!
-        auto murderer = std::shared_ptr<wrench::HostSwitch>(new wrench::HostSwitch("StableHost", 100, "FailedHost1", wrench::HostSwitch::Action::TURN_OFF));
+        auto murderer = std::shared_ptr<wrench::HostSwitcher>(new wrench::HostSwitcher("StableHost", 100, "FailedHost1", wrench::HostSwitcher::Action::TURN_OFF));
         murderer->simulation = this->simulation;
         murderer->start(murderer, true, false); // Daemonized, no auto-restart
 
         // Starting a FailedHost1 resurector!!
-        auto resurector = std::shared_ptr<wrench::HostSwitch>(new wrench::HostSwitch("StableHost", 1000, "FailedHost1", wrench::HostSwitch::Action::TURN_ON));
+        auto resurector = std::shared_ptr<wrench::HostSwitcher>(new wrench::HostSwitcher("StableHost", 1000, "FailedHost1", wrench::HostSwitcher::Action::TURN_ON));
         resurector->simulation = this->simulation;
         resurector->start(resurector, true, false); // Daemonized, no auto-restart
 
@@ -262,10 +262,10 @@ TEST_F(BareMetalComputeServiceSimulatedFailuresTest, OneFailureCausingWorkUnitRe
 #else
     TEST_F(BareMetalComputeServiceSimulatedFailuresTest, DISABLED_OneFailureCausingWorkUnitRestartOnSameHost) {
 #endif
-    DO_TEST_WITH_FORK(do_OneFailureCausingWorkUnitRestartOnSameHost_test);
+    DO_TEST_WITH_FORK(do_BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnSameHost_test);
 }
 
-void BareMetalComputeServiceSimulatedFailuresTest::do_OneFailureCausingWorkUnitRestartOnSameHost_test() {
+void BareMetalComputeServiceSimulatedFailuresTest::do_BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnSameHost_test() {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
@@ -296,7 +296,7 @@ void BareMetalComputeServiceSimulatedFailuresTest::do_OneFailureCausingWorkUnitR
 
     // Create a WMS
     wrench::WMS *wms = nullptr;
-    wms = simulation->add(new OneFailureCausingWorkUnitRestartOnSameHostTestWMS(this, stable_host, compute_service, storage_service));
+    wms = simulation->add(new BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnSameHostTestWMS(this, stable_host, compute_service, storage_service));
 
     wms->addWorkflow(workflow);
 
@@ -318,10 +318,10 @@ void BareMetalComputeServiceSimulatedFailuresTest::do_OneFailureCausingWorkUnitR
 /**                    RANDOM FAILURES                               **/
 /**********************************************************************/
 
-class RandomFailuresTestWMS : public wrench::WMS {
+class BareMetalComputeServiceRandomFailuresTestWMS : public wrench::WMS {
 
 public:
-    RandomFailuresTestWMS(BareMetalComputeServiceSimulatedFailuresTest *test,
+    BareMetalComputeServiceRandomFailuresTestWMS(BareMetalComputeServiceSimulatedFailuresTest *test,
                           std::string &hostname, wrench::ComputeService *cs, wrench::StorageService *ss) :
             wrench::WMS(nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -344,15 +344,15 @@ private:
 
             // Starting a FailedHost1 random repeat switch!!
             unsigned long seed1 = trial * 2 + 37;
-            auto switch1 = std::shared_ptr<wrench::HostRandomRepeatSwitch>(
-                    new wrench::HostRandomRepeatSwitch("StableHost", seed1, 10, 100, "FailedHost1"));
+            auto switch1 = std::shared_ptr<wrench::HostRandomRepeatSwitcher>(
+                    new wrench::HostRandomRepeatSwitcher("StableHost", seed1, 10, 100, "FailedHost1"));
             switch1->simulation = this->simulation;
             switch1->start(switch1, true, false); // Daemonized, no auto-restart
 
             // Starting a FailedHost2 random repeat switch!!
             unsigned long seed2 = trial * 7 + 417;
-            auto switch2 = std::shared_ptr<wrench::HostRandomRepeatSwitch>(
-                    new wrench::HostRandomRepeatSwitch("StableHost", seed2, 10, 100, "FailedHost2"));
+            auto switch2 = std::shared_ptr<wrench::HostRandomRepeatSwitcher>(
+                    new wrench::HostRandomRepeatSwitcher("StableHost", seed2, 10, 100, "FailedHost2"));
             switch2->simulation = this->simulation;
             switch2->start(switch2, true, false); // Daemonized, no auto-restart
 
@@ -391,10 +391,10 @@ TEST_F(BareMetalComputeServiceSimulatedFailuresTest, RandomFailures) {
 #else
     TEST_F(BareMetalComputeServiceSimulatedFailuresTest, DISABLED_RandomFailures) {
 #endif
-    DO_TEST_WITH_FORK(do_RandomFailures_test);
+    DO_TEST_WITH_FORK(do_BareMetalComputeServiceRandomFailures_test);
 }
 
-void BareMetalComputeServiceSimulatedFailuresTest::do_RandomFailures_test() {
+void BareMetalComputeServiceSimulatedFailuresTest::do_BareMetalComputeServiceRandomFailures_test() {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
@@ -425,7 +425,7 @@ void BareMetalComputeServiceSimulatedFailuresTest::do_RandomFailures_test() {
 
     // Create a WMS
     wrench::WMS *wms = nullptr;
-    wms = simulation->add(new RandomFailuresTestWMS(this, stable_host, compute_service, storage_service));
+    wms = simulation->add(new BareMetalComputeServiceRandomFailuresTestWMS(this, stable_host, compute_service, storage_service));
 
     wms->addWorkflow(workflow);
 

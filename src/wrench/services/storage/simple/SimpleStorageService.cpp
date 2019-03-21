@@ -323,7 +323,6 @@ namespace wrench {
 
         // Reply with a "go ahead, send me the file" message
         try {
-            WRENCH_INFO("SENDING ANSWER BACK");
             S4U_Mailbox::dputMessage(answer_mailbox,
                                     new StorageServiceFileWriteAnswerMessage(file,
                                                                              this,
@@ -332,15 +331,12 @@ namespace wrench {
                                                                              file_reception_mailbox,
                                                                              this->getMessagePayloadValueAsDouble(
                                                                                      SimpleStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
-            WRENCH_INFO("ANSWER SENT!");
         } catch (std::shared_ptr<NetworkError> &cause) {
             return true;
         }
-        WRENCH_INFO("ADDING CONNETION");
         this->network_connection_manager->addConnection(std::unique_ptr<NetworkConnection>(
                 new NetworkConnection(NetworkConnection::INCOMING_DATA, file, dst_partition, file_reception_mailbox, "")));
 
-        WRENCH_INFO("CONNECTION ADDED");
         return true;
     }
 
@@ -375,7 +371,6 @@ namespace wrench {
 
         // Send back the corresponding ack, asynchronously and in a "fire and forget" fashion
         try {
-            WRENCH_INFO("SENDING ANSWER TO FILE READ REQUESTS");
             S4U_Mailbox::dputMessage(answer_mailbox,
                                      new StorageServiceFileReadAnswerMessage(file, this, success, failure_cause,
                                                                              this->getMessagePayloadValueAsDouble(
@@ -386,7 +381,6 @@ namespace wrench {
 
         // If success, then follow up with sending the file (ASYNCHRONOUSLY!)
         if (success) {
-            WRENCH_INFO("ADDING CONNECTION FOR OUTGOING DATA");
             this->network_connection_manager->addConnection(std::unique_ptr<NetworkConnection>(
                     new NetworkConnection(NetworkConnection::OUTGOING_DATA, file, src_partition , mailbox_to_receive_the_file_content, "")
             ));
