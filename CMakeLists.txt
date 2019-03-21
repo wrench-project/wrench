@@ -243,32 +243,32 @@ set(TEST_FILES
         test/workflow/WorkflowTaskTest.cpp
         test/workflow/WorkflowLoadFromDAXTest.cpp
         test/workflow/WorkflowLoadFromJSONTest.cpp
-        test/simulation/BareMetalComputeService/BareMetalComputeServiceOneTaskTest.cpp
-        test/simulation/SimpleStorageService/InternalNetworkConnectionTest.cpp
-        test/simulation/SimpleStorageService/SimpleStorageServiceFunctionalTest.cpp
-        test/simulation/SimpleStorageService/SimpleStorageServicePerformanceTest.cpp
-        test/simulation/SimpleStorageService/SimpleStorageServiceLimitedConnectionsTest.cpp
-        test/simulation/SimpleStorageService/StorageServiceDeleteRegisterTest.cpp
-        test/simulation/SimpleStorageService/DataMovementManagerCopyRegisterTest.cpp
-        test/simulation/SimpleStorageService/ZeroSizeFileTest.cpp
-        test/simulation/BareMetalComputeService/BareMetalComputeServiceTestStandardJobs.cpp
-        test/simulation/BareMetalComputeService/BareMetalComputeServiceTestPilotJobs.cpp
-        test/simulation/BareMetalComputeService/BareMetalComputeServiceSchedulingTest.cpp
-        test/simulation/BareMetalComputeService/StandardJobExecutorTest.cpp
-        test/simulation/BareMetalComputeService/BareMetalComputeServiceResourceInformationTest.cpp
-        test/simulation/BatchService/BatchServiceTest.cpp
-        test/simulation/BatchService/BatchServiceFCFSTest.cpp
-        test/simulation/BatchService/BatchServiceTraceFileTest.cpp
-        test/simulation/BatchService/BatchServiceOutputCSVFileTest.cpp
-        test/simulation/BatchService/BatchServiceBatschedQueueWaitTimePredictionTest.cpp
-        test/simulation/BatchService/BatchServiceBatschedContiguityTest.cpp
-        test/simulation/wms/WMSTest.cpp
-        test/simulation/wms/MultipleWMSTest.cpp
-        test/simulation/wms/WMSOptimizationsTest.cpp
-        test/simulation/VirtualizedClusterServiceTest.cpp
-        test/simulation/NetworkProximityTest.cpp
-        test/simulation/FileRegistryTest.cpp
-        test/simulation/JobManagerTest.cpp
+        test/compute_services/BareMetalComputeService/BareMetalComputeServiceOneTaskTest.cpp
+        test/storage_services/SimpleStorageService/InternalNetworkConnectionTest.cpp
+        test/storage_services/SimpleStorageService/SimpleStorageServiceFunctionalTest.cpp
+        test/storage_services/SimpleStorageService/SimpleStorageServicePerformanceTest.cpp
+        test/storage_services/SimpleStorageService/SimpleStorageServiceLimitedConnectionsTest.cpp
+        test/storage_services/SimpleStorageService/StorageServiceDeleteRegisterTest.cpp
+        test/storage_services/SimpleStorageService/DataMovementManagerCopyRegisterTest.cpp
+        test/storage_services/SimpleStorageService/ZeroSizeFileTest.cpp
+        test/compute_services/BareMetalComputeService/BareMetalComputeServiceTestStandardJobs.cpp
+        test/compute_services/BareMetalComputeService/BareMetalComputeServiceTestPilotJobs.cpp
+        test/compute_services/BareMetalComputeService/BareMetalComputeServiceSchedulingTest.cpp
+        test/compute_services/StandardJobExecutor/StandardJobExecutorTest.cpp
+        test/compute_services/BareMetalComputeService/BareMetalComputeServiceResourceInformationTest.cpp
+        test/compute_services/BatchService/BatchServiceTest.cpp
+        test/compute_services/BatchService/BatchServiceFCFSTest.cpp
+        test/compute_services/BatchService/BatchServiceTraceFileTest.cpp
+        test/compute_services/BatchService/BatchServiceOutputCSVFileTest.cpp
+        test/compute_services/BatchService/BatchServiceBatschedQueueWaitTimePredictionTest.cpp
+        test/compute_services/BatchService/BatchServiceBatschedContiguityTest.cpp
+        test/wms/WMSTest.cpp
+        test/wms/MultipleWMSTest.cpp
+        test/wms/WMSOptimizationsTest.cpp
+        test/compute_services/VirtualizedClusterServiceTest.cpp
+        test/network_proximity_services/NetworkProximityTest.cpp
+        test/file_registry_services/FileRegistryTest.cpp
+        test/wms/JobManagerTest.cpp
         test/simulation/SimpleSimulationTest.cpp
         test/simulation/DynamicServiceCreationTest.cpp
         test/simulation/SimulationCommandLineArgumentsTest.cpp
@@ -276,14 +276,14 @@ set(TEST_FILES
         test/simulation/simulation_output/SimulationTimestampTaskTest.cpp
         test/simulation/simulation_output/SimulationTimestampFileCopyTest.cpp
         test/simulation/simulation_output/SimulationTimestampEnergyTest.cpp
-        test/simulation/ScratchSpaceTest.cpp
+        test/compute_services/ScratchSpaceTest.cpp
         test/simulation/S4U_DaemonTest.cpp
         test/pilot_job/CriticalPathSchedulerTest.cpp
         test/misc/PointerUtilTest.cpp
         examples/simple-example/scheduler/pilot_job/CriticalPathPilotJobScheduler.cpp
-        test/simulation/ScratchSpaceTest.cpp test/simulation/EnergyConsumptionTest.cpp
+        test/compute_services/ScratchSpaceTest.cpp test/energy_consumption/EnergyConsumptionTest.cpp
         test/simulation/simulation_output/SimulationDumpJSONTest.cpp
-        test/simulation/HTCondorServiceTest.cpp
+        test/compute_services/HTCondorServiceTest.cpp
         src/wrench/managers/EnergyMeter.cpp include/wrench/managers/EnergyMeter.h
         test/simulated_failures/SimulatedFailures.cpp
         test/simulated_failures/BareMetalComputeServiceFailures.cpp
