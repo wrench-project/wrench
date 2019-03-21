@@ -13,10 +13,10 @@
 
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
-#include "HostSwitch.h"
+#include "test_util/HostSwitch.h"
 #include "wrench/services/helpers/ServiceFailureDetector.h"
-#include "SleeperVictim.h"
-#include "HostRandomRepeatSwitch.h"
+#include "test_util/SleeperVictim.h"
+#include "test_util/HostRandomRepeatSwitch.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(bare_metal_compute_service_simulated_failures_test, "Log category for BareMetalComputeServiceSimulatedFailuresTests");
 
