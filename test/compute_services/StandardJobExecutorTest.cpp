@@ -14,8 +14,8 @@
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
 
-#include "../../include/TestWithFork.h"
-#include "../../include/UniqueTmpPathPrefix.h"
+#include "../include/TestWithFork.h"
+#include "../include/UniqueTmpPathPrefix.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(standard_job_executor_test, "Log category for Simple SandardJobExecutorTest");
 
