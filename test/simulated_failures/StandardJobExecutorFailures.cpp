@@ -18,10 +18,10 @@
 #include "test_util/SleeperVictim.h"
 #include "test_util/HostRandomRepeatSwitch.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(bare_metal_compute_service_simulated_failures_test, "Log category for BareMetalComputeServiceSimulatedFailuresTests");
+XBT_LOG_NEW_DEFAULT_CATEGORY(standard_job_executor_simulated_failures_test, "Log category for StandardJobExecutorSimulatedFailuresTests");
 
 
-class BareMetalComputeServiceSimulatedFailuresTest : public ::testing::Test {
+class StandardJobExecutorSimulatedFailuresTest : public ::testing::Test {
 
 public:
     wrench::Workflow *workflow;
@@ -34,12 +34,12 @@ public:
     wrench::ComputeService *compute_service = nullptr;
 
     void do_OneFailureCausingWorkUnitRestartOnAnotherHost_test();
-    void do_OneFailureCausingWorkUnitRestartOnSameHost_test();
-    void do_RandomFailures_test();
+//    void do_OneFailureCausingWorkUnitRestartOnSameHost_test();
+//    void do_RandomFailures_test();
 
 protected:
 
-    BareMetalComputeServiceSimulatedFailuresTest() {
+    StandardJobExecutorSimulatedFailuresTest() {
         // Create the simplest workflow
         workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
         workflow = workflow_unique_ptr.get();
@@ -80,7 +80,7 @@ protected:
 
 
 
-
+#if 0
 
 /**********************************************************************/
 /**                FAIL OVER TO SECOND HOST  TEST                    **/
@@ -89,15 +89,15 @@ protected:
 class OneFailureCausingWorkUnitRestartOnAnotherHostTestWMS : public wrench::WMS {
 
 public:
-    OneFailureCausingWorkUnitRestartOnAnotherHostTestWMS(BareMetalComputeServiceSimulatedFailuresTest *test,
-                                                         std::string &hostname, wrench::ComputeService *cs, wrench::StorageService *ss) :
-            wrench::WMS(nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
+    OneFailureCausingWorkUnitRestartOnAnotherHostTestWMS(StandardJobExecutorSimulatedFailuresTest *test,
+                                                         std::string &hostname, wrench::StorageService *ss) :
+            wrench::WMS(nullptr, nullptr, {}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
 private:
 
-    BareMetalComputeServiceSimulatedFailuresTest *test;
+    StandardJobExecutorSimulatedFailuresTest *test;
 
     int main() override {
 
@@ -115,10 +115,56 @@ private:
         // Create a job manager
         std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
-        // Create a standard job
-        auto job = job_manager->createStandardJob(this->test->task, {{this->test->input_file, this->test->storage_service},
-                                                                     {this->test->output_file, this->test->storage_service}});
+        // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
+        auto job = job_manager->createStandardJob(
+                {task},
+                {
+                        {*(task->getInputFiles().begin()),  this->test->storage_service1},
+                        {*(task->getOutputFiles().begin()), this->test->storage_service2}
+                },
+                {},
+                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
+                        this->getWorkflow()->getFileByID("output_file"), this->test->storage_service2,
+                        this->test->storage_service1)},
+                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->getWorkflow()->getFileByID("output_file"),
+                                                                              this->test->storage_service2)});
 
+        // Create a StandardJobExecutor
+        try {
+            executor = std::shared_ptr<wrench::StandardJobExecutor>(
+                    new wrench::StandardJobExecutor(
+                            test->simulation,
+                            my_mailbox,
+                            {"FailedHost1", "FailedHost2"},
+                            job,
+                            {std::make_pair("Host1", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                            nullptr,
+                            false,
+                            nullptr,
+                            {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
+                                    thread_startup_overhead)}}, {}
+                    ));
+        } catch (std::invalid_argument &e) {
+            throw std::runtime_error("Should be able to create a valid standard job executor!");
+        }
+
+        executor->start(executor, true, false); // Daemonized, no auto-restart
+
+        // Wait for a message on my mailbox_name
+        std::unique_ptr<wrench::SimulationMessage> message;
+        try {
+            message = wrench::S4U_Mailbox::getMessage(my_mailbox);
+        } catch (std::shared_ptr<wrench::NetworkError> &cause) {
+            throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
+        }
+
+        // Did we get the expected message?
+        auto msg = dynamic_cast<wrench::StandardJobExecutorDoneMessage *>(message.get());
+        if (!msg) {
+            throw std::runtime_error("Unexpected '" + message->getName() + "' message");
+        }
+
+        job_manager->forgetJob(job);
         // Submit the standard job to the compute service, making it sure it runs on FailedHost1
         std::map<std::string, std::string> service_specific_args;
         service_specific_args["task"] = "FailedHost1";
@@ -142,14 +188,14 @@ private:
 };
 
 #if ((SIMGRID_VERSION_MAJOR == 3) && (SIMGRID_VERSION_MINOR == 22)) || ((SIMGRID_VERSION_MAJOR == 3) && (SIMGRID_VERSION_MINOR == 21) && (SIMGRID_VERSION_PATCH > 0))
-TEST_F(BareMetalComputeServiceSimulatedFailuresTest, OneFailureCausingWorkUnitRestartOnAnotherHost) {
+TEST_F(StandardJobExecutorSimulatedFailuresTest, OneFailureCausingWorkUnitRestartOnAnotherHost) {
 #else
-    TEST_F(BareMetalComputeServiceSimulatedFailuresTest, DISABLED_OneFailureCausingWorkUnitRestartOnAnotherHost) {
+    TEST_F(StandardJobExecutorSimulatedFailuresTest, DISABLED_OneFailureCausingWorkUnitRestartOnAnotherHost) {
 #endif
     DO_TEST_WITH_FORK(do_OneFailureCausingWorkUnitRestartOnAnotherHost_test);
 }
 
-void BareMetalComputeServiceSimulatedFailuresTest::do_OneFailureCausingWorkUnitRestartOnAnotherHost_test() {
+void StandardJobExecutorSimulatedFailuresTest::do_OneFailureCausingWorkUnitRestartOnAnotherHost_test() {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
@@ -166,22 +212,13 @@ void BareMetalComputeServiceSimulatedFailuresTest::do_OneFailureCausingWorkUnitR
     // Get a hostname
     std::string stable_host = "StableHost";
 
-    // Create a Compute Service that has access to two hosts
-    compute_service = simulation->add(
-            new wrench::BareMetalComputeService(stable_host,
-                                                (std::map<std::string, std::tuple<unsigned long, double>>){
-                                                        std::make_pair("FailedHost1", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)),
-                                                        std::make_pair("FailedHost2", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))
-                                                },
-                                                100.0,
-                                                {}));
 
     // Create a Storage Service
     storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, 10000000000000.0));
 
     // Create a WMS
     wrench::WMS *wms = nullptr;
-    wms = simulation->add(new OneFailureCausingWorkUnitRestartOnAnotherHostTestWMS(this, stable_host, compute_service, storage_service));
+    wms = simulation->add(new OneFailureCausingWorkUnitRestartOnAnotherHostTestWMS(this, stable_host, storage_service));
 
     wms->addWorkflow(workflow);
 
@@ -198,7 +235,9 @@ void BareMetalComputeServiceSimulatedFailuresTest::do_OneFailureCausingWorkUnitR
     free(argv);
 }
 
+#endif
 
+#if 0
 
 /**********************************************************************/
 /**                    RESTART ON SAME HOST                          **/
@@ -207,7 +246,7 @@ void BareMetalComputeServiceSimulatedFailuresTest::do_OneFailureCausingWorkUnitR
 class OneFailureCausingWorkUnitRestartOnSameHostTestWMS : public wrench::WMS {
 
 public:
-    OneFailureCausingWorkUnitRestartOnSameHostTestWMS(BareMetalComputeServiceSimulatedFailuresTest *test,
+    OneFailureCausingWorkUnitRestartOnSameHostTestWMS(StandardJobExecutorSimulatedFailuresTest *test,
                                                       std::string &hostname, wrench::ComputeService *cs, wrench::StorageService *ss) :
             wrench::WMS(nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -215,7 +254,7 @@ public:
 
 private:
 
-    BareMetalComputeServiceSimulatedFailuresTest *test;
+    StandardJobExecutorSimulatedFailuresTest *test;
 
     int main() override {
 
@@ -258,14 +297,14 @@ private:
 };
 
 #if ((SIMGRID_VERSION_MAJOR == 3) && (SIMGRID_VERSION_MINOR == 22)) || ((SIMGRID_VERSION_MAJOR == 3) && (SIMGRID_VERSION_MINOR == 21) && (SIMGRID_VERSION_PATCH > 0))
-TEST_F(BareMetalComputeServiceSimulatedFailuresTest, OneFailureCausingWorkUnitRestartOnSameHost) {
+TEST_F(StandardJobExecutorSimulatedFailuresTest, OneFailureCausingWorkUnitRestartOnSameHost) {
 #else
-    TEST_F(BareMetalComputeServiceSimulatedFailuresTest, DISABLED_OneFailureCausingWorkUnitRestartOnSameHost) {
+    TEST_F(StandardJobExecutorSimulatedFailuresTest, DISABLED_OneFailureCausingWorkUnitRestartOnSameHost) {
 #endif
     DO_TEST_WITH_FORK(do_OneFailureCausingWorkUnitRestartOnSameHost_test);
 }
 
-void BareMetalComputeServiceSimulatedFailuresTest::do_OneFailureCausingWorkUnitRestartOnSameHost_test() {
+void StandardJobExecutorSimulatedFailuresTest::do_OneFailureCausingWorkUnitRestartOnSameHost_test() {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
@@ -284,7 +323,7 @@ void BareMetalComputeServiceSimulatedFailuresTest::do_OneFailureCausingWorkUnitR
 
     // Create a Compute Service that has access to two hosts
     compute_service = simulation->add(
-            new wrench::BareMetalComputeService(stable_host,
+            new wrench::StandardJobExecutor(stable_host,
                                                 (std::map<std::string, std::tuple<unsigned long, double>>){
                                                         std::make_pair("FailedHost1", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)),
                                                 },
@@ -321,7 +360,7 @@ void BareMetalComputeServiceSimulatedFailuresTest::do_OneFailureCausingWorkUnitR
 class RandomFailuresTestWMS : public wrench::WMS {
 
 public:
-    RandomFailuresTestWMS(BareMetalComputeServiceSimulatedFailuresTest *test,
+    RandomFailuresTestWMS(StandardJobExecutorSimulatedFailuresTest *test,
                           std::string &hostname, wrench::ComputeService *cs, wrench::StorageService *ss) :
             wrench::WMS(nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -329,14 +368,14 @@ public:
 
 private:
 
-    BareMetalComputeServiceSimulatedFailuresTest *test;
+    StandardJobExecutorSimulatedFailuresTest *test;
 
     int main() override {
 
         // Create a job manager
         std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
-        unsigned long NUM_TRIALS = 500;
+        unsigned long NUM_TRIALS = 1;
 
         for (unsigned long trial=0; trial < NUM_TRIALS; trial++) {
 
@@ -387,14 +426,14 @@ private:
 };
 
 #if ((SIMGRID_VERSION_MAJOR == 3) && (SIMGRID_VERSION_MINOR == 22)) || ((SIMGRID_VERSION_MAJOR == 3) && (SIMGRID_VERSION_MINOR == 21) && (SIMGRID_VERSION_PATCH > 0))
-TEST_F(BareMetalComputeServiceSimulatedFailuresTest, RandomFailures) {
+TEST_F(StandardJobExecutorSimulatedFailuresTest, RandomFailures) {
 #else
-    TEST_F(BareMetalComputeServiceSimulatedFailuresTest, DISABLED_RandomFailures) {
+    TEST_F(StandardJobExecutorSimulatedFailuresTest, DISABLED_RandomFailures) {
 #endif
     DO_TEST_WITH_FORK(do_RandomFailures_test);
 }
 
-void BareMetalComputeServiceSimulatedFailuresTest::do_RandomFailures_test() {
+void StandardJobExecutorSimulatedFailuresTest::do_RandomFailures_test() {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
@@ -412,7 +451,7 @@ void BareMetalComputeServiceSimulatedFailuresTest::do_RandomFailures_test() {
 
     // Create a Compute Service that has access to two hosts
     compute_service = simulation->add(
-            new wrench::BareMetalComputeService(stable_host,
+            new wrench::StandardJobExecutor(stable_host,
                                                 (std::map<std::string, std::tuple<unsigned long, double>>){
                                                         std::make_pair("FailedHost1", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)),
                                                         std::make_pair("FailedHost2", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)),
@@ -441,3 +480,5 @@ void BareMetalComputeServiceSimulatedFailuresTest::do_RandomFailures_test() {
     free(argv[0]);
     free(argv);
 }
+
+#endif

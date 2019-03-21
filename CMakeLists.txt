@@ -281,12 +281,16 @@ set(TEST_FILES
         test/pilot_job/CriticalPathSchedulerTest.cpp
         test/misc/PointerUtilTest.cpp
         examples/simple-example/scheduler/pilot_job/CriticalPathPilotJobScheduler.cpp
-        test/compute_services/ScratchSpaceTest.cpp test/energy_consumption/EnergyConsumptionTest.cpp
+        test/compute_services/ScratchSpaceTest.cpp
+        test/energy_consumption/EnergyConsumptionTest.cpp
         test/simulation/simulation_output/SimulationDumpJSONTest.cpp
         test/compute_services/HTCondorServiceTest.cpp
-        src/wrench/managers/EnergyMeter.cpp include/wrench/managers/EnergyMeter.h
+        src/wrench/managers/EnergyMeter.cpp
+        include/wrench/managers/EnergyMeter.h
         test/simulated_failures/ServiceStartReStart.cpp
+        test/simulated_failures/FailureDetector.cpp
         test/simulated_failures/BareMetalComputeServiceFailures.cpp
+        test/simulated_failures/StandardJobExecutorFailures.cpp
         test/simulated_failures/test_util/HostSwitch.cpp
         test/simulated_failures/test_util/HostSwitch.h
         test/simulated_failures/test_util/SleeperVictim.cpp
