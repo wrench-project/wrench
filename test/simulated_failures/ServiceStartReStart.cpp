@@ -18,7 +18,7 @@
 #include "./test_util/SleeperVictim.h"
 #include "./test_util/ComputerVictim.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(simulated_failures_test, "Log category for SimulatedFailuresTests");
+XBT_LOG_NEW_DEFAULT_CATEGORY(service_start_restart_test, "Log category for ServiceStartRestartTest");
 
 
 class SimulatedFailuresTest : public ::testing::Test {

@@ -13,12 +13,12 @@
 
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
-#include "util/HostSwitch.h"
+#include "test_util/HostSwitch.h"
 #include "wrench/services/helpers/ServiceFailureDetector.h"
-#include "util/SleeperVictim.h"
-#include "util/ComputerVictim.h"
+#include "test_util/SleeperVictim.h"
+#include "test_util/ComputerVictim.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(simulated_failures_test, "Log category for SimulatedFailuresTests");
+XBT_LOG_NEW_DEFAULT_CATEGORY(failure_detector_test, "Log category for FailureDetectorTest");
 
 
 class SimulatedFailuresTest : public ::testing::Test {
