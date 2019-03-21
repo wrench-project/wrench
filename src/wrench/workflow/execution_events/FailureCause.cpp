@@ -347,55 +347,6 @@ namespace wrench {
       return "Network error (" + error + ") while " + operation + " mailbox_name " + this->mailbox;
     };
 
-//    /**
-//     * @brief Constructor
-//     *
-//     * @param operation_type: NetworkTimeout::OperationType::SENDING or NetworkTimeout::OperationType::RECEIVING
-//     * @param mailbox: the mailbox name
-//     */
-//    NetworkTimeout::NetworkTimeout(NetworkTimeout::OperationType operation_type, std::string mailbox) : FailureCause(NETWORK_TIMEOUT) {
-//      this->operation_type = operation_type;
-//      this->mailbox = mailbox;
-//    }
-//
-//    /**
-//     * @brief Returns whether the network error occurred while receiving
-//     * @return true or false
-//     */
-//    bool NetworkTimeout::whileReceiving() {
-//      return (this->operation_type == NetworkTimeout::RECEIVING);
-//    }
-//
-//    /**
-//     * @brief Returns whether the network error occurred while sending
-//     * @return true or false
-//     */
-//    bool NetworkTimeout::whileSending() {
-//      return (this->operation_type == NetworkTimeout::SENDING);
-//    }
-//
-//    /**
-//     * @brief Returns the mailbox name on which the error occurred
-//     * @return the mailbox name
-//     */
-//    std::string NetworkTimeout::getMailbox() {
-//      return this->mailbox;
-//    }
-//
-//    /**
-//     * @brief Get the human-readable failure message
-//     * @return the message
-//     */
-//    std::string NetworkTimeout::toString() {
-//      std::string operation;
-//      if (this->while_sending) {
-//        operation = "sending to";
-//      } else {
-//        operation = "receiving from";
-//      }
-//      return "Network timeout while " + operation + " mailbox_name " + this->mailbox;
-//    };
-
     /**
      * @brief Constructor
      *
@@ -644,6 +595,6 @@ namespace wrench {
      * @return the message
      */
      std::string HostError::toString() {
-         return "The host (" + this->hostname + ") has failed or is down";
+         return "The host (" + this->hostname + ") is down and no service cannot be started on it";
      }
 };
