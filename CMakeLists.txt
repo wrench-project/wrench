@@ -291,14 +291,14 @@ set(TEST_FILES
         test/simulated_failures/FailureDetector.cpp
         test/simulated_failures/BareMetalComputeServiceFailures.cpp
         test/simulated_failures/StandardJobExecutorFailures.cpp
-        test/simulated_failures/test_util/HostSwitch.cpp
-        test/simulated_failures/test_util/HostSwitch.h
+        test/simulated_failures/test_util/HostSwitcher.cpp
+        test/simulated_failures/test_util/HostSwitcher.h
         test/simulated_failures/test_util/SleeperVictim.cpp
         test/simulated_failures/test_util/SleeperVictim.h
         test/simulated_failures/test_util/ComputerVictim.cpp
         test/simulated_failures/test_util/ComputerVictim.h
-        test/simulated_failures/test_util/HostRandomRepeatSwitch.cpp
-        test/simulated_failures/test_util/HostRandomRepeatSwitch.h
+        test/simulated_failures/test_util/HostRandomRepeatSwitcher.cpp
+        test/simulated_failures/test_util/HostRandomRepeatSwitcher.h
         )
 
 # wrench library

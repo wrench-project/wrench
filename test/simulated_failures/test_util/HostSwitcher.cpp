@@ -7,26 +7,26 @@
  * (at your option) any later version.
  */
 
-#include "HostSwitch.h"
+#include "HostSwitcher.h"
 
 #include <wrench/simulation/Simulation.h>
 #include <wrench-dev.h>
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(host_switch, "Log category for HostSwitch");
+XBT_LOG_NEW_DEFAULT_CATEGORY(host_switcher, "Log category for HostSwitcher");
 
 
-wrench::HostSwitch::HostSwitch(std::string host_on_which_to_run, double sleep_time, std::string host_to_switch, Action action) :
+wrench::HostSwitcher::HostSwitcher(std::string host_on_which_to_run, double sleep_time, std::string host_to_switch, Action action) :
         Service(host_on_which_to_run, "host_switcher", "host_switcher"){
     this->sleep_time = sleep_time;
     this->host_to_switch = host_to_switch;
     this->action = action;
 }
 
-int wrench::HostSwitch::main() {
+int wrench::HostSwitcher::main() {
 
     WRENCH_INFO("Starting and sleeping for %.3lf seconds...", sleep_time);
     wrench::Simulation::sleep(sleep_time);
-    if (this->action == HostSwitch::Action::TURN_OFF) {
+    if (this->action == HostSwitcher::Action::TURN_OFF) {
         WRENCH_INFO("Turning OFF host %s", this->host_to_switch.c_str());
         simgrid::s4u::Host::by_name(host_to_switch)->turn_off();
     } else {
