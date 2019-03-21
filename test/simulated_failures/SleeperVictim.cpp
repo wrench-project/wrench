@@ -26,14 +26,13 @@ wrench::SleeperVictim::SleeperVictim(std::string host_on_which_to_run, double se
 int wrench::SleeperVictim::main() {
 
     WRENCH_INFO("Starting  (%u)", this->num_starts);
-    try {
-        WRENCH_INFO("Sleeping for %.3lf seconds...", this->seconds_of_life);
-        wrench::Simulation::sleep(this->seconds_of_life);
-    } catch (std::shared_ptr<wrench::HostError> &e) {
-        return 1;
-    }
+    WRENCH_INFO("Sleeping for %.3lf seconds...", this->seconds_of_life);
+    wrench::Simulation::sleep(this->seconds_of_life);
     S4U_Mailbox::putMessage(this->mailbox_to_notify, this->msg);
-
     return 0;
 
+}
+
+void wrench::SleeperVictim::cleanup(bool has_terminated_cleanly, int return_value) {
+    // Do nothing (ignore failures)
 }

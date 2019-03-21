@@ -22,9 +22,7 @@ namespace wrench {
 
         explicit SleeperVictim(std::string host_on_which_to_run, double seconds_of_life, SimulationMessage *msg, std::string mailbox_to_notify);
 
-        /***********************/
-        /** \endcond           */
-        /***********************/
+        void cleanup(bool has_terminated_cleanly, int return_value) override;
 
     private:
         double seconds_of_life;
@@ -33,10 +31,6 @@ namespace wrench {
         int main() override;
 
     };
-
-    /***********************/
-    /** \endcond            */
-    /***********************/
 
 
 };
