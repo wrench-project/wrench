@@ -1,10 +1,16 @@
-var data={}
+var data={"modified":"2019-03-12T10:28:22.009Z","file":"test_data/workflow_data.json","contents":[{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_1","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task0","terminated":-1,"vertical_position":0,"whole_task":{"end":3827.6378817372047,"start":0.007199838144329895},"write":{"end":3827.6378817372047,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_1","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task1","terminated":-1,"vertical_position":1,"whole_task":{"end":3827.635010247309,"start":0.007199838144329895},"write":{"end":3827.635010247309,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_1","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task10","terminated":-1,"vertical_position":2,"whole_task":{"end":3827.639191182566,"start":0.007199838144329895},"write":{"end":3827.639191182566,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_2","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task11","terminated":-1,"vertical_position":0,"whole_task":{"end":3827.6411369314314,"start":0.007199838144329895},"write":{"end":3827.6411369314314,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_2","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task12","terminated":-1,"vertical_position":1,"whole_task":{"end":3827.641331233935,"start":0.007199838144329895},"write":{"end":3827.641331233935,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_2","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task13","terminated":-1,"vertical_position":2,"whole_task":{"end":3827.6414647120796,"start":0.007199838144329895},"write":{"end":3827.6414647120796,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_3","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task14","terminated":-1,"vertical_position":0,"whole_task":{"end":3827.641553979021,"start":0.007199838144329895},"write":{"end":3827.641553979021,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_3","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task15","terminated":-1,"vertical_position":1,"whole_task":{"end":3827.641607708093,"start":0.007199838144329895},"write":{"end":3827.641607708093,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_3","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task16","terminated":-1,"vertical_position":2,"whole_task":{"end":3827.6416322071746,"start":0.007199838144329895},"write":{"end":3827.6416322071746,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_4","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task17","terminated":-1,"vertical_position":0,"whole_task":{"end":3827.640506539679,"start":0.007199838144329895},"write":{"end":3827.640506539679,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_4","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task18","terminated":-1,"vertical_position":1,"whole_task":{"end":3827.6399793833903,"start":0.007199838144329895},"write":{"end":3827.6399793833903,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_4","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task19","terminated":-1,"vertical_position":2,"whole_task":{"end":3827.6408767314315,"start":0.007199838144329895},"write":{"end":3827.6408767314315,"start":3807.8470265752576}},{"compute":{"end":7566.212108144485,"start":3966.2118479444844},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_1","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":3966.2118479444844,"start":3827.6507028638657},"task_id":"task2","terminated":-1,"vertical_position":0,"whole_task":{"end":7579.408645646651,"start":3827.6507028638657},"write":{"end":7579.408645646651,"start":7566.212108144485}},{"compute":{"end":7912.423338350066,"start":7612.4230781500655},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_1","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":7612.4230781500655,"start":7579.417740802427},"task_id":"task20","terminated":-1,"vertical_position":0,"whole_task":{"end":7929.747237014191,"start":7579.417740802427},"write":{"end":7929.747237014191,"start":7912.423338350066}},{"compute":{"end":7566.212108144485,"start":3966.2118479444844},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_1","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":3966.2118479444844,"start":3827.6507028638657},"task_id":"task3","terminated":-1,"vertical_position":1,"whole_task":{"end":7579.408772085021,"start":3827.6507028638657},"write":{"end":7579.408772085021,"start":7566.212108144485}},{"compute":{"end":7566.212108144485,"start":3966.2118479444844},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_1","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":3966.2118479444844,"start":3827.6507028638657},"task_id":"task4","terminated":-1,"vertical_position":2,"whole_task":{"end":7579.408734069057,"start":3827.6507028638657},"write":{"end":7579.408734069057,"start":7566.212108144485}},{"compute":{"end":7566.212108144485,"start":3966.2118479444844},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_2","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":3966.2118479444844,"start":3827.6507028638657},"task_id":"task5","terminated":-1,"vertical_position":0,"whole_task":{"end":7579.405173391115,"start":3827.6507028638657},"write":{"end":7579.405173391115,"start":7566.212108144485}},{"compute":{"end":7566.212108144485,"start":3966.2118479444844},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_2","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":3966.2118479444844,"start":3827.6507028638657},"task_id":"task6","terminated":-1,"vertical_position":1,"whole_task":{"end":7579.4070007028695,"start":3827.6507028638657},"write":{"end":7579.4070007028695,"start":7566.212108144485}},{"compute":{"end":7566.212108144485,"start":3966.2118479444844},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_2","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":3966.2118479444844,"start":3827.6507028638657},"task_id":"task7","terminated":-1,"vertical_position":2,"whole_task":{"end":7579.407786370086,"start":3827.6507028638657},"write":{"end":7579.407786370086,"start":7566.212108144485}},{"compute":{"end":7566.212108144485,"start":3966.2118479444844},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_3","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":3966.2118479444844,"start":3827.6507028638657},"task_id":"task8","terminated":-1,"vertical_position":0,"whole_task":{"end":7579.408224259434,"start":3827.6507028638657},"write":{"end":7579.408224259434,"start":7566.212108144485}},{"compute":{"end":7566.212108144485,"start":3966.2118479444844},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_3","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":3966.2118479444844,"start":3827.6507028638657},"task_id":"task9","terminated":-1,"vertical_position":1,"whole_task":{"end":7579.4084844594345,"start":3827.6507028638657},"write":{"end":7579.4084844594345,"start":7566.212108144485}}]}
 var currGraphState = "taskView"
 var hostColours = {}
+var currentlySelectedHost = {hostName: "", id: ""}
+var firstVisit
 
 function initialise() {
     var noFileDiv = document.getElementById("no-file")
     var mainBodyDiv = document.getElementById("main-body")
+    if (localStorage.getItem("firstVisit") === "null") {
+        localStorage.setItem("firstVisit", true)
+        firstVisit = true
+    }
     if (data.file === undefined) {
         noFileDiv.style.display = "block"
         mainBodyDiv.style.display = "none"
@@ -152,6 +158,27 @@ function generateGraph(data, containerId) {
         .attr('transform',
             'translate(0,' + (CONTAINER_HEIGHT - PADDING) + ')')
         .call(x_axis)
+
+    // text label for the x axis
+    svg.append("text")
+        .attr("class", "x label")
+        .attr("text-anchor", "end")
+        .attr("x", CONTAINER_WIDTH/2)
+        .attr("y", CONTAINER_HEIGHT - 6)
+        .text("Time (seconds)")
+
+    var yAxisText = currGraphState === "taskView" ? "TaskID" : "Host Name"
+
+    // text label for the y axis
+    svg.append("text")
+        .attr("id", "y-axis-label")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 0)
+        .attr("x",0 - (CONTAINER_HEIGHT / 2))
+        .attr("dy", "1em")
+        .style("text-anchor", "middle")
+        .text(yAxisText)
+
     data.forEach(function(d) {
         var group = svg.append('g')
            .attr('id', d.task_id)
@@ -415,7 +442,7 @@ function getOverallWorkflowMetrics(data) {
     var metrics = {
         totalHosts: {
             value: toFiveDecimalPlaces(totalHosts),
-            display: 'Total Hosts Utilised'
+            display: 'Total Hosts Utilized'
         },
         totalDuration: {
             value: toFiveDecimalPlaces(totalDuration),
@@ -508,12 +535,16 @@ function hostColoursJSONPopulated() {
     return false
 }
 
-function switchToHostView(data) {
+function switchToHostView(data, selectedHost) {
     var hostNames = getHostNames(data)
 
     if (!hostColoursJSONPopulated()) {
         hostNames.forEach(function(hostName) {
-            hostColours[hostName] = getRandomColour()
+            var colour = getRandomColour()
+            while (colour === '#FF0000' || colour === '#FFA500') {
+                colour = getRandomColour()
+            }
+            hostColours[hostName] = colour
         })
     }
     
@@ -525,9 +556,59 @@ function switchToHostView(data) {
         var taskWrite = d3.select(`#${task.task_id} .write`)
 
         taskRead.style("fill", hostColours[hostName])
+        taskRead.style("opacity", 1)
+
         taskCompute.style("fill", hostColours[hostName])
+        taskCompute.style("opacity", 1)
+
         taskWrite.style("fill", hostColours[hostName])
+        taskWrite.style("opacity", 1)
+
+        if (selectedHost !== '' && selectedHost !== hostName) {
+            taskRead.style("fill", "gray")
+            taskRead.style("opacity", 0.2)
+
+            taskCompute.style("fill", "gray")
+            taskCompute.style("opacity", 0.2)
+
+            taskWrite.style("fill", "gray")
+            taskWrite.style("opacity", 0.2)
+        }
     })
+}
+
+function legendHover(hostName, id, alreadySelected) {
+    if (currentlySelectedHost.hostName !== '') {
+        return
+    }
+    var legendElement = d3.select(`#${id}`)
+    if (alreadySelected) {
+        legendElement.style("font-weight", "normal")
+    } else {
+        legendElement.style("font-weight", "bold")
+    }
+    switchToHostView(data.contents, hostName)
+}
+
+function legendClick(hostName, id) {
+    var legendElement = d3.select(`#${id}`)
+    if (hostName === currentlySelectedHost.hostName) {
+        // deselect same host
+        currentlySelectedHost.hostName = ""
+        currentlySelectedHost.id = ""
+        legendElement.style("font-weight", "normal")
+        switchToHostView(data.contents, "")
+        return
+    } 
+    if (currentlySelectedHost.hostName !== "" && hostName !== currentlySelectedHost.hostName) {
+        // deselect different host
+        var currentlySelectedLegendElement = d3.select(`#${currentlySelectedHost.id}`)
+        currentlySelectedLegendElement.style("font-weight", "normal")
+    }
+    currentlySelectedHost.hostName = hostName
+    currentlySelectedHost.id = id
+    legendElement.style("font-weight", "bold")
+    switchToHostView(data.contents, hostName)
 }
 
 function populateLegend(currView) {
@@ -540,6 +621,7 @@ function populateLegend(currView) {
         <small class="inline-block" id="workflow-execution-chart-legend-failed">Failed During Execution</small>
         <small class="inline-block" id="workflow-execution-chart-legend-terminated">Terminated by User</small>`
     } else if (currView === "hostView") {
+        var i = 0
         document.getElementById("workflow-execution-chart-legend").innerHTML = ``
         var legend = d3.select("#workflow-execution-chart-legend")
         legend.append("small")
@@ -547,9 +629,14 @@ function populateLegend(currView) {
         for (var hostName in hostColours) {
             if (hostColours.hasOwnProperty(hostName)) {
                 legend.append("small")
+                    .attr("id", `workflow-execution-chart-legend-${i}`)
                     .attr("class", "inline-block")
+                    .attr("onclick", `legendClick('${hostName}', 'workflow-execution-chart-legend-${i}')`)
+                    .attr("onmouseover", `legendHover('${hostName}', 'workflow-execution-chart-legend-${i}', false)`)
+                    .attr("onmouseout", `legendHover('', 'workflow-execution-chart-legend-${i}', true)`)
                     .style("border-left", `15px solid ${hostColours[hostName]}`)
                     .text(hostName)
+                i++
             }
         }
         legend.append("small")
@@ -559,20 +646,47 @@ function populateLegend(currView) {
         legend.append("small")
             .attr("class", "inline-block")
             .attr("id","workflow-execution-chart-legend-terminated")
-            .text("Terminated During Execution")
+            .text("Terminated By User")
     }
 }
 
+function showHostInstructions() {
+    var hostInstructions = document.getElementById("host-instructions")
+    var informationImg = document.getElementById("information-img")
+    hostInstructions.style.display = "block"
+    informationImg.style.display = "none"
+}
+
+function hideHostInstructions() {
+    var hostInstructions = document.getElementById("host-instructions")
+    var informationImg = document.getElementById("information-img")
+    hostInstructions.style.display = "none"
+    informationImg.style.display = "inline-block"
+}
+
 function toggleView() {
+    var hostInstructions = document.getElementById("host-instructions")
+    var informationImg = document.getElementById("information-img")
     if (currGraphState === "taskView") {
-        switchToHostView(data.contents)
+        switchToHostView(data.contents, '')
+        d3.select("#y-axis-label").text("Host Name")
         populateLegend("hostView")
         d3.select("#toggle-view-button").text("Switch to Task View")
+        if (firstVisit) {
+            hostInstructions.style.display = "block"
+            informationImg.style.display = "none"
+        } else {
+            hostInstructions.style.display = "none"
+            informationImg.style.display = "inline-block"
+        }
         currGraphState = "hostView"
     } else if (currGraphState === "hostView") {
         generateGraph(data.contents, "graph-container")
+        d3.select("#y-axis-label").text("TaskID")
         populateLegend("taskView")
         d3.select("#toggle-view-button").text("Switch to Host View")
+        hostInstructions.style.display = "none"
+        informationImg.style.display = "none"
         currGraphState = "taskView"
     }
 }
