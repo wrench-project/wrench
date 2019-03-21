@@ -285,16 +285,16 @@ set(TEST_FILES
         test/simulation/simulation_output/SimulationDumpJSONTest.cpp
         test/compute_services/HTCondorServiceTest.cpp
         src/wrench/managers/EnergyMeter.cpp include/wrench/managers/EnergyMeter.h
-        test/simulated_failures/SimulatedFailures.cpp
+        test/simulated_failures/ServiceStartReStart.cpp
         test/simulated_failures/BareMetalComputeServiceFailures.cpp
-        test/simulated_failures/HostSwitch.cpp
-        test/simulated_failures/HostSwitch.h
-        test/simulated_failures/SleeperVictim.cpp
-        test/simulated_failures/SleeperVictim.h
-        test/simulated_failures/ComputerVictim.cpp
-        test/simulated_failures/ComputerVictim.h
-        test/simulated_failures/HostRandomRepeatSwitch.cpp
-        test/simulated_failures/HostRandomRepeatSwitch.h
+        test/simulated_failures/test_util/HostSwitch.cpp
+        test/simulated_failures/test_util/HostSwitch.h
+        test/simulated_failures/test_util/SleeperVictim.cpp
+        test/simulated_failures/test_util/SleeperVictim.h
+        test/simulated_failures/test_util/ComputerVictim.cpp
+        test/simulated_failures/test_util/ComputerVictim.h
+        test/simulated_failures/test_util/HostRandomRepeatSwitch.cpp
+        test/simulated_failures/test_util/HostRandomRepeatSwitch.h
         )
 
 # wrench library
