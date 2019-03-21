@@ -663,11 +663,7 @@ namespace wrench {
      * @param duration: a number of floating point operations
      */
     void Simulation::compute(double flops) {
-        try {
             S4U_Simulation::compute(flops);
-        } catch (std::shared_ptr<HostError> &e) {
-            throw;
-        }
     }
 
     /**

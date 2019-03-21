@@ -38,16 +38,8 @@ namespace wrench {
      * @return
      */
     int ComputeThread::main() {
-        try {
-            WRENCH_INFO("New compute thread (%.2f flops, will report to %s)", this->flops, reply_mailbox.c_str());
-            S4U_Simulation::compute(this->flops);
-        } catch (std::exception &e) {
-            WRENCH_INFO("Probably got killed while I was  computing");
-            return 1;
-        } catch (std::shared_ptr<HostError> &e) {
-            WRENCH_INFO("Probably got killed while I was computing");
-            return 1;
-        }
+        WRENCH_INFO("New compute thread (%.2f flops, will report to %s)", this->flops, reply_mailbox.c_str());
+        S4U_Simulation::compute(this->flops);
         try {
             S4U_Mailbox::putMessage(this->reply_mailbox, new ComputeThreadDoneMessage());
         } catch (std::shared_ptr<NetworkError> &e) {
@@ -67,6 +59,17 @@ namespace wrench {
         } catch (std::shared_ptr<FatalFailure> &e) {
             WRENCH_INFO("Failed to kill a compute thread.. .perhaps it's already dead... nevermind");
         }
+    }
+
+    /**
+     * @brief Cleanup method that overrides the base method and does nothing as a compute thread
+     *        does not need to implement any particular fault-tolerant behavior (it runs on the
+     *        same how as a workunit executor, which is also dead anyway)
+     * @param has_terminated_cleanly: whether the daemon has terminated cleanly (i.e., returned from main)
+     * @param return_value: main's return value
+     */
+    void ComputeThread::cleanup(bool has_terminated_cleanly, int return_value) {
+        return;
     }
 
 };

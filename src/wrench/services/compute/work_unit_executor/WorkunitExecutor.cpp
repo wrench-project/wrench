@@ -196,10 +196,6 @@ namespace wrench {
             S4U_Mailbox::putMessage(this->callback_mailbox, msg_to_send_back);
         } catch (std::shared_ptr<NetworkError> &cause) {
             WRENCH_INFO("Work unit executor on can't report back due to network error.. oh well!");
-        } catch (std::shared_ptr<HostError> &e) {
-            WRENCH_INFO("Work unit executor on can't report back due to hosterror error.. oh well!");
-        } catch (simgrid::HostFailureException &e) {
-            WRENCH_INFO("Work unit executor on can't report back due to SimGrid HostFailureException error.. oh well!");
         }
 
         return 0;

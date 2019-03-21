@@ -336,7 +336,7 @@ private:
         // Create a job manager
         std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
-        unsigned long NUM_TRIALS = 250;
+        unsigned long NUM_TRIALS = 1;
 
         for (unsigned long trial=0; trial < NUM_TRIALS; trial++) {
 
