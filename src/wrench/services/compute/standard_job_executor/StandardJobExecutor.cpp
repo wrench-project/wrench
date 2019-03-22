@@ -216,7 +216,13 @@ namespace wrench {
 
     }
 
-    void StandardJobExecutor::cleanup(bool has_returned_from_main, int return_value) {
+    void StandardJobExecutor::cleanup(bool has_terminated_cleanly, int return_value) {
+
+        if ((not has_terminated_cleanly) and (not simgrid::s4u::Host::by_name(hostname)->is_on())) {
+            throw std::runtime_error("S4U_Daemon::cleanup(): This daemon has died due to a failure of its host, but does not override cleanup() "
+                                     "(so that is can implement fault-tolerance or explicitly ignore fault) ");
+        }
+
         for (auto wue: this->running_workunit_executors) {
             std::shared_ptr<Workunit> wu = wue->workunit;
             if (wu->task != nullptr) {
@@ -229,6 +235,9 @@ namespace wrench {
         this->ready_workunits.clear();
         this->running_workunits.clear();
         this->completed_workunits.clear();
+
+        // Kill the host state monitor
+        this->host_state_monitor->kill();
     }
 
 
@@ -265,17 +274,15 @@ namespace wrench {
             WRENCH_INFO("  %s: %ld cores", std::get<0>(h).c_str(), std::get<1>(h));
         }
 
-        {
-            // Create the host state monitor
-            std::vector<std::string> hosts_to_monitor;
-            for (auto const &h : this->compute_resources) {
-                hosts_to_monitor.push_back(h.first);
-            }
-            auto host_state_monitor = std::shared_ptr<HostStateChangeDetector>(
-                    new HostStateChangeDetector(this->hostname, hosts_to_monitor, true, false, this->mailbox_name));
-            host_state_monitor->simulation = this->simulation;
-            host_state_monitor->start(host_state_monitor, true, false); // Daemonized, no auto-restart
+        // Create the host state monitor
+        std::vector<std::string> hosts_to_monitor;
+        for (auto const &h : this->compute_resources) {
+            hosts_to_monitor.push_back(h.first);
         }
+        this->host_state_monitor = std::shared_ptr<HostStateChangeDetector>(
+                new HostStateChangeDetector(this->hostname, hosts_to_monitor, true, false, this->mailbox_name));
+        this->host_state_monitor->simulation = this->simulation;
+        this->host_state_monitor->start(this->host_state_monitor, true, false); // Daemonized, no auto-restart
 
 
         /** Create all Workunits **/
@@ -857,8 +864,6 @@ namespace wrench {
         this->running_workunits.erase(workunit);
         this->ready_workunits.insert(workunit);
     }
-
-
 
 
     /**
