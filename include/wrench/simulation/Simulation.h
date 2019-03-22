@@ -14,6 +14,8 @@
 #include <string>
 #include <vector>
 #include <nlohmann/json.hpp>
+#include <wrench/services/compute/standard_job_executor/StandardJobExecutor.h>
+
 
 #include "wrench/services/file_registry/FileRegistryService.h"
 #include "wrench/services/network_proximity/NetworkProximityService.h"

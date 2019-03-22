@@ -134,6 +134,8 @@ namespace wrench {
                                             std::shared_ptr<Workunit> workunit,
                                             std::shared_ptr<FailureCause> cause);
 
+        void processWorkunitExecutorCrash(WorkunitExecutor *workunit_executor);
+
         bool processNextMessage();
 
         unsigned long computeWorkUnitMinNumCores(Workunit *wu);
@@ -142,7 +144,7 @@ namespace wrench {
 
           void dispatchReadyWorkunits();
 
-        void createWorkunits();
+//        void createWorkunits();
 
         std::vector<std::shared_ptr<Workunit>> sortReadyWorkunits();
 
