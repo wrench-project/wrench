@@ -32,7 +32,7 @@ public:
     wrench::ComputeService *compute_service = nullptr;
 
     void do_StandardJobExecutorOneFailureCausingWorkUnitRestartOnAnotherHost_test();
-//    void do_OneFailureCausingWorkUnitRestartOnSameHost_test();
+    void do_StandardJobExecutorOneFailureCausingWorkUnitRestartOnSameHost_test();
 //    void do_RandomFailures_test();
 
 protected:
@@ -86,7 +86,7 @@ class StandardJobExecutorOneFailureCausingWorkUnitRestartOnAnotherHostTestWMS : 
 
 public:
     StandardJobExecutorOneFailureCausingWorkUnitRestartOnAnotherHostTestWMS(StandardJobExecutorSimulatedFailuresTest *test,
-                                                         std::string &hostname, wrench::StorageService *ss) :
+                                                                            std::string &hostname, wrench::StorageService *ss) :
             wrench::WMS(nullptr, nullptr, {}, {ss}, {}, nullptr, hostname, "testX") {
         this->test = test;
     }
@@ -213,7 +213,6 @@ void StandardJobExecutorSimulatedFailuresTest::do_StandardJobExecutorOneFailureC
 }
 
 
-#if 0
 
 /**********************************************************************/
 /**                    RESTART ON SAME HOST                          **/
@@ -223,8 +222,8 @@ class StandardJobExecutorOneFailureCausingWorkUnitRestartOnSameHostTestWMS : pub
 
 public:
     StandardJobExecutorOneFailureCausingWorkUnitRestartOnSameHostTestWMS(StandardJobExecutorSimulatedFailuresTest *test,
-                                                      std::string &hostname, wrench::ComputeService *cs, wrench::StorageService *ss) :
-            wrench::WMS(nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
+                                                      std::string &hostname, wrench::StorageService *ss) :
+            wrench::WMS(nullptr, nullptr, {}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -248,25 +247,52 @@ private:
         // Create a job manager
         std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
-        // Create a standard job
-        auto job = job_manager->createStandardJob(this->test->task, {{this->test->input_file, this->test->storage_service},
-                                                                     {this->test->output_file, this->test->storage_service}});
+        // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
+        auto job = job_manager->createStandardJob(
+                {this->test->task},
+                {
+                        {*(this->test->task->getInputFiles().begin()),  this->test->storage_service},
+                        {*(this->test->task->getOutputFiles().begin()), this->test->storage_service}
+                },
+                {},
+                {},
+                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->getWorkflow()->getFileByID("input_file"),
+                                                                              this->test->storage_service)});
 
-        // Submit the standard job to the compute service, making it sure it runs on FailedHost1
-        job_manager->submitJob(job, this->test->compute_service, {});
-
-        // Wait for a workflow execution event
-        std::unique_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
-        if (event->type != wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION) {
-            throw std::runtime_error("Unexpected workflow execution event!");
+        // Create a StandardJobExecutor
+        std::shared_ptr<wrench::StandardJobExecutor> executor;
+        try {
+            executor = std::shared_ptr<wrench::StandardJobExecutor>(
+                    new wrench::StandardJobExecutor(
+                            this->simulation,
+                            this->mailbox_name,
+                            {"StableHost"},
+                            job,
+                            {std::make_pair("FailedHost1", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                            nullptr,
+                            false,
+                            nullptr,
+                            {}, {}
+                    ));
+        } catch (std::invalid_argument &e) {
+            throw std::runtime_error("Should be able to create the standard job executor!");
         }
 
-        // Paranoid check
-        if (!this->test->storage_service->lookupFile(this->test->output_file, nullptr)) {
-            throw std::runtime_error("Output file not written to storage service");
+        executor->start(executor, true, false); // Daemonized, no auto-restart
+
+        // Wait for a message on my mailbox_name
+        std::unique_ptr<wrench::SimulationMessage> message;
+        try {
+            message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
+        } catch (std::shared_ptr<wrench::NetworkError> &cause) {
+            throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
         }
 
-
+        // Did we get the expected message?
+        auto msg = dynamic_cast<wrench::StandardJobExecutorDoneMessage *>(message.get());
+        if (!msg) {
+            throw std::runtime_error("Unexpected '" + message->getName() + "' message");
+        }
 
         return 0;
     }
@@ -277,10 +303,10 @@ TEST_F(StandardJobExecutorSimulatedFailuresTest, OneFailureCausingWorkUnitRestar
 #else
     TEST_F(StandardJobExecutorSimulatedFailuresTest, DISABLED_OneFailureCausingWorkUnitRestartOnSameHost) {
 #endif
-    DO_TEST_WITH_FORK(do_OneFailureCausingWorkUnitRestartOnSameHost_test);
+    DO_TEST_WITH_FORK(do_StandardJobExecutorOneFailureCausingWorkUnitRestartOnSameHost_test);
 }
 
-void StandardJobExecutorSimulatedFailuresTest::do_OneFailureCausingWorkUnitRestartOnSameHost_test() {
+void StandardJobExecutorSimulatedFailuresTest::do_StandardJobExecutorOneFailureCausingWorkUnitRestartOnSameHost_test() {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
@@ -297,21 +323,12 @@ void StandardJobExecutorSimulatedFailuresTest::do_OneFailureCausingWorkUnitResta
     // Get a hostname
     std::string stable_host = "StableHost";
 
-    // Create a Compute Service that has access to two hosts
-    compute_service = simulation->add(
-            new wrench::StandardJobExecutor(stable_host,
-                                                (std::map<std::string, std::tuple<unsigned long, double>>){
-                                                        std::make_pair("FailedHost1", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)),
-                                                },
-                                                100.0,
-                                                {}));
-
     // Create a Storage Service
     storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, 10000000000000.0));
 
     // Create a WMS
     wrench::WMS *wms = nullptr;
-    wms = simulation->add(new StandardJobExecutorOneFailureCausingWorkUnitRestartOnSameHostTestWMS(this, stable_host, compute_service, storage_service));
+    wms = simulation->add(new StandardJobExecutorOneFailureCausingWorkUnitRestartOnSameHostTestWMS(this, stable_host, storage_service));
 
     wms->addWorkflow(workflow);
 
@@ -327,6 +344,8 @@ void StandardJobExecutorSimulatedFailuresTest::do_OneFailureCausingWorkUnitResta
     free(argv[0]);
     free(argv);
 }
+
+#if 0
 
 
 /**********************************************************************/
