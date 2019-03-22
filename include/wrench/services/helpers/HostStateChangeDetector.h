@@ -21,9 +21,7 @@ namespace wrench {
 
         explicit HostStateChangeDetector(std::string host_on_which_to_run, std::vector<std::string> hosts_to_monitor, bool notify_when_turned_on, bool notify_when_turned_off,std::string mailbox_to_notify);
 
-        /***********************/
-        /** \endcond           */
-        /***********************/
+        void kill();
 
     private:
 
@@ -39,11 +37,6 @@ namespace wrench {
         std::vector<std::string> hosts_that_have_recently_turned_off;
 
     };
-
-    /***********************/
-    /** \endcond            */
-    /***********************/
-
 
 };
 

@@ -12,6 +12,8 @@
 
 #include <wrench/simulation/Simulation.h>
 #include <wrench-dev.h>
+#include <wrench/services/helpers/HostStateChangeDetector.h>
+
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(host_state_change_detector, "Log category for HostStateChangeDetector");
 
@@ -81,4 +83,11 @@ int wrench::HostStateChangeDetector::main() {
         }
     }
     return 0;
+}
+
+/**
+ * @brief Kill the service
+ */
+void wrench::HostStateChangeDetector::kill() {
+    this->killActor();
 }

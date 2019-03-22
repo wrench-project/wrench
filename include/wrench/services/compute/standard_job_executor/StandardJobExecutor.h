@@ -19,6 +19,7 @@
 #include "wrench/services/compute/standard_job_executor/StandardJobExecutorProperty.h"
 #include "wrench/services/compute/standard_job_executor/StandardJobExecutorMessagePayload.h"
 #include "wrench/services/compute/workunit_executor/Workunit.h"
+#include "wrench/services/helpers/HostStateChangeDetector.h"
 
 
 namespace wrench {
@@ -120,6 +121,8 @@ namespace wrench {
                 {StandardJobExecutorMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD, "1024"},
                 {StandardJobExecutorMessagePayload::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD, "1024"},
         };
+
+        std::shared_ptr<HostStateChangeDetector> host_state_monitor;
 
         int main() override;
 
