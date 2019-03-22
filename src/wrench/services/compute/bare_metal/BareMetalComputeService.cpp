@@ -805,7 +805,7 @@ namespace wrench {
             Service *service = msg->service;
             auto workunit_executor = dynamic_cast<WorkunitExecutor *>(service);
             if (not workunit_executor) {
-                throw std::runtime_error("Received a FailureDetectorServiceHasFailedMessage message, but that service is not WorkUnitExecutor!");
+                throw std::runtime_error("Received a FailureDetectorServiceHasFailedMessage message, but that service is not a WorkUnitExecutor!");
             }
             processWorkunitExecutorCrash(workunit_executor);
             return true;
@@ -1144,10 +1144,10 @@ namespace wrench {
     }
 
 
-/**
- * @brief Helper function to "forget" a workunit executor (and free memory)
- * @param workunit_executor: the workunit executor
- */
+    /**
+     * @brief Helper function to "forget" a workunit executor (and free memory)
+     * @param workunit_executor: the workunit executor
+     */
     void BareMetalComputeService::forgetWorkunitExecutor(WorkunitExecutor *workunit_executor) {
 
         StandardJob *job = workunit_executor->getJob();
