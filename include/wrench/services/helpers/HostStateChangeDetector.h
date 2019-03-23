@@ -23,8 +23,10 @@ namespace wrench {
 
         void kill();
 
+
     private:
 
+        void cleanup(bool has_terminated_cleanly, int return_value) override;
         void hostChangeCallback(simgrid::s4u::Host const &h);
 
         std::vector<std::string> hosts_to_monitor;
