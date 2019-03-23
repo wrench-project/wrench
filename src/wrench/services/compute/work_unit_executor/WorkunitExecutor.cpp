@@ -80,7 +80,7 @@ namespace wrench {
     }
 
     void WorkunitExecutor::cleanup(bool has_returned_from_main, int return_value) {
-        WRENCH_INFO("In on_exit.cleanup(): WorkunitExecutor: %s has_returned_from_main = %d (return_value = %d, job terminated = %d)",
+        WRENCH_INFO("In on_exit.cleanup(): WorkunitExecutor: %s has_returned_from_main = %d (return_value = %d, job forcefully terminated = %d)",
                      this->getName().c_str(), has_returned_from_main, return_value, this->terminated_due_job_being_forcefully_terminated);
         if ((not has_returned_from_main) and (this->task_start_timestamp_has_been_inserted) and
             (not this->task_failure_time_stamp_has_already_been_generated)) {
@@ -138,11 +138,12 @@ namespace wrench {
 
 
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_BLUE);
-        WRENCH_INFO("New work_unit_executor starting (%s) to do: %ld pre file copies, %d tasks, %ld post file copies",
+        WRENCH_INFO("New work_unit_executor starting (%s) to do: %ld pre file copies, %d tasks, %ld post file copies, %ld file deletions",
                     this->mailbox_name.c_str(),
                     this->workunit->pre_file_copies.size(),
                     (this->workunit->task != nullptr) ? 1 : 0,
-                    this->workunit->post_file_copies.size());
+                    this->workunit->post_file_copies.size(),
+                    this->workunit->cleanup_file_deletions.size());
 
         SimulationMessage *msg_to_send_back = nullptr;
         bool success;
@@ -380,7 +381,11 @@ namespace wrench {
                     storage_service->deleteFile(file, nullptr, nullptr);
                 }
             } catch (WorkflowExecutionException &e) {
-                throw;
+                if (e.getCause()->getCauseType() == FailureCause::FILE_NOT_FOUND) {
+                    // Ignore (maybe it was already deleted during a previous attempt!
+                } else {
+                    throw;
+                }
             }
         }
 
