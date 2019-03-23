@@ -17,6 +17,14 @@
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(host_state_change_detector, "Log category for HostStateChangeDetector");
 
+
+void wrench::HostStateChangeDetector::cleanup(bool has_terminated_cleanly, int return_value) {
+    // Unregister the callbacks! (otherwise we'd get a segfault after destruction of this service)
+    simgrid::s4u::Host::on_state_change.disconnect_slots();
+}
+
+
+
 wrench::HostStateChangeDetector::HostStateChangeDetector(std::string host_on_which_to_run,
                                                          std::vector<std::string> hosts_to_monitor,
                                                          bool notify_when_turned_on, bool notify_when_turned_off,
@@ -89,5 +97,6 @@ int wrench::HostStateChangeDetector::main() {
  * @brief Kill the service
  */
 void wrench::HostStateChangeDetector::kill() {
+    WRENCH_INFO("KILLING %s", this->getName().c_str());
     this->killActor();
 }

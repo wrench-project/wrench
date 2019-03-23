@@ -832,8 +832,9 @@ namespace wrench {
         bool found_it = false;
         for (auto const &wue : this->running_workunit_executors) {
             if (wue.get() == workunit_executor) {
+                auto tmp = wue;
                 this->running_workunit_executors.erase(wue);
-                this->failed_workunit_executors.insert(wue);
+                this->failed_workunit_executors.insert(tmp);
                 found_it = true;
                 break;
             }
