@@ -82,7 +82,8 @@ namespace wrench {
 #define CLEAN_UP_MAILBOX_TO_AVOID_MEMORY_LEAK 0
 
     S4U_Daemon::~S4U_Daemon() {
-//        WRENCH_INFO("IN DAEMON DESTRUCTOR (%s)'", this->getName().c_str());
+        WRENCH_INFO("IN DAEMON DESTRUCTOR (%s)'", this->getName().c_str());
+
         /** The code below was to avoid a memory leak on the actor! However, weirdly,
          *  it now causes problems due to SimGrid complaining that on_exit() functions
          *  shouldn't do blocking things.... So it's commented-out for now

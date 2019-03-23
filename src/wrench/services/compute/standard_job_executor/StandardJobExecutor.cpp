@@ -236,8 +236,7 @@ namespace wrench {
         this->running_workunits.clear();
         this->completed_workunits.clear();
 
-        // Kill the host state monitor
-        this->host_state_monitor->kill();
+
     }
 
 
@@ -329,9 +328,11 @@ namespace wrench {
 
         if (not this->part_of_pilot_job) {
             /*** Clean up everything in the scratch space ***/
-//        WRENCH_INFO("CLEANING UP SCRATCH IN STRANDARDJOBEXECUTOR ITSELF");
             cleanUpScratch();
         }
+
+        // Kill the host state monitor (if the host went down, it died anyway)
+        this->host_state_monitor->kill();
 
         WRENCH_INFO("Standard Job Executor on host %s cleanly terminating!", S4U_Simulation::getHostName().c_str());
         return 0;
