@@ -855,11 +855,11 @@ namespace wrench {
         // Update RAM availabilities and running thread counts
         if (workunit->task) {
             this->ram_availabilities[workunit_executor->getHostname()] += workunit->task->getMemoryRequirement();
+            // Reset the internal task state to READY (it may have been completed actually, but we just redo the whole workunit)
+            workunit->task->setInternalState(WorkflowTask::InternalState::TASK_READY);
         }
 
 
-        // Reset the internal task state to READY (it may have been completed actually, but we just redo the whole workunit)
-        workunit->task->setInternalState(WorkflowTask::InternalState::TASK_READY);
         // Put the WorkUnit back in the ready list (at the end)
         WRENCH_INFO("Putting task back in the ready queue");
         this->running_workunits.erase(workunit);
