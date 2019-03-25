@@ -2,7 +2,7 @@
  * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+ * it under the xterms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
@@ -90,7 +90,7 @@ class BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnAnotherHostTestWM
 
 public:
     BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnAnotherHostTestWMS(BareMetalComputeServiceSimulatedFailuresTest *test,
-                                                         std::string &hostname, wrench::ComputeService *cs, wrench::StorageService *ss) :
+                                                                                std::string &hostname, wrench::ComputeService *cs, wrench::StorageService *ss) :
             wrench::WMS(nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -187,8 +187,8 @@ void BareMetalComputeServiceSimulatedFailuresTest::do_BareMetalComputeServiceOne
 
     // Staging the input_file on the storage service
     // Create a File Registry Service
-    ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(stable_host)));
-    ASSERT_NO_THROW(simulation->stageFiles({{input_file->getID(), input_file}}, storage_service));
+    simulation->add(new wrench::FileRegistryService(stable_host));
+    simulation->stageFiles({{input_file->getID(), input_file}}, storage_service);
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -208,7 +208,7 @@ class BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnSameHostTestWMS :
 
 public:
     BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnSameHostTestWMS(BareMetalComputeServiceSimulatedFailuresTest *test,
-                                                      std::string &hostname, wrench::ComputeService *cs, wrench::StorageService *ss) :
+                                                                             std::string &hostname, wrench::ComputeService *cs, wrench::StorageService *ss) :
             wrench::WMS(nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -302,8 +302,8 @@ void BareMetalComputeServiceSimulatedFailuresTest::do_BareMetalComputeServiceOne
 
     // Staging the input_file on the storage service
     // Create a File Registry Service
-    ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(stable_host)));
-    ASSERT_NO_THROW(simulation->stageFiles({{input_file->getID(), input_file}}, storage_service));
+    simulation->add(new wrench::FileRegistryService(stable_host));
+    simulation->stageFiles({{input_file->getID(), input_file}}, storage_service);
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -322,7 +322,7 @@ class BareMetalComputeServiceRandomFailuresTestWMS : public wrench::WMS {
 
 public:
     BareMetalComputeServiceRandomFailuresTestWMS(BareMetalComputeServiceSimulatedFailuresTest *test,
-                          std::string &hostname, wrench::ComputeService *cs, wrench::StorageService *ss) :
+                                                 std::string &hostname, wrench::ComputeService *cs, wrench::StorageService *ss) :
             wrench::WMS(nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -336,7 +336,7 @@ private:
         // Create a job manager
         std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
-        unsigned long NUM_TRIALS = 500;
+        unsigned long NUM_TRIALS = 1000;
 
         for (unsigned long trial=0; trial < NUM_TRIALS; trial++) {
 
@@ -431,8 +431,8 @@ void BareMetalComputeServiceSimulatedFailuresTest::do_BareMetalComputeServiceRan
 
     // Staging the input_file on the storage service
     // Create a File Registry Service
-    ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(stable_host)));
-    ASSERT_NO_THROW(simulation->stageFiles({{input_file->getID(), input_file}}, storage_service));
+    simulation->add(new wrench::FileRegistryService(stable_host));
+    simulation->stageFiles({{input_file->getID(), input_file}}, storage_service);
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -441,3 +441,4 @@ void BareMetalComputeServiceSimulatedFailuresTest::do_BareMetalComputeServiceRan
     free(argv[0]);
     free(argv);
 }
+
