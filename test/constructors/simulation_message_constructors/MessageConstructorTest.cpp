@@ -323,9 +323,9 @@ TEST_F(MessageConstructorTest, NetworkProximityMessages) {
   ASSERT_THROW(new wrench::NetworkProximityLookupRequestMessage("mailbox", std::make_pair("","b"), 666), std::invalid_argument);
   ASSERT_THROW(new wrench::NetworkProximityLookupRequestMessage("mailbox", std::make_pair("a",""), 666), std::invalid_argument);
 
-  ASSERT_NO_THROW(new wrench::NetworkProximityLookupAnswerMessage(std::make_pair("a","b"), 1.0, 666));
-  ASSERT_THROW(new wrench::NetworkProximityLookupAnswerMessage(std::make_pair("","b"), 1.0, 666), std::invalid_argument);
-  ASSERT_THROW(new wrench::NetworkProximityLookupAnswerMessage(std::make_pair("a",""), 1.0, 666), std::invalid_argument);
+  ASSERT_NO_THROW(new wrench::NetworkProximityLookupAnswerMessage(std::make_pair("a","b"), 1.0, 1.0, 666));
+  ASSERT_THROW(new wrench::NetworkProximityLookupAnswerMessage(std::make_pair("","b"), 1.0, 1.0, 666), std::invalid_argument);
+  ASSERT_THROW(new wrench::NetworkProximityLookupAnswerMessage(std::make_pair("a",""), 1.0, 1.0, 666), std::invalid_argument);
 
   ASSERT_NO_THROW(new wrench::NetworkProximityComputeAnswerMessage(std::make_pair("a","b"), 1.0, 666));
   ASSERT_THROW(new wrench::NetworkProximityComputeAnswerMessage(std::make_pair("","b"), 1.0, 666), std::invalid_argument);
@@ -338,8 +338,8 @@ TEST_F(MessageConstructorTest, NetworkProximityMessages) {
   ASSERT_THROW(new wrench::CoordinateLookupRequestMessage("", "requested_host", 666), std::invalid_argument);
   ASSERT_THROW(new wrench::CoordinateLookupRequestMessage("mailbox", "", 666), std::invalid_argument);
 
-  ASSERT_NO_THROW(new wrench::CoordinateLookupAnswerMessage("requested_host", std::make_pair(1.0,1.0), 666));
-  ASSERT_THROW(new wrench::CoordinateLookupAnswerMessage("", std::make_pair(1.0, 1.0), 666), std::invalid_argument);
+  ASSERT_NO_THROW(new wrench::CoordinateLookupAnswerMessage("requested_host", std::make_pair(1.0,1.0), 1.0, 666));
+  ASSERT_THROW(new wrench::CoordinateLookupAnswerMessage("", std::make_pair(1.0, 1.0), 1.0, 666), std::invalid_argument);
 }
 
 

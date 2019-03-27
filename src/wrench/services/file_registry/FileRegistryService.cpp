@@ -345,7 +345,8 @@ namespace wrench {
         auto locations_itr = locations.cbegin();
 
         for (auto &storage_service: storage_services_with_file) {
-          proximity = msg->network_proximity_service->query(std::make_pair(reference_host, storage_service->hostname));
+          proximity = std::get<0>(msg->network_proximity_service->getHostPairDistance(
+                  std::make_pair(reference_host, storage_service->hostname)));
           locations_itr = locations.insert(locations_itr, std::make_pair(proximity, storage_service));
         }
 

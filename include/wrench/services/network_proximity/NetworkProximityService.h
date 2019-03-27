@@ -76,11 +76,11 @@ namespace wrench{
         /** \cond DEVELOPER    */
         /***********************/
 
-        double query(std::pair<std::string, std::string> hosts);
 
         std::vector<std::string> getHostnameList();
 
-        std::pair<double, double> getCoordinate(std::string);
+        std::pair<double, double> getHostPairDistance(std::pair<std::string, std::string> hosts);
+        std::pair<std::pair<double, double>, double>  getHostCoordinate(std::string);
 
         std::string getNetworkProximityServiceType();
 
@@ -103,9 +103,9 @@ namespace wrench{
 
         void addEntryToDatabase(std::pair<std::string,std::string> pair_hosts,double proximity_value);
 
-        std::map<std::pair<std::string,std::string>,double> entries;
+        std::map<std::pair<std::string,std::string>,std::pair<double,double>> entries;
 
-        std::map<std::string, std::complex<double>> coordinate_lookup_table;
+        std::map<std::string, std::pair<std::complex<double>, double>> coordinate_lookup_table;
 
         std::shared_ptr<NetworkProximityDaemon> getCommunicationPeer(const NetworkProximityDaemon * sender_daemon);
 
