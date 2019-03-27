@@ -43,35 +43,37 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param hosts: the pair of hosts that were looked up
-     * @param proximityvalue: the proximity value between the pair of hosts
+     * @param proximity_value: the proximity value between the pair of hosts
      * @param payload: the message size in bytes
      */
     NetworkProximityLookupAnswerMessage::NetworkProximityLookupAnswerMessage(std::pair<std::string, std::string> hosts,
-                                                                             double proximityvalue, double payload) :
+                                                                             double proximity_value, double timestamp,
+                                                                             double payload) :
             NetworkProximityMessage("PROXIMITY_LOOKUP_ANSWER", payload) {
       if ((std::get<0>(hosts) == "") || (std::get<1>(hosts) == "")) {
         throw std::invalid_argument(
                 "NetworkProximityLookupAnswerMessage::NetworkProximityLookupAnswerMessage(): Invalid argument");
       }
       this->hosts = hosts;
-      this->proximityValue = proximityvalue;
+      this->proximity_value = proximity_value;
+      this->timestamp = timestamp;
     }
 
     /**
      * @brief Constructor
      * @param hosts: a pair of hosts
-     * @param proximityvalue: the proximity value between the pair of hosts
+     * @param proximity_value: the proximity value between the pair of hosts
      * @param payload: the message size in bytes
      */
     NetworkProximityComputeAnswerMessage::NetworkProximityComputeAnswerMessage(
-            std::pair<std::string, std::string> hosts, double proximityvalue, double payload) :
+            std::pair<std::string, std::string> hosts, double proximity_value, double payload) :
             NetworkProximityMessage("PROXIMITY_COMPUTE_ANSWER", payload) {
       if ((std::get<0>(hosts) == "") || (std::get<1>(hosts) == "")) {
         throw std::invalid_argument(
                 "NetworkProximityComputeAnswerMessage::NetworkProximityComputeAnswerMessage(): Invalid argument");
       }
       this->hosts = hosts;
-      this->proximityValue = proximityvalue;
+      this->proximity_value = proximity_value;
     }
 
 
@@ -92,13 +94,16 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param next_host_to_send: the next host to contact
+     * @param next_daemon_to_send: the next daemon to contact
      * @param next_mailbox_to_send: the next mailbox to contact
      * @param payload: the message size in bytes
      */
     NextContactDaemonAnswerMessage::NextContactDaemonAnswerMessage(std::string next_host_to_send,
+                                                                   NetworkProximityDaemon *next_daemon_to_send,
                                                                    std::string next_mailbox_to_send, double payload) :
             NetworkProximityMessage("NEXT_CONTACT_DAEMON_ANSWER", payload) {
       this->next_host_to_send = next_host_to_send;
+      this->next_daemon_to_send = next_daemon_to_send;
       this->next_mailbox_to_send = next_mailbox_to_send;
     }
 
@@ -132,10 +137,12 @@ namespace wrench {
      * @brief Constructor
      * @param requested_host: the name of the host whose coordinates are being requested
      * @param xy_coordinate: the (x,y) coordinate of the host
+     * @param timestamp: the timestamp for the coordinates
      * @param payload: the message size in bytes
      */
     CoordinateLookupAnswerMessage::CoordinateLookupAnswerMessage(std::string requested_host,
                                                                  std::pair<double, double> xy_coordinate,
+                                                                 double timestamp,
                                                                  double payload) :
             NetworkProximityMessage("COORDINATE_LOOKUP_ANSWER", payload) {
       if (requested_host == "") {
@@ -143,5 +150,6 @@ namespace wrench {
       }
       this->requested_host = requested_host;
       this->xy_coordinate = xy_coordinate;
+      this->timestamp = timestamp;
     }
 }

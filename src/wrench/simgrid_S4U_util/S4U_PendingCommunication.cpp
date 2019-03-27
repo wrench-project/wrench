@@ -40,10 +40,6 @@ namespace wrench {
       } catch (simgrid::TimeoutError &e) {
         throw std::shared_ptr<NetworkError>(
                 new NetworkError(NetworkError::RECEIVING, NetworkError::TIMEOUT, mailbox_name));
-      } catch (std::exception &e) {
-        // This is likely paranoid
-        throw std::shared_ptr<NetworkError>(
-                new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, mailbox_name));
       }
       return std::move(this->simulation_message);
     }

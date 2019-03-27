@@ -82,7 +82,7 @@ namespace wrench {
 #define CLEAN_UP_MAILBOX_TO_AVOID_MEMORY_LEAK 0
 
     S4U_Daemon::~S4U_Daemon() {
-        WRENCH_INFO("IN DAEMON DESTRUCTOR (%s)'", this->getName().c_str());
+//        WRENCH_INFO("IN DAEMON DESTRUCTOR (%s)'", this->getName().c_str());
 
         /** The code below was to avoid a memory leak on the actor! However, weirdly,
          *  it now causes problems due to SimGrid complaining that on_exit() functions
@@ -145,6 +145,9 @@ namespace wrench {
             throw std::shared_ptr<HostError>(new HostError(hostname));
         }
 
+        this->daemonized = daemonized;
+        this->auto_restart = auto_restart;
+
         // Create the s4u_actor
         try {
             this->s4u_actor = simgrid::s4u::Actor::create(this->process_name.c_str(),
@@ -164,14 +167,15 @@ namespace wrench {
         // terminate immediately. This is a weird simgrid::s4u behavior/bug, that may be
         // fixed at some point, but this test saves us for now.
         if (not this->has_returned_from_main) {
-            if (daemonized) {
+
+            if (this->daemonized) {
                 this->s4u_actor->daemonize();
             }
-            this->auto_restart = auto_restart;
+
             if (this->auto_restart) {
                 this->s4u_actor->set_auto_restart(true);
             }
-//            this->s4u_actor->on_exit(daemon_goodbye, (void *) (this));
+
             auto daemon_object = this;
             this->s4u_actor->on_exit([daemon_object](bool failed) {
                 WRENCH_INFO("Terminating");
@@ -198,6 +202,14 @@ namespace wrench {
  */
     bool S4U_Daemon::isSetToAutoRestart() {
         return this->auto_restart;
+    }
+
+    /**
+ * @brief Return the daemonized status of the daemon
+ * @return true or false
+ */
+    bool S4U_Daemon::isDaemonized() {
+        return this->daemonized;
     }
 
 /**
