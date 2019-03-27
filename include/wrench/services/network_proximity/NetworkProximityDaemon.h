@@ -30,18 +30,18 @@ namespace wrench {
     public:
 
         NetworkProximityDaemon(Simulation *simulation, std::string hostname,
-                       std::string network_proximity_service_mailbox,
-        double message_size,double measurement_period,
-        double noise, std::map<std::string, std::string> messagepayload_list);
+                               std::string network_proximity_service_mailbox,
+                               double message_size,double measurement_period,
+                               double noise, std::map<std::string, std::string> messagepayload_list);
 
     private:
 
         friend class Simulation;
 
         NetworkProximityDaemon(Simulation *simulation, std::string hostname,
-                       std::string network_proximity_service_mailbox,
-                       double message_size,double measurement_period,
-                       double noise, std::map<std::string, std::string> messagepayload_list, std::string suffix);
+                               std::string network_proximity_service_mailbox,
+                               double message_size,double measurement_period,
+                               double noise, std::map<std::string, std::string> messagepayload_list, std::string suffix);
 
 
         double message_size;
@@ -50,14 +50,17 @@ namespace wrench {
 
         std::string suffix;
         std::string next_mailbox_to_send;
+        NetworkProximityDaemon *next_daemon_to_send;
         std::string next_host_to_send;
         std::string network_proximity_service_mailbox;
 
         int main() override;
+        void cleanup(bool has_returned_from_main, int return_value) override;
+
 
         double getTimeUntilNextMeasurement();
 
-          bool processNextMessage(double timeout);
+        bool processNextMessage(double timeout);
     };
 
     /***********************/

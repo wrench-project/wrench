@@ -116,12 +116,12 @@ private:
       int count = 0, max_count = 100;
       auto network_proximity_services = this->getAvailableNetworkProximityServices();
       auto network_proximity_service = network_proximity_services.begin();
-      double proximity = (*network_proximity_service)->query(hosts_to_compute_proximity);
+      double proximity = (*network_proximity_service)->getHostPairDistance(hosts_to_compute_proximity).first;
 
       while (proximity == DBL_MAX && count < max_count) {
         count++;
         wrench::S4U_Simulation::sleep(20.0);
-        proximity = (*network_proximity_service)->query(hosts_to_compute_proximity);
+        proximity = (*network_proximity_service)->getHostPairDistance(hosts_to_compute_proximity).first;
       }
 
       if (count == max_count) {
@@ -132,11 +132,11 @@ private:
         throw std::runtime_error("Got a NOT_AVAILABLE proximity value");
       }
 
-      // Shutodown the proximity service
+      // Shutdown the proximity service
       (*network_proximity_service)->stop();
 
       try {
-        (*network_proximity_service)->query(hosts_to_compute_proximity);
+          (*network_proximity_service)->getHostPairDistance(hosts_to_compute_proximity);
         throw std::runtime_error("Should not be able to query a service that is down");
       } catch (wrench::WorkflowExecutionException &e) {
         // Check Exception
@@ -309,13 +309,14 @@ private:
       first_pair_to_compute_proximity = std::make_pair(this->simulation->getHostnameList()[0],
                                                        this->simulation->getHostnameList()[1]);
       int count = 0, max_count = 1000;
-      double first_pair_proximity = (*(this->getAvailableNetworkProximityServices().begin()))->query(
-              first_pair_to_compute_proximity);
+      double first_pair_proximity = (*(this->getAvailableNetworkProximityServices().begin()))->getHostPairDistance(
+              first_pair_to_compute_proximity).first;
 
       while (first_pair_proximity == DBL_MAX && count < max_count) {
         count++;
         wrench::Simulation::sleep(10.0);
-        first_pair_proximity = (*(this->getAvailableNetworkProximityServices().begin()))->query(first_pair_to_compute_proximity);
+        first_pair_proximity = (*(this->getAvailableNetworkProximityServices().begin()))->getHostPairDistance(
+                first_pair_to_compute_proximity).first;
       }
 
       if (count == max_count) {
@@ -331,13 +332,14 @@ private:
       second_pair_to_compute_proximity = std::make_pair(this->simulation->getHostnameList()[2],
                                                         this->simulation->getHostnameList()[3]);
       count = 0, max_count = 1000;
-      double second_pair_proximity = (*(this->getAvailableNetworkProximityServices().begin()))->query(
-              second_pair_to_compute_proximity);
+      double second_pair_proximity = (*(this->getAvailableNetworkProximityServices().begin()))->getHostPairDistance(
+              second_pair_to_compute_proximity).first;
 
       while (second_pair_proximity == DBL_MAX && count < max_count) {
         count++;
         wrench::Simulation::sleep(10.0);
-        second_pair_proximity = (*(this->getAvailableNetworkProximityServices().begin()))->query(second_pair_to_compute_proximity);
+        second_pair_proximity = (*(this->getAvailableNetworkProximityServices().begin()))->getHostPairDistance(
+                second_pair_to_compute_proximity).first;
       }
 
       if (count == max_count) {
@@ -350,7 +352,7 @@ private:
 
       if (first_pair_proximity > second_pair_proximity) {
         throw std::runtime_error(
-                "CompareProxTestWMS::main():: Expected proximity between a pair to be less than the other pair of hosts"
+                "Expected proximity between a pair to be less than the other pair of hosts"
         );
       }
       return 0;
@@ -481,8 +483,8 @@ private:
       }
 
       wrench::S4U_Simulation::sleep(1000);
-      double alltoall_proximity = alltoall_service->query(hosts_to_compute_proximity);
-      double vivaldi_proximity = vivaldi_service->query(hosts_to_compute_proximity);
+      double alltoall_proximity = alltoall_service->getHostPairDistance(hosts_to_compute_proximity).first;
+      double vivaldi_proximity = vivaldi_service->getHostPairDistance(hosts_to_compute_proximity).first;
 
 
       if (vivaldi_proximity > 0.1) {
@@ -497,7 +499,7 @@ private:
       }
 
       std::string target_host = "Host3";
-      std::pair<double,double> coordinates = vivaldi_service->getCoordinate(target_host);
+      std::pair<double,double> coordinates = vivaldi_service->getHostCoordinate(target_host).first;
 
       if (coordinates.first == 0 && coordinates.second == 0) {
         throw std::runtime_error("Vivaldi algorithm did not update the coordinates of host:" + target_host);
@@ -505,7 +507,7 @@ private:
 
       // Try to get coordinates from a service that does not support coordinates
       try {
-        coordinates = alltoall_service->getCoordinate(target_host);
+        coordinates = alltoall_service->getHostCoordinate(target_host).first;
         throw std::runtime_error(
                 "Should not be able to get coordinates from an all-to-all proximity service");
       } catch (std::runtime_error &e) {
@@ -514,7 +516,7 @@ private:
       // stop the service
       vivaldi_service->stop();
       try {
-        coordinates = vivaldi_service->getCoordinate(target_host);
+        coordinates = vivaldi_service->getHostCoordinate(target_host).first;
         throw std::runtime_error("Should not be able to get coordinates from a service that is down");
       } catch (wrench::WorkflowExecutionException &e) {
         // Check Exception
