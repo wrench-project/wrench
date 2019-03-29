@@ -148,7 +148,7 @@ namespace wrench {
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("network_query_entry");
 
         try {
-            S4U_Mailbox::putMessage(this->mailbox_name,
+            S4U_Mailbox::dputMessage(this->mailbox_name,
                                     new NetworkProximityLookupRequestMessage(answer_mailbox, std::move(hosts),
                                                                              this->getMessagePayloadValueAsDouble(
                                                                                      NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
