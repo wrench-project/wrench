@@ -199,8 +199,8 @@ namespace wrench {
                       "TraceFileLoader::loadFromTraceFileSWF(): invalid job with negative flops and negative requested flops in batch workload trace file");
             }
             if (requested_time < time) {
-              throw std::invalid_argument(
-                      "TraceFileLoader::loadFromTraceFileSWF(): invalid job with requested time smaller than actual time in batch workload trace file");
+                WRENCH_WARN("TraceFileLoader::loadFromTraceFileSWF(): invalid job with requested time smaller than actual time in batch workload trace file [fixing it]");
+                requested_time = time;
             }
 
             if (requested_ram < 0) {
