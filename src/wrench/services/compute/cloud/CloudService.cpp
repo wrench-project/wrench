@@ -377,7 +377,7 @@ namespace wrench {
       serviceSanityCheck();
 
       try {
-        S4U_Mailbox::putMessage(this->mailbox_name, message);
+        S4U_Mailbox::dputMessage(this->mailbox_name, message);
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }

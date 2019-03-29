@@ -307,7 +307,7 @@ namespace wrench {
         // Send a "run a batch job" message to the daemon's mailbox_name
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("batch_standard_job_mailbox");
         try {
-            S4U_Mailbox::putMessage(this->mailbox_name,
+            S4U_Mailbox::dputMessage(this->mailbox_name,
                                     new BatchServiceJobRequestMessage(
                                             answer_mailbox, batch_job,
                                             this->getMessagePayloadValueAsDouble(
@@ -1085,7 +1085,7 @@ namespace wrench {
             this->setStateToDown();
             this->failCurrentStandardJobs();
             this->terminateRunningPilotJobs();
-            //this->cleanup(true, 0);
+
             // Send back a synchronous reply!
             try {
                 S4U_Mailbox::putMessage(msg->ack_mailbox,
