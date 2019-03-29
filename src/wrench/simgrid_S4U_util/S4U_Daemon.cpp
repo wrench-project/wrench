@@ -190,9 +190,8 @@ namespace wrench {
         }
 
         // Set the mailbox_name receiver (causes memory leak)
-//        simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::by_name(this->mailbox_name);
-        simgrid::s4u::Mailbox *mailbox = simgrid::s4u::Mailbox::by_name(this->mailbox_name);
-        mailbox->set_receiver(this->s4u_actor);
+        // Causes Mailbox::put() to no longer implement a rendez-vous communication.
+        simgrid::s4u::Mailbox::by_name(this->mailbox_name)->set_receiver(this->s4u_actor);
     }
 
 
@@ -286,18 +285,14 @@ namespace wrench {
  * @return true if the daemon terminated cleanly (i.e., main() returned), or false otherwise
  */
     std::pair<bool, int> S4U_Daemon::join() {
-        if (this->hasReturnedFromMain()) {
-            return std::make_pair(this->hasReturnedFromMain(), this->getReturnValue());
-        }
+//        if (this->hasReturnedFromMain()) {
+//            return std::make_pair(this->hasReturnedFromMain(), this->getReturnValue());
+//        }
 
         if (this->s4u_actor != nullptr) {
-            try {
-                this->s4u_actor->join();
-            } catch (xbt_ex &e) {
-                throw std::shared_ptr<FatalFailure>(new FatalFailure());
-            } catch (std::exception &e) {
-                throw std::shared_ptr<FatalFailure>(new FatalFailure());
-            }
+            this->s4u_actor->join();
+        } else {
+            throw std::runtime_error("S4U_Daemon::join(): Fatal error: this->s4u_actor shouldn't be nullptr");
         }
 //        WRENCH_INFO("JOIN ON '%s' HAS RETURNED: %d %d", this->getName().c_str(), this->hasReturnedFromMain(), this->getReturnValue());
         return std::make_pair(this->hasReturnedFromMain(), this->getReturnValue());

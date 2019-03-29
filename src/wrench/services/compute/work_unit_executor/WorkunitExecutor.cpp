@@ -104,7 +104,7 @@ namespace wrench {
      * @brief Kill the worker thread
      *
      * @param job_termination: if the reason for being killed is that the job was terminated by the submitter
-     * (as opposed to being terminated becuase the above service was also terminated).
+     * (as opposed to being terminated because the above service was also terminated).
      */
     void WorkunitExecutor::kill(bool job_termination) {
 
