@@ -32,7 +32,8 @@ namespace wrench {
          *      - "FCFS": First Come First Serve
          *    - If ENABLE_BATSCHED is set to on:
          *      - whatever scheduling algorithm is supported by Batsched
-         *                  (by default: "easy_bf")
+         *        (by default: "conservative_bf", other options include
+         *        "easy_bf" and "easy_bf_fast")
          *
          **/
         DECLARE_PROPERTY_NAME(BATCH_SCHEDULING_ALGORITHM);
@@ -71,12 +72,23 @@ namespace wrench {
          * be in the SWF format (see http://www.cs.huji.ac.il/labs/parallel/workload/swf.html), in which
          * case it must have extension ".swf", or in the JSON format as used in the BATSIM project
          * (see https://github.com/oar-team/batsim), in which case is must have the ".json" extension).
-         * Note that jobs in the trace whose node/host/processor/core requirements exceed the capacity
+         * The jobs in the trace whose node/host/processor/core requirements exceed the capacity
          * of the batch service will simply be capped at that capacity. Job submission times in the trace files
          * are relative to the BatchService's start time (i.e., all jobs in the trace files will be replayed
-         * no matter when the BatchService starts).
+         * no matter when the BatchService starts). Note that in the BATSIM JSON format, the trace does not
+         * contains requested vs. actual trace runtimes, and to all requested runtimes are 100% accurate.
          */
         DECLARE_PROPERTY_NAME(SIMULATED_WORKLOAD_TRACE_FILE);
+
+        /**
+         * @brief Whether, when simulating a workload trace file, to use the actual runtimes
+         * as requested runtimes (i.e., simulating users who request exactly what they need)
+         * or not (i.e., simulating users who always overestimate what they need, which is
+         * typical in the real world):
+         *      - "true": use real runtimes as requested runtimes
+         *      - "false": use requested times from the trace file
+         */
+        DECLARE_PROPERTY_NAME(USE_REAL_RUNTIMES_AS_REQUESTED_RUNTIMES);
 
         /**
          * @brief Path to a to-be-generated Batsim-style CSV trace file (e.g. for b3atch schedule visualization purposes).

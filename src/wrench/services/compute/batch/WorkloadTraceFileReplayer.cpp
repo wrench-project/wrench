@@ -24,12 +24,14 @@ namespace wrench {
      * @param hostname: the name of the host on which the trace file replayer will be started
      * @param batch_service: the batch service to which it submits jobs
      * @param num_cores_per_node: the number of cores per host on the batch service
+     * @param use_actual_runtimes_as_requested_runtimes: if true, use actual runtimes as requested runtimes
      * @param workload_trace: the workload trace to be replayed
      */
     WorkloadTraceFileReplayer::WorkloadTraceFileReplayer(Simulation *simulation,
                                                          std::string hostname,
                                                          BatchService *batch_service,
                                                          unsigned long num_cores_per_node,
+                                                         bool use_actual_runtimes_as_requested_runtimes,
                                                          std::vector<std::tuple<std::string, double, double, double, double, unsigned int>> &workload_trace
     ) :
             WMS(nullptr, nullptr,
@@ -39,7 +41,9 @@ namespace wrench {
                 "workload_tracefile_replayer"),
             workload_trace(workload_trace),
             batch_service(batch_service),
-            num_cores_per_node(num_cores_per_node) {}
+            num_cores_per_node(num_cores_per_node),
+            use_actual_runtimes_as_requested_runtimes(use_actual_runtimes_as_requested_runtimes)
+            {}
 
 
     int WorkloadTraceFileReplayer::main() {
@@ -80,6 +84,9 @@ namespace wrench {
         std::string job_id = std::get<0>(job);
         double time = std::get<2>(job);
         double requested_time = std::get<3>(job);
+        if (this->use_actual_runtimes_as_requested_runtimes) {
+          requested_time = time;
+        }
         double requested_ram = std::get<4>(job);
         int num_nodes = std::get<5>(job);
 
@@ -91,9 +98,9 @@ namespace wrench {
           double task_flops = num_cores_per_node * (core_flop_rate * (time - time_fudge));
           double parallel_efficiency = 1.0;
           WorkflowTask *task = workflow->addTask(this->getName() + "_job_" + std::to_string(job_count) + "_task_" + std::to_string(i),
-                            task_flops,
-                            num_cores_per_node, num_cores_per_node, parallel_efficiency,
-                            requested_ram);
+                                                 task_flops,
+                                                 num_cores_per_node, num_cores_per_node, parallel_efficiency,
+                                                 requested_ram);
           to_submit.push_back(task);
         }
 
