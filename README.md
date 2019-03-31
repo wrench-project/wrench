@@ -4,6 +4,7 @@
 [![Coverage Status][coveralls-badge]][coveralls-link]
 [![Codacy Badge][codacy-badge]][codacy-link]
 [![SonarCloud Badge][sonarcloud-badge]][sonarcloud-link]
+[![CII Best Practices][cii-badge]][cii-link]
 
 <img src="doc/images/logo-vertical.png" width="100" />
 
@@ -95,3 +96,5 @@ it provides a recent and general overview on the framework.
 [codacy-link]:              https://www.codacy.com/app/WRENCH/wrench?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=wrench-project/wrench&amp;utm_campaign=Badge_Grade
 [sonarcloud-badge]:         https://sonarcloud.io/api/project_badges/measure?project=wrench&metric=ncloc
 [sonarcloud-link]:          https://sonarcloud.io/dashboard?id=wrench
+[cii-badge]:                https://bestpractices.coreinfrastructure.org/projects/2357/badge
+[cii-link]:                 https://bestpractices.coreinfrastructure.org/projects/2357

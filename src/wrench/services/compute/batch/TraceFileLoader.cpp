@@ -198,6 +198,11 @@ namespace wrench {
               throw std::invalid_argument(
                       "TraceFileLoader::loadFromTraceFileSWF(): invalid job with negative flops and negative requested flops in batch workload trace file");
             }
+            if (requested_time < time) {
+                WRENCH_WARN("TraceFileLoader::loadFromTraceFileSWF(): invalid job with requested time smaller than actual time in batch workload trace file [fixing it]");
+                requested_time = time;
+            }
+
             if (requested_ram < 0) {
               requested_ram = 0;
             }
@@ -259,7 +264,6 @@ namespace wrench {
         throw std::invalid_argument("TraceFileLoader::loadFromTraceFileJSON(): Cannot open JSON batch workload trace file " + filename);
       }
 
-
       try {
         file >> j;
         file.close();
@@ -299,10 +303,11 @@ namespace wrench {
         if ((res <= 0) or (subtime < 0) or (walltime < 0)) {
           throw std::invalid_argument("TraceFileLoader::loadFromTraceFileJSON(): invalid job specification in JSON batch workload trace file");
         }
-        res += load_time_compensation;
+        subtime += load_time_compensation;
 
-        // TODO: What the deal with requested times????
-        // For now, just use the walltime...
+        // It seems the Batsim JSON format does not include requested
+        // runtimes, and so we set the requested runtime to the walltime
+        // (i.e., users always ask exactly for what they need)
         double requested_time = walltime;
 
 //      // Add the job to the list

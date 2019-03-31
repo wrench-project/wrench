@@ -13,6 +13,18 @@ body {
     font-family: sans-serif;
     font-size: 12px;
 }
+#host-tooltip-container {
+    position: absolute;
+    width: auto;
+    padding: 10px;
+    background-color: #f2f2f2;
+    border-radius: 2px;
+    border: 0px solid #000;
+    display: none;
+    pointer-events: none;
+    font-family: sans-serif;
+    font-size: 12px;
+}
 #logo {
     width: 150px;
     margin-bottom: 20px;
@@ -21,8 +33,18 @@ body {
     width: 1000px;
     margin: auto;
 }
+
+#host-graph-container {
+    width: 1000px;
+    height: 1000px;
+    margin: auto;
+}
+
 #info-container {
     text-align: center;
+}
+#workflow-execution-chart-legend {
+    overflow-wrap: break-word;
 }
 #workflow-execution-chart-legend-read-input {
     border-left: 15px solid #cbb5dd;
@@ -71,6 +93,7 @@ body {
 .task-details-table-td {
     padding: .75rem;
     border-top: 1px solid #dee2e6;
+    font-size: 12px;
 }
 
 .task-details-table-header {
@@ -136,4 +159,41 @@ td {
 .arrow-img {
     vertical-align: middle;
     height: 20px;
+}
+
+#no-file {
+    text-align: center;
+}
+
+#host-instructions {
+    display: none;
+    background-color: rgba(0, 255, 204, 0.2);
+    text-align: center;
+    padding-bottom: 6px;
+}
+
+#information-img {
+    display: none;
+    width: 25px;
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+#host-instructions-close-button-container {
+    text-align: right;
+    margin-right: 16px;
+    padding-top: 2px;
+}
+
+#host-instructions-close-button {
+    width: 13px;
+    cursor: pointer;
+}
+
+#toggle-view-button {
+    cursor: pointer;
+}
+
+#button-and-information-container {
+    margin-top: 6px;
 }
