@@ -27,7 +27,7 @@ namespace wrench {
       WRENCH_INFO("Starting!");
       while (true) {
 
-        StandardJob *job;
+        StandardJob *job = nullptr ;
 
         // Wait for the workflow execution event
         WRENCH_INFO("Waiting for job completion...");

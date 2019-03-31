@@ -23,6 +23,7 @@
 #include <vector>
 #include <cmath>
 #include <string>
+#include <unordered_set>
 
 namespace wrench {
 
@@ -371,7 +372,7 @@ namespace wrench {
      *
      * <pre>
      * {
-     *      nodes: [
+     *      vertices: [
      *          {
      *              type: <"task">,
      *              id: <string>,
@@ -387,7 +388,7 @@ namespace wrench {
      *              size: <double>
      *          }, . . .
      *      ],
-     *      links: [
+     *      edges: [
      *          {
      *              source: <string>,
      *              target: <string>
@@ -409,12 +410,12 @@ namespace wrench {
         /* schema
          *
          */
-        nlohmann::json nodes;
-        nlohmann::json links;
+        nlohmann::json vertices;
+        nlohmann::json edges;
 
-        // add the task nodes
+        // add the task vertices
         for (const auto &task : workflow->getTasks()) {
-            nodes.push_back({
+            vertices.push_back({
                                     {"type", "task"},
                                     {"id", task->getID()},
                                     {"flops", task->getFlops()},
@@ -425,20 +426,20 @@ namespace wrench {
                             });
         }
 
-        // add the file nodes
+        // add the file vertices
         for (const auto &file : workflow->getFiles()) {
-            nodes.push_back({
+            vertices.push_back({
                                     {"type", "file"},
                                     {"id", file->getID()},
                                     {"size", file->getSize()}
                             });
         }
 
-        // add the links
+        // add the edges
         for (const auto &task : workflow->getTasks()) {
-            // create links between input files (if any) and the current task
+            // create edges between input files (if any) and the current task
             for (const auto &input_file : task->getInputFiles()) {
-                links.push_back({
+                edges.push_back({
                                         {"source", input_file->getID()},
                                         {"target", task->getID()}
                                 });
@@ -449,15 +450,15 @@ namespace wrench {
             bool has_children = (task->getNumberOfChildren() > 0) ? true : false;
 
             if (has_output_files) {
-                // create the links between current task and its output files (if any)
+                // create the edges between current task and its output files (if any)
                 for (const auto &output_file : task->getOutputFiles()) {
-                    links.push_back({{"source", task->getID()},
+                    edges.push_back({{"source", task->getID()},
                                      {"target", output_file->getID()}});
                 }
             } else if (has_children) {
-                // then create the links from the current task to its children tasks (if it has not output files)
+                // then create the edges from the current task to its children tasks (if it has not output files)
                 for (const auto & child : workflow->getTaskChildren(task)) {
-                    links.push_back({
+                    edges.push_back({
                                             {"source", task->getID()},
                                             {"target", child->getID()}});
                 }
@@ -465,8 +466,8 @@ namespace wrench {
         }
 
         nlohmann::json workflow_task_graph;
-        workflow_task_graph["nodes"] = nodes;
-        workflow_task_graph["links"] = links;
+        workflow_task_graph["vertices"] = vertices;
+        workflow_task_graph["edges"] = edges;
 
 
         std::ofstream output(file_path);
@@ -604,5 +605,294 @@ namespace wrench {
             // the functions that get energy information catch any exceptions then throw runtime_errors
             std::cerr << e.what() << std::endl;
         }
+    }
+
+    /**
+     * @brief Writes a JSON file containing all hosts, network links, and the routes between each host.
+     * @description The JSON array has the following format:
+     *
+     * <pre>
+     * {
+     *    vertices: [
+     *        {
+     *            type: <"host">,
+     *            id: <string>,
+     *            flop_rate: <double (flops per second)>,
+     *            memory: <double (bytes)>,
+     *            cores: <unsigned_long>
+     *        },
+     *        {
+     *            type: <"link">,
+     *            id: <string>,
+     *            bandwidth: <double (bytes per second)>,
+     *            latency: <double (in seconds)>
+     *        }, . . .
+     *    ],
+     *    edges: [
+     *        {
+     *            source: {
+     *                type: <string>,
+     *                id: <string>
+     *            }
+     *            target: {
+     *                type: <string>,
+     *                id: <string>
+     *           }
+     *        }, . . .
+     *    ],
+     *   routes: [
+     *       {
+     *           source: <string>,
+     *           target: <string>,
+     *           latency: <double (in seconds)>
+     *           route: [
+     *               link_id, ...
+     *           ]
+     *       }
+     *   ],
+     * }
+     * </pre>
+     *
+     * @param file_path: the path to write the file
+     *
+     * @throws std::invalid_argument
+     */
+    void SimulationOutput::dumpPlatformGraphJSON(std::string file_path) {
+        if (file_path.empty()) {
+            throw std::invalid_argument("SimulationOutput::dumpPlatformGraphJSON() requires a valid file_path");
+        }
+
+        nlohmann::json platform_graph_json;
+
+        simgrid::s4u::Engine *simgrid_engine = simgrid::s4u::Engine::get_instance();
+
+        // Get all the hosts
+        auto hosts = simgrid_engine->get_all_hosts();
+
+        // get the by-cluster host information
+        std::map<std::string, std::vector<std::string>> cluster_to_hosts = S4U_Simulation::getAllHostnamesByCluster();
+
+        // Build a host-to-cluster map initialized with hostnames as cluster_ids
+        std::map<std::string, std::string> host_to_cluster;
+        for (auto const &h : hosts) {
+            host_to_cluster[h->get_name()] = h->get_name();
+        }
+        // Update cluster_id value for those hosts that are in an actual cluster
+        for (auto const &c : cluster_to_hosts) {
+            std::string cluster_id = c.first;
+            for (auto const &h : c.second) {
+                host_to_cluster[h] = cluster_id;
+            }
+        }
+
+        // add all hosts to the list of vertices
+        for (const auto &host : hosts) {
+            platform_graph_json["vertices"].push_back({
+                                                           {"type", "host"},
+                                                           {"id", host->get_name()},
+                                                           {"cluster_id", host_to_cluster[host->get_name()]},
+                                                           {"flop_rate", host->get_speed()},
+                                                           {"memory", Simulation::getHostMemoryCapacity(host->get_name())},
+                                                           {"cores", host->get_core_count()}
+            });
+        }
+
+        // add all network links to the list of vertices
+        std::vector<simgrid::s4u::Link *> links = simgrid_engine->get_all_links();
+        for (const auto &link : links) {
+            if (not (link->get_name() == "__loopback__")) { // Ignore loopback link
+                platform_graph_json["vertices"].push_back({
+                                                               {"type",      "link"},
+                                                               {"id",        link->get_name()},
+                                                               {"bandwidth", link->get_bandwidth()},
+                                                               {"latency",   link->get_latency()}
+                                                       });
+            }
+        }
+
+
+        // add each route to the list of routes
+        std::vector<simgrid::s4u::Link *> route_forward;
+        std::vector<simgrid::s4u::Link *> route_backward;
+        double route_forward_latency = 0;
+        double route_backward_latency = 0;
+
+        // for every combination of host pairs
+        for (auto target = hosts.begin(); target != hosts.end(); ++target) {
+            for (auto source = hosts.begin(); source != target; ++source) {
+                nlohmann::json route_forward_json;
+
+                // populate "route_forward" with an ordered list of network links along
+                // the route between source and target
+                (*source)->route_to(*target, route_forward, &route_forward_latency);
+
+                // add the route from source to target to the json
+                route_forward_json["source"] = (*source)->get_name();
+                route_forward_json["target"] = (*target)->get_name();
+                route_forward_json["latency"] = route_forward_latency;
+
+                for (const auto &link : route_forward) {
+                    route_forward_json["route"].push_back(link->get_name());
+                }
+
+                platform_graph_json["routes"].push_back(route_forward_json);
+
+                // populate "route_backward" with an ordered list of network links along
+                // the route between target and source; the "route_backward" could be different
+                // so we need to add it if it is in fact different
+                nlohmann::json route_backward_json;
+                (*target)->route_to(*source, route_backward, &route_backward_latency);
+
+                // check to see if the route from source to target is the same as from target to source
+                bool is_route_equal = true;
+                if (route_forward.size() == route_backward.size()) {
+                    for (size_t i = 0; i < route_forward.size(); ++i) {
+                        if (route_forward.at(i)->get_name() != route_backward.at(route_backward.size() - 1 - i)->get_name()) {
+                            is_route_equal = false;
+                            break;
+                        }
+                    }
+                } else {
+                    is_route_equal = false;
+                }
+
+                if (not is_route_equal) {
+                    // add the route from target to source to the json
+                    route_backward_json["source"] = (*target)->get_name();
+                    route_backward_json["target"] = (*source)->get_name();
+                    route_backward_json["latency"] = route_backward_latency;
+
+                    for (const auto &link : route_backward) {
+                        route_backward_json["route"].push_back(link->get_name());
+                    }
+
+                    platform_graph_json["routes"].push_back(route_backward_json);
+                }
+
+                // reset these values
+                route_forward.clear();
+                route_backward.clear();
+
+                // reset these values
+                route_forward_latency = 0;
+                route_backward_latency = 0;
+            }
+        }
+
+        // maintain a unique list of edges where edges are represented using the following string format:
+        // <source_type>:<source_id>-<target_type>:<target_id> where type could be 'host' or 'link'
+        std::unordered_set<std::string> edges;
+        const std::string HOST("host");
+        const std::string LINK("link");
+
+        std::string source_string;
+        std::string target_string;
+
+        std::string source_id;
+        std::string target_id;
+
+        // for each route, add "host<-->link" and "link<-->link" connections
+        for (nlohmann::json::iterator route_itr = platform_graph_json["routes"].begin(); route_itr != platform_graph_json["routes"].end(); ++route_itr) {
+
+            source_id = (*route_itr)["source"].get<std::string>();
+            source_string = HOST + ":" + source_id;
+
+            target_id = (*route_itr)["route"].at(0).get<std::string>();
+            target_string = LINK + ":" + target_id;
+
+            // check that the undirected edge doesn't already exist in set of edges
+            if (edges.find(source_string + "-" + target_string) == edges.end() and
+                edges.find(target_string + "-" + source_string) == edges.end())
+            {
+
+                edges.insert(source_string + "-" + target_string);
+
+                // add a graph link from the source host to the first network link
+                platform_graph_json["edges"].push_back({
+                                                               {"source", {
+                                                                                  {"type", HOST},
+                                                                                  {"id", source_id}
+                                                                          }
+
+                                                               },
+                                                               {"target", {
+                                                                                  {"type", LINK},
+                                                                                  {"id", target_id}
+                                                                          }
+                                                               }
+                                                       });
+            }
+
+
+
+            // add graph edges comprising only network links
+            for (nlohmann::json::iterator link_itr = (*route_itr)["route"].begin(); link_itr != (*route_itr)["route"].end(); ++link_itr) {
+                auto next_link_itr = link_itr + 1;
+
+                if (next_link_itr != (*route_itr)["route"].end()) {
+
+                    source_id = (*link_itr).get<std::string>();
+                    source_string = LINK + ":" + source_id;
+
+                    target_id = (*next_link_itr).get<std::string>();
+                    target_string = LINK + ":" + target_id;
+
+                    // check that the undirected edge doesn't already exist in set of edges
+                    if (edges.find(source_string + "-" + target_string) == edges.end() and
+                        edges.find(target_string + "-" + source_string) == edges.end()) {
+
+                        edges.insert(source_string + "-" + target_string);
+
+                        platform_graph_json["edges"].push_back({
+                                                                       {"source", {
+                                                                                          {"type", LINK},
+                                                                                          {"id", source_id}
+                                                                                  }
+                                                                       },
+                                                                       {"target", {
+                                                                                          {"type", LINK},
+                                                                                          {"id", target_id}
+                                                                                  }
+                                                                       }
+                                                               });
+                    }
+                }
+            }
+
+            source_id = (*route_itr)["route"].at(((*route_itr)["route"].size()) - 1).get<std::string>();
+            source_string = LINK + ":" + source_id;
+
+            target_id = (*route_itr)["target"].get<std::string>();
+            target_string = HOST + ":" + target_id;
+
+            // check that the undirected edge doesn't already exist in set of edges
+            if (edges.find(source_string + "-" + target_string) == edges.end() and
+                edges.find(target_string + "-" + source_string) == edges.end()) {
+
+                edges.insert(source_string + "-" + target_string);
+
+                // add a graph link from the last link to the target host
+                platform_graph_json["edges"].push_back({
+                                                               {"source", {
+                                                                                  {"type", "link"},
+                                                                                  {"id", source_id}
+                                                                          }
+                                                               },
+                                                               {"target", {
+                                                                                  {"type", "host"},
+                                                                                  {"id", target_id}
+                                                                          }
+                                                               }
+                                                       });
+
+            }
+        }
+
+        //std::cerr << platform_graph_json.dump(4) << std::endl;
+
+
+        std::ofstream output(file_path);
+        output << std::setw(4) << platform_graph_json << std::endl;
+        output.close();
     }
 };
