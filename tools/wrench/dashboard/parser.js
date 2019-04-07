@@ -55,7 +55,6 @@ else if (numProgramArguments == 1 || numProgramArguments == 2) {   // Only task 
             if (numProgramArguments == 2) {    // Task and energy data files both included
                 energyFilePath = process.argv[3];
                 energyData = JSON.parse(fs.readFileSync(energyFilePath));
-                energyModule.setData(energyData);
         
                 addToHTMLFile(content, energyData);
             }
