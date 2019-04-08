@@ -22,7 +22,7 @@ namespace wrench {
      * @brief Constructor
      *
      * @param wms: the WMS that uses this data movement manager
-     * @paqram measurement_periods: the measurement period for each metered host
+     * @param measurement_periods: the measurement period for each metered host
      */
     EnergyMeter::EnergyMeter(WMS *wms, const std::map<std::string, double> &measurement_periods) :
             Service(wms->hostname, "energy_meter", "energy_meter") {

@@ -300,6 +300,7 @@ namespace wrench {
 
 /**
  * @brief Returns true if the daemon has returned from main() (i.e., not brutally killed)
+ * @return The true or false
  */
     bool S4U_Daemon::hasReturnedFromMain() {
         return this->has_returned_from_main;
@@ -307,6 +308,7 @@ namespace wrench {
 
 /**
  * @brief Returns the value returned by main() (if the daemon has returned from main)
+ * @return The return value
  */
     int S4U_Daemon::getReturnValue() {
         return this->return_value;
@@ -314,7 +316,6 @@ namespace wrench {
 
 /**
  * @brief Retrieve the process name
- *
  * @return the name
  */
     std::string S4U_Daemon::getName() {
