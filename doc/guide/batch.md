@@ -62,7 +62,7 @@ auto batch_cs = simulation->add(
 ~~~~~~~~~~~~~
 
 
-## Batch compute service properties             {#guide-baremetal-creating-properties}
+## Batch compute service properties             {#guide-batch-creating-properties}
 
 In addition to properties inherited from `wrench::ComputeServiceProperty`, a batch compute
 service supports the following properties:

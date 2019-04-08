@@ -203,6 +203,9 @@ namespace wrench {
 
         void setNumCoresAllocated(unsigned long num_cores);
 
+        /**
+         * @brief A data structure that keeps track of a task's execution event times
+         */
         struct WorkflowTaskExecution {
             double task_start = -1.0;
             double read_input_start = -1.0;

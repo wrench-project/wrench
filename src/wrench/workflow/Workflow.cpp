@@ -806,15 +806,6 @@ namespace wrench {
       return max_top_level;
     }
 
-
-//    /**
-//     * @brief Sets the number of levels in the workflow
-//     * @param num_levels: the number of levels
-//     */
-//    void Workflow::setNumLevels(unsigned long num_levels) {
-//      this->num_levels = num_levels;
-//    }
-
     /**
      * @brief Returns the workflow's completion date
      * @return a date in seconds (or a negative value

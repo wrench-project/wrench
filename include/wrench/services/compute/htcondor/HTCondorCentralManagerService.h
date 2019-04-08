@@ -16,6 +16,9 @@
 
 namespace wrench {
 
+    /**
+     * @brief A HTCondor central manager service implementation
+     */
     class HTCondorCentralManagerService : public ComputeService {
     private:
         std::map<std::string, std::string> default_property_values = {};
@@ -44,6 +47,10 @@ namespace wrench {
                                std::map<std::string, std::string> &service_specific_arguments) override;
 
         void submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_arguments) override;
+            
+        /***********************/
+        /** \endcond          **/
+        /***********************/
 
         /***********************/
         /** \cond INTERNAL    */
