@@ -14,10 +14,18 @@
         <script src="public/d3.min.js" type="text/javascript"></script>
         <script src="public/jQueryRotate.js" type="text/javascript"></script>
 
+        <!-- billboard.js scripts -->
+        <script src="https://d3js.org/d3.v5.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/billboard.js/dist/billboard.min.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/billboard.js/dist/billboard.min.css">
+
         <!-- Brightcharts scripts -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-selection/1.2.0/d3-selection.js"></script>
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-selection/1.2.0/d3-selection.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/britecharts@2.10.0/dist/umd/bar.min.js" type="text/javascript"></script>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/britecharts/dist/css/britecharts.min.css" type="text/css" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/britecharts/3.0.0/css/charts/line.css" type="text/javascript"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/britecharts/3.0.0/umd/line.min.js" type="text/javascript"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/britecharts/3.0.0/umd/tooltip.min.js" type="text/javascript"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/britecharts/dist/css/britecharts.min.css" type="text/css" /> -->
 
     </head>
     <body>
@@ -129,37 +137,67 @@
 
             </div>
 
-            <!-- Energy graph -->
-            <div class="bar-container"></div>
+            <!-- Markup -->
+            <div id="lineChart"></div>
+
+            <!-- Get energy consumed data from JSON for each host -->
             <script>
-                // Instantiate bar chart and container
-                const barChart = britecharts.bar();
-                const container = d3.select('.bar-container');
-            
-                // Create Dataset with proper shape
-                const barData = [
-                    { name: 'Luminous', value: 2 },
-                    { name: 'Glittering', value: 5 },
-                    { name: 'Intense', value: 4 },
-                    { name: 'Radiant', value: 3 }
-                ];
-            
-                // Configure chart
-                barChart
-                    .margin({left: 100})
-                    .isHorizontal(true)
-                    .height(400)
-                    .width(600);
-            
-                container.datum(barData).call(barChart);
+                data = [];
+                xAxisMarks = ["x"];
+                // Iterate through data for each host
+                for(var i = 0; i < energyData.length; i++) {
+                    var hostData = energyData[i]["consumed_energy_trace"];
+
+                    consumedEnergyData = []
+
+                    // Iterate through each energy trace for a host
+                    for(var j = 0; j < hostData.length; j++) {
+                        var trace = hostData[j];
+
+                        if (xAxisMarks.length <= hostData.length) {
+                            xAxisMarks.push(trace["time"])
+                        }
+
+                        consumedEnergyData.push(trace["joules"])
+                    }
+
+                    // Add host name to the front of the data for graph labeling
+                    consumedEnergyData.unshift(energyData[i]["hostname"])
+                    data.push(consumedEnergyData)
+                }
+                
+                data.push(xAxisMarks)
+
+                bb.generate({
+                    bindto: "#lineChart",
+                    data: {
+                        x : "x",
+                        columns: data,
+                        // columns: [
+                        //     ["data1", 30, 200, 100, 170, 150, 250],
+                        //     ["data2", 130, 100, 140, 35, 110, 50]
+                        // ],
+                        // types: {
+                        // data1: "line",
+                        // data2: "line"
+                        // },
+                        // colors: {
+                        // data1: "red",
+                        // data2: "green"
+                        // }
+                    },
+                    axis: {
+                        x: {
+                            min: 0,
+                            padding: {bottom: 0},
+                            tick: {
+                                count: xAxisMarks.length,
+                                values: xAxisMarks,
+                            },
+                        }
+                    }
+                });
             </script>
-            <!-- <div>
-                <script> 
-                    $(document).ready(function(){
-                        alert(JSON.stringify(energyData))
-                    });
-                </script>
-            </div> -->
         </div>
     </body>
     <script>
