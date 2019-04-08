@@ -15,6 +15,9 @@
 
 namespace wrench {
 
+    /**
+     * @brief A service that detects and reports on host state changed (turned on, turned off)
+     */
     class HostStateChangeDetector : public Service {
 
     public:

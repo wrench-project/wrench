@@ -398,32 +398,32 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the amount of bytes read by the task
-     * @return bytes read by the task in KB
+     * @brief Get the number of bytes read by the task
+     * @return number of bytes read by the task in KB
      */
     unsigned long WorkflowTask::getBytesRead() const {
       return this->bytes_read;
     }
 
     /**
-     * @brief Set the amount of bytes read by the task
-     * @param bytes_read: bytes read by the task in KB
+     * @brief Set the number of bytes read by the task
+     * @param bytes_read: number of bytes read by the task in KB
      */
     void WorkflowTask::setBytesRead(unsigned long bytes_read) {
       this->bytes_read = bytes_read;
     }
 
     /**
-     * @brief Set the amount of bytes written by the task
-     * @return bytes written by the task in KB
+     * @brief Get the number of bytes written by the task
+     * @return number of bytes written by the task in KB
      */
     unsigned long WorkflowTask::getBytesWritten() const {
       return this->bytes_written;
     }
 
     /**
-     * @brief Set the amount of bytes written by the task
-     * @param bytes_read: bytes read by the task in KB
+     * @brief Set the number of bytes written by the task
+     * @param bytes_written: number of bytes written by the task in KB
      */
     void WorkflowTask::setBytesWritten(unsigned long bytes_written) {
       this->bytes_written = bytes_written;

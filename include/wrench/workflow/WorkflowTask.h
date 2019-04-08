@@ -207,18 +207,30 @@ namespace wrench {
          * @brief A data structure that keeps track of a task's execution event times
          */
         struct WorkflowTaskExecution {
+            /** @brief Task's start time **/
             double task_start = -1.0;
+            /** @brief Task's read input start time **/
             double read_input_start = -1.0;
+            /** @brief Task's read input end time **/
             double read_input_end = -1.0;
+            /** @brief Task's computation start time **/
             double computation_start = -1.0;
+            /** @brief Task's computation end time **/
             double computation_end = -1.0;
+            /** @brief Task's write output start time **/
             double write_output_start = -1.0;
+            /** @brief Task's write output end time **/
             double write_output_end = -1.0;
+            /** @brief Task's end time **/
             double task_end = -1.0;
+            /** @brief Task's failed time **/
             double task_failed = -1.0;
+            /** @brief Task's terminated time **/
             double task_terminated = -1.0;
 
+            /** @brief Task's execution host **/
             std::string execution_host = "";
+            /** @brief Task's number of allocated cores **/
             unsigned long num_cores_allocated = 0;
 
             WorkflowTaskExecution(double task_start) : task_start(task_start) {

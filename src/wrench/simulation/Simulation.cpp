@@ -660,7 +660,7 @@ namespace wrench {
 
     /**
      * @brief Make the calling process compute
-     * @param duration: a number of floating point operations
+     * @param flops: a number of floating point operations
      */
     void Simulation::compute(double flops) {
             S4U_Simulation::compute(flops);
