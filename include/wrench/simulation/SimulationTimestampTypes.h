@@ -155,28 +155,49 @@ namespace wrench {
          * @brief A file location struct that contains the storage service and partition where a file is located
          */
         struct FileLocation {
+            /** @brief The StorageService where the file is located **/
             StorageService *storage_service;
+            /** @brief The StorageService's partition at which file is located **/
             std::string partition;
 
+            /** @brief Constructor 
+             * @param storage_service: the StorageService where the file is located    
+             * @param partition: the StorageService's partition where the file is stored    
+             */
             FileLocation(StorageService *storage_service, std::string partition) : storage_service(storage_service), partition(partition) {
-
             }
 
+            /**
+             * @brief Overloaded "equal" operator
+             * @param rhs: right-hand side of the comparison
+             * @return true if equal, false otherwise
+             */
             bool operator==(const FileLocation &rhs) {
                 return (this->storage_service == rhs.storage_service) && (this->partition == rhs.partition);
             }
 
+            /**
+             * @brief Overloaded "not equal" operator
+             * @param rhs: right-hand side of the comparison
+             * @return true if different, false otherwise
+             */
             bool operator!=(const FileLocation &rhs) {
                 return !FileLocation::operator==(rhs);
             }
         };
 
+        /**
+         * @brief Retrieve the matching endpoint, if any
+         */
         SimulationTimestampFileCopy *getEndpoint() override;
         WorkflowFile *getFile();
         FileLocation getSource();
         FileLocation getDestination();
 
     protected:
+        /** 
+         * @brief The WorkflowFile that was being copied
+         */
         WorkflowFile *file;
 
         /**

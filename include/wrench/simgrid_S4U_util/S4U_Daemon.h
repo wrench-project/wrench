@@ -94,6 +94,7 @@ namespace wrench {
 
         void releaseDaemonLock();
 
+        /** @brief The number of time that this daemon has started (i.e., 1 + #restarts) */
         unsigned int num_starts = 0;
     private:
         // Lock use typically to prevent kill() from killing the actor
