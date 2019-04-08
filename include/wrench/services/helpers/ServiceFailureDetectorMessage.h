@@ -30,6 +30,10 @@ namespace wrench {
         explicit ServiceFailureDetectorMessage(std::string name);
     };
 
+    /**
+     * @brief A message sent by the ServiceFailureDetector to notify some listener that the 
+     *        monitored service has crashed
+     */
     class ServiceHasCrashedMessage : public ServiceFailureDetectorMessage {
     public:
         explicit ServiceHasCrashedMessage(Service *service);

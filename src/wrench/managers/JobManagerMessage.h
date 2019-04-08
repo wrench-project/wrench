@@ -31,6 +31,9 @@ namespace wrench {
         explicit JobManagerMessage(std::string name);
     };
 
+    /**
+     * @brief A message sent by the JobManager to notify some submitter that a StandardJob has completed
+     */
     class JobManagerStandardJobDoneMessage : public JobManagerMessage {
     public:
         JobManagerStandardJobDoneMessage(StandardJob *job, ComputeService *compute_service,
@@ -42,6 +45,9 @@ namespace wrench {
         std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes;
     };
 
+    /**
+     * @brief A message sent by the JobManager to notify some submitter that a StandardJob has failed
+     */
     class JobManagerStandardJobFailedMessage : public JobManagerMessage {
     public:
         JobManagerStandardJobFailedMessage(StandardJob *job, ComputeService *compute_service,

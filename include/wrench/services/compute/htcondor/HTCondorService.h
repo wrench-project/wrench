@@ -62,6 +62,11 @@ namespace wrench {
         void setLocalStorageService(StorageService *local_storage_service);
 
         /***********************/
+        /** \endcond          **/
+        /***********************/
+
+
+        /***********************/
         /** \cond INTERNAL    */
         /***********************/
 

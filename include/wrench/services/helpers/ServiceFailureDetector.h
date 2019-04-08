@@ -15,6 +15,10 @@
 
 namespace wrench {
 
+    /**
+     * @brief A service that immediately detects when some service crashes and then notifies
+     *        some other service of the crash
+     */
     class ServiceFailureDetector : public Service {
 
     public:

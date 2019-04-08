@@ -17,6 +17,9 @@ namespace wrench {
     class WorkflowTask;
     class StorageService;
 
+    /**
+     * @brief A top-level base class for simulation timestamps
+     */
     class SimulationTimestampType {
     public:
         SimulationTimestampType();
@@ -44,6 +47,7 @@ namespace wrench {
         virtual SimulationTimestampPair *getEndpoint();
 
     protected:
+        /** @brief An optional associated "endpoint" simulation timestamp */
         SimulationTimestampPair *endpoint = nullptr;
     };
 
@@ -257,6 +261,9 @@ namespace wrench {
         int pstate;
     };
 
+    /**
+     * @brief A simulation timestamp class for energy consumption
+     */
     class SimulationTimestampEnergyConsumption: public SimulationTimestampType {
     public:
         /***********************/

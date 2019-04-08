@@ -30,12 +30,18 @@ namespace wrench {
         explicit HostStateChangeDetectorMessage(std::string name);
     };
 
+    /**
+     * @brief A message sent by the HostStateChangeDetector to notify some listener that a host has turned on 
+     */
     class HostHasTurnedOnMessage : public HostStateChangeDetectorMessage {
     public:
         explicit HostHasTurnedOnMessage(std::string hostname);
         std::string hostname;
     };
 
+    /**
+     * @brief A message sent by the HostStateChangeDetector to notify some listener that a host has turned off 
+     */
     class HostHasTurnedOffMessage : public HostStateChangeDetectorMessage {
     public:
         explicit HostHasTurnedOffMessage(std::string hostname);
