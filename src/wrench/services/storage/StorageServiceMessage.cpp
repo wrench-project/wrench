@@ -291,6 +291,7 @@ namespace wrench {
    * @param answer_mailbox: the mailbox to which to send the answer
    * @param mailbox_to_receive_the_file_content: the mailbox to which to send the file content
    * @param file: the file
+   * @param src_partition: the partition where the file is stored
    * @param payload: the message size in bytes
    *
    * @throw std::invalid_argument
