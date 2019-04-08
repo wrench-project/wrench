@@ -23,6 +23,7 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(cloud_service, "Log category for Cloud Service");
 
 namespace wrench {
 
+    /** @brief VM ID sequence number */ 
     unsigned long CloudService::VM_ID = 1;
 
     /**
@@ -657,6 +658,7 @@ namespace wrench {
           return;
         }
 
+        // Create a BareMetal Computer Service
         try {
           auto vm = std::get<0>(vm_tuple->second);
           vm->start();
@@ -680,6 +682,8 @@ namespace wrench {
         } catch (std::runtime_error &e) {
           throw;
         }
+
+
 
         S4U_Mailbox::dputMessage(
                 answer_mailbox,

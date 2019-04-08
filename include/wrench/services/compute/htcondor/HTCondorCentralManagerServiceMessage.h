@@ -15,11 +15,17 @@
 
 namespace wrench {
 
+    /**
+     * @brief Top-level class for messages received/sent by a HTCondorCentralManagerService
+     */
     class HTCondorCentralManagerServiceMessage : public ServiceMessage {
     protected:
         HTCondorCentralManagerServiceMessage(std::string name, double payload);
     };
 
+    /**
+     * @brief A message received by a HTCondorCentralManagerService so that it is notified of a negotiator cycle completion
+     */
     class NegotiatorCompletionMessage : public HTCondorCentralManagerServiceMessage {
     public:
         NegotiatorCompletionMessage(std::vector<StandardJob *> scheduled_jobs, double payload);

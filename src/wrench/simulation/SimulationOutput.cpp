@@ -156,7 +156,8 @@ namespace wrench {
     /**
      * @brief Searches for a possible host utilization gantt chart layout and updates the data to include what vertical
      *        position to plot each rectangle.
-     * @description Recursive backtracking search for a valid gantt chart layout. This algorithm looks for a
+     * 
+     * Recursive backtracking search for a valid gantt chart layout. This algorithm looks for a
      *              vertical position to place each task execution event such that it doesn't overlap with
      *              any other task.
      *
@@ -251,7 +252,8 @@ namespace wrench {
 
     /**
      * @brief Generates graph layout for host utilization and adds that information to the JSON object.
-     * @description Searches for a possible gantt chart layout to represent host utilization. If a layout is found
+     * 
+     * Searches for a possible gantt chart layout to represent host utilization. If a layout is found
      *              (no tasks overlap), then information about where to plot what is added to the JSON object. Note
      *              that this is a possible layout and does not reflect what task ran on what core specifically. For
      *              example, we may hav a task that was allocated 2-cores on a idle 4-core host. The task, when plotted
@@ -272,7 +274,8 @@ namespace wrench {
 
     /**
       * @brief Writes WorkflowTask execution history for each task to a file, formatted as a JSON array.
-      * @description The JSON array has the following format:
+      * 
+      * The JSON array has the following format:
       *
       * <pre>
       *    [
@@ -367,7 +370,8 @@ namespace wrench {
 
     /**
      * @brief Writes a JSON graph representation of the Workflow to a file.
-     * @description A node is added for each WorkflowTask and WorkflowFile. A WorkflowTask will have the type "task" and
+     * 
+     * A node is added for each WorkflowTask and WorkflowFile. A WorkflowTask will have the type "task" and
      *  a WorkflowFile will have the type "file". A directed link is added for each dependency in the Workflow.
      *
      * <pre>
@@ -478,7 +482,8 @@ namespace wrench {
 
     /**
      * @brief Writes a JSON file containing host energy consumption information as a JSON array.
-     * @description The JSON array has the following format:
+     * 
+     * The JSON array has the following format:
      *
      * <pre>
      * [
@@ -609,7 +614,8 @@ namespace wrench {
 
     /**
      * @brief Writes a JSON file containing all hosts, network links, and the routes between each host.
-     * @description The JSON array has the following format:
+     * 
+     * The JSON array has the following format:
      *
      * <pre>
      * {
