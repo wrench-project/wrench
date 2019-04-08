@@ -15,6 +15,12 @@
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(failure_detector, "Log category for ServiceFailureDetector");
 
+/**
+ * @brief Constructor
+ * @param host_on_which_to_run: the service's host
+ * @param service_to_monitor: which service to monitor
+ * @param mailbox_to_notify: which mailbox to notify
+ */
 wrench::ServiceFailureDetector::ServiceFailureDetector(std::string host_on_which_to_run,
                                                        std::shared_ptr<Service> service_to_monitor,
                                                        std::string mailbox_to_notify) :
@@ -24,6 +30,9 @@ wrench::ServiceFailureDetector::ServiceFailureDetector(std::string host_on_which
 
 }
 
+/**
+ * @brief main method
+ */
 int wrench::ServiceFailureDetector::main() {
 
     WRENCH_INFO("Starting");
