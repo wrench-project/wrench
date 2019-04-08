@@ -30,6 +30,7 @@ namespace wrench {
     public:
         NegotiatorCompletionMessage(std::vector<StandardJob *> scheduled_jobs, double payload);
 
+        /** @brief List of scheduled jobs */
         std::vector<StandardJob *> scheduled_jobs;
     };
 }

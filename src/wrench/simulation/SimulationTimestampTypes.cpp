@@ -233,11 +233,6 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param file: the file associated with this file copy
-     * @param src: the source StorageService from which this file was being copied
-     * @param src_partition: the partition in the source StorageService from which this file was being copied
-     * @param dst: the destination StorageService where this file was going to be copied
-     * @param dst_partition: the partition in the destination StorageService where this file was going to be copied
      * @param start_timestamp: a pointer to the SimulationTimestampFileCopyStart associated with this timestamp
      * @throw std::invalid_argument
      */

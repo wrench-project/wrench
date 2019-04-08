@@ -30,6 +30,7 @@ namespace wrench {
         /**
          * @brief Constructor
          * @param hostname: the name of the host on which the "one job" WMS will run
+         * @param job_manager: A JobManager with which to interact
          */
         WorkloadTraceFileReplayerEventReceiver(std::string hostname, std::shared_ptr<JobManager> job_manager) : WMS(nullptr, nullptr,
                                                                                {}, {},

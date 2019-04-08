@@ -233,9 +233,13 @@ namespace wrench {
             /** @brief Task's number of allocated cores **/
             unsigned long num_cores_allocated = 0;
 
-            WorkflowTaskExecution(double task_start) : task_start(task_start) {
+            /**
+             * @brief Constructor
+             *
+             * @param task_start: Task start time
+             */
+            WorkflowTaskExecution(double task_start) : task_start(task_start) { }
 
-            }
         };
 
         /***********************/
