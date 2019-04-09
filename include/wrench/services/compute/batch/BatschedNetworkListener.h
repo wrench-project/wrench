@@ -22,6 +22,7 @@ namespace wrench {
     /** \cond INTERNAL     */
     /***********************/
 
+#ifdef ENABLE_BATSCHED
     /**
      * @brief A helper service that handles all interaction with Batsched
      */
@@ -29,11 +30,9 @@ namespace wrench {
 
     public:
 
-        BatschedNetworkListener(std::string hostname, BatchService *batch_service, 
+        BatschedNetworkListener(std::string hostname, BatchService *batch_service,
                                 std::string batch_service_mailbox, std::string sched_port,
                                 std::string data_to_send,std::map<std::string, std::string> property_list = {});
-
-
     private:
         std::map<std::string, std::string> default_property_values = {
                 };
@@ -59,6 +58,15 @@ namespace wrench {
         void sendQueryAnswerMessageToBatchService(double estimated_waiting_time);
         void send_receive();
     };
+
+#else // ENABLE_BATSCHED
+    /**
+     * @brief An empty class to make Doxygen happy when Batsched is not enabled
+     */
+    class BatschedNetworkListener {
+
+    };
+#endif
 
     /***********************/
     /** \endcond           */
