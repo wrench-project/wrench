@@ -22,18 +22,18 @@ namespace wrench {
 
         unsigned long getJobID();
         unsigned long getAllocatedTime();
-        void setAllocatedTime(unsigned long);
+        void setAllocatedTime(unsigned long time);
         unsigned long getAllocatedCoresPerNode();
         double getMemoryRequirement();
         double getBeginTimeStamp();
-        void setBeginTimeStamp(double);
+        void setBeginTimeStamp(double time_stamp);
         double getEndingTimeStamp();
         double getArrivalTimeStamp();
         unsigned long getNumNodes();
         WorkflowJob* getWorkflowJob();
-        void setEndingTimeStamp(double);
+        void setEndingTimeStamp(double time_stamp);
         std::map<std::string, std::tuple<unsigned long, double>> getResourcesAllocated();
-        void setAllocatedResources(std::map<std::string, std::tuple<unsigned long, double>>);
+        void setAllocatedResources(std::map<std::string, std::tuple<unsigned long, double>> resources);
 
     private:
         unsigned long jobid;
@@ -48,8 +48,10 @@ namespace wrench {
 
     public:
         // Variables below are for the BatSim-style CVS output log file (only ifdef ENABLED_BATSCHED)
-        std::string csv_metadata; // "metadata" field
-        std::string csv_allocated_processors; // "allocated_processors" field
+        /** @brief The meta-data field for BatSim-style CSV output */
+        std::string csv_metadata;
+        /** @brief The allocated processors field for BatSim-style CSV output */
+        std::string csv_allocated_processors; 
     };
 
     /***********************/

@@ -142,15 +142,16 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the service's local StorageService
-     * @return a pointer to the service local StorageService object
+     * @brief Get the service's local storage service
+     * @return the local storage service object
      */
     StorageService *HTCondorService::getLocalStorageService() const {
       return this->local_storage_service;
     }
 
     /**
-     * @brief Set the service's local StorageService
+     * @brief Set the service's local storage service
+     * @param local_storage_service: a storage service
      */
     void HTCondorService::setLocalStorageService(wrench::StorageService *local_storage_service) {
       this->local_storage_service = local_storage_service;

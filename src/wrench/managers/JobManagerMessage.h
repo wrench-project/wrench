@@ -40,8 +40,11 @@ namespace wrench {
                                          std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes);
 
 
+        /** @brief The job that is done */
         StandardJob *job;
+        /** @brief The compute service on which the job ran */
         ComputeService *compute_service;
+        /** @brief The necessary task state changes */
         std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes;
     };
 
@@ -56,10 +59,15 @@ namespace wrench {
                                            std::shared_ptr<FailureCause> cause);
 
 
+        /** @brief The job that has failed */
         StandardJob *job;
+        /** @brief The compute service on which the job has failed */
         ComputeService *compute_service;
+        /** @brief The task state change that should be made */
         std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes;
+        /** @brief The tasks whose failure counts need to be incremented */
         std::set<WorkflowTask *> necessary_failure_count_increments;
+        /** @brief The cause of the failure */
         std::shared_ptr<FailureCause> cause;
     };
 

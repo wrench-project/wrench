@@ -20,6 +20,9 @@ namespace wrench {
     /***********************/
     /** \cond DEVELOPER    */
     /***********************/
+    /**
+     * @brief A HTCondor negotiator service
+     */
     class HTCondorNegotiatorService : public Service {
     private:
         std::map<std::string, std::string> default_messagepayload_values = {
