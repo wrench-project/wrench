@@ -49,15 +49,16 @@ wrench::HostStateChangeDetector::HostStateChangeDetector(std::string host_on_whi
 }
 
 void wrench::HostStateChangeDetector::hostChangeCallback(simgrid::s4u::Host const &h) {
-    // If this is not a host I care about, whatever
+    // If this is not a host I care about, don't do anything
     if (std::find(this->hosts_to_monitor.begin(), this->hosts_to_monitor.end(), h.get_name()) == this->hosts_to_monitor.end()) {
         return;
     }
-    if (h.is_on()) {
-        this->hosts_that_have_recently_turned_on.push_back(h.get_name());
-    } else {
-        this->hosts_that_have_recently_turned_off.push_back(h.get_name());
-    }
+    this->hosts_that_have_recently_changed_state.push_back(std::make_pair(h.get_name(), h.is_on()));
+//    if (h.is_on()) {
+//        this->hosts_that_have_recently_turned_on.push_back(h.get_name());
+//    } else {
+//        this->hosts_that_have_recently_turned_off.push_back(h.get_name());
+//    }
 
 }
 
@@ -66,38 +67,69 @@ int wrench::HostStateChangeDetector::main() {
 
     WRENCH_INFO("Starting");
     while(true) {
-        Simulation::sleep(1.0);
-        if (this->notify_when_turned_on) {
-            while (not this->hosts_that_have_recently_turned_on.empty()) {
-                std::string hostname = this->hosts_that_have_recently_turned_on.at(0);
-                this->hosts_that_have_recently_turned_on.erase(this->hosts_that_have_recently_turned_on.begin());
-                WRENCH_INFO("Notifying mailbox '%s' that host '%s' has turned on", this->mailbox_to_notify.c_str(),
-                            hostname.c_str());
-                auto msg = new HostHasTurnedOnMessage(hostname);
-                try {
-                    S4U_Mailbox::dputMessage(this->mailbox_to_notify, msg);
-                } catch (std::shared_ptr<NetworkError> &e) {
-                    WRENCH_INFO("Network error '%s' while notying mailbox of a host turning on... ignoring",
-                                e->toString().c_str());
-                }
+        Simulation::sleep(1.0); // 1 second resolution
+
+        while (not this->hosts_that_have_recently_changed_state.empty()) {
+            auto host_info = this->hosts_that_have_recently_changed_state.at(0);
+            std::string hostname = std::get<0>(host_info);
+            bool new_state_is_on = std::get<1>(host_info);
+            bool new_state_is_off  = not new_state_is_on;
+            this->hosts_that_have_recently_changed_state.erase(this->hosts_that_have_recently_changed_state.begin());
+
+            HostStateChangeDetectorMessage *msg;
+
+            if (this->notify_when_turned_on && new_state_is_on) {
+                msg = new HostHasTurnedOnMessage(hostname);
+            } else if (this->notify_when_turned_off && new_state_is_off) {
+                msg = new HostHasTurnedOffMessage(hostname);
+            } else {
+                continue;
             }
+
+            WRENCH_INFO("Notifying mailbox '%s' that host '%s' has changed state", this->mailbox_to_notify.c_str(),
+                        hostname.c_str());
+            try {
+                S4U_Mailbox::dputMessage(this->mailbox_to_notify, msg);
+            } catch (std::shared_ptr<NetworkError> &e) {
+                WRENCH_INFO("Network error '%s' while notifying mailbox of a host state change ... ignoring",
+                            e->toString().c_str());
+            }
+
         }
 
-        if (this->notify_when_turned_off) {
-            while (not this->hosts_that_have_recently_turned_off.empty()) {
-                std::string hostname = this->hosts_that_have_recently_turned_off.at(0);
-                this->hosts_that_have_recently_turned_off.erase(this->hosts_that_have_recently_turned_off.begin());
-                WRENCH_INFO("Notifying mailbox '%s' that host '%s' has turned off", this->mailbox_to_notify.c_str(),
-                            hostname.c_str());
-                auto msg = new HostHasTurnedOffMessage(hostname);
-                try {
-                    S4U_Mailbox::dputMessage(this->mailbox_to_notify, msg);
-                } catch (std::shared_ptr<NetworkError> &e) {
-                    WRENCH_INFO("Network error '%s' while notying mailbox of a host turning off... ignoring",
-                                e->toString().c_str());
-                }
-            }
-        }
+//        // Hosts that turned on
+//        if (this->notify_when_turned_on) {
+//            while (not this->hosts_that_have_recently_turned_on.empty()) {
+//                std::string hostname = this->hosts_that_have_recently_turned_on.at(0);
+//                this->hosts_that_have_recently_turned_on.erase(this->hosts_that_have_recently_turned_on.begin());
+//                WRENCH_INFO("Notifying mailbox '%s' that host '%s' has turned on", this->mailbox_to_notify.c_str(),
+//                            hostname.c_str());
+//                auto msg = new HostHasTurnedOnMessage(hostname);
+//                try {
+//                    S4U_Mailbox::dputMessage(this->mailbox_to_notify, msg);
+//                } catch (std::shared_ptr<NetworkError> &e) {
+//                    WRENCH_INFO("Network error '%s' while notying mailbox of a host turning on... ignoring",
+//                                e->toString().c_str());
+//                }
+//            }
+//        }
+//
+//        // Hosts that turned off
+//        if (this->notify_when_turned_off) {
+//            while (not this->hosts_that_have_recently_turned_off.empty()) {
+//                std::string hostname = this->hosts_that_have_recently_turned_off.at(0);
+//                this->hosts_that_have_recently_turned_off.erase(this->hosts_that_have_recently_turned_off.begin());
+//                WRENCH_INFO("Notifying mailbox '%s' that host '%s' has turned off", this->mailbox_to_notify.c_str(),
+//                            hostname.c_str());
+//                auto msg = new HostHasTurnedOffMessage(hostname);
+//                try {
+//                    S4U_Mailbox::dputMessage(this->mailbox_to_notify, msg);
+//                } catch (std::shared_ptr<NetworkError> &e) {
+//                    WRENCH_INFO("Network error '%s' while notying mailbox of a host turning off... ignoring",
+//                                e->toString().c_str());
+//                }
+//            }
+//        }
     }
     return 0;
 }

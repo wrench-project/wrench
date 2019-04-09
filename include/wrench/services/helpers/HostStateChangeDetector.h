@@ -38,6 +38,8 @@ namespace wrench {
         std::string mailbox_to_notify;
         int main() override;
 
+        std::vector<std::pair<std::string, bool>> hosts_that_have_recently_changed_state;
+
         std::vector<std::string> hosts_that_have_recently_turned_on;
         std::vector<std::string> hosts_that_have_recently_turned_off;
 

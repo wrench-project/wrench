@@ -269,13 +269,7 @@ namespace wrench {
 */
     void S4U_Daemon::resume() {
         if ((this->s4u_actor != nullptr) && (not this->has_returned_from_main)) {
-            try {
-                this->s4u_actor->resume();
-            } catch (xbt_ex &e) {
-                throw std::shared_ptr<FatalFailure>(new FatalFailure());
-            } catch (std::exception &e) {
-                throw std::shared_ptr<FatalFailure>(new FatalFailure());
-            }
+            this->s4u_actor->resume();
         }
     }
 
