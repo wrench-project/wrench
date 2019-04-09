@@ -105,13 +105,32 @@ namespace wrench {
         /** \cond INTERNAL    **/
         /***********************/
 
-        virtual void
-        submitStandardJob(StandardJob *job, std::map<std::string, std::string> &service_specific_arguments) = 0;
+        /** 
+         * @brief Method to submit a standard job to the service
+         * 
+         * @param job: The job being submitted
+         * @param service_specific_arguments: the set of service-specific arguments
+         */
+        virtual void submitStandardJob(StandardJob *job, std::map<std::string, std::string> &service_specific_arguments) = 0;
 
+        /** 
+         * @brief Method to submit a pilot job to the service
+         * 
+         * @param job: The job being submitted
+         * @param service_specific_arguments: the set of service-specific arguments
+         */
         virtual void submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_arguments) = 0;
 
+        /**
+         * @brief Method to terminate a running standard job
+         * @param job: the standard job
+         */
         virtual void terminateStandardJob(StandardJob *job) = 0;
 
+        /**
+         * @brief Method to terminate a running pilot job
+         * @param job: the pilot job
+         */
         virtual void terminatePilotJob(PilotJob *job) = 0;
 
         ComputeService(const std::string &hostname,

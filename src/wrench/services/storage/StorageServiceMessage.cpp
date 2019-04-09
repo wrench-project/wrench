@@ -160,8 +160,10 @@ namespace wrench {
     * @param file: the file
     * @param src: the source storage service
     * @param src_partition: the file partition from where the file will be copied
+    * @param dst: the destination storage service
     * @param dst_partition: the file partition where the file will be stored
     * @param file_registry_service: the file registry service to update (nullptr if none)
+    * @param start_timestamp: the file copy start timestamp
     * @param payload: the message size in bytes
     *
     * @throw std::invalid_argument
@@ -197,9 +199,7 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param file: the file
-     * @param src: the source storage service
-     * @param src_partition: the source partition
-     * @param dst: the destination storage service
+     * @param storage_service: the destination storage service
      * @param dst_partition: the destination partition
      * @param file_registry_service: the file registry service to update (nullptr if none)
      * @param file_registry_service_updated: whether the file registry service was updated
@@ -238,6 +238,7 @@ namespace wrench {
     * @brief Constructor
     * @param answer_mailbox: the mailbox to which to send the answer
     * @param file: the file
+    * @param dst_partition: the destination partition
     * @param payload: the message size in bytes
     *
     * @throw std::invalid_argument

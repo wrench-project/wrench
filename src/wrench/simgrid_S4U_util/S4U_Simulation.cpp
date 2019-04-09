@@ -266,6 +266,8 @@ namespace wrench {
 
     /**
      * @brief Get the property associated to the host specified in the platform file
+     * @param hostname: the host name
+     * @param property_name: the property name
      * @return a string relating to the property specified in the platform file
      */
     std::string S4U_Simulation::getHostProperty(std::string hostname, std::string property_name) {
@@ -275,7 +277,7 @@ namespace wrench {
 
     /**
      * @brief Get the energy consumed by the host up to now
-     * @param hostname the host name
+     * @param hostname: the host name
      * @return the energy consumed by the host in Joules
      * @throw std::runtime_error
      */
@@ -294,7 +296,7 @@ namespace wrench {
 
     /**
      * @brief Get the total energy consumed by a set of hosts
-     * @param the list of hostnames
+     * @param hostnames: the list of hostnames
      * @return The total energy consumed by all the hosts in Joules
      * @throw std::runtime_error
      */

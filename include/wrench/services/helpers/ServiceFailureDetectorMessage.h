@@ -38,6 +38,7 @@ namespace wrench {
     public:
         explicit ServiceHasCrashedMessage(Service *service);
 
+        /** @brief The service that has crashed */
         Service *service;
     };
 

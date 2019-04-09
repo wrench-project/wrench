@@ -29,6 +29,7 @@ namespace wrench {
      * @param message_size the size of the message to be sent between network daemons to compute proximity
      * @param measurement_period the time-difference between two message transfer to compute proximity
      * @param noise the noise to add to compute the time-difference
+     * @param messagepayload_list: a message payload list
      */
     NetworkProximityDaemon::NetworkProximityDaemon(Simulation *simulation,
                                                    std::string hostname,

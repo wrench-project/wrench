@@ -104,7 +104,7 @@ namespace wrench {
         /***********************/
         /** \cond DEVELOPER   **/
         /***********************/
-        std::map<std::string,double> getStartTimeEstimates(std::set<std::tuple<std::string,unsigned int,unsigned int, double>>);
+        std::map<std::string,double> getStartTimeEstimates(std::set<std::tuple<std::string,unsigned int,unsigned int, double>> resources);
 
         /***********************/
         /** \endcond          **/

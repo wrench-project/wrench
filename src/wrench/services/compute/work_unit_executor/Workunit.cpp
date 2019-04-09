@@ -75,9 +75,10 @@ namespace wrench {
     }
 
     /**
- * @brief Create all work for a newly dispatched job
- * @param job: the job
- */
+     * @brief Create all work units for a newly dispatched job
+     * @param job: the job
+     * @return A set of work units
+     */
     std::set<std::shared_ptr<Workunit>> Workunit::createWorkunits(StandardJob *job) {
 
       std::shared_ptr<Workunit> pre_file_copies_work_unit = nullptr;

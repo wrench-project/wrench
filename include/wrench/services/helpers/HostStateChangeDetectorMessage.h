@@ -36,6 +36,7 @@ namespace wrench {
     class HostHasTurnedOnMessage : public HostStateChangeDetectorMessage {
     public:
         explicit HostHasTurnedOnMessage(std::string hostname);
+        /** @brief The name of the host that has tuned on */
         std::string hostname;
     };
 
@@ -45,6 +46,7 @@ namespace wrench {
     class HostHasTurnedOffMessage : public HostStateChangeDetectorMessage {
     public:
         explicit HostHasTurnedOffMessage(std::string hostname);
+        /** @brief The name of the host that has tuned off */
         std::string hostname;
     };
 

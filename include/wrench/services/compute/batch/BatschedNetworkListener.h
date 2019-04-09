@@ -29,8 +29,9 @@ namespace wrench {
 
     public:
 
-        BatschedNetworkListener(std::string hostname, BatchService *batch_service, std::string batch_service_mailbox, std::string sched_port,
-                             std::string data_to_send,std::map<std::string, std::string> property_list = {});
+        BatschedNetworkListener(std::string hostname, BatchService *batch_service, 
+                                std::string batch_service_mailbox, std::string sched_port,
+                                std::string data_to_send,std::map<std::string, std::string> property_list = {});
 
 
     private:

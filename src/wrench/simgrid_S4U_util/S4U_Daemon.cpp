@@ -107,7 +107,7 @@ namespace wrench {
      *        is naturally tolerant.
      *
      * @param has_terminated_cleanly: whether the daemon returned from main() by itself
-     * @param exit_code: the return value from main (if has_terminated_cleanly is true)
+     * @param return_value: the return value from main (if has_terminated_cleanly is true)
      *
      * @throw std::runtime_error
      */
