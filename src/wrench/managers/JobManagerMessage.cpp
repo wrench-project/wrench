@@ -21,6 +21,12 @@ namespace wrench {
     }
 
 
+    /**
+     * @brief Constructor 
+     * @param job: the job that is done
+     * @param compute_service: the ComputeService on which it ran 
+     * @param necessary_state_changes: necessary task state changes
+     */
     JobManagerStandardJobDoneMessage::JobManagerStandardJobDoneMessage(StandardJob *job,
                                                                        ComputeService *compute_service,
                                                                        std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes) :
@@ -30,6 +36,14 @@ namespace wrench {
       this->necessary_state_changes = necessary_state_changes;
     }
 
+    /**
+     * @brief Constructor 
+     * @param job: the job that has failed
+     * @param compute_service: the ComputeService on which it ran 
+     * @param necessary_state_changes: necessary task state changes
+     * @param necessary_failure_count_increments: necessary task failure count increments
+     * @param cause: the cause of the failure
+     */
     JobManagerStandardJobFailedMessage::JobManagerStandardJobFailedMessage(StandardJob *job,
                                                                            ComputeService *compute_service,
                                                                            std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes,

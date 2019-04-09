@@ -155,7 +155,9 @@ namespace wrench {
      * @brief Ask the data manager to perform a synchronous file copy
      * @param file: the file to copy
      * @param src: the source storage service
+     * @param src_partition: the partition on the source storage service
      * @param dst: the destination storage service
+     * @param dst_partition: the partition on the destination storage service
      * @param file_registry_service: a file registry service to update once the file copy has (successfully) completed (none if nullptr)
      *
      * @throw std::invalid_argument

@@ -56,6 +56,7 @@ namespace wrench {
      *              - If memory == ComputeService::ALL_RAM, then ALL the ram of the host is used
      * @param scratch_space: the usable scratch storage space  (or nullptr if none)
      * @param part_of_pilot_job: true if the job executor is running within a pilot job
+     * @param parent_pilot_job: the parent pilog job, if any
      * @param property_list: a property list
      * @param messagepayload_list: a message payload list
      *
@@ -242,6 +243,7 @@ namespace wrench {
 
     /**
      * @brief Kill the executor
+     * @param job_termination: true if the job was terminated by the submitted, false otherwise
      */
     void StandardJobExecutor::kill(bool job_termination) {
 

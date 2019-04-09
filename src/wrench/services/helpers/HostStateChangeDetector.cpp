@@ -25,6 +25,15 @@ void wrench::HostStateChangeDetector::cleanup(bool has_terminated_cleanly, int r
 
 
 
+/**
+ * @brief Constructor
+ * @param host_on_which_to_run: hosts on which this service runs
+ * @param hosts_to_monitor: the list of hosts to monitor
+ * @param notify_when_turned_on: whether to send a notifications when hosts turn on
+ * @param notify_when_turned_off: whether to send a notifications when hosts turn off
+ * @param mailbox_to_notify: the mailbox to notify
+ *
+ */
 wrench::HostStateChangeDetector::HostStateChangeDetector(std::string host_on_which_to_run,
                                                          std::vector<std::string> hosts_to_monitor,
                                                          bool notify_when_turned_on, bool notify_when_turned_off,

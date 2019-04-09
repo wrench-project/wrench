@@ -46,7 +46,7 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param task: a pointer to the WorkflowTask associated with this timestamp
-     * @throw: std::invalid_argument
+     * @throw std::invalid_argument
      */
     SimulationTimestampTask::SimulationTimestampTask(WorkflowTask *task) : task(task) {
         if (task == nullptr) {
@@ -169,6 +169,7 @@ namespace wrench {
      * @param src_partition: the partition in the source StorageService from which this file is being copied
      * @param dst: the destination StorageService where this file will be copied
      * @param dst_partition: the partition in the destination StorageService where this file will be copied
+     * @param start_timestamp: the timestamp for the file copy start
      */
     SimulationTimestampFileCopy::SimulationTimestampFileCopy(WorkflowFile *file, StorageService *src, std::string src_partition, StorageService *dst, std::string dst_partition, SimulationTimestampFileCopyStart *start_timestamp) :
             SimulationTimestampPair(start_timestamp), file(file), source(FileLocation(src, src_partition)), destination(FileLocation(dst, dst_partition)) {

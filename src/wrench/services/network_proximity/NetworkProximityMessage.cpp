@@ -44,6 +44,7 @@ namespace wrench {
      * @brief Constructor
      * @param hosts: the pair of hosts that were looked up
      * @param proximity_value: the proximity value between the pair of hosts
+     * @param timestamp: the timestamp of the proximity value determination
      * @param payload: the message size in bytes
      */
     NetworkProximityLookupAnswerMessage::NetworkProximityLookupAnswerMessage(std::pair<std::string, std::string> hosts,
