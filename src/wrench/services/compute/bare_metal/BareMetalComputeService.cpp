@@ -274,7 +274,7 @@ namespace wrench {
      */
     BareMetalComputeService::BareMetalComputeService(
             const std::string &hostname,
-            std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
+            const std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
             double scratch_space_size,
             std::map<std::string, std::string> property_list,
             std::map<std::string, std::string> messagepayload_list
