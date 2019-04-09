@@ -17,7 +17,7 @@
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 
-#ifdef ENABLE_BATSCHED
+#ifdef ENABLE_BATSCHED // Only include these files below if Batsched is enabled
 
 #include <nlohmann/json.hpp>
 #include <zmq.hpp>
@@ -33,7 +33,7 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(batch_network_listener_service, "Log category for B
 
 namespace wrench {
 
-    #ifdef ENABLE_BATSCHED
+#ifdef ENABLE_BATSCHED // Only define methods if Batsched is enabled
 
     /**
     * @brief Constructor
@@ -87,7 +87,6 @@ namespace wrench {
      */
     int BatschedNetworkListener::main() {
 
-      #ifdef ENABLE_BATSCHED
       TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_CYAN);
 
       WRENCH_INFO("Starting");
@@ -101,9 +100,6 @@ namespace wrench {
 
       WRENCH_INFO("Batch Network Listener Service on host %s terminating!", S4U_Simulation::getHostName().c_str());
       return 0;
-      #else
-      throw std::runtime_error("BatschedNetworkListener::main(): This should not be called unless ENABLE_BATSCHED is set to on!");
-      #endif
     }
 
     /**
@@ -202,6 +198,6 @@ namespace wrench {
 
 
     }
-    #endif
+    #endif // ENABLE_BATSCHED
 
 }
