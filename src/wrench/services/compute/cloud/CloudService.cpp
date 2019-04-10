@@ -17,6 +17,8 @@
 #include "wrench/services/compute/cloud/CloudService.h"
 #include "wrench/services/compute/bare_metal/BareMetalComputeService.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
+#include "wrench/services/helpers/ServiceFailureDetector.h"
+
 
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(cloud_service, "Log category for Cloud Service");
@@ -568,6 +570,12 @@ namespace wrench {
             throw;
           }
 
+          // Creating a Failure Detector for the service
+          auto failure_detector = std::shared_ptr<ServiceFailureDetector>(
+                  new ServiceFailureDetector(this->hostname, cs, this->mailbox_name));
+          failure_detector->simulation = this->simulation;
+          failure_detector->start(failure_detector, true, false); // Daemonized, no auto-restart
+
           this->vm_list[vm_name] = std::make_tuple(vm, cs, num_cores, ram_memory);
 
           if (this->used_cores_per_execution_host.find(pm_hostname) == this->used_cores_per_execution_host.end()) {
@@ -679,6 +687,14 @@ namespace wrench {
           cs->simulation = this->simulation;
           cs->start(cs, true, false); // Daemonized, no auto-restart
           std::get<1>(vm_tuple->second) = cs;
+
+          // Creating a Failure Detector for the service
+          auto failure_detector = std::shared_ptr<ServiceFailureDetector>(
+                  new ServiceFailureDetector(this->hostname, cs, this->mailbox_name));
+          failure_detector->simulation = this->simulation;
+          failure_detector->start(failure_detector, true, false); // Daemonized, no auto-restart
+
+
 
         } catch (std::runtime_error &e) {
           throw;
