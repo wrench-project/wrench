@@ -290,6 +290,7 @@ set(TEST_FILES
         test/simulated_failures/ServiceStartReStart.cpp
         test/simulated_failures/FailureDetector.cpp
         test/simulated_failures/BareMetalComputeServiceFailures.cpp
+        test/simulated_failures/CloudComputeServiceFailures.cpp
         test/simulated_failures/StandardJobExecutorFailures.cpp
         test/simulated_failures/NetworkProximityFailures.cpp
         test/simulated_failures/test_util/HostSwitcher.cpp
