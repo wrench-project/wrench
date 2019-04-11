@@ -26,7 +26,7 @@
           },
           {
              "pstate":0,
-             "time":0.0
+             "time":2.0
           }
        ],
        "pstates":[
@@ -75,6 +75,10 @@
           {
              "pstate":0,
              "time":0.0
+          },
+          {
+             "pstate":1,
+             "time":2.0
           }
        ],
        "pstates":[
