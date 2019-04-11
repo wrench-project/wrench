@@ -8,8 +8,11 @@
  *
  */
 
+#include "wrench/logging/TerminalOutput.h"
 #include "wrench/simgrid_S4U_util/S4U_VirtualMachine.h"
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
+
+XBT_LOG_NEW_DEFAULT_CATEGORY(s4u_virtual_machine, "Log category for S4U_VirtualMachine");
 
 namespace wrench {
 
@@ -29,6 +32,7 @@ namespace wrench {
                                                     (int)num_cores,
                                                     (size_t)ram_memory);
 
+        WRENCH_INFO("Starting VM %s on Physical host %s", vm_hostname.c_str(), pm_hostname.c_str());
         // Henri commented out the call below because The RAM size is passed to the constructor above...
         // this->vm->set_ramsize((size_t)ram_memory);
         start();
