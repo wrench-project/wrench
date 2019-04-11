@@ -16,7 +16,7 @@
 namespace wrench {
 
     /**
-     * @brief A service that detects and reports on host state changed (turned on, turned off)
+     * @brief A service that detects and reports on host state changes (turned on, turned off)
      */
     class HostStateChangeDetector : public Service {
 
@@ -30,7 +30,7 @@ namespace wrench {
     private:
 
         void cleanup(bool has_terminated_cleanly, int return_value) override;
-        void hostChangeCallback(simgrid::s4u::Host const &h);
+        void hostChangeCallback(std::string const &name, bool is_on, std::string message);
 
         std::vector<std::string> hosts_to_monitor;
         bool notify_when_turned_on;

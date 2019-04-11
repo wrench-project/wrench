@@ -18,10 +18,10 @@
 #include "test_util/SleeperVictim.h"
 #include "test_util/HostRandomRepeatSwitcher.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(cloud_compute_service_simulated_failures_test, "Log category for CloudComputeServiceSimulatedFailuresTests");
+XBT_LOG_NEW_DEFAULT_CATEGORY(cloud_compute_service_simulated_failures_test, "Log category for CloudServiceSimulatedFailuresTests");
 
 
-class CloudComputeServiceSimulatedFailuresTest : public ::testing::Test {
+class CloudServiceSimulatedFailuresTest : public ::testing::Test {
 
 public:
     wrench::Workflow *workflow;
@@ -33,13 +33,13 @@ public:
     wrench::StorageService *storage_service = nullptr;
     wrench::ComputeService *compute_service = nullptr;
 
-    void do_CloudComputeServiceOneFailureCausingWorkUnitRestartOnAnotherHost_test();
-    void do_CloudComputeServiceOneFailureCausingWorkUnitRestartOnSameHost_test();
-    void do_CloudComputeServiceRandomFailures_test();
+    void do_CloudServiceOneFailureCausingWorkUnitRestartOnAnotherHost_test();
+    void do_CloudServiceOneFailureCausingWorkUnitRestartOnSameHost_test();
+    void do_CloudServiceRandomFailures_test();
 
 protected:
 
-    CloudComputeServiceSimulatedFailuresTest() {
+    CloudServiceSimulatedFailuresTest() {
         // Create the simplest workflow
         workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
         workflow = workflow_unique_ptr.get();
@@ -86,10 +86,10 @@ protected:
 /**                FAIL OVER TO SECOND HOST  TEST                    **/
 /**********************************************************************/
 
-class CloudComputeServiceOneFailureCausingWorkUnitRestartOnAnotherHostTestWMS : public wrench::WMS {
+class CloudServiceOneFailureCausingWorkUnitRestartOnAnotherHostTestWMS : public wrench::WMS {
 
 public:
-    CloudComputeServiceOneFailureCausingWorkUnitRestartOnAnotherHostTestWMS(CloudComputeServiceSimulatedFailuresTest *test,
+    CloudServiceOneFailureCausingWorkUnitRestartOnAnotherHostTestWMS(CloudServiceSimulatedFailuresTest *test,
                                                                                 std::string &hostname, wrench::ComputeService *cs, wrench::StorageService *ss) :
             wrench::WMS(nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -97,7 +97,7 @@ public:
 
 private:
 
-    CloudComputeServiceSimulatedFailuresTest *test;
+    CloudServiceSimulatedFailuresTest *test;
 
     int main() override {
 
@@ -106,11 +106,17 @@ private:
         murderer->simulation = this->simulation;
         murderer->start(murderer, true, false); // Daemonized, no auto-restart
 
-        // Starting a FailedHost1 resurector!!
+//        // Starting a FailedHost1 resurector!!
         auto resurector = std::shared_ptr<wrench::HostSwitcher>(new wrench::HostSwitcher("StableHost", 1000, "FailedHost1", wrench::HostSwitcher::Action::TURN_ON));
         resurector->simulation = this->simulation;
         resurector->start(resurector, true, false); // Daemonized, no auto-restart
 
+
+        // Create a VM on the Cloud Service
+        auto cloud_service = (wrench::CloudService *)this->test->compute_service;
+        cloud_service->createVM(1, wrench::ComputeService::ALL_RAM);
+
+        wrench::Simulation::sleep(10000);
 
         // Create a job manager
         std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
@@ -142,14 +148,14 @@ private:
 };
 
 #if ((SIMGRID_VERSION_MAJOR == 3) && (SIMGRID_VERSION_MINOR == 22)) || ((SIMGRID_VERSION_MAJOR == 3) && (SIMGRID_VERSION_MINOR == 21) && (SIMGRID_VERSION_PATCH > 0))
-TEST_F(CloudComputeServiceSimulatedFailuresTest, OneFailureCausingWorkUnitRestartOnAnotherHost) {
+TEST_F(CloudServiceSimulatedFailuresTest, OneFailureCausingWorkUnitRestartOnAnotherHost) {
 #else
-    TEST_F(CloudComputeServiceSimulatedFailuresTest, DISABLED_OneFailureCausingWorkUnitRestartOnAnotherHost) {
+    TEST_F(CloudServiceSimulatedFailuresTest, DISABLED_OneFailureCausingWorkUnitRestartOnAnotherHost) {
 #endif
-    DO_TEST_WITH_FORK(do_CloudComputeServiceOneFailureCausingWorkUnitRestartOnAnotherHost_test);
+    DO_TEST_WITH_FORK(do_CloudServiceOneFailureCausingWorkUnitRestartOnAnotherHost_test);
 }
 
-void CloudComputeServiceSimulatedFailuresTest::do_CloudComputeServiceOneFailureCausingWorkUnitRestartOnAnotherHost_test() {
+void CloudServiceSimulatedFailuresTest::do_CloudServiceOneFailureCausingWorkUnitRestartOnAnotherHost_test() {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
@@ -165,14 +171,14 @@ void CloudComputeServiceSimulatedFailuresTest::do_CloudComputeServiceOneFailureC
 
     // Get a hostname
     std::string stable_host = "StableHost";
+    std::vector<std::string> compute_hosts;
+    compute_hosts.push_back("FailedHost1");
+//    compute_hosts.push_back("FailedHost2");
 
     // Create a Compute Service that has access to two hosts
     compute_service = simulation->add(
-            new wrench::CloudComputeService(stable_host,
-                                                (std::map<std::string, std::tuple<unsigned long, double>>){
-                                                        std::make_pair("FailedHost1", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)),
-                                                        std::make_pair("FailedHost2", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))
-                                                },
+            new wrench::CloudService(stable_host,
+                                                compute_hosts,
                                                 100.0,
                                                 {}));
 
@@ -181,7 +187,7 @@ void CloudComputeServiceSimulatedFailuresTest::do_CloudComputeServiceOneFailureC
 
     // Create a WMS
     wrench::WMS *wms = nullptr;
-    wms = simulation->add(new CloudComputeServiceOneFailureCausingWorkUnitRestartOnAnotherHostTestWMS(this, stable_host, compute_service, storage_service));
+    wms = simulation->add(new CloudServiceOneFailureCausingWorkUnitRestartOnAnotherHostTestWMS(this, stable_host, compute_service, storage_service));
 
     wms->addWorkflow(workflow);
 
@@ -205,10 +211,10 @@ void CloudComputeServiceSimulatedFailuresTest::do_CloudComputeServiceOneFailureC
 /**                    RESTART ON SAME HOST                          **/
 /**********************************************************************/
 
-class CloudComputeServiceOneFailureCausingWorkUnitRestartOnSameHostTestWMS : public wrench::WMS {
+class CloudServiceOneFailureCausingWorkUnitRestartOnSameHostTestWMS : public wrench::WMS {
 
 public:
-    CloudComputeServiceOneFailureCausingWorkUnitRestartOnSameHostTestWMS(CloudComputeServiceSimulatedFailuresTest *test,
+    CloudServiceOneFailureCausingWorkUnitRestartOnSameHostTestWMS(CloudServiceSimulatedFailuresTest *test,
                                                                              std::string &hostname, wrench::ComputeService *cs, wrench::StorageService *ss) :
             wrench::WMS(nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -216,7 +222,7 @@ public:
 
 private:
 
-    CloudComputeServiceSimulatedFailuresTest *test;
+    CloudServiceSimulatedFailuresTest *test;
 
     int main() override {
 
@@ -259,14 +265,14 @@ private:
 };
 
 #if ((SIMGRID_VERSION_MAJOR == 3) && (SIMGRID_VERSION_MINOR == 22)) || ((SIMGRID_VERSION_MAJOR == 3) && (SIMGRID_VERSION_MINOR == 21) && (SIMGRID_VERSION_PATCH > 0))
-TEST_F(CloudComputeServiceSimulatedFailuresTest, OneFailureCausingWorkUnitRestartOnSameHost) {
+TEST_F(CloudServiceSimulatedFailuresTest, OneFailureCausingWorkUnitRestartOnSameHost) {
 #else
-    TEST_F(CloudComputeServiceSimulatedFailuresTest, DISABLED_OneFailureCausingWorkUnitRestartOnSameHost) {
+    TEST_F(CloudServiceSimulatedFailuresTest, DISABLED_OneFailureCausingWorkUnitRestartOnSameHost) {
 #endif
-    DO_TEST_WITH_FORK(do_CloudComputeServiceOneFailureCausingWorkUnitRestartOnSameHost_test);
+    DO_TEST_WITH_FORK(do_CloudServiceOneFailureCausingWorkUnitRestartOnSameHost_test);
 }
 
-void CloudComputeServiceSimulatedFailuresTest::do_CloudComputeServiceOneFailureCausingWorkUnitRestartOnSameHost_test() {
+void CloudServiceSimulatedFailuresTest::do_CloudServiceOneFailureCausingWorkUnitRestartOnSameHost_test() {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
@@ -285,7 +291,7 @@ void CloudComputeServiceSimulatedFailuresTest::do_CloudComputeServiceOneFailureC
 
     // Create a Compute Service that has access to two hosts
     compute_service = simulation->add(
-            new wrench::CloudComputeService(stable_host,
+            new wrench::CloudService(stable_host,
                                                 (std::map<std::string, std::tuple<unsigned long, double>>){
                                                         std::make_pair("FailedHost1", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)),
                                                 },
@@ -297,7 +303,7 @@ void CloudComputeServiceSimulatedFailuresTest::do_CloudComputeServiceOneFailureC
 
     // Create a WMS
     wrench::WMS *wms = nullptr;
-    wms = simulation->add(new CloudComputeServiceOneFailureCausingWorkUnitRestartOnSameHostTestWMS(this, stable_host, compute_service, storage_service));
+    wms = simulation->add(new CloudServiceOneFailureCausingWorkUnitRestartOnSameHostTestWMS(this, stable_host, compute_service, storage_service));
 
     wms->addWorkflow(workflow);
 
@@ -319,10 +325,10 @@ void CloudComputeServiceSimulatedFailuresTest::do_CloudComputeServiceOneFailureC
 /**                    RANDOM FAILURES                               **/
 /**********************************************************************/
 
-class CloudComputeServiceRandomFailuresTestWMS : public wrench::WMS {
+class CloudServiceRandomFailuresTestWMS : public wrench::WMS {
 
 public:
-    CloudComputeServiceRandomFailuresTestWMS(CloudComputeServiceSimulatedFailuresTest *test,
+    CloudServiceRandomFailuresTestWMS(CloudServiceSimulatedFailuresTest *test,
                                                  std::string &hostname, wrench::ComputeService *cs, wrench::StorageService *ss) :
             wrench::WMS(nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -330,7 +336,7 @@ public:
 
 private:
 
-    CloudComputeServiceSimulatedFailuresTest *test;
+    CloudServiceSimulatedFailuresTest *test;
 
     int main() override {
 
@@ -388,14 +394,14 @@ private:
 };
 
 #if ((SIMGRID_VERSION_MAJOR == 3) && (SIMGRID_VERSION_MINOR == 22)) || ((SIMGRID_VERSION_MAJOR == 3) && (SIMGRID_VERSION_MINOR == 21) && (SIMGRID_VERSION_PATCH > 0))
-TEST_F(CloudComputeServiceSimulatedFailuresTest, RandomFailures) {
+TEST_F(CloudServiceSimulatedFailuresTest, RandomFailures) {
 #else
-    TEST_F(CloudComputeServiceSimulatedFailuresTest, DISABLED_RandomFailures) {
+    TEST_F(CloudServiceSimulatedFailuresTest, DISABLED_RandomFailures) {
 #endif
-    DO_TEST_WITH_FORK(do_CloudComputeServiceRandomFailures_test);
+    DO_TEST_WITH_FORK(do_CloudServiceRandomFailures_test);
 }
 
-void CloudComputeServiceSimulatedFailuresTest::do_CloudComputeServiceRandomFailures_test() {
+void CloudServiceSimulatedFailuresTest::do_CloudServiceRandomFailures_test() {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
@@ -413,7 +419,7 @@ void CloudComputeServiceSimulatedFailuresTest::do_CloudComputeServiceRandomFailu
 
     // Create a Compute Service that has access to two hosts
     compute_service = simulation->add(
-            new wrench::CloudComputeService(stable_host,
+            new wrench::CloudService(stable_host,
                                                 (std::map<std::string, std::tuple<unsigned long, double>>){
                                                         std::make_pair("FailedHost1", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)),
                                                         std::make_pair("FailedHost2", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)),
@@ -426,7 +432,7 @@ void CloudComputeServiceSimulatedFailuresTest::do_CloudComputeServiceRandomFailu
 
     // Create a WMS
     wrench::WMS *wms = nullptr;
-    wms = simulation->add(new CloudComputeServiceRandomFailuresTestWMS(this, stable_host, compute_service, storage_service));
+    wms = simulation->add(new CloudServiceRandomFailuresTestWMS(this, stable_host, compute_service, storage_service));
 
     wms->addWorkflow(workflow);
 
