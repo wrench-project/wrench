@@ -12,6 +12,7 @@
 #define WRENCH_CLOUDSERVICEMESSAGE_H
 
 #include <vector>
+#include <wrench/services/compute/bare_metal/BareMetalComputeService.h>
 
 #include "wrench/services/compute/ComputeServiceMessage.h"
 
@@ -59,7 +60,6 @@ namespace wrench {
     class CloudServiceCreateVMRequestMessage : public CloudServiceMessage {
     public:
         CloudServiceCreateVMRequestMessage(const std::string &answer_mailbox,
-                                           const std::string &pm_hostname,
                                            const std::string &vm_hostname,
                                            unsigned long num_cores,
                                            double ram_memory,
@@ -70,8 +70,6 @@ namespace wrench {
     public:
         /** @brief The mailbox to which the answer message should be sent */
         std::string answer_mailbox;
-        /** @brief The name of the physical machine host */
-        std::string pm_hostname;
         /** @brief The name of the new VM host */
         std::string vm_hostname;
         /** @brief The number of cores the service can use (0 means "use as many as there are cores on the host") */
@@ -89,10 +87,14 @@ namespace wrench {
      */
     class CloudServiceCreateVMAnswerMessage : public CloudServiceMessage {
     public:
-        CloudServiceCreateVMAnswerMessage(bool success, double payload);
+        CloudServiceCreateVMAnswerMessage(bool success, std::shared_ptr<BareMetalComputeService> cs, std::shared_ptr<FailureCause> failure_cause, double payload);
 
         /** @brief Whether the VM creation was successful or not */
         bool success;
+        /** @brief The BareMetalComputeService that runs on the VM */
+        std::shared_ptr<BareMetalComputeService> cs;
+        /** @brief The cause of the failure, or nullptr on success */
+        std::shared_ptr<FailureCause> failure_cause;
     };
 
     /**

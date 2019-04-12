@@ -41,8 +41,6 @@ public:
 
     void do_VMMigrationTest_test();
 
-    void do_PilotJobTaskTest_test();
-
     void do_NumCoresTest_test();
 
     void do_StopAllVMsTest_test();
@@ -131,11 +129,21 @@ private:
     VirtualizedClusterServiceTest *test;
 
     int main() {
+      auto cs = (wrench::CloudService *) this->test->compute_service;
+
       // Create a data movement manager
       std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
 
       // Create a job manager
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+
+      // Create a VM
+      std::pair<std::string, std::shared_ptr<wrench::BareMetalComputeService>> vm;
+      try {
+        vm = cs->createVM(2, 10);
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error(e.what());
+      }
 
       // Create a 2-task job
       wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {},
@@ -144,12 +152,9 @@ private:
                                                                                           wrench::ComputeService::SCRATCH)},
                                                                          {}, {});
 
-
       // Submit the 2-task job for execution
       try {
-        auto cs = (wrench::CloudService *) this->test->compute_service;
-        cs->createVM(2, 10);
-        job_manager->submitJob(two_task_job, this->test->compute_service);
+        job_manager->submitJob(two_task_job, vm.second.get());
       } catch (wrench::WorkflowExecutionException &e) {
         throw std::runtime_error(e.what());
       }
@@ -396,7 +401,7 @@ private:
 
         // create a VM with the PM number of cores
         auto cs = (wrench::CloudService *) this->test->compute_service;
-        cs->createVM(0, 10);
+        cs->createVM(wrench::ComputeService::ALL_CORES, 10);
         num_cores = cs->getNumCores();
         sum_num_cores = 0;
         for (auto const &c : num_cores) {

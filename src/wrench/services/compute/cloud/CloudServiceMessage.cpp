@@ -36,12 +36,12 @@ namespace wrench {
             "GET_EXECUTION_HOSTS_REQUEST",
             payload) {
 
-      if (answer_mailbox.empty()) {
-        throw std::invalid_argument(
-                "CloudServiceGetExecutionHostsRequestMessage::CloudServiceGetExecutionHostsRequestMessage(): "
-                "Invalid arguments");
-      }
-      this->answer_mailbox = answer_mailbox;
+        if (answer_mailbox.empty()) {
+            throw std::invalid_argument(
+                    "CloudServiceGetExecutionHostsRequestMessage::CloudServiceGetExecutionHostsRequestMessage(): "
+                    "Invalid arguments");
+        }
+        this->answer_mailbox = answer_mailbox;
     }
 
     /**
@@ -58,7 +58,6 @@ namespace wrench {
      * @brief Constructor
      *
      * @param answer_mailbox: the mailbox to which to send the answer
-     * @param pm_hostname: the name of the physical machine host
      * @param vm_hostname: the name of the new VM host
      * @param num_cores: the number of cores the service can use (use ComputeService::ALL_CORES to use all cores
      *                   available on the host)
@@ -72,7 +71,6 @@ namespace wrench {
      */
     CloudServiceCreateVMRequestMessage::CloudServiceCreateVMRequestMessage(
             const std::string &answer_mailbox,
-            const std::string &pm_hostname,
             const std::string &vm_hostname,
             unsigned long num_cores,
             double ram_memory,
@@ -83,25 +81,28 @@ namespace wrench {
             num_cores(num_cores), ram_memory(ram_memory),
             property_list(property_list), messagepayload_list(messagepayload_list) {
 
-      if (answer_mailbox.empty() || pm_hostname.empty() || vm_hostname.empty()) {
+        if (answer_mailbox.empty() || vm_hostname.empty()) {
 //        std::cerr << answer_mailbox << " - " << pm_hostname << " - " << vm_hostname << std::endl;
-        throw std::invalid_argument(
-                "CloudServiceCreateVMRequestMessage::CloudServiceCreateVMRequestMessage(): Invalid arguments");
-      }
-      this->answer_mailbox = answer_mailbox;
-      this->pm_hostname = pm_hostname;
-      this->vm_hostname = vm_hostname;
+            throw std::invalid_argument(
+                    "CloudServiceCreateVMRequestMessage::CloudServiceCreateVMRequestMessage(): Invalid arguments");
+        }
+        this->answer_mailbox = answer_mailbox;
+        this->vm_hostname = vm_hostname;
     }
 
     /**
      * @brief Constructor
      *
      * @param success: whether the VM creation was successful or not
+     * @param cs: the BareMetalComputeService that rusn on the VM (nullptr if success == false)
+     * @param failure_cause: the cause of the failure (or nullptr if success)
      * @param payload: the message size in bytes
      */
     CloudServiceCreateVMAnswerMessage::CloudServiceCreateVMAnswerMessage(bool success,
+                                                                         std::shared_ptr<BareMetalComputeService> cs,
+                                                                         std::shared_ptr<FailureCause> failure_cause,
                                                                          double payload) :
-            CloudServiceMessage("CREATE_VM_ANSWER", payload), success(success) {}
+            CloudServiceMessage("CREATE_VM_ANSWER", payload), success(success), cs(cs), failure_cause(failure_cause) {}
 
     /**
      * @brief Constructor
@@ -118,12 +119,12 @@ namespace wrench {
             double payload) :
             CloudServiceMessage("SHUTDOWN_VM_REQUEST", payload) {
 
-      if (answer_mailbox.empty() || vm_hostname.empty()) {
-        throw std::invalid_argument(
-                "CloudServiceShutdownVMRequestMessage::CloudServiceShutdownVMRequestMessage(): Invalid arguments");
-      }
-      this->answer_mailbox = answer_mailbox;
-      this->vm_hostname = vm_hostname;
+        if (answer_mailbox.empty() || vm_hostname.empty()) {
+            throw std::invalid_argument(
+                    "CloudServiceShutdownVMRequestMessage::CloudServiceShutdownVMRequestMessage(): Invalid arguments");
+        }
+        this->answer_mailbox = answer_mailbox;
+        this->vm_hostname = vm_hostname;
     }
 
     /**
@@ -151,12 +152,12 @@ namespace wrench {
             double payload) :
             CloudServiceMessage("START_VM_REQUEST", payload) {
 
-      if (answer_mailbox.empty() || vm_hostname.empty()) {
-        throw std::invalid_argument(
-                "CloudServiceStartVMRequestMessage::CloudServiceStartVMRequestMessage(): Invalid arguments");
-      }
-      this->answer_mailbox = answer_mailbox;
-      this->vm_hostname = vm_hostname;
+        if (answer_mailbox.empty() || vm_hostname.empty()) {
+            throw std::invalid_argument(
+                    "CloudServiceStartVMRequestMessage::CloudServiceStartVMRequestMessage(): Invalid arguments");
+        }
+        this->answer_mailbox = answer_mailbox;
+        this->vm_hostname = vm_hostname;
     }
 
     /**
@@ -184,12 +185,12 @@ namespace wrench {
             double payload) :
             CloudServiceMessage("SUSPEND_VM_REQUEST", payload) {
 
-      if (answer_mailbox.empty() || vm_hostname.empty()) {
-        throw std::invalid_argument(
-                "CloudServiceSuspendVMRequestMessage::CloudServiceSuspendVMRequestMessage(): Invalid arguments");
-      }
-      this->answer_mailbox = answer_mailbox;
-      this->vm_hostname = vm_hostname;
+        if (answer_mailbox.empty() || vm_hostname.empty()) {
+            throw std::invalid_argument(
+                    "CloudServiceSuspendVMRequestMessage::CloudServiceSuspendVMRequestMessage(): Invalid arguments");
+        }
+        this->answer_mailbox = answer_mailbox;
+        this->vm_hostname = vm_hostname;
     }
 
     /**
@@ -217,12 +218,12 @@ namespace wrench {
             double payload) :
             CloudServiceMessage("RESUME_VM_REQUEST", payload) {
 
-      if (answer_mailbox.empty() || vm_hostname.empty()) {
-        throw std::invalid_argument(
-                "CloudServiceResumeVMRequestMessage::CloudServiceResumeVMRequestMessage(): Invalid arguments");
-      }
-      this->answer_mailbox = answer_mailbox;
-      this->vm_hostname = vm_hostname;
+        if (answer_mailbox.empty() || vm_hostname.empty()) {
+            throw std::invalid_argument(
+                    "CloudServiceResumeVMRequestMessage::CloudServiceResumeVMRequestMessage(): Invalid arguments");
+        }
+        this->answer_mailbox = answer_mailbox;
+        this->vm_hostname = vm_hostname;
     }
 
     /**
