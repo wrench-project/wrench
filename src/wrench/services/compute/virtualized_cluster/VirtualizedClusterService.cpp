@@ -65,7 +65,7 @@ namespace wrench {
      *
      * @throw WorkflowExecutionException
      */
-    std::string VirtualizedClusterService::createVM(const std::string &pm_hostname,
+    std::pair<std::string, std::shared_ptr<BareMetalComputeService>> VirtualizedClusterService::createVM(const std::string &pm_hostname,
                                                     unsigned long num_cores,
                                                     double ram_memory,
                                                     std::map<std::string, std::string> property_list,
@@ -79,17 +79,18 @@ namespace wrench {
 
       std::unique_ptr<SimulationMessage> answer_message = sendRequest(
               answer_mailbox,
-              new CloudServiceCreateVMRequestMessage(
-                      answer_mailbox, vm_name,
+              new VirtualizedClusterServiceCreateVMRequestMessage(
+                      answer_mailbox, pm_hostname, vm_name,
                       num_cores, ram_memory, property_list, messagepayload_list,
                       this->getMessagePayloadValueAsDouble(
-                              CloudServiceMessagePayload::CREATE_VM_REQUEST_MESSAGE_PAYLOAD)));
+                              VirtualizedClusterServiceMessagePayload::CREATE_VM_REQUEST_MESSAGE_PAYLOAD)));
 
-      if (auto msg = dynamic_cast<CloudServiceCreateVMAnswerMessage *>(answer_message.get())) {
+      if (auto msg = dynamic_cast<VirtualizedClusterServiceCreateVMAnswerMessage *>(answer_message.get())) {
         if (msg->success) {
-          return vm_name;
+          return std::make_pair(vm_name, msg->cs);
+        } else {
+          throw WorkflowExecutionException(msg->failure_cause);
         }
-        return nullptr;
       } else {
         throw std::runtime_error("VirtualizedClusterService::createVM(): Unexpected [" + msg->getName() + "] message");
       }
@@ -190,8 +191,8 @@ namespace wrench {
         processGetExecutionHosts(msg->answer_mailbox);
         return true;
 
-      } else if (auto msg = dynamic_cast<CloudServiceCreateVMRequestMessage *>(message.get())) {
-        processCreateVM(msg->answer_mailbox, msg->vm_hostname, msg->num_cores, msg->ram_memory,
+      } else if (auto msg = dynamic_cast<VirtualizedClusterServiceCreateVMRequestMessage *>(message.get())) {
+        processCreateVM(msg->answer_mailbox, msg->pm_hostname, msg->vm_hostname, msg->num_cores, msg->ram_memory,
                         msg->property_list, msg->messagepayload_list);
         return true;
 
