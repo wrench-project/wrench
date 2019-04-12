@@ -523,6 +523,7 @@ namespace wrench {
             if (this->cs_available_ram.find(host) != this->cs_available_ram.end()) {
                 available_ram = this->cs_available_ram[host];
             }
+            WRENCH_INFO("---> %lf", available_ram);
             if ((requested_ram == ComputeService::ALL_RAM) && (available_ram < total_ram)) {
                 continue;
             } else if (available_ram < requested_ram) {
@@ -534,7 +535,6 @@ namespace wrench {
             auto num_available_cores = total_num_cores;
             if (this->used_cores_per_execution_host.find(host) != this->used_cores_per_execution_host.end()) {
                 num_available_cores -= this->used_cores_per_execution_host[host];
-                break;
             }
             if ((requested_num_cores == ComputeService::ALL_CORES) && (num_available_cores < total_num_cores)) {
                 continue;
