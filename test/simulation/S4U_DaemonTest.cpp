@@ -135,13 +135,13 @@ private:
       wrench::Simulation::sleep(10);
 
       // suspend the daemon
-      daemon->suspend();
+        daemon->suspendActor();
 
       // sleep another 10 seconds
       wrench::Simulation::sleep(20);
 
       // resume the daemon
-      daemon->resume();
+        daemon->resumeActor();
 
       // Join and check that we get to the right time
       daemon->join();

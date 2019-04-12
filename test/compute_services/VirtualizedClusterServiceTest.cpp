@@ -657,9 +657,10 @@ private:
       }
 
       wrench::Simulation::sleep(1);
-      // shutdown VMs
+      // shutdown all VMs
       try {
         for (auto &vm : vm_list) {
+            WRENCH_INFO("SHUTTING DOIWN VM '%s", vm.first.c_str());
           if (!cs->shutdownVM(vm.first)) {
             throw std::runtime_error("Unable to shutdown VM");
           }
@@ -684,20 +685,26 @@ private:
       }
 
 
+      // (Re)start VM #3
+     WRENCH_INFO("RESTARTING #3");
       try {
         cs->startVM(vm_list[3].first);
       } catch (std::runtime_error &e) {
         throw std::runtime_error(e.what());
       }
 
+      WRENCH_INFO("SUSPENDING #3");
       try {
         cs->suspendVM(vm_list[3].first);
+        WRENCH_INFO("SUBMITTING TO #3");
         job_manager->submitJob(job, vm_list[3].second.get());
         throw std::runtime_error("should have thrown an exception since there are no resources available");
       } catch (wrench::WorkflowExecutionException &e) {
+          WRENCH_INFO("GO THIS EXEPCTED EXCEPTION: %s", e.getCause()->toString().c_str());
         // do nothing, should have thrown an exception since there are no resources available
       }
 
+      WRENCH_INFO("RESUMING #3");
       try {
         if (!cs->resumeVM(vm_list[3].first)) {
           throw std::runtime_error("Could not resume the VM");
@@ -706,11 +713,16 @@ private:
         throw std::runtime_error(e.what());
       }
 
+      WRENCH_INFO("RESUMING AGAIN");
       if (cs->resumeVM(vm_list[3].first)) {
         throw std::runtime_error("VM was already resumed, so an exception was expected!");
       }
 
+      WRENCH_INFO("SU?BMITTING");
+
+
       job_manager->submitJob(job, vm_list[3].second.get());
+      WRENCH_INFO("SUBMITTED");
 
       // Wait for a workflow execution event
       std::unique_ptr<wrench::WorkflowExecutionEvent> event;

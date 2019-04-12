@@ -135,7 +135,7 @@ namespace wrench {
         std::unique_ptr<SimulationMessage> answer_message = sendRequest(
                 answer_mailbox,
                 new CloudServiceCreateVMRequestMessage(
-                        answer_mailbox, vm_name,
+                        answer_mailbox, "", vm_name,
                         num_cores, ram_memory, property_list, messagepayload_list,
                         this->getMessagePayloadValueAsDouble(
                                 CloudServiceMessagePayload::CREATE_VM_REQUEST_MESSAGE_PAYLOAD)));
@@ -159,8 +159,13 @@ namespace wrench {
      * @return Whether the VM shutdown succeeded
      *
      * @throw WorkflowExecutionException
+     * @throw std::invalid_argument
      */
     bool CloudService::shutdownVM(const std::string &vm_hostname) {
+
+        if (this->vm_list.find(vm_hostname) == this->vm_list.end()) {
+            throw std::invalid_argument("CloudService::shutdownVM(): Unknown VM name '" + vm_hostname + "'");
+        }
 
         // send a "shutdown vm" message to the daemon's mailbox_name
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("shutdown_vm");
@@ -187,8 +192,13 @@ namespace wrench {
      * @return Whether the VM start succeeded
      *
      * @throw WorkflowExecutionException
+     * @throw std::invalid_argument
      */
     bool CloudService::startVM(const std::string &vm_hostname) {
+
+        if (this->vm_list.find(vm_hostname) == this->vm_list.end()) {
+            throw std::invalid_argument("CloudService::startVM(): Unknown VM name '" + vm_hostname + "'");
+        }
 
         // send a "shutdown vm" message to the daemon's mailbox_name
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("start_vm");
@@ -215,8 +225,13 @@ namespace wrench {
      * @return Whether the VM suspend succeeded
      *
      * @throw WorkflowExecutionException
+     * @throw std::invalid_argument
      */
     bool CloudService::suspendVM(const std::string &vm_hostname) {
+
+        if (this->vm_list.find(vm_hostname) == this->vm_list.end()) {
+            throw std::invalid_argument("CloudService::suspendVM(): Unknown VM name '" + vm_hostname + "'");
+        }
 
         // send a "shutdown vm" message to the daemon's mailbox_name
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("suspend_vm");
@@ -243,8 +258,13 @@ namespace wrench {
      * @return Whether the VM resume succeeded
      *
      * @throw WorkflowExecutionException
+     * @throw std::invalid_argument
      */
     bool CloudService::resumeVM(const std::string &vm_hostname) {
+
+        if (this->vm_list.find(vm_hostname) == this->vm_list.end()) {
+            throw std::invalid_argument("CloudService::resumeVM(): Unknown VM name '" + vm_hostname + "'");
+        }
 
         // send a "shutdown vm" message to the daemon's mailbox_name
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("resume_vm");
@@ -272,9 +292,21 @@ namespace wrench {
      *        (if not provided, the service will pick the vm)
      *
      * @throw WorkflowExecutionException
+     * @throw std::invalid_argument
      * @throw std::runtime_error
      */
     void CloudService::submitStandardJob(StandardJob *job, std::map<std::string, std::string> &service_specific_args) {
+
+
+        for (auto const &arg : service_specific_args) {
+           if (arg.first != "-vm") {
+               throw std::invalid_argument("CloudService::submitStandardJob(): Invalid service-specific argument key '" + arg.first + "'");
+           }
+            if (this->vm_list.find(arg.second) == this->vm_list.end()) {
+                throw std::invalid_argument("CloudService::submitStandardJob(): In service-specific argument value: Unknown VM name '" + arg.second + "'");
+            }
+        }
+
 
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_standard_job");
 
@@ -308,6 +340,15 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void CloudService::submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_args) {
+
+        for (auto const &arg : service_specific_args) {
+            if (arg.first != "-vm") {
+                throw std::invalid_argument("CloudService::submitPilotJob(): Invalid service-specific argument key '" + arg.first + "'");
+            }
+            if (this->vm_list.find(arg.second) == this->vm_list.end()) {
+                throw std::invalid_argument("CloudService::submitPilotJob(): In service-specific argument value: Unknown VM name '" + arg.second + "'");
+            }
+        }
 
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_pilot_job");
 
@@ -617,7 +658,7 @@ namespace wrench {
 
             // Start the service
             try {
-                cs->start(cs, true, false); // Daemonized, no auto-restart
+                cs->start(cs, true, false); // Daemonized
             } catch (std::runtime_error &e) {
                 throw; // This shouldn't happen
             }
@@ -664,9 +705,10 @@ namespace wrench {
 
             auto cs = std::get<1>(vm_tuple->second);
             cs->stop();
+            // Commented this out to prevent the object from being freed!
+            // std::get<1>(vm_tuple->second) = nullptr;
             auto vm = std::get<0>(vm_tuple->second);
             vm->shutdown();
-            std::get<1>(vm_tuple->second) = nullptr;
 
             S4U_Mailbox::dputMessage(
                     answer_mailbox,
@@ -707,7 +749,10 @@ namespace wrench {
             try {
                 auto vm = std::get<0>(vm_tuple->second);
                 vm->start();
+                auto cs = std::get<1>(vm_tuple->second);
+                cs->start(cs, true, false);
 
+#ifdef NOT_NEEDED
                 // TODO: creating a BareMetal service would not be necessary once auto_restart will be available
                 // create a BareNetak compute service for the VM
                 std::map<std::string, std::tuple<unsigned long, double>> compute_resources = {
@@ -723,6 +768,7 @@ namespace wrench {
                 cs->simulation = this->simulation;
                 cs->start(cs, true, false); // Daemonized, no auto-restart
                 std::get<1>(vm_tuple->second) = cs;
+#endif
 
             } catch (std::runtime_error &e) {
                 throw;
@@ -765,7 +811,12 @@ namespace wrench {
                 return;
             }
 
-            std::shared_ptr<S4U_VirtualMachine> vm = std::get<0>(vm_tuple->second);
+            auto cs = std::get<1>(vm_tuple->second);
+            WRENCH_INFO("SUSPENDING THE CS '%s'", cs->getName().c_str());
+            cs->suspendActor();
+
+            WRENCH_INFO("SUSPENDING THE VM");
+            auto vm = std::get<0>(vm_tuple->second);
             vm->suspend();
 
             S4U_Mailbox::dputMessage(
@@ -793,7 +844,9 @@ namespace wrench {
             auto vm_tuple = this->vm_list.find(vm_hostname);
 
             if (vm_tuple != this->vm_list.end()) {
-                std::shared_ptr<S4U_VirtualMachine> vm = std::get<0>(vm_tuple->second);
+                auto cs = std::get<1>(vm_tuple->second);
+                cs->resumeActor();
+                auto vm = std::get<0>(vm_tuple->second);
                 if (vm->isSuspended()) {
                     vm->resume();
 

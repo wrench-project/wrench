@@ -214,6 +214,7 @@ namespace wrench {
       }
     }
 
+
     /**
      * @brief Synchronously stop the service (does nothing if the service is already stopped)
      *
@@ -259,6 +260,20 @@ namespace wrench {
 
       // Set the service state to down
       this->state = Service::DOWN;
+    }
+
+    /**
+     * @brief Suspend the service
+     */
+     void Service::suspend() {
+         ASDASDSADa
+     }
+
+    /**
+      * @brief Resume the service
+      */
+    void Service::resume() {
+        ASDASDSADa
     }
 
     /**
