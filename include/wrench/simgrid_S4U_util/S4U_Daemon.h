@@ -72,9 +72,9 @@ namespace wrench {
 
         std::pair<bool, int> join();
 
-        void suspend();
+        void suspendActor();
 
-        void resume();
+        void resumeActor();
 
         std::string getName();
 

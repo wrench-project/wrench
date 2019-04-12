@@ -82,7 +82,7 @@ namespace wrench {
 #define CLEAN_UP_MAILBOX_TO_AVOID_MEMORY_LEAK 0
 
     S4U_Daemon::~S4U_Daemon() {
-//        WRENCH_INFO("IN DAEMON DESTRUCTOR (%s)'", this->getName().c_str());
+        WRENCH_INFO("IN DAEMON DESTRUCTOR (%s)'", this->getName().c_str());
 
         /** The code below was to avoid a memory leak on the actor! However, weirdly,
          *  it now causes problems due to SimGrid complaining that on_exit() functions
@@ -147,6 +147,7 @@ namespace wrench {
 
         this->daemonized = daemonized;
         this->auto_restart = auto_restart;
+        this->has_returned_from_main = false;
 
         // Create the s4u_actor
         try {
@@ -184,6 +185,7 @@ namespace wrench {
                 // Free memory for the object unless the service is set to auto-restart
                 if (not daemon_object->isSetToAutoRestart()) {
                     delete daemon_object->life_saver;
+                    daemon_object->life_saver = nullptr;
                 }
                 return 0;
             });
@@ -250,24 +252,20 @@ namespace wrench {
     }
 
 /**
-* @brief Suspend the daemon/actor.
-*/
-    void S4U_Daemon::suspend() {
+ * @brief Suspend the daemon/actor.
+ */
+    void S4U_Daemon::suspendActor() {
+        WRENCH_INFO("IN SUSPEND: %p %d", this->s4u_actor.get(), this->has_returned_from_main);
         if ((this->s4u_actor != nullptr) && (not this->has_returned_from_main)) {
-            try {
-                this->s4u_actor->suspend();
-            } catch (xbt_ex &e) {
-                throw std::shared_ptr<FatalFailure>(new FatalFailure());
-            } catch (std::exception &e) {
-                throw std::shared_ptr<FatalFailure>(new FatalFailure());
-            }
+            WRENCH_INFO("SUSPENDING THE ACTOR");
+            this->s4u_actor->suspend();
         }
     }
 
 /**
-* @brief Resume the daemon/actor.
-*/
-    void S4U_Daemon::resume() {
+ * @brief Resume the daemon/actor.
+ */
+    void S4U_Daemon::resumeActor() {
         if ((this->s4u_actor != nullptr) && (not this->has_returned_from_main)) {
             this->s4u_actor->resume();
         }
