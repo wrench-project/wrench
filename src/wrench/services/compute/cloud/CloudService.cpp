@@ -17,8 +17,6 @@
 #include "wrench/services/compute/cloud/CloudService.h"
 #include "wrench/services/compute/bare_metal/BareMetalComputeService.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
-#include "wrench/services/helpers/ServiceFailureDetector.h"
-
 
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(cloud_service, "Log category for Cloud Service");
@@ -102,37 +100,28 @@ namespace wrench {
      * @brief Create a BareMetalComputeService VM (balances load on execution hosts)
      *
      * @param num_cores: the number of cores the VM can use (use ComputeService::ALL_CORES to use all cores
-     *                   available on the host)
-     * @param ram_memory: the VM's RAM memory capacity (use ComputeService::ALL_RAM to use all RAM available on the
+     *                   available on a physical host)
+     * @param ram_memory: the VM's RAM memory capacity (use ComputeService::ALL_RAM to use all RAM available on a physical
      *                    host, this can be lead to an out of memory issue)
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      *
-     * @return Virtual machine name
+     * @return A pair that contains the VM name and the BareMetalComputeService that runs on that VM
      *
      * @throw WorkflowExecutionException
+     * @throw std::runtime_error
      */
-    std::string CloudService::createVM(unsigned long num_cores,
-                                       double ram_memory,
-                                       std::map<std::string, std::string> property_list,
-                                       std::map<std::string, std::string> messagepayload_list) {
+    std::pair<std::string, std::shared_ptr<BareMetalComputeService>> CloudService::createVM(unsigned long num_cores,
+                                                                                            double ram_memory,
+                                                                                            std::map<std::string, std::string> property_list,
+                                                                                            std::map<std::string, std::string> messagepayload_list) {
 
-        // determine physical machine hostname
-        std::string pm_hostname;
-        unsigned long min_cores = ULONG_MAX;
-        for (auto &host : this->execution_hosts) {
-            if (this->used_cores_per_execution_host.find(host) == this->used_cores_per_execution_host.end()) {
-                pm_hostname = host;
-                break;
-            }
-            if (this->used_cores_per_execution_host[host] < min_cores) {
-                pm_hostname = host;
-                min_cores = this->used_cores_per_execution_host[host];
-            }
-        }
 
-        // vm host name
-        std::string vm_name = "vm" + std::to_string(CloudService::VM_ID++) + "_" + pm_hostname;
+        // Pick a VM hostname (and being paranoid about mistakenly picking an actual hostname!)
+        std::string vm_name;
+        do {
+            vm_name = this->getName() + "_vm" + std::to_string(CloudService::VM_ID++);
+        } while (simgrid::s4u::Host::by_name_or_null(vm_name) != nullptr);
 
         // send a "create vm" message to the daemon's mailbox_name
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("create_vm");
@@ -140,16 +129,17 @@ namespace wrench {
         std::unique_ptr<SimulationMessage> answer_message = sendRequest(
                 answer_mailbox,
                 new CloudServiceCreateVMRequestMessage(
-                        answer_mailbox, pm_hostname, vm_name,
+                        answer_mailbox, vm_name,
                         num_cores, ram_memory, property_list, messagepayload_list,
                         this->getMessagePayloadValueAsDouble(
                                 CloudServiceMessagePayload::CREATE_VM_REQUEST_MESSAGE_PAYLOAD)));
 
         if (auto msg = dynamic_cast<CloudServiceCreateVMAnswerMessage *>(answer_message.get())) {
             if (msg->success) {
-                return vm_name;
+                return  std::make_pair(vm_name, msg->cs);
+            } else {
+                throw WorkflowExecutionException(msg->failure_cause);
             }
-            return nullptr;
         } else {
             throw std::runtime_error("CloudService::createVM(): Unexpected [" + msg->getName() + "] message");
         }
@@ -446,7 +436,7 @@ namespace wrench {
             return true;
 
         } else if (auto msg = dynamic_cast<CloudServiceCreateVMRequestMessage *>(message.get())) {
-            processCreateVM(msg->answer_mailbox, msg->pm_hostname, msg->vm_hostname, msg->num_cores, msg->ram_memory,
+            processCreateVM(msg->answer_mailbox, msg->vm_hostname, msg->num_cores, msg->ram_memory,
                             msg->property_list, msg->messagepayload_list);
             return true;
 
@@ -473,6 +463,7 @@ namespace wrench {
         } else if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobRequestMessage *>(message.get())) {
             processSubmitPilotJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
             return true;
+
         } else {
             throw std::runtime_error("Unexpected [" + message->getName() + "] message");
         }
@@ -501,114 +492,133 @@ namespace wrench {
      * @brief Create a BareMetalComputeService VM on a physical machine
      *
      * @param answer_mailbox: the mailbox to which the answer message should be sent
-     * @param pm_hostname: the name of the physical machine host
      * @param vm_name: the name of the VM host
-     * @param num_cores: the number of cores the service can use (use ComputeService::ALL_CORES to use all cores available on the host)
-     * @param ram_memory: the VM's RAM memory capacity (use ComputeService::ALL_RAM to use all RAM available on the host, this can be lead to out of memory issue)
+     * @param requested_num_cores: the number of cores the service can use (use ComputeService::ALL_CORES to use all cores available on the host)
+     * @param requested_ram: the VM's RAM memory capacity (use ComputeService::ALL_RAM to use all RAM available on the host, this can be lead to out of memory issue)
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      *
      * @throw std::runtime_error
      */
     void CloudService::processCreateVM(const std::string &answer_mailbox,
-                                       const std::string &pm_hostname,
                                        const std::string &vm_name,
-                                       unsigned long num_cores,
-                                       double ram_memory,
+                                       unsigned long requested_num_cores,
+                                       double requested_ram,
                                        std::map<std::string, std::string> &property_list,
                                        std::map<std::string, std::string> &messagepayload_list) {
 
-        try {
-            WRENCH_INFO("Asked to create a VM on %s with %d cores", pm_hostname.c_str(), (int) num_cores);
 
-            if (simgrid::s4u::Host::by_name_or_null(vm_name) == nullptr) {
-                if (num_cores <= 0) {
-                    num_cores = S4U_Simulation::getHostNumCores(pm_hostname);
-                }
+        WRENCH_INFO("Asked to create a VM with %s cores and %s RAM",
+                           (requested_num_cores == ComputeService::ALL_CORES ? "max" : std::to_string(requested_num_cores)).c_str(),
+                           (requested_ram == ComputeService::ALL_RAM ? "max" : std::to_string(requested_ram)).c_str());
 
-                // RAM memory management
-                if (ram_memory != 0) { // RAM is a requirement for creating the VM
-                    if (this->cs_available_ram.find(pm_hostname) == this->cs_available_ram.end()) {
-                        this->cs_available_ram[pm_hostname] = S4U_Simulation::getHostMemoryCapacity(pm_hostname);
-                    }
-                    if (ram_memory < 0 || ram_memory == ComputeService::ALL_RAM) {
-                        ram_memory = this->cs_available_ram[pm_hostname];
-                    }
-                    if (this->cs_available_ram[pm_hostname] < ram_memory) {
-                        throw std::runtime_error("Requested memory is below available memory");
-                    }
-                }
-
-                // create a VM on the provided physical machine
-                Simulation::sleep(
-                        this->getPropertyValueAsDouble(CloudServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS));
-                auto vm = std::make_shared<S4U_VirtualMachine>(vm_name, pm_hostname, num_cores, ram_memory);
-
-                // Create a host state monitor for the VM
-                std::vector<std::string> hosts_to_monitor;
-                hosts_to_monitor.push_back(vm_name);
-                hosts_to_monitor.push_back(pm_hostname);
-                auto host_state_monitor = std::shared_ptr<HostStateChangeDetector>(
-                        new HostStateChangeDetector(this->hostname, hosts_to_monitor, true, true, this->mailbox_name));
-                host_state_monitor->simulation = this->simulation;
-                host_state_monitor->start(host_state_monitor, true, false); // Daemonized, no auto-restart
-
-                // create a BareMetalComputeService compute service for the VM (which runs on my stable host)
-                std::map<std::string, std::tuple<unsigned long, double>> compute_resources = {
-                        std::make_pair(vm_name, std::make_tuple(num_cores, ram_memory))};
-
-                // Merge the compute service property and message payload lists
-                property_list.insert(this->property_list.begin(), this->property_list.end());
-                messagepayload_list.insert(this->messagepayload_list.begin(), this->messagepayload_list.end());
-
-                std::shared_ptr<ComputeService> cs = std::shared_ptr<ComputeService>(
-                        new BareMetalComputeService(this->hostname,
-                                                    compute_resources,
-                                                    property_list,
-                                                    messagepayload_list,
-                                                    getScratch()));
-                cs->simulation = this->simulation;
-
-                this->cs_available_ram[pm_hostname] -= ram_memory;
-
-                // starting the service
-                try {
-                    cs->start(cs, true, false); // Daemonized, no auto-restart
-                } catch (std::runtime_error &e) {
-                    throw;
-                }
-
-                // Creating a Failure Detector for the service
-                auto failure_detector = std::shared_ptr<ServiceFailureDetector>(
-                        new ServiceFailureDetector(this->hostname, cs, this->mailbox_name));
-                failure_detector->simulation = this->simulation;
-                failure_detector->start(failure_detector, true, false); // Daemonized, no auto-restart
-
-                this->vm_list[vm_name] = std::make_tuple(vm, cs, num_cores, ram_memory);
-
-                if (this->used_cores_per_execution_host.find(pm_hostname) == this->used_cores_per_execution_host.end()) {
-                    this->used_cores_per_execution_host.insert(std::make_pair(pm_hostname, num_cores));
-                } else {
-                    this->used_cores_per_execution_host[pm_hostname] += num_cores;
-                }
-
-                S4U_Mailbox::dputMessage(
-                        answer_mailbox,
-                        new CloudServiceCreateVMAnswerMessage(
-                                true,
-                                this->getMessagePayloadValueAsDouble(
-                                        CloudServiceMessagePayload::CREATE_VM_ANSWER_MESSAGE_PAYLOAD)));
-            } else {
-                S4U_Mailbox::dputMessage(
-                        answer_mailbox,
-                        new CloudServiceCreateVMAnswerMessage(
-                                false,
-                                this->getMessagePayloadValueAsDouble(
-                                        CloudServiceMessagePayload::CREATE_VM_ANSWER_MESSAGE_PAYLOAD)));
+        // Find a physical host to start the VM
+        std::string picked_host = "";
+        unsigned long picked_num_cores = 0;
+        double picked_ram = 0;
+        for (auto const &host : this->execution_hosts) {
+            // Check for RAM
+            auto total_ram = Simulation::getHostMemoryCapacity(host);
+            auto available_ram = total_ram;
+            if (this->cs_available_ram.find(host) != this->cs_available_ram.end()) {
+                available_ram = this->cs_available_ram[host];
             }
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            return;
+            if ((requested_ram == ComputeService::ALL_RAM) && (available_ram < total_ram)) {
+                continue;
+            } else if (available_ram < requested_ram) {
+                continue;
+            }
+
+            // Check for cores
+            auto total_num_cores = Simulation::getHostNumCores(host);
+            auto num_available_cores = total_num_cores;
+            if (this->used_cores_per_execution_host.find(host) != this->used_cores_per_execution_host.end()) {
+                num_available_cores -= this->used_cores_per_execution_host[host];
+                break;
+            }
+            if ((requested_num_cores == ComputeService::ALL_CORES) && (num_available_cores < total_num_cores)) {
+                continue;
+            } else if (num_available_cores < requested_num_cores) {
+                continue;
+            }
+
+            picked_num_cores = (requested_num_cores == ComputeService::ALL_CORES ? total_num_cores : requested_num_cores);
+            picked_ram = (requested_ram == ComputeService::ALL_RAM ? total_ram : requested_ram);
+            picked_host = host;
+            break;
         }
+
+        CloudServiceCreateVMAnswerMessage *msg_to_send_back;
+
+        // Did we find a viable host?
+        if (picked_host.empty()) {
+            msg_to_send_back =
+                    new CloudServiceCreateVMAnswerMessage(
+                            false,
+                            nullptr,
+                            std::shared_ptr<FailureCause>(new NotEnoughResources(nullptr, this)),
+                            this->getMessagePayloadValueAsDouble(
+                                    CloudServiceMessagePayload::CREATE_VM_ANSWER_MESSAGE_PAYLOAD));
+        } else {
+
+            // Sleep for the VM creation overhead
+            Simulation::sleep(
+                    this->getPropertyValueAsDouble(CloudServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS));
+
+            // Create the VM
+            auto vm = std::make_shared<S4U_VirtualMachine>(vm_name, picked_host, picked_num_cores, picked_ram);
+
+            // Create the resource set for the BareMetalComputeService
+            std::map<std::string, std::tuple<unsigned long, double>> compute_resources = {
+                    std::make_pair(vm_name, std::make_tuple(requested_num_cores, requested_ram))};
+
+            // Merge the compute service property and message payload lists
+            property_list.insert(this->property_list.begin(), this->property_list.end());
+            messagepayload_list.insert(this->messagepayload_list.begin(), this->messagepayload_list.end());
+
+            // The BareMetal service should accept standard jobs!
+            property_list[ComputeServiceProperty::SUPPORTS_STANDARD_JOBS] = "true";
+
+            // Create the BareMetal service, whose main daemon is on this (stable) host
+            std::shared_ptr<BareMetalComputeService> cs = std::shared_ptr<BareMetalComputeService>(
+                    new BareMetalComputeService(this->hostname,
+                                                compute_resources,
+                                                property_list,
+                                                messagepayload_list,
+                                                getScratch()));
+            cs->simulation = this->simulation;
+
+            // Update internal data structures
+            this->vm_list[vm_name] = std::make_tuple(vm, cs, picked_num_cores, picked_ram);
+            this->cs_available_ram[picked_host] -= requested_ram;
+            if (this->used_cores_per_execution_host.find(picked_host) == this->used_cores_per_execution_host.end()) {
+                this->used_cores_per_execution_host.insert(std::make_pair(picked_host, picked_num_cores));
+            } else {
+                this->used_cores_per_execution_host[picked_host] += picked_num_cores;
+            }
+
+            // Start the service
+            try {
+                cs->start(cs, true, false); // Daemonized, no auto-restart
+            } catch (std::runtime_error &e) {
+                throw; // This shouldn't happen
+            }
+
+            msg_to_send_back = new CloudServiceCreateVMAnswerMessage(
+                    true,
+                    cs,
+                    nullptr,
+                    this->getMessagePayloadValueAsDouble(
+                            CloudServiceMessagePayload::CREATE_VM_ANSWER_MESSAGE_PAYLOAD));
+        }
+
+        // Send reply
+        try {
+            S4U_Mailbox::dputMessage(answer_mailbox,msg_to_send_back);
+        } catch (std::shared_ptr<NetworkError> &cause) {
+            // Ignore
+        }
+        return;
     }
 
     /**
@@ -681,13 +691,13 @@ namespace wrench {
                 vm->start();
 
                 // TODO: creating a BareMetal service would not be necessary once auto_restart will be available
-                // create a BareNetak compute service for the VM, which runs on my stable host
+                // create a BareNetak compute service for the VM
                 std::map<std::string, std::tuple<unsigned long, double>> compute_resources = {
                         std::make_pair(vm_name,
                                        std::make_tuple(std::get<2>(vm_tuple->second), std::get<3>(vm_tuple->second)))};
 
-                std::shared_ptr<ComputeService> cs = std::shared_ptr<ComputeService>(
-                        new BareMetalComputeService(this->hostname,
+                std::shared_ptr<BareMetalComputeService> cs = std::shared_ptr<BareMetalComputeService>(
+                        new BareMetalComputeService(vm_name,
                                                     compute_resources,
                                                     property_list,
                                                     messagepayload_list,
@@ -695,14 +705,6 @@ namespace wrench {
                 cs->simulation = this->simulation;
                 cs->start(cs, true, false); // Daemonized, no auto-restart
                 std::get<1>(vm_tuple->second) = cs;
-
-                // Creating a Failure Detector for the service
-                auto failure_detector = std::shared_ptr<ServiceFailureDetector>(
-                        new ServiceFailureDetector(this->hostname, cs, this->mailbox_name));
-                failure_detector->simulation = this->simulation;
-                failure_detector->start(failure_detector, true, false); // Daemonized, no auto-restart
-
-
 
             } catch (std::runtime_error &e) {
                 throw;
@@ -811,75 +813,22 @@ namespace wrench {
     void CloudService::processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
                                                 std::map<std::string, std::string> &service_specific_args) {
 
-        WRENCH_INFO("Asked to run a standard job with %ld tasks", job->getNumTasks());
         if (not this->supportsStandardJobs()) {
             try {
                 S4U_Mailbox::dputMessage(
-                        answer_mailbox,
-                        new ComputeServiceSubmitStandardJobAnswerMessage(
+                        answer_mailbox, new ComputeServiceSubmitStandardJobAnswerMessage(
                                 job, this, false, std::shared_ptr<FailureCause>(new JobTypeNotSupported(job, this)),
                                 this->getMessagePayloadValueAsDouble(
-                                        ComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
+                                        CloudServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
             } catch (std::shared_ptr<NetworkError> &cause) {
                 return;
             }
             return;
+        } else {
+            throw std::runtime_error(
+                    "CloudService::processSubmitPilotJob(): A Cloud service should never support standard jobs");
         }
 
-        std::map<std::string, std::tuple<std::shared_ptr<S4U_VirtualMachine>, std::shared_ptr<ComputeService>,
-                unsigned long, unsigned long>> vm_local_list = this->vm_list;
-
-        // whether the job should be mapped to a particular VM
-        auto vm_it = service_specific_args.find("-vm");
-        if (vm_it != service_specific_args.end()) {
-            vm_local_list.clear();
-            auto vm_tuple_it = this->vm_list.find(vm_it->second);
-            if (vm_tuple_it != this->vm_list.end()) {
-                vm_local_list.insert(std::make_pair(vm_it->second, vm_tuple_it->second));
-            }
-        }
-
-        for (auto vm_tuple : vm_local_list) {
-            std::shared_ptr<S4U_VirtualMachine> vm = std::get<0>(vm_tuple.second);
-            if (vm->isRunning()) {
-
-                ComputeService *cs = std::get<1>(vm_tuple.second).get();
-                std::map<std::string, unsigned long> num_idle_cores = cs->getNumIdleCores();
-                unsigned long sum_idle_cores = 0;
-                for (auto h : num_idle_cores) {
-                    sum_idle_cores += h.second;
-                }
-
-                if (std::get<2>(vm_tuple.second) >= job->getMinimumRequiredNumCores() &&
-                    sum_idle_cores >= job->getMinimumRequiredNumCores()) {
-                    std::map<std::string, std::string> empty_args;
-                    cs->submitStandardJob(job, empty_args);
-
-                    try {
-                        S4U_Mailbox::dputMessage(
-                                answer_mailbox,
-                                new ComputeServiceSubmitStandardJobAnswerMessage(
-                                        job, this, true, nullptr, this->getMessagePayloadValueAsDouble(
-                                                ComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
-                        return;
-                    } catch (std::shared_ptr<NetworkError> &cause) {
-                        return;
-                    }
-                }
-            }
-        }
-
-        // could not find a suitable resource
-        try {
-            S4U_Mailbox::dputMessage(
-                    answer_mailbox,
-                    new ComputeServiceSubmitStandardJobAnswerMessage(
-                            job, this, false, std::shared_ptr<FailureCause>(new NotEnoughResources(job, this)),
-                            this->getMessagePayloadValueAsDouble(
-                                    ComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            return;
-        }
     }
 
     /**
@@ -893,8 +842,6 @@ namespace wrench {
      */
     void CloudService::processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job,
                                              std::map<std::string, std::string> &service_specific_args) {
-
-        WRENCH_INFO("Asked to run a pilot job");
 
         if (not this->supportsPilotJobs()) {
             try {
@@ -1004,10 +951,16 @@ namespace wrench {
      */
     void CloudService::validateProperties() {
 
-        // Supporting Pilot jobs
+        // Supporting pilot jobs
         if (this->getPropertyValueAsBoolean(CloudServiceProperty::SUPPORTS_PILOT_JOBS)) {
             throw std::invalid_argument(
                     "Invalid SUPPORTS_PILOT_JOBS property specification: a CloudService cannot support pilot jobs");
+        }
+
+        // Supporting standard jobs
+        if (this->getPropertyValueAsBoolean(CloudServiceProperty::SUPPORTS_STANDARD_JOBS)) {
+            throw std::invalid_argument(
+                    "Invalid SUPPORTS_STANDARD_JOBS property specification: a CloudService cannot support standard jobs (instead, it allows for creating VM instances to which standard jobs can be submitted)");
         }
 
         // VM Boot overhead

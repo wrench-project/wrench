@@ -72,7 +72,7 @@ namespace wrench {
                                                     std::map<std::string, std::string> messagepayload_list) {
 
       // vm host name
-      std::string vm_name = "vm" + std::to_string(CloudService::VM_ID++) + "_" + pm_hostname;
+      std::string vm_name = this->getName() + "_vm" + std::to_string(CloudService::VM_ID++);
 
       // send a "create vm" message to the daemon's mailbox_name
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("create_vm");
@@ -80,7 +80,7 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> answer_message = sendRequest(
               answer_mailbox,
               new CloudServiceCreateVMRequestMessage(
-                      answer_mailbox, pm_hostname, vm_name,
+                      answer_mailbox, vm_name,
                       num_cores, ram_memory, property_list, messagepayload_list,
                       this->getMessagePayloadValueAsDouble(
                               CloudServiceMessagePayload::CREATE_VM_REQUEST_MESSAGE_PAYLOAD)));
@@ -191,7 +191,7 @@ namespace wrench {
         return true;
 
       } else if (auto msg = dynamic_cast<CloudServiceCreateVMRequestMessage *>(message.get())) {
-        processCreateVM(msg->answer_mailbox, msg->pm_hostname, msg->vm_hostname, msg->num_cores, msg->ram_memory,
+        processCreateVM(msg->answer_mailbox, msg->vm_hostname, msg->num_cores, msg->ram_memory,
                         msg->property_list, msg->messagepayload_list);
         return true;
 
