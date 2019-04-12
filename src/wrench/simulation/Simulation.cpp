@@ -204,7 +204,7 @@ namespace wrench {
      *
      */
     std::vector<std::string> Simulation::getHostnameList() {
-        return this->s4u_simulation->getAllHostnames();
+        return S4U_Simulation::getAllHostnames();
     }
 
     /**
@@ -214,7 +214,7 @@ namespace wrench {
      *
      */
     std::map<std::string, std::vector<std::string>> Simulation::getHostnameListByCluster() {
-        return this->s4u_simulation->getAllHostnamesByCluster();
+        return S4U_Simulation::getAllHostnamesByCluster();
     }
 
     /**

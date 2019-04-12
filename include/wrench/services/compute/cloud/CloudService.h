@@ -132,6 +132,7 @@ namespace wrench {
         virtual void processGetExecutionHosts(const std::string &answer_mailbox);
 
         virtual void processCreateVM(const std::string &answer_mailbox,
+                                     const std::string &pm_name,
                                      const std::string &vm_name,
                                      unsigned long requested_num_cores,
                                      double requested_ram,
@@ -161,14 +162,14 @@ namespace wrench {
         /** @brief List of execution host names */
         std::vector<std::string> execution_hosts;
 
-        /** @brief Map of available RAM at hosts */
-        std::map<std::string, double> cs_available_ram;
+        /** @brief Map of used RAM at the hosts */
+        std::map<std::string, double> used_ram_per_execution_host;
+
+        /** @brief Map of number of used cores at the hosts */
+        std::map<std::string, unsigned long> used_cores_per_execution_host;
 
         /** @brief A map of VMs described by the VM actor, the actual compute service, the total number of cores, and RAM size */
         std::map<std::string, std::tuple<std::shared_ptr<S4U_VirtualMachine>, std::shared_ptr<BareMetalComputeService>, unsigned long, unsigned long>> vm_list;
-
-        /** @brief A map of the number of used cores (per VM) per execution host */
-        std::map<std::string, unsigned long> used_cores_per_execution_host;
 
         /***********************/
         /** \endcond           */

@@ -49,7 +49,6 @@ namespace wrench {
             throw std::invalid_argument(
                     "CloudService::CloudService(): At least one execution host should be provided");
         }
-        this->execution_hosts = execution_hosts;
 
         // Set default and specified properties
         this->setProperties(this->default_property_values, std::move(property_list));
@@ -59,6 +58,13 @@ namespace wrench {
 
         // Set default and specified message payloads
         this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
+
+        // Initialize internal data structures
+        this->execution_hosts = execution_hosts;
+        for (auto const &h : this->execution_hosts) {
+            this->used_ram_per_execution_host[h] = 0;
+            this->used_cores_per_execution_host[h] = 0;
+        }
     }
 
     /**
@@ -436,7 +442,7 @@ namespace wrench {
             return true;
 
         } else if (auto msg = dynamic_cast<CloudServiceCreateVMRequestMessage *>(message.get())) {
-            processCreateVM(msg->answer_mailbox, msg->vm_hostname, msg->num_cores, msg->ram_memory,
+            processCreateVM(msg->answer_mailbox, "", msg->vm_hostname, msg->num_cores, msg->ram_memory,
                             msg->property_list, msg->messagepayload_list);
             return true;
 
@@ -492,6 +498,7 @@ namespace wrench {
      * @brief Create a BareMetalComputeService VM on a physical machine
      *
      * @param answer_mailbox: the mailbox to which the answer message should be sent
+     * @param pm_name: the name of the physical host (or "" if to be decided)
      * @param vm_name: the name of the VM host
      * @param requested_num_cores: the number of cores the service can use (use ComputeService::ALL_CORES to use all cores available on the host)
      * @param requested_ram: the VM's RAM memory capacity (use ComputeService::ALL_RAM to use all RAM available on the host, this can be lead to out of memory issue)
@@ -501,6 +508,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void CloudService::processCreateVM(const std::string &answer_mailbox,
+                                       const std::string &pm_name,
                                        const std::string &vm_name,
                                        unsigned long requested_num_cores,
                                        double requested_ram,
@@ -509,38 +517,51 @@ namespace wrench {
 
 
         WRENCH_INFO("Asked to create a VM with %s cores and %s RAM",
-                           (requested_num_cores == ComputeService::ALL_CORES ? "max" : std::to_string(requested_num_cores)).c_str(),
-                           (requested_ram == ComputeService::ALL_RAM ? "max" : std::to_string(requested_ram)).c_str());
+                    (requested_num_cores == ComputeService::ALL_CORES ? "max" : std::to_string(requested_num_cores)).c_str(),
+                    (requested_ram == ComputeService::ALL_RAM ? "max" : std::to_string(requested_ram)).c_str());
+
+        if ((not pm_name.empty()) and (std::find(this->execution_hosts.begin(), this->execution_hosts.end(), pm_name) == this->execution_hosts.end())) {
+            throw std::runtime_error("Trying to start a VM on an unknown (at least to this service) physical host");
+        }
 
         // Find a physical host to start the VM
         std::string picked_host = "";
         unsigned long picked_num_cores = 0;
         double picked_ram = 0;
+
         for (auto const &host : this->execution_hosts) {
+
+            if ((not pm_name.empty()) and (host != pm_name)) {
+                continue;
+            }
+
             // Check for RAM
             auto total_ram = Simulation::getHostMemoryCapacity(host);
-            auto available_ram = total_ram;
-            if (this->cs_available_ram.find(host) != this->cs_available_ram.end()) {
-                available_ram = this->cs_available_ram[host];
-            }
-            WRENCH_INFO("---> %lf", available_ram);
-            if ((requested_ram == ComputeService::ALL_RAM) && (available_ram < total_ram)) {
-                continue;
+            auto available_ram = total_ram - this->used_ram_per_execution_host[host];
+            WRENCH_INFO("TOTAL RAM = %lf     AVAIL RAM = %lf", total_ram, available_ram);
+            if (requested_ram == ComputeService::ALL_RAM) {
+                if (available_ram < total_ram) {
+                    continue;
+                }
             } else if (available_ram < requested_ram) {
                 continue;
             }
 
+            WRENCH_INFO("CHECKING FOR CORES!");
+
             // Check for cores
             auto total_num_cores = Simulation::getHostNumCores(host);
-            auto num_available_cores = total_num_cores;
-            if (this->used_cores_per_execution_host.find(host) != this->used_cores_per_execution_host.end()) {
-                num_available_cores -= this->used_cores_per_execution_host[host];
-            }
-            if ((requested_num_cores == ComputeService::ALL_CORES) && (num_available_cores < total_num_cores)) {
-                continue;
+            auto num_available_cores = total_num_cores - this->used_cores_per_execution_host[host];
+            WRENCH_INFO("TOTAL CORES = %lu     AVAIL CORES = %lu", total_num_cores, num_available_cores);
+
+            if (requested_num_cores == ComputeService::ALL_CORES) {
+                if (num_available_cores < total_num_cores) {
+                    continue;
+                }
             } else if (num_available_cores < requested_num_cores) {
                 continue;
             }
+            WRENCH_INFO("YAH!");
 
             picked_num_cores = (requested_num_cores == ComputeService::ALL_CORES ? total_num_cores : requested_num_cores);
             picked_ram = (requested_ram == ComputeService::ALL_RAM ? total_ram : requested_ram);
@@ -591,12 +612,8 @@ namespace wrench {
 
             // Update internal data structures
             this->vm_list[vm_name] = std::make_tuple(vm, cs, picked_num_cores, picked_ram);
-            this->cs_available_ram[picked_host] -= requested_ram;
-            if (this->used_cores_per_execution_host.find(picked_host) == this->used_cores_per_execution_host.end()) {
-                this->used_cores_per_execution_host.insert(std::make_pair(picked_host, picked_num_cores));
-            } else {
-                this->used_cores_per_execution_host[picked_host] += picked_num_cores;
-            }
+            this->used_ram_per_execution_host[picked_host] += picked_ram;
+            this->used_cores_per_execution_host[picked_host] += picked_num_cores;
 
             // Start the service
             try {
@@ -933,7 +950,7 @@ namespace wrench {
 
         WRENCH_INFO("Stopping Cloud Service");
         for (auto &vm : this->vm_list) {
-            this->cs_available_ram[(std::get<0>(vm.second))->getPm()->get_name()] += S4U_Simulation::getHostMemoryCapacity(
+            this->used_ram_per_execution_host[(std::get<0>(vm.second))->getPm()->get_name()] -= S4U_Simulation::getHostMemoryCapacity(
                     std::get<0>(vm));
             // Deal with the compute service (if it hasn't been stopped before)
             if (std::get<1>(vm.second)) {

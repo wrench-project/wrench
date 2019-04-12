@@ -44,8 +44,11 @@ namespace wrench {
 
         void instantiatePlatform(std::string);
 
-        std::vector<std::string> getHostnameList();
-        std::map<std::string, std::vector<std::string>> getHostnameListByCluster();
+        static std::vector<std::string> getHostnameList();
+        static std::map<std::string, std::vector<std::string>> getHostnameListByCluster();
+        static double getHostMemoryCapacity(std::string hostname);
+        static unsigned long getHostNumCores(std::string hostname);
+        static double getHostFlopRate(std::string hostname);
 
         void launch();
 
@@ -62,12 +65,6 @@ namespace wrench {
         void stageFiles(std::map<std::string, WorkflowFile *> files, StorageService *storage_service, std::string partition);
 
         SimulationOutput &getOutput();
-
-        static double getHostMemoryCapacity(std::string hostname);
-
-        static unsigned long getHostNumCores(std::string hostname);
-
-        static double getHostFlopRate(std::string hostname);
 
         //start energy related calls
         double getEnergyConsumed(const std::string &hostname, bool record_as_time_stamp = false);

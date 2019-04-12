@@ -62,7 +62,7 @@ namespace wrench {
 
         using CloudService::createVM;
 
-        virtual std::string createVM(const std::string &pm_hostname,
+        virtual std::pair<std::string, std::shared_ptr<BareMetalComputeService>> createVM(const std::string &pm_hostname,
                                      unsigned long num_cores = ComputeService::ALL_CORES,
                                      double ram_memory = ComputeService::ALL_RAM,
                                      std::map<std::string, std::string> property_list = {},

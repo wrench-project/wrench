@@ -108,7 +108,7 @@ private:
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       // Get the file registry service
-      wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
+      auto file_registry_service = this->getAvailableFileRegistryService();
 
       std::set<std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>> pre_copies = {};
       for (auto it : this->getWorkflow()->getInputFiles()) {
@@ -125,8 +125,8 @@ private:
       // Submit the 2-task job for execution
       try {
         auto cs = (wrench::CloudService *) *this->getAvailableComputeServices().begin();
-        cs->createVM(2);
-        job_manager->submitJob(two_task_job, this->test->compute_service);
+        auto vm = cs->createVM(2, 100);
+        job_manager->submitJob(two_task_job, vm.second.get());
       } catch (wrench::WorkflowExecutionException &e) {
         throw std::runtime_error(e.what());
       }

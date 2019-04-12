@@ -297,14 +297,14 @@ void HTCondorServiceTest::do_SimpleServiceTest_test() {
   ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
+  std::string hostname = wrench::Simulation::getHostnameList()[0];
 
   // Create a Storage Service
   ASSERT_NO_THROW(storage_service = simulation->add(new wrench::SimpleStorageService(hostname, 100.0)));
 
   // Create list of compute services
   std::set<wrench::ComputeService *> compute_services;
-  std::string execution_host = simulation->getHostnameList()[1];
+  std::string execution_host = wrench::Simulation::getHostnameList()[1];
   std::vector<std::string> execution_hosts;
   execution_hosts.push_back(execution_host);
   compute_services.insert(new wrench::CloudService(hostname, execution_hosts,

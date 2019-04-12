@@ -106,7 +106,7 @@ namespace wrench {
      * @return a vector of hostnames
      */
     std::vector<std::string> S4U_Simulation::getAllHostnames() {
-        std::vector<simgrid::s4u::Host *> host_list = this->engine->get_all_hosts();
+        std::vector<simgrid::s4u::Host *> host_list = simgrid::s4u::Engine::get_instance()->get_all_hosts();
         std::vector<std::string> hostname_list;
         hostname_list.reserve(host_list.size());
         for (auto h : host_list) {
