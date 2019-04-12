@@ -27,7 +27,7 @@ namespace wrench {
 
     class Simulation;
 
-    class ComputeService;
+    class BareMetalComputeService;
 
     /**
      * @brief A cloud-based compute service that manages a set of physical
@@ -39,7 +39,7 @@ namespace wrench {
     private:
         std::map<std::string, std::string> default_property_values = {
                 {CloudServiceProperty::SUPPORTS_PILOT_JOBS,         "false"},
-                {CloudServiceProperty::SUPPORTS_STANDARD_JOBS,      "true"},
+                {CloudServiceProperty::SUPPORTS_STANDARD_JOBS,      "false"},
                 {CloudServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS, "0.0"}
         };
 
@@ -77,7 +77,7 @@ namespace wrench {
         /** \cond DEVELOPER    */
         /***********************/
 
-        virtual std::string createVM(unsigned long num_cores = ComputeService::ALL_CORES,
+        virtual std::pair<std::string, std::shared_ptr<BareMetalComputeService>> createVM(unsigned long num_cores = ComputeService::ALL_CORES,
                                      double ram_memory = ComputeService::ALL_RAM,
                                      std::map<std::string, std::string> property_list = {},
                                      std::map<std::string, std::string> messagepayload_list = {});
@@ -132,10 +132,9 @@ namespace wrench {
         virtual void processGetExecutionHosts(const std::string &answer_mailbox);
 
         virtual void processCreateVM(const std::string &answer_mailbox,
-                                     const std::string &pm_hostname,
                                      const std::string &vm_name,
-                                     unsigned long num_cores,
-                                     double ram_memory,
+                                     unsigned long requested_num_cores,
+                                     double requested_ram,
                                      std::map<std::string, std::string> &property_list,
                                      std::map<std::string, std::string> &messagepayload_list);
 
@@ -166,7 +165,7 @@ namespace wrench {
         std::map<std::string, double> cs_available_ram;
 
         /** @brief A map of VMs described by the VM actor, the actual compute service, the total number of cores, and RAM size */
-        std::map<std::string, std::tuple<std::shared_ptr<S4U_VirtualMachine>, std::shared_ptr<ComputeService>, unsigned long, unsigned long>> vm_list;
+        std::map<std::string, std::tuple<std::shared_ptr<S4U_VirtualMachine>, std::shared_ptr<BareMetalComputeService>, unsigned long, unsigned long>> vm_list;
 
         /** @brief A map of the number of used cores (per VM) per execution host */
         std::map<std::string, unsigned long> used_cores_per_execution_host;

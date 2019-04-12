@@ -208,7 +208,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param job: the job that could not be executed
+     * @param job: the job that could not be executed (or nullptr if no job was involved)
      * @param compute_service: the compute service that didn't have enough cores or ram
      */
     NotEnoughResources::NotEnoughResources(WorkflowJob *job, ComputeService *compute_service) : FailureCause(
