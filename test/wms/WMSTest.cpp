@@ -82,12 +82,12 @@ private:
 
       // Create a VM on the cloud service
       auto cloud = (wrench::CloudService *) (this->test->cs_cloud);
-      cloud->createVM(4, 0.0, {}, {});
+      auto vm = cloud->createVM(4, 0.0, {}, {});
 
       // Get a "STANDARD JOB COMPLETION" event (default handler)
       wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 10.0, 1, 1, 1.0, 0);
       wrench::StandardJob *job1 = job_manager->createStandardJob(task1, {});
-      job_manager->submitJob(job1, cloud);
+      job_manager->submitJob(job1, vm.second.get());
       this->waitForAndProcessNextEvent();
 
       auto batch = (wrench::BatchService *) (this->test->cs_batch);
@@ -225,11 +225,11 @@ private:
 
       // Get a "STANDARD JOB COMPLETION" event (default handler)
       auto cloud = (wrench::CloudService *) (this->test->cs_cloud);
-      cloud->createVM(4, 0.0, {}, {});
+      auto vm = cloud->createVM(4, 0.0, {}, {});
 
       wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 10.0, 1, 1, 1.0, 0);
       wrench::StandardJob *job1 = job_manager->createStandardJob(task1, {});
-      job_manager->submitJob(job1, this->test->cs_cloud);
+      job_manager->submitJob(job1, vm.second.get());
       this->waitForAndProcessNextEvent();
       if (this->counter != 1) {
         throw std::runtime_error("Did not get expected 'STANDARD JOB COMPLETION' event");

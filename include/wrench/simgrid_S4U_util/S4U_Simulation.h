@@ -55,7 +55,7 @@ namespace wrench {
 
 				bool isInitialized();
         bool isPlatformSetup();
-        std::vector<std::string> getAllHostnames();
+        static std::vector<std::string> getAllHostnames();
         static std::map<std::string, std::vector<std::string>> getAllHostnamesByCluster();
         void shutdown();
 
