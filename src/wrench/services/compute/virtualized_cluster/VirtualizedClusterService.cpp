@@ -79,20 +79,20 @@ namespace wrench {
 
       std::unique_ptr<SimulationMessage> answer_message = sendRequest(
               answer_mailbox,
-              new VirtualizedClusterServiceCreateVMRequestMessage(
+              new CloudServiceCreateVMRequestMessage(
                       answer_mailbox, pm_hostname, vm_name,
                       num_cores, ram_memory, property_list, messagepayload_list,
                       this->getMessagePayloadValueAsDouble(
                               VirtualizedClusterServiceMessagePayload::CREATE_VM_REQUEST_MESSAGE_PAYLOAD)));
 
-      if (auto msg = dynamic_cast<VirtualizedClusterServiceCreateVMAnswerMessage *>(answer_message.get())) {
+      if (auto msg = dynamic_cast<CloudServiceCreateVMAnswerMessage *>(answer_message.get())) {
         if (msg->success) {
           return std::make_pair(vm_name, msg->cs);
         } else {
           throw WorkflowExecutionException(msg->failure_cause);
         }
       } else {
-        throw std::runtime_error("VirtualizedClusterService::createVM(): Unexpected [" + msg->getName() + "] message");
+        throw std::runtime_error("VirtualizedClusterService::createVM(): Unexpected [" + answer_message->getName() + "] message");
       }
     }
 
@@ -191,7 +191,7 @@ namespace wrench {
         processGetExecutionHosts(msg->answer_mailbox);
         return true;
 
-      } else if (auto msg = dynamic_cast<VirtualizedClusterServiceCreateVMRequestMessage *>(message.get())) {
+      } else if (auto msg = dynamic_cast<CloudServiceCreateVMRequestMessage *>(message.get())) {
         processCreateVM(msg->answer_mailbox, msg->pm_hostname, msg->vm_hostname, msg->num_cores, msg->ram_memory,
                         msg->property_list, msg->messagepayload_list);
         return true;

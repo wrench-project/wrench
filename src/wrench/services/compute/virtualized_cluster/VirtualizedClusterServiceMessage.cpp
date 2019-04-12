@@ -58,41 +58,6 @@ namespace wrench {
                                                                                                      double payload) :
             VirtualizedClusterServiceMessage("MIGRATE_VM_ANSWER", payload), success(success) {}
 
-    /**
-     * @brief Constructor
-     *
-     * @param answer_mailbox: the mailbox to which to send the answer
-     * @param pm_hostname: the name of the physical host on which to create the VM
-     * @param vm_hostname: the requested VM name
-     * @param num_cores: the requested number of cores
-     * @param ram_memory: the requested ram
-     * @param property_list: a property list
-     * @param messagepayload_list: a message payload list
-     * @param payload: the message payload
-     */
-    VirtualizedClusterServiceCreateVMRequestMessage::VirtualizedClusterServiceCreateVMRequestMessage(
-            const std::string &answer_mailbox, const std::string &pm_hostname, const std::string &vm_hostname, unsigned long num_cores,
-            double ram_memory, std::map<std::string, std::string> &property_list,
-            std::map<std::string, std::string> &messagepayload_list, double payload) :
-            VirtualizedClusterServiceMessage("CREATE_VM_REQUEST", payload), answer_mailbox(answer_mailbox),
-            pm_hostname(pm_hostname), vm_hostname(vm_hostname), num_cores(num_cores),
-            ram_memory(ram_memory), property_list(property_list), messagepayload_list(messagepayload_list) {}
 
-
-    /**
-     * @brief Constructor
-     *
-     * @param success: whether the VM creation was a success
-     * @param cs: the VM's compute service (or nullptr if failure)
-     * @param failure_cause: the failure cause (or nullptr if success)
-     * @param payload: the message paylaod
-     */
-    VirtualizedClusterServiceCreateVMAnswerMessage::VirtualizedClusterServiceCreateVMAnswerMessage(
-            bool success,
-            std::shared_ptr<BareMetalComputeService> cs,
-            std::shared_ptr<FailureCause> failure_cause,
-            double payload) :
-            VirtualizedClusterServiceMessage("CREATE_VM_ANSWER", payload),
-            success(success), cs(cs), failure_cause(failure_cause) {}
 
 }

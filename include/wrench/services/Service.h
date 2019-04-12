@@ -37,11 +37,14 @@ namespace wrench {
             UP,
             /** @brief DOWN state: the service has been shutdown and/or has terminated */
             DOWN,
+            /** @brief SUSPENDED state: the service has been suspended (and hopefully will be resumed0 */
+            SUSPENDED,
         };
 
         void start(std::shared_ptr<Service> this_service, bool daemonize, bool auto_restart);
-
         virtual void stop();
+        void suspend();
+        void resume();
 
         std::string getHostname();
 

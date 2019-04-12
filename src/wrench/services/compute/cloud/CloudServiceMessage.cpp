@@ -58,6 +58,7 @@ namespace wrench {
      * @brief Constructor
      *
      * @param answer_mailbox: the mailbox to which to send the answer
+     * @param pm_hostname: the name of the requested physical host (or empty if not specified)
      * @param vm_hostname: the name of the new VM host
      * @param num_cores: the number of cores the service can use (use ComputeService::ALL_CORES to use all cores
      *                   available on the host)
@@ -71,6 +72,7 @@ namespace wrench {
      */
     CloudServiceCreateVMRequestMessage::CloudServiceCreateVMRequestMessage(
             const std::string &answer_mailbox,
+            const std::string &pm_hostname,
             const std::string &vm_hostname,
             unsigned long num_cores,
             double ram_memory,
@@ -78,6 +80,7 @@ namespace wrench {
             std::map<std::string, std::string> &messagepayload_list,
             double payload) :
             CloudServiceMessage("CREATE_VM_REQUEST", payload),
+            pm_hostname(pm_hostname),
             num_cores(num_cores), ram_memory(ram_memory),
             property_list(property_list), messagepayload_list(messagepayload_list) {
 
