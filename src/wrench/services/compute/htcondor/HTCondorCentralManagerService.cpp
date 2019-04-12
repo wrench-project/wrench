@@ -162,7 +162,7 @@ namespace wrench {
           // for cloud services
           if (auto cloud = dynamic_cast<CloudService *>(cs)) {
             for (auto &host : cloud->getExecutionHosts()) {
-              for (int i = 0; i < S4U_Simulation::getHostNumCores(host); i++) {
+              for (unsigned int i = 0; i < S4U_Simulation::getHostNumCores(host); i++) {
                 cloud->createVM(1, ComputeService::ALL_RAM);
               }
             }
