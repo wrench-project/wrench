@@ -22,7 +22,7 @@ namespace wrench {
      * @param cause: the type of the failure cause
      */
     FailureCause::FailureCause(CauseType cause) {
-      this->cause = cause;
+        this->cause = cause;
     }
 
     /**
@@ -30,7 +30,7 @@ namespace wrench {
      * @return
      */
     FailureCause::CauseType FailureCause::getCauseType() {
-      return this->cause;
+        return this->cause;
     }
 
     /**
@@ -39,7 +39,7 @@ namespace wrench {
      */
     NoStorageServiceForFile::NoStorageServiceForFile(WorkflowFile *file) : FailureCause(
             NO_STORAGE_SERVICE_FOR_FILE) {
-      this->file = file;
+        this->file = file;
     }
 
     /**
@@ -48,7 +48,7 @@ namespace wrench {
      */
     NoScratchSpace::NoScratchSpace(std::string error) : FailureCause(
             NO_SCRATCH_SPACE) {
-      this->error = error;
+        this->error = error;
     }
 
     /**
@@ -56,7 +56,7 @@ namespace wrench {
      * @return the message
      */
     std::string NoScratchSpace::toString() {
-      return error;
+        return error;
     }
 
     /**
@@ -64,7 +64,7 @@ namespace wrench {
      * @return the file
      */
     WorkflowFile *NoStorageServiceForFile::getFile() {
-      return this->file;
+        return this->file;
     }
 
     /**
@@ -72,7 +72,7 @@ namespace wrench {
      * @return the message
      */
     std::string NoStorageServiceForFile::toString() {
-      return "No Storage Service location is specified for file " + this->file->getID();
+        return "No Storage Service location is specified for file " + this->file->getID();
     }
 
     /**
@@ -82,8 +82,8 @@ namespace wrench {
      */
     FileNotFound::FileNotFound(WorkflowFile *file, StorageService *storage_service) : FailureCause(
             FILE_NOT_FOUND) {
-      this->file = file;
-      this->storage_service = storage_service;
+        this->file = file;
+        this->storage_service = storage_service;
     }
 
     /**
@@ -91,7 +91,7 @@ namespace wrench {
      * @return the file
      */
     WorkflowFile *FileNotFound::getFile() {
-      return this->file;
+        return this->file;
     }
 
     /**
@@ -99,7 +99,7 @@ namespace wrench {
      * @return the storage service
      */
     StorageService *FileNotFound::getStorageService() {
-      return this->storage_service;
+        return this->storage_service;
     }
 
     /**
@@ -107,7 +107,7 @@ namespace wrench {
      * @return the message
      */
     std::string FileNotFound::toString() {
-      return "Couldn't find file " + this->file->getID() + " at Storage Service " + this->storage_service->getName();
+        return "Couldn't find file " + this->file->getID() + " at Storage Service " + this->storage_service->getName();
     }
 
     /**
@@ -117,8 +117,8 @@ namespace wrench {
      */
     StorageServiceNotEnoughSpace::StorageServiceNotEnoughSpace(WorkflowFile *file, StorageService *storage_service)
             : FailureCause(STORAGE_NOT_ENOUGH_SPACE) {
-      this->file = file;
-      this->storage_service = storage_service;
+        this->file = file;
+        this->storage_service = storage_service;
     }
 
     /**
@@ -126,7 +126,7 @@ namespace wrench {
      * @return the file
      */
     WorkflowFile *StorageServiceNotEnoughSpace::getFile() {
-      return this->file;
+        return this->file;
     }
 
     /**
@@ -134,7 +134,7 @@ namespace wrench {
      * @return the storage service
      */
     StorageService *StorageServiceNotEnoughSpace::getStorageService() {
-      return this->storage_service;
+        return this->storage_service;
     }
 
     /**
@@ -142,8 +142,8 @@ namespace wrench {
      * @return the message
      */
     std::string StorageServiceNotEnoughSpace::toString() {
-      return "Cannot write file " + this->file->getID() + " to Storage Service " +
-             this->storage_service->getName() + " due to lack of storage space";
+        return "Cannot write file " + this->file->getID() + " to Storage Service " +
+               this->storage_service->getName() + " due to lack of storage space";
     }
 
     /**
@@ -151,7 +151,7 @@ namespace wrench {
      * @param service: the service that was down
      */
     ServiceIsDown::ServiceIsDown(Service *service) : FailureCause(SERVICE_DOWN) {
-      this->service = service;
+        this->service = service;
     }
 
     /**
@@ -159,7 +159,7 @@ namespace wrench {
      * @return the service
      */
     Service *ServiceIsDown::getService() {
-      return this->service;
+        return this->service;
     }
 
     /**
@@ -167,7 +167,7 @@ namespace wrench {
      * @return the message
      */
     std::string ServiceIsDown::toString() {
-      return "Service " + this->service->getName() + " on host " + this->service->getHostname() + " was terminated ";
+        return "Service " + this->service->getName() + " on host " + this->service->getHostname() + " was terminated ";
     }
 
     /**
@@ -177,8 +177,8 @@ namespace wrench {
      */
     JobTypeNotSupported::JobTypeNotSupported(WorkflowJob *job, ComputeService *compute_service)
             : FailureCause(JOB_TYPE_NOT_SUPPORTED) {
-      this->job = job;
-      this->compute_service = compute_service;
+        this->job = job;
+        this->compute_service = compute_service;
     }
 
     /**
@@ -186,7 +186,7 @@ namespace wrench {
      * @return the job
      */
     WorkflowJob *JobTypeNotSupported::getJob() {
-      return this->job;
+        return this->job;
     }
 
     /**
@@ -194,7 +194,7 @@ namespace wrench {
      * @return the compute service
      */
     ComputeService *JobTypeNotSupported::getComputeService() {
-      return this->compute_service;
+        return this->compute_service;
     }
 
     /**
@@ -202,8 +202,8 @@ namespace wrench {
      * @return the message
      */
     std::string JobTypeNotSupported::toString() {
-      return "Compute service " + this->compute_service->getName() + " on host " +
-             this->compute_service->getHostname() + " does not support jobs of type " + this->job->getTypeAsString();
+        return "Compute service " + this->compute_service->getName() + " on host " +
+               this->compute_service->getHostname() + " does not support jobs of type " + this->job->getTypeAsString();
     }
 
     /**
@@ -213,8 +213,8 @@ namespace wrench {
      */
     NotEnoughResources::NotEnoughResources(WorkflowJob *job, ComputeService *compute_service) : FailureCause(
             NOT_ENOUGH_RESOURCES) {
-      this->job = job;
-      this->compute_service = compute_service;
+        this->job = job;
+        this->compute_service = compute_service;
     }
 
     /**
@@ -222,7 +222,7 @@ namespace wrench {
      * @return the job
      */
     WorkflowJob *NotEnoughResources::getJob() {
-      return this->job;
+        return this->job;
     }
 
     /**
@@ -230,7 +230,7 @@ namespace wrench {
      * @return the compute service
      */
     ComputeService *NotEnoughResources::getComputeService() {
-      return this->compute_service;
+        return this->compute_service;
     }
 
     /**
@@ -238,8 +238,12 @@ namespace wrench {
      * @return the message
      */
     std::string NotEnoughResources::toString() {
-      return "Compute service " + this->compute_service->getName() + " on host " +
-             this->compute_service->getHostname() + " does not have enough compute resources to support job " + job->getName();
+        std::string text_msg = "Compute service " + this->compute_service->getName() + " on host " +
+                               this->compute_service->getHostname() + " does not have enough compute resources";
+        if (job) {
+            text_msg += " to support job " + job->getName();
+        }
+        return text_msg;
     }
 
     /**
@@ -249,8 +253,8 @@ namespace wrench {
     */
     JobKilled::JobKilled(WorkflowJob *job, ComputeService *compute_service) : FailureCause(
             JOB_KILLED) {
-      this->job = job;
-      this->compute_service = compute_service;
+        this->job = job;
+        this->compute_service = compute_service;
     }
 
     /**
@@ -258,7 +262,7 @@ namespace wrench {
      * @return the job
      */
     WorkflowJob *JobKilled::getJob() {
-      return this->job;
+        return this->job;
     }
 
     /**
@@ -266,7 +270,7 @@ namespace wrench {
      * @return the compute service
      */
     ComputeService *JobKilled::getComputeService() {
-      return this->compute_service;
+        return this->compute_service;
     }
 
     /**
@@ -274,8 +278,8 @@ namespace wrench {
      * @return the message
      */
     std::string JobKilled::toString() {
-      return "Job " + this->job->getName() + " on service " +
-             this->compute_service->getName() + " was killed (likely the service was stopped/terminated)";
+        return "Job " + this->job->getName() + " on service " +
+               this->compute_service->getName() + " was killed (likely the service was stopped/terminated)";
     }
 
     /**
@@ -288,12 +292,12 @@ namespace wrench {
     NetworkError::NetworkError(NetworkError::OperationType operation_type,
                                NetworkError::ErrorType error_type,
                                std::string mailbox) : FailureCause(NETWORK_ERROR) {
-      if (mailbox.empty()) {
-        throw std::invalid_argument("NetworkError::NetworkError(): invalid arguments");
-      }
-      this->operation_type = operation_type;
-      this->error_type = error_type;
-      this->mailbox = mailbox;
+        if (mailbox.empty()) {
+            throw std::invalid_argument("NetworkError::NetworkError(): invalid arguments");
+        }
+        this->operation_type = operation_type;
+        this->error_type = error_type;
+        this->mailbox = mailbox;
     }
 
     /**
@@ -301,7 +305,7 @@ namespace wrench {
      * @return true or false
      */
     bool NetworkError::whileReceiving() {
-      return (this->operation_type == NetworkError::RECEIVING);
+        return (this->operation_type == NetworkError::RECEIVING);
     }
 
     /**
@@ -309,7 +313,7 @@ namespace wrench {
      * @return true or false
      */
     bool NetworkError::whileSending() {
-      return (this->operation_type == NetworkError::SENDING);
+        return (this->operation_type == NetworkError::SENDING);
     }
 
     /**
@@ -317,7 +321,7 @@ namespace wrench {
      * @return true or false
      */
     bool NetworkError::isTimeout() {
-      return (this->error_type == NetworkError::TIMEOUT);
+        return (this->error_type == NetworkError::TIMEOUT);
     }
 
     /**
@@ -325,7 +329,7 @@ namespace wrench {
      * @return the mailbox name
      */
     std::string NetworkError::getMailbox() {
-      return this->mailbox;
+        return this->mailbox;
     }
 
     /**
@@ -333,19 +337,19 @@ namespace wrench {
      * @return the message
      */
     std::string NetworkError::toString() {
-      std::string operation;
-      if (this->while_sending) {
-        operation = "sending to";
-      } else {
-        operation = "receiving from";
-      }
-      std::string error;
-      if (this->isTimeout()) {
-        error = "timeout";
-      } else {
-        error = "link failure, or communication peer died";
-      }
-      return "Network error (" + error + ") while " + operation + " mailbox_name " + this->mailbox;
+        std::string operation;
+        if (this->while_sending) {
+            operation = "sending to";
+        } else {
+            operation = "receiving from";
+        }
+        std::string error;
+        if (this->isTimeout()) {
+            error = "timeout";
+        } else {
+            error = "link failure, or communication peer died";
+        }
+        return "Network error (" + error + ") while " + operation + " mailbox_name " + this->mailbox;
     };
 
     /**
@@ -355,7 +359,7 @@ namespace wrench {
      */
     JobCannotBeTerminated::JobCannotBeTerminated(WorkflowJob *job) : FailureCause(
             JOB_CANNOT_BE_TERMINATED) {
-      this->job = job;
+        this->job = job;
     }
 
 
@@ -364,7 +368,7 @@ namespace wrench {
      * @return the job
      */
     WorkflowJob *JobCannotBeTerminated::getJob() {
-      return this->job;
+        return this->job;
     }
 
     /**
@@ -372,7 +376,7 @@ namespace wrench {
      * @return the message
      */
     std::string JobCannotBeTerminated::toString() {
-      return "Job cannot be terminated (because it's neither pending nor running)";
+        return "Job cannot be terminated (because it's neither pending nor running)";
     };
 
 
@@ -383,7 +387,7 @@ namespace wrench {
     */
     JobCannotBeForgotten::JobCannotBeForgotten(WorkflowJob *job) : FailureCause(
             JOB_CANNOT_BE_FORGOTTEN) {
-      this->job = job;
+        this->job = job;
     }
 
 
@@ -392,7 +396,7 @@ namespace wrench {
      * @return the job
      */
     WorkflowJob *JobCannotBeForgotten::getJob() {
-      return this->job;
+        return this->job;
     }
 
     /**
@@ -400,7 +404,7 @@ namespace wrench {
      * @return the message
      */
     std::string JobCannotBeForgotten::toString() {
-      return "Job cannot be forgotten (because it's not completed or failed)";
+        return "Job cannot be forgotten (because it's not completed or failed)";
     };
 
 //    /**
@@ -448,9 +452,9 @@ namespace wrench {
      */
     FileAlreadyBeingCopied::FileAlreadyBeingCopied(WorkflowFile *file, StorageService *storage_service, std::string dst_partition)
             : FailureCause(FILE_ALREADY_BEING_COPIED) {
-      this->file = file;
-      this->storage_service = storage_service;
-      this->dst_partition = dst_partition;
+        this->file = file;
+        this->storage_service = storage_service;
+        this->dst_partition = dst_partition;
     }
 
     /**
@@ -458,7 +462,7 @@ namespace wrench {
      * @return the file
      */
     WorkflowFile *FileAlreadyBeingCopied::getFile() {
-      return this->file;
+        return this->file;
     }
 
     /**
@@ -466,7 +470,7 @@ namespace wrench {
      * @return the storage service
      */
     StorageService *FileAlreadyBeingCopied::getStorageService() {
-      return this->storage_service;
+        return this->storage_service;
     }
 
     /**
@@ -474,7 +478,7 @@ namespace wrench {
     * @return the destination partition
     */
     std::string FileAlreadyBeingCopied::getPartition() {
-      return this->dst_partition;
+        return this->dst_partition;
     }
 
 
@@ -483,8 +487,8 @@ namespace wrench {
      * @return the message
      */
     std::string FileAlreadyBeingCopied::toString() {
-      return "File " + this->file->getID() + " is already being copied to  Storage Service " +
-             this->storage_service->getName();
+        return "File " + this->file->getID() + " is already being copied to  Storage Service " +
+               this->storage_service->getName();
     }
 
 
@@ -502,7 +506,7 @@ namespace wrench {
      * @return the message
      */
     std::string ComputeThreadHasDied::toString() {
-      return "A compute thread has died";
+        return "A compute thread has died";
     };
 
     /**
@@ -519,7 +523,7 @@ namespace wrench {
      * @return the message
      */
     std::string FatalFailure::toString() {
-      return "Internal implementation, likely a WRENCH bug";
+        return "Internal implementation, likely a WRENCH bug";
     };
 
     /**
@@ -528,8 +532,8 @@ namespace wrench {
      * @param functionality_name: a description of the functionality that's not available
      */
     FunctionalityNotAvailable::FunctionalityNotAvailable(Service *service, std::string functionality_name) : FailureCause(FUNCTIONALITY_NOT_AVAILABLE) {
-      this->service = service;
-      this->functionality_name = std::move(functionality_name);
+        this->service = service;
+        this->functionality_name = std::move(functionality_name);
     }
 
     /**
@@ -537,7 +541,7 @@ namespace wrench {
      * @return the service
      */
     Service* FunctionalityNotAvailable::getService() {
-      return this->service;
+        return this->service;
     }
 
     /**
@@ -545,7 +549,7 @@ namespace wrench {
      * @return the functionality name
      */
     std::string FunctionalityNotAvailable::getFunctionalityName() {
-      return this->functionality_name;
+        return this->functionality_name;
     }
 
 
@@ -554,7 +558,7 @@ namespace wrench {
      * @return the message
      */
     std::string FunctionalityNotAvailable::toString() {
-      return "The request functionality (" + this->functionality_name + ") is not available on service " + this->service->getName();
+        return "The request functionality (" + this->functionality_name + ") is not available on service " + this->service->getName();
     }
 
     /**
@@ -564,7 +568,7 @@ namespace wrench {
     */
     JobTimeout::JobTimeout(WorkflowJob *job) : FailureCause(
             JOB_TIMEOUT) {
-      this->job = job;
+        this->job = job;
     }
 
 
@@ -573,7 +577,7 @@ namespace wrench {
      * @return the job
      */
     WorkflowJob *JobTimeout::getJob() {
-      return this->job;
+        return this->job;
     }
 
     /**
@@ -581,7 +585,7 @@ namespace wrench {
      * @return the message
      */
     std::string JobTimeout::toString() {
-      return "Job has timed out - likely not enough time was requested from a (batch-scheduled?) compute service";
+        return "Job has timed out - likely not enough time was requested from a (batch-scheduled?) compute service";
     };
 
     /**
@@ -595,7 +599,7 @@ namespace wrench {
     /** @brief Get the human-readable failure message
      * @return the message
      */
-     std::string HostError::toString() {
-         return "The host (" + this->hostname + ") is down and no service cannot be started on it";
-     }
+    std::string HostError::toString() {
+        return "The host (" + this->hostname + ") is down and no service cannot be started on it";
+    }
 };
