@@ -249,7 +249,7 @@ namespace wrench {
 
       unsigned long total_num_cores = 0;
 
-      for (auto it : getNumCores()) {
+      for (const auto& it : getNumCores()) {
         total_num_cores += it.second;
       }
 
@@ -296,7 +296,7 @@ namespace wrench {
 
       unsigned long total_num_idle_cores = 0;
 
-      for (auto it : getNumIdleCores()) {
+      for (const auto& it : getNumIdleCores()) {
         total_num_idle_cores += it.second;
       }
 
