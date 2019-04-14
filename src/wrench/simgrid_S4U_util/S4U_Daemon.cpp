@@ -184,8 +184,9 @@ namespace wrench {
                 daemon_object->cleanup(daemon_object->hasReturnedFromMain(), daemon_object->getReturnValue());
                 // Free memory for the object unless the service is set to auto-restart
                 if (not daemon_object->isSetToAutoRestart()) {
-                    delete daemon_object->life_saver;
+                    auto life_saver = daemon_object->life_saver;
                     daemon_object->life_saver = nullptr;
+                    delete life_saver;
                 }
                 return 0;
             });
