@@ -21,6 +21,7 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(s4u_virtual_machine, "Log category for S4U_VirtualM
 namespace wrench {
 
     S4U_VirtualMachine::~S4U_VirtualMachine() {
+        WRENCH_INFO("THIS->VM = %p", this->vm);
         this->vm->destroy();
         this->vm = nullptr;
     }
