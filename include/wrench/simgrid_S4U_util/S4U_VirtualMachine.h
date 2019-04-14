@@ -33,8 +33,6 @@ namespace wrench {
             SUSPENDED
         };
 
-        ~S4U_VirtualMachine();
-
         S4U_VirtualMachine(const std::string &vm_hostname,
                            unsigned long num_cores,
                            double ram_memory);

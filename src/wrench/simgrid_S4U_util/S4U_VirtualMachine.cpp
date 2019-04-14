@@ -20,12 +20,6 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(s4u_virtual_machine, "Log category for S4U_VirtualM
 
 namespace wrench {
 
-    S4U_VirtualMachine::~S4U_VirtualMachine() {
-        WRENCH_INFO("THIS->VM = %p", this->vm);
-        this->vm->destroy();
-        this->vm = nullptr;
-    }
-
     /**
      * @brief Constructor
      *
@@ -136,6 +130,7 @@ namespace wrench {
             throw std::runtime_error("S4U_VirtualMachine::shutdown(): Cannot shutdown a VM that's in state " + this->getStateAsString());
         }
         this->vm->shutdown();
+        this->vm->destroy();
         this->state = State::DOWN;
     }
 
