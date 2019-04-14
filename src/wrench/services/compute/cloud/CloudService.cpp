@@ -652,7 +652,7 @@ namespace wrench {
             } while (simgrid::s4u::Host::by_name_or_null(vm_name) != nullptr);
 
             // Create the VM
-            auto vm = std::make_shared<S4U_VirtualMachine>(vm_name, requested_num_cores, requested_ram);
+            auto vm = std::shared_ptr<S4U_VirtualMachine>(new S4U_VirtualMachine(vm_name, requested_num_cores, requested_ram));
 
             // Add the VM to the list of VMs, with (for now) a nullptr compute service
             this->vm_list[vm_name] = std::make_pair(vm, nullptr);

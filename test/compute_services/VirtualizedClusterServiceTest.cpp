@@ -399,7 +399,7 @@ private:
 
             // create a VM with the PM number of cores and 10 bytes of RAM
             auto cs = (wrench::CloudService *) this->test->compute_service;
-            cs->createVM(wrench::ComputeService::ALL_CORES, 10);
+            cs->createVM(2, 10);
             num_cores = cs->getNumCores();
             sum_num_cores = 0;
             for (auto const &c : num_cores) {
