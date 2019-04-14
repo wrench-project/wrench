@@ -21,6 +21,8 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(host_state_change_detector, "Log category for HostS
 void wrench::HostStateChangeDetector::cleanup(bool has_terminated_cleanly, int return_value) {
     // Unregister the callbacks! (otherwise we'd get a segfault after destruction of this service)
     simgrid::s4u::Host::on_state_change.disconnect_slots();
+    simgrid::s4u::VirtualMachine::on_shutdown.disconnect_slots();
+    simgrid::s4u::VirtualMachine::on_start.disconnect_slots();
 }
 
 
