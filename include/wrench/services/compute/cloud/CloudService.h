@@ -77,18 +77,18 @@ namespace wrench {
         /** \cond DEVELOPER    */
         /***********************/
 
-        virtual std::pair<std::string, std::shared_ptr<BareMetalComputeService>> createVM(unsigned long num_cores = ComputeService::ALL_CORES,
-                                     double ram_memory = ComputeService::ALL_RAM,
-                                     std::map<std::string, std::string> property_list = {},
-                                     std::map<std::string, std::string> messagepayload_list = {});
+        virtual std::string createVM(unsigned long num_cores,
+                                     double ram_memory);
 
-        virtual bool shutdownVM(const std::string &vm_hostname);
+        virtual void shutdownVM(const std::string &vm_name);
 
-        virtual bool startVM(const std::string &vm_hostname);
+        virtual std::shared_ptr<BareMetalComputeService> startVM(const std::string &vm_name);
 
-        virtual bool suspendVM(const std::string &vm_hostname);
+        virtual void suspendVM(const std::string &vm_name);
 
-        virtual bool resumeVM(const std::string &vm_hostname);
+        virtual void resumeVM(const std::string &vm_name);
+
+        virtual void destroyVM(const std::string &vm_name);
 
         std::vector<std::string> getExecutionHosts();
 
@@ -132,20 +132,19 @@ namespace wrench {
         virtual void processGetExecutionHosts(const std::string &answer_mailbox);
 
         virtual void processCreateVM(const std::string &answer_mailbox,
-                                     const std::string &pm_name,
-                                     const std::string &vm_name,
                                      unsigned long requested_num_cores,
-                                     double requested_ram,
-                                     std::map<std::string, std::string> &property_list,
-                                     std::map<std::string, std::string> &messagepayload_list);
+                                     double requested_ram);
 
-        virtual void processShutdownVM(const std::string &answer_mailbox, const std::string &vm_hostname);
 
-        virtual void processStartVM(const std::string &answer_mailbox, const std::string &vm_name);
+        virtual void processStartVM(const std::string &answer_mailbox, const std::string &vm_name, const std::string &pm_name);
 
-        virtual void processSuspendVM(const std::string &answer_mailbox, const std::string &vm_hostname);
+        virtual void processShutdownVM(const std::string &answer_mailbox, const std::string &vm_name);
 
-        virtual void processResumeVM(const std::string &answer_mailbox, const std::string &vm_hostname);
+        virtual void processSuspendVM(const std::string &answer_mailbox, const std::string &vm_name);
+
+        virtual void processResumeVM(const std::string &answer_mailbox, const std::string &vm_name);
+
+        virtual void processDestroyVM(const std::string &answer_mailbox, const std::string &vm_name);
 
         virtual void processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
                                               std::map<std::string, std::string> &service_specific_args);
@@ -168,8 +167,8 @@ namespace wrench {
         /** @brief Map of number of used cores at the hosts */
         std::map<std::string, unsigned long> used_cores_per_execution_host;
 
-        /** @brief A map of VMs described by the VM actor, the actual compute service, the total number of cores, and RAM size */
-        std::map<std::string, std::tuple<std::shared_ptr<S4U_VirtualMachine>, std::shared_ptr<BareMetalComputeService>, unsigned long, unsigned long>> vm_list;
+        /** @brief A map of VMs */
+        std::map<std::string, std::pair<std::shared_ptr<S4U_VirtualMachine>, std::shared_ptr<BareMetalComputeService>>> vm_list;
 
         /***********************/
         /** \endcond           */

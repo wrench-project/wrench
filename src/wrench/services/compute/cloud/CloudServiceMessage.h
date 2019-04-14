@@ -60,29 +60,17 @@ namespace wrench {
     class CloudServiceCreateVMRequestMessage : public CloudServiceMessage {
     public:
         CloudServiceCreateVMRequestMessage(const std::string &answer_mailbox,
-                                           const std::string &pm_hostname,
-                                           const std::string &vm_hostname,
                                            unsigned long num_cores,
                                            double ram_memory,
-                                           std::map<std::string, std::string> &property_list,
-                                           std::map<std::string, std::string> &messagepayload_list,
                                            double payload);
 
     public:
         /** @brief The mailbox to which the answer message should be sent */
         std::string answer_mailbox;
-        /** @brief The name of the new VM host  (or the empty string if none specified) */
-        std::string pm_hostname;
-        /** @brief The name of the new VM host */
-        std::string vm_hostname;
         /** @brief The number of cores the service can use (0 means "use as many as there are cores on the host") */
         unsigned long num_cores;
         /** @brief The VM RAM memory capacity (0 means "use all memory available on the host", this can be lead to out of memory issue) */
         double ram_memory;
-        /** @brief A property list ({} means "use all defaults") */
-        std::map<std::string, std::string> property_list;
-        /** @brief A message payload list ({} means "use all defaults") */
-        std::map<std::string, std::string> messagepayload_list;
     };
 
     /**
@@ -90,12 +78,12 @@ namespace wrench {
      */
     class CloudServiceCreateVMAnswerMessage : public CloudServiceMessage {
     public:
-        CloudServiceCreateVMAnswerMessage(bool success, std::shared_ptr<BareMetalComputeService> cs, std::shared_ptr<FailureCause> failure_cause, double payload);
+        CloudServiceCreateVMAnswerMessage(bool success, std::string &vm_name, std::shared_ptr<FailureCause> failure_cause, double payload);
 
         /** @brief Whether the VM creation was successful or not */
         bool success;
-        /** @brief The BareMetalComputeService that runs on the VM */
-        std::shared_ptr<BareMetalComputeService> cs;
+        /** @brief The VM name if success */
+        std::string vm_name;
         /** @brief The cause of the failure, or nullptr on success */
         std::shared_ptr<FailureCause> failure_cause;
     };
@@ -106,14 +94,14 @@ namespace wrench {
     class CloudServiceShutdownVMRequestMessage : public CloudServiceMessage {
     public:
         CloudServiceShutdownVMRequestMessage(const std::string &answer_mailbox,
-                                             const std::string &vm_hostname,
+                                             const std::string &vm_name,
                                              double payload);
 
     public:
         /** @brief The mailbox to which the answer message should be sent */
         std::string answer_mailbox;
         /** @brief The name of the new VM host */
-        std::string vm_hostname;
+        std::string vm_name;
     };
 
     /**
@@ -121,10 +109,12 @@ namespace wrench {
      */
     class CloudServiceShutdownVMAnswerMessage : public CloudServiceMessage {
     public:
-        CloudServiceShutdownVMAnswerMessage(bool success, double payload);
+        CloudServiceShutdownVMAnswerMessage(bool success, std::shared_ptr<FailureCause> failure_cause, double payload);
 
         /** @brief Whether the VM shutdown was successful or not */
         bool success;
+        /** @brief The cause of the failure, or nullptr on success */
+        std::shared_ptr<FailureCause> failure_cause;
     };
 
     /**
@@ -133,14 +123,17 @@ namespace wrench {
     class CloudServiceStartVMRequestMessage : public CloudServiceMessage {
     public:
         CloudServiceStartVMRequestMessage(const std::string &answer_mailbox,
-                                          const std::string &vm_hostname,
+                                          const std::string &vm_name,
+                                          const std::string &pm_name,
                                           double payload);
 
     public:
         /** @brief The mailbox to which the answer message should be sent */
         std::string answer_mailbox;
-        /** @brief The name of the new VM host */
-        std::string vm_hostname;
+        /** @brief The name of the VM  to start */
+        std::string vm_name;
+        /** @brief The name of the physical host on which to start the VM (or "" if up to the service") */
+        std::string pm_name;
     };
 
     /**
@@ -148,10 +141,17 @@ namespace wrench {
      */
     class CloudServiceStartVMAnswerMessage : public CloudServiceMessage {
     public:
-        CloudServiceStartVMAnswerMessage(bool success, double payload);
+        CloudServiceStartVMAnswerMessage(bool success,
+                                         std::shared_ptr<BareMetalComputeService> cs,
+                                         std::shared_ptr<FailureCause> failure_cause,
+                                         double payload);
 
         /** @brief Whether the VM start was successful or not */
         bool success;
+        /** @brief The VM's compute service */
+        std::shared_ptr<BareMetalComputeService> cs;
+        /** @brief The failure cause (or nullptr if success) */
+        std::shared_ptr<FailureCause> failure_cause;
     };
 
     /**
@@ -160,14 +160,14 @@ namespace wrench {
     class CloudServiceSuspendVMRequestMessage : public CloudServiceMessage {
     public:
         CloudServiceSuspendVMRequestMessage(const std::string &answer_mailbox,
-                                            const std::string &vm_hostname,
+                                            const std::string &vm_name,
                                             double payload);
 
     public:
         /** @brief The mailbox to which the answer message should be sent */
         std::string answer_mailbox;
         /** @brief The name of the new VM host */
-        std::string vm_hostname;
+        std::string vm_name;
     };
 
     /**
@@ -175,10 +175,14 @@ namespace wrench {
      */
     class CloudServiceSuspendVMAnswerMessage : public CloudServiceMessage {
     public:
-        CloudServiceSuspendVMAnswerMessage(bool success, double payload);
+        CloudServiceSuspendVMAnswerMessage(bool success,
+                                           std::shared_ptr<FailureCause> failure_cause,
+                                           double payload);
 
         /** @brief Whether the VM suspend was successful or not */
         bool success;
+        /** @brief The failure cause (or nullptr if success) */
+        std::shared_ptr<FailureCause> failure_cause;
     };
 
     /**
@@ -187,14 +191,14 @@ namespace wrench {
     class CloudServiceResumeVMRequestMessage : public CloudServiceMessage {
     public:
         CloudServiceResumeVMRequestMessage(const std::string &answer_mailbox,
-                                           const std::string &vm_hostname,
+                                           const std::string &vm_name,
                                            double payload);
 
     public:
         /** @brief The mailbox to which the answer message should be sent */
         std::string answer_mailbox;
-        /** @brief The name of the new VM host */
-        std::string vm_hostname;
+        /** @brief The name of the VM host */
+        std::string vm_name;
     };
 
     /**
@@ -202,10 +206,50 @@ namespace wrench {
      */
     class CloudServiceResumeVMAnswerMessage : public CloudServiceMessage {
     public:
-        CloudServiceResumeVMAnswerMessage(bool success, double payload);
+        CloudServiceResumeVMAnswerMessage(bool success,
+                                          std::shared_ptr<FailureCause> failure_cause,
+                                          double payload);
 
         /** @brief Whether the VM resume was successful or not */
         bool success;
+        /** @brief The failure cause (or nullptr if success) */
+        std::shared_ptr<FailureCause> failure_cause;
+    };
+
+
+
+
+
+
+    /**
+    * @brief A message sent to a CloudService to request a VM destruction
+    */
+    class CloudServiceDestroyVMRequestMessage : public CloudServiceMessage {
+    public:
+        CloudServiceDestroyVMRequestMessage(const std::string &answer_mailbox,
+                                            const std::string &vm_name,
+                                            double payload);
+
+    public:
+        /** @brief The mailbox to which the answer message should be sent */
+        std::string answer_mailbox;
+        /** @brief The name of the VM host */
+        std::string vm_name;
+    };
+
+    /**
+     * @brief A message sent by a CloudService in answer to a VM destroy request
+     */
+    class CloudServiceDestroyVMAnswerMessage : public CloudServiceMessage {
+    public:
+        CloudServiceDestroyVMAnswerMessage(bool success,
+                                           std::shared_ptr<FailureCause> failure_cause,
+                                           double payload);
+
+        /** @brief Whether the VM suspend was successful or not */
+        bool success;
+        /** @brief The failure cause (or nullptr if success) */
+        std::shared_ptr<FailureCause> failure_cause;
     };
 
     /***********************/

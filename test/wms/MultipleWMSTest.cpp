@@ -125,8 +125,9 @@ private:
       // Submit the 2-task job for execution
       try {
         auto cs = (wrench::CloudService *) *this->getAvailableComputeServices().begin();
-        auto vm = cs->createVM(2, 100);
-        job_manager->submitJob(two_task_job, vm.second.get());
+        auto vm_name = cs->createVM(2, 100);
+        auto vm_cs = cs->startVM(vm_name);
+        job_manager->submitJob(two_task_job, vm_cs.get());
       } catch (wrench::WorkflowExecutionException &e) {
         throw std::runtime_error(e.what());
       }

@@ -277,9 +277,12 @@ namespace wrench {
      * @param batch_job_args
      */
     void BatchService::submitWorkflowJob(WorkflowJob *job, std::map<std::string, std::string> &batch_job_args) {
-        if (this->state == Service::DOWN) {
-            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-        }
+
+        assertServiceIsUp();
+//
+//        if (this->state == Service::DOWN) {
+//            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+//        }
 
         // Get all arguments
         unsigned long num_hosts = 0;
@@ -403,9 +406,11 @@ namespace wrench {
      */
     void BatchService::terminateWorkflowJob(WorkflowJob *job) {
 
-        if (this->state == Service::DOWN) {
-            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-        }
+        assertServiceIsUp();
+
+//        if (this->state == Service::DOWN) {
+//            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+//        }
 
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("terminate_standard_job");
 

@@ -54,6 +54,8 @@ namespace wrench {
                     STORAGE_NOT_ENOUGH_SPACE,
             /** @brief The service cannot be used because it is down (likely it was terminated) */
                     SERVICE_DOWN,
+            /** @brief The service cannot be used because it is suspended (likely it was terminated) */
+                    SERVICE_SUSPENDED,
             /** @brief The compute service does not support this job type */
                     JOB_TYPE_NOT_SUPPORTED,
             /** @brief The compute service cannot run the job (ever) due to insufficient resources (cores and/or ram) */
@@ -75,7 +77,9 @@ namespace wrench {
             /** @brief A job was terminated due to a timeout */
                     JOB_TIMEOUT,
             /** @brief The host went down (while computing, while sleeping) **/
-                    HOST_ERROR
+                    HOST_ERROR,
+            /** @brief Operation is not allowed **/
+                    NOT_ALLOWED
 
         };
 
@@ -252,6 +256,27 @@ namespace wrench {
         /** \cond INTERNAL     */
         /***********************/
         explicit ServiceIsDown(Service *service);
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
+        Service *getService();
+        std::string toString() override;
+
+    private:
+        Service *service;
+    };
+
+    /**
+     * @brief A "service is suspended" failure cause
+     */
+    class
+    ServiceIsSuspended : public FailureCause {
+    public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        explicit ServiceIsSuspended(Service *service);
         /***********************/
         /** \endcond           */
         /***********************/
@@ -512,6 +537,28 @@ namespace wrench {
     private:
         WorkflowJob *job;
     };
+
+    /**
+    * @brief A "operation not allowed" failure cause
+    */
+    class NotAllowed : public FailureCause {
+    public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        NotAllowed(Service *service, std::string &error_message);
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
+        Service *getService();
+        std::string toString();
+
+    private:
+        Service *service;
+        std::string error_message;
+    };
+
 
 
     /***********************/

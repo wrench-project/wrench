@@ -44,6 +44,10 @@ namespace wrench {
         DECLARE_MESSAGEPAYLOAD_NAME(RESUME_VM_REQUEST_MESSAGE_PAYLOAD);
         /** @brief The number of bytes in the control message sent by the service in answer to a VM resume request. **/
         DECLARE_MESSAGEPAYLOAD_NAME(RESUME_VM_ANSWER_MESSAGE_PAYLOAD);
+        /** @brief The number of bytes in the control message sent to the service to request a VM destruction. **/
+        DECLARE_MESSAGEPAYLOAD_NAME(DESTROY_VM_REQUEST_MESSAGE_PAYLOAD);
+        /** @brief The number of bytes in the control message sent by the service in answer to a VM destruction request. **/
+        DECLARE_MESSAGEPAYLOAD_NAME(DESTROY_VM_ANSWER_MESSAGE_PAYLOAD);
     };
 }
 

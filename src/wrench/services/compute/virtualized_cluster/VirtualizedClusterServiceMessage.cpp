@@ -26,7 +26,7 @@ namespace wrench {
      * @brief Constructor
      *
      * @param answer_mailbox: the mailbox to which to send the answer
-     * @param vm_hostname: the name of the new VM host
+     * @param vm_name: the name of the new VM host
      * @param dest_pm_hostname: the name of the destination physical machine host
      * @param payload: the message size in bytes
      *
@@ -34,17 +34,17 @@ namespace wrench {
      */
     VirtualizedClusterServiceMigrateVMRequestMessage::VirtualizedClusterServiceMigrateVMRequestMessage(
             const std::string &answer_mailbox,
-            const std::string &vm_hostname,
+            const std::string &vm_name,
             const std::string &dest_pm_hostname,
             double payload) :
             VirtualizedClusterServiceMessage("MIGRATE_VM_REQUEST", payload) {
 
-        if (answer_mailbox.empty() || dest_pm_hostname.empty() || vm_hostname.empty()) {
+        if (answer_mailbox.empty() || dest_pm_hostname.empty() || vm_name.empty()) {
             throw std::invalid_argument(
                     "VirtualizedClusterServiceMigrateVMRequestMessage::VirtualizedClusterServiceMigrateVMRequestMessage(): Invalid arguments");
         }
         this->answer_mailbox = answer_mailbox;
-        this->vm_hostname = vm_hostname;
+        this->vm_name = vm_name;
         this->dest_pm_hostname = dest_pm_hostname;
     }
 
@@ -52,11 +52,13 @@ namespace wrench {
      * @brief Constructor
      *
      * @param success: whether the VM migration was successful or not
+     * @param failure_cause: a failure cause (or nullptr if success)
      * @param payload: the message size in bytes
      */
     VirtualizedClusterServiceMigrateVMAnswerMessage::VirtualizedClusterServiceMigrateVMAnswerMessage(bool success,
+                                                                                                     std::shared_ptr<FailureCause> failure_cause,
                                                                                                      double payload) :
-            VirtualizedClusterServiceMessage("MIGRATE_VM_ANSWER", payload), success(success) {}
+            VirtualizedClusterServiceMessage("MIGRATE_VM_ANSWER", payload), success(success), failure_cause(failure_cause) {}
 
 
 

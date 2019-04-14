@@ -80,14 +80,15 @@ private:
       // Get the file registry service
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
-      // Create a VM on the cloud service
+      // Create and start a VM on the cloud service
       auto cloud = (wrench::CloudService *) (this->test->cs_cloud);
-      auto vm = cloud->createVM(4, 0.0, {}, {});
+      auto vm_name = cloud->createVM(4, 0.0);
+      auto vm_cs = cloud->startVM(vm_name);
 
       // Get a "STANDARD JOB COMPLETION" event (default handler)
       wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 10.0, 1, 1, 1.0, 0);
       wrench::StandardJob *job1 = job_manager->createStandardJob(task1, {});
-      job_manager->submitJob(job1, vm.second.get());
+      job_manager->submitJob(job1, vm_cs.get());
       this->waitForAndProcessNextEvent();
 
       auto batch = (wrench::BatchService *) (this->test->cs_batch);
@@ -225,11 +226,12 @@ private:
 
       // Get a "STANDARD JOB COMPLETION" event (default handler)
       auto cloud = (wrench::CloudService *) (this->test->cs_cloud);
-      auto vm = cloud->createVM(4, 0.0, {}, {});
+      auto vm_name = cloud->createVM(4, 0.0);
+      auto vm_cs = cloud->startVM(vm_name);
 
       wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 10.0, 1, 1, 1.0, 0);
       wrench::StandardJob *job1 = job_manager->createStandardJob(task1, {});
-      job_manager->submitJob(job1, vm.second.get());
+      job_manager->submitJob(job1, vm_cs.get());
       this->waitForAndProcessNextEvent();
       if (this->counter != 1) {
         throw std::runtime_error("Did not get expected 'STANDARD JOB COMPLETION' event");

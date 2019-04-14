@@ -154,7 +154,8 @@ private:
 
         // Create a 2-core VM
         auto cs = (wrench::CloudService *) this->test->compute_service;
-        auto vm = cs->createVM(2, 10);
+        auto vm_name = cs->createVM(2, 10);
+        auto vm_cs = cs->startVM(vm_name);
 
         wrench::StandardJob *one_task_jobs[5];
         int job_index = 0;
@@ -170,7 +171,7 @@ private:
                     throw std::runtime_error("A one-task job that hasn't even started should not say it has a completed task");
                 }
 
-                job_manager->submitJob(one_task_jobs[job_index], vm.second.get());
+                job_manager->submitJob(one_task_jobs[job_index], vm_cs.get());
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error(e.what());
             }
@@ -194,17 +195,13 @@ private:
             job_index++;
         }
 
-        {
-            // Try to create and submit a job with tasks that are pending, which should fail
-            wrench::StandardJob *bogus_job = job_manager->createStandardJob({*(tasks.begin())}, {}, {}, {}, {});
-            try {
-                job_manager->submitJob(bogus_job, vm.second.get());
-                throw std::runtime_error("Should not be able to create a job with PENDING tasks");
-            } catch (std::invalid_argument &e) {
-            }
+        // Try to create and submit a job with tasks that are pending, which should fail
+        wrench::StandardJob *bogus_job = job_manager->createStandardJob({*(tasks.begin())}, {}, {}, {}, {});
+        try {
+            job_manager->submitJob(bogus_job, vm_cs.get());
+            throw std::runtime_error("Should not be able to create a job with PENDING tasks");
+        } catch (std::invalid_argument &e) {
         }
-
-
 
         // Wait for workflow execution events
         for (auto const & task : tasks) {
@@ -235,7 +232,7 @@ private:
             // Try to create and submit a job with tasks that are completed, which should fail
             wrench::StandardJob *bogus_job = job_manager->createStandardJob({*(++tasks.begin())}, {}, {}, {}, {});
             try {
-                job_manager->submitJob(bogus_job, vm.second.get());
+                job_manager->submitJob(bogus_job, vm_cs.get());
                 throw std::runtime_error("Should not be able to create a job with PENDING tasks");
             } catch (std::invalid_argument &e) {
             }
@@ -258,7 +255,7 @@ private:
         wrench::Simulation::compute(1 / flop_rate);
 
         std::map<std::string, std::vector<std::string>> clusters =
-                this->simulation->getHostnameListByCluster();
+                wrench::Simulation::getHostnameListByCluster();
 
         data_movement_manager->kill();
         job_manager->kill();

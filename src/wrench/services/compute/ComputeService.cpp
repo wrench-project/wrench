@@ -59,9 +59,10 @@ namespace wrench {
         throw std::invalid_argument("ComputeService::submitJob(): invalid argument");
       }
 
-      if (this->state == ComputeService::DOWN) {
-        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-      }
+      assertServiceIsUp();
+//      if (this->state == ComputeService::DOWN) {
+//        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+//      }
 
       try {
         switch (job->getType()) {
@@ -96,9 +97,10 @@ namespace wrench {
         throw std::invalid_argument("ComputeService::terminateJob(): invalid argument");
       }
 
-      if (this->state == ComputeService::DOWN) {
-        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-      }
+      assertServiceIsUp();
+//      if (this->state == ComputeService::DOWN) {
+//        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+//      }
 
       try {
         switch (job->getType()) {
@@ -348,9 +350,10 @@ namespace wrench {
      */
     std::map<std::string, std::map<std::string, double>> ComputeService::getServiceResourceInformation() {
 
-      if (this->state == Service::DOWN) {
-        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-      }
+      assertServiceIsUp();
+//      if (this->state == Service::DOWN) {
+//        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+//      }
 
       // send a "info request" message to the daemon's mailbox_name
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("get_service_info");

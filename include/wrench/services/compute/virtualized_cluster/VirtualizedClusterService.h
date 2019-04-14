@@ -60,15 +60,11 @@ namespace wrench {
         /** \cond DEVELOPER    */
         /***********************/
 
-        using CloudService::createVM;
+        using CloudService::startVM;
 
-        virtual std::pair<std::string, std::shared_ptr<BareMetalComputeService>> createVM(const std::string &pm_hostname,
-                                     unsigned long num_cores = ComputeService::ALL_CORES,
-                                     double ram_memory = ComputeService::ALL_RAM,
-                                     std::map<std::string, std::string> property_list = {},
-                                     std::map<std::string, std::string> messagepayload_list = {});
+        virtual std::shared_ptr<BareMetalComputeService> startVM(const std::string &vm_name, const std::string &pm_name);
 
-        virtual bool migrateVM(const std::string &vm_hostname, const std::string &dest_pm_hostname);
+        virtual void migrateVM(const std::string &vm_hostname, const std::string &dest_pm_hostname);
 
         /***********************/
         /** \endcond          **/
@@ -87,7 +83,7 @@ namespace wrench {
         virtual bool processNextMessage() override;
 
         virtual void processMigrateVM(const std::string &answer_mailbox,
-                                      const std::string &vm_hostname,
+                                      const std::string &vm_name,
                                       const std::string &dest_pm_hostname);
 
         /***********************/

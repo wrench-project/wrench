@@ -38,12 +38,12 @@ namespace wrench {
     class VirtualizedClusterServiceMigrateVMRequestMessage : public VirtualizedClusterServiceMessage {
     public:
         VirtualizedClusterServiceMigrateVMRequestMessage(const std::string &answer_mailbox,
-                                                         const std::string &vm_hostname,
+                                                         const std::string &vm_name,
                                                          const std::string &dest_pm_hostname,
                                                          double payload);
 
         /** @brief The name of the host on which the VM is currently executed */
-        std::string vm_hostname;
+        std::string vm_name;
         /** @brief The name of the host to which the VM should be migrated */
         std::string dest_pm_hostname;
         /** @brief The mailbox to which the answer message should be sent */
@@ -55,10 +55,13 @@ namespace wrench {
      */
     class VirtualizedClusterServiceMigrateVMAnswerMessage : public VirtualizedClusterServiceMessage {
     public:
-        VirtualizedClusterServiceMigrateVMAnswerMessage(bool success, double payload);
+        VirtualizedClusterServiceMigrateVMAnswerMessage(bool success, std::shared_ptr<FailureCause> failure_cause, double payload);
 
         /** @brief Whether the VM migration was successful or not */
         bool success;
+        /** @brief A failure cause (or nullptr if success) */
+        std::shared_ptr<FailureCause> failure_cause;
+
     };
 
     /***********************/

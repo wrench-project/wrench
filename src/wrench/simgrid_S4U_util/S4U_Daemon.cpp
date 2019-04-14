@@ -82,7 +82,7 @@ namespace wrench {
 #define CLEAN_UP_MAILBOX_TO_AVOID_MEMORY_LEAK 0
 
     S4U_Daemon::~S4U_Daemon() {
-        WRENCH_INFO("IN DAEMON DESTRUCTOR (%s)'", this->getName().c_str());
+//        WRENCH_INFO("IN DAEMON DESTRUCTOR (%s)'", this->getName().c_str());
 
         /** The code below was to avoid a memory leak on the actor! However, weirdly,
          *  it now causes problems due to SimGrid complaining that on_exit() functions
@@ -255,9 +255,7 @@ namespace wrench {
  * @brief Suspend the daemon/actor.
  */
     void S4U_Daemon::suspendActor() {
-        WRENCH_INFO("IN SUSPEND: %p %d", this->s4u_actor.get(), this->has_returned_from_main);
         if ((this->s4u_actor != nullptr) && (not this->has_returned_from_main)) {
-            WRENCH_INFO("SUSPENDING THE ACTOR");
             this->s4u_actor->suspend();
         }
     }
