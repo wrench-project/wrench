@@ -393,44 +393,35 @@ private:
                 sum_num_idle_cores += c.second;
             }
 
-            if (sum_num_cores != 0 || sum_num_idle_cores != 0) {
-                throw std::runtime_error("getHostNumCores() and getNumIdleCores() should be 0.");
-            }
-
-            // create a VM with the PM number of cores and 10 bytes of RAM
-            auto cs = (wrench::CloudService *) this->test->compute_service;
-            cs->createVM(2, 10);
-            num_cores = cs->getNumCores();
-            sum_num_cores = 0;
-            for (auto const &c : num_cores) {
-                sum_num_cores += c.second;
-            }
-
-            num_idle_cores = cs->getNumIdleCores();
-            sum_num_idle_cores = 0;
-            for (auto const &c : num_idle_cores) {
-                sum_num_idle_cores += c.second;
-            }
-
-            if (sum_num_cores != 4 || sum_num_idle_cores != 4) {
-                throw std::runtime_error("getHostNumCores() and getNumIdleCores() should be 4.");
-            }
-
-            // create a VM with two cores
-            cs->createVM(2, 10);
-            num_cores = cs->getNumCores();
-            sum_num_cores = 0;
-            for (auto const &c : num_cores) {
-                sum_num_cores += c.second;
-            }
-            num_idle_cores = cs->getNumIdleCores();
-            sum_num_idle_cores = 0;
-            for (auto const &c : num_idle_cores) {
-                sum_num_idle_cores += c.second;
-            }
-
             if (sum_num_cores != 6 || sum_num_idle_cores != 6) {
-                throw std::runtime_error("getHostNumCores() and getNumIdleCores() should be 6.");
+                throw std::runtime_error("getHostNumCores() and getNumIdleCores() should be 6 (they report " +
+                std::to_string(sum_num_cores) + " and " + std::to_string(sum_num_idle_cores)+ ")");
+            }
+
+            // create and start VM with the 2  cores and 10 bytes of RAM
+            auto cs = (wrench::CloudService *) this->test->compute_service;
+            cs->startVM(cs->createVM(2, 10));
+
+            num_idle_cores = cs->getNumIdleCores();
+            sum_num_idle_cores = 0;
+            for (auto const &c : num_idle_cores) {
+                sum_num_idle_cores += c.second;
+            }
+
+            if (sum_num_idle_cores != 4) {
+                throw std::runtime_error("getNumIdleCores() should be 4 (it is reported as " + std::to_string(sum_num_idle_cores) + ")");
+            }
+
+            // create and start a VM with two cores
+            cs->startVM(cs->createVM(2, 10));
+            num_idle_cores = cs->getNumIdleCores();
+            sum_num_idle_cores = 0;
+            for (auto const &c : num_idle_cores) {
+                sum_num_idle_cores += c.second;
+            }
+
+            if (sum_num_idle_cores != 2) {
+                throw std::runtime_error("getHostNumCores() and getNumIdleCores() should be 2 (it is reported as " + std::to_string(sum_num_idle_cores) + ")");
             }
 
         } catch (wrench::WorkflowExecutionException &e) {
