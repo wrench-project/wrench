@@ -132,9 +132,12 @@ namespace wrench {
      *
      */
     double StorageService::getFreeSpace() {
-      if (this->state == DOWN) {
-        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-      }
+
+      assertServiceIsUp();
+
+//      if (this->state == DOWN) {
+//        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+//      }
 
       // Send a message to the daemon
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("how_much_free_space");
@@ -179,9 +182,11 @@ namespace wrench {
         throw std::invalid_argument("StorageService::lookupFile(): Invalid arguments");
       }
 
-      if (this->state == DOWN) {
-        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-      }
+      assertServiceIsUp();
+
+//      if (this->state == DOWN) {
+//        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+//      }
 
       std::string dst_partition = "/";
       return this->lookupFile(file, dst_partition);
@@ -204,9 +209,11 @@ namespace wrench {
         throw std::invalid_argument("StorageService::lookupFile(): Invalid arguments");
       }
 
-      if (this->state == DOWN) {
-        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-      }
+      assertServiceIsUp();
+
+//      if (this->state == DOWN) {
+//        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+//      }
 
       std::string dst_partition = "/";
       if (job != nullptr) {
@@ -233,9 +240,11 @@ namespace wrench {
         throw std::invalid_argument("StorageService::lookupFile(): Invalid arguments");
       }
 
-      if (this->state == DOWN) {
-        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-      }
+      assertServiceIsUp();
+
+//      if (this->state == DOWN) {
+//        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+//      }
 
       // Empty partition means "/"
       if (dst_partition.empty()) {
@@ -320,9 +329,11 @@ namespace wrench {
         throw std::invalid_argument("StorageService::readFile(): Invalid arguments");
       }
 
-      if (this->state == DOWN) {
-        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-      }
+      assertServiceIsUp();
+
+//      if (this->state == DOWN) {
+//        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+//      }
 
       // Empty partition means "/"
       if (src_partition.empty()) {
@@ -433,9 +444,11 @@ namespace wrench {
         throw std::invalid_argument("StorageService::writeFile(): Invalid arguments");
       }
 
-      if (this->state == DOWN) {
-        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-      }
+      assertServiceIsUp();
+
+//      if (this->state == DOWN) {
+//        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+//      }
 
       // Empty partition means "/"
       if (dst_partition.empty()) {
@@ -647,9 +660,11 @@ namespace wrench {
         throw std::invalid_argument("StorageService::deleteFile(): Invalid arguments");
       }
 
-      if (this->state == DOWN) {
-        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-      }
+      assertServiceIsUp();
+
+//      if (this->state == DOWN) {
+//        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+//      }
 
       std::string dst_partition = "/";
       this->deleteFile(file, dst_partition, file_registry_service);
@@ -673,9 +688,11 @@ namespace wrench {
         throw std::invalid_argument("StorageService::deleteFile(): Invalid arguments");
       }
 
-      if (this->state == DOWN) {
-        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-      }
+      assertServiceIsUp();
+
+//      if (this->state == DOWN) {
+//        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+//      }
 
       std::string dst_partition = "/";
       if (job != nullptr) {
@@ -797,9 +814,11 @@ namespace wrench {
                 "StorageService::copyFile(file,src): Cannot redundantly copy a file to its own partition");
       }
 
-      if (this->state == DOWN) {
-        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-      }
+      assertServiceIsUp();
+
+//      if (this->state == DOWN) {
+//        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+//      }
 
       std::string src_partition = "/";
 
@@ -834,9 +853,11 @@ namespace wrench {
                 "StorageService::copyFile(file,src,src_job,dst_job): Cannot copy files from one job's private partition to another job's private partition");
       }
 
-      if (this->state == DOWN) {
-        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-      }
+      assertServiceIsUp();
+
+//      if (this->state == DOWN) {
+//        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+//      }
 
       std::string src_partition = "/";
       if (src_job != nullptr) {
@@ -949,9 +970,11 @@ namespace wrench {
                 "StorageService::copyFile(): Cannot redundantly copy a file to the its own partition");
       }
 
-      if (this->state == DOWN) {
-        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-      }
+      assertServiceIsUp();
+
+//      if (this->state == DOWN) {
+//        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+//      }
 
       auto start_timestamp = new SimulationTimestampFileCopyStart(file, src, src_partition, this, dst_partition);
       this->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyStart>(start_timestamp);
@@ -995,9 +1018,11 @@ namespace wrench {
         throw std::invalid_argument("StorageService::initiateFileRead(): Invalid arguments");
       }
 
-      if (this->state == DOWN) {
-        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-      }
+      assertServiceIsUp();
+
+//      if (this->state == DOWN) {
+//        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+//      }
 
       // Empty partition means "/"
       if (src_partition.empty()) {

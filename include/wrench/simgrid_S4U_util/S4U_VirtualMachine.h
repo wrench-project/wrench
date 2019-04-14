@@ -25,16 +25,21 @@ namespace wrench {
     class S4U_VirtualMachine {
 
     public:
+
+        /** @brief VM state enum */
+        enum State {
+            DOWN,
+            RUNNING,
+            SUSPENDED
+        };
+
+        ~S4U_VirtualMachine();
+
         S4U_VirtualMachine(const std::string &vm_hostname,
-                           const std::string &pm_hostname,
                            unsigned long num_cores,
                            double ram_memory);
 
-        simgrid::s4u::VirtualMachine *get();
-
-        simgrid::s4u::Host *getPm();
-
-        void start();
+        void start(std::string &pm_name);
 
         void suspend();
 
@@ -42,15 +47,23 @@ namespace wrench {
 
         void shutdown();
 
-        void stop();
+        void migrate(const std::string &dst_pm_name);
 
-        bool isRunning();
 
-        bool isSuspended();
+        std::string getPhysicalHostname();
+        unsigned long getNumCores();
+        double getMemory();
+        State getState();
+        std::string getStateAsString();
+
 
     private:
-        /** @brief a pointer to the simgrid::s4u::VirtualMachine object */
+        State state;
+        std::string vm_name;
         simgrid::s4u::VirtualMachine *vm;
+        unsigned long num_cores;
+        double ram_memory;
+        std::string pm_hostname;
     };
 
     /***********************/

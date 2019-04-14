@@ -167,9 +167,33 @@ namespace wrench {
      * @return the message
      */
     std::string ServiceIsDown::toString() {
-        return "Service " + this->service->getName() + " on host " + this->service->getHostname() + " was terminated ";
+        return "Service " + this->service->getName() + " on host " + this->service->getHostname() + " was terminated";
     }
 
+    /**
+     * @brief Constructor
+     * @param service: the service that was suspended
+     */
+    ServiceIsSuspended::ServiceIsSuspended(Service *service) : FailureCause(SERVICE_DOWN) {
+        this->service = service;
+    }
+
+    /**
+     * @brief Getter
+     * @return the service
+     */
+    Service *ServiceIsSuspended::getService() {
+        return this->service;
+    }
+
+    /**
+     * @brief Get the human-readable failure message
+     * @return the message
+     */
+    std::string ServiceIsSuspended::toString() {
+        return "Service " + this->service->getName() + " on host " + this->service->getHostname() + " is suspended";
+    }
+    
     /**
      * @brief Constructor
      * @param job: the job that wasn't supported
@@ -602,4 +626,31 @@ namespace wrench {
     std::string HostError::toString() {
         return "The host (" + this->hostname + ") is down and no service cannot be started on it";
     }
+
+    /**
+     * @brief Constructor
+     * @param service: the service that cause the error
+     * @param error_message: a custom error message
+     */
+    NotAllowed::NotAllowed(Service *service, std::string &error_message) : FailureCause(NOT_ALLOWED) {
+        this->service = service;
+        this->error_message = error_message;
+    }
+
+    /**
+     * @brief Get the service that caused the error
+     * @return the service
+     */
+    Service *NotAllowed::getService() {
+        return this->service;
+    }
+
+    /**
+     * @brief Get the human-readable failure message
+     * @return the message
+     */
+    std::string NotAllowed::toString() {
+        return "The service (" + this->service->getName() + ") does not allow the operation (" + this->error_message + ")";
+    }
+
 };

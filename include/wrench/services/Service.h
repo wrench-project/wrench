@@ -55,6 +55,8 @@ namespace wrench {
         double getPropertyValueAsUnsignedLong(std::string);
         bool getPropertyValueAsBoolean(std::string);
 
+        void assertServiceIsUp();
+
         double getNetworkTimeoutValue();
         void setNetworkTimeoutValue(double value);
 

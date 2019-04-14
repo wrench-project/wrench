@@ -79,9 +79,11 @@ namespace wrench {
      */
     std::pair<std::pair<double, double>, double> NetworkProximityService::getHostCoordinate(std::string requested_host) {
 
-        if (this->state == DOWN) {
-            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-        }
+        assertServiceIsUp();
+
+//        if (this->state == DOWN) {
+//            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+//        }
 
         if (boost::iequals(
                 this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE),
@@ -131,9 +133,11 @@ namespace wrench {
      */
     std::pair<double, double> NetworkProximityService::getHostPairDistance(std::pair<std::string, std::string> hosts) {
 
-        if (this->state == DOWN) {
-            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-        }
+        assertServiceIsUp();
+
+//        if (this->state == DOWN) {
+//            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+//        }
 
         std::string network_service_type = this->getPropertyValueAsString(
                 NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE);

@@ -79,9 +79,11 @@ namespace wrench {
         throw std::invalid_argument("FileRegistryService::lookupEntry(): Invalid argument");
       }
 
-      if (this->state != Service::UP) {
-        throw WorkflowExecutionException(std::shared_ptr<ServiceIsDown>(new ServiceIsDown(this)));
-      }
+      assertServiceIsUp();
+
+//      if (this->state != Service::UP) {
+//        throw WorkflowExecutionException(std::shared_ptr<ServiceIsDown>(new ServiceIsDown(this)));
+//      }
 
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("lookup_entry");
 
@@ -128,9 +130,11 @@ namespace wrench {
         throw std::invalid_argument("FileRegistryService::lookupEntryByProximity(): Invalid argument, no file");
       }
 
-      if (this->state != Service::UP) {
-        throw WorkflowExecutionException(std::shared_ptr<ServiceIsDown>(new ServiceIsDown(this)));
-      }
+      assertServiceIsUp();
+
+//      if (this->state != Service::UP) {
+//        throw WorkflowExecutionException(std::shared_ptr<ServiceIsDown>(new ServiceIsDown(this)));
+//      }
 
       // check to see if the 'reference_host' is valid
       std::vector<std::string> monitored_hosts = network_proximity_service->getHostnameList();
@@ -178,9 +182,11 @@ namespace wrench {
         throw std::invalid_argument("FileRegistryService::addEntry(): Invalid  argument");
       }
 
-      if (this->state != Service::UP) {
-        throw WorkflowExecutionException(std::shared_ptr<ServiceIsDown>(new ServiceIsDown(this)));
-      }
+      assertServiceIsUp();
+
+//      if (this->state != Service::UP) {
+//        throw WorkflowExecutionException(std::shared_ptr<ServiceIsDown>(new ServiceIsDown(this)));
+//      }
 
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("add_entry");
 
@@ -223,9 +229,11 @@ namespace wrench {
         throw std::invalid_argument(" FileRegistryService::removeEntry(): Invalid input argument");
       }
 
-      if (this->state != Service::UP) {
-        throw WorkflowExecutionException(std::shared_ptr<ServiceIsDown>(new ServiceIsDown(this)));
-      }
+      assertServiceIsUp();
+
+//      if (this->state != Service::UP) {
+//        throw WorkflowExecutionException(std::shared_ptr<ServiceIsDown>(new ServiceIsDown(this)));
+//      }
 
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("remove_entry");
 

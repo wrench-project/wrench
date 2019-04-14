@@ -8,101 +8,175 @@
  *
  */
 
+#include <wrench/simgrid_S4U_util/S4U_VirtualMachine.h>
+
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/simgrid_S4U_util/S4U_VirtualMachine.h"
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
+#include <simgrid/plugins/live_migration.h>
+
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(s4u_virtual_machine, "Log category for S4U_VirtualMachine");
 
 namespace wrench {
 
+    S4U_VirtualMachine::~S4U_VirtualMachine() {
+        this->vm->destroy();
+        this->vm = nullptr;
+    }
+
     /**
      * @brief Constructor
      *
-     * @param vm_hostname: the name of the VM host
-     * @param pm_hostname: the name of the physical machine host
+     * @param vm_hostname: the name of the VM
      * @param num_cores: the number of cores the VM can use
      * @param ram_memory: the VM RAM memory capacity
      */
-    S4U_VirtualMachine::S4U_VirtualMachine(const std::string &vm_hostname, const std::string &pm_hostname,
+    S4U_VirtualMachine::S4U_VirtualMachine(const std::string &vm_name,
                                            unsigned long num_cores, double ram_memory) {
 
-        this->vm = new simgrid::s4u::VirtualMachine(vm_hostname,
-                                                    simgrid::s4u::Host::by_name(pm_hostname),
-                                                    (int)num_cores,
-                                                    (size_t)ram_memory);
+        this->vm_name = vm_name;
+        this->num_cores = num_cores;
+        this->ram_memory = ram_memory;
+        this->state = State::DOWN;
+    }
 
-        WRENCH_INFO("Starting VM %s on Physical host %s", vm_hostname.c_str(), pm_hostname.c_str());
-        // Henri commented out the call below because The RAM size is passed to the constructor above...
-        // this->vm->set_ramsize((size_t)ram_memory);
-        start();
+//    /**
+//     * @brief Get a pointer to the simgrid::s4u::VirtualMachine object
+//     *
+//     * @return a pointer to the simgrid::s4u::VirtualMachine object
+//     */
+//    simgrid::s4u::VirtualMachine *S4U_VirtualMachine::get() {
+//        return this->vm;
+//    }
+
+//    /**
+//     * @brief Get a pointer to the physical machine host
+//     * @return a pointer to the physical machine host
+//     */
+//    simgrid::s4u::Host *S4U_VirtualMachine::getPm() {
+//        return this->vm->get_pm();
+//    }
+
+    /**
+    * @brief Get the physical hostname
+    * @return the physical hostname
+    */
+    std::string S4U_VirtualMachine::getPhysicalHostname() {
+        return this->pm_hostname;
     }
 
     /**
-     * @brief Get a pointer to the simgrid::s4u::VirtualMachine object
-     *
-     * @return a pointer to the simgrid::s4u::VirtualMachine object
-     */
-    simgrid::s4u::VirtualMachine *S4U_VirtualMachine::get() {
-        return this->vm;
+       * @brief Get the number of cores
+       * @return the number of cores
+       */
+    unsigned long S4U_VirtualMachine::getNumCores() {
+        return this->num_cores;
     }
 
     /**
-     * @brief Get a pointer to the physical machine host
-     * @return a pointer to the physical machine host
-     */
-    simgrid::s4u::Host *S4U_VirtualMachine::getPm() {
-        return this->vm->get_pm();
+    * @brief Get the memory consumption
+    * @return the memory consumption
+    */
+    double S4U_VirtualMachine::getMemory() {
+        return this->ram_memory;
     }
 
     /**
-     * @brief Start the virtual machine
-     */
-    void S4U_VirtualMachine::start() {
+    * @brief Start the virtual machine
+    * @param pm_name: the physical host name
+    */
+    void S4U_VirtualMachine::start(std::string &pm_name) {
+
+        if (this->state != State::DOWN) {
+            throw std::runtime_error("S4U_VirtualMachine::suspend(): Cannot suspend a VM that's in state " + this->getStateAsString());
+        }
+
+        simgrid::s4u::Host *physical_host = simgrid::s4u::Host::by_name_or_null(pm_name);
+        if (physical_host == nullptr) {
+            throw std::runtime_error("S4U_VirtualMachine::start(): unknown physical host '" + pm_name + "'");
+        }
+        this->vm = new simgrid::s4u::VirtualMachine(this->vm_name,
+                                                    physical_host,
+                                                    (int)this->num_cores,
+                                                    (size_t)this->ram_memory);
         this->vm->start();
+        this->state = State::RUNNING;
     }
 
     /**
      * @brief Suspend the virtual machine
      */
     void S4U_VirtualMachine::suspend() {
+        if (this->state != State::RUNNING) {
+            throw std::runtime_error("S4U_VirtualMachine::suspend(): Cannot suspend a VM that's in state " + this->getStateAsString());
+        }
         this->vm->suspend();
+        this->state = State::SUSPENDED;
     }
 
     /**
      * @brief Resume the virtual machine
      */
     void S4U_VirtualMachine::resume() {
+        if (this->vm->get_state() != simgrid::s4u::VirtualMachine::state::SUSPENDED) {
+            throw std::runtime_error("S4U_VirtualMachine::resume(): Cannot resume a VM that's in state " + this->getStateAsString());
+        }
         this->vm->resume();
+        this->state = State::RUNNING;
     }
 
     /**
      * @brief Shutdown the virtual machine
      */
     void S4U_VirtualMachine::shutdown() {
+        if ((this->vm->get_state() != simgrid::s4u::VirtualMachine::state::SUSPENDED) and
+            (this->vm->get_state() != simgrid::s4u::VirtualMachine::state::RUNNING)) {
+            throw std::runtime_error("S4U_VirtualMachine::shutdown(): Cannot shutdown a VM that's in state " + this->getStateAsString());
+        }
         this->vm->shutdown();
+        this->state = State::DOWN;
     }
 
-    /**
-     * @brief Stop the virtual machine
-     */
-    void S4U_VirtualMachine::stop() {
-        this->vm->destroy();
+//    /**
+//     * @brief Stop the virtual machine
+//     */
+//    void S4U_VirtualMachine::destroy() {
+//        if (this->vm->get_state() != simgrid::s4u::VirtualMachine::state::CREATED) {
+//            throw std::runtime_error("S4U_VirtualMachine::resume(): Cannot resume a VM that is not suspended");
+//        }
+//        this->vm->destroy();
+//    }
+
+
+
+    S4U_VirtualMachine::State S4U_VirtualMachine::getState() {
+        return this->state;
     }
 
-    /**
-     * @brief Check whether the VM is running
-     * @return True if the VM is running, false otherwise
-     */
-    bool S4U_VirtualMachine::isRunning() {
-        return this->vm->get_state() == simgrid::s4u::VirtualMachine::state::RUNNING;
+
+    std::string S4U_VirtualMachine::getStateAsString() {
+        switch (this->state) {
+            case State::DOWN:
+                return "DOWN";
+            case State::RUNNING:
+                return "RUNNING";
+            case State::SUSPENDED:
+                return "SUSPENDED";
+            default:
+                return "???";
+        }
     }
 
-    /**
-     * @brief Check whether the VM is suspended
-     * @return True if the VM is suspended, false otherwise
-     */
-    bool S4U_VirtualMachine::isSuspended() {
-        return this->vm->get_state() == simgrid::s4u::VirtualMachine::state::SUSPENDED;
+    void S4U_VirtualMachine::migrate(const std::string &dest_pm_name) {
+
+        std::string src_pm_hostname = this->vm->get_pm()->get_name();
+        simgrid::s4u::Host *dest_pm = simgrid::s4u::Host::by_name_or_null(dest_pm_name);
+
+        double mig_sta = simgrid::s4u::Engine::get_clock();
+        sg_vm_migrate(this->vm, dest_pm);
+        double mig_end = simgrid::s4u::Engine::get_clock();
+        WRENCH_INFO("%s migrated: %s to %g s", src_pm_hostname.c_str(), dest_pm_name.c_str(), mig_end - mig_sta);
     }
+
 }
