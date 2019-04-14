@@ -84,6 +84,8 @@ namespace wrench {
      */
     std::vector<std::string> CloudService::getExecutionHosts() {
 
+        assertServiceIsUp();
+
         // send a "get execution hosts" message to the daemon's mailbox_name
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("get_execution_hosts");
 
@@ -98,36 +100,35 @@ namespace wrench {
             return msg->execution_hosts;
         } else {
             throw std::runtime_error(
-                    "CloudService::sendRequest(): Received an unexpected [" + msg->getName() + "] message!");
+                    "CloudService::sendRequest(): Received an unexpected [" + answer_message->getName() + "] message!");
         }
     }
 
     /**
      * @brief Create a BareMetalComputeService VM (balances load on execution hosts)
      *
-     * @param num_cores: the number of cores the VM can use (use ComputeService::ALL_CORES to use all cores
-     *                   available on a physical host)
-     * @param ram_memory: the VM's RAM memory capacity (use ComputeService::ALL_RAM to use all RAM available on a physical
-     *                    host, this can be lead to an out of memory issue)
+     * @param num_cores: the number of cores for the VM
+     * @param ram_memory: the VM's RAM memory capacity
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      *
-     * @return A pair that contains the VM name and the BareMetalComputeService that runs on that VM
+     * @return A VM name
      *
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
      */
-    std::pair<std::string, std::shared_ptr<BareMetalComputeService>> CloudService::createVM(unsigned long num_cores,
-                                                                                            double ram_memory,
-                                                                                            std::map<std::string, std::string> property_list,
-                                                                                            std::map<std::string, std::string> messagepayload_list) {
+    std::string CloudService::createVM(unsigned long num_cores,
+                                       double ram_memory) {
 
 
-        // Pick a VM hostname (and being paranoid about mistakenly picking an actual hostname!)
-        std::string vm_name;
-        do {
-            vm_name = this->getName() + "_vm" + std::to_string(CloudService::VM_ID++);
-        } while (simgrid::s4u::Host::by_name_or_null(vm_name) != nullptr);
+        if (num_cores == ComputeService::ALL_CORES) {
+            throw std::invalid_argument("CloudService::createVM(): the VM's number of cores cannot be ComputeService::ALL_CORES");
+        }
+        if (ram_memory == ComputeService::ALL_RAM) {
+            throw std::invalid_argument("CloudService::createVM(): the VM's memory requirement cannot be ComputeService::ALL_RAM");
+        }
+
+        assertServiceIsUp();
 
         // send a "create vm" message to the daemon's mailbox_name
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("create_vm");
@@ -135,37 +136,37 @@ namespace wrench {
         std::unique_ptr<SimulationMessage> answer_message = sendRequest(
                 answer_mailbox,
                 new CloudServiceCreateVMRequestMessage(
-                        answer_mailbox, "", vm_name,
-                        num_cores, ram_memory, property_list, messagepayload_list,
+                        answer_mailbox,
+                        num_cores, ram_memory,
                         this->getMessagePayloadValueAsDouble(
                                 CloudServiceMessagePayload::CREATE_VM_REQUEST_MESSAGE_PAYLOAD)));
 
         if (auto msg = dynamic_cast<CloudServiceCreateVMAnswerMessage *>(answer_message.get())) {
-            if (msg->success) {
-                return  std::make_pair(vm_name, msg->cs);
-            } else {
+            if (not msg->success) {
                 throw WorkflowExecutionException(msg->failure_cause);
+            } else {
+                return msg->vm_name;
             }
         } else {
-            throw std::runtime_error("CloudService::createVM(): Unexpected [" + msg->getName() + "] message");
+            throw std::runtime_error("CloudService::createVM(): Unexpected [" + answer_message->getName() + "] message");
         }
     }
 
     /**
      * @brief Shutdown an active VM
      *
-     * @param vm_hostname: the name of the VM host
-     *
-     * @return Whether the VM shutdown succeeded
+     * @param vm_name: the name of the VM
      *
      * @throw WorkflowExecutionException
      * @throw std::invalid_argument
      */
-    bool CloudService::shutdownVM(const std::string &vm_hostname) {
+    void CloudService::shutdownVM(const std::string &vm_name) {
 
-        if (this->vm_list.find(vm_hostname) == this->vm_list.end()) {
-            throw std::invalid_argument("CloudService::shutdownVM(): Unknown VM name '" + vm_hostname + "'");
+        if (this->vm_list.find(vm_name) == this->vm_list.end()) {
+            throw std::invalid_argument("CloudService::shutdownVM(): Unknown VM name '" + vm_name + "'");
         }
+
+        assertServiceIsUp();
 
         // send a "shutdown vm" message to the daemon's mailbox_name
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("shutdown_vm");
@@ -173,65 +174,73 @@ namespace wrench {
         std::unique_ptr<SimulationMessage> answer_message = sendRequest(
                 answer_mailbox,
                 new CloudServiceShutdownVMRequestMessage(
-                        answer_mailbox, vm_hostname,
+                        answer_mailbox, vm_name,
                         this->getMessagePayloadValueAsDouble(
                                 CloudServiceMessagePayload::SHUTDOWN_VM_REQUEST_MESSAGE_PAYLOAD)));
 
         if (auto msg = dynamic_cast<CloudServiceShutdownVMAnswerMessage *>(answer_message.get())) {
-            return msg->success;
+            if (not msg->success) {
+                throw WorkflowExecutionException(msg->failure_cause);
+            }
         } else {
-            throw std::runtime_error("CloudService::shutdownVM(): Unexpected [" + msg->getName() + "] message");
+            throw std::runtime_error("CloudService::shutdownVM(): Unexpected [" + answer_message->getName() + "] message");
         }
+        return;
     }
 
     /**
      * @brief Start a VM
      *
-     * @param vm_hostname: the name of the VM host
+     * @param vm_name: the name of the VM
      *
-     * @return Whether the VM start succeeded
+     * @return A BareMetalComputeService that runs on the VM
      *
      * @throw WorkflowExecutionException
      * @throw std::invalid_argument
      */
-    bool CloudService::startVM(const std::string &vm_hostname) {
+    std::shared_ptr<BareMetalComputeService> CloudService::startVM(const std::string &vm_name) {
 
-        if (this->vm_list.find(vm_hostname) == this->vm_list.end()) {
-            throw std::invalid_argument("CloudService::startVM(): Unknown VM name '" + vm_hostname + "'");
+        if (this->vm_list.find(vm_name) == this->vm_list.end()) {
+            throw std::invalid_argument("CloudService::startVM(): Unknown VM name '" + vm_name + "'");
         }
 
-        // send a "shutdown vm" message to the daemon's mailbox_name
+
+        assertServiceIsUp();
+
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("start_vm");
 
         std::unique_ptr<SimulationMessage> answer_message = sendRequest(
                 answer_mailbox,
                 new CloudServiceStartVMRequestMessage(
-                        answer_mailbox, vm_hostname,
+                        answer_mailbox, vm_name, "",
                         this->getMessagePayloadValueAsDouble(
                                 CloudServiceMessagePayload::START_VM_REQUEST_MESSAGE_PAYLOAD)));
 
         if (auto msg = dynamic_cast<CloudServiceStartVMAnswerMessage *>(answer_message.get())) {
-            return msg->success;
+            if (not msg->success) {
+                throw WorkflowExecutionException(msg->failure_cause);
+            }
+            return msg->cs;
         } else {
-            throw std::runtime_error("CloudService::startVM(): Unexpected [" + msg->getName() + "] message");
+            throw std::runtime_error("CloudService::startVM(): Unexpected [" + answer_message->getName() + "] message");
         }
     }
 
     /**
      * @brief Suspend a running VM
      *
-     * @param vm_hostname: the name of the VM host
-     *
-     * @return Whether the VM suspend succeeded
+     * @param vm_name: the name of the VM
      *
      * @throw WorkflowExecutionException
      * @throw std::invalid_argument
      */
-    bool CloudService::suspendVM(const std::string &vm_hostname) {
+    void CloudService::suspendVM(const std::string &vm_name) {
 
-        if (this->vm_list.find(vm_hostname) == this->vm_list.end()) {
-            throw std::invalid_argument("CloudService::suspendVM(): Unknown VM name '" + vm_hostname + "'");
+        if (this->vm_list.find(vm_name) == this->vm_list.end()) {
+            throw std::invalid_argument("CloudService::suspendVM(): Unknown VM name '" + vm_name + "'");
         }
+
+        assertServiceIsUp();
 
         // send a "shutdown vm" message to the daemon's mailbox_name
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("suspend_vm");
@@ -239,32 +248,35 @@ namespace wrench {
         std::unique_ptr<SimulationMessage> answer_message = sendRequest(
                 answer_mailbox,
                 new CloudServiceSuspendVMRequestMessage(
-                        answer_mailbox, vm_hostname,
+                        answer_mailbox, vm_name,
                         this->getMessagePayloadValueAsDouble(
                                 CloudServiceMessagePayload::SUSPEND_VM_REQUEST_MESSAGE_PAYLOAD)));
 
         if (auto msg = dynamic_cast<CloudServiceSuspendVMAnswerMessage *>(answer_message.get())) {
-            return msg->success;
+            if (not msg->success) {
+                throw WorkflowExecutionException(msg->failure_cause);
+            }
         } else {
-            throw std::runtime_error("CloudService::suspendVM(): Unexpected [" + msg->getName() + "] message");
+            throw std::runtime_error("CloudService::suspendVM(): Unexpected [" + answer_message->getName() + "] message");
         }
+        return;
     }
 
     /**
      * @brief Resume a suspended VM
      *
-     * @param vm_hostname: the name of the VM host
-     *
-     * @return Whether the VM resume succeeded
+     * @param vm_name: the name of the VM
      *
      * @throw WorkflowExecutionException
      * @throw std::invalid_argument
      */
-    bool CloudService::resumeVM(const std::string &vm_hostname) {
+    void CloudService::resumeVM(const std::string &vm_name) {
 
-        if (this->vm_list.find(vm_hostname) == this->vm_list.end()) {
-            throw std::invalid_argument("CloudService::resumeVM(): Unknown VM name '" + vm_hostname + "'");
+        if (this->vm_list.find(vm_name) == this->vm_list.end()) {
+            throw std::invalid_argument("CloudService::resumeVM(): Unknown VM name '" + vm_name + "'");
         }
+
+        assertServiceIsUp();
 
         // send a "shutdown vm" message to the daemon's mailbox_name
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("resume_vm");
@@ -272,15 +284,55 @@ namespace wrench {
         std::unique_ptr<SimulationMessage> answer_message = sendRequest(
                 answer_mailbox,
                 new CloudServiceResumeVMRequestMessage(
-                        answer_mailbox, vm_hostname,
+                        answer_mailbox, vm_name,
                         this->getMessagePayloadValueAsDouble(
-                                CloudServiceMessagePayload::START_VM_REQUEST_MESSAGE_PAYLOAD)));
+                                CloudServiceMessagePayload::RESUME_VM_REQUEST_MESSAGE_PAYLOAD)));
 
         if (auto msg = dynamic_cast<CloudServiceResumeVMAnswerMessage *>(answer_message.get())) {
-            return msg->success;
+            if (not msg->success) {
+                throw WorkflowExecutionException(msg->failure_cause);
+            }
+            // Got the expected reply
         } else {
-            throw std::runtime_error("CloudService::resumeVM(): Unexpected [" + msg->getName() + "] message");
+            throw std::runtime_error("CloudService::resumeVM(): Unexpected [" + answer_message->getName() + "] message");
         }
+        return;
+    }
+
+    /**
+     * @brief Destroy a VM
+     *
+     * @param vm_name: the name of the VM
+     *
+     * @throw WorkflowExecutionException
+     * @throw std::invalid_argument
+     */
+    void CloudService::destroyVM(const std::string &vm_name) {
+
+        if (this->vm_list.find(vm_name) == this->vm_list.end()) {
+            throw std::invalid_argument("CloudService::resumeVM(): Unknown VM name '" + vm_name + "'");
+        }
+
+        assertServiceIsUp();
+
+        // send a "shutdown vm" message to the daemon's mailbox_name
+        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("destroy_vm");
+
+        std::unique_ptr<SimulationMessage> answer_message = sendRequest(
+                answer_mailbox,
+                new CloudServiceDestroyVMRequestMessage(
+                        answer_mailbox, vm_name,
+                        this->getMessagePayloadValueAsDouble(
+                                CloudServiceMessagePayload::DESTROY_VM_REQUEST_MESSAGE_PAYLOAD)));
+
+        if (auto msg = dynamic_cast<CloudServiceDestroyVMAnswerMessage *>(answer_message.get())) {
+            if (not msg->success) {
+                throw WorkflowExecutionException(msg->failure_cause);
+            }
+        } else {
+            throw std::runtime_error("CloudService::destroyVM(): Unexpected [" + answer_message->getName() + "] message");
+        }
+        return;
     }
 
     /**
@@ -297,11 +349,12 @@ namespace wrench {
      */
     void CloudService::submitStandardJob(StandardJob *job, std::map<std::string, std::string> &service_specific_args) {
 
+        assertServiceIsUp();
 
         for (auto const &arg : service_specific_args) {
-           if (arg.first != "-vm") {
-               throw std::invalid_argument("CloudService::submitStandardJob(): Invalid service-specific argument key '" + arg.first + "'");
-           }
+            if (arg.first != "-vm") {
+                throw std::invalid_argument("CloudService::submitStandardJob(): Invalid service-specific argument key '" + arg.first + "'");
+            }
             if (this->vm_list.find(arg.second) == this->vm_list.end()) {
                 throw std::invalid_argument("CloudService::submitStandardJob(): In service-specific argument value: Unknown VM name '" + arg.second + "'");
             }
@@ -341,6 +394,8 @@ namespace wrench {
      */
     void CloudService::submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_args) {
 
+        assertServiceIsUp();
+
         for (auto const &arg : service_specific_args) {
             if (arg.first != "-vm") {
                 throw std::invalid_argument("CloudService::submitPilotJob(): Invalid service-specific argument key '" + arg.first + "'");
@@ -378,7 +433,16 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void CloudService::terminateStandardJob(StandardJob *job) {
-        throw std::runtime_error("CloudService::terminateStandardJob(): Not implemented yet!");
+        throw std::runtime_error("CloudService::terminateStandardJob(): Not implemented!");
+    }
+
+    /**
+     * @brief non-implemented
+     * @param job: a pilot job to (supposedly) terminate
+     */
+    void CloudService::terminatePilotJob(PilotJob *job) {
+        throw std::runtime_error(
+                "CloudService::terminatePilotJob(): not implemented because CloudService never supports pilot jobs");
     }
 
 
@@ -483,24 +547,27 @@ namespace wrench {
             return true;
 
         } else if (auto msg = dynamic_cast<CloudServiceCreateVMRequestMessage *>(message.get())) {
-            processCreateVM(msg->answer_mailbox, "", msg->vm_hostname, msg->num_cores, msg->ram_memory,
-                            msg->property_list, msg->messagepayload_list);
+            processCreateVM(msg->answer_mailbox, msg->num_cores, msg->ram_memory);
             return true;
 
         } else if (auto msg = dynamic_cast<CloudServiceShutdownVMRequestMessage *>(message.get())) {
-            processShutdownVM(msg->answer_mailbox, msg->vm_hostname);
+            processShutdownVM(msg->answer_mailbox, msg->vm_name);
             return true;
 
         } else if (auto msg = dynamic_cast<CloudServiceStartVMRequestMessage *>(message.get())) {
-            processStartVM(msg->answer_mailbox, msg->vm_hostname);
+            processStartVM(msg->answer_mailbox, msg->vm_name, msg->pm_name);
             return true;
 
         } else if (auto msg = dynamic_cast<CloudServiceSuspendVMRequestMessage *>(message.get())) {
-            processSuspendVM(msg->answer_mailbox, msg->vm_hostname);
+            processSuspendVM(msg->answer_mailbox, msg->vm_name);
             return true;
 
         } else if (auto msg = dynamic_cast<CloudServiceResumeVMRequestMessage *>(message.get())) {
-            processResumeVM(msg->answer_mailbox, msg->vm_hostname);
+            processResumeVM(msg->answer_mailbox, msg->vm_name);
+            return true;
+
+        } else if (auto msg = dynamic_cast<CloudServiceDestroyVMRequestMessage *>(message.get())) {
+            processDestroyVM(msg->answer_mailbox, msg->vm_name);
             return true;
 
         } else if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobRequestMessage *>(message.get())) {
@@ -539,133 +606,60 @@ namespace wrench {
      * @brief Create a BareMetalComputeService VM on a physical machine
      *
      * @param answer_mailbox: the mailbox to which the answer message should be sent
-     * @param pm_name: the name of the physical host (or "" if to be decided)
-     * @param vm_name: the name of the VM host
-     * @param requested_num_cores: the number of cores the service can use (use ComputeService::ALL_CORES to use all cores available on the host)
-     * @param requested_ram: the VM's RAM memory capacity (use ComputeService::ALL_RAM to use all RAM available on the host, this can be lead to out of memory issue)
-     * @param property_list: a property list ({} means "use all defaults")
-     * @param messagepayload_list: a message payload list ({} means "use all defaults")
+     * @param requested_num_cores: the number of cores the service can use
+     * @param requested_ram: the VM's RAM memory capacity
      *
      * @throw std::runtime_error
      */
     void CloudService::processCreateVM(const std::string &answer_mailbox,
-                                       const std::string &pm_name,
-                                       const std::string &vm_name,
                                        unsigned long requested_num_cores,
-                                       double requested_ram,
-                                       std::map<std::string, std::string> &property_list,
-                                       std::map<std::string, std::string> &messagepayload_list) {
+                                       double requested_ram) {
 
 
         WRENCH_INFO("Asked to create a VM with %s cores and %s RAM",
                     (requested_num_cores == ComputeService::ALL_CORES ? "max" : std::to_string(requested_num_cores)).c_str(),
                     (requested_ram == ComputeService::ALL_RAM ? "max" : std::to_string(requested_ram)).c_str());
 
-        if ((not pm_name.empty()) and (std::find(this->execution_hosts.begin(), this->execution_hosts.end(), pm_name) == this->execution_hosts.end())) {
-            throw std::runtime_error("Trying to start a VM on an unknown (at least to this service) physical host");
-        }
-
-        // Find a physical host to start the VM
-        std::string picked_host = "";
-        unsigned long picked_num_cores = 0;
-        double picked_ram = 0;
-
-        for (auto const &host : this->execution_hosts) {
-
-            if ((not pm_name.empty()) and (host != pm_name)) {
-                continue;
-            }
-
-            // Check for RAM
-            auto total_ram = Simulation::getHostMemoryCapacity(host);
-            auto available_ram = total_ram - this->used_ram_per_execution_host[host];
-            WRENCH_INFO("TOTAL RAM = %lf     AVAIL RAM = %lf", total_ram, available_ram);
-            if (requested_ram == ComputeService::ALL_RAM) {
-                if (available_ram < total_ram) {
-                    continue;
-                }
-            } else if (available_ram < requested_ram) {
-                continue;
-            }
-
-            WRENCH_INFO("CHECKING FOR CORES!");
-
-            // Check for cores
-            auto total_num_cores = Simulation::getHostNumCores(host);
-            auto num_available_cores = total_num_cores - this->used_cores_per_execution_host[host];
-            WRENCH_INFO("TOTAL CORES = %lu     AVAIL CORES = %lu", total_num_cores, num_available_cores);
-
-            if (requested_num_cores == ComputeService::ALL_CORES) {
-                if (num_available_cores < total_num_cores) {
-                    continue;
-                }
-            } else if (num_available_cores < requested_num_cores) {
-                continue;
-            }
-            WRENCH_INFO("YAH!");
-
-            picked_num_cores = (requested_num_cores == ComputeService::ALL_CORES ? total_num_cores : requested_num_cores);
-            picked_ram = (requested_ram == ComputeService::ALL_RAM ? total_ram : requested_ram);
-            picked_host = host;
-            break;
-        }
-
         CloudServiceCreateVMAnswerMessage *msg_to_send_back;
 
-        // Did we find a viable host?
-        if (picked_host.empty()) {
-            WRENCH_INFO("Not enough resources to create the VM");
+        // Check that there is at least one physical host that could support the VM
+        bool found_a_host = false;
+        for (auto const &host : this->execution_hosts) {
+            auto total_num_cores = Simulation::getHostNumCores(host);
+            auto total_ram = Simulation::getHostMemoryCapacity(host);
+            if ((requested_num_cores <= total_num_cores) and (requested_ram <= total_ram)) {
+                found_a_host = true;
+                break;
+            }
+        }
+
+        if (not found_a_host) {
+            WRENCH_INFO("Not host on this service can accommodate this VM");
+            std::string empty= std::string();
             msg_to_send_back =
                     new CloudServiceCreateVMAnswerMessage(
                             false,
-                            nullptr,
+                            empty,
                             std::shared_ptr<FailureCause>(new NotEnoughResources(nullptr, this)),
                             this->getMessagePayloadValueAsDouble(
                                     CloudServiceMessagePayload::CREATE_VM_ANSWER_MESSAGE_PAYLOAD));
         } else {
 
-            // Sleep for the VM creation overhead
-            Simulation::sleep(
-                    this->getPropertyValueAsDouble(CloudServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS));
+            // Pick a VM name (and being paranoid about mistakenly picking an actual hostname!)
+            std::string vm_name;
+            do {
+                vm_name = this->getName() + "_vm" + std::to_string(CloudService::VM_ID++);
+            } while (simgrid::s4u::Host::by_name_or_null(vm_name) != nullptr);
 
             // Create the VM
-            auto vm = std::make_shared<S4U_VirtualMachine>(vm_name, picked_host, picked_num_cores, picked_ram);
+            auto vm = std::make_shared<S4U_VirtualMachine>(vm_name, requested_num_cores, requested_ram);
 
-            // Create the resource set for the BareMetalComputeService
-            std::map<std::string, std::tuple<unsigned long, double>> compute_resources = {
-                    std::make_pair(vm_name, std::make_tuple(requested_num_cores, requested_ram))};
-
-            // Merge the compute service property and message payload lists
-            property_list.insert(this->property_list.begin(), this->property_list.end());
-            messagepayload_list.insert(this->messagepayload_list.begin(), this->messagepayload_list.end());
-
-            // The BareMetal service should accept standard jobs!
-            property_list[ComputeServiceProperty::SUPPORTS_STANDARD_JOBS] = "true";
-
-            // Create the BareMetal service, whose main daemon is on this (stable) host
-            std::shared_ptr<BareMetalComputeService> cs = std::shared_ptr<BareMetalComputeService>(
-                    new BareMetalComputeService(this->hostname,
-                                                compute_resources,
-                                                property_list,
-                                                messagepayload_list,
-                                                getScratch()));
-            cs->simulation = this->simulation;
-
-            // Update internal data structures
-            this->vm_list[vm_name] = std::make_tuple(vm, cs, picked_num_cores, picked_ram);
-            this->used_ram_per_execution_host[picked_host] += picked_ram;
-            this->used_cores_per_execution_host[picked_host] += picked_num_cores;
-
-            // Start the service
-            try {
-                cs->start(cs, true, false); // Daemonized
-            } catch (std::runtime_error &e) {
-                throw; // This shouldn't happen
-            }
+            // Add the VM to the list of VMs, with (for now) a nullptr compute service
+            this->vm_list[vm_name] = std::make_pair(vm, nullptr);
 
             msg_to_send_back = new CloudServiceCreateVMAnswerMessage(
                     true,
-                    cs,
+                    vm_name,
                     nullptr,
                     this->getMessagePayloadValueAsDouble(
                             CloudServiceMessagePayload::CREATE_VM_ANSWER_MESSAGE_PAYLOAD));
@@ -684,193 +678,308 @@ namespace wrench {
      * @brief: Process a VM shutdown request
      *
      * @param answer_mailbox: the mailbox to which the answer message should be sent
-     * @param vm_hostname: the name of the VM host
+     * @param vm_name: the name of the VM
      */
-    void CloudService::processShutdownVM(const std::string &answer_mailbox, const std::string &vm_hostname) {
+    void CloudService::processShutdownVM(const std::string &answer_mailbox, const std::string &vm_name) {
 
-        try {
-            WRENCH_INFO("Asked to shutdown VM %s", vm_hostname.c_str());
+        WRENCH_INFO("Asked to shutdown VM %s", vm_name.c_str());
 
-            auto vm_tuple = this->vm_list.find(vm_hostname);
+        CloudServiceShutdownVMAnswerMessage *msg_to_send_back;
 
-            if (vm_tuple == this->vm_list.end()) {
-                S4U_Mailbox::dputMessage(
-                        answer_mailbox,
-                        new CloudServiceShutdownVMAnswerMessage(
-                                false,
-                                this->getMessagePayloadValueAsDouble(
-                                        CloudServiceMessagePayload::SHUTDOWN_VM_ANSWER_MESSAGE_PAYLOAD)));
-                return;
-            }
+        auto vm_pair = *(this->vm_list.find(vm_name));
+        auto vm = vm_pair.second.first;
+        auto cs = vm_pair.second.second;
 
-            auto cs = std::get<1>(vm_tuple->second);
+        if (vm->getState() != S4U_VirtualMachine::State::RUNNING) {
+
+            std::string error_message("Cannot shutdown a VM that is not running");
+            msg_to_send_back =  new CloudServiceShutdownVMAnswerMessage(
+                    false,
+                    std::shared_ptr<FailureCause>(new NotAllowed(this, error_message)),
+                    this->getMessagePayloadValueAsDouble(
+                            CloudServiceMessagePayload::SHUTDOWN_VM_ANSWER_MESSAGE_PAYLOAD));
+        } else {
+
+            // Stop the Compute Service
             cs->stop();
-            // Commented this out to prevent the object from being freed!
-            // std::get<1>(vm_tuple->second) = nullptr;
-            auto vm = std::get<0>(vm_tuple->second);
+            // Shutdown the VM
             vm->shutdown();
 
-            S4U_Mailbox::dputMessage(
-                    answer_mailbox,
-                    new CloudServiceShutdownVMAnswerMessage(
-                            true,
-                            this->getMessagePayloadValueAsDouble(
-                                    CloudServiceMessagePayload::SHUTDOWN_VM_ANSWER_MESSAGE_PAYLOAD)));
+            // Update internal data structures
+            std::string pm = vm->getPhysicalHostname();
+            this->used_ram_per_execution_host[pm] -= vm->getMemory();
+            this->used_cores_per_execution_host[pm] -= vm->getNumCores();
 
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            return;
+            msg_to_send_back = new CloudServiceShutdownVMAnswerMessage(
+                    true,
+                    nullptr,
+                    this->getMessagePayloadValueAsDouble(
+                            CloudServiceMessagePayload::SHUTDOWN_VM_ANSWER_MESSAGE_PAYLOAD));
         }
+
+        try {
+            S4U_Mailbox::dputMessage(answer_mailbox, msg_to_send_back);
+        } catch (std::shared_ptr<NetworkError> &cause) {
+            // ignore
+        }
+        return;
     }
 
     /**
      * @brief: Process a VM start request
      *
      * @param answer_mailbox: the mailbox to which the answer message should be sent
-     * @param vm_name: the name of the VM host
+     * @param vm_name: the name of the VM
+     * @param pm_name: the name of the physical host on which to start the VM (empty string if up to the service to pick a host)
      */
-    void CloudService::processStartVM(const std::string &answer_mailbox, const std::string &vm_name) {
+    void CloudService::processStartVM(const std::string &answer_mailbox, const std::string &vm_name, const std::string &pm_name) {
 
-        try {
-            WRENCH_INFO("Asked to start VM %s", vm_name.c_str());
+        auto vm_pair = this->vm_list[vm_name];
+        auto vm = vm_pair.first;
 
-            auto vm_tuple = this->vm_list.find(vm_name);
+        CloudServiceStartVMAnswerMessage *msg_to_send_back;
 
-            if (vm_tuple == this->vm_list.end()) {
-                S4U_Mailbox::dputMessage(
-                        answer_mailbox,
+        if (vm->getState() != S4U_VirtualMachine::State::DOWN) {
+
+            std::string error_message("Cannot start a VM that is not down");
+            msg_to_send_back =  new CloudServiceStartVMAnswerMessage(
+                    false,
+                    nullptr,
+                    std::shared_ptr<FailureCause>(new NotAllowed(this, error_message)),
+                    this->getMessagePayloadValueAsDouble(
+                            CloudServiceMessagePayload::START_VM_ANSWER_MESSAGE_PAYLOAD));
+
+        } else {
+
+            // Find a physical host to start the VM
+            std::string picked_host = "";
+
+            for (auto const &host : this->execution_hosts) {
+
+                if ((not pm_name.empty()) and (host != pm_name)) {
+                    continue;
+                }
+
+                // Check for RAM
+                auto total_ram = Simulation::getHostMemoryCapacity(host);
+                auto available_ram = total_ram - this->used_ram_per_execution_host[host];
+                if (vm->getMemory() > available_ram) {
+                    continue;
+                }
+
+                // Check for cores
+                auto total_num_cores = Simulation::getHostNumCores(host);
+                auto num_available_cores = total_num_cores - this->used_cores_per_execution_host[host];
+                if (vm->getNumCores() > num_available_cores) {
+                    continue;
+                }
+
+                picked_host = host;
+                break;
+            }
+
+            // Did we find a viable host?
+            if (picked_host.empty()) {
+                WRENCH_INFO("Not enough resources to create the VM");
+                msg_to_send_back =
                         new CloudServiceStartVMAnswerMessage(
                                 false,
+                                nullptr,
+                                std::shared_ptr<FailureCause>(new NotEnoughResources(nullptr, this)),
                                 this->getMessagePayloadValueAsDouble(
-                                        CloudServiceMessagePayload::START_VM_ANSWER_MESSAGE_PAYLOAD)));
-                return;
+                                        CloudServiceMessagePayload::START_VM_ANSWER_MESSAGE_PAYLOAD));
+            } else {
+
+                // Sleep for the VM booting overhead
+                Simulation::sleep(
+                        this->getPropertyValueAsDouble(CloudServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS));
+
+                // Start the actual vm
+                vm->start(picked_host);
+
+
+                // Create the Compute Service if needed
+                if (vm_pair.second == nullptr) {
+
+                    // Create the resource set for the BareMetalComputeService
+                    std::map<std::string, std::tuple<unsigned long, double>> compute_resources = {
+                            std::make_pair(vm_name, std::make_tuple(vm->getNumCores(), vm->getMemory()))};
+
+                    // Create the BareMetal service, whose main daemon is on this (stable) host
+                    std::shared_ptr<BareMetalComputeService> cs = std::shared_ptr<BareMetalComputeService>(
+                            new BareMetalComputeService(this->hostname,
+                                                        compute_resources,
+                                                        {{ComputeServiceProperty::SUPPORTS_STANDARD_JOBS,"true"}},
+                                                        {},
+                                                        getScratch()));
+                    cs->simulation = this->simulation;
+                    std::get<1>(this->vm_list[vm_name]) = cs;
+                }
+
+                // Update internal data structures
+                this->used_ram_per_execution_host[picked_host] += vm->getMemory();
+                this->used_cores_per_execution_host[picked_host] += vm->getNumCores();
+
+                // Start the service
+                try {
+                    std::get<1>(this->vm_list[vm_name])->start(std::get<1>(this->vm_list[vm_name]), true,
+                                                               false); // Daemonized
+                } catch (std::runtime_error &e) {
+                    throw; // This shouldn't happen
+                }
+
+                msg_to_send_back = new CloudServiceStartVMAnswerMessage(
+                        true,
+                        std::get<1>(this->vm_list[vm_name]),
+                        nullptr,
+                        this->getMessagePayloadValueAsDouble(
+                                CloudServiceMessagePayload::START_VM_ANSWER_MESSAGE_PAYLOAD));
             }
-
-            // Create a BareMetal Computer Service
-            try {
-                auto vm = std::get<0>(vm_tuple->second);
-                vm->start();
-                auto cs = std::get<1>(vm_tuple->second);
-                cs->start(cs, true, false);
-
-#ifdef NOT_NEEDED
-                // TODO: creating a BareMetal service would not be necessary once auto_restart will be available
-                // create a BareNetak compute service for the VM
-                std::map<std::string, std::tuple<unsigned long, double>> compute_resources = {
-                        std::make_pair(vm_name,
-                                       std::make_tuple(std::get<2>(vm_tuple->second), std::get<3>(vm_tuple->second)))};
-
-                std::shared_ptr<BareMetalComputeService> cs = std::shared_ptr<BareMetalComputeService>(
-                        new BareMetalComputeService(vm_name,
-                                                    compute_resources,
-                                                    property_list,
-                                                    messagepayload_list,
-                                                    getScratch()));
-                cs->simulation = this->simulation;
-                cs->start(cs, true, false); // Daemonized, no auto-restart
-                std::get<1>(vm_tuple->second) = cs;
-#endif
-
-            } catch (std::runtime_error &e) {
-                throw;
-            }
-
-
-
-            S4U_Mailbox::dputMessage(
-                    answer_mailbox,
-                    new CloudServiceStartVMAnswerMessage(
-                            true,
-                            this->getMessagePayloadValueAsDouble(
-                                    CloudServiceMessagePayload::START_VM_ANSWER_MESSAGE_PAYLOAD)));
-
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            return;
         }
+
+        try {
+            S4U_Mailbox::dputMessage(
+                    answer_mailbox, msg_to_send_back);
+        }  catch (std::shared_ptr<NetworkError> &cause) {
+            // ignore
+        }
+        return;
     }
 
     /**
      * @brief: Process a VM suspend request
      *
      * @param answer_mailbox: the mailbox to which the answer message should be sent
-     * @param vm_hostname: the name of the VM host
+     * @param vm_name: the name of the VM
      */
-    void CloudService::processSuspendVM(const std::string &answer_mailbox, const std::string &vm_hostname) {
+    void CloudService::processSuspendVM(const std::string &answer_mailbox, const std::string &vm_name) {
 
-        try {
-            WRENCH_INFO("Asked to suspend VM %s", vm_hostname.c_str());
+        auto vm_pair = this->vm_list[vm_name];
+        auto vm = vm_pair.first;
 
-            auto vm_tuple = this->vm_list.find(vm_hostname);
+        CloudServiceSuspendVMAnswerMessage *msg_to_send_back;
 
-            if (vm_tuple == this->vm_list.end()) {
-                S4U_Mailbox::dputMessage(
-                        answer_mailbox,
-                        new CloudServiceSuspendVMAnswerMessage(
-                                false,
-                                this->getMessagePayloadValueAsDouble(
-                                        CloudServiceMessagePayload::SUSPEND_VM_ANSWER_MESSAGE_PAYLOAD)));
-                return;
-            }
+        if (vm->getState() != S4U_VirtualMachine::State::RUNNING) {
+
+            std::string error_message("Cannot suspend a VM that is not running");
+            msg_to_send_back =  new CloudServiceSuspendVMAnswerMessage(
+                    false,
+                    std::shared_ptr<FailureCause>(new NotAllowed(this, error_message)),
+                    this->getMessagePayloadValueAsDouble(
+                            CloudServiceMessagePayload::SUSPEND_VM_ANSWER_MESSAGE_PAYLOAD));
+
+        } else {
+
+            WRENCH_INFO("Asked to suspend VM %s", vm_name.c_str());
+
+            auto vm_tuple = this->vm_list.find(vm_name);
 
             auto cs = std::get<1>(vm_tuple->second);
             WRENCH_INFO("SUSPENDING THE CS '%s'", cs->getName().c_str());
-            cs->suspendActor();
+            cs->suspend();
 
             WRENCH_INFO("SUSPENDING THE VM");
             auto vm = std::get<0>(vm_tuple->second);
             vm->suspend();
 
-            S4U_Mailbox::dputMessage(
-                    answer_mailbox,
+            msg_to_send_back =
                     new CloudServiceSuspendVMAnswerMessage(
                             true,
+                            nullptr,
                             this->getMessagePayloadValueAsDouble(
-                                    CloudServiceMessagePayload::SUSPEND_VM_ANSWER_MESSAGE_PAYLOAD)));
-
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            return;
+                                    CloudServiceMessagePayload::SUSPEND_VM_ANSWER_MESSAGE_PAYLOAD));
         }
+
+        try {
+            S4U_Mailbox::dputMessage(answer_mailbox, msg_to_send_back);
+        } catch (std::shared_ptr<NetworkError> &cause) {
+            // ignore
+        }
+        return;
     }
 
     /**
      * @brief: Process a VM resume request
      *
      * @param answer_mailbox: the mailbox to which the answer message should be sent
-     * @param vm_hostname: the name of the VM host
+     * @param vm_name: the name of the VM
      */
-    void CloudService::processResumeVM(const std::string &answer_mailbox, const std::string &vm_hostname) {
+    void CloudService::processResumeVM(const std::string &answer_mailbox, const std::string &vm_name) {
+
+        WRENCH_INFO("Asked to resume VM %s", vm_name.c_str());
+        auto vm_pair = this->vm_list[vm_name];
+        auto vm = vm_pair.first;
+
+        CloudServiceResumeVMAnswerMessage *msg_to_send_back;
+
+        if (vm->getState() != S4U_VirtualMachine::State::SUSPENDED) {
+
+            std::string error_message("Cannot resume a VM that is not suspended");
+            msg_to_send_back =  new CloudServiceResumeVMAnswerMessage(
+                    false,
+                    std::shared_ptr<FailureCause>(new NotAllowed(this, error_message)),
+                    this->getMessagePayloadValueAsDouble(
+                            CloudServiceMessagePayload::RESUME_VM_ANSWER_MESSAGE_PAYLOAD));
+        } else {
+
+            vm->resume();
+            auto cs = vm_pair.second;
+            cs->resume();
+
+            msg_to_send_back = new CloudServiceResumeVMAnswerMessage(
+                    true,
+                    nullptr,
+                    this->getMessagePayloadValueAsDouble(
+                            CloudServiceMessagePayload::RESUME_VM_ANSWER_MESSAGE_PAYLOAD));
+        }
 
         try {
-            WRENCH_INFO("Asked to resume VM %s", vm_hostname.c_str());
-            auto vm_tuple = this->vm_list.find(vm_hostname);
+            S4U_Mailbox::dputMessage(answer_mailbox, msg_to_send_back);
+        } catch (std::shared_ptr<NetworkError> &cause) {
+            // ignore
+        }
+        return;
+    }
 
-            if (vm_tuple != this->vm_list.end()) {
-                auto cs = std::get<1>(vm_tuple->second);
-                cs->resumeActor();
-                auto vm = std::get<0>(vm_tuple->second);
-                if (vm->isSuspended()) {
-                    vm->resume();
 
-                    S4U_Mailbox::dputMessage(
-                            answer_mailbox,
-                            new CloudServiceResumeVMAnswerMessage(
-                                    true,
-                                    this->getMessagePayloadValueAsDouble(
-                                            CloudServiceMessagePayload::RESUME_VM_ANSWER_MESSAGE_PAYLOAD)));
-                    return;
-                }
-            }
+    /**
+    * @brief: Process a VM destruction request
+    *
+    * @param answer_mailbox: the mailbox to which the answer message should be sent
+    * @param vm_name: the name of the VM
+    */
+    void CloudService::processDestroyVM(const std::string &answer_mailbox, const std::string &vm_name) {
 
-            S4U_Mailbox::dputMessage(
-                    answer_mailbox,
-                    new CloudServiceResumeVMAnswerMessage(
-                            false,
-                            this->getMessagePayloadValueAsDouble(
-                                    CloudServiceMessagePayload::RESUME_VM_ANSWER_MESSAGE_PAYLOAD)));
+        WRENCH_INFO("Asked to destroy VM %s", vm_name.c_str());
+        auto vm_pair = this->vm_list[vm_name];
+        auto vm = vm_pair.first;
 
+        CloudServiceDestroyVMAnswerMessage *msg_to_send_back;
+
+        if (vm->getState() != S4U_VirtualMachine::State::DOWN) {
+            std::string error_message("Cannot destroy a VM that is not down");
+            msg_to_send_back =  new CloudServiceDestroyVMAnswerMessage(
+                    false,
+                    std::shared_ptr<FailureCause>(new NotAllowed(this, error_message)),
+                    this->getMessagePayloadValueAsDouble(
+                            CloudServiceMessagePayload::DESTROY_VM_ANSWER_MESSAGE_PAYLOAD));
+
+        } else {
+            this->vm_list.erase(vm_name);
+            msg_to_send_back = new CloudServiceDestroyVMAnswerMessage(
+                    true,
+                    nullptr,
+                    this->getMessagePayloadValueAsDouble(
+                            CloudServiceMessagePayload::DESTROY_VM_ANSWER_MESSAGE_PAYLOAD));
+        }
+
+        try {
+            S4U_Mailbox::dputMessage(answer_mailbox, msg_to_send_back);
         } catch (std::shared_ptr<NetworkError> &cause) {
             // do nothing, just return
         }
     }
+
 
     /**
      * @brief Process a submit standard job request
@@ -954,9 +1063,9 @@ namespace wrench {
         for (auto &vm : this->vm_list) {
 
             // Num cores per vm
-            num_cores.insert(std::make_pair(vm.first, (double) std::get<2>(vm.second)));
+            num_cores.insert(std::make_pair(vm.first, (double)(std::get<0>(vm.second)->getNumCores())));
 
-            // Num idle cores per vm
+            // Num idle cores per vm compute service
             std::map<std::string, unsigned long> idle_core_counts = std::get<1>(vm.second)->getNumIdleCores();
             unsigned long total_count = 0;
             for (auto &c : idle_core_counts) {
@@ -1003,14 +1112,14 @@ namespace wrench {
 
         WRENCH_INFO("Stopping Cloud Service");
         for (auto &vm : this->vm_list) {
-            this->used_ram_per_execution_host[(std::get<0>(vm.second))->getPm()->get_name()] -= S4U_Simulation::getHostMemoryCapacity(
+            this->used_ram_per_execution_host[(std::get<0>(vm.second))->getPhysicalHostname()] -= S4U_Simulation::getHostMemoryCapacity(
                     std::get<0>(vm));
             // Deal with the compute service (if it hasn't been stopped before)
             if (std::get<1>(vm.second)) {
                 std::get<1>(vm.second)->stop();
             }
             // Deal with the VM
-            std::get<0>(vm.second)->stop();
+            std::get<0>(vm.second)->shutdown();
         }
         this->vm_list.clear();
     }
@@ -1049,14 +1158,6 @@ namespace wrench {
         }
     }
 
-    /**
-     * @brief non-implemented
-     * @param job: a pilot job to (supposedly) terminate
-     */
-    void CloudService::terminatePilotJob(PilotJob *job) {
-        throw std::runtime_error(
-                "CloudService::terminatePilotJob(): not implemented because CloudService never supports pilot jobs");
-    }
 
 
 }

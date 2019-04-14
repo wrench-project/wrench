@@ -203,43 +203,49 @@ TEST_F(MessageConstructorTest, CloudServiceMessages) {
 
   std::map<std::string, std::string> property_list;
   std::map<std::string, std::string> messagepayload_list;
-  ASSERT_NO_THROW(new wrench::CloudServiceCreateVMRequestMessage("mailbox", "host", "vm", 42, 10, property_list, messagepayload_list, 666));
-  ASSERT_THROW(new wrench::CloudServiceCreateVMRequestMessage("", "host", "vm", 42, 0, property_list, messagepayload_list, 666), std::invalid_argument);
-  ASSERT_THROW(new wrench::CloudServiceCreateVMRequestMessage("mailbox", "host", "", 42, 0, property_list, messagepayload_list, 666), std::invalid_argument);
-  ASSERT_THROW(new wrench::CloudServiceCreateVMRequestMessage("mailbox", "", "vm", 42, 0, property_list, messagepayload_list, 666), std::invalid_argument);
+  ASSERT_NO_THROW(new wrench::CloudServiceCreateVMRequestMessage("mailbox", 42, 10, 666));
+  ASSERT_THROW(
+          new wrench::CloudServiceCreateVMRequestMessage("", 42, 0, 666), std::invalid_argument);
 
   ASSERT_NO_THROW(new wrench::VirtualizedClusterServiceMigrateVMRequestMessage("mailbox", "host", "host", 666));
-  ASSERT_THROW(new wrench::VirtualizedClusterServiceMigrateVMRequestMessage("", "host", "host", 666), std::invalid_argument);
-  ASSERT_THROW(new wrench::VirtualizedClusterServiceMigrateVMRequestMessage("mailbox", "", "host", 666), std::invalid_argument);
-  ASSERT_THROW(new wrench::VirtualizedClusterServiceMigrateVMRequestMessage("mailbox", "host", "", 666), std::invalid_argument);
+  ASSERT_THROW(new wrench::VirtualizedClusterServiceMigrateVMRequestMessage("", "host", "host", 666),
+               std::invalid_argument);
+  ASSERT_THROW(new wrench::VirtualizedClusterServiceMigrateVMRequestMessage("mailbox", "", "host", 666),
+               std::invalid_argument);
+  ASSERT_THROW(new wrench::VirtualizedClusterServiceMigrateVMRequestMessage("mailbox", "host", "", 666),
+               std::invalid_argument);
 
   ASSERT_NO_THROW(new wrench::CloudServiceShutdownVMRequestMessage("mailbox", "vm", 666));
   ASSERT_THROW(new wrench::CloudServiceShutdownVMRequestMessage("", "vm", 666), std::invalid_argument);
   ASSERT_THROW(new wrench::CloudServiceShutdownVMRequestMessage("mailbox", "", 666), std::invalid_argument);
 
-  ASSERT_NO_THROW(new wrench::CloudServiceShutdownVMAnswerMessage(true, 666));
+  ASSERT_NO_THROW(new wrench::CloudServiceShutdownVMAnswerMessage(true, nullptr, 666));
 
-  ASSERT_NO_THROW(new wrench::CloudServiceStartVMRequestMessage("mailbox", "vm", 666));
-  ASSERT_THROW(new wrench::CloudServiceStartVMRequestMessage("", "vm", 666), std::invalid_argument);
-  ASSERT_THROW(new wrench::CloudServiceStartVMRequestMessage("mailbox", "", 666), std::invalid_argument);
+  ASSERT_NO_THROW(new wrench::CloudServiceStartVMRequestMessage("mailbox", "vm", "host", 666));
+  ASSERT_THROW(new wrench::CloudServiceStartVMRequestMessage("", "vm", "host", 666), std::invalid_argument);
+  ASSERT_THROW(new wrench::CloudServiceStartVMRequestMessage("mailbox", "", "host", 666), std::invalid_argument);
 
-  ASSERT_NO_THROW(new wrench::CloudServiceStartVMAnswerMessage(true, 666));
+  ASSERT_NO_THROW(new wrench::CloudServiceStartVMAnswerMessage(true, nullptr, nullptr, 666));
 
   ASSERT_NO_THROW(new wrench::CloudServiceSuspendVMRequestMessage("mailbox", "vm", 666));
   ASSERT_THROW(new wrench::CloudServiceSuspendVMRequestMessage("", "vm", 666), std::invalid_argument);
   ASSERT_THROW(new wrench::CloudServiceSuspendVMRequestMessage("mailbox", "", 666), std::invalid_argument);
 
-  ASSERT_NO_THROW(new wrench::CloudServiceSuspendVMAnswerMessage(true, 666));
+  ASSERT_NO_THROW(new wrench::CloudServiceSuspendVMAnswerMessage(true, nullptr, 666));
 
   ASSERT_NO_THROW(new wrench::CloudServiceResumeVMRequestMessage("mailbox", "vm", 666));
   ASSERT_THROW(new wrench::CloudServiceResumeVMRequestMessage("", "vm", 666), std::invalid_argument);
   ASSERT_THROW(new wrench::CloudServiceResumeVMRequestMessage("mailbox", "", 666), std::invalid_argument);
 
-  ASSERT_NO_THROW(new wrench::CloudServiceResumeVMAnswerMessage(true, 666));
+  ASSERT_NO_THROW(new wrench::CloudServiceResumeVMAnswerMessage(true, nullptr, 666));
 
+  ASSERT_NO_THROW(new wrench::CloudServiceDestroyVMRequestMessage("mailbox", "vm", 666));
+  ASSERT_THROW(new wrench::CloudServiceDestroyVMRequestMessage("", "vm", 666), std::invalid_argument);
+  ASSERT_THROW(new wrench::CloudServiceDestroyVMRequestMessage("mailbox", "", 666), std::invalid_argument);
+
+  ASSERT_NO_THROW(new wrench::CloudServiceDestroyVMAnswerMessage(true, nullptr, 666));
 
 }
-
 
 
 TEST_F(MessageConstructorTest, StorageServiceMessages) {

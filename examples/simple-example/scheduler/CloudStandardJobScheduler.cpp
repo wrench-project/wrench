@@ -76,13 +76,14 @@ namespace wrench {
 
         if (sum_num_idle_cores < mim_num_cores) {
           try {
-            std::string vm_host = cloud_service->createVM(mim_num_cores, task->getMemoryRequirement());
+            auto vm_host = cloud_service->createVM(mim_num_cores, task->getMemoryRequirement());
 
           } catch (WorkflowExecutionException &e) {
             // unable to create a new VM, tasks won't be scheduled in this iteration.
             return;
           }
         }
+        // TODO: This no longer works as one cannot just submit to a cloud service
         this->getJobManager()->submitJob(job, cloud_service);
       }
       WRENCH_INFO("Done with scheduling tasks as standard jobs");
