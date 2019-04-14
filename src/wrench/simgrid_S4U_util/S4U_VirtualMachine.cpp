@@ -58,7 +58,11 @@ namespace wrench {
     * @return the physical hostname
     */
     std::string S4U_VirtualMachine::getPhysicalHostname() {
-        return this->pm_hostname;
+        if (this->state == S4U_VirtualMachine::DOWN) {
+            return "";
+        } else {
+            return this->vm->get_pm()->get_name();
+        }
     }
 
     /**
