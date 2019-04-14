@@ -1060,27 +1060,36 @@ namespace wrench {
         std::map<std::string, double> ram_capacities;
         std::map<std::string, double> ram_availabilities;
 
-        for (auto &vm : this->vm_list) {
-
-            // Num cores per vm
-            num_cores.insert(std::make_pair(vm.first, (double)(std::get<0>(vm.second)->getNumCores())));
-
-            // Num idle cores per vm compute service
-            std::map<std::string, unsigned long> idle_core_counts = std::get<1>(vm.second)->getNumIdleCores();
-            unsigned long total_count = 0;
-            for (auto &c : idle_core_counts) {
-                total_count += c.second;
+        for (auto &host : this->execution_hosts) {
+            // Total num cores
+            unsigned long total_num_cores = Simulation::getHostNumCores(host);
+            num_cores.insert(std::make_pair(host, (double)total_num_cores));
+            // Idle cores
+            unsigned long num_cores_allocated_to_vms = 0;
+            for (auto &vm_pair : this->vm_list) {
+                auto actual_vm = vm_pair.second.first;
+                if ((actual_vm->getState() != S4U_VirtualMachine::DOWN) and (actual_vm->getPhysicalHostname() == host)) {
+                    num_cores_allocated_to_vms += actual_vm->getNumCores();
+                }
             }
-            num_idle_cores.insert(std::make_pair(vm.first, (double) total_count));
+            num_idle_cores.insert(std::make_pair(host, (double) (total_num_cores - num_cores_allocated_to_vms)));
+            // Total RAM
+            double total_ram = Simulation::getHostMemoryCapacity(host);
+            ram_capacities.insert(std::make_pair(host, total_ram));
+            // Available RAM
+            double ram_allocated_to_vms = 0;
+            for (auto &vm_pair : this->vm_list) {
+                auto actual_vm = vm_pair.second.first;
+                if ((actual_vm->getState() != S4U_VirtualMachine::DOWN) and (actual_vm->getPhysicalHostname() == host)) {
+                    ram_allocated_to_vms += actual_vm->getMemory();
+                }
+            }
+            ram_availabilities.insert(std::make_pair(host, total_ram - ram_allocated_to_vms));
 
-            // Flop rate per vm
-            flop_rates.insert(std::make_pair(vm.first, S4U_Simulation::getHostFlopRate(vm.first)));
+            // Flop rate
+            double flop_rate = Simulation::getHostFlopRate(host);
+            flop_rates.insert(std::make_pair(host, flop_rate));
 
-            // RAM capacity per host
-            ram_capacities.insert(std::make_pair(vm.first, S4U_Simulation::getHostMemoryCapacity(vm.first)));
-
-            // RAM availability per
-            ram_availabilities.insert(std::make_pair(vm.first, S4U_Simulation::getHostMemoryCapacity(vm.first)));
         }
 
         dict.insert(std::make_pair("num_cores", num_cores));
