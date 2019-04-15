@@ -10,6 +10,7 @@
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/compute/cloud/CloudService.h"
+#include "wrench/services/compute/bare_metal/BareMetalComputeService.h"
 #include "wrench/services/compute/ComputeServiceMessage.h"
 #include "wrench/services/compute/htcondor/HTCondorCentralManagerService.h"
 #include "wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessage.h"
@@ -168,18 +169,26 @@ namespace wrench {
           // But then how do we know it will be on that host (i.e., if it's not a VirtualizedClusterService
           if (auto cloud = dynamic_cast<CloudService *>(cs)) {
 
-            for (auto &host : cloud->getExecutionHosts()) {
+
+            for (auto const &host : cloud->getExecutionHosts()) {
               for (unsigned int i = 0; i < Simulation::getHostNumCores(host); i++) {
                 auto vm_name = cloud->createVM(1, std::floor(Simulation::getHostMemoryCapacity(host) / Simulation::getHostNumCores(host)));
-                auto vm = cloud->startVM(vm_name);
+                auto vm_cs = cloud->startVM(vm_name);
+                // set the number of idle cores
+                std::map<std::string, unsigned long> num_idle_cores = vm_cs->getNumIdleCores();
+                for (auto const &h : num_idle_cores) {
+                  sum_num_idle_cores += h.second;
+                }
+                this->compute_resources_map.insert(std::make_pair(vm_cs.get(), sum_num_idle_cores));
               }
             }
+
 
           } else {
 
             // set the number of available cores
             std::map<std::string, unsigned long> num_idle_cores = cs->getNumIdleCores();
-            for (auto h : num_idle_cores) {
+            for (auto const &h : num_idle_cores) {
               sum_num_idle_cores += h.second;
             }
             this->compute_resources_map.insert(std::make_pair(cs, sum_num_idle_cores));
