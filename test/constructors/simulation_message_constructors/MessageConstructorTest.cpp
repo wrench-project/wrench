@@ -203,9 +203,9 @@ TEST_F(MessageConstructorTest, CloudServiceMessages) {
 
   std::map<std::string, std::string> property_list;
   std::map<std::string, std::string> messagepayload_list;
-  ASSERT_NO_THROW(new wrench::CloudServiceCreateVMRequestMessage("mailbox", 42, 10, 666));
+  ASSERT_NO_THROW(new wrench::CloudServiceCreateVMRequestMessage("mailbox", 42, 10, {}, {}, 666));
   ASSERT_THROW(
-          new wrench::CloudServiceCreateVMRequestMessage("", 42, 0, 666), std::invalid_argument);
+          new wrench::CloudServiceCreateVMRequestMessage("", 42, 0, {}, {}, 666), std::invalid_argument);
 
   ASSERT_NO_THROW(new wrench::VirtualizedClusterServiceMigrateVMRequestMessage("mailbox", "host", "host", 666));
   ASSERT_THROW(new wrench::VirtualizedClusterServiceMigrateVMRequestMessage("", "host", "host", 666),

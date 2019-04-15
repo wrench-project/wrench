@@ -62,6 +62,8 @@ namespace wrench {
      *                   available on the host)
      * @param ram_memory: the VM's RAM memory capacity (use ComputeService::ALL_RAM to use all RAM available on the
      *                    host, this can be lead to an out of memory issue)
+     * @param property_list: a property list for the BareMetalService that will run on the VM ({} means "use all defaults")
+     * @param messagepayload_list: a message payload list for the BareMetalService that will run on the VM ({} means "use all defaults")
      * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
@@ -70,9 +72,11 @@ namespace wrench {
             const std::string &answer_mailbox,
             unsigned long num_cores,
             double ram_memory,
+            std::map<std::string, std::string> property_list,
+            std::map<std::string, std::string> messagepayload_list,
             double payload) :
             CloudServiceMessage("CREATE_VM_REQUEST", payload),
-            num_cores(num_cores), ram_memory(ram_memory) {
+            num_cores(num_cores), ram_memory(ram_memory), property_list(property_list), messagepayload_list(messagepayload_list)  {
 
         if (answer_mailbox.empty() || (ram_memory < 0.0)) {
 //        std::cerr << answer_mailbox << " - " << pm_hostname << " - " << vm_name << std::endl;

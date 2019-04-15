@@ -151,30 +151,40 @@ namespace wrench {
     int HTCondorCentralManagerService::main() {
 
       TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
-      WRENCH_INFO("HTCondor Service starting on host %s listening on mailbox_name %s", this->hostname.c_str(),
-                  this->mailbox_name.c_str());
+      WRENCH_INFO("HTCondor Service starting on host %s listening on mailbox_name %s",
+              this->hostname.c_str(), this->mailbox_name.c_str());
 
       // start the compute resource services
       try {
         for (auto cs : this->compute_resources) {
           this->simulation->startNewService(cs);
 
-          // for cloud services
+          unsigned long sum_num_idle_cores = 0;
+
+          // for cloud services, we must create/start VMs, each of which
+          // is a BareMetalComputeService. Right now, we just create a bunch
+          // of 1-core VMs that all share RAM
+          // TODO: Create one VM per host?
+          // But then how do we know it will be on that host (i.e., if it's not a VirtualizedClusterService
           if (auto cloud = dynamic_cast<CloudService *>(cs)) {
+
             for (auto &host : cloud->getExecutionHosts()) {
-              for (unsigned int i = 0; i < S4U_Simulation::getHostNumCores(host); i++) {
-                cloud->createVM(1, ComputeService::ALL_RAM);
+              for (unsigned int i = 0; i < Simulation::getHostNumCores(host); i++) {
+                auto vm_name = cloud->createVM(1, std::floor(Simulation::getHostMemoryCapacity(host) / Simulation::getHostNumCores(host)));
+                auto vm = cloud->startVM(vm_name);
               }
             }
+
+          } else {
+
+            // set the number of available cores
+            std::map<std::string, unsigned long> num_idle_cores = cs->getNumIdleCores();
+            for (auto h : num_idle_cores) {
+              sum_num_idle_cores += h.second;
+            }
+            this->compute_resources_map.insert(std::make_pair(cs, sum_num_idle_cores));
           }
 
-          // set the number of available cores
-          std::map<std::string, unsigned long> num_idle_cores = cs->getNumIdleCores();
-          unsigned long sum_num_idle_cores = 0;
-          for (auto h : num_idle_cores) {
-            sum_num_idle_cores += h.second;
-          }
-          this->compute_resources_map.insert(std::make_pair(cs, sum_num_idle_cores));
         }
       } catch (std::runtime_error &e) {
         throw;

@@ -35,7 +35,9 @@ namespace wrench {
 
         S4U_VirtualMachine(const std::string &vm_hostname,
                            unsigned long num_cores,
-                           double ram_memory);
+                           double ram_memory,
+                           std::map<std::string, std::string> property_list,
+                           std::map<std::string, std::string> messagepayload_list);
 
         void start(std::string &pm_name);
 
@@ -51,6 +53,9 @@ namespace wrench {
         std::string getPhysicalHostname();
         unsigned long getNumCores();
         double getMemory();
+        std::map<std::string, std::string> getPropertyList();
+        std::map<std::string, std::string> getMessagePayloadList();
+
         State getState();
         std::string getStateAsString();
 
@@ -61,6 +66,8 @@ namespace wrench {
         simgrid::s4u::VirtualMachine *vm;
         unsigned long num_cores;
         double ram_memory;
+        std::map<std::string, std::string> property_list;
+        std::map<std::string, std::string> messagepayload_list;
     };
 
     /***********************/
