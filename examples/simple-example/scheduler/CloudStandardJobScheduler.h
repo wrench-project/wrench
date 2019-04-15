@@ -39,6 +39,7 @@ namespace wrench {
     private:
         std::vector<std::string> execution_hosts;
         StorageService *default_storage_service;
+        std::vector<std::shared_ptr<BareMetalComputeService>> compute_services_running_on_vms;
     };
 }
 

@@ -80,7 +80,7 @@ namespace wrench {
     }
 
     void WorkunitExecutor::cleanup(bool has_returned_from_main, int return_value) {
-        WRENCH_INFO("In on_exit.cleanup(): WorkunitExecutor: %s has_returned_from_main = %d (return_value = %d, job forcefully terminated = %d)",
+        WRENCH_DEBUG("In on_exit.cleanup(): WorkunitExecutor: %s has_returned_from_main = %d (return_value = %d, job forcefully terminated = %d)",
                      this->getName().c_str(), has_returned_from_main, return_value, this->terminated_due_job_being_forcefully_terminated);
         if ((not has_returned_from_main) and (this->task_start_timestamp_has_been_inserted) and
             (not this->task_failure_time_stamp_has_already_been_generated)) {
@@ -163,7 +163,7 @@ namespace wrench {
         } catch (WorkflowExecutionException &e) {
 
             // build "failed!" message
-            WRENCH_INFO("Got an exception while performing work: %s", e.getCause()->toString().c_str());
+            WRENCH_DEBUG("Got an exception while performing work: %s", e.getCause()->toString().c_str());
             success = false;
             msg_to_send_back = new WorkunitExecutorFailedMessage(
                     this,
@@ -315,7 +315,7 @@ namespace wrench {
                 throw;
             }
 
-            WRENCH_INFO("Setting the internal state of %s to TASK_COMPLETED", task->getID().c_str());
+            WRENCH_DEBUG("Setting the internal state of %s to TASK_COMPLETED", task->getID().c_str());
             task->setInternalState(WorkflowTask::InternalState::TASK_COMPLETED);
             this->simulation->getOutput().addTimestamp<SimulationTimestampTaskCompletion>(
                     new SimulationTimestampTaskCompletion(task));
@@ -457,7 +457,6 @@ namespace wrench {
                 this->releaseDaemonLock();
                 throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ComputeThreadHasDied()));
             }
-            WRENCH_INFO("Waiting for completion of all compute threads");
 
             this->releaseDaemonLock();  // People can kill me now
 
@@ -488,6 +487,7 @@ namespace wrench {
 
         }
 #endif
+            WRENCH_INFO("All compute threads have completed");
 
             if (!success) {
                 throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ComputeThreadHasDied()));
