@@ -747,7 +747,7 @@ namespace wrench {
 
     /**
      * @brief Returns the task's top level (max number of hops on a reverse path up to an entry task. Entry
-     *        tasks have a top-leve of 0)
+     *        tasks have a top-level of 0)
      * @return
      */
     unsigned long WorkflowTask::getTopLevel() {

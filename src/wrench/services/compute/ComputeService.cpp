@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2019. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ namespace wrench {
 
     constexpr unsigned long ComputeService::ALL_CORES;
     constexpr double ComputeService::ALL_RAM;
-    StorageService *ComputeService::SCRATCH = (StorageService *)ULONG_MAX;
+    StorageService *ComputeService::SCRATCH = (StorageService *) ULONG_MAX;
 
     /**
      * @brief Stop the compute service - must be called by the stop()
@@ -132,8 +132,7 @@ namespace wrench {
                                    const std::string service_name,
                                    const std::string mailbox_name_prefix,
                                    double scratch_space_size) :
-            Service(hostname, service_name, mailbox_name_prefix)
-    {
+            Service(hostname, service_name, mailbox_name_prefix) {
 
       this->state = ComputeService::UP;
       // Set default and specified properties
@@ -142,7 +141,8 @@ namespace wrench {
         try {
           this->scratch_space_storage_service =
                   new SimpleStorageService(hostname, scratch_space_size);
-          this->scratch_space_storage_service_shared_ptr = std::shared_ptr<StorageService>(this->scratch_space_storage_service);
+          this->scratch_space_storage_service_shared_ptr = std::shared_ptr<StorageService>(
+                  this->scratch_space_storage_service);
         } catch (std::runtime_error &e) {
           throw;
         }
@@ -241,8 +241,8 @@ namespace wrench {
     }
 
     /**
-      * @brief Get the toal core counts of the compute service's hosts
-      * @return a core count
+      * @brief Get the total core counts for all hosts of the compute service
+      * @return total core counts
       *
       * @throw WorkflowExecutionException
       * @throw std::runtime_error
@@ -300,8 +300,8 @@ namespace wrench {
     }
 
     /**
-     * @brief Get idle core counts for each of the compute service's host
-     * @return the idle core counts (could be empty)
+     * @brief Get the total idle core count for all hosts of the compute service
+     * @return total idle core count
      *
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
