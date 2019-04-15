@@ -193,7 +193,7 @@ namespace wrench {
             return true;
 
         } else if (auto msg = dynamic_cast<CloudServiceCreateVMRequestMessage *>(message.get())) {
-            processCreateVM(msg->answer_mailbox, msg->num_cores, msg->ram_memory);
+            processCreateVM(msg->answer_mailbox, msg->num_cores, msg->ram_memory, msg->property_list, msg->messagepayload_list);
             return true;
 
         } else if (auto msg = dynamic_cast<CloudServiceShutdownVMRequestMessage *>(message.get())) {

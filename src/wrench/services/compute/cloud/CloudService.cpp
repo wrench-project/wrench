@@ -109,8 +109,8 @@ namespace wrench {
      *
      * @param num_cores: the number of cores for the VM
      * @param ram_memory: the VM's RAM memory capacity
-     * @param property_list: a property list ({} means "use all defaults")
-     * @param messagepayload_list: a message payload list ({} means "use all defaults")
+     * @param property_list: a property list for the BareMetalService that will run on the VM ({} means "use all defaults")
+     * @param messagepayload_list: a message payload list for the BareMetalService that will run on the VM ({} means "use all defaults")
      *
      * @return A VM name
      *
@@ -118,7 +118,9 @@ namespace wrench {
      * @throw std::runtime_error
      */
     std::string CloudService::createVM(unsigned long num_cores,
-                                       double ram_memory) {
+                                       double ram_memory,
+                                       std::map<std::string, std::string> property_list,
+                                       std::map<std::string, std::string> messagepayload_list) {
 
 
         if (num_cores == ComputeService::ALL_CORES) {
@@ -137,7 +139,7 @@ namespace wrench {
                 answer_mailbox,
                 new CloudServiceCreateVMRequestMessage(
                         answer_mailbox,
-                        num_cores, ram_memory,
+                        num_cores, ram_memory, property_list, messagepayload_list,
                         this->getMessagePayloadValueAsDouble(
                                 CloudServiceMessagePayload::CREATE_VM_REQUEST_MESSAGE_PAYLOAD)));
 
@@ -548,7 +550,7 @@ namespace wrench {
             return true;
 
         } else if (auto msg = dynamic_cast<CloudServiceCreateVMRequestMessage *>(message.get())) {
-            processCreateVM(msg->answer_mailbox, msg->num_cores, msg->ram_memory);
+            processCreateVM(msg->answer_mailbox, msg->num_cores, msg->ram_memory, msg->property_list, msg->messagepayload_list);
             return true;
 
         } else if (auto msg = dynamic_cast<CloudServiceShutdownVMRequestMessage *>(message.get())) {
@@ -609,12 +611,16 @@ namespace wrench {
      * @param answer_mailbox: the mailbox to which the answer message should be sent
      * @param requested_num_cores: the number of cores the service can use
      * @param requested_ram: the VM's RAM memory capacity
+     * @param property_list: a property list for the BareMetalService that will run on the VM ({} means "use all defaults")
+     * @param messagepayload_list: a message payload list for the BareMetalService that will run on the VM ({} means "use all defaults")
      *
      * @throw std::runtime_error
      */
     void CloudService::processCreateVM(const std::string &answer_mailbox,
                                        unsigned long requested_num_cores,
-                                       double requested_ram) {
+                                       double requested_ram,
+                                       std::map<std::string, std::string> property_list,
+                                       std::map<std::string, std::string> messagepayload_list) {
 
 
         WRENCH_INFO("Asked to create a VM with %s cores and %s RAM",
@@ -653,7 +659,7 @@ namespace wrench {
             } while (simgrid::s4u::Host::by_name_or_null(vm_name) != nullptr);
 
             // Create the VM
-            auto vm = std::shared_ptr<S4U_VirtualMachine>(new S4U_VirtualMachine(vm_name, requested_num_cores, requested_ram));
+            auto vm = std::shared_ptr<S4U_VirtualMachine>(new S4U_VirtualMachine(vm_name, requested_num_cores, requested_ram, property_list, messagepayload_list));
 
             // Add the VM to the list of VMs, with (for now) a nullptr compute service
             this->vm_list[vm_name] = std::make_pair(vm, nullptr);
@@ -810,8 +816,8 @@ namespace wrench {
                     std::shared_ptr<BareMetalComputeService> cs = std::shared_ptr<BareMetalComputeService>(
                             new BareMetalComputeService(this->hostname,
                                                         compute_resources,
-                                                        {{ComputeServiceProperty::SUPPORTS_STANDARD_JOBS,"true"}},
-                                                        {},
+                                                        vm->getPropertyList(),
+                                                        vm->getMessagePayloadList(),
                                                         getScratch()));
                     cs->simulation = this->simulation;
                     std::get<1>(this->vm_list[vm_name]) = cs;
