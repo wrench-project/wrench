@@ -40,7 +40,8 @@ namespace wrench {
         std::map<std::string, std::string> default_property_values = {
                 {CloudServiceProperty::SUPPORTS_PILOT_JOBS,         "false"},
                 {CloudServiceProperty::SUPPORTS_STANDARD_JOBS,      "false"},
-                {CloudServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS, "0.0"}
+                {CloudServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS, "0.0"},
+                {CloudServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM, "best-fit-ram-first"}
         };
 
         std::map<std::string, std::string> default_messagepayload_values = {
