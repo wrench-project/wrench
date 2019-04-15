@@ -528,6 +528,7 @@ namespace wrench {
 
         if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
             this->stopAllVMs();
+            this->vm_list.clear();
             // This is Synchronous
             try {
                 S4U_Mailbox::putMessage(msg->ack_mailbox,
@@ -1121,16 +1122,31 @@ namespace wrench {
 
         WRENCH_INFO("Stopping Cloud Service");
         for (auto &vm : this->vm_list) {
-            this->used_ram_per_execution_host[(std::get<0>(vm.second))->getPhysicalHostname()] -= S4U_Simulation::getHostMemoryCapacity(
-                    std::get<0>(vm));
-            // Deal with the compute service (if it hasn't been stopped before)
-            if (std::get<1>(vm.second)) {
-                std::get<1>(vm.second)->stop();
+            auto actual_vm = vm.second.first;
+            auto cs = vm.second.second;
+            WRENCH_INFO("DEALING WITH VM %s whose state is %s", vm.first.c_str(), actual_vm->getStateAsString().c_str());
+            switch (actual_vm->getState()) {
+                case S4U_VirtualMachine::State::DOWN:
+                    // Nothing to do
+                    break;
+                case S4U_VirtualMachine::State::SUSPENDED:
+                    // Resume the VM
+                    actual_vm->resume();
+                    cs->resume();
+                    // WARNING: No the lack of a "break" below which is a hacl
+                case S4U_VirtualMachine::State::RUNNING:
+                    // Shut it down
+                    std::string pm = actual_vm->getPhysicalHostname();
+                    // Stop the Compute Service
+                    cs->stop();
+                    // Shutdown the VM
+                    actual_vm->shutdown();
+                    // Update internal data structures
+                    this->used_ram_per_execution_host[pm] -= actual_vm->getMemory();
+                    this->used_cores_per_execution_host[pm] -= actual_vm->getNumCores();
+                    break;
             }
-            // Deal with the VM
-            std::get<0>(vm.second)->shutdown();
         }
-        this->vm_list.clear();
     }
 
     /**
