@@ -61,7 +61,6 @@ namespace wrench {
         simgrid::s4u::VirtualMachine *vm;
         unsigned long num_cores;
         double ram_memory;
-        std::string pm_hostname;
     };
 
     /***********************/

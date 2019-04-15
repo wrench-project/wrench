@@ -36,30 +36,13 @@ namespace wrench {
         this->state = State::DOWN;
     }
 
-//    /**
-//     * @brief Get a pointer to the simgrid::s4u::VirtualMachine object
-//     *
-//     * @return a pointer to the simgrid::s4u::VirtualMachine object
-//     */
-//    simgrid::s4u::VirtualMachine *S4U_VirtualMachine::get() {
-//        return this->vm;
-//    }
-
-//    /**
-//     * @brief Get a pointer to the physical machine host
-//     * @return a pointer to the physical machine host
-//     */
-//    simgrid::s4u::Host *S4U_VirtualMachine::getPm() {
-//        return this->vm->get_pm();
-//    }
-
     /**
     * @brief Get the physical hostname
     * @return the physical hostname
     */
     std::string S4U_VirtualMachine::getPhysicalHostname() {
         if (this->state == S4U_VirtualMachine::DOWN) {
-            return "";
+           throw std::runtime_error("S4U_VirtualMachine::getPhysicalHostname(): no physical host for VM '" + this->vm_name + "'");
         } else {
             return this->vm->get_pm()->get_name();
         }
