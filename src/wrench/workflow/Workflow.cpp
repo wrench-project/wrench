@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2019. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -115,7 +115,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    WorkflowTask *Workflow::getTaskByID(const std::string id) {
+    WorkflowTask *Workflow::getTaskByID(const std::string &id) {
       if (tasks.find(id) == tasks.end()) {
         throw std::invalid_argument("Workflow::getTaskByID(): Unknown WorkflowTask ID " + id);
       }
@@ -128,16 +128,17 @@ namespace wrench {
      *
      * @param src: the parent task
      * @param dst: the child task
+     * @param redundant_dependencies: whether DAG redundant dependencies should be kept in the graph
      *
      * @throw std::invalid_argument
      */
-    void Workflow::addControlDependency(WorkflowTask *src, WorkflowTask *dst) {
+    void Workflow::addControlDependency(WorkflowTask *src, WorkflowTask *dst, bool redundant_dependencies) {
 
       if ((src == nullptr) || (dst == nullptr)) {
         throw std::invalid_argument("Workflow::addControlDependency(): Invalid arguments");
       }
 
-      if (not pathExists(src, dst)) {
+      if (redundant_dependencies || not pathExists(src, dst)) {
 
         WRENCH_DEBUG("Adding control dependency %s-->%s", src->getID().c_str(), dst->getID().c_str());
         DAG->addArc(src->DAG_node, dst->DAG_node);
@@ -150,7 +151,6 @@ namespace wrench {
         }
       }
     }
-
 
     /**
      * @brief Add a new file to the workflow
@@ -191,7 +191,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    WorkflowFile *Workflow::getFileByID(const std::string id) {
+    WorkflowFile *Workflow::getFileByID(const std::string &id) {
       if (files.find(id) == files.end()) {
         throw std::invalid_argument("Workflow::getFileByID(): Unknown WorkflowFile ID " + id);
       } else {
@@ -248,7 +248,7 @@ namespace wrench {
               new lemon::ListDigraph::NodeMap<WorkflowTask *>(*DAG));
       this->callback_mailbox = S4U_Mailbox::generateUniqueMailboxName("workflow_mailbox");
       this->simulation = nullptr;
-    };
+    }
 
     /**
      * @brief Get a vector of ready tasks
@@ -509,12 +509,14 @@ namespace wrench {
      *                             This is needed because DAX files specify task execution times in seconds,
      *                             but the WRENCH simulation needs some notion of "amount of computation" to
      *                             apply reasonable scaling. (Because the XML platform description specifies host
-     *                             compute speeds in flops/sec). The times in the DAX file are thus asume to be obtained
-     *                             on an machine with flop rate reference_flop_rate.
+     *                             compute speeds in flops/sec). The times in the DAX file are thus assumed to be
+     *                             obtained on an machine with flop rate reference_flop_rate.
+     * @param redundant_dependencies: whether DAG redundant dependencies should be kept in the graph
      *
      * @throw std::invalid_argument
      */
-    void Workflow::loadFromDAX(const std::string &filename, const std::string &reference_flop_rate) {
+    void Workflow::loadFromDAX(const std::string &filename, const std::string &reference_flop_rate,
+                               bool redundant_dependencies) {
 
       pugi::xml_document dax_tree;
 
@@ -595,7 +597,7 @@ namespace wrench {
           std::string parent_id = parent.attribute("ref").value();
 
           WorkflowTask *parent_task = this->getTaskByID(parent_id);
-          this->addControlDependency(parent_task, child_task);
+          this->addControlDependency(parent_task, child_task, redundant_dependencies);
         }
       }
     }
@@ -608,12 +610,14 @@ namespace wrench {
      *                             This is needed because JSON files specify task execution times in seconds,
      *                             but the WRENCH simulation needs some notion of "amount of computation" to
      *                             apply reasonable scaling. (Because the XML platform description specifies host
-     *                             compute speeds in flops/sec). The times in the JSON file are thus asume to be obtained
-     *                             on an machine with flop rate reference_flop_rate.
+     *                             compute speeds in flops/sec). The times in the JSON file are thus assumed to be
+     *                             obtained on an machine with flop rate reference_flop_rate.
+     * @param redundant_dependencies: whether DAG redundant dependencies should be kept in the graph
      *
      * @throw std::invalid_argument
      */
-    void Workflow::loadFromJSON(const std::string &filename, const std::string &reference_flop_rate) {
+    void Workflow::loadFromJSON(const std::string &filename, const std::string &reference_flop_rate,
+                                bool redundant_dependencies) {
 
       std::ifstream file;
       nlohmann::json j;
@@ -723,7 +727,7 @@ namespace wrench {
             for (auto &parent : parents) {
               try {
                 WorkflowTask *parent_task = this->getTaskByID(parent);
-                this->addControlDependency(parent_task, task);
+                this->addControlDependency(parent_task, task, redundant_dependencies);
               } catch (std::invalid_argument &e) {
                 // do nothing
               }
@@ -742,12 +746,14 @@ namespace wrench {
     *                             This is needed because JSON files specify task execution times in seconds,
     *                             but the WRENCH simulation needs some notion of "amount of computation" to
     *                             apply reasonable scaling. (Because the XML platform description specifies host
-    *                             compute speeds in flops/sec). The times in the JSON file are thus asume to be obtained
-    *                             on an machine with flop rate reference_flop_rate.
+    *                             compute speeds in flops/sec). The times in the JSON file are thus assumed to be
+     *                            obtained on an machine with flop rate reference_flop_rate.
+    * @param redundant_dependencies: whether DAG redundant dependencies should be kept in the graph
     *
     * @throw std::invalid_argument
     */
-    void Workflow::loadFromDAXorJSON(const std::string &filename, const std::string &reference_flop_rate) {
+    void Workflow::loadFromDAXorJSON(const std::string &filename, const std::string &reference_flop_rate,
+                                     bool redundant_dependencies) {
       std::istringstream ss(filename);
       std::string token;
       std::vector<std::string> tokens;
@@ -763,15 +769,14 @@ namespace wrench {
       std::string extension = tokens[tokens.size() - 1];
 
       if (extension == "dax") {
-        loadFromDAX(filename, reference_flop_rate);
+        loadFromDAX(filename, reference_flop_rate, redundant_dependencies);
       } else if (extension == "json") {
-        loadFromJSON(filename, reference_flop_rate);
+        loadFromJSON(filename, reference_flop_rate, redundant_dependencies);
       } else {
         throw std::invalid_argument(
                 "Workflow::loadFromDAXorJSON(): workflow file name must end with '.dax' or '.json'");
       }
     }
-
 
     /**
      * @brief Returns all tasks with top-levels in a range
@@ -827,4 +832,4 @@ namespace wrench {
       return makespan;
     }
 
-};
+}
