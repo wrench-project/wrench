@@ -13,5 +13,6 @@
 namespace wrench {
 
     SET_PROPERTY_NAME(CloudServiceProperty, VM_BOOT_OVERHEAD_IN_SECONDS);
+    SET_PROPERTY_NAME(CloudServiceProperty, VM_RESOURCE_ALLOCATION_ALGORITHM);
 
 }

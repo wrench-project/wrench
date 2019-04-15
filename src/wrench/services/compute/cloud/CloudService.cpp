@@ -796,22 +796,44 @@ namespace wrench {
                                         CloudServiceMessagePayload::START_VM_ANSWER_MESSAGE_PAYLOAD));
             } else {
 
-                // Sort the possible hosts to implement best fit (using RAM first)
-                std::sort(possible_hosts.begin(), possible_hosts.end(),
-                          [](std::string const &a, std::string const &b) {
-                              unsigned long a_num_cores = Simulation::getHostNumCores(a);
-                              double a_ram = Simulation::getHostMemoryCapacity(a);
-                              unsigned long b_num_cores = Simulation::getHostNumCores(b);
-                              double b_ram = Simulation::getHostMemoryCapacity(b);
+                std::string vm_resource_allocation_algorithm = this->getPropertyValueAsString(CloudServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM);
+                if (vm_resource_allocation_algorithm == "first-fit") {
+                    //don't sort the possibvle hosts
+                }  else if (vm_resource_allocation_algorithm == "best-fit-ram-first") {
+                    // Sort the possible hosts to implement best fit (using RAM first)
+                    std::sort(possible_hosts.begin(), possible_hosts.end(),
+                              [](std::string const &a, std::string const &b) {
+                                  unsigned long a_num_cores = Simulation::getHostNumCores(a);
+                                  double a_ram = Simulation::getHostMemoryCapacity(a);
+                                  unsigned long b_num_cores = Simulation::getHostNumCores(b);
+                                  double b_ram = Simulation::getHostMemoryCapacity(b);
 
-                              if (a_ram != b_ram) {
-                                  return a_ram < b_ram;
-                              } else if (a_num_cores < b_num_cores) {
-                                  return a_num_cores < b_num_cores;
-                              } else {
-                                  return a < b;  // string order
-                              }
-                          });
+                                  if (a_ram != b_ram) {
+                                      return a_ram < b_ram;
+                                  } else if (a_num_cores < b_num_cores) {
+                                      return a_num_cores < b_num_cores;
+                                  } else {
+                                      return a < b;  // string order
+                                  }
+                              });
+                } else if (vm_resource_allocation_algorithm == "best-fit-cores-first") {
+                    // Sort the possible hosts to implement best fit (using cores first)
+                    std::sort(possible_hosts.begin(), possible_hosts.end(),
+                              [](std::string const &a, std::string const &b) {
+                                  unsigned long a_num_cores = Simulation::getHostNumCores(a);
+                                  double a_ram = Simulation::getHostMemoryCapacity(a);
+                                  unsigned long b_num_cores = Simulation::getHostNumCores(b);
+                                  double b_ram = Simulation::getHostMemoryCapacity(b);
+
+                                  if (a_num_cores != b_num_cores) {
+                                      return a_num_cores < b_num_cores;
+                                  } else if (a_ram < b_ram) {
+                                      return a_ram < b_ram;
+                                  } else {
+                                      return a < b;  // string order
+                                  }
+                              });
+                }
 
                 auto picked_host = *(possible_hosts.begin());
 
@@ -1204,6 +1226,15 @@ namespace wrench {
         if ((!success) or (vm_boot_overhead < 0)) {
             throw std::invalid_argument("Invalid THREAD_STARTUP_OVERHEAD property specification: " +
                                         this->getPropertyValueAsString(CloudServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS));
+        }
+
+        // VM resource allocation algorithm
+        std::string vm_resource_allocation_algorithm = this->getPropertyValueAsString(CloudServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM);
+        if (vm_resource_allocation_algorithm != "first-fit" and
+            vm_resource_allocation_algorithm != "best-fit-ram-first" and
+            vm_resource_allocation_algorithm != "best-fit-cores-first") {
+            throw std::invalid_argument("Inalid VM_RESOURCE_ALLOCATION_ALGORITHM property specification: " +
+                                        vm_resource_allocation_algorithm);
         }
     }
 
