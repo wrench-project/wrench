@@ -78,7 +78,9 @@ namespace wrench {
         /***********************/
 
         virtual std::string createVM(unsigned long num_cores,
-                                     double ram_memory);
+                                     double ram_memory,
+                                     std::map<std::string, std::string> property_list = {},
+                                     std::map<std::string, std::string> messagepayload_list = {});
 
         virtual void shutdownVM(const std::string &vm_name);
 
@@ -133,7 +135,10 @@ namespace wrench {
 
         virtual void processCreateVM(const std::string &answer_mailbox,
                                      unsigned long requested_num_cores,
-                                     double requested_ram);
+                                     double requested_ram,
+                                     std::map<std::string, std::string> property_list,
+                                     std::map<std::string, std::string> messagepayload_list
+                                     );
 
 
         virtual void processStartVM(const std::string &answer_mailbox, const std::string &vm_name, const std::string &pm_name);

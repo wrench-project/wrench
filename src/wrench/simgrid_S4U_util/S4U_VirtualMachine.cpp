@@ -28,11 +28,12 @@ namespace wrench {
      * @param ram_memory: the VM RAM memory capacity
      */
     S4U_VirtualMachine::S4U_VirtualMachine(const std::string &vm_name,
-                                           unsigned long num_cores, double ram_memory) {
+                                           unsigned long num_cores, double ram_memory,
+                                           std::map<std::string, std::string> property_list,
+                                           std::map<std::string, std::string> messagepayload_list) :
+                                           vm_name(vm_name), num_cores(num_cores), ram_memory(ram_memory),
+                                           property_list(property_list), messagepayload_list(messagepayload_list) {
 
-        this->vm_name = vm_name;
-        this->num_cores = num_cores;
-        this->ram_memory = ram_memory;
         this->state = State::DOWN;
     }
 
@@ -65,7 +66,7 @@ namespace wrench {
     }
 
     /**
-    * @brief Start the virtual machine
+    * @brief Start the VM
     * @param pm_name: the physical host name
     */
     void S4U_VirtualMachine::start(std::string &pm_name) {
@@ -87,7 +88,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Suspend the virtual machine
+     * @brief Suspend the VM
      */
     void S4U_VirtualMachine::suspend() {
         if (this->state != State::RUNNING) {
@@ -98,7 +99,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Resume the virtual machine
+     * @brief Resume the VM
      */
     void S4U_VirtualMachine::resume() {
         if (this->vm->get_state() != simgrid::s4u::VirtualMachine::state::SUSPENDED) {
@@ -109,7 +110,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Shutdown the virtual machine
+     * @brief Shutdown the VM
      */
     void S4U_VirtualMachine::shutdown() {
         if ((this->vm->get_state() != simgrid::s4u::VirtualMachine::state::SUSPENDED) and
@@ -121,23 +122,18 @@ namespace wrench {
         this->state = State::DOWN;
     }
 
-//    /**
-//     * @brief Stop the virtual machine
-//     */
-//    void S4U_VirtualMachine::destroy() {
-//        if (this->vm->get_state() != simgrid::s4u::VirtualMachine::state::CREATED) {
-//            throw std::runtime_error("S4U_VirtualMachine::resume(): Cannot resume a VM that is not suspended");
-//        }
-//        this->vm->destroy();
-//    }
-
-
-
+    /**
+     * @brief Get the VM's state
+     * @return a state
+     */
     S4U_VirtualMachine::State S4U_VirtualMachine::getState() {
         return this->state;
     }
 
-
+    /**
+     * @brief Get the VM's state as a string
+     * @return a state as a string
+     */
     std::string S4U_VirtualMachine::getStateAsString() {
         switch (this->state) {
             case State::DOWN:
@@ -151,6 +147,10 @@ namespace wrench {
         }
     }
 
+    /**
+     * @brief Migrate the VM
+     * @param dest_pm_name: the name of the host to which to migrate the VM
+     */
     void S4U_VirtualMachine::migrate(const std::string &dest_pm_name) {
 
         std::string src_pm_hostname = this->vm->get_pm()->get_name();
@@ -160,6 +160,22 @@ namespace wrench {
         sg_vm_migrate(this->vm, dest_pm);
         double mig_end = simgrid::s4u::Engine::get_clock();
         WRENCH_INFO("%s migrated: %s to %g s", src_pm_hostname.c_str(), dest_pm_name.c_str(), mig_end - mig_sta);
+    }
+
+    /**
+     * @brief Get the property list for the BareMetalService that is to run on the VM ({} means "use all defaults")
+     * @return a property list
+     */
+    std::map<std::string, std::string> S4U_VirtualMachine::getPropertyList() {
+        return this->property_list;
+    }
+
+    /**
+     * @brief Get the message payload list for the BareMetalService that will run on the VM ({} means "use all defaults")
+     * @return a message payload list
+     */
+    std::map<std::string, std::string> S4U_VirtualMachine::getMessagePayloadList() {
+        return this->messagepayload_list;
     }
 
 }
