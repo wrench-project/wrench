@@ -901,6 +901,7 @@ private:
             std::string execution_host = cs->getExecutionHosts()[0];
 
             for (int i=0; i < 4; i++) {
+                WRENCH_INFO("CREATING A VM");
                 auto vm_name = cs->createVM(1, 10);
                 auto vm_cs = cs->startVM(vm_name, execution_host);
                 vm_list.push_back(std::make_tuple(vm_name, vm_cs));
@@ -910,14 +911,18 @@ private:
             throw std::runtime_error(e.what());
         }
 
+        WRENCH_INFO("VMHAVE EEN CREATED");
         // shutdown some VMs
         try {
+            WRENCH_INFO("SHUTTING DONW A VM");
             cs->shutdownVM(std::get<0>(vm_list.at(0)));
+            WRENCH_INFO("SHUTTING DONW A VM");
             cs->shutdownVM(std::get<0>(vm_list.at(2)));
         } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error(e.what());
         }
 
+        WRENCH_INFO("STOPPING SERVICE");
         // stop service
         cs->stop();
 
