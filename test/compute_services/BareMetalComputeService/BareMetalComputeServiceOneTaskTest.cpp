@@ -629,19 +629,19 @@ private:
       double ram_capacity;
 
       ram_capacity = wrench::Simulation::getHostMemoryCapacity("SingleHost");
-      if (ram_capacity != wrench::ComputeService::ALL_RAM) {
-        throw std::runtime_error("RAM Capacity of SingleHost should be +infty");
+      if (ram_capacity != wrench::S4U_Simulation::DEFAULT_RAM) {
+        throw std::runtime_error("RAM Capacity of SingleHost should be the default");
       }
 
       ram_capacity = wrench::Simulation::getMemoryCapacity();
-      if (ram_capacity != wrench::ComputeService::ALL_RAM) {
-        throw std::runtime_error("RAM Capacity of SingleHost should be +infty");
+      if (ram_capacity != wrench::S4U_Simulation::DEFAULT_RAM) {
+        throw std::runtime_error("RAM Capacity of SingleHost should be the default");
       }
 
 
       ram_capacity = wrench::Simulation::getHostMemoryCapacity("RAMHost");
-      if (ram_capacity == wrench::ComputeService::ALL_RAM) {
-        throw std::runtime_error("RAM Capacity of RAMHost should not be +infty");
+      if (ram_capacity == wrench::S4U_Simulation::DEFAULT_RAM) {
+        throw std::runtime_error("RAM Capacity of RAMHost should not be the default");
       }
       if (std::abs(ram_capacity - 1024) > 0.01) {
         throw std::runtime_error("RAM Capacity of RAMHost should  be 1024");

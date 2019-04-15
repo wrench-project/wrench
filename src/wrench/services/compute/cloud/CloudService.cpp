@@ -733,7 +733,7 @@ namespace wrench {
     }
 
     /**
-     * @brief: Process a VM start request
+     * @brief: Process a VM start request by startibnng a VM on a host (using best fit for RAM first, and then for cores)
      *
      * @param answer_mailbox: the mailbox to which the answer message should be sent
      * @param vm_name: the name of the VM
@@ -759,8 +759,7 @@ namespace wrench {
         } else {
 
             // Find a physical host to start the VM
-            std::string picked_host = "";
-
+            std::vector<std::string> possible_hosts;
             for (auto const &host : this->execution_hosts) {
 
                 if ((not pm_name.empty()) and (host != pm_name)) {
@@ -781,12 +780,12 @@ namespace wrench {
                     continue;
                 }
 
-                picked_host = host;
+                possible_hosts.push_back(host);
                 break;
             }
 
             // Did we find a viable host?
-            if (picked_host.empty()) {
+            if (possible_hosts.empty()) {
                 WRENCH_INFO("Not enough resources to create the VM");
                 msg_to_send_back =
                         new CloudServiceStartVMAnswerMessage(
@@ -796,6 +795,25 @@ namespace wrench {
                                 this->getMessagePayloadValueAsDouble(
                                         CloudServiceMessagePayload::START_VM_ANSWER_MESSAGE_PAYLOAD));
             } else {
+
+                // Sort the possible hosts to implement best fit (using RAM first)
+                std::sort(possible_hosts.begin(), possible_hosts.end(),
+                          [](std::string const &a, std::string const &b) {
+                              unsigned long a_num_cores = Simulation::getHostNumCores(a);
+                              double a_ram = Simulation::getHostMemoryCapacity(a);
+                              unsigned long b_num_cores = Simulation::getHostNumCores(b);
+                              double b_ram = Simulation::getHostMemoryCapacity(b);
+
+                              if (a_ram != b_ram) {
+                                  return a_ram < b_ram;
+                              } else if (a_num_cores < b_num_cores) {
+                                  return a_num_cores < b_num_cores;
+                              } else {
+                                  return a < b;  // string order
+                              }
+                          });
+
+                auto picked_host = *(possible_hosts.begin());
 
                 // Sleep for the VM booting overhead
                 Simulation::sleep(

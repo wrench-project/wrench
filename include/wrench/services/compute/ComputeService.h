@@ -58,7 +58,6 @@ namespace wrench {
          */
         static constexpr double ALL_RAM = DBL_MAX;
 
-
         /***********************/
         /** \cond DEVELOPER   **/
         /***********************/
@@ -91,10 +90,6 @@ namespace wrench {
 
         unsigned long  getTotalNumIdleCores();
 
-        unsigned long getTotalNumCores();
-
-        unsigned long getTotalNumIdleCores();
-
         std::map<std::string, double> getMemoryCapacity();
 
         std::map<std::string, double> getCoreFlopRate();
@@ -112,6 +107,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
+
 
         /** 
          * @brief Method to submit a standard job to the service
