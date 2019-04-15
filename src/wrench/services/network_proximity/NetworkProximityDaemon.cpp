@@ -205,7 +205,7 @@ namespace wrench {
             return false;
         }
 
-//        WRENCH_INFO("Got a [%s] message", message->getName().c_str());
+        WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
 
         if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
             // This is Synchronous
@@ -228,7 +228,6 @@ namespace wrench {
 
         } else if (auto msg = dynamic_cast<NetworkProximityTransferMessage *>(message.get())) {
 
-//            WRENCH_INFO("Got a [%s] message", message->getName().c_str());
             return true;
 
         } else {

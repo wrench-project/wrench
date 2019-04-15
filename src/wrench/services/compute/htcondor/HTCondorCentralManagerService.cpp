@@ -175,10 +175,7 @@ namespace wrench {
                 auto vm_name = cloud->createVM(1, std::floor(Simulation::getHostMemoryCapacity(host) / Simulation::getHostNumCores(host)));
                 auto vm_cs = cloud->startVM(vm_name);
                 // set the number of idle cores
-                std::map<std::string, unsigned long> num_idle_cores = vm_cs->getNumIdleCores();
-                for (auto const &h : num_idle_cores) {
-                  sum_num_idle_cores += h.second;
-                }
+                sum_num_idle_cores = vm_cs->getTotalNumIdleCores();
                 this->compute_resources_map.insert(std::make_pair(vm_cs.get(), sum_num_idle_cores));
               }
             }
@@ -187,10 +184,7 @@ namespace wrench {
           } else {
 
             // set the number of available cores
-            std::map<std::string, unsigned long> num_idle_cores = cs->getNumIdleCores();
-            for (auto const &h : num_idle_cores) {
-              sum_num_idle_cores += h.second;
-            }
+            sum_num_idle_cores = cs->getTotalNumIdleCores();
             this->compute_resources_map.insert(std::make_pair(cs, sum_num_idle_cores));
           }
 

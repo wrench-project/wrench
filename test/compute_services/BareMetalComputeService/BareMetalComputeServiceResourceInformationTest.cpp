@@ -111,12 +111,12 @@ private:
       // Get number of Cores
       std::map<std::string, unsigned long> num_cores;
 
-      num_cores = this->test->compute_service1->getNumCores();
+      num_cores = this->test->compute_service1->getPerHostNumCores();
       if ((num_cores.size() != 2) or ((*(num_cores.begin())).second != 4) or ((*(++num_cores.begin())).second != 4)) {
         throw std::runtime_error("getHostNumCores() should return {4,4} for compute service #1");
       }
 
-      num_cores = this->test->compute_service2->getNumCores();
+      num_cores = this->test->compute_service2->getPerHostNumCores();
       if ((num_cores.size() != 2) or ((*(num_cores.begin())).second != 8) or ((*(++num_cores.begin())).second != 8)) {
         throw std::runtime_error("getHostNumCores() should return {8,8} for compute service #1");
       }
@@ -169,7 +169,7 @@ private:
       wrench::Simulation::sleep(1.0);
 
       // Get number of idle cores
-      std::map<std::string, unsigned long> num_idle_cores = this->test->compute_service1->getNumIdleCores();
+      std::map<std::string, unsigned long> num_idle_cores = this->test->compute_service1->getPerHostNumIdleCores();
       std::vector<unsigned long> idle_core_counts;
       for (auto const &c : num_idle_cores) {
         idle_core_counts.push_back(c.second);

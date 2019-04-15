@@ -218,7 +218,7 @@ namespace wrench {
       * @throw WorkflowExecutionException
       * @throw std::runtime_error
       */
-    std::map<std::string, unsigned long> ComputeService::getNumCores() {
+    std::map<std::string, unsigned long> ComputeService::getPerHostNumCores() {
 
       std::map<std::string, std::map<std::string, double>> dict;
       try {
@@ -241,13 +241,43 @@ namespace wrench {
     }
 
     /**
+      * @brief Get the toal core counts of the compute service's hosts
+      * @return a core count
+      *
+      * @throw WorkflowExecutionException
+      * @throw std::runtime_error
+      */
+    unsigned long ComputeService::getTotalNumCores() {
+
+      std::map<std::string, std::map<std::string, double>> dict;
+      try {
+        dict = this->getServiceResourceInformation();
+      } catch (WorkflowExecutionException &e) {
+        throw;
+      } catch (std::runtime_error &e) {
+        throw;
+      }
+
+      if (dict.find("num_cores") != dict.end()) {
+        unsigned long count = 0;
+        for (auto x : dict["num_cores"]) {
+          count += (unsigned long) x.second;
+        }
+        return count;
+      } else {
+        return 0;
+      }
+    }
+
+
+    /**
      * @brief Get idle core counts for each of the compute service's host
      * @return the idle core counts (could be empty)
      *
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
      */
-    std::map<std::string, unsigned long> ComputeService::getNumIdleCores() {
+    std::map<std::string, unsigned long> ComputeService::getPerHostNumIdleCores() {
 
       std::map<std::string, std::map<std::string, double>> dict;
       try {
@@ -267,6 +297,36 @@ namespace wrench {
       }
 
       return to_return;
+    }
+
+    /**
+     * @brief Get idle core counts for each of the compute service's host
+     * @return the idle core counts (could be empty)
+     *
+     * @throw WorkflowExecutionException
+     * @throw std::runtime_error
+     */
+    unsigned long ComputeService::getTotalNumIdleCores() {
+
+      std::map<std::string, std::map<std::string, double>> dict;
+      try {
+        dict = this->getServiceResourceInformation();
+      } catch (WorkflowExecutionException &e) {
+        throw;
+      } catch (std::runtime_error &e) {
+        throw;
+      }
+
+
+      if (dict.find("num_cores") != dict.end()) {
+        unsigned long count = 0;
+        for (auto x : dict["num_idle_cores"]) {
+          count += (unsigned long)x.second;
+        }
+        return count;
+      } else {
+        return 0;
+      }
     }
 
     /**

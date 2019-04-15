@@ -83,9 +83,13 @@ namespace wrench {
 
         unsigned long getNumHosts();
 
-        std::map<std::string, unsigned long> getNumCores();
+        std::map<std::string, unsigned long> getPerHostNumCores();
 
-        std::map<std::string, unsigned long> getNumIdleCores();
+        unsigned long getTotalNumCores();
+
+        std::map<std::string, unsigned long> getPerHostNumIdleCores();
+
+        unsigned long  getTotalNumIdleCores();
 
         std::map<std::string, double> getMemoryCapacity();
 

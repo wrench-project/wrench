@@ -381,17 +381,9 @@ private:
         try {
 
             // no VMs
-            std::map<std::string, unsigned long> num_cores = this->test->compute_service->getNumCores();
-            unsigned long sum_num_cores = 0;
-            for (auto const &c : num_cores) {
-                sum_num_cores += c.second;
-            }
+            unsigned long sum_num_cores = this->test->compute_service->getTotalNumCores();
 
-            std::map<std::string, unsigned long> num_idle_cores = this->test->compute_service->getNumIdleCores();
-            unsigned long sum_num_idle_cores = 0;
-            for (auto const &c : num_idle_cores) {
-                sum_num_idle_cores += c.second;
-            }
+            unsigned long sum_num_idle_cores = this->test->compute_service->getTotalNumIdleCores();
 
             if (sum_num_cores != 6 || sum_num_idle_cores != 6) {
                 throw std::runtime_error("getHostNumCores() and getNumIdleCores() should be 6 (they report " +
@@ -402,11 +394,7 @@ private:
             auto cs = (wrench::CloudService *) this->test->compute_service;
             cs->startVM(cs->createVM(2, 10));
 
-            num_idle_cores = cs->getNumIdleCores();
-            sum_num_idle_cores = 0;
-            for (auto const &c : num_idle_cores) {
-                sum_num_idle_cores += c.second;
-            }
+            sum_num_idle_cores = cs->getTotalNumIdleCores();
 
             if (sum_num_idle_cores != 4) {
                 throw std::runtime_error("getNumIdleCores() should be 4 (it is reported as " + std::to_string(sum_num_idle_cores) + ")");
@@ -414,11 +402,7 @@ private:
 
             // create and start a VM with two cores
             cs->startVM(cs->createVM(2, 10));
-            num_idle_cores = cs->getNumIdleCores();
-            sum_num_idle_cores = 0;
-            for (auto const &c : num_idle_cores) {
-                sum_num_idle_cores += c.second;
-            }
+            sum_num_idle_cores = cs->getTotalNumIdleCores();
 
             if (sum_num_idle_cores != 2) {
                 throw std::runtime_error("getHostNumCores() and getNumIdleCores() should be 2 (it is reported as " + std::to_string(sum_num_idle_cores) + ")");

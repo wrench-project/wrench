@@ -91,7 +91,7 @@ namespace wrench {
           }
           break;
         case NetworkConnection::INCOMING_CONTROL:
-        WRENCH_INFO("Asynchronously receiving a control message...");
+        WRENCH_DEBUG("Asynchronously receiving a control message...");
           try {
             this->comm = S4U_Mailbox::igetMessage(this->mailbox);
           } catch (std::shared_ptr<NetworkError> &cause) {
