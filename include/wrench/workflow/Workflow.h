@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2019. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,21 +41,27 @@ namespace wrench {
 
         void removeTask(WorkflowTask *task);
 
-        WorkflowTask *getTaskByID(std::string);
+        WorkflowTask *getTaskByID(const std::string &id);
 
         WorkflowFile *addFile(std::string, double);
 
-        WorkflowFile *getFileByID(std::string);
+        WorkflowFile *getFileByID(const std::string &id);
 
         static double getSumFlops(std::vector<WorkflowTask *> tasks);
 
-        void addControlDependency(WorkflowTask *, WorkflowTask *);
+        void addControlDependency(WorkflowTask *src, WorkflowTask *dest, bool redundant_dependencies = false);
 
-        void loadFromDAX(const std::string &filename, const std::string &reference_flop_rate);
+        void loadFromDAX(const std::string &filename,
+                         const std::string &reference_flop_rate,
+                         bool redundant_dependencies = false);
 
-        void loadFromJSON(const std::string &filename, const std::string &reference_flop_rate);
+        void loadFromJSON(const std::string &filename,
+                          const std::string &reference_flop_rate,
+                          bool redundant_dependencies = false);
 
-        void loadFromDAXorJSON(const std::string &filename, const std::string &reference_flop_rate);
+        void loadFromDAXorJSON(const std::string &filename,
+                               const std::string &reference_flop_rate,
+                               bool redundant_dependencies = false);
 
         unsigned long getNumberOfTasks();
 
@@ -87,7 +93,6 @@ namespace wrench {
 
         std::vector<WorkflowTask *> getTaskChildren(const WorkflowTask *task);
 
-
         /***********************/
         /** \endcond           */
         /***********************/
@@ -108,6 +113,7 @@ namespace wrench {
 
     private:
         friend class WMS;
+
         friend class WorkflowTask;
 
 //        void setNumLevels(unsigned long);
@@ -123,10 +129,8 @@ namespace wrench {
         bool pathExists(WorkflowTask *, WorkflowTask *);
 
         std::string callback_mailbox;
-
         ComputeService *parent_compute_service; // The compute service to which the job was submitted, if any
-
-        Simulation * simulation; // a ptr to the simulation so that the simulation can obtain simulation timestamps for workflow tasks
+        Simulation *simulation; // a ptr to the simulation so that the simulation can obtain simulation timestamps for workflow tasks
     };
 };
 

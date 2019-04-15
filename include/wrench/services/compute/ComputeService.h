@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2019. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -90,6 +90,10 @@ namespace wrench {
         std::map<std::string, unsigned long> getPerHostNumIdleCores();
 
         unsigned long  getTotalNumIdleCores();
+
+        unsigned long getTotalNumCores();
+
+        unsigned long getTotalNumIdleCores();
 
         std::map<std::string, double> getMemoryCapacity();
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2019. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,26 +37,26 @@ protected:
 
       // Create a two-host quad-core platform file
       std::string xml = "<?xml version='1.0'?>"
-              "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
-              "<platform version=\"4.1\"> "
-              "   <zone id=\"AS0\" routing=\"Full\"> "
-              "       <host id=\"Host1\" speed=\"1f\" core=\"4\"> "
-              "         <prop id=\"ram\" value=\"2048\"/> "
-              "       </host>  "
-              "       <host id=\"Host2\" speed=\"10Gf\" core=\"4\"> "
-              "         <prop id=\"ram\" value=\"1024\"/> "
-              "       </host>  "
-              "       <host id=\"Host3\" speed=\"1f\" core=\"10\"> "
-              "       </host>  "
-              "       <host id=\"Host4\" speed=\"1f\" core=\"10\">  "
-              "         <prop id=\"ram\" value=\"1024\"/> "
-              "       </host>  "
-              "        <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
-              "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"1\"/> </route>"
-              "       <route src=\"Host1\" dst=\"Host3\"> <link_ctn id=\"1\"/> </route>"
-              "       <route src=\"Host1\" dst=\"Host4\"> <link_ctn id=\"1\"/> </route>"
-              "   </zone> "
-              "</platform>";
+                        "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                        "<platform version=\"4.1\"> "
+                        "   <zone id=\"AS0\" routing=\"Full\"> "
+                        "       <host id=\"Host1\" speed=\"1f\" core=\"4\"> "
+                        "         <prop id=\"ram\" value=\"2048\"/> "
+                        "       </host>  "
+                        "       <host id=\"Host2\" speed=\"10Gf\" core=\"4\"> "
+                        "         <prop id=\"ram\" value=\"1024\"/> "
+                        "       </host>  "
+                        "       <host id=\"Host3\" speed=\"1f\" core=\"10\"> "
+                        "       </host>  "
+                        "       <host id=\"Host4\" speed=\"1f\" core=\"10\">  "
+                        "         <prop id=\"ram\" value=\"1024\"/> "
+                        "       </host>  "
+                        "        <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
+                        "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"1\"/> </route>"
+                        "       <route src=\"Host1\" dst=\"Host3\"> <link_ctn id=\"1\"/> </route>"
+                        "       <route src=\"Host1\" dst=\"Host4\"> <link_ctn id=\"1\"/> </route>"
+                        "   </zone> "
+                        "</platform>";
       FILE *platform_file = fopen(platform_file_path.c_str(), "w");
       fprintf(platform_file, "%s", xml.c_str());
       fclose(platform_file);
@@ -79,7 +79,7 @@ public:
                                const std::set<wrench::ComputeService *> &compute_services,
                                const std::set<wrench::StorageService *> &storage_services,
                                std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
     }
 
@@ -119,6 +119,14 @@ private:
       num_cores = this->test->compute_service2->getPerHostNumCores();
       if ((num_cores.size() != 2) or ((*(num_cores.begin())).second != 8) or ((*(++num_cores.begin())).second != 8)) {
         throw std::runtime_error("getHostNumCores() should return {8,8} for compute service #1");
+      }
+
+      if (this->test->compute_service1->getTotalNumCores() != 8) {
+        throw std::runtime_error("getHostTotalNumCores() should return 8 for compute service #1");
+      }
+
+      if (this->test->compute_service2->getTotalNumCores() != 16) {
+        throw std::runtime_error("getHostTotalNumCores() should return 16 for compute service #2");
       }
 
       // Get Ram capacities
@@ -164,7 +172,8 @@ private:
       tasks.push_back(t2);
       wrench::StandardJob *job = job_manager->createStandardJob(tasks, {}, {}, {}, {});
 
-      job_manager->submitJob(job, this->test->compute_service1, {{"task1", "Host1:3"},{"task2", "Host2:2"}});
+      job_manager->submitJob(job, this->test->compute_service1, {{"task1", "Host1:3"},
+                                                                 {"task2", "Host2:2"}});
 
       wrench::Simulation::sleep(1.0);
 
@@ -180,6 +189,10 @@ private:
           (idle_core_counts[0] != 1) or
           (idle_core_counts[1] != 2)) {
         throw std::runtime_error("getNumIdleCores() should return {1,2} or {2,1} for compute service #1");
+      }
+
+      if (this->test->compute_service1->getTotalNumIdleCores() != 3) {
+        throw std::runtime_error("getTotalNumIdleCores() should return 3 for compute service #1");
       }
 
       // Wait for the workflow execution event
@@ -216,17 +229,21 @@ void BareMetalComputeServiceTestResourceInformation::do_ResourceInformation_test
 
   // Create 1 Compute Service that manages Host1 and Host2
   ASSERT_NO_THROW(compute_service1 = simulation->add(
-                  new wrench::BareMetalComputeService("Host1",
-                                                               {{std::make_pair("Host1", std::make_tuple(4, wrench::ComputeService::ALL_RAM))},
-                                                                {std::make_pair("Host2", std::make_tuple(4, wrench::ComputeService::ALL_RAM))}}, 0
-                  )));
+          new wrench::BareMetalComputeService("Host1",
+                                              {{std::make_pair("Host1",
+                                                               std::make_tuple(4, wrench::ComputeService::ALL_RAM))},
+                                               {std::make_pair("Host2",
+                                                               std::make_tuple(4, wrench::ComputeService::ALL_RAM))}}, 0
+          )));
 
   // Create 1 Compute Service that manages Host3 and Host4
   ASSERT_NO_THROW(compute_service2 = simulation->add(
-                  new wrench::BareMetalComputeService("Host1",
-                                                               {{std::make_pair("Host3", std::make_tuple(8, wrench::ComputeService::ALL_RAM))},
-                                                                {std::make_pair("Host4", std::make_tuple(8, wrench::ComputeService::ALL_RAM))}}, 0
-                  )));
+          new wrench::BareMetalComputeService("Host1",
+                                              {{std::make_pair("Host3",
+                                                               std::make_tuple(8, wrench::ComputeService::ALL_RAM))},
+                                               {std::make_pair("Host4",
+                                                               std::make_tuple(8, wrench::ComputeService::ALL_RAM))}}, 0
+          )));
   std::set<wrench::ComputeService *> compute_services;
   compute_services.insert(compute_service1);
   compute_services.insert(compute_service2);
@@ -235,7 +252,7 @@ void BareMetalComputeServiceTestResourceInformation::do_ResourceInformation_test
   wrench::WMS *wms = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(
           new ResourceInformationTestWMS(
-                  this,  compute_services, {}, "Host1")));
+                  this, compute_services, {}, "Host1")));
 
   ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
