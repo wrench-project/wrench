@@ -244,12 +244,12 @@ namespace wrench {
      */
     double S4U_Simulation::getHostMemoryCapacity(simgrid::s4u::Host *host) {
         std::set<std::string> tags = {"mem", "Mem", "MEM", "ram", "Ram", "RAM", "memory", "Memory", "MEMORY"};
-        double capacity_value = ComputeService::ALL_RAM;
+        double capacity_value = S4U_Simulation::DEFAULT_RAM;
 
         for (auto const &tag : tags) {
             const char *capacity_string = host->get_property(tag);
             if (capacity_string) {
-                if (capacity_value != ComputeService::ALL_RAM) {
+                if (capacity_value != S4U_Simulation::DEFAULT_RAM) {
                     throw std::invalid_argument("S4U_Simulation::getHostMemoryCapacity(): Host '" + std::string(host->get_cname()) + "' has multiple memory capacity specifications");
                 }
                 try {
