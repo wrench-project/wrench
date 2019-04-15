@@ -700,13 +700,13 @@ namespace wrench {
                             CloudServiceMessagePayload::SHUTDOWN_VM_ANSWER_MESSAGE_PAYLOAD));
         } else {
 
+            std::string pm = vm->getPhysicalHostname();
             // Stop the Compute Service
             cs->stop();
             // Shutdown the VM
             vm->shutdown();
 
             // Update internal data structures
-            std::string pm = vm->getPhysicalHostname();
             this->used_ram_per_execution_host[pm] -= vm->getMemory();
             this->used_cores_per_execution_host[pm] -= vm->getNumCores();
 

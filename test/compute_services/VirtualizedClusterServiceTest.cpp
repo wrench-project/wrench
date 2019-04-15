@@ -631,7 +631,7 @@ private:
 
         auto cs = (wrench::VirtualizedClusterService *) this->test->compute_service;
 
-        // Create VMs
+        // Create  and start VMs
         try {
             std::string execution_host = cs->getExecutionHosts()[0];
             for (int i=0; i < 4; i++) {
@@ -643,6 +643,7 @@ private:
             throw std::runtime_error(e.what());
         }
 
+        WRENCH_INFO("SHUTTING THEM ALL DOWN");
         wrench::Simulation::sleep(1);
         // shutdown all VMs
         try {
