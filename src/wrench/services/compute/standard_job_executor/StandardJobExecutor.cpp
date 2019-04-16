@@ -442,17 +442,10 @@ namespace wrench {
             std::string target_host = "";
             unsigned long target_num_cores = 0;
 
-<<<<<<< HEAD
             WRENCH_INFO("Looking for a host to run a work unit that needs at least %ld cores, and would like %ld cores, and requires %.2ef bytes of RAM",
                         minimum_num_cores, desired_num_cores, required_ram);
             std::string host_selection_algorithm =
                     this->getPropertyValueAsString(StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM);
-=======
-        WRENCH_INFO("Looking for a host to run a work unit that needs at least %ld cores, and would like %ld cores, and requires %.2ef bytes of RAM",
-                    minimum_num_cores, desired_num_cores, required_ram);
-        std::string host_selection_algorithm =
-                this->getPropertyValueAsString(StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM);
->>>>>>> master
 
 //        std::cerr << "** FINDING A HOST USING " << host_selection_algorithm << "\n";
 
@@ -910,7 +903,7 @@ namespace wrench {
                       // Non-computational workunits have higher priority
 
                     if (wu1->task == nullptr and wu2->task == nullptr) {
-                      return ((uintptr_t) wu1 > (uintptr_t) wu2);
+                      return ((uintptr_t) wu1.get() > (uintptr_t) wu2.get());
                     }
                     if (wu1->task == nullptr) {
                       return true;
