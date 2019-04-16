@@ -410,9 +410,6 @@ namespace wrench {
 
         WRENCH_INFO("Looking for a host to run a work unit that needs at least %ld cores, and would like %ld cores, and requires %.2ef bytes of RAM",
                     minimum_num_cores, desired_num_cores, required_ram);
-        if (wu->task) {
-          WRENCH_INFO("    This is for Task %s", wu->task->getID().c_str());
-        }
         std::string host_selection_algorithm =
                 this->getPropertyValueAsString(StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM);
 
