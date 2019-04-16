@@ -410,6 +410,9 @@ namespace wrench {
 
         WRENCH_INFO("Looking for a host to run a work unit that needs at least %ld cores, and would like %ld cores, and requires %.2ef bytes of RAM",
                     minimum_num_cores, desired_num_cores, required_ram);
+        if (wu->task) {
+          WRENCH_INFO("    This is for Task %s", wu->task->getID().c_str());
+        }
         std::string host_selection_algorithm =
                 this->getPropertyValueAsString(StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM);
 
@@ -803,19 +806,19 @@ namespace wrench {
 
                     if (selection_algorithm == "maximum_flops") {
                       if (wu1->task->getFlops() == wu2->task->getFlops()) {
-                        return ((uintptr_t) wu1 > (uintptr_t) wu2);
+                        return (wu1->task->getID() >  wu2->task->getID());
                       }
                       return (wu1->task->getFlops() >= wu2->task->getFlops());
 
                     } else if (selection_algorithm == "maximum_minimum_cores") {
                       if (wu1->task->getMinNumCores() == wu2->task->getMinNumCores()) {
-                        return ((uintptr_t) wu1 > (uintptr_t) wu2);
+                        return (wu1->task->getID() > wu2->task->getID());
                       }
                       return (wu1->task->getMinNumCores() >= wu2->task->getMinNumCores());
 
                     } else if (selection_algorithm == "minimum_top_level") {
                       if (wu1->task->getTopLevel() == wu2->task->getTopLevel()) {
-                        return ((uintptr_t) wu1 > (uintptr_t) wu2);
+                        return (wu1->task->getID() > wu2->task->getID());
                       }
                       return (wu1->task->getTopLevel() <= wu2->task->getTopLevel());
                     } else {
