@@ -922,7 +922,7 @@ namespace wrench {
                           if (wu1->task->getMinNumCores() == wu2->task->getMinNumCores()) {
                               return (wu1->task->getID() > wu2->task->getID());
                           }
-                          return (wu1->task->getMinNumCores() < wu2->task->getMinNumCores());
+                          return (wu1->task->getMinNumCores() > wu2->task->getMinNumCores());
 
                       } else if (selection_algorithm == "minimum_top_level") {
                           if (wu1->task->getTopLevel() == wu2->task->getTopLevel()) {
@@ -930,7 +930,8 @@ namespace wrench {
                           }
                           return (wu1->task->getTopLevel() < wu2->task->getTopLevel());
                       } else {
-                        return (wu1->task->getID() >  wu2->task->getID());
+                          throw std::runtime_error("Unknown StandardJobExecutorProperty::TASK_SELECTION_ALGORITHM property '"
+                                                   + selection_algorithm + "'");
                       }
                   });
 
