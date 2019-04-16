@@ -442,10 +442,17 @@ namespace wrench {
             std::string target_host = "";
             unsigned long target_num_cores = 0;
 
+<<<<<<< HEAD
             WRENCH_INFO("Looking for a host to run a work unit that needs at least %ld cores, and would like %ld cores, and requires %.2ef bytes of RAM",
                         minimum_num_cores, desired_num_cores, required_ram);
             std::string host_selection_algorithm =
                     this->getPropertyValueAsString(StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM);
+=======
+        WRENCH_INFO("Looking for a host to run a work unit that needs at least %ld cores, and would like %ld cores, and requires %.2ef bytes of RAM",
+                    minimum_num_cores, desired_num_cores, required_ram);
+        std::string host_selection_algorithm =
+                this->getPropertyValueAsString(StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM);
+>>>>>>> master
 
 //        std::cerr << "** FINDING A HOST USING " << host_selection_algorithm << "\n";
 
@@ -902,16 +909,6 @@ namespace wrench {
 //                    std::cerr << "IN LAMBDA2: " << wu1->tasks.size() << "  " << wu2->tasks.size() << "\n";
                       // Non-computational workunits have higher priority
 
-<<<<<<< HEAD
-                      if (wu1->task == nullptr and wu2->task == nullptr) {
-                          return ((uintptr_t) wu1.get() > (uintptr_t) wu2.get());
-                      }
-                      if (wu1->task == nullptr) {
-                          return true;
-                      }
-                      if (wu2->task == nullptr) {
-                          return false;
-=======
                     if (wu1->task == nullptr and wu2->task == nullptr) {
                       return ((uintptr_t) wu1 > (uintptr_t) wu2);
                     }
@@ -931,35 +928,11 @@ namespace wrench {
                     } else if (selection_algorithm == "maximum_minimum_cores") {
                       if (wu1->task->getMinNumCores() == wu2->task->getMinNumCores()) {
                         return (wu1->task->getID() > wu2->task->getID());
->>>>>>> master
                       }
 
-<<<<<<< HEAD
-                      if (selection_algorithm == "maximum_flops") {
-                          if (wu1->task->getFlops() == wu2->task->getFlops()) {
-                              return ((uintptr_t) wu1.get() > (uintptr_t) wu2.get());
-                          }
-                          return (wu1->task->getFlops() >= wu2->task->getFlops());
-
-                      } else if (selection_algorithm == "maximum_minimum_cores") {
-                          if (wu1->task->getMinNumCores() == wu2->task->getMinNumCores()) {
-                              return ((uintptr_t) wu1.get() > (uintptr_t) wu2.get());
-                          }
-                          return (wu1->task->getMinNumCores() >= wu2->task->getMinNumCores());
-
-                      } else if (selection_algorithm == "minimum_top_level") {
-                          if (wu1->task->getTopLevel() == wu2->task->getTopLevel()) {
-                              return ((uintptr_t) wu1.get() > (uintptr_t) wu2.get());
-                          }
-                          return (wu1->task->getTopLevel() <= wu2->task->getTopLevel());
-                      } else {
-                          throw std::runtime_error("Unknown StandardJobExecutorProperty::TASK_SELECTION_ALGORITHM property '"
-                                                   + selection_algorithm + "'");
-=======
                     } else if (selection_algorithm == "minimum_top_level") {
                       if (wu1->task->getTopLevel() == wu2->task->getTopLevel()) {
                         return (wu1->task->getID() > wu2->task->getID());
->>>>>>> master
                       }
                   });
 
