@@ -902,6 +902,7 @@ namespace wrench {
 //                    std::cerr << "IN LAMBDA2: " << wu1->tasks.size() << "  " << wu2->tasks.size() << "\n";
                       // Non-computational workunits have higher priority
 
+<<<<<<< HEAD
                       if (wu1->task == nullptr and wu2->task == nullptr) {
                           return ((uintptr_t) wu1.get() > (uintptr_t) wu2.get());
                       }
@@ -910,8 +911,30 @@ namespace wrench {
                       }
                       if (wu2->task == nullptr) {
                           return false;
+=======
+                    if (wu1->task == nullptr and wu2->task == nullptr) {
+                      return ((uintptr_t) wu1 > (uintptr_t) wu2);
+                    }
+                    if (wu1->task == nullptr) {
+                      return true;
+                    }
+                    if (wu2->task == nullptr) {
+                      return false;
+                    }
+
+                    if (selection_algorithm == "maximum_flops") {
+                      if (wu1->task->getFlops() == wu2->task->getFlops()) {
+                        return (wu1->task->getID() >  wu2->task->getID());
+                      }
+                      return (wu1->task->getFlops() >= wu2->task->getFlops());
+
+                    } else if (selection_algorithm == "maximum_minimum_cores") {
+                      if (wu1->task->getMinNumCores() == wu2->task->getMinNumCores()) {
+                        return (wu1->task->getID() > wu2->task->getID());
+>>>>>>> master
                       }
 
+<<<<<<< HEAD
                       if (selection_algorithm == "maximum_flops") {
                           if (wu1->task->getFlops() == wu2->task->getFlops()) {
                               return ((uintptr_t) wu1.get() > (uintptr_t) wu2.get());
@@ -932,6 +955,11 @@ namespace wrench {
                       } else {
                           throw std::runtime_error("Unknown StandardJobExecutorProperty::TASK_SELECTION_ALGORITHM property '"
                                                    + selection_algorithm + "'");
+=======
+                    } else if (selection_algorithm == "minimum_top_level") {
+                      if (wu1->task->getTopLevel() == wu2->task->getTopLevel()) {
+                        return (wu1->task->getID() > wu2->task->getID());
+>>>>>>> master
                       }
                   });
 
