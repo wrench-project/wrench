@@ -49,16 +49,23 @@ wrench::HostStateChangeDetector::HostStateChangeDetector(std::string host_on_whi
     // Connect my member method to the on_state_change signal from SimGrid regarding Hosts
     simgrid::s4u::Host::on_state_change.connect([this](simgrid::s4u::Host const &h) {this->hostChangeCallback(h.get_name(), h.is_on(), "HOST STATE CHANGE");});
     // Connect my member method to the on_state_change signal from SimGrid regarding VMs
-    simgrid::s4u::VirtualMachine::on_shutdown.connect([this](simgrid::s4u::VirtualMachine const &h) {this->hostChangeCallback(h.get_name(),false, "VM SHUTDOWN");});
+    simgrid::s4u::VirtualMachine::on_shutdown.connect([this](simgrid::s4u::VirtualMachine const &h) -> void {this->hostChangeCallback(h.get_name(),false, "VM SHUTDOWN");});
     simgrid::s4u::VirtualMachine::on_start.connect([this](simgrid::s4u::VirtualMachine const &h) {this->hostChangeCallback(h.get_name(), true, "VM START");});
 }
 
 void wrench::HostStateChangeDetector::hostChangeCallback(std::string const &name, bool is_on, std::string message) {
-    WRENCH_INFO("************************************");
-    WRENCH_INFO("***** %s : IN CALLBACK: %s : %s (%d)", this->getName().c_str(),message.c_str(), name.c_str(), is_on);
-    WRENCH_INFO("************************************");
+//    WRENCH_INFO("************************************");
+//    WRENCH_INFO("***** %s : IN CALLBACK: %s : %s ", this->getName().c_str(),message.c_str(), name.c_str());
+//    WRENCH_INFO("************************************");
+
     // If this is not a host I care about, don't do anything
     if (std::find(this->hosts_to_monitor.begin(), this->hosts_to_monitor.end(), name) == this->hosts_to_monitor.end()) {
+        return;
+    }
+    // This seems to be a SimGrid bug: we get the shutdown, but somehow is_on() returns true!
+    // So for now we manually turn off the VM, which will then cause another callback
+    if (message == "VM SHUTDOWN") {
+        simgrid::s4u::VirtualMachine::by_name(name)->turn_off();
         return;
     }
     this->hosts_that_have_recently_changed_state.push_back(std::make_pair(name, is_on));
