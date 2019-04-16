@@ -853,10 +853,12 @@ namespace wrench {
                             std::make_pair(vm_name, std::make_tuple(vm->getNumCores(), vm->getMemory()))};
 
                     // Create the BareMetal service, whose main daemon is on this (stable) host
+                    auto plist = vm->getPropertyList();
+                    plist.insert(std::make_pair(BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN, "true"));
                     std::shared_ptr<BareMetalComputeService> cs = std::shared_ptr<BareMetalComputeService>(
                             new BareMetalComputeService(this->hostname,
                                                         compute_resources,
-                                                        vm->getPropertyList(),
+                                                        plist,
                                                         vm->getMessagePayloadList(),
                                                         getScratch()));
                     cs->simulation = this->simulation;

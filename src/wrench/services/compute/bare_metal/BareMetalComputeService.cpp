@@ -514,7 +514,7 @@ namespace wrench {
                 hosts_to_monitor.push_back(h.first);
             }
             auto host_state_monitor = std::shared_ptr<HostStateChangeDetector>(
-                    new HostStateChangeDetector(this->hostname, hosts_to_monitor, true, false, this->mailbox_name));
+                    new HostStateChangeDetector(this->hostname, hosts_to_monitor, true, true, this->mailbox_name));
             host_state_monitor->simulation = this->simulation;
             host_state_monitor->start(host_state_monitor, true, false); // Daemonized, no auto-restart
         }
@@ -532,6 +532,7 @@ namespace wrench {
 
             /** Dispatch ready work units **/
             this->dispatchReadyWorkunits();
+
         }
 
         WRENCH_INFO("Multicore Job Executor on host %s terminating cleanly!", S4U_Simulation::getHostName().c_str());
@@ -765,6 +766,29 @@ namespace wrench {
         if (auto msg = dynamic_cast<HostHasTurnedOnMessage *>(message.get())) {
             // Do nothing, just wake up
             return true;
+        } else if (auto msg = dynamic_cast<HostHasTurnedOffMessage *>(message.get())) {
+            WRENCH_INFO("NOTIFIED THAT HOST '%s' is down!", msg->hostname.c_str());
+            // If all hosts being off should not cause the service to terminate, nevermind
+            if (this->getPropertyValueAsString(BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN) == "false") {
+                return true;
+            }
+            bool all_hosts_are_down = true;
+            for (auto const &h : this->compute_resources) {
+                if (simgrid::s4u::Host::by_name(h.first)->is_on()) {
+                    all_hosts_are_down = false;
+                    break;
+                }
+            }
+            if (all_hosts_are_down) {
+                if (this->containing_pilot_job != nullptr) {
+                    /*** Clean up everything in the scratch space ***/
+                    cleanUpScratch();
+                }
+                this->terminate(true);
+                return false;
+            } else {
+                return true;
+            }
         } else if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
 
             if (this->containing_pilot_job != nullptr) {
