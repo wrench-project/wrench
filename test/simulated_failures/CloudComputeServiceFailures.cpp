@@ -33,9 +33,7 @@ public:
     wrench::StorageService *storage_service = nullptr;
     wrench::ComputeService *compute_service = nullptr;
 
-    void do_CloudServiceOneFailureCausingWorkUnitRestartOnAnotherHost_test();
-    void do_CloudServiceOneFailureCausingWorkUnitRestartOnSameHost_test();
-    void do_CloudServiceRandomFailures_test();
+    void do_CloudServiceFailureOfAVM_test();
 
 protected:
 
@@ -86,11 +84,11 @@ protected:
 /**                FAIL OVER TO SECOND HOST  TEST                    **/
 /**********************************************************************/
 
-class CloudServiceOneFailureCausingWorkUnitRestartOnAnotherHostTestWMS : public wrench::WMS {
+class CloudServiceFailureOfAVMTestWMS : public wrench::WMS {
 
 public:
-    CloudServiceOneFailureCausingWorkUnitRestartOnAnotherHostTestWMS(CloudServiceSimulatedFailuresTest *test,
-                                                                                std::string &hostname, wrench::ComputeService *cs, wrench::StorageService *ss) :
+    CloudServiceFailureOfAVMTestWMS(CloudServiceSimulatedFailuresTest *test,
+                                    std::string &hostname, wrench::ComputeService *cs, wrench::StorageService *ss) :
             wrench::WMS(nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -106,17 +104,11 @@ private:
         murderer->simulation = this->simulation;
         murderer->start(murderer, true, false); // Daemonized, no auto-restart
 
-//        // Starting a FailedHost1 resurector!!
-        auto resurector = std::shared_ptr<wrench::HostSwitcher>(new wrench::HostSwitcher("StableHost", 1000, "FailedHost1", wrench::HostSwitcher::Action::TURN_ON));
-        resurector->simulation = this->simulation;
-        resurector->start(resurector, true, false); // Daemonized, no auto-restart
-
+        wrench::Simulation::sleep(10);
 
         // Create a VM on the Cloud Service
         auto cloud_service = (wrench::CloudService *)this->test->compute_service;
-        cloud_service->createVM(1, wrench::ComputeService::ALL_RAM);
-
-        wrench::Simulation::sleep(10000);
+        auto vm_cs = cloud_service->startVM(cloud_service->createVM(1, this->test->task->getMemoryRequirement()));
 
         // Create a job manager
         std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
@@ -126,36 +118,27 @@ private:
                                                                      {this->test->output_file, this->test->storage_service}});
 
         // Submit the standard job to the compute service, making it sure it runs on FailedHost1
-        std::map<std::string, std::string> service_specific_args;
-        service_specific_args["task"] = "FailedHost1";
-        job_manager->submitJob(job, this->test->compute_service, service_specific_args);
+        job_manager->submitJob(job, vm_cs.get());
 
         // Wait for a workflow execution event
         std::unique_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
-        if (event->type != wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION) {
+        if (event->type != wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE) {
             throw std::runtime_error("Unexpected workflow execution event!");
         }
-
-        // Paranoid check
-        if (!this->test->storage_service->lookupFile(this->test->output_file, nullptr)) {
-            throw std::runtime_error("Output file not written to storage service");
-        }
-
-
 
         return 0;
     }
 };
 
 #if ((SIMGRID_VERSION_MAJOR == 3) && (SIMGRID_VERSION_MINOR == 22)) || ((SIMGRID_VERSION_MAJOR == 3) && (SIMGRID_VERSION_MINOR == 21) && (SIMGRID_VERSION_PATCH > 0))
-TEST_F(CloudServiceSimulatedFailuresTest, OneFailureCausingWorkUnitRestartOnAnotherHost) {
+TEST_F(CloudServiceSimulatedFailuresTest, FailureOfAVM) {
 #else
-    TEST_F(CloudServiceSimulatedFailuresTest, DISABLED_OneFailureCausingWorkUnitRestartOnAnotherHost) {
+    TEST_F(CloudServiceSimulatedFailuresTest, DISABLED_FailureOfAVM) {
 #endif
-    DO_TEST_WITH_FORK(do_CloudServiceOneFailureCausingWorkUnitRestartOnAnotherHost_test);
+    DO_TEST_WITH_FORK(do_CloudServiceFailureOfAVM_test);
 }
 
-void CloudServiceSimulatedFailuresTest::do_CloudServiceOneFailureCausingWorkUnitRestartOnAnotherHost_test() {
+void CloudServiceSimulatedFailuresTest::do_CloudServiceFailureOfAVM_test() {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
@@ -173,21 +156,20 @@ void CloudServiceSimulatedFailuresTest::do_CloudServiceOneFailureCausingWorkUnit
     std::string stable_host = "StableHost";
     std::vector<std::string> compute_hosts;
     compute_hosts.push_back("FailedHost1");
-//    compute_hosts.push_back("FailedHost2");
 
     // Create a Compute Service that has access to two hosts
     compute_service = simulation->add(
             new wrench::CloudService(stable_host,
-                                                compute_hosts,
-                                                100.0,
-                                                {}));
+                                     compute_hosts,
+                                     100.0,
+                                     {}));
 
     // Create a Storage Service
     storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, 10000000000000.0));
 
     // Create a WMS
     wrench::WMS *wms = nullptr;
-    wms = simulation->add(new CloudServiceOneFailureCausingWorkUnitRestartOnAnotherHostTestWMS(this, stable_host, compute_service, storage_service));
+    wms = simulation->add(new CloudServiceFailureOfAVMTestWMS(this, stable_host, compute_service, storage_service));
 
     wms->addWorkflow(workflow);
 
@@ -205,249 +187,4 @@ void CloudServiceSimulatedFailuresTest::do_CloudServiceOneFailureCausingWorkUnit
 }
 
 
-#if 0
-
-/**********************************************************************/
-/**                    RESTART ON SAME HOST                          **/
-/**********************************************************************/
-
-class CloudServiceOneFailureCausingWorkUnitRestartOnSameHostTestWMS : public wrench::WMS {
-
-public:
-    CloudServiceOneFailureCausingWorkUnitRestartOnSameHostTestWMS(CloudServiceSimulatedFailuresTest *test,
-                                                                             std::string &hostname, wrench::ComputeService *cs, wrench::StorageService *ss) :
-            wrench::WMS(nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
-        this->test = test;
-    }
-
-private:
-
-    CloudServiceSimulatedFailuresTest *test;
-
-    int main() override {
-
-        // Starting a FailedHost1 murderer!!
-        auto murderer = std::shared_ptr<wrench::HostSwitcher>(new wrench::HostSwitcher("StableHost", 100, "FailedHost1", wrench::HostSwitcher::Action::TURN_OFF));
-        murderer->simulation = this->simulation;
-        murderer->start(murderer, true, false); // Daemonized, no auto-restart
-
-        // Starting a FailedHost1 resurector!!
-        auto resurector = std::shared_ptr<wrench::HostSwitcher>(new wrench::HostSwitcher("StableHost", 1000, "FailedHost1", wrench::HostSwitcher::Action::TURN_ON));
-        resurector->simulation = this->simulation;
-        resurector->start(resurector, true, false); // Daemonized, no auto-restart
-
-
-        // Create a job manager
-        std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
-
-        // Create a standard job
-        auto job = job_manager->createStandardJob(this->test->task, {{this->test->input_file, this->test->storage_service},
-                                                                     {this->test->output_file, this->test->storage_service}});
-
-        // Submit the standard job to the compute service, making it sure it runs on FailedHost1
-        job_manager->submitJob(job, this->test->compute_service, {});
-
-        // Wait for a workflow execution event
-        std::unique_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
-        if (event->type != wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION) {
-            throw std::runtime_error("Unexpected workflow execution event!");
-        }
-
-        // Paranoid check
-        if (!this->test->storage_service->lookupFile(this->test->output_file, nullptr)) {
-            throw std::runtime_error("Output file not written to storage service");
-        }
-
-
-
-        return 0;
-    }
-};
-
-#if ((SIMGRID_VERSION_MAJOR == 3) && (SIMGRID_VERSION_MINOR == 22)) || ((SIMGRID_VERSION_MAJOR == 3) && (SIMGRID_VERSION_MINOR == 21) && (SIMGRID_VERSION_PATCH > 0))
-TEST_F(CloudServiceSimulatedFailuresTest, OneFailureCausingWorkUnitRestartOnSameHost) {
-#else
-    TEST_F(CloudServiceSimulatedFailuresTest, DISABLED_OneFailureCausingWorkUnitRestartOnSameHost) {
-#endif
-    DO_TEST_WITH_FORK(do_CloudServiceOneFailureCausingWorkUnitRestartOnSameHost_test);
-}
-
-void CloudServiceSimulatedFailuresTest::do_CloudServiceOneFailureCausingWorkUnitRestartOnSameHost_test() {
-
-    // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
-    int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("failure_test");
-
-
-    simulation->init(&argc, argv);
-
-    // Setting up the platform
-    simulation->instantiatePlatform(platform_file_path);
-
-    // Get a hostname
-    std::string stable_host = "StableHost";
-
-    // Create a Compute Service that has access to two hosts
-    compute_service = simulation->add(
-            new wrench::CloudService(stable_host,
-                                                (std::map<std::string, std::tuple<unsigned long, double>>){
-                                                        std::make_pair("FailedHost1", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)),
-                                                },
-                                                100.0,
-                                                {}));
-
-    // Create a Storage Service
-    storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, 10000000000000.0));
-
-    // Create a WMS
-    wrench::WMS *wms = nullptr;
-    wms = simulation->add(new CloudServiceOneFailureCausingWorkUnitRestartOnSameHostTestWMS(this, stable_host, compute_service, storage_service));
-
-    wms->addWorkflow(workflow);
-
-    // Staging the input_file on the storage service
-    // Create a File Registry Service
-    simulation->add(new wrench::FileRegistryService(stable_host));
-    simulation->stageFiles({{input_file->getID(), input_file}}, storage_service);
-
-    // Running a "run a single task" simulation
-    ASSERT_NO_THROW(simulation->launch());
-
-    delete simulation;
-    free(argv[0]);
-    free(argv);
-}
-
-
-/**********************************************************************/
-/**                    RANDOM FAILURES                               **/
-/**********************************************************************/
-
-class CloudServiceRandomFailuresTestWMS : public wrench::WMS {
-
-public:
-    CloudServiceRandomFailuresTestWMS(CloudServiceSimulatedFailuresTest *test,
-                                                 std::string &hostname, wrench::ComputeService *cs, wrench::StorageService *ss) :
-            wrench::WMS(nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
-        this->test = test;
-    }
-
-private:
-
-    CloudServiceSimulatedFailuresTest *test;
-
-    int main() override {
-
-        // Create a job manager
-        std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
-
-        unsigned long NUM_TRIALS = 1000;
-
-        for (unsigned long trial=0; trial < NUM_TRIALS; trial++) {
-
-            WRENCH_INFO("*** Trial %ld", trial);
-
-            // Starting a FailedHost1 random repeat switch!!
-            unsigned long seed1 = trial * 2 + 37;
-            auto switch1 = std::shared_ptr<wrench::HostRandomRepeatSwitcher>(
-                    new wrench::HostRandomRepeatSwitcher("StableHost", seed1, 10, 100, "FailedHost1"));
-            switch1->simulation = this->simulation;
-            switch1->start(switch1, true, false); // Daemonized, no auto-restart
-
-            // Starting a FailedHost2 random repeat switch!!
-            unsigned long seed2 = trial * 7 + 417;
-            auto switch2 = std::shared_ptr<wrench::HostRandomRepeatSwitcher>(
-                    new wrench::HostRandomRepeatSwitcher("StableHost", seed2, 10, 100, "FailedHost2"));
-            switch2->simulation = this->simulation;
-            switch2->start(switch2, true, false); // Daemonized, no auto-restart
-
-            // Add a task to the workflow
-            auto task = this->test->workflow->addTask("task_" + std::to_string(trial), 80, 1, 1, 1.0, 0);
-            task->addInputFile(this->test->input_file);
-            task->addOutputFile(this->test->output_file);
-
-            // Create a standard job
-            auto job = job_manager->createStandardJob(task, {{this->test->input_file, this->test->storage_service},
-                                                             {this->test->output_file, this->test->storage_service}});
-
-            // Submit the standard job to the compute service, making it sure it runs on FailedHost1
-            job_manager->submitJob(job, this->test->compute_service, {});
-
-            // Wait for a workflow execution event
-            std::unique_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
-            if (event->type != wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION) {
-                throw std::runtime_error("Unexpected workflow execution event!");
-            }
-
-            switch1->kill();
-            switch2->kill();
-
-            wrench::Simulation::sleep(10.0);
-            this->test->workflow->removeTask(task);
-
-        }
-
-        return 0;
-    }
-};
-
-#if ((SIMGRID_VERSION_MAJOR == 3) && (SIMGRID_VERSION_MINOR == 22)) || ((SIMGRID_VERSION_MAJOR == 3) && (SIMGRID_VERSION_MINOR == 21) && (SIMGRID_VERSION_PATCH > 0))
-TEST_F(CloudServiceSimulatedFailuresTest, RandomFailures) {
-#else
-    TEST_F(CloudServiceSimulatedFailuresTest, DISABLED_RandomFailures) {
-#endif
-    DO_TEST_WITH_FORK(do_CloudServiceRandomFailures_test);
-}
-
-void CloudServiceSimulatedFailuresTest::do_CloudServiceRandomFailures_test() {
-
-    // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
-    int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("failure_test");
-
-    simulation->init(&argc, argv);
-
-    // Setting up the platform
-    simulation->instantiatePlatform(platform_file_path);
-
-    // Get a hostname
-    std::string stable_host = "StableHost";
-
-    // Create a Compute Service that has access to two hosts
-    compute_service = simulation->add(
-            new wrench::CloudService(stable_host,
-                                                (std::map<std::string, std::tuple<unsigned long, double>>){
-                                                        std::make_pair("FailedHost1", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)),
-                                                        std::make_pair("FailedHost2", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)),
-                                                },
-                                                100.0,
-                                                {}));
-
-    // Create a Storage Service
-    storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, 10000000000000.0));
-
-    // Create a WMS
-    wrench::WMS *wms = nullptr;
-    wms = simulation->add(new CloudServiceRandomFailuresTestWMS(this, stable_host, compute_service, storage_service));
-
-    wms->addWorkflow(workflow);
-
-    // Staging the input_file on the storage service
-    // Create a File Registry Service
-    simulation->add(new wrench::FileRegistryService(stable_host));
-    simulation->stageFiles({{input_file->getID(), input_file}}, storage_service);
-
-    // Running a "run a single task" simulation
-    ASSERT_NO_THROW(simulation->launch());
-
-    delete simulation;
-    free(argv[0]);
-    free(argv);
-}
-
-#endif
 
