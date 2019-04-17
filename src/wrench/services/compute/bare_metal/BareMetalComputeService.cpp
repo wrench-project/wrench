@@ -573,7 +573,7 @@ namespace wrench {
             }
 
             // If the host is down, then don't look at it
-            if (not simgrid::s4u::Host::by_name(r.first)->is_on()) {
+            if (not Simulation::isHostOn(r.first)) {
                 continue;
             }
 
@@ -907,7 +907,7 @@ namespace wrench {
         this->workunit_executors.erase(job);
 
         /** Yield, so that all working_executors have a chance to do their cleanup, etc. */
-        simgrid::s4u::this_actor::yield();
+        S4U_Simulation::yield();
 
         /** Remove all relevant work units */
         std::set<std::shared_ptr<Workunit>> to_remove;
@@ -1614,7 +1614,7 @@ namespace wrench {
     bool BareMetalComputeService::areAllComputeResourcesDownWithNoWUERunning() {
         bool all_resources_down = true;
         for (auto const &h : this->compute_resources) {
-            if (simgrid::s4u::Host::by_name(h.first)->is_on()) {
+            if (Simulation::isHostOn(h.first)) {
                 all_resources_down = false;
                 break;
             }

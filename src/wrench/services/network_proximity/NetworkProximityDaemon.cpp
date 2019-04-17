@@ -126,7 +126,7 @@ namespace wrench {
                 life = this->processNextMessage(countdown);
             } else {
                 if ((not this->next_mailbox_to_send.empty()) &&
-                    (simgrid::s4u::Host::by_name(this->next_host_to_send)->is_on()) &&
+                    (S4U_Simulation::isHostOn(this->next_host_to_send)) &&
                     (this->next_daemon_to_send->isUp())) {
 
                     double start_time = S4U_Simulation::getClock();

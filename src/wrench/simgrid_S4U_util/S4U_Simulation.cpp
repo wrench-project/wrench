@@ -185,6 +185,25 @@ namespace wrench {
     }
 
     /**
+     * @brief Returns whether a host is on or not
+     *
+     * @param hostname: the name of the host
+     * @return true or false
+     *
+     * @throw std::invalid_argument
+     */
+    bool S4U_Simulation::isHostOn(std::string hostname) {
+        bool is_on = 0;
+        try {
+            is_on = simgrid::s4u::Host::by_name(hostname)->is_on();
+        } catch (std::out_of_range &e) {
+            throw std::invalid_argument("Unknown hostname " + hostname);
+        }
+        return is_on;
+    }
+
+
+    /**
      * @brief Get the flop rate of the current host
      *
      * @return the flop rate in floating point operations per second
@@ -218,6 +237,13 @@ namespace wrench {
      */
     void S4U_Simulation::sleep(double duration ) {
             simgrid::s4u::this_actor::sleep_for(duration);
+    }
+
+    /**
+     * @brief Simulates a yield
+     */
+    void S4U_Simulation::yield() {
+        simgrid::s4u::this_actor::yield();
     }
 
     /**

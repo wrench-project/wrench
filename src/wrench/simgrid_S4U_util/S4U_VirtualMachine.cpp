@@ -118,9 +118,9 @@ namespace wrench {
         if (this->state == State::DOWN) {
             throw std::runtime_error("S4U_VirtualMachine::shutdown(): Cannot shutdown a VM that's in state " + this->getStateAsString());
         }
+        this->state = State::DOWN; // Doing this first before a possible context switch
         this->vm->shutdown();
         this->vm->destroy();
-        this->state = State::DOWN;
         this->pm_name = "";
     }
 

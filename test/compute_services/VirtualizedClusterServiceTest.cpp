@@ -138,6 +138,21 @@ private:
     int main() {
         auto cs = (wrench::CloudService *) this->test->compute_service;
 
+
+        // Non-existent VM operations (for coverage)
+        try {
+            cs->startVM("NON_EXISTENT_VM");
+            cs->shutdownVM("NON_EXISTENT_VM");
+            cs->suspendVM("NON_EXISTENT_VM");
+            cs->resumeVM("NON_EXISTENT_VM");
+            cs->isVMRunning("NON_EXISTENT_VM");
+            cs->isVMDown("NON_EXISTENT_VM");
+            cs->isVMSuspended("NON_EXISTENT_VM");
+            throw std::runtime_error("Shouldn't be able to interact with a non-existent VM");
+        } catch (std::invalid_argument &e) {
+            // do nothing, since it is the expected behavior
+        }
+
         // Create a data movement manager
         std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
 
@@ -165,8 +180,18 @@ private:
 
         // Create and start a VM
         auto vm_name = cs->createVM(2, 10);
+
+        // Check the state
+        if (not cs->isVMDown(vm_name)) {
+          throw std::runtime_error("A just created VM should be down");
+        }
+
         auto vm_cs = cs->startVM(vm_name);
 
+        // Check the state
+        if (not cs->isVMRunning(vm_name)) {
+            throw std::runtime_error("A just started VM should be running");
+        }
 
         // Submit the 2-task job for execution
         try {
@@ -290,6 +315,12 @@ private:
 
             // migrating the VM
             std::string dest_host = cs->getExecutionHosts()[1];
+            try { // try a bogus one for coverage
+              cs->migrateVM("NON-EXISTENT", dest_host);
+              throw std::runtime_error("Should not be able to migrate a non-existent VM");
+            } catch (std::invalid_argument &e) {
+            }
+
             cs->migrateVM(vm_name, dest_host);
 
         } catch (wrench::WorkflowExecutionException &e) {
@@ -635,6 +666,7 @@ private:
 
         auto cs = (wrench::VirtualizedClusterService *) this->test->compute_service;
 
+
         // Create  and start VMs
         try {
             std::string execution_host = cs->getExecutionHosts()[0];
@@ -647,7 +679,6 @@ private:
             throw std::runtime_error(e.what());
         }
 
-        WRENCH_INFO("SHUTTING THEM ALL DOWN");
         wrench::Simulation::sleep(1);
         // shutdown all VMs
         try {
@@ -675,32 +706,32 @@ private:
 
 
         // (Re)start VM #3
-        WRENCH_INFO("RESTARTING #3");
         try {
             cs->startVM(std::get<0>(vm_list[3]));
         } catch (std::runtime_error &e) {
             throw std::runtime_error(e.what());
         }
 
-        WRENCH_INFO("SUSPENDING #3");
         try {
             cs->suspendVM(std::get<0>(vm_list[3]));
-            WRENCH_INFO("SUBMITTING TO #3");
+            if (not cs->isVMSuspended(std::get<0>(vm_list[3]))) {
+                throw std::runtime_error("A just suspended VM should be in the suspended state");
+            }
             job_manager->submitJob(job, std::get<1>(vm_list[3]).get());
             throw std::runtime_error("should have thrown an exception since there are no resources available");
         } catch (wrench::WorkflowExecutionException &e) {
-            WRENCH_INFO("GO THIS EXEPCTED EXCEPTION: %s", e.getCause()->toString().c_str());
             // do nothing, should have thrown an exception since there are no resources available
         }
 
-        WRENCH_INFO("RESUMING #3");
         try {
             cs->resumeVM(std::get<0>(vm_list[3]));
+            if (not cs->isVMRunning(std::get<0>(vm_list[3]))) {
+                throw std::runtime_error("A just resumed VM should be in the running state");
+            }
         } catch (std::runtime_error &e) {
             throw std::runtime_error(e.what());
         }
 
-        WRENCH_INFO("RESUMING AGAIN");
         try {
             cs->resumeVM(std::get<0>(vm_list[3]));
             throw std::runtime_error("VM was already resumed, so an exception was expected!");
@@ -708,10 +739,7 @@ private:
             // Expected
         }
 
-        WRENCH_INFO("SUBMITTING XXXXX");
-
         job_manager->submitJob(job, std::get<1>(vm_list[3]).get());
-        WRENCH_INFO("SUBMITTED");
 
         // Wait for a workflow execution event
         std::unique_ptr<wrench::WorkflowExecutionEvent> event;
@@ -790,13 +818,7 @@ private:
         }
 
 
-        // attempt to shutdown non-existent VM
-        try {
-            cs->shutdownVM("NON_EXISTENT_VM");
-            throw std::runtime_error("Shouldn't be able to shutdown a non-existent VM");
-        } catch (std::invalid_argument &e) {
-            // do nothing, since it is the expected behavior
-        }
+
 
         return 0;
     }
