@@ -15,6 +15,10 @@
 
 namespace wrench {
 
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
+
     /**
      * @brief A service that immediately detects when some service crashes and then notifies
      *        some other service of the crash
@@ -25,9 +29,6 @@ namespace wrench {
 
         explicit ServiceTerminationDetector(std::string host_on_which_to_run, std::shared_ptr<Service> service_to_monitor, std::string mailbox_to_notify, bool notify_on_crash, bool notify_on_termination);
 
-        /***********************/
-        /** \endcond           */
-        /***********************/
 
     private:
 
