@@ -747,6 +747,10 @@ namespace wrench {
                                   unsigned long cores_per_node,
                                   double ram_per_node) {
 
+        if (ram_per_node == ComputeService::ALL_RAM) {
+            ram_per_node = Simulation::getHostMemoryCapacity(this->available_nodes_to_cores.begin()->first);
+        }
+
         if (ram_per_node > Simulation::getHostMemoryCapacity(this->available_nodes_to_cores.begin()->first)) {
             throw std::runtime_error("BatchService::scheduleOnHosts(): Asking for too much RAM per host");
         }
