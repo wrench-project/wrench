@@ -9,12 +9,12 @@
 
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
-#include <wrench/services/helpers/ServiceFailureDetectorMessage.h>
+#include <wrench/services/helpers/ServiceTerminationDetectorMessage.h>
 
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
 #include "test_util/HostSwitcher.h"
-#include "wrench/services/helpers/ServiceFailureDetector.h"
+#include "wrench/services/helpers/ServiceTerminationDetector.h"
 #include "test_util/SleeperVictim.h"
 #include "test_util/ComputerVictim.h"
 
@@ -107,7 +107,7 @@ private:
         murderer->start(murderer, true, false); // Daemonized, no auto-restart
 
         // Starting the failure detector!
-        auto failure_detector1 = std::shared_ptr<wrench::ServiceFailureDetector>(new wrench::ServiceFailureDetector("StableHost", victim1, this->mailbox_name));
+        auto failure_detector1 = std::shared_ptr<wrench::ServiceTerminationDetector>(new wrench::ServiceTerminationDetector("StableHost", victim1, this->mailbox_name, true, false));
         failure_detector1->simulation = this->simulation;
         failure_detector1->start(failure_detector1, true, false); // Daemonized, no auto-restart
 
@@ -117,7 +117,7 @@ private:
         victim2->start(victim2, true, false); // Daemonized, no auto-restart
 
         // Starting the failure detector!
-        auto failure_detector2 = std::shared_ptr<wrench::ServiceFailureDetector>(new wrench::ServiceFailureDetector("StableHost", victim2, this->mailbox_name));
+        auto failure_detector2 = std::shared_ptr<wrench::ServiceTerminationDetector>(new wrench::ServiceTerminationDetector("StableHost", victim2, this->mailbox_name, true, false));
         failure_detector2->simulation = this->simulation;
         failure_detector2->start(failure_detector2, true, false); // Daemonized, no auto-restart
 
@@ -229,7 +229,7 @@ private:
         murderer->start(murderer, true, false); // Daemonized, no auto-restart
 
         // Starting the failure detector!
-        auto failure_detector1 = std::shared_ptr<wrench::ServiceFailureDetector>(new wrench::ServiceFailureDetector("StableHost", victim1, this->mailbox_name));
+        auto failure_detector1 = std::shared_ptr<wrench::ServiceTerminationDetector>(new wrench::ServiceTerminationDetector("StableHost", victim1, this->mailbox_name, true, false));
         failure_detector1->simulation = this->simulation;
         failure_detector1->start(failure_detector1, true, false); // Daemonized, no auto-restart
 
@@ -239,7 +239,7 @@ private:
         victim2->start(victim2, true, false); // Daemonized, no auto-restart
 
         // Starting the failure detector!
-        auto failure_detector2 = std::shared_ptr<wrench::ServiceFailureDetector>(new wrench::ServiceFailureDetector("StableHost", victim2, this->mailbox_name));
+        auto failure_detector2 = std::shared_ptr<wrench::ServiceTerminationDetector>(new wrench::ServiceTerminationDetector("StableHost", victim2, this->mailbox_name, true, false));
         failure_detector2->simulation = this->simulation;
         failure_detector2->start(failure_detector2, true, false); // Daemonized, no auto-restart
 

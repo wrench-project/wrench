@@ -139,7 +139,7 @@ namespace wrench {
                                      double requested_ram,
                                      std::map<std::string, std::string> property_list,
                                      std::map<std::string, std::string> messagepayload_list
-                                     );
+        );
 
 
         virtual void processStartVM(const std::string &answer_mailbox, const std::string &vm_name, const std::string &pm_name);
@@ -157,6 +157,8 @@ namespace wrench {
 
         virtual void processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job,
                                            std::map<std::string, std::string> &service_specific_args);
+
+        virtual void processBareMetalComputeServiceTermination(BareMetalComputeService *cs);
 
         void stopAllVMs();
 
@@ -179,6 +181,10 @@ namespace wrench {
         /***********************/
         /** \endcond           */
         /***********************/
+
+    private:
+        std::string findHost(unsigned long desired_num_cores, double desired_ram, std::string desired_host);
+
     };
 }
 
