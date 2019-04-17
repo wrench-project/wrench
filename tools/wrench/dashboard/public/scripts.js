@@ -24,6 +24,100 @@ function initialise() {
     }
 }
 
+function generateEnergyGraphs() {
+    // Generate consumed energy graph
+    energyData = [];
+    xAxisMarks = ["x"];
+    // Iterate through data for each host
+    for(var i = 0; i < energyData.length; i++) {
+        var hostData = energyData[i]["consumed_energy_trace"];
+
+        consumedEnergyData = []
+
+        // Iterate through each energy trace for a host
+        for(var j = 0; j < hostData.length; j++) {
+            var trace = hostData[j];
+
+            if (xAxisMarks.length <= hostData.length) {
+                xAxisMarks.push(trace["time"])
+            }
+
+            consumedEnergyData.push(trace["joules"])
+        }
+
+        // Add host name to the front of the data for graph labeling
+        consumedEnergyData.unshift(energyData[i]["hostname"])
+        data.push(consumedEnergyData)
+    }
+    
+    data.push(xAxisMarks)
+
+    bb.generate({
+        bindto: "#consumedEnergyGraph",
+        data: {
+            x : "x",
+            columns: data,
+        },
+        axis: {
+            x: {
+                min: 0,
+                padding: {bottom: 0},
+                tick: {
+                    count: xAxisMarks.length,
+                    values: xAxisMarks,
+                },
+            }
+        }
+    });
+
+    // Generate p-state graph
+    pStateData = [];
+    xAxisMarks = ["x"];
+    // Iterate through data for each host
+    for(var i = 0; i < energyData.length; i++) {
+        var hostData = energyData[i]["pstate_trace"];
+
+        consumedEnergyData = []
+
+        // Iterate through each energy trace for a host
+        for(var j = 0; j < hostData.length; j++) {
+            var trace = hostData[j]
+
+            if (xAxisMarks.length <= hostData.length) {
+                xAxisMarks.push(trace["time"])
+                // console.log(trace["time"])
+            }
+
+            consumedEnergyData.push(trace["pstate"])
+        }
+
+        // Add host name to the front of the data for graph labeling
+        consumedEnergyData.unshift(energyData[i]["hostname"])
+        data.push(consumedEnergyData)
+    }
+    
+    data.push(xAxisMarks)
+    console.log(data)
+
+    bb.generate({
+        bindto: "#pStateGraph",
+        data: {
+            x : "x",
+            columns: data,
+        },
+        axis: {
+            x: {
+                min: 0,
+                padding: {bottom: 0},
+                tick: {
+                    count: xAxisMarks.length,
+                    values: xAxisMarks,
+                },
+            }
+        }
+    });
+}
+
 /**
  * Helper function used to get the position of the mouse within the browser window
  * so that we can have nice moving tooltips. The input is the DOM element we are
