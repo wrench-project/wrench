@@ -224,6 +224,8 @@ namespace wrench {
                                      "(so that is can implement fault-tolerance or explicitly ignore fault) ");
         }
 
+//        this->host_state_monitor->kill();
+
         for (auto wue: this->running_workunit_executors) {
             std::shared_ptr<Workunit> wu = wue->workunit;
             if (wu->task != nullptr) {
@@ -281,7 +283,7 @@ namespace wrench {
             hosts_to_monitor.push_back(h.first);
         }
         this->host_state_monitor = std::shared_ptr<HostStateChangeDetector>(
-                new HostStateChangeDetector(this->hostname, hosts_to_monitor, true, false, this->mailbox_name));
+                new HostStateChangeDetector(this->hostname, hosts_to_monitor, true, false, this->getSharedPtr(), this->mailbox_name));
         this->host_state_monitor->simulation = this->simulation;
         this->host_state_monitor->start(this->host_state_monitor, true, false); // Daemonized, no auto-restart
 
@@ -334,7 +336,7 @@ namespace wrench {
         }
 
         // Kill the host state monitor (if the host went down, it died anyway)
-        this->host_state_monitor->kill();
+//        this->host_state_monitor->kill();
 
         WRENCH_INFO("Standard Job Executor on host %s cleanly terminating!", S4U_Simulation::getHostName().c_str());
         return 0;

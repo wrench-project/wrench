@@ -27,7 +27,7 @@ namespace wrench {
      * @param service: the service that has crashed
      */
     ServiceHasCrashedMessage::ServiceHasCrashedMessage(Service *service) :
-            ServiceTerminationDetectorMessage("ServiceFailureDetectorServiceHasCrashedMessage") {
+            ServiceTerminationDetectorMessage("ServiceHasCrashedMessage") {
       this->service = service;
     }
 
@@ -36,9 +36,10 @@ namespace wrench {
      *
      * @param service: the service that has terminated
      */
-    ServiceHasTerminatedMessage::ServiceHasTerminatedMessage(Service *service) :
-            ServiceTerminationDetectorMessage("ServiceFailureDetectorServiceHasTerminatedMessage") {
+    ServiceHasTerminatedMessage::ServiceHasTerminatedMessage(Service *service, int return_value) :
+            ServiceTerminationDetectorMessage("ServiceHasTerminatedMessage") {
         this->service = service;
+        this->return_value = return_value;
     }
 
 }

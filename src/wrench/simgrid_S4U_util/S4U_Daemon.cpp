@@ -73,7 +73,8 @@ namespace wrench {
         this->hostname = hostname;
         this->simulation = nullptr;
         unsigned long seq = S4U_Mailbox::generateUniqueSequenceNumber();
-        this->mailbox_name = mailbox_prefix + "_" + std::to_string(seq);
+        this->initial_mailbox_name = mailbox_prefix + "_" + std::to_string(seq);
+        this->mailbox_name = this->initial_mailbox_name + "_#" + std::to_string(this->num_starts);
         this->process_name = process_name_prefix + "_" + std::to_string(seq);
         this->has_returned_from_main = false;
     }
@@ -118,6 +119,21 @@ namespace wrench {
         }
     }
 
+    /**
+     * @brief Get the global shared pointer to the daemon
+     * @return a shared pointer
+     */
+    std::shared_ptr<S4U_Daemon> S4U_Daemon::getSharedPtr() {
+        return this->life_saver->reference;
+    }
+
+    /**
+     * @brief Get the daemon's state
+     * @return a state
+     */
+    S4U_Daemon::State S4U_Daemon::getState() {
+        return this->state;
+    }
 
     /**
      * @brief Start the daemon
@@ -148,7 +164,7 @@ namespace wrench {
         this->daemonized = daemonized;
         this->auto_restart = auto_restart;
         this->has_returned_from_main = false;
-
+        this->mailbox_name = this->initial_mailbox_name + "_#" + std::to_string(this->num_starts);
         // Create the s4u_actor
         try {
             this->s4u_actor = simgrid::s4u::Actor::create(this->process_name.c_str(),
@@ -222,8 +238,10 @@ namespace wrench {
         // Compute zero flop so that nothing happens
         // until the host has a >0 pstate
         S4U_Simulation::computeZeroFlop();
+        this->state = State::UP;
         this->return_value = this->main();
         this->has_returned_from_main = true;
+        this->state = State::DOWN;
     }
 
 

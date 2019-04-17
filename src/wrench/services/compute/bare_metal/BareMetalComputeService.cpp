@@ -45,6 +45,9 @@ namespace wrench {
     }
 
 
+    void BareMetalComputeService::cleanup(bool has_terminated_cleanly, int return_value) {
+    }
+
     /**
      * @brief Helper static method to parse resource specifications to the <cores,ram> format
      * @param spec: specification string
@@ -501,6 +504,7 @@ namespace wrench {
      * @return 0 on termination
      */
     int BareMetalComputeService::main() {
+        this->state = Service::UP;
 
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_RED);
 
@@ -513,12 +517,13 @@ namespace wrench {
             for (auto const &h : this->compute_resources) {
                 hosts_to_monitor.push_back(h.first);
             }
-            auto host_state_monitor = std::shared_ptr<HostStateChangeDetector>(
-                    new HostStateChangeDetector(this->hostname, hosts_to_monitor, true, true, this->mailbox_name));
-            host_state_monitor->simulation = this->simulation;
-            host_state_monitor->start(host_state_monitor, true, false); // Daemonized, no auto-restart
+            this->host_state_change_monitor = std::shared_ptr<HostStateChangeDetector>(
+                    new HostStateChangeDetector(this->hostname, hosts_to_monitor, true, true, this->getSharedPtr(), this->mailbox_name));
+            this->host_state_change_monitor->simulation = this->simulation;
+            this->host_state_change_monitor->start(this->host_state_change_monitor, true, false); // Daemonized, no auto-restart
         }
 
+        simgrid::s4u::Host::on_state_change.connect( [this] (simgrid::s4u::Host const &h) { this->someHostIsBackOn(h);});
         simgrid::s4u::Host::on_state_change.connect( [this] (simgrid::s4u::Host const &h) { this->someHostIsBackOn(h);});
 
 
@@ -536,7 +541,7 @@ namespace wrench {
         }
 
         WRENCH_INFO("Multicore Job Executor on host %s terminating cleanly!", S4U_Simulation::getHostName().c_str());
-        return 0;
+        return this->exit_code;
     }
 
     /**
@@ -761,13 +766,12 @@ namespace wrench {
             return false;
         }
 
-        WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
+        WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
         if (auto msg = dynamic_cast<HostHasTurnedOnMessage *>(message.get())) {
             // Do nothing, just wake up
             return true;
         } else if (auto msg = dynamic_cast<HostHasTurnedOffMessage *>(message.get())) {
-            WRENCH_INFO("NOTIFIED THAT HOST '%s' is down!", msg->hostname.c_str());
             // If all hosts being off should not cause the service to terminate, nevermind
             if (this->getPropertyValueAsString(BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN) == "false") {
                 return true;
@@ -785,6 +789,7 @@ namespace wrench {
                     cleanUpScratch();
                 }
                 this->terminate(true);
+                this->exit_code = 1;
                 return false;
             } else {
                 return true;

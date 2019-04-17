@@ -46,6 +46,8 @@ namespace wrench {
         }
     }
 
+
+
     /**
     * @brief Set a message payload of the Service
     * @param messagepayload: the message payload (which must a a string representation of a >=0 double)
@@ -212,6 +214,7 @@ namespace wrench {
         } catch (std::invalid_argument &e) {
             throw std::runtime_error("Service::start(): " + std::string(e.what()));
         }
+
     }
 
 
@@ -240,6 +243,7 @@ namespace wrench {
                                             ack_mailbox,
                                             this->getMessagePayloadValueAsDouble(ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
+            this->shutting_down = false;
             throw WorkflowExecutionException(cause);
         }
 
@@ -249,6 +253,7 @@ namespace wrench {
         try {
             message = S4U_Mailbox::getMessage(ack_mailbox, this->network_timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
+            this->shutting_down = false;
             throw WorkflowExecutionException(cause);
         }
 
@@ -259,6 +264,7 @@ namespace wrench {
         }
 
         // Set the service state to down
+        this->shutting_down = false;
         this->state = Service::DOWN;
     }
 
@@ -380,12 +386,12 @@ namespace wrench {
      * @brief Throws an exception if the service is not up
      * @throw WorkflowExecutionException
      */
-     void Service::assertServiceIsUp() {
+    void Service::assertServiceIsUp() {
         if (this->state == Service::DOWN) {
             throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
         }
         if (this->state == Service::SUSPENDED) {
             throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsSuspended(this)));
         }
-     }
+    }
 };

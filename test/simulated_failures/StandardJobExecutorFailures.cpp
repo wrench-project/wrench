@@ -163,11 +163,7 @@ private:
     }
 };
 
-#if ((SIMGRID_VERSION_MAJOR == 3) && (SIMGRID_VERSION_MINOR == 22)) || ((SIMGRID_VERSION_MAJOR == 3) && (SIMGRID_VERSION_MINOR == 21) && (SIMGRID_VERSION_PATCH > 0))
 TEST_F(StandardJobExecutorSimulatedFailuresTest, OneFailureCausingWorkUnitRestartOnAnotherHost) {
-#else
-    TEST_F(StandardJobExecutorSimulatedFailuresTest, DISABLED_OneFailureCausingWorkUnitRestartOnAnotherHost) {
-#endif
     DO_TEST_WITH_FORK(do_StandardJobExecutorOneFailureCausingWorkUnitRestartOnAnotherHost_test);
 }
 
@@ -298,11 +294,7 @@ private:
     }
 };
 
-#if ((SIMGRID_VERSION_MAJOR == 3) && (SIMGRID_VERSION_MINOR == 22)) || ((SIMGRID_VERSION_MAJOR == 3) && (SIMGRID_VERSION_MINOR == 21) && (SIMGRID_VERSION_PATCH > 0))
 TEST_F(StandardJobExecutorSimulatedFailuresTest, OneFailureCausingWorkUnitRestartOnSameHost) {
-#else
-    TEST_F(StandardJobExecutorSimulatedFailuresTest, DISABLED_OneFailureCausingWorkUnitRestartOnSameHost) {
-#endif
     DO_TEST_WITH_FORK(do_StandardJobExecutorOneFailureCausingWorkUnitRestartOnSameHost_test);
 }
 
@@ -456,11 +448,7 @@ private:
     }
 };
 
-#if ((SIMGRID_VERSION_MAJOR == 3) && (SIMGRID_VERSION_MINOR == 22)) || ((SIMGRID_VERSION_MAJOR == 3) && (SIMGRID_VERSION_MINOR == 21) && (SIMGRID_VERSION_PATCH > 0))
 TEST_F(StandardJobExecutorSimulatedFailuresTest, RandomFailures) {
-#else
-    TEST_F(StandardJobExecutorSimulatedFailuresTest, DISABLED_RandomFailures) {
-#endif
     DO_TEST_WITH_FORK(do_StandardJobExecutorRandomFailures_test);
 }
 

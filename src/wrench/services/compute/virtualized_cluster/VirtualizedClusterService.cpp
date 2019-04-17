@@ -16,6 +16,7 @@
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/compute/virtualized_cluster/VirtualizedClusterService.h"
+#include "wrench/services/helpers/ServiceTerminationDetectorMessage.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 
 
@@ -224,6 +225,13 @@ namespace wrench {
             processSubmitPilotJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
             return true;
 
+        } else if (auto msg = dynamic_cast<ServiceHasTerminatedMessage *>(message.get())) {
+            if (auto bmcs = dynamic_cast<BareMetalComputeService *>(msg->service)) {
+                processBareMetalComputeServiceTermination(bmcs, msg->return_value);
+            } else {
+                throw std::runtime_error("VirtualizedClusterService::processNextMessage(): Received a service termination message for a non-BareMetalComputeService!");
+            }
+            return true;
         } else {
             throw std::runtime_error("Unexpected [" + message->getName() + "] message");
         }
