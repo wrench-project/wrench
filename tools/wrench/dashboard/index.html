@@ -129,9 +129,23 @@
 
             </div>
 
-            <!-- Markup -->
-            <div id="consumedEnergyGraph"></div>
-            <div id="pStateGraph"></div>
+            <div class='element-and-title-container'>
+                <div class='title-container' onclick='showHideArrow("energy-graph", "energy-graph-arrow")'>
+                    <h6 class='title-text'>Energy Graphs</h6>
+                    <div class='arrow-div'>
+                        <span class='arrow-helper'></span>
+                        <img id='energy-graph-arrow' class='arrow-img' src='public/expand-arrow.png'/>
+                    </div>
+                </div>
+
+                <div class='hidden' id='energy-graph'>
+                    <!-- Markup -->
+                    <div id="consumedEnergyGraph"></div>
+                    <div id="pStateGraph"></div>
+                </div>
+
+            </div>
+
         </div>
     </body>
     <script>
