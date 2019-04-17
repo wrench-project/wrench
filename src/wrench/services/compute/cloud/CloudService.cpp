@@ -14,6 +14,8 @@
 #include "CloudServiceMessage.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
+#include "wrench/services/helpers/ServiceTerminationDetector.h"
+#include "wrench/services/helpers/ServiceTerminationDetectorMessage.h"
 #include "wrench/services/compute/cloud/CloudService.h"
 #include "wrench/services/compute/bare_metal/BareMetalComputeService.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
@@ -580,6 +582,13 @@ namespace wrench {
         } else if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobRequestMessage *>(message.get())) {
             processSubmitPilotJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
             return true;
+        } else if (auto msg = dynamic_cast<ServiceHasTerminatedMessage *>(message.get())) {
+            if (auto bmcs = dynamic_cast<BareMetalComputeService *>(msg->service)) {
+                processBareMetalComputeServiceTermination(bmcs);
+            } else {
+                throw std::runtime_error("CloudService::processNextMessage(): Received a service termination message for a non-BareMetalComputeService!");
+            }
+            return true;
 
         } else {
             throw std::runtime_error("Unexpected [" + message->getName() + "] message");
@@ -733,6 +742,90 @@ namespace wrench {
     }
 
     /**
+     * @brief A helper method that finds a host with a given number of available cores and a given amount of
+     *        available RAM using one of the several resource allocation algorithms.
+     * @param desired_num_cores: desired number of cores
+     * @param desired_ram: desired amount of RAM
+     * @oaram desired_host: name of a desired host ("" if none)
+     * @return
+     */
+    std::string CloudService::findHost(unsigned long desired_num_cores, double desired_ram, std::string desired_host) {
+        // Find a physical host to start the VM
+        std::vector<std::string> possible_hosts;
+        for (auto const &host : this->execution_hosts) {
+
+            if ((not desired_host.empty()) and (host != desired_host)) {
+                continue;
+            }
+
+            // Check for RAM
+            auto total_ram = Simulation::getHostMemoryCapacity(host);
+            auto available_ram = total_ram - this->used_ram_per_execution_host[host];
+            if (desired_ram > available_ram) {
+                continue;
+            }
+
+            // Check for cores
+            auto total_num_cores = Simulation::getHostNumCores(host);
+            auto num_available_cores = total_num_cores - this->used_cores_per_execution_host[host];
+            if (desired_num_cores > num_available_cores) {
+                continue;
+            }
+
+            possible_hosts.push_back(host);
+            break;
+        }
+
+        // Did we find a viable host?
+        if (possible_hosts.empty()) {
+            return "";
+        }
+
+        std::string vm_resource_allocation_algorithm = this->getPropertyValueAsString(CloudServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM);
+        if (vm_resource_allocation_algorithm == "first-fit") {
+            //don't sort the possibvle hosts
+        }  else if (vm_resource_allocation_algorithm == "best-fit-ram-first") {
+            // Sort the possible hosts to implement best fit (using RAM first)
+            std::sort(possible_hosts.begin(), possible_hosts.end(),
+                      [](std::string const &a, std::string const &b) {
+                          unsigned long a_num_cores = Simulation::getHostNumCores(a);
+                          double a_ram = Simulation::getHostMemoryCapacity(a);
+                          unsigned long b_num_cores = Simulation::getHostNumCores(b);
+                          double b_ram = Simulation::getHostMemoryCapacity(b);
+
+                          if (a_ram != b_ram) {
+                              return a_ram < b_ram;
+                          } else if (a_num_cores < b_num_cores) {
+                              return a_num_cores < b_num_cores;
+                          } else {
+                              return a < b;  // string order
+                          }
+                      });
+        } else if (vm_resource_allocation_algorithm == "best-fit-cores-first") {
+            // Sort the possible hosts to implement best fit (using cores first)
+            std::sort(possible_hosts.begin(), possible_hosts.end(),
+                      [](std::string const &a, std::string const &b) {
+                          unsigned long a_num_cores = Simulation::getHostNumCores(a);
+                          double a_ram = Simulation::getHostMemoryCapacity(a);
+                          unsigned long b_num_cores = Simulation::getHostNumCores(b);
+                          double b_ram = Simulation::getHostMemoryCapacity(b);
+
+                          if (a_num_cores != b_num_cores) {
+                              return a_num_cores < b_num_cores;
+                          } else if (a_ram < b_ram) {
+                              return a_ram < b_ram;
+                          } else {
+                              return a < b;  // string order
+                          }
+                      });
+        }
+
+        auto picked_host = *(possible_hosts.begin());
+        return picked_host;
+    }
+
+
+    /**
      * @brief: Process a VM start request by startibnng a VM on a host (using best fit for RAM first, and then for cores)
      *
      * @param answer_mailbox: the mailbox to which the answer message should be sent
@@ -758,34 +851,11 @@ namespace wrench {
 
         } else {
 
-            // Find a physical host to start the VM
-            std::vector<std::string> possible_hosts;
-            for (auto const &host : this->execution_hosts) {
+            std::string picked_host = this->findHost(vm->getNumCores(), vm->getMemory(), pm_name);
 
-                if ((not pm_name.empty()) and (host != pm_name)) {
-                    continue;
-                }
-
-                // Check for RAM
-                auto total_ram = Simulation::getHostMemoryCapacity(host);
-                auto available_ram = total_ram - this->used_ram_per_execution_host[host];
-                if (vm->getMemory() > available_ram) {
-                    continue;
-                }
-
-                // Check for cores
-                auto total_num_cores = Simulation::getHostNumCores(host);
-                auto num_available_cores = total_num_cores - this->used_cores_per_execution_host[host];
-                if (vm->getNumCores() > num_available_cores) {
-                    continue;
-                }
-
-                possible_hosts.push_back(host);
-                break;
-            }
 
             // Did we find a viable host?
-            if (possible_hosts.empty()) {
+            if (picked_host.empty()) {
                 WRENCH_INFO("Not enough resources to create the VM");
                 msg_to_send_back =
                         new CloudServiceStartVMAnswerMessage(
@@ -796,54 +866,12 @@ namespace wrench {
                                         CloudServiceMessagePayload::START_VM_ANSWER_MESSAGE_PAYLOAD));
             } else {
 
-                std::string vm_resource_allocation_algorithm = this->getPropertyValueAsString(CloudServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM);
-                if (vm_resource_allocation_algorithm == "first-fit") {
-                    //don't sort the possibvle hosts
-                }  else if (vm_resource_allocation_algorithm == "best-fit-ram-first") {
-                    // Sort the possible hosts to implement best fit (using RAM first)
-                    std::sort(possible_hosts.begin(), possible_hosts.end(),
-                              [](std::string const &a, std::string const &b) {
-                                  unsigned long a_num_cores = Simulation::getHostNumCores(a);
-                                  double a_ram = Simulation::getHostMemoryCapacity(a);
-                                  unsigned long b_num_cores = Simulation::getHostNumCores(b);
-                                  double b_ram = Simulation::getHostMemoryCapacity(b);
-
-                                  if (a_ram != b_ram) {
-                                      return a_ram < b_ram;
-                                  } else if (a_num_cores < b_num_cores) {
-                                      return a_num_cores < b_num_cores;
-                                  } else {
-                                      return a < b;  // string order
-                                  }
-                              });
-                } else if (vm_resource_allocation_algorithm == "best-fit-cores-first") {
-                    // Sort the possible hosts to implement best fit (using cores first)
-                    std::sort(possible_hosts.begin(), possible_hosts.end(),
-                              [](std::string const &a, std::string const &b) {
-                                  unsigned long a_num_cores = Simulation::getHostNumCores(a);
-                                  double a_ram = Simulation::getHostMemoryCapacity(a);
-                                  unsigned long b_num_cores = Simulation::getHostNumCores(b);
-                                  double b_ram = Simulation::getHostMemoryCapacity(b);
-
-                                  if (a_num_cores != b_num_cores) {
-                                      return a_num_cores < b_num_cores;
-                                  } else if (a_ram < b_ram) {
-                                      return a_ram < b_ram;
-                                  } else {
-                                      return a < b;  // string order
-                                  }
-                              });
-                }
-
-                auto picked_host = *(possible_hosts.begin());
-
                 // Sleep for the VM booting overhead
                 Simulation::sleep(
                         this->getPropertyValueAsDouble(CloudServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS));
 
                 // Start the actual vm
                 vm->start(picked_host);
-
 
                 // Create the Compute Service if needed
                 if (vm_pair.second == nullptr) {
@@ -876,6 +904,12 @@ namespace wrench {
                 } catch (std::runtime_error &e) {
                     throw; // This shouldn't happen
                 }
+
+                // Create a failure detector for the service
+                auto termination_detector = std::shared_ptr<ServiceTerminationDetector>(
+                        new ServiceTerminationDetector(this->hostname, std::get<1>(this->vm_list[vm_name]), this->mailbox_name, false, true));
+                termination_detector->simulation = this->simulation;
+                termination_detector->start(termination_detector, true, false); // Daemonized, no auto-restart
 
                 msg_to_send_back = new CloudServiceStartVMAnswerMessage(
                         true,
@@ -1196,6 +1230,33 @@ namespace wrench {
             }
         }
     }
+
+    /**
+     * @brief Process a termination by a previously started BareMetalComputeService on a VM
+     * @param cs: the service that has terminated
+     */
+    void CloudService::processBareMetalComputeServiceTermination(BareMetalComputeService *cs) {
+        std::string vm_name;
+        for (auto const &vm_pair : this->vm_list) {
+            if (vm_pair.second.second.get() == cs) {
+               vm_name = vm_pair.first;
+               break;
+            }
+        }
+        if (vm_name.empty()) {
+            throw std::runtime_error("CloudService::processBareMetalServiceTermination(): received a termination notification for an unknown BareMetalService");
+        }
+        unsigned long used_cores = this->vm_list[vm_name].first->getNumCores();
+        double used_ram = this->vm_list[vm_name].first->getMemory();
+        std::string pm_name = this->vm_list[vm_name].first->getPhysicalHostname();
+        WRENCH_INFO("GOT A DEATH NOTIFICATION: %s %ld %lf", pm_name.c_str(), used_cores, used_ram);
+
+        this->vm_list.erase(vm_name);
+        this->used_cores_per_execution_host[pm_name] -= used_cores;
+        this->used_ram_per_execution_host[pm_name] -= used_ram;
+        return;
+    }
+
 
     /**
      * @brief Validate the service's properties

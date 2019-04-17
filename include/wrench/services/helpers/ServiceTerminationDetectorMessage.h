@@ -23,22 +23,34 @@ namespace wrench {
     /***********************/
 
     /**
-     * @brief Top-level class for messages received/sent by a FailureDetector
+     * @brief Top-level class for messages received/sent by a ServiceTerminationDetector
      */
-    class ServiceFailureDetectorMessage : public SimulationMessage {
+    class ServiceTerminationDetectorMessage : public SimulationMessage {
     protected:
-        explicit ServiceFailureDetectorMessage(std::string name);
+        explicit ServiceTerminationDetectorMessage(std::string name);
     };
 
     /**
-     * @brief A message sent by the ServiceFailureDetector to notify some listener that the 
+     * @brief A message sent by the ServiceTerminationDetector to notify some listener that the 
      *        monitored service has crashed
      */
-    class ServiceHasCrashedMessage : public ServiceFailureDetectorMessage {
+    class ServiceHasCrashedMessage : public ServiceTerminationDetectorMessage {
     public:
         explicit ServiceHasCrashedMessage(Service *service);
 
         /** @brief The service that has crashed */
+        Service *service;
+    };
+
+    /**
+     * @brief A message sent by the ServiceTerminationDetector to notify some listener that the 
+     *        monitored service has terminated
+     */
+    class ServiceHasTerminatedMessage : public ServiceTerminationDetectorMessage {
+    public:
+        explicit ServiceHasTerminatedMessage(Service *service);
+
+        /** @brief The service that has terminated */
         Service *service;
     };
 
