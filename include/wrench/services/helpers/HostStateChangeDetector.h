@@ -22,7 +22,8 @@ namespace wrench {
 
     public:
 
-        explicit HostStateChangeDetector(std::string host_on_which_to_run, std::vector<std::string> hosts_to_monitor, bool notify_when_turned_on, bool notify_when_turned_off, std::string mailbox_to_notify);
+        explicit HostStateChangeDetector(std::string host_on_which_to_run, std::vector<std::string> hosts_to_monitor, bool notify_when_turned_on, bool notify_when_turned_off,
+                std::shared_ptr<S4U_Daemon> creator, std::string mailbox_to_notify);
 
         void kill();
 
@@ -39,6 +40,8 @@ namespace wrench {
         int main() override;
 
         std::vector<std::pair<std::string, bool>> hosts_that_have_recently_changed_state;
+
+        std::shared_ptr<S4U_Daemon> creator;
 
         std::vector<std::string> hosts_that_have_recently_turned_on;
         std::vector<std::string> hosts_that_have_recently_turned_off;

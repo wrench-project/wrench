@@ -61,6 +61,8 @@ namespace wrench {
                 {CloudServiceMessagePayload::SUSPEND_VM_ANSWER_MESSAGE_PAYLOAD,            "1024"},
                 {CloudServiceMessagePayload::RESUME_VM_REQUEST_MESSAGE_PAYLOAD,            "1024"},
                 {CloudServiceMessagePayload::RESUME_VM_ANSWER_MESSAGE_PAYLOAD,             "1024"},
+                {CloudServiceMessagePayload::DESTROY_VM_REQUEST_MESSAGE_PAYLOAD,           "1024"},
+                {CloudServiceMessagePayload::DESTROY_VM_ANSWER_MESSAGE_PAYLOAD,           "1024"},
                 {CloudServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD,  "1024"},
                 {CloudServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,   "1024"},
                 {CloudServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,     "1024"},
@@ -158,7 +160,7 @@ namespace wrench {
         virtual void processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job,
                                            std::map<std::string, std::string> &service_specific_args);
 
-        virtual void processBareMetalComputeServiceTermination(BareMetalComputeService *cs);
+        virtual void processBareMetalComputeServiceTermination(BareMetalComputeService *cs, int exit_code);
 
         void stopAllVMs();
 

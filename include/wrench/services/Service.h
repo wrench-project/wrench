@@ -31,15 +31,7 @@ namespace wrench {
         /** \cond DEVELOPER    */
         /***********************/
 
-        /** @brief Service states */
-        enum State {
-            /** @brief UP state: the service has been started and is still running */
-            UP,
-            /** @brief DOWN state: the service has been shutdown and/or has terminated */
-            DOWN,
-            /** @brief SUSPENDED state: the service has been suspended (and hopefully will be resumed0 */
-            SUSPENDED,
-        };
+
 
         void start(std::shared_ptr<Service> this_service, bool daemonize, bool auto_restart);
         virtual void stop();
@@ -110,8 +102,7 @@ namespace wrench {
         std::map<std::string, std::string> messagepayload_list;
 
 
-        /** @brief The service's state */
-        State state;
+
 
         /** @brief The service's name */
         std::string name;

@@ -42,11 +42,12 @@ namespace wrench {
     * @return the physical hostname
     */
     std::string S4U_VirtualMachine::getPhysicalHostname() {
-        if (this->state == S4U_VirtualMachine::DOWN) {
-           throw std::runtime_error("S4U_VirtualMachine::getPhysicalHostname(): no physical host for VM '" + this->vm_name + "'");
-        } else {
-            return this->vm->get_pm()->get_name();
-        }
+        return this->pm_name;
+//        if (this->state == S4U_VirtualMachine::DOWN) {
+//           throw std::runtime_error("S4U_VirtualMachine::getPhysicalHostname(): no physical host for VM '" + this->vm_name + "'");
+//        } else {
+//            return this->vm->get_pm()->get_name();
+//        }
     }
 
     /**
@@ -85,6 +86,7 @@ namespace wrench {
                                                     (size_t)this->ram_memory);
         this->vm->start();
         this->state = State::RUNNING;
+        this->pm_name = pm_name;
     }
 
     /**
@@ -102,7 +104,7 @@ namespace wrench {
      * @brief Resume the VM
      */
     void S4U_VirtualMachine::resume() {
-        if (this->vm->get_state() != simgrid::s4u::VirtualMachine::state::SUSPENDED) {
+        if (this->state != State::SUSPENDED) {
             throw std::runtime_error("S4U_VirtualMachine::resume(): Cannot resume a VM that's in state " + this->getStateAsString());
         }
         this->vm->resume();
@@ -113,13 +115,13 @@ namespace wrench {
      * @brief Shutdown the VM
      */
     void S4U_VirtualMachine::shutdown() {
-        if ((this->vm->get_state() != simgrid::s4u::VirtualMachine::state::SUSPENDED) and
-            (this->vm->get_state() != simgrid::s4u::VirtualMachine::state::RUNNING)) {
+        if (this->state == State::DOWN) {
             throw std::runtime_error("S4U_VirtualMachine::shutdown(): Cannot shutdown a VM that's in state " + this->getStateAsString());
         }
         this->vm->shutdown();
         this->vm->destroy();
         this->state = State::DOWN;
+        this->pm_name = "";
     }
 
     /**
@@ -159,6 +161,7 @@ namespace wrench {
         double mig_sta = simgrid::s4u::Engine::get_clock();
         sg_vm_migrate(this->vm, dest_pm);
         double mig_end = simgrid::s4u::Engine::get_clock();
+        this->pm_name = dest_pm_name;
         WRENCH_INFO("%s migrated: %s to %g s", src_pm_hostname.c_str(), dest_pm_name.c_str(), mig_end - mig_sta);
     }
 

@@ -18,6 +18,8 @@
 #include "BareMetalComputeServiceProperty.h"
 #include "BareMetalComputeServiceMessagePayload.h"
 #include "wrench/services/compute/workunit_executor/Workunit.h"
+#include "wrench/services/helpers/HostStateChangeDetector.h"
+
 
 
 namespace wrench {
@@ -240,6 +242,13 @@ namespace wrench {
         bool jobCanRun(StandardJob *job, std::map<std::string, std::string> &service_specific_arguments);
 
         bool isThereAtLeastOneHostWithResources(unsigned long num_cores, double ram);
+
+        void cleanup(bool has_terminated_cleanly, int return_value) override;
+
+
+            int exit_code = 0;
+
+        std::shared_ptr<HostStateChangeDetector> host_state_change_monitor;
     };
 };
 

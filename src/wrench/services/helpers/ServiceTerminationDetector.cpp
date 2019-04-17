@@ -29,6 +29,7 @@ wrench::ServiceTerminationDetector::ServiceTerminationDetector(std::string host_
                                                                bool notify_on_crash,
                                                                bool notify_on_termination) :
         Service(host_on_which_to_run, "failure_detector_for_" + service_to_monitor->getName(), "failure_detector_for" + service_to_monitor->getName()){
+
     this->service_to_monitor = service_to_monitor;
     this->mailbox_to_notify = mailbox_to_notify;
     this->notify_on_crash = notify_on_crash;
@@ -45,6 +46,7 @@ int wrench::ServiceTerminationDetector::main() {
     std::pair<bool, int> return_values_from_join;
     return_values_from_join = this->service_to_monitor->join();
     bool service_has_returned_from_main = std::get<0>(return_values_from_join);
+    int return_value_from_main = std::get<1>(return_values_from_join);
 
     if (this->notify_on_crash and (not service_has_returned_from_main)) {
         // Failure detected!
@@ -54,7 +56,7 @@ int wrench::ServiceTerminationDetector::main() {
     if (this->notify_on_termination and (service_has_returned_from_main)) {
         // Failure detected!
         WRENCH_INFO("Detected termination of service %s (notifying mailbox %s)", this->service_to_monitor->getName().c_str(), this->mailbox_to_notify.c_str());
-        S4U_Mailbox::putMessage(this->mailbox_to_notify, new ServiceHasTerminatedMessage(this->service_to_monitor.get()));
+        S4U_Mailbox::putMessage(this->mailbox_to_notify, new ServiceHasTerminatedMessage(this->service_to_monitor.get(), return_value_from_main));
     }
 
     this->service_to_monitor = nullptr;  // released, so that it can be freed in case refount = 0
