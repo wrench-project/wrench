@@ -34,19 +34,24 @@ void wrench::HostStateChangeDetector::cleanup(bool has_terminated_cleanly, int r
  * @param notify_when_turned_on: whether to send a notifications when hosts turn on
  * @param notify_when_turned_off: whether to send a notifications when hosts turn off
  * @param mailbox_to_notify: the mailbox to notify
+ * @param property_list: a property list
  *
  */
 wrench::HostStateChangeDetector::HostStateChangeDetector(std::string host_on_which_to_run,
                                                          std::vector<std::string> hosts_to_monitor,
                                                          bool notify_when_turned_on, bool notify_when_turned_off,
                                                          std::shared_ptr<S4U_Daemon> creator,
-                                                         std::string mailbox_to_notify) :
+                                                         std::string mailbox_to_notify,
+                                                         std::map<std::string, std::string> property_list) :
         Service(host_on_which_to_run, "host_state_change_detector", "host_state_change_detector") {
     this->hosts_to_monitor = hosts_to_monitor;
     this->notify_when_turned_on = notify_when_turned_on;
     this->notify_when_turned_off = notify_when_turned_off;
     this->mailbox_to_notify = mailbox_to_notify;
     this->creator = creator;
+
+    // Set default and specified properties
+    this->setProperties(this->default_property_values, std::move(property_list));
 
     // Connect my member method to the on_state_change signal from SimGrid regarding Hosts
     simgrid::s4u::Host::on_state_change.connect([this](simgrid::s4u::Host const &h) {this->hostChangeCallback(h.get_name(), h.is_on(), "HOST STATE CHANGE");});
@@ -80,9 +85,11 @@ int wrench::HostStateChangeDetector::main() {
     WRENCH_INFO("Starting");
     while(true) {
         if (creator->getState() == State::DOWN) {
+            WRENCH_INFO("My Creator has terminated/died, so must I...");
             break;
         }
-        Simulation::sleep(1.0); // 1 second resolution
+        // Sleeping for my monitoring period
+        Simulation::sleep(this->getPropertyValueAsDouble(HostStateChangeDetectorProperty::MONITORING_PERIOD));
 
         while (not this->hosts_that_have_recently_changed_state.empty()) {
             auto host_info = this->hosts_that_have_recently_changed_state.at(0);

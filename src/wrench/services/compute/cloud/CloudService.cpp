@@ -451,6 +451,69 @@ namespace wrench {
 
 
     /**
+     * @brief Method to check whether a VM is currently running
+     * @param vm_name: the name of the VM
+     * @return true or false
+     * @throw std::invalid_argument
+     */
+    bool CloudService::isVMRunning(const std::string &vm_name) {
+
+        auto vm_pair_it = this->vm_list.find(vm_name);
+
+        if (vm_pair_it == this->vm_list.end()) {
+            throw std::invalid_argument("CloudService::isVMRunning(): Unknown VM name '" + vm_name + "'");
+        }
+
+        assertServiceIsUp();
+
+        return (vm_pair_it->second.first->getState() == S4U_VirtualMachine::State::RUNNING);
+    }
+
+    /**
+     * @brief Method to check whether a VM is currently down
+     * @param vm_name: the name of the VM
+     * @return true or false
+     * @throw std::invalid_argument
+     */
+    bool CloudService::isVMDown(const std::string &vm_name) {
+
+        auto vm_pair_it = this->vm_list.find(vm_name);
+
+        if (vm_pair_it == this->vm_list.end()) {
+            throw std::invalid_argument("CloudService::isVMDown(): Unknown VM name '" + vm_name + "'");
+        }
+
+        assertServiceIsUp();
+
+        return (vm_pair_it->second.first->getState() == S4U_VirtualMachine::State::RUNNING);
+    }
+
+    /**
+     * @brief Method to check whether a VM is currently running
+     * @param vm_name: the name of the VM
+     * @return true or false
+     * @throw std::invalid_argument
+     */
+    bool CloudService::isVMSuspended(const std::string &vm_name) {
+
+        auto vm_pair_it = this->vm_list.find(vm_name);
+
+        if (vm_pair_it == this->vm_list.end()) {
+            throw std::invalid_argument("CloudService::isVMSuspended(): Unknown VM name '" + vm_name + "'");
+        }
+
+        assertServiceIsUp();
+
+        return (vm_pair_it->second.first->getState() == S4U_VirtualMachine::State::RUNNING);
+    }
+
+
+
+
+
+
+
+    /**
      * @brief Main method of the daemon
      *
      * @return 0 on termination
@@ -1241,8 +1304,8 @@ namespace wrench {
         std::string vm_name;
         for (auto const &vm_pair : this->vm_list) {
             if (vm_pair.second.second.get() == cs) {
-               vm_name = vm_pair.first;
-               break;
+                vm_name = vm_pair.first;
+                break;
             }
         }
         if (vm_name.empty()) {
@@ -1251,8 +1314,8 @@ namespace wrench {
         unsigned long used_cores = this->vm_list[vm_name].first->getNumCores();
         double used_ram = this->vm_list[vm_name].first->getMemory();
         std::string pm_name = this->vm_list[vm_name].first->getPhysicalHostname();
-        WRENCH_INFO("GOT A DEATH NOTIFICATION: %s %ld %lf (exit_code = %d)",
-                pm_name.c_str(), used_cores, used_ram, exit_code);
+//        WRENCH_INFO("GOT A DEATH NOTIFICATION: %s %ld %lf (exit_code = %d)",
+//                    pm_name.c_str(), used_cores, used_ram, exit_code);
 
         if (this->vm_list[vm_name].first->getState() != S4U_VirtualMachine::State::DOWN) {
             this->vm_list[vm_name].first->shutdown();

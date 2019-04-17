@@ -135,7 +135,6 @@ namespace wrench {
             Service(hostname, service_name, mailbox_name_prefix) {
 
       this->state = ComputeService::UP;
-      // Set default and specified properties
 
       if (scratch_space_size > 0) {
         try {
