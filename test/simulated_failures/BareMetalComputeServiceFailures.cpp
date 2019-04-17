@@ -9,12 +9,12 @@
 
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
-#include <wrench/services/helpers/ServiceFailureDetectorMessage.h>
+#include <wrench/services/helpers/ServiceTerminationDetectorMessage.h>
 
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
 #include "test_util/HostSwitcher.h"
-#include "wrench/services/helpers/ServiceFailureDetector.h"
+#include "wrench/services/helpers/ServiceTerminationDetector.h"
 #include "test_util/SleeperVictim.h"
 #include "test_util/HostRandomRepeatSwitcher.h"
 

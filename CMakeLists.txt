@@ -111,8 +111,8 @@ set(HEADER_FILES
         include/wrench/services/compute/batch/BatchServiceMessagePayload.h
         include/wrench/services/compute/batch/BatschedNetworkListener.h
         include/wrench/services/helpers/Alarm.h
-        include/wrench/services/helpers/ServiceFailureDetector.h
-        include/wrench/services/helpers/ServiceFailureDetectorMessage.h
+        include/wrench/services/helpers/ServiceTerminationDetector.h
+        include/wrench/services/helpers/ServiceTerminationDetectorMessage.h
         include/wrench/services/helpers/HostStateChangeDetector.h
         include/wrench/services/helpers/HostStateChangeDetectorMessage.h
         include/wrench/util/PointerUtil.h
@@ -218,8 +218,8 @@ set(SOURCE_FILES
         src/wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessagePayload.cpp
         src/wrench/services/compute/htcondor/HTCondorNegotiatorService.cpp
         src/wrench/services/helpers/Alarm.cpp
-        src/wrench/services/helpers/ServiceFailureDetector.cpp
-        src/wrench/services/helpers/ServiceFailureDetectorMessage.cpp
+        src/wrench/services/helpers/ServiceTerminationDetector.cpp
+        src/wrench/services/helpers/ServiceTerminationDetectorMessage.cpp
         src/wrench/services/helpers/HostStateChangeDetector.cpp
         src/wrench/services/helpers/HostStateChangeDetectorMessage.cpp
         src/wrench/util/PointerUtil.cpp
@@ -288,7 +288,7 @@ set(TEST_FILES
         src/wrench/managers/EnergyMeter.cpp
         include/wrench/managers/EnergyMeter.h
         test/simulated_failures/ServiceStartReStart.cpp
-        test/simulated_failures/FailureDetector.cpp
+        test/simulated_failures/FailureDetectorTest.cpp
         test/simulated_failures/BareMetalComputeServiceFailures.cpp
         test/simulated_failures/CloudComputeServiceFailures.cpp
         test/simulated_failures/StandardJobExecutorFailures.cpp

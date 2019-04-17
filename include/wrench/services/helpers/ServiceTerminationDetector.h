@@ -19,11 +19,11 @@ namespace wrench {
      * @brief A service that immediately detects when some service crashes and then notifies
      *        some other service of the crash
      */
-    class ServiceFailureDetector : public Service {
+    class ServiceTerminationDetector : public Service {
 
     public:
 
-        explicit ServiceFailureDetector(std::string host_on_which_to_run, std::shared_ptr<Service> service_to_monitor, std::string mailbox_to_notify);
+        explicit ServiceTerminationDetector(std::string host_on_which_to_run, std::shared_ptr<Service> service_to_monitor, std::string mailbox_to_notify, bool notify_on_crash, bool notify_on_termination);
 
         /***********************/
         /** \endcond           */
@@ -34,6 +34,8 @@ namespace wrench {
         std::shared_ptr<Service> service_to_monitor;
         std::string mailbox_to_notify;
         int main() override;
+        bool notify_on_crash;
+        bool notify_on_termination;
 
     };
 

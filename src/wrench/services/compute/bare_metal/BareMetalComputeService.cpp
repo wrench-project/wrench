@@ -19,7 +19,7 @@
 #include "wrench/services/ServiceMessage.h"
 #include "wrench/services/compute/ComputeServiceMessage.h"
 #include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
-#include "wrench/services/helpers/ServiceFailureDetectorMessage.h"
+#include "wrench/services/helpers/ServiceTerminationDetectorMessage.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
@@ -30,7 +30,7 @@
 #include "wrench/services/helpers/Alarm.h"
 #include "wrench/workflow/job/StandardJob.h"
 #include "wrench/workflow/job/PilotJob.h"
-#include "wrench/services/helpers/ServiceFailureDetector.h"
+#include "wrench/services/helpers/ServiceTerminationDetector.h"
 #include "wrench/services/helpers/HostStateChangeDetector.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(baremetal_compute_service, "Log category for BareMetalComputeService");
@@ -706,7 +706,7 @@ namespace wrench {
 
             // Start a failure detector for this workunit executor (which will send me a message in case the
             // work unit executor has died)
-            auto failure_detector = std::shared_ptr<ServiceFailureDetector>(new ServiceFailureDetector(this->hostname, workunit_executor, this->mailbox_name));
+            auto failure_detector = std::shared_ptr<ServiceTerminationDetector>(new ServiceTerminationDetector(this->hostname, workunit_executor, this->mailbox_name, true, false));
             failure_detector->simulation = this->simulation;
             failure_detector->start(failure_detector, true, false); // Daemonized, no auto-restart
 

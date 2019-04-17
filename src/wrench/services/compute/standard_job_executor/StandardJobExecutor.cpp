@@ -23,8 +23,8 @@
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/workflow/job/PilotJob.h"
 #include "StandardJobExecutorMessage.h"
-#include "wrench/services/helpers/ServiceFailureDetectorMessage.h"
-#include "wrench/services/helpers/ServiceFailureDetector.h"
+#include "wrench/services/helpers/ServiceTerminationDetectorMessage.h"
+#include "wrench/services/helpers/ServiceTerminationDetector.h"
 #include "wrench/services/helpers/HostStateChangeDetector.h"
 #include <wrench/services/helpers/HostStateChangeDetectorMessage.h>
 
@@ -544,7 +544,7 @@ namespace wrench {
 
             // Start a failure detector for this workunit executor (which will send me a message in case the
             // work unit executor has died)
-            auto failure_detector = std::shared_ptr<ServiceFailureDetector>(new ServiceFailureDetector(this->hostname, workunit_executor, this->mailbox_name));
+            auto failure_detector = std::shared_ptr<ServiceTerminationDetector>(new ServiceTerminationDetector(this->hostname, workunit_executor, this->mailbox_name, true, false));
             failure_detector->simulation = this->simulation;
             failure_detector->start(failure_detector, true, false); // Daemonized, no auto-restart
 
