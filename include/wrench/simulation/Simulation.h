@@ -49,6 +49,7 @@ namespace wrench {
         static double getHostMemoryCapacity(std::string hostname);
         static unsigned long getHostNumCores(std::string hostname);
         static double getHostFlopRate(std::string hostname);
+        static bool isHostOn(std::string hostname);
 
         void launch();
 
@@ -94,6 +95,7 @@ namespace wrench {
         static double getMemoryCapacity();
         static unsigned long getNumCores();
         static double getFlopRate();
+        static std::string getHostName();
 
         static double getCurrentSimulatedDate();
 

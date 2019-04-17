@@ -109,7 +109,8 @@ private:
 
         // Create a VM on the Cloud Service
         auto cloud_service = (wrench::CloudService *)this->test->compute_service;
-        auto vm_cs = cloud_service->startVM(cloud_service->createVM(1, this->test->task->getMemoryRequirement()));
+        auto vm_name = cloud_service->createVM(1, this->test->task->getMemoryRequirement());
+        auto vm_cs = cloud_service->startVM(vm_name);
 
         // Create a job manager
         std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
@@ -126,12 +127,36 @@ private:
         if (event->type != wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE) {
             throw std::runtime_error("Unexpected workflow execution event!");
         }
+        auto failure_cause = dynamic_cast<wrench::StandardJobFailedEvent *>(event.get())->failure_cause;
+        if (failure_cause->getCauseType() != wrench::FailureCause::JOB_KILLED) {
+            throw std::runtime_error("Invalid failure cause type: should be JOB_KILLED but was " + std::to_string(failure_cause->getCauseType()));
+        }
+        auto real_failure = dynamic_cast<wrench::JobKilled *>(failure_cause.get());
+        if (real_failure->getJob() != job) {
+            throw std::runtime_error("Failure cause does not point to the correct job");
+        }
+        if (real_failure->getComputeService() != vm_cs.get()) {
+            throw std::runtime_error("Failure cause does not point to the correct compute service");
+        }
+
+        // Check that the VM is down
+        if (not cloud_service->isVMDown(vm_name)) {
+            throw std::runtime_error("The VM should be down!");
+        }
+
+        // Restart the VM (which shouldn't work because the Cloud has no more resources right now)
+        try {
+            cloud_service->startVM(vm_name);
+            throw std::runtime_error("Should not be able to restart VM since the CloudService no longer has resources!");
+        } catch (wrench::WorkflowExecutionException &e) {
+            // expected
+        }
 
         return 0;
     }
 };
 
-TEST_F(CloudServiceSimulatedFailuresTest, FailureOfAVMWithRUnningJob) {
+TEST_F(CloudServiceSimulatedFailuresTest, FailureOfAVMWithRunningJob) {
     DO_TEST_WITH_FORK(do_CloudServiceFailureOfAVMWithRunningJob_test);
 }
 

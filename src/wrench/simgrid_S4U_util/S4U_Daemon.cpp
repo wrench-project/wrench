@@ -113,7 +113,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void S4U_Daemon::cleanup(bool has_terminated_cleanly, int return_value) {
-        if ((not has_terminated_cleanly) and (not simgrid::s4u::Host::by_name(hostname)->is_on())) {
+        if ((not has_terminated_cleanly) and (not S4U_Simulation::isHostOn(hostname))) {
             throw std::runtime_error("S4U_Daemon::cleanup(): This daemon has died due to a failure of its host, but does not override cleanup() "
                                      "(so that is can implement fault-tolerance or explicitly ignore fault) ");
         }
@@ -157,7 +157,7 @@ namespace wrench {
         }
 
         // Check that the host is up!
-        if (not simgrid::s4u::Host::by_name(hostname)->is_on()) {
+        if (not S4U_Simulation::isHostOn(hostname)) {
             throw std::shared_ptr<HostError>(new HostError(hostname));
         }
 
