@@ -485,7 +485,7 @@ namespace wrench {
 
         assertServiceIsUp();
 
-        return (vm_pair_it->second.first->getState() == S4U_VirtualMachine::State::RUNNING);
+        return (vm_pair_it->second.first->getState() == S4U_VirtualMachine::State::DOWN);
     }
 
     /**
@@ -504,7 +504,7 @@ namespace wrench {
 
         assertServiceIsUp();
 
-        return (vm_pair_it->second.first->getState() == S4U_VirtualMachine::State::RUNNING);
+        return (vm_pair_it->second.first->getState() == S4U_VirtualMachine::State::SUSPENDED);
     }
 
 
@@ -591,7 +591,7 @@ namespace wrench {
             return false;
         }
 
-        WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
+        WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
         if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
             this->stopAllVMs();
@@ -729,7 +729,7 @@ namespace wrench {
             std::string vm_name;
             do {
                 vm_name = this->getName() + "_vm" + std::to_string(CloudService::VM_ID++);
-            } while (simgrid::s4u::Host::by_name_or_null(vm_name) != nullptr);
+            } while (S4U_Simulation::hostExists(vm_name));
 
             // Create the VM
             auto vm = std::shared_ptr<S4U_VirtualMachine>(new S4U_VirtualMachine(vm_name, requested_num_cores, requested_ram, property_list, messagepayload_list));
@@ -820,6 +820,11 @@ namespace wrench {
         for (auto const &host : this->execution_hosts) {
 
             if ((not desired_host.empty()) and (host != desired_host)) {
+                continue;
+            }
+
+            // Check that host is up
+            if (not Simulation::isHostOn(host)) {
                 continue;
             }
 
@@ -918,6 +923,7 @@ namespace wrench {
 
             std::string picked_host = this->findHost(vm->getNumCores(), vm->getMemory(), pm_name);
 
+            WRENCH_INFO("PICKED HOST = '%s'", picked_host.c_str());
 
             // Did we find a viable host?
             if (picked_host.empty()) {

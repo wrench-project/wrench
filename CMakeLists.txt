@@ -289,12 +289,12 @@ set(TEST_FILES
         test/compute_services/HTCondorServiceTest.cpp
         src/wrench/managers/EnergyMeter.cpp
         include/wrench/managers/EnergyMeter.h
-        test/simulated_failures/ServiceStartReStart.cpp
+        test/simulated_failures/ServiceStartReStartTest.cpp
         test/simulated_failures/FailureDetectorTest.cpp
-        test/simulated_failures/BareMetalComputeServiceFailures.cpp
-        test/simulated_failures/CloudComputeServiceFailures.cpp
-        test/simulated_failures/StandardJobExecutorFailures.cpp
-        test/simulated_failures/NetworkProximityFailures.cpp
+        test/simulated_failures/BareMetalComputeServiceFailuresTest.cpp
+        test/simulated_failures/CloudComputeServiceFailuresTest.cpp
+        test/simulated_failures/StandardJobExecutorFailuresTest.cpp
+        test/simulated_failures/NetworkProximityFailuresTest.cpp
         test/simulated_failures/test_util/HostSwitcher.cpp
         test/simulated_failures/test_util/HostSwitcher.h
         test/simulated_failures/test_util/SleeperVictim.cpp

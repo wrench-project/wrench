@@ -626,6 +626,15 @@ namespace wrench {
     }
 
     /**
+     * @brief Returns whether a host is on or not
+     * @param hostname: the hostname
+     * @return true or false
+     */
+    bool Simulation::isHostOn(std::string hostname) {
+        return S4U_Simulation::isHostOn(hostname);
+    }
+
+    /**
      * @brief Get the memory capacity of the host on which the calling process is running
      * @return a memory capacity in bytes
      */
@@ -647,6 +656,14 @@ namespace wrench {
      */
     double Simulation::getFlopRate() {
         return S4U_Simulation::getHostFlopRate(S4U_Simulation::getHostName());
+    }
+
+    /**
+     * @brief Get the name of the host on which the calling process is running
+     * @return a host name
+     */
+    std::string Simulation::getHostName() {
+        return S4U_Simulation::getHostName();
     }
 
 

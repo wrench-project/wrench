@@ -38,12 +38,14 @@ namespace wrench {
 		static bool hostExists(std::string hostname);
 		static unsigned int getHostNumCores(std::string hostname);
 		static double getHostFlopRate(std::string hostname);
+		static bool isHostOn(std::string hostname);
 		static double getFlopRate();
 		static double getHostMemoryCapacity(std::string hostname);
 		static double getMemoryCapacity();
 		static void compute(double);
 		static void sleep(double);
 		static void computeZeroFlop();
+		static void yield();
 		static std::string getHostProperty(std::string hostname, std::string property_name);
 
 		//start energy related calls
