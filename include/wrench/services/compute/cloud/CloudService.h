@@ -95,6 +95,12 @@ namespace wrench {
 
         virtual void destroyVM(const std::string &vm_name);
 
+        virtual bool isVMRunning(const std::string &vm_name);
+        virtual bool isVMSuspended(const std::string &vm_name);
+        virtual bool isVMDown(const std::string &vm_name);
+
+
+
         std::vector<std::string> getExecutionHosts();
 
         /***********************/

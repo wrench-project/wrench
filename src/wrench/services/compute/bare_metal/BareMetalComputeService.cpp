@@ -518,7 +518,9 @@ namespace wrench {
                 hosts_to_monitor.push_back(h.first);
             }
             this->host_state_change_monitor = std::shared_ptr<HostStateChangeDetector>(
-                    new HostStateChangeDetector(this->hostname, hosts_to_monitor, true, true, this->getSharedPtr(), this->mailbox_name));
+                    new HostStateChangeDetector(this->hostname, hosts_to_monitor, true, true,
+                                                this->getSharedPtr(), this->mailbox_name,
+                                                {{HostStateChangeDetectorProperty::MONITORING_PERIOD, "1.0"}}));
             this->host_state_change_monitor->simulation = this->simulation;
             this->host_state_change_monitor->start(this->host_state_change_monitor, true, false); // Daemonized, no auto-restart
         }
@@ -741,13 +743,13 @@ namespace wrench {
     }
 
 
-/**
- * @brief Wait for and react to any incoming message
- *
- * @return false if the daemon should terminate, true otherwise
- *
- * @throw std::runtime_error
- */
+    /**
+     * @brief Wait for and react to any incoming message
+     *
+     * @return false if the daemon should terminate, true otherwise
+     *
+     * @throw std::runtime_error
+     */
     bool BareMetalComputeService::processNextMessage() {
 
         S4U_Simulation::computeZeroFlop();
@@ -772,34 +774,27 @@ namespace wrench {
             // Do nothing, just wake up
             return true;
         } else if (auto msg = dynamic_cast<HostHasTurnedOffMessage *>(message.get())) {
-            // If all hosts being off should not cause the service to terminate, nevermind
+            // If all hosts being off should not cause the service to terminate, then nevermind
             if (this->getPropertyValueAsString(BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN) == "false") {
                 return true;
-            }
-            bool all_hosts_are_down = true;
-            for (auto const &h : this->compute_resources) {
-                if (simgrid::s4u::Host::by_name(h.first)->is_on()) {
-                    all_hosts_are_down = false;
-                    break;
-                }
-            }
-            if (all_hosts_are_down) {
-                if (this->containing_pilot_job != nullptr) {
-                    /*** Clean up everything in the scratch space ***/
-                    cleanUpScratch();
-                }
-                this->terminate(true);
-                this->exit_code = 1;
-                return false;
             } else {
-                return true;
+
+                // If not all resources are down or somebody is still running, nevermind
+                // we may have gotten the "Host down" message before the "This WUE has crashed" message.
+                // So we don't want to just quit right now. We'll
+                //  get a WUE Crash message, at which point we'll check whether all hosts are down again
+                if (not this->areAllComputeResourcesDownWithNoWUERunning()) {
+                    WRENCH_INFO("Not terminating as there are still non-down resources and/or WUE executors that haven't reported back yet");
+                    return true;
+                }
+
+                this->terminate(true);
+                this->exit_code = 1; // Exit code to signify that this is, in essence a crash (in case somebody cares)
+                return false;
             }
+
         } else if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
 
-            if (this->containing_pilot_job != nullptr) {
-                /*** Clean up everything in the scratch space ***/
-                cleanUpScratch();
-            }
             this->terminate(false);
 
             // This is Synchronous
@@ -841,7 +836,23 @@ namespace wrench {
                 throw std::runtime_error("Received a FailureDetectorServiceHasFailedMessage message, but that service is not a WorkUnitExecutor!");
             }
             processWorkunitExecutorCrash(workunit_executor);
-            return true;
+            // If all hosts being off should not cause the service to terminate, then nevermind
+            if (this->getPropertyValueAsString(BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN) == "false") {
+                return true;
+            } else {
+
+                // If not all resources are down or somebody is still running, nevermind
+                // we may have gotten the "Host down" message before the "This WUE has crashed" message.
+                // So we don't want to just quit right now. We'll
+                //  get a WUE Crash message, at which point we'll check whether all hosts are down again
+                if (not this->areAllComputeResourcesDownWithNoWUERunning()) {
+                    return true;
+                }
+
+                this->terminate(true);
+                this->exit_code = 1; // Exit code to signify that this is, in essence a crash (in case somebody cares)
+                return false;
+            }
 
         } else {
             throw std::runtime_error("Unexpected [" + message->getName() + "] message");
@@ -978,6 +989,12 @@ namespace wrench {
 
         WRENCH_INFO("Failing current standard jobs");
         this->failCurrentStandardJobs();
+
+        // At this point, nothing is running and no host is up
+        if (this->containing_pilot_job != nullptr) {
+            /*** Clean up everything in the scratch space ***/
+            cleanUpScratch();
+        }
 
         // Am I myself a pilot job?
         if (notify_pilot_job_submitters && this->containing_pilot_job) {
@@ -1574,7 +1591,6 @@ namespace wrench {
             this->files_in_scratch[job].insert(f);
         }
 
-
         // Update RAM availabilities and running thread counts
         if (workunit->task) {
             this->ram_availabilities[workunit_executor->getHostname()] += workunit->task->getMemoryRequirement();
@@ -1589,6 +1605,27 @@ namespace wrench {
         // Put the WorkUnit back in the ready list (at the end)
         WRENCH_INFO("Putting task back in the ready queue");
         this->ready_workunits.push_back(workunit);
+    }
+
+    /**
+     * @brief A helper method to checks if all compute resources are down
+     * @return true or false
+     */
+    bool BareMetalComputeService::areAllComputeResourcesDownWithNoWUERunning() {
+        bool all_resources_down = true;
+        for (auto const &h : this->compute_resources) {
+            if (simgrid::s4u::Host::by_name(h.first)->is_on()) {
+                all_resources_down = false;
+                break;
+            }
+        }
+
+        unsigned long num_running_wues = 0;
+        for (auto const &job_wues : this->workunit_executors) {
+            num_running_wues += job_wues.second.size();
+        }
+
+        return (all_resources_down and (num_running_wues == 0));
     }
 
 

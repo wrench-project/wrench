@@ -64,7 +64,7 @@ namespace wrench {
                     NETWORK_ERROR,
             /** @brief There was a network timeout (for a "with timeout" network operation) */
                     NETWORK_TIMEOUT,
-            /** @brief A Job has been killed (likely because the service performing it was terminated) */
+            /** @brief A Job has been killed (likely because the service performing it was terminated  or killed) */
                     JOB_KILLED,
             /** @brief The job cannot be terminated because it is neither pending nor running */
                     JOB_CANNOT_BE_TERMINATED,

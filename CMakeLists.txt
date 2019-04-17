@@ -113,6 +113,7 @@ set(HEADER_FILES
         include/wrench/services/helpers/Alarm.h
         include/wrench/services/helpers/ServiceTerminationDetector.h
         include/wrench/services/helpers/ServiceTerminationDetectorMessage.h
+        include/wrench/services/helpers/HostStateChangeDetectorProperty.h
         include/wrench/services/helpers/HostStateChangeDetector.h
         include/wrench/services/helpers/HostStateChangeDetectorMessage.h
         include/wrench/util/PointerUtil.h
@@ -217,11 +218,12 @@ set(SOURCE_FILES
         src/wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessage.cpp
         src/wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessagePayload.cpp
         src/wrench/services/compute/htcondor/HTCondorNegotiatorService.cpp
-        src/wrench/services/helpers/Alarm.cpp
-        src/wrench/services/helpers/ServiceTerminationDetector.cpp
-        src/wrench/services/helpers/ServiceTerminationDetectorMessage.cpp
-        src/wrench/services/helpers/HostStateChangeDetector.cpp
-        src/wrench/services/helpers/HostStateChangeDetectorMessage.cpp
+        src/wrench/services/helpers/alarm/Alarm.cpp
+        src/wrench/services/helpers/service_termination_detector/ServiceTerminationDetector.cpp
+        src/wrench/services/helpers/service_termination_detector/ServiceTerminationDetectorMessage.cpp
+        src/wrench/services/helpers/host_state_change_detector/HostStateChangeDetector.cpp
+        src/wrench/services/helpers/host_state_change_detector/HostStateChangeDetectorProperty.cpp
+        src/wrench/services/helpers/host_state_change_detector/HostStateChangeDetectorMessage.cpp
         src/wrench/util/PointerUtil.cpp
         src/wrench/util/MessageManager.cpp
         src/wrench/services/compute/batch/TraceFileLoader.cpp

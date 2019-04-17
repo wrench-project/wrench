@@ -245,6 +245,8 @@ namespace wrench {
 
         void cleanup(bool has_terminated_cleanly, int return_value) override;
 
+        bool areAllComputeResourcesDownWithNoWUERunning();
+
 
             int exit_code = 0;
 
