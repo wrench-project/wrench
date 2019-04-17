@@ -33,7 +33,7 @@ public:
     wrench::StorageService *storage_service = nullptr;
     wrench::ComputeService *compute_service = nullptr;
 
-    void do_CloudServiceFailureOfAVM_test();
+    void do_CloudServiceFailureOfAVMWithRunningJob_test();
 
 protected:
 
@@ -80,8 +80,9 @@ protected:
 
 
 
+
 /**********************************************************************/
-/**                FAIL OVER TO SECOND HOST  TEST                    **/
+/**                    FAILURE WITH RUNNING JOB                      **/
 /**********************************************************************/
 
 class CloudServiceFailureOfAVMTestWMS : public wrench::WMS {
@@ -130,15 +131,11 @@ private:
     }
 };
 
-#if ((SIMGRID_VERSION_MAJOR == 3) && (SIMGRID_VERSION_MINOR == 22)) || ((SIMGRID_VERSION_MAJOR == 3) && (SIMGRID_VERSION_MINOR == 21) && (SIMGRID_VERSION_PATCH > 0))
-TEST_F(CloudServiceSimulatedFailuresTest, FailureOfAVM) {
-#else
-    TEST_F(CloudServiceSimulatedFailuresTest, DISABLED_FailureOfAVM) {
-#endif
-    DO_TEST_WITH_FORK(do_CloudServiceFailureOfAVM_test);
+TEST_F(CloudServiceSimulatedFailuresTest, FailureOfAVMWithRUnningJob) {
+    DO_TEST_WITH_FORK(do_CloudServiceFailureOfAVMWithRunningJob_test);
 }
 
-void CloudServiceSimulatedFailuresTest::do_CloudServiceFailureOfAVM_test() {
+void CloudServiceSimulatedFailuresTest::do_CloudServiceFailureOfAVMWithRunningJob_test() {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();

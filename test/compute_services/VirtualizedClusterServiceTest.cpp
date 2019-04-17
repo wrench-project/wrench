@@ -51,6 +51,9 @@ public:
 
     void do_SubmitToVMTest_test();
 
+    void do_CloudServiceVMStartShutdownStartShutdown_test();
+
+
 protected:
     VirtualizedClusterServiceTest() {
 
@@ -387,7 +390,7 @@ private:
 
             if (sum_num_cores != 6 || sum_num_idle_cores != 6) {
                 throw std::runtime_error("getHostNumCores() and getNumIdleCores() should be 6 (they report " +
-                std::to_string(sum_num_cores) + " and " + std::to_string(sum_num_idle_cores)+ ")");
+                                         std::to_string(sum_num_cores) + " and " + std::to_string(sum_num_idle_cores)+ ")");
             }
 
             // create and start VM with the 2  cores and 10 bytes of RAM
@@ -1122,6 +1125,111 @@ void VirtualizedClusterServiceTest::do_SubmitToVMTest_test() {
 
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+
+    // Running a "run a single task" simulation
+    ASSERT_NO_THROW(simulation->launch());
+
+    delete simulation;
+    free(argv[0]);
+    free(argv);
+}
+
+/**********************************************************************/
+/**                VM START-SHUTDOWN-START-SHUTDOWN                  **/
+/**********************************************************************/
+
+class CloudServiceVMStartShutdownStartShutdownTestWMS : public wrench::WMS {
+
+public:
+    CloudServiceVMStartShutdownStartShutdownTestWMS(VirtualizedClusterServiceTest *test,
+                                                    std::string &hostname, wrench::ComputeService *cs, wrench::StorageService *ss) :
+            wrench::WMS(nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
+        this->test = test;
+    }
+
+private:
+
+    VirtualizedClusterServiceTest *test;
+
+    int main() override {
+
+        auto cloud_service = (wrench::CloudService *)this->test->compute_service;
+
+        // Create a VM on the Cloud Service
+        auto vm_name = cloud_service->createVM(2, 1024);
+
+        // Start the VM
+        wrench::Simulation::sleep(10);
+        WRENCH_INFO("STARTING THE VM");
+        auto vm_cs = cloud_service->startVM(vm_name);
+
+        // Shutdown the VM
+        wrench::Simulation::sleep(10);
+        WRENCH_INFO("SHUTTING DOWN THE VM");
+        cloud_service->shutdownVM(vm_name);
+
+        // Start the VM
+        wrench::Simulation::sleep(10);
+        WRENCH_INFO("STARTING THE VM");
+        vm_cs = cloud_service->startVM(vm_name);
+
+        // Shutdown the VM
+        wrench::Simulation::sleep(10);
+        WRENCH_INFO("SHUTTING DOWN THE VM");
+        cloud_service->shutdownVM(vm_name);
+
+        // Destroying the VM
+        wrench::Simulation::sleep(10);
+        WRENCH_INFO("DESTROYING  THE VM");
+        cloud_service->destroyVM(vm_name);
+
+        return 0;
+    }
+};
+
+TEST_F(VirtualizedClusterServiceTest, VMStartShutdownStartShutdown) {
+    DO_TEST_WITH_FORK(do_CloudServiceVMStartShutdownStartShutdown_test);
+}
+
+void VirtualizedClusterServiceTest::do_CloudServiceVMStartShutdownStartShutdown_test() {
+
+    // Create and initialize a simulation
+    auto *simulation = new wrench::Simulation();
+    int argc = 1;
+    auto argv = (char **) calloc(1, sizeof(char *));
+    argv[0] = strdup("failure_test");
+
+
+    simulation->init(&argc, argv);
+
+    // Setting up the platform
+    simulation->instantiatePlatform(platform_file_path);
+
+    // Get a hostname
+    std::string hostname = "DualCoreHost";
+    std::vector<std::string> compute_hosts;
+    compute_hosts.push_back("QuadCoreHost");
+
+    // Create a Compute Service that has access to two hosts
+    compute_service = simulation->add(
+            new wrench::CloudService(hostname,
+                                     compute_hosts,
+                                     100.0,
+                                     {}));
+
+    // Create a Storage Service
+    storage_service = simulation->add(new wrench::SimpleStorageService(hostname, 10000000000000.0));
+
+    // Create a WMS
+    wrench::WMS *wms = nullptr;
+    wms = simulation->add(new CloudServiceVMStartShutdownStartShutdownTestWMS(this, hostname, compute_service, storage_service));
+
+    wms->addWorkflow(workflow);
+
+    // Staging the input_file on the storage service
+    // Create a File Registry Service
+    simulation->add(new wrench::FileRegistryService(hostname));
+    simulation->stageFiles({{input_file->getID(), input_file}}, storage_service);
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());

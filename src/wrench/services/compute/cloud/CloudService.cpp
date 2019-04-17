@@ -584,13 +584,14 @@ namespace wrench {
             return true;
         } else if (auto msg = dynamic_cast<ServiceHasTerminatedMessage *>(message.get())) {
             if (auto bmcs = dynamic_cast<BareMetalComputeService *>(msg->service)) {
-                processBareMetalComputeServiceTermination(bmcs);
+                processBareMetalComputeServiceTermination(bmcs, msg->return_value);
             } else {
                 throw std::runtime_error("CloudService::processNextMessage(): Received a service termination message for a non-BareMetalComputeService!");
             }
             return true;
 
         } else {
+
             throw std::runtime_error("Unexpected [" + message->getName() + "] message");
         }
     }
@@ -719,7 +720,8 @@ namespace wrench {
             std::string pm = vm->getPhysicalHostname();
             // Stop the Compute Service
             cs->stop();
-            // Shutdown the VM
+            // We do not shut down the VM. This will be done when the CloudService is notified
+            // of the BareMetalService completion.
             vm->shutdown();
 
             // Update internal data structures
@@ -958,7 +960,7 @@ namespace wrench {
             auto vm_tuple = this->vm_list.find(vm_name);
 
             auto cs = std::get<1>(vm_tuple->second);
-            WRENCH_INFO("SUSPENDING THE CS '%s'", cs->getName().c_str());
+            WRENCH_INFO("SUSPENDING THE CS '%s' (s", cs->getName().c_str());
             cs->suspend();
 
             WRENCH_INFO("SUSPENDING THE VM");
@@ -1235,7 +1237,7 @@ namespace wrench {
      * @brief Process a termination by a previously started BareMetalComputeService on a VM
      * @param cs: the service that has terminated
      */
-    void CloudService::processBareMetalComputeServiceTermination(BareMetalComputeService *cs) {
+    void CloudService::processBareMetalComputeServiceTermination(BareMetalComputeService *cs, int exit_code) {
         std::string vm_name;
         for (auto const &vm_pair : this->vm_list) {
             if (vm_pair.second.second.get() == cs) {
@@ -1249,9 +1251,12 @@ namespace wrench {
         unsigned long used_cores = this->vm_list[vm_name].first->getNumCores();
         double used_ram = this->vm_list[vm_name].first->getMemory();
         std::string pm_name = this->vm_list[vm_name].first->getPhysicalHostname();
-        WRENCH_INFO("GOT A DEATH NOTIFICATION: %s %ld %lf", pm_name.c_str(), used_cores, used_ram);
+        WRENCH_INFO("GOT A DEATH NOTIFICATION: %s %ld %lf (exit_code = %d)",
+                pm_name.c_str(), used_cores, used_ram, exit_code);
 
-        this->vm_list.erase(vm_name);
+        if (this->vm_list[vm_name].first->getState() != S4U_VirtualMachine::State::DOWN) {
+            this->vm_list[vm_name].first->shutdown();
+        }
         this->used_cores_per_execution_host[pm_name] -= used_cores;
         this->used_ram_per_execution_host[pm_name] -= used_ram;
         return;
