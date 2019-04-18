@@ -20,6 +20,7 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(host_state_change_detector, "Log category for HostS
 
 void wrench::HostStateChangeDetector::cleanup(bool has_terminated_cleanly, int return_value) {
     // Unregister the callbacks! (otherwise we'd get a segfault after destruction of this service)
+    WRENCH_INFO("IN HOST STATE CHANGE DETECTOR DESTRUCTOR");
     simgrid::s4u::Host::on_state_change.disconnect_slots();
     simgrid::s4u::VirtualMachine::on_shutdown.disconnect_slots();
     simgrid::s4u::VirtualMachine::on_start.disconnect_slots();
@@ -53,6 +54,7 @@ wrench::HostStateChangeDetector::HostStateChangeDetector(std::string host_on_whi
     // Set default and specified properties
     this->setProperties(this->default_property_values, std::move(property_list));
 
+    WRENCH_INFO("IN HOST STATE CHANGE CONSTRUCTOR!");
     // Connect my member method to the on_state_change signal from SimGrid regarding Hosts
     simgrid::s4u::Host::on_state_change.connect([this](simgrid::s4u::Host const &h) {this->hostChangeCallback(h.get_name(), h.is_on(), "HOST STATE CHANGE");});
     // Connect my member method to the on_state_change signal from SimGrid regarding VMs
@@ -61,9 +63,9 @@ wrench::HostStateChangeDetector::HostStateChangeDetector(std::string host_on_whi
 }
 
 void wrench::HostStateChangeDetector::hostChangeCallback(std::string const &name, bool is_on, std::string message) {
-//    WRENCH_INFO("************************************");
-//    WRENCH_INFO("***** %s : IN CALLBACK: %s : %s ", this->getName().c_str(),message.c_str(), name.c_str());
-//    WRENCH_INFO("************************************");
+    WRENCH_INFO("************************************");
+    WRENCH_INFO("***** %s : IN CALLBACK: %s : %s ", this->getName().c_str(),message.c_str(), name.c_str());
+    WRENCH_INFO("************************************");
 
     // If this is not a host I care about, don't do anything
     if (std::find(this->hosts_to_monitor.begin(), this->hosts_to_monitor.end(), name) == this->hosts_to_monitor.end()) {
