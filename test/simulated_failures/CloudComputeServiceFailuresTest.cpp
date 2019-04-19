@@ -419,7 +419,7 @@ private:
             // Create a VM
             auto vm_name = cloud_service->createVM(task->getMinNumCores(), task->getMemoryRequirement());
 
-            std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+            std::unique_ptr<wrench::WorkflowExecutionEvent> event = nullptr;
             unsigned long num_vm_start_attempts = 0;
             unsigned long num_job_submission_attempts = 0;
             do {
@@ -448,7 +448,7 @@ private:
                 if (event->type == wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE) {
                     WRENCH_INFO("Job Failure: %s", (dynamic_cast<wrench::StandardJobFailedEvent*>(event.get()))->failure_cause->toString().c_str());
                 }
-            } while (event->type != wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION);
+            } while ((event == nullptr) || (event->type != wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION));
 
             WRENCH_INFO("*** WAS ABLE TO RUN THE JOB AFTER %lu attempts", num_job_submission_attempts);
             switch1->kill();
