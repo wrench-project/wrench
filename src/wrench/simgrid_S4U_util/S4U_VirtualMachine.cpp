@@ -91,7 +91,7 @@ namespace wrench {
                                                     (size_t)this->ram_memory);
         WRENCH_INFO("CALLING START ON A SIMGRID VM");
         this->vm->start();
-        WRENCH_INFO("INSERTING IN MAP at map[%s]", physical_host->get_cname());
+        WRENCH_INFO("INSERTING IN MAP in map[%s]", physical_host->get_cname());
         simgrid_vm_pm_map[physical_host].insert(this->vm);
         this->state = State::RUNNING;
         this->pm_name = pm_name;
@@ -128,6 +128,8 @@ namespace wrench {
             throw std::runtime_error("S4U_VirtualMachine::shutdown(): Cannot shutdown a VM that's in state " + this->getStateAsString());
         }
         this->state = State::DOWN; // Doing this first before a possible context switch
+        WRENCH_INFO("INSERTING IN MAP at map[%s]", this->vm->get_pm()->get_cname());
+
         simgrid_vm_pm_map[this->vm->get_pm()].erase(this->vm);
         this->vm->shutdown();
         this->vm->destroy();
