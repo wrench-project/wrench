@@ -17,7 +17,7 @@ int main(int argc, char **argv) {
 //   xbt_log_control_set("simulation_timestamps.thresh:debug");
 
 //   Example selective log enabling
-   xbt_log_control_set("cloud_compute_service_simulated_failures_test.thresh:info");
+//   xbt_log_control_set("cloud_service.thresh:info");
 //   xbt_log_control_set("multicore_compute_service.thresh:info");
 //   xbt_log_control_set("mailbox.thresh:debug");
 
