@@ -20,6 +20,9 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(s4u_virtual_machine, "Log category for S4U_VirtualM
 
 namespace wrench {
 
+     std::map<simgrid::s4u::Host*, std::set<simgrid::s4u::VirtualMachine *>> S4U_VirtualMachine::simgrid_vm_pm_map;
+
+
     /**
      * @brief Constructor
      *
@@ -72,6 +75,8 @@ namespace wrench {
     */
     void S4U_VirtualMachine::start(std::string &pm_name) {
 
+        WRENCH_INFO("IN S4U_VirtualMachine::start()");
+
         if (this->state != State::DOWN) {
             throw std::runtime_error("S4U_VirtualMachine::suspend(): Cannot suspend a VM that's in state " + this->getStateAsString());
         }
@@ -84,7 +89,9 @@ namespace wrench {
                                                     physical_host,
                                                     (int)this->num_cores,
                                                     (size_t)this->ram_memory);
+        WRENCH_INFO("CALLING START ON A SIMGRID VM");
         this->vm->start();
+        simgrid_vm_pm_map[physical_host].insert(this->vm);
         this->state = State::RUNNING;
         this->pm_name = pm_name;
     }
@@ -115,10 +122,12 @@ namespace wrench {
      * @brief Shutdown the VM
      */
     void S4U_VirtualMachine::shutdown() {
+        WRENCH_INFO("IN S4U_VirtualMachine::shutdown()");
         if (this->state == State::DOWN) {
             throw std::runtime_error("S4U_VirtualMachine::shutdown(): Cannot shutdown a VM that's in state " + this->getStateAsString());
         }
         this->state = State::DOWN; // Doing this first before a possible context switch
+        simgrid_vm_pm_map[this->vm->get_pm()].erase(this->vm);
         this->vm->shutdown();
         this->vm->destroy();
         this->pm_name = "";

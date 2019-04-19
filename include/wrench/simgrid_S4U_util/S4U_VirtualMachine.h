@@ -12,6 +12,7 @@
 #define WRENCH_S4U_VIRTUALMACHINE_H
 
 #include <simgrid/s4u/VirtualMachine.hpp>
+#include <set>
 
 namespace wrench {
 
@@ -25,6 +26,8 @@ namespace wrench {
     class S4U_VirtualMachine {
 
     public:
+
+        static std::map<simgrid::s4u::Host*, std::set<simgrid::s4u::VirtualMachine *>> simgrid_vm_pm_map;
 
         /** @brief VM state enum */
         enum State {
