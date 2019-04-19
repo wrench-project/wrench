@@ -2679,7 +2679,7 @@ private:
         // Initialize with deterministic seed!
         rng.seed(666);
 
-        for (int trial = 0; trial < 500; trial++) {
+        for (int trial = 0; trial < 200; trial++) {
             WRENCH_INFO("Trial %d", trial);
 
             /**  Create a 4-task job and kill it **/

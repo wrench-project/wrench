@@ -27,8 +27,6 @@ namespace wrench {
 
     public:
 
-        static std::map<simgrid::s4u::Host*, std::set<simgrid::s4u::VirtualMachine *>> simgrid_vm_pm_map;
-
         /** @brief VM state enum */
         enum State {
             DOWN,
