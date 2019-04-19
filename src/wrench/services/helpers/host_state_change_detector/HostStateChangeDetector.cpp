@@ -92,7 +92,7 @@ void wrench::HostStateChangeDetector::hostChangeCallback(std::string const &name
             }
             S4U_VirtualMachine::simgrid_vm_pm_map[simgrid::s4u::Host::by_name(name)].clear();
             this->hosts_that_have_recently_changed_state.push_back(std::make_pair(name, is_on));
-            return;
+            goto end_here;
         }
     }
 
@@ -108,19 +108,22 @@ void wrench::HostStateChangeDetector::hostChangeCallback(std::string const &name
                 }
                 this->hosts_that_have_recently_changed_state.push_back(std::make_pair(name, is_on));
                 S4U_VirtualMachine::simgrid_vm_pm_map[pm.first].erase(vm);
-                return;
+                goto end_here;
             }
         }
     }
 
-//    WRENCH_INFO("*************** AFTER *********************");
-//    for (const auto &pm : S4U_VirtualMachine::simgrid_vm_pm_map) {
-//        WRENCH_INFO("PM = %s", pm.first->get_cname());
-//        for (const auto &vm : pm.second) {
-//            WRENCH_INFO("   VM = %s", vm->get_cname());
-//        }
-//    }
-//    WRENCH_INFO("************************************");
+    end_here:
+
+    WRENCH_INFO("*************** AFTER *********************");
+    WRENCH_INFO("SIZE OF MAP = %lu", S4U_VirtualMachine::simgrid_vm_pm_map.size());
+    for (const auto &pm : S4U_VirtualMachine::simgrid_vm_pm_map) {
+        WRENCH_INFO("PM = %s", pm.first->get_cname());
+        for (const auto &vm : pm.second) {
+            WRENCH_INFO("   VM = %s", vm->get_cname());
+        }
+    }
+    WRENCH_INFO("************************************");
 
 
 }
