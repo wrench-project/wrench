@@ -68,7 +68,6 @@ namespace wrench {
      */
     Simulation::~Simulation() {
         MessageManager::cleanUpAllMessages();
-        simgrid::s4u::Host::on_state_change.disconnect(this->on_state_change_callback_id);
         this->s4u_simulation->shutdown();
     }
 
