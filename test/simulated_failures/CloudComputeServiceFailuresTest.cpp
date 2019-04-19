@@ -392,7 +392,7 @@ private:
         // Create a job manager
         std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
-        unsigned long NUM_TRIALS = 1;
+        unsigned long NUM_TRIALS = 100;
 
         auto cloud_service = (wrench::CloudService *)this->test->compute_service;
 
@@ -408,7 +408,7 @@ private:
             switch1->start(switch1, true, false); // Daemonized, no auto-restart
 
             // Add a task to the workflow
-            auto task = this->test->workflow->addTask("task_" + std::to_string(trial), 200, 1, 1, 1.0, 0);
+            auto task = this->test->workflow->addTask("task_" + std::to_string(trial), 95, 1, 1, 1.0, 0);
             task->addInputFile(this->test->input_file);
             task->addOutputFile(this->test->output_file);
 
