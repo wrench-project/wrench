@@ -118,6 +118,10 @@ namespace wrench {
      * @return bool
      */
     bool isSegmentOverlappingXAxis(std::pair<unsigned long long, unsigned long long> segment1, std::pair<unsigned long long, unsigned long long> segment2) {
+        // Note: EPSILON looks big because we "blow up" the floats by 10^9 so as to do all computations
+        //       with unsigned long longs instead of doubles (thus avoiding float comparison weirdnesses)
+        //       And the goal of this EPSILON is to capture the fact that this is for a visual display
+        //       made up of pixels, thus we don't want to be too stringent in terms of overlaps
         const unsigned long long EPSILON = 1000 * 1000 * 10;
         if (std::fabs(segment1.second - segment2.first) <= EPSILON or std::fabs(segment2.second -  segment1.first) <= EPSILON) {
             return false;

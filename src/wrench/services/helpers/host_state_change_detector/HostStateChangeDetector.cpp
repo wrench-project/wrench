@@ -9,6 +9,7 @@
 
 #include "wrench/services/helpers/HostStateChangeDetector.h"
 #include "wrench/services/helpers/HostStateChangeDetectorMessage.h"
+#include "wrench/simgrid_S4U_util/S4U_VirtualMachine.h"
 
 #include <wrench/simulation/Simulation.h>
 #include <wrench-dev.h>
@@ -58,26 +59,63 @@ wrench::HostStateChangeDetector::HostStateChangeDetector(std::string host_on_whi
     // Connect my member method to the on_state_change signal from SimGrid regarding Hosts
     simgrid::s4u::Host::on_state_change.connect([this](simgrid::s4u::Host const &h) {this->hostChangeCallback(h.get_name(), h.is_on(), "HOST STATE CHANGE");});
     // Connect my member method to the on_state_change signal from SimGrid regarding VMs
-    simgrid::s4u::VirtualMachine::on_shutdown.connect([this](simgrid::s4u::VirtualMachine const &h) -> void {this->hostChangeCallback(h.get_name(),false, "VM SHUTDOWN");});
-    simgrid::s4u::VirtualMachine::on_start.connect([this](simgrid::s4u::VirtualMachine const &h) {this->hostChangeCallback(h.get_name(), true, "VM START");});
+//    simgrid::s4u::VirtualMachine::on_shutdown.connect([this](simgrid::s4u::VirtualMachine const &h) -> void {this->hostChangeCallback(h.get_name(),false, "VM SHUTDOWN");});
+//    simgrid::s4u::VirtualMachine::on_start.connect([this](simgrid::s4u::VirtualMachine const &h) {this->hostChangeCallback(h.get_name(), true, "VM START");});
 }
 
 void wrench::HostStateChangeDetector::hostChangeCallback(std::string const &name, bool is_on, std::string message) {
     WRENCH_INFO("************************************");
     WRENCH_INFO("***** %s : IN CALLBACK: %s : %s ", this->getName().c_str(),message.c_str(), name.c_str());
     WRENCH_INFO("************************************");
+    for (const auto &pm : S4U_VirtualMachine::simgrid_vm_pm_map) {
+        WRENCH_INFO("PM = %s (is_on = %d)", pm.first->get_cname(), pm.first->is_on());
+        for (const auto &vm : pm.second) {
+            WRENCH_INFO("   VM = %s (is_on = %d)", vm->get_cname(), vm->is_on());
+        }
+    }
+    WRENCH_INFO("************************************");
+    WRENCH_INFO("HOSTS I CARE ABOUT: -");
+    for (auto const &host : this->hosts_to_monitor) {
+        WRENCH_INFO("  --> %s", host.c_str());
+    }
+    // Is this is a physical host I care about?
+    bool this_is_a_pm_i_care_about = (std::find(this->hosts_to_monitor.begin(), this->hosts_to_monitor.end(), name) != this->hosts_to_monitor.end());
 
-    // If this is not a host I care about, don't do anything
-    if (std::find(this->hosts_to_monitor.begin(), this->hosts_to_monitor.end(), name) == this->hosts_to_monitor.end()) {
+    if (this_is_a_pm_i_care_about) {
+        // This seems to be a SimGrid bug:the VM are not killed! Kill them all
+        for (auto &vm : S4U_VirtualMachine::simgrid_vm_pm_map[simgrid::s4u::Host::by_name(name)]) {
+            WRENCH_INFO("BY HAND TURNING OFF THE VM %s", vm->get_cname());
+            vm->turn_off();
+        }
+        S4U_VirtualMachine::simgrid_vm_pm_map[simgrid::s4u::Host::by_name(name)].clear();
+        this->hosts_that_have_recently_changed_state.push_back(std::make_pair(name, is_on));
         return;
     }
-    // This seems to be a SimGrid bug: we get the shutdown, but somehow is_on() returns true!
-    // So for now we manually turn off the VM, which will then cause another callback
-    if (message == "VM SHUTDOWN") {
-        simgrid::s4u::VirtualMachine::by_name(name)->turn_off();
-        return;
+
+    // Is this a VM I care about?
+    for (const auto &pm : S4U_VirtualMachine::simgrid_vm_pm_map) {
+        for (const auto &vm : pm.second) {
+            if (std::find(this->hosts_to_monitor.begin(), this->hosts_to_monitor.end(), vm->get_name()) != this->hosts_to_monitor.end()) {
+                if (vm->is_on()) {
+                    WRENCH_INFO("BY HAND TURNING OFF VM %s", vm->get_cname());
+                    vm->turn_off();
+                }
+                this->hosts_that_have_recently_changed_state.push_back(std::make_pair(name, is_on));
+                S4U_VirtualMachine::simgrid_vm_pm_map[pm.first].erase(vm);
+                return;
+            }
+        }
     }
-    this->hosts_that_have_recently_changed_state.push_back(std::make_pair(name, is_on));
+
+//    WRENCH_INFO("*************** AFTER *********************");
+//    for (const auto &pm : S4U_VirtualMachine::simgrid_vm_pm_map) {
+//        WRENCH_INFO("PM = %s", pm.first->get_cname());
+//        for (const auto &vm : pm.second) {
+//            WRENCH_INFO("   VM = %s", vm->get_cname());
+//        }
+//    }
+//    WRENCH_INFO("************************************");
+
 
 }
 

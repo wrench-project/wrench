@@ -403,12 +403,12 @@ private:
             // Starting a FailedHost1 random repeat switch!!
             unsigned long seed1 = trial * 2 + 37;
             auto switch1 = std::shared_ptr<wrench::HostRandomRepeatSwitcher>(
-                    new wrench::HostRandomRepeatSwitcher("StableHost", seed1, 10, 30, "FailedHost1"));
+                    new wrench::HostRandomRepeatSwitcher("StableHost", seed1, 10, 100, "FailedHost1"));
             switch1->simulation = this->simulation;
             switch1->start(switch1, true, false); // Daemonized, no auto-restart
 
             // Add a task to the workflow
-            auto task = this->test->workflow->addTask("task_" + std::to_string(trial), 150, 1, 1, 1.0, 0);
+            auto task = this->test->workflow->addTask("task_" + std::to_string(trial), 200, 1, 1, 1.0, 0);
             task->addInputFile(this->test->input_file);
             task->addOutputFile(this->test->output_file);
 
@@ -442,6 +442,7 @@ private:
                 job_manager->submitJob(job, vm_cs.get());
                 num_job_submission_attempts++;
 
+                WRENCH_INFO("Waiting for an event...");
                 // Wait for a workflow execution event
                 event = this->getWorkflow()->waitForNextExecutionEvent();
                 if (event->type == wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE) {
