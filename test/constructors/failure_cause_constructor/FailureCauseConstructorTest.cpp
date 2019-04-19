@@ -32,7 +32,7 @@ protected:
 
 TEST_F(FailureCauseConstructorTest, NetworkError) {
 
-  wrench::NetworkError *cause = nullptr;
+  wrench::NetworkError *cause;
   ASSERT_NO_THROW(cause = new wrench::NetworkError(wrench::NetworkError::SENDING, wrench::NetworkError::TIMEOUT, "mailbox"));
   ASSERT_NO_THROW(cause = new wrench::NetworkError(wrench::NetworkError::RECEIVING, wrench::NetworkError::TIMEOUT, "mailbox"));
   ASSERT_NO_THROW(cause = new wrench::NetworkError(wrench::NetworkError::SENDING, wrench::NetworkError::FAILURE, "mailbox"));
@@ -54,6 +54,6 @@ TEST_F(FailureCauseConstructorTest, NetworkError) {
 }
 
 TEST_F(FailureCauseConstructorTest, HostError) {
-  wrench::HostError *cause = nullptr;
+  wrench::HostError *cause;
   ASSERT_NO_THROW(cause = new wrench::HostError("hostname"));
 }
