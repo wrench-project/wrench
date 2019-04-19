@@ -84,14 +84,16 @@ void wrench::HostStateChangeDetector::hostChangeCallback(std::string const &name
     bool this_is_a_pm_i_care_about = (std::find(this->hosts_to_monitor.begin(), this->hosts_to_monitor.end(), name) != this->hosts_to_monitor.end());
 
     if (this_is_a_pm_i_care_about) {
-        // This seems to be a SimGrid bug:the VM are not killed! Kill them all
-        for (auto &vm : S4U_VirtualMachine::simgrid_vm_pm_map[simgrid::s4u::Host::by_name(name)]) {
-            WRENCH_INFO("BY HAND TURNING OFF THE VM %s", vm->get_cname());
-            vm->turn_off();
+        if (S4U_VirtualMachine::simgrid_vm_pm_map.find(simgrid::s4u::Host::by_name(name)) != S4U_VirtualMachine::simgrid_vm_pm_map.end()) {
+            // This seems to be a SimGrid bug:the VM are not killed! Kill them all
+            for (auto &vm : S4U_VirtualMachine::simgrid_vm_pm_map[simgrid::s4u::Host::by_name(name)]) {
+                WRENCH_INFO("BY HAND TURNING OFF THE VM %s", vm->get_cname());
+                vm->turn_off();
+            }
+            S4U_VirtualMachine::simgrid_vm_pm_map[simgrid::s4u::Host::by_name(name)].clear();
+            this->hosts_that_have_recently_changed_state.push_back(std::make_pair(name, is_on));
+            return;
         }
-        S4U_VirtualMachine::simgrid_vm_pm_map[simgrid::s4u::Host::by_name(name)].clear();
-        this->hosts_that_have_recently_changed_state.push_back(std::make_pair(name, is_on));
-        return;
     }
 
     // Is this a VM I care about?
@@ -101,6 +103,8 @@ void wrench::HostStateChangeDetector::hostChangeCallback(std::string const &name
                 if (vm->is_on()) {
                     WRENCH_INFO("BY HAND TURNING OFF VM %s", vm->get_cname());
                     vm->turn_off();
+                } else {
+                    WRENCH_INFO("GOOD, VM IS OFF");
                 }
                 this->hosts_that_have_recently_changed_state.push_back(std::make_pair(name, is_on));
                 S4U_VirtualMachine::simgrid_vm_pm_map[pm.first].erase(vm);
