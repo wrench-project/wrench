@@ -20,6 +20,7 @@
 #include "wrench/services/storage/StorageService.h"
 #include "wrench/simulation/Simulation.h"
 #include "simgrid/plugins/energy.h"
+#include "wrench/simgrid_S4U_util/S4U_VirtualMachine.h"
 
 #include <nlohmann/json.hpp>
 #include <fstream>
@@ -67,6 +68,7 @@ namespace wrench {
      */
     Simulation::~Simulation() {
         MessageManager::cleanUpAllMessages();
+        simgrid::s4u::Host::on_state_change.disconnect(this->on_state_change_callback_id);
         this->s4u_simulation->shutdown();
     }
 
@@ -680,7 +682,7 @@ namespace wrench {
      * @param flops: a number of floating point operations
      */
     void Simulation::compute(double flops) {
-            S4U_Simulation::compute(flops);
+        S4U_Simulation::compute(flops);
     }
 
     /**

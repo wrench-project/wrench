@@ -47,7 +47,7 @@ namespace wrench {
     private:
 
         void cleanup(bool has_terminated_cleanly, int return_value) override;
-        void hostChangeCallback(std::string const &name, bool is_on, std::string message);
+        void hostStateChangeCallback(std::string const &hostname);
 
         std::vector<std::string> hosts_to_monitor;
         bool notify_when_turned_on;
@@ -61,6 +61,8 @@ namespace wrench {
 
         std::vector<std::string> hosts_that_have_recently_turned_on;
         std::vector<std::string> hosts_that_have_recently_turned_off;
+
+        unsigned int on_state_change_call_back_id;
 
     };
 

@@ -591,7 +591,7 @@ namespace wrench {
             return false;
         }
 
-        WRENCH_INFO("Got a [%s] message", message->getName().c_str());
+        WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
 
         if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
             this->stopAllVMs();
@@ -922,8 +922,6 @@ namespace wrench {
         } else {
 
             std::string picked_host = this->findHost(vm->getNumCores(), vm->getMemory(), pm_name);
-
-            WRENCH_INFO("PICKED HOST = '%s'", picked_host.c_str());
 
             // Did we find a viable host?
             if (picked_host.empty()) {

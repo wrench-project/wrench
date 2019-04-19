@@ -131,9 +131,10 @@ namespace wrench {
 
         bool is_running = false;
 
+        unsigned int on_state_change_callback_id;
 
 
-    };
+        };
 
 };
 

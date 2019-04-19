@@ -392,7 +392,7 @@ private:
         // Create a job manager
         std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
-        unsigned long NUM_TRIALS = 100;
+        unsigned long NUM_TRIALS = 1000;
 
         auto cloud_service = (wrench::CloudService *)this->test->compute_service;
 
@@ -407,8 +407,15 @@ private:
             switch1->simulation = this->simulation;
             switch1->start(switch1, true, false); // Daemonized, no auto-restart
 
+            // Starting a FailedHost2 random repeat switch!!
+            unsigned long seed2 = trial * 17 + 42;
+            auto switch2 = std::shared_ptr<wrench::HostRandomRepeatSwitcher>(
+                    new wrench::HostRandomRepeatSwitcher("StableHost", seed1, 10, 100, "FailedHost2"));
+            switch2->simulation = this->simulation;
+            switch2->start(switch1, true, false); // Daemonized, no auto-restart
+
             // Add a task to the workflow
-            auto task = this->test->workflow->addTask("task_" + std::to_string(trial), 95, 1, 1, 1.0, 0);
+            auto task = this->test->workflow->addTask("task_" + std::to_string(trial), 50, 1, 1, 1.0, 0);
             task->addInputFile(this->test->input_file);
             task->addOutputFile(this->test->output_file);
 
@@ -420,6 +427,7 @@ private:
             auto vm_name = cloud_service->createVM(task->getMinNumCores(), task->getMemoryRequirement());
 
             std::unique_ptr<wrench::WorkflowExecutionEvent> event = nullptr;
+            unsigned long total_num_vm_start_attempts = 0;
             unsigned long num_vm_start_attempts = 0;
             unsigned long num_job_submission_attempts = 0;
             do {
@@ -427,31 +435,30 @@ private:
                 // Start the VM (sleep 10 and retry if unsuccessful)
                 std::shared_ptr<wrench::BareMetalComputeService> vm_cs;
                 try {
-                    WRENCH_INFO("Trying to start the VM");
+//                    WRENCH_INFO("Trying to start the VM");
                     num_vm_start_attempts++;
+                    total_num_vm_start_attempts++;
                     vm_cs = cloud_service->startVM(vm_name);
                 } catch (wrench::WorkflowExecutionException &e) {
                     wrench::Simulation::sleep(10);
                     continue;
                 }
-                WRENCH_INFO("*** WAS ABLE TO START THE VM AFTER %lu attempts", num_vm_start_attempts);
+//                WRENCH_INFO("*** WAS ABLE TO START THE VM AFTER %lu attempts", num_vm_start_attempts);
                 num_vm_start_attempts = 0;
 
                 // Submit the standard job to the compute service, making it sure it runs on FailedHost1
-                WRENCH_INFO("Submitting the job");
                 job_manager->submitJob(job, vm_cs.get());
                 num_job_submission_attempts++;
 
-                WRENCH_INFO("Waiting for an event...");
                 // Wait for a workflow execution event
                 event = this->getWorkflow()->waitForNextExecutionEvent();
-                if (event->type == wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE) {
-                    WRENCH_INFO("Job Failure: %s", (dynamic_cast<wrench::StandardJobFailedEvent*>(event.get()))->failure_cause->toString().c_str());
-                }
             } while ((event == nullptr) || (event->type != wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION));
 
-            WRENCH_INFO("*** WAS ABLE TO RUN THE JOB AFTER %lu attempts", num_job_submission_attempts);
+            WRENCH_INFO("*** WAS ABLE TO RUN THE JOB AFTER %lu attempts (%lu VM start attempts)",
+                        num_job_submission_attempts,
+                        total_num_vm_start_attempts);
             switch1->kill();
+            switch2->kill();
 
             wrench::Simulation::sleep(10.0);
             this->test->workflow->removeTask(task);
@@ -483,6 +490,7 @@ void CloudServiceSimulatedFailuresTest::do_CloudServiceRandomFailures_test() {
     std::string stable_host = "StableHost";
     std::vector<std::string> compute_hosts;
     compute_hosts.push_back("FailedHost1");
+    compute_hosts.push_back("FailedHost2");
 
     // Create a Compute Service that has access to two hosts
     compute_service = simulation->add(
