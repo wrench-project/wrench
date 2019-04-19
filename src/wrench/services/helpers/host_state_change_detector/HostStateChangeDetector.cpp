@@ -67,8 +67,10 @@ void wrench::HostStateChangeDetector::hostChangeCallback(std::string const &name
     WRENCH_INFO("************************************");
     WRENCH_INFO("***** %s : IN CALLBACK: %s : %s ", this->getName().c_str(),message.c_str(), name.c_str());
     WRENCH_INFO("************************************");
+    WRENCH_INFO("SIZE OF MAP = %lu", S4U_VirtualMachine::simgrid_vm_pm_map.size());
     for (const auto &pm : S4U_VirtualMachine::simgrid_vm_pm_map) {
-        WRENCH_INFO("PM = %s (is_on = %d)", pm.first->get_cname(), pm.first->is_on());
+        WRENCH_INFO("PM = %s ", pm.first->get_cname());
+        WRENCH_INFO("\t\t(is_on = %d)", pm.first->is_on());
         for (const auto &vm : pm.second) {
             WRENCH_INFO("   VM = %s (is_on = %d)", vm->get_cname(), vm->is_on());
         }
