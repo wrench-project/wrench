@@ -91,6 +91,7 @@ namespace wrench {
                                                     (size_t)this->ram_memory);
         WRENCH_INFO("CALLING START ON A SIMGRID VM");
         this->vm->start();
+        WRENCH_INFO("INSERTING IN MAP at map[%s]", physical_host->get_cname());
         simgrid_vm_pm_map[physical_host].insert(this->vm);
         this->state = State::RUNNING;
         this->pm_name = pm_name;
