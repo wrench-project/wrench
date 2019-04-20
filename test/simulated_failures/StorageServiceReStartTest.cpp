@@ -95,13 +95,29 @@ private:
 
     int main() override {
 
+        // Starting a FailedHost murderer!!
+        auto murderer = std::shared_ptr<wrench::HostSwitcher>(new wrench::HostSwitcher("StableHost", 100, "FailedHost", wrench::HostSwitcher::Action::TURN_OFF));
+        murderer->simulation = this->simulation;
+        murderer->start(murderer, true, false); // Daemonized, no auto-restart
+
+        // Starting a FailedHost resurector!!
+        auto resurector = std::shared_ptr<wrench::HostSwitcher>(new wrench::HostSwitcher("StableHost", 500, "FailedHost", wrench::HostSwitcher::Action::TURN_ON));
+        resurector->simulation = this->simulation;
+        resurector->start(murderer, true, false); // Daemonized, no auto-restart
+
         auto file = this->getWorkflow()->getFileByID("file");
         auto storage_service = *(this->getAvailableStorageServices().begin());
         try {
             storage_service->readFile(file);
-            throw std::runtime_error("Should have gotten an error");
+            throw std::runtime_error("Should not have been able to read the file (first attempt)");
         } catch (wrench::WorkflowExecutionException &e) {
-
+            // Expected
+        }
+        wrench::Simulation::sleep(1000);
+        try {
+            storage_service->readFile(file);
+        } catch (wrench::WorkflowExecutionException &e) {
+            throw std::runtime_error("Should  have been able to read the file (second attempt)");
         }
 
 
@@ -127,7 +143,7 @@ void SimulatedFailuresTest::do_StorageServiceRestartTest_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string failed_host = "FailedHostTrace";
+    std::string failed_host = "FailedHost";
     auto storage_service = simulation->add(new wrench::SimpleStorageService(failed_host, 10000000000000.0));
 
     // Create a WMS
