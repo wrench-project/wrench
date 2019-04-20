@@ -44,6 +44,15 @@ namespace wrench {
         this->default_property_values.clear();
     }
 
+    void SimpleStorageService::cleanup(bool has_returned_from_main, int return_value) {
+        WRENCH_DEBUG("In on_exit.cleanup(): SimpleStorageService: %s has_returned_from_main = %d (return_value = %d)",
+                     this->getName().c_str(), has_returned_from_main, return_value);
+        // Reset the network connection manager
+        this->network_connection_manager =  std::unique_ptr<NetworkConnectionManager>(
+                new NetworkConnectionManager(this->num_concurrent_connections));
+
+    }
+
     /**
      * @brief Public constructor
      *
@@ -324,13 +333,13 @@ namespace wrench {
         // Reply with a "go ahead, send me the file" message
         try {
             S4U_Mailbox::dputMessage(answer_mailbox,
-                                    new StorageServiceFileWriteAnswerMessage(file,
-                                                                             this,
-                                                                             true,
-                                                                             nullptr,
-                                                                             file_reception_mailbox,
-                                                                             this->getMessagePayloadValueAsDouble(
-                                                                                     SimpleStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
+                                     new StorageServiceFileWriteAnswerMessage(file,
+                                                                              this,
+                                                                              true,
+                                                                              nullptr,
+                                                                              file_reception_mailbox,
+                                                                              this->getMessagePayloadValueAsDouble(
+                                                                                      SimpleStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
             return true;
         }

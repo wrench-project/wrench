@@ -353,7 +353,6 @@ namespace wrench {
                                         this->getMessagePayloadValueAsDouble(
                                                 StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
-        WRENCH_INFO("THROWING DUE TO NETWORK ERROR!");
         throw WorkflowExecutionException(cause);
       }
 
@@ -363,9 +362,6 @@ namespace wrench {
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
-        WRENCH_INFO("THROWING DUE TO NETWORK ERROR (2)!");
-        WRENCH_INFO("CAUSE: %s", cause->toString().c_str());
-
         throw WorkflowExecutionException(cause);
       }
 
@@ -376,14 +372,16 @@ namespace wrench {
           throw WorkflowExecutionException(cause);
         }
 
+      WRENCH_INFO("GETTING IT?");
         // Otherwise, retrieve  the file
         std::unique_ptr<SimulationMessage> file_content_message = nullptr;
         try {
           file_content_message = S4U_Mailbox::getMessage(answer_mailbox);
         } catch (std::shared_ptr<NetworkError> &cause) {
-            WRENCH_INFO("THROWING DUE TO NETWORK ERROR(3)");
+            WRENCH_INFO("THROOWING!");
           throw WorkflowExecutionException(cause);
         }
+        WRENCH_INFO("GOT IT");
 
         if (auto file_content_msg = dynamic_cast<StorageServiceFileContentMessage *>(file_content_message.get())) {
           // do nothing

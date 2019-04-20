@@ -345,7 +345,7 @@ namespace wrench {
 
             // Start the storage services
             for (const auto &storage_service : this->storage_services) {
-                storage_service->start(storage_service, true, false); // Daemonized, no auto-restart
+                storage_service->start(storage_service, true, true); // Daemonized, AUTO-RESTART
             }
 
             // Start the scratch services
