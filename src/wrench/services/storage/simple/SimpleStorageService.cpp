@@ -47,10 +47,6 @@ namespace wrench {
     void SimpleStorageService::cleanup(bool has_returned_from_main, int return_value) {
         WRENCH_DEBUG("In on_exit.cleanup(): SimpleStorageService: %s has_returned_from_main = %d (return_value = %d)",
                      this->getName().c_str(), has_returned_from_main, return_value);
-        // Reset the network connection manager
-        this->network_connection_manager =  std::unique_ptr<NetworkConnectionManager>(
-                new NetworkConnectionManager(this->num_concurrent_connections));
-
     }
 
     /**
@@ -72,8 +68,7 @@ namespace wrench {
         } else {
             this->num_concurrent_connections = (unsigned long) (this->getPropertyValueAsDouble("MAX_NUM_CONCURRENT_DATA_CONNECTIONS"));
         }
-        this->network_connection_manager =  std::unique_ptr<NetworkConnectionManager>(
-                new NetworkConnectionManager(this->num_concurrent_connections));
+
 
     }
 
@@ -107,6 +102,10 @@ namespace wrench {
     int SimpleStorageService::main() {
 
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_CYAN);
+
+        // Create a new network connection manager
+        this->network_connection_manager =  std::unique_ptr<NetworkConnectionManager>(
+                new NetworkConnectionManager(this->num_concurrent_connections));
 
         // number of files staged
         unsigned long num_stored_files = 0;

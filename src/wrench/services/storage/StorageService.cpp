@@ -372,16 +372,13 @@ namespace wrench {
           throw WorkflowExecutionException(cause);
         }
 
-      WRENCH_INFO("GETTING IT?");
         // Otherwise, retrieve  the file
         std::unique_ptr<SimulationMessage> file_content_message = nullptr;
         try {
           file_content_message = S4U_Mailbox::getMessage(answer_mailbox);
         } catch (std::shared_ptr<NetworkError> &cause) {
-            WRENCH_INFO("THROOWING!");
           throw WorkflowExecutionException(cause);
         }
-        WRENCH_INFO("GOT IT");
 
         if (auto file_content_msg = dynamic_cast<StorageServiceFileContentMessage *>(file_content_message.get())) {
           // do nothing
