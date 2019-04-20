@@ -295,6 +295,7 @@ set(TEST_FILES
         test/simulated_failures/CloudComputeServiceFailuresTest.cpp
         test/simulated_failures/StandardJobExecutorFailuresTest.cpp
         test/simulated_failures/NetworkProximityFailuresTest.cpp
+        test/simulated_failures/StorageServiceReStartTest.cpp
         test/simulated_failures/test_util/HostSwitcher.cpp
         test/simulated_failures/test_util/HostSwitcher.h
         test/simulated_failures/test_util/SleeperVictim.cpp
