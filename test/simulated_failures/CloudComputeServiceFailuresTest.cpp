@@ -245,8 +245,6 @@ private:
         resurector->start(resurector, true, false); // Daemonized, no auto-restart
 
 
-        // STOPPED HERE
-
         wrench::Simulation::sleep(10);
 
         // Create a VM on the Cloud Service
