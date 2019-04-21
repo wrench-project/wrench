@@ -43,7 +43,7 @@ var energyData = null;
 if (numProgramArguments == 0) {
     console.log("Please provide the file name that holds the data as a command line argument")
 } 
-else if (numProgramArguments == 1 || numProgramArguments == 2) {   // Only task data file included
+else if (numProgramArguments == 2) {
    
     // Add task data from file to index.html
     // var content = parseFile(process.argv[2])
@@ -52,15 +52,10 @@ else if (numProgramArguments == 1 || numProgramArguments == 2) {   // Only task 
             // opn('index.html')
             // process.exit()
 
-            if (numProgramArguments == 2) {    // Task and energy data files both included
                 energyFilePath = process.argv[3];
                 energyData = JSON.parse(fs.readFileSync(energyFilePath));
         
                 addToHTMLFile(content, energyData);
-            }
-            else {
-                addToHTMLFile(content, "[]")
-            }
         })
         .catch(function(err) {
                 console.log(err);

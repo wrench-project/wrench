@@ -138,10 +138,16 @@
                     </div>
                 </div>
 
-                <div class='hidden' id='energy-graph'>
+                <div class='hidden' id='energy-graph' style="padding: 10px">
                     <!-- Markup -->
-                    <div id="consumedEnergyGraph"></div>
-                    <div id="pStateGraph"></div>
+                    <b><p style="align-content: center">Consumed Energy Graph</p></b>
+                    <div id="consumedEnergyGraph" style="margin: 10px"></div>
+                    <div id="consumedEnergyGraphLegend" style="margin-left: 35px; margin-bottom: 10px"></div>
+
+                    <b><p style="align-content: center">Power State Graph</p></b>
+                    <div id="pStateGraph" style="margin: 20px"></div>
+                    <div id="pStateGraphLegend" style="margin-left: 35px"></div>
+                    
                 </div>
 
             </div>
@@ -149,8 +155,10 @@
         </div>
     </body>
     <script>
-        generateConsumedEnergyGraph()
-        generatePStateGraph()
+        if (energyData != []) {
+            generateConsumedEnergyGraph()
+            generatePStateGraph()
+        }
         initialise()
     </script>
 </html>
