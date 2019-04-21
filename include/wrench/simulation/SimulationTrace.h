@@ -12,6 +12,9 @@
 
 #include <vector>
 #include <map>
+#include <cmath>
+#include <cfloat>
+#include <algorithm>
 
 #include "wrench/simulation/SimulationTimestamp.h"
 
@@ -73,22 +76,96 @@ namespace wrench {
          * @brief Destructor
          */
         ~SimulationTrace<T>() {
-          for (auto s : this->trace) {
-            delete s;
+          for (auto &timestamp : this->trace) {
+            delete timestamp;
           }
         }
 
         /***********************/
-        /** \endcond INTERNAL     */
+        /** \endcond INTERNAL  */
         /***********************/
 
     private:
         std::vector<SimulationTimestamp<T> *> trace;
-
     };
 
     /***********************/
-    /** \endcond           */
+    /** \endcond DEVELOPER */
+    /***********************/
+
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
+
+    /**
+     * @brief A specialized class to represent a trace of SimulationTimestampPstateSet timestamps
+     */
+    template <>
+    class SimulationTrace<SimulationTimestampPstateSet> : public GenericSimulationTrace {
+    public:
+
+        /**
+         * @brief Append a SimulationTimestampPstateSet timestamp to the trace
+         * @param new_timestamp: pointer to the timestamp
+         */
+        void addTimestamp(SimulationTimestamp<SimulationTimestampPstateSet> *new_timestamp) {
+            auto hostname = new_timestamp->getContent()->getHostname();
+
+            auto hostname_search = latest_timestamps_by_host.find(hostname);
+            if (hostname_search == latest_timestamps_by_host.end()) {
+                // no pstate timestamps associated to this hostname have been added yet
+                this->trace.push_back(new_timestamp);
+                this->latest_timestamps_by_host[hostname] = this->trace.size() - 1;
+            } else {
+                // a pstate timestamp associated to this host already exists
+                SimulationTimestamp<SimulationTimestampPstateSet> *& latest_timestamp = this->trace[this->latest_timestamps_by_host[hostname]];
+
+                // if the new_timestamp has the same date as the latest_timestamp, then the new_timestamp replaces
+                // the latest_timestamp in the trace, else the new time_stamp is added to the trace and the map of latest
+                // timestamps is updated to reflect this change
+                if (std::fabs(new_timestamp->getDate() - latest_timestamp->getDate()) < DBL_EPSILON) {
+                    std::swap(new_timestamp, latest_timestamp);
+
+                    // now, latest_timestamp points to the contents of new_timestamp
+                    // and new_timestamp points to the contents of latest_timestamp so
+                    // we need to delete new_timestamp
+                    delete new_timestamp;
+                } else {
+                    if (new_timestamp->getDate() > latest_timestamp->getDate()) {
+                        this->trace.push_back(new_timestamp);
+                        this->latest_timestamps_by_host[hostname] = this->trace.size() - 1;
+                    } else {
+                        throw std::runtime_error(
+                                "SimulationTrace<SimulationTimestampPstateSet>::addTimestamp() timestamps out of order");
+                    }
+                }
+            }
+        }
+
+        /**
+         * @brief Retrieve the trace as a vector of SimulationTimestamp<SimulationTimestampPstateSet> timestamps
+         * @return a vector of pointers to SimulationTimestamp<SimulationTimestampPstateSet> objects
+         */
+        std::vector<SimulationTimestamp<SimulationTimestampPstateSet> *> getTrace() {
+            return this->trace;
+        }
+
+        /**
+         * @brief Destructor
+         */
+        ~SimulationTrace<SimulationTimestampPstateSet>() {
+            for (auto &timestamp: this->trace) {
+                delete timestamp;
+            }
+        }
+        
+    private:
+        std::map<std::string, size_t> latest_timestamps_by_host;
+        std::vector<SimulationTimestamp<SimulationTimestampPstateSet> *> trace;
+    };
+
+    /***********************/
+    /** \endcond INTERNAL  */
     /***********************/
 
 };
