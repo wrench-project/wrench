@@ -1027,10 +1027,8 @@ namespace wrench {
             auto vm_tuple = this->vm_list.find(vm_name);
 
             auto cs = std::get<1>(vm_tuple->second);
-            WRENCH_INFO("SUSPENDING THE CS '%s' (s", cs->getName().c_str());
             cs->suspend();
 
-            WRENCH_INFO("SUSPENDING THE VM");
             auto vm = std::get<0>(vm_tuple->second);
             vm->suspend();
 
@@ -1275,7 +1273,6 @@ namespace wrench {
         for (auto &vm : this->vm_list) {
             auto actual_vm = vm.second.first;
             auto cs = vm.second.second;
-            WRENCH_INFO("DEALING WITH VM %s whose state is %s", vm.first.c_str(), actual_vm->getStateAsString().c_str());
             switch (actual_vm->getState()) {
                 case S4U_VirtualMachine::State::DOWN:
                     // Nothing to do

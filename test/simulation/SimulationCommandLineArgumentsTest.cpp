@@ -113,7 +113,6 @@ void SimulationCommandLineArgumentsTest::do_versionArgument_test() {
   // Check exit code
   ASSERT_EQ(exit_code, 0);
 
-  std::cerr << "HERE\n";
   // Check file content
   FILE *stdout_file = fopen((UNIQUE_TMP_PATH_PREFIX + "unit_tests.stdout").c_str(), "r");
   int linecount = 0;

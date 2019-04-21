@@ -290,7 +290,6 @@ namespace wrench {
 
         /** Create all Workunits **/
         std::set<std::shared_ptr<Workunit>> all_work_units = Workunit::createWorkunits(this->job);
-        WRENCH_INFO("CREATED %lu workunits!", all_work_units.size());
 
         /** Put each workunit either in the "non-ready" list or the "ready" list **/
         while (not all_work_units.empty()) {
