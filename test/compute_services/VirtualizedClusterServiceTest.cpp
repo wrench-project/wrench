@@ -1087,14 +1087,12 @@ private:
             // do nothing, expected behavior
         }
 
-        WRENCH_INFO("HERE");
         try {
             cs->startVM(std::get<0>(vm_list[1]));
         } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error("Couldn't start VM: " + e.getCause()->toString());
         }
 
-        WRENCH_INFO("HERE 2");
         try {
             job_manager->submitJob(job1, std::get<1>(vm_list[1]).get());
         } catch (wrench::WorkflowExecutionException &e) {

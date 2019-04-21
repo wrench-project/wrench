@@ -290,6 +290,7 @@ set(TEST_FILES
         src/wrench/managers/EnergyMeter.cpp
         include/wrench/managers/EnergyMeter.h
         test/simulated_failures/ServiceStartReStartTest.cpp
+        test/simulated_failures/ComprehensiveIntegrationTest.cpp
         test/simulated_failures/FailureDetectorTest.cpp
         test/simulated_failures/BareMetalComputeServiceFailuresTest.cpp
         test/simulated_failures/CloudComputeServiceFailuresTest.cpp
