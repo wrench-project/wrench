@@ -71,8 +71,16 @@ private:
     SimulationTimestampEnergyTest *test;
 
     int main() {
-        wrench::S4U_Simulation::sleep(10.0);
+        // default ptstate = 0
+        wrench::S4U_Simulation::sleep(10.000001);
+
+        // set the pstate of the host to be 2, then 1 at the same simulated time
+        // the first call to setPstate(hostname, 2) should record a timestamp
+        // then the second call to setPstate(hostname, 1) should record a timestamp that replaces the one previously added
+        // so that we don't end up with timestamps that show two different pstates at the same point in time
+        this->simulation->setPstate(this->getHostname(), 2);
         this->simulation->setPstate(this->getHostname(), 1);
+
         wrench::S4U_Simulation::sleep(10.0);
         this->simulation->setPstate(this->getHostname(), 2);
 
@@ -117,21 +125,21 @@ void SimulationTimestampEnergyTest::do_SimulationTimestampPstateSet_test() {
     auto set_pstate_timestamps = simulation->getOutput().getTrace<wrench::SimulationTimestampPstateSet>();
     ASSERT_EQ(4, set_pstate_timestamps.size());
 
-    // pstate timestamp added prior to the simulation starting
+    // pstate timestamp added at time 0.0
     auto ts1 = set_pstate_timestamps[0];
-    ASSERT_EQ(0, ts1->getDate());
+    ASSERT_DOUBLE_EQ(0, ts1->getDate());
     ASSERT_EQ(0, ts1->getContent()->getPstate());
     ASSERT_EQ("host1", ts1->getContent()->getHostname());
 
-    // pstate timestamp added from wms first call of setPstate()
+    // pstate timestamp added at time 10.000001
     auto ts2 = set_pstate_timestamps[2];
-    ASSERT_EQ(10, ts2->getDate());
+    ASSERT_DOUBLE_EQ(10.000001, ts2->getDate());
     ASSERT_EQ(1, ts2->getContent()->getPstate());
     ASSERT_EQ("host1", ts2->getContent()->getHostname());
 
-    // pstate timestamp added from wms second call of setPstate()
+    // pstate timestamp added at time 20.000001
     auto ts3 = set_pstate_timestamps[3];
-    ASSERT_EQ(20, ts3->getDate());
+    ASSERT_DOUBLE_EQ(20.000001, ts3->getDate());
     ASSERT_EQ(2, ts3->getContent()->getPstate());
     ASSERT_EQ("host1", ts3->getContent()->getHostname());
 
