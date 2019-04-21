@@ -3,4 +3,4 @@ WORKDIR /app
 COPY package.json /app
 RUN npm install
 COPY . /app
-CMD node parser.js ./test_data/data.json
+CMD node parser.js ./test_data/data.json ./test_data/energy.json
