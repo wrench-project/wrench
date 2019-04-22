@@ -13,6 +13,7 @@
 #include <wrench/managers/EnergyMeter.h>
 #include "wrench/simgrid_S4U_util/S4U_Daemon.h"
 #include "wrench/services/Service.h"
+#include "wrench/services/compute/ComputeService.h"
 #include "wrench/wms/DynamicOptimization.h"
 #include "wrench/wms/StaticOptimization.h"
 #include "wrench/wms/scheduler/PilotJobScheduler.h"
