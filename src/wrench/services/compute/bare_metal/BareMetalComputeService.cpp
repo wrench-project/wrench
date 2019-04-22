@@ -46,6 +46,22 @@ namespace wrench {
 
 
     void BareMetalComputeService::cleanup(bool has_terminated_cleanly, int return_value) {
+
+        // All this is useful in case of a restart() of the service
+
+        for (auto host : this->compute_resources) {
+            this->total_num_cores += std::get<0>(host.second);
+            this->ram_availabilities.insert(std::make_pair(host.first, S4U_Simulation::getHostMemoryCapacity(host.first)));
+            this->running_thread_counts.insert(std::make_pair(host.first, 0));
+        }
+
+        this->running_jobs.clear();
+        this->job_run_specs.clear();
+        this->all_workunits.clear();
+        this->ready_workunits.clear();
+        this->completed_workunits.clear();
+        this->workunit_executors.clear();
+
     }
 
     /**
@@ -957,7 +973,11 @@ namespace wrench {
         // Remove files from Scratch
         if (this->containing_pilot_job == nullptr) {
             for (auto const &f : this->files_in_scratch[job]) {
-                this->getScratch()->deleteFile(f, job, nullptr);
+                try {
+                    this->getScratch()->deleteFile(f, job, nullptr);
+                } catch (WorkflowExecutionException &e) {
+                    // ignore (perhaps it was never written)
+                }
             }
             this->files_in_scratch[job].clear();
             this->files_in_scratch.erase(job);
