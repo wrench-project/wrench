@@ -1,6 +1,19 @@
 WRENCH Release Notes
 ------
 
+### WRENCH 1.4
+
+(Apr 22, 2019) This release includes a series of new features and bug fixes, including:
+
+- Updated [Batsched](https://gitlab.inria.fr/batsim/batsched) support (support to new JSON-based protocol)
+- Dump `pstate` and energy consumption data as JSON
+- Adding support for `bytesRead`, `bytesWritten`, and `avgCPU` for workflows defined as JSON
+- Adding `ComputeService::getTotalNumCores()` and `ComputeService::getTotalNumIdleCores()` 
+- `wrench::BatchService` should handle requested vs. real job run times when replaying traces
+- Bug fixes: [#97](https://github.com/wrench-project/wrench/issues/97), [#99](https://github.com/wrench-project/wrench/issues/99), [#100](https://github.com/wrench-project/wrench/issues/100)
+
+**Note**: WRENCH 1.4 requires [SimGrid 3.21](https://simgrid.org).
+
 ### WRENCH 1.3
 
 (_Jan 3, 2019_) This release includes a series of new features and bug fixes, including:
@@ -9,9 +22,9 @@ WRENCH Release Notes
 - `MultiHostMultiCoreComputeService` re-implemented as `BareMetalComputeService`
 - Documentation of the JSON schema for workflows
 - Documentation Guide containing detailed descriptions of WRENCH core services
-- Bug fixes: #81
+- Bug fixes: [#81](https://github.com/wrench-project/wrench/issues/81)
 
-**Note**: WRENCH 1.2 requires [SimGrid 3.21](https://simgrid.org).
+**Note**: WRENCH 1.3 requires [SimGrid 3.21](https://simgrid.org).
 
 ### WRENCH 1.2
 
