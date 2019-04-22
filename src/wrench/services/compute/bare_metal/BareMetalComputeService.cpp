@@ -407,15 +407,15 @@ namespace wrench {
 
     }
 
-    void BareMetalComputeService::someHostIsBackOn(simgrid::s4u::Host const &h) {
-        for (auto const &c : this->compute_resources) {
-            if ((c.first == h.get_name()) and (h.is_on())) {
-//                WRENCH_INFO("HOST %s CAME BACK ON!!!", h.get_cname());
-                this->host_back_on = true;
-                break;
-            }
-        }
-    }
+//    void BareMetalComputeService::someHostIsBackOn(simgrid::s4u::Host const &h) {
+//        for (auto const &c : this->compute_resources) {
+//            if ((c.first == h.get_name()) and (h.is_on())) {
+////                WRENCH_INFO("HOST %s CAME BACK ON!!!", h.get_cname());
+//                this->host_back_on = true;
+//                break;
+//            }
+//        }
+//    }
 
 
     /**
@@ -534,6 +534,7 @@ namespace wrench {
             std::vector<std::string> hosts_to_monitor;
             for (auto const &h : this->compute_resources) {
                 hosts_to_monitor.push_back(h.first);
+                WRENCH_INFO("=====> %s", h.first.c_str());
             }
             this->host_state_change_monitor = std::shared_ptr<HostStateChangeDetector>(
                     new HostStateChangeDetector(this->hostname, hosts_to_monitor, true, true,
@@ -543,8 +544,8 @@ namespace wrench {
             this->host_state_change_monitor->start(this->host_state_change_monitor, true, false); // Daemonized, no auto-restart
         }
 
-        simgrid::s4u::Host::on_state_change.connect( [this] (simgrid::s4u::Host const &h) { this->someHostIsBackOn(h);});
-        simgrid::s4u::Host::on_state_change.connect( [this] (simgrid::s4u::Host const &h) { this->someHostIsBackOn(h);});
+//        simgrid::s4u::Host::on_state_change.connect( [this] (simgrid::s4u::Host const &h) { this->someHostIsBackOn(h);});
+//        simgrid::s4u::Host::on_state_change.connect( [this] (simgrid::s4u::Host const &h) { this->someHostIsBackOn(h);});
 
 
         // Set an alarm for my timely death, if necessary

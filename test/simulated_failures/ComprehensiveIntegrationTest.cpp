@@ -25,9 +25,9 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(comprehensive_failure_integration_test, "Log catego
 #define NUM_TASKS 100
 #define MAX_TASK_DURATION_WITH_ON_CORE 3600
 #define CHAOS_MONKEY_MIN_SLEEP_BEFORE_OFF 100
-#define CHAOS_MONKEY_MAX_SLEEP_BEFORE_OFF 3600
+#define CHAOS_MONKEY_MAX_SLEEP_BEFORE_OFF 3000  // The bigger this number the less flaky the platform
 #define CHAOS_MONKEY_MIN_SLEEP_BEFORE_ON 100
-#define CHAOS_MONKEY_MAX_SLEEP_BEFORE_ON 1000
+#define CHAOS_MONKEY_MAX_SLEEP_BEFORE_ON 2000    // The bigger this number the more flaky the platform
 
 class IntegrationSimulatedFailuresTest : public ::testing::Test {
 
@@ -73,7 +73,7 @@ protected:
                                               "BareMetalHead", "BareMetalHost1", "BareMetalHost2"};
 
         for (auto const &h : hostnames) {
-            xml += "<host id=\"" + h + "\"  speed=\"1f\" core=\"4\"/>\n";
+            xml += "<host id=\"" + h + "\"  speed=\"1f\" core=\"4\"> <prop id=\"ram\" value=\"100\"/> </host>\n";
         }
 
         xml += "<link id=\"link\" bandwidth=\"1kBps\" latency=\"0\"/>\n";
@@ -185,7 +185,7 @@ private:
             // Create my sef of VMs
             try {
                 for (int i = 0; i < 6; i++) {
-                    auto vm_name = this->test->cloud_service->createVM(2, 1000);
+                    auto vm_name = this->test->cloud_service->createVM(2, 45);
                     auto vm_cs = this->test->cloud_service->startVM(vm_name);
                     this->vms[vm_name] = vm_cs;
                     this->vm_used[vm_cs] = false;
@@ -226,6 +226,7 @@ private:
                     } catch (wrench::WorkflowExecutionException &e) {
                         if (e.getCause()->getCauseType() == wrench::FailureCause::NOT_ENOUGH_RESOURCES) {
                             // oh well
+//                            WRENCH_INFO("Cannot start VM");
                         } else {
                             throw;
                         }
@@ -290,7 +291,10 @@ private:
         }
 
         // Create/submit a standard job
-        auto job = this->job_manager->createStandardJob(task, {{*(task->getInputFiles().begin()), target_storage_service}});
+        auto job = this->job_manager->createStandardJob(task, {
+                {*(task->getInputFiles().begin()), target_storage_service},
+                {*(task->getOutputFiles().begin()), target_storage_service},
+        });
         this->job_manager->submitJob(job, target_cs);
 
 //        WRENCH_INFO("Submitted task '%s' to '%s' with files to read from '%s",
@@ -302,7 +306,7 @@ private:
 
     void processEventStandardJobCompletion(std::unique_ptr<wrench::StandardJobCompletedEvent> event) override {
         auto task = *(event->standard_job->getTasks().begin());
-//        WRENCH_INFO("Task '%s' has completed", task->getID().c_str());
+        WRENCH_INFO("Task '%s' has completed", task->getID().c_str());
         if (event->compute_service == this->test->baremetal_service) {
             num_jobs_on_baremetal_cs--;
         } else {
@@ -316,7 +320,7 @@ private:
 
     void processEventStandardJobFailure(std::unique_ptr<wrench::StandardJobFailedEvent> event) override {
         auto task = *(event->standard_job->getTasks().begin());
-//        WRENCH_INFO("Task '%s' has failed: %s", task->getID().c_str(), event->failure_cause->toString().c_str());
+        WRENCH_INFO("Task '%s' has failed: %s", task->getID().c_str(), event->failure_cause->toString().c_str());
         if (event->compute_service == this->test->baremetal_service) {
             num_jobs_on_baremetal_cs--;
         } else {
@@ -335,6 +339,13 @@ TEST_F(IntegrationSimulatedFailuresTest, OneNonFaultyStorageOneFaultyBareMetal) 
     std::map<std::string, bool> args;
     args["storage1"] = false;
     args["baremetal"] = true;
+    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTestTest_test, args);
+}
+
+TEST_F(IntegrationSimulatedFailuresTest, OneFaultyStorageOneNonFaultyBareMetal) {
+    std::map<std::string, bool> args;
+    args["storage1"] = true;
+    args["baremetal"] = false;
     DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTestTest_test, args);
 }
 
@@ -442,8 +453,10 @@ void IntegrationSimulatedFailuresTest::do_IntegrationFailureTestTest_test(std::m
     simulation->add(new wrench::FileRegistryService("WMSHost"));
 
     // Create workflow tasks and stage input file
+    srand(666);
     for (int i=0; i < NUM_TASKS; i++) {
-        auto task = workflow->addTask("task_" + std::to_string(i), 1 + rand() % MAX_TASK_DURATION_WITH_ON_CORE, 1, 3, 1.0, 0);
+//        auto task = workflow->addTask("task_" + std::to_string(i), 1 + rand() % MAX_TASK_DURATION_WITH_ON_CORE, 1, 3, 1.0, 0);
+        auto task = workflow->addTask("task_" + std::to_string(i), MAX_TASK_DURATION_WITH_ON_CORE, 1, 3, 1.0, 40);
         auto input_file = workflow->addFile(task->getID() + ".input", 1 + rand() % 100);
         auto output_file = workflow->addFile(task->getID() + ".output", 1 + rand() % 100);
         task->addInputFile(input_file);
