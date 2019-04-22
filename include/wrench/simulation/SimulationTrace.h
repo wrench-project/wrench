@@ -37,7 +37,7 @@ namespace wrench {
     /***********************/
 
     /***********************/
-    /** \cond DEVELOPER    */
+    /** \cond INTERNAL    */
     /***********************/
 
     /**
@@ -59,9 +59,7 @@ namespace wrench {
           this->trace.push_back(timestamp);
         }
 
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
+
         /**
          * @brief Retrieve the trace as a vector of timestamps
          *
@@ -81,21 +79,11 @@ namespace wrench {
           }
         }
 
-        /***********************/
-        /** \endcond INTERNAL  */
-        /***********************/
 
     private:
         std::vector<SimulationTimestamp<T> *> trace;
     };
 
-    /***********************/
-    /** \endcond DEVELOPER */
-    /***********************/
-
-    /***********************/
-    /** \cond INTERNAL     */
-    /***********************/
 
     /**
      * @brief A specialized class to represent a trace of SimulationTimestampPstateSet timestamps
@@ -158,7 +146,7 @@ namespace wrench {
                 delete timestamp;
             }
         }
-        
+
     private:
         std::map<std::string, size_t> latest_timestamps_by_host;
         std::vector<SimulationTimestamp<SimulationTimestampPstateSet> *> trace;
