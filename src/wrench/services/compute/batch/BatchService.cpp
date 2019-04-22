@@ -1021,8 +1021,11 @@ namespace wrench {
     void BatchService::cleanup(bool has_returned_from_main, int return_value) {
 
 #ifdef ENABLE_BATSCHED
+        // Kill the batsched process
         this->stopBatsched();
 #endif
+        // Do the default behavior (which will throw as this is not a fault-tolerant service)
+        Service::cleanup(has_returned_from_main, return_value);
 
     }
 
