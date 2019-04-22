@@ -60,8 +60,10 @@ wrench::HostStateChangeDetector::HostStateChangeDetector(std::string host_on_whi
 }
 
 void wrench::HostStateChangeDetector::hostStateChangeCallback(std::string const &hostname) {
-    auto host = simgrid::s4u::Host::by_name(hostname);
-    this->hosts_that_have_recently_changed_state.push_back(std::make_pair(hostname, host->is_on()));
+    if (std::find(this->hosts_to_monitor.begin(), this->hosts_to_monitor.end(), hostname) != this->hosts_to_monitor.end()) {
+        auto host = simgrid::s4u::Host::by_name(hostname);
+        this->hosts_that_have_recently_changed_state.push_back(std::make_pair(hostname, host->is_on()));
+    }
 }
 
 
