@@ -131,7 +131,7 @@ namespace wrench {
     *
     * @throw std::invalid_argument
     */
-    double Service::getPropertyValueAsUnsignedLong(std::string property) {
+    unsigned long Service::getPropertyValueAsUnsignedLong(std::string property) {
         unsigned long value;
         std::string string_value;
         try {
