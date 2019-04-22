@@ -50,8 +50,8 @@ namespace wrench {
          */
         void operator()() {
             // TODO: Setting up the on_exit function below to circumvent a SimGrid bug. This could go
-            // TODO: back into the S4U_Daemon class in the future (when SimGrid doesn't "forget"
-            // TODO: on_exit() calls when auto-restarting an actor).
+            //       back into the S4U_Daemon class in the future (when SimGrid doesn't "forget"
+            //       on_exit() calls when auto-restarting an actor).
             this->setupOnExitFunction();
             this->daemon->runMainMethod();
         }

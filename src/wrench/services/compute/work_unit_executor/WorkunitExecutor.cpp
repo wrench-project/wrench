@@ -451,7 +451,7 @@ namespace wrench {
 
             if (!success) {
                 WRENCH_INFO("Failed to create some compute threads...");
-                // TODO: Dangerous to kill these now? (this was commented out before, but seems legit, so Henri uncommented them)
+                // TODO: Dangerous to kill these now?? (this was commented out before, but seems legit, so Henri uncommented them)
                 for (auto const &ct : this->compute_threads) {
                     ct->kill();
                 }

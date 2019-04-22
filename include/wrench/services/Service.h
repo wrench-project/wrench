@@ -44,7 +44,7 @@ namespace wrench {
 
         std::string getPropertyValueAsString(std::string);
         double getPropertyValueAsDouble(std::string);
-        double getPropertyValueAsUnsignedLong(std::string);
+        unsigned long getPropertyValueAsUnsignedLong(std::string);
         bool getPropertyValueAsBoolean(std::string);
 
         void assertServiceIsUp();
