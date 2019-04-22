@@ -21,6 +21,7 @@
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 
 
+
 /***********************/
 /** \cond INTERNAL     */
 /***********************/
@@ -41,20 +42,27 @@ namespace wrench {
          * @param d: a daemon instance
          */
         explicit S4U_DaemonActor(S4U_Daemon *d) {
-          this->daemon = d;
+            this->daemon = d;
         }
 
         /**
          * @brief The S4U way of defining the actor's "main" method
          */
         void operator()() {
-          this->daemon->runMainMethod();
+            // Setting up the on_exit function to circumvent a SimGrid bug. This could go
+            // back into the S4U_Daemon class in the future (when SimGrid doesn't "forget"
+            // on_exit() calls when auto-restarting an actor).
+            this->setupOnExitFunction();
+            this->daemon->runMainMethod();
         }
 
     private:
+
         S4U_Daemon *daemon;
 
-    };
+        void setupOnExitFunction();
+
+        };
 
     /***********************/
     /** \endcond           */

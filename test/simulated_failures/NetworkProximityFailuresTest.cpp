@@ -14,7 +14,7 @@
 
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
-#include "test_util/HostSwitcher.h"
+#include "failure_test_util/HostSwitcher.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(network_proximity_failures, "Log category for NetworkProximityFailuresTest");
 
