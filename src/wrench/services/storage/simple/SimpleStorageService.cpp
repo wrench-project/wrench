@@ -45,8 +45,7 @@ namespace wrench {
     }
 
     void SimpleStorageService::cleanup(bool has_returned_from_main, int return_value) {
-        WRENCH_INFO("In on_exit.cleanup(): SimpleStorageService: %s has_returned_from_main = %d (return_value = %d)",
-                     this->getName().c_str(), has_returned_from_main, return_value);
+       // Do nothing. It's fine to die and we'll just autorestart with our previous state
     }
 
     /**

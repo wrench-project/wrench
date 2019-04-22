@@ -103,13 +103,14 @@ namespace wrench {
      *        should be overriden in a daemons implements some fault-tolerant behavior, or
      *        is naturally tolerant.
      *
-     * @param has_terminated_cleanly: whether the daemon returned from main() by itself
+     * @param has_returned_from_main: whether the daemon returned from main() by itself
      * @param return_value: the return value from main (if has_terminated_cleanly is true)
      *
      * @throw std::runtime_error
      */
-    void S4U_Daemon::cleanup(bool has_terminated_cleanly, int return_value) {
-        if ((not has_terminated_cleanly) and (not S4U_Simulation::isHostOn(hostname))) {
+    void S4U_Daemon::cleanup(bool has_returned_from_main, int return_value) {
+        // Default behavior is to throw in case of any problem
+        if ((not has_returned_from_main) and (not S4U_Simulation::isHostOn(hostname))) {
             throw std::runtime_error("S4U_Daemon::cleanup(): This daemon has died due to a failure of its host, but does not override cleanup() "
                                      "(so that is can implement fault-tolerance or explicitly ignore fault) ");
         }

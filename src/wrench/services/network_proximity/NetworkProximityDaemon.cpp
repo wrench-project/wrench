@@ -81,8 +81,7 @@ namespace wrench {
     }
 
     void NetworkProximityDaemon::cleanup(bool has_returned_from_main, int return_value) {
-        // Do nothing for fault-tolerance
-        return;
+        // Do nothing. It's fine to die and we'll just autorestart with our previous state
     }
 
 

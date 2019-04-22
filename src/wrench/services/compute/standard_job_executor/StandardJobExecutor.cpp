@@ -217,15 +217,12 @@ namespace wrench {
 
     }
 
-    void StandardJobExecutor::cleanup(bool has_terminated_cleanly, int return_value) {
+    void StandardJobExecutor::cleanup(bool has_returned_from_main, int return_value) {
 
-        if ((not has_terminated_cleanly) and (not Simulation::isHostOn(hostname))) {
-            throw std::runtime_error("S4U_Daemon::cleanup(): This daemon has died due to a failure of its host, but does not override cleanup() "
-                                     "(so that is can implement fault-tolerance or explicitly ignore fault) ");
-        }
+        // Do the default behavior (which will throw as this is not a fault-tolerant service)
+        Service::cleanup(has_returned_from_main, return_value);
 
-//        this->host_state_monitor->kill();
-
+        // Cleanup state in case of a restart
         for (auto wue: this->running_workunit_executors) {
             std::shared_ptr<Workunit> wu = wue->workunit;
             if (wu->task != nullptr) {
