@@ -1168,7 +1168,10 @@ private:
 
     int main() {
 
-        // default pstate is set to 1, change it back to 0 so another timestamp is added
+        // default pstate is set to 1, change it back to 0
+        // at time 0.0, the pstate is set to 1 as specified in the platform file,
+        // then again at time 0.0, it is set to pstate 0 and only one timestamp should
+        // be generated for this host at time 0.0
         this->simulation->setPstate(this->getHostname(), 0);
 
         const std::vector<std::string> hostnames = this->simulation->getHostnameList();
@@ -1253,10 +1256,6 @@ void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
                 ],
                 "hostname": "host1",
                 "pstate_trace": [
-                    {
-                        "pstate": 1,
-                        "time": 0.0
-                    },
                     {
                         "pstate": 0,
                         "time": 0.0
