@@ -19,6 +19,8 @@ namespace wrench {
     void S4U_DaemonActor::setupOnExitFunction() {
 
         simgrid::s4u::this_actor::on_exit([this](bool failed) {
+            // Set state to down
+            this->daemon->state = S4U_Daemon::State::DOWN;
             // Call cleanup
             this->daemon->cleanup(daemon->hasReturnedFromMain(), this->daemon->getReturnValue());
             // Free memory for the object unless the service is set to auto-restart
