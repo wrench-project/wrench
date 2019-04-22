@@ -27,7 +27,7 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(comprehensive_failure_integration_test, "Log catego
 #define CHAOS_MONKEY_MIN_SLEEP_BEFORE_OFF 100
 #define CHAOS_MONKEY_MAX_SLEEP_BEFORE_OFF 4000
 #define CHAOS_MONKEY_MIN_SLEEP_BEFORE_ON 100
-#define CHAOS_MONKEY_MAX_SLEEP_BEFORE_ON 10gi00
+#define CHAOS_MONKEY_MAX_SLEEP_BEFORE_ON 1000
 
 class IntegrationSimulatedFailuresTest : public ::testing::Test {
 
