@@ -45,10 +45,12 @@ namespace wrench {
     }
 
 
-    void BareMetalComputeService::cleanup(bool has_terminated_cleanly, int return_value) {
+    void BareMetalComputeService::cleanup(bool has_returned_from_main, int return_value) {
 
-        // All this is useful in case of a restart() of the service
+        // Do the default behavior (which will throw as this is not a fault-tolerant service)
+        Service::cleanup(has_returned_from_main, return_value);
 
+        // Clean up state in case of a restart
         for (auto host : this->compute_resources) {
             this->total_num_cores += std::get<0>(host.second);
             this->ram_availabilities.insert(std::make_pair(host.first, S4U_Simulation::getHostMemoryCapacity(host.first)));

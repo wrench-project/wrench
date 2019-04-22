@@ -65,10 +65,10 @@ namespace wrench {
      * @brief Cleanup method that overrides the base method and does nothing as a compute thread
      *        does not need to implement any particular fault-tolerant behavior (it runs on the
      *        same how as a workunit executor, which is also dead anyway)
-     * @param has_terminated_cleanly: whether the daemon has terminated cleanly (i.e., returned from main)
+     * @param has_returned_from_main: whether the daemon has terminated cleanly (i.e., returned from main)
      * @param return_value: main's return value
      */
-    void ComputeThread::cleanup(bool has_terminated_cleanly, int return_value) {
+    void ComputeThread::cleanup(bool has_returned_from_main, int return_value) {
         return;
     }
 

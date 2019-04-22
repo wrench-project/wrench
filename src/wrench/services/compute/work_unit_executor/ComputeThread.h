@@ -37,7 +37,7 @@ namespace wrench {
         ComputeThread(Simulation *simulation, std::string hostname, double flops, std::string reply_mailbox);
 
         int main() override;
-        void cleanup(bool has_terminated_cleanly, int return_value) override;
+        void cleanup(bool has_returned_from_main, int return_value) override;
 
             void kill();
 
