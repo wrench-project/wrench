@@ -56,6 +56,7 @@ namespace wrench {
         message = S4U_Mailbox::getMessage(mailbox, timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
         if (cause->isTimeout()) {
+            WRENCH_INFO("TIMEOUT");
           return nullptr;
         }
         throw WorkflowExecutionException(cause);
@@ -103,6 +104,12 @@ namespace wrench {
                   new FileCopyFailedEvent(m->file, m->storage_service, m->failure_cause));
         }
       } else {
+        WRENCH_INFO("ASDASDASDAS %s", message->getName().c_str());
+        if (auto m = dynamic_cast<JobManagerStandardJobFailedMessage *>(message.get())) {
+            WRENCH_INFO("WEIRD");
+        } else {
+            WRENCH_INFO("NO WEIRD");
+        }
         throw std::runtime_error(
                 "WorkflowExecutionEvent::waitForNextExecutionEvent(): Non-handled message type when generating execution event");
       }
