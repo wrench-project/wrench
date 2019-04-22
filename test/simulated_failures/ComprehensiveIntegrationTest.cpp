@@ -375,6 +375,15 @@ TEST_F(IntegrationSimulatedFailuresTest, TwoFaultyStorageOneFaultyCloud) {
     DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTestTest_test, args);
 }
 
+TEST_F(IntegrationSimulatedFailuresTest, WholeEnchilada) {
+    std::map<std::string, bool> args;
+    args["storage1"] = true;
+    args["storage2"] = true;
+    args["baremetal"] = true;
+    args["cloud"] = true;
+    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTestTest_test, args);
+}
+
 void IntegrationSimulatedFailuresTest::do_IntegrationFailureTestTest_test(std::map<std::string, bool> args) {
 
     // Create and initialize a simulation
