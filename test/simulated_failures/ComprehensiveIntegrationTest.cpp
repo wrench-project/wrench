@@ -159,6 +159,7 @@ public:
 private:
 
     std::map<std::string, std::shared_ptr<wrench::BareMetalComputeService>> vms;
+    std::map<std::shared_ptr<wrench::BareMetalComputeService>, bool> vm_used;
     IntegrationSimulatedFailuresTest *test;
     std::shared_ptr<wrench::JobManager> job_manager;
     unsigned long num_jobs_on_baremetal_cs = 0;
@@ -187,6 +188,7 @@ private:
                     auto vm_name = this->test->cloud_service->createVM(2, 1000);
                     auto vm_cs = this->test->cloud_service->startVM(vm_name);
                     this->vms[vm_name] = vm_cs;
+                    this->vm_used[vm_cs] = false;
                 }
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error("Should be able to create VMs!!");
@@ -269,14 +271,17 @@ private:
         wrench::ComputeService *target_cs = nullptr;
         for (auto &vm : this->vms) {
             auto vm_cs = vm.second;
-            if (vm_cs->isUp()) {
+            if (vm_cs->isUp() and (not this->vm_used[vm_cs])) {
                 target_cs = vm_cs.get();
+                this->vm_used[vm_cs] = true;
                 break;
             }
         }
+
         if ((target_cs == nullptr) and (this->test->baremetal_service != nullptr)) {
             if (num_jobs_on_baremetal_cs < max_num_jobs_on_baremetal_cs) {
                 target_cs = this->test->baremetal_service;
+                num_jobs_on_baremetal_cs++;
             }
         }
 
@@ -287,9 +292,7 @@ private:
         // Create/submit a standard job
         auto job = this->job_manager->createStandardJob(task, {{*(task->getInputFiles().begin()), target_storage_service}});
         this->job_manager->submitJob(job, target_cs);
-        if (target_cs == this->test->baremetal_service) {
-            num_jobs_on_baremetal_cs++;
-        }
+
 //        WRENCH_INFO("Submitted task '%s' to '%s' with files to read from '%s",
 //                    task->getID().c_str(),
 //                    target_cs->getName().c_str(),
@@ -302,6 +305,12 @@ private:
 //        WRENCH_INFO("Task '%s' has completed", task->getID().c_str());
         if (event->compute_service == this->test->baremetal_service) {
             num_jobs_on_baremetal_cs--;
+        } else {
+            for (auto const &u : this->vm_used) {
+                if (u.first.get() == event->compute_service) {
+                    this->vm_used[u.first] = false;
+                }
+            }
         }
     }
 
@@ -310,6 +319,12 @@ private:
 //        WRENCH_INFO("Task '%s' has failed: %s", task->getID().c_str(), event->failure_cause->toString().c_str());
         if (event->compute_service == this->test->baremetal_service) {
             num_jobs_on_baremetal_cs--;
+        } else {
+            for (auto const &u : this->vm_used) {
+                if (u.first.get() == event->compute_service) {
+                    this->vm_used[u.first] = false;
+                }
+            }
         }
     }
 
