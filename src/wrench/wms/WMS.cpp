@@ -163,14 +163,27 @@ namespace wrench {
 
     /**
      * @brief Wait for a workflow execution event and then call the associated function to process that event
-     *
-     * @throw wrench::WorkflowExecutionException
      */
     void WMS::waitForAndProcessNextEvent() {
-      std::unique_ptr<WorkflowExecutionEvent> event = workflow->waitForNextExecutionEvent();
+        this->waitForAndProcessNextEvent(-1.0);
+    }
+
+    /**
+     * @brief Wait for a workflow execution event and then call the associated function to process that event
+     * @param timeout: a timeout value in seconds
+     *
+     * @return false if a timeout occurred (in which case no event was received/processed)
+     * @throw wrench::WorkflowExecutionException
+     */
+    bool WMS::waitForAndProcessNextEvent(double timeout) {
+
+      std::unique_ptr<WorkflowExecutionEvent> event = workflow->waitForNextExecutionEvent(timeout);
+      if (event == nullptr) {
+          return false;
+      }
+
       WorkflowExecutionEvent *event_ptr = event.release();
 
-      
       switch (event_ptr->type) {
         case WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
           processEventStandardJobCompletion(std::unique_ptr<StandardJobCompletedEvent>(
@@ -207,6 +220,7 @@ namespace wrench {
                                    std::to_string(event->type) + "'");
         }
       }
+      return true;
     }
 
     /**

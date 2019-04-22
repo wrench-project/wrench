@@ -391,6 +391,16 @@ namespace wrench {
     }
 
     /**
+    * @brief Wait for the next worklow execution event
+    * @param timeout: a timeout value in seconds
+    *
+    * @return a workflow execution event, or nullptr if a timeout occurred
+    */
+    std::unique_ptr<WorkflowExecutionEvent> Workflow::waitForNextExecutionEvent(double timeout) {
+      return WorkflowExecutionEvent::waitForNextExecutionEvent(this->callback_mailbox, timeout);
+    }
+
+    /**
      * @brief Get the mailbox name associated to this workflow
      *
      * @return the mailbox name

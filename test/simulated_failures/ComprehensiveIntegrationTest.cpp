@@ -24,8 +24,10 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(comprehensive_failure_integration_test, "Log catego
 
 #define NUM_TASKS 100
 #define MAX_TASK_DURATION_WITH_ON_CORE 3600
-#define CHAOS_MONKEY_MIN_SLEEP 100
-#define CHAOS_MONKEY_MAX_SLEEP 4000
+#define CHAOS_MONKEY_MIN_SLEEP_BEFORE_OFF 100
+#define CHAOS_MONKEY_MAX_SLEEP_BEFORE_OFF 4000
+#define CHAOS_MONKEY_MIN_SLEEP_BEFORE_ON 100
+#define CHAOS_MONKEY_MAX_SLEEP_BEFORE_ON 10gi00
 
 class IntegrationSimulatedFailuresTest : public ::testing::Test {
 
@@ -97,9 +99,14 @@ protected:
         xml += createRoute("StorageHost1", "CloudHost1", {"linkstorage1", "linkcloud", "linkcloudinternal"});
         xml += createRoute("StorageHost1", "CloudHost2", {"linkstorage1", "linkcloud", "linkcloudinternal"});
         xml += createRoute("StorageHost1", "CloudHost3", {"linkstorage1", "linkcloud", "linkcloudinternal"});
+        xml += createRoute("StorageHost2", "CloudHost1", {"linkstorage2", "linkcloud", "linkcloudinternal"});
+        xml += createRoute("StorageHost2", "CloudHost2", {"linkstorage2", "linkcloud", "linkcloudinternal"});
+        xml += createRoute("StorageHost2", "CloudHost3", {"linkstorage2", "linkcloud", "linkcloudinternal"});
 
         xml += createRoute("StorageHost1", "BareMetalHost1", {"linkstorage1", "linkbaremetal", "linkbaremetalinternal"});
         xml += createRoute("StorageHost1", "BareMetalHost2", {"linkstorage1", "linkbaremetal", "linkbaremetalinternal"});
+        xml += createRoute("StorageHost2", "BareMetalHost1", {"linkstorage2", "linkbaremetal", "linkbaremetalinternal"});
+        xml += createRoute("StorageHost2", "BareMetalHost2", {"linkstorage2", "linkbaremetal", "linkbaremetalinternal"});
 
         xml += "   </zone> \n"
                "</platform>\n";
@@ -157,12 +164,14 @@ private:
     unsigned long num_jobs_on_baremetal_cs = 0;
     unsigned long max_num_jobs_on_baremetal_cs = 4;
 
-    void createMonkey(std::string victimhost) {
+    void createMonkey(std::string victimhost, double alpha = 1.0) {
         static unsigned long seed = 666;
         seed = seed * 17 + 37;
         auto switcher = std::shared_ptr<wrench::HostRandomRepeatSwitcher>(
                 new wrench::HostRandomRepeatSwitcher("WMSHost", seed,
-                                                     CHAOS_MONKEY_MIN_SLEEP, CHAOS_MONKEY_MAX_SLEEP, victimhost));
+                                                     CHAOS_MONKEY_MIN_SLEEP_BEFORE_OFF, CHAOS_MONKEY_MAX_SLEEP_BEFORE_OFF,
+                                                     CHAOS_MONKEY_MIN_SLEEP_BEFORE_ON, CHAOS_MONKEY_MAX_SLEEP_BEFORE_ON,
+                                                     victimhost));
         switcher->simulation = this->simulation;
         switcher->start(switcher, true, false); // Daemonized, no auto-restart
     }
@@ -216,13 +225,17 @@ private:
 
             while (scheduleAReadyTask()) {}
 
-            this->waitForAndProcessNextEvent();
+            if (not this->waitForAndProcessNextEvent(50.00)) {
+//                WRENCH_INFO("TIMEOUT");
+            }
         }
+        WRENCH_INFO("WORKFLOW DONE!");
 
         return 0;
     }
 
     bool scheduleAReadyTask() {
+
         // Find a ready task
         wrench::WorkflowTask *task = nullptr;
         for (auto const &t : this->getWorkflow()->getTasks()) {
@@ -235,7 +248,6 @@ private:
 
         // Pick a storage service
         wrench::StorageService *target_storage_service;
-
 
         if (this->test->storage_service1 and this->test->storage_service1->isUp()) {
             target_storage_service = this->test->storage_service1;
@@ -270,16 +282,16 @@ private:
         if (target_cs == this->test->baremetal_service) {
             num_jobs_on_baremetal_cs++;
         }
-        WRENCH_INFO("Submitted task '%s' to '%s' with files to read from '%s",
-                    task->getID().c_str(),
-                    target_cs->getName().c_str(),
-                    target_storage_service->getName().c_str());
+//        WRENCH_INFO("Submitted task '%s' to '%s' with files to read from '%s",
+//                    task->getID().c_str(),
+//                    target_cs->getName().c_str(),
+//                    target_storage_service->getName().c_str());
         return true;
     }
 
     void processEventStandardJobCompletion(std::unique_ptr<wrench::StandardJobCompletedEvent> event) override {
         auto task = *(event->standard_job->getTasks().begin());
-        WRENCH_INFO("Task '%s' has completed", task->getID().c_str());
+//        WRENCH_INFO("Task '%s' has completed", task->getID().c_str());
         if (event->compute_service == this->test->baremetal_service) {
             num_jobs_on_baremetal_cs--;
         }
