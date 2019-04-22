@@ -130,7 +130,7 @@ namespace wrench {
      *
      * @return a set of compute services
      */
-    std::set<std::shared_ptr<ComputeService>> WMS::getAvailableComputeServices() {
+    std::set<ComputeService *> WMS::getAvailableComputeServices() {
       return this->compute_services;
     }
 
