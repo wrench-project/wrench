@@ -218,8 +218,16 @@ private:
 
             // Try to restart down VMs
             for (auto const &vm : this->vms) {
-                if (not vm.second->isUp()) {
-                    this->test->cloud_service->startVM(vm.first);
+                if (this->test->cloud_service->isVMDown(vm.first)) {
+                    try {
+                        this->test->cloud_service->startVM(vm.first);
+                    } catch (wrench::WorkflowExecutionException &e) {
+                        if (e.getCause()->getCauseType() == wrench::FailureCause::NOT_ENOUGH_RESOURCES) {
+                            // oh well
+                        } else {
+                            throw;
+                        }
+                    }
                 }
             }
 
@@ -327,6 +335,28 @@ TEST_F(IntegrationSimulatedFailuresTest, TwoFaultyStorageOneFaultyBareMetal) {
     args["storage1"] = true;
     args["storage2"] = true;
     args["baremetal"] = true;
+    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTestTest_test, args);
+}
+
+TEST_F(IntegrationSimulatedFailuresTest, OneNonFaultyStorageOneFaultyCloud) {
+    std::map<std::string, bool> args;
+    args["storage1"] = false;
+    args["cloud"] = true;
+    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTestTest_test, args);
+}
+
+TEST_F(IntegrationSimulatedFailuresTest, OneFaultyStorageOneFaultyCloud) {
+    std::map<std::string, bool> args;
+    args["storage1"] = true;
+    args["cloud"] = true;
+    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTestTest_test, args);
+}
+
+TEST_F(IntegrationSimulatedFailuresTest, TwoFaultyStorageOneFaultyCloud) {
+    std::map<std::string, bool> args;
+    args["storage1"] = true;
+    args["storage2"] = true;
+    args["cloud"] = true;
     DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTestTest_test, args);
 }
 

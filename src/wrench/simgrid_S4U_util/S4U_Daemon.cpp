@@ -139,7 +139,6 @@ namespace wrench {
      */
     void S4U_Daemon::startDaemon(bool daemonized, bool auto_restart) {
 
-        WRENCH_INFO("IN START DAEMON: %s", this->getName().c_str());
         // Check that there is a lifesaver
         if (not this->life_saver) {
             throw std::runtime_error(

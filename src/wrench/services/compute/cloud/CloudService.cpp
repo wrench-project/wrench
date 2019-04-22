@@ -925,7 +925,7 @@ namespace wrench {
 
             // Did we find a viable host?
             if (picked_host.empty()) {
-                WRENCH_INFO("Not enough resources to create the VM");
+                WRENCH_INFO("Not enough resources to start the VM");
                 msg_to_send_back =
                         new CloudServiceStartVMAnswerMessage(
                                 false,
