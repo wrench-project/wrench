@@ -70,6 +70,7 @@ namespace wrench {
         /** \cond INTERNAL     */
         /***********************/
         static std::unique_ptr<WorkflowExecutionEvent> waitForNextExecutionEvent(std::string);
+        static std::unique_ptr<WorkflowExecutionEvent> waitForNextExecutionEvent(std::string, double timeout);
         virtual ~WorkflowExecutionEvent() = default;
 
     protected:

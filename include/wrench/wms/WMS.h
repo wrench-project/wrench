@@ -76,6 +76,7 @@ namespace wrench {
         FileRegistryService * getAvailableFileRegistryService();
 
         void waitForAndProcessNextEvent();
+        bool waitForAndProcessNextEvent(double timeout);
 
         virtual void processEventStandardJobCompletion(std::unique_ptr<StandardJobCompletedEvent>);
 

@@ -370,14 +370,14 @@ private:
             // Starting a FailedHost1 random repeat switch!!
             unsigned long seed1 = trial * 3 + 137;
             auto switch1 = std::shared_ptr<wrench::HostRandomRepeatSwitcher>(
-                    new wrench::HostRandomRepeatSwitcher("StableHost", seed1, 10, 100, "FailedHost1"));
+                    new wrench::HostRandomRepeatSwitcher("StableHost", seed1, 10, 100, 10, 100, "FailedHost1"));
             switch1->simulation = this->simulation;
             switch1->start(switch1, true, false); // Daemonized, no auto-restart
 
             // Starting a FailedHost2 random repeat switch!!
             unsigned long seed2 = trial * 11 + 317;
             auto switch2 = std::shared_ptr<wrench::HostRandomRepeatSwitcher>(
-                    new wrench::HostRandomRepeatSwitcher("StableHost", seed2, 10, 100, "FailedHost2"));
+                    new wrench::HostRandomRepeatSwitcher("StableHost", seed2, 10, 100, 10, 100, "FailedHost2"));
             switch2->simulation = this->simulation;
             switch2->start(switch2, true, false); // Daemonized, no auto-restart
 

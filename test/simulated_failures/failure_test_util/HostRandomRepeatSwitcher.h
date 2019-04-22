@@ -15,12 +15,15 @@
 
 namespace wrench {
 
-class HostRandomRepeatSwitcher : public Service {
+    class HostRandomRepeatSwitcher : public Service {
 
     public:
 
 
-        explicit HostRandomRepeatSwitcher(std::string host_on_which_to_run, double seed, double min_sleep_time, double max_sleep_time, std::string host_to_switch);
+        explicit HostRandomRepeatSwitcher(std::string host_on_which_to_run, double seed,
+                                          double min_sleep_before_off_time, double max_sleep_before_off_time,
+                                          double min_sleep_before_on_time, double max_sleep_before_on_time,
+                                          std::string host_to_switch);
 
         void kill();
 
@@ -31,8 +34,10 @@ class HostRandomRepeatSwitcher : public Service {
     private:
 
         double seed;
-        double min_sleep_time;
-        double max_sleep_time;
+        double min_sleep_before_off_time;
+        double max_sleep_before_off_time;
+        double min_sleep_before_on_time;
+        double max_sleep_before_on_time;
         std::string host_to_switch;
         int main();
 

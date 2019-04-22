@@ -34,15 +34,32 @@ namespace wrench {
      * @throw std::runtime_error
      */
     std::unique_ptr<WorkflowExecutionEvent> WorkflowExecutionEvent::waitForNextExecutionEvent(std::string mailbox) {
+      return WorkflowExecutionEvent::waitForNextExecutionEvent(mailbox, -1);
+    }
+
+    /**
+     * @brief Block the calling process until a WorkflowExecutionEvent is generated
+     *        based on messages received on a mailbox, or until a timeout ooccurs
+     *
+     * @param mailbox: the name of the receiving mailbox
+     * @param timeout: a timeout value in seconds
+     * @return a workflow execution event (or nullptr in case of a timeout)
+     *
+     * @throw WorkflowExecutionException
+     * @throw std::runtime_error
+     */
+    std::unique_ptr<WorkflowExecutionEvent> WorkflowExecutionEvent::waitForNextExecutionEvent(std::string mailbox, double timeout) {
 
       // Get the message from the mailbox_name
       std::unique_ptr<SimulationMessage> message = nullptr;
       try {
-        message = S4U_Mailbox::getMessage(mailbox);
+        message = S4U_Mailbox::getMessage(mailbox, timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
+        if (cause->isTimeout()) {
+          return nullptr;
+        }
         throw WorkflowExecutionException(cause);
       }
-
 
       if (auto m = dynamic_cast<JobManagerStandardJobDoneMessage *>(message.get())) {
         // Update task states
@@ -52,7 +69,7 @@ namespace wrench {
           task->setState(state);
         }
         return std::unique_ptr<StandardJobCompletedEvent>(
-          new StandardJobCompletedEvent(m->job, m->compute_service));
+                new StandardJobCompletedEvent(m->job, m->compute_service));
 
       } else if (auto m = dynamic_cast<JobManagerStandardJobFailedMessage *>(message.get())) {
         // Update task states
@@ -73,8 +90,8 @@ namespace wrench {
                 new PilotJobStartedEvent(m->job, m->compute_service));
 
       } else if (auto m = dynamic_cast<ComputeServicePilotJobExpiredMessage *>(message.get())) {
-      return std::unique_ptr<PilotJobExpiredEvent>(
-              new PilotJobExpiredEvent(m->job, m->compute_service));
+        return std::unique_ptr<PilotJobExpiredEvent>(
+                new PilotJobExpiredEvent(m->job, m->compute_service));
 
       } else if (auto m = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {
         if (m->success) {

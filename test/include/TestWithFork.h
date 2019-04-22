@@ -10,6 +10,8 @@
 #ifndef WRENCH_TESTWITHFORK_H_H
 #define WRENCH_TESTWITHFORK_H_H
 
+#include <stdlib.h>
+
 // Convenient macro to launch a test inside a separate process
 // and check the exit code, which denotes an error
 #define DO_TEST_WITH_FORK(function){ \

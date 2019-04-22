@@ -80,6 +80,7 @@ namespace wrench {
     }
 
     void WorkunitExecutor::cleanup(bool has_returned_from_main, int return_value) {
+
         WRENCH_DEBUG("In on_exit.cleanup(): WorkunitExecutor: %s has_returned_from_main = %d (return_value = %d, job forcefully terminated = %d)",
                      this->getName().c_str(), has_returned_from_main, return_value, this->terminated_due_job_being_forcefully_terminated);
         if ((not has_returned_from_main) and (this->task_start_timestamp_has_been_inserted) and
