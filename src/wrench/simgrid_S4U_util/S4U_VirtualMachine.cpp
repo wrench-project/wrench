@@ -72,8 +72,6 @@ namespace wrench {
     */
     void S4U_VirtualMachine::start(std::string &pm_name) {
 
-        WRENCH_INFO("IN S4U_VirtualMachine::start()");
-
         if (this->state != State::DOWN) {
             throw std::runtime_error("S4U_VirtualMachine::suspend(): Cannot suspend a VM that's in state " + this->getStateAsString());
         }
