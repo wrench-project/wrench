@@ -24,4 +24,16 @@
                                       } \
                                    }
 
+#define DO_TEST_WITH_FORK_ONE_ARG(function, arg){ \
+                                      pid_t pid = fork(); \
+                                      if (pid) { \
+                                        int exit_code; \
+                                        waitpid(pid, &exit_code, 0); \
+                                        ASSERT_EQ(exit_code, 0); \
+                                      } else { \
+                                        this->function(arg); \
+                                        exit((::testing::Test::HasFailure() ? 666 : 0)); \
+                                      } \
+                                   }
+
 #endif //WRENCH_TESTWITHFORK_H_H

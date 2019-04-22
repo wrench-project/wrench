@@ -1,3 +1,4 @@
+
 /**
  * Copyright (c) 2017. The WRENCH Team.
  *
@@ -8,6 +9,26 @@
  *
  */
 
+#include "S4U_DaemonActor.h"
+#include <xbt/log.h>
+
+            XBT_LOG_NEW_DEFAULT_CATEGORY(s4u_daemon_actor, "Log category for S4U_DaemonActor");
+
 namespace wrench {
+
+    void S4U_DaemonActor::setupOnExitFunction() {
+
+        simgrid::s4u::this_actor::on_exit([this](bool failed) {
+            // Call cleanup
+            this->daemon->cleanup(daemon->hasReturnedFromMain(), this->daemon->getReturnValue());
+            // Free memory for the object unless the service is set to auto-restart
+            if (not this->daemon->isSetToAutoRestart()) {
+                auto life_saver = this->daemon->life_saver;
+                this->daemon->life_saver = nullptr;
+                delete life_saver;
+            }
+            return 0;
+        });
+    }
 
 };

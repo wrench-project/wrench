@@ -13,8 +13,8 @@
 #include "../../../wrench/src/wrench/services/compute/standard_job_executor/StandardJobExecutorMessage.h"
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
-#include "test_util/HostSwitcher.h"
-#include "test_util/HostRandomRepeatSwitcher.h"
+#include "failure_test_util/HostSwitcher.h"
+#include "failure_test_util/HostRandomRepeatSwitcher.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(standard_job_executor_simulated_failures_test, "Log category for StandardJobExecutorSimulatedFailuresTests");
 

@@ -20,8 +20,7 @@
 
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(s4u_simulation, "Log category for S4U_"
-                                             "Simulation");
+XBT_LOG_NEW_DEFAULT_CATEGORY(s4u_simulation, "Log category for S4U_Simulation");
 
 
 namespace wrench {

@@ -13,10 +13,10 @@
 
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
-#include "test_util/HostSwitcher.h"
+#include "failure_test_util/HostSwitcher.h"
 #include "wrench/services/helpers/ServiceTerminationDetector.h"
-#include "./test_util/SleeperVictim.h"
-#include "./test_util/ComputerVictim.h"
+#include "./failure_test_util/SleeperVictim.h"
+#include "./failure_test_util/ComputerVictim.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(service_start_restart_test, "Log category for ServiceStartRestartTest");
 

@@ -80,6 +80,7 @@ namespace wrench {
 
         void resumeActor();
 
+
         std::string getName();
 
         /** @brief Daemon states */
@@ -118,7 +119,8 @@ namespace wrench {
 
         std::shared_ptr<S4U_Daemon> getSharedPtr();
     private:
-        // Lock use typically to prevent kill() from killing the actor
+
+        // Lock used typically to prevent kill() from killing the actor
         // while it's in the middle of doing something critical
         simgrid::s4u::MutexPtr daemon_lock;
 
