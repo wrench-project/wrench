@@ -13,10 +13,10 @@
 
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
-#include "test_util/HostSwitcher.h"
 #include "wrench/services/helpers/ServiceTerminationDetector.h"
-#include "./test_util/SleeperVictim.h"
-#include "./test_util/ComputerVictim.h"
+#include "./failure_test_util/HostSwitcher.h"
+#include "./failure_test_util/SleeperVictim.h"
+#include "./failure_test_util/ComputerVictim.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(storage_service_start_restart_test, "Log category for StorageServiceStartRestartTest");
 
@@ -120,6 +120,28 @@ private:
             throw std::runtime_error("Should  have been able to read the file (second attempt)");
         }
 
+        // Starting a FailedHost murderer!!
+        murderer = std::shared_ptr<wrench::HostSwitcher>(new wrench::HostSwitcher("StableHost", 100, "FailedHost", wrench::HostSwitcher::Action::TURN_OFF));
+        murderer->simulation = this->simulation;
+        murderer->start(murderer, true, false); // Daemonized, no auto-restart
+
+        // Starting a FailedHost resurector!!
+        resurector = std::shared_ptr<wrench::HostSwitcher>(new wrench::HostSwitcher("StableHost", 500, "FailedHost", wrench::HostSwitcher::Action::TURN_ON));
+        resurector->simulation = this->simulation;
+        resurector->start(murderer, true, false); // Daemonized, no auto-restart
+
+        try {
+            storage_service->readFile(file);
+            throw std::runtime_error("Should not have been able to read the file (first attempt)");
+        } catch (wrench::WorkflowExecutionException &e) {
+            // Expected
+        }
+        wrench::Simulation::sleep(1000);
+        try {
+            storage_service->readFile(file);
+        } catch (wrench::WorkflowExecutionException &e) {
+            throw std::runtime_error("Should  have been able to read the file (second attempt)");
+        }
 
         return 0;
     }

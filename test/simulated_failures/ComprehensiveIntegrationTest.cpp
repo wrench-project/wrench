@@ -13,27 +13,33 @@
 
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
-#include "test_util/HostSwitcher.h"
+#include "failure_test_util/HostSwitcher.h"
 #include "wrench/services/helpers/ServiceTerminationDetector.h"
-#include "./test_util/SleeperVictim.h"
-#include "./test_util/ComputerVictim.h"
+#include "./failure_test_util/SleeperVictim.h"
+#include "./failure_test_util/ComputerVictim.h"
+#include "failure_test_util/HostRandomRepeatSwitcher.h"
+
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(comprehensive_failure_integration_test, "Log category for ComprehesiveIntegrationFailureTest");
 
-#define NUM_TASKS 10
+#define NUM_TASKS 100
+#define MAX_TASK_DURATION_WITH_ON_CORE 3600
+#define CHAOS_MONKEY_MIN_SLEEP 100
+#define CHAOS_MONKEY_MAX_SLEEP 4000
 
 class IntegrationSimulatedFailuresTest : public ::testing::Test {
 
 public:
     wrench::Workflow *workflow;
     std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
+    std::map<std::string, bool> faulty_map;
 
-    wrench::StorageService *storage_service1;
-    wrench::StorageService *storage_service2;
-    wrench::ComputeService *cloud_service;
-    wrench::ComputeService *baremetal_service;
+    wrench::StorageService *storage_service1 = nullptr;
+    wrench::StorageService *storage_service2 = nullptr;
+    wrench::CloudService *cloud_service = nullptr;
+    wrench::BareMetalComputeService *baremetal_service = nullptr;
 
-    void do_IntegrationFailureTestTest_test();
+    void do_IntegrationFailureTestTest_test(std::map<std::string, bool> args);
 
 
 protected:
@@ -123,6 +129,7 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
+
 };
 
 
@@ -144,20 +151,174 @@ public:
 
 private:
 
+    std::map<std::string, std::shared_ptr<wrench::BareMetalComputeService>> vms;
     IntegrationSimulatedFailuresTest *test;
+    std::shared_ptr<wrench::JobManager> job_manager;
+    unsigned long num_jobs_on_baremetal_cs = 0;
+    unsigned long max_num_jobs_on_baremetal_cs = 4;
+
+    void createMonkey(std::string victimhost) {
+        static unsigned long seed = 666;
+        seed = seed * 17 + 37;
+        auto switcher = std::shared_ptr<wrench::HostRandomRepeatSwitcher>(
+                new wrench::HostRandomRepeatSwitcher("WMSHost", seed,
+                                                     CHAOS_MONKEY_MIN_SLEEP, CHAOS_MONKEY_MAX_SLEEP, victimhost));
+        switcher->simulation = this->simulation;
+        switcher->start(switcher, true, false); // Daemonized, no auto-restart
+    }
 
     int main() override {
 
+        this->job_manager = createJobManager();
+
+        if (this->test->faulty_map.find("cloud") != this->test->faulty_map.end()) {
+            // Create my sef of VMs
+            try {
+                for (int i = 0; i < 6; i++) {
+                    auto vm_name = this->test->cloud_service->createVM(2, 1000);
+                    auto vm_cs = this->test->cloud_service->startVM(vm_name);
+                    this->vms[vm_name] = vm_cs;
+                }
+            } catch (wrench::WorkflowExecutionException &e) {
+                throw std::runtime_error("Should be able to create VMs!!");
+            }
+        }
+
+        // Creating Chaos Monkeys
+        for (auto const &faulty : this->test->faulty_map) {
+            if (not faulty.second) {
+                continue;
+            }
+            if (faulty.first == "cloud") {
+                createMonkey("CloudHost1");
+                createMonkey("CloudHost2");
+                createMonkey("CloudHost3");
+
+            } else if (faulty.first == "baremetal") {
+                createMonkey("BareMetalHost1");
+                createMonkey("BareMetalHost2");
+            } else if (faulty.first == "storage1") {
+                createMonkey("StorageHost1");
+            } else if (faulty.first == "storage2") {
+                createMonkey("StorageHost2");
+            }
+        }
+
+
+        while (not this->getWorkflow()->isDone()) {
+
+            // Try to restart down VMs
+            for (auto const &vm : this->vms) {
+                if (not vm.second->isUp()) {
+                    this->test->cloud_service->startVM(vm.first);
+                }
+            }
+
+            while (scheduleAReadyTask()) {}
+
+            this->waitForAndProcessNextEvent();
+        }
 
         return 0;
     }
+
+    bool scheduleAReadyTask() {
+        // Find a ready task
+        wrench::WorkflowTask *task = nullptr;
+        for (auto const &t : this->getWorkflow()->getTasks()) {
+            if (t->getState() == wrench::WorkflowTask::READY) {
+                task = t;
+                break;
+            }
+        }
+        if (not task) return false; // no ready task right now
+
+        // Pick a storage service
+        wrench::StorageService *target_storage_service;
+
+
+        if (this->test->storage_service1 and this->test->storage_service1->isUp()) {
+            target_storage_service = this->test->storage_service1;
+        } else if (this->test->storage_service2 and this->test->storage_service2->isUp()) {
+            target_storage_service = this->test->storage_service2;
+        } else {
+            return false;
+        }
+
+        // Pick a compute resource (trying the cloud first)
+        wrench::ComputeService *target_cs = nullptr;
+        for (auto &vm : this->vms) {
+            auto vm_cs = vm.second;
+            if (vm_cs->isUp()) {
+                target_cs = vm_cs.get();
+                break;
+            }
+        }
+        if ((target_cs == nullptr) and (this->test->baremetal_service != nullptr)) {
+            if (num_jobs_on_baremetal_cs < max_num_jobs_on_baremetal_cs) {
+                target_cs = this->test->baremetal_service;
+            }
+        }
+
+        if (target_cs == nullptr) {
+            return false;
+        }
+
+        // Create/submit a standard job
+        auto job = this->job_manager->createStandardJob(task, {{*(task->getInputFiles().begin()), target_storage_service}});
+        this->job_manager->submitJob(job, target_cs);
+        if (target_cs == this->test->baremetal_service) {
+            num_jobs_on_baremetal_cs++;
+        }
+        WRENCH_INFO("Submitted task '%s' to '%s' with files to read from '%s",
+                    task->getID().c_str(),
+                    target_cs->getName().c_str(),
+                    target_storage_service->getName().c_str());
+        return true;
+    }
+
+    void processEventStandardJobCompletion(std::unique_ptr<wrench::StandardJobCompletedEvent> event) override {
+        auto task = *(event->standard_job->getTasks().begin());
+        WRENCH_INFO("Task '%s' has completed", task->getID().c_str());
+        if (event->compute_service == this->test->baremetal_service) {
+            num_jobs_on_baremetal_cs--;
+        }
+    }
+
+    void processEventStandardJobFailure(std::unique_ptr<wrench::StandardJobFailedEvent> event) override {
+        auto task = *(event->standard_job->getTasks().begin());
+//        WRENCH_INFO("Task '%s' has failed: %s", task->getID().c_str(), event->failure_cause->toString().c_str());
+        if (event->compute_service == this->test->baremetal_service) {
+            num_jobs_on_baremetal_cs--;
+        }
+    }
+
+
 };
 
-TEST_F(IntegrationSimulatedFailuresTest, StorageServiceReStartTest) {
-    DO_TEST_WITH_FORK(do_IntegrationFailureTestTest_test);
+TEST_F(IntegrationSimulatedFailuresTest, OneNonFaultyStorageOneFaultyBareMetal) {
+    std::map<std::string, bool> args;
+    args["storage1"] = false;
+    args["baremetal"] = true;
+    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTestTest_test, args);
 }
 
-void IntegrationSimulatedFailuresTest::do_IntegrationFailureTestTest_test() {
+TEST_F(IntegrationSimulatedFailuresTest, OneFaultyStorageOneFaultyBareMetal) {
+    std::map<std::string, bool> args;
+    args["storage1"] = true;
+    args["baremetal"] = true;
+    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTestTest_test, args);
+}
+
+TEST_F(IntegrationSimulatedFailuresTest, TwoFaultyStorageOneFaultyBareMetal) {
+    std::map<std::string, bool> args;
+    args["storage1"] = true;
+    args["storage2"] = true;
+    args["baremetal"] = true;
+    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTestTest_test, args);
+}
+
+void IntegrationSimulatedFailuresTest::do_IntegrationFailureTestTest_test(std::map<std::string, bool> args) {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
@@ -165,52 +326,69 @@ void IntegrationSimulatedFailuresTest::do_IntegrationFailureTestTest_test() {
     auto argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("failure_test");
 
+    this->faulty_map = args;
+
     simulation->init(&argc, argv);
 
     // Setting up the platform
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Create Storage Services
-    this->storage_service1 = simulation->add(new wrench::SimpleStorageService("StorageHost1", 10000000000000.0));
-    this->storage_service2 = simulation->add(new wrench::SimpleStorageService("StorageHost2", 10000000000000.0));
+    if (args.find("storage1") != args.end()) {
+        this->storage_service1 = simulation->add(new wrench::SimpleStorageService("StorageHost1", 10000000000000.0));
+    }
+    if (args.find("storage2") != args.end()) {
+        this->storage_service2 = simulation->add(new wrench::SimpleStorageService("StorageHost2", 10000000000000.0));
+    }
+
+    ASSERT_TRUE((this->storage_service1 != nullptr) or (this->storage_service2 != nullptr));
 
     // Create BareMetal Service
-    this->baremetal_service = simulation->add(new wrench::BareMetalComputeService(
-            "BareMetalHead",
-            (std::map<std::string, std::tuple<unsigned long, double>>){
-                    std::make_pair("BareMetalHost1", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)),
-                    std::make_pair("BareMetalHost2", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)),
-            },
-            100.0,
-            {}, {}));
+    if (args.find("baremetal") != args.end()) {
+        this->baremetal_service = (wrench::BareMetalComputeService *) simulation->add(
+                new wrench::BareMetalComputeService(
+                        "BareMetalHead",
+                        (std::map<std::string, std::tuple<unsigned long, double>>) {
+                                std::make_pair("BareMetalHost1", std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                 wrench::ComputeService::ALL_RAM)),
+                                std::make_pair("BareMetalHost2", std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                 wrench::ComputeService::ALL_RAM)),
+                        },
+                        100.0,
+                        {}, {}));
+    }
 
     // Create Cloud Service
-    std::string cloudhead = "CloudHead";
-    std::vector<std::string> cloudhosts;
-    cloudhosts.push_back("CloudHost1");
-    cloudhosts.push_back("CloudHost2");
-    cloudhosts.push_back("CloudHost3");
-    this->cloud_service = simulation->add(new wrench::CloudService(
-//            "CloudHead",
-            cloudhead,
-            cloudhosts,
-            1000000.0,
-            {}, {}));
+    if (args.find("cloud") != args.end()) {
+        std::string cloudhead = "CloudHead";
+        std::vector<std::string> cloudhosts;
+        cloudhosts.push_back("CloudHost1");
+        cloudhosts.push_back("CloudHost2");
+        cloudhosts.push_back("CloudHost3");
+        this->cloud_service = (wrench::CloudService *) simulation->add(new wrench::CloudService(
+                cloudhead,
+                cloudhosts,
+                1000000.0,
+                {}, {}));
+    }
 
     // Create a FileRegistryService
     simulation->add(new wrench::FileRegistryService("WMSHost"));
 
     // Create workflow tasks and stage input file
     for (int i=0; i < NUM_TASKS; i++) {
-        auto task = workflow->addTask("task_" + std::to_string(i), 1 + rand() % 3600, 1, 3, 1.0, 0);
+        auto task = workflow->addTask("task_" + std::to_string(i), 1 + rand() % MAX_TASK_DURATION_WITH_ON_CORE, 1, 3, 1.0, 0);
         auto input_file = workflow->addFile(task->getID() + ".input", 1 + rand() % 100);
         auto output_file = workflow->addFile(task->getID() + ".output", 1 + rand() % 100);
         task->addInputFile(input_file);
         task->addOutputFile(output_file);
-        simulation->stageFiles({{input_file->getID(), input_file}}, storage_service1);
-        simulation->stageFiles({{input_file->getID(), input_file}}, storage_service2);
+        if (this->storage_service1) {
+            simulation->stageFiles({{input_file->getID(), input_file}}, this->storage_service1);
+        }
+        if (this->storage_service2) {
+            simulation->stageFiles({{input_file->getID(), input_file}}, this->storage_service2);
+        }
     }
-
 
     // Create a WMS
     std::string wms_host = "WMSHost";

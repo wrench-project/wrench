@@ -12,11 +12,7 @@
 #include "simgrid_S4U_util/S4U_DaemonActor.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include <wrench/logging/TerminalOutput.h>
-
-//#include <xbt/ex.hpp>
 #include <wrench/util/MessageManager.h>
-
-
 #include <boost/algorithm/string.hpp>
 
 
@@ -143,6 +139,7 @@ namespace wrench {
      */
     void S4U_Daemon::startDaemon(bool daemonized, bool auto_restart) {
 
+        WRENCH_INFO("IN START DAEMON: %s", this->getName().c_str());
         // Check that there is a lifesaver
         if (not this->life_saver) {
             throw std::runtime_error(
@@ -194,24 +191,13 @@ namespace wrench {
             }
 
             auto daemon_object = this;
-            this->s4u_actor->on_exit([daemon_object](bool failed) {
-                WRENCH_INFO("Terminating");
-                // Call cleanup
-                daemon_object->cleanup(daemon_object->hasReturnedFromMain(), daemon_object->getReturnValue());
-                // Free memory for the object unless the service is set to auto-restart
-                if (not daemon_object->isSetToAutoRestart()) {
-                    auto life_saver = daemon_object->life_saver;
-                    daemon_object->life_saver = nullptr;
-                    delete life_saver;
-                }
-                return 0;
-            });
         }
 
         // Set the mailbox_name receiver (causes memory leak)
         // Causes Mailbox::put() to no longer implement a rendez-vous communication.
         simgrid::s4u::Mailbox::by_name(this->mailbox_name)->set_receiver(this->s4u_actor);
     }
+
 
 
 /**
