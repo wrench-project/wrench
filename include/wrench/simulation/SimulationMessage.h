@@ -14,6 +14,7 @@
 #include <string>
 #include <map>
 #include <wrench/workflow/execution_events/FailureCause.h>
+#include <iostream>
 
 namespace wrench {
 
@@ -29,7 +30,7 @@ namespace wrench {
     public:
 
         SimulationMessage(std::string name, double payload);
-        virtual ~SimulationMessage(){};
+        virtual ~SimulationMessage();
 
         virtual std::string getName();
 

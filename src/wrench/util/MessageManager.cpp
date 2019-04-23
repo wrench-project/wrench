@@ -8,7 +8,11 @@
  */
 
 #include <iostream>
+#include "wrench/logging/TerminalOutput.h"
+
 #include "wrench/util/MessageManager.h"
+
+XBT_LOG_NEW_DEFAULT_CATEGORY(message_manager, "Log category for MessageManager");
 
 
 namespace wrench {
@@ -33,6 +37,7 @@ namespace wrench {
         mailbox_messages.insert({mailbox, {}});
       }
       mailbox_messages[mailbox].insert(msg);
+//      WRENCH_INFO("MESSAGE_MANAGER: INSERTING [%s]:%s (%lu)", mailbox.c_str(), msg->getName().c_str(), (unsigned long)msg);
     }
 
     /**
@@ -42,7 +47,8 @@ namespace wrench {
     void MessageManager::cleanUpMessages(std::string mailbox) {
       if (mailbox_messages.find(mailbox) != mailbox_messages.end()) {
         for (auto msg : mailbox_messages[mailbox]) {
-          delete msg;
+//            WRENCH_INFO("DELETING A MESSAGE FOR MAILBOX : %s (%lu)", mailbox.c_str(), (unsigned long)(msg));
+            delete msg;
         }
         mailbox_messages[mailbox].clear();
       }
@@ -63,9 +69,10 @@ namespace wrench {
      * @param mailbox: the name of the mailbox from which the message was received
      * @param msg: the message
      */
-    void MessageManager::removeReceivedMessages(std::string mailbox, SimulationMessage *msg) {
+    void MessageManager::removeReceivedMessage(std::string mailbox, SimulationMessage *msg) {
       if (mailbox_messages.find(mailbox) != mailbox_messages.end()) {
         if (mailbox_messages[mailbox].find(msg) != mailbox_messages[mailbox].end()) {
+//            WRENCH_INFO("MESSAGE_MANAGER: REMOVING [%s]:%s (%lu)", mailbox.c_str(), msg->getName().c_str(), (unsigned long)msg);
           mailbox_messages[mailbox].erase(msg);
         }
       }

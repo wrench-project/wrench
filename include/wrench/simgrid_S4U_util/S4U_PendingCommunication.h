@@ -14,6 +14,8 @@
 
 #include <vector>
 #include <simgrid/s4u/Comm.hpp>
+#include <wrench/util/MessageManager.h>
+
 //#include "S4U_PendingCommunication.h"
 
 namespace wrench {
@@ -38,6 +40,8 @@ namespace wrench {
         static unsigned long waitForSomethingToHappen(
                 std::vector<S4U_PendingCommunication*> pending_comms,
                 double timeout);
+
+        ~S4U_PendingCommunication();
 
         /** @brief The SimGrid communication handle */
         simgrid::s4u::CommPtr comm_ptr;

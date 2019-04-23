@@ -30,18 +30,19 @@ namespace wrench {
      */
     std::unique_ptr<SimulationMessage> S4U_PendingCommunication::wait() {
 
-      try {
-        if (this->comm_ptr->get_state() != simgrid::s4u::Activity::State::FINISHED) {
-          this->comm_ptr->wait();
+        try {
+            if (this->comm_ptr->get_state() != simgrid::s4u::Activity::State::FINISHED) {
+                this->comm_ptr->wait();
+                MessageManager::removeReceivedMessage(this->mailbox_name, this->simulation_message.get());
+            }
+        } catch (simgrid::NetworkFailureException &e) {
+            throw std::shared_ptr<NetworkError>(
+                    new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, mailbox_name));
+        } catch (simgrid::TimeoutError &e) {
+            throw std::shared_ptr<NetworkError>(
+                    new NetworkError(NetworkError::RECEIVING, NetworkError::TIMEOUT, mailbox_name));
         }
-      } catch (simgrid::NetworkFailureException &e) {
-        throw std::shared_ptr<NetworkError>(
-                new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, mailbox_name));
-      } catch (simgrid::TimeoutError &e) {
-        throw std::shared_ptr<NetworkError>(
-                new NetworkError(NetworkError::RECEIVING, NetworkError::TIMEOUT, mailbox_name));
-      }
-      return std::move(this->simulation_message);
+        return std::move(this->simulation_message);
     }
 
     /**
@@ -55,12 +56,12 @@ namespace wrench {
      */
     unsigned long S4U_PendingCommunication::waitForSomethingToHappen(
             std::vector<std::unique_ptr<S4U_PendingCommunication>> pending_comms, double timeout) {
-      std::vector<S4U_PendingCommunication *> raw_pointer_comms;
-      for (auto const &pc : pending_comms) {
+        std::vector<S4U_PendingCommunication *> raw_pointer_comms;
+        for (auto const &pc : pending_comms) {
 //      for (auto it = pending_comms.begin(); it != pending_comms.end(); it++) {
-        raw_pointer_comms.push_back(pc.get());
-      }
-      return S4U_PendingCommunication::waitForSomethingToHappen(raw_pointer_comms, timeout);
+            raw_pointer_comms.push_back(pc.get());
+        }
+        return S4U_PendingCommunication::waitForSomethingToHappen(raw_pointer_comms, timeout);
     }
 
 
@@ -78,46 +79,47 @@ namespace wrench {
 
 //      std::set<S4U_PendingCommunication *> completed_comms;
 
-      if (pending_comms.empty()) {
-        throw std::invalid_argument("S4U_PendingCommunication::waitForSomethingToHappen(): invalid argument");
-      }
-
-      std::vector<simgrid::s4u::CommPtr> pending_s4u_comms;
-      for (auto it = pending_comms.begin(); it < pending_comms.end(); it++) {
-        pending_s4u_comms.push_back((*it)->comm_ptr);
-      }
-
-      unsigned long index;
-      bool one_comm_failed = false;
-      try {
-        index = (unsigned long) simgrid::s4u::Comm::wait_any_for(&pending_s4u_comms, timeout);
-        MessageManager::removeReceivedMessages(pending_comms[index]->mailbox_name, pending_comms[index]->simulation_message.get());
-      } catch (simgrid::NetworkFailureException &e) {
-        one_comm_failed = true;
-      } catch (simgrid::TimeoutError &e) {
-        one_comm_failed = true;
-      } catch (std::exception &e) {
-        throw std::runtime_error("S4U_PendingCommunication::waitForSomethingToHappen(): Unexpected std::exception  (" +
-                                 std::string(e.what()) + ")");
-      }
-
-      if (one_comm_failed) {
-        for (index = 0; index < pending_s4u_comms.size(); index++) {
-          try {
-            pending_s4u_comms[index]->test();
-          } catch (simgrid::NetworkFailureException &e) {
-            break;
-          } catch (simgrid::TimeoutError &e) {
-            break;
-          } catch (std::exception &e) {
-            throw std::runtime_error(
-                    "S4U_PendingCommunication::waitForSomethingToHappen(): Unexpected std::exception  (" +
-                    std::string(e.what()) + ")");
-          }
+        if (pending_comms.empty()) {
+            throw std::invalid_argument("S4U_PendingCommunication::waitForSomethingToHappen(): invalid argument");
         }
-      }
 
-      return index;
+        std::vector<simgrid::s4u::CommPtr> pending_s4u_comms;
+        for (auto it = pending_comms.begin(); it < pending_comms.end(); it++) {
+            pending_s4u_comms.push_back((*it)->comm_ptr);
+        }
+
+        unsigned long index;
+        bool one_comm_failed = false;
+        try {
+            index = (unsigned long) simgrid::s4u::Comm::wait_any_for(&pending_s4u_comms, timeout);
+            MessageManager::removeReceivedMessage(pending_comms[index]->mailbox_name,
+                                                  pending_comms[index]->simulation_message.get());
+        } catch (simgrid::NetworkFailureException &e) {
+            one_comm_failed = true;
+        } catch (simgrid::TimeoutError &e) {
+            one_comm_failed = true;
+        } catch (std::exception &e) {
+            throw std::runtime_error("S4U_PendingCommunication::waitForSomethingToHappen(): Unexpected std::exception  (" +
+                                     std::string(e.what()) + ")");
+        }
+
+        if (one_comm_failed) {
+            for (index = 0; index < pending_s4u_comms.size(); index++) {
+                try {
+                    pending_s4u_comms[index]->test();
+                } catch (simgrid::NetworkFailureException &e) {
+                    break;
+                } catch (simgrid::TimeoutError &e) {
+                    break;
+                } catch (std::exception &e) {
+                    throw std::runtime_error(
+                            "S4U_PendingCommunication::waitForSomethingToHappen(): Unexpected std::exception  (" +
+                            std::string(e.what()) + ")");
+                }
+            }
+        }
+
+        return index;
     }
 
     /**
@@ -128,5 +130,12 @@ namespace wrench {
     S4U_PendingCommunication::S4U_PendingCommunication(std::string mailbox) : mailbox_name(mailbox) {
     }
 
+    /**
+     * @brief Destructor
+     */
+    S4U_PendingCommunication::~S4U_PendingCommunication() {
+        // Not really a received message, but we're getting destroyed so...
+        MessageManager::removeReceivedMessage(this->mailbox_name, this->simulation_message.get());
+    }
 
 };
