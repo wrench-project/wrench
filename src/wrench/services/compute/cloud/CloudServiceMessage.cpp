@@ -165,6 +165,7 @@ namespace wrench {
      * @brief Constructor
      *
      * @param success: whether the VM start succeeded
+     * @param cs: the BareMetalComputeService exposed by the started VM (or nullptr if not success)
      * @param failure_cause: the cause of the failure (or nullptr if success)
      * @param payload: the message size in bytes
      */

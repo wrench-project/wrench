@@ -13,7 +13,6 @@
 int main(int argc, char **argv) {
   // disable log
    xbt_log_control_set("root.thresh:critical");
-
 //   xbt_log_control_set("simulation_timestamps.thresh:debug");
 
 //   Example selective log enabling
