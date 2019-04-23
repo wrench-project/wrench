@@ -26,6 +26,8 @@ namespace wrench {
      * @param vm_hostname: the name of the VM
      * @param num_cores: the number of cores the VM can use
      * @param ram_memory: the VM RAM memory capacity
+     * @param property_list: a property list ({} means use all defaults)
+     * @param messagepayload_list: a message payload list ({} means use all defaults)
      */
     S4U_VirtualMachine::S4U_VirtualMachine(const std::string &vm_name,
                                            unsigned long num_cores, double ram_memory,

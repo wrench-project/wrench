@@ -647,7 +647,7 @@ namespace wrench {
             return true;
         } else if (auto msg = dynamic_cast<ServiceHasTerminatedMessage *>(message.get())) {
             if (auto bmcs = dynamic_cast<BareMetalComputeService *>(msg->service)) {
-                processBareMetalComputeServiceTermination(bmcs, msg->return_value);
+                processBareMetalComputeServiceTermination(bmcs, msg->exit_code);
             } else {
                 throw std::runtime_error("CloudService::processNextMessage(): Received a service termination message for a non-BareMetalComputeService!");
             }
@@ -1300,6 +1300,7 @@ namespace wrench {
     /**
      * @brief Process a termination by a previously started BareMetalComputeService on a VM
      * @param cs: the service that has terminated
+     * @param exit_code: the service's exit code
      */
     void CloudService::processBareMetalComputeServiceTermination(BareMetalComputeService *cs, int exit_code) {
         std::string vm_name;

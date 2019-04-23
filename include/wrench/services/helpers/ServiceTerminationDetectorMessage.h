@@ -48,12 +48,12 @@ namespace wrench {
      */
     class ServiceHasTerminatedMessage : public ServiceTerminationDetectorMessage {
     public:
-        explicit ServiceHasTerminatedMessage(Service *service, int return_value);
+        explicit ServiceHasTerminatedMessage(Service *service, int exit_code);
 
         /** @brief The service that has terminated */
         Service *service;
-        /** @brief The return value of the service's main */
-        int return_value;
+        /** @brief The exit code of the service's main */
+        int exit_code;
     };
 
     /***********************/

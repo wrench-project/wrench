@@ -26,7 +26,7 @@ namespace wrench {
 	class S4U_Simulation {
 
 	public:
-		/* @brief The ram capacity of a physical host whenever not specified in the platform description file */
+		/** @brief The ram capacity of a physical host whenever not specified in the platform description file */
 		static constexpr double DEFAULT_RAM = (1024.0 * 1024.0 * 1024.0 * 1024.0 * 1024.0); // 1 PiB
 
 	public:
