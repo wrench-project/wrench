@@ -534,7 +534,6 @@ namespace wrench {
             std::vector<std::string> hosts_to_monitor;
             for (auto const &h : this->compute_resources) {
                 hosts_to_monitor.push_back(h.first);
-                WRENCH_INFO("=====> %s", h.first.c_str());
             }
             this->host_state_change_monitor = std::shared_ptr<HostStateChangeDetector>(
                     new HostStateChangeDetector(this->hostname, hosts_to_monitor, true, true,
