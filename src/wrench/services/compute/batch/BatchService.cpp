@@ -19,7 +19,6 @@
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 #include "wrench/simulation/Simulation.h"
-#include "wrench/util/MessageManager.h"
 #include "wrench/util/PointerUtil.h"
 #include "wrench/util/TraceFileLoader.h"
 #include "wrench/workflow/job/PilotJob.h"

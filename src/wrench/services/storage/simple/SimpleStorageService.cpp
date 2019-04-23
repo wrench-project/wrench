@@ -8,7 +8,6 @@
  */
 
 #include <climits>
-#include <wrench/util/MessageManager.h>
 
 #include "wrench/services/storage/simple/SimpleStorageService.h"
 #include "wrench/services/ServiceMessage.h"

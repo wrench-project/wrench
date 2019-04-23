@@ -39,7 +39,6 @@ namespace wrench {
      */
     std::unique_ptr<SimulationMessage> S4U_Mailbox::getMessage(std::string mailbox_name) {
       WRENCH_DEBUG("Getting a message from mailbox_name '%s'", mailbox_name.c_str());
-//      simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
       simgrid::s4u::Mailbox *mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
       SimulationMessage *msg = nullptr;
       try {
@@ -58,7 +57,7 @@ namespace wrench {
       }
 
       //Remove this message from the message manager list
-      MessageManager::removeReceivedMessages(mailbox_name, msg);
+        MessageManager::removeReceivedMessage(mailbox_name, msg);
       WRENCH_DEBUG("Received a '%s' message from mailbox_name %s", msg->getName().c_str(), mailbox_name.c_str());
       return std::unique_ptr<SimulationMessage>(msg);
     }
@@ -102,7 +101,7 @@ namespace wrench {
       auto msg = static_cast<SimulationMessage *>(data);
 
       //Remove this message from the message manager list
-      MessageManager::removeReceivedMessages(mailbox_name, msg);
+        MessageManager::removeReceivedMessage(mailbox_name, msg);
 
       WRENCH_DEBUG("Received a '%s' message from mailbox_name '%s'", msg->getName().c_str(), mailbox_name.c_str());
 
