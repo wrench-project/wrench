@@ -35,11 +35,12 @@ namespace wrench {
      * @brief Constructor
      *
      * @param service: the service that has terminated
+     * @param exit_code: the service exit_code
      */
-    ServiceHasTerminatedMessage::ServiceHasTerminatedMessage(Service *service, int return_value) :
+    ServiceHasTerminatedMessage::ServiceHasTerminatedMessage(Service *service, int exit_code) :
             ServiceTerminationDetectorMessage("ServiceHasTerminatedMessage") {
         this->service = service;
-        this->return_value = return_value;
+        this->exit_code = exit_code;
     }
 
 }

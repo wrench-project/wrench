@@ -227,7 +227,7 @@ namespace wrench {
 
         } else if (auto msg = dynamic_cast<ServiceHasTerminatedMessage *>(message.get())) {
             if (auto bmcs = dynamic_cast<BareMetalComputeService *>(msg->service)) {
-                processBareMetalComputeServiceTermination(bmcs, msg->return_value);
+                processBareMetalComputeServiceTermination(bmcs, msg->exit_code);
             } else {
                 throw std::runtime_error("VirtualizedClusterService::processNextMessage(): Received a service termination message for a non-BareMetalComputeService!");
             }

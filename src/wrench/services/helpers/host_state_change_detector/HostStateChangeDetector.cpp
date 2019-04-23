@@ -32,6 +32,7 @@ void wrench::HostStateChangeDetector::cleanup(bool has_returned_from_main, int r
  * @param hosts_to_monitor: the list of hosts to monitor
  * @param notify_when_turned_on: whether to send a notifications when hosts turn on
  * @param notify_when_turned_off: whether to send a notifications when hosts turn off
+ * @param creator: the service that created this service (when its creator dies, so does this service)
  * @param mailbox_to_notify: the mailbox to notify
  * @param property_list: a property list
  *

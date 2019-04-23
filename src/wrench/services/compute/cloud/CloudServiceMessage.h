@@ -73,7 +73,7 @@ namespace wrench {
         unsigned long num_cores;
         /** @brief The VM RAM memory capacity (0 means "use all memory available on the host", this can be lead to out of memory issue) */
         double ram_memory;
-        /** @vbrief A property list for the BareMetalService that will run on the VM ({} means "use all defaults") */
+        /** @brief A property list for the BareMetalService that will run on the VM ({} means "use all defaults") */
         std::map<std::string, std::string> property_list;
         /** @brief A message payload list for the BareMetalService that will run on the VM ({} means "use all defaults") */
         std::map<std::string, std::string> messagepayload_list;
