@@ -235,19 +235,19 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
                std::invalid_argument);
 
   // Create a network proximity service with BOGUS Payloads
-  ASSERT_THROW(network_proximity_service = new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network, {}, {{wrench::NetworkProximityServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, "-1.0"}}), std::invalid_argument);
+  ASSERT_THROW(network_proximity_service = new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network, {}, {{wrench::NetworkProximityServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, -1.0}}), std::invalid_argument);
 
-  ASSERT_THROW(network_proximity_service = new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network, {}, {{wrench::NetworkProximityServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, "-1.0"}}), std::invalid_argument);
+  ASSERT_THROW(network_proximity_service = new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network, {}, {{wrench::NetworkProximityServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, -1.0}}), std::invalid_argument);
 
-  ASSERT_THROW(network_proximity_service = new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network, {}, {{wrench::NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD, "-1.0"}}), std::invalid_argument);
+  ASSERT_THROW(network_proximity_service = new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network, {}, {{wrench::NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD, -1.0}}), std::invalid_argument);
 
-  ASSERT_THROW(network_proximity_service = new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network, {}, {{wrench::NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD, "-1.0"}}), std::invalid_argument);
+  ASSERT_THROW(network_proximity_service = new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network, {}, {{wrench::NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD, -1.0}}), std::invalid_argument);
 
-  ASSERT_THROW(network_proximity_service = new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network, {}, {{wrench::NetworkProximityServiceMessagePayload::NETWORK_DAEMON_MEASUREMENT_REPORTING_PAYLOAD, "-1.0"}}), std::invalid_argument);
+  ASSERT_THROW(network_proximity_service = new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network, {}, {{wrench::NetworkProximityServiceMessagePayload::NETWORK_DAEMON_MEASUREMENT_REPORTING_PAYLOAD, -1.0}}), std::invalid_argument);
 
-  ASSERT_THROW(network_proximity_service = new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network, {}, {{wrench::NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD, "-1.0"}}), std::invalid_argument);
+  ASSERT_THROW(network_proximity_service = new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network, {}, {{wrench::NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD, -1.0}}), std::invalid_argument);
 
-  ASSERT_THROW(network_proximity_service = new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network, {}, {{wrench::NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD, "-1.0"}}), std::invalid_argument);
+  ASSERT_THROW(network_proximity_service = new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network, {}, {{wrench::NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD, -1.0}}), std::invalid_argument);
 
 
   ASSERT_NO_THROW(network_proximity_service =
@@ -710,30 +710,28 @@ void NetworkProximityTest::do_ValidateProperties_Test() {
                                                {wrench::NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE, "-1.1"}})),
                std::invalid_argument);
 
-
   ASSERT_THROW(nps = simulation->add(
           new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
                                               {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"}},
-                                              {{wrench::NetworkProximityServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, "-1.0"}})),
-               std::invalid_argument);
-
-
-  ASSERT_THROW(nps = simulation->add(
-          new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
-                                              {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"}},
-                                              {{wrench::NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD, "-1.0"}})),
+                                              {{wrench::NetworkProximityServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, -1.0}})),
                std::invalid_argument);
 
   ASSERT_THROW(nps = simulation->add(
           new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
                                               {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"}},
-                                              {{wrench::NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD, "-1.0"}})),
+                                              {{wrench::NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD, -1.0}})),
                std::invalid_argument);
 
   ASSERT_THROW(nps = simulation->add(
           new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
                                               {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"}},
-                                              {{wrench::NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD, "-1.0"}})),
+                                              {{wrench::NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD, -1.0}})),
+               std::invalid_argument);
+
+  ASSERT_THROW(nps = simulation->add(
+          new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
+                                              {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"}},
+                                              {{wrench::NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD, -1.0}})),
                std::invalid_argument);
 
   ASSERT_THROW(nps = simulation->add(
@@ -770,10 +768,10 @@ void NetworkProximityTest::do_ValidateProperties_Test() {
                                                {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MESSAGE_SIZE, "20.1"},
                                                {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD, "0.01"},
                                                {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE, "10"}},
-                                              {{wrench::NetworkProximityServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, "1"},
-                                               {wrench::NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD, "2"},
-                                               {wrench::NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD, "2"},
-                                               {wrench::NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD, "3.1"}}
+                                              {{wrench::NetworkProximityServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, 1},
+                                               {wrench::NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD, 2},
+                                               {wrench::NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD, 2},
+                                               {wrench::NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD, 3.1}}
 
           )));
 

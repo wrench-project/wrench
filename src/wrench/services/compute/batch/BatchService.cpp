@@ -96,7 +96,7 @@ namespace wrench {
                                std::vector<std::string> compute_hosts,
                                double scratch_space_size,
                                std::map<std::string, std::string> property_list,
-                               std::map<std::string, std::string> messagepayload_list
+                               std::map<std::string, double> messagepayload_list
     ) :
             BatchService(hostname, std::move(compute_hosts), ComputeService::ALL_CORES,
                          ComputeService::ALL_RAM, scratch_space_size, std::move(property_list),
@@ -123,7 +123,7 @@ namespace wrench {
                                double ram_per_host,
                                double scratch_space_size,
                                std::map<std::string, std::string> property_list,
-                               std::map<std::string, std::string> messagepayload_list,
+                               std::map<std::string, double> messagepayload_list,
                                std::string suffix) :
             ComputeService(hostname,
                            "batch" + suffix,
@@ -312,7 +312,7 @@ namespace wrench {
             S4U_Mailbox::dputMessage(this->mailbox_name,
                                     new BatchServiceJobRequestMessage(
                                             answer_mailbox, batch_job,
-                                            this->getMessagePayloadValueAsDouble(
+                                            this->getMessagePayloadValue(
                                                     BatchServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw WorkflowExecutionException(cause);
@@ -419,14 +419,14 @@ namespace wrench {
                 case WorkflowJob::Type::STANDARD: {
                     S4U_Mailbox::putMessage(this->mailbox_name,
                                             new ComputeServiceTerminateStandardJobRequestMessage(answer_mailbox, (StandardJob *)job,
-                                                                                                 this->getMessagePayloadValueAsDouble(
+                                                                                                 this->getMessagePayloadValue(
                                                                                                          BatchServiceMessagePayload::TERMINATE_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
                     break;
                 }
                 case WorkflowJob::Type::PILOT: {
                     S4U_Mailbox::putMessage(this->mailbox_name,
                                             new ComputeServiceTerminatePilotJobRequestMessage(answer_mailbox, (PilotJob *)job,
-                                                                                              this->getMessagePayloadValueAsDouble(
+                                                                                              this->getMessagePayloadValue(
                                                                                                       BatchServiceMessagePayload::TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
                     break;
                 }
@@ -568,7 +568,7 @@ namespace wrench {
             S4U_Mailbox::dputMessage(job->popCallbackMailbox(),
                                      new ComputeServicePilotJobExpiredMessage(
                                              job, this,
-                                             this->getMessagePayloadValueAsDouble(
+                                             this->getMessagePayloadValue(
                                                      BatchServiceMessagePayload::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
             return; // ignore
@@ -600,7 +600,7 @@ namespace wrench {
             S4U_Mailbox::putMessage(job->popCallbackMailbox(),
                                     new ComputeServiceStandardJobFailedMessage(
                                             job, this, cause,
-                                            this->getMessagePayloadValueAsDouble(
+                                            this->getMessagePayloadValue(
                                                     BatchServiceMessagePayload::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
             return; // ignore
@@ -1103,7 +1103,7 @@ namespace wrench {
             // Send back a synchronous reply!
             try {
                 S4U_Mailbox::putMessage(msg->ack_mailbox,
-                                        new ServiceDaemonStoppedMessage(this->getMessagePayloadValueAsDouble(
+                                        new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
                                                 BatchServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
 
             } catch (std::shared_ptr<NetworkError> &cause) {
@@ -1220,7 +1220,7 @@ namespace wrench {
                                                          new JobTypeNotSupported(
                                                                  job->getWorkflowJob(),
                                                                  this)),
-                                                 this->getMessagePayloadValueAsDouble(
+                                                 this->getMessagePayloadValue(
                                                          BatchServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
             } catch (std::shared_ptr<NetworkError> &cause) {
                 return;
@@ -1238,7 +1238,7 @@ namespace wrench {
                                                          new JobTypeNotSupported(
                                                                  job->getWorkflowJob(),
                                                                  this)),
-                                                 this->getMessagePayloadValueAsDouble(
+                                                 this->getMessagePayloadValue(
                                                          BatchServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
             } catch (std::shared_ptr<NetworkError> &cause) {
                 return;
@@ -1275,7 +1275,7 @@ namespace wrench {
                                                 new NotEnoughResources(
                                                         job->getWorkflowJob(),
                                                         this)),
-                                        this->getMessagePayloadValueAsDouble(
+                                        this->getMessagePayloadValue(
                                                 BatchServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
                     } catch (std::shared_ptr<NetworkError> &cause) {}
                     return;
@@ -1296,7 +1296,7 @@ namespace wrench {
                                                          new NotEnoughResources(
                                                                  job->getWorkflowJob(),
                                                                  this)),
-                                                 this->getMessagePayloadValueAsDouble(
+                                                 this->getMessagePayloadValue(
                                                          BatchServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
             } catch (std::shared_ptr<NetworkError> &cause) {}
             return;
@@ -1310,7 +1310,7 @@ namespace wrench {
                                                  (StandardJob *) job->getWorkflowJob(), this,
                                                  true,
                                                  nullptr,
-                                                 this->getMessagePayloadValueAsDouble(
+                                                 this->getMessagePayloadValue(
                                                          BatchServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
             } catch (std::shared_ptr<NetworkError> &cause) {
                 return;
@@ -1322,7 +1322,7 @@ namespace wrench {
                                                  (PilotJob *) job->getWorkflowJob(), this,
                                                  true,
                                                  nullptr,
-                                                 this->getMessagePayloadValueAsDouble(
+                                                 this->getMessagePayloadValue(
                                                          BatchServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
             } catch (std::shared_ptr<NetworkError> &cause) {
                 return;
@@ -1394,7 +1394,7 @@ namespace wrench {
                 job_id = std::to_string((*it)->getJobID());
                 ComputeServiceTerminatePilotJobAnswerMessage *answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
                         job, this, true, nullptr,
-                        this->getMessagePayloadValueAsDouble(
+                        this->getMessagePayloadValue(
                                 BatchServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
                 try {
                     S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
@@ -1418,7 +1418,7 @@ namespace wrench {
                 job_id = std::to_string((*it2)->getJobID());
                 ComputeServiceTerminatePilotJobAnswerMessage *answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
                         job, this, true, nullptr,
-                        this->getMessagePayloadValueAsDouble(
+                        this->getMessagePayloadValue(
                                 BatchServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
                 try {
                     S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
@@ -1448,7 +1448,7 @@ namespace wrench {
                 }
                 ComputeServiceTerminatePilotJobAnswerMessage *answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
                         job, this, true, nullptr,
-                        this->getMessagePayloadValueAsDouble(
+                        this->getMessagePayloadValue(
                                 BatchServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
                 try {
                     S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
@@ -1478,7 +1478,7 @@ namespace wrench {
         WRENCH_INFO("Trying to terminate a pilot job that's neither pending nor running!");
         ComputeServiceTerminatePilotJobAnswerMessage *answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
                 job, this, false, std::shared_ptr<FailureCause>(new JobCannotBeTerminated(job)),
-                this->getMessagePayloadValueAsDouble(
+                this->getMessagePayloadValue(
                         BatchServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
         try {
             S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
@@ -1549,7 +1549,7 @@ namespace wrench {
             S4U_Mailbox::dputMessage(job->popCallbackMailbox(),
                                      new ComputeServiceStandardJobDoneMessage(
                                              job, this,
-                                             this->getMessagePayloadValueAsDouble(
+                                             this->getMessagePayloadValue(
                                                      BatchServiceMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
             return;
@@ -1747,7 +1747,7 @@ namespace wrench {
                     S4U_Mailbox::dputMessage(job->getCallbackMailbox(),
                                              new ComputeServicePilotJobStartedMessage(
                                                      job, this,
-                                                     this->getMessagePayloadValueAsDouble(
+                                                     this->getMessagePayloadValue(
                                                              BatchServiceMessagePayload::PILOT_JOB_STARTED_MESSAGE_PAYLOAD)));
                 } catch (std::shared_ptr<NetworkError> &cause) {
                     throw WorkflowExecutionException(cause);
@@ -1828,7 +1828,7 @@ namespace wrench {
         // Send the reply
         ComputeServiceResourceInformationAnswerMessage *answer_message = new ComputeServiceResourceInformationAnswerMessage(
                 dict,
-                this->getMessagePayloadValueAsDouble(
+                this->getMessagePayloadValue(
                         ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD));
         try {
             S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
@@ -2092,7 +2092,7 @@ namespace wrench {
                             job, this, false, std::shared_ptr<FailureCause>(
                                     new JobCannotBeTerminated(
                                             job)),
-                            this->getMessagePayloadValueAsDouble(
+                            this->getMessagePayloadValue(
                                     BatchServiceMessagePayload::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD));
             try {
                 S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
@@ -2125,7 +2125,7 @@ namespace wrench {
         ComputeServiceTerminateStandardJobAnswerMessage *answer_message =
                 new ComputeServiceTerminateStandardJobAnswerMessage(
                         job, this, true, nullptr,
-                        this->getMessagePayloadValueAsDouble(
+                        this->getMessagePayloadValue(
                                 BatchServiceMessagePayload::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD));
         try {
             S4U_Mailbox::dputMessage(answer_mailbox, answer_message);

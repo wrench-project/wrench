@@ -43,7 +43,7 @@ namespace wrench {
                                std::vector<std::string> &execution_hosts,
                                double scratch_space_size,
                                std::map<std::string, std::string> property_list,
-                               std::map<std::string, std::string> messagepayload_list) :
+                               std::map<std::string, double> messagepayload_list) :
             ComputeService(hostname, "cloud_service", "cloud_service",
                            scratch_space_size) {
 
@@ -95,7 +95,7 @@ namespace wrench {
                 answer_mailbox,
                 new CloudServiceGetExecutionHostsRequestMessage(
                         answer_mailbox,
-                        this->getMessagePayloadValueAsDouble(
+                        this->getMessagePayloadValue(
                                 CloudServiceMessagePayload::GET_EXECUTION_HOSTS_REQUEST_MESSAGE_PAYLOAD)));
 
         if (auto msg = dynamic_cast<CloudServiceGetExecutionHostsAnswerMessage *>(answer_message.get())) {
@@ -122,7 +122,7 @@ namespace wrench {
     std::string CloudService::createVM(unsigned long num_cores,
                                        double ram_memory,
                                        std::map<std::string, std::string> property_list,
-                                       std::map<std::string, std::string> messagepayload_list) {
+                                       std::map<std::string, double> messagepayload_list) {
 
 
         if (num_cores == ComputeService::ALL_CORES) {
@@ -142,7 +142,7 @@ namespace wrench {
                 new CloudServiceCreateVMRequestMessage(
                         answer_mailbox,
                         num_cores, ram_memory, property_list, messagepayload_list,
-                        this->getMessagePayloadValueAsDouble(
+                        this->getMessagePayloadValue(
                                 CloudServiceMessagePayload::CREATE_VM_REQUEST_MESSAGE_PAYLOAD)));
 
         if (auto msg = dynamic_cast<CloudServiceCreateVMAnswerMessage *>(answer_message.get())) {
@@ -179,7 +179,7 @@ namespace wrench {
                 answer_mailbox,
                 new CloudServiceShutdownVMRequestMessage(
                         answer_mailbox, vm_name,
-                        this->getMessagePayloadValueAsDouble(
+                        this->getMessagePayloadValue(
                                 CloudServiceMessagePayload::SHUTDOWN_VM_REQUEST_MESSAGE_PAYLOAD)));
 
         if (auto msg = dynamic_cast<CloudServiceShutdownVMAnswerMessage *>(answer_message.get())) {
@@ -217,7 +217,7 @@ namespace wrench {
                 answer_mailbox,
                 new CloudServiceStartVMRequestMessage(
                         answer_mailbox, vm_name, "",
-                        this->getMessagePayloadValueAsDouble(
+                        this->getMessagePayloadValue(
                                 CloudServiceMessagePayload::START_VM_REQUEST_MESSAGE_PAYLOAD)));
 
         if (auto msg = dynamic_cast<CloudServiceStartVMAnswerMessage *>(answer_message.get())) {
@@ -253,7 +253,7 @@ namespace wrench {
                 answer_mailbox,
                 new CloudServiceSuspendVMRequestMessage(
                         answer_mailbox, vm_name,
-                        this->getMessagePayloadValueAsDouble(
+                        this->getMessagePayloadValue(
                                 CloudServiceMessagePayload::SUSPEND_VM_REQUEST_MESSAGE_PAYLOAD)));
 
         if (auto msg = dynamic_cast<CloudServiceSuspendVMAnswerMessage *>(answer_message.get())) {
@@ -289,7 +289,7 @@ namespace wrench {
                 answer_mailbox,
                 new CloudServiceResumeVMRequestMessage(
                         answer_mailbox, vm_name,
-                        this->getMessagePayloadValueAsDouble(
+                        this->getMessagePayloadValue(
                                 CloudServiceMessagePayload::RESUME_VM_REQUEST_MESSAGE_PAYLOAD)));
 
         if (auto msg = dynamic_cast<CloudServiceResumeVMAnswerMessage *>(answer_message.get())) {
@@ -326,7 +326,7 @@ namespace wrench {
                 answer_mailbox,
                 new CloudServiceDestroyVMRequestMessage(
                         answer_mailbox, vm_name,
-                        this->getMessagePayloadValueAsDouble(
+                        this->getMessagePayloadValue(
                                 CloudServiceMessagePayload::DESTROY_VM_REQUEST_MESSAGE_PAYLOAD)));
 
         if (auto msg = dynamic_cast<CloudServiceDestroyVMAnswerMessage *>(answer_message.get())) {
@@ -371,7 +371,7 @@ namespace wrench {
                 answer_mailbox,
                 new ComputeServiceSubmitStandardJobRequestMessage(
                         answer_mailbox, job, service_specific_args,
-                        this->getMessagePayloadValueAsDouble(
+                        this->getMessagePayloadValue(
                                 ComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
 
         if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobAnswerMessage *>(answer_message.get())) {
@@ -414,7 +414,7 @@ namespace wrench {
         std::unique_ptr<SimulationMessage> answer_message = sendRequest(
                 answer_mailbox,
                 new ComputeServiceSubmitPilotJobRequestMessage(
-                        answer_mailbox, job, service_specific_args, this->getMessagePayloadValueAsDouble(
+                        answer_mailbox, job, service_specific_args, this->getMessagePayloadValue(
                                 CloudServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
 
         if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobAnswerMessage *>(answer_message.get())) {
@@ -599,7 +599,7 @@ namespace wrench {
             // This is Synchronous
             try {
                 S4U_Mailbox::putMessage(msg->ack_mailbox,
-                                        new ServiceDaemonStoppedMessage(this->getMessagePayloadValueAsDouble(
+                                        new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
                                                 CloudServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
             } catch (std::shared_ptr<NetworkError> &cause) {
                 return false;
@@ -671,7 +671,7 @@ namespace wrench {
                     answer_mailbox,
                     new CloudServiceGetExecutionHostsAnswerMessage(
                             this->execution_hosts,
-                            this->getMessagePayloadValueAsDouble(
+                            this->getMessagePayloadValue(
                                     CloudServiceMessagePayload::GET_EXECUTION_HOSTS_ANSWER_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
             return;
@@ -693,7 +693,7 @@ namespace wrench {
                                        unsigned long requested_num_cores,
                                        double requested_ram,
                                        std::map<std::string, std::string> property_list,
-                                       std::map<std::string, std::string> messagepayload_list) {
+                                       std::map<std::string, double> messagepayload_list) {
 
 
         WRENCH_INFO("Asked to create a VM with %s cores and %s RAM",
@@ -721,7 +721,7 @@ namespace wrench {
                             false,
                             empty,
                             std::shared_ptr<FailureCause>(new NotEnoughResources(nullptr, this)),
-                            this->getMessagePayloadValueAsDouble(
+                            this->getMessagePayloadValue(
                                     CloudServiceMessagePayload::CREATE_VM_ANSWER_MESSAGE_PAYLOAD));
         } else {
 
@@ -741,7 +741,7 @@ namespace wrench {
                     true,
                     vm_name,
                     nullptr,
-                    this->getMessagePayloadValueAsDouble(
+                    this->getMessagePayloadValue(
                             CloudServiceMessagePayload::CREATE_VM_ANSWER_MESSAGE_PAYLOAD));
         }
 
@@ -776,7 +776,7 @@ namespace wrench {
             msg_to_send_back =  new CloudServiceShutdownVMAnswerMessage(
                     false,
                     std::shared_ptr<FailureCause>(new NotAllowed(this, error_message)),
-                    this->getMessagePayloadValueAsDouble(
+                    this->getMessagePayloadValue(
                             CloudServiceMessagePayload::SHUTDOWN_VM_ANSWER_MESSAGE_PAYLOAD));
         } else {
 
@@ -794,7 +794,7 @@ namespace wrench {
             msg_to_send_back = new CloudServiceShutdownVMAnswerMessage(
                     true,
                     nullptr,
-                    this->getMessagePayloadValueAsDouble(
+                    this->getMessagePayloadValue(
                             CloudServiceMessagePayload::SHUTDOWN_VM_ANSWER_MESSAGE_PAYLOAD));
         }
 
@@ -916,7 +916,7 @@ namespace wrench {
                     false,
                     nullptr,
                     std::shared_ptr<FailureCause>(new NotAllowed(this, error_message)),
-                    this->getMessagePayloadValueAsDouble(
+                    this->getMessagePayloadValue(
                             CloudServiceMessagePayload::START_VM_ANSWER_MESSAGE_PAYLOAD));
 
         } else {
@@ -931,7 +931,7 @@ namespace wrench {
                                 false,
                                 nullptr,
                                 std::shared_ptr<FailureCause>(new NotEnoughResources(nullptr, this)),
-                                this->getMessagePayloadValueAsDouble(
+                                this->getMessagePayloadValue(
                                         CloudServiceMessagePayload::START_VM_ANSWER_MESSAGE_PAYLOAD));
             } else {
 
@@ -984,7 +984,7 @@ namespace wrench {
                         true,
                         std::get<1>(this->vm_list[vm_name]),
                         nullptr,
-                        this->getMessagePayloadValueAsDouble(
+                        this->getMessagePayloadValue(
                                 CloudServiceMessagePayload::START_VM_ANSWER_MESSAGE_PAYLOAD));
             }
         }
@@ -1017,7 +1017,7 @@ namespace wrench {
             msg_to_send_back =  new CloudServiceSuspendVMAnswerMessage(
                     false,
                     std::shared_ptr<FailureCause>(new NotAllowed(this, error_message)),
-                    this->getMessagePayloadValueAsDouble(
+                    this->getMessagePayloadValue(
                             CloudServiceMessagePayload::SUSPEND_VM_ANSWER_MESSAGE_PAYLOAD));
 
         } else {
@@ -1036,7 +1036,7 @@ namespace wrench {
                     new CloudServiceSuspendVMAnswerMessage(
                             true,
                             nullptr,
-                            this->getMessagePayloadValueAsDouble(
+                            this->getMessagePayloadValue(
                                     CloudServiceMessagePayload::SUSPEND_VM_ANSWER_MESSAGE_PAYLOAD));
         }
 
@@ -1068,7 +1068,7 @@ namespace wrench {
             msg_to_send_back =  new CloudServiceResumeVMAnswerMessage(
                     false,
                     std::shared_ptr<FailureCause>(new NotAllowed(this, error_message)),
-                    this->getMessagePayloadValueAsDouble(
+                    this->getMessagePayloadValue(
                             CloudServiceMessagePayload::RESUME_VM_ANSWER_MESSAGE_PAYLOAD));
         } else {
 
@@ -1079,7 +1079,7 @@ namespace wrench {
             msg_to_send_back = new CloudServiceResumeVMAnswerMessage(
                     true,
                     nullptr,
-                    this->getMessagePayloadValueAsDouble(
+                    this->getMessagePayloadValue(
                             CloudServiceMessagePayload::RESUME_VM_ANSWER_MESSAGE_PAYLOAD));
         }
 
@@ -1111,7 +1111,7 @@ namespace wrench {
             msg_to_send_back =  new CloudServiceDestroyVMAnswerMessage(
                     false,
                     std::shared_ptr<FailureCause>(new NotAllowed(this, error_message)),
-                    this->getMessagePayloadValueAsDouble(
+                    this->getMessagePayloadValue(
                             CloudServiceMessagePayload::DESTROY_VM_ANSWER_MESSAGE_PAYLOAD));
 
         } else {
@@ -1119,7 +1119,7 @@ namespace wrench {
             msg_to_send_back = new CloudServiceDestroyVMAnswerMessage(
                     true,
                     nullptr,
-                    this->getMessagePayloadValueAsDouble(
+                    this->getMessagePayloadValue(
                             CloudServiceMessagePayload::DESTROY_VM_ANSWER_MESSAGE_PAYLOAD));
         }
 
@@ -1148,7 +1148,7 @@ namespace wrench {
                 S4U_Mailbox::dputMessage(
                         answer_mailbox, new ComputeServiceSubmitStandardJobAnswerMessage(
                                 job, this, false, std::shared_ptr<FailureCause>(new JobTypeNotSupported(job, this)),
-                                this->getMessagePayloadValueAsDouble(
+                                this->getMessagePayloadValue(
                                         CloudServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
             } catch (std::shared_ptr<NetworkError> &cause) {
                 return;
@@ -1178,7 +1178,7 @@ namespace wrench {
                 S4U_Mailbox::dputMessage(
                         answer_mailbox, new ComputeServiceSubmitPilotJobAnswerMessage(
                                 job, this, false, std::shared_ptr<FailureCause>(new JobTypeNotSupported(job, this)),
-                                this->getMessagePayloadValueAsDouble(
+                                this->getMessagePayloadValue(
                                         CloudServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
             } catch (std::shared_ptr<NetworkError> &cause) {
                 return;
@@ -1255,7 +1255,7 @@ namespace wrench {
         // Send the reply
         ComputeServiceResourceInformationAnswerMessage *answer_message = new ComputeServiceResourceInformationAnswerMessage(
                 dict,
-                this->getMessagePayloadValueAsDouble(
+                this->getMessagePayloadValue(
                         ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD));
         try {
             S4U_Mailbox::dputMessage(answer_mailbox, answer_message);

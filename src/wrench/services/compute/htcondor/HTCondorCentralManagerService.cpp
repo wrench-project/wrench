@@ -36,7 +36,7 @@ namespace wrench {
             const std::string &hostname,
             std::set<ComputeService *> compute_resources,
             std::map<std::string, std::string> property_list,
-            std::map<std::string, std::string> messagepayload_list)
+            std::map<std::string, double> messagepayload_list)
             : ComputeService(hostname, "htcondor_central_manager", "htcondor_central_manager", nullptr) {
 
         // Check compute_resource viability
@@ -91,7 +91,7 @@ namespace wrench {
                     this->mailbox_name,
                     new ComputeServiceSubmitStandardJobRequestMessage(
                             answer_mailbox, job, service_specific_args,
-                            this->getMessagePayloadValueAsDouble(
+                            this->getMessagePayloadValue(
                                     HTCondorCentralManagerServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw WorkflowExecutionException(cause);
@@ -246,7 +246,7 @@ namespace wrench {
                 S4U_Mailbox::putMessage(
                         msg->ack_mailbox,
                         new ServiceDaemonStoppedMessage(
-                                this->getMessagePayloadValueAsDouble(
+                                this->getMessagePayloadValue(
                                         HTCondorCentralManagerServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
             } catch (std::shared_ptr<NetworkError> &cause) {
                 return false;
@@ -290,7 +290,7 @@ namespace wrench {
             S4U_Mailbox::dputMessage(
                     answer_mailbox,
                     new ComputeServiceSubmitStandardJobAnswerMessage(
-                            job, this, true, nullptr, this->getMessagePayloadValueAsDouble(
+                            job, this, true, nullptr, this->getMessagePayloadValue(
                                     HTCondorCentralManagerServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
         }
@@ -314,7 +314,7 @@ namespace wrench {
         try {
             S4U_Mailbox::dputMessage(
                     callback_mailbox, new ComputeServiceStandardJobDoneMessage(
-                            job, this, this->getMessagePayloadValueAsDouble(
+                            job, this, this->getMessagePayloadValue(
                                     HTCondorCentralManagerServiceMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD)));
             this->resources_unavailable = false;
         } catch (std::shared_ptr<NetworkError> &cause) {

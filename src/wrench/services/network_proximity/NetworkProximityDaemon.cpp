@@ -36,7 +36,7 @@ namespace wrench {
                                                    std::string network_proximity_service_mailbox,
                                                    double message_size, double measurement_period,
                                                    double noise,
-                                                   std::map<std::string, std::string> messagepayload_list) :
+                                                   std::map<std::string, double> messagepayload_list) :
             NetworkProximityDaemon(simulation, std::move(hostname), std::move(network_proximity_service_mailbox),
                                    message_size, measurement_period, noise, messagepayload_list, "") {
     }
@@ -61,7 +61,7 @@ namespace wrench {
             std::string network_proximity_service_mailbox,
             double message_size, double measurement_period,
             double noise,
-            std::map<std::string, std::string> messagepayload_list,
+            std::map<std::string, double> messagepayload_list,
             std::string suffix = "") :
             Service(std::move(hostname), "network_daemon" + suffix, "network_daemon" + suffix) {
 
@@ -108,7 +108,7 @@ namespace wrench {
         try {
             S4U_Mailbox::dputMessage(this->network_proximity_service_mailbox,
                                      new NextContactDaemonRequestMessage(this,
-                                                                         this->getMessagePayloadValueAsDouble(
+                                                                         this->getMessagePayloadValue(
                                                                                  NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
             // give up right away!
@@ -152,7 +152,7 @@ namespace wrench {
                     try {
                         S4U_Mailbox::dputMessage(this->network_proximity_service_mailbox,
                                                  new NetworkProximityComputeAnswerMessage(hosts, proximityValue,
-                                                                                          this->getMessagePayloadValueAsDouble(
+                                                                                          this->getMessagePayloadValue(
                                                                                                   NetworkProximityServiceMessagePayload::NETWORK_DAEMON_MEASUREMENT_REPORTING_PAYLOAD)));
                     } catch (std::shared_ptr<NetworkError> &cause) {
                         // Couldn't report measurement... oh well.. ignoring
@@ -170,7 +170,7 @@ namespace wrench {
                     try {
                         S4U_Mailbox::dputMessage(this->network_proximity_service_mailbox,
                                                  new NextContactDaemonRequestMessage(this,
-                                                                                     this->getMessagePayloadValueAsDouble(
+                                                                                     this->getMessagePayloadValue(
                                                                                              NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD)));
                     } catch (std::shared_ptr<NetworkError> &cause) {
                         // Couldn't find out who to talk to next... aborting
@@ -210,7 +210,7 @@ namespace wrench {
             // This is Synchronous
             try {
                 S4U_Mailbox::putMessage(msg->ack_mailbox,
-                                        new ServiceDaemonStoppedMessage(this->getMessagePayloadValueAsDouble(
+                                        new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
                                                 NetworkProximityServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
             } catch (std::shared_ptr<NetworkError> &cause) {
                 return false;

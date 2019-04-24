@@ -39,7 +39,7 @@ namespace wrench {
                                                          std::vector<std::string> &execution_hosts,
                                                          double scratch_space_size,
                                                          std::map<std::string, std::string> property_list,
-                                                         std::map<std::string, std::string> messagepayload_list) :
+                                                         std::map<std::string, double> messagepayload_list) :
             CloudService(hostname, execution_hosts, scratch_space_size) {
 
         // Set default and specified properties
@@ -78,7 +78,7 @@ namespace wrench {
                 answer_mailbox,
                 new CloudServiceStartVMRequestMessage(
                         answer_mailbox, vm_name, pm_name,
-                        this->getMessagePayloadValueAsDouble(
+                        this->getMessagePayloadValue(
                                 CloudServiceMessagePayload::START_VM_REQUEST_MESSAGE_PAYLOAD)));
 
         if (auto msg = dynamic_cast<CloudServiceStartVMAnswerMessage *>(answer_message.get())) {
@@ -112,7 +112,7 @@ namespace wrench {
                 answer_mailbox,
                 new VirtualizedClusterServiceMigrateVMRequestMessage(
                         answer_mailbox, vm_name, dest_pm_hostname,
-                        this->getMessagePayloadValueAsDouble(
+                        this->getMessagePayloadValue(
                                 VirtualizedClusterServiceMessagePayload::MIGRATE_VM_REQUEST_MESSAGE_PAYLOAD)));
 
         if (auto msg = dynamic_cast<VirtualizedClusterServiceMigrateVMAnswerMessage *>(answer_message.get())) {
@@ -178,7 +178,7 @@ namespace wrench {
             // This is Synchronous
             try {
                 S4U_Mailbox::putMessage(msg->ack_mailbox,
-                                        new ServiceDaemonStoppedMessage(this->getMessagePayloadValueAsDouble(
+                                        new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
                                                 CloudServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
             } catch (std::shared_ptr<NetworkError> &cause) {
                 return false;
@@ -265,7 +265,7 @@ namespace wrench {
             msg_to_send_back = new VirtualizedClusterServiceMigrateVMAnswerMessage(
                     false,
                     std::shared_ptr<FailureCause>(new NotEnoughResources(nullptr, this)),
-                    this->getMessagePayloadValueAsDouble(
+                    this->getMessagePayloadValue(
                             VirtualizedClusterServiceMessagePayload::MIGRATE_VM_ANSWER_MESSAGE_PAYLOAD));
 
         } else {
@@ -274,7 +274,7 @@ namespace wrench {
             msg_to_send_back = new VirtualizedClusterServiceMigrateVMAnswerMessage(
                     true,
                     nullptr,
-                    this->getMessagePayloadValueAsDouble(
+                    this->getMessagePayloadValue(
                             VirtualizedClusterServiceMessagePayload::MIGRATE_VM_ANSWER_MESSAGE_PAYLOAD));
         }
 

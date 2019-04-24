@@ -59,26 +59,26 @@ namespace wrench {
                 {BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN,      "false"},
         };
 
-        std::map<std::string, std::string> default_messagepayload_values = {
-                {BareMetalComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,                    "1024"},
-                {BareMetalComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,                 "1024"},
-                {BareMetalComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD,    "1024"},
-                {BareMetalComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,     "1024"},
-                {BareMetalComputeServiceMessagePayload::JOB_TYPE_NOT_SUPPORTED_MESSAGE_PAYLOAD,         "1024"},
-                {BareMetalComputeServiceMessagePayload::NOT_ENOUGH_CORES_MESSAGE_PAYLOAD,               "1024"},
-                {BareMetalComputeServiceMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD,              "1024"},
-                {BareMetalComputeServiceMessagePayload::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD,            "1024"},
-                {BareMetalComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD, "1024"},
-                {BareMetalComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,  "1024"},
-                {BareMetalComputeServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,       "1024"},
-                {BareMetalComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,        "1024"},
-                {BareMetalComputeServiceMessagePayload::PILOT_JOB_STARTED_MESSAGE_PAYLOAD,              "1024"},
-                {BareMetalComputeServiceMessagePayload::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD,              "1024"},
-                {BareMetalComputeServiceMessagePayload::PILOT_JOB_FAILED_MESSAGE_PAYLOAD,               "1024"},
-                {BareMetalComputeServiceMessagePayload::TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,    "1024"},
-                {BareMetalComputeServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,     "1024"},
-                {BareMetalComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD,     "1024"},
-                {BareMetalComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD,      "1024"},
+        std::map<std::string, double> default_messagepayload_values = {
+                {BareMetalComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,                    1024},
+                {BareMetalComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,                 1024},
+                {BareMetalComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD,    1024},
+                {BareMetalComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,     1024},
+                {BareMetalComputeServiceMessagePayload::JOB_TYPE_NOT_SUPPORTED_MESSAGE_PAYLOAD,         1024},
+                {BareMetalComputeServiceMessagePayload::NOT_ENOUGH_CORES_MESSAGE_PAYLOAD,               1024},
+                {BareMetalComputeServiceMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD,              1024},
+                {BareMetalComputeServiceMessagePayload::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD,            1024},
+                {BareMetalComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
+                {BareMetalComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,  1024},
+                {BareMetalComputeServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,       1024},
+                {BareMetalComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,        1024},
+                {BareMetalComputeServiceMessagePayload::PILOT_JOB_STARTED_MESSAGE_PAYLOAD,              1024},
+                {BareMetalComputeServiceMessagePayload::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD,              1024},
+                {BareMetalComputeServiceMessagePayload::PILOT_JOB_FAILED_MESSAGE_PAYLOAD,               1024},
+                {BareMetalComputeServiceMessagePayload::TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,    1024},
+                {BareMetalComputeServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,     1024},
+                {BareMetalComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD,     1024},
+                {BareMetalComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD,      1024},
         };
 
     public:
@@ -88,7 +88,7 @@ namespace wrench {
                                          const std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
                                          double scratch_space_size,
                                          std::map<std::string, std::string> property_list = {},
-                                         std::map<std::string, std::string> messagepayload_list = {}
+                                         std::map<std::string, double> messagepayload_list = {}
         );
 
         // Public Constructor
@@ -96,7 +96,7 @@ namespace wrench {
                                          const std::set<std::string> compute_hosts,
                                          double scratch_space_size,
                                          std::map<std::string, std::string> property_list = {},
-                                         std::map<std::string, std::string> messagepayload_list = {}
+                                         std::map<std::string, double> messagepayload_list = {}
         );
 
 
@@ -128,7 +128,7 @@ namespace wrench {
         BareMetalComputeService(const std::string &hostname,
                                          std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
                                          std::map<std::string, std::string> property_list,
-                                         std::map<std::string, std::string> messagepayload_list,
+                                         std::map<std::string, double> messagepayload_list,
                                          double ttl,
                                          PilotJob *pj, std::string suffix,
                                          StorageService* scratch_space); // reference to upper level scratch space
@@ -137,14 +137,14 @@ namespace wrench {
         BareMetalComputeService(const std::string &hostname,
                                          std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
                                          std::map<std::string, std::string> property_list,
-                                         std::map<std::string, std::string> messagepayload_list,
+                                         std::map<std::string, double> messagepayload_list,
                                          StorageService* scratch_space);
 
         // Low-level constructor helper method
         void initiateInstance(const std::string &hostname,
                               std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
                               std::map<std::string, std::string> property_list,
-                              std::map<std::string, std::string> messagepayload_list,
+                              std::map<std::string, double> messagepayload_list,
                               double ttl,
                               PilotJob *pj);
 
