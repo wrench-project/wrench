@@ -1,8 +1,6 @@
 
-# docker pull wrenchproject/wrench-dashboard
-# docker images -q wrenchproject/wrench-dashboard > images.txt
-docker pull spenceralbrecht/wrench-dashboard
-docker images -q spenceralbrecht/wrench-dashboard > images.txt
+docker pull wrenchproject/wrench-dashboard
+docker images -q wrenchproject/wrench-dashboard > images.txt
 
 imageID=$(head -n 1 images.txt)
 docker create $imageID
