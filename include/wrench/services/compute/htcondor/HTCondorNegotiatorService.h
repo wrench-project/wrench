@@ -25,10 +25,10 @@ namespace wrench {
      */
     class HTCondorNegotiatorService : public Service {
     private:
-        std::map<std::string, std::string> default_messagepayload_values = {
-                {HTCondorCentralManagerServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,              "1024"},
-                {HTCondorCentralManagerServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,           "1024"},
-                {HTCondorCentralManagerServiceMessagePayload::HTCONDOR_NEGOTIATOR_DONE_MESSAGE_PAYLOAD, "1024"},
+        std::map<std::string, double> default_messagepayload_values = {
+                {HTCondorCentralManagerServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,              1024},
+                {HTCondorCentralManagerServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,           1024},
+                {HTCondorCentralManagerServiceMessagePayload::HTCONDOR_NEGOTIATOR_DONE_MESSAGE_PAYLOAD, 1024},
         };
 
     public:

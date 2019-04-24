@@ -37,7 +37,7 @@ namespace wrench {
         std::map<std::string, std::string> default_property_values = {
                 };
 
-        std::map<std::string, std::string> default_messagepayload_values = {
+        std::map<std::string, double> default_messagepayload_values = {
                 };
 
         BatschedNetworkListener(std::string, BatchService *batch_service, std::string batch_service_mailbox, std::string sched_port,

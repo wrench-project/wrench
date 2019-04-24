@@ -73,7 +73,7 @@ namespace wrench {
             unsigned long num_cores,
             double ram_memory,
             std::map<std::string, std::string> property_list,
-            std::map<std::string, std::string> messagepayload_list,
+            std::map<std::string, double> messagepayload_list,
             double payload) :
             CloudServiceMessage("CREATE_VM_REQUEST", payload),
             num_cores(num_cores), ram_memory(ram_memory), property_list(property_list), messagepayload_list(messagepayload_list)  {

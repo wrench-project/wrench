@@ -38,7 +38,7 @@ namespace wrench {
                            unsigned long num_cores,
                            double ram_memory,
                            std::map<std::string, std::string> property_list,
-                           std::map<std::string, std::string> messagepayload_list);
+                           std::map<std::string, double> messagepayload_list);
 
         void start(std::string &pm_name);
 
@@ -55,7 +55,7 @@ namespace wrench {
         unsigned long getNumCores();
         double getMemory();
         std::map<std::string, std::string> getPropertyList();
-        std::map<std::string, std::string> getMessagePayloadList();
+        std::map<std::string, double> getMessagePayloadList();
 
         State getState();
         std::string getStateAsString();
@@ -69,7 +69,7 @@ namespace wrench {
         double ram_memory;
         std::string pm_name;
         std::map<std::string, std::string> property_list;
-        std::map<std::string, std::string> messagepayload_list;
+        std::map<std::string, double> messagepayload_list;
     };
 
     /***********************/

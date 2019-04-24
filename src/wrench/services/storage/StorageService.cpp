@@ -144,7 +144,7 @@ namespace wrench {
       try {
         S4U_Mailbox::putMessage(this->mailbox_name, new StorageServiceFreeSpaceRequestMessage(
                 answer_mailbox,
-                this->getMessagePayloadValueAsDouble(
+                this->getMessagePayloadValue(
                         StorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
@@ -258,7 +258,7 @@ namespace wrench {
                 answer_mailbox,
                 file,
                 dst_partition,
-                this->getMessagePayloadValueAsDouble(
+                this->getMessagePayloadValue(
                         StorageServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
@@ -350,7 +350,7 @@ namespace wrench {
                                         answer_mailbox,
                                         file,
                                         src_partition,
-                                        this->getMessagePayloadValueAsDouble(
+                                        this->getMessagePayloadValue(
                                                 StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
@@ -459,7 +459,7 @@ namespace wrench {
                                         answer_mailbox,
                                         file,
                                         dst_partition,
-                                        this->getMessagePayloadValueAsDouble(
+                                        this->getMessagePayloadValue(
                                                 StorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
@@ -723,7 +723,7 @@ namespace wrench {
                 answer_mailbox,
                 file,
                 dst_partition,
-                this->getMessagePayloadValueAsDouble(
+                this->getMessagePayloadValue(
                         StorageServiceMessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
@@ -909,7 +909,7 @@ namespace wrench {
                 dst_partition,
                 nullptr,
                 start_timestamp,
-                this->getMessagePayloadValueAsDouble(StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
+                this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -985,7 +985,7 @@ namespace wrench {
                 dst_partition,
                 nullptr,
                 start_timestamp,
-                this->getMessagePayloadValueAsDouble(StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
+                this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -1033,7 +1033,7 @@ namespace wrench {
                                                                          mailbox_that_should_receive_file_content,
                                                                          file,
                                                                          src_partition,
-                                                                         this->getMessagePayloadValueAsDouble(
+                                                                         this->getMessagePayloadValue(
                                                                                  StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);

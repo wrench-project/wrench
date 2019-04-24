@@ -300,11 +300,11 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     ASSERT_THROW(storage_service = simulation->add(
             new wrench::SimpleStorageService(hostname, 100.0,
                                              {{wrench::SimpleStorageServiceProperty::SELF_CONNECTION_DELAY, "BOGUS"}},
-                                             {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, "BOGUS"}})), std::invalid_argument);
+                                             {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, -1}})), std::invalid_argument);
     storage_service = simulation->add(
             new wrench::SimpleStorageService(hostname, 100.0,
                                              {{wrench::SimpleStorageServiceProperty::SELF_CONNECTION_DELAY, "BOGUS"}},
-                                             {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, "123"}}));
+                                             {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 123}}));
 
 
     // Try to get a bogus property as string or double
@@ -315,8 +315,9 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     ASSERT_THROW(storage_service->getPropertyValueAsDouble(wrench::SimpleStorageServiceProperty::SELF_CONNECTION_DELAY),
                  std::invalid_argument);
 
-    ASSERT_THROW(storage_service->getMessagePayloadValueAsDouble("BOGUS"), std::invalid_argument);
-    ASSERT_EQ(123, storage_service->getMessagePayloadValueAsDouble(wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD));
+    ASSERT_THROW(storage_service->getMessagePayloadValue("BOGUS"), std::invalid_argument);
+    ASSERT_EQ(123, storage_service->getMessagePayloadValue(
+            wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD));
 
     // Create a Cloud Service
     std::vector<std::string> execution_hosts = {"QuadCoreHost"};
@@ -324,9 +325,8 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
             new wrench::CloudService(hostname, execution_hosts, 100.0,
                                      { {wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
 
-    // Try to get the message payload as a string, just for kicks
-    ASSERT_NO_THROW(compute_service->getMessagePayloadValueAsString(wrench::ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD));
-    ASSERT_THROW(compute_service->getMessagePayloadValueAsString("BOGUS"), std::invalid_argument);
+    // Try to get a message payload value, just for kicks
+    ASSERT_NO_THROW(compute_service->getMessagePayloadValue(wrench::ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD));
 
     // Create a WMS
     wrench::WMS *wms = nullptr;

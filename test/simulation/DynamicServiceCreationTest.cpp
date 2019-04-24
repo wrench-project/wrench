@@ -134,7 +134,7 @@ private:
         auto dynamically_created_storage_service = simulation->startNewService(
                 new wrench::SimpleStorageService(hostname, 100.0,
                                                  {{wrench::SimpleStorageServiceProperty::SELF_CONNECTION_DELAY, "0"}},
-                                                 {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, "123"}}));
+                                                 {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 123}}));
 
 
         // Dynamically create a Cloud Service
@@ -244,7 +244,7 @@ void DynamicServiceCreationTest::do_getReadyTasksTest_test() {
     storage_service = simulation->add(
             new wrench::SimpleStorageService(hostname, 100.0,
                                              {{wrench::SimpleStorageServiceProperty::SELF_CONNECTION_DELAY, "0"}},
-                                             {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, "123"}}));
+                                             {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 123}}));
 
 
 

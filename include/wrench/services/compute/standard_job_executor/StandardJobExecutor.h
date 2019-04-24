@@ -59,7 +59,7 @@ namespace wrench {
                 bool part_of_pilot_job,
                 PilotJob* parent_pilot_job,
                 std::map<std::string, std::string> property_list,
-                std::map<std::string, std::string> messagepayload_list
+                std::map<std::string, double> messagepayload_list
         );
 
         void kill(bool job_termination);
@@ -117,9 +117,9 @@ namespace wrench {
                 {StandardJobExecutorProperty::SIMULATE_COMPUTATION_AS_SLEEP, "false"},
         };
 
-        std::map<std::string, std::string> default_messagepayload_values = {
-                {StandardJobExecutorMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD, "1024"},
-                {StandardJobExecutorMessagePayload::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD, "1024"},
+        std::map<std::string, double> default_messagepayload_values = {
+                {StandardJobExecutorMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD, 1024},
+                {StandardJobExecutorMessagePayload::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD, 1024},
         };
 
         std::shared_ptr<HostStateChangeDetector> host_state_monitor;
