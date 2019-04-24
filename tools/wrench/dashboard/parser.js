@@ -49,8 +49,8 @@ else if (numProgramArguments == 2) {
     // var content = parseFile(process.argv[2])
     parseFile(process.argv[2])
         .then(function(content) {
-            // opn('index.html')
-            // process.exit()
+            opn('index.html')
+            process.exit()
 
                 energyFilePath = process.argv[3];
                 energyData = JSON.parse(fs.readFileSync(energyFilePath));
