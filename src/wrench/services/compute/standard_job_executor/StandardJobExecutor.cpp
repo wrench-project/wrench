@@ -72,7 +72,7 @@ namespace wrench {
                                              bool part_of_pilot_job,
                                              PilotJob* parent_pilot_job,
                                              std::map<std::string, std::string> property_list,
-                                             std::map<std::string, std::string> messagepayload_list
+                                             std::map<std::string, double> messagepayload_list
     ) :
             Service(hostname, "standard_job_executor", "standard_job_executor") {
 
@@ -692,7 +692,7 @@ namespace wrench {
             try {
                 S4U_Mailbox::putMessage(this->callback_mailbox,
                                         new StandardJobExecutorDoneMessage(this->job, this,
-                                                                           this->getMessagePayloadValueAsDouble(
+                                                                           this->getMessagePayloadValue(
                                                                                    StandardJobExecutorMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD)));
             } catch (std::shared_ptr<NetworkError> &cause) {
                 WRENCH_INFO("Failed to send the callback... oh well");
@@ -811,7 +811,7 @@ namespace wrench {
         try {
             S4U_Mailbox::putMessage(this->callback_mailbox,
                                     new StandardJobExecutorFailedMessage(this->job, this, cause,
-                                                                         this->getMessagePayloadValueAsDouble(
+                                                                         this->getMessagePayloadValue(
                                                                                  StandardJobExecutorMessagePayload::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
             // do nothing

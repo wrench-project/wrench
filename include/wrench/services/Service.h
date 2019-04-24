@@ -60,9 +60,7 @@ namespace wrench {
         /** \cond INTERNAL     */
         /***********************/
 
-        std::string getMessagePayloadValueAsString(std::string);
-
-        double getMessagePayloadValueAsDouble(std::string);
+        double getMessagePayloadValue(std::string);
 
         void setStateToDown();
 
@@ -87,10 +85,10 @@ namespace wrench {
                            std::map<std::string, std::string> overriden_property_values);
 
         // MessagePayload stuff
-        void setMessagePayload(std::string, std::string);
+        void setMessagePayload(std::string, double);
 
-        void setMessagePayloads(std::map<std::string, std::string> default_messagepayload_values,
-                           std::map<std::string, std::string> overriden_messagepayload_values);
+        void setMessagePayloads(std::map<std::string, double> default_messagepayload_values,
+                                std::map<std::string, double> overriden_messagepayload_values);
 
 
         void serviceSanityCheck();
@@ -99,7 +97,7 @@ namespace wrench {
         std::map<std::string, std::string> property_list;
 
         /** @brief The service's messagepayload list */
-        std::map<std::string, std::string> messagepayload_list;
+        std::map<std::string, double> messagepayload_list;
 
 
 

@@ -54,21 +54,15 @@ namespace wrench {
     * @param value: the message payload value
     * @throw std::invalid_argument
     */
-    void Service::setMessagePayload(std::string messagepayload, std::string value) {
+    void Service::setMessagePayload(std::string messagepayload, double value) {
         // Check that the value is a >=0 double
-        double double_value;
 
-        if ((sscanf(value.c_str(), "%lf", &double_value) != 1) || (double_value < 0)) {
+        if (value < 0) {
             throw std::invalid_argument(
                     "Service::setMessagePayload(): Invalid message payload value " + messagepayload + ": " +
-                    value);
+                    std::to_string(value));
         }
-
-        if (this->messagepayload_list.find(messagepayload) != this->messagepayload_list.end()) {
-            this->messagepayload_list[messagepayload] = value;
-        } else {
-            this->messagepayload_list.insert(std::make_pair(messagepayload, value));
-        }
+        this->messagepayload_list[messagepayload] = value;
     }
     /**
      * @brief Get a property of the Service as a string
@@ -84,22 +78,6 @@ namespace wrench {
         }
         return this->property_list[property];
     }
-
-    /**
-     * @brief Get a message payload of the Service as a string
-     * @param message_payload: the message payload
-     * @return the message payload value as a string
-     *
-     * @throw std::invalid_argument
-     */
-    std::string Service::getMessagePayloadValueAsString(std::string message_payload) {
-        if (this->messagepayload_list.find(message_payload) == this->messagepayload_list.end()) {
-            throw std::invalid_argument("Service::getMessagePayloadValueAsString(): Cannot find value for message_payload " + message_payload +
-                                        " (perhaps a derived service class does not provide a default value?)");
-        }
-        return this->messagepayload_list[message_payload];
-    }
-
 
     /**
      * @brief Get a property of the Service as a double
@@ -154,20 +132,12 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    double Service::getMessagePayloadValueAsDouble(std::string message_payload) {
-        double value;
-        std::string string_value;
-        try {
-            string_value = this->getMessagePayloadValueAsString(message_payload);
-        } catch (std::invalid_argument &e) {
-            throw;
+    double Service::getMessagePayloadValue(std::string message_payload) {
+        if (this->messagepayload_list.find(message_payload) == this->messagepayload_list.end()) {
+            throw std::invalid_argument("Service::getMessagePayloadValue(): Cannot find value for message_payload " + message_payload +
+                                        " (perhaps a derived service class does not provide a default value?)");
         }
-        if ((sscanf(string_value.c_str(), "%lf", &value) != 1) || (value < 0)) {
-            throw std::invalid_argument(
-                    "Service::getMessagePayloadValueAsDouble(): Invalid double message payload value " + message_payload + " " +
-                    this->getMessagePayloadValueAsString(message_payload));
-        }
-        return value;
+        return this->messagepayload_list[message_payload];
     }
 
 
@@ -241,7 +211,8 @@ namespace wrench {
             S4U_Mailbox::putMessage(this->mailbox_name,
                                     new ServiceStopDaemonMessage(
                                             ack_mailbox,
-                                            this->getMessagePayloadValueAsDouble(ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD)));
+                                            this->getMessagePayloadValue(
+                                                    ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
             this->shutting_down = false;
             throw WorkflowExecutionException(cause);
@@ -339,8 +310,8 @@ namespace wrench {
      * @param default_messagepayload_values: list of default message payloads
      * @param overridden_messagepayload_values: list of overridden message payloads (override the default)
      */
-    void Service::setMessagePayloads(std::map<std::string, std::string> default_messagepayload_values,
-                                     std::map<std::string, std::string> overridden_messagepayload_values) {
+    void Service::setMessagePayloads(std::map<std::string, double> default_messagepayload_values,
+                                     std::map<std::string, double> overridden_messagepayload_values) {
         // Set default messagepayloads
         for (auto const &p : default_messagepayload_values) {
             this->setMessagePayload(p.first, p.second);

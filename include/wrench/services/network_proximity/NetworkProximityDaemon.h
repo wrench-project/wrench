@@ -32,7 +32,7 @@ namespace wrench {
         NetworkProximityDaemon(Simulation *simulation, std::string hostname,
                                std::string network_proximity_service_mailbox,
                                double message_size,double measurement_period,
-                               double noise, std::map<std::string, std::string> messagepayload_list);
+                               double noise, std::map<std::string, double> messagepayload_list);
 
     private:
 
@@ -41,7 +41,7 @@ namespace wrench {
         NetworkProximityDaemon(Simulation *simulation, std::string hostname,
                                std::string network_proximity_service_mailbox,
                                double message_size,double measurement_period,
-                               double noise, std::map<std::string, std::string> messagepayload_list, std::string suffix);
+                               double noise, std::map<std::string, double> messagepayload_list, std::string suffix);
 
 
         double message_size;

@@ -114,7 +114,7 @@ namespace wrench {
       try {
         S4U_Mailbox::putMessage(
                 this->reply_mailbox, new NegotiatorCompletionMessage(
-                        scheduled_jobs, this->getMessagePayloadValueAsDouble(
+                        scheduled_jobs, this->getMessagePayloadValue(
                                 HTCondorCentralManagerServiceMessagePayload::HTCONDOR_NEGOTIATOR_DONE_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         return 1;

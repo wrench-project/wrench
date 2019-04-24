@@ -37,21 +37,21 @@ namespace wrench {
                  {SimpleStorageServiceProperty::SELF_CONNECTION_DELAY,  "0"},
                 };
 
-        std::map<std::string, std::string> default_messagepayload_values = {
-                 {SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,         "1024"},
-                 {SimpleStorageServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,      "1024"},
-                 {SimpleStorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD,  "1024"},
-                 {SimpleStorageServiceMessagePayload::FREE_SPACE_ANSWER_MESSAGE_PAYLOAD,   "1024"},
-                 {SimpleStorageServiceMessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD, "1024"},
-                 {SimpleStorageServiceMessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD,  "1024"},
-                 {SimpleStorageServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD, "1024"},
-                 {SimpleStorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD,  "1024"},
-                 {SimpleStorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD,   "1024"},
-                 {SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD,    "1024"},
-                 {SimpleStorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD,  "1024"},
-                 {SimpleStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD,   "1024"},
-                 {SimpleStorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD,   "1024"},
-                 {SimpleStorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD,    "1024"},
+        std::map<std::string, double> default_messagepayload_values = {
+                 {SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,         1024},
+                 {SimpleStorageServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,      1024},
+                 {SimpleStorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD,  1024},
+                 {SimpleStorageServiceMessagePayload::FREE_SPACE_ANSWER_MESSAGE_PAYLOAD,   1024},
+                 {SimpleStorageServiceMessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD, 1024},
+                 {SimpleStorageServiceMessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD,  1024},
+                 {SimpleStorageServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD, 1024},
+                 {SimpleStorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD,  1024},
+                 {SimpleStorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD,   1024},
+                 {SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD,    1024},
+                 {SimpleStorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD,  1024},
+                 {SimpleStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD,   1024},
+                 {SimpleStorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD,   1024},
+                 {SimpleStorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD,    1024},
                 };
 
     public:
@@ -60,7 +60,7 @@ namespace wrench {
         SimpleStorageService(std::string hostname,
                              double capacity,
                              std::map<std::string, std::string> property_list = {},
-                             std::map<std::string, std::string> messagepayload_list = {});
+                             std::map<std::string, double> messagepayload_list = {});
 
         /***********************/
         /** \cond INTERNAL    **/
@@ -84,7 +84,7 @@ namespace wrench {
         SimpleStorageService(std::string hostname,
                              double capacity,
                              std::map<std::string, std::string> property_list,
-                             std::map<std::string, std::string> messagepayload_list,
+                             std::map<std::string, double> messagepayload_list,
                              std::string suffix);
 
         int main() override;

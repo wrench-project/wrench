@@ -32,7 +32,7 @@ namespace wrench {
     S4U_VirtualMachine::S4U_VirtualMachine(const std::string &vm_name,
                                            unsigned long num_cores, double ram_memory,
                                            std::map<std::string, std::string> property_list,
-                                           std::map<std::string, std::string> messagepayload_list) :
+                                           std::map<std::string, double> messagepayload_list) :
                                            vm_name(vm_name), num_cores(num_cores), ram_memory(ram_memory),
                                            property_list(property_list), messagepayload_list(messagepayload_list) {
 
@@ -179,7 +179,7 @@ namespace wrench {
      * @brief Get the message payload list for the BareMetalService that will run on the VM ({} means "use all defaults")
      * @return a message payload list
      */
-    std::map<std::string, std::string> S4U_VirtualMachine::getMessagePayloadList() {
+    std::map<std::string, double> S4U_VirtualMachine::getMessagePayloadList() {
         return this->messagepayload_list;
     }
 

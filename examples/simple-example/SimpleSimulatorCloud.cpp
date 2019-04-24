@@ -95,7 +95,7 @@ int main(int argc, char **argv) {
   std::string wms_host = hostname_list[0];
   wrench::CloudService *cloud_service = new wrench::CloudService(
           wms_host, execution_hosts, 0, {},
-          {{wrench::CloudServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, "1024"}});
+          {{wrench::CloudServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024}});
 
   /* Add the cloud service to the simulation, catching a possible exception */
   try {

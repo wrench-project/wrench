@@ -526,8 +526,8 @@ void VirtualizedClusterServiceTest::do_NumCoresTest_test() {
 class StopAllVMsTestWMS : public wrench::WMS {
 
 public:
-    std::map<std::string, std::string> default_messagepayload_values = {
-            {wrench::ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, "1024"}
+    std::map<std::string, double> default_messagepayload_values = {
+            {wrench::ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024}
     };
 
     StopAllVMsTestWMS(VirtualizedClusterServiceTest *test,
@@ -633,9 +633,9 @@ void VirtualizedClusterServiceTest::do_StopAllVMsTest_test() {
 class ShutdownVMTestWMS : public wrench::WMS {
 
 public:
-    std::map<std::string, std::string> default_messagepayload_values = {
-            {wrench::VirtualizedClusterServiceMessagePayload::SHUTDOWN_VM_ANSWER_MESSAGE_PAYLOAD,  "1024"},
-            {wrench::VirtualizedClusterServiceMessagePayload::SHUTDOWN_VM_REQUEST_MESSAGE_PAYLOAD, "1024"}
+    std::map<std::string, double> default_messagepayload_values = {
+            {wrench::VirtualizedClusterServiceMessagePayload::SHUTDOWN_VM_ANSWER_MESSAGE_PAYLOAD,  1024},
+            {wrench::VirtualizedClusterServiceMessagePayload::SHUTDOWN_VM_REQUEST_MESSAGE_PAYLOAD, 1024}
     };
 
     ShutdownVMTestWMS(VirtualizedClusterServiceTest *test,
@@ -889,9 +889,9 @@ void VirtualizedClusterServiceTest::do_ShutdownVMTest_test() {
 class ShutdownVMAndThenShutdownServiceTestWMS : public wrench::WMS {
 
 public:
-    std::map<std::string, std::string> default_messagepayload_values = {
-            {wrench::VirtualizedClusterServiceMessagePayload::SHUTDOWN_VM_ANSWER_MESSAGE_PAYLOAD,  "1024"},
-            {wrench::VirtualizedClusterServiceMessagePayload::SHUTDOWN_VM_REQUEST_MESSAGE_PAYLOAD, "1024"}
+    std::map<std::string, double> default_messagepayload_values = {
+            {wrench::VirtualizedClusterServiceMessagePayload::SHUTDOWN_VM_ANSWER_MESSAGE_PAYLOAD,  1024},
+            {wrench::VirtualizedClusterServiceMessagePayload::SHUTDOWN_VM_REQUEST_MESSAGE_PAYLOAD, 1024}
     };
 
     ShutdownVMAndThenShutdownServiceTestWMS(VirtualizedClusterServiceTest *test,
@@ -1018,9 +1018,9 @@ void VirtualizedClusterServiceTest::do_ShutdownVMAndThenShutdownServiceTest_test
 class SubmitToVMTestWMS : public wrench::WMS {
 
 public:
-    std::map<std::string, std::string> default_messagepayload_values = {
-            {wrench::VirtualizedClusterServiceMessagePayload::SHUTDOWN_VM_ANSWER_MESSAGE_PAYLOAD,  "1024"},
-            {wrench::VirtualizedClusterServiceMessagePayload::SHUTDOWN_VM_REQUEST_MESSAGE_PAYLOAD, "1024"}
+    std::map<std::string, double> default_messagepayload_values = {
+            {wrench::VirtualizedClusterServiceMessagePayload::SHUTDOWN_VM_ANSWER_MESSAGE_PAYLOAD,  1024},
+            {wrench::VirtualizedClusterServiceMessagePayload::SHUTDOWN_VM_REQUEST_MESSAGE_PAYLOAD, 1024}
     };
 
     SubmitToVMTestWMS(VirtualizedClusterServiceTest *test,

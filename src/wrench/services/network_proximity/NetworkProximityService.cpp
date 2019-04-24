@@ -48,7 +48,7 @@ namespace wrench {
     NetworkProximityService::NetworkProximityService(std::string hostname,
                                                      std::vector<std::string> hosts_in_network,
                                                      std::map<std::string, std::string> property_list,
-                                                     std::map<std::string, std::string> messagepayload_list
+                                                     std::map<std::string, double> messagepayload_list
     ) :
             Service(hostname, "network_proximity", "network_proximity") {
 
@@ -99,7 +99,7 @@ namespace wrench {
         try {
             S4U_Mailbox::putMessage(this->mailbox_name,
                                     new CoordinateLookupRequestMessage(answer_mailbox, requested_host,
-                                                                       this->getMessagePayloadValueAsDouble(
+                                                                       this->getMessagePayloadValue(
                                                                                NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw WorkflowExecutionException(cause);
@@ -154,7 +154,7 @@ namespace wrench {
         try {
             S4U_Mailbox::dputMessage(this->mailbox_name,
                                     new NetworkProximityLookupRequestMessage(answer_mailbox, std::move(hosts),
-                                                                             this->getMessagePayloadValueAsDouble(
+                                                                             this->getMessagePayloadValue(
                                                                                      NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw WorkflowExecutionException(cause);
@@ -284,7 +284,7 @@ namespace wrench {
                 this->network_daemons.clear();
                 this->hosts_in_network.clear();
                 S4U_Mailbox::putMessage(msg->ack_mailbox,
-                                        new ServiceDaemonStoppedMessage(this->getMessagePayloadValueAsDouble(
+                                        new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
                                                 NetworkProximityServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
             } catch (std::shared_ptr<NetworkError> &cause) {
                 return false;
@@ -314,7 +314,7 @@ namespace wrench {
             try {
                 S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                          new NetworkProximityLookupAnswerMessage(msg->hosts, proximity_value, timestamp,
-                                                                                 this->getMessagePayloadValueAsDouble(
+                                                                                 this->getMessagePayloadValue(
                                                                                          NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
             }
             catch (std::shared_ptr<NetworkError> &cause) {
@@ -347,7 +347,7 @@ namespace wrench {
                                          new NextContactDaemonAnswerMessage(chosen_peer->getHostname(),
                                                                             chosen_peer.get(),
                                                                             chosen_peer->mailbox_name,
-                                                                            this->getMessagePayloadValueAsDouble(
+                                                                            this->getMessagePayloadValue(
                                                                                     NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD)));
             } catch (std::shared_ptr<NetworkError> &cause) {
                 return true;
@@ -364,7 +364,7 @@ namespace wrench {
                                                                                        coordinate_itr->second.first.real(),
                                                                                        coordinate_itr->second.first.imag()),
                                                                                coordinate_itr->second.second,
-                                                                               this->getMessagePayloadValueAsDouble(
+                                                                               this->getMessagePayloadValue(
                                                                                        NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD)));
                 } catch (std::shared_ptr<NetworkError> &cause) {
                     return true;

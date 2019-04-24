@@ -44,29 +44,29 @@ namespace wrench {
                 {CloudServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM, "best-fit-ram-first"}
         };
 
-        std::map<std::string, std::string> default_messagepayload_values = {
-                {CloudServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,                  "1024"},
-                {CloudServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,               "1024"},
-                {CloudServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD, "1024"},
-                {CloudServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD,  "1024"},
-                {CloudServiceMessagePayload::GET_EXECUTION_HOSTS_REQUEST_MESSAGE_PAYLOAD,  "1024"},
-                {CloudServiceMessagePayload::GET_EXECUTION_HOSTS_ANSWER_MESSAGE_PAYLOAD,   "1024"},
-                {CloudServiceMessagePayload::CREATE_VM_REQUEST_MESSAGE_PAYLOAD,            "1024"},
-                {CloudServiceMessagePayload::CREATE_VM_ANSWER_MESSAGE_PAYLOAD,             "1024"},
-                {CloudServiceMessagePayload::SHUTDOWN_VM_REQUEST_MESSAGE_PAYLOAD,          "1024"},
-                {CloudServiceMessagePayload::SHUTDOWN_VM_ANSWER_MESSAGE_PAYLOAD,           "1024"},
-                {CloudServiceMessagePayload::START_VM_REQUEST_MESSAGE_PAYLOAD,             "1024"},
-                {CloudServiceMessagePayload::START_VM_ANSWER_MESSAGE_PAYLOAD,              "1024"},
-                {CloudServiceMessagePayload::SUSPEND_VM_REQUEST_MESSAGE_PAYLOAD,           "1024"},
-                {CloudServiceMessagePayload::SUSPEND_VM_ANSWER_MESSAGE_PAYLOAD,            "1024"},
-                {CloudServiceMessagePayload::RESUME_VM_REQUEST_MESSAGE_PAYLOAD,            "1024"},
-                {CloudServiceMessagePayload::RESUME_VM_ANSWER_MESSAGE_PAYLOAD,             "1024"},
-                {CloudServiceMessagePayload::DESTROY_VM_REQUEST_MESSAGE_PAYLOAD,           "1024"},
-                {CloudServiceMessagePayload::DESTROY_VM_ANSWER_MESSAGE_PAYLOAD,           "1024"},
-                {CloudServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD,  "1024"},
-                {CloudServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,   "1024"},
-                {CloudServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,     "1024"},
-                {CloudServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,      "1024"}
+        std::map<std::string, double> default_messagepayload_values = {
+                {CloudServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,                  1024},
+                {CloudServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,               1024},
+                {CloudServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD, 1024},
+                {CloudServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD,  1024},
+                {CloudServiceMessagePayload::GET_EXECUTION_HOSTS_REQUEST_MESSAGE_PAYLOAD,  1024},
+                {CloudServiceMessagePayload::GET_EXECUTION_HOSTS_ANSWER_MESSAGE_PAYLOAD,   1024},
+                {CloudServiceMessagePayload::CREATE_VM_REQUEST_MESSAGE_PAYLOAD,            1024},
+                {CloudServiceMessagePayload::CREATE_VM_ANSWER_MESSAGE_PAYLOAD,             1024},
+                {CloudServiceMessagePayload::SHUTDOWN_VM_REQUEST_MESSAGE_PAYLOAD,          1024},
+                {CloudServiceMessagePayload::SHUTDOWN_VM_ANSWER_MESSAGE_PAYLOAD,           1024},
+                {CloudServiceMessagePayload::START_VM_REQUEST_MESSAGE_PAYLOAD,             1024},
+                {CloudServiceMessagePayload::START_VM_ANSWER_MESSAGE_PAYLOAD,              1024},
+                {CloudServiceMessagePayload::SUSPEND_VM_REQUEST_MESSAGE_PAYLOAD,           1024},
+                {CloudServiceMessagePayload::SUSPEND_VM_ANSWER_MESSAGE_PAYLOAD,            1024},
+                {CloudServiceMessagePayload::RESUME_VM_REQUEST_MESSAGE_PAYLOAD,            1024},
+                {CloudServiceMessagePayload::RESUME_VM_ANSWER_MESSAGE_PAYLOAD,             1024},
+                {CloudServiceMessagePayload::DESTROY_VM_REQUEST_MESSAGE_PAYLOAD,           1024},
+                {CloudServiceMessagePayload::DESTROY_VM_ANSWER_MESSAGE_PAYLOAD,           1024},
+                {CloudServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD,  1024},
+                {CloudServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,   1024},
+                {CloudServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,     1024},
+                {CloudServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,      1024}
         };
 
     public:
@@ -74,7 +74,7 @@ namespace wrench {
                      std::vector<std::string> &execution_hosts,
                      double scratch_space_size,
                      std::map<std::string, std::string> property_list = {},
-                     std::map<std::string, std::string> messagepayload_list = {});
+                     std::map<std::string, double> messagepayload_list = {});
 
         /***********************/
         /** \cond DEVELOPER    */
@@ -83,7 +83,7 @@ namespace wrench {
         virtual std::string createVM(unsigned long num_cores,
                                      double ram_memory,
                                      std::map<std::string, std::string> property_list = {},
-                                     std::map<std::string, std::string> messagepayload_list = {});
+                                     std::map<std::string, double> messagepayload_list = {});
 
         virtual void shutdownVM(const std::string &vm_name);
 
@@ -146,7 +146,7 @@ namespace wrench {
                                      unsigned long requested_num_cores,
                                      double requested_ram,
                                      std::map<std::string, std::string> property_list,
-                                     std::map<std::string, std::string> messagepayload_list
+                                     std::map<std::string, double> messagepayload_list
         );
 
 
