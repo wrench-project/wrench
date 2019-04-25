@@ -245,8 +245,8 @@ void SimulationCommandLineArgumentsTest::do_HelpSimGridArgument_test() {
   }
   fclose(stdout_file);
 
-  ASSERT_GE(linecount, 150);
-  ASSERT_LE(linecount, 250);
+  ASSERT_GE(linecount, 100);
+  ASSERT_LE(linecount, 300);
 
   delete simulation;
   free(argv[0]);

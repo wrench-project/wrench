@@ -49,10 +49,6 @@ namespace wrench {
          * @brief The S4U way of defining the actor's "main" method
          */
         void operator()() {
-            // TODO: Setting up the on_exit function below to circumvent a SimGrid bug. This could go
-            //       back into the S4U_Daemon class in the future (when SimGrid doesn't "forget"
-            //       on_exit() calls when auto-restarting an actor).
-            this->setupOnExitFunction();
             this->daemon->runMainMethod();
         }
 
@@ -60,9 +56,7 @@ namespace wrench {
 
         S4U_Daemon *daemon;
 
-        void setupOnExitFunction();
-
-        };
+    };
 
     /***********************/
     /** \endcond           */

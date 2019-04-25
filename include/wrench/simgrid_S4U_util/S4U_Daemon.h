@@ -73,6 +73,7 @@ namespace wrench {
         int getReturnValue();
         bool isDaemonized();
         bool isSetToAutoRestart();
+        void setupOnExitFunction();
 
         std::pair<bool, int> join();
 
