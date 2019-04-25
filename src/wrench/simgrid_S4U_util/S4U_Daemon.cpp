@@ -182,6 +182,8 @@ namespace wrench {
         // fixed at some point, but this test saves us for now.
         if (not this->has_returned_from_main) {
 
+            this->setupOnExitFunction();
+
             if (this->daemonized) {
                 this->s4u_actor->daemonize();
             }
@@ -190,7 +192,6 @@ namespace wrench {
                 this->s4u_actor->set_auto_restart(true);
             }
 
-            auto daemon_object = this;
         }
 
         // Set the mailbox_name receiver (causes memory leak)
@@ -198,6 +199,25 @@ namespace wrench {
         simgrid::s4u::Mailbox::by_name(this->mailbox_name)->set_receiver(this->s4u_actor);
     }
 
+    /**
+     * @brief Sets up the on_exit functionf for the actor
+     */
+    void S4U_Daemon::setupOnExitFunction() {
+
+        this->s4u_actor->on_exit([this](bool failed) {
+            // Set state to down
+            this->state = S4U_Daemon::State::DOWN;
+            // Call cleanup
+            this->cleanup(this->hasReturnedFromMain(), this->getReturnValue());
+            // Free memory for the object unless the service is set to auto-restart
+            if (not this->isSetToAutoRestart()) {
+                auto life_saver = this->life_saver;
+                this->life_saver = nullptr;
+                delete life_saver;
+            }
+            return 0;
+        });
+    }
 
 
 /**
