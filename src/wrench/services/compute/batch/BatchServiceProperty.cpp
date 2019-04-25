@@ -10,6 +10,7 @@
 #include "wrench/services/compute/batch/BatchServiceProperty.h"
 
 namespace wrench {
+
     SET_PROPERTY_NAME(BatchServiceProperty, THREAD_STARTUP_OVERHEAD);
     SET_PROPERTY_NAME(BatchServiceProperty, HOST_SELECTION_ALGORITHM);
     SET_PROPERTY_NAME(BatchServiceProperty, TASK_SELECTION_ALGORITHM);
