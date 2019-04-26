@@ -204,6 +204,7 @@ namespace wrench {
             } catch (std::exception &e) {
                 throw;
             }
+            // Fix value
             for (auto &j : this->workload_trace) {
                 std::string id = std::get<0>(j);
                 double submit_time = std::get<1>(j);
@@ -212,9 +213,11 @@ namespace wrench {
                 double requested_ram = std::get<4>(j);
                 unsigned int num_nodes = std::get<5>(j);
 
+                // Capping to max number of nodes, silently
                 if (num_nodes > this->total_num_of_nodes) {
                     std::get<5>(j) = this->total_num_of_nodes;
                 }
+                // Capping to ram, silently
                 if (requested_ram > ram_available) {
                     std::get<4>(j) = ram_available;
                 }
@@ -278,10 +281,6 @@ namespace wrench {
     void BatchService::submitWorkflowJob(WorkflowJob *job, std::map<std::string, std::string> &batch_job_args) {
 
         assertServiceIsUp();
-//
-//        if (this->state == Service::DOWN) {
-//            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-//        }
 
         // Get all arguments
         unsigned long num_hosts = 0;
@@ -406,10 +405,6 @@ namespace wrench {
     void BatchService::terminateWorkflowJob(WorkflowJob *job) {
 
         assertServiceIsUp();
-
-//        if (this->state == Service::DOWN) {
-//            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-//        }
 
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("terminate_standard_job");
 

@@ -60,9 +60,6 @@ namespace wrench {
       }
 
       assertServiceIsUp();
-//      if (this->state == ComputeService::DOWN) {
-//        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-//      }
 
       try {
         switch (job->getType()) {
@@ -98,9 +95,6 @@ namespace wrench {
       }
 
       assertServiceIsUp();
-//      if (this->state == ComputeService::DOWN) {
-//        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-//      }
 
       try {
         switch (job->getType()) {
@@ -410,9 +404,6 @@ namespace wrench {
     std::map<std::string, std::map<std::string, double>> ComputeService::getServiceResourceInformation() {
 
       assertServiceIsUp();
-//      if (this->state == Service::DOWN) {
-//        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-//      }
 
       // send a "info request" message to the daemon's mailbox_name
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("get_service_info");
