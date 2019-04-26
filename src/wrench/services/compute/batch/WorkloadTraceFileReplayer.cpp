@@ -41,7 +41,7 @@ namespace wrench {
             batch_service(batch_service),
             num_cores_per_node(num_cores_per_node),
             use_actual_runtimes_as_requested_runtimes(use_actual_runtimes_as_requested_runtimes)
-            {}
+    {}
 
 
     int WorkloadTraceFileReplayer::main() {
@@ -69,6 +69,7 @@ namespace wrench {
       // Record the start time of the current time (submission times will be just offsets from this time)
       double real_start_time = S4U_Simulation::getClock();
 
+      unsigned long counter = 0;
       for (auto job : this->workload_trace) {
 
         // Sleep until the submission time
@@ -87,7 +88,6 @@ namespace wrench {
         }
         double requested_ram = std::get<4>(job);
         int num_nodes = std::get<5>(job);
-
 
         // Create the set of tasks
         std::vector<WorkflowTask *> to_submit;
@@ -114,8 +114,11 @@ namespace wrench {
         batch_job_args["-color"] = "green";
 
         // Submit this job to the batch service
-        WRENCH_INFO("Submitting a [-N:%s, -t:%s, -c:%s] job",
-                    batch_job_args["-N"].c_str(), batch_job_args["-t"].c_str(), batch_job_args["-c"].c_str());
+        WRENCH_INFO("#%lu: Submitting a [-N:%s, -t:%s, -c:%s] job",
+                    counter++,
+                batch_job_args["-N"].c_str(),
+                batch_job_args["-t"].c_str(),
+                batch_job_args["-c"].c_str());
         try {
           job_manager->submitJob(standard_job, this->batch_service, batch_job_args);
         } catch (WorkflowExecutionException &e) {

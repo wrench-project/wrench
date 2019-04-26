@@ -126,10 +126,6 @@ namespace wrench {
 
         assertServiceIsUp();
 
-//        if (this->state == Service::DOWN) {
-//            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-//        }
-
         /* make sure that service arguments are provided for tasks in the jobs */
         for (auto const &arg : service_specific_args) {
             bool found = false;
@@ -242,10 +238,6 @@ namespace wrench {
                                             std::map<std::string, std::string> &service_specific_args) {
 
         assertServiceIsUp();
-
-//        if (this->state == Service::DOWN) {
-//            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-//        }
 
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_pilot_job");
 
@@ -1048,10 +1040,6 @@ namespace wrench {
     void BareMetalComputeService::terminateStandardJob(StandardJob *job) {
 
         assertServiceIsUp();
-
-//        if (this->state == Service::DOWN) {
-//            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-//        }
 
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("terminate_standard_job");
 
