@@ -35,7 +35,7 @@ namespace wrench {
      *
      * @param wms: the wms for which this manager is working
      */
-    JobManager::JobManager(WMS *wms) :
+    JobManager::JobManager(std::shared_ptr<WMS> wms) :
             Service(wms->hostname, "job_manager", "job_manager") {
 
       this->wms = wms;
