@@ -60,7 +60,7 @@ namespace wrench {
 
         friend class WMS;
 
-        explicit DataMovementManager(WMS *wms);
+        explicit DataMovementManager(std::shared_ptr<WMS> wms);
 
         /***********************/
         /** \endcond           */
@@ -70,7 +70,7 @@ namespace wrench {
 
         int main();
 
-        WMS *wms = nullptr;
+        std::shared_ptr<WMS> wms = nullptr;
 
         bool processNextMessage();
 

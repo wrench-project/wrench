@@ -32,7 +32,7 @@ namespace wrench {
      *
      * @param wms: the WMS that uses this data movement manager
      */
-    DataMovementManager::DataMovementManager(WMS *wms) :
+    DataMovementManager::DataMovementManager(std::shared_ptr<WMS> wms) :
             Service(wms->hostname, "data_movement_manager", "data_movement_manager") {
 
       this->wms = wms;
