@@ -82,13 +82,13 @@ int main(int argc, char **argv) {
    * terminate it will be 2048 bytes. See the documentation to find out all available
    * configurable properties for each kind of service.
    */
-  auto batch_service = new wrench::BatchComputeService(
-          wms_host, hostname_list, 0, {},
-          {{wrench::BatchComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 2048}});
+  std::shared_ptr<wrench::BatchComputeService> batch_service;
 
   /* Add the batch service to the simulation, catching a possible exception */
   try {
-    simulation.add(batch_service);
+    simulation.add(new wrench::BatchComputeService(
+            wms_host, hostname_list, 0, {},
+            {{wrench::BatchComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 2048}}));
 
   } catch (std::invalid_argument &e) {
     std::cerr << "Error: " << e.what() << std::endl;
@@ -96,7 +96,7 @@ int main(int argc, char **argv) {
   }
 
   /* Create a list of compute services that will be used by the WMS */
-  std::set<wrench::ComputeService *> compute_services;
+  std::set<std::shared_ptr<wrench::ComputeService>> compute_services;
   compute_services.insert(batch_service);
 
   /* Create a list of storage services that will be used by the WMS */

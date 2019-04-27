@@ -73,7 +73,7 @@ int main(int argc, char **argv) {
    */
   std::string storage_host = hostname_list[(hostname_list.size() > 2) ? 2 : 1];
   std::cerr << "Instantiating a SimpleStorageService on " << storage_host << "..." << std::endl;
-  wrench::StorageService *storage_service = simulation.add(
+  auto storage_service = simulation.add(
           new wrench::SimpleStorageService(storage_host, 10000000000000.0));
 
   /* Construct a list of hosts (in the example only one host) on which the
@@ -93,13 +93,13 @@ int main(int argc, char **argv) {
    * configurable properties for each kind of service.
    */
   std::string wms_host = hostname_list[0];
-  wrench::CloudComputeService *cloud_service = new wrench::CloudComputeService(
-          wms_host, execution_hosts, 0, {},
-          {{wrench::CloudComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024}});
+  std::shared_ptr<wrench::CloudComputeService> cloud_service;
 
   /* Add the cloud service to the simulation, catching a possible exception */
   try {
-    simulation.add(cloud_service);
+    simulation.add(new wrench::CloudComputeService(
+            wms_host, execution_hosts, 0, {},
+            {{wrench::CloudComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024}}));
 
   } catch (std::invalid_argument &e) {
     std::cerr << "Error: " << e.what() << std::endl;
@@ -107,11 +107,11 @@ int main(int argc, char **argv) {
   }
 
   /* Create a list of compute services that will be used by the WMS */
-  std::set<wrench::ComputeService *> compute_services;
+  std::set<std::shared_ptr<wrench::ComputeService>> compute_services;
   compute_services.insert(cloud_service);
 
   /* Create a list of storage services that will be used by the WMS */
-  std::set<wrench::StorageService *> storage_services;
+  std::set<std::shared_ptr<wrench::StorageService>> storage_services;
   storage_services.insert(storage_service);
 
   /* Instantiate a WMS, to be stated on some host (wms_host), which is responsible
@@ -122,7 +122,7 @@ int main(int argc, char **argv) {
    * The WMS implementation is in SimpleWMS.[cpp|h].
    */
   std::cerr << "Instantiating a WMS on " << wms_host << "..." << std::endl;
-  wrench::WMS *wms = simulation.add(
+  auto wms = simulation.add(
           new wrench::SimpleWMS(std::unique_ptr<wrench::CloudStandardJobScheduler>(
                   new wrench::CloudStandardJobScheduler(storage_service)),
                                 nullptr, compute_services, storage_services, wms_host));
