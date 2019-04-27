@@ -22,6 +22,15 @@
 
 class MessageConstructorTest : public ::testing::Test {
 protected:
+
+    ~MessageConstructorTest() {
+        storage_service.reset();
+        compute_service.reset();
+        network_proximity_service.reset();
+        network_proximity_daemon.reset();
+        failure_cause.reset();
+    }
+
     MessageConstructorTest() {
       workflow = new wrench::Workflow();
       workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(workflow);

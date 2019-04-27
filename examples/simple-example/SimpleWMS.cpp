@@ -26,8 +26,8 @@ namespace wrench {
      */
     SimpleWMS::SimpleWMS(std::unique_ptr<StandardJobScheduler> standard_job_scheduler,
                          std::unique_ptr<PilotJobScheduler> pilot_job_scheduler,
-                         const std::set<ComputeService *> &compute_services,
-                         const std::set<StorageService *> &storage_services,
+                         const std::set<std::shared_ptr<ComputeService>> &compute_services,
+                         const std::set<std::shared_ptr<StorageService>> &storage_services,
                          const std::string &hostname) : WMS(
             std::move(standard_job_scheduler),
             std::move(pilot_job_scheduler),
