@@ -76,7 +76,7 @@ namespace wrench {
         return getStartTimeEstimatesForFCFS(set_of_jobs);
       } else {
         throw WorkflowExecutionException(std::shared_ptr<FunctionalityNotAvailable>(
-                new FunctionalityNotAvailable(this, "start time estimates")));
+                new FunctionalityNotAvailable(std::dynamic_pointer_cast<BatchComputeService>(this->getSharedPtr()), "start time estimates")));
       }
 #endif
     }
