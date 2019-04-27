@@ -166,7 +166,7 @@ namespace wrench {
         // start the compute resource services
         try {
             for (auto cs : this->compute_resources) {
-                this->simulation->startNewService(cs);
+                auto cs_shared_ptr = this->simulation->startNewService(cs);
 
                 unsigned long sum_num_idle_cores = 0;
 
@@ -181,7 +181,7 @@ namespace wrench {
                         auto vm_cs = virtualized_cluster->startVM(vm_name, host);
                         // set the number of idle cores
                         sum_num_idle_cores = vm_cs->getTotalNumIdleCores();
-                        this->compute_resources_map.insert(std::make_pair(vm_cs.get(), sum_num_idle_cores));
+                        this->compute_resources_map.insert(std::make_pair(vm_cs, sum_num_idle_cores));
                     }
 
                 } else if (auto cloud = dynamic_cast<CloudComputeService *>(cs)) {
@@ -190,7 +190,7 @@ namespace wrench {
 
                     // set the number of available cores
                     sum_num_idle_cores = cs->getTotalNumIdleCores();
-                    this->compute_resources_map.insert(std::make_pair(cs, sum_num_idle_cores));
+                    this->compute_resources_map.insert(std::make_pair(cs_shared_ptr, sum_num_idle_cores));
                 }
 
             }
