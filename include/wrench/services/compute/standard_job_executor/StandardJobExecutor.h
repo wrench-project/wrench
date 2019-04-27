@@ -55,7 +55,7 @@ namespace wrench {
                 std::string hostname,
                 StandardJob *job,
                 std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
-                StorageService* scratch_space,
+                std::shared_ptr<StorageService> scratch_space,
                 bool part_of_pilot_job,
                 PilotJob* parent_pilot_job,
                 std::map<std::string, std::string> property_list,
@@ -80,7 +80,7 @@ namespace wrench {
         std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
         int total_num_cores;
         double total_ram;
-        StorageService *scratch_space;
+        std::shared_ptr<StorageService> scratch_space;
 
         bool part_of_pilot_job;
 

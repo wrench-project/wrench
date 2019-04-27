@@ -13,7 +13,6 @@
 
 #include <string>
 #include <map>
-#include <wrench/workflow/execution_events/FailureCause.h>
 #include <iostream>
 
 namespace wrench {

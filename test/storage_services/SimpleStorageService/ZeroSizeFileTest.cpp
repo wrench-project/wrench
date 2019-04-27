@@ -10,7 +10,7 @@ class SimpleStorageServiceZeroSizeFileTest : public ::testing::Test {
 public:
     wrench::WorkflowFile *file;
 
-    wrench::StorageService *storage_service = nullptr;
+    std::shared_ptr<wrench::StorageService> storage_service = nullptr;
 
     void do_ReadZeroSizeFileTest();
 
@@ -49,8 +49,8 @@ protected:
 class SimpleStorageServiceZeroSizeFileTestWMS : public wrench::WMS {
 public:
     SimpleStorageServiceZeroSizeFileTestWMS(SimpleStorageServiceZeroSizeFileTest *test,
-                                              const std::set<wrench::StorageService *> &storage_services,
-                                              wrench::FileRegistryService * file_registry_service,
+                                              const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                                            std::shared_ptr<wrench::FileRegistryService> file_registry_service,
                                               std::string hostname) :
             wrench::WMS(nullptr, nullptr, {}, storage_services, {}, file_registry_service,
                         hostname, "test") {
@@ -63,10 +63,10 @@ private:
     int main() {
 
         // get the file registry service
-        wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
+        auto file_registry_service = this->getAvailableFileRegistryService();
 
         // get the single storage service
-        wrench::StorageService *storage_service = *(this->getAvailableStorageServices().begin());
+        auto storage_service = *(this->getAvailableStorageServices().begin());
 
         // read the file
         storage_service->readFile(this->test->file);
@@ -98,11 +98,11 @@ void SimpleStorageServiceZeroSizeFileTest::do_ReadZeroSizeFileTest() {
             new wrench::SimpleStorageService("StorageHost", 10)));
 
     // Create a file registry
-    wrench::FileRegistryService *file_registry_service = nullptr;
+    std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
     ASSERT_NO_THROW(file_registry_service = simulation->add(new wrench::FileRegistryService("WMSHost")));
 
     // Create a WMS
-    wrench::WMS *wms = nullptr;
+    std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(new SimpleStorageServiceZeroSizeFileTestWMS(
             this, {storage_service}, file_registry_service, "WMSHost")));
 

@@ -12,8 +12,8 @@
 #include <wrench/simulation/SimulationMessage.h>
 #include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
 #include <gtest/gtest.h>
-#include <wrench/services/compute/batch/BatchService.h>
-#include <wrench/services/compute/batch/BatchServiceMessage.h>
+#include <wrench/services/compute/batch/BatchComputeService.h>
+#include <wrench/services/compute/batch/BatchComputeServiceMessage.h>
 #include "wrench/workflow/job/PilotJob.h"
 #include <algorithm>
 #include <simgrid/plugins/energy.h>
@@ -27,11 +27,11 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(energy_consumption_test, "Log category for EnergyCo
 class EnergyConsumptionTest : public ::testing::Test {
 
 public:
-    wrench::StorageService *storage_service1 = nullptr;
-    wrench::StorageService *storage_service2 = nullptr;
-    wrench::ComputeService *compute_service = nullptr;
-    wrench::ComputeService *compute_service1 = nullptr;
-    wrench::ComputeService *compute_service2 = nullptr;
+    std::shared_ptr<wrench::StorageService> storage_service1 = nullptr;
+    std::shared_ptr<wrench::StorageService> storage_service2 = nullptr;
+    std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
+    std::shared_ptr<wrench::ComputeService> compute_service1 = nullptr;
+    std::shared_ptr<wrench::ComputeService> compute_service2 = nullptr;
     wrench::Simulation *simulation = nullptr;
 
     void do_AccessEnergyApiExceptionTests_test();
@@ -100,7 +100,7 @@ class EnergyApiAccessExceptionsTestWMS : public wrench::WMS {
 
 public:
     EnergyApiAccessExceptionsTestWMS(EnergyConsumptionTest *test,
-                             const std::set<wrench::ComputeService *> &compute_services,
+                             const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                              std::string& hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
                         "test") {
@@ -113,7 +113,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       {
 
@@ -279,7 +279,7 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionTests_test() {
   simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   EXPECT_NO_THROW(wms = simulation->add(
           new EnergyApiAccessExceptionsTestWMS(
                   this,  {compute_service}, hostname)));
@@ -313,7 +313,7 @@ class EnergyConsumptionTestWMS : public wrench::WMS {
 
 public:
     EnergyConsumptionTestWMS(EnergyConsumptionTest *test,
-                              const std::set<wrench::ComputeService *> &compute_services,
+                              const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                               std::string& hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
                         "test") {
@@ -326,7 +326,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       {
 
@@ -434,7 +434,7 @@ void EnergyConsumptionTest::do_EnergyConsumption_test() {
   simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   EXPECT_NO_THROW(wms = simulation->add(
           new EnergyConsumptionTestWMS(
                   this,  {compute_service}, hostname)));
@@ -469,7 +469,7 @@ class EnergyAPICheckTestWMS : public wrench::WMS {
 
 public:
     EnergyAPICheckTestWMS(EnergyConsumptionTest *test,
-                             const std::set<wrench::ComputeService *> &compute_services,
+                             const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                              std::string& hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
                         "test") {
@@ -482,7 +482,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
       {
         std::vector<std::string> simulation_hosts = test->simulation->getHostnameList();
 
@@ -587,7 +587,7 @@ void EnergyConsumptionTest::do_SimpleApiChecksEnergy_test() {
   simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   EXPECT_NO_THROW(wms = simulation->add(
           new EnergyAPICheckTestWMS(
                   this,  {compute_service}, hostname)));
@@ -622,7 +622,7 @@ class EnergyConsumptionPStateChangeTestWMS : public wrench::WMS {
 
 public:
     EnergyConsumptionPStateChangeTestWMS(EnergyConsumptionTest *test,
-                             const std::set<wrench::ComputeService *> &compute_services,
+                             const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                              std::string& hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
                         "test") {
@@ -637,7 +637,7 @@ private:
 
       //The tests is just to switch pstate and check if energy consumed is +ve and we don't have any segfaults or something
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       {
         std::vector<std::string> simulation_hosts = test->simulation->getHostnameList();
@@ -823,7 +823,7 @@ void EnergyConsumptionTest::do_EnergyConsumptionPStateChange_test() {
   simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   EXPECT_NO_THROW(wms = simulation->add(
           new EnergyConsumptionPStateChangeTestWMS(
                   this,  {compute_service}, hostname)));

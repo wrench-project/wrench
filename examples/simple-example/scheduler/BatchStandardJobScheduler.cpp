@@ -32,8 +32,8 @@ namespace wrench {
       }
 
       ComputeService *compute_service = *compute_services.begin();
-      BatchService *batch_service;
-      if (not(batch_service = dynamic_cast<BatchService *>(compute_service))) {
+      BatchComputeService *batch_service;
+      if (not(batch_service = dynamic_cast<BatchComputeService *>(compute_service))) {
         throw std::runtime_error("This example Batch Scheduler can only handle a batch service");
       }
 

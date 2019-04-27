@@ -54,7 +54,7 @@ namespace wrench {
             double ram_utilization,
             std::string callback_mailbox,
             std::shared_ptr<Workunit> workunit,
-            StorageService *scratch_space,
+            std::shared_ptr<StorageService> scratch_space,
             StandardJob* job,
             double thread_startup_overhead,
             bool simulate_computation_as_sleep) :
@@ -220,14 +220,14 @@ namespace wrench {
         for (auto file_copy : work->pre_file_copies) {
             WorkflowFile *file = std::get<0>(file_copy);
             //Even in the pre-file copies, the src can be the scratch itself???
-            StorageService *src = std::get<1>(file_copy);
+            std::shared_ptr<StorageService> src = std::get<1>(file_copy);
             if (src == ComputeService::SCRATCH) {
                 if (this->scratch_space == nullptr) {
                     throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new NoScratchSpace("WorkunitExecutor::performWork(): Scratch Space was asked to be used as source but is null")));
                 }
                 src = this->scratch_space;
             }
-            StorageService *dst = std::get<2>(file_copy);
+            std::shared_ptr<StorageService> dst = std::get<2>(file_copy);
             if (dst == ComputeService::SCRATCH) {
                 if (this->scratch_space == nullptr) {
                     throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new NoScratchSpace("WorkunitExecutor::performWork(): Scratch Space was asked to be used as destination but is null")));
@@ -344,11 +344,11 @@ namespace wrench {
         // TODO: This is sequential right now, but probably it should be concurrent in some fashion
         for (auto file_copy : work->post_file_copies) {
             WorkflowFile *file = std::get<0>(file_copy);
-            StorageService *src = std::get<1>(file_copy);
+            std::shared_ptr<StorageService> src = std::get<1>(file_copy);
             if (src == ComputeService::SCRATCH) {
                 src = this->scratch_space;
             }
-            StorageService *dst = std::get<2>(file_copy);
+            std::shared_ptr<StorageService> dst = std::get<2>(file_copy);
             if (dst == ComputeService::SCRATCH) {
                 dst = this->scratch_space;
                 files_stored_in_scratch.insert(file);
@@ -373,7 +373,7 @@ namespace wrench {
         /** Perform all cleanup file deletions */
         for (auto cleanup : work->cleanup_file_deletions) {
             WorkflowFile *file = std::get<0>(cleanup);
-            StorageService *storage_service = std::get<1>(cleanup);
+            std::shared_ptr<StorageService> storage_service = std::get<1>(cleanup);
             try {
                 S4U_Simulation::sleep(this->thread_startup_overhead);
                 if (storage_service == this->scratch_space) {

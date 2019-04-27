@@ -21,8 +21,8 @@ public:
     wrench::WorkflowFile *input_file;
     wrench::WorkflowFile *output_file;
     wrench::WorkflowTask *task;
-    wrench::StorageService *storage_service1 = nullptr;
-    wrench::ComputeService *compute_service = nullptr;
+    std::shared_ptr<wrench::StorageService> storage_service1 = nullptr;
+    std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
 
     void do_NetworkProximity_Test();
 
@@ -96,9 +96,9 @@ class ProxTestWMS : public wrench::WMS {
 
 public:
     ProxTestWMS(NetworkProximityTest *test,
-                const std::set<wrench::ComputeService *> &compute_services,
-                const std::set<wrench::StorageService *> &storage_services,
-                const std::set<wrench::NetworkProximityService *> &network_proximity_services,
+                const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                const std::set<std::shared_ptr<wrench::NetworkProximityService>> &network_proximity_services,
                 std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, storage_services, network_proximity_services, nullptr, hostname, "test") {
       this->test = test;
@@ -188,7 +188,7 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
 
 
   // Create a file registry service
-  wrench::FileRegistryService *file_registry_service = simulation->add( new wrench::FileRegistryService(hostname));
+  auto file_registry_service = simulation->add( new wrench::FileRegistryService(hostname));
 
   // Staging the input_file on the storage service
   ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
@@ -257,12 +257,13 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
   ASSERT_NO_THROW(simulation->add(network_proximity_service));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;
+  std::shared_ptr<wrench::NetworkProximityService> network_proximity_service_shr = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(
           new ProxTestWMS(
                   this,
                   {compute_service}, {storage_service1},
-                  {network_proximity_service}, hostname)));
+                  {network_proximity_service_shr}, hostname)));
 
   ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
@@ -284,9 +285,9 @@ class CompareProxTestWMS : public wrench::WMS {
 
 public:
     CompareProxTestWMS(NetworkProximityTest *test,
-                       std::set<wrench::ComputeService *> compute_services,
-                       std::set<wrench::StorageService *> storage_services,
-                       std::set<wrench::NetworkProximityService *> network_proximity_services,
+                       std::set<std::shared_ptr<wrench::ComputeService>> compute_services,
+                       std::set<std::shared_ptr<wrench::StorageService>> storage_services,
+                       std::set<std::shared_ptr<wrench::NetworkProximityService>> network_proximity_services,
                        std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, storage_services,
                         network_proximity_services, nullptr, hostname, "test") {
@@ -299,10 +300,10 @@ private:
 
     int main() {
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       // Create a data movement manager
-      std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
+      auto data_movement_manager = this->createDataMovementManager();
 
 
       std::pair<std::string, std::string> first_pair_to_compute_proximity;
@@ -409,18 +410,16 @@ void NetworkProximityTest::do_CompareNetworkProximity_Test() {
   std::string network_daemon4 = simulation->getHostnameList()[3];
   std::vector<std::string> hosts_in_network = {network_daemon1, network_daemon2, network_daemon3, network_daemon4};
 
-  wrench::NetworkProximityService *network_proximity_service(
-          new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network, {})
-  );
+  std::shared_ptr<wrench::NetworkProximityService> network_proximity_service;
 
-  ASSERT_NO_THROW(simulation->add(network_proximity_service));
+  ASSERT_NO_THROW(simulation->add(new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network, {})));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
-          new CompareProxTestWMS(this, (std::set<wrench::ComputeService *>){compute_service},
-                                 (std::set<wrench::StorageService *>){storage_service1},
-                                 (std::set<wrench::NetworkProximityService *>){network_proximity_service},
+          new CompareProxTestWMS(this, (std::set<std::shared_ptr<wrench::ComputeService>>){compute_service},
+                                 (std::set<std::shared_ptr<wrench::StorageService>>){storage_service1},
+                                 (std::set<std::shared_ptr<wrench::NetworkProximityService>>){network_proximity_service},
                                  hostname)));
 
   wms->addWorkflow(this->workflow.get(), 0.0);
@@ -443,9 +442,9 @@ void NetworkProximityTest::do_CompareNetworkProximity_Test() {
 class VivaldiConvergeWMS : public wrench::WMS {
 public:
     VivaldiConvergeWMS(NetworkProximityTest *test,
-                       std::set<wrench::ComputeService *> compute_services,
-                       std::set<wrench::StorageService *> storage_services,
-                       std::set<wrench::NetworkProximityService *> network_proximity_services,
+                       std::set<std::shared_ptr<wrench::ComputeService>> compute_services,
+                       std::set<std::shared_ptr<wrench::StorageService>> storage_services,
+                       std::set<std::shared_ptr<wrench::NetworkProximityService>> network_proximity_services,
                        std::string hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services,
                         network_proximity_services, nullptr, hostname, "test") {
@@ -457,18 +456,18 @@ private:
 
     int main() {
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       // Create a data movement manager
-      std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
+      auto data_movement_manager = this->createDataMovementManager();
 
       std::pair<std::string, std::string> hosts_to_compute_proximity;
       hosts_to_compute_proximity = std::make_pair("Host3", "Host4");
 
-      std::set<wrench::NetworkProximityService *> network_proximity_services = this->getAvailableNetworkProximityServices();
+      auto network_proximity_services = this->getAvailableNetworkProximityServices();
 
-      wrench::NetworkProximityService* alltoall_service;
-      wrench::NetworkProximityService* vivaldi_service;
+      std::shared_ptr<wrench::NetworkProximityService> alltoall_service;
+      std::shared_ptr<wrench::NetworkProximityService> vivaldi_service;
 
       for (auto  &nps : network_proximity_services) {
         std::string type = nps->getNetworkProximityServiceType();
@@ -583,30 +582,26 @@ void NetworkProximityTest::do_VivaldiConverge_Test() {
   std::string host4 = simulation->getHostnameList()[3];
   std::vector<std::string> hosts_in_network = {host1, host2, host3, host4};
 
-  wrench::NetworkProximityService* alltoall_network_service = nullptr;
-  wrench::NetworkProximityService* vivaldi_network_service = nullptr;
+  std::shared_ptr<wrench::NetworkProximityService> alltoall_network_service = nullptr;
+  std::shared_ptr<wrench::NetworkProximityService> vivaldi_network_service = nullptr;
 
   // Add vivaldi and alltoall network proximity services
-  ASSERT_NO_THROW(alltoall_network_service =
+  ASSERT_NO_THROW(alltoall_network_service = simulation->add(
                           new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
-                                                              {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"}}));
+                                                              {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"}})));
 
-  ASSERT_NO_THROW(vivaldi_network_service =
+  ASSERT_NO_THROW(vivaldi_network_service = simulation->add(
                           new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
                                                               {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "VIVALDI"},
-                                                               {wrench::NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE, "1.0"}}));
-
-  ASSERT_NO_THROW(simulation->add(alltoall_network_service));
-  ASSERT_NO_THROW(simulation->add(vivaldi_network_service));
-
+                                                               {wrench::NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE, "1.0"}})));
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new VivaldiConvergeWMS(
                   this,
-                  (std::set<wrench::ComputeService *>){compute_service},
-                  (std::set<wrench::StorageService *>){storage_service1},
-                  (std::set<wrench::NetworkProximityService *>){alltoall_network_service, vivaldi_network_service},
+                  (std::set<std::shared_ptr<wrench::ComputeService>>){compute_service},
+                  (std::set<std::shared_ptr<wrench::StorageService>>){storage_service1},
+                  (std::set<std::shared_ptr<wrench::NetworkProximityService>>){alltoall_network_service, vivaldi_network_service},
                   hostname)));
 
   ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
@@ -627,9 +622,9 @@ void NetworkProximityTest::do_VivaldiConverge_Test() {
 class ValidatePropertiesWMS : public wrench::WMS {
 public:
     ValidatePropertiesWMS(NetworkProximityTest *test,
-                          std::set<wrench::ComputeService *> compute_services,
-                          std::set<wrench::StorageService *> storage_services,
-                          std::set<wrench::NetworkProximityService *> network_proximity_services,
+                          std::set<std::shared_ptr<wrench::ComputeService>> compute_services,
+                          std::set<std::shared_ptr<wrench::StorageService>> storage_services,
+                          std::set<std::shared_ptr<wrench::NetworkProximityService>> network_proximity_services,
                           std::string hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services,
                         network_proximity_services, nullptr, hostname, "test") {
@@ -688,7 +683,7 @@ void NetworkProximityTest::do_ValidateProperties_Test() {
   std::string host2 = simulation->getHostnameList()[1];
   std::vector<std::string> hosts_in_network = {host1, host2};
 
-  wrench::NetworkProximityService* nps = nullptr;
+  std::shared_ptr<wrench::NetworkProximityService> nps = nullptr;
   ASSERT_NO_THROW(nps = simulation->add(new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
                                                                             {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"}})));
 
@@ -776,13 +771,13 @@ void NetworkProximityTest::do_ValidateProperties_Test() {
           )));
 
   //Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new ValidatePropertiesWMS(
                   this,
-                  (std::set<wrench::ComputeService *>){compute_service},
-                  (std::set<wrench::StorageService *>){storage_service1},
-                  (std::set<wrench::NetworkProximityService *>){nps},
+                  (std::set<std::shared_ptr<wrench::ComputeService>>){compute_service},
+                  (std::set<std::shared_ptr<wrench::StorageService>>){storage_service1},
+                  (std::set<std::shared_ptr<wrench::NetworkProximityService>>){nps},
                   hostname)));
 
   ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));

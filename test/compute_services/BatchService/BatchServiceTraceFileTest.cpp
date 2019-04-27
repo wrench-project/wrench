@@ -12,8 +12,8 @@
 #include <wrench/simulation/SimulationMessage.h>
 #include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
 #include <gtest/gtest.h>
-#include <wrench/services/compute/batch/BatchService.h>
-#include <wrench/services/compute/batch/BatchServiceMessage.h>
+#include <wrench/services/compute/batch/BatchComputeService.h>
+#include <wrench/services/compute/batch/BatchComputeServiceMessage.h>
 #include <wrench/util/TraceFileLoader.h>
 #include "wrench/workflow/job/PilotJob.h"
 #include <unistd.h>
@@ -27,9 +27,9 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(batch_service_trace_file_test, "Log category for Ba
 class BatchServiceTest : public ::testing::Test {
 
 public:
-    wrench::StorageService *storage_service1 = nullptr;
-    wrench::StorageService *storage_service2 = nullptr;
-    wrench::ComputeService *compute_service = nullptr;
+    std::shared_ptr<wrench::StorageService> storage_service1 = nullptr;
+    std::shared_ptr<wrench::StorageService> storage_service2 = nullptr;
+    std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
     wrench::Simulation *simulation;
 
     void do_BatchTraceFileReplayTest_test();
@@ -82,8 +82,8 @@ class BatchTraceFileReplayTestWMS : public wrench::WMS {
 
 public:
     BatchTraceFileReplayTestWMS(BatchServiceTest *test,
-                                const std::set<wrench::ComputeService *> &compute_services,
-                                const std::set<wrench::StorageService *> &storage_services,
+                                const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                 std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, storage_services,
                         {}, nullptr, hostname, "test") {
@@ -97,7 +97,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
       
       // Submit the jobs
       unsigned long num_submitted_jobs = 0;
@@ -205,11 +205,11 @@ void BatchServiceTest::do_BatchTraceFileReplayTest_test() {
 
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname,
+          new wrench::BatchComputeService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, {})));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new BatchTraceFileReplayTestWMS(
                   this, {compute_service}, {}, hostname)));
@@ -236,8 +236,8 @@ class BatchTraceFileReplayTestWithFailedJobWMS : public wrench::WMS {
 
 public:
     BatchTraceFileReplayTestWithFailedJobWMS(BatchServiceTest *test,
-                                const std::set<wrench::ComputeService *> &compute_services,
-                                const std::set<wrench::StorageService *> &storage_services,
+                                const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                 std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, storage_services,
                         {}, nullptr, hostname, "test") {
@@ -288,14 +288,14 @@ void BatchServiceTest::do_BatchTraceFileReplayTestWithFailedJob_test() {
 
   // Create a Batch Service with a the valid trace file
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname,
+          new wrench::BatchComputeService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, 0,
-                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
+                                   {{wrench::BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
           )));
 
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new BatchTraceFileReplayTestWithFailedJobWMS(
                   this, {compute_service}, {}, hostname)));
@@ -321,8 +321,8 @@ class WorkloadTraceFileSWFTestWMS : public wrench::WMS {
 
 public:
     WorkloadTraceFileSWFTestWMS(BatchServiceTest *test,
-                                const std::set<wrench::ComputeService *> &compute_services,
-                                const std::set<wrench::StorageService *> &storage_services,
+                                const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                 std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
                         hostname, "test") {
@@ -335,7 +335,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       wrench::Simulation::sleep(10);
       // At this point, using the FCFS algorithm, a 2-node 30-min job should complete around t=1.5 hours
@@ -464,23 +464,23 @@ void BatchServiceTest::do_WorkloadTraceFileTestSWF_test() {
 
   // Create a Batch Service with a trace file with no extension, which should throw
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname,
+          new wrench::BatchComputeService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, 0,
-                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, "/not_there_invalid"}}
+                                   {{wrench::BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, "/not_there_invalid"}}
           )), std::invalid_argument);
 
   // Create a Batch Service with a trace file with a bogus extension, which should throw
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname,
+          new wrench::BatchComputeService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, 0,
-                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, "/not_there.invalid"}}
+                                   {{wrench::BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, "/not_there.invalid"}}
           )), std::invalid_argument);
 
   // Create a Batch Service with a non-existing workload trace file, which should throw
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname,
+          new wrench::BatchComputeService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, 0,
-                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, "/not_there.swf"}}
+                                   {{wrench::BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, "/not_there.swf"}}
           )), std::invalid_argument);
 
   std::string trace_file_path = UNIQUE_TMP_PATH_PREFIX + "swf_trace.swf";
@@ -494,9 +494,9 @@ void BatchServiceTest::do_WorkloadTraceFileTestSWF_test() {
 
   // Create a Batch Service with a bogus trace file, which should throw
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname,
+          new wrench::BatchComputeService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, 0,
-                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
+                                   {{wrench::BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
           )), std::invalid_argument);
 
   // Create another invalid trace file
@@ -507,9 +507,9 @@ void BatchServiceTest::do_WorkloadTraceFileTestSWF_test() {
 
   // Create a Batch Service with a bogus trace file, which should throw
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname,
+          new wrench::BatchComputeService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, 0,
-                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
+                                   {{wrench::BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
           )), std::invalid_argument);
 
   // Create another invalid trace file
@@ -521,9 +521,9 @@ void BatchServiceTest::do_WorkloadTraceFileTestSWF_test() {
 
   // Create a Batch Service with a bogus trace file, which should throw
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname,
+          new wrench::BatchComputeService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, 0,
-                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
+                                   {{wrench::BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
           )), std::invalid_argument);
 
   // Create another invalid trace file
@@ -535,14 +535,14 @@ void BatchServiceTest::do_WorkloadTraceFileTestSWF_test() {
 
   // Create a Batch Service with a non-existing workload trace file, which should throw
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname,
+          new wrench::BatchComputeService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, 0,
-                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
+                                   {{wrench::BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
           )), std::invalid_argument);
 
 
   // Create a Valid trace file (not the "wrong" estimates, which are ignored due to
-  // passing the correct option to the BatchService constructor
+  // passing the correct option to the BatchComputeService constructor
   trace_file = fopen(trace_file_path.c_str(), "w");
   fprintf(trace_file, "1 0 -1 3600 -1 -1 -1 4 5600 -1\n");  // job that takes the whole machine
   fprintf(trace_file, "2 1 -1 3600 -1 -1 -1 2 8666 -1\n");  // job that takes half the machine (and times out, for coverage)
@@ -551,17 +551,17 @@ void BatchServiceTest::do_WorkloadTraceFileTestSWF_test() {
 
   // Create a Batch Service with a the valid trace file
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname,
+          new wrench::BatchComputeService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, 0,
                                    {
-              {wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path},
-              {wrench::BatchServiceProperty::USE_REAL_RUNTIMES_AS_REQUESTED_RUNTIMES, "true"}
+              {wrench::BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path},
+              {wrench::BatchComputeServiceProperty::USE_REAL_RUNTIMES_AS_REQUESTED_RUNTIMES, "true"}
                                    }
           )));
 
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(new WorkloadTraceFileSWFTestWMS(
           this, {compute_service}, {}, hostname)));
 
@@ -592,8 +592,8 @@ class WorkloadTraceFileSWFRequestedTimesTestWMS : public wrench::WMS {
 
 public:
     WorkloadTraceFileSWFRequestedTimesTestWMS(BatchServiceTest *test,
-                                const std::set<wrench::ComputeService *> &compute_services,
-                                const std::set<wrench::StorageService *> &storage_services,
+                                const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                 std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
                         hostname, "test") {
@@ -607,7 +607,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       wrench::Simulation::sleep(10);
 
@@ -718,20 +718,20 @@ void BatchServiceTest::do_WorkloadTraceFileRequestedTimesTestSWF_test() {
 
   // Create a Batch Service with a the valid trace file
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname,
+          new wrench::BatchComputeService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, 0,
                                    {
-            {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "easy_bf"},
-            {wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path},
-            {wrench::BatchServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP, "true"},
-            {wrench::BatchServiceProperty::BATSCHED_LOGGING_MUTED, "true"},
-            {wrench::BatchServiceProperty::USE_REAL_RUNTIMES_AS_REQUESTED_RUNTIMES, "false"}
+            {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "easy_bf"},
+            {wrench::BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path},
+            {wrench::BatchComputeServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP, "true"},
+            {wrench::BatchComputeServiceProperty::BATSCHED_LOGGING_MUTED, "true"},
+            {wrench::BatchComputeServiceProperty::USE_REAL_RUNTIMES_AS_REQUESTED_RUNTIMES, "false"}
                                    }
           )));
 
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(new WorkloadTraceFileSWFRequestedTimesTestWMS(
           this, {compute_service}, {}, hostname)));
 
@@ -782,8 +782,8 @@ class WorkloadTraceFileJSONTestWMS : public wrench::WMS {
 
 public:
     WorkloadTraceFileJSONTestWMS(BatchServiceTest *test,
-                                 const std::set<wrench::ComputeService *> &compute_services,
-                                 const std::set<wrench::StorageService *> &storage_services,
+                                 const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                 const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                  std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
                         hostname, "test") {
@@ -797,7 +797,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       wrench::Simulation::sleep(10);
       // At this point, using the FCFS algorithm, a 2-node 30-min job should complete around t=1.5 hours
@@ -926,24 +926,24 @@ void BatchServiceTest::do_WorkloadTraceFileTestJSON_test() {
 
   // Create a Batch Service with a trace file with no extension, which should throw
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname,
+          new wrench::BatchComputeService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, 0,
-                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, "/not_there_invalid"}}
+                                   {{wrench::BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, "/not_there_invalid"}}
           )), std::invalid_argument);
 
   // Create a Batch Service with a trace file with a bogus extension, which should throw
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname,
+          new wrench::BatchComputeService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, 0,
-                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, "/not_there.invalid"}}
+                                   {{wrench::BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, "/not_there.invalid"}}
           )), std::invalid_argument);
 
 
   // Create a Batch Service with a non-existing workload trace file, which should throw
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname,
+          new wrench::BatchComputeService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, 0,
-                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, "/not_there.json"}}
+                                   {{wrench::BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, "/not_there.json"}}
           )), std::invalid_argument);
 
   std::string trace_file_path = UNIQUE_TMP_PATH_PREFIX + "swf_trace.json";
@@ -976,9 +976,9 @@ void BatchServiceTest::do_WorkloadTraceFileTestJSON_test() {
 
   // Create a Batch Service with a bogus trace file, which should throw
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname,
+          new wrench::BatchComputeService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, 0,
-                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
+                                   {{wrench::BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
           )), std::invalid_argument);
 
   /** Create an invalid trace file: Valid JSON Syntax but no jobs **/
@@ -1013,9 +1013,9 @@ void BatchServiceTest::do_WorkloadTraceFileTestJSON_test() {
 
   // Create a Batch Service with a bogus trace file, which should throw
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname,
+          new wrench::BatchComputeService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, 0,
-                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
+                                   {{wrench::BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
           )), std::invalid_argument);
 
 
@@ -1044,9 +1044,9 @@ void BatchServiceTest::do_WorkloadTraceFileTestJSON_test() {
   fclose(trace_file);
 
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname,
+          new wrench::BatchComputeService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, 0,
-                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
+                                   {{wrench::BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
           )), std::invalid_argument);
 
   /** Create an invalid trace file: Valid JSON and jobs, but missing field **/
@@ -1080,9 +1080,9 @@ void BatchServiceTest::do_WorkloadTraceFileTestJSON_test() {
 
   // Create a Batch Service with a bogus trace file, which should throw
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname,
+          new wrench::BatchComputeService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, 0,
-                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
+                                   {{wrench::BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
           )), std::invalid_argument);
 
   /** Create an invalid trace file: Valid JSON and jobs, but invalid res field **/
@@ -1117,9 +1117,9 @@ void BatchServiceTest::do_WorkloadTraceFileTestJSON_test() {
 
   // Create a Batch Service with a bogus trace file, which should throw
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname,
+          new wrench::BatchComputeService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, 0,
-                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
+                                   {{wrench::BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
           )), std::invalid_argument);
 
 
@@ -1155,9 +1155,9 @@ void BatchServiceTest::do_WorkloadTraceFileTestJSON_test() {
 
   // Create a Batch Service with a bogus trace file, which should throw
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname,
+          new wrench::BatchComputeService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, 0,
-                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
+                                   {{wrench::BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
           )), std::invalid_argument);
 
   /** Create an invalid trace file: Valid JSON and jobs, but invalid walltime field **/
@@ -1192,9 +1192,9 @@ void BatchServiceTest::do_WorkloadTraceFileTestJSON_test() {
 
   // Create a Batch Service with a bogus trace file, which should throw
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname,
+          new wrench::BatchComputeService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, 0,
-                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
+                                   {{wrench::BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
           )), std::invalid_argument);
 
 
@@ -1231,14 +1231,14 @@ void BatchServiceTest::do_WorkloadTraceFileTestJSON_test() {
 
   // Create a Batch Service with a non-existing workload trace file, which should throw
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname,
+          new wrench::BatchComputeService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, 0,
-                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
+                                   {{wrench::BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
           )));
 
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(new WorkloadTraceFileJSONTestWMS(
           this, {compute_service}, {}, hostname)));
 

@@ -12,9 +12,11 @@
 #define WRENCH_FILEREGISTRYMESSAGE_H
 
 
-#include <wrench/services/ServiceMessage.h>
 #include <iostream>
+#include <wrench/services/ServiceMessage.h>
+#include <wrench/workflow/WorkflowFile.h>
 #include <wrench/services/network_proximity/NetworkProximityService.h>
+#include <wrench/services/storage/StorageService.h>
 
 namespace wrench {
 
@@ -49,12 +51,12 @@ namespace wrench {
      */
     class FileRegistryFileLookupAnswerMessage : public FileRegistryMessage {
     public:
-        FileRegistryFileLookupAnswerMessage(WorkflowFile *file, std::set<StorageService *> locations, double payload);
+        FileRegistryFileLookupAnswerMessage(WorkflowFile *file, std::set<std::shared_ptr<StorageService>> locations, double payload);
 
         /** @brief The file that was looked up */
         WorkflowFile *file;
         /** @brief The (possibly empty) set of storage services where the file was found */
-        std::set<StorageService *> locations;
+        std::set<std::shared_ptr<StorageService>> locations;
     };
 
     /**
@@ -65,7 +67,8 @@ namespace wrench {
     public:
         FileRegistryFileLookupByProximityRequestMessage(std::string answer_mailbox, WorkflowFile *file,
                                                         std::string reference_host,
-                NetworkProximityService *network_proximity_service, double payload);
+                                                        std::shared_ptr<NetworkProximityService> network_proximity_service,
+                                                                double payload);
 
         /** @brief The mailbox to which the answer message should be sent */
         std::string answer_mailbox;
@@ -83,7 +86,7 @@ namespace wrench {
         /**
          * @brief The network proximity service to be used
          */
-        NetworkProximityService *network_proximity_service;
+        std::shared_ptr<NetworkProximityService> network_proximity_service;
     };
 
     /**
@@ -94,7 +97,7 @@ namespace wrench {
     public:
         FileRegistryFileLookupByProximityAnswerMessage(WorkflowFile *file,
                                                        std::string reference_host,
-                                                       std::map<double, StorageService *> locations,
+                                                       std::map<double, std::shared_ptr<StorageService>> locations,
                                                        double payload);
 
         /** @brief The file to lookup */
@@ -111,7 +114,7 @@ namespace wrench {
          * @brief A map of all locations where the file resides sorted with respect to their distance from
          * the host 'host_to_measure_from'
          */
-        std::map<double, StorageService *> locations;
+        std::map<double, std::shared_ptr<StorageService>> locations;
     };
 
     /**
@@ -120,14 +123,14 @@ namespace wrench {
     class FileRegistryRemoveEntryRequestMessage : public FileRegistryMessage {
     public:
         FileRegistryRemoveEntryRequestMessage(std::string answer_mailbox, WorkflowFile *file,
-                                              StorageService *storage_service, double payload);
+                                              std::shared_ptr<StorageService> storage_service, double payload);
 
         /** @brief The mailbox to which the answer message should be sent */
         std::string answer_mailbox;
         /** @brief The file for which one entry should be removed */
         WorkflowFile *file;
         /** @brief The storage service of the entry to remove */
-        StorageService *storage_service;
+        std::shared_ptr<StorageService> storage_service;
     };
 
     /**
@@ -147,14 +150,14 @@ namespace wrench {
     class FileRegistryAddEntryRequestMessage : public FileRegistryMessage {
     public:
         FileRegistryAddEntryRequestMessage(std::string answer_mailbox, WorkflowFile *file,
-                                           StorageService *storage_service, double payload);
+                                           std::shared_ptr<StorageService> storage_service, double payload);
 
         /** @brief The mailbox to which the answer message should be sent */
         std::string answer_mailbox;
         /** @brief The file for which to add an entry */
         WorkflowFile *file;
         /** @brief The storage service in that entry */
-        StorageService *storage_service;
+        std::shared_ptr<StorageService> storage_service;
     };
 
     /**

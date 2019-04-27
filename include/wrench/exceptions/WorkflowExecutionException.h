@@ -17,6 +17,7 @@
 #include <string.h>
 
 #include "wrench/workflow/execution_events/FailureCause.h"
+
 namespace wrench {
 
 		/***********************/
@@ -57,16 +58,6 @@ namespace wrench {
 				/***********************/
 				/** \cond INTERNAL    */
 				/***********************/
-
-
-//
-//				/**
-//				 * @brief Constructor
-//				 * @param cause: the cause of the failure
-//				 */
-//				WorkflowExecutionException(FailureCause *cause) {
-//					this->cause = std::shared_ptr<FailureCause>(cause);
-//				}
 
 				/**
 				 * @brief Constructor

@@ -109,8 +109,8 @@ simulated platform:
 
 - **Compute Services** (classes that derive `wrench::ComputeService`): These are services
   that know how to compute workflow tasks. These include bare-metal servers (`wrench::BareMetalComputeService`), cloud
-  platforms (`wrench::CloudService`), virtualized cluster platforms (`wrench::VirtualizedClusterService`), 
-  batch-scheduled clusters (`wrench::BatchService`).
+  platforms (`wrench::CloudComputeService`), virtualized cluster platforms (`wrench::VirtualizedClusterComputeService`),
+  batch-scheduled clusters (`wrench::BatchComputeService`).
   It is not technically required to instantiate a compute service, but then no workflow task
   can be executed by the WMS. 
 
@@ -164,8 +164,8 @@ so on at all levels of the service class hierarchy.
 
 The API documentation for these property classes explains what each property means, what possible 
 values are, and what default values are. Other properties have more to do with what the service 
-can or should do when in operation. For instance, the `wrench::BatchServiceProperty` class defines a
-`wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM` which specifies what scheduling algorithm 
+can or should do when in operation. For instance, the `wrench::BatchComputeServiceProperty` class defines a
+`wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM` which specifies what scheduling algorithm
 a batch service should use for prioritizing jobs. All property classes inherit from the 
 `wrench::ServiceProperty` class, and one can explore that hierarchy to discover
 all possible (and there are many) service customization opportunities. 

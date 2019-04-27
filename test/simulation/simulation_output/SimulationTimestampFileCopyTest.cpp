@@ -11,9 +11,9 @@
 class SimulationTimestampFileCopyTest : public ::testing::Test {
 
 public:
-    wrench::ComputeService *compute_service = nullptr;
-    wrench::StorageService *source_storage_service = nullptr;
-    wrench::StorageService *destination_storage_service = nullptr;
+    std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
+    std::shared_ptr<wrench::StorageService> source_storage_service = nullptr;
+    std::shared_ptr<wrench::StorageService> destination_storage_service = nullptr;
 
     wrench::WorkflowFile *file_1;
     wrench::WorkflowFile *file_2;
@@ -61,10 +61,10 @@ protected:
 class SimulationTimestampFileCopyBasicTestWMS : public wrench::WMS {
 public:
     SimulationTimestampFileCopyBasicTestWMS(SimulationTimestampFileCopyTest *test,
-    const std::set<wrench::ComputeService *> &compute_services,
-    const std::set<wrench::StorageService *> &storage_services,
-    wrench::FileRegistryService *file_registry_service,
-    std::string &hostname) : wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, file_registry_service, hostname, "test") {
+                                            const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                            const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                                            std::shared_ptr<wrench::FileRegistryService> file_registry_service,
+                                            std::string &hostname) : wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, file_registry_service, hostname, "test") {
         this->test = test;
     }
 protected:
@@ -115,7 +115,7 @@ protected:
          */
 
         return 0;
-     }
+    }
 };
 
 TEST_F(SimulationTimestampFileCopyTest, SimulationTimestampFileCopyBasicTest) {
@@ -136,19 +136,19 @@ void SimulationTimestampFileCopyTest::do_SimulationTimestampFileCopyBasic_test()
     std::string host2 = simulation->getHostnameList()[1];
 
     ASSERT_NO_THROW(compute_service = simulation->add(new wrench::BareMetalComputeService(host1,
-                                                                                                   {std::make_pair(
-                                                                                                           host1,
-                                                                                                           std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                                           wrench::ComputeService::ALL_RAM))},
-                                                                                                   {})));
+                                                                                          {std::make_pair(
+                                                                                                  host1,
+                                                                                                  std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                                                  wrench::ComputeService::ALL_RAM))},
+                                                                                          {})));
 
     ASSERT_NO_THROW(source_storage_service = simulation->add(new wrench::SimpleStorageService(host1, 100000000000000000000.0)));
     ASSERT_NO_THROW(destination_storage_service = simulation->add(new wrench::SimpleStorageService(host2, 10000000000)));
 
-    wrench::FileRegistryService *file_registry_service = nullptr;
+    std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
     ASSERT_NO_THROW(file_registry_service = simulation->add(new wrench::FileRegistryService(host1)));
 
-    wrench::WMS *wms = nullptr;
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(new SimulationTimestampFileCopyBasicTestWMS(
             this, {compute_service}, {source_storage_service, destination_storage_service, }, file_registry_service, host1
     )));
@@ -157,10 +157,10 @@ void SimulationTimestampFileCopyTest::do_SimulationTimestampFileCopyBasic_test()
 
     //stage files
     std::map<std::string, wrench::WorkflowFile *> files_to_stage = {std::make_pair(file_1->getID(), file_1),
-                                                                  std::make_pair(file_2->getID(), file_2),
-                                                                  std::make_pair(file_3->getID(), file_3),
-                                                                  std::make_pair(xl_file->getID(), xl_file),
-                                                                  std::make_pair(too_large_file->getID(), too_large_file)};
+                                                                    std::make_pair(file_2->getID(), file_2),
+                                                                    std::make_pair(file_3->getID(), file_3),
+                                                                    std::make_pair(xl_file->getID(), xl_file),
+                                                                    std::make_pair(too_large_file->getID(), too_large_file)};
 
     ASSERT_NO_THROW(simulation->stageFiles(files_to_stage, source_storage_service));
 

@@ -53,13 +53,13 @@ namespace wrench {
          *        it implements, over a set of compute services
          * @param compute_services: the set of compute services
          */
-        virtual void schedulePilotJobs(const std::set<ComputeService *> &compute_services) = 0;
+        virtual void schedulePilotJobs(const std::set<std::shared_ptr<ComputeService>> &compute_services) = 0;
 
         /**
          * @brief Get the data movement manager to be used by this scheduler (nullptr: none is used)
          * @return a data movement manager
          */
-        DataMovementManager *getDataMovementManager() {
+        std::shared_ptr<DataMovementManager> getDataMovementManager() {
           return this->data_movement_manager;
         }
 
@@ -67,7 +67,7 @@ namespace wrench {
          * @brief Get the job manager to be used by this scheduler (nullptr: none is used)
          * @return a job manager
          */
-        JobManager *getJobManager() {
+        std::shared_ptr<JobManager> getJobManager() {
           return this->job_manager;
         }
 
@@ -83,7 +83,7 @@ namespace wrench {
          * @brief Set the data movement manager to be used by this scheduler (nullptr: none is used)
          * @param data_movement_manager: a data movement manager
          */
-        void setDataMovementManager(DataMovementManager *data_movement_manager) {
+        void setDataMovementManager(std::shared_ptr<DataMovementManager> data_movement_manager) {
           this->data_movement_manager = data_movement_manager;
         }
 
@@ -91,7 +91,7 @@ namespace wrench {
          * @brief Set the job manager to be used by this scheduler (nullptr: none is used)
          * @param job_manager: a job manager
          */
-        void setJobManager(JobManager *job_manager) {
+        void setJobManager(std::shared_ptr<JobManager> job_manager) {
           this->job_manager = job_manager;
         }
 
@@ -101,8 +101,8 @@ namespace wrench {
 
     private:
 
-        DataMovementManager *data_movement_manager;
-        JobManager *job_manager;
+        std::shared_ptr<DataMovementManager> data_movement_manager;
+        std::shared_ptr<JobManager> job_manager;
 
     };
 };

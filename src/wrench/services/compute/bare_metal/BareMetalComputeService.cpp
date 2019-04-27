@@ -359,7 +359,7 @@ namespace wrench {
             std::map<std::string, double> messagepayload_list,
             double ttl,
             PilotJob *pj,
-            std::string suffix, StorageService *scratch_space) : ComputeService(hostname,
+            std::string suffix, std::shared_ptr<StorageService> scratch_space) : ComputeService(hostname,
                                                                                 "bare_metal" + suffix,
                                                                                 "bare_metal" + suffix,
                                                                                 scratch_space) {
@@ -387,7 +387,7 @@ namespace wrench {
                                                      const std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
                                                      std::map<std::string, std::string> property_list,
                                                      std::map<std::string, double> messagepayload_list,
-                                                     StorageService *scratch_space) :
+                                                     std::shared_ptr<StorageService> scratch_space) :
             ComputeService(hostname,
                            "bare_metal",
                            "bare_metal",
@@ -888,7 +888,7 @@ namespace wrench {
         try {
             S4U_Mailbox::putMessage(job->popCallbackMailbox(),
                                     new ComputeServiceStandardJobFailedMessage(
-                                            job, this, cause, this->getMessagePayloadValue(
+                                            job, std::dynamic_pointer_cast<BareMetalComputeService>(this->getSharedPtr()), cause, this->getMessagePayloadValue(
                                                     BareMetalComputeServiceMessagePayload::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
             return;
@@ -987,7 +987,7 @@ namespace wrench {
 
 
         for (auto job : this->running_jobs) {
-            this->failRunningStandardJob(job, std::shared_ptr<FailureCause>(new JobKilled(job, this)));
+            this->failRunningStandardJob(job, std::shared_ptr<FailureCause>(new JobKilled(job, std::dynamic_pointer_cast<BareMetalComputeService>(this->getSharedPtr()))));
         }
     }
 
@@ -1019,7 +1019,7 @@ namespace wrench {
             try {
                 S4U_Mailbox::putMessage(this->containing_pilot_job->popCallbackMailbox(),
                                         new ComputeServicePilotJobExpiredMessage(
-                                                this->containing_pilot_job, this,
+                                                this->containing_pilot_job, std::dynamic_pointer_cast<BareMetalComputeService>(this->getSharedPtr()),
                                                 this->getMessagePayloadValue(
                                                         BareMetalComputeServiceMessagePayload::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD)));
             } catch (std::shared_ptr<NetworkError> &cause) {
@@ -1162,7 +1162,7 @@ namespace wrench {
         try {
             S4U_Mailbox::dputMessage(
                     job->popCallbackMailbox(), new ComputeServiceStandardJobDoneMessage(
-                            job, this, this->getMessagePayloadValue(
+                            job, std::dynamic_pointer_cast<BareMetalComputeService>(this->getSharedPtr()), this->getMessagePayloadValue(
                                     BareMetalComputeServiceMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
             return;
@@ -1241,7 +1241,7 @@ namespace wrench {
         if (this->all_workunits.find(job) == this->all_workunits.end()) {
             WRENCH_INFO("Trying to terminate a standard job that's not (no longer?) running!");
             ComputeServiceTerminateStandardJobAnswerMessage *answer_message = new ComputeServiceTerminateStandardJobAnswerMessage(
-                    job, this, false, std::shared_ptr<FailureCause>(new JobCannotBeTerminated(job)),
+                    job, std::dynamic_pointer_cast<BareMetalComputeService>(this->getSharedPtr()), false, std::shared_ptr<FailureCause>(new JobCannotBeTerminated(job)),
                     this->getMessagePayloadValue(
                             BareMetalComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD));
             try {
@@ -1256,7 +1256,7 @@ namespace wrench {
 
         // reply
         ComputeServiceTerminateStandardJobAnswerMessage *answer_message = new ComputeServiceTerminateStandardJobAnswerMessage(
-                job, this, true, nullptr,
+                job, std::dynamic_pointer_cast<BareMetalComputeService>(this->getSharedPtr()), true, nullptr,
                 this->getMessagePayloadValue(
                         BareMetalComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD));
         try {
@@ -1358,7 +1358,7 @@ namespace wrench {
                 S4U_Mailbox::dputMessage(
                         answer_mailbox,
                         new ComputeServiceSubmitStandardJobAnswerMessage(
-                                job, this, false, std::shared_ptr<FailureCause>(new JobTypeNotSupported(job, this)),
+                                job, std::dynamic_pointer_cast<BareMetalComputeService>(this->getSharedPtr()), false, std::shared_ptr<FailureCause>(new JobTypeNotSupported(job, std::dynamic_pointer_cast<BareMetalComputeService>(this->getSharedPtr()))),
                                 this->getMessagePayloadValue(
                                         ComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
             } catch (std::shared_ptr<NetworkError> &cause) {
@@ -1373,7 +1373,7 @@ namespace wrench {
                 S4U_Mailbox::dputMessage(
                         answer_mailbox,
                         new ComputeServiceSubmitStandardJobAnswerMessage(
-                                job, this, false, std::shared_ptr<FailureCause>(new NotEnoughResources(job, this)),
+                                job, std::dynamic_pointer_cast<BareMetalComputeService>(this->getSharedPtr()), false, std::shared_ptr<FailureCause>(new NotEnoughResources(job, std::dynamic_pointer_cast<BareMetalComputeService>(this->getSharedPtr()))),
                                 this->getMessagePayloadValue(
                                         BareMetalComputeServiceMessagePayload::NOT_ENOUGH_CORES_MESSAGE_PAYLOAD)));
             } catch (std::shared_ptr<NetworkError> &cause) {
@@ -1413,7 +1413,7 @@ namespace wrench {
             S4U_Mailbox::dputMessage(
                     answer_mailbox,
                     new ComputeServiceSubmitStandardJobAnswerMessage(
-                            job, this, true, nullptr, this->getMessagePayloadValue(
+                            job, std::dynamic_pointer_cast<BareMetalComputeService>(this->getSharedPtr()), true, nullptr, this->getMessagePayloadValue(
                                     ComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
             return;
@@ -1438,7 +1438,7 @@ namespace wrench {
             try {
                 S4U_Mailbox::dputMessage(
                         answer_mailbox, new ComputeServiceSubmitPilotJobAnswerMessage(
-                                job, this, false, std::shared_ptr<FailureCause>(new JobTypeNotSupported(job, this)),
+                                job, std::dynamic_pointer_cast<BareMetalComputeService>(this->getSharedPtr()), false, std::shared_ptr<FailureCause>(new JobTypeNotSupported(job, std::dynamic_pointer_cast<BareMetalComputeService>(this->getSharedPtr()))),
                                 this->getMessagePayloadValue(
                                         BareMetalComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
             } catch (std::shared_ptr<NetworkError> &cause) {

@@ -36,17 +36,20 @@ namespace wrench {
 
         void kill();
 
-        void initiateAsynchronousFileCopy(WorkflowFile *file, StorageService *src, StorageService *dst, FileRegistryService *file_registry_service=nullptr);
+        void initiateAsynchronousFileCopy(WorkflowFile *file, std::shared_ptr<StorageService> src,
+                std::shared_ptr<StorageService> dst, std::shared_ptr<FileRegistryService> file_registry_service=nullptr);
         void initiateAsynchronousFileCopy(WorkflowFile *file,
-                                          StorageService *src, std::string src_partition,
-                                          StorageService *dst, std::string dst_partition,
-                                          FileRegistryService *file_registry_service=nullptr);
+                                          std::shared_ptr<StorageService> src, std::string src_partition,
+                                                  std::shared_ptr<StorageService> dst, std::string dst_partition,
+                                          std::shared_ptr<FileRegistryService> file_registry_service=nullptr);
 
-        void doSynchronousFileCopy(WorkflowFile *file, StorageService *src, StorageService *dst, FileRegistryService *file_registry_service=nullptr);
+        void doSynchronousFileCopy(WorkflowFile *file, std::shared_ptr<StorageService> src,
+                                   std::shared_ptr<StorageService> dst,
+                                   std::shared_ptr<FileRegistryService> file_registry_service=nullptr);
         void doSynchronousFileCopy(WorkflowFile *file,
-                                   StorageService *src, std::string src_partition,
-                                   StorageService *dst, std::string dst_partition,
-                                   FileRegistryService *file_registry_service=nullptr);
+                                   std::shared_ptr<StorageService> src, std::string src_partition,
+                                   std::shared_ptr<StorageService> dst, std::string dst_partition,
+                                   std::shared_ptr<FileRegistryService> file_registry_service=nullptr);
 
     protected:
 
@@ -73,13 +76,14 @@ namespace wrench {
 
         struct CopyRequestSpecs {
             WorkflowFile *file;
-            StorageService *dst;
+            std::shared_ptr<StorageService> dst;
             std::string dst_partition;
-            FileRegistryService *file_registry_service;
+            std::shared_ptr<FileRegistryService> file_registry_service;
 
             CopyRequestSpecs(WorkflowFile *file,
-            StorageService *dst, std::string dst_partition,
-            FileRegistryService *file_registry_service) : file(file), dst(dst), dst_partition(dst_partition), file_registry_service(file_registry_service) {}
+                             std::shared_ptr<StorageService> dst, std::string dst_partition,
+                             std::shared_ptr<FileRegistryService> file_registry_service) :
+                             file(file), dst(dst), dst_partition(dst_partition), file_registry_service(file_registry_service) {}
 
             bool operator==(const CopyRequestSpecs &rhs) const {
               return (file == rhs.file) && (dst == rhs.dst) && (dst_partition == rhs.dst_partition);

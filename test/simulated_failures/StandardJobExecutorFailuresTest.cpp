@@ -28,8 +28,8 @@ public:
     wrench::WorkflowFile *input_file;
     wrench::WorkflowFile *output_file;
     wrench::WorkflowTask *task;
-    wrench::StorageService *storage_service = nullptr;
-    wrench::ComputeService *compute_service = nullptr;
+    std::shared_ptr<wrench::StorageService> storage_service = nullptr;
+    std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
 
     void do_StandardJobExecutorOneFailureCausingWorkUnitRestartOnAnotherHost_test();
     void do_StandardJobExecutorOneFailureCausingWorkUnitRestartOnSameHost_test();
@@ -86,7 +86,7 @@ class StandardJobExecutorOneFailureCausingWorkUnitRestartOnAnotherHostTestWMS : 
 
 public:
     StandardJobExecutorOneFailureCausingWorkUnitRestartOnAnotherHostTestWMS(StandardJobExecutorSimulatedFailuresTest *test,
-                                                                            std::string &hostname, wrench::StorageService *ss) :
+                                                                            std::string &hostname, std::shared_ptr<wrench::StorageService> ss) :
             wrench::WMS(nullptr, nullptr, {}, {ss}, {}, nullptr, hostname, "testX") {
         this->test = test;
     }
@@ -109,7 +109,7 @@ private:
 
 
         // Create a job manager
-        std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+        auto job_manager = this->createJobManager();
 
         // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
         auto job = job_manager->createStandardJob(
@@ -120,7 +120,7 @@ private:
                 },
                 {},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->getWorkflow()->getFileByID("input_file"),
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
                                                                               this->test->storage_service)});
 
         // Create a StandardJobExecutor
@@ -189,7 +189,7 @@ void StandardJobExecutorSimulatedFailuresTest::do_StandardJobExecutorOneFailureC
     storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, 10000000000000.0));
 
     // Create a WMS
-    wrench::WMS *wms = nullptr;
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
     wms = simulation->add(new StandardJobExecutorOneFailureCausingWorkUnitRestartOnAnotherHostTestWMS(this, stable_host, storage_service));
 
     wms->addWorkflow(workflow);
@@ -218,7 +218,7 @@ class StandardJobExecutorOneFailureCausingWorkUnitRestartOnSameHostTestWMS : pub
 
 public:
     StandardJobExecutorOneFailureCausingWorkUnitRestartOnSameHostTestWMS(StandardJobExecutorSimulatedFailuresTest *test,
-                                                                         std::string &hostname, wrench::StorageService *ss) :
+                                                                         std::string &hostname, std::shared_ptr<wrench::StorageService> ss) :
             wrench::WMS(nullptr, nullptr, {}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -241,7 +241,7 @@ private:
 
 
         // Create a job manager
-        std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+        auto job_manager = this->createJobManager();
 
         // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
         auto job = job_manager->createStandardJob(
@@ -252,7 +252,7 @@ private:
                 },
                 {},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->getWorkflow()->getFileByID("input_file"),
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
                                                                               this->test->storage_service)});
 
         // Create a StandardJobExecutor
@@ -319,7 +319,7 @@ void StandardJobExecutorSimulatedFailuresTest::do_StandardJobExecutorOneFailureC
     storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, 10000000000000.0));
 
     // Create a WMS
-    wrench::WMS *wms = nullptr;
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
     wms = simulation->add(new StandardJobExecutorOneFailureCausingWorkUnitRestartOnSameHostTestWMS(this, stable_host, storage_service));
 
     wms->addWorkflow(workflow);
@@ -346,7 +346,7 @@ class StandardJobExecutorRandomFailuresTestWMS : public wrench::WMS {
 
 public:
     StandardJobExecutorRandomFailuresTestWMS(StandardJobExecutorSimulatedFailuresTest *test,
-                                             std::string &hostname, wrench::StorageService *ss) :
+                                             std::string &hostname, std::shared_ptr<wrench::StorageService> ss) :
             wrench::WMS(nullptr, nullptr, {}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -359,7 +359,7 @@ private:
 
 
         // Create a job manager
-        std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+        auto job_manager = this->createJobManager();
 
         unsigned long NUM_TRIALS =1000;
 
@@ -396,7 +396,7 @@ private:
                     },
                     {},
                     {},
-                    {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->getWorkflow()->getFileByID("output_file"),
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("output_file"),
                                                                                   this->test->storage_service)});
 
             // Create a StandardJobExecutor
@@ -472,7 +472,7 @@ void StandardJobExecutorSimulatedFailuresTest::do_StandardJobExecutorRandomFailu
     storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, 10000000000000.0));
 
     // Create a WMS
-    wrench::WMS *wms = nullptr;
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
     wms = simulation->add(new StandardJobExecutorRandomFailuresTestWMS(this, stable_host, storage_service));
 
     wms->addWorkflow(workflow);

@@ -11,10 +11,10 @@
 class SimulationTimestampTaskTest : public ::testing::Test {
 
 public:
-    wrench::ComputeService *compute_service = nullptr;
-    wrench::StorageService *storage_service = nullptr;
-    wrench::StorageService *backup_storage_service = nullptr;
-    wrench::FileRegistryService *file_registry_service = nullptr;
+    std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
+    std::shared_ptr<wrench::StorageService> storage_service = nullptr;
+    std::shared_ptr<wrench::StorageService> backup_storage_service = nullptr;
+    std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
 
     wrench::WorkflowTask *task1 = nullptr;
     wrench::WorkflowTask *task2 = nullptr;
@@ -67,8 +67,8 @@ protected:
 class SimulationTimestampTaskBasicTestWMS : public wrench::WMS {
 public:
     SimulationTimestampTaskBasicTestWMS(SimulationTimestampTaskTest *test,
-        const std::set<wrench::ComputeService *> &compute_services,
-        const std::set<wrench::StorageService *> &storage_services,
+        const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+        const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
         std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -79,7 +79,7 @@ private:
 
     int main() {
 
-        std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+        auto job_manager = this->createJobManager();
 
         this->test->task1 = this->getWorkflow()->addTask("task1", 10.0, 1, 1, 1.0, 0);
         wrench::StandardJob *job1 = job_manager->createStandardJob(this->test->task1, {});
@@ -141,7 +141,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test(){
 
     ASSERT_NO_THROW(storage_service = simulation->add(new wrench::SimpleStorageService(wms_host, 100000000000000.0)));
 
-    wrench::WMS *wms = nullptr;
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(new SimulationTimestampTaskBasicTestWMS(
             this, {compute_service}, {storage_service}, wms_host
     )));
@@ -246,8 +246,8 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test(){
 class SimulationTimestampTaskMultipleTestWMS : public wrench::WMS {
 public:
     SimulationTimestampTaskMultipleTestWMS(SimulationTimestampTaskTest *test,
-                                           const std::set<wrench::ComputeService *> &compute_services,
-                                           const std::set<wrench::StorageService *> &storage_services,
+                                           const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                           const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                            std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -258,7 +258,7 @@ private:
 
     int main() {
 
-        std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+        auto job_manager = this->createJobManager();
 
         this->test->task1 = this->getWorkflow()->addTask("task1", 10.0, 1, 1, 1.0, 0);
 
@@ -322,7 +322,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
     ASSERT_NO_THROW(backup_storage_service = simulation->add(new wrench::SimpleStorageService(wms_host, 100000000000000.0)));
 
 
-    wrench::WMS *wms = nullptr;
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(new SimulationTimestampTaskMultipleTestWMS(
             this, {compute_service}, {storage_service, backup_storage_service}, wms_host
     )));
@@ -456,8 +456,8 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
 class SimulationTimestampTaskTerminateAndFailTestWMS : public wrench::WMS {
 public:
     SimulationTimestampTaskTerminateAndFailTestWMS(SimulationTimestampTaskTest *test,
-            const std::set<wrench::ComputeService *> &compute_services,
-            const std::set<wrench::StorageService *> &storage_services,
+            const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+            const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
             std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -468,7 +468,7 @@ private:
 
     int main() {
 
-        std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+        auto job_manager = this->createJobManager();
 
         this->test->task1 = this->getWorkflow()->addTask("terminated_task", 1000.0, 1, 1, 1.0, 0);
         wrench::StandardJob *job_that_will_be_terminated = job_manager->createStandardJob(this->test->task1, {});
@@ -513,7 +513,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskTerminateAndFail_tes
 
     ASSERT_NO_THROW(storage_service = simulation->add(new wrench::SimpleStorageService(wms_host, 100000000000000.0)));
 
-    wrench::WMS *wms = nullptr;
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(new SimulationTimestampTaskTerminateAndFailTestWMS(
             this, {compute_service}, {storage_service}, wms_host
     )));

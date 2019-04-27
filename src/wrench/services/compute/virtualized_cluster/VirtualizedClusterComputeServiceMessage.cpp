@@ -8,7 +8,7 @@
  *
  */
 
-#include "VirtualizedClusterServiceMessage.h"
+#include "VirtualizedClusterComputeServiceMessage.h"
 
 namespace wrench {
 
@@ -18,8 +18,8 @@ namespace wrench {
      * @param name: the message name
      * @param payload: the message size in bytes
      */
-    VirtualizedClusterServiceMessage::VirtualizedClusterServiceMessage(const std::string &name, double payload) :
-            ComputeServiceMessage("VirtualizedClusterServiceMessage::" + name, payload) {
+    VirtualizedClusterComputeServiceMessage::VirtualizedClusterComputeServiceMessage(const std::string &name, double payload) :
+            ComputeServiceMessage("VirtualizedClusterComputeServiceMessage::" + name, payload) {
     }
 
     /**
@@ -32,16 +32,16 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    VirtualizedClusterServiceMigrateVMRequestMessage::VirtualizedClusterServiceMigrateVMRequestMessage(
+    VirtualizedClusterComputeServiceMigrateVMRequestMessage::VirtualizedClusterComputeServiceMigrateVMRequestMessage(
             const std::string &answer_mailbox,
             const std::string &vm_name,
             const std::string &dest_pm_hostname,
             double payload) :
-            VirtualizedClusterServiceMessage("MIGRATE_VM_REQUEST", payload) {
+            VirtualizedClusterComputeServiceMessage("MIGRATE_VM_REQUEST", payload) {
 
         if (answer_mailbox.empty() || dest_pm_hostname.empty() || vm_name.empty()) {
             throw std::invalid_argument(
-                    "VirtualizedClusterServiceMigrateVMRequestMessage::VirtualizedClusterServiceMigrateVMRequestMessage(): Invalid arguments");
+                    "VirtualizedClusterComputeServiceMigrateVMRequestMessage::VirtualizedClusterComputeServiceMigrateVMRequestMessage(): Invalid arguments");
         }
         this->answer_mailbox = answer_mailbox;
         this->vm_name = vm_name;
@@ -55,10 +55,10 @@ namespace wrench {
      * @param failure_cause: a failure cause (or nullptr if success)
      * @param payload: the message size in bytes
      */
-    VirtualizedClusterServiceMigrateVMAnswerMessage::VirtualizedClusterServiceMigrateVMAnswerMessage(bool success,
+    VirtualizedClusterComputeServiceMigrateVMAnswerMessage::VirtualizedClusterComputeServiceMigrateVMAnswerMessage(bool success,
                                                                                                      std::shared_ptr<FailureCause> failure_cause,
                                                                                                      double payload) :
-            VirtualizedClusterServiceMessage("MIGRATE_VM_ANSWER", payload), success(success), failure_cause(failure_cause) {}
+            VirtualizedClusterComputeServiceMessage("MIGRATE_VM_ANSWER", payload), success(success), failure_cause(failure_cause) {}
 
 
 

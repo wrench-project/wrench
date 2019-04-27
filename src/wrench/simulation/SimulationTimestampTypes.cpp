@@ -171,7 +171,7 @@ namespace wrench {
      * @param dst_partition: the partition in the destination StorageService where this file will be copied
      * @param start_timestamp: the timestamp for the file copy start
      */
-    SimulationTimestampFileCopy::SimulationTimestampFileCopy(WorkflowFile *file, StorageService *src, std::string src_partition, StorageService *dst, std::string dst_partition, SimulationTimestampFileCopyStart *start_timestamp) :
+    SimulationTimestampFileCopy::SimulationTimestampFileCopy(WorkflowFile *file, std::shared_ptr<StorageService> src, std::string src_partition, std::shared_ptr<StorageService> dst, std::string dst_partition, SimulationTimestampFileCopyStart *start_timestamp) :
             SimulationTimestampPair(start_timestamp), file(file), source(FileLocation(src, src_partition)), destination(FileLocation(dst, dst_partition)) {
     }
 
@@ -216,8 +216,8 @@ namespace wrench {
      * @param dst_partition: the partition in the destination StorageService where this file will be copied
      * @throw std::invalid_argument
      */
-    SimulationTimestampFileCopyStart::SimulationTimestampFileCopyStart(WorkflowFile *file, StorageService *src, std::string src_partition,
-                                                                       StorageService *dst, std::string dst_partition) :
+    SimulationTimestampFileCopyStart::SimulationTimestampFileCopyStart(WorkflowFile *file, std::shared_ptr<StorageService> src, std::string src_partition,
+                                                                       std::shared_ptr<StorageService> dst, std::string dst_partition) :
             SimulationTimestampFileCopy(file, src, src_partition, dst, dst_partition) {
 
         // all information about a file copy should be passed

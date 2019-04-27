@@ -31,17 +31,17 @@ particular physical hosts).
 
 # Creating a virtualized cluster compute service #        {#guide-virtualizedcluster-creating}
 
-In WRENCH, a virtualized cluster service represents a cloud service (wrench::CloudService, 
+In WRENCH, a virtualized cluster service represents a cloud service (wrench::CloudComputeService,
 which itself represents a wrench::ComputeService), 
-which is defined by the wrench::VirtualizedClusterService class. An instantiation of a 
+which is defined by the wrench::VirtualizedClusterComputeService class. An instantiation of a
 virtualized cluster service requires the following parameters:
 
 - A hostname on which to start the service (this is the entry point to the service)
 - A list (`std::vector`) of hostnames (all cores and all RAM of each host is available to the virtualized cluster service) 
 - A scratch space size, i.e., the size in bytes of storage local to the virtualized cluster service (used to store
   workflow files, as needed, during job executions) 
-- Maps (`std::map`) of configurable properties (`wrench::VirtualizedClusterServiceProperty`) and configurable message 
-  payloads (`wrench::VirtualizedClusterServiceMessagePayload`).
+- Maps (`std::map`) of configurable properties (`wrench::VirtualizedClusterComputeServiceProperty`) and configurable message
+  payloads (`wrench::VirtualizedClusterComputeServiceMessagePayload`).
 
 The example below shows how to create an instance of a virtualized cluster service 
 that runs on host "vc_gateway", provides access to 4 execution hosts, and has a scratch 
@@ -49,8 +49,8 @@ space of 1TiB:
 
 ~~~~~~~~~~~~~{.cpp}
 auto virtualized_cluster_cs = simulation.add(
-          new wrench::VirtualizedClusterService("vc_gateway", {"host1", "host2", "host3", "host4"}, pow(2,40),
-                                                {{wrench::VirtualizedClusterServiceProperty::SUPPORTS_PILOT_JOBS, "false"}}));
+          new wrench::VirtualizedClusterComputeService("vc_gateway", {"host1", "host2", "host3", "host4"}, pow(2,40),
+                                                {{wrench::VirtualizedClusterComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}}));
 ~~~~~~~~~~~~~
 
 ## Virtualized cluster service properties             {#guide-virtualizedcluster-creating-properties}
@@ -65,8 +65,8 @@ All properties for a virtualized cluster service are inherited from `wrench::Clo
 As expected, a virtualized cluster service provides access to all mechanisms to
 [manage](@ref guide-cloud-managing) the set of VMs instantiated on the execution 
 hosts. In addition to such capabilities, the virtualized cluster service provides
-an additional wrench::VirtualizedClusterService::createVM function, which instantiates
-a VM on a specific execution host; and a wrench::VirtualizedClusterService::migrateVM 
+an additional wrench::VirtualizedClusterComputeService::createVM function, which instantiates
+a VM on a specific execution host; and a wrench::VirtualizedClusterComputeService::migrateVM
 function, which allows VM migration between execution hosts.
 
 Here is an example of VMs migration on a virtualized cluster service:

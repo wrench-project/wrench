@@ -382,13 +382,14 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    ComputeService *Simulation::add(ComputeService *service) {
+    std::shared_ptr<ComputeService> Simulation::add(ComputeService *service) {
         if (service == nullptr) {
             throw std::invalid_argument("Simulation::add(): invalid argument (nullptr service)");
         }
         service->simulation = this;
-        this->compute_services.insert(std::shared_ptr<ComputeService>(service));
-        return service;
+        auto shared_ptr = std::shared_ptr<ComputeService>(service);
+        this->compute_services.insert(shared_ptr);
+        return shared_ptr;
     }
 
     /**
@@ -402,13 +403,14 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    NetworkProximityService *Simulation::add(NetworkProximityService *service) {
+    std::shared_ptr<NetworkProximityService> Simulation::add(NetworkProximityService *service) {
         if (service == nullptr) {
             throw std::invalid_argument("Simulation::add(): invalid argument (nullptr service)");
         }
         service->simulation = this;
-        this->network_proximity_services.insert(std::shared_ptr<NetworkProximityService>(service));
-        return service;
+        auto shared_ptr = std::shared_ptr<NetworkProximityService>(service);
+        this->network_proximity_services.insert(shared_ptr);
+        return shared_ptr;
     }
 
 
@@ -423,13 +425,14 @@ namespace wrench {
     * @throw std::invalid_argument
     * @throw std::runtime_error
     */
-    StorageService *Simulation::add(StorageService *service) {
+    std::shared_ptr<StorageService> Simulation::add(StorageService *service) {
         if (service == nullptr) {
             throw std::invalid_argument("Simulation::add(): invalid argument (nullptr service)");
         }
         service->simulation = this;
-        this->storage_services.insert(std::shared_ptr<StorageService>(service));
-        return service;
+        auto shared_ptr = std::shared_ptr<StorageService>(service);
+        this->storage_services.insert(shared_ptr);
+        return shared_ptr;
     }
 
     /**
@@ -443,13 +446,14 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    WMS *Simulation::add(WMS *wms) {
+    std::shared_ptr<WMS> Simulation::add(WMS *wms) {
         if (wms == nullptr) {
             throw std::invalid_argument("Simulation::add(): invalid argument (nullptr wms)");
         }
         wms->simulation = this;
-        this->wmses.insert(std::shared_ptr<WMS>(wms));
-        return wms;
+        auto shared_ptr = std::shared_ptr<WMS>(wms);
+        this->wmses.insert(shared_ptr);
+        return shared_ptr;
     }
 
     /**
@@ -462,13 +466,14 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    FileRegistryService *Simulation::add(FileRegistryService *file_registry_service) {
+    std::shared_ptr<FileRegistryService> Simulation::add(FileRegistryService *file_registry_service) {
         if (file_registry_service == nullptr) {
             throw std::invalid_argument("Simulation::add(): invalid arguments");
         }
         file_registry_service->simulation = this;
-        this->file_registry_services.insert(std::shared_ptr<FileRegistryService>(file_registry_service));
-        return file_registry_service;
+        auto shared_ptr = std::shared_ptr<FileRegistryService>(file_registry_service);
+        this->file_registry_services.insert(shared_ptr);
+        return shared_ptr;
     }
 
     /**
@@ -480,7 +485,7 @@ namespace wrench {
         * @throw std::runtime_error
         * @throw std::invalid_argument
         */
-    void Simulation::stageFile(WorkflowFile *file, StorageService *storage_service) {
+    void Simulation::stageFile(WorkflowFile *file, std::shared_ptr<StorageService> storage_service) {
         try {
             this->stageFile(file, storage_service, "/");
         } catch (std::runtime_error &e) {
@@ -500,7 +505,7 @@ namespace wrench {
      * @throw std::runtime_error
      * @throw std::invalid_argument
      */
-    void Simulation::stageFile(WorkflowFile *file, StorageService *storage_service, std::string partition) {
+    void Simulation::stageFile(WorkflowFile *file, std::shared_ptr<StorageService> storage_service, std::string partition) {
         if ((file == nullptr) || (storage_service == nullptr)) {
             throw std::invalid_argument("Simulation::stageFile(): Invalid arguments");
         }
@@ -544,7 +549,7 @@ namespace wrench {
    * @throw std::runtime_error
    * @throw std::invalid_argument
    */
-    void Simulation::stageFiles(std::map<std::string, WorkflowFile *> files, StorageService *storage_service) {
+    void Simulation::stageFiles(std::map<std::string, WorkflowFile *> files, std::shared_ptr<StorageService> storage_service) {
         try {
             this->stageFiles(files, storage_service, "/");
         } catch (std::runtime_error &e) {
@@ -564,7 +569,7 @@ namespace wrench {
   * @throw std::runtime_error
   * @throw std::invalid_argument
   */
-    void Simulation::stageFiles(std::map<std::string, WorkflowFile *> files, StorageService *storage_service, std::string partition) {
+    void Simulation::stageFiles(std::map<std::string, WorkflowFile *> files, std::shared_ptr<StorageService> storage_service, std::string partition) {
 
         if (storage_service == nullptr) {
             throw std::invalid_argument("Simulation::stageFiles(): Invalid arguments");
@@ -802,7 +807,7 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    ComputeService *Simulation::startNewService(ComputeService *service) {
+    std::shared_ptr<ComputeService> Simulation::startNewService(ComputeService *service) {
 
         if (service == nullptr) {
             throw std::invalid_argument("Simulation::startNewService(): invalid argument (nullptr service)");
@@ -821,7 +826,7 @@ namespace wrench {
             service->getScratch()->start(service->getScratchSharedPtr(), true, false); // Daemonized, no auto-restart
         }
 
-        return shared_ptr.get();
+        return shared_ptr;
     }
 
     /**
@@ -834,7 +839,7 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    StorageService *Simulation::startNewService(StorageService *service) {
+    std::shared_ptr<StorageService>Simulation::startNewService(StorageService *service) {
 
         if (service == nullptr) {
             throw std::invalid_argument("Simulation::startNewService(): invalid argument (nullptr service)");
@@ -849,7 +854,7 @@ namespace wrench {
         this->storage_services.insert(shared_ptr);
         shared_ptr->start(shared_ptr, true, false); // Daemonized, no auto-restart
 
-        return shared_ptr.get();
+        return shared_ptr;
     }
 
     /**
@@ -862,7 +867,7 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    NetworkProximityService *Simulation::startNewService(NetworkProximityService *service) {
+    std::shared_ptr<NetworkProximityService> Simulation::startNewService(NetworkProximityService *service) {
 
         if (service == nullptr) {
             throw std::invalid_argument("Simulation::startNewService(): invalid argument (nullptr service)");
@@ -877,7 +882,7 @@ namespace wrench {
         this->network_proximity_services.insert(shared_ptr);
         shared_ptr->start(shared_ptr, true, false); // Daemonized, no auto-restart
 
-        return shared_ptr.get();
+        return shared_ptr;
     }
 
     /**
@@ -890,7 +895,7 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    FileRegistryService *Simulation::startNewService(FileRegistryService *service) {
+    std::shared_ptr<FileRegistryService> Simulation::startNewService(FileRegistryService *service) {
 
         if (service == nullptr) {
             throw std::invalid_argument("Simulation::startNewService(): invalid argument (nullptr service)");
@@ -905,7 +910,7 @@ namespace wrench {
         this->file_registry_services.insert(shared_ptr);
         shared_ptr->start(shared_ptr, true, false); // Daemonized, no auto-restart
 
-        return shared_ptr.get();
+        return shared_ptr;
     }
 
 

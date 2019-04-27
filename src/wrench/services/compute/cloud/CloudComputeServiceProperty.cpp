@@ -7,12 +7,12 @@
  * (at your option) any later version.
  */
 
-#include "wrench/services/compute/cloud/CloudServiceProperty.h"
+#include "wrench/services/compute/cloud/CloudComputeServiceProperty.h"
 
 
 namespace wrench {
 
-    SET_PROPERTY_NAME(CloudServiceProperty, VM_BOOT_OVERHEAD_IN_SECONDS);
-    SET_PROPERTY_NAME(CloudServiceProperty, VM_RESOURCE_ALLOCATION_ALGORITHM);
+    SET_PROPERTY_NAME(CloudComputeServiceProperty, VM_BOOT_OVERHEAD_IN_SECONDS);
+    SET_PROPERTY_NAME(CloudComputeServiceProperty, VM_RESOURCE_ALLOCATION_ALGORITHM);
 
 }

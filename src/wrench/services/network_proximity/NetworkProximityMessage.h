@@ -86,10 +86,10 @@ namespace wrench {
      */
     class NextContactDaemonRequestMessage : public NetworkProximityMessage {
     public:
-        NextContactDaemonRequestMessage(NetworkProximityDaemon *daemon, double payload);
+        NextContactDaemonRequestMessage(std::shared_ptr<NetworkProximityDaemon> daemon, double payload);
 
         /** @brief The NetworkProximityDaemon daemon to return the answer to */
-        NetworkProximityDaemon *daemon;
+        std::shared_ptr<NetworkProximityDaemon> daemon;
     };
 
     /**
@@ -97,13 +97,13 @@ namespace wrench {
      */
     class NextContactDaemonAnswerMessage : public NetworkProximityMessage {
     public:
-        NextContactDaemonAnswerMessage(std::string next_host_to_send, NetworkProximityDaemon *next_daemon_to_send, std::string next_mailbox_to_send,double payload);
+        NextContactDaemonAnswerMessage(std::string next_host_to_send, std::shared_ptr<NetworkProximityDaemon> next_daemon_to_send, std::string next_mailbox_to_send,double payload);
 
         /** @brief The next host for the NetworkProximityDaemon to contact */
         std::string next_host_to_send;
 
         /** @brief The next NetworkProximityDaemon for the NetworkProximityDaemon to contact */
-        NetworkProximityDaemon *next_daemon_to_send;
+        std::shared_ptr<NetworkProximityDaemon> next_daemon_to_send;
 
         /** @brief The next mailbox for the network daemon to contact */
         std::string next_mailbox_to_send;

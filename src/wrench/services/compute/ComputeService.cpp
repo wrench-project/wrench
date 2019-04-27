@@ -23,7 +23,8 @@ namespace wrench {
 
     constexpr unsigned long ComputeService::ALL_CORES;
     constexpr double ComputeService::ALL_RAM;
-    StorageService *ComputeService::SCRATCH = (StorageService *) ULONG_MAX;
+    std::shared_ptr<StorageService> ComputeService::SCRATCH =
+            std::shared_ptr<StorageService>((StorageService*)666);
 
     /**
      * @brief Stop the compute service - must be called by the stop()
@@ -43,11 +44,11 @@ namespace wrench {
      *          - If a number of cores is provided (e.g., {"task1", "12"}), the service will pick the host on which to run the task
      *          - If a hostname and a number of cores is provided (e.g., {"task1", "host1:12"}, the service will run the task on that host
      *            with the specified number of cores
-     *      - to a BatchService: {"-t":"<int>","-N":"<int>","-c":"<int>"} (SLURM-like)
+     *      - to a BatchComputeService: {"-t":"<int>","-N":"<int>","-c":"<int>"} (SLURM-like)
      *         - "-t": number of requested job duration in minutes
      *         - "-N": number of requested compute hosts
      *         - "-c": number of requested cores per compute host
-     *      - to a CloudService: {}
+     *      - to a CloudComputeService: {}
      *
      * @throw WorkflowExecutionException
      * @throw std::invalid_argument
@@ -133,7 +134,7 @@ namespace wrench {
       if (scratch_space_size > 0) {
         try {
           this->scratch_space_storage_service =
-                  new SimpleStorageService(hostname, scratch_space_size);
+                  std::shared_ptr<StorageService>(new SimpleStorageService(hostname, scratch_space_size));
           this->scratch_space_storage_service_shared_ptr = std::shared_ptr<StorageService>(
                   this->scratch_space_storage_service);
         } catch (std::runtime_error &e) {
@@ -155,7 +156,7 @@ namespace wrench {
     ComputeService::ComputeService(const std::string &hostname,
                                    const std::string service_name,
                                    const std::string mailbox_name_prefix,
-                                   StorageService *scratch_space) :
+                                   std::shared_ptr<StorageService> scratch_space) :
             Service(hostname, service_name, mailbox_name_prefix) {
 
       this->state = ComputeService::UP;
@@ -455,7 +456,7 @@ namespace wrench {
     * @brief Get the compute service's scratch storage space
     * @return a pointer to the shared scratch space
     */
-    StorageService *ComputeService::getScratch() {
+    std::shared_ptr<StorageService> ComputeService::getScratch() {
       return this->scratch_space_storage_service;
     }
 

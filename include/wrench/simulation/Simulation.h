@@ -53,17 +53,17 @@ namespace wrench {
 
         void launch();
 
-        ComputeService * add(ComputeService *);
-        StorageService * add(StorageService *);
-        NetworkProximityService * add(NetworkProximityService *);
-        WMS * add(WMS *);
-        FileRegistryService * add(FileRegistryService *);
+        std::shared_ptr<ComputeService> add(ComputeService *);
+        std::shared_ptr<StorageService> add(StorageService *);
+        std::shared_ptr<NetworkProximityService> add(NetworkProximityService *);
+        std::shared_ptr<WMS> add(WMS *);
+        std::shared_ptr<FileRegistryService> add(FileRegistryService *);
 
-        void stageFile(WorkflowFile *file, StorageService *storage_service);
-        void stageFile(WorkflowFile *file, StorageService *storage_service, std::string partition);
+        void stageFile(WorkflowFile *file, std::shared_ptr<StorageService> storage_service);
+        void stageFile(WorkflowFile *file, std::shared_ptr<StorageService> storage_service, std::string partition);
 
-        void stageFiles(std::map<std::string, WorkflowFile *> files, StorageService *storage_service);
-        void stageFiles(std::map<std::string, WorkflowFile *> files, StorageService *storage_service, std::string partition);
+        void stageFiles(std::map<std::string, WorkflowFile *> files, std::shared_ptr<StorageService>storage_service);
+        void stageFiles(std::map<std::string, WorkflowFile *> files, std::shared_ptr<StorageService>storage_service, std::string partition);
 
         SimulationOutput &getOutput();
 
@@ -86,10 +86,10 @@ namespace wrench {
         /***********************/
 
 
-        ComputeService * startNewService(ComputeService *service);
-        StorageService * startNewService(StorageService *service);
-        NetworkProximityService * startNewService(NetworkProximityService *service);
-        FileRegistryService * startNewService(FileRegistryService *service);
+        std::shared_ptr<ComputeService> startNewService(ComputeService *service);
+        std::shared_ptr<StorageService> startNewService(StorageService *service);
+        std::shared_ptr<NetworkProximityService> startNewService(NetworkProximityService *service);
+        std::shared_ptr<FileRegistryService> startNewService(FileRegistryService *service);
 
 
         static double getMemoryCapacity();

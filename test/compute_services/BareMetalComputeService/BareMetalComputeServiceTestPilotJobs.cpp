@@ -21,7 +21,7 @@ class BareMetalComputeServiceTestPilotJobs : public ::testing::Test {
 
 public:
     wrench::WorkflowFile *input_file;
-    wrench::StorageService *storage_service = nullptr;
+    std::shared_ptr<wrench::StorageService> storage_service = nullptr;
     wrench::WorkflowFile *output_file1;
     wrench::WorkflowFile *output_file2;
     wrench::WorkflowFile *output_file3;
@@ -31,7 +31,7 @@ public:
     wrench::WorkflowTask *task3;
     wrench::WorkflowTask *task4;
 
-    wrench::ComputeService *compute_service = nullptr;
+    std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
 
     void do_UnsupportedPilotJobs_test();
 
@@ -92,8 +92,8 @@ class BareMetalComputeServiceUnsupportedPilotJobsTestWMS : public wrench::WMS {
 
 public:
     BareMetalComputeServiceUnsupportedPilotJobsTestWMS(BareMetalComputeServiceTestPilotJobs *test,
-                                                                const std::set<wrench::ComputeService *> &compute_services,
-                                                                const std::set<wrench::StorageService *> &storage_services,
+                                                                const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                                                const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                                 std::string hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
@@ -106,13 +106,12 @@ private:
     int main() {
 
       // Create a data movement manager
-      std::shared_ptr<wrench::DataMovementManager> data_movement_manager =
-              this->createDataMovementManager();
+      auto data_movement_manager = this->createDataMovementManager();
 
       // Create a job  manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
-      wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
+     auto file_registry_service = this->getAvailableFileRegistryService();
 
       // Create a pilot job
       wrench::PilotJob *pilot_job = job_manager->createPilotJob();
@@ -164,7 +163,7 @@ void BareMetalComputeServiceTestPilotJobs::do_UnsupportedPilotJobs_test() {
                                                        {{wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
 
   // Create a WMS
-  wrench::WMS *wms;
+    std::shared_ptr<wrench::WMS> wms;
   ASSERT_NO_THROW(wms = simulation->add(
           new BareMetalComputeServiceUnsupportedPilotJobsTestWMS(
                   this,  {

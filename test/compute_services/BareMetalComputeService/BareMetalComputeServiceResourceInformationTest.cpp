@@ -23,9 +23,9 @@ class BareMetalComputeServiceTestResourceInformation : public ::testing::Test {
 
 public:
     // Default
-    wrench::ComputeService *compute_service1 = nullptr;
-    wrench::ComputeService *compute_service2 = nullptr;
-    wrench::ComputeService *compute_service3 = nullptr;
+    std::shared_ptr<wrench::ComputeService> compute_service1 = nullptr;
+    std::shared_ptr<wrench::ComputeService> compute_service2 = nullptr;
+    std::shared_ptr<wrench::ComputeService> compute_service3 = nullptr;
 
     void do_ResourceInformation_test();
 
@@ -76,8 +76,8 @@ class ResourceInformationTestWMS : public wrench::WMS {
 
 public:
     ResourceInformationTestWMS(BareMetalComputeServiceTestResourceInformation *test,
-                               const std::set<wrench::ComputeService *> &compute_services,
-                               const std::set<wrench::StorageService *> &storage_services,
+                               const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                               const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                std::string hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
@@ -90,7 +90,7 @@ private:
     int main() {
 
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       // Ask questions about resources
 
@@ -244,12 +244,12 @@ void BareMetalComputeServiceTestResourceInformation::do_ResourceInformation_test
                                                {std::make_pair("Host4",
                                                                std::make_tuple(8, wrench::ComputeService::ALL_RAM))}}, 0
           )));
-  std::set<wrench::ComputeService *> compute_services;
+  std::set<std::shared_ptr<wrench::ComputeService>> compute_services;
   compute_services.insert(compute_service1);
   compute_services.insert(compute_service2);
 
   // Create the WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new ResourceInformationTestWMS(
                   this, compute_services, {}, "Host1")));

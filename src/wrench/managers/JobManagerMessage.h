@@ -14,6 +14,7 @@
 
 #include <wrench/simulation/SimulationMessage.h>
 #include <wrench/workflow/job/StandardJob.h>
+#include "wrench/services/compute/ComputeService.h"
 #include <wrench-dev.h>
 
 namespace wrench {
@@ -36,14 +37,14 @@ namespace wrench {
      */
     class JobManagerStandardJobDoneMessage : public JobManagerMessage {
     public:
-        JobManagerStandardJobDoneMessage(StandardJob *job, ComputeService *compute_service,
+        JobManagerStandardJobDoneMessage(StandardJob *job, std::shared_ptr<ComputeService> compute_service,
                                          std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes);
 
 
         /** @brief The job that is done */
         StandardJob *job;
         /** @brief The compute service on which the job ran */
-        ComputeService *compute_service;
+        std::shared_ptr<ComputeService>  compute_service;
         /** @brief The necessary task state changes */
         std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes;
     };
@@ -53,7 +54,7 @@ namespace wrench {
      */
     class JobManagerStandardJobFailedMessage : public JobManagerMessage {
     public:
-        JobManagerStandardJobFailedMessage(StandardJob *job, ComputeService *compute_service,
+        JobManagerStandardJobFailedMessage(StandardJob *job, std::shared_ptr<ComputeService> compute_service,
                                            std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes,
                                            std::set<WorkflowTask *> necessary_failure_count_increments,
                                            std::shared_ptr<FailureCause> cause);
@@ -62,7 +63,7 @@ namespace wrench {
         /** @brief The job that has failed */
         StandardJob *job;
         /** @brief The compute service on which the job has failed */
-        ComputeService *compute_service;
+        std::shared_ptr<ComputeService>  compute_service;
         /** @brief The task state change that should be made */
         std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes;
         /** @brief The tasks whose failure counts need to be incremented */

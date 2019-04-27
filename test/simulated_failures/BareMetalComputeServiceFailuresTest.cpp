@@ -30,8 +30,8 @@ public:
     wrench::WorkflowFile *input_file;
     wrench::WorkflowFile *output_file;
     wrench::WorkflowTask *task;
-    wrench::StorageService *storage_service = nullptr;
-    wrench::ComputeService *compute_service = nullptr;
+    std::shared_ptr<wrench::StorageService> storage_service = nullptr;
+    std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
 
     void do_BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnAnotherHost_test();
     void do_BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnSameHost_test();
@@ -91,7 +91,8 @@ class BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnAnotherHostTestWM
 
 public:
     BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnAnotherHostTestWMS(BareMetalComputeServiceSimulatedFailuresTest *test,
-                                                                                std::string &hostname, wrench::ComputeService *cs, wrench::StorageService *ss) :
+                                                                                std::string &hostname, std::shared_ptr<wrench::ComputeService> cs,
+                                                                                std::shared_ptr<wrench::StorageService> ss) :
             wrench::WMS(nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -114,7 +115,7 @@ private:
 
 
         // Create a job manager
-        std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+        auto job_manager = this->createJobManager();
 
         // Create a standard job
         auto job = job_manager->createStandardJob(this->test->task, {{this->test->input_file, this->test->storage_service},
@@ -177,7 +178,7 @@ void BareMetalComputeServiceSimulatedFailuresTest::do_BareMetalComputeServiceOne
     storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, 10000000000000.0));
 
     // Create a WMS
-    wrench::WMS *wms = nullptr;
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
     wms = simulation->add(new BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnAnotherHostTestWMS(this, stable_host, compute_service, storage_service));
 
     wms->addWorkflow(workflow);
@@ -205,7 +206,9 @@ class BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnSameHostTestWMS :
 
 public:
     BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnSameHostTestWMS(BareMetalComputeServiceSimulatedFailuresTest *test,
-                                                                             std::string &hostname, wrench::ComputeService *cs, wrench::StorageService *ss) :
+                                                                             std::string &hostname,
+                                                                             std::shared_ptr<wrench::ComputeService> cs,
+                                                                             std::shared_ptr<wrench::StorageService> ss) :
             wrench::WMS(nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -228,7 +231,7 @@ private:
 
 
         // Create a job manager
-        std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+        auto job_manager = this->createJobManager();
 
         // Create a standard job
         auto job = job_manager->createStandardJob(this->test->task, {{this->test->input_file, this->test->storage_service},
@@ -288,7 +291,7 @@ void BareMetalComputeServiceSimulatedFailuresTest::do_BareMetalComputeServiceOne
     storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, 10000000000000.0));
 
     // Create a WMS
-    wrench::WMS *wms = nullptr;
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
     wms = simulation->add(new BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnSameHostTestWMS(this, stable_host, compute_service, storage_service));
 
     wms->addWorkflow(workflow);
@@ -315,7 +318,9 @@ class BareMetalComputeServiceRandomFailuresTestWMS : public wrench::WMS {
 
 public:
     BareMetalComputeServiceRandomFailuresTestWMS(BareMetalComputeServiceSimulatedFailuresTest *test,
-                                                 std::string &hostname, wrench::ComputeService *cs, wrench::StorageService *ss) :
+                                                 std::string &hostname,
+                                                 std::shared_ptr<wrench::ComputeService> cs,
+                                                 std::shared_ptr<wrench::StorageService> ss) :
             wrench::WMS(nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -327,7 +332,7 @@ private:
     int main() override {
 
         // Create a job manager
-        std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+        auto job_manager = this->createJobManager();
 
         unsigned long NUM_TRIALS = 1000;
 
@@ -413,7 +418,7 @@ void BareMetalComputeServiceSimulatedFailuresTest::do_BareMetalComputeServiceRan
     storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, 10000000000000.0));
 
     // Create a WMS
-    wrench::WMS *wms = nullptr;
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
     wms = simulation->add(new BareMetalComputeServiceRandomFailuresTestWMS(this, stable_host, compute_service, storage_service));
 
     wms->addWorkflow(workflow);
@@ -441,7 +446,8 @@ class BareMetalComputeServiceFailureOnServiceThatTerminatesWhenAllItsResourcesAr
 
 public:
     BareMetalComputeServiceFailureOnServiceThatTerminatesWhenAllItsResourcesAreDownTestWMS(BareMetalComputeServiceSimulatedFailuresTest *test,
-                                                                             std::string &hostname, wrench::ComputeService *cs, wrench::StorageService *ss) :
+                                                                             std::string &hostname, std::shared_ptr<wrench::ComputeService> cs,
+                                                                             std::shared_ptr<wrench::StorageService> ss) :
             wrench::WMS(nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -459,7 +465,7 @@ private:
 
 
         // Create a job manager
-        std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+        auto job_manager = this->createJobManager();
 
         // Create a standard job
         auto job = job_manager->createStandardJob(this->test->task, {{this->test->input_file, this->test->storage_service},
@@ -514,7 +520,7 @@ void BareMetalComputeServiceSimulatedFailuresTest::do_BareMetalComputeServiceFai
     storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, 10000000000000.0));
 
     // Create a WMS
-    wrench::WMS *wms = nullptr;
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
     wms = simulation->add(new BareMetalComputeServiceFailureOnServiceThatTerminatesWhenAllItsResourcesAreDownTestWMS(this, stable_host, compute_service, storage_service));
 
     wms->addWorkflow(workflow);

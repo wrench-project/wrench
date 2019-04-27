@@ -46,7 +46,7 @@ namespace wrench {
             TERMINATED
         };
 
-        ComputeService *getComputeService();
+        std::shared_ptr<ComputeService> getComputeService();
 
         PilotJob::State getState();
 

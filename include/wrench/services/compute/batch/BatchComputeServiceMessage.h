@@ -20,19 +20,19 @@ namespace wrench{
     /***********************/
 
     /**
-     * @brief Top-level class for messages received/sent by a BatchService
+     * @brief Top-level class for messages received/sent by a BatchComputeService
      */
-    class BatchServiceMessage : public ComputeServiceMessage {
+    class BatchComputeServiceMessage : public ComputeServiceMessage {
     protected:
-        BatchServiceMessage(std::string name, double payload);
+        BatchComputeServiceMessage(std::string name, double payload);
     };
 
     /**
-     * @brief A message sent to a BatchService to submit a batch job for execution
+     * @brief A message sent to a BatchComputeService to submit a batch job for execution
      */
-    class BatchServiceJobRequestMessage : public BatchServiceMessage {
+    class BatchComputeServiceJobRequestMessage : public BatchComputeServiceMessage {
     public:
-        BatchServiceJobRequestMessage(std::string answer_mailbox, BatchJob* job , double payload);
+        BatchComputeServiceJobRequestMessage(std::string answer_mailbox, BatchJob* job , double payload);
 
         /** @brief The mailbox to answer to */
         std::string answer_mailbox;
@@ -67,7 +67,7 @@ namespace wrench{
     /**
      * @brief BatchSimulationBeginsToSchedulerMessage class
      */
-    class BatchSimulationBeginsToSchedulerMessage : public BatchServiceMessage {
+    class BatchSimulationBeginsToSchedulerMessage : public BatchComputeServiceMessage {
     public:
         BatchSimulationBeginsToSchedulerMessage(std::string answer_mailbox, std::string job_args_to_scheduler, double payload);
 
@@ -82,7 +82,7 @@ namespace wrench{
     /**
      * @brief BatchSchedReadyMessage class
      */
-    class BatchSchedReadyMessage : public BatchServiceMessage {
+    class BatchSchedReadyMessage : public BatchComputeServiceMessage {
     public:
         BatchSchedReadyMessage(std::string answer_mailbox, double payload);
 
@@ -94,10 +94,10 @@ namespace wrench{
 
     /**
      * @brief A message sent by a BatschedNetworkListener to a Batsched-enabled
-     *        BatchService to tell it to start a job execution, passing it the JSON
+     *        BatchComputeService to tell it to start a job execution, passing it the JSON
      *        reply received from Batsched
      */
-    class BatchExecuteJobFromBatSchedMessage : public BatchServiceMessage {
+    class BatchExecuteJobFromBatSchedMessage : public BatchComputeServiceMessage {
     public:
         BatchExecuteJobFromBatSchedMessage(std::string answer_mailbox, std::string batsched_decision_reply, double payload);
 
@@ -109,10 +109,10 @@ namespace wrench{
     };
 
     /**
-     * @brief A message send by a BatschedNetworkListener to a Batsched-enabled BatchService
+     * @brief A message send by a BatschedNetworkListener to a Batsched-enabled BatchComputeService
      *        with a job start time estimate obtained from Batsched
      */
-    class BatchQueryAnswerMessage : public BatchServiceMessage {
+    class BatchQueryAnswerMessage : public BatchComputeServiceMessage {
     public:
         BatchQueryAnswerMessage(double estimated_job_start_time, double payload);
 
@@ -124,7 +124,7 @@ namespace wrench{
 //    /**
 //     * @brief BatchFakeReplyMessage class
 //     */
-//    class BatchFakeJobSubmissionReplyMessage : public BatchServiceMessage {
+//    class BatchFakeJobSubmissionReplyMessage : public BatchComputeServiceMessage {
 //    public:
 //        BatchFakeJobSubmissionReplyMessage(std::string json_data_string, double payload);
 //
@@ -138,7 +138,7 @@ namespace wrench{
     /**
      * @brief BatchJobSubmissionToSchedulerMessage class
      */
-    class BatchJobSubmissionToSchedulerMessage : public BatchServiceMessage {
+    class BatchJobSubmissionToSchedulerMessage : public BatchComputeServiceMessage {
     public:
         BatchJobSubmissionToSchedulerMessage(std::string answer_mailbox, WorkflowJob* job, std::string job_args_to_scheduler, double payload);
 
@@ -155,7 +155,7 @@ namespace wrench{
     /**
      * @brief BatchJobReplyFromSchedulerMessage class
      */
-    class BatchJobReplyFromSchedulerMessage : public BatchServiceMessage {
+    class BatchJobReplyFromSchedulerMessage : public BatchComputeServiceMessage {
     public:
         BatchJobReplyFromSchedulerMessage(std::string, double);
 

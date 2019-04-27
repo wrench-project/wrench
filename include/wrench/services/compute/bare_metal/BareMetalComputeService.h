@@ -47,8 +47,8 @@ namespace wrench {
      */
     class BareMetalComputeService : public ComputeService {
 
-        friend class CloudService;
-        friend class BatchService;
+        friend class CloudComputeService;
+        friend class BatchComputeService;
 
     private:
 
@@ -85,18 +85,18 @@ namespace wrench {
 
         // Public Constructor
         BareMetalComputeService(const std::string &hostname,
-                                         const std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
-                                         double scratch_space_size,
-                                         std::map<std::string, std::string> property_list = {},
-                                         std::map<std::string, double> messagepayload_list = {}
+                                const std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
+                                double scratch_space_size,
+                                std::map<std::string, std::string> property_list = {},
+                                std::map<std::string, double> messagepayload_list = {}
         );
 
         // Public Constructor
         BareMetalComputeService(const std::string &hostname,
-                                         const std::set<std::string> compute_hosts,
-                                         double scratch_space_size,
-                                         std::map<std::string, std::string> property_list = {},
-                                         std::map<std::string, double> messagepayload_list = {}
+                                const std::set<std::string> compute_hosts,
+                                double scratch_space_size,
+                                std::map<std::string, std::string> property_list = {},
+                                std::map<std::string, double> messagepayload_list = {}
         );
 
 
@@ -126,19 +126,19 @@ namespace wrench {
 
         // Low-level Constructor
         BareMetalComputeService(const std::string &hostname,
-                                         std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
-                                         std::map<std::string, std::string> property_list,
-                                         std::map<std::string, double> messagepayload_list,
-                                         double ttl,
-                                         PilotJob *pj, std::string suffix,
-                                         StorageService* scratch_space); // reference to upper level scratch space
+                                std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
+                                std::map<std::string, std::string> property_list,
+                                std::map<std::string, double> messagepayload_list,
+                                double ttl,
+                                PilotJob *pj, std::string suffix,
+                                std::shared_ptr<StorageService> scratch_space); // reference to upper level scratch space
 
         // Private Constructor
         BareMetalComputeService(const std::string &hostname,
-                                         std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
-                                         std::map<std::string, std::string> property_list,
-                                         std::map<std::string, double> messagepayload_list,
-                                         StorageService* scratch_space);
+                                std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
+                                std::map<std::string, std::string> property_list,
+                                std::map<std::string, double> messagepayload_list,
+                                std::shared_ptr<StorageService> scratch_space);
 
         // Low-level constructor helper method
         void initiateInstance(const std::string &hostname,
@@ -218,10 +218,10 @@ namespace wrench {
         /** @brief Reasons why a standard job could be terminated */
         enum JobTerminationCause {
             /** @brief The WMS intentionally requested, via a JobManager, that a running job is to be terminated */
-            TERMINATED,
+                    TERMINATED,
 
             /** @brief The compute service was directed to stop, and any running StandardJob will fail */
-            COMPUTE_SERVICE_KILLED
+                    COMPUTE_SERVICE_KILLED
         };
 
         void terminateRunningStandardJob(StandardJob *job, JobTerminationCause termination_cause);
@@ -237,7 +237,7 @@ namespace wrench {
 
         std::tuple<std::string, unsigned long> pickAllocation(WorkflowTask *task,
                                                               std::string required_host, unsigned long required_num_cores, double required_ram,
-                                                      std::set<std::string> &hosts_to_avoid);
+                                                              std::set<std::string> &hosts_to_avoid);
 
         bool jobCanRun(StandardJob *job, std::map<std::string, std::string> &service_specific_arguments);
 
@@ -248,7 +248,7 @@ namespace wrench {
         bool areAllComputeResourcesDownWithNoWUERunning();
 
 
-            int exit_code = 0;
+        int exit_code = 0;
 
         std::shared_ptr<HostStateChangeDetector> host_state_change_monitor;
     };

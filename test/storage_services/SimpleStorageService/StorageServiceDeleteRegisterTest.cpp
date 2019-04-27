@@ -13,9 +13,9 @@ public:
     wrench::WorkflowFile *file_1;
     wrench::WorkflowFile *file_2;
 
-    wrench::StorageService *storage_service = nullptr;
+    std::shared_ptr<wrench::StorageService> storage_service = nullptr;
 
-    wrench::ComputeService *compute_service = nullptr;
+    std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
 
     void do_DeleteRegisterTest();
 
@@ -55,9 +55,9 @@ protected:
 class SimpleStorageServiceDeleteRegisterTestWMS : public wrench::WMS {
 public:
     SimpleStorageServiceDeleteRegisterTestWMS(SimpleStorageServiceDeleteRegisterTest *test,
-                                              const std::set<wrench::ComputeService *> compute_services,
-                                              const std::set<wrench::StorageService *> &storage_services,
-                                              wrench::FileRegistryService * file_registry_service,
+                                              const std::set<std::shared_ptr<wrench::ComputeService>> compute_services,
+                                              const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                                              std::shared_ptr<wrench::FileRegistryService> file_registry_service,
                                               std::string hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, file_registry_service,
                         hostname, "test") {
@@ -70,10 +70,10 @@ private:
     int main() {
 
       // get the file registry service
-      wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
+      auto file_registry_service = this->getAvailableFileRegistryService();
 
       // get the single storage service
-      wrench::StorageService *storage_service = *(this->getAvailableStorageServices().begin());
+      auto storage_service = *(this->getAvailableStorageServices().begin());
 
       // register both files
       wrench::WorkflowFile *file_1 = this->test->file_1;
@@ -138,11 +138,11 @@ void SimpleStorageServiceDeleteRegisterTest::do_DeleteRegisterTest() {
           new wrench::SimpleStorageService("StorageHost", STORAGE_SIZE)));
 
   // Create a file registry
-  wrench::FileRegistryService *file_registry_service = nullptr;
+  std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
   ASSERT_NO_THROW(file_registry_service = simulation->add(new wrench::FileRegistryService("WMSHost")));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(new SimpleStorageServiceDeleteRegisterTestWMS(
           this, {compute_service}, {storage_service}, file_registry_service, "WMSHost")));
 

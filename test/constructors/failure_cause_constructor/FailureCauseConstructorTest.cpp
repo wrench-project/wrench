@@ -10,13 +10,13 @@
 
 #include <gtest/gtest.h>
 #include <map>
-#include <wrench/services/compute/batch/BatchServiceMessage.h>
+#include <wrench/services/compute/batch/BatchComputeServiceMessage.h>
 
 #include "wrench/workflow/Workflow.h"
 #include "services/file_registry/FileRegistryMessage.h"
 #include "wrench/services/compute/ComputeServiceMessage.h"
 #include "services/storage/StorageServiceMessage.h"
-#include "services/compute/virtualized_cluster/VirtualizedClusterServiceMessage.h"
+#include "services/compute/virtualized_cluster/VirtualizedClusterComputeServiceMessage.h"
 #include "services/network_proximity/NetworkProximityMessage.h"
 #include "wrench/workflow/execution_events/FailureCause.h"
 

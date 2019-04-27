@@ -17,8 +17,8 @@
 class WMSOptimizationsTest : public ::testing::Test {
 
 public:
-    wrench::ComputeService *compute_service = nullptr;
-    wrench::StorageService *storage_service = nullptr;
+    std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
+    std::shared_ptr<wrench::StorageService> storage_service = nullptr;
 
     void do_staticOptimization_test();
 
@@ -91,8 +91,8 @@ class StaticOptimizationsTestWMS : public wrench::WMS {
 
 public:
     StaticOptimizationsTestWMS(WMSOptimizationsTest *test,
-                               const std::set<wrench::ComputeService *> &compute_services,
-                               const std::set<wrench::StorageService *> &storage_services,
+                               const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                               const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test"
             ) {
@@ -105,8 +105,8 @@ private:
 
     int main() {
       // Create job and data movement managers
-      std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto data_movement_manager = this->createDataMovementManager();
+      auto job_manager = this->createJobManager();
 
       // Perform static optimizations
       runStaticOptimizations();
@@ -116,7 +116,7 @@ private:
         std::map<std::string, std::vector<wrench::WorkflowTask *>> ready_clustered_tasks = this->getWorkflow()->getReadyClusters();
 
         // Get the available compute services
-        std::set<wrench::ComputeService *> compute_services = this->getAvailableComputeServices();
+        std::set<std::shared_ptr<wrench::ComputeService>> compute_services = this->getAvailableComputeServices();
 
         // Run ready tasks with defined scheduler implementation
         unsigned int job_count = 0;
@@ -177,7 +177,7 @@ void WMSOptimizationsTest::do_staticOptimization_test() {
 
   // Create a WMS
   wrench::Workflow *workflow = this->createWorkflow();
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new StaticOptimizationsTestWMS(this, {compute_service}, {storage_service}, hostname)));
 
@@ -224,8 +224,8 @@ class DynamicOptimizationsTestWMS : public wrench::WMS {
 
 public:
     DynamicOptimizationsTestWMS(WMSOptimizationsTest *test,
-                                const std::set<wrench::ComputeService *> &compute_services,
-                                const std::set<wrench::StorageService *> &storage_services,
+                                const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                 std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
@@ -243,15 +243,15 @@ private:
 
     int main() {
       // Create job and data movement managers
-      std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto data_movement_manager = this->createDataMovementManager();
+      auto job_manager = this->createJobManager();
 
       while (true) {
         // Get the ready tasks
         std::vector<wrench::WorkflowTask *> ready_tasks = this->getWorkflow()->getReadyTasks();
 
         // Get the available compute services
-        std::set<wrench::ComputeService *> compute_services = this->getAvailableComputeServices();
+        std::set<std::shared_ptr<wrench::ComputeService>> compute_services = this->getAvailableComputeServices();
 
         // Perform static optimizations
         runDynamicOptimizations();
@@ -312,7 +312,7 @@ void WMSOptimizationsTest::do_dynamicOptimization_test() {
 
   // Create a WMS
   wrench::Workflow *workflow = this->createWorkflow();
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new DynamicOptimizationsTestWMS(this, {compute_service}, {storage_service}, hostname)));
 

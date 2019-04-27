@@ -109,7 +109,7 @@ namespace wrench {
     class StorageServiceFileDeleteAnswerMessage : public StorageServiceMessage {
     public:
         StorageServiceFileDeleteAnswerMessage(WorkflowFile *file,
-                                              StorageService *storage_service,
+                                              std::shared_ptr<StorageService>  storage_service,
                                               bool success,
                                               std::shared_ptr<FailureCause> failure_cause,
                                               double payload);
@@ -117,7 +117,7 @@ namespace wrench {
         /** @brief The file that was deleted (or not) */
         WorkflowFile *file;
         /** @brief The storage service on which the deletion happened (or not) */
-        StorageService *storage_service;
+        std::shared_ptr<StorageService>  storage_service;
         /** @brief Whether the deletion was successful */
         bool success;
         /** @brief The cause of the failure, or nullptr if success */
@@ -129,9 +129,9 @@ namespace wrench {
     */
     class StorageServiceFileCopyRequestMessage : public StorageServiceMessage {
     public:
-        StorageServiceFileCopyRequestMessage(std::string answer_mailbox, WorkflowFile *file, StorageService *src,
-                                             std::string& src_partition, StorageService * dst, std::string& dst_partition,
-                                             FileRegistryService *file_registry_service,
+        StorageServiceFileCopyRequestMessage(std::string answer_mailbox, WorkflowFile *file, std::shared_ptr<StorageService> src,
+                                             std::string& src_partition, std::shared_ptr<StorageService > dst, std::string& dst_partition,
+                                             std::shared_ptr<FileRegistryService> file_registry_service,
                                              SimulationTimestampFileCopyStart *start_timestamp,
                                              double payload);
 
@@ -140,15 +140,15 @@ namespace wrench {
         /** @brief The file to copy */
         WorkflowFile *file;
         /** @brief The storage service that the file will be copied from */
-        StorageService *src;
+        std::shared_ptr<StorageService> src;
         /** @brief The file partition from where the file will be copied from */
         std::string src_partition;
         /** @brief The StorageService where the file will be copied to */
-        StorageService *dst;
+        std::shared_ptr<StorageService> dst;
         /** @brief The file partition inside the storage service where the file will be copied to */
         std::string dst_partition;
         /** @brief The file registry service to update, or none if nullptr */
-        FileRegistryService *file_registry_service;
+        std::shared_ptr<FileRegistryService> file_registry_service;
         /** @brief The SimulationTimestampFileCopyStart associated with this file copy request */
         SimulationTimestampFileCopyStart *start_timestamp;
     };
@@ -158,9 +158,10 @@ namespace wrench {
      */
     class StorageServiceFileCopyAnswerMessage : public StorageServiceMessage {
     public:
-        StorageServiceFileCopyAnswerMessage(WorkflowFile *file, StorageService *storage_service,
+        StorageServiceFileCopyAnswerMessage(WorkflowFile *file,
+                                            std::shared_ptr<StorageService> storage_service,
                                             std::string dst_partition,
-                                            FileRegistryService *file_registry_service,
+                                            std::shared_ptr<FileRegistryService> file_registry_service,
                                             bool file_registry_service_updated,
                                             bool success, std::shared_ptr<FailureCause> cause,
                                             double payload);
@@ -168,11 +169,11 @@ namespace wrench {
         /** @brief The file was was copied, or not */
         WorkflowFile *file;
         /** @brief The storage service that performed the copy (i.e., which stored the file) */
-        StorageService *storage_service;
+        std::shared_ptr<StorageService> storage_service;
         /** @brief The destination partition */
         std::string dst_partition;
         /** @brief The file registry service that the user had requested be updated, or nullptr if none */
-        FileRegistryService *file_registry_service;
+        std::shared_ptr<FileRegistryService> file_registry_service;
         /** @brief Whether a file registry service has been updated or not */
         bool file_registry_service_updated;
         /** @brief Whether the copy was successful */
@@ -204,7 +205,7 @@ namespace wrench {
     class StorageServiceFileWriteAnswerMessage : public StorageServiceMessage {
     public:
         StorageServiceFileWriteAnswerMessage(WorkflowFile *file,
-                                             StorageService *storage_service,
+                                             std::shared_ptr<StorageService>  storage_service,
                                              bool success,
                                              std::shared_ptr<FailureCause> failure_cause,
                                              std::string data_write_mailbox_name,
@@ -213,7 +214,7 @@ namespace wrench {
         /** @brief The workflow file that should be written */
         WorkflowFile *file;
         /** @brief The storage service on which the file should be written */
-        StorageService *storage_service;
+        std::shared_ptr<StorageService>  storage_service;
         /** @brief Whether the write operation request was accepted or not */
         bool success;
         /** @brief The mailbox on which to send the file */
@@ -248,7 +249,7 @@ namespace wrench {
     class StorageServiceFileReadAnswerMessage : public StorageServiceMessage {
     public:
         StorageServiceFileReadAnswerMessage(WorkflowFile *file,
-                                            StorageService *storage_service,
+                                            std::shared_ptr<StorageService>  storage_service,
                                             bool success,
                                             std::shared_ptr<FailureCause> failure_cause,
                                             double payload);
@@ -256,7 +257,7 @@ namespace wrench {
         /** @brief The file that was read */
         WorkflowFile *file;
         /** @brief The storage service on which the file was read */
-        StorageService *storage_service;
+        std::shared_ptr<StorageService>  storage_service;
         /** @brief Whether the read operation was successful or not */
         bool success;
         /** @brief The cause of the failure, or nullptr on success */

@@ -17,7 +17,7 @@ namespace wrench {
     /**
      * @brief Configurable message payloads for a CloudService
      */
-    class CloudServiceMessagePayload : public ComputeServiceMessagePayload {
+    class CloudComputeServiceMessagePayload : public ComputeServiceMessagePayload {
 
     public:
         /** @brief The number of bytes in the control message sent to the service to request a get execution hosts. **/

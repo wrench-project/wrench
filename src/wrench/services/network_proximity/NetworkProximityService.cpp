@@ -345,7 +345,7 @@ namespace wrench {
             try {
                 S4U_Mailbox::dputMessage(msg->daemon->mailbox_name,
                                          new NextContactDaemonAnswerMessage(chosen_peer->getHostname(),
-                                                                            chosen_peer.get(),
+                                                                            chosen_peer,
                                                                             chosen_peer->mailbox_name,
                                                                             this->getMessagePayloadValue(
                                                                                     NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD)));
@@ -385,7 +385,7 @@ namespace wrench {
      * @return a shared_ptr to the network daemon that is the selected communication peer
      */
     std::shared_ptr<NetworkProximityDaemon>
-    NetworkProximityService::getCommunicationPeer(const NetworkProximityDaemon * sender_daemon) {
+    NetworkProximityService::getCommunicationPeer(const std::shared_ptr<NetworkProximityDaemon>  sender_daemon) {
 
 //        WRENCH_INFO("Obtaining communication peer for %s", sender_daemon->mailbox_name.c_str());
 

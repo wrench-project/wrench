@@ -26,14 +26,14 @@ class BareMetalComputeServiceTestScheduling : public ::testing::Test {
 
 public:
     // Default
-    wrench::ComputeService *cs = nullptr;
+    std::shared_ptr<wrench::ComputeService> cs = nullptr;
 
     // Old Default
-    wrench::ComputeService *cs_fcfs_aggressive_maximum_maximum_flops_best_fit = nullptr;
+    std::shared_ptr<wrench::ComputeService> cs_fcfs_aggressive_maximum_maximum_flops_best_fit = nullptr;
     // "minimum" core allocation
-    wrench::ComputeService *cs_fcfs_aggressive_minimum_maximum_flops_best_fit = nullptr;
+    std::shared_ptr<wrench::ComputeService> cs_fcfs_aggressive_minimum_maximum_flops_best_fit = nullptr;
     // "maximum_minimum_cores" task selection
-    wrench::ComputeService *cs_fcfs_aggressive_maximum_maximum_minimum_cores_best_fit = nullptr;
+    std::shared_ptr<wrench::ComputeService> cs_fcfs_aggressive_maximum_maximum_minimum_cores_best_fit = nullptr;
 
     void do_RAMPressure_test();
     void do_LoadBalancing1_test();
@@ -93,8 +93,8 @@ class RAMPressureTestWMS : public wrench::WMS {
 
 public:
     RAMPressureTestWMS(BareMetalComputeServiceTestScheduling *test,
-                    const std::set<wrench::ComputeService *> &compute_services,
-                    const std::set<wrench::StorageService *> &storage_services,
+                    const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                    const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                     std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
@@ -108,7 +108,7 @@ private:
     int main() {
 
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       // Create a few tasks
       std::vector<wrench::WorkflowTask *> tasks;
@@ -206,11 +206,11 @@ void BareMetalComputeServiceTestScheduling::do_RAMPressure_test() {
           new wrench::BareMetalComputeService("Host1",
                                                        (std::set<std::string>){"Host1", "Host2"}, 0.0,
                                                        {}, {})));
-  std::set<wrench::ComputeService *> compute_services;
+  std::set<std::shared_ptr<wrench::ComputeService>> compute_services;
   compute_services.insert(cs);
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(
           new RAMPressureTestWMS(
                   this, compute_services, {}, "Host1")));
@@ -236,8 +236,8 @@ class LoadBalancing1TestWMS : public wrench::WMS {
 
 public:
     LoadBalancing1TestWMS(BareMetalComputeServiceTestScheduling *test,
-                       const std::set<wrench::ComputeService *> &compute_services,
-                       const std::set<wrench::StorageService *> &storage_services,
+                       const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                       const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                        std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
@@ -251,7 +251,7 @@ private:
     int main() {
 
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       // Create a few tasks
       std::vector<wrench::WorkflowTask *> tasks;
@@ -338,11 +338,11 @@ void BareMetalComputeServiceTestScheduling::do_LoadBalancing1_test() {
           new wrench::BareMetalComputeService("Host1",
                                               (std::set<std::string>){"Host1", "Host2"}, 0.0,
                                               {}, {})));
-  std::set<wrench::ComputeService *> compute_services;
+  std::set<std::shared_ptr<wrench::ComputeService>> compute_services;
   compute_services.insert(cs);
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(
           new LoadBalancing1TestWMS(
                   this, compute_services, {}, "Host1")));
@@ -368,8 +368,8 @@ class LoadBalancing2TestWMS : public wrench::WMS {
 
 public:
     LoadBalancing2TestWMS(BareMetalComputeServiceTestScheduling *test,
-                       const std::set<wrench::ComputeService *> &compute_services,
-                       const std::set<wrench::StorageService *> &storage_services,
+                       const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                       const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                        std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
@@ -383,7 +383,7 @@ private:
     int main() {
 
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       // Create a few tasks
       std::vector<wrench::WorkflowTask *> tasks;
@@ -470,11 +470,11 @@ void BareMetalComputeServiceTestScheduling::do_LoadBalancing2_test() {
           new wrench::BareMetalComputeService("Host1",
                                               (std::set<std::string>){"Host1", "Host3"}, 0.0,
                                               {}, {})));
-  std::set<wrench::ComputeService *> compute_services;
+  std::set<std::shared_ptr<wrench::ComputeService>> compute_services;
   compute_services.insert(cs);
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new LoadBalancing2TestWMS(
                   this, compute_services, {}, "Host1")));
