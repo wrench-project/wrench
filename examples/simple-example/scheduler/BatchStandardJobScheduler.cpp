@@ -23,7 +23,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void BatchStandardJobScheduler::scheduleTasks(const std::set<ComputeService *> &compute_services,
+    void BatchStandardJobScheduler::scheduleTasks(const std::set<std::shared_ptr<ComputeService>> &compute_services,
                                                   const std::vector<WorkflowTask *> &tasks) {
 
       // Check that the right compute_services is passed
@@ -31,9 +31,10 @@ namespace wrench {
         throw std::runtime_error("This example Batch Scheduler requires a single compute service");
       }
 
-      ComputeService *compute_service = *compute_services.begin();
-      BatchComputeService *batch_service;
-      if (not(batch_service = dynamic_cast<BatchComputeService *>(compute_service))) {
+      auto compute_service = *compute_services.begin();
+      auto batch_service = std::dynamic_pointer_cast<BatchComputeService>(compute_service);
+
+      if (not(batch_service)) {
         throw std::runtime_error("This example Batch Scheduler can only handle a batch service");
       }
 
