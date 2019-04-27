@@ -80,7 +80,7 @@ namespace wrench {
      * @param file: the file that could not be found
      * @param storage_service: the storage service on which it was not found
      */
-    FileNotFound::FileNotFound(WorkflowFile *file, StorageService *storage_service) : FailureCause(
+    FileNotFound::FileNotFound(WorkflowFile *file, std::shared_ptr<StorageService> storage_service) : FailureCause(
             FILE_NOT_FOUND) {
         this->file = file;
         this->storage_service = storage_service;
@@ -98,7 +98,7 @@ namespace wrench {
      * @brief Getter
      * @return the storage service
      */
-    StorageService *FileNotFound::getStorageService() {
+    std::shared_ptr<StorageService>  FileNotFound::getStorageService() {
         return this->storage_service;
     }
 
@@ -115,7 +115,7 @@ namespace wrench {
      * @param file: the file that could not be written
      * @param storage_service:  the storage service that ran out of spacee
      */
-    StorageServiceNotEnoughSpace::StorageServiceNotEnoughSpace(WorkflowFile *file, StorageService *storage_service)
+    StorageServiceNotEnoughSpace::StorageServiceNotEnoughSpace(WorkflowFile *file, std::shared_ptr<StorageService>  storage_service)
             : FailureCause(STORAGE_NOT_ENOUGH_SPACE) {
         this->file = file;
         this->storage_service = storage_service;
@@ -133,7 +133,7 @@ namespace wrench {
      * @brief Getter
      * @return the storage service
      */
-    StorageService *StorageServiceNotEnoughSpace::getStorageService() {
+    std::shared_ptr<StorageService>  StorageServiceNotEnoughSpace::getStorageService() {
         return this->storage_service;
     }
 
@@ -150,7 +150,7 @@ namespace wrench {
      * @brief Constructor
      * @param service: the service that was down
      */
-    ServiceIsDown::ServiceIsDown(Service *service) : FailureCause(SERVICE_DOWN) {
+    ServiceIsDown::ServiceIsDown(std::shared_ptr<Service> service) : FailureCause(SERVICE_DOWN) {
         this->service = service;
     }
 
@@ -158,7 +158,7 @@ namespace wrench {
      * @brief Getter
      * @return the service
      */
-    Service *ServiceIsDown::getService() {
+    std::shared_ptr<Service> ServiceIsDown::getService() {
         return this->service;
     }
 
@@ -174,7 +174,7 @@ namespace wrench {
      * @brief Constructor
      * @param service: the service that was suspended
      */
-    ServiceIsSuspended::ServiceIsSuspended(Service *service) : FailureCause(SERVICE_DOWN) {
+    ServiceIsSuspended::ServiceIsSuspended(std::shared_ptr<Service> service) : FailureCause(SERVICE_DOWN) {
         this->service = service;
     }
 
@@ -182,7 +182,7 @@ namespace wrench {
      * @brief Getter
      * @return the service
      */
-    Service *ServiceIsSuspended::getService() {
+    std::shared_ptr<Service> ServiceIsSuspended::getService() {
         return this->service;
     }
 
@@ -199,7 +199,7 @@ namespace wrench {
      * @param job: the job that wasn't supported
      * @param compute_service: the compute service that did not support it
      */
-    JobTypeNotSupported::JobTypeNotSupported(WorkflowJob *job, ComputeService *compute_service)
+    JobTypeNotSupported::JobTypeNotSupported(WorkflowJob *job, std::shared_ptr<ComputeService>  compute_service)
             : FailureCause(JOB_TYPE_NOT_SUPPORTED) {
         this->job = job;
         this->compute_service = compute_service;
@@ -217,7 +217,7 @@ namespace wrench {
      * @brief Getter
      * @return the compute service
      */
-    ComputeService *JobTypeNotSupported::getComputeService() {
+    std::shared_ptr<ComputeService>  JobTypeNotSupported::getComputeService() {
         return this->compute_service;
     }
 
@@ -235,7 +235,7 @@ namespace wrench {
      * @param job: the job that could not be executed (or nullptr if no job was involved)
      * @param compute_service: the compute service that didn't have enough cores or ram
      */
-    NotEnoughResources::NotEnoughResources(WorkflowJob *job, ComputeService *compute_service) : FailureCause(
+    NotEnoughResources::NotEnoughResources(WorkflowJob *job, std::shared_ptr<ComputeService> compute_service) : FailureCause(
             NOT_ENOUGH_RESOURCES) {
         this->job = job;
         this->compute_service = compute_service;
@@ -253,7 +253,7 @@ namespace wrench {
      * @brief Getter
      * @return the compute service
      */
-    ComputeService *NotEnoughResources::getComputeService() {
+    std::shared_ptr<ComputeService> NotEnoughResources::getComputeService() {
         return this->compute_service;
     }
 
@@ -275,7 +275,7 @@ namespace wrench {
     * @param job: the job that could not be executed
     * @param compute_service: the compute service that didn't have enough cores
     */
-    JobKilled::JobKilled(WorkflowJob *job, ComputeService *compute_service) : FailureCause(
+    JobKilled::JobKilled(WorkflowJob *job, std::shared_ptr<ComputeService>  compute_service) : FailureCause(
             JOB_KILLED) {
         this->job = job;
         this->compute_service = compute_service;
@@ -293,7 +293,7 @@ namespace wrench {
      * @brief Getter
      * @return the compute service
      */
-    ComputeService *JobKilled::getComputeService() {
+    std::shared_ptr<ComputeService>  JobKilled::getComputeService() {
         return this->compute_service;
     }
 
@@ -436,7 +436,7 @@ namespace wrench {
 //     * @param file: the file that is already there
 //     * @param storage_service:  the storage service on which it is
 //     */
-//    StorageServiceFileAlreadyThere::StorageServiceFileAlreadyThere(WorkflowFile *file, StorageService *storage_service)
+//    StorageServiceFileAlreadyThere::StorageServiceFileAlreadyThere(WorkflowFile *file, std::shared_ptr<StorageService>  storage_service)
 //            : FailureCause(FILE_ALREADY_THERE) {
 //      this->file = file;
 //      this->storage_service = storage_service;
@@ -454,7 +454,7 @@ namespace wrench {
 //     * @brief Getter
 //     * @return the storage service
 //     */
-//    StorageService *StorageServiceFileAlreadyThere::getStorageService() {
+//    std::shared_ptr<StorageService>  StorageServiceFileAlreadyThere::getStorageService() {
 //      return this->storage_service;
 //    }
 //
@@ -474,7 +474,7 @@ namespace wrench {
      * @param storage_service:  the storage service to which is is being copied
      * @param dst_partition: the destination partition
      */
-    FileAlreadyBeingCopied::FileAlreadyBeingCopied(WorkflowFile *file, StorageService *storage_service, std::string dst_partition)
+    FileAlreadyBeingCopied::FileAlreadyBeingCopied(WorkflowFile *file, std::shared_ptr<StorageService> storage_service, std::string dst_partition)
             : FailureCause(FILE_ALREADY_BEING_COPIED) {
         this->file = file;
         this->storage_service = storage_service;
@@ -493,7 +493,7 @@ namespace wrench {
      * @brief Getter
      * @return the storage service
      */
-    StorageService *FileAlreadyBeingCopied::getStorageService() {
+    std::shared_ptr<StorageService> FileAlreadyBeingCopied::getStorageService() {
         return this->storage_service;
     }
 
@@ -555,7 +555,7 @@ namespace wrench {
      * @param service: the service
      * @param functionality_name: a description of the functionality that's not available
      */
-    FunctionalityNotAvailable::FunctionalityNotAvailable(Service *service, std::string functionality_name) : FailureCause(FUNCTIONALITY_NOT_AVAILABLE) {
+    FunctionalityNotAvailable::FunctionalityNotAvailable(std::shared_ptr<Service> service, std::string functionality_name) : FailureCause(FUNCTIONALITY_NOT_AVAILABLE) {
         this->service = service;
         this->functionality_name = std::move(functionality_name);
     }
@@ -564,7 +564,7 @@ namespace wrench {
      * @brief Getter
      * @return the service
      */
-    Service* FunctionalityNotAvailable::getService() {
+    std::shared_ptr<Service> FunctionalityNotAvailable::getService() {
         return this->service;
     }
 
@@ -632,7 +632,7 @@ namespace wrench {
      * @param service: the service that cause the error
      * @param error_message: a custom error message
      */
-    NotAllowed::NotAllowed(Service *service, std::string &error_message) : FailureCause(NOT_ALLOWED) {
+    NotAllowed::NotAllowed(std::shared_ptr<Service>  service, std::string &error_message) : FailureCause(NOT_ALLOWED) {
         this->service = service;
         this->error_message = error_message;
     }
@@ -641,7 +641,7 @@ namespace wrench {
      * @brief Get the service that caused the error
      * @return the service
      */
-    Service *NotAllowed::getService() {
+    std::shared_ptr<Service>  NotAllowed::getService() {
         return this->service;
     }
 

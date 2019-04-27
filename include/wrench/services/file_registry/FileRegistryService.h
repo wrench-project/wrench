@@ -65,14 +65,14 @@ namespace wrench {
         /** \cond DEVELOPER         */
         /****************************/
 
-        std::set<StorageService *> lookupEntry(WorkflowFile *file);
+        std::set<std::shared_ptr<StorageService>> lookupEntry(WorkflowFile *file);
 
-        std::map<double, StorageService *> lookupEntry(WorkflowFile *file, std::string reference_host,
-                                                       NetworkProximityService *);
+        std::map<double, std::shared_ptr<StorageService>> lookupEntry(WorkflowFile *file, std::string reference_host,
+                                                       std::shared_ptr<NetworkProximityService> network_proximity_service);
 
-        void addEntry(WorkflowFile *file, StorageService *storage_service);
+        void addEntry(WorkflowFile *file, std::shared_ptr<StorageService> storage_service);
 
-        void removeEntry(WorkflowFile *file, StorageService *storage_service);
+        void removeEntry(WorkflowFile *file, std::shared_ptr<StorageService> storage_service);
 
         /****************************/
         /** \endcond                */
@@ -98,15 +98,15 @@ namespace wrench {
                             std::string suffix = "");
 
 
-        void addEntryToDatabase(WorkflowFile *file, StorageService *storage_service);
+        void addEntryToDatabase(WorkflowFile *file, std::shared_ptr<StorageService> storage_service);
 
-        bool removeEntryFromDatabase(WorkflowFile *file, StorageService *storage_service);
+        bool removeEntryFromDatabase(WorkflowFile *file, std::shared_ptr<StorageService> storage_service);
 
         int main() override;
 
         bool processNextMessage();
 
-        std::map<WorkflowFile *, std::set<StorageService *>> entries;
+        std::map<WorkflowFile *, std::set<std::shared_ptr<StorageService>>> entries;
     };
 
 

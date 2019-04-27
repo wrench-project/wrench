@@ -35,7 +35,7 @@ This allows late binding of workflow tasks to compute resources.
 # Creating a batch compute service #        {#guide-batch-creating}
 
 In WRENCH, a batch service represents a compute service
-(`wrench::ComputeService`), which is defined by the `wrench::BatchService`
+(`wrench::ComputeService`), which is defined by the `wrench::BatchComputeService`
 class. An instantiation of a batch service requires the following
 parameters:
 
@@ -44,8 +44,8 @@ parameters:
   the batch service)
 - A scratch space size, i.e., the size in bytes of storage local to the batch service (used to store
   workflow files, as needed, during job executions) 
-- Maps (`std::map`) of configurable properties (`wrench::BatchServiceProperty`) and configurable message 
-  payloads (`wrench::BatchServiceMessagePayload`)
+- Maps (`std::map`) of configurable properties (`wrench::BatchComputeServiceProperty`) and configurable message
+  payloads (`wrench::BatchComputeServiceMessagePayload`)
   
 The example below shows how to create an instance of a batch service
 that runs on host "Gateway" and provides access to 4 hosts (using all their
@@ -54,10 +54,10 @@ the FCFS (First-Come-First-Serve):
 
 ~~~~~~~~~~~~~{.cpp}
 auto batch_cs = simulation->add(
-          new wrench::BatchService("Gateway", 
+          new wrench::BatchComputeService("Gateway",
                                    {"Node1", "Node2", "Node3", "Node4"},
                                    pow(2,40),
-                                   {{wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}},
+                                   {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}},
                                    {});
 ~~~~~~~~~~~~~
 
@@ -67,16 +67,16 @@ auto batch_cs = simulation->add(
 In addition to properties inherited from `wrench::ComputeServiceProperty`, a batch compute
 service supports the following properties:
 
-- `wrench::BatchServiceProperty::THREAD_STARTUP_OVERHEAD`
-- `wrench::BatchServiceProperty::HOST_SELECTION_ALGORITHM` 
-- `wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM` 
-- `wrench::BatchServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM`
-- `wrench::BatchServiceProperty::BATCH_RJMS_DELAY`
-- `wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE`
-- `wrench::BatchServiceProperty::OUTPUT_CSV_JOB_LOG`
-- `wrench::BatchServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP`
-- `wrench::BatchServiceProperty::BATSCHED_LOGGING_MUTED`
-- `wrench::BatchServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION`
+- `wrench::BatchComputeServiceProperty::THREAD_STARTUP_OVERHEAD`
+- `wrench::BatchComputeServiceProperty::HOST_SELECTION_ALGORITHM`
+- `wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM`
+- `wrench::BatchComputeServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM`
+- `wrench::BatchComputeServiceProperty::BATCH_RJMS_DELAY`
+- `wrench::BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE`
+- `wrench::BatchComputeServiceProperty::OUTPUT_CSV_JOB_LOG`
+- `wrench::BatchComputeServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP`
+- `wrench::BatchComputeServiceProperty::BATSCHED_LOGGING_MUTED`
+- `wrench::BatchComputeServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION`
 
 
 @WRENCHNotUserDoc

@@ -15,8 +15,8 @@
 #include "wrench/services/compute/standard_job_executor/StandardJobExecutor.h"
 #include "wrench/services/compute/batch/BatchJob.h"
 #include "wrench/services/compute/batch/BatschedNetworkListener.h"
-#include "wrench/services/compute/batch/BatchServiceProperty.h"
-#include "wrench/services/compute/batch/BatchServiceMessagePayload.h"
+#include "wrench/services/compute/batch/BatchComputeServiceProperty.h"
+#include "wrench/services/compute/batch/BatchComputeServiceMessagePayload.h"
 #include "wrench/services/helpers/Alarm.h"
 #include "wrench/workflow/job/StandardJob.h"
 #include "wrench/workflow/job/WorkflowJob.h"
@@ -44,7 +44,7 @@ namespace wrench {
      *        of the effects
      *        of memory sharing (e.g., swapping).
      */
-    class BatchService : public ComputeService {
+    class BatchComputeService : public ComputeService {
 
         /**
          * @brief A Batch Service
@@ -52,49 +52,49 @@ namespace wrench {
     private:
 
         std::map<std::string, std::string> default_property_values = {
-                {BatchServiceProperty::SUPPORTS_PILOT_JOBS,                         "true"},
-                {BatchServiceProperty::SUPPORTS_STANDARD_JOBS,                      "true"},
-                {BatchServiceProperty::THREAD_STARTUP_OVERHEAD,                     "0"},
-                {BatchServiceProperty::HOST_SELECTION_ALGORITHM,                    "FIRSTFIT"},
-                {BatchServiceProperty::TASK_SELECTION_ALGORITHM,                    "maximum_flops"},
+                {BatchComputeServiceProperty::SUPPORTS_PILOT_JOBS,                         "true"},
+                {BatchComputeServiceProperty::SUPPORTS_STANDARD_JOBS,                      "true"},
+                {BatchComputeServiceProperty::THREAD_STARTUP_OVERHEAD,                     "0"},
+                {BatchComputeServiceProperty::HOST_SELECTION_ALGORITHM,                    "FIRSTFIT"},
+                {BatchComputeServiceProperty::TASK_SELECTION_ALGORITHM,                    "maximum_flops"},
         #ifdef ENABLE_BATSCHED
-                {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "conservative_bf"},
-//                {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "easy_bf"},
-//                {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "easy_bf_fast"},
-                {BatchServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM,              "fcfs"},
+                {BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "conservative_bf"},
+//                {BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "easy_bf"},
+//                {BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "easy_bf_fast"},
+                {BatchComputeServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM,              "fcfs"},
         #else
-                {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,            "FCFS"},
+                {BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM,            "FCFS"},
         #endif
-                {BatchServiceProperty::BATCH_RJMS_DELAY,                            "0"},
-                {BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE,               ""},
-                {BatchServiceProperty::USE_REAL_RUNTIMES_AS_REQUESTED_RUNTIMES,     "false"},
-                {BatchServiceProperty::OUTPUT_CSV_JOB_LOG,                          ""},
-                {BatchServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP,               "false"},
-                {BatchServiceProperty::BATSCHED_LOGGING_MUTED,                      "true"},
-                {BatchServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION,              "false"}
+                {BatchComputeServiceProperty::BATCH_RJMS_DELAY,                            "0"},
+                {BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE,               ""},
+                {BatchComputeServiceProperty::USE_REAL_RUNTIMES_AS_REQUESTED_RUNTIMES,     "false"},
+                {BatchComputeServiceProperty::OUTPUT_CSV_JOB_LOG,                          ""},
+                {BatchComputeServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP,               "false"},
+                {BatchComputeServiceProperty::BATSCHED_LOGGING_MUTED,                      "true"},
+                {BatchComputeServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION,              "false"}
         };
 
         std::map<std::string, double> default_messagepayload_values = {
-                {BatchServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,                 1024},
-                {BatchServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD,1024},
-                {BatchServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {BatchServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,              1024},
-                {BatchServiceMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD,           1024},
-                {BatchServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {BatchServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,  1024},
-                {BatchServiceMessagePayload::TERMINATE_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD,  1024},
-                {BatchServiceMessagePayload::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,  1024},
-                {BatchServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,    1024},
-                {BatchServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,     1024},
-                {BatchServiceMessagePayload::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD,         1024},
-                {BatchServiceMessagePayload::PILOT_JOB_STARTED_MESSAGE_PAYLOAD,           1024},
-                {BatchServiceMessagePayload::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD,           1024},
-                {BatchServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,  1024},
-                {BatchServiceMessagePayload::TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
+                {BatchComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,                 1024},
+                {BatchComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD,1024},
+                {BatchComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD, 1024},
+                {BatchComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,              1024},
+                {BatchComputeServiceMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD,           1024},
+                {BatchComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
+                {BatchComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,  1024},
+                {BatchComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD,  1024},
+                {BatchComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,  1024},
+                {BatchComputeServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,    1024},
+                {BatchComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,     1024},
+                {BatchComputeServiceMessagePayload::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD,         1024},
+                {BatchComputeServiceMessagePayload::PILOT_JOB_STARTED_MESSAGE_PAYLOAD,           1024},
+                {BatchComputeServiceMessagePayload::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD,           1024},
+                {BatchComputeServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,  1024},
+                {BatchComputeServiceMessagePayload::TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
         };
 
     public:
-        BatchService(std::string &hostname,
+        BatchComputeService(std::string &hostname,
                      std::vector<std::string> compute_hosts,
                      double scratch_space_size,
                      std::map<std::string, std::string> property_list = {},
@@ -113,7 +113,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
-        ~BatchService() override;
+        ~BatchComputeService() override;
         /***********************/
         /** \endcond          **/
         /***********************/
@@ -122,7 +122,7 @@ namespace wrench {
     private:
         friend class WorkloadTraceFileReplayer;
 
-        BatchService(std::string hostname,
+        BatchComputeService(std::string hostname,
                      std::vector<std::string> compute_hosts,
                      unsigned long cores_per_host,
                      double ram_per_host,

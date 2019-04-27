@@ -30,8 +30,8 @@ public:
     wrench::WorkflowTask *task4;
     wrench::WorkflowTask *task5;
     wrench::WorkflowTask *task6;
-    wrench::ComputeService *compute_service = nullptr;
-    wrench::StorageService *storage_service = nullptr;
+    std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
+    std::shared_ptr<wrench::StorageService> storage_service = nullptr;
 
     void do_StandardJobTaskTest_test();
 
@@ -98,8 +98,8 @@ class HTCondorStandardJobTestWMS : public wrench::WMS {
 
 public:
     HTCondorStandardJobTestWMS(HTCondorServiceTest *test,
-                               const std::set<wrench::ComputeService *> &compute_services,
-                               const std::set<wrench::StorageService *> &storage_services,
+                               const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                               const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -111,10 +111,10 @@ private:
 
     int main() {
         // Create a data movement manager
-        std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
+        auto data_movement_manager = this->createDataMovementManager();
 
         // Create a job manager
-        std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+        auto job_manager = this->createJobManager();
 
         // Create a 2-task job
         wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task1},
@@ -195,7 +195,7 @@ void HTCondorServiceTest::do_StandardJobTaskTest_test() {
                                         {{wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
 
     // Create a WMS
-    wrench::WMS *wms = nullptr;
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new HTCondorStandardJobTestWMS(this, {compute_service}, {storage_service}, hostname)));
 
@@ -223,8 +223,8 @@ class HTCondorSimpleServiceTestWMS : public wrench::WMS {
 
 public:
     HTCondorSimpleServiceTestWMS(HTCondorServiceTest *test,
-                                 const std::set<wrench::ComputeService *> &compute_services,
-                                 const std::set<wrench::StorageService *> &storage_services,
+                                 const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                 const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                  std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -236,16 +236,17 @@ private:
 
     int main() {
         // Create a data movement manager
-        std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
+        auto data_movement_manager = this->createDataMovementManager();
 
         // Create a job manager
-        std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+        auto job_manager = this->createJobManager();
 
+        auto htcondor_cs = std::dynamic_pointer_cast<wrench::HTCondorService>(this->test->compute_service);
         // Create a 2-task job
         wrench::StandardJob *two_task_job = job_manager->createStandardJob(
                 {this->test->task1}, {},
                 {std::make_tuple(this->test->input_file,
-                                 ((wrench::HTCondorService *) this->test->compute_service)->getLocalStorageService(),
+                                 htcondor_cs->getLocalStorageService(),
                                  wrench::ComputeService::SCRATCH)},
                 {}, {});
 
@@ -308,7 +309,7 @@ void HTCondorServiceTest::do_SimpleServiceTest_test() {
         std::string execution_host = wrench::Simulation::getHostnameList()[1];
         std::vector<std::string> execution_hosts;
         execution_hosts.push_back(execution_host);
-        invalid_compute_services.insert(new wrench::CloudService(hostname, execution_hosts,
+        invalid_compute_services.insert(new wrench::CloudComputeService(hostname, execution_hosts,
                                                                  100000000000.0));
 
         // Create a HTCondor Service
@@ -324,7 +325,7 @@ void HTCondorServiceTest::do_SimpleServiceTest_test() {
     std::string execution_host = wrench::Simulation::getHostnameList()[1];
     std::vector<std::string> execution_hosts;
     execution_hosts.push_back(execution_host);
-    compute_services.insert(new wrench::VirtualizedClusterService(hostname, execution_hosts,
+    compute_services.insert(new wrench::VirtualizedClusterComputeService(hostname, execution_hosts,
                                                              100000000000.0));
 
     // Create a HTCondor Service
@@ -333,10 +334,10 @@ void HTCondorServiceTest::do_SimpleServiceTest_test() {
             new wrench::HTCondorService(hostname, "local", std::move(compute_services),
                                         {{wrench::HTCondorServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
 
-    ((wrench::HTCondorService *) compute_service)->setLocalStorageService(storage_service);
+    std::dynamic_pointer_cast<wrench::HTCondorService>(compute_service)->setLocalStorageService(storage_service);
 
     // Create a WMS
-    wrench::WMS *wms = nullptr;
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new HTCondorSimpleServiceTestWMS(this, {compute_service}, {storage_service}, hostname)));
 

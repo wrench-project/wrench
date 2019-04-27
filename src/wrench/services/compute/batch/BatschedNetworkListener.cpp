@@ -10,9 +10,9 @@
 
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
-#include "wrench/services/compute/batch/BatchService.h"
-#include "wrench/services/compute/batch/BatchServiceMessage.h"
-#include "wrench/services/compute/batch/BatchServiceProperty.h"
+#include "wrench/services/compute/batch/BatchComputeService.h"
+#include "wrench/services/compute/batch/BatchComputeServiceMessage.h"
+#include "wrench/services/compute/batch/BatchComputeServiceProperty.h"
 #include "wrench/services/compute/batch/BatschedNetworkListener.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
@@ -38,13 +38,13 @@ namespace wrench {
     /**
     * @brief Constructor
     * @param hostname: the hostname on which to start the service
-    * @param batch_service: the BatchService that this service reports to
-    * @param batch_service_mailbox: the name of the mailbox of the BatchService
+    * @param batch_service: the BatchComputeService that this service reports to
+    * @param batch_service_mailbox: the name of the mailbox of the BatchComputeService
     * @param sched_port the port for sending messages to Batsched
     * @param data_to_send: the data to send (as a JSON string)
     * @param property_list: property list ({} means "use all defaults")
     */
-    BatschedNetworkListener::BatschedNetworkListener(std::string hostname, BatchService *batch_service,
+    BatschedNetworkListener::BatschedNetworkListener(std::string hostname, std::shared_ptr<BatchComputeService> batch_service,
                                                      std::string batch_service_mailbox,
                                                      std::string sched_port,
                                                      std::string data_to_send,
@@ -65,7 +65,7 @@ namespace wrench {
     * @param suffix the suffix to append
     */
     BatschedNetworkListener::BatschedNetworkListener(
-            std::string hostname, BatchService *batch_service, std::string batch_service_mailbox,
+            std::string hostname, std::shared_ptr<BatchComputeService> batch_service, std::string batch_service_mailbox,
             std::string sched_port,
             std::string data_to_send, std::map<std::string, std::string> property_list,
             std::string suffix = "") :
@@ -107,7 +107,7 @@ namespace wrench {
      * @param answer_mailbox: mailbox on which ack will be received
      * @param execute_job_reply_data: message to send
      */
-    void BatschedNetworkListener::sendExecuteMessageToBatchService(std::string answer_mailbox,
+    void BatschedNetworkListener::sendExecuteMessageToBatchComputeService(std::string answer_mailbox,
                                                                    std::string execute_job_reply_data) {
       try {
         S4U_Mailbox::putMessage(this->batch_service_mailbox,
@@ -121,7 +121,7 @@ namespace wrench {
      * @brief Send a "query answer" message to the batch service
      * @param estimated_waiting_time: batch queue wait time estimate
      */
-    void BatschedNetworkListener::sendQueryAnswerMessageToBatchService(double estimated_waiting_time) {
+    void BatschedNetworkListener::sendQueryAnswerMessageToBatchComputeService(double estimated_waiting_time) {
       try {
         S4U_Mailbox::putMessage(this->batch_service_mailbox,
                                 new BatchQueryAnswerMessage(estimated_waiting_time,0));
@@ -183,10 +183,10 @@ namespace wrench {
           if (time_to_sleep > 0) {
             S4U_Simulation::sleep(time_to_sleep);
           }
-          sendExecuteMessageToBatchService(answer_mailbox, job_reply_data);
+          sendExecuteMessageToBatchComputeService(answer_mailbox, job_reply_data);
         } else if (strcmp(decision_type.c_str(), "ANSWER") == 0) {
           double estimated_waiting_time = execute_json_data["estimate_waiting_time"]["estimated_waiting_time"];
-          sendQueryAnswerMessageToBatchService(estimated_waiting_time);
+          sendQueryAnswerMessageToBatchComputeService(estimated_waiting_time);
         }
       }
 
@@ -196,8 +196,6 @@ namespace wrench {
         S4U_Simulation::sleep(time_to_sleep_again);
       }
 
-
     }
     #endif // ENABLE_BATSCHED
-
 }

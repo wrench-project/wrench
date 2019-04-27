@@ -25,8 +25,8 @@ parameters:
 
 - The name of a host on which to start the service (this is the entry point to the service);
 - A capacity in bytes;
-- Maps (`std::map`) of configurable properties (`wrench::BatchServiceProperty`) and configurable message 
-  payloads (`wrench::BatchServiceMessagePayload`).
+- Maps (`std::map`) of configurable properties (`wrench::BatchComputeServiceProperty`) and configurable message
+  payloads (`wrench::BatchComputeServiceMessagePayload`).
   
 The example below shows how to create an instance of a Simple storage service
 that runs on host "Gateway", has access to 64TiB of storage. 

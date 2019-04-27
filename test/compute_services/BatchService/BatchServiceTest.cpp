@@ -12,8 +12,8 @@
 #include <wrench/simulation/SimulationMessage.h>
 #include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
 #include <gtest/gtest.h>
-#include <wrench/services/compute/batch/BatchService.h>
-#include <wrench/services/compute/batch/BatchServiceMessage.h>
+#include <wrench/services/compute/batch/BatchComputeService.h>
+#include <wrench/services/compute/batch/BatchComputeServiceMessage.h>
 #include "wrench/workflow/job/PilotJob.h"
 
 #include "../../include/TestWithFork.h"
@@ -25,9 +25,9 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(batch_service_test, "Log category for BatchServiceT
 class BatchServiceTest : public ::testing::Test {
 
 public:
-    wrench::StorageService *storage_service1 = nullptr;
-    wrench::StorageService *storage_service2 = nullptr;
-    wrench::ComputeService *compute_service = nullptr;
+    std::shared_ptr<wrench::StorageService> storage_service1 = nullptr;
+    std::shared_ptr<wrench::StorageService> storage_service2 = nullptr;
+    std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
     wrench::Simulation *simulation;
 
 
@@ -101,7 +101,7 @@ class BogusSetupTestWMS : public wrench::WMS {
 
 public:
     BogusSetupTestWMS(BatchServiceTest *test,
-                      const std::set<wrench::ComputeService *> &compute_services,
+                      const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                       std::string hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, {}, {}, nullptr, hostname,
                         "test") {
@@ -142,33 +142,33 @@ void BatchServiceTest::do_BogusSetupTest_test() {
 
   // Create a Batch Service with a bogus scheduling algorithm
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, {"Host1", "Host2", "Host3", "Host4"}, 0,
-                                   {{wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "BOGUS"}})),
+          new wrench::BatchComputeService(hostname, {"Host1", "Host2", "Host3", "Host4"}, 0,
+                                   {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "BOGUS"}})),
                std::invalid_argument);
 
   // Create a Batch Service with a bogus host list
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, {}, 0,
-                                   {{wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}})),
+          new wrench::BatchComputeService(hostname, {}, 0,
+                                   {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}})),
                std::invalid_argument);
 
   // Create a Batch Service with a non-homogeneous (speed) host list
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, {"Host1", "HostFast"}, 0,
-                                   {{wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}})),
+          new wrench::BatchComputeService(hostname, {"Host1", "HostFast"}, 0,
+                                   {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}})),
                std::invalid_argument);
 
 
   // Create a Batch Service with a non-homogeneous (#cores) host list
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, {"Host1", "HostManyCores"}, 0,
-                                   {{wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}})),
+          new wrench::BatchComputeService(hostname, {"Host1", "HostManyCores"}, 0,
+                                   {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}})),
                std::invalid_argument);
 
   // Create a Batch Service with a non-homogeneous (RAM) host list
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, {"Host1", "RAMHost"}, 0,
-                                   {{wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}})),
+          new wrench::BatchComputeService(hostname, {"Host1", "RAMHost"}, 0,
+                                   {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}})),
                std::invalid_argument);
 
 
@@ -187,7 +187,7 @@ class TerminateOneStandardJobSubmissionTestWMS : public wrench::WMS {
 
 public:
     TerminateOneStandardJobSubmissionTestWMS(BatchServiceTest *test,
-                                             const std::set<wrench::ComputeService *> &compute_services,
+                                             const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                              std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
                         "test") {
@@ -200,7 +200,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       wrench::WorkflowTask *task1;
       wrench::WorkflowTask *task2;
@@ -221,11 +221,11 @@ private:
                 {
                         {*(task1->getInputFiles().begin()),  this->test->storage_service1}
                 },
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
                         this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
                         this->test->storage_service2)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->getWorkflow()->getFileByID("input_file"),
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
                                                                               this->test->storage_service2)});
 
         std::map<std::string, std::string> batch_job_args;
@@ -255,11 +255,11 @@ private:
                 {
                         {*(task2->getInputFiles().begin()),  this->test->storage_service1},
                 },
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
                         this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
                         this->test->storage_service2)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->getWorkflow()->getFileByID("input_file"),
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
                                                                               this->test->storage_service2)});
 
         std::map<std::string, std::string> batch_job_args;
@@ -336,13 +336,13 @@ void BatchServiceTest::do_TerminateStandardJobsTest_test() {
 
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, {"Host1", "Host2", "Host3", "Host4"},
+          new wrench::BatchComputeService(hostname, {"Host1", "Host2", "Host3", "Host4"},
                                    {})));
 
   simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new TerminateOneStandardJobSubmissionTestWMS(
                   this,  {compute_service}, hostname)));
@@ -377,7 +377,7 @@ class OneStandardJobSubmissionTestWMS : public wrench::WMS {
 
 public:
     OneStandardJobSubmissionTestWMS(BatchServiceTest *test,
-                                    const std::set<wrench::ComputeService *> &compute_services,
+                                    const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                     std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
                         "test") {
@@ -390,7 +390,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       {
         // Create a sequential task that lasts one min and requires 2 cores
@@ -407,11 +407,11 @@ private:
                         {*(task->getInputFiles().begin()),  this->test->storage_service1},
                         {*(task->getOutputFiles().begin()), this->test->storage_service1}
                 },
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
                         this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
                         this->test->storage_service2)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->getWorkflow()->getFileByID("input_file"),
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
                                                                               this->test->storage_service2)});
 
         std::map<std::string, std::string> batch_job_args;
@@ -490,13 +490,13 @@ void BatchServiceTest::do_OneStandardJobTaskTest_test() {
 
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, {"Host1", "Host2", "Host3", "Host4"},
+          new wrench::BatchComputeService(hostname, {"Host1", "Host2", "Host3", "Host4"},
                                    {})));
 
   simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new OneStandardJobSubmissionTestWMS(
                   this,  {compute_service}, hostname)));
@@ -531,8 +531,8 @@ class TwoStandardJobSubmissionTestWMS : public wrench::WMS {
 
 public:
     TwoStandardJobSubmissionTestWMS(BatchServiceTest *test,
-                                    const std::set<wrench::ComputeService *> &compute_services,
-                                    const std::set<wrench::StorageService *> &storage_services,
+                                    const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                    const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                     std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname,
                         "test") {
@@ -545,7 +545,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       std::vector<wrench::WorkflowTask *> tasks;
       std::map<std::string, std::string> batch_job_args;
@@ -678,13 +678,13 @@ void BatchServiceTest::do_TwoStandardJobSubmissionTest_test() {
 
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, {"Host1", "Host2", "Host3", "Host4"},
+          new wrench::BatchComputeService(hostname, {"Host1", "Host2", "Host3", "Host4"},
                                    {})));
 
   simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new TwoStandardJobSubmissionTestWMS(
                   this,  {compute_service}, {storage_service1, storage_service2}, hostname)));
@@ -718,8 +718,8 @@ class OnePilotJobSubmissionTestWMS : public wrench::WMS {
 
 public:
     OnePilotJobSubmissionTestWMS(BatchServiceTest *test,
-                                 const std::set<wrench::ComputeService *> &compute_services,
-                                 const std::set<wrench::StorageService *> &storage_services,
+                                 const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                 const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                  std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
@@ -731,7 +731,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       {
         // Create a pilot job that needs 1 host, 1 code, 0 bytes of RAM and 30 seconds
@@ -819,14 +819,14 @@ void BatchServiceTest::do_PilotJobTaskTest_test() {
 
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, {"Host1", "Host2", "Host3", "Host4"},
+          new wrench::BatchComputeService(hostname, {"Host1", "Host2", "Host3", "Host4"},
                                    {})));
 
   // Create a File Registry Service
   simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new OnePilotJobSubmissionTestWMS(
                   this,
@@ -864,8 +864,8 @@ class StandardPlusPilotJobSubmissionTestWMS : public wrench::WMS {
 
 public:
     StandardPlusPilotJobSubmissionTestWMS(BatchServiceTest *test,
-                                          const std::set<wrench::ComputeService *> &compute_services,
-                                          const std::set<wrench::StorageService *> &storage_services,
+                                          const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                          const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                           std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
@@ -878,7 +878,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       {
         // Create a sequential task that lasts one min and requires 2 cores
@@ -894,11 +894,11 @@ private:
                         {*(task->getInputFiles().begin()),  this->test->storage_service1},
                         {*(task->getOutputFiles().begin()), this->test->storage_service1}
                 },
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
                         this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
                         this->test->storage_service2)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->getWorkflow()->getFileByID("input_file"),
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
                                                                               this->test->storage_service2)});
 
         std::map<std::string, std::string> batch_job_args;
@@ -1016,12 +1016,12 @@ void BatchServiceTest::do_StandardPlusPilotJobTaskTest_test() {
 
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname,
+          new wrench::BatchComputeService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"},
                                    {})));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new StandardPlusPilotJobSubmissionTestWMS(
                   this,
@@ -1059,8 +1059,8 @@ class InsufficientCoresJobSubmissionTestWMS : public wrench::WMS {
 
 public:
     InsufficientCoresJobSubmissionTestWMS(BatchServiceTest *test,
-                                          const std::set<wrench::ComputeService *> &compute_services,
-                                          const std::set<wrench::StorageService *> &storage_services,
+                                          const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                          const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                           std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
@@ -1072,7 +1072,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       {
         // Create a sequential task that lasts one min and requires 2 cores
@@ -1088,11 +1088,11 @@ private:
                         {*(task->getInputFiles().begin()),  this->test->storage_service1},
                         {*(task->getOutputFiles().begin()), this->test->storage_service1}
                 },
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
                         this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
                         this->test->storage_service2)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->getWorkflow()->getFileByID("input_file"),
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
                                                                               this->test->storage_service2)});
 
         std::map<std::string, std::string> batch_job_args;
@@ -1146,12 +1146,12 @@ void BatchServiceTest::do_InsufficientCoresTaskTest_test() {
 
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname,
+          new wrench::BatchComputeService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"},
                                    {})));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new InsufficientCoresJobSubmissionTestWMS(
                   this,  {compute_service}, {storage_service1, storage_service2}, hostname)));
@@ -1189,8 +1189,8 @@ class NoArgumentsJobSubmissionTestWMS : public wrench::WMS {
 
 public:
     NoArgumentsJobSubmissionTestWMS(BatchServiceTest *test,
-                                    const std::set<wrench::ComputeService *> &compute_services,
-                                    const std::set<wrench::StorageService *> &storage_services,
+                                    const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                    const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                     std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
@@ -1202,7 +1202,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       {
         // Create a sequential task that lasts one min and requires 2 cores
@@ -1218,11 +1218,11 @@ private:
                         {*(task->getInputFiles().begin()),  this->test->storage_service1},
                         {*(task->getOutputFiles().begin()), this->test->storage_service1}
                 },
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
                         this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
                         this->test->storage_service2)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->getWorkflow()->getFileByID("input_file"),
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
                                                                               this->test->storage_service2)});
 
         std::map<std::string, std::string> batch_job_args;
@@ -1270,12 +1270,12 @@ void BatchServiceTest::do_noArgumentsJobSubmissionTest_test() {
 
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname,
+          new wrench::BatchComputeService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"},
                                    {})));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new NoArgumentsJobSubmissionTestWMS(
                   this,  {compute_service}, {storage_service1, storage_service2}, hostname)));
@@ -1312,8 +1312,8 @@ class StandardJobTimeoutSubmissionTestWMS : public wrench::WMS {
 
 public:
     StandardJobTimeoutSubmissionTestWMS(BatchServiceTest *test,
-                                        const std::set<wrench::ComputeService *> &compute_services,
-                                        const std::set<wrench::StorageService *> &storage_services,
+                                        const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                        const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                         std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
@@ -1326,7 +1326,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       {
         // Create a sequential task that lasts one min and requires 1 cores
@@ -1343,11 +1343,11 @@ private:
                         {*(task->getInputFiles().begin()),  this->test->storage_service1},
                         {*(task->getOutputFiles().begin()), this->test->storage_service1}
                 },
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
                         this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
                         this->test->storage_service2)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->getWorkflow()->getFileByID("input_file"),
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
                                                                               this->test->storage_service2)});
 
         std::map<std::string, std::string> batch_job_args;
@@ -1427,12 +1427,12 @@ void BatchServiceTest::do_StandardJobTimeOutTaskTest_test() {
 
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname,
+          new wrench::BatchComputeService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"},
                                    {})));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new StandardJobTimeoutSubmissionTestWMS(
                   this, {compute_service}, {storage_service1, storage_service2}, hostname)));
@@ -1469,8 +1469,8 @@ class PilotJobTimeoutSubmissionTestWMS : public wrench::WMS {
 
 public:
     PilotJobTimeoutSubmissionTestWMS(BatchServiceTest *test,
-                                     const std::set<wrench::ComputeService *> &compute_services,
-                                     const std::set<wrench::StorageService *> &storage_services,
+                                     const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                     const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                      std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
@@ -1482,7 +1482,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       {
         // Create a pilot job that needs 1 host, 1 core, 0 bytes of RAM, and 90 seconds
@@ -1569,12 +1569,12 @@ void BatchServiceTest::do_PilotJobTimeOutTaskTest_test() {
 
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname,
+          new wrench::BatchComputeService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"},
                                    {})));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new PilotJobTimeoutSubmissionTestWMS(
                   this, {compute_service}, {storage_service1, storage_service2}, hostname)));
@@ -1611,8 +1611,8 @@ class BestFitStandardJobSubmissionTestWMS : public wrench::WMS {
 
 public:
     BestFitStandardJobSubmissionTestWMS(BatchServiceTest *test,
-                                        const std::set<wrench::ComputeService *> &compute_services,
-                                        const std::set<wrench::StorageService *> &storage_services,
+                                        const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                        const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                         std::string hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
@@ -1624,7 +1624,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       {
         // Create a sequential task that lasts one min and requires 8 cores
@@ -1649,11 +1649,11 @@ private:
                         {*(task->getInputFiles().begin()),  this->test->storage_service1},
                         {*(task->getOutputFiles().begin()), this->test->storage_service1}
                 },
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
                         this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
                         this->test->storage_service2)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->getWorkflow()->getFileByID("input_file"),
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
                                                                               this->test->storage_service2)});
 
         std::map<std::string, std::string> batch_job_args;
@@ -1674,11 +1674,11 @@ private:
                         {*(task1->getInputFiles().begin()),  this->test->storage_service1},
                         {*(task1->getOutputFiles().begin()), this->test->storage_service1}
                 },
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
                         this->getWorkflow()->getFileByID("input_file_1"), this->test->storage_service1,
                         this->test->storage_service2)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->getWorkflow()->getFileByID("input_file_1"),
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file_1"),
                                                                               this->test->storage_service2)});
 
         std::map<std::string, std::string> task1_batch_job_args;
@@ -1699,11 +1699,11 @@ private:
                         {*(task2->getInputFiles().begin()),  this->test->storage_service1},
                         {*(task2->getOutputFiles().begin()), this->test->storage_service1}
                 },
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
                         this->getWorkflow()->getFileByID("input_file_2"), this->test->storage_service1,
                         this->test->storage_service2)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->getWorkflow()->getFileByID("input_file_2"),
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file_2"),
                                                                               this->test->storage_service2)});
 
         std::map<std::string, std::string> task2_batch_job_args;
@@ -1792,12 +1792,12 @@ void BatchServiceTest::do_BestFitTaskTest_test() {
 
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname,
+          new wrench::BatchComputeService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, 0,
                                    {{wrench::StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM, "BESTFIT"}})));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new BestFitStandardJobSubmissionTestWMS(
                   this,  {compute_service}, {storage_service1, storage_service2}, hostname)));
@@ -1840,8 +1840,8 @@ class FirstFitStandardJobSubmissionTestWMS : public wrench::WMS {
 
 public:
     FirstFitStandardJobSubmissionTestWMS(BatchServiceTest *test,
-                                         const std::set<wrench::ComputeService *> &compute_services,
-                                         const std::set<wrench::StorageService *> &storage_services,
+                                         const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                         const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                          std::string hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
@@ -1853,7 +1853,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       {
         //In this test, we create 40 tasks, each task uses one core. There are 4 hosts with 10 cores.
@@ -1962,12 +1962,12 @@ void BatchServiceTest::do_FirstFitTaskTest_test() {
 
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname,
+          new wrench::BatchComputeService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, 0,
                                    {{wrench::StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM, "BESTFIT"}})));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new FirstFitStandardJobSubmissionTestWMS(
                   this,  {compute_service}, {storage_service1, storage_service2}, hostname)));
@@ -2011,8 +2011,8 @@ class RoundRobinStandardJobSubmissionTestWMS : public wrench::WMS {
 
 public:
     RoundRobinStandardJobSubmissionTestWMS(BatchServiceTest *test,
-                                           const std::set<wrench::ComputeService *> &compute_services,
-                                           const std::set<wrench::StorageService *> &storage_services,
+                                           const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                           const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                            std::string hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
@@ -2024,7 +2024,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
       {
         // Create a sequential task that lasts one min and requires 2 cores
         wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 60, 2, 2, 1.0, 0);
@@ -2246,12 +2246,12 @@ void BatchServiceTest::do_RoundRobinTask_test() {
 
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname,
+          new wrench::BatchComputeService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, 0,
                                    {{wrench::StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM, "ROUNDROBIN"}})));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new RoundRobinStandardJobSubmissionTestWMS(
                   this,  {compute_service}, {storage_service1, storage_service2}, hostname)));
@@ -2295,8 +2295,8 @@ class StandardJobInsidePilotJobTimeoutSubmissionTestWMS : public wrench::WMS {
 
 public:
     StandardJobInsidePilotJobTimeoutSubmissionTestWMS(BatchServiceTest *test,
-                                                      const std::set<wrench::ComputeService *> &compute_services,
-                                                      const std::set<wrench::StorageService *> &storage_services,
+                                                      const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                                      const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                       std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
@@ -2308,7 +2308,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       {
         // Create a pilot job that needs 1 host, 1 core, 0 bytes of RAM, and 90 seconds
@@ -2437,11 +2437,11 @@ void BatchServiceTest::do_StandardJobInsidePilotJobTimeOutTaskTest_test() {
 
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname,
+          new wrench::BatchComputeService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, {})));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new StandardJobInsidePilotJobTimeoutSubmissionTestWMS(
                   this,  {compute_service}, {storage_service1, storage_service2}, hostname)));
@@ -2478,8 +2478,8 @@ class StandardJobInsidePilotJobSucessSubmissionTestWMS : public wrench::WMS {
 
 public:
     StandardJobInsidePilotJobSucessSubmissionTestWMS(BatchServiceTest *test,
-                                                     const std::set<wrench::ComputeService *> &compute_services,
-                                                     const std::set<wrench::StorageService *> &storage_services,
+                                                     const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                                     const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                      std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
@@ -2491,7 +2491,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       {
         // Create a pilot job that needs 1 host, 1 core, 0 bytes of RAM, and 90 seconds
@@ -2540,11 +2540,11 @@ private:
                         {*(task->getInputFiles().begin()),  this->test->storage_service1},
                         {*(task->getOutputFiles().begin()), this->test->storage_service1}
                 },
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
                         this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
                         this->test->storage_service2)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->getWorkflow()->getFileByID("input_file"),
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
                                                                               this->test->storage_service2)});
 
         try {
@@ -2609,12 +2609,12 @@ void BatchServiceTest::do_StandardJobInsidePilotJobSucessTaskTest_test() {
 
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname,
+          new wrench::BatchComputeService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"},
                                    {})));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new StandardJobInsidePilotJobSucessSubmissionTestWMS(
                   this, {compute_service}, {storage_service1, storage_service2}, hostname)));
@@ -2652,8 +2652,8 @@ class InsufficientCoresInsidePilotJobSubmissionTestWMS : public wrench::WMS {
 
 public:
     InsufficientCoresInsidePilotJobSubmissionTestWMS(BatchServiceTest *test,
-                                                     const std::set<wrench::ComputeService *> &compute_services,
-                                                     const std::set<wrench::StorageService *> &storage_services,
+                                                     const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                                     const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                      std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
@@ -2665,7 +2665,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       {
         // Create a pilot job that needs 1 host, 1 core, 0 bytes of RAM, and 90 seconds
@@ -2715,11 +2715,11 @@ private:
                         {*(task->getInputFiles().begin()),  this->test->storage_service1},
                         {*(task->getOutputFiles().begin()), this->test->storage_service1}
                 },
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
                         this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
                         this->test->storage_service2)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->getWorkflow()->getFileByID("input_file"),
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
                                                                               this->test->storage_service2)});
 
         try {
@@ -2767,12 +2767,12 @@ void BatchServiceTest::do_InsufficientCoresInsidePilotJobTaskTest_test() {
 
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname,
+          new wrench::BatchComputeService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"},
                                    {})));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new InsufficientCoresInsidePilotJobSubmissionTestWMS(
                   this,  {compute_service}, {storage_service1, storage_service2}, hostname)));
@@ -2810,8 +2810,8 @@ class MultipleStandardJobSubmissionTestWMS : public wrench::WMS {
 
 public:
     MultipleStandardJobSubmissionTestWMS(BatchServiceTest *test,
-                                         const std::set<wrench::ComputeService *> &compute_services,
-                                         const std::set<wrench::StorageService *> &storage_services,
+                                         const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                         const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                          std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
@@ -2823,7 +2823,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       {
 
@@ -2916,12 +2916,12 @@ void BatchServiceTest::do_MultipleStandardTaskTest_test() {
 
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname,
+          new wrench::BatchComputeService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"},
                                    {})));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new MultipleStandardJobSubmissionTestWMS(
                   this,  {compute_service}, {storage_service1, storage_service2}, hostname)));
@@ -2958,8 +2958,8 @@ class DifferentBatchAlgorithmsSubmissionTestWMS : public wrench::WMS {
 
 public:
     DifferentBatchAlgorithmsSubmissionTestWMS(BatchServiceTest *test,
-                                              const std::set<wrench::ComputeService *> &compute_services,
-                                              const std::set<wrench::StorageService *> &storage_services,
+                                              const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                              const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                               std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
@@ -2971,7 +2971,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       {
         // Create a sequential task that lasts one min and requires 2 cores
@@ -2988,11 +2988,11 @@ private:
                         {*(task->getInputFiles().begin()),  this->test->storage_service1},
                         {*(task->getOutputFiles().begin()), this->test->storage_service1}
                 },
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
                         this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
                         this->test->storage_service2)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->getWorkflow()->getFileByID("input_file"),
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
                                                                               this->test->storage_service2)});
 
         std::map<std::string, std::string> batch_job_args;
@@ -3068,15 +3068,15 @@ void BatchServiceTest::do_DifferentBatchAlgorithmsSubmissionTest_test() {
 
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname,
+          new wrench::BatchComputeService(hostname,
 
                                    {"Host1", "Host2", "Host3", "Host4"}, 0,  {
-                                           {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,     "filler"},
-                                           {wrench::BatchServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM, "fcfs"}
+                                           {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM,     "filler"},
+                                           {wrench::BatchComputeServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM, "fcfs"}
                                    })));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new DifferentBatchAlgorithmsSubmissionTestWMS(
                   this,  {compute_service}, {storage_service1, storage_service2}, hostname)));
@@ -3115,7 +3115,7 @@ class ShutdownWithPendingRunningJobsTestWMS : public wrench::WMS {
 
 public:
     ShutdownWithPendingRunningJobsTestWMS(BatchServiceTest *test,
-                                          const std::set<wrench::ComputeService *> &compute_services,
+                                          const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                           std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname, "test") {
       this->test = test;
@@ -3127,7 +3127,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       // Create 3 tasks
       wrench::WorkflowTask *tasks[3];
@@ -3225,12 +3225,12 @@ void BatchServiceTest::do_ShutdownWithPendingRunningJobsTest_test() {
 
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname,
+          new wrench::BatchComputeService(hostname,
 
                                    {"Host1"}, 0,  {})));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new ShutdownWithPendingRunningJobsTestWMS(
                   this,  {compute_service}, hostname)));

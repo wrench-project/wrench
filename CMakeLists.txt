@@ -72,12 +72,12 @@ set(HEADER_FILES
         include/wrench/services/compute/bare_metal/BareMetalComputeService.h
         include/wrench/services/compute/bare_metal/BareMetalComputeServiceProperty.h
         include/wrench/services/compute/bare_metal/BareMetalComputeServiceMessagePayload.h
-        include/wrench/services/compute/virtualized_cluster/VirtualizedClusterService.h
-        include/wrench/services/compute/virtualized_cluster/VirtualizedClusterServiceProperty.h
-        include/wrench/services/compute/virtualized_cluster/VirtualizedClusterServiceMessagePayload.h
-        include/wrench/services/compute/cloud/CloudService.h
-        include/wrench/services/compute/cloud/CloudServiceProperty.h
-        include/wrench/services/compute/cloud/CloudServiceMessagePayload.h
+        include/wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h
+        include/wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceProperty.h
+        include/wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceMessagePayload.h
+        include/wrench/services/compute/cloud/CloudComputeService.h
+        include/wrench/services/compute/cloud/CloudComputeServiceProperty.h
+        include/wrench/services/compute/cloud/CloudComputeServiceMessagePayload.h
         include/wrench/services/compute/htcondor/HTCondorService.h
         include/wrench/services/compute/htcondor/HTCondorCentralManagerService.h
         include/wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessage.h
@@ -105,10 +105,10 @@ set(HEADER_FILES
         include/wrench.h
         include/wrench-dev.h
         include/wrench/services/compute/batch/BatchJob.h
-        include/wrench/services/compute/batch/BatchServiceMessage.h
-        include/wrench/services/compute/batch/BatchService.h
-        include/wrench/services/compute/batch/BatchServiceProperty.h
-        include/wrench/services/compute/batch/BatchServiceMessagePayload.h
+        include/wrench/services/compute/batch/BatchComputeServiceMessage.h
+        include/wrench/services/compute/batch/BatchComputeService.h
+        include/wrench/services/compute/batch/BatchComputeServiceProperty.h
+        include/wrench/services/compute/batch/BatchComputeServiceMessagePayload.h
         include/wrench/services/compute/batch/BatschedNetworkListener.h
         include/wrench/services/helpers/Alarm.h
         include/wrench/services/helpers/ServiceTerminationDetector.h
@@ -180,16 +180,16 @@ set(SOURCE_FILES
         src/wrench/services/storage/StorageServiceMessage.h
         src/wrench/services/file_registry/FileRegistryMessage.cpp
         src/wrench/services/file_registry/FileRegistryMessage.h
-        src/wrench/services/compute/virtualized_cluster/VirtualizedClusterService.cpp
-        src/wrench/services/compute/virtualized_cluster/VirtualizedClusterServiceProperty.cpp
-        src/wrench/services/compute/virtualized_cluster/VirtualizedClusterServiceMessagePayload.cpp
-        src/wrench/services/compute/virtualized_cluster/VirtualizedClusterServiceMessage.h
-        src/wrench/services/compute/virtualized_cluster/VirtualizedClusterServiceMessage.cpp
-        src/wrench/services/compute/cloud/CloudService.cpp
-        src/wrench/services/compute/cloud/CloudServiceProperty.cpp
-        src/wrench/services/compute/cloud/CloudServiceMessagePayload.cpp
-        src/wrench/services/compute/cloud/CloudServiceMessage.h
-        src/wrench/services/compute/cloud/CloudServiceMessage.cpp
+        src/wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.cpp
+        src/wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceProperty.cpp
+        src/wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceMessagePayload.cpp
+        src/wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceMessage.h
+        src/wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceMessage.cpp
+        src/wrench/services/compute/cloud/CloudComputeService.cpp
+        src/wrench/services/compute/cloud/CloudComputeServiceProperty.cpp
+        src/wrench/services/compute/cloud/CloudComputeServiceMessagePayload.cpp
+        src/wrench/services/compute/cloud/CloudComputeServiceMessage.h
+        src/wrench/services/compute/cloud/CloudComputeServiceMessage.cpp
         src/wrench/services/compute/work_unit_executor/ComputeThread.h
         src/wrench/services/compute/work_unit_executor/ComputeThread.cpp
         src/wrench/services/compute/work_unit_executor/Workunit.cpp
@@ -206,12 +206,12 @@ set(SOURCE_FILES
         src/wrench/services/network_proximity/NetworkProximityMessage.h
         src/wrench/services/network_proximity/NetworkProximityDaemon.cpp
         src/wrench/services/compute/batch/BatchJob.cpp
-        src/wrench/services/compute/batch/BatchServiceMessage.cpp
-        src/wrench/services/compute/batch/BatchService.cpp
+        src/wrench/services/compute/batch/BatchComputeServiceMessage.cpp
+        src/wrench/services/compute/batch/BatchComputeService.cpp
         src/wrench/services/compute/batch/WorkloadTraceFileReplayer.cpp
         src/wrench/services/compute/batch/WorkloadTraceFileReplayerEventReceiver.cpp
-        src/wrench/services/compute/batch/BatchServiceProperty.cpp
-        src/wrench/services/compute/batch/BatchServiceMessagePayload.cpp
+        src/wrench/services/compute/batch/BatchComputeServiceProperty.cpp
+        src/wrench/services/compute/batch/BatchComputeServiceMessagePayload.cpp
         src/wrench/services/compute/batch/BatschedNetworkListener.cpp
         src/wrench/services/compute/htcondor/HTCondorService.cpp
         src/wrench/services/compute/htcondor/HTCondorCentralManagerService.cpp

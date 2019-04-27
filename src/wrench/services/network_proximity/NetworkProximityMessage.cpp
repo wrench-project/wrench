@@ -83,7 +83,7 @@ namespace wrench {
      * @param daemon: the NetworkProximityDaemon to return the request to
      * @param payload: the message size in bytes
      */
-    NextContactDaemonRequestMessage::NextContactDaemonRequestMessage(NetworkProximityDaemon *daemon, double payload) :
+    NextContactDaemonRequestMessage::NextContactDaemonRequestMessage(std::shared_ptr<NetworkProximityDaemon> daemon, double payload) :
             NetworkProximityMessage("NEXT_CONTACT_DAEMON_REQUEST", payload) {
       if (daemon == nullptr) {
         throw std::invalid_argument(
@@ -100,7 +100,7 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     NextContactDaemonAnswerMessage::NextContactDaemonAnswerMessage(std::string next_host_to_send,
-                                                                   NetworkProximityDaemon *next_daemon_to_send,
+                                                                   std::shared_ptr<NetworkProximityDaemon> next_daemon_to_send,
                                                                    std::string next_mailbox_to_send, double payload) :
             NetworkProximityMessage("NEXT_CONTACT_DAEMON_ANSWER", payload) {
       this->next_host_to_send = next_host_to_send;

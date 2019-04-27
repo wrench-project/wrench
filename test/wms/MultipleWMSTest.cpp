@@ -17,8 +17,8 @@
 class MultipleWMSTest : public ::testing::Test {
 
 public:
-    wrench::ComputeService *compute_service = nullptr;
-    wrench::StorageService *storage_service = nullptr;
+    std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
+    std::shared_ptr<wrench::StorageService> storage_service = nullptr;
 
     void do_deferredWMSStartOneWMS_test();
 
@@ -84,8 +84,8 @@ class DeferredWMSStartTestWMS : public wrench::WMS {
 
 public:
     DeferredWMSStartTestWMS(MultipleWMSTest *test,
-                            const std::set<wrench::ComputeService *> &compute_services,
-                            const std::set<wrench::StorageService *> &storage_services,
+                            const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                            const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                             std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test"
             ) {
@@ -102,32 +102,32 @@ private:
 
 
       // Create a data movement manager
-      std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
+      auto data_movement_manager = this->createDataMovementManager();
 
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       // Get the file registry service
       auto file_registry_service = this->getAvailableFileRegistryService();
 
-      std::set<std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>> pre_copies = {};
+      std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>> pre_copies = {};
       for (auto it : this->getWorkflow()->getInputFiles()) {
-        std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *> each_copy =
+        std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>> each_copy =
                 std::make_tuple(it.second, this->test->storage_service, wrench::ComputeService::SCRATCH);
         pre_copies.insert(each_copy);
       }
 
       // Create a 2-task job
-      wrench::StandardJob *two_task_job = job_manager->createStandardJob(this->getWorkflow()->getTasks(), {},
+      auto two_task_job = job_manager->createStandardJob(this->getWorkflow()->getTasks(), {},
                                                                          pre_copies,
                                                                          {}, {});
 
       // Submit the 2-task job for execution
       try {
-        auto cs = (wrench::CloudService *) *this->getAvailableComputeServices().begin();
+        auto cs = std::dynamic_pointer_cast<wrench::CloudComputeService>(*this->getAvailableComputeServices().begin());
         auto vm_name = cs->createVM(2, 100);
         auto vm_cs = cs->startVM(vm_name);
-        job_manager->submitJob(two_task_job, vm_cs.get());
+        job_manager->submitJob(two_task_job, vm_cs);
       } catch (wrench::WorkflowExecutionException &e) {
         throw std::runtime_error(e.what());
       }
@@ -179,13 +179,13 @@ void MultipleWMSTest::do_deferredWMSStartOneWMS_test() {
 
   // Create a Cloud Service
   std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
-  ASSERT_NO_THROW(compute_service = simulation->add(new wrench::CloudService(
+  ASSERT_NO_THROW(compute_service = simulation->add(new wrench::CloudComputeService(
           hostname, execution_hosts, 100.0,
           {{wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
 
   // Create a WMS
   wrench::Workflow *workflow = this->createWorkflow();
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new DeferredWMSStartTestWMS(this, {compute_service}, {storage_service}, hostname)));
 
@@ -231,12 +231,12 @@ void MultipleWMSTest::do_deferredWMSStartTwoWMS_test() {
   // Create a Cloud Service
   std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::CloudService(hostname, execution_hosts, 100.0,
+          new wrench::CloudComputeService(hostname, execution_hosts, 100.0,
                                    {{wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
 
   // Create a WMS
   wrench::Workflow *workflow = this->createWorkflow();
-  wrench::WMS *wms1 = nullptr;
+  std::shared_ptr<wrench::WMS> wms1 = nullptr;
   ASSERT_NO_THROW(wms1 = simulation->add(
           new DeferredWMSStartTestWMS(this, {compute_service}, {storage_service}, hostname)));
 
@@ -244,7 +244,7 @@ void MultipleWMSTest::do_deferredWMSStartTwoWMS_test() {
 
   // Create a second WMS
   wrench::Workflow *workflow2 = this->createWorkflow();
-  wrench::WMS *wms2 = nullptr;
+  std::shared_ptr<wrench::WMS> wms2 = nullptr;
   ASSERT_NO_THROW(wms2 = simulation->add(
           new DeferredWMSStartTestWMS(this, {compute_service}, {storage_service}, hostname)));
 

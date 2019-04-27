@@ -15,9 +15,9 @@
 namespace wrench {
 
     /**
-     * @brief Configurable properties for a CloudService
+     * @brief Configurable properties for a CloudComputeService
      */
-    class CloudServiceProperty : public ComputeServiceProperty {
+    class CloudComputeServiceProperty : public ComputeServiceProperty {
 
     public:
         /** @brief The overhead, in seconds, to boot a VM **/

@@ -9,14 +9,14 @@
 
 #include <gtest/gtest.h>
 #include <map>
-#include <wrench/services/compute/batch/BatchServiceMessage.h>
+#include <wrench/services/compute/batch/BatchComputeServiceMessage.h>
 
 #include "wrench/workflow/Workflow.h"
 #include "services/file_registry/FileRegistryMessage.h"
 #include "wrench/services/compute/ComputeServiceMessage.h"
 #include "services/storage/StorageServiceMessage.h"
-#include "services/compute/cloud/CloudServiceMessage.h"
-#include "services/compute/virtualized_cluster/VirtualizedClusterServiceMessage.h"
+#include "services/compute/cloud/CloudComputeServiceMessage.h"
+#include "services/compute/virtualized_cluster/VirtualizedClusterComputeServiceMessage.h"
 #include "services/network_proximity/NetworkProximityMessage.h"
 #include "wrench/workflow/execution_events/FailureCause.h"
 
@@ -27,10 +27,10 @@ protected:
       workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(workflow);
       task = workflow->addTask("task", 1, 1, 1, 1.0, 0);
       file = workflow->addFile("file", 1);
-      storage_service = (wrench::StorageService *)(1234);
-      compute_service = (wrench::ComputeService *)(1234);
-      network_proximity_service = (wrench::NetworkProximityService *)(1234);
-      network_proximity_daemon = (wrench::NetworkProximityDaemon *)(1234);
+      storage_service = std::shared_ptr<wrench::StorageService>((wrench::StorageService *)(1234));
+      compute_service = std::shared_ptr<wrench::ComputeService>((wrench::ComputeService *)(1234));
+      network_proximity_service = std::shared_ptr<wrench::NetworkProximityService>((wrench::NetworkProximityService *)(1234));
+      network_proximity_daemon = std::shared_ptr<wrench::NetworkProximityDaemon>((wrench::NetworkProximityDaemon *)(1234));
       workflow_job = (wrench::WorkflowJob *)(1234);
       standard_job = (wrench::StandardJob *)(1234);
       batch_job = (wrench::BatchJob *)(1234);
@@ -45,10 +45,10 @@ protected:
     wrench::Workflow *workflow;
     wrench::WorkflowTask *task;
     wrench::WorkflowFile *file;
-    wrench::StorageService *storage_service;
-    wrench::ComputeService *compute_service;
-    wrench::NetworkProximityService *network_proximity_service;
-    wrench::NetworkProximityDaemon *network_proximity_daemon;
+    std::shared_ptr<wrench::StorageService> storage_service;
+    std::shared_ptr<wrench::ComputeService> compute_service;
+    std::shared_ptr<wrench::NetworkProximityService> network_proximity_service;
+    std::shared_ptr<wrench::NetworkProximityDaemon> network_proximity_daemon;
     wrench::WorkflowJob *workflow_job;
     wrench::StandardJob *standard_job;
     wrench::BatchJob *batch_job;
@@ -192,58 +192,58 @@ TEST_F(MessageConstructorTest, ComputeServiceMessages) {
 }
 
 
-TEST_F(MessageConstructorTest, CloudServiceMessages) {
+TEST_F(MessageConstructorTest, CloudComputeServiceMessages) {
 
-  ASSERT_NO_THROW(new wrench::CloudServiceGetExecutionHostsRequestMessage("mailbox", 600));
-  ASSERT_THROW(new wrench::CloudServiceGetExecutionHostsRequestMessage("", 666), std::invalid_argument);
+  ASSERT_NO_THROW(new wrench::CloudComputeServiceGetExecutionHostsRequestMessage("mailbox", 600));
+  ASSERT_THROW(new wrench::CloudComputeServiceGetExecutionHostsRequestMessage("", 666), std::invalid_argument);
 
   std::vector<std::string> arg;
   arg.push_back("aaa");
-  ASSERT_NO_THROW(new wrench::CloudServiceGetExecutionHostsAnswerMessage(arg, 600));
+  ASSERT_NO_THROW(new wrench::CloudComputeServiceGetExecutionHostsAnswerMessage(arg, 600));
 
   std::map<std::string, std::string> property_list;
   std::map<std::string, std::string> messagepayload_list;
-  ASSERT_NO_THROW(new wrench::CloudServiceCreateVMRequestMessage("mailbox", 42, 10, {}, {}, 666));
+  ASSERT_NO_THROW(new wrench::CloudComputeServiceCreateVMRequestMessage("mailbox", 42, 10, {}, {}, 666));
   ASSERT_THROW(
-          new wrench::CloudServiceCreateVMRequestMessage("", 42, 0, {}, {}, 666), std::invalid_argument);
+          new wrench::CloudComputeServiceCreateVMRequestMessage("", 42, 0, {}, {}, 666), std::invalid_argument);
 
-  ASSERT_NO_THROW(new wrench::VirtualizedClusterServiceMigrateVMRequestMessage("mailbox", "host", "host", 666));
-  ASSERT_THROW(new wrench::VirtualizedClusterServiceMigrateVMRequestMessage("", "host", "host", 666),
+  ASSERT_NO_THROW(new wrench::VirtualizedClusterComputeServiceMigrateVMRequestMessage("mailbox", "host", "host", 666));
+  ASSERT_THROW(new wrench::VirtualizedClusterComputeServiceMigrateVMRequestMessage("", "host", "host", 666),
                std::invalid_argument);
-  ASSERT_THROW(new wrench::VirtualizedClusterServiceMigrateVMRequestMessage("mailbox", "", "host", 666),
+  ASSERT_THROW(new wrench::VirtualizedClusterComputeServiceMigrateVMRequestMessage("mailbox", "", "host", 666),
                std::invalid_argument);
-  ASSERT_THROW(new wrench::VirtualizedClusterServiceMigrateVMRequestMessage("mailbox", "host", "", 666),
+  ASSERT_THROW(new wrench::VirtualizedClusterComputeServiceMigrateVMRequestMessage("mailbox", "host", "", 666),
                std::invalid_argument);
 
-  ASSERT_NO_THROW(new wrench::CloudServiceShutdownVMRequestMessage("mailbox", "vm", 666));
-  ASSERT_THROW(new wrench::CloudServiceShutdownVMRequestMessage("", "vm", 666), std::invalid_argument);
-  ASSERT_THROW(new wrench::CloudServiceShutdownVMRequestMessage("mailbox", "", 666), std::invalid_argument);
+  ASSERT_NO_THROW(new wrench::CloudComputeServiceShutdownVMRequestMessage("mailbox", "vm", 666));
+  ASSERT_THROW(new wrench::CloudComputeServiceShutdownVMRequestMessage("", "vm", 666), std::invalid_argument);
+  ASSERT_THROW(new wrench::CloudComputeServiceShutdownVMRequestMessage("mailbox", "", 666), std::invalid_argument);
 
-  ASSERT_NO_THROW(new wrench::CloudServiceShutdownVMAnswerMessage(true, nullptr, 666));
+  ASSERT_NO_THROW(new wrench::CloudComputeServiceShutdownVMAnswerMessage(true, nullptr, 666));
 
-  ASSERT_NO_THROW(new wrench::CloudServiceStartVMRequestMessage("mailbox", "vm", "host", 666));
-  ASSERT_THROW(new wrench::CloudServiceStartVMRequestMessage("", "vm", "host", 666), std::invalid_argument);
-  ASSERT_THROW(new wrench::CloudServiceStartVMRequestMessage("mailbox", "", "host", 666), std::invalid_argument);
+  ASSERT_NO_THROW(new wrench::CloudComputeServiceStartVMRequestMessage("mailbox", "vm", "host", 666));
+  ASSERT_THROW(new wrench::CloudComputeServiceStartVMRequestMessage("", "vm", "host", 666), std::invalid_argument);
+  ASSERT_THROW(new wrench::CloudComputeServiceStartVMRequestMessage("mailbox", "", "host", 666), std::invalid_argument);
 
-  ASSERT_NO_THROW(new wrench::CloudServiceStartVMAnswerMessage(true, nullptr, nullptr, 666));
+  ASSERT_NO_THROW(new wrench::CloudComputeServiceStartVMAnswerMessage(true, nullptr, nullptr, 666));
 
-  ASSERT_NO_THROW(new wrench::CloudServiceSuspendVMRequestMessage("mailbox", "vm", 666));
-  ASSERT_THROW(new wrench::CloudServiceSuspendVMRequestMessage("", "vm", 666), std::invalid_argument);
-  ASSERT_THROW(new wrench::CloudServiceSuspendVMRequestMessage("mailbox", "", 666), std::invalid_argument);
+  ASSERT_NO_THROW(new wrench::CloudComputeServiceSuspendVMRequestMessage("mailbox", "vm", 666));
+  ASSERT_THROW(new wrench::CloudComputeServiceSuspendVMRequestMessage("", "vm", 666), std::invalid_argument);
+  ASSERT_THROW(new wrench::CloudComputeServiceSuspendVMRequestMessage("mailbox", "", 666), std::invalid_argument);
 
-  ASSERT_NO_THROW(new wrench::CloudServiceSuspendVMAnswerMessage(true, nullptr, 666));
+  ASSERT_NO_THROW(new wrench::CloudComputeServiceSuspendVMAnswerMessage(true, nullptr, 666));
 
-  ASSERT_NO_THROW(new wrench::CloudServiceResumeVMRequestMessage("mailbox", "vm", 666));
-  ASSERT_THROW(new wrench::CloudServiceResumeVMRequestMessage("", "vm", 666), std::invalid_argument);
-  ASSERT_THROW(new wrench::CloudServiceResumeVMRequestMessage("mailbox", "", 666), std::invalid_argument);
+  ASSERT_NO_THROW(new wrench::CloudComputeServiceResumeVMRequestMessage("mailbox", "vm", 666));
+  ASSERT_THROW(new wrench::CloudComputeServiceResumeVMRequestMessage("", "vm", 666), std::invalid_argument);
+  ASSERT_THROW(new wrench::CloudComputeServiceResumeVMRequestMessage("mailbox", "", 666), std::invalid_argument);
 
-  ASSERT_NO_THROW(new wrench::CloudServiceResumeVMAnswerMessage(true, nullptr, 666));
+  ASSERT_NO_THROW(new wrench::CloudComputeServiceResumeVMAnswerMessage(true, nullptr, 666));
 
-  ASSERT_NO_THROW(new wrench::CloudServiceDestroyVMRequestMessage("mailbox", "vm", 666));
-  ASSERT_THROW(new wrench::CloudServiceDestroyVMRequestMessage("", "vm", 666), std::invalid_argument);
-  ASSERT_THROW(new wrench::CloudServiceDestroyVMRequestMessage("mailbox", "", 666), std::invalid_argument);
+  ASSERT_NO_THROW(new wrench::CloudComputeServiceDestroyVMRequestMessage("mailbox", "vm", 666));
+  ASSERT_THROW(new wrench::CloudComputeServiceDestroyVMRequestMessage("", "vm", 666), std::invalid_argument);
+  ASSERT_THROW(new wrench::CloudComputeServiceDestroyVMRequestMessage("mailbox", "", 666), std::invalid_argument);
 
-  ASSERT_NO_THROW(new wrench::CloudServiceDestroyVMAnswerMessage(true, nullptr, 666));
+  ASSERT_NO_THROW(new wrench::CloudComputeServiceDestroyVMAnswerMessage(true, nullptr, 666));
 
 }
 
@@ -350,7 +350,7 @@ TEST_F(MessageConstructorTest, NetworkProximityMessages) {
 
 
 
-TEST_F(MessageConstructorTest, BatchServiceMessages) {
+TEST_F(MessageConstructorTest, BatchComputeServiceMessages) {
 
 //  ASSERT_NO_THROW(new wrench::BatchSimulationBeginsToSchedulerMessage("mailbox", "foo", 666));
 //  ASSERT_THROW(new wrench::BatchSimulationBeginsToSchedulerMessage("mailbox", "", 666), std::invalid_argument);
@@ -371,9 +371,9 @@ TEST_F(MessageConstructorTest, BatchServiceMessages) {
 
   ASSERT_NO_THROW(new wrench::BatchQueryAnswerMessage(1.0, 666));
 
-  ASSERT_NO_THROW(new wrench::BatchServiceJobRequestMessage("mailbox", batch_job, 666));
-  ASSERT_THROW(new wrench::BatchServiceJobRequestMessage("mailbox", nullptr, 666), std::invalid_argument);
-  ASSERT_THROW(new wrench::BatchServiceJobRequestMessage("", batch_job, 666), std::invalid_argument);
+  ASSERT_NO_THROW(new wrench::BatchComputeServiceJobRequestMessage("mailbox", batch_job, 666));
+  ASSERT_THROW(new wrench::BatchComputeServiceJobRequestMessage("mailbox", nullptr, 666), std::invalid_argument);
+  ASSERT_THROW(new wrench::BatchComputeServiceJobRequestMessage("", batch_job, 666), std::invalid_argument);
   ASSERT_NO_THROW(new wrench::AlarmJobTimeOutMessage(batch_job, 666));
   ASSERT_THROW(new wrench::AlarmJobTimeOutMessage(nullptr, 666), std::invalid_argument);
 

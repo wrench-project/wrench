@@ -29,7 +29,7 @@ physical hosts).
 # Creating a cloud compute service #        {#guide-cloud-creating}
 
 In WRENCH, a cloud service represents a compute service (wrench::ComputeService), 
-which is defined by the wrench::CloudService class. An instantiation of a cloud 
+which is defined by the wrench::CloudComputeService class. An instantiation of a cloud
 service requires the following parameters:
 
 - A hostname on which to start the service (this is the entry point to the service)
@@ -37,7 +37,7 @@ service requires the following parameters:
 - A scratch space size, i.e., the size in bytes of storage local to the cloud service (used to store
   workflow files, as needed, during job executions) 
 - Maps (`std::map`) of configurable properties (`wrench::CloudServiceProperty`) and configurable message 
-  payloads (`wrench::CloudServiceMessagePayload`).
+  payloads (`wrench::CloudComputeServiceMessagePayload`).
 
 The example below shows how to create an instance of a cloud service that runs 
 on host "cloud_gateway", provides access to 4 execution hosts, and has a scratch 
@@ -45,7 +45,7 @@ space of 1TiB:
 
 ~~~~~~~~~~~~~{.cpp}
 auto cloud_cs = simulation.add(
-          new wrench::CloudService("cloud_gateway", {"host1", "host2", "host3", "host4"}, pow(2,40),
+          new wrench::CloudComputeService("cloud_gateway", {"host1", "host2", "host3", "host4"}, pow(2,40),
                                    {{wrench::CloudServiceProperty::SUPPORTS_PILOT_JOBS, "false"}}));
 ~~~~~~~~~~~~~
 
@@ -63,7 +63,7 @@ service supports the following properties:
 The cloud service provides several mechanisms to manage the set of VMs instantiated
 on the execution hosts. Currently, it is possible to create, shutdown, start,
 suspend, and resume VMs (see a complete list of functions available in the 
-wrench::CloudService API documentation). The figure below shows the different states
+wrench::CloudComputeService API documentation). The figure below shows the different states
 a VM can be:
 
 ![](images/wrench-guide-cloud-state-diagram.png)
@@ -77,7 +77,7 @@ in the `wrench::ComputeService` base class. The
 service-specific arguments as a `std::map<std::string, std::string>` of
 key-value pairs.  For a cloud service, these arguments are optional and to be specified as follows:
 
-  - key: `-vm`; value: a VM name (as returned by wrench::CloudService::createVM)  on which the job will be executed. 
+  - key: `-vm`; value: a VM name (as returned by wrench::CloudComputeService::createVM)  on which the job will be executed.
 
 If no argument is specified, the cloud service will pick the VM on which to execute
 the job. 

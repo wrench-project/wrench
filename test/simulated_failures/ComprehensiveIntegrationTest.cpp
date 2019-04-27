@@ -36,10 +36,10 @@ public:
     std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
     std::map<std::string, bool> faulty_map;
 
-    wrench::StorageService *storage_service1 = nullptr;
-    wrench::StorageService *storage_service2 = nullptr;
-    wrench::CloudService *cloud_service = nullptr;
-    wrench::BareMetalComputeService *baremetal_service = nullptr;
+    std::shared_ptr<wrench::StorageService> storage_service1 = nullptr;
+    std::shared_ptr<wrench::StorageService> storage_service2 = nullptr;
+    std::shared_ptr<wrench::CloudComputeService> cloud_service = nullptr;
+    std::shared_ptr<wrench::BareMetalComputeService> baremetal_service = nullptr;
 
     void do_IntegrationFailureTestTest_test(std::map<std::string, bool> args);
 
@@ -149,8 +149,8 @@ class IntegrationFailureTestTestWMS : public wrench::WMS {
 public:
     IntegrationFailureTestTestWMS(IntegrationSimulatedFailuresTest *test,
                                   std::string &hostname,
-                                  std::set<wrench::ComputeService *> compute_services,
-                                  std::set<wrench::StorageService *> storage_services
+                                  std::set<std::shared_ptr<wrench::ComputeService>> compute_services,
+                                  std::set<std::shared_ptr<wrench::StorageService>> storage_services
     ) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -258,7 +258,7 @@ private:
         if (not task) return false; // no ready task right now
 
         // Pick a storage service
-        wrench::StorageService *target_storage_service;
+        std::shared_ptr<wrench::StorageService> target_storage_service;
 
         if (this->test->storage_service1 and this->test->storage_service1->isUp()) {
             target_storage_service = this->test->storage_service1;
@@ -269,11 +269,11 @@ private:
         }
 
         // Pick a compute resource (trying the cloud first)
-        wrench::ComputeService *target_cs = nullptr;
+        std::shared_ptr<wrench::ComputeService> target_cs = nullptr;
         for (auto &vm : this->vms) {
             auto vm_cs = vm.second;
             if (vm_cs->isUp() and (not this->vm_used[vm_cs])) {
-                target_cs = vm_cs.get();
+                target_cs = vm_cs;
                 this->vm_used[vm_cs] = true;
                 break;
             }
@@ -311,7 +311,7 @@ private:
             num_jobs_on_baremetal_cs--;
         } else {
             for (auto const &u : this->vm_used) {
-                if (u.first.get() == event->compute_service) {
+                if (u.first == event->compute_service) {
                     this->vm_used[u.first] = false;
                 }
             }
@@ -325,13 +325,12 @@ private:
             num_jobs_on_baremetal_cs--;
         } else {
             for (auto const &u : this->vm_used) {
-                if (u.first.get() == event->compute_service) {
+                if (u.first == event->compute_service) {
                     this->vm_used[u.first] = false;
                 }
             }
         }
     }
-
 
 };
 
@@ -422,7 +421,7 @@ void IntegrationSimulatedFailuresTest::do_IntegrationFailureTestTest_test(std::m
 
     // Create BareMetal Service
     if (args.find("baremetal") != args.end()) {
-        this->baremetal_service = (wrench::BareMetalComputeService *) simulation->add(
+        this->baremetal_service = std::dynamic_pointer_cast<wrench::BareMetalComputeService>(simulation->add(
                 new wrench::BareMetalComputeService(
                         "BareMetalHead",
                         (std::map<std::string, std::tuple<unsigned long, double>>) {
@@ -432,7 +431,7 @@ void IntegrationSimulatedFailuresTest::do_IntegrationFailureTestTest_test(std::m
                                                                                  wrench::ComputeService::ALL_RAM)),
                         },
                         100.0,
-                        {}, {}));
+                        {}, {})));
     }
 
     // Create Cloud Service
@@ -442,11 +441,11 @@ void IntegrationSimulatedFailuresTest::do_IntegrationFailureTestTest_test(std::m
         cloudhosts.push_back("CloudHost1");
         cloudhosts.push_back("CloudHost2");
         cloudhosts.push_back("CloudHost3");
-        this->cloud_service = (wrench::CloudService *) simulation->add(new wrench::CloudService(
+        this->cloud_service = std::dynamic_pointer_cast<wrench::CloudComputeService>(simulation->add(new wrench::CloudComputeService(
                 cloudhead,
                 cloudhosts,
                 1000000.0,
-                {}, {}));
+                {}, {})));
     }
 
     // Create a FileRegistryService

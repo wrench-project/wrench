@@ -145,7 +145,7 @@ namespace wrench {
      * @brief Get the service's local storage service
      * @return the local storage service object
      */
-    StorageService *HTCondorService::getLocalStorageService() const {
+    std::shared_ptr<StorageService> HTCondorService::getLocalStorageService() const {
       return this->local_storage_service;
     }
 
@@ -153,7 +153,7 @@ namespace wrench {
      * @brief Set the service's local storage service
      * @param local_storage_service: a storage service
      */
-    void HTCondorService::setLocalStorageService(wrench::StorageService *local_storage_service) {
+    void HTCondorService::setLocalStorageService(std::shared_ptr<wrench::StorageService> local_storage_service) {
       this->local_storage_service = local_storage_service;
     }
 
@@ -245,7 +245,7 @@ namespace wrench {
           S4U_Mailbox::dputMessage(
                   answer_mailbox,
                   new ComputeServiceSubmitStandardJobAnswerMessage(
-                          job, this, false, std::shared_ptr<FailureCause>(new JobTypeNotSupported(job, this)),
+                          job, std::dynamic_pointer_cast<HTCondorService>(this->getSharedPtr()), false, std::shared_ptr<FailureCause>(new JobTypeNotSupported(job, std::dynamic_pointer_cast<HTCondorService>(this->getSharedPtr()))),
                           this->getMessagePayloadValue(
                                   HTCondorServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
@@ -261,7 +261,7 @@ namespace wrench {
         S4U_Mailbox::dputMessage(
                 answer_mailbox,
                 new ComputeServiceSubmitStandardJobAnswerMessage(
-                        job, this, true, nullptr, this->getMessagePayloadValue(
+                        job, std::dynamic_pointer_cast<HTCondorService>(this->getSharedPtr()), true, nullptr, this->getMessagePayloadValue(
                                 HTCondorServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
         return;
       } catch (std::shared_ptr<NetworkError> &cause) {

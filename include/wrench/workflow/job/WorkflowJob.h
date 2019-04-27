@@ -60,9 +60,9 @@ namespace wrench {
 
         std::string getOriginCallbackMailbox();
 
-        void setParentComputeService(ComputeService *compute_service);
+        void setParentComputeService(std::shared_ptr<ComputeService> compute_service);
 
-        ComputeService *getParentComputeService();
+        std::shared_ptr<ComputeService> getParentComputeService();
 
         std::map<std::string, std::string> getServiceSpecificArguments();
 
@@ -90,7 +90,7 @@ namespace wrench {
         /** @brief The date at which the job was last submitted */
         double submit_date;
         /** @brief The compute service to which the job was submitted */
-        ComputeService *parent_compute_service;
+        std::shared_ptr<ComputeService> parent_compute_service;
 
     private:
         bool forward_notification_to_original_source;

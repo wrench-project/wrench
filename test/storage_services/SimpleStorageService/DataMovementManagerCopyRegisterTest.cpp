@@ -19,11 +19,11 @@ public:
     wrench::WorkflowFile *src2_file_2;
     wrench::WorkflowFile *src2_file_3;
 
-    wrench::StorageService *dst_storage_service = nullptr;
-    wrench::StorageService *src_storage_service = nullptr;
-    wrench::StorageService *src2_storage_service = nullptr;
+    std::shared_ptr<wrench::StorageService> dst_storage_service = nullptr;
+    std::shared_ptr<wrench::StorageService> src_storage_service = nullptr;
+    std::shared_ptr<wrench::StorageService> src2_storage_service = nullptr;
 
-    wrench::ComputeService *compute_service = nullptr;
+    std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
 
     void do_CopyRegister_test();
 
@@ -80,9 +80,9 @@ class DataMovementManagerCopyRegisterTestWMS : public wrench::WMS {
 
 public:
     DataMovementManagerCopyRegisterTestWMS(DataMovementManagerCopyRegisterTest *test,
-                                           const std::set<wrench::ComputeService *> compute_services,
-                                           const std::set<wrench::StorageService *> storage_services,
-                                           wrench::FileRegistryService *file_registry_service,
+                                           const std::set<std::shared_ptr<wrench::ComputeService>> compute_services,
+                                           const std::set<std::shared_ptr<wrench::StorageService>> storage_services,
+                                           std::shared_ptr<wrench::FileRegistryService> file_registry_service,
                                            std::string hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, file_registry_service,
                         hostname, "test") {
@@ -95,8 +95,8 @@ private:
     int main() {
 
 
-      std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
-      wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
+      auto data_movement_manager = this->createDataMovementManager();
+      auto file_registry_service = this->getAvailableFileRegistryService();
 
       // try synchronous copy and register
 
@@ -108,7 +108,7 @@ private:
         throw std::runtime_error("Synchronous file copy failed");
       }
 
-      std::set<wrench::StorageService *> src_file_1_locations = file_registry_service->lookupEntry(this->test->src_file_1);
+      auto src_file_1_locations = file_registry_service->lookupEntry(this->test->src_file_1);
       auto dst_search = src_file_1_locations.find(this->test->dst_storage_service);
 
       if (dst_search == src_file_1_locations.end()) {
@@ -137,7 +137,7 @@ private:
         throw std::runtime_error("Asynchronous file copy failed.");
       }
 
-      std::set<wrench::StorageService *> src2_file_1_locations = file_registry_service->lookupEntry(this->test->src2_file_1);
+      auto src2_file_1_locations = file_registry_service->lookupEntry(this->test->src2_file_1);
       dst_search = src2_file_1_locations.find(this->test->dst_storage_service);
 
       if (dst_search == src2_file_1_locations.end()) {
@@ -164,7 +164,7 @@ private:
 
       async_dual_copy_event = this->getWorkflow()->waitForNextExecutionEvent();
 
-      std::set<wrench::StorageService *> src_file_2_locations = file_registry_service->lookupEntry(this->test->src_file_2);
+      auto src_file_2_locations = file_registry_service->lookupEntry(this->test->src_file_2);
       dst_search = src_file_2_locations.find(this->test->dst_storage_service);
 
       if (dst_search == src_file_2_locations.end()) {
@@ -215,7 +215,7 @@ private:
         throw std::runtime_error("Synchronous file copy should have failed.");
       }
 
-      std::set<wrench::StorageService *> src_file_3_locations = file_registry_service->lookupEntry(this->test->src_file_3);
+      auto src_file_3_locations = file_registry_service->lookupEntry(this->test->src_file_3);
       dst_search = src_file_3_locations.find(this->test->dst_storage_service);
 
       if (dst_search == src_file_3_locations.end()) {
@@ -287,11 +287,11 @@ void DataMovementManagerCopyRegisterTest::do_CopyRegister_test() {
           new wrench::SimpleStorageService("DstHost", STORAGE_SIZE)));
 
   // Create a file registry
-  wrench::FileRegistryService *file_registry_service = nullptr;
+  std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
   ASSERT_NO_THROW(file_registry_service = simulation->add(new wrench::FileRegistryService("WMSHost")));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+    std::shared_ptr<wrench::WMS> wms = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(new DataMovementManagerCopyRegisterTestWMS(
           this, {compute_service}, {src_storage_service, src2_storage_service, dst_storage_service}, file_registry_service, "WMSHost")));
 

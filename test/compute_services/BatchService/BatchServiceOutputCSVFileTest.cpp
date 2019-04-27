@@ -12,8 +12,8 @@
 #include <wrench/simulation/SimulationMessage.h>
 #include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
 #include <gtest/gtest.h>
-#include <wrench/services/compute/batch/BatchService.h>
-#include <wrench/services/compute/batch/BatchServiceMessage.h>
+#include <wrench/services/compute/batch/BatchComputeService.h>
+#include <wrench/services/compute/batch/BatchComputeServiceMessage.h>
 #include "wrench/workflow/job/PilotJob.h"
 
 #include "../../include/TestWithFork.h"
@@ -31,7 +31,7 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(batch_service_output_csv_file_test, "Log category f
 class BatchServiceOutputCSVFileTest : public ::testing::Test {
 
 public:
-    wrench::ComputeService *compute_service = nullptr;
+    std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
     wrench::Simulation *simulation;
 
     void do_SimpleOutputCSVFile_test();
@@ -80,7 +80,7 @@ class SimpleOutputCSVFileTestWMS : public wrench::WMS {
 
 public:
     SimpleOutputCSVFileTestWMS(BatchServiceOutputCSVFileTest *test,
-                      const std::set<wrench::ComputeService *> &compute_services,
+                      const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                       std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
                         "test") {
@@ -93,7 +93,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       // Create 4 tasks and submit them as various shaped jobs
       wrench::WorkflowTask *tasks[8];
@@ -211,18 +211,18 @@ void BatchServiceOutputCSVFileTest::do_SimpleOutputCSVFile_test() {
 
   // Bogus output file
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, {"Host1", "Host2", "Host3", "Host4"}, 0,
-                                   {{wrench::BatchServiceProperty::OUTPUT_CSV_JOB_LOG, "/bogus"},
-                                    {wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}})), std::invalid_argument);
+          new wrench::BatchComputeService(hostname, {"Host1", "Host2", "Host3", "Host4"}, 0,
+                                   {{wrench::BatchComputeServiceProperty::OUTPUT_CSV_JOB_LOG, "/bogus"},
+                                    {wrench::BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}})), std::invalid_argument);
 
   // OK output file
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, {"Host1", "Host2", "Host3", "Host4"}, 0,
-                                   {{wrench::BatchServiceProperty::OUTPUT_CSV_JOB_LOG, output_csv_file},
-                                    {wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}})));
+          new wrench::BatchComputeService(hostname, {"Host1", "Host2", "Host3", "Host4"}, 0,
+                                   {{wrench::BatchComputeServiceProperty::OUTPUT_CSV_JOB_LOG, output_csv_file},
+                                    {wrench::BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}})));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new SimpleOutputCSVFileTestWMS(
                   this,  {compute_service}, hostname)));

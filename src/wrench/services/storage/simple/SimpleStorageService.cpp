@@ -228,13 +228,13 @@ namespace wrench {
                 std::set<WorkflowFile*> files = this->stored_files[msg->dst_partition];
                 if (files.find(msg->file) == files.end()) {
                     success = false;
-                    failure_cause = std::shared_ptr<FailureCause>(new FileNotFound(msg->file, this));
+                    failure_cause = std::shared_ptr<FailureCause>(new FileNotFound(msg->file, std::dynamic_pointer_cast<SimpleStorageService>(this->getSharedPtr())));
                 } else {
                     this->removeFileFromStorage(msg->file, msg->dst_partition);
                 }
             } else {
                 success = false;
-                failure_cause = std::shared_ptr<FailureCause>(new FileNotFound(msg->file, this));
+                failure_cause = std::shared_ptr<FailureCause>(new FileNotFound(msg->file, std::dynamic_pointer_cast<SimpleStorageService>(this->getSharedPtr())));
             }
 
 
@@ -242,7 +242,7 @@ namespace wrench {
             try {
                 S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                          new StorageServiceFileDeleteAnswerMessage(msg->file,
-                                                                                   this,
+                                                                                   std::dynamic_pointer_cast<SimpleStorageService>(this->getSharedPtr()),
                                                                                    success,
                                                                                    failure_cause,
                                                                                    this->getMessagePayloadValue(
@@ -307,12 +307,12 @@ namespace wrench {
                 try {
                     S4U_Mailbox::putMessage(answer_mailbox,
                                             new StorageServiceFileWriteAnswerMessage(file,
-                                                                                     this,
+                                                                                     std::dynamic_pointer_cast<SimpleStorageService>(this->getSharedPtr()),
                                                                                      false,
                                                                                      std::shared_ptr<FailureCause>(
                                                                                              new StorageServiceNotEnoughSpace(
                                                                                                      file,
-                                                                                                     this)),
+                                                                                                     std::dynamic_pointer_cast<SimpleStorageService>(this->getSharedPtr()))),
                                                                                      "none",
                                                                                      this->getMessagePayloadValue(
                                                                                              SimpleStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
@@ -332,7 +332,7 @@ namespace wrench {
         try {
             S4U_Mailbox::dputMessage(answer_mailbox,
                                      new StorageServiceFileWriteAnswerMessage(file,
-                                                                              this,
+                                                                              std::dynamic_pointer_cast<SimpleStorageService>(this->getSharedPtr()),
                                                                               true,
                                                                               nullptr,
                                                                               file_reception_mailbox,
@@ -369,17 +369,17 @@ namespace wrench {
             if (files.find(file) == files.end()) {
                 WRENCH_INFO("Received a a read request for a file I don't have (%s)", this->getName().c_str());
                 success = false;
-                failure_cause = std::shared_ptr<FailureCause>(new FileNotFound(file, this));
+                failure_cause = std::shared_ptr<FailureCause>(new FileNotFound(file, std::dynamic_pointer_cast<SimpleStorageService>(this->getSharedPtr())));
             }
         } else {
             success = false;
-            failure_cause = std::shared_ptr<FailureCause>(new FileNotFound(file, this));
+            failure_cause = std::shared_ptr<FailureCause>(new FileNotFound(file, std::dynamic_pointer_cast<SimpleStorageService>(this->getSharedPtr())));
         }
 
         // Send back the corresponding ack, asynchronously and in a "fire and forget" fashion
         try {
             S4U_Mailbox::dputMessage(answer_mailbox,
-                                     new StorageServiceFileReadAnswerMessage(file, this, success, failure_cause,
+                                     new StorageServiceFileReadAnswerMessage(file, std::dynamic_pointer_cast<SimpleStorageService>(this->getSharedPtr()), success, failure_cause,
                                                                              this->getMessagePayloadValue(
                                                                                      SimpleStorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
@@ -406,7 +406,7 @@ namespace wrench {
      * @return
      */
     bool
-    SimpleStorageService::processFileCopyRequest(WorkflowFile *file, StorageService *src, std::string src_partition, std::string dst_partition, std::string answer_mailbox, SimulationTimestampFileCopyStart *start_timestamp) {
+    SimpleStorageService::processFileCopyRequest(WorkflowFile *file, std::shared_ptr<StorageService> src, std::string src_partition, std::string dst_partition, std::string answer_mailbox, SimulationTimestampFileCopyStart *start_timestamp) {
 
         // Do a capacity check/update
         // If the file is already there, then there will just be an overwrite. Note that
@@ -418,12 +418,12 @@ namespace wrench {
 
             try {
                 S4U_Mailbox::putMessage(answer_mailbox,
-                                        new StorageServiceFileCopyAnswerMessage(file, this, dst_partition, nullptr, false,
+                                        new StorageServiceFileCopyAnswerMessage(file, std::dynamic_pointer_cast<StorageService>(this->getSharedPtr()), dst_partition, nullptr, false,
                                                                                 false,
                                                                                 std::shared_ptr<FailureCause>(
                                                                                         new StorageServiceNotEnoughSpace(
                                                                                                 file,
-                                                                                                this)),
+                                                                                                std::dynamic_pointer_cast<SimpleStorageService>(this->getSharedPtr()))),
                                                                                 this->getMessagePayloadValue(
                                                                                         SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
 
@@ -444,7 +444,7 @@ namespace wrench {
 
         // Initiate an ASYNCHRONOUS file read from the source
         try {
-            if (src == this) {
+            if (src.get() == this) {
                 //if the src and the destination are the same in a copy, then we try to simulate a
                 // particular time based on the SELF_CONNECTION_DELAY property value
                 // TODO: When S4U has a disk thingy, we'll have to revise this to simulate I/O normally
@@ -458,7 +458,7 @@ namespace wrench {
         } catch (WorkflowExecutionException &e) {
             try {
                 S4U_Mailbox::putMessage(answer_mailbox,
-                                        new StorageServiceFileCopyAnswerMessage(file, this, dst_partition, nullptr, false,
+                                        new StorageServiceFileCopyAnswerMessage(file, std::dynamic_pointer_cast<StorageService>(this->getSharedPtr()), dst_partition, nullptr, false,
                                                                                 false, e.getCause(),
                                                                                 this->getMessagePayloadValue(
                                                                                         SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
@@ -471,7 +471,7 @@ namespace wrench {
             return true;
         }
 
-        if (src == this) {
+        if (src.get() == this) {
             // add a (bogus) connection since technically we are sending data (to oneself)
             this->network_connection_manager->addConnection(std::unique_ptr<NetworkConnection>(
                     new NetworkConnection(NetworkConnection::OUTGOING_DATA, file, src_partition, file_reception_mailbox, "")
@@ -531,7 +531,7 @@ namespace wrench {
 
             try {
                 S4U_Mailbox::dputMessage(connection->ack_mailbox,
-                                         new StorageServiceFileCopyAnswerMessage(connection->file, this,
+                                         new StorageServiceFileCopyAnswerMessage(connection->file, std::dynamic_pointer_cast<SimpleStorageService>(this->getSharedPtr()),
                                                                                  connection->file_partition, nullptr, false,
                                                                                  false, connection->failure_cause,
                                                                                  this->getMessagePayloadValue(
@@ -567,7 +567,7 @@ namespace wrench {
                 try {
                     S4U_Mailbox::dputMessage(connection->ack_mailbox,
                                              new StorageServiceFileCopyAnswerMessage(connection->file,
-                                                                                     this,
+                                                                                     std::dynamic_pointer_cast<SimpleStorageService>(this->getSharedPtr()),
                                                                                      connection->file_partition,
                                                                                      nullptr,
                                                                                      false,

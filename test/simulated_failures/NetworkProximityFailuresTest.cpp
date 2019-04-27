@@ -25,8 +25,8 @@ public:
     wrench::WorkflowFile *input_file;
     wrench::WorkflowFile *output_file;
     wrench::WorkflowTask *task;
-    wrench::StorageService *storage_service1 = nullptr;
-    wrench::ComputeService *compute_service = nullptr;
+    std::shared_ptr<wrench::StorageService> storage_service1 = nullptr;
+    std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
 
     void do_NetworkProximityFailures_Test();
 
@@ -86,7 +86,7 @@ class NetworkProxFailuresTestWMS : public wrench::WMS {
 
 public:
     NetworkProxFailuresTestWMS(NetworkProximityFailuresTest *test,
-                               std::set<wrench::NetworkProximityService *> network_proximity_services,
+                               std::set<std::shared_ptr<wrench::NetworkProximityService>> network_proximity_services,
                                std::string hostname) :
             wrench::WMS(nullptr, nullptr,  {}, {},
                         network_proximity_services, nullptr, hostname, "test") {
@@ -195,18 +195,17 @@ void NetworkProximityFailuresTest::do_NetworkProximityFailures_Test() {
 //    std::vector<std::string> hosts_in_network = {"FailedHost1", "FailedHost2", "FailedHost3"};
     std::vector<std::string> hosts_in_network = {"FailedHost1", "FailedHost2"};
 
-    wrench::NetworkProximityService *network_proximity_service(
-            new wrench::NetworkProximityService(stable_hostname, hosts_in_network, {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD,"10"},
-                                                                                    {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE,"0"}})
-    );
+    std::shared_ptr<wrench::NetworkProximityService> network_proximity_service;
 
-    ASSERT_NO_THROW(simulation->add(network_proximity_service));
+
+    ASSERT_NO_THROW(simulation->add(new wrench::NetworkProximityService(stable_hostname, hosts_in_network, {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD,"10"},
+                                                                                                            {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE,"0"}})));
 
     // Create a WMS
-    wrench::WMS *wms = nullptr;
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new NetworkProxFailuresTestWMS(this,
-                                           (std::set<wrench::NetworkProximityService *>){network_proximity_service},
+                                           (std::set<std::shared_ptr<wrench::NetworkProximityService>>){network_proximity_service},
                                            stable_hostname)));
 
     wms->addWorkflow(this->workflow.get(), 0.0);

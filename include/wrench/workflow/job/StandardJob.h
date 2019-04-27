@@ -19,13 +19,13 @@
 
 #include "WorkflowJob.h"
 
+#include "wrench/services/storage/StorageService.h"
+
 namespace wrench {
 
     /***********************/
     /** \cond DEVELOPER    */
     /***********************/
-
-    class StorageService;
 
     class WorkflowFile;
 
@@ -64,10 +64,7 @@ namespace wrench {
 
         StandardJob::State getState();
 
-        std::map<WorkflowFile *, StorageService *> getFileLocations();
-
-        // Tasks to run
-
+        std::map<WorkflowFile *, std::shared_ptr<StorageService>> getFileLocations();
 
         /** @brief The job's computational tasks */
         std::vector<WorkflowTask *> tasks;
@@ -76,14 +73,14 @@ namespace wrench {
         /** @brief The number of computational tasks that have completed */
         unsigned long num_completed_tasks;
         /** @brief The file locations that tasks should read/write files from/to */
-        std::map<WorkflowFile *, StorageService *> file_locations;
+        std::map<WorkflowFile *, std::shared_ptr<StorageService>  > file_locations;
         /** @brief The file copy operations to perform before computational tasks */
-        std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies;
+        std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>  , std::shared_ptr<StorageService>  >> pre_file_copies;
 
         /** @brief The file copy operations to perform after computational tasks */
-        std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies;
+        std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>  , std::shared_ptr<StorageService>  >> post_file_copies;
         /** @brief The file deletion operations to perform at the end */
-        std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions;
+        std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>  >> cleanup_file_deletions;
 
     private:
 
@@ -95,10 +92,10 @@ namespace wrench {
         friend class JobManager;
 
         StandardJob(Workflow *workflow,
-                    std::vector<WorkflowTask *> tasks, std::map<WorkflowFile *, StorageService *> &file_locations,
-                    std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> &pre_file_copies,
-                    std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> &post_file_copies,
-                    std::set<std::tuple<WorkflowFile *, StorageService *>> &cleanup_file_deletions);
+                    std::vector<WorkflowTask *> tasks, std::map<WorkflowFile *, std::shared_ptr<StorageService>  > &file_locations,
+                    std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>  , std::shared_ptr<StorageService>  >> &pre_file_copies,
+                    std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>  , std::shared_ptr<StorageService>  >> &post_file_copies,
+                    std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>  >> &cleanup_file_deletions);
 
         State state;
 

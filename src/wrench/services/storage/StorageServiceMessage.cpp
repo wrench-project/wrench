@@ -137,7 +137,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     StorageServiceFileDeleteAnswerMessage::StorageServiceFileDeleteAnswerMessage(WorkflowFile *file,
-                                                                                 StorageService *storage_service,
+                                                                                 std::shared_ptr<StorageService>  storage_service,
                                                                                  bool success,
                                                                                  std::shared_ptr<FailureCause> failure_cause,
                                                                                  double payload)
@@ -170,16 +170,16 @@ namespace wrench {
     */
     StorageServiceFileCopyRequestMessage::StorageServiceFileCopyRequestMessage(std::string answer_mailbox,
                                                                                WorkflowFile *file,
-                                                                               StorageService *src,
+                                                                               std::shared_ptr<StorageService> src,
                                                                                std::string &src_partition,
-                                                                               StorageService *dst,
+                                                                               std::shared_ptr<StorageService> dst,
                                                                                std::string &dst_partition,
-                                                                               FileRegistryService *file_registry_service,
+                                                                               std::shared_ptr<FileRegistryService> file_registry_service,
                                                                                SimulationTimestampFileCopyStart *start_timestamp,
                                                                                double payload) : StorageServiceMessage(
             "FILE_COPY_REQUEST", payload) {
         if ((answer_mailbox == "") || (file == nullptr) || (src == nullptr)
-                || (dst == nullptr) || (start_timestamp == nullptr)) {
+            || (dst == nullptr) || (start_timestamp == nullptr)) {
             throw std::invalid_argument("StorageServiceFileCopyRequestMessage::StorageServiceFileCopyRequestMessage(): Invalid arguments");
         }
         this->answer_mailbox = answer_mailbox;
@@ -210,9 +210,9 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     StorageServiceFileCopyAnswerMessage::StorageServiceFileCopyAnswerMessage(WorkflowFile *file,
-                                                                             StorageService *storage_service,
+                                                                             std::shared_ptr<StorageService> storage_service,
                                                                              std::string dst_partition,
-                                                                             FileRegistryService *file_registry_service,
+                                                                             std::shared_ptr<FileRegistryService> file_registry_service,
                                                                              bool file_registry_service_updated,
                                                                              bool success,
                                                                              std::shared_ptr<FailureCause> failure_cause,
@@ -270,7 +270,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     StorageServiceFileWriteAnswerMessage::StorageServiceFileWriteAnswerMessage(WorkflowFile *file,
-                                                                               StorageService *storage_service,
+                                                                               std::shared_ptr<StorageService>  storage_service,
                                                                                bool success,
                                                                                std::shared_ptr<FailureCause> failure_cause,
                                                                                std::string data_write_mailbox_name,
@@ -324,7 +324,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     StorageServiceFileReadAnswerMessage::StorageServiceFileReadAnswerMessage(WorkflowFile *file,
-                                                                             StorageService *storage_service,
+                                                                             std::shared_ptr<StorageService>  storage_service,
                                                                              bool success,
                                                                              std::shared_ptr<FailureCause> failure_cause,
                                                                              double payload) : StorageServiceMessage(

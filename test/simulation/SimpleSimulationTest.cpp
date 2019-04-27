@@ -28,8 +28,8 @@ public:
     wrench::WorkflowTask *task4;
     wrench::WorkflowTask *task5;
     wrench::WorkflowTask *task6;
-    wrench::ComputeService *compute_service = nullptr;
-    wrench::StorageService *storage_service = nullptr;
+    std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
+    std::shared_ptr<wrench::StorageService> storage_service = nullptr;
     std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
 
     void do_getReadyTasksTest_test();
@@ -105,8 +105,8 @@ class SimpleSimulationReadyTasksTestWMS : public wrench::WMS {
 
 public:
     SimpleSimulationReadyTasksTestWMS(SimpleSimulationTest *test,
-                                      const std::set<wrench::ComputeService *> &compute_services,
-                                      const std::set<wrench::StorageService *> &storage_services,
+                                      const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                      const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                       std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -118,10 +118,10 @@ private:
 
     int main() {
         // Create a data movement manager
-        std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
+        auto data_movement_manager = this->createDataMovementManager();
 
         // Create a job manager
-        std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+        auto job_manager = this->createJobManager();
 
         // Get the scheduler pointers just for coverage
         // Get the scheduler pointers just for coverage
@@ -133,7 +133,7 @@ private:
         }
 
         // Get a file registry service
-        wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
+        auto file_registry_service = this->getAvailableFileRegistryService();
 
         std::vector<wrench::WorkflowTask *> tasks = this->test->workflow->getReadyTasks();
         if (tasks.size() != 5) {
@@ -153,7 +153,7 @@ private:
         }
 
         // Create a 2-core VM
-        auto cs = (wrench::CloudService *) this->test->compute_service;
+        auto cs = std::dynamic_pointer_cast<wrench::CloudComputeService>(this->test->compute_service);
         auto vm_name = cs->createVM(2, 10);
         auto vm_cs = cs->startVM(vm_name);
 
@@ -171,7 +171,7 @@ private:
                     throw std::runtime_error("A one-task job that hasn't even started should not say it has a completed task");
                 }
 
-                job_manager->submitJob(one_task_jobs[job_index], vm_cs.get());
+                job_manager->submitJob(one_task_jobs[job_index], vm_cs);
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error(e.what());
             }
@@ -198,7 +198,7 @@ private:
         // Try to create and submit a job with tasks that are pending, which should fail
         wrench::StandardJob *bogus_job = job_manager->createStandardJob({*(tasks.begin())}, {}, {}, {}, {});
         try {
-            job_manager->submitJob(bogus_job, vm_cs.get());
+            job_manager->submitJob(bogus_job, vm_cs);
             throw std::runtime_error("Should not be able to create a job with PENDING tasks");
         } catch (std::invalid_argument &e) {
         }
@@ -232,7 +232,7 @@ private:
             // Try to create and submit a job with tasks that are completed, which should fail
             wrench::StandardJob *bogus_job = job_manager->createStandardJob({*(++tasks.begin())}, {}, {}, {}, {});
             try {
-                job_manager->submitJob(bogus_job, vm_cs.get());
+                job_manager->submitJob(bogus_job, vm_cs);
                 throw std::runtime_error("Should not be able to create a job with PENDING tasks");
             } catch (std::invalid_argument &e) {
             }
@@ -280,7 +280,7 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     // Adding services to an uninitialized simulation
     std::vector<std::string> hosts = {"DualCoreHost", "QuadCoreHost"};
     ASSERT_THROW(simulation->add(
-            new wrench::CloudService("DualCoreHost", hosts, 100.0)), std::runtime_error);
+            new wrench::CloudComputeService("DualCoreHost", hosts, 100.0)), std::runtime_error);
     ASSERT_THROW(simulation->add(
             new wrench::SimpleStorageService("DualCoreHost", 100.0)), std::runtime_error);
     ASSERT_THROW(simulation->add(
@@ -322,14 +322,14 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     // Create a Cloud Service
     std::vector<std::string> execution_hosts = {"QuadCoreHost"};
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::CloudService(hostname, execution_hosts, 100.0,
+            new wrench::CloudComputeService(hostname, execution_hosts, 100.0,
                                      { {wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
 
     // Try to get a message payload value, just for kicks
     ASSERT_NO_THROW(compute_service->getMessagePayloadValue(wrench::ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD));
 
     // Create a WMS
-    wrench::WMS *wms = nullptr;
+    std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
             new SimpleSimulationReadyTasksTestWMS(this, {compute_service}, {storage_service}, hostname)));
 

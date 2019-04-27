@@ -30,8 +30,8 @@ public:
     wrench::WorkflowFile *input_file;
     wrench::WorkflowFile *output_file;
     wrench::WorkflowTask *task;
-    wrench::StorageService *storage_service = nullptr;
-    wrench::ComputeService *compute_service = nullptr;
+    std::shared_ptr<wrench::StorageService> storage_service = nullptr;
+    std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
 
     void do_CloudServiceFailureOfAVMWithRunningJob_test();
     void do_CloudServiceFailureOfAVMWithRunningJobFollowedByRestart_test();
@@ -91,7 +91,8 @@ class CloudServiceFailureOfAVMTestWMS : public wrench::WMS {
 
 public:
     CloudServiceFailureOfAVMTestWMS(CloudServiceSimulatedFailuresTest *test,
-                                    std::string &hostname, wrench::ComputeService *cs, wrench::StorageService *ss) :
+                                    std::string &hostname, std::shared_ptr<wrench::ComputeService> cs,
+                                    std::shared_ptr<wrench::StorageService> ss) :
             wrench::WMS(nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -110,19 +111,19 @@ private:
         wrench::Simulation::sleep(10);
 
         // Create a VM on the Cloud Service
-        auto cloud_service = (wrench::CloudService *)this->test->compute_service;
+        auto cloud_service = std::dynamic_pointer_cast<wrench::CloudComputeService>(this->test->compute_service);
         auto vm_name = cloud_service->createVM(1, this->test->task->getMemoryRequirement());
         auto vm_cs = cloud_service->startVM(vm_name);
 
         // Create a job manager
-        std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+        auto job_manager = this->createJobManager();
 
         // Create a standard job
         auto job = job_manager->createStandardJob(this->test->task, {{this->test->input_file, this->test->storage_service},
                                                                      {this->test->output_file, this->test->storage_service}});
 
         // Submit the standard job to the compute service, making it sure it runs on FailedHost1
-        job_manager->submitJob(job, vm_cs.get());
+        job_manager->submitJob(job, vm_cs);
 
         // Wait for a workflow execution event
         std::unique_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
@@ -137,7 +138,7 @@ private:
         if (real_failure->getJob() != job) {
             throw std::runtime_error("Failure cause does not point to the correct job");
         }
-        if (real_failure->getComputeService() != vm_cs.get()) {
+        if (real_failure->getComputeService() != vm_cs) {
             throw std::runtime_error("Failure cause does not point to the correct compute service");
         }
 
@@ -149,7 +150,7 @@ private:
         // Restart the VM (which shouldn't work because the Cloud has no more resources right now)
         try {
             cloud_service->startVM(vm_name);
-            throw std::runtime_error("Should not be able to restart VM since the CloudService no longer has resources!");
+            throw std::runtime_error("Should not be able to restart VM since the CloudComputeService no longer has resources!");
         } catch (wrench::WorkflowExecutionException &e) {
             // expected
         }
@@ -183,7 +184,7 @@ void CloudServiceSimulatedFailuresTest::do_CloudServiceFailureOfAVMWithRunningJo
 
     // Create a Compute Service that has access to two hosts
     compute_service = simulation->add(
-            new wrench::CloudService(stable_host,
+            new wrench::CloudComputeService(stable_host,
                                      compute_hosts,
                                      100.0,
                                      {}));
@@ -192,7 +193,7 @@ void CloudServiceSimulatedFailuresTest::do_CloudServiceFailureOfAVMWithRunningJo
     storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, 10000000000000.0));
 
     // Create a WMS
-    wrench::WMS *wms = nullptr;
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
     wms = simulation->add(new CloudServiceFailureOfAVMTestWMS(this, stable_host, compute_service, storage_service));
 
     wms->addWorkflow(workflow);
@@ -223,7 +224,7 @@ class CloudServiceFailureOfAVMAndRestartTestWMS : public wrench::WMS {
 
 public:
     CloudServiceFailureOfAVMAndRestartTestWMS(CloudServiceSimulatedFailuresTest *test,
-                                              std::string &hostname, wrench::ComputeService *cs, wrench::StorageService *ss) :
+                                              std::string &hostname, std::shared_ptr<wrench::ComputeService> cs, std::shared_ptr<wrench::StorageService> ss) :
             wrench::WMS(nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -248,19 +249,19 @@ private:
         wrench::Simulation::sleep(10);
 
         // Create a VM on the Cloud Service
-        auto cloud_service = (wrench::CloudService *)this->test->compute_service;
+        auto cloud_service = std::dynamic_pointer_cast<wrench::CloudComputeService>(this->test->compute_service);
         auto vm_name = cloud_service->createVM(1, this->test->task->getMemoryRequirement());
         auto vm_cs = cloud_service->startVM(vm_name);
 
         // Create a job manager
-        std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+        auto job_manager = this->createJobManager();
 
         // Create a standard job
         auto job = job_manager->createStandardJob(this->test->task, {{this->test->input_file, this->test->storage_service},
                                                                      {this->test->output_file, this->test->storage_service}});
 
         // Submit the standard job to the compute service, making it sure it runs on FailedHost1
-        job_manager->submitJob(job, vm_cs.get());
+        job_manager->submitJob(job, vm_cs);
 
         // Wait for a workflow execution event
         auto event = this->getWorkflow()->waitForNextExecutionEvent();
@@ -275,7 +276,7 @@ private:
         if (real_failure->getJob() != job) {
             throw std::runtime_error("Failure cause does not point to the correct job");
         }
-        if (real_failure->getComputeService() != vm_cs.get()) {
+        if (real_failure->getComputeService() != vm_cs) {
             throw std::runtime_error("Failure cause does not point to the correct compute service");
         }
 
@@ -287,7 +288,7 @@ private:
         // Restart the VM (which shouldn't work because the Cloud has no more resources right now)
         try {
             cloud_service->startVM(vm_name);
-            throw std::runtime_error("Should not be able to restart VM since the CloudService no longer has resources!");
+            throw std::runtime_error("Should not be able to restart VM since the CloudComputeService no longer has resources!");
         } catch (wrench::WorkflowExecutionException &e) {
             // expected
         }
@@ -297,7 +298,7 @@ private:
 
         auto vm_cs2 = cloud_service->startVM(vm_name);
         // Submit the standard job to the compute service, making it sure it runs on FailedHost1
-        job_manager->submitJob(job, vm_cs2.get());
+        job_manager->submitJob(job, vm_cs2);
 
         // Wait for a workflow execution event
         auto event2 = this->getWorkflow()->waitForNextExecutionEvent();
@@ -336,7 +337,7 @@ void CloudServiceSimulatedFailuresTest::do_CloudServiceFailureOfAVMWithRunningJo
 
     // Create a Compute Service that has access to two hosts
     compute_service = simulation->add(
-            new wrench::CloudService(stable_host,
+            new wrench::CloudComputeService(stable_host,
                                      compute_hosts,
                                      100.0,
                                      {}));
@@ -345,7 +346,7 @@ void CloudServiceSimulatedFailuresTest::do_CloudServiceFailureOfAVMWithRunningJo
     storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, 10000000000000.0));
 
     // Create a WMS
-    wrench::WMS *wms = nullptr;
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
     wms = simulation->add(new CloudServiceFailureOfAVMAndRestartTestWMS(this, stable_host, compute_service, storage_service));
 
     wms->addWorkflow(workflow);
@@ -376,7 +377,8 @@ class CloudServiceRandomFailuresTestWMS : public wrench::WMS {
 
 public:
     CloudServiceRandomFailuresTestWMS(CloudServiceSimulatedFailuresTest *test,
-                                      std::string &hostname, wrench::ComputeService *cs, wrench::StorageService *ss) :
+                                      std::string &hostname, std::shared_ptr<wrench::ComputeService> cs,
+                                      std::shared_ptr<wrench::StorageService> ss) :
             wrench::WMS(nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -388,11 +390,11 @@ private:
     int main() override {
 
         // Create a job manager
-        std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+        auto job_manager = this->createJobManager();
 
         unsigned long NUM_TRIALS = 1000;
 
-        auto cloud_service = (wrench::CloudService *)this->test->compute_service;
+        auto cloud_service = std::dynamic_pointer_cast<wrench::CloudComputeService>(this->test->compute_service);
 
         for (unsigned long trial=0; trial < NUM_TRIALS; trial++) {
 
@@ -445,7 +447,7 @@ private:
                 num_vm_start_attempts = 0;
 
                 // Submit the standard job to the compute service, making it sure it runs on FailedHost1
-                job_manager->submitJob(job, vm_cs.get());
+                job_manager->submitJob(job, vm_cs);
                 num_job_submission_attempts++;
 
                 // Wait for a workflow execution event
@@ -492,7 +494,7 @@ void CloudServiceSimulatedFailuresTest::do_CloudServiceRandomFailures_test() {
 
     // Create a Compute Service that has access to two hosts
     compute_service = simulation->add(
-            new wrench::CloudService(stable_host,
+            new wrench::CloudComputeService(stable_host,
                                      compute_hosts,
                                      100.0,
                                      {}));
@@ -501,7 +503,7 @@ void CloudServiceSimulatedFailuresTest::do_CloudServiceRandomFailures_test() {
     storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, 10000000000000.0));
 
     // Create a WMS
-    wrench::WMS *wms = nullptr;
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
     wms = simulation->add(new CloudServiceRandomFailuresTestWMS(this, stable_host, compute_service, storage_service));
 
     wms->addWorkflow(workflow);

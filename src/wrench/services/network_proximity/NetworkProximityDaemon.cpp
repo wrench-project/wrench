@@ -10,6 +10,7 @@
 
 #include <wrench/logging/TerminalOutput.h>
 #include "wrench/services/network_proximity/NetworkProximityDaemon.h"
+#include "wrench/workflow/execution_events/FailureCause.h"
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <wrench/simulation/SimulationMessage.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
@@ -107,7 +108,7 @@ namespace wrench {
 
         try {
             S4U_Mailbox::dputMessage(this->network_proximity_service_mailbox,
-                                     new NextContactDaemonRequestMessage(this,
+                                     new NextContactDaemonRequestMessage(std::dynamic_pointer_cast<NetworkProximityDaemon>(this->getSharedPtr()),
                                                                          this->getMessagePayloadValue(
                                                                                  NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
@@ -169,7 +170,7 @@ namespace wrench {
 
                     try {
                         S4U_Mailbox::dputMessage(this->network_proximity_service_mailbox,
-                                                 new NextContactDaemonRequestMessage(this,
+                                                 new NextContactDaemonRequestMessage(std::dynamic_pointer_cast<NetworkProximityDaemon>(this->getSharedPtr()),
                                                                                      this->getMessagePayloadValue(
                                                                                              NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD)));
                     } catch (std::shared_ptr<NetworkError> &cause) {

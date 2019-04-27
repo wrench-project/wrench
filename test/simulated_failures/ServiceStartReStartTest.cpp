@@ -135,7 +135,7 @@ void SimulatedFailuresTest::do_StartServiceOnDownHostTest_test() {
     std::string hostname = "StableHost";
 
     // Create a WMS
-    wrench::WMS *wms = nullptr;
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new StartServiceOnDownHostTestWMS(this, hostname)));
 
@@ -225,7 +225,7 @@ void SimulatedFailuresTest::do_ServiceRestartTest_test() {
     std::string hostname = "StableHost";
 
     // Create a WMS
-    wrench::WMS *wms = nullptr;
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new ServiceRestartTestWMS(this, hostname)));
 

@@ -24,20 +24,20 @@ namespace wrench {
     /***********************/
 
     /**
-     * @brief Top-level class for messages received/sent by a VirtualizedClusterService
+     * @brief Top-level class for messages received/sent by a VirtualizedClusterComputeService
      */
-    class VirtualizedClusterServiceMessage : public ComputeServiceMessage {
+    class VirtualizedClusterComputeServiceMessage : public ComputeServiceMessage {
     protected:
-        VirtualizedClusterServiceMessage(const std::string &name, double payload);
+        VirtualizedClusterComputeServiceMessage(const std::string &name, double payload);
     };
 
 
     /**
-     * @brief A message sent to a VirtualizedClusterService to request a VM migration
+     * @brief A message sent to a VirtualizedClusterComputeService to request a VM migration
      */
-    class VirtualizedClusterServiceMigrateVMRequestMessage : public VirtualizedClusterServiceMessage {
+    class VirtualizedClusterComputeServiceMigrateVMRequestMessage : public VirtualizedClusterComputeServiceMessage {
     public:
-        VirtualizedClusterServiceMigrateVMRequestMessage(const std::string &answer_mailbox,
+        VirtualizedClusterComputeServiceMigrateVMRequestMessage(const std::string &answer_mailbox,
                                                          const std::string &vm_name,
                                                          const std::string &dest_pm_hostname,
                                                          double payload);
@@ -51,11 +51,11 @@ namespace wrench {
     };
 
     /**
-     * @brief A message sent by a VirtualizedClusterService in answer to a VM migration request
+     * @brief A message sent by a VirtualizedClusterComputeService in answer to a VM migration request
      */
-    class VirtualizedClusterServiceMigrateVMAnswerMessage : public VirtualizedClusterServiceMessage {
+    class VirtualizedClusterComputeServiceMigrateVMAnswerMessage : public VirtualizedClusterComputeServiceMessage {
     public:
-        VirtualizedClusterServiceMigrateVMAnswerMessage(bool success, std::shared_ptr<FailureCause> failure_cause, double payload);
+        VirtualizedClusterComputeServiceMigrateVMAnswerMessage(bool success, std::shared_ptr<FailureCause> failure_cause, double payload);
 
         /** @brief Whether the VM migration was successful or not */
         bool success;

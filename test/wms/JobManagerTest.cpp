@@ -12,8 +12,8 @@
 #include <wrench/simulation/SimulationMessage.h>
 #include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
 #include <gtest/gtest.h>
-#include <wrench/services/compute/batch/BatchService.h>
-#include <wrench/services/compute/batch/BatchServiceMessage.h>
+#include <wrench/services/compute/batch/BatchComputeService.h>
+#include <wrench/services/compute/batch/BatchComputeServiceMessage.h>
 #include <wrench/util/TraceFileLoader.h>
 #include "wrench/workflow/job/PilotJob.h"
 
@@ -79,19 +79,19 @@ protected:
 /**********************************************************************/
 
 class BogusStandardJobScheduler : public wrench::StandardJobScheduler {
-    void scheduleTasks(const std::set<wrench::ComputeService *> &compute_services,
+    void scheduleTasks(const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                        const std::vector<wrench::WorkflowTask *> &tasks);
 
 };
 
-void BogusStandardJobScheduler::scheduleTasks(const std::set<wrench::ComputeService *> &compute_services,
+void BogusStandardJobScheduler::scheduleTasks(const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                               const std::vector<wrench::WorkflowTask *> &tasks) {}
 
 class BogusPilotJobScheduler : public wrench::PilotJobScheduler {
-    void schedulePilotJobs(const std::set<wrench::ComputeService *> &compute_services) override;
+    void schedulePilotJobs(const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services) override;
 };
 
-void BogusPilotJobScheduler::schedulePilotJobs(const std::set<wrench::ComputeService *> &compute_services) {}
+void BogusPilotJobScheduler::schedulePilotJobs(const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services) {}
 
 class JobManagerConstructorTestWMS : public wrench::WMS {
 
@@ -112,7 +112,7 @@ private:
     int main() {
 
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       // Kill the Job Manager abruptly, just for kicks
       job_manager->kill();
@@ -142,7 +142,7 @@ void JobManagerTest::do_JobManagerConstructorTest_test() {
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new JobManagerConstructorTestWMS(
                   this, hostname)));
@@ -180,7 +180,7 @@ private:
     int main() {
 
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       try {
         job_manager->createStandardJob(nullptr, {});
@@ -247,7 +247,7 @@ void JobManagerTest::do_JobManagerCreateJobTest_test() {
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new JobManagerCreateJobTestWMS(
                   this, hostname)));
@@ -285,10 +285,10 @@ private:
     int main() {
 
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       try {
-        job_manager->submitJob(nullptr, (wrench::ComputeService *) (1234), {});
+        job_manager->submitJob(nullptr, std::shared_ptr<wrench::ComputeService>((wrench::ComputeService *) (1234)), {});
         throw std::runtime_error("Should not be able to submit a job with a nullptr job");
       } catch (std::invalid_argument &e) {
       }
@@ -336,7 +336,7 @@ void JobManagerTest::do_JobManagerSubmitJobTest_test() {
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new JobManagerSubmitJobTestWMS(
                   this, hostname)));
@@ -362,7 +362,7 @@ class JobManagerResubmitJobTestWMS : public wrench::WMS {
 public:
     JobManagerResubmitJobTestWMS(JobManagerTest *test,
                                  std::string hostname,
-                                 std::set<wrench::ComputeService *> compute_services) :
+                                 std::set<std::shared_ptr<wrench::ComputeService>> compute_services) :
             wrench::WMS(nullptr, nullptr,
                         compute_services, {}, {}, nullptr, hostname, "test") {
       this->test = test;
@@ -376,11 +376,11 @@ private:
     int main() {
 
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       // Get the compute_services
-      wrench::ComputeService *cs_does_support_standard_jobs;
-      wrench::ComputeService *cs_does_not_support_standard_jobs;
+      std::shared_ptr<wrench::ComputeService> cs_does_support_standard_jobs;
+      std::shared_ptr<wrench::ComputeService> cs_does_not_support_standard_jobs;
       for (auto cs : this->getAvailableComputeServices()) {
         if (cs->supportsStandardJobs()) {
           cs_does_support_standard_jobs = cs;
@@ -471,7 +471,7 @@ void JobManagerTest::do_JobManagerResubmitJobTest_test() {
   ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Create a ComputeService that does not support standard jobs
-  wrench::ComputeService *cs1, *cs2;
+  std::shared_ptr<wrench::ComputeService> cs1, cs2;
 
   ASSERT_NO_THROW(cs1 = simulation->add(
           new wrench::BareMetalComputeService("Host2",
@@ -485,7 +485,7 @@ void JobManagerTest::do_JobManagerResubmitJobTest_test() {
                                                        {{wrench::ComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}})));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new JobManagerResubmitJobTestWMS(
                   this, "Host1", {cs1, cs2})));
@@ -517,7 +517,7 @@ class JobManagerTerminateJobTestWMS : public wrench::WMS {
 public:
     JobManagerTerminateJobTestWMS(JobManagerTest *test,
                                   std::string hostname,
-                                  std::set<wrench::ComputeService *> compute_services) :
+                                  std::set<std::shared_ptr<wrench::ComputeService>> compute_services) :
             wrench::WMS(nullptr, nullptr,
                         compute_services, {}, {}, nullptr, hostname, "test") {
       this->test = test;
@@ -531,10 +531,10 @@ private:
     int main() {
 
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       // Get the compute_services
-      wrench::ComputeService *cs = *(this->getAvailableComputeServices().begin());
+      std::shared_ptr<wrench::ComputeService> cs = *(this->getAvailableComputeServices().begin());
 
       // Add tasks to the workflow
       wrench::WorkflowTask *t1 = this->getWorkflow()->addTask("task1", 600, 10, 10, 1.0, 80);
@@ -614,14 +614,14 @@ void JobManagerTest::do_JobManagerTerminateJobTest_test() {
   ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Create a ComputeService that supports standard jobs
-  wrench::ComputeService *cs = nullptr;
+  std::shared_ptr<wrench::ComputeService> cs = nullptr;
   ASSERT_NO_THROW(cs = simulation->add(
           new wrench::BareMetalComputeService("Host3",
                                                        {std::make_pair("Host3", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},100.0,
                                                        {{wrench::ComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}})));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new JobManagerTerminateJobTestWMS(
                   this, "Host1", {cs})));

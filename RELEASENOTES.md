@@ -9,7 +9,7 @@ WRENCH Release Notes
 - Dump `pstate` and energy consumption data as JSON
 - Adding support for `bytesRead`, `bytesWritten`, and `avgCPU` for workflows defined as JSON
 - Adding `ComputeService::getTotalNumCores()` and `ComputeService::getTotalNumIdleCores()` 
-- `wrench::BatchService` should handle requested vs. real job run times when replaying traces
+- `wrench::BatchComputeService` should handle requested vs. real job run times when replaying traces
 - Bug fixes: [#97](https://github.com/wrench-project/wrench/issues/97), [#99](https://github.com/wrench-project/wrench/issues/99), [#100](https://github.com/wrench-project/wrench/issues/100)
 
 **Note**: WRENCH 1.4 requires [SimGrid 3.21](https://simgrid.org).

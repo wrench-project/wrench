@@ -103,8 +103,8 @@ class EmptySimulationOutputWMS : public wrench::WMS {
 
 public:
     EmptySimulationOutputWMS(SimulationOutputTest *test,
-                                      const std::set<wrench::ComputeService *> &compute_services,
-                                      const std::set<wrench::StorageService *> &storage_services,
+                                      const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                      const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                       std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
@@ -144,7 +144,7 @@ void SimulationOutputTest::do_emptyTrace_test() {
 
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new EmptySimulationOutputWMS(this, {}, {}, hostname)));
 

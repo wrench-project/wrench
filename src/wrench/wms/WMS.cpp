@@ -16,6 +16,10 @@
 #include "wrench/managers/JobManager.h"
 #include "wrench/managers/DataMovementManager.h"
 #include "wrench/services/compute/ComputeService.h"
+#include "wrench/services/compute/bare_metal/BareMetalComputeService.h"
+#include "wrench/services/compute/cloud/CloudComputeService.h"
+#include "wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h"
+#include "wrench/services/compute/batch/BatchComputeService.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(wms, "Log category for WMS");
 
@@ -37,10 +41,10 @@ namespace wrench {
      */
     WMS::WMS(std::unique_ptr<StandardJobScheduler> standard_job_scheduler,
              std::unique_ptr<PilotJobScheduler> pilot_job_scheduler,
-             const std::set<ComputeService *> &compute_services,
-             const std::set<StorageService *> &storage_services,
-             const std::set<NetworkProximityService *> &network_proximity_services,
-             FileRegistryService *file_registry_service,
+             const std::set<std::shared_ptr<ComputeService>> &compute_services,
+             const std::set<std::shared_ptr<StorageService>> &storage_services,
+             const std::set<std::shared_ptr<NetworkProximityService>> &network_proximity_services,
+             std::shared_ptr<FileRegistryService> file_registry_service,
              const std::string &hostname,
              const std::string suffix) :
             Service(hostname, "wms_" + suffix, "wms_" + suffix),
@@ -51,7 +55,7 @@ namespace wrench {
             standard_job_scheduler(std::move(standard_job_scheduler)),
             pilot_job_scheduler(std::move(pilot_job_scheduler))
     {
-      this->workflow = nullptr;
+        this->workflow = nullptr;
     }
 
     /**
@@ -61,7 +65,7 @@ namespace wrench {
      * @param optimization: a dynamic optimization implementation
      */
     void WMS::addDynamicOptimization(std::unique_ptr<DynamicOptimization> optimization) {
-      this->dynamic_optimizations.push_back(std::move(optimization));
+        this->dynamic_optimizations.push_back(std::move(optimization));
     }
 
     /**
@@ -71,7 +75,7 @@ namespace wrench {
      * @param optimization: a static optimization implementation
      */
     void WMS::addStaticOptimization(std::unique_ptr<StaticOptimization> optimization) {
-      this->static_optimizations.push_back(std::move(optimization));
+        this->static_optimizations.push_back(std::move(optimization));
     }
 
     /**
@@ -81,48 +85,48 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void WMS::checkDeferredStart() {
-      if (S4U_Simulation::getClock() < this->start_time) {
+        if (S4U_Simulation::getClock() < this->start_time) {
 
-        Alarm::createAndStartAlarm(this->simulation, this->start_time, this->hostname, this->mailbox_name,
-                                   new AlarmWMSDeferredStartMessage(0), "wms_start");
+            Alarm::createAndStartAlarm(this->simulation, this->start_time, this->hostname, this->mailbox_name,
+                                       new AlarmWMSDeferredStartMessage(0), "wms_start");
 
-        // Wait for a message
-        std::unique_ptr<SimulationMessage> message = nullptr;
+            // Wait for a message
+            std::unique_ptr<SimulationMessage> message = nullptr;
 
-        try {
-          message = S4U_Mailbox::getMessage(this->mailbox_name);
-        } catch (std::shared_ptr<NetworkError> &cause) {
-          throw std::runtime_error(cause->toString());
+            try {
+                message = S4U_Mailbox::getMessage(this->mailbox_name);
+            } catch (std::shared_ptr<NetworkError> &cause) {
+                throw std::runtime_error(cause->toString());
+            }
+
+            if (message == nullptr) {
+                std::runtime_error("Got a NULL message... Likely this means the WMS cannot be started. Aborting!");
+            }
+
+            if (auto msg = dynamic_cast<AlarmWMSDeferredStartMessage *>(message.get())) {
+                // The WMS can be started
+            } else {
+                throw std::runtime_error("WMS::checkDeferredStart(): Unexpected " + message->getName() + " message");
+            }
         }
-
-        if (message == nullptr) {
-          std::runtime_error("Got a NULL message... Likely this means the WMS cannot be started. Aborting!");
-        }
-
-        if (auto msg = dynamic_cast<AlarmWMSDeferredStartMessage *>(message.get())) {
-          // The WMS can be started
-        } else {
-          throw std::runtime_error("WMS::checkDeferredStart(): Unexpected " + message->getName() + " message");
-        }
-      }
     }
 
     /**
      * @brief Perform dynamic optimizations. Optimizations are executed in order of insertion
      */
     void WMS::runDynamicOptimizations() {
-      for (auto &opt : this->dynamic_optimizations) {
-        opt->process(this->workflow);
-      }
+        for (auto &opt : this->dynamic_optimizations) {
+            opt->process(this->workflow);
+        }
     }
 
     /**
      * @brief Perform static optimizations. Optimizations are executed in order of insertion
      */
     void WMS::runStaticOptimizations() {
-      for (auto &opt : this->static_optimizations) {
-        opt->process(this->workflow);
-      }
+        for (auto &opt : this->static_optimizations) {
+            opt->process(this->workflow);
+        }
     }
 
     /**
@@ -130,8 +134,73 @@ namespace wrench {
      *
      * @return a set of compute services
      */
-    std::set<ComputeService *> WMS::getAvailableComputeServices() {
-      return this->compute_services;
+    std::set<std::shared_ptr<ComputeService>> WMS::getAvailableComputeServices() {
+        return this->compute_services;
+    }
+
+    /**
+     * @brief Obtain the list of bare-metal compute services available to the WMS
+     *
+     * @return a set of bare-metal compute services
+     */
+    std::set<std::shared_ptr<BareMetalComputeService>> WMS::getAvailableBareMetalComputeServices() {
+        std::set<std::shared_ptr<BareMetalComputeService>> to_return;
+        for (auto const &h : this->compute_services) {
+            auto shared_ptr = std::dynamic_pointer_cast<BareMetalComputeService>(h);
+            if (shared_ptr) {
+                to_return.insert(shared_ptr);
+            }
+        }
+        return to_return;
+    }
+
+    /**
+     * @brief Obtain the list of cloud compute services available to the WMS
+     *
+     * @return a set of cloud compute services
+     */
+    std::set<std::shared_ptr<CloudComputeService>> WMS::getAvailableCloudComputeServices() {
+        std::set<std::shared_ptr<CloudComputeService>> to_return;
+        for (auto const &h : this->compute_services) {
+            auto shared_ptr_cloud = std::dynamic_pointer_cast<CloudComputeService>(h);
+            auto shared_ptr_vc = std::dynamic_pointer_cast<VirtualizedClusterComputeService>(h);
+            if (shared_ptr_cloud and (not shared_ptr_vc)) {
+                to_return.insert(shared_ptr_cloud);
+            }
+        }
+        return to_return;
+    }
+
+    /**
+     * @brief Obtain the list of virtualized cluster compute services available to the WMS
+     *
+     * @return a set of virtualized cluster compute services
+     */
+    std::set<std::shared_ptr<VirtualizedClusterComputeService>> WMS::getAvailableVirtualizedClusterComputeServices() {
+        std::set<std::shared_ptr<VirtualizedClusterComputeService>> to_return;
+        for (auto const &h : this->compute_services) {
+            auto shared_ptr = std::dynamic_pointer_cast<VirtualizedClusterComputeService>(h);
+            if (shared_ptr) {
+                to_return.insert(shared_ptr);
+            }
+        }
+        return to_return;
+    }
+
+    /**
+     * @brief Obtain the list of batch compute services available to the WMS
+     *
+     * @return a set of batch compute services
+     */
+    std::set<std::shared_ptr<BatchComputeService>> WMS::getAvailableBatchComputeServices() {
+        std::set<std::shared_ptr<BatchComputeService>> to_return;
+        for (auto const &h : this->compute_services) {
+            auto shared_ptr = std::dynamic_pointer_cast<BatchComputeService>(h);
+            if (shared_ptr) {
+                to_return.insert(shared_ptr);
+            }
+        }
+        return to_return;
     }
 
     /**
@@ -139,8 +208,8 @@ namespace wrench {
     *
     * @return a set of storage services
     */
-    std::set<StorageService *> WMS::getAvailableStorageServices() {
-      return this->storage_services;
+    std::set<std::shared_ptr<StorageService>> WMS::getAvailableStorageServices() {
+        return this->storage_services;
     }
 
     /**
@@ -148,8 +217,8 @@ namespace wrench {
     *
     * @return a set of network proximity services
     */
-    std::set<NetworkProximityService *> WMS::getAvailableNetworkProximityServices() {
-      return this->network_proximity_services;
+    std::set<std::shared_ptr<NetworkProximityService>> WMS::getAvailableNetworkProximityServices() {
+        return this->network_proximity_services;
     }
 
     /**
@@ -157,8 +226,8 @@ namespace wrench {
     *
     * @return a file registry services
     */
-    FileRegistryService * WMS::getAvailableFileRegistryService() {
-      return this->file_registry_service;
+    std::shared_ptr<FileRegistryService> WMS::getAvailableFileRegistryService() {
+        return this->file_registry_service;
     }
 
     /**
@@ -177,50 +246,50 @@ namespace wrench {
      */
     bool WMS::waitForAndProcessNextEvent(double timeout) {
 
-      std::unique_ptr<WorkflowExecutionEvent> event = workflow->waitForNextExecutionEvent(timeout);
-      if (event == nullptr) {
-          return false;
-      }
+        std::unique_ptr<WorkflowExecutionEvent> event = workflow->waitForNextExecutionEvent(timeout);
+        if (event == nullptr) {
+            return false;
+        }
 
-      WorkflowExecutionEvent *event_ptr = event.release();
+        WorkflowExecutionEvent *event_ptr = event.release();
 
-      switch (event_ptr->type) {
-        case WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-          processEventStandardJobCompletion(std::unique_ptr<StandardJobCompletedEvent>(
-                  dynamic_cast<StandardJobCompletedEvent *>(event_ptr)));
-          break;
+        switch (event_ptr->type) {
+            case WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
+                processEventStandardJobCompletion(std::unique_ptr<StandardJobCompletedEvent>(
+                        dynamic_cast<StandardJobCompletedEvent *>(event_ptr)));
+                break;
+            }
+            case WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
+                processEventStandardJobFailure(std::unique_ptr<StandardJobFailedEvent>(
+                        dynamic_cast<StandardJobFailedEvent *>(event_ptr)));
+                break;
+            }
+            case WorkflowExecutionEvent::PILOT_JOB_START: {
+                processEventPilotJobStart(std::unique_ptr<PilotJobStartedEvent>(
+                        dynamic_cast<PilotJobStartedEvent *>(event_ptr)));
+                break;
+            }
+            case WorkflowExecutionEvent::PILOT_JOB_EXPIRATION: {
+                processEventPilotJobExpiration(std::unique_ptr<PilotJobExpiredEvent>(
+                        dynamic_cast<PilotJobExpiredEvent *>(event_ptr)));
+                break;
+            }
+            case WorkflowExecutionEvent::FILE_COPY_COMPLETION: {
+                processEventFileCopyCompletion(std::unique_ptr<FileCopyCompletedEvent>(
+                        dynamic_cast<FileCopyCompletedEvent *>(event_ptr)));
+                break;
+            }
+            case WorkflowExecutionEvent::FILE_COPY_FAILURE: {
+                processEventFileCopyFailure(std::unique_ptr<FileCopyFailedEvent>(
+                        dynamic_cast<FileCopyFailedEvent *>(event_ptr)));
+                break;
+            }
+            default: {
+                throw std::runtime_error("SimpleWMS::main(): Unknown workflow execution event type '" +
+                                         std::to_string(event->type) + "'");
+            }
         }
-        case WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
-          processEventStandardJobFailure(std::unique_ptr<StandardJobFailedEvent>(
-                  dynamic_cast<StandardJobFailedEvent *>(event_ptr)));
-          break;
-        }
-        case WorkflowExecutionEvent::PILOT_JOB_START: {
-          processEventPilotJobStart(std::unique_ptr<PilotJobStartedEvent>(
-                  dynamic_cast<PilotJobStartedEvent *>(event_ptr)));
-          break;
-        }
-        case WorkflowExecutionEvent::PILOT_JOB_EXPIRATION: {
-          processEventPilotJobExpiration(std::unique_ptr<PilotJobExpiredEvent>(
-                  dynamic_cast<PilotJobExpiredEvent *>(event_ptr)));
-          break;
-        }
-        case WorkflowExecutionEvent::FILE_COPY_COMPLETION: {
-          processEventFileCopyCompletion(std::unique_ptr<FileCopyCompletedEvent>(
-                  dynamic_cast<FileCopyCompletedEvent *>(event_ptr)));
-          break;
-        }
-        case WorkflowExecutionEvent::FILE_COPY_FAILURE: {
-          processEventFileCopyFailure(std::unique_ptr<FileCopyFailedEvent>(
-                  dynamic_cast<FileCopyFailedEvent *>(event_ptr)));
-          break;
-        }
-        default: {
-          throw std::runtime_error("SimpleWMS::main(): Unknown workflow execution event type '" +
-                                   std::to_string(event->type) + "'");
-        }
-      }
-      return true;
+        return true;
     }
 
     /**
@@ -229,8 +298,8 @@ namespace wrench {
      * @param event: a workflow execution event
      */
     void WMS::processEventStandardJobCompletion(std::unique_ptr<StandardJobCompletedEvent> event) {
-      auto standard_job = event->standard_job;
-      WRENCH_INFO("Notified that a %ld-task job has completed", standard_job->getNumTasks());
+        auto standard_job = event->standard_job;
+        WRENCH_INFO("Notified that a %ld-task job has completed", standard_job->getNumTasks());
     }
 
     /**
@@ -239,7 +308,7 @@ namespace wrench {
      * @param event: a workflow execution event
      */
     void WMS::processEventStandardJobFailure(std::unique_ptr<StandardJobFailedEvent> event) {
-      WRENCH_INFO("Notified that a standard job has failed (all its tasks are back in the ready state)");
+        WRENCH_INFO("Notified that a standard job has failed (all its tasks are back in the ready state)");
     }
 
     /**
@@ -248,7 +317,7 @@ namespace wrench {
      * @param event: a workflow execution event
      */
     void WMS::processEventPilotJobStart(std::unique_ptr<PilotJobStartedEvent> event) {
-      WRENCH_INFO("Notified that a pilot job has started!");
+        WRENCH_INFO("Notified that a pilot job has started!");
     }
 
     /**
@@ -257,7 +326,7 @@ namespace wrench {
      * @param event: a workflow execution event
      */
     void WMS::processEventPilotJobExpiration(std::unique_ptr<PilotJobExpiredEvent> event) {
-      WRENCH_INFO("Notified that a pilot job has expired!");
+        WRENCH_INFO("Notified that a pilot job has expired!");
     }
 
     /**
@@ -266,7 +335,7 @@ namespace wrench {
      * @param event: a workflow execution event
      */
     void WMS::processEventFileCopyCompletion(std::unique_ptr<FileCopyCompletedEvent> event) {
-      WRENCH_INFO("Notified that a file copy is completed!");
+        WRENCH_INFO("Notified that a file copy is completed!");
     }
 
     /**
@@ -275,7 +344,7 @@ namespace wrench {
      * @param event: a workflow execution event
      */
     void WMS::processEventFileCopyFailure(std::unique_ptr<FileCopyFailedEvent> event) {
-      WRENCH_INFO("Notified that a file copy has failed!");
+        WRENCH_INFO("Notified that a file copy has failed!");
     }
 
     /**
@@ -287,22 +356,22 @@ namespace wrench {
      */
     void WMS::addWorkflow(Workflow *workflow, double start_time) {
 
-      if ((workflow == nullptr) || (start_time < 0.0)) {
-        throw std::invalid_argument("WMS::addWorkflow(): Invalid arguments");
-      }
+        if ((workflow == nullptr) || (start_time < 0.0)) {
+            throw std::invalid_argument("WMS::addWorkflow(): Invalid arguments");
+        }
 
-      if (this->workflow) {
-        throw std::invalid_argument("WMS::addWorkflow(): The WMS has already been given a workflow");
-      } else {
-        this->workflow = workflow;
+        if (this->workflow) {
+            throw std::invalid_argument("WMS::addWorkflow(): The WMS has already been given a workflow");
+        } else {
+            this->workflow = workflow;
 
-        /**
-         * Set the simulation pointer member variable of the workflow so that the
-         * workflow tasks have access to it for creating SimulationTimestamps
-         */
-        this->workflow->simulation = this->simulation;
-      }
-      this->start_time = start_time;
+            /**
+             * Set the simulation pointer member variable of the workflow so that the
+             * workflow tasks have access to it for creating SimulationTimestamps
+             */
+            this->workflow->simulation = this->simulation;
+        }
+        this->start_time = start_time;
     }
 
     /**
@@ -311,7 +380,7 @@ namespace wrench {
      * @return a workflow
      */
     Workflow *WMS::getWorkflow() {
-      return this->workflow;
+        return this->workflow;
     }
 
     /**
@@ -319,11 +388,11 @@ namespace wrench {
      * @return a job manager
      */
     std::shared_ptr<JobManager> WMS::createJobManager() {
-      auto job_manager_raw_ptr = new JobManager(this);
-      std::shared_ptr<JobManager> job_manager = std::shared_ptr<JobManager>(job_manager_raw_ptr);
-      job_manager->simulation = this->simulation;
-      job_manager->start(job_manager, true, false); // Always daemonize, no auto-restart
-      return job_manager;
+        auto job_manager_raw_ptr = new JobManager(this);
+        std::shared_ptr<JobManager> job_manager = std::shared_ptr<JobManager>(job_manager_raw_ptr);
+        job_manager->simulation = this->simulation;
+        job_manager->start(job_manager, true, false); // Always daemonize, no auto-restart
+        return job_manager;
     }
 
     /**
@@ -331,11 +400,11 @@ namespace wrench {
      * @return a data movement manager
      */
     std::shared_ptr<DataMovementManager> WMS::createDataMovementManager() {
-      auto data_movement_manager_raw_ptr = new DataMovementManager(this);
-      std::shared_ptr<DataMovementManager> data_movement_manager = std::shared_ptr<DataMovementManager>(data_movement_manager_raw_ptr);
-      data_movement_manager->simulation = this->simulation;
-      data_movement_manager->start(data_movement_manager, true, false); // Always daemonize, no auto-restart
-      return data_movement_manager;
+        auto data_movement_manager_raw_ptr = new DataMovementManager(this);
+        std::shared_ptr<DataMovementManager> data_movement_manager = std::shared_ptr<DataMovementManager>(data_movement_manager_raw_ptr);
+        data_movement_manager->simulation = this->simulation;
+        data_movement_manager->start(data_movement_manager, true, false); // Always daemonize, no auto-restart
+        return data_movement_manager;
     }
 
     /**
@@ -373,7 +442,7 @@ namespace wrench {
      * @return the pilot scheduler, or nullptr if none
      */
     PilotJobScheduler *WMS::getPilotJobScheduler() {
-      return (this->pilot_job_scheduler).get();
+        return (this->pilot_job_scheduler).get();
     }
 
     /** @brief Get the WMS's pilot scheduler
@@ -381,7 +450,7 @@ namespace wrench {
      * @return the pilot scheduler, or nullptr if none
      */
     StandardJobScheduler *WMS::getStandardJobScheduler() {
-      return (this->standard_job_scheduler).get();
+        return (this->standard_job_scheduler).get();
     }
 
 };

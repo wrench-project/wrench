@@ -83,7 +83,7 @@ class StorageServiceRestartTestWMS : public wrench::WMS {
 public:
     StorageServiceRestartTestWMS(SimulatedFailuresTest *test,
                                  std::string &hostname,
-                                 wrench::StorageService *storage_service
+                                 std::shared_ptr<wrench::StorageService> storage_service
     ) :
             wrench::WMS(nullptr, nullptr, {}, {storage_service}, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -170,7 +170,7 @@ void SimulatedFailuresTest::do_StorageServiceRestartTest_test() {
 
     // Create a WMS
     std::string stable_host = "StableHost";
-    wrench::WMS *wms = nullptr;
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new StorageServiceRestartTestWMS(this, stable_host, storage_service)));
 

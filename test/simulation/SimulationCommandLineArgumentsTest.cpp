@@ -67,10 +67,10 @@ private:
 
     int main() {
       // Create a data movement manager
-      std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
+      auto data_movement_manager = this->createDataMovementManager();
 
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       // Sleep for 1 second
       wrench::Simulation::sleep(1.0);
@@ -312,7 +312,7 @@ void SimulationCommandLineArgumentsTest::do_NoColorArgument_test() {
   ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   std::string hostname = "DualCoreHost";
   wms = simulation->add(new SimulationCommandLineArgumentsWMS(this, hostname));
 
@@ -389,7 +389,7 @@ void SimulationCommandLineArgumentsTest::do_NoLogArgument_test() {
   ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   std::string hostname = "DualCoreHost";
   wms = simulation->add(new SimulationCommandLineArgumentsWMS(this, hostname));
 
@@ -468,7 +468,7 @@ void SimulationCommandLineArgumentsTest::do_ActivateEnergyArgument_test() {
     }
 
     // Create a WMS
-    wrench::WMS *wms = nullptr;
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
     std::string hostname = "DualCoreHost";
     wms = simulation->add(new SimulationCommandLineArgumentsWMS(this, hostname));
 

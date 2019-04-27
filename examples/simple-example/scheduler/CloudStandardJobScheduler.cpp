@@ -33,9 +33,9 @@ namespace wrench {
         }
 
         ComputeService *compute_service = *compute_services.begin();
-        CloudService *cloud_service;
+        CloudComputeService *cloud_service;
 
-        if (not(cloud_service = dynamic_cast<CloudService *>(compute_service))) {
+        if (not(cloud_service = dynamic_cast<CloudComputeService *>(compute_service))) {
             throw std::runtime_error("This example Cloud Scheduler can only handle a cloud service");
         }
 
@@ -84,7 +84,7 @@ namespace wrench {
                         throw std::runtime_error("Unable to create/start a VM: " + e.getCause()->toString());
                     }
                 } else {
-                    WRENCH_INFO("Not enough idle cores on the CloudService to create a big enough VM for task '%s", task->getID().c_str());
+                    WRENCH_INFO("Not enough idle cores on the CloudComputeService to create a big enough VM for task '%s", task->getID().c_str());
                 }
             }
 

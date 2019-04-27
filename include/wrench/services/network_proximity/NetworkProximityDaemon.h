@@ -50,7 +50,7 @@ namespace wrench {
 
         std::string suffix;
         std::string next_mailbox_to_send;
-        NetworkProximityDaemon *next_daemon_to_send;
+        std::shared_ptr<NetworkProximityDaemon> next_daemon_to_send;
         std::string next_host_to_send;
         std::string network_proximity_service_mailbox;
 

@@ -30,7 +30,7 @@ namespace wrench {
         /***********************/
         /** \cond DEVELOPER    */
         /***********************/
-        void schedulePilotJobs(const std::set<ComputeService *> &compute_services) override;
+        void schedulePilotJobs(const std::set<std::shared_ptr<ComputeService>> &compute_services) override;
 
     protected:
         double getFlops(Workflow *, const std::vector<WorkflowTask *> &);

@@ -28,7 +28,7 @@ public:
     wrench::WorkflowTask *task4;
     wrench::WorkflowTask *task5;
     wrench::WorkflowTask *task6;
-    wrench::StorageService *storage_service = nullptr;
+    std::shared_ptr<wrench::StorageService> storage_service = nullptr;
     std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
 
     void do_getReadyTasksTest_test();
@@ -104,8 +104,8 @@ class DynamicServiceCreationReadyTasksTestWMS : public wrench::WMS {
 
 public:
     DynamicServiceCreationReadyTasksTestWMS(DynamicServiceCreationTest *test,
-                                            const std::set<wrench::ComputeService *> &compute_services,
-                                            const std::set<wrench::StorageService *> &storage_services,
+                                            const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                            const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                             std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -117,10 +117,10 @@ private:
 
     int main() {
         // Create a data movement manager
-        std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
+        auto data_movement_manager = this->createDataMovementManager();
 
         // Create a job manager
-        std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+        auto job_manager = this->createJobManager();
 
         // Dynamically create a File Registry Service on this host
         auto dynamically_created_file_registry_service = simulation->startNewService(
@@ -139,10 +139,9 @@ private:
 
         // Dynamically create a Cloud Service
         std::vector<std::string> execution_hosts = {"QuadCoreHost"};
-        auto dynamically_created_compute_service = (wrench::CloudService *) simulation->startNewService(
-                new wrench::CloudService(hostname, execution_hosts, 100.0,
-                                         { {wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}}));
-
+        auto dynamically_created_compute_service = std::dynamic_pointer_cast<wrench::CloudComputeService>(simulation->startNewService(
+                new wrench::CloudComputeService(hostname, execution_hosts, 100.0,
+                                         { {wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
         std::vector<wrench::WorkflowTask *> tasks = this->test->workflow->getReadyTasks();
 
         // Create a VM
@@ -161,7 +160,7 @@ private:
                     throw std::runtime_error("A one-task job should say it has one task");
                 }
 
-                job_manager->submitJob(one_task_jobs[job_index], vm_cs.get());
+                job_manager->submitJob(one_task_jobs[job_index], vm_cs);
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error(e.what());
             }
@@ -251,11 +250,11 @@ void DynamicServiceCreationTest::do_getReadyTasksTest_test() {
 //  // Create a Cloud Service
 //  std::vector<std::string> execution_hosts = {"QuadCoreHost"};
 //  compute_service = simulation->add(
-//          new wrench::CloudService(hostname, execution_hosts, 100.0,
+//          new wrench::CloudComputeService(hostname, execution_hosts, 100.0,
 //                                   { {wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}}));
 
     // Create a WMS
-    wrench::WMS *wms = nullptr;
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new DynamicServiceCreationReadyTasksTestWMS(this, {}, {storage_service}, hostname)));
 

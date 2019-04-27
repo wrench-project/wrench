@@ -12,8 +12,8 @@
 #include <wrench/simulation/SimulationMessage.h>
 #include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
 #include <gtest/gtest.h>
-#include <wrench/services/compute/batch/BatchService.h>
-#include <wrench/services/compute/batch/BatchServiceMessage.h>
+#include <wrench/services/compute/batch/BatchComputeService.h>
+#include <wrench/services/compute/batch/BatchComputeServiceMessage.h>
 #include <wrench/util/TraceFileLoader.h>
 #include "wrench/workflow/job/PilotJob.h"
 
@@ -26,10 +26,10 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(batch_service_contiguity_test, "Log category for Ba
 class BatchServiceBatschedContiguityTest : public ::testing::Test {
 
 public:
-    wrench::ComputeService *batch_service_conservative_bf_contiguous = nullptr;
-    wrench::ComputeService *batch_service_conservative_bf_non_contiguous = nullptr;
-    wrench::ComputeService *batch_service_easy_bf_contiguous = nullptr;
-    wrench::ComputeService *batch_service_easy_bf_non_contiguous = nullptr;
+    std::shared_ptr<wrench::ComputeService> batch_service_conservative_bf_contiguous = nullptr;
+    std::shared_ptr<wrench::ComputeService> batch_service_conservative_bf_non_contiguous = nullptr;
+    std::shared_ptr<wrench::ComputeService> batch_service_easy_bf_contiguous = nullptr;
+    std::shared_ptr<wrench::ComputeService> batch_service_easy_bf_non_contiguous = nullptr;
     wrench::Simulation *simulation;
 
 
@@ -80,8 +80,8 @@ class BatchJobContiguousAllocationTestWMS : public wrench::WMS {
 
 public:
     BatchJobContiguousAllocationTestWMS(BatchServiceBatschedContiguityTest *test,
-                                        const std::set<wrench::ComputeService *> &compute_services,
-                                        const std::set<wrench::StorageService *> &storage_services,
+                                        const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                        const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                         std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
                         hostname, "test") {
@@ -95,9 +95,9 @@ private:
 
     int main() {
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
-      std::vector<wrench::ComputeService*> compute_services;
+      std::vector<std::shared_ptr<wrench::ComputeService>> compute_services;
       compute_services.push_back(this->test->batch_service_conservative_bf_contiguous);
       compute_services.push_back(this->test->batch_service_conservative_bf_non_contiguous);
       compute_services.push_back(this->test->batch_service_easy_bf_contiguous);
@@ -235,40 +235,40 @@ void BatchServiceBatschedContiguityTest::do_BatchJobContiguousAllocationTest_tes
 
   // Create a Batch Service
   batch_service_conservative_bf_contiguous = simulation->add(
-          new wrench::BatchService(hostname,
+          new wrench::BatchComputeService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, 0, {
-                                           {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"},
-                                           {wrench::BatchServiceProperty::BATCH_RJMS_DELAY, "0"},
-                                           {wrench::BatchServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION,"true"}
+                                           {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"},
+                                           {wrench::BatchComputeServiceProperty::BATCH_RJMS_DELAY, "0"},
+                                           {wrench::BatchComputeServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION,"true"}
                                    }));
 
   batch_service_conservative_bf_non_contiguous = simulation->add(
-          new wrench::BatchService(hostname,
+          new wrench::BatchComputeService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, 0, {
-                                           {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"},
-                                           {wrench::BatchServiceProperty::BATCH_RJMS_DELAY, "0"},
-                                           {wrench::BatchServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION,"false"}
+                                           {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"},
+                                           {wrench::BatchComputeServiceProperty::BATCH_RJMS_DELAY, "0"},
+                                           {wrench::BatchComputeServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION,"false"}
                                    }));
 
   batch_service_easy_bf_contiguous = simulation->add(
-          new wrench::BatchService(hostname,
+          new wrench::BatchComputeService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, 0, {
-                                           {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "easy_bf"},
-                                           {wrench::BatchServiceProperty::BATCH_RJMS_DELAY, "0"},
-                                           {wrench::BatchServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION,"true"}
+                                           {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "easy_bf"},
+                                           {wrench::BatchComputeServiceProperty::BATCH_RJMS_DELAY, "0"},
+                                           {wrench::BatchComputeServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION,"true"}
                                    }));
 
   batch_service_easy_bf_non_contiguous = simulation->add(
-          new wrench::BatchService(hostname,
+          new wrench::BatchComputeService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, 0, {
-                                           {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "easy_bf"},
-                                           {wrench::BatchServiceProperty::BATCH_RJMS_DELAY, "0"},
-                                           {wrench::BatchServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION,"false"}
+                                           {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "easy_bf"},
+                                           {wrench::BatchComputeServiceProperty::BATCH_RJMS_DELAY, "0"},
+                                           {wrench::BatchComputeServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION,"false"}
                                    }));
 
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(new BatchJobContiguousAllocationTestWMS(
           this, {}, {}, hostname)));
 

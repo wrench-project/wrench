@@ -64,7 +64,7 @@ namespace wrench {
 
         /** @brief A convenient constant to mean "the scratch storage space" of a ComputeService. This is used
          *   to move data to a ComputeService's scratch storage space. **/
-        static StorageService *SCRATCH;
+        static std::shared_ptr<StorageService> SCRATCH;
 
         virtual ~ComputeService() {}
 
@@ -149,10 +149,10 @@ namespace wrench {
         ComputeService(const std::string &hostname,
                        std::string service_name,
                        std::string mailbox_name_prefix,
-                       StorageService *scratch_space);
+                       std::shared_ptr<StorageService> scratch_space);
 
         /** @brief A scratch storage service associated to the compute service */
-        StorageService *scratch_space_storage_service;
+        std::shared_ptr<StorageService> scratch_space_storage_service;
 
         /***********************/
         /** \endcond          **/
@@ -162,7 +162,7 @@ namespace wrench {
         /** \cond DEVELOPER   **/
         /***********************/
 
-        StorageService *getScratch();
+        std::shared_ptr<StorageService> getScratch();
         std::shared_ptr<StorageService> getScratchSharedPtr();
 
         /***********************/

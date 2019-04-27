@@ -19,17 +19,17 @@
 
 namespace wrench {
 
-    class BatchService;
+    class BatchComputeService;
 
     /**
      * @brief A service that goes through a job submission trace (as loaded
-     * by a TraceFileLoader), and "replays" it on a given BatchService.
+     * by a TraceFileLoader), and "replays" it on a given BatchComputeService.
      */
     class WorkloadTraceFileReplayer : public WMS {
 
     public:
         WorkloadTraceFileReplayer(std::string hostname,
-                                  BatchService *batch_service,
+                                  std::shared_ptr<BatchComputeService> batch_service,
                                   unsigned long num_cores_per_node,
                                   bool use_actual_runtimes_as_requested_runtimes,
                                   std::vector<std::tuple<std::string, double, double, double, double, unsigned int>> &workload_trace
@@ -37,7 +37,7 @@ namespace wrench {
 
     private:
         std::vector<std::tuple<std::string, double, double, double, double, unsigned int>>  &workload_trace;
-        BatchService *batch_service;
+        std::shared_ptr<BatchComputeService> batch_service;
         unsigned long num_cores_per_node;
         bool use_actual_runtimes_as_requested_runtimes;
 
