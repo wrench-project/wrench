@@ -22,7 +22,7 @@ namespace wrench {
 
     public:
 
-        BatchStandardJobScheduler(StorageService *default_storage_service) :
+        BatchStandardJobScheduler(std::shared_ptr<StorageService> default_storage_service) :
                 default_storage_service(default_storage_service) {}
 
         /***********************/
@@ -37,7 +37,7 @@ namespace wrench {
         /***********************/
 
     private:
-        StorageService *default_storage_service;
+        std::shared_ptr<StorageService> default_storage_service;
 
     };
 }

@@ -24,7 +24,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void CloudStandardJobScheduler::scheduleTasks(const std::set<ComputeService *> &compute_services,
+    void CloudStandardJobScheduler::scheduleTasks(const std::set<std::shared_ptr<ComputeService>> &compute_services,
                                                   const std::vector<WorkflowTask *> &tasks) {
 
         // Check that the right compute_services is passed
@@ -32,10 +32,10 @@ namespace wrench {
             throw std::runtime_error("This example Cloud Scheduler requires a single compute service");
         }
 
-        ComputeService *compute_service = *compute_services.begin();
-        CloudComputeService *cloud_service;
+        auto compute_service = *compute_services.begin();
+        auto  cloud_service = std::dynamic_pointer_cast<CloudComputeService>(compute_service);
 
-        if (not(cloud_service = dynamic_cast<CloudComputeService *>(compute_service))) {
+        if (cloud_service == nullptr) {
             throw std::runtime_error("This example Cloud Scheduler can only handle a cloud service");
         }
 
@@ -96,15 +96,15 @@ namespace wrench {
             WRENCH_INFO("Submitting task '%s' for execution on a VM", task->getID().c_str());
 
             // Submitting the task
-            std::map<WorkflowFile *, StorageService *> file_locations;
+            std::map<WorkflowFile *, std::shared_ptr<StorageService>> file_locations;
             for (auto f : task->getInputFiles()) {
                 file_locations.insert(std::make_pair(f, default_storage_service));
             }
             for (auto f : task->getOutputFiles()) {
                 file_locations.insert(std::make_pair(f, default_storage_service));
             }
-            WorkflowJob *job = (WorkflowJob *) this->getJobManager()->createStandardJob(task, file_locations);
-            this->getJobManager()->submitJob(job, picked_vm_cs.get());
+            auto job = this->getJobManager()->createStandardJob(task, file_locations);
+            this->getJobManager()->submitJob(job, picked_vm_cs);
         }
         WRENCH_INFO("Done with scheduling tasks as standard jobs");
     }

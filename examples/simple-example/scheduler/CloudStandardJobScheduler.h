@@ -22,14 +22,14 @@ namespace wrench {
 
 
     public:
-        CloudStandardJobScheduler(StorageService *default_storage_service) :
+        CloudStandardJobScheduler(std::shared_ptr<StorageService> default_storage_service) :
                 default_storage_service(default_storage_service) {}
 
         /***********************/
         /** \cond DEVELOPER    */
         /***********************/
 
-        void scheduleTasks(const std::set<ComputeService *> &compute_services,
+        void scheduleTasks(const std::set<std::shared_ptr<ComputeService>> &compute_services,
                            const std::vector<WorkflowTask *> &tasks);
 
         /***********************/
@@ -38,7 +38,7 @@ namespace wrench {
 
     private:
         std::vector<std::string> execution_hosts;
-        StorageService *default_storage_service;
+        std::shared_ptr<StorageService> default_storage_service;
         std::vector<std::shared_ptr<BareMetalComputeService>> compute_services_running_on_vms;
     };
 }

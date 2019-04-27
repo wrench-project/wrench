@@ -71,7 +71,7 @@ namespace wrench {
         std::vector<WorkflowTask *> ready_tasks = this->getWorkflow()->getReadyTasks();
 
         // Get the available compute services
-        std::set<ComputeService *> compute_services = this->getAvailableComputeServices();
+        auto compute_services = this->getAvailableComputeServices();
 
         if (compute_services.empty()) {
           WRENCH_INFO("Aborting - No compute services available!");
