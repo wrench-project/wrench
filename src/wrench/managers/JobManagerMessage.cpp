@@ -28,7 +28,7 @@ namespace wrench {
      * @param necessary_state_changes: necessary task state changes
      */
     JobManagerStandardJobDoneMessage::JobManagerStandardJobDoneMessage(StandardJob *job,
-                                                                       ComputeService *compute_service,
+                                                                       std::shared_ptr<ComputeService>  compute_service,
                                                                        std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes) :
             JobManagerMessage("JobManagerStandardJobDoneMessage") {
       this->job = job;
@@ -45,7 +45,7 @@ namespace wrench {
      * @param cause: the cause of the failure
      */
     JobManagerStandardJobFailedMessage::JobManagerStandardJobFailedMessage(StandardJob *job,
-                                                                           ComputeService *compute_service,
+                                                                           std::shared_ptr<ComputeService>  compute_service,
                                                                            std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes,
                                                                            std::set<WorkflowTask *> necessary_failure_count_increments,
                                                                            std::shared_ptr<FailureCause> cause) :

@@ -46,7 +46,7 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     FileRegistryFileLookupAnswerMessage::FileRegistryFileLookupAnswerMessage(WorkflowFile *file,
-                                                                             std::set<StorageService *> locations,
+                                                                             std::set<std::shared_ptr<StorageService>> locations,
                                                                              double payload) :
             FileRegistryMessage("FILE_LOOKUP_ANSWER", payload) {
       if (file == nullptr) {
@@ -66,7 +66,7 @@ namespace wrench {
      */
     FileRegistryFileLookupByProximityRequestMessage::FileRegistryFileLookupByProximityRequestMessage(
             std::string answer_mailbox, WorkflowFile *file, std::string reference_host,
-           NetworkProximityService *network_proximity_service, double payload) :
+            std::shared_ptr<NetworkProximityService> network_proximity_service, double payload) :
     FileRegistryMessage("FILE_LOOKUP_BY_PROXIMITY_REQUEST", payload) {
         if ((file == nullptr) || (answer_mailbox == "") || (reference_host == "") || (network_proximity_service == nullptr)) {
             throw std::invalid_argument("FileRegistryFileLookupByProximityRequestMessage::FileRegistryFileLookupByProximityRequestMessage(): Invalid Argument");
@@ -86,7 +86,7 @@ namespace wrench {
      */
     FileRegistryFileLookupByProximityAnswerMessage::FileRegistryFileLookupByProximityAnswerMessage(
             WorkflowFile *file, std::string reference_host,
-            std::map<double, StorageService *> locations,
+            std::map<double, std::shared_ptr<StorageService>> locations,
             double payload) :
             FileRegistryMessage("FILE_LOOKUP_BY_PROXIMITY_ANSWER", payload) {
         if ((file == nullptr) || (reference_host == "")) {
@@ -106,7 +106,7 @@ namespace wrench {
      */
     FileRegistryRemoveEntryRequestMessage::FileRegistryRemoveEntryRequestMessage(std::string answer_mailbox,
                                                                                  WorkflowFile *file,
-                                                                                 StorageService *storage_service,
+                                                                                 std::shared_ptr<StorageService> storage_service,
                                                                                  double payload) :
             FileRegistryMessage("REMOVE_ENTRY_REQUEST", payload) {
       if ((answer_mailbox == "") || (file == nullptr) || (storage_service == nullptr)) {
@@ -138,7 +138,7 @@ namespace wrench {
      */
     FileRegistryAddEntryRequestMessage::FileRegistryAddEntryRequestMessage(std::string answer_mailbox,
                                                                            WorkflowFile *file,
-                                                                           StorageService *storage_service,
+                                                                           std::shared_ptr<StorageService> storage_service,
                                                                            double payload) :
             FileRegistryMessage("ADD_ENTRY_REQUEST", payload) {
       if ((answer_mailbox == "") || (file == nullptr) || (storage_service == nullptr)) {

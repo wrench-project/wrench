@@ -42,10 +42,10 @@ namespace wrench {
 
       // Get myself known to schedulers
       if (this->wms->standard_job_scheduler) {
-        this->wms->standard_job_scheduler->setJobManager(this);
+        this->wms->standard_job_scheduler->setJobManager(std::dynamic_pointer_cast<JobManager>(this->getSharedPtr()));
       }
       if (this->wms->pilot_job_scheduler) {
-        this->wms->pilot_job_scheduler->setJobManager(this);
+        this->wms->pilot_job_scheduler->setJobManager(std::dynamic_pointer_cast<JobManager>(this->getSharedPtr()));
       }
     }
 
@@ -99,10 +99,10 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     StandardJob *JobManager::createStandardJob(std::vector<WorkflowTask *> tasks,
-                                               std::map<WorkflowFile *, StorageService *> file_locations,
-                                               std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
-                                               std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
-                                               std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions) {
+                                               std::map<WorkflowFile *, std::shared_ptr<StorageService>  > file_locations,
+                                               std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>  , std::shared_ptr<StorageService>  >> pre_file_copies,
+                                               std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>  , std::shared_ptr<StorageService>  >> post_file_copies,
+                                               std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>  >> cleanup_file_deletions) {
 
       // Do a sanity check of everything (looking for nullptr)
       for (auto t : tasks) {
@@ -184,7 +184,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     StandardJob *JobManager::createStandardJob(std::vector<WorkflowTask *> tasks,
-                                               std::map<WorkflowFile *, StorageService *> file_locations) {
+                                               std::map<WorkflowFile *, std::shared_ptr<StorageService>  > file_locations) {
       if (tasks.empty()) {
         throw std::invalid_argument("JobManager::createStandardJob(): Invalid arguments");
       }
@@ -204,7 +204,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     StandardJob *
-    JobManager::createStandardJob(WorkflowTask *task, std::map<WorkflowFile *, StorageService *> file_locations) {
+    JobManager::createStandardJob(WorkflowTask *task, std::map<WorkflowFile *, std::shared_ptr<StorageService>  > file_locations) {
 
       if (task == nullptr) {
         throw std::invalid_argument("JobManager::createStandardJob(): Invalid arguments");
@@ -245,14 +245,14 @@ namespace wrench {
      *             this many cores, but will choose the host on which to run it.
      *           - If a "hostname:num_cores" value is provided for a task, then the service will run that
      *             task with the specified number of cores on that host.
-     *      - to a BatchService: {{"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requestes cores per host)}}
-     *      - to a VirtualizedClusterService: {} (in which case the service will pick the vm) or {{"-vm":"<vm name>"}}
-     *      - to a CloudService: {} (in which case the service will pick the vm) or {{"-vm":"<vm name>"}}
+     *      - to a BatchComputeService: {{"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requestes cores per host)}}
+     *      - to a VirtualizedClusterComputeService: {} (in which case the service will pick the vm) or {{"-vm":"<vm name>"}}
+     *      - to a CloudComputeService: {} (in which case the service will pick the vm) or {{"-vm":"<vm name>"}}
      *
      * @throw std::invalid_argument
      * @throw WorkflowExecutionException
      */
-    void JobManager::submitJob(WorkflowJob *job, ComputeService *compute_service,
+    void JobManager::submitJob(WorkflowJob *job, std::shared_ptr<ComputeService> compute_service,
                                std::map<std::string, std::string> service_specific_args) {
 
       if ((job == nullptr) || (compute_service == nullptr)) {
@@ -598,7 +598,7 @@ namespace wrench {
           std::string callback_mailbox = job->popCallbackMailbox();
           if (not callback_mailbox.empty()) {
             try {
-              JobManagerStandardJobDoneMessage *augmented_msg = new JobManagerStandardJobDoneMessage(
+              auto augmented_msg = new JobManagerStandardJobDoneMessage(
                       job, msg->compute_service, necessary_state_changes);
               S4U_Mailbox::dputMessage(callback_mailbox, augmented_msg);
             } catch (std::shared_ptr<NetworkError> &cause) {

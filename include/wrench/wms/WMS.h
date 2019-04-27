@@ -24,6 +24,11 @@ namespace wrench {
 
     class Simulation;
     class ComputeService;
+    class BareMetalComputeService;
+    class ClusterComputeService;
+    class CloudComputeService;
+    class VirtualizedClusterComputeService;
+    class BatchComputeService;
     class StorageService;
     class NetworkProximityService;
     class FileRegistryService;
@@ -52,10 +57,10 @@ namespace wrench {
 
         WMS(std::unique_ptr<StandardJobScheduler> standard_job_scheduler,
             std::unique_ptr<PilotJobScheduler> pilot_job_scheduler,
-            const std::set<ComputeService *> &compute_services,
-            const std::set<StorageService *> &storage_services,
-            const std::set<NetworkProximityService *> &network_proximity_services,
-            FileRegistryService *file_registry_service,
+            const std::set<std::shared_ptr<ComputeService>> &compute_services,
+            const std::set<std::shared_ptr<StorageService>> &storage_services,
+            const std::set<std::shared_ptr<NetworkProximityService>> &network_proximity_services,
+            std::shared_ptr<FileRegistryService> file_registry_service,
             const std::string &hostname,
             const std::string suffix);
 
@@ -71,10 +76,14 @@ namespace wrench {
 
         void runStaticOptimizations();
 
-        std::set<ComputeService *> getAvailableComputeServices();
-        std::set<StorageService *> getAvailableStorageServices();
-        std::set<NetworkProximityService *> getAvailableNetworkProximityServices();
-        FileRegistryService * getAvailableFileRegistryService();
+        std::set<std::shared_ptr<ComputeService>> getAvailableComputeServices();
+        std::set<std::shared_ptr<BareMetalComputeService>> getAvailableBareMetalComputeServices();
+        std::set<std::shared_ptr<CloudComputeService>> getAvailableCloudComputeServices();
+        std::set<std::shared_ptr<VirtualizedClusterComputeService>> getAvailableVirtualizedClusterComputeServices();
+        std::set<std::shared_ptr<BatchComputeService>> getAvailableBatchComputeServices();
+        std::set<std::shared_ptr<StorageService>> getAvailableStorageServices();
+        std::set<std::shared_ptr<NetworkProximityService>> getAvailableNetworkProximityServices();
+        std::shared_ptr<FileRegistryService> getAvailableFileRegistryService();
 
         void waitForAndProcessNextEvent();
         bool waitForAndProcessNextEvent(double timeout);
@@ -109,18 +118,18 @@ namespace wrench {
         /** @brief the WMS simulated start time */
         double start_time;
         /** @brief List of available compute services */
-        std::set<ComputeService *> compute_services;
+        std::set<std::shared_ptr<ComputeService>> compute_services;
         /** @brief List of available storage services */
-        std::set<StorageService *> storage_services;
+        std::set<std::shared_ptr<StorageService>> storage_services;
         /** @brief List of available network proximity services */
-        std::set<NetworkProximityService *> network_proximity_services;
+        std::set<std::shared_ptr<NetworkProximityService>> network_proximity_services;
         /** @brief The file registry service */
-        FileRegistryService * file_registry_service;
+        std::shared_ptr<FileRegistryService> file_registry_service;
 
         /** @brief The standard job scheduler */
-        std::unique_ptr<StandardJobScheduler> standard_job_scheduler;
+        std::shared_ptr<StandardJobScheduler> standard_job_scheduler;
         /** @brief The standard job scheduler */
-        std::unique_ptr<PilotJobScheduler> pilot_job_scheduler;
+        std::shared_ptr<PilotJobScheduler> pilot_job_scheduler;
 
         /** @brief The enabled dynamic optimizations */
         std::vector<std::unique_ptr<DynamicOptimization>> dynamic_optimizations;

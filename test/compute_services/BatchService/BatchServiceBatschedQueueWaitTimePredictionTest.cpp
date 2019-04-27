@@ -12,8 +12,8 @@
 #include <wrench/simulation/SimulationMessage.h>
 #include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
 #include <gtest/gtest.h>
-#include <wrench/services/compute/batch/BatchService.h>
-#include <wrench/services/compute/batch/BatchServiceMessage.h>
+#include <wrench/services/compute/batch/BatchComputeService.h>
+#include <wrench/services/compute/batch/BatchComputeServiceMessage.h>
 #include <wrench/util/TraceFileLoader.h>
 #include "wrench/workflow/job/PilotJob.h"
 
@@ -26,9 +26,9 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(batch_service_queue_wait_time_prediction_test, "Log
 class BatchServiceTest : public ::testing::Test {
 
 public:
-    wrench::StorageService *storage_service1 = nullptr;
-    wrench::StorageService *storage_service2 = nullptr;
-    wrench::ComputeService *compute_service = nullptr;
+    std::shared_ptr<wrench::StorageService> storage_service1 = nullptr;
+    std::shared_ptr<wrench::StorageService> storage_service2 = nullptr;
+    std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
     wrench::Simulation *simulation;
 
 
@@ -85,8 +85,8 @@ class BatchJobBrokenEstimateWaitingTimeTestWMS : public wrench::WMS {
 
 public:
     BatchJobBrokenEstimateWaitingTimeTestWMS(BatchServiceTest *test,
-                                             const std::set<wrench::ComputeService *> &compute_services,
-                                             const std::set<wrench::StorageService *> &storage_services,
+                                             const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                             const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                              std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
                         hostname, "test") {
@@ -100,7 +100,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       {
         // Create a sequential task that lasts one min and requires 2 cores
@@ -111,17 +111,17 @@ private:
 
         // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
 
-        wrench::StandardJob *job = job_manager->createStandardJob(
+        auto job = job_manager->createStandardJob(
                 {task},
                 {
                         {*(task->getInputFiles().begin()),  this->test->storage_service1},
                         {*(task->getOutputFiles().begin()), this->test->storage_service1}
                 },
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
                         this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
                         this->test->storage_service2)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->getWorkflow()->getFileByID("input_file"),
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
                                                                               this->test->storage_service2)});
 
         std::map<std::string, std::string> batch_job_args;
@@ -137,7 +137,7 @@ private:
         }
         double first_job_running = this->simulation->getCurrentSimulatedDate();
 
-        auto *batch_service = dynamic_cast<wrench::BatchService *>((*this->getAvailableComputeServices().begin()));
+        auto batch_service = std::dynamic_pointer_cast<wrench::BatchComputeService>((*this->getAvailableComputeServices().begin()));
         std::string job_id = "my_tentative_job";
         unsigned int nodes = 2;
         double walltime_seconds = 1000;
@@ -224,18 +224,18 @@ void BatchServiceTest::do_BatchJobBrokenEstimateWaitingTimeTest_test() {
   // Create a Batch Service
 //  #ifdef ENABLE_BATSCHED
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, 
+          new wrench::BatchComputeService(hostname, 
                                    {"Host1", "Host2", "Host3", "Host4"}, 0,  {
-                                           {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "BOGUS"}
+                                           {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "BOGUS"}
                                    })), std::invalid_argument);
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, 
+          new wrench::BatchComputeService(hostname, 
                                    {"Host1", "Host2", "Host3", "Host4"}, 0, {
-                                           {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "easy_bf"}
+                                           {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "easy_bf"}
                                    })));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(new BatchJobBrokenEstimateWaitingTimeTestWMS(
           this, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
@@ -274,8 +274,8 @@ class BatchJobBasicEstimateWaitingTimeTestWMS : public wrench::WMS {
 
 public:
     BatchJobBasicEstimateWaitingTimeTestWMS(BatchServiceTest *test,
-                                            const std::set<wrench::ComputeService *> &compute_services,
-                                            const std::set<wrench::StorageService *> &storage_services,
+                                            const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                            const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                             std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
                         hostname, "test") {
@@ -289,7 +289,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       {
 
@@ -307,11 +307,11 @@ private:
                         {*(task->getInputFiles().begin()),  this->test->storage_service1},
                         {*(task->getOutputFiles().begin()), this->test->storage_service1}
                 },
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
                         this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
                         this->test->storage_service2)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->getWorkflow()->getFileByID("input_file"),
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
                                                                               this->test->storage_service2)});
 
         std::map<std::string, std::string> batch_job_args;
@@ -325,9 +325,9 @@ private:
                   "Got some exception"
           );
         }
-        double first_job_running = this->simulation->getCurrentSimulatedDate();
+        auto first_job_running = this->simulation->getCurrentSimulatedDate();
 
-        auto *batch_service = dynamic_cast<wrench::BatchService *>((*this->getAvailableComputeServices().begin()));
+        auto batch_service = std::dynamic_pointer_cast<wrench::BatchComputeService>((*this->getAvailableComputeServices().begin()));
         std::string job_id = "my_tentative_job";
         unsigned int nodes = 2;
         double walltime_seconds = 1000;
@@ -410,13 +410,13 @@ void BatchServiceTest::do_BatchJobBasicEstimateWaitingTimeTest_test() {
 
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, 
+          new wrench::BatchComputeService(hostname, 
                                    {"Host1", "Host2", "Host3", "Host4"}, 0, {
-                                           {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"}
+                                           {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"}
                                    })));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(new BatchJobBasicEstimateWaitingTimeTestWMS(
           this, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
@@ -455,8 +455,8 @@ class BatchJobEstimateWaitingTimeTestWMS : public wrench::WMS {
 
 public:
     BatchJobEstimateWaitingTimeTestWMS(BatchServiceTest *test,
-                                       const std::set<wrench::ComputeService *> &compute_services,
-                                       const std::set<wrench::StorageService *> &storage_services,
+                                       const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                       const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                        std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
                         hostname, "test") {
@@ -470,7 +470,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       {
 
@@ -488,11 +488,11 @@ private:
                         {*(task->getInputFiles().begin()),  this->test->storage_service1},
                         {*(task->getOutputFiles().begin()), this->test->storage_service1}
                 },
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
                         this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
                         this->test->storage_service2)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->getWorkflow()->getFileByID("input_file"),
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
                                                                               this->test->storage_service2)});
 
         std::map<std::string, std::string> batch_job_args;
@@ -509,7 +509,7 @@ private:
         double first_job_running = this->simulation->getCurrentSimulatedDate();
 
 
-        auto *batch_service = dynamic_cast<wrench::BatchService *>((*this->getAvailableComputeServices().begin()));
+        auto batch_service = std::dynamic_pointer_cast<wrench::BatchComputeService>((*this->getAvailableComputeServices().begin()));
         std::string job_id = "my_job1";
         unsigned int nodes = 2;
         double walltime_seconds = 1000;
@@ -559,11 +559,11 @@ private:
                         {*(task->getInputFiles().begin()),  this->test->storage_service1},
                         {*(task->getOutputFiles().begin()), this->test->storage_service1}
                 },
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
                         this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
                         this->test->storage_service2)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->getWorkflow()->getFileByID("input_file"),
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
                                                                               this->test->storage_service2)});
 
         std::map<std::string, std::string> batch_job_args;
@@ -578,7 +578,7 @@ private:
           );
         }
 
-        auto *batch_service = dynamic_cast<wrench::BatchService *>((*this->getAvailableComputeServices().begin()));
+        auto batch_service = std::dynamic_pointer_cast<wrench::BatchComputeService>((*this->getAvailableComputeServices().begin()));
         std::set<std::tuple<std::string, unsigned int, unsigned int, double>> set_of_jobs = {};
         for (int i=0; i<10; i++) {
           std::string job_id = "new_job"+std::to_string(i);
@@ -651,16 +651,16 @@ void BatchServiceTest::do_BatchJobEstimateWaitingTimeTest_test() {
 
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, 
+          new wrench::BatchComputeService(hostname, 
                                    {"Host1", "Host2", "Host3", "Host4"}, 0, {
-                                           {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"},
-                                           {wrench::BatchServiceProperty::BATCH_RJMS_DELAY, "0"}
+                                           {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"},
+                                           {wrench::BatchComputeServiceProperty::BATCH_RJMS_DELAY, "0"}
                                    })));
 
   simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(new BatchJobEstimateWaitingTimeTestWMS(
           this, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
@@ -693,8 +693,8 @@ class BatchJobLittleComplexEstimateWaitingTimeTestWMS : public wrench::WMS {
 
 public:
     BatchJobLittleComplexEstimateWaitingTimeTestWMS(BatchServiceTest *test,
-                                                    const std::set<wrench::ComputeService *> &compute_services,
-                                                    const std::set<wrench::StorageService *> &storage_services,
+                                                    const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                                    const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                     std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
                         hostname, "test") {
@@ -708,7 +708,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       {
 
@@ -726,11 +726,11 @@ private:
                         {*(task->getInputFiles().begin()),  this->test->storage_service1},
                         {*(task->getOutputFiles().begin()), this->test->storage_service1}
                 },
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
                         this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
                         this->test->storage_service2)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->getWorkflow()->getFileByID("input_file"),
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
                                                                               this->test->storage_service2)});
 
 
@@ -761,11 +761,11 @@ private:
                         {*(task1->getInputFiles().begin()),  this->test->storage_service1},
                         {*(task1->getOutputFiles().begin()), this->test->storage_service1}
                 },
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
                         this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
                         this->test->storage_service2)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->getWorkflow()->getFileByID("input_file"),
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
                                                                               this->test->storage_service2)});
 
         std::map<std::string, std::string> batch_job_args1;
@@ -795,11 +795,11 @@ private:
                         {*(task2->getInputFiles().begin()),  this->test->storage_service1},
                         {*(task2->getOutputFiles().begin()), this->test->storage_service1}
                 },
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
                         this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
                         this->test->storage_service2)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->getWorkflow()->getFileByID("input_file"),
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
                                                                               this->test->storage_service2)});
 
         std::map<std::string, std::string> batch_job_args2;
@@ -814,7 +814,7 @@ private:
           );
         }
 
-        auto *batch_service = dynamic_cast<wrench::BatchService *>((*this->getAvailableComputeServices().begin()));
+        auto batch_service = std::dynamic_pointer_cast<wrench::BatchComputeService>((*this->getAvailableComputeServices().begin()));
 
         std::string job_id = "my_job1";
         unsigned int nodes = 1;
@@ -931,14 +931,14 @@ void BatchServiceTest::do_BatchJobLittleComplexEstimateWaitingTimeTest_test() {
 
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, 
+          new wrench::BatchComputeService(hostname, 
                                    {"Host1", "Host2", "Host3", "Host4"}, 0, {
-                                           {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"},
-                                           {wrench::BatchServiceProperty::BATCH_RJMS_DELAY, "0"}
+                                           {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"},
+                                           {wrench::BatchComputeServiceProperty::BATCH_RJMS_DELAY, "0"}
                                    })));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(new BatchJobLittleComplexEstimateWaitingTimeTestWMS(
           this, {compute_service}, {storage_service1, storage_service2}, hostname)));
 

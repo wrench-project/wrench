@@ -146,7 +146,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        SimulationTimestampFileCopy(WorkflowFile *file, StorageService *src, std::string src_partition, StorageService *dst, std::string dst_partition, SimulationTimestampFileCopyStart *start_timestamp = nullptr);
+        SimulationTimestampFileCopy(WorkflowFile *file, std::shared_ptr<StorageService>  src, std::string src_partition, std::shared_ptr<StorageService>  dst, std::string dst_partition, SimulationTimestampFileCopyStart *start_timestamp = nullptr);
         /***********************/
         /** \endcond           */
         /***********************/
@@ -156,7 +156,7 @@ namespace wrench {
          */
         struct FileLocation {
             /** @brief The StorageService where the file is located **/
-            StorageService *storage_service;
+            std::shared_ptr<StorageService>  storage_service;
             /** @brief The StorageService's partition at which file is located **/
             std::string partition;
 
@@ -164,7 +164,7 @@ namespace wrench {
              * @param storage_service: the StorageService where the file is located    
              * @param partition: the StorageService's partition where the file is stored    
              */
-            FileLocation(StorageService *storage_service, std::string partition) : storage_service(storage_service), partition(partition) {
+            FileLocation(std::shared_ptr<StorageService> storage_service, std::string partition) : storage_service(storage_service), partition(partition) {
             }
 
             /**
@@ -222,7 +222,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        SimulationTimestampFileCopyStart(WorkflowFile *file, StorageService *src, std::string src_partition, StorageService *dst, std::string dst_partition);
+        SimulationTimestampFileCopyStart(WorkflowFile *file, std::shared_ptr<StorageService> src, std::string src_partition, std::shared_ptr<StorageService> dst, std::string dst_partition);
         /***********************/
         /** \endcond           */
         /***********************/

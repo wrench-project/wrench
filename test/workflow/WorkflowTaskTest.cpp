@@ -17,9 +17,9 @@
 class WorkflowTaskTest : public ::testing::Test {
 
 public:
-    wrench::ComputeService *compute_service = nullptr;
-    wrench::StorageService *storage_service = nullptr, *backup_storage_service = nullptr;
-    wrench::FileRegistryService *file_registry_service = nullptr;
+    std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
+    std::shared_ptr<wrench::StorageService> storage_service = nullptr, backup_storage_service = nullptr;
+    std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
 
     std::unique_ptr<wrench::Workflow> workflow;
     wrench::WorkflowTask *t1, *t2, *t4, *t5, *t6;
@@ -234,8 +234,8 @@ TEST_F(WorkflowTaskTest, StateToString) {
 class WorkflowTaskExecutionHistoryTestWMS : public wrench::WMS {
 public:
     WorkflowTaskExecutionHistoryTestWMS(WorkflowTaskTest *test,
-                                        const std::set<wrench::ComputeService *> &compute_services,
-                                        const std::set<wrench::StorageService *> &storage_services,
+                                        const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                        const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                         std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
@@ -245,7 +245,7 @@ private:
     WorkflowTaskTest *test;
 
     int main() {
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       wrench::StandardJob *job_that_will_fail = job_manager->createStandardJob(this->test->t4,
                                                                                {{this->test->small_input_file, this->test->storage_service},
@@ -308,7 +308,7 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
   ASSERT_NO_THROW(
           backup_storage_service = simulation->add(new wrench::SimpleStorageService(wms_host, 100000000000000.0)));
 
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(new WorkflowTaskExecutionHistoryTestWMS(
           this, {compute_service}, {storage_service, backup_storage_service}, wms_host
   )));

@@ -102,7 +102,9 @@ namespace wrench {
         bool processFileReadRequest(WorkflowFile *file, std::string src_dir, std::string answer_mailbox,
                                     std::string mailbox_to_receive_the_file_content);
 
-        bool processFileCopyRequest(WorkflowFile *file, StorageService *src, std::string src_dir, std::string dst_dir, std::string answer_mailbox, SimulationTimestampFileCopyStart *start_timestamp);
+        bool processFileCopyRequest(WorkflowFile *file, std::shared_ptr<StorageService> src,
+                std::string src_dir, std::string dst_dir,
+                std::string answer_mailbox, SimulationTimestampFileCopyStart *start_timestamp);
 
         unsigned long num_concurrent_connections;
 

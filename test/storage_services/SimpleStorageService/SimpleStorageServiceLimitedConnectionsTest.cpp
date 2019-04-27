@@ -25,10 +25,10 @@ class SimpleStorageServiceLimitedConnectionsTest : public ::testing::Test {
 
 public:
     wrench::WorkflowFile *files[10];
-    wrench::ComputeService *compute_service = nullptr;
-    wrench::StorageService *storage_service_wms = nullptr;
-    wrench::StorageService *storage_service_1 = nullptr;
-    wrench::StorageService *storage_service_2 = nullptr;
+    std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
+    std::shared_ptr<wrench::StorageService> storage_service_wms = nullptr;
+    std::shared_ptr<wrench::StorageService> storage_service_1 = nullptr;
+    std::shared_ptr<wrench::StorageService> storage_service_2 = nullptr;
 
     void do_ConcurrencyFileCopies_test();
 
@@ -81,8 +81,8 @@ class SimpleStorageServiceConcurrencyFileCopiesLimitedConnectionsTestWMS : publi
 
 public:
     SimpleStorageServiceConcurrencyFileCopiesLimitedConnectionsTestWMS(SimpleStorageServiceLimitedConnectionsTest *test,
-                                                                       const std::set<wrench::ComputeService *> &compute_services,
-                                                                       const std::set<wrench::StorageService *> &storage_services,
+                                                                       const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                                                       const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                                        const std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
@@ -96,10 +96,10 @@ private:
 
 
       // Create a data movement manager
-      std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
+      auto data_movement_manager = this->createDataMovementManager();
 
       // Get a file registry
-      wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
+      auto file_registry_service = this->getAvailableFileRegistryService();
 
       // Reading
       for (auto dst_storage_service : {this->test->storage_service_1, this->test->storage_service_2}) {
@@ -216,7 +216,7 @@ void SimpleStorageServiceLimitedConnectionsTest::do_ConcurrencyFileCopies_test()
                   new wrench::SimpleStorageService("Host2", STORAGE_SIZE, {{"MAX_NUM_CONCURRENT_DATA_CONNECTIONS", "3"}})));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(
           new SimpleStorageServiceConcurrencyFileCopiesLimitedConnectionsTestWMS(
                   this, {compute_service}, {storage_service_wms, storage_service_1, storage_service_2},

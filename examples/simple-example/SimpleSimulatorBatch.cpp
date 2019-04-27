@@ -82,9 +82,9 @@ int main(int argc, char **argv) {
    * terminate it will be 2048 bytes. See the documentation to find out all available
    * configurable properties for each kind of service.
    */
-  wrench::ComputeService *batch_service = new wrench::BatchService(
+  wrench::ComputeService *batch_service = new wrench::BatchComputeService(
           wms_host, hostname_list, 0, {},
-          {{wrench::BatchServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 2048}});
+          {{wrench::BatchComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 2048}});
 
   /* Add the batch service to the simulation, catching a possible exception */
   try {

@@ -359,10 +359,10 @@ namespace wrench {
      */
     void Service::assertServiceIsUp() {
         if (this->state == Service::DOWN) {
-            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(std::dynamic_pointer_cast<Service>(this->getSharedPtr()))));
         }
         if (this->state == Service::SUSPENDED) {
-            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsSuspended(this)));
+            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsSuspended(std::dynamic_pointer_cast<Service>(this->getSharedPtr()))));
         }
     }
 };

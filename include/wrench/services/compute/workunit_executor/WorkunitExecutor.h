@@ -48,7 +48,7 @@ namespace wrench {
                      double ram_utilization,
                      std::string callback_mailbox,
                      std::shared_ptr<Workunit> workunit,
-                     StorageService *scratch_space,
+                     std::shared_ptr<StorageService> scratch_space,
                      StandardJob* job,
                      double thread_startup_overhead,
                      bool simulate_computation_as_sleep);
@@ -84,7 +84,7 @@ namespace wrench {
         double thread_startup_overhead;
         bool simulate_computation_as_sleep;
 
-        StorageService* scratch_space;
+        std::shared_ptr<StorageService> scratch_space;
 
         std::set<WorkflowFile* > files_stored_in_scratch;
         std::vector<std::shared_ptr<ComputeThread>> compute_threads;

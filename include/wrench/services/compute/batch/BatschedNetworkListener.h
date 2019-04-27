@@ -11,12 +11,12 @@
 #define WRENCH_BATSCHEDNETWORKLISTENER_H
 
 #include <wrench/services/Service.h>
-#include "BatchServiceProperty.h"
+#include "BatchComputeServiceProperty.h"
 
 namespace wrench {
 
 
-    class BatchService;
+    class BatchComputeService;
 
     /***********************/
     /** \cond INTERNAL     */
@@ -30,7 +30,7 @@ namespace wrench {
 
     public:
 
-        BatschedNetworkListener(std::string hostname, BatchService *batch_service,
+        BatschedNetworkListener(std::string hostname, std::shared_ptr<BatchComputeService> batch_service,
                                 std::string batch_service_mailbox, std::string sched_port,
                                 std::string data_to_send,std::map<std::string, std::string> property_list = {});
     private:
@@ -40,7 +40,7 @@ namespace wrench {
         std::map<std::string, double> default_messagepayload_values = {
                 };
 
-        BatschedNetworkListener(std::string, BatchService *batch_service, std::string batch_service_mailbox, std::string sched_port,
+        BatschedNetworkListener(std::string, std::shared_ptr<BatchComputeService> batch_service, std::string batch_service_mailbox, std::string sched_port,
                              std::string data_to_send, std::map<std::string, std::string> property_list, std::string suffix);
 
 
@@ -49,13 +49,13 @@ namespace wrench {
         std::string sched_port;
         std::string data_to_send;
         std::string reply_received;
-        BatchService *batch_service;
+        std::shared_ptr<BatchComputeService> batch_service;
         std::string batch_service_mailbox;
 
 
 
-        void sendExecuteMessageToBatchService(std::string answer_mailbox, std::string execute_job_reply_data);
-        void sendQueryAnswerMessageToBatchService(double estimated_waiting_time);
+        void sendExecuteMessageToBatchComputeService(std::string answer_mailbox, std::string execute_job_reply_data);
+        void sendQueryAnswerMessageToBatchComputeService(double estimated_waiting_time);
         void send_receive();
     };
 

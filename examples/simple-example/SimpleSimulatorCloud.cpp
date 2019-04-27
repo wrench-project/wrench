@@ -93,9 +93,9 @@ int main(int argc, char **argv) {
    * configurable properties for each kind of service.
    */
   std::string wms_host = hostname_list[0];
-  wrench::CloudService *cloud_service = new wrench::CloudService(
+  wrench::CloudComputeService *cloud_service = new wrench::CloudComputeService(
           wms_host, execution_hosts, 0, {},
-          {{wrench::CloudServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024}});
+          {{wrench::CloudComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024}});
 
   /* Add the cloud service to the simulation, catching a possible exception */
   try {

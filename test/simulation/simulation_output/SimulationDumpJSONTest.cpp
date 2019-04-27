@@ -1218,7 +1218,7 @@ void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
     // get the single host
     std::string host = simulation->getHostnameList()[0];
 
-    wrench::WMS *wms = nullptr;
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
     EXPECT_NO_THROW(wms = simulation->add(
             new SimulationOutputDumpEnergyConsumptionTestWMS(
                     this, host

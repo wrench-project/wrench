@@ -47,22 +47,22 @@ namespace wrench {
 				void kill();
 
 				StandardJob *createStandardJob(std::vector<WorkflowTask *> tasks,
-				                               std::map<WorkflowFile *, StorageService *> file_locations,
-				                               std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
-				                               std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
-				                               std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions);
+				                               std::map<WorkflowFile *, std::shared_ptr<StorageService>  > file_locations,
+				                               std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>  , std::shared_ptr<StorageService>  >> pre_file_copies,
+				                               std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>  , std::shared_ptr<StorageService>  >> post_file_copies,
+				                               std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>  >> cleanup_file_deletions);
 
 				StandardJob *createStandardJob(std::vector<WorkflowTask *> tasks,
 				                               std::map<WorkflowFile *,
-								                               StorageService *> file_locations);
+								                               std::shared_ptr<StorageService>  > file_locations);
 
 				StandardJob *createStandardJob(WorkflowTask *task,
 				                               std::map<WorkflowFile *,
-								                               StorageService *> file_locations);
+								                               std::shared_ptr<StorageService>  > file_locations);
 
 				PilotJob *createPilotJob();
 
-				void submitJob(WorkflowJob *job, ComputeService *compute_service, std::map<std::string, std::string> service_specific_args = {});
+				void submitJob(WorkflowJob *job, std::shared_ptr<ComputeService> compute_service, std::map<std::string, std::string> service_specific_args = {});
 
 				void terminateJob(WorkflowJob *);
 

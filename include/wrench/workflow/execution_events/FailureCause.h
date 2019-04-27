@@ -14,12 +14,14 @@
 #include <set>
 #include <string>
 
+#include "wrench/services/Service.h"
+#include "wrench/services/storage/StorageService.h"
+#include "wrench/services/compute/ComputeService.h"
+
 namespace wrench {
 
     class Service;
     class WorkflowFile;
-    class StorageService;
-    class ComputeService;
     class WorkflowJob;
 
     /***********************/
@@ -158,19 +160,19 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        FileNotFound(WorkflowFile *file, StorageService *storage_service);
+        FileNotFound(WorkflowFile *file, std::shared_ptr<StorageService>  storage_service);
         /***********************/
         /** \endcond           */
         /***********************/
 
         WorkflowFile *getFile();
-        StorageService *getStorageService();
+        std::shared_ptr<StorageService>  getStorageService();
         std::string toString();
 
 
     private:
         WorkflowFile *file;
-        StorageService *storage_service;
+        std::shared_ptr<StorageService>  storage_service;
     };
 
     /**
@@ -182,19 +184,19 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        StorageServiceNotEnoughSpace(WorkflowFile *file, StorageService *storage_service);
+        StorageServiceNotEnoughSpace(WorkflowFile *file, std::shared_ptr<StorageService>  storage_service);
         /***********************/
         /** \endcond           */
         /***********************/
 
         WorkflowFile *getFile();
-        StorageService *getStorageService();
+        std::shared_ptr<StorageService>  getStorageService();
         std::string toString();
 
 
     private:
         WorkflowFile *file;
-        StorageService *storage_service;
+        std::shared_ptr<StorageService>  storage_service;
     };
 
 //    /**
@@ -206,19 +208,19 @@ namespace wrench {
 //        /***********************/
 //        /** \cond INTERNAL     */
 //        /***********************/
-//        StorageServiceFileAlreadyThere(WorkflowFile *file, StorageService *storage_service);
+//        StorageServiceFileAlreadyThere(WorkflowFile *file, std::shared_ptr<StorageService>  storage_service);
 //        /***********************/
 //        /** \endcond           */
 //        /***********************/
 //
 //        WorkflowFile *getFile();
-//        StorageService *getStorageService();
+//        std::shared_ptr<StorageService>  getStorageService();
 //        std::string toString();
 //
 //
 //    private:
 //        WorkflowFile *file;
-//        StorageService *storage_service;
+//        std::shared_ptr<StorageService>  storage_service;
 //    };
 
     /**
@@ -230,19 +232,19 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        FileAlreadyBeingCopied(WorkflowFile *file, StorageService *dst, std::string dst_partition);
+        FileAlreadyBeingCopied(WorkflowFile *file, std::shared_ptr<StorageService> dst, std::string dst_partition);
         /***********************/
         /** \endcond           */
         /***********************/
 
         WorkflowFile *getFile();
-        StorageService *getStorageService();
+        std::shared_ptr<StorageService> getStorageService();
         std::string getPartition();
         std::string toString();
 
     private:
         WorkflowFile *file;
-        StorageService *storage_service;
+        std::shared_ptr<StorageService> storage_service;
         std::string dst_partition;
     };
 
@@ -255,16 +257,16 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        explicit ServiceIsDown(Service *service);
+        explicit ServiceIsDown(std::shared_ptr<Service> service);
         /***********************/
         /** \endcond           */
         /***********************/
 
-        Service *getService();
+        std::shared_ptr<Service> getService();
         std::string toString() override;
 
     private:
-        Service *service;
+        std::shared_ptr<Service> service;
     };
 
     /**
@@ -276,16 +278,16 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        explicit ServiceIsSuspended(Service *service);
+        explicit ServiceIsSuspended(std::shared_ptr<Service> service);
         /***********************/
         /** \endcond           */
         /***********************/
 
-        Service *getService();
+        std::shared_ptr<Service> getService();
         std::string toString() override;
 
     private:
-        Service *service;
+        std::shared_ptr<Service> service;
     };
 
     /**
@@ -296,18 +298,18 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        JobTypeNotSupported(WorkflowJob *job, ComputeService *compute_service);
+        JobTypeNotSupported(WorkflowJob *job, std::shared_ptr<ComputeService>  compute_service);
         /***********************/
         /** \endcond           */
         /***********************/
 
         WorkflowJob *getJob();
-        ComputeService *getComputeService();
+        std::shared_ptr<ComputeService>  getComputeService();
         std::string toString();
 
     private:
         WorkflowJob *job;
-        ComputeService *compute_service;
+        std::shared_ptr<ComputeService>  compute_service;
     };
 
     /**
@@ -318,17 +320,17 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        FunctionalityNotAvailable(Service *service, std::string functionality_name);
+        FunctionalityNotAvailable(std::shared_ptr<Service>  service, std::string functionality_name);
         /***********************/
         /** \endcond           */
         /***********************/
 
-        Service *getService();
+        std::shared_ptr<Service>  getService();
         std::string getFunctionalityName();
         std::string toString();
 
     private:
-        Service *service;
+        std::shared_ptr<Service>  service;
         std::string functionality_name;
     };
 
@@ -341,18 +343,18 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        NotEnoughResources(WorkflowJob *job, ComputeService *compute_service);
+        NotEnoughResources(WorkflowJob *job, std::shared_ptr<ComputeService> compute_service);
         /***********************/
         /** \endcond           */
         /***********************/
 
         WorkflowJob *getJob();
-        ComputeService *getComputeService();
+        std::shared_ptr<ComputeService> getComputeService();
         std::string toString();
 
     private:
         WorkflowJob *job;
-        ComputeService *compute_service;
+        std::shared_ptr<ComputeService> compute_service;
     };
 
     /**
@@ -363,18 +365,18 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        JobKilled(WorkflowJob *job, ComputeService *compute_service);
+        JobKilled(WorkflowJob *job, std::shared_ptr<ComputeService> compute_service);
         /***********************/
         /** \endcond           */
         /***********************/
 
         WorkflowJob *getJob();
-        ComputeService *getComputeService();
+        std::shared_ptr<ComputeService> getComputeService();
         std::string toString();
 
     private:
         WorkflowJob *job;
-        ComputeService *compute_service;
+        std::shared_ptr<ComputeService> compute_service;
     };
 
 
@@ -546,16 +548,16 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        NotAllowed(Service *service, std::string &error_message);
+        NotAllowed(std::shared_ptr<Service> service, std::string &error_message);
         /***********************/
         /** \endcond           */
         /***********************/
 
-        Service *getService();
+        std::shared_ptr<Service> getService();
         std::string toString();
 
     private:
-        Service *service;
+        std::shared_ptr<Service> service;
         std::string error_message;
     };
 

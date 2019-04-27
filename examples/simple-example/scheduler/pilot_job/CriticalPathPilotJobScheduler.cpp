@@ -25,7 +25,7 @@ namespace wrench {
      * @param job_manager: a job manager
      * @param compute_services: a set of compute services available to run jobs
      */
-    void CriticalPathPilotJobScheduler::schedulePilotJobs(const std::set<ComputeService *> &compute_services) {
+    void CriticalPathPilotJobScheduler::schedulePilotJobs(const std::set<std::shared_ptr<ComputeService>> &compute_services) {
 
     double flops = 0;
       std::set<WorkflowTask *> root_tasks;
@@ -50,7 +50,7 @@ namespace wrench {
       }
 
       // Submit a pilot job to the first compute service that can support it
-      ComputeService *target_service = nullptr;
+      std::shared_ptr<ComputeService> target_service = nullptr;
       for (auto cs : compute_services) {
         if (cs->isUp() && cs->supportsPilotJobs()) {
           target_service = cs;

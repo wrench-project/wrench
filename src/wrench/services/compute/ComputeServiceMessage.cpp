@@ -58,7 +58,7 @@ namespace wrench {
      * @throw std::invalid_arguments
      */
     ComputeServiceSubmitStandardJobAnswerMessage::ComputeServiceSubmitStandardJobAnswerMessage(StandardJob *job,
-                                                                                               ComputeService *compute_service,
+                                                                                               std::shared_ptr<ComputeService>  compute_service,
                                                                                                bool success,
                                                                                                std::shared_ptr<FailureCause> failure_cause,
                                                                                                double payload) :
@@ -84,7 +84,7 @@ namespace wrench {
      * @throw std::invalid_arguments
      */
     ComputeServiceStandardJobDoneMessage::ComputeServiceStandardJobDoneMessage(StandardJob *job,
-                                                                               ComputeService *cs,
+                                                                               std::shared_ptr<ComputeService>  cs,
                                                                                double payload)
             : ComputeServiceMessage("STANDARD_JOB_DONE", payload) {
       if ((job == nullptr) || (cs == nullptr)) {
@@ -105,7 +105,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     ComputeServiceStandardJobFailedMessage::ComputeServiceStandardJobFailedMessage(StandardJob *job,
-                                                                                   ComputeService *cs,
+                                                                                   std::shared_ptr<ComputeService>  cs,
                                                                                    std::shared_ptr<FailureCause> cause,
                                                                                    double payload)
             : ComputeServiceMessage("STANDARD_JOB_FAILED", payload) {
@@ -150,7 +150,7 @@ namespace wrench {
      * @throw std::invalid_arguments
      */
     ComputeServiceTerminateStandardJobAnswerMessage::ComputeServiceTerminateStandardJobAnswerMessage(StandardJob *job,
-                                                                                                     ComputeService *compute_service,
+                                                                                                     std::shared_ptr<ComputeService>  compute_service,
                                                                                                      bool success,
                                                                                                      std::shared_ptr<FailureCause> failure_cause,
                                                                                                      double payload) :
@@ -203,7 +203,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     ComputeServiceSubmitPilotJobAnswerMessage::ComputeServiceSubmitPilotJobAnswerMessage(PilotJob *job,
-                                                                                         ComputeService *compute_service,
+                                                                                         std::shared_ptr<ComputeService>  compute_service,
                                                                                          bool success,
                                                                                          std::shared_ptr<FailureCause> failure_cause,
                                                                                          double payload)
@@ -229,7 +229,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    ComputeServicePilotJobStartedMessage::ComputeServicePilotJobStartedMessage(PilotJob *job, ComputeService *cs,
+    ComputeServicePilotJobStartedMessage::ComputeServicePilotJobStartedMessage(PilotJob *job, std::shared_ptr<ComputeService>  cs,
                                                                                double payload)
             : ComputeServiceMessage("PILOT_JOB_STARTED", payload) {
 
@@ -249,7 +249,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    ComputeServicePilotJobExpiredMessage::ComputeServicePilotJobExpiredMessage(PilotJob *job, ComputeService *cs,
+    ComputeServicePilotJobExpiredMessage::ComputeServicePilotJobExpiredMessage(PilotJob *job, std::shared_ptr<ComputeService>  cs,
                                                                                double payload)
             : ComputeServiceMessage("PILOT_JOB_EXPIRED", payload) {
       if ((job == nullptr) || (cs == nullptr)) {
@@ -268,7 +268,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    ComputeServicePilotJobFailedMessage::ComputeServicePilotJobFailedMessage(PilotJob *job, ComputeService *cs,
+    ComputeServicePilotJobFailedMessage::ComputeServicePilotJobFailedMessage(PilotJob *job, std::shared_ptr<ComputeService>  cs,
                                                                              double payload) : ComputeServiceMessage(
             "PILOT_JOB_FAILED", payload) {
       if ((job == nullptr) || (cs == nullptr)) {
@@ -311,7 +311,7 @@ namespace wrench {
      * @throw std::invalid_arguments
      */
     ComputeServiceTerminatePilotJobAnswerMessage::ComputeServiceTerminatePilotJobAnswerMessage(PilotJob *job,
-                                                                                               ComputeService *compute_service,
+                                                                                               std::shared_ptr<ComputeService>  compute_service,
                                                                                                bool success,
                                                                                                std::shared_ptr<FailureCause> failure_cause,
                                                                                                double payload) :

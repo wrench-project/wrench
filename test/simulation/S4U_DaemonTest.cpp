@@ -177,7 +177,7 @@ void S4U_DaemonTest::do_basic_Test() {
 
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new S4U_DaemonTestWMS(
                   this, hostname)));

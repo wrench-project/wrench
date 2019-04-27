@@ -35,8 +35,8 @@ namespace wrench {
      * @brief Get the compute service provided by the (running) pilot job
      * @return a compute service
      */
-    ComputeService *PilotJob::getComputeService() {
-      return this->compute_service.get();
+    std::shared_ptr<ComputeService> PilotJob::getComputeService() {
+      return this->compute_service;
     }
 
     /**

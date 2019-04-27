@@ -168,7 +168,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the property list for the BareMetalService that is to run on the VM ({} means "use all defaults")
+     * @brief Get the property list for the BareMetalComputeService that is to run on the VM ({} means "use all defaults")
      * @return a property list
      */
     std::map<std::string, std::string> S4U_VirtualMachine::getPropertyList() {
@@ -176,7 +176,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the message payload list for the BareMetalService that will run on the VM ({} means "use all defaults")
+     * @brief Get the message payload list for the BareMetalComputeService that will run on the VM ({} means "use all defaults")
      * @return a message payload list
      */
     std::map<std::string, double> S4U_VirtualMachine::getMessagePayloadList() {

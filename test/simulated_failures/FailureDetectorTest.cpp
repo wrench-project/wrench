@@ -184,7 +184,7 @@ void SimulatedFailuresTest::do_FailureDetectorForSleeperTest_test() {
     std::string hostname = "StableHost";
 
     // Create a WMS
-    wrench::WMS *wms = nullptr;
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new FailureDetectorForSleeperTestWMS(this, hostname)));
 
@@ -303,7 +303,7 @@ void SimulatedFailuresTest::do_FailureDetectorForComputerTest_test() {
     std::string hostname = "StableHost";
 
     // Create a WMS
-    wrench::WMS *wms = nullptr;
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new FailureDetectorForComputerTestWMS(this, hostname)));
 

@@ -12,8 +12,8 @@
 #include <wrench/simulation/SimulationMessage.h>
 #include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
 #include <gtest/gtest.h>
-#include <wrench/services/compute/batch/BatchService.h>
-#include <wrench/services/compute/batch/BatchServiceMessage.h>
+#include <wrench/services/compute/batch/BatchComputeService.h>
+#include <wrench/services/compute/batch/BatchComputeServiceMessage.h>
 #include "wrench/workflow/job/PilotJob.h"
 
 #include "../include/TestWithFork.h"
@@ -25,11 +25,11 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(scratch_service_test, "Log category for ScratchServ
 class ScratchSpaceTest : public ::testing::Test {
 
 public:
-    wrench::StorageService *storage_service1 = nullptr;
-    wrench::StorageService *storage_service2 = nullptr;
-    wrench::ComputeService *compute_service = nullptr;
-    wrench::ComputeService *compute_service1 = nullptr;
-    wrench::ComputeService *compute_service2 = nullptr;
+    std::shared_ptr<wrench::StorageService> storage_service1 = nullptr;
+    std::shared_ptr<wrench::StorageService> storage_service2 = nullptr;
+    std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
+    std::shared_ptr<wrench::ComputeService> compute_service1 = nullptr;
+    std::shared_ptr<wrench::ComputeService> compute_service2 = nullptr;
     wrench::Simulation *simulation;
 
     void do_SimpleScratchSpace_test();
@@ -88,7 +88,7 @@ class SimpleScratchSpaceTestWMS : public wrench::WMS {
 
 public:
     SimpleScratchSpaceTestWMS(ScratchSpaceTest *test,
-                              const std::set<wrench::ComputeService *> &compute_services,
+                              const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                               std::string hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, {}, {}, nullptr, hostname,
                         "test") {
@@ -101,7 +101,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       {
         // Create a sequential task that lasts one min and requires 1 cores
@@ -190,7 +190,7 @@ void ScratchSpaceTest::do_SimpleScratchSpace_test() {
   simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new SimpleScratchSpaceTestWMS(
                   this, {compute_service}, hostname)));
@@ -225,7 +225,7 @@ class SimpleScratchSpaceFailureTestWMS : public wrench::WMS {
 
 public:
     SimpleScratchSpaceFailureTestWMS(ScratchSpaceTest *test,
-                                     const std::set<wrench::ComputeService *> &compute_services,
+                                     const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                      std::string hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, {}, {}, nullptr, hostname,
                         "test") {
@@ -238,7 +238,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       {
         // Create a sequential task that lasts one min and requires 1 cores
@@ -422,7 +422,7 @@ void ScratchSpaceTest::do_ScratchSpaceFailure_test() {
   simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new SimpleScratchSpaceFailureTestWMS(
                   this, {compute_service}, hostname)));
@@ -458,7 +458,7 @@ class PilotJobScratchSpaceTestWMS : public wrench::WMS {
 
 public:
     PilotJobScratchSpaceTestWMS(ScratchSpaceTest *test,
-                                const std::set<wrench::ComputeService *> &compute_services,
+                                const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                 std::string hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, {}, {}, nullptr, hostname,
                         "test") {
@@ -472,9 +472,9 @@ private:
     int main() {
 
       // Create a job  manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
-      wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
+      auto file_registry_service = this->getAvailableFileRegistryService();
 
       // Create a pilot job that requires 1 host, 1 core per host, 1 bytes of RAM per host, and 1 hour
       wrench::PilotJob *pilot_job = job_manager->createPilotJob();
@@ -642,13 +642,13 @@ void ScratchSpaceTest::do_PilotJobScratchSpace_test() {
 
   // Create a Compute Service that does not have scratch space
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname,
+          new wrench::BatchComputeService(hostname,
                                    {hostname}, 3000, {})));
 
   simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new PilotJobScratchSpaceTestWMS(
                   this, {compute_service}, hostname)));
@@ -687,8 +687,8 @@ class ScratchSpaceRaceConditionTestWMS : public wrench::WMS {
 
 public:
     ScratchSpaceRaceConditionTestWMS(ScratchSpaceTest *test,
-                                     const std::set<wrench::ComputeService *> &compute_services,
-                                     const std::set<wrench::StorageService *> &storage_services,
+                                     const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                     const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                      std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
@@ -700,10 +700,10 @@ private:
 
     int main() {
       // Create a data movement manager
-      std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
+      auto data_movement_manager = this->createDataMovementManager();
 
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       // Get a reference to the file
       wrench::WorkflowFile *file = this->getWorkflow()->getFileByID("input");
@@ -795,7 +795,7 @@ void ScratchSpaceTest::do_RaceConditionTest_test() {
           new wrench::BareMetalComputeService(hostname, {"Host1"}, 100, {}, {})));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new ScratchSpaceRaceConditionTestWMS(this, {compute_service}, {storage_service1}, hostname)));
 
@@ -829,8 +829,8 @@ class ScratchNonScratchPartitionsTestWMS : public wrench::WMS {
 
 public:
     ScratchNonScratchPartitionsTestWMS(ScratchSpaceTest *test,
-                                       const std::set<wrench::ComputeService *> &compute_services,
-                                       const std::set<wrench::StorageService *> &storage_services,
+                                       const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                       const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                        std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
@@ -846,10 +846,10 @@ private:
       //Scratch have /, /<job's_name> partitions
 
       // Create a data movement manager and this should only copy from / to / of two non scratch space
-      std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
+      auto data_movement_manager = this->createDataMovementManager();
 
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       // Get a reference to the file
       wrench::WorkflowFile *file1 = this->getWorkflow()->getFileByID("input1");
@@ -996,7 +996,7 @@ void ScratchSpaceTest::do_PartitionsTest_test() {
           new wrench::BareMetalComputeService(hostname, {"Host1"}, 100, {}, {})));
 
   // Create a WMS
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new ScratchNonScratchPartitionsTestWMS(this, {compute_service}, {storage_service1}, hostname)));
 

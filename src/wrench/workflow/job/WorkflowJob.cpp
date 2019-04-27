@@ -137,7 +137,7 @@ namespace wrench {
     * @brief Set the parent compute service of the job
     * @param compute_service: a compute service
     */
-    void WorkflowJob::setParentComputeService(ComputeService *compute_service) {
+    void WorkflowJob::setParentComputeService(std::shared_ptr<ComputeService> compute_service) {
       this->parent_compute_service = compute_service;
     }
 
@@ -146,7 +146,7 @@ namespace wrench {
      *
      * @return a compute service
      */
-     ComputeService *WorkflowJob::getParentComputeService() {
+    std::shared_ptr<ComputeService> WorkflowJob::getParentComputeService() {
        return this->parent_compute_service;
      }
 

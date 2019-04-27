@@ -506,8 +506,8 @@ namespace wrench {
      * @throw WorkflowExecutionException
      */
     void StorageService::readFiles(std::set<WorkflowFile *> files,
-                                   std::map<WorkflowFile *, StorageService *> file_locations,
-                                   StorageService *default_storage_service,
+                                   std::map<WorkflowFile *, std::shared_ptr<StorageService>> file_locations,
+                                   std::shared_ptr<StorageService> default_storage_service,
                                    std::set<WorkflowFile *> &files_in_scratch,
                                    WorkflowJob *job) {
       try {
@@ -534,8 +534,8 @@ namespace wrench {
      * @throw WorkflowExecutionException
      */
     void StorageService::writeFiles(std::set<WorkflowFile *> files,
-                                    std::map<WorkflowFile *, StorageService *> file_locations,
-                                    StorageService *default_storage_service,
+                                    std::map<WorkflowFile *, std::shared_ptr<StorageService>> file_locations,
+                                    std::shared_ptr<StorageService> default_storage_service,
                                     std::set<WorkflowFile *> &files_in_scratch,
                                     WorkflowJob *job) {
       try {
@@ -563,10 +563,10 @@ namespace wrench {
      */
     void StorageService::writeOrReadFiles(FileOperation action,
                                           std::set<WorkflowFile *> files,
-                                          std::map<WorkflowFile *, StorageService *> file_locations,
-                                          StorageService *default_storage_service,
-                                          std::set<WorkflowFile *> &files_in_scratch,
-                                          WorkflowJob *job) {
+                                          std::map<WorkflowFile *, std::shared_ptr<StorageService>> file_locations,
+                                                  std::shared_ptr<StorageService> default_storage_service,
+                                                  std::set<WorkflowFile *> &files_in_scratch,
+                                                  WorkflowJob *job) {
 
       for (auto const &f : files) {
         if (f == nullptr) {
@@ -591,7 +591,7 @@ namespace wrench {
         WorkflowFile *file = f.second;
 
         // Identify the Storage Service
-        StorageService *storage_service = default_storage_service;
+        std::shared_ptr<StorageService> storage_service = default_storage_service;
         if (file_locations.find(file) != file_locations.end()) {
           storage_service = file_locations[file];
         }
@@ -649,7 +649,7 @@ namespace wrench {
      * @throw std::runtime_error
      * @throw std::invalid_argument
      */
-    void StorageService::deleteFile(WorkflowFile *file, FileRegistryService *file_registry_service) {
+    void StorageService::deleteFile(WorkflowFile *file, std::shared_ptr<FileRegistryService> file_registry_service) {
 
       if (file == nullptr) {
         throw std::invalid_argument("StorageService::deleteFile(): Invalid arguments");
@@ -677,7 +677,7 @@ namespace wrench {
      * @throw std::runtime_error
      * @throw std::invalid_argument
      */
-    void StorageService::deleteFile(WorkflowFile *file, WorkflowJob *job, FileRegistryService *file_registry_service) {
+    void StorageService::deleteFile(WorkflowFile *file, WorkflowJob *job, std::shared_ptr<FileRegistryService>file_registry_service) {
 
       if (file == nullptr) {
         throw std::invalid_argument("StorageService::deleteFile(): Invalid arguments");
@@ -708,7 +708,7 @@ namespace wrench {
     * @throw std::invalid_argument
     */
     void StorageService::deleteFile(WorkflowFile *file, std::string dst_partition,
-                                    FileRegistryService *file_registry_service) {
+                                    std::shared_ptr<FileRegistryService> file_registry_service) {
 
       // Empty partition means "/"
       if (dst_partition.empty()) {
@@ -746,7 +746,8 @@ namespace wrench {
         WRENCH_INFO("Deleted file %s on storage service %s", file->getID().c_str(), this->getName().c_str());
 
         if (unregister) {
-          file_registry_service->removeEntry(file, this);
+          file_registry_service->removeEntry(file,
+                  std::dynamic_pointer_cast<StorageService>(this->getSharedPtr()));
         }
 
       } else {
@@ -765,11 +766,11 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void StorageService::deleteFiles(std::set<WorkflowFile *> files,
-                                     std::map<WorkflowFile *, StorageService *> file_locations,
-                                     StorageService *default_storage_service) {
+                                     std::map<WorkflowFile *, std::shared_ptr<StorageService>> file_locations,
+                                     std::shared_ptr<StorageService> default_storage_service) {
       for (auto f : files) {
         // Identify the Storage Service
-        StorageService *storage_service = default_storage_service;
+        std::shared_ptr<StorageService> storage_service = default_storage_service;
         if (file_locations.find(f) != file_locations.end()) {
           storage_service = file_locations[f];
         }
@@ -797,14 +798,14 @@ namespace wrench {
      * @throw WorkflowExecutionException
      * @throw std::invalid_argument
      */
-    void StorageService::copyFile(WorkflowFile *file, StorageService *src) {
+    void StorageService::copyFile(WorkflowFile *file, std::shared_ptr<StorageService> src) {
 
 
       if ((file == nullptr) || (src == nullptr)) {
         throw std::invalid_argument("StorageService::copyFile(): Invalid arguments");
       }
 
-      if (src == this) {
+      if (src == this->getSharedPtr()) {
         throw std::invalid_argument(
                 "StorageService::copyFile(file,src): Cannot redundantly copy a file to its own partition");
       }
@@ -832,14 +833,14 @@ namespace wrench {
      * @throw WorkflowExecutionException
      * @throw std::invalid_argument
      */
-    void StorageService::copyFile(WorkflowFile *file, StorageService *src, WorkflowJob *src_job, WorkflowJob *dst_job) {
+    void StorageService::copyFile(WorkflowFile *file, std::shared_ptr<StorageService> src, WorkflowJob *src_job, WorkflowJob *dst_job) {
 
 
       if ((file == nullptr) || (src == nullptr)) {
         throw std::invalid_argument("StorageService::copyFile(): Invalid arguments");
       }
 
-      if (src == this && src_job == nullptr && dst_job == nullptr) {
+      if (src == this->getSharedPtr() && src_job == nullptr && dst_job == nullptr) {
         throw std::invalid_argument("StorageService::copyFile(): Cannot redundantly copy a file to its own partition");
       }
 
@@ -878,10 +879,10 @@ namespace wrench {
      * @throw std::runtime_error
      * @throw std::invalid_argument
      */
-    void StorageService::copyFile(WorkflowFile *file, StorageService *src, std::string src_partition,
+    void StorageService::copyFile(WorkflowFile *file, std::shared_ptr<StorageService> src, std::string src_partition,
                                   std::string dst_partition) {
 
-      if (src == this && (src_partition == dst_partition)) {
+      if (src.get() == this && (src_partition == dst_partition)) {
         throw std::invalid_argument(
                 "StorageService::copyFile(file,src,src_partition,dst_partition): Cannot redundantly copy a file to its own partition");
       }
@@ -896,7 +897,7 @@ namespace wrench {
 
       // Send a message to the daemon
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("copy_file");
-      auto start_timestamp = new SimulationTimestampFileCopyStart(file, src, src_partition, this, dst_partition);
+      auto start_timestamp = new SimulationTimestampFileCopyStart(file, src, src_partition, std::dynamic_pointer_cast<StorageService>(this->getSharedPtr()), dst_partition);
       this->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyStart>(start_timestamp);
 
       try {
@@ -905,7 +906,7 @@ namespace wrench {
                 file,
                 src,
                 src_partition,
-                this,
+                std::dynamic_pointer_cast<StorageService>(this->getSharedPtr()),
                 dst_partition,
                 nullptr,
                 start_timestamp,
@@ -945,7 +946,7 @@ namespace wrench {
      * @throw std::invalid_argument
      *
      */
-    void StorageService::initiateFileCopy(std::string answer_mailbox, WorkflowFile *file, StorageService *src,
+    void StorageService::initiateFileCopy(std::string answer_mailbox, WorkflowFile *file, std::shared_ptr<StorageService> src,
                                           std::string src_partition, std::string dst_partition) {
 
       if ((file == nullptr) || (src == nullptr)) {
@@ -960,7 +961,7 @@ namespace wrench {
         dst_partition = "/";
       }
 
-      if ((src == this) && (src_partition == dst_partition)) {
+      if ((src.get() == this) && (src_partition == dst_partition)) {
         throw std::invalid_argument(
                 "StorageService::copyFile(): Cannot redundantly copy a file to the its own partition");
       }
@@ -971,7 +972,7 @@ namespace wrench {
 //        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
 //      }
 
-      auto start_timestamp = new SimulationTimestampFileCopyStart(file, src, src_partition, this, dst_partition);
+      auto start_timestamp = new SimulationTimestampFileCopyStart(file, src, src_partition, std::dynamic_pointer_cast<StorageService>(this->getSharedPtr()), dst_partition);
       this->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyStart>(start_timestamp);
 
       // Send a message to the daemon
@@ -981,7 +982,7 @@ namespace wrench {
                 file,
                 src,
                 src_partition,
-                this,
+                std::dynamic_pointer_cast<StorageService>(this->getSharedPtr()),
                 dst_partition,
                 nullptr,
                 start_timestamp,

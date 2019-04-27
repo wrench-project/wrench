@@ -11,14 +11,14 @@
 #ifndef WRENCH_VIRTUALIZEDCLUSTERPROPERTY_H
 #define WRENCH_VIRTUALIZEDCLUSTERPROPERTY_H
 
-#include "wrench/services/compute/cloud/CloudServiceProperty.h"
+#include "wrench/services/compute/cloud/CloudComputeServiceProperty.h"
 
 namespace wrench {
 
     /**
-     * @brief Configurable properties for a VirtualizedClusterService
+     * @brief Configurable properties for a VirtualizedClusterComputeService
      */
-    class VirtualizedClusterServiceProperty : public CloudServiceProperty {
+    class VirtualizedClusterComputeServiceProperty : public CloudComputeServiceProperty {
 
     public:
     };

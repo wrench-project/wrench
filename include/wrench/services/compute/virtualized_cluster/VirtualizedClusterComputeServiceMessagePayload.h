@@ -11,14 +11,14 @@
 #ifndef WRENCH_VIRTUALIZEDCLUSTERMESSAGEPAYLOAD_H
 #define WRENCH_VIRTUALIZEDCLUSTERMESSAGEPAYLOAD_H
 
-#include "wrench/services/compute/cloud/CloudServiceMessagePayload.h"
+#include "wrench/services/compute/cloud/CloudComputeServiceMessagePayload.h"
 
 namespace wrench {
 
     /**
-     * @brief Configurable message payloads for a VirtualizedClusterService
+     * @brief Configurable message payloads for a VirtualizedClusterComputeService
      */
-    class VirtualizedClusterServiceMessagePayload : public CloudServiceMessagePayload {
+    class VirtualizedClusterComputeServiceMessagePayload : public CloudComputeServiceMessagePayload {
 
     public:
         /** @brief The number of bytes in the control message sent to the service to request a VM migration. **/

@@ -18,7 +18,7 @@
 
 namespace wrench {
 
-    class BatchService;
+    class BatchComputeService;
 
     /**
      * @brief A WMS that only submits a single job to a given batch service, which is used

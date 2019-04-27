@@ -9,8 +9,8 @@
 
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
-#include "wrench/services/compute/virtualized_cluster/VirtualizedClusterService.h"
-#include "wrench/services/compute/cloud/CloudService.h"
+#include "wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h"
+#include "wrench/services/compute/cloud/CloudComputeService.h"
 #include "wrench/services/compute/bare_metal/BareMetalComputeService.h"
 #include "wrench/services/compute/ComputeServiceMessage.h"
 #include "wrench/services/compute/htcondor/HTCondorCentralManagerService.h"
@@ -44,8 +44,8 @@ namespace wrench {
             throw std::invalid_argument("At least one compute service should be provided");
         }
         for (auto const &cs : compute_resources) {
-            if (dynamic_cast<CloudService *>(cs) and (not dynamic_cast<VirtualizedClusterService *>(cs))) {
-                throw std::invalid_argument("An HTCondorCentralManagerService cannot use a CloudService - use a VirtualizedClusterService instead");
+            if (dynamic_cast<CloudComputeService *>(cs) and (not dynamic_cast<VirtualizedClusterComputeService *>(cs))) {
+                throw std::invalid_argument("An HTCondorCentralManagerService cannot use a CloudComputeService - use a VirtualizedClusterComputeService instead");
             }
         }
 
@@ -170,7 +170,7 @@ namespace wrench {
 
                 unsigned long sum_num_idle_cores = 0;
 
-                if (auto virtualized_cluster = dynamic_cast<VirtualizedClusterService *>(cs)) {
+                if (auto virtualized_cluster = dynamic_cast<VirtualizedClusterComputeService *>(cs)) {
                     // for cloud services, we must create/start VMs, each of which
                     // is a BareMetalComputeService. Right now, we greedily use the whole Cloud!
 
@@ -184,8 +184,8 @@ namespace wrench {
                         this->compute_resources_map.insert(std::make_pair(vm_cs.get(), sum_num_idle_cores));
                     }
 
-                } else if (auto cloud = dynamic_cast<CloudService *>(cs)) {
-                    throw std::runtime_error("An HTCondorCentralManagerService cannot use a CloudService - use a VirtualizedClusterService instead");
+                } else if (auto cloud = dynamic_cast<CloudComputeService *>(cs)) {
+                    throw std::runtime_error("An HTCondorCentralManagerService cannot use a CloudComputeService - use a VirtualizedClusterComputeService instead");
                 } else {
 
                     // set the number of available cores
@@ -203,9 +203,9 @@ namespace wrench {
             // starting an HTCondor negotiator
             if (not this->dispatching_jobs && not this->pending_jobs.empty() && not this->resources_unavailable) {
                 this->dispatching_jobs = true;
-                auto negotiator = std::make_shared<HTCondorNegotiatorService>(this->hostname, this->compute_resources_map,
+                auto negotiator = std::shared_ptr<HTCondorNegotiatorService>(new HTCondorNegotiatorService(this->hostname, this->compute_resources_map,
                                                                               this->running_jobs,
-                                                                              this->pending_jobs, this->mailbox_name);
+                                                                              this->pending_jobs, this->mailbox_name));
                 negotiator->simulation = this->simulation;
                 negotiator->start(negotiator, true, false); // Daemonized, no auto-restart
             }
@@ -290,7 +290,7 @@ namespace wrench {
             S4U_Mailbox::dputMessage(
                     answer_mailbox,
                     new ComputeServiceSubmitStandardJobAnswerMessage(
-                            job, this, true, nullptr, this->getMessagePayloadValue(
+                            job, std::dynamic_pointer_cast<HTCondorCentralManagerService>(this->getSharedPtr()), true, nullptr, this->getMessagePayloadValue(
                                     HTCondorCentralManagerServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
         }
@@ -314,7 +314,7 @@ namespace wrench {
         try {
             S4U_Mailbox::dputMessage(
                     callback_mailbox, new ComputeServiceStandardJobDoneMessage(
-                            job, this, this->getMessagePayloadValue(
+                            job, std::dynamic_pointer_cast<HTCondorCentralManagerService>(this->getSharedPtr()), this->getMessagePayloadValue(
                                     HTCondorCentralManagerServiceMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD)));
             this->resources_unavailable = false;
         } catch (std::shared_ptr<NetworkError> &cause) {

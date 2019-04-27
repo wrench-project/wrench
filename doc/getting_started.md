@@ -63,7 +63,7 @@ The source file for the cloud-based simulator is at `examples/simple-example/Sim
 - The first step is to read and parse the workflow and the platform files, and to
   create a simulation object (`wrench::Simulation`).
 - A storage service (`wrench::SimpleStorageService`) is created and deployed on a host.
-- A cloud (`wrench::CloudService`) or a batch (`wrench::BatchService`) service is created and 
+- A cloud (`wrench::CloudComputeService`) or a batch (`wrench::BatchComputeService`) service is created and
   deployed on a host. Both services are seen by the simulation as compute services
   (`wrench::ComputeService`) – jobs can then be submitted to these services. 
 - A Workflow Management System (`wrench::WMS`) is instantiated (in this case the `SimpleWMS`) with a reference to 

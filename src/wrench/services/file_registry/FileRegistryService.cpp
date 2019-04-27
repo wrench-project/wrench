@@ -73,7 +73,7 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    std::set<StorageService *> FileRegistryService::lookupEntry(WorkflowFile *file) {
+    std::set<std::shared_ptr<StorageService>> FileRegistryService::lookupEntry(WorkflowFile *file) {
 
       if (file == nullptr) {
         throw std::invalid_argument("FileRegistryService::lookupEntry(): Invalid argument");
@@ -104,7 +104,7 @@ namespace wrench {
       }
 
       if (auto msg = dynamic_cast<FileRegistryFileLookupAnswerMessage *>(message.get())) {
-        std::set<StorageService *> result = msg->locations;
+        std::set<std::shared_ptr<StorageService>> result = msg->locations;
 //        msg->locations.clear(); // TODO: Understand why this removes a memory leak
         return result;
       } else {
@@ -122,9 +122,9 @@ namespace wrench {
      *
      * @return a map of <distance , storage service> pairs
      */
-    std::map<double, StorageService *> FileRegistryService::lookupEntry(WorkflowFile *file,
+    std::map<double, std::shared_ptr<StorageService>> FileRegistryService::lookupEntry(WorkflowFile *file,
                                                                         std::string reference_host,
-                                                                        NetworkProximityService *network_proximity_service) {
+                                                                        std::shared_ptr<NetworkProximityService> network_proximity_service) {
 
       if (file == nullptr) {
         throw std::invalid_argument("FileRegistryService::lookupEntryByProximity(): Invalid argument, no file");
@@ -160,7 +160,7 @@ namespace wrench {
         throw WorkflowExecutionException(cause);
       }
 
-      if (FileRegistryFileLookupByProximityAnswerMessage *msg = dynamic_cast<FileRegistryFileLookupByProximityAnswerMessage *> (message.get())) {
+      if (auto msg = dynamic_cast<FileRegistryFileLookupByProximityAnswerMessage *> (message.get())) {
         return msg->locations;
       } else {
         throw std::runtime_error("FileRegistryService::lookupEntry(): Unexpected [" + message->getName() + "] message");
@@ -176,7 +176,7 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    void FileRegistryService::addEntry(WorkflowFile *file, StorageService *storage_service) {
+    void FileRegistryService::addEntry(WorkflowFile *file, std::shared_ptr<StorageService> storage_service) {
 
       if ((file == nullptr) || (storage_service == nullptr)) {
         throw std::invalid_argument("FileRegistryService::addEntry(): Invalid  argument");
@@ -223,7 +223,7 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    void FileRegistryService::removeEntry(WorkflowFile *file, StorageService *storage_service) {
+    void FileRegistryService::removeEntry(WorkflowFile *file, std::shared_ptr<StorageService> storage_service) {
 
       if ((file == nullptr) || (storage_service == nullptr)) {
         throw std::invalid_argument(" FileRegistryService::removeEntry(): Invalid input argument");
@@ -323,7 +323,7 @@ namespace wrench {
         return false;
 
       } else if (auto msg = dynamic_cast<FileRegistryFileLookupRequestMessage *>(message.get())) {
-        std::set<StorageService *> locations;
+        std::set<std::shared_ptr<StorageService>> locations;
         if (this->entries.find(msg->file) != this->entries.end()) {
           locations = this->entries[msg->file];
         }
@@ -339,12 +339,12 @@ namespace wrench {
         }
         return true;
 
-      } else if (FileRegistryFileLookupByProximityRequestMessage *msg = dynamic_cast<FileRegistryFileLookupByProximityRequestMessage *> (message.get())) {
+      } else if (auto msg = dynamic_cast<FileRegistryFileLookupByProximityRequestMessage *> (message.get())) {
 
         std::string reference_host = msg->reference_host;
 
-        std::map<double, StorageService *> locations;
-        std::set<StorageService *> storage_services_with_file;
+        std::map<double, std::shared_ptr<StorageService>> locations;
+        std::set<std::shared_ptr<StorageService>> storage_services_with_file;
         if (this->entries.find(msg->file) != this->entries.end()) {
           storage_services_with_file = this->entries[msg->file];
         }
@@ -404,7 +404,7 @@ namespace wrench {
      * @param file: a file
      * @param storage_service: a storage_service
      */
-    void FileRegistryService::addEntryToDatabase(WorkflowFile *file, StorageService *storage_service) {
+    void FileRegistryService::addEntryToDatabase(WorkflowFile *file, std::shared_ptr<StorageService> storage_service) {
       if (this->entries.find(file) != this->entries.end()) {
         this->entries[file].insert(storage_service);
       } else {
@@ -419,7 +419,7 @@ namespace wrench {
      *
      * @return true if an entry was removed
      */
-    bool FileRegistryService::removeEntryFromDatabase(WorkflowFile *file, StorageService *storage_service) {
+    bool FileRegistryService::removeEntryFromDatabase(WorkflowFile *file, std::shared_ptr<StorageService> storage_service) {
       if (this->entries.find(file) != this->entries.end()) {
         if (this->entries[file].find(storage_service) != this->entries[file].end()) {
           this->entries[file].erase(storage_service);

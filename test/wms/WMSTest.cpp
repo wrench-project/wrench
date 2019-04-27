@@ -17,10 +17,10 @@
 class WMSTest : public ::testing::Test {
 
 public:
-    wrench::ComputeService *cs_cloud = nullptr;
-    wrench::ComputeService *cs_batch = nullptr;
-    wrench::StorageService *storage_service1 = nullptr;
-    wrench::StorageService *storage_service2 = nullptr;
+    std::shared_ptr<wrench::ComputeService> cs_cloud = nullptr;
+    std::shared_ptr<wrench::ComputeService> cs_batch = nullptr;
+    std::shared_ptr<wrench::StorageService> storage_service1 = nullptr;
+    std::shared_ptr<wrench::StorageService> storage_service2 = nullptr;
     wrench::WorkflowFile *small_file = nullptr;
     wrench::WorkflowFile *big_file = nullptr;
 
@@ -57,8 +57,8 @@ class TestDefaultHandlerWMS : public wrench::WMS {
 
 public:
     TestDefaultHandlerWMS(WMSTest *test,
-            const std::set<wrench::ComputeService *> &compute_services,
-            const std::set<wrench::StorageService *> &storage_services,
+            const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+            const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
             std::string &hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test"
             ) {
@@ -72,26 +72,26 @@ private:
     int main() {
 
       // Create a data movement manager
-      std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
+      auto data_movement_manager = this->createDataMovementManager();
 
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       // Get the file registry service
-      wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
+      auto file_registry_service = this->getAvailableFileRegistryService();
 
       // Create and start a VM on the cloud service
-      auto cloud = (wrench::CloudService *) (this->test->cs_cloud);
+      auto cloud = std::dynamic_pointer_cast<wrench::CloudComputeService>(this->test->cs_cloud);
       auto vm_name = cloud->createVM(4, 0.0);
       auto vm_cs = cloud->startVM(vm_name);
 
       // Get a "STANDARD JOB COMPLETION" event (default handler)
       wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 10.0, 1, 1, 1.0, 0);
       wrench::StandardJob *job1 = job_manager->createStandardJob(task1, {});
-      job_manager->submitJob(job1, vm_cs.get());
+      job_manager->submitJob(job1, vm_cs);
       this->waitForAndProcessNextEvent();
 
-      auto batch = (wrench::BatchService *) (this->test->cs_batch);
+      auto batch = this->test->cs_batch;
 
       // Get a "PILOT JOB STARTED" event (default handler)
       wrench::PilotJob *job2 = job_manager->createPilotJob();
@@ -151,18 +151,18 @@ void WMSTest::do_DefaultHandlerWMS_test() {
   std::vector<std::string> cloud_hosts;
   cloud_hosts.push_back(hostname1);
   ASSERT_NO_THROW(cs_cloud = simulation->add(
-          new wrench::CloudService(hostname1, cloud_hosts, 100.0, {}, {})));
+          new wrench::CloudComputeService(hostname1, cloud_hosts, 100.0, {}, {})));
 
   // Create a Batch Service
   std::vector<std::string> batch_hosts;
   batch_hosts.push_back(hostname2);
   ASSERT_NO_THROW(cs_batch = simulation->add(
-          new wrench::BatchService(hostname2, batch_hosts, 100.0, {}, {})));
+          new wrench::BatchComputeService(hostname2, batch_hosts, 100.0, {}, {})));
 
 
   // Create a WMS
   auto *workflow = new wrench::Workflow();
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new TestDefaultHandlerWMS(this,  {cs_cloud, cs_batch}, {storage_service1, storage_service2}, hostname1)));
 
@@ -199,8 +199,8 @@ class TestCustomHandlerWMS : public wrench::WMS {
 
 public:
     TestCustomHandlerWMS(WMSTest *test,
-                          const std::set<wrench::ComputeService *> &compute_services,
-                          const std::set<wrench::StorageService *> &storage_services,
+                          const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                          const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                           std::string &hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test"
             ) {
@@ -216,22 +216,22 @@ private:
     int main() override {
 
       // Create a data movement manager
-      std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
+      auto data_movement_manager = this->createDataMovementManager();
 
       // Create a job manager
-      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      auto job_manager = this->createJobManager();
 
       // Get the file registry service
-      wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
+      auto file_registry_service = this->getAvailableFileRegistryService();
 
       // Get a "STANDARD JOB COMPLETION" event (default handler)
-      auto cloud = (wrench::CloudService *) (this->test->cs_cloud);
+      auto cloud = std::dynamic_pointer_cast<wrench::CloudComputeService>(this->test->cs_cloud);
       auto vm_name = cloud->createVM(4, 0.0);
       auto vm_cs = cloud->startVM(vm_name);
 
       wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 10.0, 1, 1, 1.0, 0);
       wrench::StandardJob *job1 = job_manager->createStandardJob(task1, {});
-      job_manager->submitJob(job1, vm_cs.get());
+      job_manager->submitJob(job1, vm_cs);
       this->waitForAndProcessNextEvent();
       if (this->counter != 1) {
         throw std::runtime_error("Did not get expected 'STANDARD JOB COMPLETION' event");
@@ -336,18 +336,18 @@ void WMSTest::do_CustomHandlerWMS_test() {
   std::vector<std::string> cloud_hosts;
   cloud_hosts.push_back(hostname1);
   ASSERT_NO_THROW(cs_cloud = simulation->add(
-          new wrench::CloudService(hostname1, cloud_hosts, 100.0, {}, {})));
+          new wrench::CloudComputeService(hostname1, cloud_hosts, 100.0, {}, {})));
 
   // Create a Batch Service
   std::vector<std::string> batch_hosts;
   batch_hosts.push_back(hostname1);
   ASSERT_NO_THROW(cs_batch = simulation->add(
-          new wrench::BatchService(hostname2, batch_hosts, 100.0, {}, {})));
+          new wrench::BatchComputeService(hostname2, batch_hosts, 100.0, {}, {})));
 
 
   // Create a WMS
   auto *workflow = new wrench::Workflow();
-  wrench::WMS *wms = nullptr;
+  std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new TestCustomHandlerWMS(this,  {cs_cloud, cs_batch}, {storage_service1, storage_service2}, hostname1)));
 

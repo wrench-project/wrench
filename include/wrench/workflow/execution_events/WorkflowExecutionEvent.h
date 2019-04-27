@@ -103,7 +103,7 @@ namespace wrench {
          * @param compute_service: a compute service
          */
         StandardJobCompletedEvent(StandardJob *standard_job,
-                                  ComputeService *compute_service)
+                                  std::shared_ptr<ComputeService>  compute_service)
                 : WorkflowExecutionEvent(STANDARD_JOB_COMPLETION),
                   standard_job(standard_job), compute_service(compute_service) {}
     public:
@@ -111,7 +111,7 @@ namespace wrench {
         /** @brief The standard job that has completed */
         StandardJob *standard_job;
         /** @brief The compute service on which the standard job has completed */
-        ComputeService *compute_service;
+        std::shared_ptr<ComputeService>  compute_service;
     };
 
     /**
@@ -130,7 +130,7 @@ namespace wrench {
          * @param failure_cause: a failure_cause
          */
         StandardJobFailedEvent(StandardJob *standard_job,
-                               ComputeService *compute_service,
+                               std::shared_ptr<ComputeService>  compute_service,
                                std::shared_ptr<FailureCause> failure_cause)
                 : WorkflowExecutionEvent(STANDARD_JOB_FAILURE),
                   standard_job(standard_job),
@@ -142,7 +142,7 @@ namespace wrench {
         /** @brief The standard job that has failed */
         StandardJob *standard_job;
         /** @brief The compute service on which the job has failed */
-        ComputeService *compute_service;
+        std::shared_ptr<ComputeService>  compute_service;
         /** @brief The cause of the failure */
         std::shared_ptr<FailureCause> failure_cause;
     };
@@ -163,7 +163,7 @@ namespace wrench {
          * @param compute_service: a compute service
          */
         PilotJobStartedEvent(PilotJob *pilot_job,
-                             ComputeService *compute_service)
+                             std::shared_ptr<ComputeService>  compute_service)
                 : WorkflowExecutionEvent(PILOT_JOB_START),
                   pilot_job(pilot_job), compute_service(compute_service) {}
 
@@ -171,7 +171,7 @@ namespace wrench {
         /** @brief The pilot job that has started */
         PilotJob *pilot_job;
         /** @brief The compute service on which the pilot job has started */
-        ComputeService *compute_service;
+        std::shared_ptr<ComputeService>  compute_service;
     };
 
     /**
@@ -188,7 +188,7 @@ namespace wrench {
          * @param compute_service: a compute service
          */
         PilotJobExpiredEvent(PilotJob *pilot_job,
-                             ComputeService *compute_service)
+                             std::shared_ptr<ComputeService>  compute_service)
                 : WorkflowExecutionEvent(PILOT_JOB_EXPIRATION),
                   pilot_job(pilot_job), compute_service(compute_service) {}
 
@@ -197,7 +197,7 @@ namespace wrench {
         /** @brief The pilot job that has expired */
         PilotJob *pilot_job;
         /** @brief The compute service on which the pilot job has expired */
-        ComputeService *compute_service;
+        std::shared_ptr<ComputeService>  compute_service;
     };
 
     /**
@@ -216,8 +216,8 @@ namespace wrench {
          * @param file_registry_service_updated: whether the file registry service has been updated
          */
         FileCopyCompletedEvent(WorkflowFile *file,
-                               StorageService *storage_service,
-                               FileRegistryService *file_registry_service,
+                               std::shared_ptr<StorageService> storage_service,
+                               std::shared_ptr<FileRegistryService> file_registry_service,
                                bool file_registry_service_updated)
                 : WorkflowExecutionEvent(FILE_COPY_COMPLETION),
                   file(file), storage_service(storage_service),
@@ -228,9 +228,9 @@ namespace wrench {
         /** @brief The workflow file that has successfully been copied */
         WorkflowFile *file;
         /** @brief The storage service to which the file has been copied */
-        StorageService *storage_service;
+        std::shared_ptr<StorageService> storage_service;
         /** @brief The file registry service that was supposed to be updated (or nullptr if none) */
-        FileRegistryService *file_registry_service;
+        std::shared_ptr<FileRegistryService> file_registry_service;
         /** @brief Whether the file registry service (if any) has been successfully updated */
         bool file_registry_service_updated;
     };
@@ -251,7 +251,7 @@ namespace wrench {
          * @param failure_cause: a failure cause
          */
         FileCopyFailedEvent(WorkflowFile *file,
-                            StorageService *storage_service,
+                            std::shared_ptr<StorageService> storage_service,
                             std::shared_ptr<FailureCause> failure_cause
         )
                 : WorkflowExecutionEvent(FILE_COPY_FAILURE),
@@ -263,7 +263,7 @@ namespace wrench {
         /** @brief The workflow file that has failed to be copied */
         WorkflowFile *file;
         /** @brief The storage service on which it was supposed to be copied */
-        StorageService *storage_service;
+        std::shared_ptr<StorageService> storage_service;
         /** @brief The cause of the failure */
         std::shared_ptr<FailureCause> failure_cause;
 
