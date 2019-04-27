@@ -81,7 +81,7 @@ namespace wrench {
 
 				friend class WMS;
 
-				explicit JobManager(WMS *wms);
+				explicit JobManager(std::shared_ptr<WMS> wms);
 
 				/***********************/
 				/** \endcond           */
@@ -92,7 +92,7 @@ namespace wrench {
 				int main() override;
 
 				// Relevant WMS
-				WMS *wms;
+				std::shared_ptr<WMS> wms;
 
 				// Job map
 				std::map<WorkflowJob*, std::unique_ptr<WorkflowJob>> jobs;

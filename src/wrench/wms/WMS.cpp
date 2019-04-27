@@ -388,7 +388,7 @@ namespace wrench {
      * @return a job manager
      */
     std::shared_ptr<JobManager> WMS::createJobManager() {
-        auto job_manager_raw_ptr = new JobManager(this);
+        auto job_manager_raw_ptr = new JobManager(std::dynamic_pointer_cast<WMS>(this->getSharedPtr()));
         std::shared_ptr<JobManager> job_manager = std::shared_ptr<JobManager>(job_manager_raw_ptr);
         job_manager->simulation = this->simulation;
         job_manager->start(job_manager, true, false); // Always daemonize, no auto-restart
@@ -400,7 +400,7 @@ namespace wrench {
      * @return a data movement manager
      */
     std::shared_ptr<DataMovementManager> WMS::createDataMovementManager() {
-        auto data_movement_manager_raw_ptr = new DataMovementManager(this);
+        auto data_movement_manager_raw_ptr = new DataMovementManager(std::dynamic_pointer_cast<WMS>(this->getSharedPtr()));
         std::shared_ptr<DataMovementManager> data_movement_manager = std::shared_ptr<DataMovementManager>(data_movement_manager_raw_ptr);
         data_movement_manager->simulation = this->simulation;
         data_movement_manager->start(data_movement_manager, true, false); // Always daemonize, no auto-restart
