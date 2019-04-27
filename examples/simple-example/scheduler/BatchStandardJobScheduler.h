@@ -29,7 +29,7 @@ namespace wrench {
         /** \cond DEVELOPER    */
         /***********************/
 
-        void scheduleTasks(const std::set<ComputeService *> &compute_services,
+        void scheduleTasks(const std::set<std::shared_ptr<ComputeService>> &compute_services,
                            const std::vector<WorkflowTask *> &tasks);
 
         /***********************/

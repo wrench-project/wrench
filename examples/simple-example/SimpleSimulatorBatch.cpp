@@ -66,7 +66,7 @@ int main(int argc, char **argv) {
    */
   std::string storage_host = hostname_list[(hostname_list.size() > 2) ? 2 : 1];
   std::cerr << "Instantiating a SimpleStorageService on " << storage_host << "..." << std::endl;
-  wrench::StorageService *storage_service = simulation.add(
+  auto storage_service = simulation.add(
           new wrench::SimpleStorageService(storage_host, 10000000000000.0));
 
   std::string wms_host = hostname_list[0];
@@ -82,7 +82,7 @@ int main(int argc, char **argv) {
    * terminate it will be 2048 bytes. See the documentation to find out all available
    * configurable properties for each kind of service.
    */
-  wrench::ComputeService *batch_service = new wrench::BatchComputeService(
+  auto batch_service = new wrench::BatchComputeService(
           wms_host, hostname_list, 0, {},
           {{wrench::BatchComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 2048}});
 
@@ -100,7 +100,7 @@ int main(int argc, char **argv) {
   compute_services.insert(batch_service);
 
   /* Create a list of storage services that will be used by the WMS */
-  std::set<wrench::StorageService *> storage_services;
+  std::set<std::shared_ptr<wrench::StorageService>> storage_services;
   storage_services.insert(storage_service);
 
   /* Instantiate a WMS, to be stated on some host (wms_host), which is responsible
@@ -111,7 +111,7 @@ int main(int argc, char **argv) {
    * The WMS implementation is in SimpleWMS.[cpp|h].
    */
   std::cerr << "Instantiating a WMS on " << wms_host << "..." << std::endl;
-  wrench::WMS *wms = simulation.add(
+  auto wms = simulation.add(
           new wrench::SimpleWMS(std::unique_ptr<wrench::BatchStandardJobScheduler>(
                   new wrench::BatchStandardJobScheduler(storage_service)),
                                 nullptr, compute_services, storage_services, wms_host));
@@ -124,7 +124,7 @@ int main(int argc, char **argv) {
    */
   std::string file_registry_service_host = hostname_list[(hostname_list.size() > 2) ? 1 : 0];
   std::cerr << "Instantiating a FileRegistryService on " << file_registry_service_host << "..." << std::endl;
-  wrench::FileRegistryService *file_registry_service =
+  auto file_registry_service =
           simulation.add(new wrench::FileRegistryService(file_registry_service_host));
 
   /* It is necessary to store, or "stage", input files for the first task(s) of the workflow on some storage
