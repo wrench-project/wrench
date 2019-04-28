@@ -16,7 +16,8 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(simple_wms, "Log category for Simple WMS");
 namespace wrench {
 
     /**
-     * @brief Create a Simple WMS with a workflow instance, a scheduler implementation, and a list of compute services
+     * @brief Constructor that creates a Simple WMS with a workflow instance,
+     *        a scheduler implementation, and a list of compute services
      *
      * @param standard_job_scheduler: a standard job scheduler implementation (if nullptr none is used)
      * @param pilot_job_scheduler: a pilot job scheduler implementation if nullptr none is used)

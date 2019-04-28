@@ -40,13 +40,6 @@ namespace wrench {
 
       this->wms = wms;
 
-      // Get myself known to schedulers
-      if (this->wms->standard_job_scheduler) {
-        this->wms->standard_job_scheduler->setJobManager(std::dynamic_pointer_cast<JobManager>(this->getSharedPtr()));
-      }
-      if (this->wms->pilot_job_scheduler) {
-        this->wms->pilot_job_scheduler->setJobManager(std::dynamic_pointer_cast<JobManager>(this->getSharedPtr()));
-      }
     }
 
     /**
