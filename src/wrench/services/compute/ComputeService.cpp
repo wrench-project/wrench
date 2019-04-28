@@ -21,10 +21,14 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(compute_service, "Log category for Compute Service"
 
 namespace wrench {
 
+
     constexpr unsigned long ComputeService::ALL_CORES;
     constexpr double ComputeService::ALL_RAM;
+
+    static void null_deleter_StorageService(wrench::StorageService *) {}
+
     std::shared_ptr<StorageService> ComputeService::SCRATCH =
-            std::shared_ptr<StorageService>((StorageService*)666);
+            std::shared_ptr<StorageService>((StorageService*)666, &null_deleter_StorageService);
 
     /**
      * @brief Stop the compute service - must be called by the stop()
