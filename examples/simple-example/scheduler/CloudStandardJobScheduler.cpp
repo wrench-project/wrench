@@ -33,7 +33,7 @@ namespace wrench {
         }
 
         auto compute_service = *compute_services.begin();
-        auto  cloud_service = std::dynamic_pointer_cast<CloudComputeService>(compute_service);
+        auto cloud_service = std::dynamic_pointer_cast<CloudComputeService>(compute_service);
 
         if (cloud_service == nullptr) {
             throw std::runtime_error("This example Cloud Scheduler can only handle a cloud service");

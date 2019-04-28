@@ -93,11 +93,11 @@ int main(int argc, char **argv) {
    * configurable properties for each kind of service.
    */
   std::string wms_host = hostname_list[0];
-  std::shared_ptr<wrench::CloudComputeService> cloud_service;
+  std::shared_ptr<wrench::ComputeService> cloud_service;
 
   /* Add the cloud service to the simulation, catching a possible exception */
   try {
-    simulation.add(new wrench::CloudComputeService(
+    cloud_service = simulation.add(new wrench::CloudComputeService(
             wms_host, execution_hosts, 0, {},
             {{wrench::CloudComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024}}));
 
@@ -121,7 +121,6 @@ int main(int argc, char **argv) {
    *
    * The WMS implementation is in SimpleWMS.[cpp|h].
    */
-  std::cerr << "Instantiating a WMS on " << wms_host << "..." << std::endl;
   auto wms = simulation.add(
           new wrench::SimpleWMS(std::unique_ptr<wrench::CloudStandardJobScheduler>(
                   new wrench::CloudStandardJobScheduler(storage_service)),

@@ -388,11 +388,18 @@ namespace wrench {
      * @return a job manager
      */
     std::shared_ptr<JobManager> WMS::createJobManager() {
-        auto wms_shared_ptr = std::dynamic_pointer_cast<WMS>(this->getSharedPtr());
-        auto job_manager_raw_ptr = new JobManager(wms_shared_ptr);
-        std::shared_ptr<JobManager> job_manager = std::shared_ptr<JobManager>(job_manager_raw_ptr);
+        std::shared_ptr<JobManager> job_manager = std::shared_ptr<JobManager>(new JobManager(std::dynamic_pointer_cast<WMS>(this->getSharedPtr())));
         job_manager->simulation = this->simulation;
         job_manager->start(job_manager, true, false); // Always daemonize, no auto-restart
+
+        // Let my schedulers know who the job manager is
+        if (this->standard_job_scheduler) {
+            this->standard_job_scheduler->setJobManager(std::dynamic_pointer_cast<JobManager>(job_manager->getSharedPtr()));
+        }
+        if (this->pilot_job_scheduler) {
+            this->pilot_job_scheduler->setJobManager(std::dynamic_pointer_cast<JobManager>(job_manager->getSharedPtr()));
+        }
+
         return job_manager;
     }
 
@@ -401,10 +408,18 @@ namespace wrench {
      * @return a data movement manager
      */
     std::shared_ptr<DataMovementManager> WMS::createDataMovementManager() {
-        auto data_movement_manager_raw_ptr = new DataMovementManager(std::dynamic_pointer_cast<WMS>(this->getSharedPtr()));
-        std::shared_ptr<DataMovementManager> data_movement_manager = std::shared_ptr<DataMovementManager>(data_movement_manager_raw_ptr);
+        auto data_movement_manager = std::shared_ptr<DataMovementManager>(new DataMovementManager(std::dynamic_pointer_cast<WMS>(this->getSharedPtr())));
         data_movement_manager->simulation = this->simulation;
         data_movement_manager->start(data_movement_manager, true, false); // Always daemonize, no auto-restart
+
+        // Let my schedulers know who the data movemement manager is
+        if (this->standard_job_scheduler) {
+            this->standard_job_scheduler->setDataMovementManager(std::dynamic_pointer_cast<DataMovementManager>(data_movement_manager->getSharedPtr()));
+        }
+        if (this->pilot_job_scheduler) {
+            this->pilot_job_scheduler->setDataMovementManager(std::dynamic_pointer_cast<DataMovementManager>(data_movement_manager->getSharedPtr()));
+        }
+
         return data_movement_manager;
     }
 
