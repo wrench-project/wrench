@@ -25,8 +25,8 @@ namespace wrench {
     constexpr unsigned long ComputeService::ALL_CORES;
     constexpr double ComputeService::ALL_RAM;
 
+    // Create SCRATCH as share_ptr to a boogus ptr, with a noop destructor!
     static void null_deleter_StorageService(wrench::StorageService *) {}
-
     std::shared_ptr<StorageService> ComputeService::SCRATCH =
             std::shared_ptr<StorageService>((StorageService*)666, &null_deleter_StorageService);
 
