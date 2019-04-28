@@ -121,7 +121,6 @@ namespace wrench {
      * @return a shared pointer
      */
     std::shared_ptr<S4U_Daemon> S4U_Daemon::getSharedPtr() {
-        WRENCH_INFO("GETTING SHARED POINTER FOR %s", this->getName().c_str());
         return this->life_saver->reference;
     }
 
@@ -346,7 +345,6 @@ namespace wrench {
         if (this->life_saver) {
             throw std::runtime_error("S4U_Daemon::createLifeSaver(): Lifesaver already created!");
         }
-        WRENCH_INFO("SETTING LLIFE SAVER OF %s", this->getName().c_str());
         this->life_saver = new S4U_Daemon::LifeSaver(reference);
     }
 

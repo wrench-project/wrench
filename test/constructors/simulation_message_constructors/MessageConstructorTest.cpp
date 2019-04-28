@@ -23,31 +23,33 @@
 class MessageConstructorTest : public ::testing::Test {
 protected:
 
+    static void null_deleter_StorageService(wrench::StorageService *) {}
+    static void null_deleter_ComputeService(wrench::ComputeService *) {}
+    static void null_deleter_NetworkProximityService(wrench::NetworkProximityService *) {}
+    static void null_deleter_NetworkProximityDaemon(wrench::NetworkProximityDaemon *) {}
+    static void null_deleter_FileNotFound(wrench::FileNotFound *) {}
+
     ~MessageConstructorTest() {
-        storage_service.reset();
-        compute_service.reset();
-        network_proximity_service.reset();
-        network_proximity_daemon.reset();
-        failure_cause.reset();
     }
 
     MessageConstructorTest() {
-      workflow = new wrench::Workflow();
-      workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(workflow);
-      task = workflow->addTask("task", 1, 1, 1, 1.0, 0);
-      file = workflow->addFile("file", 1);
-      storage_service = std::shared_ptr<wrench::StorageService>((wrench::StorageService *)(1234));
-      compute_service = std::shared_ptr<wrench::ComputeService>((wrench::ComputeService *)(1234));
-      network_proximity_service = std::shared_ptr<wrench::NetworkProximityService>((wrench::NetworkProximityService *)(1234));
-      network_proximity_daemon = std::shared_ptr<wrench::NetworkProximityDaemon>((wrench::NetworkProximityDaemon *)(1234));
-      workflow_job = (wrench::WorkflowJob *)(1234);
-      standard_job = (wrench::StandardJob *)(1234);
-      batch_job = (wrench::BatchJob *)(1234);
-      pilot_job = (wrench::PilotJob *)(1234);
-      file_copy_start_time_stamp = new wrench::SimulationTimestampFileCopyStart(file, storage_service, "dir", storage_service, "dir");
-      failure_cause = std::make_shared<wrench::FileNotFound>(file, storage_service);
-      file_copy_start_time_stamp = new wrench::SimulationTimestampFileCopyStart(file, storage_service, "dir", storage_service, "dir");
+        workflow = new wrench::Workflow();
+        workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(workflow);
+        task = workflow->addTask("task", 1, 1, 1, 1.0, 0);
+        file = workflow->addFile("file", 1);
+        storage_service = std::shared_ptr<wrench::StorageService>((wrench::StorageService *)(1234), &null_deleter_StorageService);
+        compute_service = std::shared_ptr<wrench::ComputeService>((wrench::ComputeService *)(1234), &null_deleter_ComputeService);
+        network_proximity_service = std::shared_ptr<wrench::NetworkProximityService>((wrench::NetworkProximityService *)(1234), &null_deleter_NetworkProximityService);
+        network_proximity_daemon = std::shared_ptr<wrench::NetworkProximityDaemon>((wrench::NetworkProximityDaemon *)(1234), &null_deleter_NetworkProximityDaemon);
+        workflow_job = (wrench::WorkflowJob *)(1234);
+        standard_job = (wrench::StandardJob *)(1234);
+        batch_job = (wrench::BatchJob *)(1234);
+        pilot_job = (wrench::PilotJob *)(1234);
+        file_copy_start_time_stamp = new wrench::SimulationTimestampFileCopyStart(file, storage_service, "dir", storage_service, "dir");
+        failure_cause = std::shared_ptr<wrench::FileNotFound>(new wrench::FileNotFound(file, storage_service), &null_deleter_FileNotFound);
+        file_copy_start_time_stamp = new wrench::SimulationTimestampFileCopyStart(file, storage_service, "dir", storage_service, "dir");
     }
+
 
     // data members
     std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
