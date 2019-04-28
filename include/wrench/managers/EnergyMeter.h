@@ -31,8 +31,8 @@ namespace wrench {
 
         friend class WMS;
 
-        EnergyMeter(WMS *wms, const std::map<std::string, double> &measurement_periods);
-        EnergyMeter(WMS *wms, const std::vector<std::string> &hostnames, double period);
+        EnergyMeter(std::shared_ptr<WMS> wms, const std::map<std::string, double> &measurement_periods);
+        EnergyMeter(std::shared_ptr<WMS> wms, const std::vector<std::string> &hostnames, double period);
 
 
     private:
@@ -41,7 +41,7 @@ namespace wrench {
 
 
             // Relevant WMS
-        WMS *wms;
+        std::shared_ptr<WMS> wms;
 
         std::map<std::string, double> measurement_periods;
         std::map<std::string, double> time_to_next_measurement;
