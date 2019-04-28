@@ -388,7 +388,8 @@ namespace wrench {
      * @return a job manager
      */
     std::shared_ptr<JobManager> WMS::createJobManager() {
-        auto job_manager_raw_ptr = new JobManager(std::dynamic_pointer_cast<WMS>(this->getSharedPtr()));
+        auto wms_shared_ptr = std::dynamic_pointer_cast<WMS>(this->getSharedPtr());
+        auto job_manager_raw_ptr = new JobManager(wms_shared_ptr);
         std::shared_ptr<JobManager> job_manager = std::shared_ptr<JobManager>(job_manager_raw_ptr);
         job_manager->simulation = this->simulation;
         job_manager->start(job_manager, true, false); // Always daemonize, no auto-restart
@@ -415,7 +416,7 @@ namespace wrench {
      * @return an energy meter
      */
     std::shared_ptr<EnergyMeter> WMS::createEnergyMeter(const std::map<std::string, double> &measurement_periods) {
-        auto energy_meter_raw_ptr = new EnergyMeter(this, measurement_periods);
+        auto energy_meter_raw_ptr = new EnergyMeter(std::dynamic_pointer_cast<WMS>(this->getSharedPtr()), measurement_periods);
         std::shared_ptr<EnergyMeter> energy_meter = std::shared_ptr<EnergyMeter>(energy_meter_raw_ptr);
         energy_meter->simulation = this->simulation;
         energy_meter->start(energy_meter, true, false); // Always daemonize, no auto-restart
@@ -429,7 +430,7 @@ namespace wrench {
      * @return an energy meter
      */
     std::shared_ptr<EnergyMeter> WMS::createEnergyMeter(const std::vector<std::string> &hostnames, double measurement_period) {
-        auto energy_meter_raw_ptr = new EnergyMeter(this, hostnames, measurement_period);
+        auto energy_meter_raw_ptr = new EnergyMeter(std::dynamic_pointer_cast<WMS>(this->getSharedPtr()), hostnames, measurement_period);
         std::shared_ptr<EnergyMeter> energy_meter = std::shared_ptr<EnergyMeter>(energy_meter_raw_ptr);
         energy_meter->simulation = this->simulation;
         energy_meter->start(energy_meter, true, false); // Always daemonize, no auto-restart
