@@ -24,7 +24,7 @@ namespace wrench {
      * @param wms: the WMS that uses this data movement manager
      * @param measurement_periods: the measurement period for each metered host
      */
-    EnergyMeter::EnergyMeter(WMS *wms, const std::map<std::string, double> &measurement_periods) :
+    EnergyMeter::EnergyMeter(std::shared_ptr<WMS> wms, const std::map<std::string, double> &measurement_periods) :
             Service(wms->hostname, "energy_meter", "energy_meter") {
 
       if (measurement_periods.empty()) {
@@ -53,7 +53,7 @@ namespace wrench {
      * @param hostnames: the list of metered hosts, as hostnames
      * @param measurement_period: the measurement period
      */
-    EnergyMeter::EnergyMeter(WMS *wms, const std::vector<std::string> &hostnames, double measurement_period) :
+    EnergyMeter::EnergyMeter(std::shared_ptr<WMS> wms, const std::vector<std::string> &hostnames, double measurement_period) :
             Service(wms->hostname, "energy_meter", "energy_meter") {
 
       if (hostnames.empty()) {
