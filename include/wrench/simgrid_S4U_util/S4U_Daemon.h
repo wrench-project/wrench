@@ -38,6 +38,8 @@ namespace wrench {
             std::shared_ptr<S4U_Daemon> reference;
         };
 
+
+
     public:
         /** @brief The name of the daemon */
         std::string process_name;
@@ -118,7 +120,6 @@ namespace wrench {
         /** @brief The number of time that this daemon has started (i.e., 1 + number of restarts) */
         unsigned int num_starts = 0;
 
-        std::shared_ptr<S4U_Daemon> getSharedPtr();
     private:
 
         // Lock used typically to prevent kill() from killing the actor
@@ -131,6 +132,7 @@ namespace wrench {
         int return_value = 0; // Set to the value returned by main
         bool daemonized; // Set to true if daemon is daemonized
         bool auto_restart; // Set to true if daemon is supposed to auto-restart
+
 
 
 

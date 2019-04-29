@@ -65,17 +65,13 @@ namespace wrench {
 		static std::map<std::string, std::vector<std::string>> getAllHostnamesByCluster();
 		void shutdown();
 
-
 	private:
 		static double getHostMemoryCapacity(simgrid::s4u::Host *host);
 		simgrid::s4u::Engine *engine;
 		bool initialized = false;
 		bool platform_setup = false;
 
-
-
-
-	};
+    };
 
 	/***********************/
 	/** \endcond           */

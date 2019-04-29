@@ -79,6 +79,7 @@ namespace wrench {
 #define CLEAN_UP_MAILBOX_TO_AVOID_MEMORY_LEAK 0
 
     S4U_Daemon::~S4U_Daemon() {
+
 //        WRENCH_INFO("IN DAEMON DESTRUCTOR (%s)'", this->getName().c_str());
 
         /** The code below was to avoid a memory leak on the actor! However, weirdly,
@@ -116,13 +117,6 @@ namespace wrench {
         }
     }
 
-    /**
-     * @brief Get the global shared pointer to the daemon
-     * @return a shared pointer
-     */
-    std::shared_ptr<S4U_Daemon> S4U_Daemon::getSharedPtr() {
-        return this->life_saver->reference;
-    }
 
     /**
      * @brief Get the daemon's state

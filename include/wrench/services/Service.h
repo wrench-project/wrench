@@ -31,8 +31,6 @@ namespace wrench {
         /** \cond DEVELOPER    */
         /***********************/
 
-
-
         void start(std::shared_ptr<Service> this_service, bool daemonize, bool auto_restart);
         virtual void stop();
         void suspend();
@@ -76,7 +74,11 @@ namespace wrench {
 
         friend class Simulation;
 
+        ~Service();
+
         Service(std::string hostname, std::string process_name_prefix, std::string mailbox_name_prefix);
+
+        std::shared_ptr<Service> getSharedPtr();
 
         // Property stuff
         void setProperty(std::string, std::string);
@@ -109,6 +111,8 @@ namespace wrench {
          *  a NetworkTimeOut exception. (default: 30 second; if <0 never timeout)
          */
         double network_timeout = 30.0;
+
+        static std::map<Service *, std::shared_ptr<Service> *> service_shared_ptr_map;
 
     private:
         bool shutting_down = false;
