@@ -22,6 +22,28 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(service, "Log category for Service");
 
 namespace wrench {
 
+    std::map<Service *, std::shared_ptr<Service> *> Service::service_shared_ptr_map;
+
+    /**
+     * @brief Get the master shared pointer to the service
+     * @return the master shared pointer
+     */
+    std::shared_ptr<Service> Service::getSharedPtr() {
+        if (Service::service_shared_ptr_map.find(this) == Service::service_shared_ptr_map.end()) {
+            throw std::runtime_error("Service::getSharedPtr(): master shared_ptr to service not found! This should happen only"
+                                     "if the service has not been started, in which case this method shouldn't have been called");
+        }
+        return *Service::service_shared_ptr_map[this];
+    }
+
+
+    /**
+     * @brief Destructor
+     */
+    Service::~Service() {
+        Service::service_shared_ptr_map.erase(this);
+    }
+
     /**
      * @brief Constructor
      * @param hostname: the name of the host on which the service will run
@@ -180,6 +202,7 @@ namespace wrench {
         try {
             this->state = Service::UP;
             this->createLifeSaver(this_service);
+            Service::service_shared_ptr_map[this_service.get()] = &this_service;
             this->startDaemon(daemonize, auto_restart);
         } catch (std::invalid_argument &e) {
             throw std::runtime_error("Service::start(): " + std::string(e.what()));
@@ -330,10 +353,6 @@ namespace wrench {
      */
     void Service::serviceSanityCheck() {
         assertServiceIsUp();
-//
-//        if (this->state == Service::DOWN) {
-//            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-//        }
     }
 
     /**
