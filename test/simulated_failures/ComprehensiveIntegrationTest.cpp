@@ -240,7 +240,6 @@ private:
 //                WRENCH_INFO("TIMEOUT");
             }
         }
-        WRENCH_INFO("WORKFLOW DONE!");
 
         return 0;
     }

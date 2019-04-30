@@ -279,7 +279,6 @@ private:
 
 TEST_F(BareMetalComputeServiceOneTaskTest, Noop) {
     DO_TEST_WITH_FORK(do_Noop_test);
-    std::cerr << "REALLY DONE WIT TEST\n";
 }
 
 void BareMetalComputeServiceOneTaskTest::do_Noop_test() {
@@ -347,13 +346,11 @@ void BareMetalComputeServiceOneTaskTest::do_Noop_test() {
     ASSERT_NO_THROW(simulation->launch());
 
 
-    std::cerr << "DELETING SIMIUALTION OBJECT!\n";
     delete simulation;
 
     free(argv[0]);
     free(argv);
 
-    std::cerr <<"DONE WITH TEST!" << "\n";
 }
 
 

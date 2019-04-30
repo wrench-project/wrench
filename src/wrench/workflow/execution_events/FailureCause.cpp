@@ -9,11 +9,15 @@
 
 #include <wrench/workflow/execution_events/FailureCause.h>
 
+#include "wrench/logging/TerminalOutput.h"
 #include "wrench/workflow/execution_events/FailureCause.h"
 #include "wrench/workflow/WorkflowFile.h"
 #include "wrench/workflow/job/WorkflowJob.h"
 #include "wrench/services/storage/StorageService.h"
 #include "wrench/services/compute/ComputeService.h"
+
+XBT_LOG_NEW_DEFAULT_CATEGORY(falure_cause, "Log category for FailureCause");
+
 
 namespace wrench {
 

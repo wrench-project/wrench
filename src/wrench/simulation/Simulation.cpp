@@ -66,10 +66,10 @@ namespace wrench {
      * @brief Destructor
      */
     Simulation::~Simulation() {
-        WRENCH_INFO("IN SIMUALTION DESTRUCTOR");
         this->s4u_simulation->shutdown();
+        // Clearing all tracked service, which will cause all services that are not
+        // pointed to by main() to be deleted.
         Service::clearTrackedServices();
-        WRENCH_INFO("RETURNING FROM SIMULATION DESTRUCTOR");
     }
 
     /**
