@@ -249,6 +249,7 @@ namespace wrench {
             throw std::runtime_error("Simulation::launch(): " + std::string(e.what()));
         }
 
+        WRENCH_INFO("HERE");
         this->is_running = true;
 
         // Run the simulation
@@ -335,7 +336,8 @@ namespace wrench {
         try {
             // Start the WMSes
             for (const auto &wms : this->wmses) {
-                wms->start(wms, false, false);  // Not daemonized, no auto-restart
+                std::shared_ptr<Service> service_shared_ptr = std::dynamic_pointer_cast<Service>(wms);
+                wms->start(service_shared_ptr, false, false);  // Not daemonized, no auto-restart
             }
 
             // Start the compute services
