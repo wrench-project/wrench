@@ -135,10 +135,6 @@ namespace wrench {
 
         assertServiceIsUp();
 
-//        if (this->state == DOWN) {
-//            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-//        }
-
         std::string network_service_type = this->getPropertyValueAsString(
                 NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE);
 
