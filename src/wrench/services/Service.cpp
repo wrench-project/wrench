@@ -49,7 +49,7 @@ namespace wrench {
         // Clean up all messages left over in my mailbox to avoid memory leaks
 //        MessageManager::cleanUpMessages(this->mailbox_name);
         WRENCH_INFO("IN SERVICE DESTRUCTOR: REMOVING ENTRY IN MAP");
-        Service::service_shared_ptr_map.erase(this);
+//        Service::service_shared_ptr_map.erase(this);
         WRENCH_INFO("RETURNING FROM SERVICE DESTRUCTOR!");
     }
 
