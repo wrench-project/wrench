@@ -45,7 +45,7 @@ namespace wrench {
      */
     Service::~Service() {
         WRENCH_INFO("IN SERVICE DESTRUCTOR (%s): BEFORE REMOVING ENTRY IN MAP", this->getName().c_str());
-        MessageManager::print();
+//        MessageManager::print();
         // Clean up all messages left over in my mailbox to avoid memory leaks
 //        MessageManager::cleanUpMessages(this->mailbox_name);
         WRENCH_INFO("IN SERVICE DESTRUCTOR: REMOVING ENTRY IN MAP");
