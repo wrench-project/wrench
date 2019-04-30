@@ -62,6 +62,10 @@ namespace wrench {
 
         void setStateToDown();
 
+        static void increaseNumCompletedServicesCount();
+        static void clearTrackedServices();
+        static void cleanupTrackedServices();
+
         /***********************/
         /** \endcond           */
         /***********************/
@@ -77,8 +81,6 @@ namespace wrench {
         ~Service();
 
         Service(std::string hostname, std::string process_name_prefix, std::string mailbox_name_prefix);
-
-        std::shared_ptr<Service> getSharedPtr();
 
         // Property stuff
         void setProperty(std::string, std::string);
@@ -101,9 +103,6 @@ namespace wrench {
         /** @brief The service's messagepayload list */
         std::map<std::string, double> messagepayload_list;
 
-
-
-
         /** @brief The service's name */
         std::string name;
 
@@ -112,10 +111,15 @@ namespace wrench {
          */
         double network_timeout = 30.0;
 
-        static std::map<Service *, std::shared_ptr<Service>> service_shared_ptr_map;
+        std::shared_ptr<Service> getSharedPtr();
 
-    private:
+
+            private:
         bool shutting_down = false;
+
+        static std::unordered_map<Service *, std::shared_ptr<Service>> service_shared_ptr_map;
+        static unsigned long num_terminated_services;
+
 
         /***********************/
         /** \endcond           */
