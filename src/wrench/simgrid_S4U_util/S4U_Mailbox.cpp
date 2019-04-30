@@ -11,7 +11,6 @@
 #include <memory>
 #include <simgrid/s4u/Mailbox.hpp>
 #include <simgrid/s4u.hpp>
-#include <wrench/util/MessageManager.h>
 
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/workflow/execution_events/FailureCause.h"
@@ -56,8 +55,6 @@ namespace wrench {
                 new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, mailbox_name));
       }
 
-      //Remove this message from the message manager list
-        MessageManager::removeReceivedMessage(mailbox_name, msg);
       WRENCH_DEBUG("Received a '%s' message from mailbox_name %s", msg->getName().c_str(), mailbox_name.c_str());
       return std::unique_ptr<SimulationMessage>(msg);
     }
@@ -100,9 +97,6 @@ namespace wrench {
 
       auto msg = static_cast<SimulationMessage *>(data);
 
-      //Remove this message from the message manager list
-        MessageManager::removeReceivedMessage(mailbox_name, msg);
-
       WRENCH_DEBUG("Received a '%s' message from mailbox_name '%s'", msg->getName().c_str(), mailbox_name.c_str());
 
       return std::unique_ptr<SimulationMessage>(msg);
@@ -123,8 +117,6 @@ namespace wrench {
 //      simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
       simgrid::s4u::Mailbox *mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
       try {
-        //also let the MessageManager manage this message
-        MessageManager::manageMessage(mailbox_name, msg);
         mailbox->put(msg, (uint64_t) msg->payload);
       } catch (simgrid::NetworkFailureException &e) {
         throw std::shared_ptr<NetworkError>(
@@ -150,11 +142,9 @@ namespace wrench {
 
       simgrid::s4u::CommPtr comm = nullptr;
 
-//      simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
       simgrid::s4u::Mailbox *mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
 
       try {
-        MessageManager::manageMessage(mailbox_name, msg);
         mailbox->put_init(msg, (uint64_t) msg->payload)->detach();
       } catch (simgrid::NetworkFailureException &e) {
         throw std::shared_ptr<NetworkError>(
@@ -187,7 +177,6 @@ namespace wrench {
       simgrid::s4u::Mailbox *mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
 
       try {
-        MessageManager::manageMessage(mailbox_name, msg);
         comm_ptr = mailbox->put_async(msg, (uint64_t) msg->payload);
       } catch (simgrid::NetworkFailureException &e) {
         throw std::shared_ptr<NetworkError>(
