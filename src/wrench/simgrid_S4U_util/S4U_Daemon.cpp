@@ -94,7 +94,7 @@ namespace wrench {
 #ifdef ACTOR_TRACKING_OUTPUT
         num_actors[this->process_name_prefix]--;
 #endif
-        // Clean up all messages to avoid memory leaks
+        // Clean up all mymessages to avoid memory leaks
         MessageManager::cleanUpMessages(this->mailbox_name);
     }
 
@@ -207,6 +207,7 @@ namespace wrench {
             if (not this->isSetToAutoRestart()) {
                 auto life_saver = this->life_saver;
                 this->life_saver = nullptr;
+                WRENCH_INFO("DELETING LIFE SAVER FOR %s", this->getName().c_str());
                 delete life_saver;
             }
             return 0;
