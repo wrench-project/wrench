@@ -135,10 +135,6 @@ namespace wrench {
 
       assertServiceIsUp();
 
-//      if (this->state == DOWN) {
-//        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-//      }
-
       // Send a message to the daemon
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("how_much_free_space");
       try {
@@ -184,10 +180,6 @@ namespace wrench {
 
       assertServiceIsUp();
 
-//      if (this->state == DOWN) {
-//        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-//      }
-
       std::string dst_partition = "/";
       return this->lookupFile(file, dst_partition);
     }
@@ -210,10 +202,6 @@ namespace wrench {
       }
 
       assertServiceIsUp();
-
-//      if (this->state == DOWN) {
-//        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-//      }
 
       std::string dst_partition = "/";
       if (job != nullptr) {
@@ -241,10 +229,6 @@ namespace wrench {
       }
 
       assertServiceIsUp();
-
-//      if (this->state == DOWN) {
-//        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-//      }
 
       // Empty partition means "/"
       if (dst_partition.empty()) {
@@ -330,10 +314,6 @@ namespace wrench {
       }
 
       assertServiceIsUp();
-
-//      if (this->state == DOWN) {
-//        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-//      }
 
       // Empty partition means "/"
       if (src_partition.empty()) {
@@ -440,10 +420,6 @@ namespace wrench {
       }
 
       assertServiceIsUp();
-
-//      if (this->state == DOWN) {
-//        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-//      }
 
       // Empty partition means "/"
       if (dst_partition.empty()) {
@@ -657,10 +633,6 @@ namespace wrench {
 
       assertServiceIsUp();
 
-//      if (this->state == DOWN) {
-//        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-//      }
-
       std::string dst_partition = "/";
       this->deleteFile(file, dst_partition, file_registry_service);
     }
@@ -684,10 +656,6 @@ namespace wrench {
       }
 
       assertServiceIsUp();
-
-//      if (this->state == DOWN) {
-//        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-//      }
 
       std::string dst_partition = "/";
       if (job != nullptr) {
@@ -812,10 +780,6 @@ namespace wrench {
 
       assertServiceIsUp();
 
-//      if (this->state == DOWN) {
-//        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-//      }
-
       std::string src_partition = "/";
 
       std::string dst_partition = "/";
@@ -850,10 +814,6 @@ namespace wrench {
       }
 
       assertServiceIsUp();
-
-//      if (this->state == DOWN) {
-//        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-//      }
 
       std::string src_partition = "/";
       if (src_job != nullptr) {
@@ -968,10 +928,6 @@ namespace wrench {
 
       assertServiceIsUp();
 
-//      if (this->state == DOWN) {
-//        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-//      }
-
       auto start_timestamp = new SimulationTimestampFileCopyStart(file, src, src_partition, std::dynamic_pointer_cast<StorageService>(this->getSharedPtr()), dst_partition);
       this->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyStart>(start_timestamp);
 
@@ -1015,10 +971,6 @@ namespace wrench {
       }
 
       assertServiceIsUp();
-
-//      if (this->state == DOWN) {
-//        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-//      }
 
       // Empty partition means "/"
       if (src_partition.empty()) {

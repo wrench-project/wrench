@@ -30,7 +30,6 @@ namespace wrench {
     * @return the master shared pointer
     */
     std::shared_ptr<Service> Service::getSharedPtr() {
-        WRENCH_INFO("GETTING SHARED POINTER FOR %s", this->getName().c_str());
         if (Service::service_shared_ptr_map.find(this) == Service::service_shared_ptr_map.end()) {
             throw std::runtime_error("Service::getSharedPtr(): master shared_ptr to service not found! This should happen only "
                                      "if the service has not been started, in which case this method shouldn't have been called");
@@ -73,7 +72,7 @@ namespace wrench {
      * @brief Destructor
      */
     Service::~Service() {
-        WRENCH_INFO("IN SERVICE DESTRUCTOR: %s", this->getName().c_str());
+//        WRENCH_INFO("IN SERVICE DESTRUCTOR: %s", this->getName().c_str());
     }
 
     /**
@@ -422,12 +421,8 @@ namespace wrench {
      * @throw WorkflowExecutionException
      */
     void Service::assertServiceIsUp() {
-        WRENCH_INFO("IN ASSERT SERVICE IS UP: %p", this);
         if (this->state == Service::DOWN) {
-            WRENCH_INFO("SERVICE IS DOWN: %p", this);
             auto shared_ptr = this->getSharedPtr();
-            WRENCH_INFO("HERE!");
-            WRENCH_INFO("---> %s", this->getSharedPtr()->getName().c_str());
             throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this->getSharedPtr())));
         }
         if (this->state == Service::SUSPENDED) {

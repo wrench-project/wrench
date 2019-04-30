@@ -207,7 +207,6 @@ namespace wrench {
             if (not this->isSetToAutoRestart()) {
                 auto life_saver = this->life_saver;
                 this->life_saver = nullptr;
-                WRENCH_INFO("DELETING LIFE SAVER FOR %s", this->getName().c_str());
                 Service::increaseNumCompletedServicesCount();
                 delete life_saver;
             }
