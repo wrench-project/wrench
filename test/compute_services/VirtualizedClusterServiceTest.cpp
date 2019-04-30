@@ -136,7 +136,7 @@ private:
     VirtualizedClusterServiceTest *test;
 
     int main() {
-        auto cs = std::dynamic_pointer_cast<wrench::VirtualizedClusterComputeService>(this->test->compute_service);
+        auto cs = std::dynamic_pointer_cast<wrench::CloudComputeService>(this->test->compute_service);
 
 
         // Non-existent VM operations (for coverage)
@@ -442,7 +442,7 @@ private:
             }
 
             // create and start VM with the 2  cores and 10 bytes of RAM
-            auto cs = std::dynamic_pointer_cast<wrench::VirtualizedClusterComputeService>(this->test->compute_service);
+            auto cs = std::dynamic_pointer_cast<wrench::CloudComputeService>(this->test->compute_service);
             cs->startVM(cs->createVM(2, 10));
 
             sum_num_idle_cores = cs->getTotalNumIdleCores();
