@@ -17,6 +17,9 @@
 
 #define EPSILON 0.05
 
+XBT_LOG_NEW_DEFAULT_CATEGORY(bare_metal_compute_service_test_standard_jobs, "Log category for BareMetalComputeServiceTestStandardJobs");
+
+
 class BareMetalComputeServiceTestStandardJobs : public ::testing::Test {
 
 public:
@@ -1502,13 +1505,13 @@ private:
       }
       switch (event->type) {
         case wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
-          if (dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())->failure_cause->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
-            std::runtime_error("Got the correct failure event, but the cause seems wrong");
+          if (dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())->failure_cause->getCauseType() != wrench::FailureCause::NO_STORAGE_SERVICE_FOR_FILE) {
+            throw std::runtime_error("Got the correct failure event, but the cause seems wrong");
           }
-          auto *real_cause = (wrench::ServiceIsDown *) (dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())->failure_cause.get());
-          if (real_cause->getService() != this->test->storage_service) {
-            std::runtime_error(
-                    "Got the correct failure even, a correct cause type, but the cause points to the wrong service");
+          auto real_cause = std::dynamic_pointer_cast<wrench::NoStorageServiceForFile>((dynamic_cast<wrench::StandardJobFailedEvent*>(event.get()))->failure_cause);
+          if (real_cause->getFile() != this->test->input_file) {
+            throw std::runtime_error(
+                    "Got the correct failure even, a correct cause type, but the cause points to the wrong file");
           }
           break;
         }

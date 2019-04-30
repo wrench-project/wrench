@@ -81,10 +81,6 @@ namespace wrench {
 
       assertServiceIsUp();
 
-//      if (this->state != Service::UP) {
-//        throw WorkflowExecutionException(std::shared_ptr<ServiceIsDown>(new ServiceIsDown(this)));
-//      }
-
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("lookup_entry");
 
       try {
@@ -131,10 +127,6 @@ namespace wrench {
       }
 
       assertServiceIsUp();
-
-//      if (this->state != Service::UP) {
-//        throw WorkflowExecutionException(std::shared_ptr<ServiceIsDown>(new ServiceIsDown(this)));
-//      }
 
       // check to see if the 'reference_host' is valid
       std::vector<std::string> monitored_hosts = network_proximity_service->getHostnameList();
@@ -184,10 +176,6 @@ namespace wrench {
 
       assertServiceIsUp();
 
-//      if (this->state != Service::UP) {
-//        throw WorkflowExecutionException(std::shared_ptr<ServiceIsDown>(new ServiceIsDown(this)));
-//      }
-
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("add_entry");
 
       try {
@@ -230,10 +218,6 @@ namespace wrench {
       }
 
       assertServiceIsUp();
-
-//      if (this->state != Service::UP) {
-//        throw WorkflowExecutionException(std::shared_ptr<ServiceIsDown>(new ServiceIsDown(this)));
-//      }
 
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("remove_entry");
 

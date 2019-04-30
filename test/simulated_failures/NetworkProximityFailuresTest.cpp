@@ -198,7 +198,7 @@ void NetworkProximityFailuresTest::do_NetworkProximityFailures_Test() {
     std::shared_ptr<wrench::NetworkProximityService> network_proximity_service;
 
 
-    ASSERT_NO_THROW(simulation->add(new wrench::NetworkProximityService(stable_hostname, hosts_in_network, {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD,"10"},
+    ASSERT_NO_THROW(network_proximity_service = simulation->add(new wrench::NetworkProximityService(stable_hostname, hosts_in_network, {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD,"10"},
                                                                                                             {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE,"0"}})));
 
     // Create a WMS
