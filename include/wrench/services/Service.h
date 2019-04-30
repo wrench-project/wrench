@@ -112,7 +112,7 @@ namespace wrench {
          */
         double network_timeout = 30.0;
 
-        static std::map<Service *, std::shared_ptr<Service> *> service_shared_ptr_map;
+        static std::map<Service *, std::shared_ptr<Service>> service_shared_ptr_map;
 
     private:
         bool shutting_down = false;
