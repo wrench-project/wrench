@@ -36,6 +36,7 @@ namespace wrench {
         static void cleanUpMessages(std::string);
         static void removeReceivedMessage(std::string mailbox, SimulationMessage *msg);
         static void cleanUpAllMessages();
+        static void print();
 
     };
 

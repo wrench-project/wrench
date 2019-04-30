@@ -47,7 +47,7 @@ namespace wrench {
     void MessageManager::cleanUpMessages(std::string mailbox) {
       if (mailbox_messages.find(mailbox) != mailbox_messages.end()) {
         for (auto msg : mailbox_messages[mailbox]) {
-//            WRENCH_INFO("DELETING A MESSAGE FOR MAILBOX : %s (%lu)", mailbox.c_str(), (unsigned long)(msg));
+            WRENCH_INFO("DELETING A MESSAGE FOR MAILBOX : %s (%lu)", mailbox.c_str(), (unsigned long)(msg));
             delete msg;
         }
         mailbox_messages[mailbox].clear();
@@ -64,6 +64,13 @@ namespace wrench {
       }
     }
 
+    void MessageManager::print() {
+        WRENCH_INFO("MESSAGE_MANAGER DB:");
+        for (auto const &x : mailbox_messages) {
+            WRENCH_INFO("   ==> [%s]:%lu", x.first.c_str(), x.second.size());
+        }
+    }
+
     /**
      * @brief Remove a received message from the "database" of messages
      * @param mailbox: the name of the mailbox from which the message was received
@@ -74,6 +81,9 @@ namespace wrench {
         if (mailbox_messages[mailbox].find(msg) != mailbox_messages[mailbox].end()) {
 //            WRENCH_INFO("MESSAGE_MANAGER: REMOVING [%s]:%s (%lu)", mailbox.c_str(), msg->getName().c_str(), (unsigned long)msg);
           mailbox_messages[mailbox].erase(msg);
+          if (mailbox_messages[mailbox].empty()) {
+              mailbox_messages.erase(mailbox);
+          }
         }
       }
 

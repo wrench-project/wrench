@@ -12,6 +12,7 @@
 #include <wrench/simulation/SimulationMessage.h>
 #include "wrench/services/ServiceMessage.h"
 #include "wrench/simgrid_S4U_util/S4U_Daemon.h"
+#include "wrench/util/MessageManager.h"
 #include "wrench/services/Service.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
@@ -43,8 +44,9 @@ namespace wrench {
      * @brief Destructor
      */
     Service::~Service() {
+        WRENCH_INFO("IN SERVICE DESTRUCTOR (%s): BEFORE REMOVING ENTRY IN MAP", this->getName().c_str());
+        MessageManager::print();
         WRENCH_INFO("IN SERVICE DESTRUCTOR: REMOVING ENTRY IN MAP");
-        Service::service_shared_ptr_map.erase(this);
     }
 
     /**
