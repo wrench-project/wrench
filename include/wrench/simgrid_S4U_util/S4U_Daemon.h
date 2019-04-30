@@ -122,6 +122,7 @@ namespace wrench {
 
     private:
 
+
         // Lock used typically to prevent kill() from killing the actor
         // while it's in the middle of doing something critical
         simgrid::s4u::MutexPtr daemon_lock;
@@ -132,8 +133,6 @@ namespace wrench {
         int return_value = 0; // Set to the value returned by main
         bool daemonized; // Set to true if daemon is daemonized
         bool auto_restart; // Set to true if daemon is supposed to auto-restart
-
-
 
 
 #ifdef ACTOR_TRACKING_OUTPUT

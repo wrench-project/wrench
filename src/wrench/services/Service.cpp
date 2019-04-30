@@ -12,7 +12,6 @@
 #include <wrench/simulation/SimulationMessage.h>
 #include "wrench/services/ServiceMessage.h"
 #include "wrench/simgrid_S4U_util/S4U_Daemon.h"
-#include "wrench/util/MessageManager.h"
 #include "wrench/services/Service.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
@@ -23,34 +22,57 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(service, "Log category for Service");
 
 namespace wrench {
 
-    std::map<Service *, std::shared_ptr<Service>> Service::service_shared_ptr_map;
+    std::unordered_map<Service *, std::shared_ptr<Service>> Service::service_shared_ptr_map;
+    unsigned long Service::num_terminated_services = 0;
 
     /**
-     * @brief Get the master shared pointer to the service
-     * @return the master shared pointer
-     */
+    * @brief Get the master shared pointer to the service
+    * @return the master shared pointer
+    */
     std::shared_ptr<Service> Service::getSharedPtr() {
-        WRENCH_INFO("IN GET SHARED PTR");
+        WRENCH_INFO("GETTING SHARED POINTER FOR %s", this->getName().c_str());
         if (Service::service_shared_ptr_map.find(this) == Service::service_shared_ptr_map.end()) {
-            throw std::runtime_error("Service::getSharedPtr(): master shared_ptr to service not found! This should happen only"
+            throw std::runtime_error("Service::getSharedPtr(): master shared_ptr to service not found! This should happen only "
                                      "if the service has not been started, in which case this method shouldn't have been called");
         }
-        WRENCH_INFO("FOUND IT!");
         return Service::service_shared_ptr_map[this];
-
     }
+
+    /**
+     * @brief Increase the completed service count
+     */
+    void Service::increaseNumCompletedServicesCount() {
+        Service::num_terminated_services++;
+    }
+
+    /**
+     * @brief Forget all tracked services
+     */
+    void Service::clearTrackedServices() {
+        Service::service_shared_ptr_map.clear();
+    }
+
+    /**
+     * @brief Go through the tracked services and remove all entries with a refcount of 1!
+     */
+    void Service::cleanupTrackedServices() {
+        std::set<Service *> to_cleanup;
+
+        for (auto const &x : Service::service_shared_ptr_map) {
+            if (x.second.use_count() == 1) {
+                to_cleanup.insert(x.first);
+            }
+        }
+        for (auto const &x : to_cleanup) {
+            Service::service_shared_ptr_map.erase(x);
+        }
+    }
+
 
     /**
      * @brief Destructor
      */
     Service::~Service() {
-        WRENCH_INFO("IN SERVICE DESTRUCTOR (%s): BEFORE REMOVING ENTRY IN MAP", this->getName().c_str());
-//        MessageManager::print();
-        // Clean up all messages left over in my mailbox to avoid memory leaks
-//        MessageManager::cleanUpMessages(this->mailbox_name);
-        WRENCH_INFO("IN SERVICE DESTRUCTOR: REMOVING ENTRY IN MAP");
-//        Service::service_shared_ptr_map.erase(this);
-        WRENCH_INFO("RETURNING FROM SERVICE DESTRUCTOR!");
     }
 
     /**
@@ -209,16 +231,27 @@ namespace wrench {
      */
     void Service::start(std::shared_ptr<Service> this_service, bool daemonize, bool auto_restart) {
         try {
+            // Setting the state to UP
             this->state = Service::UP;
+            // Creating the life saver so that the the actor will never see the
+            // Service object deleted from under its feet
             this->createLifeSaver(this_service);
-            WRENCH_INFO("ADDING ENTRY to service_shared_ptr_map for %s", this_service->getName().c_str());
-            Service::service_shared_ptr_map[this_service.get()] = this_service;
-            WRENCH_INFO("Starting the ademoon");
+            // Keep track of the master share_ptr reference to this service
+            Service::service_shared_ptr_map[this] = this_service;
+            // Start the daemon for the service
             this->startDaemon(daemonize, auto_restart);
+            // Print some information a out the currently tracked daemons
+            WRENCH_INFO("MAP SIZE = %ld    NUM_TERMINATED_SERVICES = %ld",
+                        Service::service_shared_ptr_map.size(), Service::num_terminated_services);
+            if ((Service::service_shared_ptr_map.size() > 1000) or
+                (Service::num_terminated_services > Service::service_shared_ptr_map.size() / 2)) {
+                Service::cleanupTrackedServices();
+                Service::num_terminated_services = 0;
+            }
+
         } catch (std::invalid_argument &e) {
             throw std::runtime_error("Service::start(): " + std::string(e.what()));
         }
-
     }
 
 

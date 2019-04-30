@@ -11,7 +11,6 @@
 #include <iomanip>
 #include <csignal>
 #include <simgrid/plugins/live_migration.h>
-#include <wrench/util/MessageManager.h>
 
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/Service.h"
@@ -68,12 +67,8 @@ namespace wrench {
      */
     Simulation::~Simulation() {
         WRENCH_INFO("IN SIMUALTION DESTRUCTOR");
-//        MessageManager::print();
         this->s4u_simulation->shutdown();
-        WRENCH_INFO("AFTER SHHUdtOWN");
-//        MessageManager::print();
-//        WRENCH_INFO("CLEARING EVERYTING THAT NEEDS CLEARING!");
-        Service::service_shared_ptr_map.clear();
+        Service::clearTrackedServices();
         WRENCH_INFO("RETURNING FROM SIMULATION DESTRUCTOR");
     }
 
@@ -255,7 +250,6 @@ namespace wrench {
             throw std::runtime_error("Simulation::launch(): " + std::string(e.what()));
         }
 
-        WRENCH_INFO("HERE");
         this->is_running = true;
 
         // Run the simulation

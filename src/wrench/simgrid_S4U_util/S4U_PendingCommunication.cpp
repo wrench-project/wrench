@@ -10,8 +10,6 @@
 #include <memory>
 #include <iostream>
 
-//#include <xbt/ex.hpp>
-#include <wrench/util/MessageManager.h>
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/simgrid_S4U_util/S4U_PendingCommunication.h"
 #include "wrench/simulation/SimulationMessage.h"
@@ -33,7 +31,6 @@ namespace wrench {
         try {
             if (this->comm_ptr->get_state() != simgrid::s4u::Activity::State::FINISHED) {
                 this->comm_ptr->wait();
-                MessageManager::removeReceivedMessage(this->mailbox_name, this->simulation_message.get());
             }
         } catch (simgrid::NetworkFailureException &e) {
             throw std::shared_ptr<NetworkError>(
@@ -92,8 +89,6 @@ namespace wrench {
         bool one_comm_failed = false;
         try {
             index = (unsigned long) simgrid::s4u::Comm::wait_any_for(&pending_s4u_comms, timeout);
-            MessageManager::removeReceivedMessage(pending_comms[index]->mailbox_name,
-                                                  pending_comms[index]->simulation_message.get());
         } catch (simgrid::NetworkFailureException &e) {
             one_comm_failed = true;
         } catch (simgrid::TimeoutError &e) {
@@ -134,8 +129,6 @@ namespace wrench {
      * @brief Destructor
      */
     S4U_PendingCommunication::~S4U_PendingCommunication() {
-        // Not really a received message, but we're getting destroyed so...
-        MessageManager::removeReceivedMessage(this->mailbox_name, this->simulation_message.get());
     }
 
 };

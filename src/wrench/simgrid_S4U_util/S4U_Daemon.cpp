@@ -189,6 +189,8 @@ namespace wrench {
         // Set the mailbox_name receiver (causes memory leak)
         // Causes Mailbox::put() to no longer implement a rendez-vous communication.
         simgrid::s4u::Mailbox::by_name(this->mailbox_name)->set_receiver(this->s4u_actor);
+
+
     }
 
     /**
@@ -206,6 +208,7 @@ namespace wrench {
                 auto life_saver = this->life_saver;
                 this->life_saver = nullptr;
                 WRENCH_INFO("DELETING LIFE SAVER FOR %s", this->getName().c_str());
+                Service::increaseNumCompletedServicesCount();
                 delete life_saver;
             }
             return 0;

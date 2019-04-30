@@ -47,7 +47,6 @@ namespace wrench {
     void MessageManager::cleanUpMessages(std::string mailbox) {
       if (mailbox_messages.find(mailbox) != mailbox_messages.end()) {
         for (auto msg : mailbox_messages[mailbox]) {
-            WRENCH_INFO("DELETING A MESSAGE FOR MAILBOX : %s (%lu)", mailbox.c_str(), (unsigned long)(msg));
             delete msg;
         }
         mailbox_messages[mailbox].clear();
