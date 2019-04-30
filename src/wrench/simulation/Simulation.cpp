@@ -67,8 +67,14 @@ namespace wrench {
      * @brief Destructor
      */
     Simulation::~Simulation() {
-        MessageManager::cleanUpAllMessages();
+//        MessageManager::cleanUpAllMessages();
+        WRENCH_INFO("IN SIMUALTION DESTRUCTOR");
+        MessageManager::print();
         this->s4u_simulation->shutdown();
+        WRENCH_INFO("AFTER SHHUdtOWN");
+        MessageManager::print();
+        this->wmses.clear();
+        WRENCH_INFO("RETURNING FROM SIMULATION DESTRUCTOR");
     }
 
     /**
@@ -258,6 +264,7 @@ namespace wrench {
         } catch (std::runtime_error &e) {
             throw;
         }
+
     }
 
     /**
