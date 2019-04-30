@@ -14,6 +14,9 @@
 #include <string>
 #include <stack>
 #include <map>
+#include <memory>
+
+//#include "wrench/services/compute/ComputeService.h"
 
 namespace wrench {
 
