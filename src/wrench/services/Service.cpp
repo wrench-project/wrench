@@ -73,6 +73,7 @@ namespace wrench {
      * @brief Destructor
      */
     Service::~Service() {
+        WRENCH_INFO("IN SERVICE DESTRUCTOR: %s", this->getName().c_str());
     }
 
     /**
@@ -421,11 +422,16 @@ namespace wrench {
      * @throw WorkflowExecutionException
      */
     void Service::assertServiceIsUp() {
+        WRENCH_INFO("IN ASSERT SERVICE IS UP: %p", this);
         if (this->state == Service::DOWN) {
-            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(std::dynamic_pointer_cast<Service>(this->getSharedPtr()))));
+            WRENCH_INFO("SERVICE IS DOWN: %p", this);
+            auto shared_ptr = this->getSharedPtr();
+            WRENCH_INFO("HERE!");
+            WRENCH_INFO("---> %s", this->getSharedPtr()->getName().c_str());
+            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this->getSharedPtr())));
         }
         if (this->state == Service::SUSPENDED) {
-            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsSuspended(std::dynamic_pointer_cast<Service>(this->getSharedPtr()))));
+            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsSuspended(this->getSharedPtr())));
         }
     }
 };
