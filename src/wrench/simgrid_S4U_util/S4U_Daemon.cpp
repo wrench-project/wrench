@@ -12,7 +12,6 @@
 #include "simgrid_S4U_util/S4U_DaemonActor.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include <wrench/logging/TerminalOutput.h>
-#include <wrench/util/MessageManager.h>
 #include <boost/algorithm/string.hpp>
 
 
@@ -94,8 +93,7 @@ namespace wrench {
 #ifdef ACTOR_TRACKING_OUTPUT
         num_actors[this->process_name_prefix]--;
 #endif
-        // Clean up all mymessages to avoid memory leaks
-        MessageManager::cleanUpMessages(this->mailbox_name);
+
     }
 
     /**
