@@ -74,6 +74,8 @@ namespace wrench {
         WRENCH_INFO("AFTER SHHUdtOWN");
         MessageManager::print();
         this->wmses.clear();
+        WRENCH_INFO("CLEARING EVERYTING THAT NEEDS CLEARING!");
+        Service::service_shared_ptr_map.clear();
         WRENCH_INFO("RETURNING FROM SIMULATION DESTRUCTOR");
     }
 
