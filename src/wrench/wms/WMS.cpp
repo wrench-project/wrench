@@ -389,6 +389,7 @@ namespace wrench {
      */
     std::shared_ptr<JobManager> WMS::createJobManager() {
         std::shared_ptr<JobManager> job_manager = std::shared_ptr<JobManager>(new JobManager(std::dynamic_pointer_cast<WMS>(this->getSharedPtr())));
+        WRENCH_INFO("ASDASDA");
         job_manager->simulation = this->simulation;
         job_manager->start(job_manager, true, false); // Always daemonize, no auto-restart
 
