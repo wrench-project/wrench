@@ -68,10 +68,10 @@ namespace wrench {
      */
     Simulation::~Simulation() {
         WRENCH_INFO("IN SIMUALTION DESTRUCTOR");
-        MessageManager::print();
+//        MessageManager::print();
         this->s4u_simulation->shutdown();
         WRENCH_INFO("AFTER SHHUdtOWN");
-        MessageManager::print();
+//        MessageManager::print();
 //        WRENCH_INFO("CLEARING EVERYTING THAT NEEDS CLEARING!");
 //        Service::service_shared_ptr_map.clear();
         WRENCH_INFO("RETURNING FROM SIMULATION DESTRUCTOR");
