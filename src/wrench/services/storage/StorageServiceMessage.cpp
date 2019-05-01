@@ -13,6 +13,8 @@
 #include <wrench/simulation/SimulationTimestampTypes.h>
 #include <wrench/simulation/Simulation.h>
 #include <wrench/simulation/SimulationOutput.h>
+#include <wrench/services/compute/cloud/CloudComputeService.h>
+#include <wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h>
 #include <wrench/services/storage/StorageService.h>
 
 namespace wrench {

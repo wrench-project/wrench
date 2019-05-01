@@ -381,7 +381,7 @@ private:
       // Get the compute_services
       std::shared_ptr<wrench::ComputeService> cs_does_support_standard_jobs;
       std::shared_ptr<wrench::ComputeService> cs_does_not_support_standard_jobs;
-      for (auto cs : this->getAvailableComputeServices()) {
+      for (auto cs : this->getAvailableComputeServices<wrench::ComputeService>()) {
         if (cs->supportsStandardJobs()) {
           cs_does_support_standard_jobs = cs;
         } else {
@@ -534,7 +534,7 @@ private:
       auto job_manager = this->createJobManager();
 
       // Get the compute_services
-      std::shared_ptr<wrench::ComputeService> cs = *(this->getAvailableComputeServices().begin());
+      auto cs = *(this->getAvailableComputeServices<wrench::ComputeService>().begin());
 
       // Add tasks to the workflow
       wrench::WorkflowTask *t1 = this->getWorkflow()->addTask("task1", 600, 10, 10, 1.0, 80);

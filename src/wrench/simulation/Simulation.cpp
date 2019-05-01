@@ -12,6 +12,9 @@
 #include <csignal>
 #include <simgrid/plugins/live_migration.h>
 
+#include <wrench/wms/WMS.h>
+#include "wrench/services/compute/cloud/CloudComputeService.h"
+#include "wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/Service.h"
 #include "wrench/services/compute/bare_metal/BareMetalComputeService.h"
@@ -337,8 +340,7 @@ namespace wrench {
         try {
             // Start the WMSes
             for (const auto &wms : this->wmses) {
-                std::shared_ptr<Service> service_shared_ptr = std::dynamic_pointer_cast<Service>(wms);
-                wms->start(service_shared_ptr, false, false);  // Not daemonized, no auto-restart
+                wms->start(wms, false, false);  // Not daemonized, no auto-restart
             }
 
             // Start the compute services

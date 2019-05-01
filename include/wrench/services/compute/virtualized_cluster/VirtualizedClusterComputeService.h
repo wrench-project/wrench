@@ -11,16 +11,16 @@
 #ifndef WRENCH_VIRTUALIZEDCLUSTERSERVICE_H
 #define WRENCH_VIRTUALIZEDCLUSTERSERVICE_H
 
-#include "wrench/services/compute/cloud/CloudComputeService.h"
 #include "wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceProperty.h"
 #include "wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceMessagePayload.h"
-
+#include <wrench/services/compute/cloud/CloudComputeService.h>
 
 namespace wrench {
 
     class Simulation;
 
     class ComputeService;
+    class CloudComputeService;
 
     /**
      * @brief A  virtualized cluster-based compute service

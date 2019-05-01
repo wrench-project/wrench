@@ -366,7 +366,7 @@ private:
       batch_job_args["-c"] = std::to_string(10); //number of cores per task
 
       // Submit this job to the batch service
-      job_manager->submitJob(standard_job_2_nodes, *(this->getAvailableComputeServices().begin()), batch_job_args);
+      job_manager->submitJob(standard_job_2_nodes, *(this->getAvailableComputeServices<wrench::ComputeService>().begin()), batch_job_args);
 
 
       // Create and submit a job that needs 2 nodes and 30 minutes
@@ -394,7 +394,7 @@ private:
       batch_job_args["-c"] = std::to_string(10); //number of cores per task
 
       // Submit this job to the batch service
-      job_manager->submitJob(standard_job_4_nodes, *(this->getAvailableComputeServices().begin()), batch_job_args);
+      job_manager->submitJob(standard_job_4_nodes, *(this->getAvailableComputeServices<wrench::ComputeService>().begin()), batch_job_args);
 
 
       // Wait for the two execution events
@@ -636,7 +636,7 @@ private:
       batch_job_args["-c"] = std::to_string(10);  //number of cores per task
 
       // Submit this job to the batch service
-      job_manager->submitJob(standard_job_2_nodes, *(this->getAvailableComputeServices().begin()), batch_job_args);
+      job_manager->submitJob(standard_job_2_nodes, *(this->getAvailableComputeServices<wrench::ComputeService>().begin()), batch_job_args);
 
 
       // Wait for the two execution events
@@ -828,7 +828,7 @@ private:
       batch_job_args["-c"] = std::to_string(10); //number of cores per task
 
       // Submit this job to the batch service
-      job_manager->submitJob(standard_job_2_nodes, *(this->getAvailableComputeServices().begin()), batch_job_args);
+      job_manager->submitJob(standard_job_2_nodes, *(this->getAvailableComputeServices<wrench::ComputeService>().begin()), batch_job_args);
 
 
       // Create and submit a job that needs 2 nodes and 30 minutes
@@ -856,7 +856,7 @@ private:
       batch_job_args["-c"] = std::to_string(10); //number of cores per task
 
       // Submit this job to the batch service
-      job_manager->submitJob(standard_job_4_nodes, *(this->getAvailableComputeServices().begin()), batch_job_args);
+      job_manager->submitJob(standard_job_4_nodes, *(this->getAvailableComputeServices<wrench::ComputeService>().begin()), batch_job_args);
 
 
       // Wait for the two execution events
