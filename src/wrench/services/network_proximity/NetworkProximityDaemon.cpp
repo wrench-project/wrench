@@ -108,7 +108,7 @@ namespace wrench {
 
         try {
             S4U_Mailbox::dputMessage(this->network_proximity_service_mailbox,
-                                     new NextContactDaemonRequestMessage(std::dynamic_pointer_cast<NetworkProximityDaemon>(this->getSharedPtr()),
+                                     new NextContactDaemonRequestMessage(this->getSharedPtr<NetworkProximityDaemon>(),
                                                                          this->getMessagePayloadValue(
                                                                                  NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
@@ -170,7 +170,7 @@ namespace wrench {
 
                     try {
                         S4U_Mailbox::dputMessage(this->network_proximity_service_mailbox,
-                                                 new NextContactDaemonRequestMessage(std::dynamic_pointer_cast<NetworkProximityDaemon>(this->getSharedPtr()),
+                                                 new NextContactDaemonRequestMessage(this->getSharedPtr<NetworkProximityDaemon>(),
                                                                                      this->getMessagePayloadValue(
                                                                                              NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD)));
                     } catch (std::shared_ptr<NetworkError> &cause) {

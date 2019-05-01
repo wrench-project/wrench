@@ -68,7 +68,7 @@ namespace wrench {
             return getStartTimeEstimatesFromBatsched(set_of_jobs);
         } else {
             throw WorkflowExecutionException(std::shared_ptr<FunctionalityNotAvailable>(
-                    new FunctionalityNotAvailable(std::dynamic_pointer_cast<BatchComputeService>(this->getSharedPtr()), "queue wait time prediction")));
+                    new FunctionalityNotAvailable(this->getSharedPtr<BatchComputeService>(), "queue wait time prediction")));
         }
 #else
         if ((this->getPropertyValueAsString(BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM) == "FCFS") and
@@ -76,7 +76,7 @@ namespace wrench {
         return getStartTimeEstimatesForFCFS(set_of_jobs);
       } else {
         throw WorkflowExecutionException(std::shared_ptr<FunctionalityNotAvailable>(
-                new FunctionalityNotAvailable(std::dynamic_pointer_cast<BatchComputeService>(this->getSharedPtr()), "start time estimates")));
+                new FunctionalityNotAvailable(this->getSharedPtr<BatchComputeService>(), "start time estimates")));
       }
 #endif
     }
@@ -562,7 +562,7 @@ namespace wrench {
         try {
             S4U_Mailbox::dputMessage(job->popCallbackMailbox(),
                                      new ComputeServicePilotJobExpiredMessage(
-                                             job, std::dynamic_pointer_cast<BatchComputeService>(this->getSharedPtr()),
+                                             job, this->getSharedPtr<BatchComputeService>(),
                                              this->getMessagePayloadValue(
                                                      BatchComputeServiceMessagePayload::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
@@ -594,7 +594,7 @@ namespace wrench {
         try {
             S4U_Mailbox::putMessage(job->popCallbackMailbox(),
                                     new ComputeServiceStandardJobFailedMessage(
-                                            job, std::dynamic_pointer_cast<BatchComputeService>(this->getSharedPtr()), cause,
+                                            job, this->getSharedPtr<BatchComputeService>(), cause,
                                             this->getMessagePayloadValue(
                                                     BatchComputeServiceMessagePayload::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
@@ -951,7 +951,7 @@ namespace wrench {
                     auto *job = (StandardJob *) workflow_job;
                     terminateRunningStandardJob(job);
                     this->sendStandardJobFailureNotification(job, std::to_string(j->getJobID()),
-                                                             std::shared_ptr<FailureCause>(new JobKilled(workflow_job, std::dynamic_pointer_cast<BatchComputeService>(this->getSharedPtr()))));
+                                                             std::shared_ptr<FailureCause>(new JobKilled(workflow_job, this->getSharedPtr<BatchComputeService>())));
                     to_erase.push_back(j);
                 }
             }
@@ -973,7 +973,7 @@ namespace wrench {
                     to_erase.push_back(it1);
                     auto *job = (StandardJob *) workflow_job;
                     this->sendStandardJobFailureNotification(job, std::to_string((*it1)->getJobID()),
-                                                             std::shared_ptr<FailureCause>(new JobKilled(workflow_job, std::dynamic_pointer_cast<BatchComputeService>(this->getSharedPtr()))));
+                                                             std::shared_ptr<FailureCause>(new JobKilled(workflow_job, this->getSharedPtr<BatchComputeService>())));
                 }
             }
 
@@ -993,7 +993,7 @@ namespace wrench {
                     to_erase.push_back(wj);
                     auto *job = (StandardJob *) workflow_job;
                     this->sendStandardJobFailureNotification(job, std::to_string(wj->getJobID()),
-                                                             std::shared_ptr<FailureCause>(new JobKilled(workflow_job, std::dynamic_pointer_cast<BatchComputeService>(this->getSharedPtr()))));
+                                                             std::shared_ptr<FailureCause>(new JobKilled(workflow_job, this->getSharedPtr<BatchComputeService>())));
                 }
             }
 
@@ -1209,12 +1209,12 @@ namespace wrench {
                 S4U_Mailbox::dputMessage(answer_mailbox,
                                          new ComputeServiceSubmitStandardJobAnswerMessage(
                                                  (StandardJob *) job->getWorkflowJob(),
-                                                 std::dynamic_pointer_cast<BatchComputeService>(this->getSharedPtr()),
+                                                 this->getSharedPtr<BatchComputeService>(),
                                                  false,
                                                  std::shared_ptr<FailureCause>(
                                                          new JobTypeNotSupported(
                                                                  job->getWorkflowJob(),
-                                                                 std::dynamic_pointer_cast<BatchComputeService>(this->getSharedPtr()))),
+                                                                 this->getSharedPtr<BatchComputeService>())),
                                                  this->getMessagePayloadValue(
                                                          BatchComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
             } catch (std::shared_ptr<NetworkError> &cause) {
@@ -1227,12 +1227,12 @@ namespace wrench {
                 S4U_Mailbox::dputMessage(answer_mailbox,
                                          new ComputeServiceSubmitPilotJobAnswerMessage(
                                                  (PilotJob *) job->getWorkflowJob(),
-                                                 std::dynamic_pointer_cast<BatchComputeService>(this->getSharedPtr()),
+                                                 this->getSharedPtr<BatchComputeService>(),
                                                  false,
                                                  std::shared_ptr<FailureCause>(
                                                          new JobTypeNotSupported(
                                                                  job->getWorkflowJob(),
-                                                                 std::dynamic_pointer_cast<BatchComputeService>(this->getSharedPtr()))),
+                                                                 this->getSharedPtr<BatchComputeService>())),
                                                  this->getMessagePayloadValue(
                                                          BatchComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
             } catch (std::shared_ptr<NetworkError> &cause) {
@@ -1264,12 +1264,12 @@ namespace wrench {
                                 answer_mailbox,
                                 new ComputeServiceSubmitStandardJobAnswerMessage(
                                         (StandardJob *) job->getWorkflowJob(),
-                                        std::dynamic_pointer_cast<BatchComputeService>(this->getSharedPtr()),
+                                        this->getSharedPtr<BatchComputeService>(),
                                         false,
                                         std::shared_ptr<FailureCause>(
                                                 new NotEnoughResources(
                                                         job->getWorkflowJob(),
-                                                        std::dynamic_pointer_cast<BatchComputeService>(this->getSharedPtr()))),
+                                                        this->getSharedPtr<BatchComputeService>())),
                                         this->getMessagePayloadValue(
                                                 BatchComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
                     } catch (std::shared_ptr<NetworkError> &cause) {}
@@ -1285,12 +1285,12 @@ namespace wrench {
                 S4U_Mailbox::dputMessage(answer_mailbox,
                                          new ComputeServiceSubmitPilotJobAnswerMessage(
                                                  (PilotJob *) job->getWorkflowJob(),
-                                                 std::dynamic_pointer_cast<BatchComputeService>(this->getSharedPtr()),
+                                                 this->getSharedPtr<BatchComputeService>(),
                                                  false,
                                                  std::shared_ptr<FailureCause>(
                                                          new NotEnoughResources(
                                                                  job->getWorkflowJob(),
-                                                                 std::dynamic_pointer_cast<BatchComputeService>(this->getSharedPtr()))),
+                                                                 this->getSharedPtr<BatchComputeService>())),
                                                  this->getMessagePayloadValue(
                                                          BatchComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
             } catch (std::shared_ptr<NetworkError> &cause) {}
@@ -1302,7 +1302,7 @@ namespace wrench {
             try {
                 S4U_Mailbox::dputMessage(answer_mailbox,
                                          new ComputeServiceSubmitStandardJobAnswerMessage(
-                                                 (StandardJob *) job->getWorkflowJob(), std::dynamic_pointer_cast<BatchComputeService>(this->getSharedPtr()),
+                                                 (StandardJob *) job->getWorkflowJob(), this->getSharedPtr<BatchComputeService>(),
                                                  true,
                                                  nullptr,
                                                  this->getMessagePayloadValue(
@@ -1314,7 +1314,7 @@ namespace wrench {
             try {
                 S4U_Mailbox::dputMessage(answer_mailbox,
                                          new ComputeServiceSubmitPilotJobAnswerMessage(
-                                                 (PilotJob *) job->getWorkflowJob(), std::dynamic_pointer_cast<BatchComputeService>(this->getSharedPtr()),
+                                                 (PilotJob *) job->getWorkflowJob(), this->getSharedPtr<BatchComputeService>(),
                                                  true,
                                                  nullptr,
                                                  this->getMessagePayloadValue(
@@ -1388,7 +1388,7 @@ namespace wrench {
             if ((*it)->getWorkflowJob() == job) {
                 job_id = std::to_string((*it)->getJobID());
                 ComputeServiceTerminatePilotJobAnswerMessage *answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
-                        job, std::dynamic_pointer_cast<BatchComputeService>(this->getSharedPtr()), true, nullptr,
+                        job, this->getSharedPtr<BatchComputeService>(), true, nullptr,
                         this->getMessagePayloadValue(
                                 BatchComputeServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
                 try {
@@ -1412,7 +1412,7 @@ namespace wrench {
             if ((*it2)->getWorkflowJob() == job) {
                 job_id = std::to_string((*it2)->getJobID());
                 ComputeServiceTerminatePilotJobAnswerMessage *answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
-                        job, std::dynamic_pointer_cast<BatchComputeService>(this->getSharedPtr()), true, nullptr,
+                        job, this->getSharedPtr<BatchComputeService>(), true, nullptr,
                         this->getMessagePayloadValue(
                                 BatchComputeServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
                 try {
@@ -1442,7 +1442,7 @@ namespace wrench {
                     this->available_nodes_to_cores[r.first] += std::get<0>(r.second);
                 }
                 ComputeServiceTerminatePilotJobAnswerMessage *answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
-                        job, std::dynamic_pointer_cast<BatchComputeService>(this->getSharedPtr()), true, nullptr,
+                        job, this->getSharedPtr<BatchComputeService>(), true, nullptr,
                         this->getMessagePayloadValue(
                                 BatchComputeServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
                 try {
@@ -1472,7 +1472,7 @@ namespace wrench {
         // If we got here, we're in trouble
         WRENCH_INFO("Trying to terminate a pilot job that's neither pending nor running!");
         ComputeServiceTerminatePilotJobAnswerMessage *answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
-                job, std::dynamic_pointer_cast<BatchComputeService>(this->getSharedPtr()), false, std::shared_ptr<FailureCause>(new JobCannotBeTerminated(job)),
+                job, this->getSharedPtr<BatchComputeService>(), false, std::shared_ptr<FailureCause>(new JobCannotBeTerminated(job)),
                 this->getMessagePayloadValue(
                         BatchComputeServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
         try {
@@ -1543,7 +1543,7 @@ namespace wrench {
         try {
             S4U_Mailbox::dputMessage(job->popCallbackMailbox(),
                                      new ComputeServiceStandardJobDoneMessage(
-                                             job, std::dynamic_pointer_cast<BatchComputeService>(this->getSharedPtr()),
+                                             job, this->getSharedPtr<BatchComputeService>(),
                                              this->getMessagePayloadValue(
                                                      BatchComputeServiceMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
@@ -1741,7 +1741,7 @@ namespace wrench {
                 try {
                     S4U_Mailbox::dputMessage(job->getCallbackMailbox(),
                                              new ComputeServicePilotJobStartedMessage(
-                                                     job, std::dynamic_pointer_cast<BatchComputeService>(this->getSharedPtr()),
+                                                     job, this->getSharedPtr<BatchComputeService>(),
                                                      this->getMessagePayloadValue(
                                                              BatchComputeServiceMessagePayload::PILOT_JOB_STARTED_MESSAGE_PAYLOAD)));
                 } catch (std::shared_ptr<NetworkError> &cause) {
@@ -1845,7 +1845,7 @@ namespace wrench {
         // Create the trace replayer process
         this->workload_trace_replayer = std::shared_ptr<WorkloadTraceFileReplayer>(
                 new WorkloadTraceFileReplayer(S4U_Simulation::getHostName(),
-                                              std::dynamic_pointer_cast<BatchComputeService>(this->getSharedPtr()),
+                                              this->getSharedPtr<BatchComputeService>(),
                                               this->num_cores_per_node,
                                               this->getPropertyValueAsBoolean(BatchComputeServiceProperty::USE_REAL_RUNTIMES_AS_REQUESTED_RUNTIMES),
                                               this->workload_trace)
@@ -2085,7 +2085,7 @@ namespace wrench {
             // Send a failure reply
             ComputeServiceTerminateStandardJobAnswerMessage *answer_message =
                     new ComputeServiceTerminateStandardJobAnswerMessage(
-                            job, std::dynamic_pointer_cast<BatchComputeService>(this->getSharedPtr()), false, std::shared_ptr<FailureCause>(
+                            job, this->getSharedPtr<BatchComputeService>(), false, std::shared_ptr<FailureCause>(
                                     new JobCannotBeTerminated(
                                             job)),
                             this->getMessagePayloadValue(
@@ -2120,7 +2120,7 @@ namespace wrench {
         }
         ComputeServiceTerminateStandardJobAnswerMessage *answer_message =
                 new ComputeServiceTerminateStandardJobAnswerMessage(
-                        job, std::dynamic_pointer_cast<BatchComputeService>(this->getSharedPtr()), true, nullptr,
+                        job, this->getSharedPtr<BatchComputeService>(), true, nullptr,
                         this->getMessagePayloadValue(
                                 BatchComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD));
         try {
@@ -2337,7 +2337,7 @@ namespace wrench {
 
         std::shared_ptr<BatschedNetworkListener> network_listener =
                 std::shared_ptr<BatschedNetworkListener>(
-                        new BatschedNetworkListener(this->hostname, std::dynamic_pointer_cast<BatchComputeService>(this->getSharedPtr()), batchsched_query_mailbox,
+                        new BatschedNetworkListener(this->hostname, this->getSharedPtr<BatchComputeService>(), batchsched_query_mailbox,
                                                     std::to_string(this->batsched_port),
                                                     data));
         network_listener->simulation = this->simulation;
@@ -2398,7 +2398,7 @@ namespace wrench {
         std::string data = batch_submission_data.dump();
         std::shared_ptr<BatschedNetworkListener> network_listener =
                 std::shared_ptr<BatschedNetworkListener>(
-                        new BatschedNetworkListener(this->hostname, std::dynamic_pointer_cast<BatchComputeService>(this->getSharedPtr()), this->mailbox_name,
+                        new BatschedNetworkListener(this->hostname, this->getSharedPtr<BatchComputeService>(), this->mailbox_name,
                                                     std::to_string(this->batsched_port),
                                                     data));
         network_listener->simulation = this->simulation;
@@ -2435,7 +2435,7 @@ namespace wrench {
         try {
             std::shared_ptr<BatschedNetworkListener> network_listener =
                     std::shared_ptr<BatschedNetworkListener>(
-                            new BatschedNetworkListener(this->hostname, std::dynamic_pointer_cast<BatchComputeService>(this->getSharedPtr()), this->mailbox_name,
+                            new BatschedNetworkListener(this->hostname, this->getSharedPtr<BatchComputeService>(), this->mailbox_name,
                                                         std::to_string(this->batsched_port),
                                                         data));
             network_listener->simulation = this->simulation;
@@ -2485,7 +2485,7 @@ namespace wrench {
         std::string data = batch_submission_data.dump();
         std::shared_ptr<BatschedNetworkListener> network_listener =
                 std::shared_ptr<BatschedNetworkListener>(
-                        new BatschedNetworkListener(this->hostname, std::dynamic_pointer_cast<BatchComputeService>(this->getSharedPtr()), this->mailbox_name,
+                        new BatschedNetworkListener(this->hostname, this->getSharedPtr<BatchComputeService>(), this->mailbox_name,
                                                     std::to_string(this->batsched_port),
                                                     data));
         network_listener->simulation = this->simulation;

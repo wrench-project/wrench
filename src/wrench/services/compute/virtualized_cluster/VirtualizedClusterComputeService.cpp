@@ -264,7 +264,7 @@ namespace wrench {
         if ((dest_available_ram < vm->getMemory()) or (dest_available_cores < vm->getNumCores())) {
             msg_to_send_back = new VirtualizedClusterComputeServiceMigrateVMAnswerMessage(
                     false,
-                    std::shared_ptr<FailureCause>(new NotEnoughResources(nullptr, std::dynamic_pointer_cast<VirtualizedClusterComputeService>(this->getSharedPtr()))),
+                    std::shared_ptr<FailureCause>(new NotEnoughResources(nullptr, this->getSharedPtr<VirtualizedClusterComputeService>())),
                     this->getMessagePayloadValue(
                             VirtualizedClusterComputeServiceMessagePayload::MIGRATE_VM_ANSWER_MESSAGE_PAYLOAD));
 
