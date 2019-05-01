@@ -290,7 +290,7 @@ namespace wrench {
             S4U_Mailbox::dputMessage(
                     answer_mailbox,
                     new ComputeServiceSubmitStandardJobAnswerMessage(
-                            job, std::dynamic_pointer_cast<HTCondorCentralManagerService>(this->getSharedPtr()), true, nullptr, this->getMessagePayloadValue(
+                            job, this->getSharedPtr<HTCondorCentralManagerService>(), true, nullptr, this->getMessagePayloadValue(
                                     HTCondorCentralManagerServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
         }
@@ -314,7 +314,7 @@ namespace wrench {
         try {
             S4U_Mailbox::dputMessage(
                     callback_mailbox, new ComputeServiceStandardJobDoneMessage(
-                            job, std::dynamic_pointer_cast<HTCondorCentralManagerService>(this->getSharedPtr()), this->getMessagePayloadValue(
+                            job, this->getSharedPtr<HTCondorCentralManagerService>(), this->getMessagePayloadValue(
                                     HTCondorCentralManagerServiceMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD)));
             this->resources_unavailable = false;
         } catch (std::shared_ptr<NetworkError> &cause) {

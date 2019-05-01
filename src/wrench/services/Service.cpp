@@ -29,13 +29,18 @@ namespace wrench {
     * @brief Get the master shared pointer to the service
     * @return the master shared pointer
     */
-    std::shared_ptr<Service> Service::getSharedPtr() {
-        if (Service::service_shared_ptr_map.find(this) == Service::service_shared_ptr_map.end()) {
-            throw std::runtime_error("Service::getSharedPtr(): master shared_ptr to service not found! This should happen only "
-                                     "if the service has not been started, in which case this method shouldn't have been called");
-        }
-        return Service::service_shared_ptr_map[this];
-    }
+//    template <class T>
+//    std::shared_ptr<T> Service::getSharedPtr() {
+//        if (Service::service_shared_ptr_map.find(this) == Service::service_shared_ptr_map.end()) {
+//            throw std::runtime_error("Service::getSharedPtr(): master shared_ptr to service not found! This should happen only "
+//                                     "if the service has not been started, in which case this method shouldn't have been called");
+//        }
+//        auto shared_ptr = std::dynamic_pointer_cast<T>(Service::service_shared_ptr_map[this]);
+//        if (not shared_ptr) {
+//            throw std::runtime_error("Service::getSharedPtr(): Invalid provided template");
+//        }
+//        return shared_ptr;
+//    }
 
     /**
      * @brief Increase the completed service count
@@ -57,11 +62,13 @@ namespace wrench {
     void Service::cleanupTrackedServices() {
         std::set<Service *> to_cleanup;
 
+        // TODO: Perhaps do this as one step?
         for (auto const &x : Service::service_shared_ptr_map) {
             if (x.second.use_count() == 1) {
                 to_cleanup.insert(x.first);
             }
         }
+
         for (auto const &x : to_cleanup) {
             Service::service_shared_ptr_map.erase(x);
         }
@@ -422,11 +429,10 @@ namespace wrench {
      */
     void Service::assertServiceIsUp() {
         if (this->state == Service::DOWN) {
-            auto shared_ptr = this->getSharedPtr();
-            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this->getSharedPtr())));
+            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this->getSharedPtr<Service>())));
         }
         if (this->state == Service::SUSPENDED) {
-            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsSuspended(this->getSharedPtr())));
+            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsSuspended(this->getSharedPtr<Service>())));
         }
     }
 };

@@ -2682,7 +2682,7 @@ private:
         unsigned long NUM_TRIALS = 200;
 
         for (unsigned long trial = 0; trial < NUM_TRIALS; trial++) {
-            WRENCH_INFO("Trial %d", trial);
+            WRENCH_INFO("Trial %lu", trial);
 
             /**  Create a 4-task job and kill it **/
             {

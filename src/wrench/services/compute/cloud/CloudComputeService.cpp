@@ -720,7 +720,7 @@ namespace wrench {
                     new CloudComputeServiceCreateVMAnswerMessage(
                             false,
                             empty,
-                            std::shared_ptr<FailureCause>(new NotEnoughResources(nullptr, std::dynamic_pointer_cast<CloudComputeService>(this->getSharedPtr()))),
+                            std::shared_ptr<FailureCause>(new NotEnoughResources(nullptr, this->getSharedPtr<CloudComputeService>())),
                             this->getMessagePayloadValue(
                                     CloudComputeServiceMessagePayload::CREATE_VM_ANSWER_MESSAGE_PAYLOAD));
         } else {
@@ -775,7 +775,7 @@ namespace wrench {
             std::string error_message("Cannot shutdown a VM that is not running");
             msg_to_send_back =  new CloudComputeServiceShutdownVMAnswerMessage(
                     false,
-                    std::shared_ptr<FailureCause>(new NotAllowed(std::dynamic_pointer_cast<CloudComputeService>(this->getSharedPtr()), error_message)),
+                    std::shared_ptr<FailureCause>(new NotAllowed(this->getSharedPtr<CloudComputeService>(), error_message)),
                     this->getMessagePayloadValue(
                             CloudComputeServiceMessagePayload::SHUTDOWN_VM_ANSWER_MESSAGE_PAYLOAD));
         } else {
@@ -915,7 +915,7 @@ namespace wrench {
             msg_to_send_back =  new CloudComputeServiceStartVMAnswerMessage(
                     false,
                     nullptr,
-                    std::shared_ptr<FailureCause>(new NotAllowed(std::dynamic_pointer_cast<CloudComputeService>(this->getSharedPtr()), error_message)),
+                    std::shared_ptr<FailureCause>(new NotAllowed(this->getSharedPtr<CloudComputeService>(), error_message)),
                     this->getMessagePayloadValue(
                             CloudComputeServiceMessagePayload::START_VM_ANSWER_MESSAGE_PAYLOAD));
 
@@ -930,7 +930,7 @@ namespace wrench {
                         new CloudComputeServiceStartVMAnswerMessage(
                                 false,
                                 nullptr,
-                                std::shared_ptr<FailureCause>(new NotEnoughResources(nullptr, std::dynamic_pointer_cast<CloudComputeService>(this->getSharedPtr()))),
+                                std::shared_ptr<FailureCause>(new NotEnoughResources(nullptr, this->getSharedPtr<CloudComputeService>())),
                                 this->getMessagePayloadValue(
                                         CloudComputeServiceMessagePayload::START_VM_ANSWER_MESSAGE_PAYLOAD));
             } else {
@@ -1016,7 +1016,7 @@ namespace wrench {
             std::string error_message("Cannot suspend a VM that is not running");
             msg_to_send_back =  new CloudComputeServiceSuspendVMAnswerMessage(
                     false,
-                    std::shared_ptr<FailureCause>(new NotAllowed(std::dynamic_pointer_cast<CloudComputeService>(this->getSharedPtr()), error_message)),
+                    std::shared_ptr<FailureCause>(new NotAllowed(this->getSharedPtr<CloudComputeService>(), error_message)),
                     this->getMessagePayloadValue(
                             CloudComputeServiceMessagePayload::SUSPEND_VM_ANSWER_MESSAGE_PAYLOAD));
 
@@ -1067,7 +1067,7 @@ namespace wrench {
             std::string error_message("Cannot resume a VM that is not suspended");
             msg_to_send_back =  new CloudComputeServiceResumeVMAnswerMessage(
                     false,
-                    std::shared_ptr<FailureCause>(new NotAllowed(std::dynamic_pointer_cast<CloudComputeService>(this->getSharedPtr()), error_message)),
+                    std::shared_ptr<FailureCause>(new NotAllowed(this->getSharedPtr<CloudComputeService>(), error_message)),
                     this->getMessagePayloadValue(
                             CloudComputeServiceMessagePayload::RESUME_VM_ANSWER_MESSAGE_PAYLOAD));
         } else {
@@ -1110,7 +1110,7 @@ namespace wrench {
             std::string error_message("Cannot destroy a VM that is not down");
             msg_to_send_back =  new CloudComputeServiceDestroyVMAnswerMessage(
                     false,
-                    std::shared_ptr<FailureCause>(new NotAllowed(std::dynamic_pointer_cast<CloudComputeService>(this->getSharedPtr()), error_message)),
+                    std::shared_ptr<FailureCause>(new NotAllowed(this->getSharedPtr<CloudComputeService>(), error_message)),
                     this->getMessagePayloadValue(
                             CloudComputeServiceMessagePayload::DESTROY_VM_ANSWER_MESSAGE_PAYLOAD));
 
@@ -1147,7 +1147,7 @@ namespace wrench {
             try {
                 S4U_Mailbox::dputMessage(
                         answer_mailbox, new ComputeServiceSubmitStandardJobAnswerMessage(
-                                job, std::dynamic_pointer_cast<CloudComputeService>(this->getSharedPtr()), false, std::shared_ptr<FailureCause>(new JobTypeNotSupported(job, std::dynamic_pointer_cast<CloudComputeService>(this->getSharedPtr()))),
+                                job, this->getSharedPtr<CloudComputeService>(), false, std::shared_ptr<FailureCause>(new JobTypeNotSupported(job, this->getSharedPtr<CloudComputeService>())),
                                 this->getMessagePayloadValue(
                                         CloudComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
             } catch (std::shared_ptr<NetworkError> &cause) {
@@ -1177,7 +1177,7 @@ namespace wrench {
             try {
                 S4U_Mailbox::dputMessage(
                         answer_mailbox, new ComputeServiceSubmitPilotJobAnswerMessage(
-                                job, std::dynamic_pointer_cast<CloudComputeService>(this->getSharedPtr()), false, std::shared_ptr<FailureCause>(new JobTypeNotSupported(job, std::dynamic_pointer_cast<CloudComputeService>(this->getSharedPtr()))),
+                                job, this->getSharedPtr<CloudComputeService>(), false, std::shared_ptr<FailureCause>(new JobTypeNotSupported(job, this->getSharedPtr<CloudComputeService>())),
                                 this->getMessagePayloadValue(
                                         CloudComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
             } catch (std::shared_ptr<NetworkError> &cause) {
