@@ -388,17 +388,17 @@ namespace wrench {
      * @return a job manager
      */
     std::shared_ptr<JobManager> WMS::createJobManager() {
-        std::shared_ptr<JobManager> job_manager = std::shared_ptr<JobManager>(new JobManager(std::dynamic_pointer_cast<WMS>(this->getSharedPtr())));
+        std::shared_ptr<JobManager> job_manager = std::shared_ptr<JobManager>(new JobManager(this->getSharedPtr<WMS>()));
         WRENCH_INFO("ASDASDA");
         job_manager->simulation = this->simulation;
         job_manager->start(job_manager, true, false); // Always daemonize, no auto-restart
 
         // Let my schedulers know who the job manager is
         if (this->standard_job_scheduler) {
-            this->standard_job_scheduler->setJobManager(std::dynamic_pointer_cast<JobManager>(job_manager->getSharedPtr()));
+            this->standard_job_scheduler->setJobManager(job_manager->getSharedPtr<JobManager>());
         }
         if (this->pilot_job_scheduler) {
-            this->pilot_job_scheduler->setJobManager(std::dynamic_pointer_cast<JobManager>(job_manager->getSharedPtr()));
+            this->pilot_job_scheduler->setJobManager(job_manager->getSharedPtr<JobManager>());
         }
 
         return job_manager;
@@ -409,16 +409,16 @@ namespace wrench {
      * @return a data movement manager
      */
     std::shared_ptr<DataMovementManager> WMS::createDataMovementManager() {
-        auto data_movement_manager = std::shared_ptr<DataMovementManager>(new DataMovementManager(std::dynamic_pointer_cast<WMS>(this->getSharedPtr())));
+        auto data_movement_manager = std::shared_ptr<DataMovementManager>(new DataMovementManager(this->getSharedPtr<WMS>()));
         data_movement_manager->simulation = this->simulation;
         data_movement_manager->start(data_movement_manager, true, false); // Always daemonize, no auto-restart
 
         // Let my schedulers know who the data movemement manager is
         if (this->standard_job_scheduler) {
-            this->standard_job_scheduler->setDataMovementManager(std::dynamic_pointer_cast<DataMovementManager>(data_movement_manager->getSharedPtr()));
+            this->standard_job_scheduler->setDataMovementManager(data_movement_manager->getSharedPtr<DataMovementManager>());
         }
         if (this->pilot_job_scheduler) {
-            this->pilot_job_scheduler->setDataMovementManager(std::dynamic_pointer_cast<DataMovementManager>(data_movement_manager->getSharedPtr()));
+            this->pilot_job_scheduler->setDataMovementManager(data_movement_manager->getSharedPtr<DataMovementManager>());
         }
 
         return data_movement_manager;
@@ -432,7 +432,7 @@ namespace wrench {
      * @return an energy meter
      */
     std::shared_ptr<EnergyMeter> WMS::createEnergyMeter(const std::map<std::string, double> &measurement_periods) {
-        auto energy_meter_raw_ptr = new EnergyMeter(std::dynamic_pointer_cast<WMS>(this->getSharedPtr()), measurement_periods);
+        auto energy_meter_raw_ptr = new EnergyMeter(this->getSharedPtr<WMS>(), measurement_periods);
         std::shared_ptr<EnergyMeter> energy_meter = std::shared_ptr<EnergyMeter>(energy_meter_raw_ptr);
         energy_meter->simulation = this->simulation;
         energy_meter->start(energy_meter, true, false); // Always daemonize, no auto-restart
@@ -446,7 +446,7 @@ namespace wrench {
      * @return an energy meter
      */
     std::shared_ptr<EnergyMeter> WMS::createEnergyMeter(const std::vector<std::string> &hostnames, double measurement_period) {
-        auto energy_meter_raw_ptr = new EnergyMeter(std::dynamic_pointer_cast<WMS>(this->getSharedPtr()), hostnames, measurement_period);
+        auto energy_meter_raw_ptr = new EnergyMeter(this->getSharedPtr<WMS>(), hostnames, measurement_period);
         std::shared_ptr<EnergyMeter> energy_meter = std::shared_ptr<EnergyMeter>(energy_meter_raw_ptr);
         energy_meter->simulation = this->simulation;
         energy_meter->start(energy_meter, true, false); // Always daemonize, no auto-restart

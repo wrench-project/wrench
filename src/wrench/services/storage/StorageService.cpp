@@ -715,7 +715,7 @@ namespace wrench {
 
         if (unregister) {
           file_registry_service->removeEntry(file,
-                  std::dynamic_pointer_cast<StorageService>(this->getSharedPtr()));
+                  this->getSharedPtr<StorageService>());
         }
 
       } else {
@@ -773,7 +773,7 @@ namespace wrench {
         throw std::invalid_argument("StorageService::copyFile(): Invalid arguments");
       }
 
-      if (src == this->getSharedPtr()) {
+      if (src == this->getSharedPtr<StorageService>()) {
         throw std::invalid_argument(
                 "StorageService::copyFile(file,src): Cannot redundantly copy a file to its own partition");
       }
@@ -804,7 +804,7 @@ namespace wrench {
         throw std::invalid_argument("StorageService::copyFile(): Invalid arguments");
       }
 
-      if (src == this->getSharedPtr() && src_job == nullptr && dst_job == nullptr) {
+      if (src == this->getSharedPtr<StorageService>() && src_job == nullptr && dst_job == nullptr) {
         throw std::invalid_argument("StorageService::copyFile(): Cannot redundantly copy a file to its own partition");
       }
 
@@ -857,7 +857,7 @@ namespace wrench {
 
       // Send a message to the daemon
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("copy_file");
-      auto start_timestamp = new SimulationTimestampFileCopyStart(file, src, src_partition, std::dynamic_pointer_cast<StorageService>(this->getSharedPtr()), dst_partition);
+      auto start_timestamp = new SimulationTimestampFileCopyStart(file, src, src_partition, this->getSharedPtr<StorageService>(), dst_partition);
       this->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyStart>(start_timestamp);
 
       try {
@@ -866,7 +866,7 @@ namespace wrench {
                 file,
                 src,
                 src_partition,
-                std::dynamic_pointer_cast<StorageService>(this->getSharedPtr()),
+                this->getSharedPtr<StorageService>(),
                 dst_partition,
                 nullptr,
                 start_timestamp,
@@ -928,7 +928,7 @@ namespace wrench {
 
       assertServiceIsUp();
 
-      auto start_timestamp = new SimulationTimestampFileCopyStart(file, src, src_partition, std::dynamic_pointer_cast<StorageService>(this->getSharedPtr()), dst_partition);
+      auto start_timestamp = new SimulationTimestampFileCopyStart(file, src, src_partition, this->getSharedPtr<StorageService>(), dst_partition);
       this->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyStart>(start_timestamp);
 
       // Send a message to the daemon
@@ -938,7 +938,7 @@ namespace wrench {
                 file,
                 src,
                 src_partition,
-                std::dynamic_pointer_cast<StorageService>(this->getSharedPtr()),
+                this->getSharedPtr<StorageService>(),
                 dst_partition,
                 nullptr,
                 start_timestamp,
