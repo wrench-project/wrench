@@ -11,9 +11,7 @@
 #define WRENCH_WMS_H
 
 #include <wrench/managers/EnergyMeter.h>
-#include "wrench/simgrid_S4U_util/S4U_Daemon.h"
 #include "wrench/services/Service.h"
-#include "wrench/services/compute/ComputeService.h"
 #include "wrench/wms/DynamicOptimization.h"
 #include "wrench/wms/StaticOptimization.h"
 #include "wrench/wms/scheduler/PilotJobScheduler.h"
@@ -24,11 +22,8 @@ namespace wrench {
 
     class Simulation;
     class ComputeService;
-    class BareMetalComputeService;
-    class ClusterComputeService;
     class CloudComputeService;
     class VirtualizedClusterComputeService;
-    class BatchComputeService;
     class StorageService;
     class NetworkProximityService;
     class FileRegistryService;
@@ -76,11 +71,43 @@ namespace wrench {
 
         void runStaticOptimizations();
 
-        std::set<std::shared_ptr<ComputeService>> getAvailableComputeServices();
-        std::set<std::shared_ptr<BareMetalComputeService>> getAvailableBareMetalComputeServices();
-        std::set<std::shared_ptr<CloudComputeService>> getAvailableCloudComputeServices();
-        std::set<std::shared_ptr<VirtualizedClusterComputeService>> getAvailableVirtualizedClusterComputeServices();
-        std::set<std::shared_ptr<BatchComputeService>> getAvailableBatchComputeServices();
+        /**
+         * @brief Obtain the list of compute services available to the WMS
+         * @tparam T: ComputeService, or any if derived classes (but for CloudComputeService)
+         * @return a set of compute services
+         */
+        template <class T>
+        std::set<std::shared_ptr<T>> getAvailableComputeServices() {
+            std::set<std::shared_ptr<T>> to_return;
+            for (auto const &h : this->compute_services) {
+                auto shared_ptr = std::dynamic_pointer_cast<T>(h);
+                if (shared_ptr) {
+                    to_return.insert(shared_ptr);
+                }
+            }
+            return to_return;
+        }
+
+        /**
+         * @brief Obtain the list of compute services available to the WMS
+         * @tparam CloudComputeService
+         * @return a set of compute services
+         * @return
+         */
+        template <>
+        std::set<std::shared_ptr<CloudComputeService>> getAvailableComputeServices() {
+            std::set<std::shared_ptr<CloudComputeService>> to_return;
+            for (auto const &h : this->compute_services) {
+                auto shared_ptr_cloud = std::dynamic_pointer_cast<CloudComputeService>(h);
+                auto shared_ptr_vc = std::dynamic_pointer_cast<VirtualizedClusterComputeService>(h);
+                if (shared_ptr_cloud and (not shared_ptr_vc)) {
+                    to_return.insert(shared_ptr_cloud);
+                }
+            }
+            return to_return;
+        }
+
+
         std::set<std::shared_ptr<StorageService>> getAvailableStorageServices();
         std::set<std::shared_ptr<NetworkProximityService>> getAvailableNetworkProximityServices();
         std::shared_ptr<FileRegistryService> getAvailableFileRegistryService();

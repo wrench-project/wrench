@@ -7,6 +7,7 @@
  * (at your option) any later version.
  */
 
+#include "wrench/wms/WMS.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/helpers/Alarm.h"
@@ -129,79 +130,7 @@ namespace wrench {
         }
     }
 
-    /**
-     * @brief Obtain the list of compute services available to the WMS
-     *
-     * @return a set of compute services
-     */
-    std::set<std::shared_ptr<ComputeService>> WMS::getAvailableComputeServices() {
-        return this->compute_services;
-    }
 
-    /**
-     * @brief Obtain the list of bare-metal compute services available to the WMS
-     *
-     * @return a set of bare-metal compute services
-     */
-    std::set<std::shared_ptr<BareMetalComputeService>> WMS::getAvailableBareMetalComputeServices() {
-        std::set<std::shared_ptr<BareMetalComputeService>> to_return;
-        for (auto const &h : this->compute_services) {
-            auto shared_ptr = std::dynamic_pointer_cast<BareMetalComputeService>(h);
-            if (shared_ptr) {
-                to_return.insert(shared_ptr);
-            }
-        }
-        return to_return;
-    }
-
-    /**
-     * @brief Obtain the list of cloud compute services available to the WMS
-     *
-     * @return a set of cloud compute services
-     */
-    std::set<std::shared_ptr<CloudComputeService>> WMS::getAvailableCloudComputeServices() {
-        std::set<std::shared_ptr<CloudComputeService>> to_return;
-        for (auto const &h : this->compute_services) {
-            auto shared_ptr_cloud = std::dynamic_pointer_cast<CloudComputeService>(h);
-            auto shared_ptr_vc = std::dynamic_pointer_cast<VirtualizedClusterComputeService>(h);
-            if (shared_ptr_cloud and (not shared_ptr_vc)) {
-                to_return.insert(shared_ptr_cloud);
-            }
-        }
-        return to_return;
-    }
-
-    /**
-     * @brief Obtain the list of virtualized cluster compute services available to the WMS
-     *
-     * @return a set of virtualized cluster compute services
-     */
-    std::set<std::shared_ptr<VirtualizedClusterComputeService>> WMS::getAvailableVirtualizedClusterComputeServices() {
-        std::set<std::shared_ptr<VirtualizedClusterComputeService>> to_return;
-        for (auto const &h : this->compute_services) {
-            auto shared_ptr = std::dynamic_pointer_cast<VirtualizedClusterComputeService>(h);
-            if (shared_ptr) {
-                to_return.insert(shared_ptr);
-            }
-        }
-        return to_return;
-    }
-
-    /**
-     * @brief Obtain the list of batch compute services available to the WMS
-     *
-     * @return a set of batch compute services
-     */
-    std::set<std::shared_ptr<BatchComputeService>> WMS::getAvailableBatchComputeServices() {
-        std::set<std::shared_ptr<BatchComputeService>> to_return;
-        for (auto const &h : this->compute_services) {
-            auto shared_ptr = std::dynamic_pointer_cast<BatchComputeService>(h);
-            if (shared_ptr) {
-                to_return.insert(shared_ptr);
-            }
-        }
-        return to_return;
-    }
 
     /**
     * @brief Obtain the list of storage services available to the WMS

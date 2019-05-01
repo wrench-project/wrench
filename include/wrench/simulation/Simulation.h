@@ -14,21 +14,26 @@
 #include <string>
 #include <vector>
 #include <nlohmann/json.hpp>
-#include <wrench/services/compute/standard_job_executor/StandardJobExecutor.h>
-
-
-#include "wrench/services/file_registry/FileRegistryService.h"
-#include "wrench/services/network_proximity/NetworkProximityService.h"
-#include "wrench/simgrid_S4U_util/S4U_Simulation.h"
-#include "wrench/simulation/SimulationOutput.h"
-#include "wrench/wms/WMS.h"
-#include "wrench/workflow/job/StandardJob.h"
 #include "Version.h"
+
+#include <wrench/simulation/SimulationOutput.h>
 
 
 namespace wrench {
 
     class StorageService;
+    class NetworkProximityService;
+    class FileRegistryService;
+    class ComputeService;
+    class BatchComputeService;
+    class BareMetalComputeService;
+    class CloudComputeService;
+    class VirtualizedClusterComputeService;
+    class WMS;
+    class WorkflowFile;
+    class SimulationOutput;
+    class S4U_Simulation;
+
 
     /**
      * @brief A class that provides basic simulation methods

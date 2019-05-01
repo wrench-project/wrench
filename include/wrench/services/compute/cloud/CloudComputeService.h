@@ -14,11 +14,11 @@
 #include <map>
 #include <simgrid/s4u/VirtualMachine.hpp>
 
+#include "wrench/simulation/Simulation.h"
 #include "wrench/services/compute/ComputeServiceMessage.h"
-#include "wrench/services/compute/ComputeService.h"
+//#include "wrench/services/compute/ComputeService.h"
 #include "wrench/services/compute/cloud/CloudComputeServiceProperty.h"
 #include "wrench/services/compute/cloud/CloudComputeServiceMessagePayload.h"
-#include "wrench/simulation/Simulation.h"
 #include "wrench/simgrid_S4U_util/S4U_VirtualMachine.h"
 #include "wrench/workflow/job/PilotJob.h"
 

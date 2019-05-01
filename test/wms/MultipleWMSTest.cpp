@@ -124,7 +124,7 @@ private:
 
       // Submit the 2-task job for execution
       try {
-        auto cs = std::dynamic_pointer_cast<wrench::CloudComputeService>(*this->getAvailableComputeServices().begin());
+        auto cs = *this->getAvailableComputeServices<wrench::CloudComputeService>().begin();
         auto vm_name = cs->createVM(2, 100);
         auto vm_cs = cs->startVM(vm_name);
         job_manager->submitJob(two_task_job, vm_cs);

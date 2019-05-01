@@ -116,7 +116,7 @@ private:
         std::map<std::string, std::vector<wrench::WorkflowTask *>> ready_clustered_tasks = this->getWorkflow()->getReadyClusters();
 
         // Get the available compute services
-        std::set<std::shared_ptr<wrench::ComputeService>> compute_services = this->getAvailableComputeServices();
+        auto compute_services = this->getAvailableComputeServices<wrench::ComputeService>();
 
         // Run ready tasks with defined scheduler implementation
         unsigned int job_count = 0;
@@ -251,7 +251,7 @@ private:
         std::vector<wrench::WorkflowTask *> ready_tasks = this->getWorkflow()->getReadyTasks();
 
         // Get the available compute services
-        std::set<std::shared_ptr<wrench::ComputeService>> compute_services = this->getAvailableComputeServices();
+        auto compute_services = this->getAvailableComputeServices<wrench::ComputeService>();
 
         // Perform static optimizations
         runDynamicOptimizations();

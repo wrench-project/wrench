@@ -137,7 +137,7 @@ private:
         }
         double first_job_running = this->simulation->getCurrentSimulatedDate();
 
-        auto batch_service = std::dynamic_pointer_cast<wrench::BatchComputeService>((*this->getAvailableComputeServices().begin()));
+        auto batch_service = (*this->getAvailableComputeServices<wrench::BatchComputeService>().begin());
         std::string job_id = "my_tentative_job";
         unsigned int nodes = 2;
         double walltime_seconds = 1000;
@@ -327,7 +327,7 @@ private:
         }
         auto first_job_running = this->simulation->getCurrentSimulatedDate();
 
-        auto batch_service = std::dynamic_pointer_cast<wrench::BatchComputeService>((*this->getAvailableComputeServices().begin()));
+        auto batch_service = (*this->getAvailableComputeServices<wrench::BatchComputeService>().begin());
         std::string job_id = "my_tentative_job";
         unsigned int nodes = 2;
         double walltime_seconds = 1000;
@@ -509,7 +509,7 @@ private:
         double first_job_running = this->simulation->getCurrentSimulatedDate();
 
 
-        auto batch_service = std::dynamic_pointer_cast<wrench::BatchComputeService>((*this->getAvailableComputeServices().begin()));
+        auto batch_service = (*this->getAvailableComputeServices<wrench::BatchComputeService>().begin());
         std::string job_id = "my_job1";
         unsigned int nodes = 2;
         double walltime_seconds = 1000;
@@ -578,7 +578,7 @@ private:
           );
         }
 
-        auto batch_service = std::dynamic_pointer_cast<wrench::BatchComputeService>((*this->getAvailableComputeServices().begin()));
+        auto batch_service = (*this->getAvailableComputeServices<wrench::BatchComputeService>().begin());
         std::set<std::tuple<std::string, unsigned int, unsigned int, double>> set_of_jobs = {};
         for (int i=0; i<10; i++) {
           std::string job_id = "new_job"+std::to_string(i);
@@ -814,7 +814,7 @@ private:
           );
         }
 
-        auto batch_service = std::dynamic_pointer_cast<wrench::BatchComputeService>((*this->getAvailableComputeServices().begin()));
+        auto batch_service = (*this->getAvailableComputeServices<wrench::BatchComputeService>().begin());
 
         std::string job_id = "my_job1";
         unsigned int nodes = 1;
