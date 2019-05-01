@@ -72,7 +72,7 @@ namespace wrench {
         std::vector<WorkflowTask *> ready_tasks = this->getWorkflow()->getReadyTasks();
 
         // Get the available compute services
-        auto compute_services = this->getAvailableComputeServices();
+        auto compute_services = this->getAvailableComputeServices<ComputeService>();
 
         if (compute_services.empty()) {
           WRENCH_INFO("Aborting - No compute services available!");
@@ -82,7 +82,7 @@ namespace wrench {
         // Submit pilot jobs
         if (this->getPilotJobScheduler()) {
           WRENCH_INFO("Scheduling pilot jobs...");
-          this->getPilotJobScheduler()->schedulePilotJobs(this->getAvailableComputeServices());
+          this->getPilotJobScheduler()->schedulePilotJobs(this->getAvailableComputeServices<ComputeService>());
         }
 
         // Perform dynamic optimizations
@@ -90,7 +90,7 @@ namespace wrench {
 
         // Run ready tasks with defined scheduler implementation
         WRENCH_INFO("Scheduling tasks...");
-        this->getStandardJobScheduler()->scheduleTasks(this->getAvailableComputeServices(), ready_tasks);
+        this->getStandardJobScheduler()->scheduleTasks(this->getAvailableComputeServices<ComputeService>(), ready_tasks);
 
         // Wait for a workflow execution event, and process it
         try {

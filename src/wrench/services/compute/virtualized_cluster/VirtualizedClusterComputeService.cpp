@@ -13,9 +13,9 @@
 
 #include "VirtualizedClusterComputeServiceMessage.h"
 #include "../cloud/CloudComputeServiceMessage.h"
+#include "wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
-#include "wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h"
 #include "wrench/services/helpers/ServiceTerminationDetectorMessage.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 

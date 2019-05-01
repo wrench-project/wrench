@@ -9,10 +9,9 @@
  *
  */
 
-#include "S4U_DaemonActor.h"
 #include <xbt/log.h>
 
-            XBT_LOG_NEW_DEFAULT_CATEGORY(s4u_daemon_actor, "Log category for S4U_DaemonActor");
+XBT_LOG_NEW_DEFAULT_CATEGORY(s4u_daemon_actor, "Log category for S4U_DaemonActor");
 
 namespace wrench {
 

@@ -12,14 +12,16 @@
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/services/ServiceMessage.h>
 #include <wrench/logging/TerminalOutput.h>
+#include <wrench/workflow/Workflow.h>
+#include <wrench/workflow/execution_events/WorkflowExecutionEvent.h>
 #include <wrench/exceptions/WorkflowExecutionException.h>
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
-#include "wrench/services/compute/workunit_executor/WorkunitExecutor.h"
+#include <wrench/services/compute/workunit_executor/WorkunitExecutor.h>
 #include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
 #include <wrench/workflow/WorkflowTask.h>
 #include <wrench/workflow/job/StandardJob.h>
 #include <wrench/simulation/SimulationTimestampTypes.h>
-#include "wrench/services/compute/workunit_executor/Workunit.h"
+#include <wrench/services/compute/workunit_executor/Workunit.h>
 #include "ComputeThread.h"
 #include "wrench/simulation/Simulation.h"
 
