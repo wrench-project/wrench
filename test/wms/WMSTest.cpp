@@ -81,7 +81,7 @@ private:
       auto file_registry_service = this->getAvailableFileRegistryService();
 
       // Create and start a VM on the cloud service
-      auto cloud = std::dynamic_pointer_cast<wrench::CloudComputeService>(this->test->cs_cloud);
+      auto cloud = *(this->getAvailableComputeServices<wrench::CloudComputeService>().begin());
       auto vm_name = cloud->createVM(4, 0.0);
       auto vm_cs = cloud->startVM(vm_name);
 
@@ -225,7 +225,7 @@ private:
       auto file_registry_service = this->getAvailableFileRegistryService();
 
       // Get a "STANDARD JOB COMPLETION" event (default handler)
-      auto cloud = std::dynamic_pointer_cast<wrench::CloudComputeService>(this->test->cs_cloud);
+      auto cloud = *(this->getAvailableComputeServices<wrench::CloudComputeService>().begin());
       auto vm_name = cloud->createVM(4, 0.0);
       auto vm_cs = cloud->startVM(vm_name);
 

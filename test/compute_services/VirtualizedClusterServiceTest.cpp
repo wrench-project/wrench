@@ -136,7 +136,7 @@ private:
     VirtualizedClusterServiceTest *test;
 
     int main() {
-        auto cs = std::dynamic_pointer_cast<wrench::CloudComputeService>(this->test->compute_service);
+        auto cs = *(this->getAvailableComputeServices<wrench::CloudComputeService>().begin());
 
 
         // Non-existent VM operations (for coverage)
@@ -306,7 +306,7 @@ private:
 
         // Submit the 2-task job for execution
         try {
-            auto cs = std::dynamic_pointer_cast<wrench::VirtualizedClusterComputeService>(this->test->compute_service);
+            auto cs = *(this->getAvailableComputeServices<wrench::VirtualizedClusterComputeService>().begin());
             std::string src_host = cs->getExecutionHosts()[0];
             auto vm_name = cs->createVM(2, 10);
             auto vm_cs = cs->startVM(vm_name, src_host);
@@ -442,7 +442,7 @@ private:
             }
 
             // create and start VM with the 2  cores and 10 bytes of RAM
-            auto cs = std::dynamic_pointer_cast<wrench::CloudComputeService>(this->test->compute_service);
+            auto cs = *(this->getAvailableComputeServices<wrench::CloudComputeService>().begin());
             cs->startVM(cs->createVM(2, 10));
 
             sum_num_idle_cores = cs->getTotalNumIdleCores();
@@ -553,7 +553,7 @@ private:
 
         // Create a bunch of VMs
         try {
-            auto cs = std::dynamic_pointer_cast<wrench::VirtualizedClusterComputeService>(this->test->compute_service);
+            auto cs = *(this->getAvailableComputeServices<wrench::VirtualizedClusterComputeService>().begin());
             std::string execution_host = cs->getExecutionHosts()[0];
 
             cs->startVM(cs->createVM(1, 10));
@@ -664,7 +664,7 @@ private:
 
         std::vector<std::tuple<std::string, std::shared_ptr<wrench::BareMetalComputeService>>> vm_list;
 
-        auto cs = std::dynamic_pointer_cast<wrench::VirtualizedClusterComputeService>(this->test->compute_service);
+        auto cs = *(this->getAvailableComputeServices<wrench::VirtualizedClusterComputeService>().begin());
 
 
         // Create  and start VMs
@@ -920,7 +920,7 @@ private:
 
         std::vector<std::tuple<std::string, std::shared_ptr<wrench::BareMetalComputeService>>> vm_list;
 
-        auto cs = std::dynamic_pointer_cast<wrench::VirtualizedClusterComputeService>(this->test->compute_service);
+        auto cs = *(this->getAvailableComputeServices<wrench::VirtualizedClusterComputeService>().begin());
 
         // Create VMs
         try {
@@ -1057,7 +1057,7 @@ private:
                                                                    {}, {});
         std::vector<std::tuple<std::string,std::shared_ptr<wrench::BareMetalComputeService>>> vm_list;
 
-        auto cs = std::dynamic_pointer_cast<wrench::VirtualizedClusterComputeService>(this->test->compute_service);
+        auto cs = *(this->getAvailableComputeServices<wrench::VirtualizedClusterComputeService>().begin());
 
         // Create some VMs
         try {
@@ -1190,7 +1190,7 @@ private:
 
     int main() override {
 
-        auto cloud_service = std::dynamic_pointer_cast<wrench::CloudComputeService>(this->test->compute_service);
+        auto cloud_service = *(this->getAvailableComputeServices<wrench::CloudComputeService>().begin());
 
         // Create a VM on the Cloud Service
         auto vm_name = cloud_service->createVM(2, 1024);
@@ -1295,7 +1295,7 @@ private:
 
     int main() override {
 
-        auto cloud_service = std::dynamic_pointer_cast<wrench::CloudComputeService>(this->test->compute_service);
+        auto cloud_service = *(this->getAvailableComputeServices<wrench::CloudComputeService>().begin());
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -1424,7 +1424,7 @@ private:
 
     int main() override {
 
-        auto cloud_service = std::dynamic_pointer_cast<wrench::CloudComputeService>(this->test->compute_service);
+        auto cloud_service = *(this->getAvailableComputeServices<wrench::CloudComputeService>().begin());
 
         // Create a job manager
         auto job_manager = this->createJobManager();
