@@ -196,8 +196,6 @@ namespace wrench {
 
         void failCurrentStandardJobs();
 
-        bool processMessage(SimulationMessage *msh);
-
         void processWorkunitExecutorCompletion(WorkunitExecutor *workunit_executor, std::shared_ptr<Workunit> workunit);
 
         void processWorkunitExecutorFailure(WorkunitExecutor *workunit_executor, std::shared_ptr<Workunit> workunit, std::shared_ptr<FailureCause> cause);
