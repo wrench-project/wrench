@@ -111,7 +111,7 @@ private:
         wrench::Simulation::sleep(10);
 
         // Create a VM on the Cloud Service
-        auto cloud_service = std::dynamic_pointer_cast<wrench::CloudComputeService>(this->test->compute_service);
+        auto cloud_service =  *(this->getAvailableComputeServices<wrench::CloudComputeService>().begin());
         auto vm_name = cloud_service->createVM(1, this->test->task->getMemoryRequirement());
         auto vm_cs = cloud_service->startVM(vm_name);
 
@@ -249,7 +249,7 @@ private:
         wrench::Simulation::sleep(10);
 
         // Create a VM on the Cloud Service
-        auto cloud_service = std::dynamic_pointer_cast<wrench::CloudComputeService>(this->test->compute_service);
+        auto cloud_service =  *(this->getAvailableComputeServices<wrench::CloudComputeService>().begin());
         auto vm_name = cloud_service->createVM(1, this->test->task->getMemoryRequirement());
         auto vm_cs = cloud_service->startVM(vm_name);
 
@@ -394,7 +394,7 @@ private:
 
         unsigned long NUM_TRIALS = 1000;
 
-        auto cloud_service = std::dynamic_pointer_cast<wrench::CloudComputeService>(this->test->compute_service);
+        auto cloud_service = *(this->getAvailableComputeServices<wrench::CloudComputeService>().begin());
 
         for (unsigned long trial=0; trial < NUM_TRIALS; trial++) {
 

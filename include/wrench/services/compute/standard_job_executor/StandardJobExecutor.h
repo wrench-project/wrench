@@ -126,10 +126,6 @@ namespace wrench {
 
         int main() override;
 
-//        void setProperty(std::string property, std::string value);
-//        std::string getPropertyValueAsString(std::string property);
-//        double getPropertyValueAsDouble(std::string property);
-
         void processWorkunitExecutorCompletion(WorkunitExecutor *workunit_executor,
                                                std::shared_ptr<Workunit> workunit);
 
