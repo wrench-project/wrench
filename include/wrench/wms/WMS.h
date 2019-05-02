@@ -16,6 +16,7 @@
 #include "wrench/wms/StaticOptimization.h"
 #include "wrench/wms/scheduler/PilotJobScheduler.h"
 #include "wrench/wms/scheduler/StandardJobScheduler.h"
+#include "wrench/services/compute/cloud/CloudComputeService.h"
 #include "wrench/workflow/Workflow.h"
 
 namespace wrench {
@@ -78,6 +79,7 @@ namespace wrench {
          */
         template <class T>
         std::set<std::shared_ptr<T>> getAvailableComputeServices() {
+//            bool is_cloud = (std::type_index(typeid(T)) == std::type_index(typeid(CloudComputeService)));
             std::set<std::shared_ptr<T>> to_return;
             for (auto const &h : this->compute_services) {
                 auto shared_ptr = std::dynamic_pointer_cast<T>(h);

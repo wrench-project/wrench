@@ -22,6 +22,7 @@
 namespace wrench {
 
     class StorageService;
+    class Service;
     class NetworkProximityService;
     class FileRegistryService;
     class ComputeService;

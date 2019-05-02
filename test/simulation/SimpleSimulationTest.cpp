@@ -147,13 +147,13 @@ private:
 
         // Create a bogus standard job with an empty task list for coverage
         try {
-            wrench::StandardJob *bogus_job = job_manager->createStandardJob({}, {});
+            job_manager->createStandardJob({}, {});
             throw std::runtime_error("Should not be able to create a job with an empty task list");
         } catch (std::invalid_argument &e) {
         }
 
         // Create a 2-core VM
-        auto cs = std::dynamic_pointer_cast<wrench::CloudComputeService>(this->test->compute_service);
+        auto cs = *(this->getAvailableComputeServices<wrench::CloudComputeService>().begin());
         auto vm_name = cs->createVM(2, 10);
         auto vm_cs = cs->startVM(vm_name);
 
