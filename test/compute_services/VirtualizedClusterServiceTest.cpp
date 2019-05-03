@@ -174,7 +174,7 @@ private:
         } catch (wrench::WorkflowExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::JobTypeNotSupported>(e.getCause());
             if (not cause) {
-                throw std::runtime_error("Invalid failure cause: " + cause->toString()+
+                throw std::runtime_error("Invalid failure cause: " + e.getCause()->toString()+
                                          " (expected: JobTypeNotSupported");
             }
 
@@ -1085,7 +1085,7 @@ private:
         } catch (wrench::WorkflowExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(e.getCause());
             if (not cause) {
-                throw std::runtime_error("Invalid failure cause: " + cause->toString() +
+                throw std::runtime_error("Invalid failure cause: " + e.getCause()->toString() +
                                          " (expected: ServiceIsDown)");
             }
             // do nothing, expected behavior
@@ -1340,7 +1340,7 @@ private:
         auto real_event = dynamic_cast<wrench::StandardJobFailedEvent *>(event.get());
         auto cause = std::dynamic_pointer_cast<wrench::JobKilled>(real_event->failure_cause);
         if (not cause) {
-            throw std::runtime_error("Unexpected failure cause: " + cause->toString() + " (expected: JobKilled)");
+            throw std::runtime_error("Unexpected failure cause: " + real_event->failure_cause->toString() + " (expected: JobKilled)");
         }
         if (cause->getJob() != job) {
             throw std::runtime_error("Failure cause does not point to the correct job");
@@ -1468,7 +1468,7 @@ private:
         auto real_event = dynamic_cast<wrench::StandardJobFailedEvent *>(event.get());
         auto cause = std::dynamic_pointer_cast<wrench::JobKilled>(real_event->failure_cause);
         if (not cause) {
-            throw std::runtime_error("Unexpected failure cause: " + cause->toString() + " (expected: JobKilled)");
+            throw std::runtime_error("Unexpected failure cause: " + real_event->failure_cause->toString() + " (expected: JobKilled)");
         }
         if (cause->getJob() != job) {
             throw std::runtime_error("Failure cause does not point to the correct job");

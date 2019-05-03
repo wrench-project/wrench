@@ -780,7 +780,7 @@ private:
             auto cause = std::dynamic_pointer_cast<wrench::FileNotFound>(msg->cause);
             if (not cause) {
                 throw std::runtime_error("Unexpected failure cause:  " +
-                                         cause->toString() + " (expected: FileNotFound)");
+                                         msg->cause->toString() + " (expected: FileNotFound)");
             }
 
             if (cause->getFile() != this->getWorkflow()->getFileByID("input_file")) {
@@ -959,7 +959,7 @@ private:
             auto cause = std::dynamic_pointer_cast<wrench::FileNotFound>(msg->cause);
             if (not cause) {
                 throw std::runtime_error("Unexpected failure cause type: " +
-                                         cause->toString() + " (expected: FileNotFound)");
+                                         msg->cause->toString() + " (expected: FileNotFound)");
             }
 
             std::string error_msg = cause->toString();

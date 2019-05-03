@@ -468,7 +468,7 @@ private:
           auto cause = std::dynamic_pointer_cast<wrench::FunctionalityNotAvailable>(e.getCause());
         if (not cause) {
           throw std::runtime_error("Got expected exception, but unexpected failure cause: " +
-                                   cause->toString() + "(Expected: FunctionalityNotAvailable)");
+                                   e.getCause()->toString() + "(Expected: FunctionalityNotAvailable)");
         }
         if (cause->getService() != this->test->compute_service) {
           throw std::runtime_error("Got expected exception and cause type, but compute service is wrong");

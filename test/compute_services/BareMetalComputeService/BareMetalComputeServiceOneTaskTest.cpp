@@ -1172,7 +1172,8 @@ private:
                 auto cause = std::dynamic_pointer_cast<wrench::NoStorageServiceForFile>(real_event->failure_cause);
                 if (not cause) {
                     throw std::runtime_error(
-                            "Got an Standard Job Failure as expected, but it does not have the correct failure cause type");
+                            "Got an Standard Job Failure as expected, but unexpected failure cause: " +
+                             real_event->failure_cause->toString() + " (expected: NoStorageServiceForFile");
                 }
                 std::string error_msg = cause->toString();
                 if (cause->getFile() != test->input_file) {
@@ -1296,7 +1297,7 @@ private:
             auto cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
             if (not cause) {
                 throw std::runtime_error("Received the expected exception, but unexpected failure cause: " +
-                cause->toString() + " (expected: NotEnoughResources)");
+                e.getCause()->toString() + " (expected: NotEnoughResources)");
             }
             std::string error_msg = cause->toString();
             if (cause->getJob() != job) {
@@ -1417,7 +1418,7 @@ private:
             auto cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
             if (not cause) {
                 throw std::runtime_error("Received the expected exception, but unexpected failure cause: " +
-                cause->toString() + " (expected: NotEnoughResources)");
+                e.getCause()->toString() + " (expected: NotEnoughResources)");
             }
             std::string error_msg = cause->toString();
             if (cause->getJob() != job) {

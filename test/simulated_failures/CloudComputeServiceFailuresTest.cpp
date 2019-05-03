@@ -133,7 +133,7 @@ private:
         auto real_event = dynamic_cast<wrench::StandardJobFailedEvent *>(event.get());
         auto cause = std::dynamic_pointer_cast<wrench::JobKilled>(real_event->failure_cause);
         if (not cause) {
-            throw std::runtime_error("Invalid failure cause type: " + cause->toString() + " (expected: JobKilled)");
+            throw std::runtime_error("Invalid failure cause type: " + real_event->failure_cause->toString() + " (expected: JobKilled)");
         }
         if (cause->getJob() != job) {
             throw std::runtime_error("Failure cause does not point to the correct job");
@@ -271,7 +271,7 @@ private:
         auto real_event = dynamic_cast<wrench::StandardJobFailedEvent *>(event.get());
         auto cause = std::dynamic_pointer_cast<wrench::JobKilled>(real_event->failure_cause);
         if (not cause) {
-            throw std::runtime_error("Invalid failure cause: " + cause->toString() + " (expected: JobKilled)");
+            throw std::runtime_error("Invalid failure cause: " + real_event->failure_cause->toString() + " (expected: JobKilled)");
         }
         if (cause->getJob() != job) {
             throw std::runtime_error("Failure cause does not point to the correct job");
