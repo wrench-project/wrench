@@ -7,6 +7,7 @@
  * (at your option) any later version.
  */
 
+#include <typeinfo>
 #include <map>
 #include <memory>
 #include <wrench/util/PointerUtil.h>
@@ -779,7 +780,6 @@ namespace wrench {
         }
 
         WRENCH_INFO("Got a [%s] message", message->getName().c_str());
-
         if (auto msg = dynamic_cast<HostHasTurnedOnMessage *>(message.get())) {
             // Do nothing, just wake up
             return true;

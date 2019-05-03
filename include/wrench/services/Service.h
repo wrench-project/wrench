@@ -125,8 +125,7 @@ namespace wrench {
         }
 
 
-
-            private:
+    private:
         bool shutting_down = false;
 
         static std::unordered_map<Service *, std::shared_ptr<Service>> service_shared_ptr_map;
