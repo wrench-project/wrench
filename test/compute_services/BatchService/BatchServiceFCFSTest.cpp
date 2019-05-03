@@ -159,13 +159,13 @@ private:
         double actual_completion_times[8];
         for (int i=0; i < 8; i++) {
             // Wait for a workflow execution event
-            std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
-            if (dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
+            if (std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
                 actual_completion_times[i] =  this->simulation->getCurrentSimulatedDate();
             } else {
                 throw std::runtime_error("Unexpected workflow execution event: " + event->toString());

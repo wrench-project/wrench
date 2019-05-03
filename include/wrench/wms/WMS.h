@@ -127,17 +127,17 @@ namespace wrench {
         void waitForAndProcessNextEvent();
         bool waitForAndProcessNextEvent(double timeout);
 
-        virtual void processEventStandardJobCompletion(std::unique_ptr<StandardJobCompletedEvent>);
+        virtual void processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent>);
 
-        virtual void processEventStandardJobFailure(std::unique_ptr<StandardJobFailedEvent>);
+        virtual void processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent>);
 
-        virtual void processEventPilotJobStart(std::unique_ptr<PilotJobStartedEvent>);
+        virtual void processEventPilotJobStart(std::shared_ptr<PilotJobStartedEvent>);
 
-        virtual void processEventPilotJobExpiration(std::unique_ptr<PilotJobExpiredEvent>);
+        virtual void processEventPilotJobExpiration(std::shared_ptr<PilotJobExpiredEvent>);
 
-        virtual void processEventFileCopyCompletion(std::unique_ptr<FileCopyCompletedEvent>);
+        virtual void processEventFileCopyCompletion(std::shared_ptr<FileCopyCompletedEvent>);
 
-        virtual void processEventFileCopyFailure(std::unique_ptr<FileCopyFailedEvent>);
+        virtual void processEventFileCopyFailure(std::shared_ptr<FileCopyFailedEvent>);
 
         /***********************/
         /** \endcond           */

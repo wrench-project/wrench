@@ -101,8 +101,8 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        std::unique_ptr<WorkflowExecutionEvent> waitForNextExecutionEvent();
-        std::unique_ptr<WorkflowExecutionEvent> waitForNextExecutionEvent(double timeout);
+        std::shared_ptr<WorkflowExecutionEvent> waitForNextExecutionEvent();
+        std::shared_ptr<WorkflowExecutionEvent> waitForNextExecutionEvent(double timeout);
 
         std::string getCallbackMailbox();
 

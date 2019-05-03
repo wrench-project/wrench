@@ -281,7 +281,7 @@ private:
         // Terminate job2 (which is pending)
         job_manager->terminateJob(job2);
 
-        std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+        std::shared_ptr<wrench::WorkflowExecutionEvent> event;
 
         // Terminate job1 (which is running)
         job_manager->terminateJob(job1);
@@ -428,13 +428,13 @@ private:
 
 
             // Wait for a workflow execution event
-            std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
-            if (not dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
+            if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
                 throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
             this->getWorkflow()->removeTask(task);
@@ -599,10 +599,10 @@ private:
         // Wait for the two execution events
         for (auto job : {standard_job_1, standard_job_2}) {
             // Wait for the workflow execution event
-            std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
-                auto real_event = dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get());
+                auto real_event = std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event);
                 if (real_event) {
                     if (real_event->standard_job != job) {
                         throw std::runtime_error("Wrong job completion order: got " +
@@ -743,13 +743,13 @@ private:
             }
 
             // Wait for a workflow execution event
-            std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
-            if (not dynamic_cast<wrench::PilotJobStartedEvent*>(event.get())) {
+            if (not std::dynamic_pointer_cast<wrench::PilotJobStartedEvent>(event)) {
                 throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
 
@@ -758,7 +758,7 @@ private:
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
-            if (not dynamic_cast<wrench::PilotJobExpiredEvent*>(event.get())) {
+            if (not std::dynamic_pointer_cast<wrench::PilotJobExpiredEvent>(event)) {
                 throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
         }
@@ -891,13 +891,13 @@ private:
                 );
             }
             // Wait for a workflow execution event
-            std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
-            if (not dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
+            if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
                 throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
             this->getWorkflow()->removeTask(task);
@@ -922,13 +922,13 @@ private:
             }
 
             // Wait for a workflow execution event
-            std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
-            if (not dynamic_cast<wrench::PilotJobStartedEvent*>(event.get())) {
+            if (not std::dynamic_pointer_cast<wrench::PilotJobStartedEvent>(event)) {
                 throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
 
@@ -937,7 +937,7 @@ private:
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
-            if (not dynamic_cast<wrench::PilotJobExpiredEvent*>(event.get())) {
+            if (not std::dynamic_pointer_cast<wrench::PilotJobExpiredEvent>(event)) {
                 throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
         }
@@ -1325,13 +1325,13 @@ private:
             }
 
             // Wait for a workflow execution event
-            std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
-            auto real_event = dynamic_cast<wrench::StandardJobFailedEvent*>(event.get());
+            auto real_event = std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event);
             if (real_event) {
                 auto cause = std::dynamic_pointer_cast<wrench::JobTimeout>(real_event->failure_cause);
                 if (not cause) {
@@ -1459,13 +1459,13 @@ private:
             }
 
             // Wait for a workflow execution event
-            std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
-            if (not dynamic_cast<wrench::PilotJobStartedEvent*>(event.get())) {
+            if (not std::dynamic_pointer_cast<wrench::PilotJobStartedEvent>(event)) {
                 throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
 
@@ -1475,7 +1475,7 @@ private:
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
 
-            if (not dynamic_cast<wrench::PilotJobExpiredEvent*>(event.get())) {
+            if (not std::dynamic_pointer_cast<wrench::PilotJobExpiredEvent>(event)) {
                 throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
         }
@@ -1666,13 +1666,13 @@ private:
             //wait for three standard job completion events
             int num_events = 0;
             while (num_events < 3) {
-                std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+                std::shared_ptr<wrench::WorkflowExecutionEvent> event;
                 try {
                     event = this->getWorkflow()->waitForNextExecutionEvent();
                 } catch (wrench::WorkflowExecutionException &e) {
                     throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
                 }
-                if (not dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
+                if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
                     throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
                 }
                 num_events++;
@@ -1826,13 +1826,13 @@ private:
             //wait for two standard job completion events
             int num_events = 0;
             while (num_events < num_tasks) {
-                std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+                std::shared_ptr<wrench::WorkflowExecutionEvent> event;
                 try {
                     event = this->getWorkflow()->waitForNextExecutionEvent();
                 } catch (wrench::WorkflowExecutionException &e) {
                     throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
                 }
-                if (not dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
+                if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
                     throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
                 }
                 num_events++;
@@ -2034,13 +2034,13 @@ private:
             //wait for two standard job completion events
             int num_events = 0;
             while (num_events < 4) {
-                std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+                std::shared_ptr<wrench::WorkflowExecutionEvent> event;
                 try {
                     event = this->getWorkflow()->waitForNextExecutionEvent();
                 } catch (wrench::WorkflowExecutionException &e) {
                     throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
                 }
-                if (not dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
+                if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
                     throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
                 }
                 num_events++;
@@ -2098,13 +2098,13 @@ private:
             //wait for two standard job completion events
             int num_events = 0;
             while (num_events < num_tasks) {
-                std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+                std::shared_ptr<wrench::WorkflowExecutionEvent> event;
                 try {
                     event = this->getWorkflow()->waitForNextExecutionEvent();
                 } catch (wrench::WorkflowExecutionException &e) {
                     throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
                 }
-                if (not dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
+                if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
                     throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
                 }
                 num_events++;
@@ -2256,13 +2256,13 @@ private:
             }
 
             // Wait for a workflow execution event
-            std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
-            if (not dynamic_cast<wrench::PilotJobStartedEvent*>(event.get())) {
+            if (not std::dynamic_pointer_cast<wrench::PilotJobStartedEvent>(event)) {
                 throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
 
@@ -2292,7 +2292,7 @@ private:
                 throw std::runtime_error(
                         "Error while getting and execution event: " + e.getCause()->toString());
             }
-            auto real_event = dynamic_cast<wrench::StandardJobFailedEvent*>(event.get());
+            auto real_event = std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event);
             if (real_event) {
                 auto cause = std::dynamic_pointer_cast<wrench::JobKilled>(real_event->failure_cause);
                 if (not cause) {
@@ -2429,13 +2429,13 @@ private:
             }
 
             // Wait for a workflow execution event
-            std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
-            if (not dynamic_cast<wrench::PilotJobStartedEvent*>(event.get())) {
+            if (not std::dynamic_pointer_cast<wrench::PilotJobStartedEvent>(event)) {
                     throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
 
@@ -2469,7 +2469,7 @@ private:
                 throw std::runtime_error(
                         "Error while getting and execution event: " + e.getCause()->toString());
             }
-            if (not dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
+            if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
                 throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
 
@@ -2592,13 +2592,13 @@ private:
             }
 
             // Wait for a workflow execution event
-            std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
-            if (not dynamic_cast<wrench::PilotJobStartedEvent*>(event.get())) {
+            if (not std::dynamic_pointer_cast<wrench::PilotJobStartedEvent>(event)) {
                 throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
 
@@ -2753,13 +2753,13 @@ private:
             for (int i = 0; i < num_standard_jobs; i++) {
 
                 // Wait for a workflow execution event
-                std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+                std::shared_ptr<wrench::WorkflowExecutionEvent> event;
                 try {
                     event = this->getWorkflow()->waitForNextExecutionEvent();
                 } catch (wrench::WorkflowExecutionException &e) {
                     throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
                 }
-                if (not dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
+                if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
                     throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
                 }
             }
@@ -2897,13 +2897,13 @@ private:
 
 
             // Wait for a workflow execution event
-            std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
-            if (not dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
+            if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
                 throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
             this->getWorkflow()->removeTask(task);
@@ -3046,17 +3046,17 @@ private:
 
         // Wait for workflow execution events
         for (int i=0; i < 3; i++) {
-            std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
-            if (not dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())) {
+            if (not std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event)) {
                 throw std::runtime_error("Should have received a STANDARD_JOB_FAILURE event (received " + event->toString());
             }
 
-            auto real_event = dynamic_cast<wrench::StandardJobFailedEvent*>(event.get());
+            auto real_event = std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event);
             auto cause = std::dynamic_pointer_cast<wrench::JobKilled>(real_event->failure_cause);
             if (not cause) {
                 throw std::runtime_error("Expected event, but unexpected failure cause: " +

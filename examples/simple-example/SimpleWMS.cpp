@@ -126,7 +126,7 @@ namespace wrench {
      *
      * @param event: a workflow execution event
      */
-    void SimpleWMS::processEventStandardJobFailure(std::unique_ptr<StandardJobFailedEvent> event) {
+    void SimpleWMS::processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent> event) {
       auto job = event->standard_job;
       WRENCH_INFO("Notified that a standard job has failed (all its tasks are back in the ready state)");
       WRENCH_INFO("CauseType: %s", event->failure_cause->toString().c_str());

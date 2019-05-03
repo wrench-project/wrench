@@ -122,8 +122,8 @@ private:
 
           double completion_dates[10];
           for (int i = 0; i < 10; i++) {
-            std::unique_ptr<wrench::WorkflowExecutionEvent> event1 = this->getWorkflow()->waitForNextExecutionEvent();
-            if (not dynamic_cast<wrench::FileCopyCompletedEvent*>(event1.get())) {
+            std::shared_ptr<wrench::WorkflowExecutionEvent> event1 = this->getWorkflow()->waitForNextExecutionEvent();
+            if (not std::dynamic_pointer_cast<wrench::FileCopyCompletedEvent>(event1)) {
               throw std::runtime_error("Unexpected Workflow Execution Event: " + event1->toString());
             }
             completion_dates[i] = this->simulation->getCurrentSimulatedDate();

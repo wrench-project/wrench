@@ -127,8 +127,8 @@ private:
         job_manager->submitJob(job, this->test->compute_service, service_specific_args);
 
         // Wait for a workflow execution event
-        std::unique_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
-        if (not dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
+        std::shared_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
+        if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
             throw std::runtime_error("Unexpected workflow execution event!");
         }
 
@@ -239,8 +239,8 @@ private:
         job_manager->submitJob(job, this->test->compute_service, {});
 
         // Wait for a workflow execution event
-        std::unique_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
-        if (not dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
+        std::shared_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
+        if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
             throw std::runtime_error("Unexpected workflow execution event!");
         }
 
@@ -365,8 +365,8 @@ private:
             job_manager->submitJob(job, this->test->compute_service, {});
 
             // Wait for a workflow execution event
-            std::unique_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
-            if (not dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
+            std::shared_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
+            if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
                 throw std::runtime_error("Unexpected workflow execution event!");
             }
 
@@ -473,8 +473,8 @@ private:
         job_manager->submitJob(job, this->test->compute_service, {});
 
         // Wait for a workflow execution event
-        std::unique_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
-        if (not dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())) {
+        std::shared_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
+        if (not std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event)) {
             throw std::runtime_error("Unexpected workflow execution event!");
         }
 

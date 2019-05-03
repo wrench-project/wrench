@@ -149,13 +149,13 @@ private:
 
       for (int i=0; i < 8; i++) {
         // Wait for a workflow execution event
-        std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+        std::shared_ptr<wrench::WorkflowExecutionEvent> event;
         try {
           event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
-        if (not dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
+        if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
       }
