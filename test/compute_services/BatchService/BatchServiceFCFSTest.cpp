@@ -465,19 +465,19 @@ private:
                 (*(this->getAvailableComputeServices<wrench::BatchComputeService>().begin()))->getStartTimeEstimates(set_of_jobs);
         throw std::runtime_error("Should not have been able to get prediction for BESTFIT algorithm");
       } catch (wrench::WorkflowExecutionException &e) {
-        if (e.getCause()->getCauseType() != wrench::FailureCause::FUNCTIONALITY_NOT_AVAILABLE) {
-          throw std::runtime_error("Got expected exception, but failure cause type of wrong (" +
-                                   std::to_string(e.getCause()->getCauseType()) + ")");
+          auto cause = std::dynamic_pointer_cast<wrench::FunctionalityNotAvailable>(e.getCause());
+        if (not cause) {
+          throw std::runtime_error("Got expected exception, but unexpected failure cause: " +
+                                   cause->toString() + "(Expected: FunctionalityNotAvailable)");
         }
-        auto real_cause = (wrench::FunctionalityNotAvailable *) e.getCause().get();
-        if (real_cause->getService() != this->test->compute_service) {
+        if (cause->getService() != this->test->compute_service) {
           throw std::runtime_error("Got expected exception and cause type, but compute service is wrong");
         }
-        if (real_cause->getFunctionalityName() != "start time estimates") {
+        if (cause->getFunctionalityName() != "start time estimates") {
           throw std::runtime_error("Got expected exception and cause type, but functionality name is wrong (" +
-          real_cause->getFunctionalityName() + ")");
+          cause->getFunctionalityName() + ")");
         }
-        WRENCH_INFO("toString: %s", real_cause->toString().c_str());  // for coverage
+        WRENCH_INFO("toString: %s", cause->toString().c_str());  // for coverage
 
       }
 

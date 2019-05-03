@@ -1168,13 +1168,14 @@ private:
         std::unique_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
         switch (event->type) {
             case wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
-                if (dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())->failure_cause->getCauseType() != wrench::FailureCause::NO_STORAGE_SERVICE_FOR_FILE) {
+                auto real_event = dynamic_cast<wrench::StandardJobFailedEvent*>(event.get());
+                auto cause = std::dynamic_pointer_cast<wrench::NoStorageServiceForFile>(real_event->failure_cause);
+                if (not cause) {
                     throw std::runtime_error(
                             "Got an Standard Job Failure as expected, but it does not have the correct failure cause type");
                 }
-                auto real_cause = (wrench::NoStorageServiceForFile *) dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())->failure_cause.get();
-                std::string error_msg = real_cause->toString();
-                if (real_cause->getFile() != test->input_file) {
+                std::string error_msg = cause->toString();
+                if (cause->getFile() != test->input_file) {
                     throw std::runtime_error(
                             "Got the expected failure, but the failure cause does not point to the right file");
                 }
@@ -1292,16 +1293,17 @@ private:
             job_manager->submitJob(job, test->compute_service, {{"task2", "OneCoreHost:2"}});
             throw std::runtime_error("Should not be able to submit a job to a service without enough cores");
         } catch (wrench::WorkflowExecutionException &e) {
-            if (e.getCause()->getCauseType() != wrench::FailureCause::NOT_ENOUGH_RESOURCES) {
-                throw std::runtime_error("Received the expected exception, but the failure cause is incorrect");
+            auto cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
+            if (not cause) {
+                throw std::runtime_error("Received the expected exception, but unexpected failure cause: " +
+                cause->toString() + " (expected: NotEnoughResources)");
             }
-            auto real_cause = (wrench::NotEnoughResources *) e.getCause().get();
-            std::string error_msg = real_cause->toString();
-            if (real_cause->getJob() != job) {
+            std::string error_msg = cause->toString();
+            if (cause->getJob() != job) {
                 throw std::runtime_error(
                         "Got the expected failure, but the failure cause does not point to the right job");
             }
-            if (real_cause->getComputeService() != test->compute_service) {
+            if (cause->getComputeService() != test->compute_service) {
                 throw std::runtime_error(
                         "Got the expected failure, but the failure cause does not point to the right compute service");
             }
@@ -1412,16 +1414,17 @@ private:
             job_manager->submitJob(job, test->compute_service);
             throw std::runtime_error("Should not be able to submit a job to a service without enough RAM");
         } catch (wrench::WorkflowExecutionException &e) {
-            if (e.getCause()->getCauseType() != wrench::FailureCause::NOT_ENOUGH_RESOURCES) {
-                throw std::runtime_error("Received the expected exception, but the failure cause is incorrect");
+            auto cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
+            if (not cause) {
+                throw std::runtime_error("Received the expected exception, but unexpected failure cause: " +
+                cause->toString() + " (expected: NotEnoughResources)");
             }
-            auto real_cause = (wrench::NotEnoughResources *) e.getCause().get();
-            std::string error_msg = real_cause->toString();
-            if (real_cause->getJob() != job) {
+            std::string error_msg = cause->toString();
+            if (cause->getJob() != job) {
                 throw std::runtime_error(
                         "Got the expected failure, but the failure cause does not point to the right job");
             }
-            if (real_cause->getComputeService() != test->compute_service) {
+            if (cause->getComputeService() != test->compute_service) {
                 throw std::runtime_error(
                         "Got the expected failure, but the failure cause does not point to the right compute service");
             }
@@ -1536,12 +1539,13 @@ private:
             job_manager->submitJob(job, test->compute_service);
             throw std::runtime_error("Should not be able to submit a job to a service that is down");
         } catch (wrench::WorkflowExecutionException &e) {
-            if (e.getCause()->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
-                throw std::runtime_error("Got the expected exception, but the failure cause is wrong");
+            auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(e.getCause());
+            if (not cause) {
+                throw std::runtime_error("Got the expected exception, but an expected failure cause: " +
+                                         e.getCause()->toString() + "(expected: ServiceIsDown)");
             }
-            auto real_cause = (wrench::ServiceIsDown *) e.getCause().get();
-            std::string error_msg = real_cause->toString();
-            if (real_cause->getService() != test->compute_service) {
+            std::string error_msg = cause->toString();
+            if (cause->getService() != test->compute_service) {
                 throw std::runtime_error(
                         "Got the expected failure, but the failure cause does not point to the right compute service");
             }
