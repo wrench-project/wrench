@@ -90,24 +90,24 @@ namespace wrench {
             return to_return;
         }
 
-        /**
-         * @brief Obtain the list of compute services available to the WMS
-         * @tparam CloudComputeService
-         * @return a set of compute services
-         * @return
-         */
-        template <>
-        std::set<std::shared_ptr<CloudComputeService>> getAvailableComputeServices() {
-            std::set<std::shared_ptr<CloudComputeService>> to_return;
-            for (auto const &h : this->compute_services) {
-                auto shared_ptr_cloud = std::dynamic_pointer_cast<CloudComputeService>(h);
-                auto shared_ptr_vc = std::dynamic_pointer_cast<VirtualizedClusterComputeService>(h);
-                if (shared_ptr_cloud and (not shared_ptr_vc)) {
-                    to_return.insert(shared_ptr_cloud);
-                }
-            }
-            return to_return;
-        }
+//        /**
+//         * @brief Obtain the list of compute services available to the WMS
+//         * @tparam CloudComputeService
+//         * @return a set of compute services
+//         * @return
+//         */
+//        template <>
+//        std::set<std::shared_ptr<CloudComputeService>> getAvailableComputeServices<CloudComputeService>() {
+//            std::set<std::shared_ptr<CloudComputeService>> to_return;
+//            for (auto const &h : this->compute_services) {
+//                auto shared_ptr_cloud = std::dynamic_pointer_cast<CloudComputeService>(h);
+//                auto shared_ptr_vc = std::dynamic_pointer_cast<VirtualizedClusterComputeService>(h);
+//                if (shared_ptr_cloud and (not shared_ptr_vc)) {
+//                    to_return.insert(shared_ptr_cloud);
+//                }
+//            }
+//            return to_return;
+//        }
 
 
         std::set<std::shared_ptr<StorageService>> getAvailableStorageServices();
@@ -173,6 +173,26 @@ namespace wrench {
         virtual int main() = 0;
 
     };
+
+    /**
+     * @brief Obtain the list of compute services available to the WMS
+     * @tparam CloudComputeService
+     * @return a set of compute services
+     * @return
+     */
+    template <>
+    std::set<std::shared_ptr<CloudComputeService>> WMS::getAvailableComputeServices() {
+        std::set<std::shared_ptr<CloudComputeService>> to_return;
+        for (auto const &h : this->compute_services) {
+            auto shared_ptr_cloud = std::dynamic_pointer_cast<CloudComputeService>(h);
+            auto shared_ptr_vc = std::dynamic_pointer_cast<VirtualizedClusterComputeService>(h);
+            if (shared_ptr_cloud and (not shared_ptr_vc)) {
+                to_return.insert(shared_ptr_cloud);
+            }
+        }
+        return to_return;
+    }
+
 };
 
 
