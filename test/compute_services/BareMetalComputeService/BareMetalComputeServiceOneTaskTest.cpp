@@ -23,7 +23,7 @@ public:
     wrench::WorkflowTask *task;
     std::shared_ptr<wrench::StorageService> storage_service1 = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service2 = nullptr;
-    std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
+    std::shared_ptr<wrench::BareMetalComputeService> compute_service = nullptr;
 
     void do_BadSetup_test();
 
