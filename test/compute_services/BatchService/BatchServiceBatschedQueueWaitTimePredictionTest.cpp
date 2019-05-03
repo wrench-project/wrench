@@ -155,7 +155,7 @@ private:
                 auto cause = std::dynamic_pointer_cast<wrench::FunctionalityNotAvailable>(e.getCause());
                 if (not cause) {
                     throw std::runtime_error("Got an expected exception but unexpected failure cause : " +
-                                             cause->toString() + " (expected: FunctionalityNotAvailable)");
+                                             e.getCause()->toString() + " (expected: FunctionalityNotAvailable)");
                 }
                 if (cause->getService() != batch_service) {
                     throw std::runtime_error(

@@ -169,7 +169,8 @@ private:
         } catch (wrench::WorkflowExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::JobTypeNotSupported>(e.getCause());
             if (not cause) {
-                throw std::runtime_error("Didn't get the expected exception");
+                throw std::runtime_error("Got expected exception, but unexpected failure cause: " +
+                                         e.getCause()->toString() + " (expected: 'JobTypeNotSupported");
             }
             if (cause->getJob() != two_task_job) {
                 throw std::runtime_error(
@@ -1123,7 +1124,7 @@ private:
             if (not cause) {
                 throw std::runtime_error(
                         "Got an expected exception but an unexpected failure cause: " +
-                        cause->toString() + " (expected: JobCannotBeTerminated)");
+                        e.getCause()->toString() + " (expected: JobCannotBeTerminated)");
             }
             if (cause->getJob() != two_task_job) {
                 throw std::runtime_error(
@@ -1376,7 +1377,7 @@ private:
                 auto cause = std::dynamic_pointer_cast<wrench::JobKilled>(real_event->failure_cause);
                 if (not cause) {
                     throw std::runtime_error("Got a job failure event, but an unexpected failure cause: " +
-                    cause->toString() + " (expected: JobKilled)");
+                    real_event->failure_cause->toString() + " (expected: JobKilled)");
                 }
                 if (cause->getComputeService() != this->test->compute_service) {
                     std::runtime_error(
@@ -1511,7 +1512,8 @@ private:
                 auto real_event = dynamic_cast<wrench::StandardJobFailedEvent*>(event.get());
                 auto cause = std::dynamic_pointer_cast<wrench::NoStorageServiceForFile>(real_event->failure_cause);
                 if (not cause) {
-                    throw std::runtime_error("Got the correct failure event, but the cause seems wrong");
+                    throw std::runtime_error("Got the expected job failure but unexpected failure cause: " +
+                            real_event->failure_cause->toString() + " (expected: NoStorageServiceForFile)");
                 }
                 if (cause->getFile() != this->test->input_file) {
                     throw std::runtime_error(

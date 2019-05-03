@@ -400,7 +400,7 @@ private:
             auto cause = std::dynamic_pointer_cast<wrench::JobTypeNotSupported>(e.getCause());
             if (not cause) {
                 throw std::runtime_error("Got expected exception but unexpected failure cause: " +
-                                         cause->toString() + " (expected: JobTypeNotSupported)");
+                                         e.getCause()->toString() + " (expected: JobTypeNotSupported)");
             }
             if (cause->getJob() != job) {
                 throw std::runtime_error(

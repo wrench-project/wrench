@@ -214,7 +214,8 @@ private:
         } catch (wrench::WorkflowExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::FileNotFound>(e.getCause());
             if (not cause) {
-                throw std::runtime_error("Got an expected exception, but not the expected failure cause type");
+                throw std::runtime_error("Got an expected exception, but unexpected failure cause: " +
+                                         e.getCause()->toString() + " (expected: FileNotFound)");
             }
             if (cause->getStorageService() != this->test->storage_service_100) {
                 throw std::runtime_error(
@@ -234,7 +235,8 @@ private:
         } catch (wrench::WorkflowExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::FileNotFound>(e.getCause());
             if (not cause) {
-                throw std::runtime_error("Got an expected 'file not found' exception, but not the expected failure cause type");
+                throw std::runtime_error("Got an expected 'file not found' exception, but unexpected failure cause: " +
+                e.getCause()->toString() + " (expected: FileNotFound)");
             }
             if (cause->getStorageService() != this->test->storage_service_100) {
                 throw std::runtime_error(
@@ -356,7 +358,8 @@ private:
                 auto real_event = dynamic_cast<wrench::FileCopyFailedEvent*>(event.get());
                 auto cause = std::dynamic_pointer_cast<wrench::StorageServiceNotEnoughSpace>(real_event->failure_cause);
                 if (not cause) {
-                    throw std::runtime_error("Should have gotten a 'out of space' failure cause");
+                    throw std::runtime_error("Got expected event but unexpected failure cause: " +
+                    real_event->failure_cause->toString() + " (expected: FileCopyFailedEvent)");
                 }
                 break;
             }
@@ -386,7 +389,8 @@ private:
                 auto real_event = dynamic_cast<wrench::FileCopyFailedEvent*>(event.get());
                 auto cause = std::dynamic_pointer_cast<wrench::FileNotFound>(real_event->failure_cause);
                 if (not cause) {
-                    throw std::runtime_error("Should have gotten a 'file not found' failure cause");
+                    throw std::runtime_error("Got expected event but unexpected failure cause: " +
+                    real_event->failure_cause->toString() + " (expected: FileNotFound)");
                 }
                 break;
             }
@@ -414,7 +418,7 @@ private:
             auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(e.getCause());
             if (not cause) {
                 throw std::runtime_error("Got an exception, as expected, but of the unexpected failure cause: " +
-                                         cause->toString() + " (expected: ServiceIsDown)");
+                                         e.getCause()->toString() + " (expected: ServiceIsDown)");
             }
             // Check Exception details
             if (cause->getService() != this->test->storage_service_100) {
@@ -482,7 +486,7 @@ private:
             auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(e.getCause());
             if (not cause) {
                 throw std::runtime_error("Got an exception, as expected, but of the unexpected failure cause: " +
-                                         cause->toString() + " (was expecting ServiceIsDown)");
+                                         e.getCause()->toString() + " (was expecting ServiceIsDown)");
             }
             // Check Exception details
             if (cause->getService() != this->test->storage_service_100) {
@@ -774,7 +778,7 @@ private:
             auto cause = std::dynamic_pointer_cast<wrench::FileAlreadyBeingCopied>(e.getCause());
             if (not cause) {
                 throw std::runtime_error("Got expected exception, but unexpected failure cause: " +
-                                         cause->toString() +
+                                         e.getCause()->toString() +
                                          " (expected: FileAlreadyBeingCopied)");
             }
             if (cause->getFile() != this->test->file_500) {
@@ -906,7 +910,7 @@ private:
             auto cause = std::dynamic_pointer_cast<wrench::StorageServiceNotEnoughSpace>(e.getCause());
             if (not cause) {
                 throw std::runtime_error("Got an expected exception but an unexpected failure cause: " +
-                                         cause->toString() + " (expected: StorageServiceNotEnoughSpace)");
+                                         e.getCause()->toString() + " (expected: StorageServiceNotEnoughSpace)");
             }
             // Check Exception details
             std::string error_msg = cause->toString();
@@ -942,7 +946,7 @@ private:
             auto cause = std::dynamic_pointer_cast<wrench::FileNotFound>(e.getCause());
             if (not cause) {
                 throw std::runtime_error("Got an expected exception but unexpected failure cause: " +
-                                         cause->toString() + " (expected: FileNotFound)");
+                                         e.getCause()->toString() + " (expected: FileNotFound)");
             }
             // Check Exception details
             if (cause->getFile() != this->test->file_500) {
@@ -1117,7 +1121,7 @@ private:
                 auto cause = std::dynamic_pointer_cast<wrench::StorageServiceNotEnoughSpace>(real_event->failure_cause);
                 if (not cause) {
                     throw std::runtime_error("Got an expected exception, but an unexpected failure cause: " +
-                                             cause->toString() + " (expected: StorageServiceNotEnoughSpace");
+                                             real_event->failure_cause->toString() + " (expected: StorageServiceNotEnoughSpace");
                 }
                 if (cause->getFile() != this->test->file_500) {
                     throw std::runtime_error(
@@ -1155,7 +1159,7 @@ private:
                 auto cause = std::dynamic_pointer_cast<wrench::FileNotFound>(real_event->failure_cause);
                 if (not cause) {
                     throw std::runtime_error("Got an expected exception, but an unexpected failure cause: " +
-                                             cause->toString() + " (expected: FileNotFound)");
+                                             real_event->failure_cause->toString() + " (expected: FileNotFound)");
                 }
                 if (cause->getFile() != this->test->file_100) {
                     throw std::runtime_error(
@@ -1195,7 +1199,7 @@ private:
                 auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(real_event->failure_cause);
                 if (not cause) {
                     throw std::runtime_error("Got an expected exception, but an unexpected failure cause: " +
-                                             cause->toString() + " (expected: ServiceIsDown)");
+                                             real_event->failure_cause->toString() + " (expected: ServiceIsDown)");
                 }
                 if (cause->getService() != this->test->storage_service_1000) {
                     throw std::runtime_error(
@@ -1220,7 +1224,7 @@ private:
             auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(e.getCause());
             if (not cause) {
                 throw std::runtime_error("Got an exception, as expected, but of the unexpected failure cause: " +
-                                         cause->toString() + " (expected: ServiceIsDown");
+                                         e.getCause()->toString() + " (expected: ServiceIsDown");
             }
             // Check Exception details
             if (cause->getService() != this->test->storage_service_510) {
@@ -1621,7 +1625,7 @@ private:
             auto cause = std::dynamic_pointer_cast<wrench::StorageServiceNotEnoughSpace>(e.getCause());
             if (not cause) {
                 throw std::runtime_error("Got an expected exception but unexpected cause type: " +
-                                         cause->toString() + " (expected: StorageServiceNotEnoughSpace");
+                                         e.getCause()->toString() + " (expected: StorageServiceNotEnoughSpace");
             }
             if (cause->getStorageService() != this->test->storage_service_100) {
                 throw std::runtime_error(
@@ -1640,7 +1644,7 @@ private:
             auto cause = std::dynamic_pointer_cast<wrench::StorageServiceNotEnoughSpace>(e.getCause());
             if (not cause) {
                 throw std::runtime_error("Got an expected exception but unexpected cause type: " +
-                                         cause->toString() + " (expected: StorageServiceNotEnoughSpace");
+                                         e.getCause()->toString() + " (expected: StorageServiceNotEnoughSpace");
             }
             if (cause->getStorageService() != this->test->storage_service_100) {
                 throw std::runtime_error(
