@@ -142,7 +142,7 @@ namespace wrench {
      * @brief Retrieve the message for a communication
      * @return the message, or nullptr if the connection has failed
      */
-    std::unique_ptr<SimulationMessage> NetworkConnection::getMessage() {
+    std::shared_ptr<SimulationMessage> NetworkConnection::getMessage() {
 
       WRENCH_DEBUG("Getting the message from connection");
       if (this->type == NetworkConnection::OUTGOING_DATA) {
@@ -151,7 +151,7 @@ namespace wrench {
       if (this->hasFailed()) {
         return nullptr;
       }
-      std::unique_ptr<SimulationMessage> message;
+      std::shared_ptr<SimulationMessage> message;
       try {
         message = this->comm->wait();
       } catch (std::shared_ptr<NetworkError> &cause) {

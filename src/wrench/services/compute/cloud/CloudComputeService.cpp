@@ -91,7 +91,7 @@ namespace wrench {
         // send a "get execution hosts" message to the daemon's mailbox_name
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("get_execution_hosts");
 
-        std::unique_ptr<SimulationMessage> answer_message = sendRequest(
+        std::shared_ptr<SimulationMessage> answer_message = sendRequest(
                 answer_mailbox,
                 new CloudComputeServiceGetExecutionHostsRequestMessage(
                         answer_mailbox,
@@ -137,7 +137,7 @@ namespace wrench {
         // send a "create vm" message to the daemon's mailbox_name
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("create_vm");
 
-        std::unique_ptr<SimulationMessage> answer_message = sendRequest(
+        std::shared_ptr<SimulationMessage> answer_message = sendRequest(
                 answer_mailbox,
                 new CloudComputeServiceCreateVMRequestMessage(
                         answer_mailbox,
@@ -175,7 +175,7 @@ namespace wrench {
         // send a "shutdown vm" message to the daemon's mailbox_name
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("shutdown_vm");
 
-        std::unique_ptr<SimulationMessage> answer_message = sendRequest(
+        std::shared_ptr<SimulationMessage> answer_message = sendRequest(
                 answer_mailbox,
                 new CloudComputeServiceShutdownVMRequestMessage(
                         answer_mailbox, vm_name,
@@ -213,7 +213,7 @@ namespace wrench {
 
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("start_vm");
 
-        std::unique_ptr<SimulationMessage> answer_message = sendRequest(
+        std::shared_ptr<SimulationMessage> answer_message = sendRequest(
                 answer_mailbox,
                 new CloudComputeServiceStartVMRequestMessage(
                         answer_mailbox, vm_name, "",
@@ -249,7 +249,7 @@ namespace wrench {
         // send a "shutdown vm" message to the daemon's mailbox_name
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("suspend_vm");
 
-        std::unique_ptr<SimulationMessage> answer_message = sendRequest(
+        std::shared_ptr<SimulationMessage> answer_message = sendRequest(
                 answer_mailbox,
                 new CloudComputeServiceSuspendVMRequestMessage(
                         answer_mailbox, vm_name,
@@ -285,7 +285,7 @@ namespace wrench {
         // send a "shutdown vm" message to the daemon's mailbox_name
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("resume_vm");
 
-        std::unique_ptr<SimulationMessage> answer_message = sendRequest(
+        std::shared_ptr<SimulationMessage> answer_message = sendRequest(
                 answer_mailbox,
                 new CloudComputeServiceResumeVMRequestMessage(
                         answer_mailbox, vm_name,
@@ -322,7 +322,7 @@ namespace wrench {
         // send a "shutdown vm" message to the daemon's mailbox_name
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("destroy_vm");
 
-        std::unique_ptr<SimulationMessage> answer_message = sendRequest(
+        std::shared_ptr<SimulationMessage> answer_message = sendRequest(
                 answer_mailbox,
                 new CloudComputeServiceDestroyVMRequestMessage(
                         answer_mailbox, vm_name,
@@ -367,7 +367,7 @@ namespace wrench {
 
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_standard_job");
 
-        std::unique_ptr<SimulationMessage> answer_message = sendRequest(
+        std::shared_ptr<SimulationMessage> answer_message = sendRequest(
                 answer_mailbox,
                 new ComputeServiceSubmitStandardJobRequestMessage(
                         answer_mailbox, job, service_specific_args,
@@ -411,7 +411,7 @@ namespace wrench {
 
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_pilot_job");
 
-        std::unique_ptr<SimulationMessage> answer_message = sendRequest(
+        std::shared_ptr<SimulationMessage> answer_message = sendRequest(
                 answer_mailbox,
                 new ComputeServiceSubmitPilotJobRequestMessage(
                         answer_mailbox, job, service_specific_args, this->getMessagePayloadValue(
@@ -543,7 +543,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    std::unique_ptr<SimulationMessage>
+    std::shared_ptr<SimulationMessage>
     CloudComputeService::sendRequest(std::string &answer_mailbox, ComputeServiceMessage *message) {
 
         serviceSanityCheck();
@@ -555,7 +555,7 @@ namespace wrench {
         }
 
         // Wait for a reply
-        std::unique_ptr<SimulationMessage> answer_message = nullptr;
+        std::shared_ptr<SimulationMessage> answer_message = nullptr;
 
         try {
             answer_message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
@@ -578,7 +578,7 @@ namespace wrench {
         S4U_Simulation::computeZeroFlop();
 
         // Wait for a message
-        std::unique_ptr<SimulationMessage> message;
+        std::shared_ptr<SimulationMessage> message;
 
         try {
             message = S4U_Mailbox::getMessage(this->mailbox_name);
@@ -593,7 +593,7 @@ namespace wrench {
 
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
 
-        if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+        if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
             this->stopAllVMs();
             this->vm_list.clear();
             // This is Synchronous
@@ -606,46 +606,46 @@ namespace wrench {
             }
             return false;
 
-        } else if (auto msg = dynamic_cast<ComputeServiceResourceInformationRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceResourceInformationRequestMessage>(message)) {
             processGetResourceInformation(msg->answer_mailbox);
             return true;
 
-        } else if (auto msg = dynamic_cast<CloudComputeServiceGetExecutionHostsRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<CloudComputeServiceGetExecutionHostsRequestMessage>(message)) {
             processGetExecutionHosts(msg->answer_mailbox);
             return true;
 
-        } else if (auto msg = dynamic_cast<CloudComputeServiceCreateVMRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<CloudComputeServiceCreateVMRequestMessage>(message)) {
             processCreateVM(msg->answer_mailbox, msg->num_cores, msg->ram_memory, msg->property_list, msg->messagepayload_list);
             return true;
 
-        } else if (auto msg = dynamic_cast<CloudComputeServiceShutdownVMRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<CloudComputeServiceShutdownVMRequestMessage>(message)) {
             processShutdownVM(msg->answer_mailbox, msg->vm_name);
             return true;
 
-        } else if (auto msg = dynamic_cast<CloudComputeServiceStartVMRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<CloudComputeServiceStartVMRequestMessage>(message)) {
             processStartVM(msg->answer_mailbox, msg->vm_name, msg->pm_name);
             return true;
 
-        } else if (auto msg = dynamic_cast<CloudComputeServiceSuspendVMRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<CloudComputeServiceSuspendVMRequestMessage>(message)) {
             processSuspendVM(msg->answer_mailbox, msg->vm_name);
             return true;
 
-        } else if (auto msg = dynamic_cast<CloudComputeServiceResumeVMRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<CloudComputeServiceResumeVMRequestMessage>(message)) {
             processResumeVM(msg->answer_mailbox, msg->vm_name);
             return true;
 
-        } else if (auto msg = dynamic_cast<CloudComputeServiceDestroyVMRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<CloudComputeServiceDestroyVMRequestMessage>(message)) {
             processDestroyVM(msg->answer_mailbox, msg->vm_name);
             return true;
 
-        } else if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceSubmitStandardJobRequestMessage>(message)) {
             processSubmitStandardJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
             return true;
 
-        } else if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceSubmitPilotJobRequestMessage>(message)) {
             processSubmitPilotJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
             return true;
-        } else if (auto msg = dynamic_cast<ServiceHasTerminatedMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ServiceHasTerminatedMessage>(message)) {
             if (auto bmcs = dynamic_cast<BareMetalComputeService *>(msg->service)) {
                 processBareMetalComputeServiceTermination(bmcs, msg->exit_code);
             } else {
