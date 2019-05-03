@@ -752,7 +752,7 @@ private:
 
         // Wait for the workflow execution event
         std::unique_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
-        if (event->type != wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION) {
+        if (not dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
             throw std::runtime_error("Unexpected workflow execution event!");
         }
 
@@ -894,7 +894,7 @@ private:
 
         // Wait for the workflow execution event
         std::unique_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
-        if (event->type != wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION) {
+        if (not dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
             throw std::runtime_error("Unexpected workflow execution event!");
         }
 
@@ -1017,17 +1017,13 @@ private:
 
         // Wait for the workflow execution event
         std::unique_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
-        switch (event->type) {
-            case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-                break;
-            }
-            case wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
-                throw std::runtime_error("Unexpected job failure: " +
-                                         dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())->failure_cause->toString());
-            }
-            default: {
-                throw std::runtime_error("Unexpected workflow execution event: " + std::to_string(event->type));
-            }
+        if (dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
+            // do nothing
+        } else if (auto real_event = dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())) {
+            throw std::runtime_error("Unexpected job failure: " +
+                                     real_event->failure_cause->toString());
+        } else {
+            throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
         // Test file locations
@@ -1166,25 +1162,21 @@ private:
 
         // Wait for the workflow execution event
         std::unique_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
-        switch (event->type) {
-            case wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
-                auto real_event = dynamic_cast<wrench::StandardJobFailedEvent*>(event.get());
-                auto cause = std::dynamic_pointer_cast<wrench::NoStorageServiceForFile>(real_event->failure_cause);
-                if (not cause) {
-                    throw std::runtime_error(
-                            "Got an Standard Job Failure as expected, but unexpected failure cause: " +
-                             real_event->failure_cause->toString() + " (expected: NoStorageServiceForFile");
-                }
-                std::string error_msg = cause->toString();
-                if (cause->getFile() != test->input_file) {
-                    throw std::runtime_error(
-                            "Got the expected failure, but the failure cause does not point to the right file");
-                }
-                break;
+        auto real_event = dynamic_cast<wrench::StandardJobFailedEvent*>(event.get());
+        if (real_event) {
+            auto cause = std::dynamic_pointer_cast<wrench::NoStorageServiceForFile>(real_event->failure_cause);
+            if (not cause) {
+                throw std::runtime_error(
+                        "Got an Standard Job Failure as expected, but unexpected failure cause: " +
+                        real_event->failure_cause->toString() + " (expected: NoStorageServiceForFile");
             }
-            default: {
-                throw std::runtime_error("Unexpected workflow execution event: " + std::to_string(event->type));
+            std::string error_msg = cause->toString();
+            if (cause->getFile() != test->input_file) {
+                throw std::runtime_error(
+                        "Got the expected failure, but the failure cause does not point to the right file");
             }
+        } else {
+            throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
         return 0;
@@ -1297,7 +1289,7 @@ private:
             auto cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
             if (not cause) {
                 throw std::runtime_error("Received the expected exception, but unexpected failure cause: " +
-                e.getCause()->toString() + " (expected: NotEnoughResources)");
+                                         e.getCause()->toString() + " (expected: NotEnoughResources)");
             }
             std::string error_msg = cause->toString();
             if (cause->getJob() != job) {
@@ -1418,7 +1410,7 @@ private:
             auto cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
             if (not cause) {
                 throw std::runtime_error("Received the expected exception, but unexpected failure cause: " +
-                e.getCause()->toString() + " (expected: NotEnoughResources)");
+                                         e.getCause()->toString() + " (expected: NotEnoughResources)");
             }
             std::string error_msg = cause->toString();
             if (cause->getJob() != job) {

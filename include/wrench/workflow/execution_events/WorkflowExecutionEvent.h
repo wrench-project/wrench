@@ -44,6 +44,7 @@ namespace wrench {
 
     public:
 
+#if 0
         /** @brief Workflow execution event types */
         enum EventType {
             /** @brief An error type */
@@ -61,9 +62,10 @@ namespace wrench {
             /** @brief A file copy operation failed */
                     FILE_COPY_FAILURE,
         };
+#endif
 
-        /** @brief The event type */
-        WorkflowExecutionEvent::EventType type;
+//        /** @brief The event type */
+//        WorkflowExecutionEvent::EventType type;
 
 
         /***********************/
@@ -71,19 +73,17 @@ namespace wrench {
         /***********************/
         static std::unique_ptr<WorkflowExecutionEvent> waitForNextExecutionEvent(std::string);
         static std::unique_ptr<WorkflowExecutionEvent> waitForNextExecutionEvent(std::string, double timeout);
+        virtual std::string toString() { return "Generic WorkflowExecutionEvent"; }
         virtual ~WorkflowExecutionEvent() = default;
 
     protected:
+        WorkflowExecutionEvent() = default;
 
-        /**
-         * @brief Constructor
-         *
-         * @param type: event type
-         */
-        WorkflowExecutionEvent(EventType type) : type(type) {}
         /***********************/
         /** \endcond           */
         /***********************/
+
+
 
     };
 
@@ -93,10 +93,10 @@ namespace wrench {
      */
     class StandardJobCompletedEvent : public WorkflowExecutionEvent {
 
-
     private:
 
         friend class WorkflowExecutionEvent;
+
         /**
          * @brief Constructor
          * @param standard_job: a standard job
@@ -104,14 +104,15 @@ namespace wrench {
          */
         StandardJobCompletedEvent(StandardJob *standard_job,
                                   std::shared_ptr<ComputeService>  compute_service)
-                : WorkflowExecutionEvent(STANDARD_JOB_COMPLETION),
-                  standard_job(standard_job), compute_service(compute_service) {}
+                : standard_job(standard_job), compute_service(compute_service) {}
     public:
 
         /** @brief The standard job that has completed */
         StandardJob *standard_job;
         /** @brief The compute service on which the standard job has completed */
         std::shared_ptr<ComputeService>  compute_service;
+
+        std::string toString() override { return "StandardJobCompletedEvent (job: " + this->standard_job->getName() + "; cs = " + this->compute_service->getName() + ")";}
     };
 
     /**
@@ -132,8 +133,7 @@ namespace wrench {
         StandardJobFailedEvent(StandardJob *standard_job,
                                std::shared_ptr<ComputeService>  compute_service,
                                std::shared_ptr<FailureCause> failure_cause)
-                : WorkflowExecutionEvent(STANDARD_JOB_FAILURE),
-                  standard_job(standard_job),
+                : standard_job(standard_job),
                   compute_service(compute_service),
                   failure_cause(failure_cause) {}
 
@@ -145,6 +145,10 @@ namespace wrench {
         std::shared_ptr<ComputeService>  compute_service;
         /** @brief The cause of the failure */
         std::shared_ptr<FailureCause> failure_cause;
+
+        std::string toString() override { return "StandardJobFailedEvent (job: " + this->standard_job->getName() + "; cs = " +
+        this->compute_service->getName() + "; cause: " + this->failure_cause->toString() + ")";}
+
     };
 
 
@@ -164,14 +168,16 @@ namespace wrench {
          */
         PilotJobStartedEvent(PilotJob *pilot_job,
                              std::shared_ptr<ComputeService>  compute_service)
-                : WorkflowExecutionEvent(PILOT_JOB_START),
-                  pilot_job(pilot_job), compute_service(compute_service) {}
+                : pilot_job(pilot_job), compute_service(compute_service) {}
 
     public:
         /** @brief The pilot job that has started */
         PilotJob *pilot_job;
         /** @brief The compute service on which the pilot job has started */
         std::shared_ptr<ComputeService>  compute_service;
+
+        std::string toString() override { return "PilotJobStartedEvent (cs = " + this->compute_service->getName() + ")";}
+
     };
 
     /**
@@ -189,8 +195,7 @@ namespace wrench {
          */
         PilotJobExpiredEvent(PilotJob *pilot_job,
                              std::shared_ptr<ComputeService>  compute_service)
-                : WorkflowExecutionEvent(PILOT_JOB_EXPIRATION),
-                  pilot_job(pilot_job), compute_service(compute_service) {}
+                : pilot_job(pilot_job), compute_service(compute_service) {}
 
     public:
 
@@ -198,6 +203,9 @@ namespace wrench {
         PilotJob *pilot_job;
         /** @brief The compute service on which the pilot job has expired */
         std::shared_ptr<ComputeService>  compute_service;
+
+        std::string toString() override { return "PilotJobExpiredEvent (cs = " + this->compute_service->getName() + ")";}
+
     };
 
     /**
@@ -219,8 +227,7 @@ namespace wrench {
                                std::shared_ptr<StorageService> storage_service,
                                std::shared_ptr<FileRegistryService> file_registry_service,
                                bool file_registry_service_updated)
-                : WorkflowExecutionEvent(FILE_COPY_COMPLETION),
-                  file(file), storage_service(storage_service),
+                : file(file), storage_service(storage_service),
                   file_registry_service(file_registry_service),
                   file_registry_service_updated(file_registry_service_updated) {}
 
@@ -233,6 +240,9 @@ namespace wrench {
         std::shared_ptr<FileRegistryService> file_registry_service;
         /** @brief Whether the file registry service (if any) has been successfully updated */
         bool file_registry_service_updated;
+
+        std::string toString() override { return "FileCopyCompletedEvent (file: " + this->file->getID() + "; ss = " + this->storage_service->getName() + ")";}
+
     };
 
 
@@ -254,8 +264,7 @@ namespace wrench {
                             std::shared_ptr<StorageService> storage_service,
                             std::shared_ptr<FailureCause> failure_cause
         )
-                : WorkflowExecutionEvent(FILE_COPY_FAILURE),
-                  file(file), storage_service(storage_service),
+                : file(file), storage_service(storage_service),
                   failure_cause(failure_cause) {}
 
     public:
@@ -266,6 +275,9 @@ namespace wrench {
         std::shared_ptr<StorageService> storage_service;
         /** @brief The cause of the failure */
         std::shared_ptr<FailureCause> failure_cause;
+
+        std::string toString() override { return "FileCopyFailedEvent (file: " + this->file->getID() + "; ss = " + this->storage_service->getName() +
+                                        "; cause: " + this->failure_cause->toString() + ")";}
 
     };
 

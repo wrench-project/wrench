@@ -22,54 +22,45 @@ namespace wrench {
      */
     int WorkloadTraceFileReplayerEventReceiver::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
+        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
 
-      WRENCH_INFO("Starting!");
-      while (true) {
+        WRENCH_INFO("Starting!");
+        while (true) {
 
-        StandardJob *job = nullptr ;
+            StandardJob *job = nullptr ;
 
-        // Wait for the workflow execution event
-        WRENCH_INFO("Waiting for job completion...");
-        std::unique_ptr<wrench::WorkflowExecutionEvent> event;
-        try {
-          event = this->getWorkflow()->waitForNextExecutionEvent();
-          switch (event->type) {
-            case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-              auto real_event = dynamic_cast<wrench::StandardJobCompletedEvent *>(event.get());
-              job = real_event->standard_job;
-              // success, do nothing
-              WRENCH_INFO("Received job completion notification");
-              break;
+            // Wait for the workflow execution event
+            WRENCH_INFO("Waiting for job completion...");
+            std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+            try {
+                event = this->getWorkflow()->waitForNextExecutionEvent();
+
+                if (auto real_event = dynamic_cast<wrench::StandardJobCompletedEvent *>(event.get())) {
+                    job = real_event->standard_job;
+                    // success, do nothing
+                    WRENCH_INFO("Received job completion notification");
+                } else if (auto real_event = dynamic_cast<wrench::StandardJobFailedEvent *>(event.get())) {
+                    job = real_event->standard_job;
+                    WRENCH_INFO("Received job failure notification: %s",
+                                real_event->failure_cause->toString().c_str());
+                } else  {
+                    throw std::runtime_error(
+                            "WorkloadTraceFileReplayerEventReceiver::main(): Unexpected workflow execution event");
+                }
+            } catch (wrench::WorkflowExecutionException &e) {
+                //ignore (network error or something)
+                break;
+
             }
-            case wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
-              // failure, do nothing
-              auto real_event = dynamic_cast<wrench::StandardJobFailedEvent *>(event.get());
-              job = real_event->standard_job;
-              WRENCH_INFO("Received job failure notification: %s",
-                          real_event->failure_cause->toString().c_str());
-              break;
-            }
-            default: {
-              throw std::runtime_error(
-                      "WorkloadTraceFileReplayerEventReceiver::main(): Unexpected workflow execution event: " +
-                      std::to_string((int) (event->type)));
-            }
-          }
-        } catch (wrench::WorkflowExecutionException &e) {
-          //ignore (network error or something)
-          break;
 
+            // Remove tasks that correspond to the job
+            for (auto t : job->getTasks()) {
+                this->getWorkflow()->removeTask(t);
+            }
+
+            this->job_manager->forgetJob(job);
         }
-
-        // Remove tasks that correspond to the job
-        for (auto t : job->getTasks()) {
-          this->getWorkflow()->removeTask(t);
-        }
-
-        this->job_manager->forgetJob(job);
-      }
-      return 0;
+        return 0;
 
     }
 };

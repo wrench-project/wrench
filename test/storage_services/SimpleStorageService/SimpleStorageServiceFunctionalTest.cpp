@@ -236,7 +236,7 @@ private:
             auto cause = std::dynamic_pointer_cast<wrench::FileNotFound>(e.getCause());
             if (not cause) {
                 throw std::runtime_error("Got an expected 'file not found' exception, but unexpected failure cause: " +
-                e.getCause()->toString() + " (expected: FileNotFound)");
+                                         e.getCause()->toString() + " (expected: FileNotFound)");
             }
             if (cause->getStorageService() != this->test->storage_service_100) {
                 throw std::runtime_error(
@@ -311,14 +311,8 @@ private:
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
-        switch (event->type) {
-            case wrench::WorkflowExecutionEvent::FILE_COPY_COMPLETION: {
-                // success, do nothing
-                break;
-            }
-            default: {
-                throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
-            }
+        if (not dynamic_cast<wrench::FileCopyCompletedEvent*>(event.get())) {
+            throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
         // Check that the copy has happened..
@@ -353,19 +347,14 @@ private:
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
-        switch (event->type) {
-            case wrench::WorkflowExecutionEvent::FILE_COPY_FAILURE: {
-                auto real_event = dynamic_cast<wrench::FileCopyFailedEvent*>(event.get());
-                auto cause = std::dynamic_pointer_cast<wrench::StorageServiceNotEnoughSpace>(real_event->failure_cause);
-                if (not cause) {
-                    throw std::runtime_error("Got expected event but unexpected failure cause: " +
-                    real_event->failure_cause->toString() + " (expected: FileCopyFailedEvent)");
-                }
-                break;
+        if (auto real_event = dynamic_cast<wrench::FileCopyFailedEvent*>(event.get())) {
+            auto cause = std::dynamic_pointer_cast<wrench::StorageServiceNotEnoughSpace>(real_event->failure_cause);
+            if (not cause) {
+                throw std::runtime_error("Got expected event but unexpected failure cause: " +
+                                         real_event->failure_cause->toString() + " (expected: FileCopyFailedEvent)");
             }
-            default: {
-                throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
-            }
+        } else {
+            throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
         // Do an INVALID asynchronous file copy (file not there)
@@ -384,19 +373,15 @@ private:
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
-        switch (event->type) {
-            case wrench::WorkflowExecutionEvent::FILE_COPY_FAILURE: {
-                auto real_event = dynamic_cast<wrench::FileCopyFailedEvent*>(event.get());
-                auto cause = std::dynamic_pointer_cast<wrench::FileNotFound>(real_event->failure_cause);
-                if (not cause) {
-                    throw std::runtime_error("Got expected event but unexpected failure cause: " +
-                    real_event->failure_cause->toString() + " (expected: FileNotFound)");
-                }
-                break;
+        auto real_event = dynamic_cast<wrench::FileCopyFailedEvent*>(event.get());
+        if (real_event) {
+            auto cause = std::dynamic_pointer_cast<wrench::FileNotFound>(real_event->failure_cause);
+            if (not cause) {
+                throw std::runtime_error("Got expected event but unexpected failure cause: " +
+                                         real_event->failure_cause->toString() + " (expected: FileNotFound)");
             }
-            default: {
-                throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
-            }
+        } else {
+            throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
         // Do a really bogus file removal
@@ -802,13 +787,8 @@ private:
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
-        switch (event->type) {
-            case wrench::WorkflowExecutionEvent::FILE_COPY_COMPLETION: {
-                break;
-            }
-            default: {
-                throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
-            }
+        if (not dynamic_cast<wrench::FileCopyCompletedEvent*>(event.get())) {
+            throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
 
@@ -1115,27 +1095,24 @@ private:
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
-        switch (event->type) {
-            case wrench::WorkflowExecutionEvent::FILE_COPY_FAILURE: {
-                auto real_event = dynamic_cast<wrench::FileCopyFailedEvent*>(event.get());
-                auto cause = std::dynamic_pointer_cast<wrench::StorageServiceNotEnoughSpace>(real_event->failure_cause);
-                if (not cause) {
-                    throw std::runtime_error("Got an expected exception, but an unexpected failure cause: " +
-                                             real_event->failure_cause->toString() + " (expected: StorageServiceNotEnoughSpace");
-                }
-                if (cause->getFile() != this->test->file_500) {
-                    throw std::runtime_error(
-                            "Got the expected exception and failure type, but the failure cause doesn't point to the right file");
-                }
-                if (cause->getStorageService() != this->test->storage_service_100) {
-                    throw std::runtime_error(
-                            "Got the expected exception and failure type, but the failure cause doesn't point to the right storage service");
-                }
-                break;
+        auto real_event = dynamic_cast<wrench::FileCopyFailedEvent*>(event.get());
+        if (real_event) {
+            auto cause = std::dynamic_pointer_cast<wrench::StorageServiceNotEnoughSpace>(real_event->failure_cause);
+            if (not cause) {
+                throw std::runtime_error("Got an expected exception, but an unexpected failure cause: " +
+                                         real_event->failure_cause->toString() + " (expected: StorageServiceNotEnoughSpace");
             }
-            default: {
-                throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+            if (cause->getFile() != this->test->file_500) {
+                throw std::runtime_error(
+                        "Got the expected exception and failure type, but the failure cause doesn't point to the right file");
             }
+            if (cause->getStorageService() != this->test->storage_service_100) {
+                throw std::runtime_error(
+                        "Got the expected exception and failure type, but the failure cause doesn't point to the right storage service");
+            }
+
+        } else {
+            throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
         // Do the file copy for a file that's not there
@@ -1153,27 +1130,23 @@ private:
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
-        switch (event->type) {
-            case wrench::WorkflowExecutionEvent::FILE_COPY_FAILURE: {
-                auto real_event = dynamic_cast<wrench::FileCopyFailedEvent*>(event.get());
-                auto cause = std::dynamic_pointer_cast<wrench::FileNotFound>(real_event->failure_cause);
-                if (not cause) {
-                    throw std::runtime_error("Got an expected exception, but an unexpected failure cause: " +
-                                             real_event->failure_cause->toString() + " (expected: FileNotFound)");
-                }
-                if (cause->getFile() != this->test->file_100) {
-                    throw std::runtime_error(
-                            "Got the expected exception and failure type, but the failure cause doesn't point to the right file");
-                }
-                if (cause->getStorageService() != this->test->storage_service_1000) {
-                    throw std::runtime_error(
-                            "Got the expected exception and failure type, but the failure cause doesn't point to the right storage service");
-                }
-                break;
+        auto real_event2 = dynamic_cast<wrench::FileCopyFailedEvent*>(event.get());
+        if (real_event2) {
+            auto cause = std::dynamic_pointer_cast<wrench::FileNotFound>(real_event2->failure_cause);
+            if (not cause) {
+                throw std::runtime_error("Got an expected exception, but an unexpected failure cause: " +
+                                         real_event2->failure_cause->toString() + " (expected: FileNotFound)");
             }
-            default: {
-                throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+            if (cause->getFile() != this->test->file_100) {
+                throw std::runtime_error(
+                        "Got the expected exception and failure type, but the failure cause doesn't point to the right file");
             }
+            if (cause->getStorageService() != this->test->storage_service_1000) {
+                throw std::runtime_error(
+                        "Got the expected exception and failure type, but the failure cause doesn't point to the right storage service");
+            }
+        } else {
+            throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
         // Do the file copy for a src storage service that's down
@@ -1193,23 +1166,19 @@ private:
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
-        switch (event->type) {
-            case wrench::WorkflowExecutionEvent::FILE_COPY_FAILURE: {
-                auto real_event = dynamic_cast<wrench::FileCopyFailedEvent*>(event.get());
-                auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(real_event->failure_cause);
-                if (not cause) {
-                    throw std::runtime_error("Got an expected exception, but an unexpected failure cause: " +
-                                             real_event->failure_cause->toString() + " (expected: ServiceIsDown)");
-                }
-                if (cause->getService() != this->test->storage_service_1000) {
-                    throw std::runtime_error(
-                            "Got the expected exception and failure type, but the failure cause doesn't point to the right storage service");
-                }
-                break;
+        auto real_event3 = dynamic_cast<wrench::FileCopyFailedEvent*>(event.get());
+        if (real_event3) {
+            auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(real_event3->failure_cause);
+            if (not cause) {
+                throw std::runtime_error("Got an expected exception, but an unexpected failure cause: " +
+                                         real_event3->failure_cause->toString() + " (expected: ServiceIsDown)");
             }
-            default: {
-                throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+            if (cause->getService() != this->test->storage_service_1000) {
+                throw std::runtime_error(
+                        "Got the expected exception and failure type, but the failure cause doesn't point to the right storage service");
             }
+        } else {
+            throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
         // Do the file copy from a dst storage service that's down
@@ -1344,13 +1313,8 @@ private:
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
-        switch (event->type) {
-            case wrench::WorkflowExecutionEvent::FILE_COPY_COMPLETION: {
-                // do nothing
-                break;
-            }
-            default:
-                throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+        if (not dynamic_cast<wrench::FileCopyCompletedEvent*>(event.get())) {
+            throw std::runtime_error("Unexpected workflow execution event: " +event->toString());
         }
 
         // Do a very similar copy, but with "empty" partitions that default to "/"
@@ -1369,13 +1333,8 @@ private:
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
-        switch (event->type) {
-            case wrench::WorkflowExecutionEvent::FILE_COPY_COMPLETION: {
-                // do nothing
-                break;
-            }
-            default:
-                throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+        if (not dynamic_cast<wrench::FileCopyCompletedEvent*>(event.get())) {
+            throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
         // Remove the file at storage_service_510:/:file_10
@@ -1402,13 +1361,8 @@ private:
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
-        switch (event->type) {
-            case wrench::WorkflowExecutionEvent::FILE_COPY_FAILURE: {
-                // do nothing
-                break;
-            }
-            default:
-                throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+        if (not dynamic_cast<wrench::FileCopyFailedEvent*>(event.get())) {
+            throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
         // Copy storage_service_510:foo:file_10 to storage_service_1000:foo
@@ -1426,13 +1380,8 @@ private:
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
-        switch (event->type) {
-            case wrench::WorkflowExecutionEvent::FILE_COPY_COMPLETION: {
-                // do nothing
-                break;
-            }
-            default:
-                throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+        if (not dynamic_cast<wrench::FileCopyCompletedEvent*>(event.get())) {
+            throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
 
@@ -1451,16 +1400,9 @@ private:
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
-        switch (event->type) {
-            case wrench::WorkflowExecutionEvent::FILE_COPY_COMPLETION: {
-                // do nothing
-                break;
-            }
-            default:
-                throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+        if (not dynamic_cast<wrench::FileCopyCompletedEvent*>(event.get())) {
+            throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
-
-
 
         // Copy storage_service_510:foo:file_10 to storage_service_510:foo    SHOULD NOT WORK
         try {
@@ -1515,14 +1457,8 @@ private:
         } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
-
-        switch (event->type) {
-            case wrench::WorkflowExecutionEvent::FILE_COPY_COMPLETION: {
-                // do nothing
-                break;
-            }
-            default:
-                throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+        if (not dynamic_cast<wrench::FileCopyCompletedEvent*>(event.get())) {
+            throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
         return 0;

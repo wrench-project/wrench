@@ -138,14 +138,9 @@ private:
         } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
-        switch (event->type) {
-            case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-                // success, do nothing for now
-                break;
-            }
-            default: {
-                throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
-            }
+
+        if (not dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
+            throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
         return 0;
@@ -264,14 +259,8 @@ private:
         } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
-        switch (event->type) {
-            case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-                // success, do nothing for now
-                break;
-            }
-            default: {
-                throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
-            }
+        if (not dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
+            throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
         this->test->compute_service->stop();
@@ -310,7 +299,7 @@ void HTCondorServiceTest::do_SimpleServiceTest_test() {
         std::vector<std::string> execution_hosts;
         execution_hosts.push_back(execution_host);
         invalid_compute_services.insert(new wrench::CloudComputeService(hostname, execution_hosts,
-                                                                 100000000000.0));
+                                                                        100000000000.0));
 
         // Create a HTCondor Service
         ASSERT_THROW(simulation->add(new wrench::HTCondorService(hostname, "", {})), std::runtime_error);
@@ -326,7 +315,7 @@ void HTCondorServiceTest::do_SimpleServiceTest_test() {
     std::vector<std::string> execution_hosts;
     execution_hosts.push_back(execution_host);
     compute_services.insert(new wrench::VirtualizedClusterComputeService(hostname, execution_hosts,
-                                                             100000000000.0));
+                                                                         100000000000.0));
 
     // Create a HTCondor Service
     ASSERT_THROW(simulation->add(new wrench::HTCondorService(hostname, "", {})), std::runtime_error);
