@@ -317,7 +317,6 @@ private:
                 }
             }
 
-
             // Submit two jobs for execution to the same compute service which has just enough scratch for only one job and so
             // one should succeed and the second one should fail
             job_manager->submitJob(job1, this->test->compute_service2);
