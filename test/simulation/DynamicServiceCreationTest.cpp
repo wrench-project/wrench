@@ -141,7 +141,7 @@ private:
         std::vector<std::string> execution_hosts = {"QuadCoreHost"};
         auto dynamically_created_compute_service = std::dynamic_pointer_cast<wrench::CloudComputeService>(simulation->startNewService(
                 new wrench::CloudComputeService(hostname, execution_hosts, 100.0,
-                                         { {wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
+                                                { {wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
         std::vector<wrench::WorkflowTask *> tasks = this->test->workflow->getReadyTasks();
 
         // Create a VM
@@ -177,14 +177,8 @@ private:
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
-            switch (event->type) {
-                case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-                    // success, do nothing for now
-                    break;
-                }
-                default: {
-                    throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
-                }
+            if (not dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
+                throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
         }
 

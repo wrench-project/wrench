@@ -182,42 +182,22 @@ namespace wrench {
 
         WorkflowExecutionEvent *event_ptr = event.release();
 
-        switch (event_ptr->type) {
-            case WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-                processEventStandardJobCompletion(std::unique_ptr<StandardJobCompletedEvent>(
-                        dynamic_cast<StandardJobCompletedEvent *>(event_ptr)));
-                break;
-            }
-            case WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
-                processEventStandardJobFailure(std::unique_ptr<StandardJobFailedEvent>(
-                        dynamic_cast<StandardJobFailedEvent *>(event_ptr)));
-                break;
-            }
-            case WorkflowExecutionEvent::PILOT_JOB_START: {
-                processEventPilotJobStart(std::unique_ptr<PilotJobStartedEvent>(
-                        dynamic_cast<PilotJobStartedEvent *>(event_ptr)));
-                break;
-            }
-            case WorkflowExecutionEvent::PILOT_JOB_EXPIRATION: {
-                processEventPilotJobExpiration(std::unique_ptr<PilotJobExpiredEvent>(
-                        dynamic_cast<PilotJobExpiredEvent *>(event_ptr)));
-                break;
-            }
-            case WorkflowExecutionEvent::FILE_COPY_COMPLETION: {
-                processEventFileCopyCompletion(std::unique_ptr<FileCopyCompletedEvent>(
-                        dynamic_cast<FileCopyCompletedEvent *>(event_ptr)));
-                break;
-            }
-            case WorkflowExecutionEvent::FILE_COPY_FAILURE: {
-                processEventFileCopyFailure(std::unique_ptr<FileCopyFailedEvent>(
-                        dynamic_cast<FileCopyFailedEvent *>(event_ptr)));
-                break;
-            }
-            default: {
-                throw std::runtime_error("SimpleWMS::main(): Unknown workflow execution event type '" +
-                                         std::to_string(event->type) + "'");
-            }
+        if (auto real_event = dynamic_cast<StandardJobCompletedEvent *>(event_ptr)) {
+            processEventStandardJobCompletion(std::unique_ptr<StandardJobCompletedEvent>(real_event));
+        } else if (auto real_event = dynamic_cast<StandardJobFailedEvent *>(event_ptr)) {
+            processEventStandardJobFailure(std::unique_ptr<StandardJobFailedEvent>(real_event));
+        } else if (auto real_event = dynamic_cast<PilotJobStartedEvent *>(event_ptr)) {
+            processEventPilotJobStart(std::unique_ptr<PilotJobStartedEvent>(real_event));
+        } else if (auto real_event = dynamic_cast<PilotJobExpiredEvent *>(event_ptr)) {
+            processEventPilotJobExpiration(std::unique_ptr<PilotJobExpiredEvent>(real_event));
+        } else if (auto real_event = dynamic_cast<FileCopyCompletedEvent *>(event_ptr)) {
+            processEventFileCopyCompletion(std::unique_ptr<FileCopyCompletedEvent>(real_event));
+        } else if (auto real_event = dynamic_cast<FileCopyFailedEvent *>(event_ptr)) {
+            processEventFileCopyFailure(std::unique_ptr<FileCopyFailedEvent>(real_event));
+        } else {
+            throw std::runtime_error("SimpleWMS::main(): Unknown workflow execution event: " + event_ptr->toString());
         }
+
         return true;
     }
 

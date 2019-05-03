@@ -67,9 +67,9 @@ protected:
 class SimulationTimestampTaskBasicTestWMS : public wrench::WMS {
 public:
     SimulationTimestampTaskBasicTestWMS(SimulationTimestampTaskTest *test,
-        const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-        const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-        std::string &hostname) :
+                                        const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                        const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                                        std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -102,12 +102,12 @@ private:
 
         std::unique_ptr<wrench::WorkflowExecutionEvent> workflow_execution_event;
         try {
-           workflow_execution_event = this->getWorkflow()->waitForNextExecutionEvent();
+            workflow_execution_event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error("Error getting the execution event: " + e.getCause()->toString());
         }
 
-        if (workflow_execution_event->type != wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE) {
+        if (not dynamic_cast<wrench::StandardJobFailedEvent*>(workflow_execution_event.get())) {
             throw std::runtime_error("Job should have failed");
         }
 
@@ -116,7 +116,7 @@ private:
 };
 
 TEST_F(SimulationTimestampTaskTest, SimulationTimestampTaskBasicTest) {
-   DO_TEST_WITH_FORK(do_SimulationTimestampTaskBasic_test);
+    DO_TEST_WITH_FORK(do_SimulationTimestampTaskBasic_test);
 }
 
 void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test(){
@@ -133,11 +133,11 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test(){
     std::string execution_host = simulation->getHostnameList()[0];
 
     ASSERT_NO_THROW(compute_service = simulation->add(new wrench::BareMetalComputeService(wms_host,
-                                                                                                   {std::make_pair(
-                                                                                                           execution_host,
-                                                                                                           std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                                           wrench::ComputeService::ALL_RAM))},
-                                                                                                   {})));
+                                                                                          {std::make_pair(
+                                                                                                  execution_host,
+                                                                                                  std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                                                  wrench::ComputeService::ALL_RAM))},
+                                                                                          {})));
 
     ASSERT_NO_THROW(storage_service = simulation->add(new wrench::SimpleStorageService(wms_host, 100000000000000.0)));
 
@@ -155,7 +155,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test(){
 
     ASSERT_NO_THROW(simulation->stageFiles({{large_input_file->getID(), large_input_file},
                                             {small_input_file->getID(), small_input_file}},
-                                                    storage_service));
+                                           storage_service));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -285,7 +285,7 @@ private:
         this->waitForAndProcessNextEvent();
 
         wrench::StandardJob *passing_job = job_manager->createStandardJob(this->test->failed_task, {{this->test->small_input_file, this->test->backup_storage_service},
-                                                                                                   {this->test->large_input_file, this->test->storage_service}});
+                                                                                                    {this->test->large_input_file, this->test->storage_service}});
         job_manager->submitJob(passing_job, this->test->compute_service);
         this->waitForAndProcessNextEvent();
 
@@ -312,11 +312,11 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
     std::string execution_host = simulation->getHostnameList()[0];
 
     ASSERT_NO_THROW(compute_service = simulation->add(new wrench::BareMetalComputeService(wms_host,
-                                                                                                   {std::make_pair(
-                                                                                                           execution_host,
-                                                                                                           std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                                           wrench::ComputeService::ALL_RAM))},
-                                                                                                   {})));
+                                                                                          {std::make_pair(
+                                                                                                  execution_host,
+                                                                                                  std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                                                  wrench::ComputeService::ALL_RAM))},
+                                                                                          {})));
 
     ASSERT_NO_THROW(storage_service = simulation->add(new wrench::SimpleStorageService(wms_host, 100000000000000.0)));
     ASSERT_NO_THROW(backup_storage_service = simulation->add(new wrench::SimpleStorageService(wms_host, 100000000000000.0)));
@@ -456,9 +456,9 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
 class SimulationTimestampTaskTerminateAndFailTestWMS : public wrench::WMS {
 public:
     SimulationTimestampTaskTerminateAndFailTestWMS(SimulationTimestampTaskTest *test,
-            const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-            const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-            std::string &hostname) :
+                                                   const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                                   const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                                                   std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -505,11 +505,11 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskTerminateAndFail_tes
     std::string execution_host = simulation->getHostnameList()[0];
 
     ASSERT_NO_THROW(compute_service = simulation->add(new wrench::BareMetalComputeService(execution_host,
-                                                                                                   {std::make_pair(
-                                                                                                           execution_host,
-                                                                                                           std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                                           wrench::ComputeService::ALL_RAM))},
-                                                                                                   {})));
+                                                                                          {std::make_pair(
+                                                                                                  execution_host,
+                                                                                                  std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                                                  wrench::ComputeService::ALL_RAM))},
+                                                                                          {})));
 
     ASSERT_NO_THROW(storage_service = simulation->add(new wrench::SimpleStorageService(wms_host, 100000000000000.0)));
 
@@ -531,32 +531,32 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskTerminateAndFail_tes
      *  - some time passes and compute services gets turned off while task is running
      *  - failed_task fails (SimulationTimestampTaskFailure should be generated)
      */
-     auto start_timestamps = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskStart>();
-     auto terminated_timestamps = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskTermination>();
-     auto failure_timestamps = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskFailure>();
+    auto start_timestamps = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskStart>();
+    auto terminated_timestamps = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskTermination>();
+    auto failure_timestamps = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskFailure>();
 
-     // check the number of timestamps
-     ASSERT_EQ(start_timestamps.size(), 2);
-     ASSERT_EQ(terminated_timestamps.size(), 1);
-     ASSERT_EQ(failure_timestamps.size(), 1);
+    // check the number of timestamps
+    ASSERT_EQ(start_timestamps.size(), 2);
+    ASSERT_EQ(terminated_timestamps.size(), 1);
+    ASSERT_EQ(failure_timestamps.size(), 1);
 
-     // check that endpoints were set correctly
-     wrench::SimulationTimestampTask *terminated_task_start = start_timestamps[0]->getContent();
-     wrench::SimulationTimestampTask *terminated_task_termination = terminated_timestamps[0]->getContent();
-     ASSERT_EQ(terminated_task_start->getEndpoint(), terminated_task_termination);
-     ASSERT_EQ(terminated_task_termination->getEndpoint(), terminated_task_start);
+    // check that endpoints were set correctly
+    wrench::SimulationTimestampTask *terminated_task_start = start_timestamps[0]->getContent();
+    wrench::SimulationTimestampTask *terminated_task_termination = terminated_timestamps[0]->getContent();
+    ASSERT_EQ(terminated_task_start->getEndpoint(), terminated_task_termination);
+    ASSERT_EQ(terminated_task_termination->getEndpoint(), terminated_task_start);
 
-     wrench::SimulationTimestampTask *failed_task_start = start_timestamps[1]->getContent();
-     wrench::SimulationTimestampTask *failed_task_failure = failure_timestamps[0]->getContent();
-     ASSERT_EQ(failed_task_start->getEndpoint(), failed_task_failure);
-     ASSERT_EQ(failed_task_failure->getEndpoint(), failed_task_start);
+    wrench::SimulationTimestampTask *failed_task_start = start_timestamps[1]->getContent();
+    wrench::SimulationTimestampTask *failed_task_failure = failure_timestamps[0]->getContent();
+    ASSERT_EQ(failed_task_start->getEndpoint(), failed_task_failure);
+    ASSERT_EQ(failed_task_failure->getEndpoint(), failed_task_start);
 
-     // check that dates were set correctly
-     ASSERT_EQ(std::floor(terminated_task_start->getDate()), 0);
-     ASSERT_EQ(std::floor(terminated_task_termination->getDate()), 10);
+    // check that dates were set correctly
+    ASSERT_EQ(std::floor(terminated_task_start->getDate()), 0);
+    ASSERT_EQ(std::floor(terminated_task_termination->getDate()), 10);
 
-     ASSERT_EQ(std::floor(failed_task_start->getDate()), 10);
-     ASSERT_EQ(std::floor(failed_task_failure->getDate()), 20);
+    ASSERT_EQ(std::floor(failed_task_start->getDate()), 10);
+    ASSERT_EQ(std::floor(failed_task_failure->getDate()), 20);
 
     delete simulation;
     free(argv[0]);

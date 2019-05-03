@@ -128,20 +128,16 @@ private:
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
-            switch (event->type) {
-                case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-                    //sleep to make sure that the files are deleted
-                    wrench::S4U_Simulation::sleep(100);
-                    double free_space_size = this->test->compute_service->getFreeScratchSpaceSize();
-                    if (free_space_size < this->test->compute_service->getTotalScratchSpaceSize()) {
-                        throw std::runtime_error(
-                                "File was not deleted from scratch");
-                    }
-                    break;
+            if (dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
+                //sleep to make sure that the files are deleted
+                wrench::S4U_Simulation::sleep(100);
+                double free_space_size = this->test->compute_service->getFreeScratchSpaceSize();
+                if (free_space_size < this->test->compute_service->getTotalScratchSpaceSize()) {
+                    throw std::runtime_error(
+                            "File was not deleted from scratch");
                 }
-                default: {
-                    throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
-                }
+            } else {
+                throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
         }
 
@@ -278,20 +274,16 @@ private:
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
 
-            switch (event->type) {
-                case wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
-                    auto real_event = dynamic_cast<wrench::StandardJobFailedEvent *>(event.get());
-                    auto cause = std::dynamic_pointer_cast<wrench::NoScratchSpace>(real_event->failure_cause);
-                    if (not cause) {
-                        throw std::runtime_error("Got a job failure event, but unexpected failure cause: " +
-                                                 real_event->failure_cause->toString() + " (expected: NoScratchSpace)");
-                    }
-                    cause->toString(); // for coverage
-                    break;
+            auto real_event = dynamic_cast<wrench::StandardJobFailedEvent *>(event.get());
+            if (real_event) {
+                auto cause = std::dynamic_pointer_cast<wrench::NoScratchSpace>(real_event->failure_cause);
+                if (not cause) {
+                    throw std::runtime_error("Got a job failure event, but unexpected failure cause: " +
+                                             real_event->failure_cause->toString() + " (expected: NoScratchSpace)");
                 }
-                default: {
-                    throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
-                }
+                cause->toString(); // for coverage
+            } else {
+                throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
 
             // Submit the job for execution to the compute service which has some scratch, but not enough space, thus expecting an exception
@@ -302,19 +294,16 @@ private:
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
-            switch (event->type) {
-                case wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
-                    auto real_event = dynamic_cast<wrench::StandardJobFailedEvent *>(event.get());
-                    auto cause = std::dynamic_pointer_cast<wrench::StorageServiceNotEnoughSpace>(real_event->failure_cause);
-                    if (not cause) {
-                        throw std::runtime_error("Got a job failure event, but unexpected failure cause: " +
-                                                 real_event->failure_cause->toString() + " (expected: StorageServiceNotEnoughSpace)");
-                    }
-                    break;
+
+            auto real_event2 = dynamic_cast<wrench::StandardJobFailedEvent *>(event.get());
+            if (real_event2) {
+                auto cause = std::dynamic_pointer_cast<wrench::StorageServiceNotEnoughSpace>(real_event2->failure_cause);
+                if (not cause) {
+                    throw std::runtime_error("Got a job failure event, but unexpected failure cause: " +
+                                             real_event2->failure_cause->toString() + " (expected: StorageServiceNotEnoughSpace)");
                 }
-                default: {
-                    throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
-                }
+            } else {
+                throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
 
             // Submit two jobs for execution to the same compute service which has just enough scratch for only one job and so
@@ -332,29 +321,23 @@ private:
                 } catch (wrench::WorkflowExecutionException &e) {
                     throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
                 }
-                switch (event->type) {
-                    case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-                        if (prev_event == -1) {
-                            prev_event = 0;
-                            num_events++;
-                        } else if (prev_event == 1) {
-                            num_events++;
-                        }
-                        break;
+
+                if (dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
+                    if (prev_event == -1) {
+                        prev_event = 0;
+                        num_events++;
+                    } else if (prev_event == 1) {
+                        num_events++;
                     }
-                    case wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
-                        if (prev_event == -1) {
-                            prev_event = 1;
-                            num_events++;
-                        } else if (prev_event == 0) {
-                            num_events++;
-                        }
-                        break;
+                } else if (dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())) {
+                    if (prev_event == -1) {
+                        prev_event = 1;
+                        num_events++;
+                    } else if (prev_event == 0) {
+                        num_events++;
                     }
-                    default: {
-                        throw std::runtime_error(
-                                "Unexpected workflow execution event or here: " + std::to_string((int) (event->type)));
-                    }
+                } else {
+                    throw std::runtime_error("Unexpected workflow execution event or here: " + event->toString());
                 }
                 i++;
             }
@@ -495,14 +478,9 @@ private:
             throw std::runtime_error(
                     "Error while getting and execution event: " + e.getCause()->toString());
         }
-        switch (event->type) {
-            case wrench::WorkflowExecutionEvent::PILOT_JOB_START: {
-                // success, do nothing for now
-                break;
-            }
-            default: {
-                throw std::runtime_error("Unexpected workflow execution event: " + std::to_string(event->type));
-            }
+
+        if (not dynamic_cast<wrench::PilotJobStartedEvent*>(event.get())) {
+            throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
         // Create a sequential task that lasts one min and requires 1 cores
@@ -564,19 +542,15 @@ private:
                 throw std::runtime_error(
                         "Error while getting and execution event: " + e.getCause()->toString());
             }
-            switch (event->type) {
-                case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-                    // success, check if the scratch space size is not full again or not, it should not be
-                    double free_space_size = pilot_job->getComputeService()->getFreeScratchSpaceSize();
-                    if (free_space_size == 3000.0) {
-                        throw std::runtime_error(
-                                "Pilot Job is expected to clear its scratch space only after all the standard job finishes");
-                    }
-                    break;
+            if (dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
+                // success, check if the scratch space size is not full again or not, it should not be
+                double free_space_size = pilot_job->getComputeService()->getFreeScratchSpaceSize();
+                if (free_space_size == 3000.0) {
+                    throw std::runtime_error(
+                            "Pilot Job is expected to clear its scratch space only after all the standard job finishes");
                 }
-                default: {
-                    throw std::runtime_error("Unexpected workflow execution event: " + std::to_string(event->type));
-                }
+            } else {
+                throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
             i++;
         }
@@ -588,23 +562,17 @@ private:
             throw std::runtime_error(
                     "Error while getting and execution event: " + e.getCause()->toString());
         }
-        switch (event->type) {
-            case wrench::WorkflowExecutionEvent::PILOT_JOB_EXPIRATION: {
-                // success, check if the scratch space size is full again or not, it should be full
-                wrench::S4U_Simulation::sleep(10); //sleep for some time to ensure everything is deleted
-                double free_space_size = pilot_job->getComputeService()->getFreeScratchSpaceSize();
-                if (free_space_size != 3000.0) {
-                    throw std::runtime_error(
-                            "Scratch space should be full after this pilot job expires but it is not now");
-                }
-                break;
+        if (dynamic_cast<wrench::PilotJobExpiredEvent*>(event.get())) {
+            // success, check if the scratch space size is full again or not, it should be full
+            wrench::S4U_Simulation::sleep(10); //sleep for some time to ensure everything is deleted
+            double free_space_size = pilot_job->getComputeService()->getFreeScratchSpaceSize();
+            if (free_space_size != 3000.0) {
+                throw std::runtime_error(
+                        "Scratch space should be full after this pilot job expires but it is not now");
             }
-            default: {
-                throw std::runtime_error("Unexpected workflow execution event: " + std::to_string(event->type));
-            }
+        } else {
+            throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
-
-
 
         return 0;
     }
@@ -749,17 +717,10 @@ private:
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
-            switch (event->type) {
-                case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-                    // success, do nothing for now
-                    break;
-                }
-                default: {
-                    throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
-                }
+            if (not dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
+                throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
         }
-
 
         return 0;
     }
@@ -893,14 +854,8 @@ private:
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
-            switch (event->type) {
-                case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-                    // success, do nothing for now
-                    break;
-                }
-                default: {
-                    throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
-                }
+            if (not dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
+                throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
         }
 

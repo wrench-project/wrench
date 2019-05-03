@@ -211,14 +211,8 @@ private:
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
-            switch (event->type) {
-                case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-                    // success, do nothing for now
-                    break;
-                }
-                default: {
-                    throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
-                }
+            if (not dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
+                throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
         }
 
@@ -323,7 +317,7 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     std::vector<std::string> execution_hosts = {"QuadCoreHost"};
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::CloudComputeService(hostname, execution_hosts, 100.0,
-                                     { {wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
+                                            { {wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
 
     // Try to get a message payload value, just for kicks
     ASSERT_NO_THROW(compute_service->getMessagePayloadValue(wrench::ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD));

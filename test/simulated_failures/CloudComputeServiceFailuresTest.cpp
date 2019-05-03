@@ -127,7 +127,7 @@ private:
 
         // Wait for a workflow execution event
         std::unique_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
-        if (event->type != wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE) {
+        if (not dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())) {
             throw std::runtime_error("Unexpected workflow execution event!");
         }
         auto real_event = dynamic_cast<wrench::StandardJobFailedEvent *>(event.get());
@@ -265,7 +265,7 @@ private:
 
         // Wait for a workflow execution event
         auto event = this->getWorkflow()->waitForNextExecutionEvent();
-        if (event->type != wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE) {
+        if (not dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())) {
             throw std::runtime_error("Unexpected workflow execution event!");
         }
         auto real_event = dynamic_cast<wrench::StandardJobFailedEvent *>(event.get());
@@ -302,8 +302,8 @@ private:
 
         // Wait for a workflow execution event
         auto event2 = this->getWorkflow()->waitForNextExecutionEvent();
-        if (event2->type != wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION) {
-            throw std::runtime_error("Unexpected workflow execution event!");
+        if (not dynamic_cast<wrench::StandardJobCompletedEvent*>(event2.get())) {
+            throw std::runtime_error("Unexpected workflow execution event: " + event2->toString());
         }
 
 
@@ -452,7 +452,7 @@ private:
 
                 // Wait for a workflow execution event
                 event = this->getWorkflow()->waitForNextExecutionEvent();
-            } while ((event == nullptr) || (event->type != wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION));
+            } while ((event == nullptr) || (not dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())));
 
             WRENCH_INFO("*** WAS ABLE TO RUN THE JOB AFTER %lu attempts (%lu VM start attempts)",
                         num_job_submission_attempts,

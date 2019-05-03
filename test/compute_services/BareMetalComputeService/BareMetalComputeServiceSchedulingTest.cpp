@@ -134,8 +134,8 @@ private:
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
-        if (event->type != wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION) {
-          throw std::runtime_error("Unexpected execution event: " + std::to_string((int) (event->type)));
+        if (not dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
+          throw std::runtime_error("Unexpected execution event: " + event->toString());
         }
 
         wrench::StandardJob *job = dynamic_cast<wrench::StandardJobCompletedEvent *>(event.get())->standard_job;
@@ -277,11 +277,13 @@ private:
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
-        if (event->type != wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION) {
-          throw std::runtime_error("Unexpected execution event: " + std::to_string((int) (event->type)));
+
+        auto real_event = dynamic_cast<wrench::StandardJobCompletedEvent *>(event.get());
+        if (not real_event) {
+          throw std::runtime_error("Unexpected execution event: " + event->toString());
         }
 
-        wrench::StandardJob *job = dynamic_cast<wrench::StandardJobCompletedEvent *>(event.get())->standard_job;
+        wrench::StandardJob *job = real_event->standard_job;
         wrench::WorkflowTask *task = *(job->getTasks().begin());
         double start_time = task->getStartDate();
         double end_time = task->getEndDate();
@@ -409,11 +411,13 @@ private:
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
-        if (event->type != wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION) {
-          throw std::runtime_error("Unexpected execution event: " + std::to_string((int) (event->type)));
+        auto real_event = dynamic_cast<wrench::StandardJobCompletedEvent *>(event.get());
+
+        if (not real_event) {
+          throw std::runtime_error("Unexpected execution event: " + event->toString());
         }
 
-        wrench::StandardJob *job = dynamic_cast<wrench::StandardJobCompletedEvent *>(event.get())->standard_job;
+        wrench::StandardJob *job = real_event->standard_job;
         wrench::WorkflowTask *task = *(job->getTasks().begin());
         double start_time = task->getStartDate();
         double end_time = task->getEndDate();
