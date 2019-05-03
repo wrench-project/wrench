@@ -46,7 +46,7 @@ namespace wrench {
         NetworkConnection(int type, WorkflowFile* file, std::string file_partition, std::string mailbox, std::string ack_mailbox, SimulationTimestampFileCopyStart *start_timestamp = nullptr);
         bool start();
         bool hasFailed();
-        std::unique_ptr<SimulationMessage> getMessage();
+        std::shared_ptr<SimulationMessage> getMessage();
 
         /** @brief: the connection type */
         int type;
@@ -57,7 +57,7 @@ namespace wrench {
         /** @brief: the mailbox for this connection */
         std::string mailbox;
         /** @brief The low-level pending communication */
-        std::unique_ptr<S4U_PendingCommunication> comm;
+        std::shared_ptr<S4U_PendingCommunication> comm;
         /** @brief The failure cause, in case the communication fails */
         std::shared_ptr<FailureCause> failure_cause;
         /** @brief: the mailbox to which to send an ack when this connection completes/fails */

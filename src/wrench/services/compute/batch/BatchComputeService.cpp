@@ -321,7 +321,7 @@ namespace wrench {
         }
 
         // Get the answer
-        std::unique_ptr<SimulationMessage> message = nullptr;
+        std::shared_ptr<SimulationMessage> message = nullptr;
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
@@ -330,7 +330,7 @@ namespace wrench {
 
         // Standard Job?
         if (job->getType() == WorkflowJob::Type::STANDARD) {
-            if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobAnswerMessage *>(message.get())) {
+            if (auto msg = std::dynamic_pointer_cast<ComputeServiceSubmitStandardJobAnswerMessage>(message)) {
                 // If no success, throw an exception
                 if (not msg->success) {
                     throw WorkflowExecutionException(msg->failure_cause);
@@ -341,7 +341,7 @@ namespace wrench {
 
         // Pilot Job?
         if (job->getType() == WorkflowJob::Type::PILOT) {
-            if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobAnswerMessage *>(message.get())) {
+            if (auto msg = std::dynamic_pointer_cast<ComputeServiceSubmitPilotJobAnswerMessage>(message)) {
                 // If no success, throw an exception
                 if (not msg->success) {
                     throw WorkflowExecutionException(msg->failure_cause);
@@ -434,7 +434,7 @@ namespace wrench {
         }
 
         // Get the answer
-        std::unique_ptr<SimulationMessage> message = nullptr;
+        std::shared_ptr<SimulationMessage> message = nullptr;
 
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
@@ -444,7 +444,7 @@ namespace wrench {
 
         switch (job->getType()) {
             case WorkflowJob::Type::STANDARD: {
-                if (auto msg = dynamic_cast<ComputeServiceTerminateStandardJobAnswerMessage *>(message.get())) {
+                if (auto msg = std::dynamic_pointer_cast<ComputeServiceTerminateStandardJobAnswerMessage>(message)) {
                     // If no success, throw an exception
                     if (not msg->success) {
                         throw WorkflowExecutionException(msg->failure_cause);
@@ -453,7 +453,7 @@ namespace wrench {
                 }
             }
             case WorkflowJob::Type::PILOT: {
-                if (auto msg = dynamic_cast<ComputeServiceTerminatePilotJobAnswerMessage *>(message.get())) {
+                if (auto msg = std::dynamic_pointer_cast<ComputeServiceTerminatePilotJobAnswerMessage>(message)) {
                     // If no success, throw an exception
                     if (not msg->success) {
                         throw WorkflowExecutionException(msg->failure_cause);
@@ -1076,7 +1076,7 @@ namespace wrench {
         S4U_Simulation::computeZeroFlop();
 
         // Wait for a message
-        std::unique_ptr<SimulationMessage> message = nullptr;
+        std::shared_ptr<SimulationMessage> message = nullptr;
 
         try {
             message = S4U_Mailbox::getMessage(this->mailbox_name);
@@ -1093,7 +1093,7 @@ namespace wrench {
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
 
 
-        if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+        if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
             this->setStateToDown();
             this->failCurrentStandardJobs();
             this->terminateRunningPilotJobs();
@@ -1109,35 +1109,35 @@ namespace wrench {
             }
             return false;
 
-        } else if (auto msg = dynamic_cast<ComputeServiceResourceInformationRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceResourceInformationRequestMessage>(message)) {
             processGetResourceInformation(msg->answer_mailbox);
             return true;
 
-        } else if (auto msg = dynamic_cast<BatchComputeServiceJobRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<BatchComputeServiceJobRequestMessage>(message)) {
             processJobSubmission(msg->job, msg->answer_mailbox);
             return true;
 
-        } else if (auto msg = dynamic_cast<StandardJobExecutorDoneMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<StandardJobExecutorDoneMessage>(message)) {
             processStandardJobCompletion(msg->executor, msg->job);
             return true;
 
-        } else if (auto msg = dynamic_cast<StandardJobExecutorFailedMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<StandardJobExecutorFailedMessage>(message)) {
             processStandardJobFailure(msg->executor, msg->job, msg->cause);
             return true;
 
-        } else if (auto msg = dynamic_cast<ComputeServiceTerminateStandardJobRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceTerminateStandardJobRequestMessage>(message)) {
             processStandardJobTerminationRequest(msg->job, msg->answer_mailbox);
             return true;
 
-        } else if (auto msg = dynamic_cast<ComputeServicePilotJobExpiredMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServicePilotJobExpiredMessage>(message)) {
             processPilotJobCompletion(msg->job);
             return true;
 
-        } else if (auto msg = dynamic_cast<ComputeServiceTerminatePilotJobRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceTerminatePilotJobRequestMessage>(message)) {
             processPilotJobTerminationRequest(msg->job, msg->answer_mailbox);
             return true;
 
-        } else if (auto msg = dynamic_cast<AlarmJobTimeOutMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<AlarmJobTimeOutMessage>(message)) {
             if (this->running_jobs.find(msg->job) == this->running_jobs.end()) {
                 WRENCH_INFO("Received a time out message (%ld) for an unknown batch job (%ld)... ignoring",
                             (unsigned long) (message.get()),
@@ -1174,14 +1174,14 @@ namespace wrench {
             }
 
 #ifdef ENABLE_BATSCHED
-            //      } else if (auto msg = dynamic_cast<BatchSchedReadyMessage *>(message.get())) {
+            //      } else if (auto msg = std::dynamic_pointer_cast<BatchSchedReadyMessage>(message)) {
 //        is_bat_sched_ready = true;
 //        return true;
 
-        } else if (auto msg = dynamic_cast<BatchExecuteJobFromBatSchedMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<BatchExecuteJobFromBatSchedMessage>(message)) {
             processExecuteJobFromBatSched(msg->batsched_decision_reply);
             return true;
-//      } else if (auto msg = dynamic_cast<AlarmNotifyBatschedMessage *>(message.get())) {
+//      } else if (auto msg = std::dynamic_pointer_cast<AlarmNotifyBatschedMessage>(message)) {
 //        //first forward this notification to the batsched
 //        this->notifyJobEventsToBatSched(msg->job_id, "SUCCESS", "COMPLETED_SUCCESSFULLY", "");
 //        return true;
@@ -2352,14 +2352,14 @@ namespace wrench {
         std::map<std::string, double> job_estimated_start_times = {};
         for (auto job : set_of_jobs) {
             // Get the answer
-            std::unique_ptr<SimulationMessage> message = nullptr;
+            std::shared_ptr<SimulationMessage> message = nullptr;
             try {
                 message = S4U_Mailbox::getMessage(batchsched_query_mailbox);
             } catch (std::shared_ptr<NetworkError> &cause) {
                 throw WorkflowExecutionException(cause);
             }
 
-            if (auto *msg = dynamic_cast<BatchQueryAnswerMessage *>(message.get())) {
+            if (auto msg = std::dynamic_pointer_cast<BatchQueryAnswerMessage>(message)) {
                 job_estimated_start_times[std::get<0>(job)] = msg->estimated_start_time;
             } else {
                 throw std::runtime_error(

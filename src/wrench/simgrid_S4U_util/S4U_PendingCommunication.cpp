@@ -26,7 +26,7 @@ namespace wrench {
      *
      * @throw std::shared_ptr<NetworkError>
      */
-    std::unique_ptr<SimulationMessage> S4U_PendingCommunication::wait() {
+    std::shared_ptr<SimulationMessage> S4U_PendingCommunication::wait() {
 
         try {
             if (this->comm_ptr->get_state() != simgrid::s4u::Activity::State::FINISHED) {
@@ -52,7 +52,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     unsigned long S4U_PendingCommunication::waitForSomethingToHappen(
-            std::vector<std::unique_ptr<S4U_PendingCommunication>> pending_comms, double timeout) {
+            std::vector<std::shared_ptr<S4U_PendingCommunication>> pending_comms, double timeout) {
         std::vector<S4U_PendingCommunication *> raw_pointer_comms;
         for (auto const &pc : pending_comms) {
 //      for (auto it = pending_comms.begin(); it != pending_comms.end(); it++) {

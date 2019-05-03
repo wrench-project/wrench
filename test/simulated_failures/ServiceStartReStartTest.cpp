@@ -186,7 +186,7 @@ private:
         life->start(life, true, false); // Daemonized, no auto-restart
 
         // Waiting for a message
-        std::unique_ptr<wrench::SimulationMessage> message;
+        std::shared_ptr<wrench::SimulationMessage> message;
         try {
             message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
         } catch (std::shared_ptr<wrench::NetworkError> &cause) {

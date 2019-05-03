@@ -411,7 +411,7 @@ private:
         executor->start(executor, true, false); // Daemonized, no auto-restart
 
         // Wait for a message on my mailbox_name
-        std::unique_ptr<wrench::SimulationMessage> message;
+        std::shared_ptr<wrench::SimulationMessage> message;
         try {
             message = wrench::S4U_Mailbox::getMessage(my_mailbox);
         } catch (std::shared_ptr<wrench::NetworkError> &cause) {
@@ -564,7 +564,7 @@ private:
             executor->start(executor, true, false); // Daemonized, no auto-restart
 
             // Wait for a message on my mailbox_name
-            std::unique_ptr<wrench::SimulationMessage> message;
+            std::shared_ptr<wrench::SimulationMessage> message;
             try {
                 message = wrench::S4U_Mailbox::getMessage(my_mailbox);
             } catch (std::shared_ptr<wrench::NetworkError> &cause) {
@@ -764,7 +764,7 @@ private:
             executor->start(executor, true, false); // Daemonized, no auto-restart
 
             // Wait for a message on my mailbox_name
-            std::unique_ptr<wrench::SimulationMessage> message;
+            std::shared_ptr<wrench::SimulationMessage> message;
             try {
                 message = wrench::S4U_Mailbox::getMessage(my_mailbox);
             } catch (std::shared_ptr<wrench::NetworkError> &cause) {
@@ -943,7 +943,7 @@ private:
             executor->start(executor, true, false); // Daemonized, no auto-restart
 
             // Wait for a message on my mailbox_name
-            std::unique_ptr<wrench::SimulationMessage> message;
+            std::shared_ptr<wrench::SimulationMessage> message;
             try {
                 message = wrench::S4U_Mailbox::getMessage(my_mailbox);
             } catch (std::shared_ptr<wrench::NetworkError> &cause) {
@@ -1141,7 +1141,7 @@ private:
             executor->start(executor, true, false); // Daemonized, no auto-restart
 
             // Wait for a message on my mailbox_name
-            std::unique_ptr<wrench::SimulationMessage> message;
+            std::shared_ptr<wrench::SimulationMessage> message;
             try {
                 message = wrench::S4U_Mailbox::getMessage(my_mailbox);
             } catch (std::shared_ptr<wrench::NetworkError> &cause) {
@@ -1295,7 +1295,7 @@ private:
         executor->start(executor, true, false); // Daemonized, no auto-restart
 
         // Wait for a message on my mailbox_name
-        std::unique_ptr<wrench::SimulationMessage> message;
+        std::shared_ptr<wrench::SimulationMessage> message;
         try {
             message = wrench::S4U_Mailbox::getMessage(my_mailbox);
         } catch (std::shared_ptr<wrench::NetworkError> &cause) {
@@ -1446,7 +1446,7 @@ private:
         executor->start(executor, true, false); // Daemonized, no auto-restart
 
         // Wait for a message on my mailbox_name
-        std::unique_ptr<wrench::SimulationMessage> message;
+        std::shared_ptr<wrench::SimulationMessage> message;
         try {
             message = wrench::S4U_Mailbox::getMessage(my_mailbox);
         } catch (std::shared_ptr<wrench::NetworkError> &cause) {
@@ -1604,7 +1604,7 @@ private:
         executor->start(executor, true, false); // Daemonized, no auto-restart
 
         // Wait for a message on my mailbox_name
-        std::unique_ptr<wrench::SimulationMessage> message;
+        std::shared_ptr<wrench::SimulationMessage> message;
         try {
             message = wrench::S4U_Mailbox::getMessage(my_mailbox);
         } catch (std::shared_ptr<wrench::NetworkError> &cause) {
@@ -1770,7 +1770,7 @@ private:
             executor->start(executor, true, false); // Daemonized, no auto-restart
 
             // Wait for a message on my mailbox_name
-            std::unique_ptr<wrench::SimulationMessage> message;
+            std::shared_ptr<wrench::SimulationMessage> message;
             try {
                 message = wrench::S4U_Mailbox::getMessage(my_mailbox);
             } catch (std::shared_ptr<wrench::NetworkError> &cause) {
@@ -1857,7 +1857,7 @@ private:
             executor->start(executor, true, false); // Daemonized, no auto-restart
 
             // Wait for a message on my mailbox_name
-            std::unique_ptr<wrench::SimulationMessage> message;
+            std::shared_ptr<wrench::SimulationMessage> message;
             try {
                 message = wrench::S4U_Mailbox::getMessage(my_mailbox);
             } catch (std::shared_ptr<wrench::NetworkError> &cause) {
@@ -1945,7 +1945,7 @@ private:
             executor->start(executor, true, false); // Daemonized, no auto-restart
 
             // Wait for a message on my mailbox_name
-            std::unique_ptr<wrench::SimulationMessage> message;
+            std::shared_ptr<wrench::SimulationMessage> message;
             try {
                 message = wrench::S4U_Mailbox::getMessage(my_mailbox);
             } catch (std::shared_ptr<wrench::NetworkError> &cause) {
@@ -2135,7 +2135,7 @@ public:
             executor->start(executor, true, false); // Daemonized, no auto-restart
 
             // Wait for a message on my mailbox_name
-            std::unique_ptr<wrench::SimulationMessage> message;
+            std::shared_ptr<wrench::SimulationMessage> message;
             try {
                 message = wrench::S4U_Mailbox::getMessage(my_mailbox);
             } catch (std::shared_ptr<wrench::NetworkError> &cause) {
@@ -2223,7 +2223,7 @@ public:
             executor->start(executor, true, false); // Daemonized, no auto-restart
 
             // Wait for a message on my mailbox_name
-            std::unique_ptr<wrench::SimulationMessage> message;
+            std::shared_ptr<wrench::SimulationMessage> message;
             try {
                 message = wrench::S4U_Mailbox::getMessage(my_mailbox);
             } catch (std::shared_ptr<wrench::NetworkError> &cause) {
@@ -2941,7 +2941,7 @@ private:
         executor->start(executor, true, false); // Daemonized, no auto-restart
 
         // Wait for a message on my mailbox_name
-        std::unique_ptr<wrench::SimulationMessage> message;
+        std::shared_ptr<wrench::SimulationMessage> message;
         try {
             message = wrench::S4U_Mailbox::getMessage(my_mailbox);
         } catch (std::shared_ptr<wrench::NetworkError> &cause) {

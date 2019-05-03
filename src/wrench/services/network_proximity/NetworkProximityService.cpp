@@ -101,7 +101,7 @@ namespace wrench {
             throw WorkflowExecutionException(cause);
         }
 
-        std::unique_ptr<SimulationMessage> message = nullptr;
+        std::shared_ptr<SimulationMessage> message = nullptr;
 
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
@@ -109,7 +109,7 @@ namespace wrench {
             throw WorkflowExecutionException(cause);
         }
 
-        if (auto msg = dynamic_cast<CoordinateLookupAnswerMessage *>(message.get())) {
+        if (auto msg = std::dynamic_pointer_cast<CoordinateLookupAnswerMessage>(message)) {
             return std::make_pair(msg->xy_coordinate, msg->timestamp);
         } else {
             throw std::runtime_error(
@@ -152,7 +152,7 @@ namespace wrench {
             throw WorkflowExecutionException(cause);
         }
 
-        std::unique_ptr<SimulationMessage> message = nullptr;
+        std::shared_ptr<SimulationMessage> message = nullptr;
 
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
@@ -160,7 +160,7 @@ namespace wrench {
             throw WorkflowExecutionException(cause);
         }
 
-        if (auto msg = dynamic_cast<NetworkProximityLookupAnswerMessage *>(message.get())) {
+        if (auto msg = std::dynamic_pointer_cast<NetworkProximityLookupAnswerMessage>(message)) {
             return std::make_pair(msg->proximity_value, msg->timestamp);
         } else {
             throw std::runtime_error(
@@ -247,7 +247,7 @@ namespace wrench {
         S4U_Simulation::computeZeroFlop();
 
         // Wait for a message
-        std::unique_ptr<SimulationMessage> message = nullptr;
+        std::shared_ptr<SimulationMessage> message = nullptr;
 
         try {
             message = S4U_Mailbox::getMessage(this->mailbox_name);
@@ -262,7 +262,7 @@ namespace wrench {
 
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
 
-        if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+        if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
 
             // This is Synchronous
             try {
@@ -282,7 +282,7 @@ namespace wrench {
                 return false;
             }
 
-        } else if (auto msg = dynamic_cast<NetworkProximityLookupRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<NetworkProximityLookupRequestMessage>(message)) {
             double proximity_value = NetworkProximityService::NOT_AVAILABLE;
             double timestamp = -1;
 
@@ -314,7 +314,7 @@ namespace wrench {
             }
             return true;
 
-        } else if (auto msg = dynamic_cast<NetworkProximityComputeAnswerMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<NetworkProximityComputeAnswerMessage>(message)) {
 //            WRENCH_INFO(
 //                    "NetworkProximityService::processNextMessage()::Adding proximity value between %s and %s into the database", msg->hosts.first.c_str(), msg->hosts.second.c_str());
             this->addEntryToDatabase(msg->hosts, msg->proximity_value);
@@ -327,7 +327,7 @@ namespace wrench {
 
             return true;
 
-        } else if (auto msg = dynamic_cast<NextContactDaemonRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<NextContactDaemonRequestMessage>(message)) {
 
             std::shared_ptr<NetworkProximityDaemon> chosen_peer = NetworkProximityService::getCommunicationPeer(
                     msg->daemon);

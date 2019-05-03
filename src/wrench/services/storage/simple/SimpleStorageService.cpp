@@ -181,7 +181,7 @@ namespace wrench {
         S4U_Simulation::computeZeroFlop();
 
         // Get the message
-        std::unique_ptr<SimulationMessage> message;
+        std::shared_ptr<SimulationMessage> message;
         try {
             message = connection->comm->wait();
         } catch (std::shared_ptr<NetworkError> &cause) {
@@ -197,7 +197,7 @@ namespace wrench {
 
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
 
-        if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+        if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
             try {
                 S4U_Mailbox::putMessage(msg->ack_mailbox,
                                         new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
@@ -207,7 +207,7 @@ namespace wrench {
             }
             return false;
 
-        } else if (auto msg = dynamic_cast<StorageServiceFreeSpaceRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFreeSpaceRequestMessage>(message)) {
             double free_space = this->capacity - this->occupied_space;
 
             try {
@@ -220,7 +220,7 @@ namespace wrench {
             }
             return true;
 
-        } else if (auto msg = dynamic_cast<StorageServiceFileDeleteRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFileDeleteRequestMessage>(message)) {
 
             bool success = true;
             std::shared_ptr<FailureCause> failure_cause = nullptr;
@@ -253,7 +253,7 @@ namespace wrench {
 
             return true;
 
-        } else if (auto msg = dynamic_cast<StorageServiceFileLookupRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFileLookupRequestMessage>(message)) {
 
             std::set<WorkflowFile*> files = this->stored_files[msg->dst_partition];
 
@@ -269,15 +269,15 @@ namespace wrench {
 
             return true;
 
-        } else if (auto msg = dynamic_cast<StorageServiceFileWriteRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFileWriteRequestMessage>(message)) {
 
             return processFileWriteRequest(msg->file, msg->dst_partition, msg->answer_mailbox);
 
-        } else if (auto msg = dynamic_cast<StorageServiceFileReadRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFileReadRequestMessage>(message)) {
 
             return processFileReadRequest(msg->file, msg->src_partition, msg->answer_mailbox, msg->mailbox_to_receive_the_file_content);
 
-        } else if (auto msg = dynamic_cast<StorageServiceFileCopyRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFileCopyRequestMessage>(message)) {
 
             return processFileCopyRequest(msg->file, msg->src, msg->src_partition, msg->dst_partition, msg->answer_mailbox, msg->start_timestamp);
 
@@ -511,7 +511,7 @@ namespace wrench {
     bool SimpleStorageService::processIncomingDataConnection(std::unique_ptr<NetworkConnection> connection) {
 
         // Get the message
-        std::unique_ptr<SimulationMessage> message = connection->getMessage();
+        std::shared_ptr<SimulationMessage> message = connection->getMessage();
 
         if (message == nullptr) {
             WRENCH_INFO("SimpleStorageService::processDataConnection(): Communication failure when receiving file '%s",
@@ -544,7 +544,7 @@ namespace wrench {
 
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
 
-        if (auto msg = dynamic_cast<StorageServiceFileContentMessage *>(message.get())) {
+        if (auto msg = std::dynamic_pointer_cast<StorageServiceFileContentMessage>(message)) {
 
             if (msg->file != connection->file) {
                 throw std::runtime_error(

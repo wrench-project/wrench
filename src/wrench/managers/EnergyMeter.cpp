@@ -155,7 +155,7 @@ namespace wrench {
      */
     bool EnergyMeter::processNextMessage(double timeout) {
 
-      std::unique_ptr<SimulationMessage> message = nullptr;
+      std::shared_ptr<SimulationMessage> message = nullptr;
 
       try {
         message = S4U_Mailbox::getMessage(this->mailbox_name, timeout);
@@ -170,7 +170,7 @@ namespace wrench {
 
       WRENCH_INFO("Data Movement Manager got a %s message", message->getName().c_str());
 
-      if (dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+      if (std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
         // There shouldn't be any need to clean any state up
         return false;
       }

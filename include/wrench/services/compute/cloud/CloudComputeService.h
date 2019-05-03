@@ -134,7 +134,7 @@ namespace wrench {
 
         int main() override;
 
-        std::unique_ptr<SimulationMessage> sendRequest(std::string &answer_mailbox, ComputeServiceMessage *message);
+        std::shared_ptr<SimulationMessage> sendRequest(std::string &answer_mailbox, ComputeServiceMessage *message);
 
         virtual bool processNextMessage();
 
