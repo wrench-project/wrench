@@ -384,7 +384,7 @@ namespace wrench {
                     storage_service->deleteFile(file, nullptr, nullptr);
                 }
             } catch (WorkflowExecutionException &e) {
-                if (e.getCause()->getCauseType() == FailureCause::FILE_NOT_FOUND) {
+                if (std::dynamic_pointer_cast<FileNotFound>(e.getCause())) {
                     // Ignore (maybe it was already deleted during a previous attempt!
                 } else {
                     throw;

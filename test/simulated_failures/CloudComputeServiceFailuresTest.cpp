@@ -130,15 +130,15 @@ private:
         if (event->type != wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE) {
             throw std::runtime_error("Unexpected workflow execution event!");
         }
-        auto failure_cause = dynamic_cast<wrench::StandardJobFailedEvent *>(event.get())->failure_cause;
-        if (failure_cause->getCauseType() != wrench::FailureCause::JOB_KILLED) {
-            throw std::runtime_error("Invalid failure cause type: should be JOB_KILLED but was " + std::to_string(failure_cause->getCauseType()));
+        auto real_event = dynamic_cast<wrench::StandardJobFailedEvent *>(event.get());
+        auto cause = std::dynamic_pointer_cast<wrench::JobKilled>(real_event->failure_cause);
+        if (not cause) {
+            throw std::runtime_error("Invalid failure cause type: " + cause->toString() + " (expected: JobKilled)");
         }
-        auto real_failure = dynamic_cast<wrench::JobKilled *>(failure_cause.get());
-        if (real_failure->getJob() != job) {
+        if (cause->getJob() != job) {
             throw std::runtime_error("Failure cause does not point to the correct job");
         }
-        if (real_failure->getComputeService() != vm_cs) {
+        if (cause->getComputeService() != vm_cs) {
             throw std::runtime_error("Failure cause does not point to the correct compute service");
         }
 
@@ -268,15 +268,15 @@ private:
         if (event->type != wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE) {
             throw std::runtime_error("Unexpected workflow execution event!");
         }
-        auto failure_cause = dynamic_cast<wrench::StandardJobFailedEvent *>(event.get())->failure_cause;
-        if (failure_cause->getCauseType() != wrench::FailureCause::JOB_KILLED) {
-            throw std::runtime_error("Invalid failure cause type: should be JOB_KILLED but was " + std::to_string(failure_cause->getCauseType()));
+        auto real_event = dynamic_cast<wrench::StandardJobFailedEvent *>(event.get());
+        auto cause = std::dynamic_pointer_cast<wrench::JobKilled>(real_event->failure_cause);
+        if (not cause) {
+            throw std::runtime_error("Invalid failure cause: " + cause->toString() + " (expected: JobKilled)");
         }
-        auto real_failure = dynamic_cast<wrench::JobKilled *>(failure_cause.get());
-        if (real_failure->getJob() != job) {
+        if (cause->getJob() != job) {
             throw std::runtime_error("Failure cause does not point to the correct job");
         }
-        if (real_failure->getComputeService() != vm_cs) {
+        if (cause->getComputeService() != vm_cs) {
             throw std::runtime_error("Failure cause does not point to the correct compute service");
         }
 

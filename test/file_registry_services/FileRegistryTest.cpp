@@ -191,13 +191,13 @@ private:
         throw std::runtime_error("Should not be able to remove an entry from a service that is down");
       } catch (wrench::WorkflowExecutionException &e) {
         // Check Exception
-        if (e.getCause()->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
-          throw std::runtime_error("Got an exception, as expected, but of the unexpected type " +
-                                   std::to_string(e.getCause()->getCauseType()) + " (was expecting ServiceIsDown)");
+          auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(e.getCause());
+        if (not cause) {
+          throw std::runtime_error("Got an exception, as expected, but of the unexpected failure cause: " +
+                                   cause->toString() + " (expected: ServiceIsDown)");
         }
         // Check Exception details
-        wrench::ServiceIsDown *real_cause = (wrench::ServiceIsDown *) e.getCause().get();
-        if (real_cause->getService() != frs) {
+        if (cause->getService() != frs) {
           throw std::runtime_error(
                   "Got the expected 'service is down' exception, but the failure cause does not point to the correct service");
         }
@@ -351,13 +351,13 @@ private:
         throw std::runtime_error("Should not be able to lookup a file when the service is down");
       } catch (wrench::WorkflowExecutionException &e) {
         // Check Exception
-        if (e.getCause()->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
-          throw std::runtime_error("Got an exception, as expected, but of the unexpected type " +
-                                   std::to_string(e.getCause()->getCauseType()) + " (was expecting ServiceIsDown)");
+          auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(e.getCause());
+        if (not cause) {
+          throw std::runtime_error("Got an exception, as expected, but of the unexpected failure cause: " +
+                                   cause->toString() + " (expected: ServiceIsDown)");
         }
         // Check Exception details
-        wrench::ServiceIsDown *real_cause = (wrench::ServiceIsDown *) e.getCause().get();
-        if (real_cause->getService() != frs) {
+        if (cause->getService() != frs) {
           throw std::runtime_error(
                   "Got the expected 'service is down' exception, but the failure cause does not point to the correct service");
         }
@@ -368,13 +368,13 @@ private:
         throw std::runtime_error("Should not be able to lookup a file when the service is down");
       } catch (wrench::WorkflowExecutionException &e) {
         // Check Exception
-        if (e.getCause()->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
-          throw std::runtime_error("Got an exception, as expected, but of the unexpected type " +
-                                   std::to_string(e.getCause()->getCauseType()) + " (was expecting ServiceIsDown)");
+          auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(e.getCause());
+        if (not cause) {
+          throw std::runtime_error("Got an exception, as expected, but of the unexpected failure cause: " +
+                                   cause->toString() + " (expected: ServiceIsDown)");
         }
         // Check Exception details
-        wrench::ServiceIsDown *real_cause = (wrench::ServiceIsDown *) e.getCause().get();
-        if (real_cause->getService() != frs) {
+        if (cause->getService() != frs) {
           throw std::runtime_error(
                   "Got the expected 'service is down' exception, but the failure cause does not point to the correct service");
         }
