@@ -194,7 +194,7 @@ private:
           auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(e.getCause());
         if (not cause) {
           throw std::runtime_error("Got an exception, as expected, but of the unexpected failure cause: " +
-                                   cause->toString() + " (expected: ServiceIsDown)");
+                                   e.getCause()->toString() + " (expected: ServiceIsDown)");
         }
         // Check Exception details
         if (cause->getService() != frs) {
@@ -354,7 +354,7 @@ private:
           auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(e.getCause());
         if (not cause) {
           throw std::runtime_error("Got an exception, as expected, but of the unexpected failure cause: " +
-                                   cause->toString() + " (expected: ServiceIsDown)");
+                                   e.getCause()->toString() + " (expected: ServiceIsDown)");
         }
         // Check Exception details
         if (cause->getService() != frs) {
@@ -371,7 +371,7 @@ private:
           auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(e.getCause());
         if (not cause) {
           throw std::runtime_error("Got an exception, as expected, but of the unexpected failure cause: " +
-                                   cause->toString() + " (expected: ServiceIsDown)");
+                                   e.getCause()->toString() + " (expected: ServiceIsDown)");
         }
         // Check Exception details
         if (cause->getService() != frs) {

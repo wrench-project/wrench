@@ -124,7 +124,8 @@ private:
         } catch (wrench::WorkflowExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::JobTypeNotSupported>(e.getCause());
             if (not cause) {
-                throw std::runtime_error("Didn't get the expected exception");
+                throw std::runtime_error("Did get the expected exception but unexpected failure cause: " +
+                e.getCause()->toString() + " (expected: JobTypeNotSupported)");
             }
         }
 

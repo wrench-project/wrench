@@ -1107,7 +1107,7 @@ private:
                 auto cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
                 if (not cause) {
                     throw std::runtime_error("Got an expected exception but unexpected failure cause: " +
-                                             cause->toString() + " (expected: NotEnoughResources)");
+                                             e.getCause()->toString() + " (expected: NotEnoughResources)");
                 }
             }
 
@@ -1374,13 +1374,13 @@ private:
             switch (event->type) {
                 case wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
                     auto real_event = dynamic_cast<wrench::StandardJobFailedEvent*>(event.get());
-                    auto cause = std::dynamic_pointer_cast<wrench::JobKilled>(real_event->failure_cause);
+                    auto cause = std::dynamic_pointer_cast<wrench::JobTimeout>(real_event->failure_cause);
                     if (not cause) {
                         throw std::runtime_error("Expected event, but unexpected failure cause: " +
-                                                 cause->toString() + " (expected: JobKilled)");
+                                                 real_event->failure_cause->toString() + " (expected: JobTimeout)");
                     }
                     if (cause->getJob() != job) {
-                        throw std::runtime_error("Expected JobTimeOut failure cause does not point to expected job");
+                        throw std::runtime_error("Expected JobTimeout failure cause does not point to expected job");
                     }
                     cause->toString(); // for coverage
 
@@ -2384,8 +2384,8 @@ private:
                     auto real_event = dynamic_cast<wrench::StandardJobFailedEvent*>(event.get());
                     auto cause = std::dynamic_pointer_cast<wrench::JobKilled>(real_event->failure_cause);
                     if (not cause) {
-                        throw std::runtime_error("Got a job failure event but unexpected failure cause: " + cause->toString() +
-                                                 " (expected: JobKilled)");
+                        throw std::runtime_error("Got a job failure event but unexpected failure cause: " +
+                                                 real_event->failure_cause->toString() + " (expected: JobKilled)");
                     }
                     std::string error_msg = cause->toString();
                     if (cause->getComputeService() != this->test->compute_service) {
@@ -3187,7 +3187,7 @@ private:
             auto cause = std::dynamic_pointer_cast<wrench::JobKilled>(real_event->failure_cause);
             if (not cause) {
                 throw std::runtime_error("Expected event, but unexpected failure cause: " +
-                                         cause->toString() + " (expected: JobKilled)");
+                                         real_event->failure_cause->toString() + " (expected: JobKilled)");
             }
             if ((cause->getJob() != jobs[0])  and
                 (cause->getJob() != jobs[1]) and
