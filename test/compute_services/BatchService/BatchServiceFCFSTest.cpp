@@ -361,7 +361,7 @@ private:
       expectations.insert(std::make_pair("job10", 480));
 
       std::map<std::string,double> jobs_estimated_start_times =
-              std::dynamic_pointer_cast<wrench::BatchComputeService>(this->test->compute_service)->getStartTimeEstimates(set_of_jobs);
+              (*(this->getAvailableComputeServices<wrench::BatchComputeService>().begin()))->getStartTimeEstimates(set_of_jobs);
 
       for (auto job : set_of_jobs) {
         std::string id = std::get<0>(job);
@@ -462,7 +462,7 @@ private:
 
       try {
         std::map<std::string,double> jobs_estimated_start_times =
-                std::dynamic_pointer_cast<wrench::BatchComputeService>(this->test->compute_service)->getStartTimeEstimates(set_of_jobs);
+                (*(this->getAvailableComputeServices<wrench::BatchComputeService>().begin()))->getStartTimeEstimates(set_of_jobs);
         throw std::runtime_error("Should not have been able to get prediction for BESTFIT algorithm");
       } catch (wrench::WorkflowExecutionException &e) {
         if (e.getCause()->getCauseType() != wrench::FailureCause::FUNCTIONALITY_NOT_AVAILABLE) {

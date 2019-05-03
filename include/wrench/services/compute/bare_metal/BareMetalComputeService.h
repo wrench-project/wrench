@@ -204,7 +204,6 @@ namespace wrench {
 
         void forgetWorkunitExecutor(WorkunitExecutor *workunit_executor);
 
-
         void processStandardJobTerminationRequest(StandardJob *job, const std::string &answer_mailbox);
 
         bool processNextMessage();
