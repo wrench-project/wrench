@@ -31,15 +31,15 @@ namespace wrench {
 
             // Wait for the workflow execution event
             WRENCH_INFO("Waiting for job completion...");
-            std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
 
-                if (auto real_event = dynamic_cast<wrench::StandardJobCompletedEvent *>(event.get())) {
+                if (auto real_event = std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
                     job = real_event->standard_job;
                     // success, do nothing
                     WRENCH_INFO("Received job completion notification");
-                } else if (auto real_event = dynamic_cast<wrench::StandardJobFailedEvent *>(event.get())) {
+                } else if (auto real_event = std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event)) {
                     job = real_event->standard_job;
                     WRENCH_INFO("Received job failure notification: %s",
                                 real_event->failure_cause->toString().c_str());

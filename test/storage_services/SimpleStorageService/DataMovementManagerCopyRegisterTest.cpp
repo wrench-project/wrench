@@ -117,7 +117,7 @@ private:
 
 
         // try asynchronous copy and register
-        std::unique_ptr<wrench::WorkflowExecutionEvent> async_copy_event;
+        std::shared_ptr<wrench::WorkflowExecutionEvent> async_copy_event;
 
         try {
             data_movement_manager->initiateAsynchronousFileCopy(this->test->src2_file_1,
@@ -133,7 +133,7 @@ private:
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
-        if (dynamic_cast<wrench::FileCopyFailedEvent*>(async_copy_event.get())) {
+        if (std::dynamic_pointer_cast<wrench::FileCopyFailedEvent>(async_copy_event)) {
             throw std::runtime_error("Asynchronous file copy failed.");
         }
 
@@ -146,7 +146,7 @@ private:
 
         // try 2 asynchronous copies of the same file
         bool double_copy_failed = false;
-        std::unique_ptr<wrench::WorkflowExecutionEvent> async_dual_copy_event;
+        std::shared_ptr<wrench::WorkflowExecutionEvent> async_dual_copy_event;
 
         data_movement_manager->initiateAsynchronousFileCopy(this->test->src_file_2,
                                                             this->test->src_storage_service,
@@ -175,14 +175,14 @@ private:
             throw std::runtime_error("The second asynchronous file copy should have failed.");
         }
 
-        if (not dynamic_cast<wrench::FileCopyCompletedEvent*>(async_copy_event.get())) {
+        if (not std::dynamic_pointer_cast<wrench::FileCopyCompletedEvent>(async_copy_event)) {
             throw std::runtime_error("Asynchronous copy event should be FileCompletedEvent. Instead: " + async_copy_event->toString());
         }
 
         // try 1 asynchronous and 1 synchronous copy of the same file
         double_copy_failed = false;
 
-        std::unique_ptr<wrench::WorkflowExecutionEvent> async_dual_copy_event2;
+        std::shared_ptr<wrench::WorkflowExecutionEvent> async_dual_copy_event2;
 
 
         data_movement_manager->initiateAsynchronousFileCopy(this->test->src_file_3,
@@ -201,7 +201,7 @@ private:
 
         async_dual_copy_event2 = this->getWorkflow()->waitForNextExecutionEvent();
 
-        auto async_dual_copy_event2_real = dynamic_cast<wrench::FileCopyCompletedEvent *>(async_dual_copy_event2.get());
+        auto async_dual_copy_event2_real = std::dynamic_pointer_cast<wrench::FileCopyCompletedEvent>(async_dual_copy_event2);
 
         if (not async_dual_copy_event2_real)  {
             throw std::runtime_error(std::string("Unexpected workflow execution event: " + async_dual_copy_event2->toString()));
@@ -224,7 +224,7 @@ private:
         }
 
         // try 1 asynchronous copy and then kill the file registry service right after the copy is instantiated
-        std::unique_ptr<wrench::WorkflowExecutionEvent> async_copy_event2;
+        std::shared_ptr<wrench::WorkflowExecutionEvent> async_copy_event2;
 
         data_movement_manager->initiateAsynchronousFileCopy(this->test->src2_file_2,
                                                             this->test->src2_storage_service,
@@ -234,7 +234,7 @@ private:
 
         async_copy_event2 = this->getWorkflow()->waitForNextExecutionEvent();
 
-        auto async_copy_event2_real = dynamic_cast<wrench::FileCopyCompletedEvent *>(async_copy_event2.get());
+        auto async_copy_event2_real = std::dynamic_pointer_cast<wrench::FileCopyCompletedEvent>(async_copy_event2);
 
         if (not async_copy_event2_real) {
             throw std::runtime_error("Asynchronous file copy should have completed");

@@ -386,7 +386,7 @@ namespace wrench {
      *
      * @return a workflow execution event
      */
-    std::unique_ptr<WorkflowExecutionEvent> Workflow::waitForNextExecutionEvent() {
+    std::shared_ptr<WorkflowExecutionEvent> Workflow::waitForNextExecutionEvent() {
       return WorkflowExecutionEvent::waitForNextExecutionEvent(this->callback_mailbox);
     }
 
@@ -396,7 +396,7 @@ namespace wrench {
     *
     * @return a workflow execution event, or nullptr if a timeout occurred
     */
-    std::unique_ptr<WorkflowExecutionEvent> Workflow::waitForNextExecutionEvent(double timeout) {
+    std::shared_ptr<WorkflowExecutionEvent> Workflow::waitForNextExecutionEvent(double timeout) {
       return WorkflowExecutionEvent::waitForNextExecutionEvent(this->callback_mailbox, timeout);
     }
 

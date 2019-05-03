@@ -304,7 +304,7 @@ private:
         return true;
     }
 
-    void processEventStandardJobCompletion(std::unique_ptr<wrench::StandardJobCompletedEvent> event) override {
+    void processEventStandardJobCompletion(std::shared_ptr<wrench::StandardJobCompletedEvent> event) override {
         auto task = *(event->standard_job->getTasks().begin());
         WRENCH_INFO("Task '%s' has completed", task->getID().c_str());
         if (event->compute_service == this->test->baremetal_service) {
@@ -318,7 +318,7 @@ private:
         }
     }
 
-    void processEventStandardJobFailure(std::unique_ptr<wrench::StandardJobFailedEvent> event) override {
+    void processEventStandardJobFailure(std::shared_ptr<wrench::StandardJobFailedEvent> event) override {
         auto task = *(event->standard_job->getTasks().begin());
         WRENCH_INFO("Task '%s' has failed: %s", task->getID().c_str(), event->failure_cause->toString().c_str());
         if (event->compute_service == this->test->baremetal_service) {

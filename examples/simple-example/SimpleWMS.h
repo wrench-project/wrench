@@ -33,7 +33,7 @@ namespace wrench {
         /** \cond DEVELOPER    */
         /***********************/
 
-        void processEventStandardJobFailure(std::unique_ptr<StandardJobFailedEvent>) override;
+        void processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent>) override;
 
         /***********************/
         /** \endcond           */

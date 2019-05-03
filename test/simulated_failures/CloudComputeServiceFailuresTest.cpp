@@ -126,11 +126,11 @@ private:
         job_manager->submitJob(job, vm_cs);
 
         // Wait for a workflow execution event
-        std::unique_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
-        if (not dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())) {
+        std::shared_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
+        if (not std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event)) {
             throw std::runtime_error("Unexpected workflow execution event!");
         }
-        auto real_event = dynamic_cast<wrench::StandardJobFailedEvent *>(event.get());
+        auto real_event = std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event);
         auto cause = std::dynamic_pointer_cast<wrench::JobKilled>(real_event->failure_cause);
         if (not cause) {
             throw std::runtime_error("Invalid failure cause type: " + real_event->failure_cause->toString() + " (expected: JobKilled)");
@@ -265,10 +265,10 @@ private:
 
         // Wait for a workflow execution event
         auto event = this->getWorkflow()->waitForNextExecutionEvent();
-        if (not dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())) {
+        if (not std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event)) {
             throw std::runtime_error("Unexpected workflow execution event!");
         }
-        auto real_event = dynamic_cast<wrench::StandardJobFailedEvent *>(event.get());
+        auto real_event = std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event);
         auto cause = std::dynamic_pointer_cast<wrench::JobKilled>(real_event->failure_cause);
         if (not cause) {
             throw std::runtime_error("Invalid failure cause: " + real_event->failure_cause->toString() + " (expected: JobKilled)");
@@ -302,7 +302,7 @@ private:
 
         // Wait for a workflow execution event
         auto event2 = this->getWorkflow()->waitForNextExecutionEvent();
-        if (not dynamic_cast<wrench::StandardJobCompletedEvent*>(event2.get())) {
+        if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event2)) {
             throw std::runtime_error("Unexpected workflow execution event: " + event2->toString());
         }
 
@@ -426,7 +426,7 @@ private:
             // Create a VM
             auto vm_name = cloud_service->createVM(task->getMinNumCores(), task->getMemoryRequirement());
 
-            std::unique_ptr<wrench::WorkflowExecutionEvent> event = nullptr;
+            std::shared_ptr<wrench::WorkflowExecutionEvent> event = nullptr;
             unsigned long total_num_vm_start_attempts = 0;
             unsigned long num_vm_start_attempts = 0;
             unsigned long num_job_submission_attempts = 0;
@@ -452,7 +452,7 @@ private:
 
                 // Wait for a workflow execution event
                 event = this->getWorkflow()->waitForNextExecutionEvent();
-            } while ((event == nullptr) || (not dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())));
+            } while ((event == nullptr) || (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)));
 
             WRENCH_INFO("*** WAS ABLE TO RUN THE JOB AFTER %lu attempts (%lu VM start attempts)",
                         num_job_submission_attempts,

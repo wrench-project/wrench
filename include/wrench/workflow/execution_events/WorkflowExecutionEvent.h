@@ -71,8 +71,8 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        static std::unique_ptr<WorkflowExecutionEvent> waitForNextExecutionEvent(std::string);
-        static std::unique_ptr<WorkflowExecutionEvent> waitForNextExecutionEvent(std::string, double timeout);
+        static std::shared_ptr<WorkflowExecutionEvent> waitForNextExecutionEvent(std::string);
+        static std::shared_ptr<WorkflowExecutionEvent> waitForNextExecutionEvent(std::string, double timeout);
         virtual std::string toString() { return "Generic WorkflowExecutionEvent"; }
         virtual ~WorkflowExecutionEvent() = default;
 
