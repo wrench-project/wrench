@@ -284,7 +284,7 @@ private:
                     auto cause = std::dynamic_pointer_cast<wrench::NoScratchSpace>(real_event->failure_cause);
                     if (not cause) {
                         throw std::runtime_error("Got a job failure event, but unexpected failure cause: " +
-                                                 real_event->cause->toString() + " (expected: NoScratchSpace)");
+                                                 real_event->failure_cause->toString() + " (expected: NoScratchSpace)");
                     }
                     cause->toString(); // for coverage
                     break;
@@ -308,7 +308,7 @@ private:
                     auto cause = std::dynamic_pointer_cast<wrench::StorageServiceNotEnoughSpace>(real_event->failure_cause);
                     if (not cause) {
                         throw std::runtime_error("Got a job failure event, but unexpected failure cause: " +
-                                                 real_event->cause->toString() + " (expected: StorageServiceNotEnoughSpace)");
+                                                 real_event->failure_cause->toString() + " (expected: StorageServiceNotEnoughSpace)");
                     }
                     break;
                 }
