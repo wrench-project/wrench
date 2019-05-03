@@ -44,7 +44,7 @@ namespace wrench {
 
         double date;
         std::string reply_mailbox_name;
-        std::shared_ptr<SimulationMessage> msg;
+        SimulationMessage *msg;
 
         int main() override;
 
