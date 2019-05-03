@@ -38,7 +38,7 @@ namespace wrench {
 //                "Alarm is being started but notification date is in the past. Notification will be sent immediately.");
 //      }
       this->reply_mailbox_name = reply_mailbox_name;
-      this->msg = std::unique_ptr<SimulationMessage>(msg);
+      this->msg = std::shared_ptr<SimulationMessage>(msg);
     }
 
     /**
@@ -57,7 +57,7 @@ namespace wrench {
         WRENCH_INFO("Alarm Service Sending a message to %s", this->reply_mailbox_name.c_str());
         try {
           S4U_Mailbox::putMessage(this->reply_mailbox_name,
-                                  msg.release());
+                                  msg.get());
         } catch (std::shared_ptr<NetworkError> &cause) {
           WRENCH_WARN("AlarmService was not able to send the trigger to its upper service");
         }

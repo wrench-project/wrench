@@ -587,7 +587,7 @@ namespace wrench {
         S4U_Simulation::computeZeroFlop();
 
         // Wait for a message
-        std::unique_ptr<SimulationMessage> message;
+        std::shared_ptr<SimulationMessage> message;
 
         try {
             message = S4U_Mailbox::getMessage(this->mailbox_name);
@@ -605,17 +605,17 @@ namespace wrench {
 
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
 
-        if (auto msg = dynamic_cast<HostHasTurnedOnMessage *>(message.get())) {
+        if (auto msg = std::dynamic_pointer_cast<HostHasTurnedOnMessage>(message)) {
             // Do nothing, just wake up
             return true;
-        } else if (auto msg = dynamic_cast<WorkunitExecutorDoneMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<WorkunitExecutorDoneMessage>(message)) {
             processWorkunitExecutorCompletion(msg->workunit_executor, msg->workunit);
             return true;
-        } else if (auto msg = dynamic_cast<WorkunitExecutorFailedMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<WorkunitExecutorFailedMessage>(message)) {
             processWorkunitExecutorFailure(msg->workunit_executor, msg->workunit, msg->cause);
             return false; // We should exit since we've killed everything
 
-        } else if (auto msg = dynamic_cast<ServiceHasCrashedMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ServiceHasCrashedMessage>(message)) {
             Service *service = msg->service;
             auto workunit_executor = dynamic_cast<WorkunitExecutor *>(service);
             if (not workunit_executor) {

@@ -91,7 +91,7 @@ namespace wrench {
         throw WorkflowExecutionException(cause);
       }
 
-      std::unique_ptr<SimulationMessage> message = nullptr;
+      std::shared_ptr<SimulationMessage> message = nullptr;
 
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
@@ -99,7 +99,7 @@ namespace wrench {
         throw WorkflowExecutionException(cause);
       }
 
-      if (auto msg = dynamic_cast<FileRegistryFileLookupAnswerMessage *>(message.get())) {
+      if (auto msg = std::dynamic_pointer_cast<FileRegistryFileLookupAnswerMessage>(message)) {
         std::set<std::shared_ptr<StorageService>> result = msg->locations;
 //        msg->locations.clear(); // TODO: Understand why this removes a memory leak
         return result;
@@ -144,7 +144,7 @@ namespace wrench {
         throw WorkflowExecutionException(cause);
       }
 
-      std::unique_ptr<SimulationMessage> message = nullptr;
+      std::shared_ptr<SimulationMessage> message = nullptr;
 
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
@@ -187,7 +187,7 @@ namespace wrench {
         throw WorkflowExecutionException(cause);
       }
 
-      std::unique_ptr<SimulationMessage> message = nullptr;
+      std::shared_ptr<SimulationMessage> message = nullptr;
 
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
@@ -195,7 +195,7 @@ namespace wrench {
         throw WorkflowExecutionException(cause);
       }
 
-      if (auto msg = dynamic_cast<FileRegistryAddEntryAnswerMessage *>(message.get())) {
+      if (auto msg = std::dynamic_pointer_cast<FileRegistryAddEntryAnswerMessage>(message)) {
         return;
       } else {
         std::runtime_error("FileRegistryService::addEntry(): Unexpected [" + message->getName() + "] message");
@@ -230,7 +230,7 @@ namespace wrench {
         throw WorkflowExecutionException(cause);
       }
 
-      std::unique_ptr<SimulationMessage> message = nullptr;
+      std::shared_ptr<SimulationMessage> message = nullptr;
 
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
@@ -238,7 +238,7 @@ namespace wrench {
         throw WorkflowExecutionException(cause);
       }
 
-      if (auto msg = dynamic_cast<FileRegistryRemoveEntryAnswerMessage *>(message.get())) {
+      if (auto msg = std::dynamic_pointer_cast<FileRegistryRemoveEntryAnswerMessage>(message)) {
         if (!msg->success) {
           WRENCH_WARN("Attempted to remove non-existent (%s,%s) entry from file registry service (ignored)",
                       file->getID().c_str(), storage_service->getName().c_str());
@@ -280,7 +280,7 @@ namespace wrench {
       S4U_Simulation::computeZeroFlop();
 
       // Wait for a message
-      std::unique_ptr<SimulationMessage> message = nullptr;
+      std::shared_ptr<SimulationMessage> message = nullptr;
 
       try {
         message = S4U_Mailbox::getMessage(this->mailbox_name);
@@ -295,7 +295,7 @@ namespace wrench {
 
       WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
 
-      if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+      if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
         // This is Synchronous
         try {
           S4U_Mailbox::putMessage(msg->ack_mailbox,
@@ -306,7 +306,7 @@ namespace wrench {
         }
         return false;
 
-      } else if (auto msg = dynamic_cast<FileRegistryFileLookupRequestMessage *>(message.get())) {
+      } else if (auto msg = std::dynamic_pointer_cast<FileRegistryFileLookupRequestMessage>(message)) {
         std::set<std::shared_ptr<StorageService>> locations;
         if (this->entries.find(msg->file) != this->entries.end()) {
           locations = this->entries[msg->file];
@@ -353,7 +353,7 @@ namespace wrench {
         }
         return true;
 
-      } else if (auto msg = dynamic_cast<FileRegistryAddEntryRequestMessage *>(message.get())) {
+      } else if (auto msg = std::dynamic_pointer_cast<FileRegistryAddEntryRequestMessage>(message)) {
         addEntryToDatabase(msg->file, msg->storage_service);
         try {
           S4U_Mailbox::dputMessage(msg->answer_mailbox,
@@ -364,7 +364,7 @@ namespace wrench {
         }
         return true;
 
-      } else if (auto msg = dynamic_cast<FileRegistryRemoveEntryRequestMessage *>(message.get())) {
+      } else if (auto msg = std::dynamic_pointer_cast<FileRegistryRemoveEntryRequestMessage>(message)) {
 
         bool success = removeEntryFromDatabase(msg->file, msg->storage_service);
         try {

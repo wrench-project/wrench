@@ -123,7 +123,7 @@ private:
 
 
         // Waiting for a message
-        std::unique_ptr<wrench::SimulationMessage> message;
+        std::shared_ptr<wrench::SimulationMessage> message;
 
 
         try {
@@ -244,7 +244,7 @@ private:
         failure_detector2->start(failure_detector2, true, false); // Daemonized, no auto-restart
 
         // Waiting for a message
-        std::unique_ptr<wrench::SimulationMessage> message;
+        std::shared_ptr<wrench::SimulationMessage> message;
 
         try {
             message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);

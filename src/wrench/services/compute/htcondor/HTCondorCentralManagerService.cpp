@@ -98,14 +98,14 @@ namespace wrench {
         }
 
         // Get the answer
-        std::unique_ptr<SimulationMessage> message = nullptr;
+        std::shared_ptr<SimulationMessage> message = nullptr;
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox);
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw WorkflowExecutionException(cause);
         }
 
-        if (auto *msg = dynamic_cast<ComputeServiceSubmitStandardJobAnswerMessage *>(message.get())) {
+        if (auto msg = std::dynamic_pointer_cast<ComputeServiceSubmitStandardJobAnswerMessage>(message)) {
             // If no success, throw an exception
             if (not msg->success) {
                 throw WorkflowExecutionException(msg->failure_cause);
@@ -224,7 +224,7 @@ namespace wrench {
      */
     bool HTCondorCentralManagerService::processNextMessage() {
         // Wait for a message
-        std::unique_ptr<SimulationMessage> message;
+        std::shared_ptr<SimulationMessage> message;
 
         try {
             message = S4U_Mailbox::getMessage(this->mailbox_name);
@@ -239,7 +239,7 @@ namespace wrench {
 
         WRENCH_INFO("HTCondor Central Manager got a [%s] message", message->getName().c_str());
 
-        if (auto *msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+        if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
             this->terminate();
             // This is Synchronous
             try {
@@ -253,15 +253,15 @@ namespace wrench {
             }
             return false;
 
-        } else if (auto *msg = dynamic_cast<ComputeServiceSubmitStandardJobRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceSubmitStandardJobRequestMessage>(message)) {
             processSubmitStandardJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
             return true;
 
-        } else if (auto *msg = dynamic_cast<ComputeServiceStandardJobDoneMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceStandardJobDoneMessage>(message)) {
             processStandardJobCompletion(msg->job);
             return true;
 
-        } else if (auto *msg = dynamic_cast<NegotiatorCompletionMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<NegotiatorCompletionMessage>(message)) {
             processNegotiatorCompletion(msg->scheduled_jobs);
             return true;
 

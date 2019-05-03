@@ -484,7 +484,7 @@ namespace wrench {
 
       bool keep_going = true;
       while (keep_going) {
-        std::unique_ptr<SimulationMessage> message = nullptr;
+        std::shared_ptr<SimulationMessage> message = nullptr;
         try {
           message = S4U_Mailbox::getMessage(this->mailbox_name);
         } catch (std::shared_ptr<NetworkError> &cause) {
@@ -500,11 +500,11 @@ namespace wrench {
 
         WRENCH_INFO("Job Manager got a %s message", message->getName().c_str());
 
-        if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+        if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
           // There shouldn't be any need to clean any state up
           keep_going = false;
 
-        } else if (auto msg = dynamic_cast<ComputeServiceStandardJobDoneMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceStandardJobDoneMessage>(message)) {
           // update job state
           StandardJob *job = msg->job;
           job->state = StandardJob::State::COMPLETED;
@@ -600,7 +600,7 @@ namespace wrench {
           }
           keep_going = true;
 
-        } else if (auto msg = dynamic_cast<ComputeServiceStandardJobFailedMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceStandardJobFailedMessage>(message)) {
 
           // update job state
           StandardJob *job = msg->job;
@@ -691,7 +691,7 @@ namespace wrench {
             keep_going = true;
           }
 
-        } else if (auto msg = dynamic_cast<ComputeServicePilotJobStartedMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServicePilotJobStartedMessage>(message)) {
 
           // update job state
           PilotJob *job = msg->job;
@@ -711,7 +711,7 @@ namespace wrench {
             keep_going = true;
           }
 
-        } else if (auto msg = dynamic_cast<ComputeServicePilotJobExpiredMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServicePilotJobExpiredMessage>(message)) {
 
           // update job state
           PilotJob *job = msg->job;

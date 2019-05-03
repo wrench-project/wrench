@@ -74,7 +74,7 @@ namespace wrench {
 
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("start_vm");
 
-        std::unique_ptr<SimulationMessage> answer_message = sendRequest(
+        std::shared_ptr<SimulationMessage> answer_message = sendRequest(
                 answer_mailbox,
                 new CloudComputeServiceStartVMRequestMessage(
                         answer_mailbox, vm_name, pm_name,
@@ -108,7 +108,7 @@ namespace wrench {
         // send a "migrate vm" message to the daemon's mailbox_name
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("migrate_vm");
 
-        std::unique_ptr<SimulationMessage> answer_message = sendRequest(
+        std::shared_ptr<SimulationMessage> answer_message = sendRequest(
                 answer_mailbox,
                 new VirtualizedClusterComputeServiceMigrateVMRequestMessage(
                         answer_mailbox, vm_name, dest_pm_hostname,
@@ -158,7 +158,7 @@ namespace wrench {
         S4U_Simulation::computeZeroFlop();
 
         // Wait for a message
-        std::unique_ptr<SimulationMessage> message;
+        std::shared_ptr<SimulationMessage> message;
 
         try {
             message = S4U_Mailbox::getMessage(this->mailbox_name);
@@ -173,7 +173,7 @@ namespace wrench {
 
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
 
-        if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+        if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
             this->stopAllVMs();
             // This is Synchronous
             try {
@@ -185,47 +185,47 @@ namespace wrench {
             }
             return false;
 
-        } else if (auto msg = dynamic_cast<ComputeServiceResourceInformationRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceResourceInformationRequestMessage>(message)) {
             processGetResourceInformation(msg->answer_mailbox);
             return true;
 
-        } else if (auto msg = dynamic_cast<CloudComputeServiceGetExecutionHostsRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<CloudComputeServiceGetExecutionHostsRequestMessage>(message)) {
             processGetExecutionHosts(msg->answer_mailbox);
             return true;
 
-        } else if (auto msg = dynamic_cast<CloudComputeServiceCreateVMRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<CloudComputeServiceCreateVMRequestMessage>(message)) {
             processCreateVM(msg->answer_mailbox, msg->num_cores, msg->ram_memory, msg->property_list, msg->messagepayload_list);
             return true;
 
-        } else if (auto msg = dynamic_cast<CloudComputeServiceShutdownVMRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<CloudComputeServiceShutdownVMRequestMessage>(message)) {
             processShutdownVM(msg->answer_mailbox, msg->vm_name);
             return true;
 
-        } else if (auto msg = dynamic_cast<CloudComputeServiceStartVMRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<CloudComputeServiceStartVMRequestMessage>(message)) {
             processStartVM(msg->answer_mailbox, msg->vm_name, msg->pm_name);
             return true;
 
-        } else if (auto msg = dynamic_cast<CloudComputeServiceSuspendVMRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<CloudComputeServiceSuspendVMRequestMessage>(message)) {
             processSuspendVM(msg->answer_mailbox, msg->vm_name);
             return true;
 
-        } else if (auto msg = dynamic_cast<CloudComputeServiceResumeVMRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<CloudComputeServiceResumeVMRequestMessage>(message)) {
             processResumeVM(msg->answer_mailbox, msg->vm_name);
             return true;
 
-        } else if (auto msg = dynamic_cast<VirtualizedClusterComputeServiceMigrateVMRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<VirtualizedClusterComputeServiceMigrateVMRequestMessage>(message)) {
             processMigrateVM(msg->answer_mailbox, msg->vm_name, msg->dest_pm_hostname);
             return true;
 
-        } else if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceSubmitStandardJobRequestMessage>(message)) {
             processSubmitStandardJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
             return true;
 
-        } else if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobRequestMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceSubmitPilotJobRequestMessage>(message)) {
             processSubmitPilotJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
             return true;
 
-        } else if (auto msg = dynamic_cast<ServiceHasTerminatedMessage *>(message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<ServiceHasTerminatedMessage>(message)) {
             if (auto bmcs = dynamic_cast<BareMetalComputeService *>(msg->service)) {
                 processBareMetalComputeServiceTermination(bmcs, msg->exit_code);
             } else {
