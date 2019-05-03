@@ -79,17 +79,27 @@ namespace wrench {
          */
         template <class T>
         std::set<std::shared_ptr<T>> getAvailableComputeServices() {
-//            bool is_cloud = (std::type_index(typeid(T)) == std::type_index(typeid(CloudComputeService)));
+            bool is_cloud = (std::type_index(typeid(T)) == std::type_index(typeid(CloudComputeService)));
             std::set<std::shared_ptr<T>> to_return;
             for (auto const &h : this->compute_services) {
-                auto shared_ptr = std::dynamic_pointer_cast<T>(h);
-                if (shared_ptr) {
-                    to_return.insert(shared_ptr);
+                if (not is_cloud) {
+                    auto shared_ptr = std::dynamic_pointer_cast<T>(h);
+                    if (shared_ptr) {
+                        to_return.insert(shared_ptr);
+                    }
+                } else {
+                    auto shared_ptr_cloud = std::dynamic_pointer_cast<T>(h);
+                    auto shared_ptr_vc = std::dynamic_pointer_cast<VirtualizedClusterComputeService>(h);
+                    if (shared_ptr_cloud and (not shared_ptr_vc)) {
+                        to_return.insert(shared_ptr_cloud);
+                    }
                 }
             }
             return to_return;
         }
 
+        // The template specialization below does not compile with gcc, hence the above method!
+        
 //        /**
 //         * @brief Obtain the list of compute services available to the WMS
 //         * @tparam CloudComputeService
@@ -173,25 +183,6 @@ namespace wrench {
         virtual int main() = 0;
 
     };
-
-    /**
-     * @brief Obtain the list of compute services available to the WMS
-     * @tparam CloudComputeService
-     * @return a set of compute services
-     * @return
-     */
-    template <>
-    std::set<std::shared_ptr<CloudComputeService>> WMS::getAvailableComputeServices() {
-        std::set<std::shared_ptr<CloudComputeService>> to_return;
-        for (auto const &h : this->compute_services) {
-            auto shared_ptr_cloud = std::dynamic_pointer_cast<CloudComputeService>(h);
-            auto shared_ptr_vc = std::dynamic_pointer_cast<VirtualizedClusterComputeService>(h);
-            if (shared_ptr_cloud and (not shared_ptr_vc)) {
-                to_return.insert(shared_ptr_cloud);
-            }
-        }
-        return to_return;
-    }
 
 };
 
