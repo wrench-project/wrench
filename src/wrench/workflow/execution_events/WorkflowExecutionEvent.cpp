@@ -33,7 +33,7 @@ namespace wrench {
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
      */
-    std::unique_ptr<WorkflowExecutionEvent> WorkflowExecutionEvent::waitForNextExecutionEvent(std::string mailbox) {
+    std::shared_ptr<WorkflowExecutionEvent> WorkflowExecutionEvent::waitForNextExecutionEvent(std::string mailbox) {
       return WorkflowExecutionEvent::waitForNextExecutionEvent(mailbox, -1);
     }
 
@@ -48,7 +48,7 @@ namespace wrench {
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
      */
-    std::unique_ptr<WorkflowExecutionEvent> WorkflowExecutionEvent::waitForNextExecutionEvent(std::string mailbox, double timeout) {
+    std::shared_ptr<WorkflowExecutionEvent> WorkflowExecutionEvent::waitForNextExecutionEvent(std::string mailbox, double timeout) {
 
       // Get the message from the mailbox_name
       std::unique_ptr<SimulationMessage> message = nullptr;
@@ -68,8 +68,7 @@ namespace wrench {
           WorkflowTask::State state = state_update.second;
           task->setState(state);
         }
-        return std::unique_ptr<StandardJobCompletedEvent>(
-                new StandardJobCompletedEvent(m->job, m->compute_service));
+        return std::shared_ptr<StandardJobCompletedEvent>(new StandardJobCompletedEvent(m->job, m->compute_service));
 
       } else if (auto m = dynamic_cast<JobManagerStandardJobFailedMessage *>(message.get())) {
         // Update task states
@@ -82,25 +81,21 @@ namespace wrench {
         for (auto task : m->necessary_failure_count_increments) {
           task->incrementFailureCount();
         }
-        return std::unique_ptr<StandardJobFailedEvent>(
-                new StandardJobFailedEvent(m->job, m->compute_service, m->cause));
+        return std::shared_ptr<StandardJobFailedEvent>(new StandardJobFailedEvent(m->job, m->compute_service, m->cause));
 
       } else if (auto m = dynamic_cast<ComputeServicePilotJobStartedMessage *>(message.get())) {
-        return std::unique_ptr<PilotJobStartedEvent>(
-                new PilotJobStartedEvent(m->job, m->compute_service));
+        return std::shared_ptr<PilotJobStartedEvent>(new PilotJobStartedEvent(m->job, m->compute_service));
 
       } else if (auto m = dynamic_cast<ComputeServicePilotJobExpiredMessage *>(message.get())) {
-        return std::unique_ptr<PilotJobExpiredEvent>(
-                new PilotJobExpiredEvent(m->job, m->compute_service));
+        return std::shared_ptr<PilotJobExpiredEvent>(new PilotJobExpiredEvent(m->job, m->compute_service));
 
       } else if (auto m = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {
         if (m->success) {
-          return std::unique_ptr<FileCopyCompletedEvent>(
-                  new FileCopyCompletedEvent(m->file, m->storage_service, m->file_registry_service, m->file_registry_service_updated));
+          return std::shared_ptr<FileCopyCompletedEvent>(new FileCopyCompletedEvent(
+                  m->file, m->storage_service, m->file_registry_service, m->file_registry_service_updated));
 
         } else {
-          return std::unique_ptr<FileCopyFailedEvent>(
-                  new FileCopyFailedEvent(m->file, m->storage_service, m->failure_cause));
+          return std::shared_ptr<FileCopyFailedEvent>(new FileCopyFailedEvent(m->file, m->storage_service, m->failure_cause));
         }
       } else {
         throw std::runtime_error(

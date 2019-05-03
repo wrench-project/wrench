@@ -100,14 +100,14 @@ private:
         job_manager->submitJob(failed_job, this->test->compute_service);
         this->test->storage_service->deleteFile(this->getWorkflow()->getFileByID("small_input_file"), this->test->file_registry_service);
 
-        std::unique_ptr<wrench::WorkflowExecutionEvent> workflow_execution_event;
+        std::shared_ptr<wrench::WorkflowExecutionEvent> workflow_execution_event;
         try {
             workflow_execution_event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error("Error getting the execution event: " + e.getCause()->toString());
         }
 
-        if (not dynamic_cast<wrench::StandardJobFailedEvent*>(workflow_execution_event.get())) {
+        if (not std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(workflow_execution_event)) {
             throw std::runtime_error("Job should have failed");
         }
 

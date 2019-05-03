@@ -304,14 +304,14 @@ private:
 
 
         // Wait for a workflow execution event
-        std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+        std::shared_ptr<wrench::WorkflowExecutionEvent> event;
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
-        if (not dynamic_cast<wrench::FileCopyCompletedEvent*>(event.get())) {
+        if (not std::dynamic_pointer_cast<wrench::FileCopyCompletedEvent>(event)) {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
@@ -347,7 +347,7 @@ private:
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
-        if (auto real_event = dynamic_cast<wrench::FileCopyFailedEvent*>(event.get())) {
+        if (auto real_event = std::dynamic_pointer_cast<wrench::FileCopyFailedEvent>(event)) {
             auto cause = std::dynamic_pointer_cast<wrench::StorageServiceNotEnoughSpace>(real_event->failure_cause);
             if (not cause) {
                 throw std::runtime_error("Got expected event but unexpected failure cause: " +
@@ -373,7 +373,7 @@ private:
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
-        auto real_event = dynamic_cast<wrench::FileCopyFailedEvent*>(event.get());
+        auto real_event = std::dynamic_pointer_cast<wrench::FileCopyFailedEvent>(event);
         if (real_event) {
             auto cause = std::dynamic_pointer_cast<wrench::FileNotFound>(real_event->failure_cause);
             if (not cause) {
@@ -779,7 +779,7 @@ private:
         }
 
         // Wait for the next execution event
-        std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+        std::shared_ptr<wrench::WorkflowExecutionEvent> event;
 
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
@@ -787,7 +787,7 @@ private:
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
-        if (not dynamic_cast<wrench::FileCopyCompletedEvent*>(event.get())) {
+        if (not std::dynamic_pointer_cast<wrench::FileCopyCompletedEvent>(event)) {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
@@ -1087,7 +1087,7 @@ private:
         }
 
         // Wait for the next execution event
-        std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+        std::shared_ptr<wrench::WorkflowExecutionEvent> event;
 
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
@@ -1095,7 +1095,7 @@ private:
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
-        auto real_event = dynamic_cast<wrench::FileCopyFailedEvent*>(event.get());
+        auto real_event = std::dynamic_pointer_cast<wrench::FileCopyFailedEvent>(event);
         if (real_event) {
             auto cause = std::dynamic_pointer_cast<wrench::StorageServiceNotEnoughSpace>(real_event->failure_cause);
             if (not cause) {
@@ -1130,7 +1130,7 @@ private:
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
-        auto real_event2 = dynamic_cast<wrench::FileCopyFailedEvent*>(event.get());
+        auto real_event2 = std::dynamic_pointer_cast<wrench::FileCopyFailedEvent>(event);
         if (real_event2) {
             auto cause = std::dynamic_pointer_cast<wrench::FileNotFound>(real_event2->failure_cause);
             if (not cause) {
@@ -1166,7 +1166,7 @@ private:
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
-        auto real_event3 = dynamic_cast<wrench::FileCopyFailedEvent*>(event.get());
+        auto real_event3 = std::dynamic_pointer_cast<wrench::FileCopyFailedEvent>(event);
         if (real_event3) {
             auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(real_event3->failure_cause);
             if (not cause) {
@@ -1305,7 +1305,7 @@ private:
         }
 
         // Wait for the next execution event
-        std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+        std::shared_ptr<wrench::WorkflowExecutionEvent> event;
 
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
@@ -1313,7 +1313,7 @@ private:
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
-        if (not dynamic_cast<wrench::FileCopyCompletedEvent*>(event.get())) {
+        if (not std::dynamic_pointer_cast<wrench::FileCopyCompletedEvent>(event)) {
             throw std::runtime_error("Unexpected workflow execution event: " +event->toString());
         }
 
@@ -1333,7 +1333,7 @@ private:
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
-        if (not dynamic_cast<wrench::FileCopyCompletedEvent*>(event.get())) {
+        if (not std::dynamic_pointer_cast<wrench::FileCopyCompletedEvent>(event)) {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
@@ -1361,7 +1361,7 @@ private:
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
-        if (not dynamic_cast<wrench::FileCopyFailedEvent*>(event.get())) {
+        if (not std::dynamic_pointer_cast<wrench::FileCopyFailedEvent>(event)) {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
@@ -1380,7 +1380,7 @@ private:
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
-        if (not dynamic_cast<wrench::FileCopyCompletedEvent*>(event.get())) {
+        if (not std::dynamic_pointer_cast<wrench::FileCopyCompletedEvent>(event)) {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
@@ -1400,7 +1400,7 @@ private:
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
-        if (not dynamic_cast<wrench::FileCopyCompletedEvent*>(event.get())) {
+        if (not std::dynamic_pointer_cast<wrench::FileCopyCompletedEvent>(event)) {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
@@ -1457,7 +1457,7 @@ private:
         } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
-        if (not dynamic_cast<wrench::FileCopyCompletedEvent*>(event.get())) {
+        if (not std::dynamic_pointer_cast<wrench::FileCopyCompletedEvent>(event)) {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 

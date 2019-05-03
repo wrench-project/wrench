@@ -116,7 +116,7 @@ private:
                                                           this->test->storage_service_1,
                                                           this->test->storage_service_2);
 
-      std::unique_ptr<wrench::WorkflowExecutionEvent> event1 = this->getWorkflow()->waitForNextExecutionEvent();
+      std::shared_ptr<wrench::WorkflowExecutionEvent> event1 = this->getWorkflow()->waitForNextExecutionEvent();
       double event1_arrival = this->simulation->getCurrentSimulatedDate();
 
       // Now do 2 of them in parallel
@@ -131,10 +131,10 @@ private:
                                                           this->test->storage_service_2);
 
 
-      std::unique_ptr<wrench::WorkflowExecutionEvent> event2 = this->getWorkflow()->waitForNextExecutionEvent();
+      std::shared_ptr<wrench::WorkflowExecutionEvent> event2 = this->getWorkflow()->waitForNextExecutionEvent();
       double event2_arrival = this->simulation->getCurrentSimulatedDate();
 
-      std::unique_ptr<wrench::WorkflowExecutionEvent> event3 = this->getWorkflow()->waitForNextExecutionEvent();
+      std::shared_ptr<wrench::WorkflowExecutionEvent> event3 = this->getWorkflow()->waitForNextExecutionEvent();
       double event3_arrival = this->simulation->getCurrentSimulatedDate();
 
       double transfer_time_1 = event1_arrival - copy1_start;

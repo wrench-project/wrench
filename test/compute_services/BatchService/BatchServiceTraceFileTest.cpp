@@ -162,13 +162,13 @@ private:
         // Wait for the execution events
         for (unsigned long i=0; i < num_submitted_jobs; i++) {
             // Wait for a workflow execution event
-            std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
-            if (not dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
+            if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
                 throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
         }
@@ -395,10 +395,10 @@ private:
         for (auto job : {standard_job_2_nodes, standard_job_4_nodes}) {
             // Wait for the workflow execution event
             WRENCH_INFO("Waiting for job completion of job %s", job->getName().c_str());
-            std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
-                auto real_event = dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get());
+                auto real_event = std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event);
                 if (real_event) {
                     if (real_event->standard_job != job) {
                         throw std::runtime_error("Wrong job completion order: got " +
@@ -634,10 +634,10 @@ private:
         for (auto job : {standard_job_2_nodes}) {
             // Wait for the workflow execution event
             WRENCH_INFO("Waiting for job completion of job %s", job->getName().c_str());
-            std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
-                auto real_event = dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get());
+                auto real_event = std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event);
                 if (real_event) {
                     if (real_event->standard_job != job) {
                         throw std::runtime_error("Wrong job completion order: got " +
@@ -851,10 +851,10 @@ private:
         for (auto job : {standard_job_2_nodes, standard_job_4_nodes}) {
             // Wait for the workflow execution event
             WRENCH_INFO("Waiting for job completion of job %s", job->getName().c_str());
-            std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
-                auto real_event = dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get());
+                auto real_event = std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event);
                 if (real_event) {
                     if (real_event->standard_job != job) {
                         throw std::runtime_error("Wrong job completion order: got " +
