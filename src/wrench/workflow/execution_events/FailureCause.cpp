@@ -23,26 +23,9 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param cause: the type of the failure cause
-     */
-    FailureCause::FailureCause(CauseType cause) {
-        this->cause = cause;
-    }
-
-    /**
-     * @brief Retrieve the type of the failure cause
-     * @return
-     */
-    FailureCause::CauseType FailureCause::getCauseType() {
-        return this->cause;
-    }
-
-    /**
-     * @brief Constructor
      * @param file: the file that could not be found on any storage service
      */
-    NoStorageServiceForFile::NoStorageServiceForFile(WorkflowFile *file) : FailureCause(
-            NO_STORAGE_SERVICE_FOR_FILE) {
+    NoStorageServiceForFile::NoStorageServiceForFile(WorkflowFile *file)  {
         this->file = file;
     }
 
@@ -50,8 +33,7 @@ namespace wrench {
      * @brief Constructor
      * @param error: error message
      */
-    NoScratchSpace::NoScratchSpace(std::string error) : FailureCause(
-            NO_SCRATCH_SPACE) {
+    NoScratchSpace::NoScratchSpace(std::string error) {
         this->error = error;
     }
 
@@ -84,8 +66,7 @@ namespace wrench {
      * @param file: the file that could not be found
      * @param storage_service: the storage service on which it was not found
      */
-    FileNotFound::FileNotFound(WorkflowFile *file, std::shared_ptr<StorageService> storage_service) : FailureCause(
-            FILE_NOT_FOUND) {
+    FileNotFound::FileNotFound(WorkflowFile *file, std::shared_ptr<StorageService> storage_service) {
         this->file = file;
         this->storage_service = storage_service;
     }
@@ -120,7 +101,7 @@ namespace wrench {
      * @param storage_service:  the storage service that ran out of spacee
      */
     StorageServiceNotEnoughSpace::StorageServiceNotEnoughSpace(WorkflowFile *file, std::shared_ptr<StorageService>  storage_service)
-            : FailureCause(STORAGE_NOT_ENOUGH_SPACE) {
+             {
         this->file = file;
         this->storage_service = storage_service;
     }
@@ -154,7 +135,7 @@ namespace wrench {
      * @brief Constructor
      * @param service: the service that was down
      */
-    ServiceIsDown::ServiceIsDown(std::shared_ptr<Service> service) : FailureCause(SERVICE_DOWN) {
+    ServiceIsDown::ServiceIsDown(std::shared_ptr<Service> service) {
         this->service = service;
     }
 
@@ -178,7 +159,7 @@ namespace wrench {
      * @brief Constructor
      * @param service: the service that was suspended
      */
-    ServiceIsSuspended::ServiceIsSuspended(std::shared_ptr<Service> service) : FailureCause(SERVICE_DOWN) {
+    ServiceIsSuspended::ServiceIsSuspended(std::shared_ptr<Service> service) {
         this->service = service;
     }
 
@@ -203,8 +184,7 @@ namespace wrench {
      * @param job: the job that wasn't supported
      * @param compute_service: the compute service that did not support it
      */
-    JobTypeNotSupported::JobTypeNotSupported(WorkflowJob *job, std::shared_ptr<ComputeService>  compute_service)
-            : FailureCause(JOB_TYPE_NOT_SUPPORTED) {
+    JobTypeNotSupported::JobTypeNotSupported(WorkflowJob *job, std::shared_ptr<ComputeService>  compute_service) {
         this->job = job;
         this->compute_service = compute_service;
     }
@@ -239,8 +219,7 @@ namespace wrench {
      * @param job: the job that could not be executed (or nullptr if no job was involved)
      * @param compute_service: the compute service that didn't have enough cores or ram
      */
-    NotEnoughResources::NotEnoughResources(WorkflowJob *job, std::shared_ptr<ComputeService> compute_service) : FailureCause(
-            NOT_ENOUGH_RESOURCES) {
+    NotEnoughResources::NotEnoughResources(WorkflowJob *job, std::shared_ptr<ComputeService> compute_service) {
         this->job = job;
         this->compute_service = compute_service;
     }
@@ -279,8 +258,7 @@ namespace wrench {
     * @param job: the job that could not be executed
     * @param compute_service: the compute service that didn't have enough cores
     */
-    JobKilled::JobKilled(WorkflowJob *job, std::shared_ptr<ComputeService>  compute_service) : FailureCause(
-            JOB_KILLED) {
+    JobKilled::JobKilled(WorkflowJob *job, std::shared_ptr<ComputeService>  compute_service) {
         this->job = job;
         this->compute_service = compute_service;
     }
@@ -319,7 +297,7 @@ namespace wrench {
      */
     NetworkError::NetworkError(NetworkError::OperationType operation_type,
                                NetworkError::ErrorType error_type,
-                               std::string mailbox) : FailureCause(NETWORK_ERROR) {
+                               std::string mailbox) {
         if (mailbox.empty()) {
             throw std::invalid_argument("NetworkError::NetworkError(): invalid arguments");
         }
@@ -385,8 +363,7 @@ namespace wrench {
      *
      * @param job: the job that couldn't be terminated
      */
-    JobCannotBeTerminated::JobCannotBeTerminated(WorkflowJob *job) : FailureCause(
-            JOB_CANNOT_BE_TERMINATED) {
+    JobCannotBeTerminated::JobCannotBeTerminated(WorkflowJob *job) {
         this->job = job;
     }
 
@@ -413,8 +390,7 @@ namespace wrench {
     *
     * @param job: the job that couldn't be forgotten
     */
-    JobCannotBeForgotten::JobCannotBeForgotten(WorkflowJob *job) : FailureCause(
-            JOB_CANNOT_BE_FORGOTTEN) {
+    JobCannotBeForgotten::JobCannotBeForgotten(WorkflowJob *job) {
         this->job = job;
     }
 
@@ -478,8 +454,7 @@ namespace wrench {
      * @param storage_service:  the storage service to which is is being copied
      * @param dst_partition: the destination partition
      */
-    FileAlreadyBeingCopied::FileAlreadyBeingCopied(WorkflowFile *file, std::shared_ptr<StorageService> storage_service, std::string dst_partition)
-            : FailureCause(FILE_ALREADY_BEING_COPIED) {
+    FileAlreadyBeingCopied::FileAlreadyBeingCopied(WorkflowFile *file, std::shared_ptr<StorageService> storage_service, std::string dst_partition) {
         this->file = file;
         this->storage_service = storage_service;
         this->dst_partition = dst_partition;
@@ -524,8 +499,7 @@ namespace wrench {
      * @brief Constructor
      *
      */
-    ComputeThreadHasDied::ComputeThreadHasDied() : FailureCause(
-            COMPUTE_THREAD_HAS_DIED) {
+    ComputeThreadHasDied::ComputeThreadHasDied() {
     }
 
 
@@ -541,8 +515,7 @@ namespace wrench {
     * @brief Constructor
     *
     */
-    FatalFailure::FatalFailure() : FailureCause(
-            FATAL_FAILURE) {
+    FatalFailure::FatalFailure() {
     }
 
 
@@ -559,7 +532,7 @@ namespace wrench {
      * @param service: the service
      * @param functionality_name: a description of the functionality that's not available
      */
-    FunctionalityNotAvailable::FunctionalityNotAvailable(std::shared_ptr<Service> service, std::string functionality_name) : FailureCause(FUNCTIONALITY_NOT_AVAILABLE) {
+    FunctionalityNotAvailable::FunctionalityNotAvailable(std::shared_ptr<Service> service, std::string functionality_name) {
         this->service = service;
         this->functionality_name = std::move(functionality_name);
     }
@@ -594,8 +567,7 @@ namespace wrench {
     *
     * @param job: the job that has timed out
     */
-    JobTimeout::JobTimeout(WorkflowJob *job) : FailureCause(
-            JOB_TIMEOUT) {
+    JobTimeout::JobTimeout(WorkflowJob *job) {
         this->job = job;
     }
 
@@ -620,7 +592,7 @@ namespace wrench {
      * @brief Constructor
      * @param hostname: the name of the host that experienced the error
      */
-    HostError::HostError(std::string hostname) : FailureCause(HOST_ERROR) {
+    HostError::HostError(std::string hostname) {
         this->hostname = hostname;
     }
 
@@ -636,7 +608,7 @@ namespace wrench {
      * @param service: the service that cause the error
      * @param error_message: a custom error message
      */
-    NotAllowed::NotAllowed(std::shared_ptr<Service>  service, std::string &error_message) : FailureCause(NOT_ALLOWED) {
+    NotAllowed::NotAllowed(std::shared_ptr<Service>  service, std::string &error_message) {
         this->service = service;
         this->error_message = error_message;
     }

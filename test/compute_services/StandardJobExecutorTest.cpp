@@ -777,17 +777,17 @@ private:
                 throw std::runtime_error("Unexpected '" + message->getName() + "' message");
             }
 
-            if (msg->cause->getCauseType() != wrench::FailureCause::FILE_NOT_FOUND) {
-                throw std::runtime_error("Unexpected failure cause type " +
-                                         std::to_string(msg->cause->getCauseType()) + " (" + msg->cause->toString() + ")");
+            auto cause = std::dynamic_pointer_cast<wrench::FileNotFound>(msg->cause);
+            if (not cause) {
+                throw std::runtime_error("Unexpected failure cause:  " +
+                                         cause->toString() + " (expected: FileNotFound)");
             }
 
-            auto real_cause = (wrench::FileNotFound *) msg->cause.get();
-            if (real_cause->getFile() != this->getWorkflow()->getFileByID("input_file")) {
+            if (cause->getFile() != this->getWorkflow()->getFileByID("input_file")) {
                 throw std::runtime_error(
                         "Got the expected 'file not found' exception, but the failure cause does not point to the correct file");
             }
-            if (real_cause->getStorageService() != this->test->storage_service2) {
+            if (cause->getStorageService() != this->test->storage_service2) {
                 throw std::runtime_error(
                         "Got the expected 'file not found' exception, but the failure cause does not point to the correct storage service");
             }
@@ -956,18 +956,18 @@ private:
                 throw std::runtime_error("Unexpected '" + message->getName() + "' message");
             }
 
-            if (msg->cause->getCauseType() != wrench::FailureCause::FILE_NOT_FOUND) {
-                throw std::runtime_error("Unexpected failure cause type " +
-                                         std::to_string(msg->cause->getCauseType()) + " (" + msg->cause->toString() + ")");
+            auto cause = std::dynamic_pointer_cast<wrench::FileNotFound>(msg->cause);
+            if (not cause) {
+                throw std::runtime_error("Unexpected failure cause type: " +
+                                         cause->toString() + " (expected: FileNotFound)");
             }
 
-            wrench::FileNotFound *real_cause = (wrench::FileNotFound *) msg->cause.get();
-            std::string error_msg = real_cause->toString();
-            if (real_cause->getFile() != this->getWorkflow()->getFileByID("input_file")) {
+            std::string error_msg = cause->toString();
+            if (cause->getFile() != this->getWorkflow()->getFileByID("input_file")) {
                 throw std::runtime_error(
                         "Got the expected 'file not found' exception, but the failure cause does not point to the correct file");
             }
-            if (real_cause->getStorageService() != this->test->storage_service2) {
+            if (cause->getStorageService() != this->test->storage_service2) {
                 throw std::runtime_error(
                         "Got the expected 'file not found' exception, but the failure cause does not point to the correct storage service");
             }

@@ -224,7 +224,8 @@ private:
                     try {
                         this->test->cloud_service->startVM(vm.first);
                     } catch (wrench::WorkflowExecutionException &e) {
-                        if (e.getCause()->getCauseType() == wrench::FailureCause::NOT_ENOUGH_RESOURCES) {
+                        auto cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
+                        if (cause) {
                             // oh well
 //                            WRENCH_INFO("Cannot start VM");
                         } else {

@@ -38,6 +38,7 @@ namespace wrench {
 
     public:
 
+#if 0
         /** @brief Types of failure causes */
         enum CauseType {
             /** @brief Unknown cause */
@@ -84,8 +85,10 @@ namespace wrench {
                     NOT_ALLOWED
 
         };
+#endif
 
-        explicit FailureCause(CauseType cause);
+//        explicit FailureCause(CauseType cause);
+        FailureCause() = default;
 
         /***********************/
         /** \cond INTERNAL     */
@@ -103,10 +106,10 @@ namespace wrench {
          */
         virtual std::string toString() = 0;
 
-        CauseType getCauseType();
+//        CauseType getCauseType();
 
-    private:
-        CauseType cause;
+//    private:
+//        CauseType cause;
     };
 
 
