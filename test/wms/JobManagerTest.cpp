@@ -439,14 +439,8 @@ private:
             throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
 
-        switch (event->type) {
-            case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-                // success, do nothing
-                break;
-            }
-            default: {
-                throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
-            }
+        if (not dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
+            throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
 

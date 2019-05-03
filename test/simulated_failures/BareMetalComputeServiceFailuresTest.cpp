@@ -128,7 +128,7 @@ private:
 
         // Wait for a workflow execution event
         std::unique_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
-        if (event->type != wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION) {
+        if (not dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
             throw std::runtime_error("Unexpected workflow execution event!");
         }
 
@@ -136,8 +136,6 @@ private:
         if (!this->test->storage_service->lookupFile(this->test->output_file, nullptr)) {
             throw std::runtime_error("Output file not written to storage service");
         }
-
-
 
         return 0;
     }
@@ -242,7 +240,7 @@ private:
 
         // Wait for a workflow execution event
         std::unique_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
-        if (event->type != wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION) {
+        if (not dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
             throw std::runtime_error("Unexpected workflow execution event!");
         }
 
@@ -368,7 +366,7 @@ private:
 
             // Wait for a workflow execution event
             std::unique_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
-            if (event->type != wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION) {
+            if (not dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
                 throw std::runtime_error("Unexpected workflow execution event!");
             }
 
@@ -446,8 +444,8 @@ class BareMetalComputeServiceFailureOnServiceThatTerminatesWhenAllItsResourcesAr
 
 public:
     BareMetalComputeServiceFailureOnServiceThatTerminatesWhenAllItsResourcesAreDownTestWMS(BareMetalComputeServiceSimulatedFailuresTest *test,
-                                                                             std::string &hostname, std::shared_ptr<wrench::ComputeService> cs,
-                                                                             std::shared_ptr<wrench::StorageService> ss) :
+                                                                                           std::string &hostname, std::shared_ptr<wrench::ComputeService> cs,
+                                                                                           std::shared_ptr<wrench::StorageService> ss) :
             wrench::WMS(nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -476,7 +474,7 @@ private:
 
         // Wait for a workflow execution event
         std::unique_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
-        if (event->type != wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE) {
+        if (not dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())) {
             throw std::runtime_error("Unexpected workflow execution event!");
         }
 

@@ -434,14 +434,8 @@ private:
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
-            switch (event->type) {
-                case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-                    // success, do nothing for now
-                    break;
-                }
-                default: {
-                    throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
-                }
+            if (not dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
+                throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
             this->getWorkflow()->removeTask(task);
 
@@ -608,18 +602,15 @@ private:
             std::unique_ptr<wrench::WorkflowExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
-                switch (event->type) {
-                    case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-                        if (dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())->standard_job != job) {
-                            throw std::runtime_error("Wrong job completion order: got " +
-                                                     dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())->standard_job->getName() + " but expected " + job->getName());
-                        }
-                        break;
+                auto real_event = dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get());
+                if (real_event) {
+                    if (real_event->standard_job != job) {
+                        throw std::runtime_error("Wrong job completion order: got " +
+                                                 real_event->standard_job->getName() + " but expected " + job->getName());
                     }
-                    default: {
-                        throw std::runtime_error(
-                                "Unexpected workflow execution event: " + std::to_string((int) (event->type)));
-                    }
+                } else {
+                    throw std::runtime_error(
+                            "Unexpected workflow execution event: " + event->toString());
                 }
             } catch (wrench::WorkflowExecutionException &e) {
                 //ignore (network error or something)
@@ -692,8 +683,8 @@ void BatchServiceTest::do_TwoStandardJobSubmissionTest_test() {
     ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
 
     // Create two workflow files
-    wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
-    wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
+    auto input_file = this->workflow->addFile("input_file", 10000.0);
+    auto output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
@@ -758,15 +749,8 @@ private:
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
-            switch (event->type) {
-                case wrench::WorkflowExecutionEvent::PILOT_JOB_START: {
-                    //std::cout<<"Got the pilot job started message\n";
-                    // success, do nothing for now
-                    break;
-                }
-                default: {
-                    throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
-                }
+            if (not dynamic_cast<wrench::PilotJobStartedEvent*>(event.get())) {
+                throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
 
             try {
@@ -774,14 +758,8 @@ private:
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
-            switch (event->type) {
-                case wrench::WorkflowExecutionEvent::PILOT_JOB_EXPIRATION: {
-                    // success, do nothing for now
-                    break;
-                }
-                default: {
-                    throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
-                }
+            if (not dynamic_cast<wrench::PilotJobExpiredEvent*>(event.get())) {
+                throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
         }
 
@@ -796,7 +774,7 @@ TEST_F(BatchServiceTest, OnePilotJobSubmissionTest) {
 void BatchServiceTest::do_PilotJobTaskTest_test() {
 
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("batch_service_test");
@@ -919,14 +897,8 @@ private:
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
-            switch (event->type) {
-                case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-                    // success, do nothing for now
-                    break;
-                }
-                default: {
-                    throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
-                }
+            if (not dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
+                throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
             this->getWorkflow()->removeTask(task);
         }
@@ -956,14 +928,8 @@ private:
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
-            switch (event->type) {
-                case wrench::WorkflowExecutionEvent::PILOT_JOB_START: {
-                    // success, do nothing for now
-                    break;
-                }
-                default: {
-                    throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
-                }
+            if (not dynamic_cast<wrench::PilotJobStartedEvent*>(event.get())) {
+                throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
 
             try {
@@ -971,14 +937,8 @@ private:
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
-            switch (event->type) {
-                case wrench::WorkflowExecutionEvent::PILOT_JOB_EXPIRATION: {
-                    // success, do nothing for now
-                    break;
-                }
-                default: {
-                    throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
-                }
+            if (not dynamic_cast<wrench::PilotJobExpiredEvent*>(event.get())) {
+                throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
         }
 
@@ -1371,25 +1331,20 @@ private:
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
-            switch (event->type) {
-                case wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
-                    auto real_event = dynamic_cast<wrench::StandardJobFailedEvent*>(event.get());
-                    auto cause = std::dynamic_pointer_cast<wrench::JobTimeout>(real_event->failure_cause);
-                    if (not cause) {
-                        throw std::runtime_error("Expected event, but unexpected failure cause: " +
-                                                 real_event->failure_cause->toString() + " (expected: JobTimeout)");
-                    }
-                    if (cause->getJob() != job) {
-                        throw std::runtime_error("Expected JobTimeout failure cause does not point to expected job");
-                    }
-                    cause->toString(); // for coverage
-
-                    // success, do nothing for now
-                    break;
+            auto real_event = dynamic_cast<wrench::StandardJobFailedEvent*>(event.get());
+            if (real_event) {
+                auto cause = std::dynamic_pointer_cast<wrench::JobTimeout>(real_event->failure_cause);
+                if (not cause) {
+                    throw std::runtime_error("Expected event, but unexpected failure cause: " +
+                                             real_event->failure_cause->toString() + " (expected: JobTimeout)");
                 }
-                default: {
-                    throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+                if (cause->getJob() != job) {
+                    throw std::runtime_error("Expected JobTimeout failure cause does not point to expected job");
                 }
+                cause->toString(); // for coverage
+                // success, do nothing for now
+            } else {
+                throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
             this->getWorkflow()->removeTask(task);
         }
@@ -1510,14 +1465,8 @@ private:
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
-            switch (event->type) {
-                case wrench::WorkflowExecutionEvent::PILOT_JOB_START: {
-                    // success, do nothing for now
-                    break;
-                }
-                default: {
-                    throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
-                }
+            if (not dynamic_cast<wrench::PilotJobStartedEvent*>(event.get())) {
+                throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
 
             try {
@@ -1525,14 +1474,9 @@ private:
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
-            switch (event->type) {
-                case wrench::WorkflowExecutionEvent::PILOT_JOB_EXPIRATION: {
-                    // success, do nothing for now
-                    break;
-                }
-                default: {
-                    throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
-                }
+
+            if (not dynamic_cast<wrench::PilotJobExpiredEvent*>(event.get())) {
+                throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
         }
 
@@ -1728,15 +1672,8 @@ private:
                 } catch (wrench::WorkflowExecutionException &e) {
                     throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
                 }
-                switch (event->type) {
-                    case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-                        // success, do nothing for now
-                        break;
-                    }
-                    default: {
-                        throw std::runtime_error(
-                                "Unexpected workflow execution event: " + std::to_string((int) (event->type)));
-                    }
+                if (not dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
+                    throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
                 }
                 num_events++;
             }
@@ -1895,14 +1832,8 @@ private:
                 } catch (wrench::WorkflowExecutionException &e) {
                     throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
                 }
-                switch (event->type) {
-                    case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-                        break;
-                    }
-                    default: {
-                        throw std::runtime_error(
-                                "Unexpected workflow execution event: " + std::to_string((int) (event->type)));
-                    }
+                if (not dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
+                    throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
                 }
                 num_events++;
             }
@@ -2109,14 +2040,8 @@ private:
                 } catch (wrench::WorkflowExecutionException &e) {
                     throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
                 }
-                switch (event->type) {
-                    case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-                        break;
-                    }
-                    default: {
-                        throw std::runtime_error(
-                                "Unexpected workflow execution event: " + std::to_string((int) (event->type)));
-                    }
+                if (not dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
+                    throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
                 }
                 num_events++;
             }
@@ -2179,14 +2104,8 @@ private:
                 } catch (wrench::WorkflowExecutionException &e) {
                     throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
                 }
-                switch (event->type) {
-                    case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-                        break;
-                    }
-                    default: {
-                        throw std::runtime_error(
-                                "Unexpected workflow execution event: " + std::to_string((int) (event->type)));
-                    }
+                if (not dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
+                    throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
                 }
                 num_events++;
             }
@@ -2343,14 +2262,8 @@ private:
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
-            switch (event->type) {
-                case wrench::WorkflowExecutionEvent::PILOT_JOB_START: {
-                    // success, do nothing for now
-                    break;
-                }
-                default: {
-                    throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
-                }
+            if (not dynamic_cast<wrench::PilotJobStartedEvent*>(event.get())) {
+                throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
 
             // Create a StandardJob with some pre-copies and post-deletions
@@ -2379,28 +2292,24 @@ private:
                 throw std::runtime_error(
                         "Error while getting and execution event: " + e.getCause()->toString());
             }
-            switch (event->type) {
-                case wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
-                    auto real_event = dynamic_cast<wrench::StandardJobFailedEvent*>(event.get());
-                    auto cause = std::dynamic_pointer_cast<wrench::JobKilled>(real_event->failure_cause);
-                    if (not cause) {
-                        throw std::runtime_error("Got a job failure event but unexpected failure cause: " +
-                                                 real_event->failure_cause->toString() + " (expected: JobKilled)");
-                    }
-                    std::string error_msg = cause->toString();
-                    if (cause->getComputeService() != this->test->compute_service) {
-                        std::runtime_error(
-                                "Got the correct failure even, a correct cause type, but the cause points to the wrong service");
-                    }
-                    if (cause->getJob() != job) {
-                        std::runtime_error(
-                                "Got the correct failure even, a correct cause type, but the cause points to the wrong job");
-                    }
-                    break;
+            auto real_event = dynamic_cast<wrench::StandardJobFailedEvent*>(event.get());
+            if (real_event) {
+                auto cause = std::dynamic_pointer_cast<wrench::JobKilled>(real_event->failure_cause);
+                if (not cause) {
+                    throw std::runtime_error("Got a job failure event but unexpected failure cause: " +
+                                             real_event->failure_cause->toString() + " (expected: JobKilled)");
                 }
-                default: {
-                    throw std::runtime_error("Unexpected workflow execution event: " + std::to_string(event->type));
+                std::string error_msg = cause->toString();
+                if (cause->getComputeService() != this->test->compute_service) {
+                    std::runtime_error(
+                            "Got the correct failure even, a correct cause type, but the cause points to the wrong service");
                 }
+                if (cause->getJob() != job) {
+                    std::runtime_error(
+                            "Got the correct failure even, a correct cause type, but the cause points to the wrong job");
+                }
+            } else {
+                throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
 
             this->getWorkflow()->removeTask(task);
@@ -2526,14 +2435,8 @@ private:
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
-            switch (event->type) {
-                case wrench::WorkflowExecutionEvent::PILOT_JOB_START: {
-                    // success, do nothing for now
-                    break;
-                }
-                default: {
-                    throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
-                }
+            if (not dynamic_cast<wrench::PilotJobStartedEvent*>(event.get())) {
+                    throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
 
             // Create a StandardJob with some pre-copies and post-deletions
@@ -2566,13 +2469,8 @@ private:
                 throw std::runtime_error(
                         "Error while getting and execution event: " + e.getCause()->toString());
             }
-            switch (event->type) {
-                case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-                    break;
-                }
-                default: {
-                    throw std::runtime_error("Unexpected workflow execution event: " + std::to_string(event->type));
-                }
+            if (not dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
+                throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
 
             this->getWorkflow()->removeTask(task);
@@ -2700,14 +2598,8 @@ private:
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
-            switch (event->type) {
-                case wrench::WorkflowExecutionEvent::PILOT_JOB_START: {
-                    // success, do nothing for now
-                    break;
-                }
-                default: {
-                    throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
-                }
+            if (not dynamic_cast<wrench::PilotJobStartedEvent*>(event.get())) {
+                throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
 
 
@@ -2867,15 +2759,8 @@ private:
                 } catch (wrench::WorkflowExecutionException &e) {
                     throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
                 }
-                switch (event->type) {
-                    case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-                        // success, do nothing for now
-                        break;
-                    }
-                    default: {
-                        throw std::runtime_error(
-                                "Unexpected workflow execution event: " + std::to_string((int) (event->type)));
-                    }
+                if (not dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
+                    throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
                 }
             }
 
@@ -3018,14 +2903,8 @@ private:
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
-            switch (event->type) {
-                case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-                    // success, do nothing for now
-                    break;
-                }
-                default: {
-                    throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
-                }
+            if (not dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
+                throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
             this->getWorkflow()->removeTask(task);
         }
@@ -3173,14 +3052,8 @@ private:
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
-            switch (event->type) {
-                case wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
-                    break;
-                }
-                default: {
-                    throw std::runtime_error("Should have received a STANDARD_JOB_FAILURE event (received " +
-                                             std::to_string((int) (event->type)));
-                }
+            if (not dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())) {
+                throw std::runtime_error("Should have received a STANDARD_JOB_FAILURE event (received " + event->toString());
             }
 
             auto real_event = dynamic_cast<wrench::StandardJobFailedEvent*>(event.get());

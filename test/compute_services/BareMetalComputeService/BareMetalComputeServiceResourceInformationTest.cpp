@@ -196,8 +196,8 @@ private:
       }
 
       // Wait for the workflow execution event
-      std::unique_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
-      if (event->type != wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION) {
+      auto event = this->getWorkflow()->waitForNextExecutionEvent();
+      if (not dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())) {
         throw std::runtime_error("Unexpected workflow execution event!");
       }
 
