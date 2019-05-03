@@ -377,109 +377,84 @@ namespace wrench {
     }
 
     /**
-     * @brief Add a ComputeService to the simulation. The simulation takes ownership of
-     *        the reference and will call the destructor.
+     * @brief Add a ComputeService to the simulation.
      *
      * @param service: a compute service
      *
-     * @return the ComputeService
-     *
      * @throw std::invalid_argument
-     * @throw std::runtime_error
      */
-    std::shared_ptr<ComputeService> Simulation::add(ComputeService *service) {
+    void Simulation::addService(std::shared_ptr<ComputeService> service) {
         if (service == nullptr) {
-            throw std::invalid_argument("Simulation::add(): invalid argument (nullptr service)");
+            throw std::invalid_argument("Simulation::addService(): invalid argument (nullptr service)");
         }
         service->simulation = this;
-        auto shared_ptr = std::shared_ptr<ComputeService>(service);
-        this->compute_services.insert(shared_ptr);
-        return shared_ptr;
+        this->compute_services.insert(service);
     }
 
     /**
-     * @brief Add a NetworkProximityService to the simulation. The simulation takes ownership of
-     *        the reference and will call the destructor.
+     * @brief Add a NetworkProximityService to the simulation.
      *
      * @param service: a network proximity service
      *
-     * @return the NetworkProximityService
-     *
      * @throw std::invalid_argument
-     * @throw std::runtime_error
      */
-    std::shared_ptr<NetworkProximityService> Simulation::add(NetworkProximityService *service) {
+    void Simulation::addService(std::shared_ptr<NetworkProximityService> service) {
         if (service == nullptr) {
-            throw std::invalid_argument("Simulation::add(): invalid argument (nullptr service)");
+            throw std::invalid_argument("Simulation::addService(): invalid argument (nullptr service)");
         }
         service->simulation = this;
-        auto shared_ptr = std::shared_ptr<NetworkProximityService>(service);
-        this->network_proximity_services.insert(shared_ptr);
-        return shared_ptr;
+        this->network_proximity_services.insert(service);
     }
 
-
     /**
-    * @brief Add a StorageService to the simulation. The simulation takes ownership of
-     *        the reference and will call the destructor.
+    * @brief Add a StorageService to the simulation.
     *
     * @param service: a storage service
-     *
-     * @return the StorageService
-     *
+    *
     * @throw std::invalid_argument
-    * @throw std::runtime_error
     */
-    std::shared_ptr<StorageService> Simulation::add(StorageService *service) {
+    void Simulation::addService(std::shared_ptr<StorageService> service) {
         if (service == nullptr) {
-            throw std::invalid_argument("Simulation::add(): invalid argument (nullptr service)");
+            throw std::invalid_argument("Simulation::addService(): invalid argument (nullptr service)");
         }
         service->simulation = this;
-        auto shared_ptr = std::shared_ptr<StorageService>(service);
-        this->storage_services.insert(shared_ptr);
-        return shared_ptr;
+        this->storage_services.insert(service);
     }
 
-    /**
-     * @brief Add a WMS for the simulation. The simulation takes ownership of
-     *        the reference and will call the destructor.
-     *
-     * @param wms: a WMS
-     *
-     * @return the WMS
-     *
-     * @throw std::invalid_argument
-     * @throw std::runtime_error
-     */
-    std::shared_ptr<WMS> Simulation::add(WMS *wms) {
-        if (wms == nullptr) {
-            throw std::invalid_argument("Simulation::add(): invalid argument (nullptr wms)");
-        }
-        wms->simulation = this;
-        auto shared_ptr = std::shared_ptr<WMS>(wms);
-        this->wmses.insert(shared_ptr);
-        return shared_ptr;
-    }
 
     /**
-     * @brief Set a FileRegistryService for the simulation. The simulation takes ownership of
-     *        the reference and will call the destructor.
-     *
-     * @param file_registry_service: a file registry service
-     *
-     * @return the FileRegistryService
-     *
-     * @throw std::invalid_argument
-     */
-    std::shared_ptr<FileRegistryService> Simulation::add(FileRegistryService *file_registry_service) {
-        if (file_registry_service == nullptr) {
-            throw std::invalid_argument("Simulation::add(): invalid arguments");
+   * @brief Add a WMS to the simulation.
+   *
+   * @param service: a WMS
+   *
+   * @throw std::invalid_argument
+   */
+    void Simulation::addService(std::shared_ptr<WMS> service) {
+        if (service == nullptr) {
+            throw std::invalid_argument("Simulation::addService(): invalid argument (nullptr service)");
         }
-        file_registry_service->simulation = this;
-        auto shared_ptr = std::shared_ptr<FileRegistryService>(file_registry_service);
-        this->file_registry_services.insert(shared_ptr);
-        return shared_ptr;
+        service->simulation = this;
+        this->wmses.insert(service);
     }
+
+
+    /**
+      * @brief Add a FileRegistryService to the simulation.
+      *
+      * @param service: a file registry service
+      *
+      * @throw std::invalid_argument
+      */
+    void Simulation::addService(std::shared_ptr<FileRegistryService> service) {
+        if (service == nullptr) {
+            throw std::invalid_argument("Simulation::addService(): invalid argument (nullptr service)");
+        }
+        service->simulation = this;
+        this->file_registry_services.insert(service);
+    }
+
+
+
 
     /**
         * @brief Stage a copy of a file on a storage service (to the "/" partition)

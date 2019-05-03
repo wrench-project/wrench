@@ -37,7 +37,9 @@ namespace wrench {
 
 
     /**
-     * @brief A class that provides basic simulation methods
+     * @brief A class that provides basic simulation methods.  Once the simulation object has been
+     *        explicitly or implicitly destroyed, then any call to the WRENCH APIs has undefied behavior (due
+     *        to memory being de-allocated).
      */
     class Simulation {
 
@@ -59,11 +61,18 @@ namespace wrench {
 
         void launch();
 
-        std::shared_ptr<ComputeService> add(ComputeService *);
-        std::shared_ptr<StorageService> add(StorageService *);
-        std::shared_ptr<NetworkProximityService> add(NetworkProximityService *);
-        std::shared_ptr<WMS> add(WMS *);
-        std::shared_ptr<FileRegistryService> add(FileRegistryService *);
+        template <class T>
+        std::shared_ptr<T> add(T *t) {
+            auto s = std::shared_ptr<T>(t);
+            this->addService(s);
+            return s;
+        }
+
+        void addService(std::shared_ptr<ComputeService> service);
+        void addService(std::shared_ptr<StorageService> service);
+        void addService(std::shared_ptr<NetworkProximityService> service);
+        void addService(std::shared_ptr<WMS> service);
+        void addService(std::shared_ptr<FileRegistryService> service);
 
         void stageFile(WorkflowFile *file, std::shared_ptr<StorageService> storage_service);
         void stageFile(WorkflowFile *file, std::shared_ptr<StorageService> storage_service, std::string partition);
