@@ -111,6 +111,11 @@ namespace wrench {
          */
         double network_timeout = 30.0;
 
+        /**
+         * @brief Method to retrieve the shared_ptr to a service
+         * @tparam T: the class of the service (the base class is Service)
+         * @return a shared pointer
+         */
         template <class T>
         std::shared_ptr<T> getSharedPtr() {
             if (Service::service_shared_ptr_map.find(this) == Service::service_shared_ptr_map.end()) {
