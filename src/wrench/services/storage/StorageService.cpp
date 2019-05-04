@@ -362,7 +362,7 @@ namespace wrench {
           throw WorkflowExecutionException(cause);
         }
 
-        if (auto file_content_msg = dynamic_cast<StorageServiceFileContentMessage *>(file_content_message.get())) {
+        if (auto file_content_msg = std::dynamic_pointer_cast<StorageServiceFileContentMessage>(file_content_message)) {
           // do nothing
         } else {
           throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +

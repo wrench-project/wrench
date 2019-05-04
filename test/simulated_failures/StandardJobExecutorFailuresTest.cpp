@@ -154,7 +154,7 @@ private:
         }
 
         // Did we get the expected message?
-        auto msg = dynamic_cast<wrench::StandardJobExecutorDoneMessage *>(message.get());
+        auto msg = std::dynamic_pointer_cast<wrench::StandardJobExecutorDoneMessage>(message);
         if (!msg) {
             throw std::runtime_error("Unexpected '" + message->getName() + "' message");
         }
@@ -285,7 +285,7 @@ private:
         }
 
         // Did we get the expected message?
-        auto msg = dynamic_cast<wrench::StandardJobExecutorDoneMessage *>(message.get());
+        auto msg = std::dynamic_pointer_cast<wrench::StandardJobExecutorDoneMessage>(message);
         if (!msg) {
             throw std::runtime_error("Unexpected '" + message->getName() + "' message");
         }
@@ -432,7 +432,7 @@ private:
             }
 
             // Did we get the expected message?
-            auto msg = dynamic_cast<wrench::StandardJobExecutorDoneMessage *>(message.get());
+            auto msg = std::dynamic_pointer_cast<wrench::StandardJobExecutorDoneMessage>(message);
             if (!msg) {
                 throw std::runtime_error("Unexpected '" + message->getName() + "' message");
             }

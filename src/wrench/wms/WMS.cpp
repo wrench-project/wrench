@@ -130,8 +130,6 @@ namespace wrench {
         }
     }
 
-
-
     /**
     * @brief Obtain the list of storage services available to the WMS
     *

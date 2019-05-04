@@ -56,16 +56,16 @@ protected:
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"FailedHost\" speed=\"1f\" core=\"1\"/> "
                           "       <host id=\"FailedHostTrace\" speed=\"1f\" state_file=\""+trace_file_name+"\"  core=\"1\"/> "
-                          "       <host id=\"StableHost\" speed=\"1f\" core=\"1\"/> "
-                          "       <link id=\"link1\" bandwidth=\"100kBps\" latency=\"0\"/>"
-                          "       <route src=\"FailedHost\" dst=\"StableHost\">"
-                          "           <link_ctn id=\"link1\"/>"
-                          "       </route>"
-                          "       <route src=\"FailedHostTrace\" dst=\"StableHost\">"
-                          "           <link_ctn id=\"link1\"/>"
-                          "       </route>"
-                          "   </zone> "
-                          "</platform>";
+                                                                                                           "       <host id=\"StableHost\" speed=\"1f\" core=\"1\"/> "
+                                                                                                           "       <link id=\"link1\" bandwidth=\"100kBps\" latency=\"0\"/>"
+                                                                                                           "       <route src=\"FailedHost\" dst=\"StableHost\">"
+                                                                                                           "           <link_ctn id=\"link1\"/>"
+                                                                                                           "       </route>"
+                                                                                                           "       <route src=\"FailedHostTrace\" dst=\"StableHost\">"
+                                                                                                           "           <link_ctn id=\"link1\"/>"
+                                                                                                           "       </route>"
+                                                                                                           "   </zone> "
+                                                                                                           "</platform>";
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
@@ -83,7 +83,7 @@ class StartServiceOnDownHostTestWMS : public wrench::WMS {
 
 public:
     StartServiceOnDownHostTestWMS(SimulatedFailuresTest *test,
-                          std::string &hostname) :
+                                  std::string &hostname) :
             wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -159,7 +159,7 @@ class ServiceRestartTestWMS : public wrench::WMS {
 
 public:
     ServiceRestartTestWMS(SimulatedFailuresTest *test,
-                              std::string &hostname) :
+                          std::string &hostname) :
             wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -193,13 +193,11 @@ private:
             throw std::runtime_error("Network error while getting a message!" + cause->toString());
         }
 
-        if (dynamic_cast<wrench::ServiceTTLExpiredMessage *>(message.get())) {
-            // All good
-        } else {
+        if (not std::dynamic_pointer_cast<wrench::ServiceTTLExpiredMessage>(message)) {
             throw std::runtime_error("Unexpected " + message->getName() + " message");
         }
 
-	return 0;
+        return 0;
     }
 };
 

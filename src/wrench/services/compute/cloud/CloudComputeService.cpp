@@ -98,7 +98,7 @@ namespace wrench {
                         this->getMessagePayloadValue(
                                 CloudComputeServiceMessagePayload::GET_EXECUTION_HOSTS_REQUEST_MESSAGE_PAYLOAD)));
 
-        if (auto msg = dynamic_cast<CloudComputeServiceGetExecutionHostsAnswerMessage *>(answer_message.get())) {
+        if (auto msg = std::dynamic_pointer_cast<CloudComputeServiceGetExecutionHostsAnswerMessage>(answer_message)) {
             return msg->execution_hosts;
         } else {
             throw std::runtime_error(
@@ -145,7 +145,7 @@ namespace wrench {
                         this->getMessagePayloadValue(
                                 CloudComputeServiceMessagePayload::CREATE_VM_REQUEST_MESSAGE_PAYLOAD)));
 
-        if (auto msg = dynamic_cast<CloudComputeServiceCreateVMAnswerMessage *>(answer_message.get())) {
+        if (auto msg = std::dynamic_pointer_cast<CloudComputeServiceCreateVMAnswerMessage>(answer_message)) {
             if (not msg->success) {
                 throw WorkflowExecutionException(msg->failure_cause);
             } else {
@@ -182,7 +182,7 @@ namespace wrench {
                         this->getMessagePayloadValue(
                                 CloudComputeServiceMessagePayload::SHUTDOWN_VM_REQUEST_MESSAGE_PAYLOAD)));
 
-        if (auto msg = dynamic_cast<CloudComputeServiceShutdownVMAnswerMessage *>(answer_message.get())) {
+        if (auto msg = std::dynamic_pointer_cast<CloudComputeServiceShutdownVMAnswerMessage>(answer_message)) {
             if (not msg->success) {
                 throw WorkflowExecutionException(msg->failure_cause);
             }
@@ -220,7 +220,7 @@ namespace wrench {
                         this->getMessagePayloadValue(
                                 CloudComputeServiceMessagePayload::START_VM_REQUEST_MESSAGE_PAYLOAD)));
 
-        if (auto msg = dynamic_cast<CloudComputeServiceStartVMAnswerMessage *>(answer_message.get())) {
+        if (auto msg = std::dynamic_pointer_cast<CloudComputeServiceStartVMAnswerMessage>(answer_message)) {
             if (not msg->success) {
                 throw WorkflowExecutionException(msg->failure_cause);
             }
@@ -256,7 +256,7 @@ namespace wrench {
                         this->getMessagePayloadValue(
                                 CloudComputeServiceMessagePayload::SUSPEND_VM_REQUEST_MESSAGE_PAYLOAD)));
 
-        if (auto msg = dynamic_cast<CloudComputeServiceSuspendVMAnswerMessage *>(answer_message.get())) {
+        if (auto msg = std::dynamic_pointer_cast<CloudComputeServiceSuspendVMAnswerMessage>(answer_message)) {
             if (not msg->success) {
                 throw WorkflowExecutionException(msg->failure_cause);
             }
@@ -292,7 +292,7 @@ namespace wrench {
                         this->getMessagePayloadValue(
                                 CloudComputeServiceMessagePayload::RESUME_VM_REQUEST_MESSAGE_PAYLOAD)));
 
-        if (auto msg = dynamic_cast<CloudComputeServiceResumeVMAnswerMessage *>(answer_message.get())) {
+        if (auto msg = std::dynamic_pointer_cast<CloudComputeServiceResumeVMAnswerMessage>(answer_message)) {
             if (not msg->success) {
                 throw WorkflowExecutionException(msg->failure_cause);
             }
@@ -329,7 +329,7 @@ namespace wrench {
                         this->getMessagePayloadValue(
                                 CloudComputeServiceMessagePayload::DESTROY_VM_REQUEST_MESSAGE_PAYLOAD)));
 
-        if (auto msg = dynamic_cast<CloudComputeServiceDestroyVMAnswerMessage *>(answer_message.get())) {
+        if (auto msg = std::dynamic_pointer_cast<CloudComputeServiceDestroyVMAnswerMessage>(answer_message)) {
             if (not msg->success) {
                 throw WorkflowExecutionException(msg->failure_cause);
             }
@@ -374,7 +374,7 @@ namespace wrench {
                         this->getMessagePayloadValue(
                                 ComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
 
-        if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobAnswerMessage *>(answer_message.get())) {
+        if (auto msg = std::dynamic_pointer_cast<ComputeServiceSubmitStandardJobAnswerMessage>(answer_message)) {
             // If no success, throw an exception
             if (not msg->success) {
                 throw WorkflowExecutionException(msg->failure_cause);
@@ -417,7 +417,7 @@ namespace wrench {
                         answer_mailbox, job, service_specific_args, this->getMessagePayloadValue(
                                 CloudComputeServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
 
-        if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobAnswerMessage *>(answer_message.get())) {
+        if (auto msg = std::dynamic_pointer_cast<ComputeServiceSubmitPilotJobAnswerMessage>(answer_message)) {
             // If no success, throw an exception
             if (not msg->success) {
                 throw WorkflowExecutionException(msg->failure_cause);
@@ -646,7 +646,7 @@ namespace wrench {
             processSubmitPilotJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
             return true;
         } else if (auto msg = std::dynamic_pointer_cast<ServiceHasTerminatedMessage>(message)) {
-            if (auto bmcs = dynamic_cast<BareMetalComputeService *>(msg->service)) {
+            if (auto bmcs = std::dynamic_pointer_cast<BareMetalComputeService>(msg->service)) {
                 processBareMetalComputeServiceTermination(bmcs, msg->exit_code);
             } else {
                 throw std::runtime_error("CloudComputeService::processNextMessage(): Received a service termination message for a non-BareMetalComputeService!");
@@ -1303,10 +1303,10 @@ namespace wrench {
      * @param cs: the service that has terminated
      * @param exit_code: the service's exit code
      */
-    void CloudComputeService::processBareMetalComputeServiceTermination(BareMetalComputeService *cs, int exit_code) {
+    void CloudComputeService::processBareMetalComputeServiceTermination(std::shared_ptr<BareMetalComputeService> cs, int exit_code) {
         std::string vm_name;
         for (auto const &vm_pair : this->vm_list) {
-            if (vm_pair.second.second.get() == cs) {
+            if (vm_pair.second.second == cs) {
                 vm_name = vm_pair.first;
                 break;
             }

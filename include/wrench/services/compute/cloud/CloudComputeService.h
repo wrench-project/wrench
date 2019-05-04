@@ -166,7 +166,7 @@ namespace wrench {
         virtual void processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job,
                                            std::map<std::string, std::string> &service_specific_args);
 
-        virtual void processBareMetalComputeServiceTermination(BareMetalComputeService *cs, int exit_code);
+        virtual void processBareMetalComputeServiceTermination(std::shared_ptr<BareMetalComputeService> cs, int exit_code);
 
         void stopAllVMs();
 
