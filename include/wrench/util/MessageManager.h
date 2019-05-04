@@ -28,13 +28,13 @@ namespace wrench {
 
     class MessageManager {
 
-        static std::map<std::string,std::unordered_set<SimulationMessage*>> mailbox_messages;
+        static std::unordered_map<std::string,std::unordered_set<SimulationMessage*>> mailbox_messages;
 
     public:
 
-        static void manageMessage(std::string, SimulationMessage* msg);
-        static void cleanUpMessages(std::string);
-        static void removeReceivedMessage(std::string mailbox, SimulationMessage *msg);
+        static void manageMessage(const std::string &mailbox, SimulationMessage* msg);
+        static void cleanUpMessages(const std::string &mailbox);
+        static void removeReceivedMessage(const std::string &mailbox, SimulationMessage *msg);
         static void cleanUpAllMessages();
         static void print();
 
