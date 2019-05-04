@@ -23,7 +23,7 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param vm_hostname: the name of the VM
+     * @param vm_name: the name of the VM
      * @param num_cores: the number of cores the VM can use
      * @param ram_memory: the VM RAM memory capacity
      * @param property_list: a property list ({} means use all defaults)
