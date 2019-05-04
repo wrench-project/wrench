@@ -23,6 +23,9 @@
 #include "wrench/simulation/Simulation.h"
 #include "simgrid/plugins/energy.h"
 #include "wrench/simgrid_S4U_util/S4U_VirtualMachine.h"
+#ifdef MESSAGE_MANAGER
+#include <wrench/util/MessageManager.h>
+#endif
 
 #include <nlohmann/json.hpp>
 #include <fstream>
@@ -73,6 +76,10 @@ namespace wrench {
         // Clearing all tracked service, which will cause all services that are not
         // pointed to by main() to be deleted.
         Service::clearTrackedServices();
+
+#ifdef MESSAGE_MANAGER
+        MessageManager::cleanUpAllMessages();
+#endif
     }
 
     /**
