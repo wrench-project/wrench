@@ -668,11 +668,10 @@ namespace wrench {
  * @param job
  */
     void BatchComputeService::processStandardJobTimeout(StandardJob *job) {
-        std::set<std::shared_ptr<StandardJobExecutor>>::iterator it;
 
-        for (it = this->running_standard_job_executors.begin(); it != this->running_standard_job_executors.end(); it++) {
-            if (((*it).get())->getJob() == job) {
-                ((*it).get())->kill(false);
+        for (auto it = this->running_standard_job_executors.begin(); it != this->running_standard_job_executors.end(); it++) {
+            if ((*it)->getJob() == job) {
+                (*it)->kill(false);
                 // Make failed tasks ready again
                 for (auto task : job->tasks) {
                     switch (task->getInternalState()) {
@@ -1492,11 +1491,11 @@ namespace wrench {
  *
  * @throw std::runtime_error
  */
-    void BatchComputeService::processStandardJobCompletion(StandardJobExecutor *executor, StandardJob *job) {
+    void BatchComputeService::processStandardJobCompletion(std::shared_ptr<StandardJobExecutor> executor, StandardJob *job) {
         bool executor_on_the_list = false;
         std::set<std::shared_ptr<StandardJobExecutor>>::iterator it;
         for (it = this->running_standard_job_executors.begin(); it != this->running_standard_job_executors.end(); it++) {
-            if ((*it).get() == executor) {
+            if (*it == executor) {
                 PointerUtil::moveSharedPtrFromSetToSet(it, &(this->running_standard_job_executors),
                                                        &(this->finished_standard_job_executors));
                 executor_on_the_list = true;
@@ -1566,14 +1565,14 @@ namespace wrench {
  * @param work: the work
  * @param cause: the cause of the failure
  */
-    void BatchComputeService::processStandardJobFailure(StandardJobExecutor *executor,
+    void BatchComputeService::processStandardJobFailure(std::shared_ptr<StandardJobExecutor> executor,
                                                  StandardJob *job,
                                                  std::shared_ptr<FailureCause> cause) {
 
         bool executor_on_the_list = false;
         std::set<std::shared_ptr<StandardJobExecutor>>::iterator it;
         for (it = this->running_standard_job_executors.begin(); it != this->running_standard_job_executors.end(); it++) {
-            if ((*it).get() == executor) {
+            if ((*it) == executor) {
                 PointerUtil::moveSharedPtrFromSetToSet(it, &(this->running_standard_job_executors),
                                                        &(this->finished_standard_job_executors));
                 executor_on_the_list = true;

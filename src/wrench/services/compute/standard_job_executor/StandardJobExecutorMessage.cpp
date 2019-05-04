@@ -31,7 +31,7 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     WorkunitExecutorDoneMessage::WorkunitExecutorDoneMessage(
-            WorkunitExecutor *workunit_executor,
+            std::shared_ptr<WorkunitExecutor> workunit_executor,
             std::shared_ptr<Workunit> workunit,
             double payload) :
             StandardJobExecutorMessage("WORK_UNIT_EXECUTOR_DONE", payload) {
@@ -47,7 +47,7 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     WorkunitExecutorFailedMessage::WorkunitExecutorFailedMessage(
-            WorkunitExecutor *workunit_executor,
+            std::shared_ptr<WorkunitExecutor> workunit_executor,
             std::shared_ptr<Workunit> workunit,
             std::shared_ptr<FailureCause> cause,
             double payload):
@@ -65,7 +65,7 @@ namespace wrench {
      */
     StandardJobExecutorDoneMessage::StandardJobExecutorDoneMessage(
             StandardJob *job,
-            StandardJobExecutor *executor,
+            std::shared_ptr<StandardJobExecutor> executor,
             double payload) :
             StandardJobExecutorMessage("STANDARD_JOB_COMPLETED", payload) {
       this->job = job;
@@ -81,7 +81,7 @@ namespace wrench {
      */
     StandardJobExecutorFailedMessage::StandardJobExecutorFailedMessage(
             StandardJob *job,
-            StandardJobExecutor *executor,
+            std::shared_ptr<StandardJobExecutor> executor,
             std::shared_ptr<FailureCause> cause,
             double payload) :
             StandardJobExecutorMessage("STANDARD_JOB_FAILED", payload) {

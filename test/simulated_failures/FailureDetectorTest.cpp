@@ -132,11 +132,11 @@ private:
             throw std::runtime_error("Network error while getting a message!" + cause->toString());
         }
 
-        auto real_msg = dynamic_cast<wrench::ServiceHasCrashedMessage *>(message.get());
+        auto real_msg = std::dynamic_pointer_cast<wrench::ServiceHasCrashedMessage>(message);
         if (not real_msg) {
             throw std::runtime_error("Unexpected " + message->getName() + " message");
         } else {
-            if (real_msg->service != victim1.get()) {
+            if (real_msg->service != victim1) {
                 throw std::runtime_error("Got a failure notification, but not for the right service!");
             }
         }
@@ -149,11 +149,11 @@ private:
             throw std::runtime_error("Network error while getting a message!" + cause->toString());
         }
 
-        real_msg = dynamic_cast<wrench::ServiceHasCrashedMessage *>(message.get());
+        real_msg = std::dynamic_pointer_cast<wrench::ServiceHasCrashedMessage>(message);
         if (not real_msg) {
             throw std::runtime_error("Unexpected " + message->getName() + " message");
         } else {
-            if (real_msg->service != victim2.get()) {
+            if (real_msg->service != victim2) {
                 throw std::runtime_error("Got a failure notification, but not for the right service!");
             }
         }
@@ -252,11 +252,11 @@ private:
             throw std::runtime_error("Network error while getting a message! " + cause->toString());
         }
 
-        auto real_msg = dynamic_cast<wrench::ServiceHasCrashedMessage *>(message.get());
+        auto real_msg = std::dynamic_pointer_cast<wrench::ServiceHasCrashedMessage>(message);
         if (not real_msg) {
             throw std::runtime_error("Unexpected " + message->getName() + " message");
         } else {
-            if (real_msg->service != victim1.get()) {
+            if (real_msg->service != victim1) {
                 throw std::runtime_error("Got a failure notification, but not for the right service!");
             }
         }
@@ -268,11 +268,11 @@ private:
             throw std::runtime_error("Network error while getting a message!" + cause->toString());
         }
 
-        real_msg = dynamic_cast<wrench::ServiceHasCrashedMessage *>(message.get());
+        real_msg = std::dynamic_pointer_cast<wrench::ServiceHasCrashedMessage>(message);
         if (not real_msg) {
             throw std::runtime_error("Unexpected " + message->getName() + " message");
         } else {
-            if (real_msg->service != victim2.get()) {
+            if (real_msg->service != victim2) {
                 throw std::runtime_error("Got a failure notification, but not for the right service!");
             }
         }

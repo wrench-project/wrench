@@ -840,8 +840,8 @@ namespace wrench {
             return true;
 
         } else if (auto msg = std::dynamic_pointer_cast<ServiceHasCrashedMessage>(message)) {
-            Service *service = msg->service;
-            auto workunit_executor = dynamic_cast<WorkunitExecutor *>(service);
+            auto service = msg->service;
+            auto workunit_executor = std::dynamic_pointer_cast<WorkunitExecutor>(service);
             if (not workunit_executor) {
                 throw std::runtime_error("Received a FailureDetectorServiceHasFailedMessage message, but that service is not a WorkUnitExecutor!");
             }
@@ -1080,7 +1080,7 @@ namespace wrench {
  * @param workunit: the workunit
  */
 
-    void BareMetalComputeService::processWorkunitExecutorCompletion(WorkunitExecutor *workunit_executor,
+    void BareMetalComputeService::processWorkunitExecutorCompletion(std::shared_ptr<WorkunitExecutor> workunit_executor,
                                                                     std::shared_ptr<Workunit> workunit) {
         StandardJob *job = workunit_executor->getJob();
 
@@ -1178,7 +1178,7 @@ namespace wrench {
 * @param cause: the failure cause
 */
 
-    void BareMetalComputeService::processWorkunitExecutorFailure(WorkunitExecutor *workunit_executor,
+    void BareMetalComputeService::processWorkunitExecutorFailure(std::shared_ptr<WorkunitExecutor> workunit_executor,
                                                                  std::shared_ptr<Workunit> workunit,
                                                                  std::shared_ptr<FailureCause> cause) {
         StandardJob *job = workunit_executor->getJob();
@@ -1210,12 +1210,12 @@ namespace wrench {
      * @brief Helper function to "forget" a workunit executor (and free memory)
      * @param workunit_executor: the workunit executor
      */
-    void BareMetalComputeService::forgetWorkunitExecutor(WorkunitExecutor *workunit_executor) {
+    void BareMetalComputeService::forgetWorkunitExecutor(std::shared_ptr<WorkunitExecutor> workunit_executor) {
 
         StandardJob *job = workunit_executor->getJob();
         std::shared_ptr<WorkunitExecutor> found_it;
         for (auto const &wue : this->workunit_executors[job]) {
-            if (wue.get() == workunit_executor) {
+            if (wue == workunit_executor) {
                 found_it = wue;
             }
         }
@@ -1588,7 +1588,7 @@ namespace wrench {
      *
      * @param workunitExecutor: the workunit executor that has crashed
      */
-    void BareMetalComputeService::processWorkunitExecutorCrash(WorkunitExecutor *workunit_executor) {
+    void BareMetalComputeService::processWorkunitExecutorCrash(std::shared_ptr<WorkunitExecutor> workunit_executor) {
         std::shared_ptr<Workunit> workunit = workunit_executor->workunit;
 
         WRENCH_INFO("Handling a WorkunitExecutor crash!");

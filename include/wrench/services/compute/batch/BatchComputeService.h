@@ -238,9 +238,9 @@ namespace wrench {
 
         void processGetResourceInformation(const std::string &answer_mailbox);
 
-        void processStandardJobCompletion(StandardJobExecutor *executor, StandardJob *job);
+        void processStandardJobCompletion(std::shared_ptr<StandardJobExecutor> executor, StandardJob *job);
 
-        void processStandardJobFailure(StandardJobExecutor *executor,
+        void processStandardJobFailure(std::shared_ptr<StandardJobExecutor> executor,
                                        StandardJob *job,
                                        std::shared_ptr<FailureCause> cause);
 

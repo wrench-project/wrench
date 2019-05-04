@@ -42,12 +42,12 @@ namespace wrench {
     class WorkunitExecutorDoneMessage : public StandardJobExecutorMessage {
     public:
         WorkunitExecutorDoneMessage(
-                WorkunitExecutor *workunit_executor,
+                std::shared_ptr<WorkunitExecutor> workunit_executor,
                 std::shared_ptr<Workunit> workunit,
                 double payload);
 
         /** @brief The work unit executor that has completed the work unit */
-        WorkunitExecutor *workunit_executor;
+        std::shared_ptr<WorkunitExecutor> workunit_executor;
         /** @brief The work unit that has completed */
         std::shared_ptr<Workunit> workunit;
     };
@@ -58,13 +58,13 @@ namespace wrench {
     class WorkunitExecutorFailedMessage : public StandardJobExecutorMessage {
     public:
         WorkunitExecutorFailedMessage(
-                WorkunitExecutor *workunit_executor,
+                std::shared_ptr<WorkunitExecutor> workunit_executor,
                 std::shared_ptr<Workunit> workunit,
                 std::shared_ptr<FailureCause> cause,
                 double payload);
 
         /** @brief The worker unit executor that has failed to perform the work unit */
-        WorkunitExecutor *workunit_executor;
+        std::shared_ptr<WorkunitExecutor> workunit_executor;
         /** @brief The work unit that has failed */
         std::shared_ptr<Workunit> workunit;
         /** @brief The cause of the failure */
@@ -79,11 +79,11 @@ namespace wrench {
     public:
         StandardJobExecutorDoneMessage(
                 StandardJob *job,
-                StandardJobExecutor *executor,
+                std::shared_ptr<StandardJobExecutor> executor,
                 double payload);
 
         /** @brief The standard job executor that has completed the standard job */
-        StandardJobExecutor *executor;
+        std::shared_ptr<StandardJobExecutor> executor;
         /** @brief The standard job that has completed */
         StandardJob *job;
 
@@ -96,12 +96,12 @@ namespace wrench {
     public:
         StandardJobExecutorFailedMessage(
                 StandardJob *job,
-                StandardJobExecutor *executor,
+                std::shared_ptr<StandardJobExecutor> executor,
                 std::shared_ptr<FailureCause> cause,
                 double payload);
 
         /** @brief The standard job executor that has ailed to complete the standard job */
-        StandardJobExecutor *executor;
+        std::shared_ptr<StandardJobExecutor> executor;
         /** @brief The standard job that has failed */
         StandardJob *job;
         /** @brief The cause of the failure */

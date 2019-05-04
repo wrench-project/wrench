@@ -126,14 +126,14 @@ namespace wrench {
 
         int main() override;
 
-        void processWorkunitExecutorCompletion(WorkunitExecutor *workunit_executor,
+        void processWorkunitExecutorCompletion(std::shared_ptr<WorkunitExecutor> workunit_executor,
                                                std::shared_ptr<Workunit> workunit);
 
-        void processWorkunitExecutorFailure(WorkunitExecutor *workunit_executor,
+        void processWorkunitExecutorFailure(std::shared_ptr<WorkunitExecutor> workunit_executor,
                                             std::shared_ptr<Workunit> workunit,
                                             std::shared_ptr<FailureCause> cause);
 
-        void processWorkunitExecutorCrash(WorkunitExecutor *workunit_executor);
+        void processWorkunitExecutorCrash(std::shared_ptr<WorkunitExecutor> workunit_executor);
 
         bool processNextMessage();
 

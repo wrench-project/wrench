@@ -345,7 +345,7 @@ namespace wrench {
                 return true;
             }
             return true;
-        } else if (auto msg = dynamic_cast<CoordinateLookupRequestMessage *> (message.get())) {
+        } else if (auto msg = std::dynamic_pointer_cast<CoordinateLookupRequestMessage> (message)) {
             std::string requested_host = msg->requested_host;
             auto const coordinate_itr = this->coordinate_lookup_table.find(requested_host);
             if (coordinate_itr != this->coordinate_lookup_table.cend()) {
