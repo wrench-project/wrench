@@ -19,7 +19,7 @@ namespace wrench {
 
     // TODO: At some point, we may want to make this with only unique pointers...
 
-    std::map<std::string, std::unordered_set<SimulationMessage *>> MessageManager::mailbox_messages = {};
+    std::unordered_map<std::string, std::unordered_set<SimulationMessage *>> MessageManager::mailbox_messages = {};
 
     /**
      * @brief Insert a message in the manager's  "database"
@@ -27,7 +27,7 @@ namespace wrench {
      * @param msg: the message
      * @throw std::runtime_error
      */
-    void MessageManager::manageMessage(std::string mailbox, SimulationMessage *msg) {
+    void MessageManager::manageMessage(const std::string &mailbox, SimulationMessage *msg) {
       if (msg == nullptr) {
         throw std::runtime_error(
                 "MessageManager::manageMessage()::Null Message cannot be saved by MessageManager"
@@ -44,12 +44,13 @@ namespace wrench {
      * @brief Clean up messages for a given mailbox (so as to free up memory)
      * @param mailbox: the mailbox name
      */
-    void MessageManager::cleanUpMessages(std::string mailbox) {
+    void MessageManager::cleanUpMessages(const std::string &mailbox) {
       if (mailbox_messages.find(mailbox) != mailbox_messages.end()) {
         for (auto msg : mailbox_messages[mailbox]) {
             delete msg;
         }
         mailbox_messages[mailbox].clear();
+        mailbox_messages.erase(mailbox);
       }
     }
 
@@ -57,7 +58,6 @@ namespace wrench {
      * @brief Clean up all the messages that MessageManager has stored (so as to free up memory)
      */
     void MessageManager::cleanUpAllMessages() {
-      std::map<std::string, std::vector<SimulationMessage *>>::iterator msg_itr;
       for (auto m : mailbox_messages) {
         cleanUpMessages(m.first);
       }
@@ -78,7 +78,7 @@ namespace wrench {
      * @param mailbox: the name of the mailbox from which the message was received
      * @param msg: the message
      */
-    void MessageManager::removeReceivedMessage(std::string mailbox, SimulationMessage *msg) {
+    void MessageManager::removeReceivedMessage(const std::string &mailbox, SimulationMessage *msg) {
       if (mailbox_messages.find(mailbox) != mailbox_messages.end()) {
         if (mailbox_messages[mailbox].find(msg) != mailbox_messages[mailbox].end()) {
 //            WRENCH_INFO("MESSAGE_MANAGER: REMOVING [%s]:%s (%lu)", mailbox.c_str(), msg->getName().c_str(), (unsigned long)msg);
