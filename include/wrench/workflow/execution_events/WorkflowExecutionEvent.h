@@ -73,7 +73,13 @@ namespace wrench {
         /***********************/
         static std::shared_ptr<WorkflowExecutionEvent> waitForNextExecutionEvent(std::string);
         static std::shared_ptr<WorkflowExecutionEvent> waitForNextExecutionEvent(std::string, double timeout);
+
+        /**
+         * @brief Get a textual description of the event
+         * @return a text string
+         */
         virtual std::string toString() { return "Generic WorkflowExecutionEvent"; }
+
         virtual ~WorkflowExecutionEvent() = default;
 
     protected:
@@ -112,6 +118,10 @@ namespace wrench {
         /** @brief The compute service on which the standard job has completed */
         std::shared_ptr<ComputeService>  compute_service;
 
+        /** 
+         * @brief Get a textual description of the event
+         * @return a text string
+         */
         std::string toString() override { return "StandardJobCompletedEvent (job: " + this->standard_job->getName() + "; cs = " + this->compute_service->getName() + ")";}
     };
 
@@ -146,6 +156,10 @@ namespace wrench {
         /** @brief The cause of the failure */
         std::shared_ptr<FailureCause> failure_cause;
 
+        /** 
+         * @brief Get a textual description of the event
+         * @return a text string
+         */
         std::string toString() override { return "StandardJobFailedEvent (job: " + this->standard_job->getName() + "; cs = " +
         this->compute_service->getName() + "; cause: " + this->failure_cause->toString() + ")";}
 
@@ -176,6 +190,10 @@ namespace wrench {
         /** @brief The compute service on which the pilot job has started */
         std::shared_ptr<ComputeService>  compute_service;
 
+        /**
+         * @brief Get a textual description of the event
+         * @return a text string
+         */
         std::string toString() override { return "PilotJobStartedEvent (cs = " + this->compute_service->getName() + ")";}
 
     };
@@ -204,6 +222,10 @@ namespace wrench {
         /** @brief The compute service on which the pilot job has expired */
         std::shared_ptr<ComputeService>  compute_service;
 
+        /**
+         * @brief Get a textual description of the event
+         * @return a text string
+         */
         std::string toString() override { return "PilotJobExpiredEvent (cs = " + this->compute_service->getName() + ")";}
 
     };
@@ -241,6 +263,10 @@ namespace wrench {
         /** @brief Whether the file registry service (if any) has been successfully updated */
         bool file_registry_service_updated;
 
+        /**
+         * @brief Get a textual description of the event
+         * @return a text string
+         */
         std::string toString() override { return "FileCopyCompletedEvent (file: " + this->file->getID() + "; ss = " + this->storage_service->getName() + ")";}
 
     };
@@ -276,6 +302,10 @@ namespace wrench {
         /** @brief The cause of the failure */
         std::shared_ptr<FailureCause> failure_cause;
 
+        /**
+         * @brief Get a textual description of the event
+         * @return a text string
+         */
         std::string toString() override { return "FileCopyFailedEvent (file: " + this->file->getID() + "; ss = " + this->storage_service->getName() +
                                         "; cause: " + this->failure_cause->toString() + ")";}
 
