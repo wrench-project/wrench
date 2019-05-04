@@ -616,8 +616,8 @@ namespace wrench {
             return false; // We should exit since we've killed everything
 
         } else if (auto msg = std::dynamic_pointer_cast<ServiceHasCrashedMessage>(message)) {
-            Service *service = msg->service;
-            auto workunit_executor = dynamic_cast<WorkunitExecutor *>(service);
+            auto service = msg->service;
+            auto workunit_executor = std::dynamic_pointer_cast<WorkunitExecutor>(service);
             if (not workunit_executor) {
                 throw std::runtime_error("Received a FailureDetectorServiceHasFailedMessage message, but that service is not a WorkUnitExecutor!");
             }
@@ -638,7 +638,7 @@ namespace wrench {
  * @throw std::runtime_error
  */
     void StandardJobExecutor::processWorkunitExecutorCompletion(
-            WorkunitExecutor *workunit_executor,
+            std::shared_ptr<WorkunitExecutor> workunit_executor,
             std::shared_ptr<Workunit> workunit) {
 
         // Don't kill me while I am doing this
@@ -651,7 +651,7 @@ namespace wrench {
 
         // Remove the workunit executor from the workunit executor list
         for (auto it = this->running_workunit_executors.begin(); it != this->running_workunit_executors.end(); it++) {
-            if ((*it).get() == workunit_executor) {
+            if ((*it) == workunit_executor) {
                 PointerUtil::moveSharedPtrFromSetToSet(it, &(this->running_workunit_executors), &(this->finished_workunit_executors));
                 break;
             }
@@ -691,7 +691,7 @@ namespace wrench {
 
             try {
                 S4U_Mailbox::putMessage(this->callback_mailbox,
-                                        new StandardJobExecutorDoneMessage(this->job, this,
+                                        new StandardJobExecutorDoneMessage(this->job, this->getSharedPtr<StandardJobExecutor>(),
                                                                            this->getMessagePayloadValue(
                                                                                    StandardJobExecutorMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD)));
             } catch (std::shared_ptr<NetworkError> &cause) {
@@ -754,7 +754,7 @@ namespace wrench {
  */
 
     void StandardJobExecutor::processWorkunitExecutorFailure(
-            WorkunitExecutor *workunit_executor,
+            std::shared_ptr<WorkunitExecutor> workunit_executor,
             std::shared_ptr<Workunit> workunit,
             std::shared_ptr<FailureCause> cause) {
 
@@ -771,7 +771,7 @@ namespace wrench {
 
         // Remove the workunit executor from the workunit executor list and put it in the failed list
         for (auto it = this->running_workunit_executors.begin(); it != this->running_workunit_executors.end(); it++) {
-            if ((*it).get() == workunit_executor) {
+            if ((*it) == workunit_executor) {
                 PointerUtil::moveSharedPtrFromSetToSet(it, &(this->running_workunit_executors), &(this->failed_workunit_executors));
                 break;
             }
@@ -810,7 +810,7 @@ namespace wrench {
         // Send the notification back
         try {
             S4U_Mailbox::putMessage(this->callback_mailbox,
-                                    new StandardJobExecutorFailedMessage(this->job, this, cause,
+                                    new StandardJobExecutorFailedMessage(this->job, this->getSharedPtr<StandardJobExecutor>(), cause,
                                                                          this->getMessagePayloadValue(
                                                                                  StandardJobExecutorMessagePayload::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
@@ -827,13 +827,13 @@ namespace wrench {
      * @brief Process a WorkunitExecutor crash
      * @param workunit_executor: the WorkunitExecutor that has crashed
      */
-    void StandardJobExecutor::processWorkunitExecutorCrash(WorkunitExecutor *workunit_executor) {
+    void StandardJobExecutor::processWorkunitExecutorCrash(std::shared_ptr<WorkunitExecutor> workunit_executor) {
         WRENCH_INFO("Handling a WorkunitExecutor crash!");
 
         // Look for the workunit executor
         bool found_it = false;
         for (auto const &wue : this->running_workunit_executors) {
-            if (wue.get() == workunit_executor) {
+            if (wue == workunit_executor) {
                 auto tmp = wue;
                 this->running_workunit_executors.erase(wue);
                 this->failed_workunit_executors.insert(tmp);

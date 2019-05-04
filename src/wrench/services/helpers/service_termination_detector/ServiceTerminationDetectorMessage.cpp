@@ -26,7 +26,7 @@ namespace wrench {
      *
      * @param service: the service that has crashed
      */
-    ServiceHasCrashedMessage::ServiceHasCrashedMessage(Service *service) :
+    ServiceHasCrashedMessage::ServiceHasCrashedMessage(std::shared_ptr<Service> service) :
             ServiceTerminationDetectorMessage("ServiceHasCrashedMessage") {
       this->service = service;
     }
@@ -37,7 +37,7 @@ namespace wrench {
      * @param service: the service that has terminated
      * @param exit_code: the service exit_code
      */
-    ServiceHasTerminatedMessage::ServiceHasTerminatedMessage(Service *service, int exit_code) :
+    ServiceHasTerminatedMessage::ServiceHasTerminatedMessage(std::shared_ptr<Service> service, int exit_code) :
             ServiceTerminationDetectorMessage("ServiceHasTerminatedMessage") {
         this->service = service;
         this->exit_code = exit_code;

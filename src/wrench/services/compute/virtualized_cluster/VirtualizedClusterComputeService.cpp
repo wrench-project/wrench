@@ -81,7 +81,7 @@ namespace wrench {
                         this->getMessagePayloadValue(
                                 CloudComputeServiceMessagePayload::START_VM_REQUEST_MESSAGE_PAYLOAD)));
 
-        if (auto msg = dynamic_cast<CloudComputeServiceStartVMAnswerMessage *>(answer_message.get())) {
+        if (auto msg = std::dynamic_pointer_cast<CloudComputeServiceStartVMAnswerMessage>(answer_message)) {
             if (not msg->success) {
                 throw WorkflowExecutionException(msg->failure_cause);
             }
@@ -115,7 +115,7 @@ namespace wrench {
                         this->getMessagePayloadValue(
                                 VirtualizedClusterComputeServiceMessagePayload::MIGRATE_VM_REQUEST_MESSAGE_PAYLOAD)));
 
-        if (auto msg = dynamic_cast<VirtualizedClusterComputeServiceMigrateVMAnswerMessage *>(answer_message.get())) {
+        if (auto msg = std::dynamic_pointer_cast<VirtualizedClusterComputeServiceMigrateVMAnswerMessage>(answer_message)) {
             if (not msg->success) {
                 throw WorkflowExecutionException(msg->failure_cause);
             }
@@ -226,7 +226,7 @@ namespace wrench {
             return true;
 
         } else if (auto msg = std::dynamic_pointer_cast<ServiceHasTerminatedMessage>(message)) {
-            if (auto bmcs = dynamic_cast<BareMetalComputeService *>(msg->service)) {
+            if (auto bmcs = std::dynamic_pointer_cast<BareMetalComputeService>(msg->service)) {
                 processBareMetalComputeServiceTermination(bmcs, msg->exit_code);
             } else {
                 throw std::runtime_error("VirtualizedClusterComputeService::processNextMessage(): Received a service termination message for a non-BareMetalComputeService!");

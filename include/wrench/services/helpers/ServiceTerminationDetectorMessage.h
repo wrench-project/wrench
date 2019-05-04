@@ -36,10 +36,10 @@ namespace wrench {
      */
     class ServiceHasCrashedMessage : public ServiceTerminationDetectorMessage {
     public:
-        explicit ServiceHasCrashedMessage(Service *service);
+        explicit ServiceHasCrashedMessage(std::shared_ptr<Service> service);
 
         /** @brief The service that has crashed */
-        Service *service;
+        std::shared_ptr<Service> service;
     };
 
     /**
@@ -48,10 +48,10 @@ namespace wrench {
      */
     class ServiceHasTerminatedMessage : public ServiceTerminationDetectorMessage {
     public:
-        explicit ServiceHasTerminatedMessage(Service *service, int exit_code);
+        explicit ServiceHasTerminatedMessage(std::shared_ptr<Service> service, int exit_code);
 
         /** @brief The service that has terminated */
-        Service *service;
+        std::shared_ptr<Service> service;
         /** @brief The exit code of the service's main */
         int exit_code;
     };

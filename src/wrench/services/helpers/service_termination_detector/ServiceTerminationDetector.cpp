@@ -51,12 +51,12 @@ int wrench::ServiceTerminationDetector::main() {
     if (this->notify_on_crash and (not service_has_returned_from_main)) {
         // Failure detected!
         WRENCH_INFO("Detected crash of service %s (notifying mailbox %s)", this->service_to_monitor->getName().c_str(), this->mailbox_to_notify.c_str());
-        S4U_Mailbox::putMessage(this->mailbox_to_notify, new ServiceHasCrashedMessage(this->service_to_monitor.get()));
+        S4U_Mailbox::putMessage(this->mailbox_to_notify, new ServiceHasCrashedMessage(this->service_to_monitor));
     }
     if (this->notify_on_termination and (service_has_returned_from_main)) {
         // Failure detected!
         WRENCH_INFO("Detected termination of service %s (notifying mailbox %s)", this->service_to_monitor->getName().c_str(), this->mailbox_to_notify.c_str());
-        S4U_Mailbox::putMessage(this->mailbox_to_notify, new ServiceHasTerminatedMessage(this->service_to_monitor.get(), return_value_from_main));
+        S4U_Mailbox::putMessage(this->mailbox_to_notify, new ServiceHasTerminatedMessage(this->service_to_monitor, return_value_from_main));
     }
 
     this->service_to_monitor = nullptr;  // released, so that it can be freed in case refount = 0

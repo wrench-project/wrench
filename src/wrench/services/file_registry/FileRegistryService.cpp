@@ -152,7 +152,7 @@ namespace wrench {
         throw WorkflowExecutionException(cause);
       }
 
-      if (auto msg = dynamic_cast<FileRegistryFileLookupByProximityAnswerMessage *> (message.get())) {
+      if (auto msg = std::dynamic_pointer_cast<FileRegistryFileLookupByProximityAnswerMessage> (message)) {
         return msg->locations;
       } else {
         throw std::runtime_error("FileRegistryService::lookupEntry(): Unexpected [" + message->getName() + "] message");
@@ -323,7 +323,7 @@ namespace wrench {
         }
         return true;
 
-      } else if (auto msg = dynamic_cast<FileRegistryFileLookupByProximityRequestMessage *> (message.get())) {
+      } else if (auto msg = std::dynamic_pointer_cast<FileRegistryFileLookupByProximityRequestMessage> (message)) {
 
         std::string reference_host = msg->reference_host;
 

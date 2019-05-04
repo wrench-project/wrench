@@ -160,7 +160,7 @@ namespace wrench {
             // build "success!" message
             success = true;
             msg_to_send_back = new WorkunitExecutorDoneMessage(
-                    this,
+                    this->getSharedPtr<WorkunitExecutor>(),
                     this->workunit,
                     0.0);
 
@@ -170,7 +170,7 @@ namespace wrench {
             WRENCH_DEBUG("Got an exception while performing work: %s", e.getCause()->toString().c_str());
             success = false;
             msg_to_send_back = new WorkunitExecutorFailedMessage(
-                    this,
+                    this->getSharedPtr<WorkunitExecutor>(),
                     this->workunit,
                     e.getCause(),
                     0.0);
