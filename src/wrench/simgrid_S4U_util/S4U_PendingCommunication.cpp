@@ -10,6 +10,9 @@
 #include <memory>
 #include <iostream>
 
+#ifdef MESSAGE_MANAGER
+#include <wrench/util/MessageManager.h>
+#endif
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/simgrid_S4U_util/S4U_PendingCommunication.h"
 #include "wrench/simulation/SimulationMessage.h"
@@ -89,6 +92,9 @@ namespace wrench {
         bool one_comm_failed = false;
         try {
             index = (unsigned long) simgrid::s4u::Comm::wait_any_for(&pending_s4u_comms, timeout);
+#ifdef MESSAGE_MANAGER
+            MessageManager::removeReceivedMessage(pending_comms[index]->mailbox_name, pending_comms[index]->simulation_message.get());
+#endif
         } catch (simgrid::NetworkFailureException &e) {
             one_comm_failed = true;
         } catch (simgrid::TimeoutError &e) {
