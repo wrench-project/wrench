@@ -120,13 +120,13 @@ namespace wrench {
      */
     std::map<std::string, std::vector<std::string>> S4U_Simulation::getAllHostnamesByCluster() {
         std::map<std::string, std::vector<std::string>> result;
-        std::vector<simgrid::kernel::routing::ClusterZone*>clusters;
+        std::vector<simgrid::kernel::routing::ClusterZone *> clusters;
 
         auto simgrid_engine = simgrid::s4u::Engine::get_instance();
 
         clusters = simgrid_engine->get_filtered_netzones<simgrid::kernel::routing::ClusterZone>();
         for (auto c : clusters) {
-            std::vector<simgrid::s4u::Host*> host_list = c->get_all_hosts();
+            std::vector<simgrid::s4u::Host *> host_list = c->get_all_hosts();
             std::vector<std::string> hostname_list;
             hostname_list.reserve(host_list.size());
             for (auto h : host_list) {
@@ -234,8 +234,8 @@ namespace wrench {
      * @brief Simulates a sleep
      * @param duration: the number of seconds to sleep
      */
-    void S4U_Simulation::sleep(double duration ) {
-            simgrid::s4u::this_actor::sleep_for(duration);
+    void S4U_Simulation::sleep(double duration) {
+        simgrid::s4u::this_actor::sleep_for(duration);
     }
 
     /**
@@ -275,13 +275,16 @@ namespace wrench {
             const char *capacity_string = host->get_property(tag);
             if (capacity_string) {
                 if (capacity_value != S4U_Simulation::DEFAULT_RAM) {
-                    throw std::invalid_argument("S4U_Simulation::getHostMemoryCapacity(): Host '" + std::string(host->get_cname()) + "' has multiple memory capacity specifications");
+                    throw std::invalid_argument(
+                            "S4U_Simulation::getHostMemoryCapacity(): Host '" + std::string(host->get_cname()) +
+                            "' has multiple memory capacity specifications");
                 }
                 try {
                     capacity_value = UnitParser::parse_size(capacity_string);
                 } catch (std::invalid_argument &e) {
                     throw std::invalid_argument(
-                            "S4U_Simulation::getHostMemoryCapacity(): Host '" + std::string(host->get_cname()) + "'has invalid memory capacity specification '" + tag +":" +
+                            "S4U_Simulation::getHostMemoryCapacity(): Host '" + std::string(host->get_cname()) +
+                            "'has invalid memory capacity specification '" + tag + ":" +
                             std::string(capacity_string) + "'");
                 }
             }
@@ -310,7 +313,7 @@ namespace wrench {
         double energy_consumed = 0;
         try {
             energy_consumed = sg_host_get_consumed_energy(simgrid::s4u::Host::by_name(hostname));
-        } catch (std::exception& e) {
+        } catch (std::exception &e) {
             throw std::runtime_error(
                     "S4U_Simulation::getEnergyConsumedByHost(): Was not able to get the energy consumed by the host. Make sure energy plugin is enabled and "
                     "the host name is correct"
@@ -331,7 +334,7 @@ namespace wrench {
             for (auto hostname: hostnames) {
                 total_energy += sg_host_get_consumed_energy(simgrid::s4u::Host::by_name(hostname));
             }
-        } catch (std::exception& e) {
+        } catch (std::exception &e) {
             throw std::runtime_error(
                     "S4U_Simulation::getTotalEnergyConsumed(): Was not able to get the total energy consumed by the host. Make sure energy plugin is enabled and "
                     "the host name is correct"
@@ -346,10 +349,10 @@ namespace wrench {
      * @param pstate: the power state index (the power state index is specified in the platform xml description file)
      * @throw std::runtime_error
      */
-    void S4U_Simulation::setPstate(const std::string &hostname, int pstate ) {
+    void S4U_Simulation::setPstate(const std::string &hostname, int pstate) {
         try {
             simgrid::s4u::Host::by_name(hostname)->set_pstate(pstate);
-        } catch (std::exception& e) {
+        } catch (std::exception &e) {
             throw std::runtime_error(
                     "S4U_Simulation::setPstate(): Was not able to set the pstate of the host. Make sure energy is plugin is enabled and "
                     "the host name is correct and the pstate is within range of pstates available to the host"
@@ -366,7 +369,7 @@ namespace wrench {
     int S4U_Simulation::getNumberofPstates(const std::string &hostname) {
         try {
             return simgrid::s4u::Host::by_name(hostname)->get_pstate_count();
-        } catch (std::exception& e) {
+        } catch (std::exception &e) {
             throw std::runtime_error(
                     "S4U_Simulation::getNumberofPstates():: Was not able to get the energy consumed by the host. Make sure energy plugin is enabled and "
                     "the host name is correct"
@@ -383,7 +386,7 @@ namespace wrench {
     int S4U_Simulation::getCurrentPstate(const std::string &hostname) {
         try {
             return simgrid::s4u::Host::by_name(hostname)->get_pstate();
-        } catch (std::exception& e) {
+        } catch (std::exception &e) {
             throw std::runtime_error(
                     "S4U_Simulation::getNumberofPstates(): Was not able to get the number of pstates of the host. Make sure energy plugin is enabled and "
                     "the host name is correct"
@@ -401,7 +404,7 @@ namespace wrench {
         try {
             return sg_host_get_wattmin_at(simgrid::s4u::Host::by_name(hostname),
                                           (simgrid::s4u::Host::by_name(hostname))->get_pstate());
-        } catch (std::exception& e) {
+        } catch (std::exception &e) {
             throw std::runtime_error(
                     "S4U_Simulation::getMinPowerAvailable(): Was not able to get the min power available to the host. Make sure energy plugin is enabled and "
                     "the host name is correct"
@@ -419,7 +422,7 @@ namespace wrench {
         try {
             return sg_host_get_wattmax_at(simgrid::s4u::Host::by_name(hostname),
                                           (simgrid::s4u::Host::by_name(hostname))->get_pstate());
-        } catch (std::exception& e) {
+        } catch (std::exception &e) {
             throw std::runtime_error(
                     "S4U_Simulation::getMaxPowerPossible():: Was not able to get the max power possible for the host. Make sure energy is plugin is enabled and "
                     "the host name is correct"
@@ -440,7 +443,7 @@ namespace wrench {
             for (int i = 0; i < num_pstates; i++) {
                 list.push_back(i);
             }
-        } catch (std::exception& e) {
+        } catch (std::exception &e) {
             throw std::runtime_error(
                     "S4U_Simulation::getListOfPstates(): Was not able to get the list of pstates for the host. Make sure energy plugin is enabled and "
                     "the host name is correct"

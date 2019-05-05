@@ -33,18 +33,18 @@ namespace wrench {
     * @throw std::invalid_arguments
     */
     ComputeServiceSubmitStandardJobRequestMessage::ComputeServiceSubmitStandardJobRequestMessage(
-            std::string answer_mailbox,
+            const std::string answer_mailbox,
             StandardJob *job,
             std::map<std::string, std::string> &service_specific_args,
             double payload) :
             ComputeServiceMessage("SUBMIT_STANDARD_JOB_REQUEST", payload),
             service_specific_args(service_specific_args) {
-      if ((answer_mailbox.empty()) || (job == nullptr)) {
-        throw std::invalid_argument(
-                "ComputeServiceSubmitStandardJobRequestMessage::ComputeServiceSubmitStandardJobRequestMessage(): Invalid arguments");
-      }
-      this->answer_mailbox = answer_mailbox;
-      this->job = job;
+        if ((answer_mailbox.empty()) || (job == nullptr)) {
+            throw std::invalid_argument(
+                    "ComputeServiceSubmitStandardJobRequestMessage::ComputeServiceSubmitStandardJobRequestMessage(): Invalid arguments");
+        }
+        this->answer_mailbox = answer_mailbox;
+        this->job = job;
     }
 
     /**
@@ -58,21 +58,21 @@ namespace wrench {
      * @throw std::invalid_arguments
      */
     ComputeServiceSubmitStandardJobAnswerMessage::ComputeServiceSubmitStandardJobAnswerMessage(StandardJob *job,
-                                                                                               std::shared_ptr<ComputeService>  compute_service,
+                                                                                               std::shared_ptr<ComputeService> compute_service,
                                                                                                bool success,
                                                                                                std::shared_ptr<FailureCause> failure_cause,
                                                                                                double payload) :
             ComputeServiceMessage("SUBMIT_STANDARD_JOB_ANSWER", payload) {
-      if ((job == nullptr) || (compute_service == nullptr) ||
-              (success && (failure_cause != nullptr)) ||
-              (!success && (failure_cause == nullptr))) {
-        throw std::invalid_argument(
-                "ComputeServiceSubmitStandardJobAnswerMessage::ComputeServiceSubmitStandardJobAnswerMessage(): Invalid arguments");
-      }
-      this->job = job;
-      this->compute_service = compute_service;
-      this->success = success;
-      this->failure_cause = failure_cause;
+        if ((job == nullptr) || (compute_service == nullptr) ||
+            (success && (failure_cause != nullptr)) ||
+            (!success && (failure_cause == nullptr))) {
+            throw std::invalid_argument(
+                    "ComputeServiceSubmitStandardJobAnswerMessage::ComputeServiceSubmitStandardJobAnswerMessage(): Invalid arguments");
+        }
+        this->job = job;
+        this->compute_service = compute_service;
+        this->success = success;
+        this->failure_cause = failure_cause;
     }
 
     /**
@@ -84,15 +84,15 @@ namespace wrench {
      * @throw std::invalid_arguments
      */
     ComputeServiceStandardJobDoneMessage::ComputeServiceStandardJobDoneMessage(StandardJob *job,
-                                                                               std::shared_ptr<ComputeService>  cs,
+                                                                               std::shared_ptr<ComputeService> cs,
                                                                                double payload)
             : ComputeServiceMessage("STANDARD_JOB_DONE", payload) {
-      if ((job == nullptr) || (cs == nullptr)) {
-        throw std::invalid_argument(
-                "ComputeServiceStandardJobDoneMessage::ComputeServiceStandardJobDoneMessage(): Invalid arguments");
-      }
-      this->job = job;
-      this->compute_service = cs;
+        if ((job == nullptr) || (cs == nullptr)) {
+            throw std::invalid_argument(
+                    "ComputeServiceStandardJobDoneMessage::ComputeServiceStandardJobDoneMessage(): Invalid arguments");
+        }
+        this->job = job;
+        this->compute_service = cs;
     }
 
     /**
@@ -105,17 +105,17 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     ComputeServiceStandardJobFailedMessage::ComputeServiceStandardJobFailedMessage(StandardJob *job,
-                                                                                   std::shared_ptr<ComputeService>  cs,
+                                                                                   std::shared_ptr<ComputeService> cs,
                                                                                    std::shared_ptr<FailureCause> cause,
                                                                                    double payload)
             : ComputeServiceMessage("STANDARD_JOB_FAILED", payload) {
-      if ((job == nullptr) || (cs == nullptr) || (cause == nullptr)) {
-        throw std::invalid_argument(
-                "ComputeServiceStandardJobFailedMessage::ComputeServiceStandardJobFailedMessage(): Invalid arguments");
-      }
-      this->job = job;
-      this->compute_service = cs;
-      this->cause = cause;
+        if ((job == nullptr) || (cs == nullptr) || (cause == nullptr)) {
+            throw std::invalid_argument(
+                    "ComputeServiceStandardJobFailedMessage::ComputeServiceStandardJobFailedMessage(): Invalid arguments");
+        }
+        this->job = job;
+        this->compute_service = cs;
+        this->cause = cause;
     }
 
     /**
@@ -131,12 +131,12 @@ namespace wrench {
             StandardJob *job,
             double payload) :
             ComputeServiceMessage("TERMINATE_STANDARD_JOB_REQUEST", payload) {
-      if ((answer_mailbox == "") || (job == nullptr)) {
-        throw std::invalid_argument(
-                "ComputeServiceTerminateStandardJobRequestMessage::ComputeServiceTerminateStandardJobRequestMessage(): Invalid arguments");
-      }
-      this->answer_mailbox = answer_mailbox;
-      this->job = job;
+        if ((answer_mailbox == "") || (job == nullptr)) {
+            throw std::invalid_argument(
+                    "ComputeServiceTerminateStandardJobRequestMessage::ComputeServiceTerminateStandardJobRequestMessage(): Invalid arguments");
+        }
+        this->answer_mailbox = answer_mailbox;
+        this->job = job;
     }
 
     /**
@@ -150,21 +150,21 @@ namespace wrench {
      * @throw std::invalid_arguments
      */
     ComputeServiceTerminateStandardJobAnswerMessage::ComputeServiceTerminateStandardJobAnswerMessage(StandardJob *job,
-                                                                                                     std::shared_ptr<ComputeService>  compute_service,
+                                                                                                     std::shared_ptr<ComputeService> compute_service,
                                                                                                      bool success,
                                                                                                      std::shared_ptr<FailureCause> failure_cause,
                                                                                                      double payload) :
             ComputeServiceMessage("TERMINATE_STANDARD_JOB_ANSWER", payload) {
-      if ((job == nullptr) || (compute_service == nullptr) ||
-              (success && (failure_cause != nullptr)) ||
-              (!success && (failure_cause == nullptr))) {
-        throw std::invalid_argument(
-                "ComputeServiceTerminateStandardJobAnswerMessage::ComputeServiceTerminateStandardJobAnswerMessage(): Invalid arguments");
-      }
-      this->job = job;
-      this->compute_service = compute_service;
-      this->success = success;
-      this->failure_cause = failure_cause;
+        if ((job == nullptr) || (compute_service == nullptr) ||
+            (success && (failure_cause != nullptr)) ||
+            (!success && (failure_cause == nullptr))) {
+            throw std::invalid_argument(
+                    "ComputeServiceTerminateStandardJobAnswerMessage::ComputeServiceTerminateStandardJobAnswerMessage(): Invalid arguments");
+        }
+        this->job = job;
+        this->compute_service = compute_service;
+        this->success = success;
+        this->failure_cause = failure_cause;
     }
 
 
@@ -183,13 +183,13 @@ namespace wrench {
                                                                                            double payload)
             : ComputeServiceMessage(
             "SUBMIT_PILOT_JOB_REQUEST", payload) {
-      if ((job == nullptr) || (answer_mailbox == "")) {
-        throw std::invalid_argument(
-                "ComputeServiceSubmitPilotJobRequestMessage::ComputeServiceSubmitPilotJobRequestMessage(): Invalid arguments");
-      }
-      this->answer_mailbox = answer_mailbox;
-      this->job = job;
-      this->service_specific_args = service_specific_args;
+        if ((job == nullptr) || (answer_mailbox == "")) {
+            throw std::invalid_argument(
+                    "ComputeServiceSubmitPilotJobRequestMessage::ComputeServiceSubmitPilotJobRequestMessage(): Invalid arguments");
+        }
+        this->answer_mailbox = answer_mailbox;
+        this->job = job;
+        this->service_specific_args = service_specific_args;
     }
 
     /**
@@ -203,22 +203,22 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     ComputeServiceSubmitPilotJobAnswerMessage::ComputeServiceSubmitPilotJobAnswerMessage(PilotJob *job,
-                                                                                         std::shared_ptr<ComputeService>  compute_service,
+                                                                                         std::shared_ptr<ComputeService> compute_service,
                                                                                          bool success,
                                                                                          std::shared_ptr<FailureCause> failure_cause,
                                                                                          double payload)
             : ComputeServiceMessage(
             "SUBMIT_PILOT_JOB_ANSWER", payload) {
-      if ((job == nullptr) || (compute_service == nullptr) ||
-              (success && (failure_cause != nullptr)) ||
-              (!success && (failure_cause == nullptr))) {
-        throw std::invalid_argument(
-                "ComputeServiceSubmitPilotJobAnswerMessage::ComputeServiceSubmitPilotJobAnswerMessage(): Invalid arguments");
-      }
-      this->job = job;
-      this->compute_service = compute_service;
-      this->success = success;
-      this->failure_cause = failure_cause;
+        if ((job == nullptr) || (compute_service == nullptr) ||
+            (success && (failure_cause != nullptr)) ||
+            (!success && (failure_cause == nullptr))) {
+            throw std::invalid_argument(
+                    "ComputeServiceSubmitPilotJobAnswerMessage::ComputeServiceSubmitPilotJobAnswerMessage(): Invalid arguments");
+        }
+        this->job = job;
+        this->compute_service = compute_service;
+        this->success = success;
+        this->failure_cause = failure_cause;
     }
 
     /**
@@ -229,16 +229,17 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    ComputeServicePilotJobStartedMessage::ComputeServicePilotJobStartedMessage(PilotJob *job, std::shared_ptr<ComputeService>  cs,
+    ComputeServicePilotJobStartedMessage::ComputeServicePilotJobStartedMessage(PilotJob *job,
+                                                                               std::shared_ptr<ComputeService> cs,
                                                                                double payload)
             : ComputeServiceMessage("PILOT_JOB_STARTED", payload) {
 
-      if ((job == nullptr) || (cs == nullptr)) {
-        throw std::invalid_argument(
-                "ComputeServicePilotJobStartedMessage::ComputeServicePilotJobStartedMessage(): Invalid arguments");
-      }
-      this->job = job;
-      this->compute_service = cs;
+        if ((job == nullptr) || (cs == nullptr)) {
+            throw std::invalid_argument(
+                    "ComputeServicePilotJobStartedMessage::ComputeServicePilotJobStartedMessage(): Invalid arguments");
+        }
+        this->job = job;
+        this->compute_service = cs;
     }
 
     /**
@@ -249,15 +250,16 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    ComputeServicePilotJobExpiredMessage::ComputeServicePilotJobExpiredMessage(PilotJob *job, std::shared_ptr<ComputeService>  cs,
+    ComputeServicePilotJobExpiredMessage::ComputeServicePilotJobExpiredMessage(PilotJob *job,
+                                                                               std::shared_ptr<ComputeService> cs,
                                                                                double payload)
             : ComputeServiceMessage("PILOT_JOB_EXPIRED", payload) {
-      if ((job == nullptr) || (cs == nullptr)) {
-        throw std::invalid_argument(
-                "ComputeServicePilotJobExpiredMessage::ComputeServicePilotJobExpiredMessage(): Invalid arguments");
-      }
-      this->job = job;
-      this->compute_service = cs;
+        if ((job == nullptr) || (cs == nullptr)) {
+            throw std::invalid_argument(
+                    "ComputeServicePilotJobExpiredMessage::ComputeServicePilotJobExpiredMessage(): Invalid arguments");
+        }
+        this->job = job;
+        this->compute_service = cs;
     }
 
     /**
@@ -268,15 +270,16 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    ComputeServicePilotJobFailedMessage::ComputeServicePilotJobFailedMessage(PilotJob *job, std::shared_ptr<ComputeService>  cs,
+    ComputeServicePilotJobFailedMessage::ComputeServicePilotJobFailedMessage(PilotJob *job,
+                                                                             std::shared_ptr<ComputeService> cs,
                                                                              double payload) : ComputeServiceMessage(
             "PILOT_JOB_FAILED", payload) {
-      if ((job == nullptr) || (cs == nullptr)) {
-        throw std::invalid_argument(
-                "ComputeServicePilotJobFailedMessage::ComputeServicePilotJobFailedMessage(): Invalid arguments");
-      }
-      this->job = job;
-      this->compute_service = cs;
+        if ((job == nullptr) || (cs == nullptr)) {
+            throw std::invalid_argument(
+                    "ComputeServicePilotJobFailedMessage::ComputeServicePilotJobFailedMessage(): Invalid arguments");
+        }
+        this->job = job;
+        this->compute_service = cs;
     }
 
     /**
@@ -292,12 +295,12 @@ namespace wrench {
             PilotJob *job,
             double payload) :
             ComputeServiceMessage("TERMINATE_PILOT_JOB_REQUEST", payload) {
-      if ((answer_mailbox == "") || (job == nullptr)) {
-        throw std::invalid_argument(
-                "ComputeServiceTerminatePilotJobRequestMessage::ComputeServiceTerminatePilotJobRequestMessage(): Invalid arguments");
-      }
-      this->answer_mailbox = answer_mailbox;
-      this->job = job;
+        if ((answer_mailbox == "") || (job == nullptr)) {
+            throw std::invalid_argument(
+                    "ComputeServiceTerminatePilotJobRequestMessage::ComputeServiceTerminatePilotJobRequestMessage(): Invalid arguments");
+        }
+        this->answer_mailbox = answer_mailbox;
+        this->job = job;
     }
 
     /**
@@ -311,21 +314,21 @@ namespace wrench {
      * @throw std::invalid_arguments
      */
     ComputeServiceTerminatePilotJobAnswerMessage::ComputeServiceTerminatePilotJobAnswerMessage(PilotJob *job,
-                                                                                               std::shared_ptr<ComputeService>  compute_service,
+                                                                                               std::shared_ptr<ComputeService> compute_service,
                                                                                                bool success,
                                                                                                std::shared_ptr<FailureCause> failure_cause,
                                                                                                double payload) :
             ComputeServiceMessage("TERMINATE_PILOT_JOB_ANSWER", payload) {
-      if ((job == nullptr) || (compute_service == nullptr) ||
-              (success && (failure_cause != nullptr)) ||
-              (!success && (failure_cause == nullptr))) {
-        throw std::invalid_argument(
-                "ComputeServiceTerminatePilotJobAnswerMessage::ComputeServiceTerminatePilotJobAnswerMessage(): Invalid arguments");
-      }
-      this->job = job;
-      this->compute_service = compute_service;
-      this->success = success;
-      this->failure_cause = failure_cause;
+        if ((job == nullptr) || (compute_service == nullptr) ||
+            (success && (failure_cause != nullptr)) ||
+            (!success && (failure_cause == nullptr))) {
+            throw std::invalid_argument(
+                    "ComputeServiceTerminatePilotJobAnswerMessage::ComputeServiceTerminatePilotJobAnswerMessage(): Invalid arguments");
+        }
+        this->job = job;
+        this->compute_service = compute_service;
+        this->success = success;
+        this->failure_cause = failure_cause;
     }
 
     /**
@@ -335,14 +338,15 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    ComputeServiceResourceInformationRequestMessage::ComputeServiceResourceInformationRequestMessage(std::string answer_mailbox,
-                                                                                       double payload)
+    ComputeServiceResourceInformationRequestMessage::ComputeServiceResourceInformationRequestMessage(
+            std::string answer_mailbox,
+            double payload)
             : ComputeServiceMessage("RESOURCE_DESCRIPTION_REQUEST", payload) {
-      if (answer_mailbox.empty()) {
-        throw std::invalid_argument(
-                "ComputeServiceResourceInformationRequestMessage::ComputeServiceResourceInformationRequestMessage(): Invalid arguments");
-      }
-      this->answer_mailbox = answer_mailbox;
+        if (answer_mailbox.empty()) {
+            throw std::invalid_argument(
+                    "ComputeServiceResourceInformationRequestMessage::ComputeServiceResourceInformationRequestMessage(): Invalid arguments");
+        }
+        this->answer_mailbox = answer_mailbox;
     }
 
 

@@ -25,26 +25,27 @@ namespace wrench {
      */
     BatchJob::BatchJob(WorkflowJob *job, unsigned long jobid, unsigned long time_in_minutes, unsigned long num_nodes,
                        unsigned long cores_per_node, double ending_time_stamp, double arrival_time_stamp) {
-      if (job == nullptr) {
-        throw std::invalid_argument(
-                "BatchJob::BatchJob(): StandardJob cannot be null"
-        );
-      }
-      this->job = job;
-      if (jobid <= 0 || num_nodes == 0 || cores_per_node == 0) {
-        std::cout << "Info: " << jobid << " " << time_in_minutes << " " << num_nodes << " " << cores_per_node << "\n";
-        throw std::invalid_argument(
-                "BatchJob::BatchJob(): either jobid, time_in_minutes, num_nodes, cores_per_node is less than or equal to zero"
-        );
-      }
-      this->jobid = jobid;
-      this->allocated_time = time_in_minutes * 60;
-      this->num_nodes = num_nodes;
-      this->cores_per_node = cores_per_node;
-      this->ending_time_stamp = ending_time_stamp;
-      this->arrival_time_stamp = arrival_time_stamp;
+        if (job == nullptr) {
+            throw std::invalid_argument(
+                    "BatchJob::BatchJob(): StandardJob cannot be null"
+            );
+        }
+        this->job = job;
+        if (jobid <= 0 || num_nodes == 0 || cores_per_node == 0) {
+            std::cout << "Info: " << jobid << " " << time_in_minutes << " " << num_nodes << " " << cores_per_node
+                      << "\n";
+            throw std::invalid_argument(
+                    "BatchJob::BatchJob(): either jobid, time_in_minutes, num_nodes, cores_per_node is less than or equal to zero"
+            );
+        }
+        this->jobid = jobid;
+        this->allocated_time = time_in_minutes * 60;
+        this->num_nodes = num_nodes;
+        this->cores_per_node = cores_per_node;
+        this->ending_time_stamp = ending_time_stamp;
+        this->arrival_time_stamp = arrival_time_stamp;
 
-      this->csv_metadata = "color:red";
+        this->csv_metadata = "color:red";
     }
 
     /**
@@ -52,7 +53,7 @@ namespace wrench {
      * @return a number of cores
      */
     unsigned long BatchJob::getAllocatedCoresPerNode() {
-      return this->cores_per_node;
+        return this->cores_per_node;
     }
 
     /**
@@ -60,7 +61,7 @@ namespace wrench {
      * @return a time in seconds
      */
     unsigned long BatchJob::getAllocatedTime() {
-      return this->allocated_time;
+        return this->allocated_time;
     }
 
     /**
@@ -68,7 +69,7 @@ namespace wrench {
      * @param time: a time in seconds
      */
     void BatchJob::setAllocatedTime(unsigned long time) {
-      this->allocated_time = time;
+        this->allocated_time = time;
     }
 
     /**
@@ -76,16 +77,16 @@ namespace wrench {
      * @return a size in bytes
      */
     double BatchJob::getMemoryRequirement() {
-      WorkflowJob *workflow_job = this->job;
-      double memory_requirement = 0.0;
-      if (workflow_job->getType() == WorkflowJob::STANDARD) {
-        auto standard_job = (StandardJob *)workflow_job;
-        for (auto const &t : standard_job->getTasks()) {
-          double ram = t->getMemoryRequirement();
-          memory_requirement = (memory_requirement < ram ? ram : memory_requirement);
+        WorkflowJob *workflow_job = this->job;
+        double memory_requirement = 0.0;
+        if (workflow_job->getType() == WorkflowJob::STANDARD) {
+            auto standard_job = (StandardJob *) workflow_job;
+            for (auto const &t : standard_job->getTasks()) {
+                double ram = t->getMemoryRequirement();
+                memory_requirement = (memory_requirement < ram ? ram : memory_requirement);
+            }
         }
-      }
-      return memory_requirement;
+        return memory_requirement;
 
     }
 
@@ -94,7 +95,7 @@ namespace wrench {
      * @return a date
      */
     double BatchJob::getArrivalTimeStamp() {
-      return this->arrival_time_stamp;
+        return this->arrival_time_stamp;
     }
 
     /**
@@ -102,7 +103,7 @@ namespace wrench {
      * @return a workflow job
      */
     WorkflowJob *BatchJob::getWorkflowJob() {
-      return this->job;
+        return this->job;
     }
 
     /**
@@ -110,7 +111,7 @@ namespace wrench {
      * @return a string id
      */
     unsigned long BatchJob::getJobID() {
-      return this->jobid;
+        return this->jobid;
     }
 
     /**
@@ -118,7 +119,7 @@ namespace wrench {
      * @return a number of nodes
      */
     unsigned long BatchJob::getNumNodes() {
-      return this->num_nodes;
+        return this->num_nodes;
     }
 
 
@@ -127,7 +128,7 @@ namespace wrench {
      * @param time_stamp: a date
      */
     void BatchJob::setBeginTimeStamp(double time_stamp) {
-      this->begin_time_stamp = time_stamp;
+        this->begin_time_stamp = time_stamp;
     }
 
 
@@ -136,7 +137,7 @@ namespace wrench {
      * @return a date
      */
     double BatchJob::getBeginTimeStamp() {
-      return this->begin_time_stamp;
+        return this->begin_time_stamp;
     }
 
 /**
@@ -144,7 +145,7 @@ namespace wrench {
      * @return a date
      */
     double BatchJob::getEndingTimeStamp() {
-      return this->ending_time_stamp;
+        return this->ending_time_stamp;
     }
 
     /**
@@ -152,12 +153,12 @@ namespace wrench {
      * @param time_stamp: a date
      */
     void BatchJob::setEndingTimeStamp(double time_stamp) {
-      if (this->ending_time_stamp > 0) {
-        throw std::runtime_error(
-                "BatchJob::setEndingTimeStamp(): Cannot set time stamp again for the same job"
-        );
-      }
-      this->ending_time_stamp = time_stamp;
+        if (this->ending_time_stamp > 0) {
+            throw std::runtime_error(
+                    "BatchJob::setEndingTimeStamp(): Cannot set time stamp again for the same job"
+            );
+        }
+        this->ending_time_stamp = time_stamp;
     }
 
     /**
@@ -165,7 +166,7 @@ namespace wrench {
      * @return a list of resource, each as a <hostname, number of cores, bytes of RAM> tuple
      */
     std::map<std::string, std::tuple<unsigned long, double>> BatchJob::getResourcesAllocated() {
-      return this->resources_allocated;
+        return this->resources_allocated;
     }
 
     /**
@@ -173,12 +174,12 @@ namespace wrench {
      * @param resources: a list of resource, each as a <hostname, number of cores, bytes of RAM> tuple
      */
     void BatchJob::setAllocatedResources(std::map<std::string, std::tuple<unsigned long, double>> resources) {
-      if (resources.empty()) {
-        throw std::invalid_argument(
-                "BatchJob::setAllocatedResources(): Empty Resources allocated"
-        );
-      }
-      this->resources_allocated = resources;
+        if (resources.empty()) {
+            throw std::invalid_argument(
+                    "BatchJob::setAllocatedResources(): Empty Resources allocated"
+            );
+        }
+        this->resources_allocated = resources;
     }
 
 

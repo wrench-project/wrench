@@ -21,7 +21,7 @@ namespace wrench {
             ComputeServiceMessage("BatchComputeServiceMessage::" + name, payload) {
     }
 
-    #if 0
+#if 0
     /**
      * @brief Constructor
      * @param answer_mailbox: the mailbox to reply to
@@ -45,9 +45,9 @@ namespace wrench {
       this->answer_mailbox = answer_mailbox;
       this->job_args_to_scheduler = job_args_to_scheduler;
     }
-    #endif
+#endif
 
-    #if 0
+#if 0
     /**
      * @brief Constructor
      * @param answer_mailbox: the mailbox to reply to
@@ -63,7 +63,7 @@ namespace wrench {
       }
       this->answer_mailbox = answer_mailbox;
     }
-    #endif
+#endif
 
     /**
      * @brief Constructor
@@ -77,16 +77,16 @@ namespace wrench {
                                                                            std::string batsched_decision_reply,
                                                                            double payload)
             : BatchComputeServiceMessage("BatchExecuteJobFromBatSchedMessage", payload) {
-      if (answer_mailbox.empty()) {
-        throw std::invalid_argument(
-                "BatchExecuteJobFromBatSchedMessage::BatchExecuteJobFromBatSchedMessage(): Empty answer mailbox");
-      }
-      if (batsched_decision_reply.empty()) {
-        throw std::invalid_argument(
-                "BatchExecuteJobFromBatSchedMessage::BatchExecuteJobFromBatSchedMessage(): Empty batsched decision reply");
-      }
-      this->answer_mailbox = answer_mailbox;
-      this->batsched_decision_reply = batsched_decision_reply;
+        if (answer_mailbox.empty()) {
+            throw std::invalid_argument(
+                    "BatchExecuteJobFromBatSchedMessage::BatchExecuteJobFromBatSchedMessage(): Empty answer mailbox");
+        }
+        if (batsched_decision_reply.empty()) {
+            throw std::invalid_argument(
+                    "BatchExecuteJobFromBatSchedMessage::BatchExecuteJobFromBatSchedMessage(): Empty batsched decision reply");
+        }
+        this->answer_mailbox = answer_mailbox;
+        this->batsched_decision_reply = batsched_decision_reply;
     }
 
     /**
@@ -98,10 +98,10 @@ namespace wrench {
      */
     BatchQueryAnswerMessage::BatchQueryAnswerMessage(double estimated_job_start_time, double payload)
             : BatchComputeServiceMessage("BatchQueryAnswerMessage", payload) {
-      this->estimated_start_time = estimated_job_start_time;
+        this->estimated_start_time = estimated_job_start_time;
     }
 
-    #if 0
+#if 0
     /**
      * @brief Constructor
      * @param answer_mailbox: the mailbox to reply to
@@ -130,7 +130,7 @@ namespace wrench {
       this->answer_mailbox = answer_mailbox;
       this->job = job;
     }
-    #endif
+#endif
 
 
 #if 0
@@ -155,18 +155,18 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     BatchComputeServiceJobRequestMessage::BatchComputeServiceJobRequestMessage(std::string answer_mailbox,
-                                                                 BatchJob *job, double payload)
+                                                                               BatchJob *job, double payload)
             : BatchComputeServiceMessage("BatchComputeServiceJobRequestMessage", payload) {
-      if (job == nullptr) {
-        throw std::invalid_argument(
-                "BatchComputeServiceJobRequestMessage::BatchComputeServiceJobRequestMessage(): Invalid arguments");
-      }
-      if (answer_mailbox.empty()) {
-        throw std::invalid_argument(
-                "BatchComputeServiceJobRequestMessage::BatchComputeServiceJobRequestMessage(): Empty answer mailbox");
-      }
-      this->job = job;
-      this->answer_mailbox = answer_mailbox;
+        if (job == nullptr) {
+            throw std::invalid_argument(
+                    "BatchComputeServiceJobRequestMessage::BatchComputeServiceJobRequestMessage(): Invalid arguments");
+        }
+        if (answer_mailbox.empty()) {
+            throw std::invalid_argument(
+                    "BatchComputeServiceJobRequestMessage::BatchComputeServiceJobRequestMessage(): Empty answer mailbox");
+        }
+        this->job = job;
+        this->answer_mailbox = answer_mailbox;
     }
 
     /**
@@ -178,14 +178,14 @@ namespace wrench {
      */
     AlarmJobTimeOutMessage::AlarmJobTimeOutMessage(BatchJob *job, double payload)
             : ServiceMessage("AlarmJobTimeOutMessage", payload) {
-      if (job == nullptr) {
-        throw std::invalid_argument(
-                "AlarmJobTimeOutMessage::AlarmJobTimeOutMessage: Invalid argument");
-      }
-      this->job = job;
+        if (job == nullptr) {
+            throw std::invalid_argument(
+                    "AlarmJobTimeOutMessage::AlarmJobTimeOutMessage: Invalid argument");
+        }
+        this->job = job;
     }
 
-    #if 0
+#if 0
     /**
      * @brief Constructor
      * @param job_id: the id of a batch job
@@ -195,6 +195,6 @@ namespace wrench {
      */
     AlarmNotifyBatschedMessage::AlarmNotifyBatschedMessage(std::string job_id, double payload)
             : ServiceMessage("ALARM_NOTIFY_BATSCHED", payload), job_id(job_id) {}
-    #endif
+#endif
 
 }

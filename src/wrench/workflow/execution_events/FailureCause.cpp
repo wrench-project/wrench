@@ -25,7 +25,7 @@ namespace wrench {
      * @brief Constructor
      * @param file: the file that could not be found on any storage service
      */
-    NoStorageServiceForFile::NoStorageServiceForFile(WorkflowFile *file)  {
+    NoStorageServiceForFile::NoStorageServiceForFile(WorkflowFile *file) {
         this->file = file;
     }
 
@@ -83,7 +83,7 @@ namespace wrench {
      * @brief Getter
      * @return the storage service
      */
-    std::shared_ptr<StorageService>  FileNotFound::getStorageService() {
+    std::shared_ptr<StorageService> FileNotFound::getStorageService() {
         return this->storage_service;
     }
 
@@ -100,8 +100,8 @@ namespace wrench {
      * @param file: the file that could not be written
      * @param storage_service:  the storage service that ran out of spacee
      */
-    StorageServiceNotEnoughSpace::StorageServiceNotEnoughSpace(WorkflowFile *file, std::shared_ptr<StorageService>  storage_service)
-             {
+    StorageServiceNotEnoughSpace::StorageServiceNotEnoughSpace(WorkflowFile *file,
+                                                               std::shared_ptr<StorageService> storage_service) {
         this->file = file;
         this->storage_service = storage_service;
     }
@@ -118,7 +118,7 @@ namespace wrench {
      * @brief Getter
      * @return the storage service
      */
-    std::shared_ptr<StorageService>  StorageServiceNotEnoughSpace::getStorageService() {
+    std::shared_ptr<StorageService> StorageServiceNotEnoughSpace::getStorageService() {
         return this->storage_service;
     }
 
@@ -178,13 +178,13 @@ namespace wrench {
     std::string ServiceIsSuspended::toString() {
         return "Service " + this->service->getName() + " on host " + this->service->getHostname() + " is suspended";
     }
-    
+
     /**
      * @brief Constructor
      * @param job: the job that wasn't supported
      * @param compute_service: the compute service that did not support it
      */
-    JobTypeNotSupported::JobTypeNotSupported(WorkflowJob *job, std::shared_ptr<ComputeService>  compute_service) {
+    JobTypeNotSupported::JobTypeNotSupported(WorkflowJob *job, std::shared_ptr<ComputeService> compute_service) {
         this->job = job;
         this->compute_service = compute_service;
     }
@@ -201,7 +201,7 @@ namespace wrench {
      * @brief Getter
      * @return the compute service
      */
-    std::shared_ptr<ComputeService>  JobTypeNotSupported::getComputeService() {
+    std::shared_ptr<ComputeService> JobTypeNotSupported::getComputeService() {
         return this->compute_service;
     }
 
@@ -258,7 +258,7 @@ namespace wrench {
     * @param job: the job that could not be executed
     * @param compute_service: the compute service that didn't have enough cores
     */
-    JobKilled::JobKilled(WorkflowJob *job, std::shared_ptr<ComputeService>  compute_service) {
+    JobKilled::JobKilled(WorkflowJob *job, std::shared_ptr<ComputeService> compute_service) {
         this->job = job;
         this->compute_service = compute_service;
     }
@@ -275,7 +275,7 @@ namespace wrench {
      * @brief Getter
      * @return the compute service
      */
-    std::shared_ptr<ComputeService>  JobKilled::getComputeService() {
+    std::shared_ptr<ComputeService> JobKilled::getComputeService() {
         return this->compute_service;
     }
 
@@ -454,7 +454,8 @@ namespace wrench {
      * @param storage_service:  the storage service to which is is being copied
      * @param dst_partition: the destination partition
      */
-    FileAlreadyBeingCopied::FileAlreadyBeingCopied(WorkflowFile *file, std::shared_ptr<StorageService> storage_service, std::string dst_partition) {
+    FileAlreadyBeingCopied::FileAlreadyBeingCopied(WorkflowFile *file, std::shared_ptr<StorageService> storage_service,
+                                                   std::string dst_partition) {
         this->file = file;
         this->storage_service = storage_service;
         this->dst_partition = dst_partition;
@@ -532,7 +533,8 @@ namespace wrench {
      * @param service: the service
      * @param functionality_name: a description of the functionality that's not available
      */
-    FunctionalityNotAvailable::FunctionalityNotAvailable(std::shared_ptr<Service> service, std::string functionality_name) {
+    FunctionalityNotAvailable::FunctionalityNotAvailable(std::shared_ptr<Service> service,
+                                                         std::string functionality_name) {
         this->service = service;
         this->functionality_name = std::move(functionality_name);
     }
@@ -559,7 +561,8 @@ namespace wrench {
      * @return the message
      */
     std::string FunctionalityNotAvailable::toString() {
-        return "The request functionality (" + this->functionality_name + ") is not available on service " + this->service->getName();
+        return "The request functionality (" + this->functionality_name + ") is not available on service " +
+               this->service->getName();
     }
 
     /**
@@ -608,7 +611,7 @@ namespace wrench {
      * @param service: the service that cause the error
      * @param error_message: a custom error message
      */
-    NotAllowed::NotAllowed(std::shared_ptr<Service>  service, std::string &error_message) {
+    NotAllowed::NotAllowed(std::shared_ptr<Service> service, std::string &error_message) {
         this->service = service;
         this->error_message = error_message;
     }
@@ -617,7 +620,7 @@ namespace wrench {
      * @brief Get the service that caused the error
      * @return the service
      */
-    std::shared_ptr<Service>  NotAllowed::getService() {
+    std::shared_ptr<Service> NotAllowed::getService() {
         return this->service;
     }
 
@@ -626,7 +629,8 @@ namespace wrench {
      * @return the message
      */
     std::string NotAllowed::toString() {
-        return "The service (" + this->service->getName() + ") does not allow the operation (" + this->error_message + ")";
+        return "The service (" + this->service->getName() + ") does not allow the operation (" + this->error_message +
+               ")";
     }
 
 };

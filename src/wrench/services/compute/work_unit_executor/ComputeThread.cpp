@@ -26,7 +26,8 @@ namespace wrench {
      * @param flops: the number of flops to perform
      * @param reply_mailbox: the mailbox to which the "done/failed" message should be sent
      */
-    ComputeThread::ComputeThread(Simulation *simulation, std::string hostname, double flops, std::string reply_mailbox) :
+    ComputeThread::ComputeThread(Simulation *simulation, std::string hostname, double flops, std::string reply_mailbox)
+            :
             Service(hostname, "compute_thread", "compute_thread") {
         this->simulation = simulation;
         this->flops = flops;

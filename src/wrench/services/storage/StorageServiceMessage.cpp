@@ -40,7 +40,8 @@ namespace wrench {
                                                                                  double payload)
             : StorageServiceMessage("FREE_SPACE_REQUEST", payload) {
         if ((answer_mailbox == "")) {
-            throw std::invalid_argument("StorageServiceFreeSpaceRequestMessage::StorageServiceFreeSpaceRequestMessage(): Invalid arguments");
+            throw std::invalid_argument(
+                    "StorageServiceFreeSpaceRequestMessage::StorageServiceFreeSpaceRequestMessage(): Invalid arguments");
         }
         this->answer_mailbox = answer_mailbox;
     }
@@ -56,7 +57,8 @@ namespace wrench {
             : StorageServiceMessage(
             "FREE_SPACE_ANSWER", payload) {
         if ((free_space < 0.0)) {
-            throw std::invalid_argument("StorageServiceFreeSpaceAnswerMessage::StorageServiceFreeSpaceAnswerMessage(): Invalid arguments");
+            throw std::invalid_argument(
+                    "StorageServiceFreeSpaceAnswerMessage::StorageServiceFreeSpaceAnswerMessage(): Invalid arguments");
         }
         this->free_space = free_space;
     }
@@ -77,7 +79,8 @@ namespace wrench {
             : StorageServiceMessage("FILE_LOOKUP_REQUEST",
                                     payload) {
         if ((file == nullptr) || (answer_mailbox == "")) {
-            throw std::invalid_argument("StorageServiceFileLookupRequestMessage::StorageServiceFileLookupRequestMessage(): Invalid arguments");
+            throw std::invalid_argument(
+                    "StorageServiceFileLookupRequestMessage::StorageServiceFileLookupRequestMessage(): Invalid arguments");
         }
         this->answer_mailbox = answer_mailbox;
         this->file = file;
@@ -99,7 +102,8 @@ namespace wrench {
             "FILE_LOOKUP_ANSWER", payload) {
 
         if (file == nullptr) {
-            throw std::invalid_argument("StorageServiceFileLookupAnswerMessage::StorageServiceFileLookupAnswerMessage(): Invalid arguments");
+            throw std::invalid_argument(
+                    "StorageServiceFileLookupAnswerMessage::StorageServiceFileLookupAnswerMessage(): Invalid arguments");
         }
         this->file = file;
         this->file_is_available = file_is_available;
@@ -121,7 +125,8 @@ namespace wrench {
             : StorageServiceMessage("FILE_DELETE_REQUEST",
                                     payload) {
         if ((answer_mailbox == "") || (file == nullptr)) {
-            throw std::invalid_argument("StorageServiceFileDeleteRequestMessage::StorageServiceFileDeleteRequestMessage(): Invalid arguments");
+            throw std::invalid_argument(
+                    "StorageServiceFileDeleteRequestMessage::StorageServiceFileDeleteRequestMessage(): Invalid arguments");
         }
         this->file = file;
         this->answer_mailbox = answer_mailbox;
@@ -139,7 +144,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     StorageServiceFileDeleteAnswerMessage::StorageServiceFileDeleteAnswerMessage(WorkflowFile *file,
-                                                                                 std::shared_ptr<StorageService>  storage_service,
+                                                                                 std::shared_ptr<StorageService> storage_service,
                                                                                  bool success,
                                                                                  std::shared_ptr<FailureCause> failure_cause,
                                                                                  double payload)
@@ -148,7 +153,8 @@ namespace wrench {
         if ((file == nullptr) || (storage_service == nullptr) ||
             (success && (failure_cause != nullptr)) ||
             ((!success) && (failure_cause == nullptr))) {
-            throw std::invalid_argument("StorageServiceFileDeleteAnswerMessage::StorageServiceFileDeleteAnswerMessage(): Invalid arguments");
+            throw std::invalid_argument(
+                    "StorageServiceFileDeleteAnswerMessage::StorageServiceFileDeleteAnswerMessage(): Invalid arguments");
         }
         this->file = file;
         this->storage_service = storage_service;
@@ -182,7 +188,8 @@ namespace wrench {
             "FILE_COPY_REQUEST", payload) {
         if ((answer_mailbox == "") || (file == nullptr) || (src == nullptr)
             || (dst == nullptr) || (start_timestamp == nullptr)) {
-            throw std::invalid_argument("StorageServiceFileCopyRequestMessage::StorageServiceFileCopyRequestMessage(): Invalid arguments");
+            throw std::invalid_argument(
+                    "StorageServiceFileCopyRequestMessage::StorageServiceFileCopyRequestMessage(): Invalid arguments");
         }
         this->answer_mailbox = answer_mailbox;
         this->file = file;
@@ -224,7 +231,8 @@ namespace wrench {
             (success && (failure_cause != nullptr)) ||
             (!success && (failure_cause == nullptr)) ||
             ((file_registry_service == nullptr) and (file_registry_service_updated))) {
-            throw std::invalid_argument("StorageServiceFileCopyAnswerMessage::StorageServiceFileCopyAnswerMessage(): Invalid arguments");
+            throw std::invalid_argument(
+                    "StorageServiceFileCopyAnswerMessage::StorageServiceFileCopyAnswerMessage(): Invalid arguments");
         }
         this->file = file;
         this->storage_service = storage_service;
@@ -252,7 +260,8 @@ namespace wrench {
             : StorageServiceMessage("FILE_WRITE_REQUEST",
                                     payload) {
         if ((answer_mailbox == "") || (file == nullptr)) {
-            throw std::invalid_argument("StorageServiceFileWriteRequestMessage::StorageServiceFileWriteRequestMessage(): Invalid arguments");
+            throw std::invalid_argument(
+                    "StorageServiceFileWriteRequestMessage::StorageServiceFileWriteRequestMessage(): Invalid arguments");
         }
         this->payload = payload;
         this->answer_mailbox = answer_mailbox;
@@ -272,7 +281,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     StorageServiceFileWriteAnswerMessage::StorageServiceFileWriteAnswerMessage(WorkflowFile *file,
-                                                                               std::shared_ptr<StorageService>  storage_service,
+                                                                               std::shared_ptr<StorageService> storage_service,
                                                                                bool success,
                                                                                std::shared_ptr<FailureCause> failure_cause,
                                                                                std::string data_write_mailbox_name,
@@ -280,7 +289,8 @@ namespace wrench {
             "FILE_WRITE_ANSWER", payload) {
         if ((file == nullptr) || (storage_service == nullptr) || (data_write_mailbox_name == "") ||
             (success && (failure_cause != nullptr)) || (!success && (failure_cause == nullptr))) {
-            throw std::invalid_argument("StorageServiceFileWriteAnswerMessage::StorageServiceFileWriteAnswerMessage(): Invalid arguments");
+            throw std::invalid_argument(
+                    "StorageServiceFileWriteAnswerMessage::StorageServiceFileWriteAnswerMessage(): Invalid arguments");
         }
         this->file = file;
         this->storage_service = storage_service;
@@ -307,7 +317,8 @@ namespace wrench {
             "FILE_READ_REQUEST",
             payload) {
         if ((answer_mailbox == "") || (mailbox_to_receive_the_file_content == "") || (file == nullptr)) {
-            throw std::invalid_argument("StorageServiceFileReadRequestMessage::StorageServiceFileReadRequestMessage(): Invalid arguments");
+            throw std::invalid_argument(
+                    "StorageServiceFileReadRequestMessage::StorageServiceFileReadRequestMessage(): Invalid arguments");
         }
         this->answer_mailbox = answer_mailbox;
         this->mailbox_to_receive_the_file_content = mailbox_to_receive_the_file_content;
@@ -326,7 +337,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     StorageServiceFileReadAnswerMessage::StorageServiceFileReadAnswerMessage(WorkflowFile *file,
-                                                                             std::shared_ptr<StorageService>  storage_service,
+                                                                             std::shared_ptr<StorageService> storage_service,
                                                                              bool success,
                                                                              std::shared_ptr<FailureCause> failure_cause,
                                                                              double payload) : StorageServiceMessage(
@@ -334,7 +345,8 @@ namespace wrench {
             payload) {
         if ((file == nullptr) || (storage_service == nullptr) ||
             (success && (failure_cause != nullptr)) || (!success && (failure_cause == nullptr))) {
-            throw std::invalid_argument("StorageServiceFileReadAnswerMessage::StorageServiceFileReadAnswerMessage(): Invalid arguments");
+            throw std::invalid_argument(
+                    "StorageServiceFileReadAnswerMessage::StorageServiceFileReadAnswerMessage(): Invalid arguments");
         }
         this->file = file;
         this->storage_service = storage_service;
@@ -349,7 +361,8 @@ namespace wrench {
     StorageServiceFileContentMessage::StorageServiceFileContentMessage(WorkflowFile *file) : StorageServiceMessage(
             "FILE_CONTENT", 0) {
         if (file == nullptr) {
-            throw std::invalid_argument("StorageServiceFileContentMessage::StorageServiceFileContentMessage(): Invalid arguments");
+            throw std::invalid_argument(
+                    "StorageServiceFileContentMessage::StorageServiceFileContentMessage(): Invalid arguments");
         }
         this->payload += file->getSize();
         this->file = file;

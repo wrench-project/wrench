@@ -39,12 +39,12 @@ namespace wrench {
             : ServiceMessage("DAEMON_STOPPED", payload) {}
 
 
-  /**
-    * @brief Constructor
-    * @param payload: message size in bytes
-    *
-    * @throw std::invalid_arguments
-    */
+    /**
+      * @brief Constructor
+      * @param payload: message size in bytes
+      *
+      * @throw std::invalid_arguments
+      */
     ServiceTTLExpiredMessage::ServiceTTLExpiredMessage(double payload)
             : ServiceMessage("TTL_EXPIRED", payload) {}
 

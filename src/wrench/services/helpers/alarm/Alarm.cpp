@@ -32,13 +32,13 @@ namespace wrench {
                  SimulationMessage *msg, std::string suffix) : Service(hostname, "alarm_service_" + suffix,
                                                                        "alarm_service_" + suffix) {
 
-      this->date = date;
+        this->date = date;
 //      if (this->date <= S4U_Simulation::getClock()) {
 //        WRENCH_INFO(
 //                "Alarm is being started but notification date is in the past. Notification will be sent immediately.");
 //      }
-      this->reply_mailbox_name = reply_mailbox_name;
-      this->msg = msg;
+        this->reply_mailbox_name = reply_mailbox_name;
+        this->msg = msg;
     }
 
     /**
@@ -47,24 +47,24 @@ namespace wrench {
      * @return 0 on termination
      */
     int Alarm::main() {
-      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
-      WRENCH_INFO("Alarm Service starting");
+        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
+        WRENCH_INFO("Alarm Service starting");
 
-      double time_to_sleep = this->date - S4U_Simulation::getClock();
+        double time_to_sleep = this->date - S4U_Simulation::getClock();
 
-      if (time_to_sleep > 0) {
-        S4U_Simulation::sleep(time_to_sleep);
-        WRENCH_INFO("Alarm Service Sending a message to %s", this->reply_mailbox_name.c_str());
-        try {
-          S4U_Mailbox::putMessage(this->reply_mailbox_name,
-                                  msg);
-        } catch (std::shared_ptr<NetworkError> &cause) {
-          WRENCH_WARN("AlarmService was not able to send the trigger to its upper service");
+        if (time_to_sleep > 0) {
+            S4U_Simulation::sleep(time_to_sleep);
+            WRENCH_INFO("Alarm Service Sending a message to %s", this->reply_mailbox_name.c_str());
+            try {
+                S4U_Mailbox::putMessage(this->reply_mailbox_name,
+                                        msg);
+            } catch (std::shared_ptr<NetworkError> &cause) {
+                WRENCH_WARN("AlarmService was not able to send the trigger to its upper service");
+            }
         }
-      }
 
-      this->setStateToDown();
-      return 0;
+        this->setStateToDown();
+        return 0;
     }
 
 
@@ -82,24 +82,25 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     std::shared_ptr<Alarm>
-    Alarm::createAndStartAlarm(Simulation *simulation, double date, std::string hostname, std::string &reply_mailbox_name,
+    Alarm::createAndStartAlarm(Simulation *simulation, double date, std::string hostname,
+                               std::string &reply_mailbox_name,
                                SimulationMessage *msg, std::string suffix) {
-      std::shared_ptr<Alarm> alarm_ptr = std::shared_ptr<Alarm>(
-              new Alarm(date, hostname, reply_mailbox_name, msg, suffix));
-      alarm_ptr->simulation = simulation;
-      try {
-        alarm_ptr->start(alarm_ptr, true, false); // Daemonized, no auto-restart
-      } catch (std::invalid_argument &e) {
-        throw;
-      }
-      return alarm_ptr;
+        std::shared_ptr<Alarm> alarm_ptr = std::shared_ptr<Alarm>(
+                new Alarm(date, hostname, reply_mailbox_name, msg, suffix));
+        alarm_ptr->simulation = simulation;
+        try {
+            alarm_ptr->start(alarm_ptr, true, false); // Daemonized, no auto-restart
+        } catch (std::invalid_argument &e) {
+            throw;
+        }
+        return alarm_ptr;
     }
 
     /**
      * @brief Immediately (i.e., brutally) terminate the alarm service
      */
     void Alarm::kill() {
-      this->killActor();
+        this->killActor();
     }
 
 };

@@ -16,7 +16,6 @@
 #include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
 
 
-
 namespace wrench {
 
     /***********************/
@@ -37,9 +36,10 @@ namespace wrench {
         ComputeThread(Simulation *simulation, std::string hostname, double flops, std::string reply_mailbox);
 
         int main() override;
+
         void cleanup(bool has_returned_from_main, int return_value) override;
 
-            void kill();
+        void kill();
 
     private:
         double flops;

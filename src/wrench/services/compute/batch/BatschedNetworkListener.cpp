@@ -197,5 +197,5 @@ namespace wrench {
       }
 
     }
-    #endif // ENABLE_BATSCHED
+#endif // ENABLE_BATSCHED
 }

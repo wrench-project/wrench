@@ -54,10 +54,10 @@ namespace wrench {
 
         double getTaskEndTime() {
             return std::max({
-                this->whole_task.second,
-                this->failed,
-                this->terminated
-            });
+                                    this->whole_task.second,
+                                    this->failed,
+                                    this->terminated
+                            });
         }
     } WorkflowTaskExecutionInstance;
 
@@ -70,34 +70,34 @@ namespace wrench {
      */
     void to_json(nlohmann::json &j, const WorkflowTaskExecutionInstance &w) {
         j = nlohmann::json{
-                {"task_id", w.task_id},
-                {"execution_host", {
-                                    {"hostname", w.hostname},
-                                    {"flop_rate", w.host_flop_rate},
-                                    {"memory", w.host_memory},
-                                    {"cores", w.host_num_cores}
+                {"task_id",             w.task_id},
+                {"execution_host",      {
+                                                {"hostname", w.hostname},
+                                                {"flop_rate", w.host_flop_rate},
+                                                {"memory", w.host_memory},
+                                                {"cores", w.host_num_cores}
 
-                            }},
+                                        }},
                 {"num_cores_allocated", w.num_cores_allocated},
-                {"vertical_position", w.vertical_position},
-                {"whole_task", {
-                                    {"start", w.whole_task.first},
-                                    {"end", w.whole_task.second}
-                            }},
-                {"read", {
-                                    {"start", w.read.first},
-                                    {"end", w.read.second}
-                            }},
-                {"compute", {
-                                    {"start", w.compute.first},
-                                    {"end", w.compute.second}
-                            }},
-                {"write", {
-                                    {"start", w.write.first},
-                                    {"end", w.write.second}
-                            }},
-                {"failed", w.failed},
-                {"terminated", w.terminated}
+                {"vertical_position",   w.vertical_position},
+                {"whole_task",          {
+                                                {"start",    w.whole_task.first},
+                                                {"end",       w.whole_task.second}
+                                        }},
+                {"read",                {
+                                                {"start",    w.read.first},
+                                                {"end",       w.read.second}
+                                        }},
+                {"compute",             {
+                                                {"start",    w.compute.first},
+                                                {"end",       w.compute.second}
+                                        }},
+                {"write",               {
+                                                {"start",    w.write.first},
+                                                {"end",       w.write.second}
+                                        }},
+                {"failed",              w.failed},
+                {"terminated",          w.terminated}
         };
     }
 
@@ -117,21 +117,23 @@ namespace wrench {
      * @param segment2: second segment
      * @return bool
      */
-    bool isSegmentOverlappingXAxis(std::pair<unsigned long long, unsigned long long> segment1, std::pair<unsigned long long, unsigned long long> segment2) {
+    bool isSegmentOverlappingXAxis(std::pair<unsigned long long, unsigned long long> segment1,
+                                   std::pair<unsigned long long, unsigned long long> segment2) {
         // Note: EPSILON looks big because we "blow up" the floats by 10^9 so as to do all computations
         //       with unsigned long longs instead of doubles (thus avoiding float comparison weirdnesses)
         //       And the goal of this EPSILON is to capture the fact that this is for a visual display
         //       made up of pixels, thus we don't want to be too stringent in terms of overlaps
         const unsigned long long EPSILON = 1000 * 1000 * 10;
-        if (std::fabs(segment1.second - segment2.first) <= EPSILON or std::fabs(segment2.second -  segment1.first) <= EPSILON) {
+        if (std::fabs(segment1.second - segment2.first) <= EPSILON or
+            std::fabs(segment2.second - segment1.first) <= EPSILON) {
             return false;
 
-        // if any point of either segment lies within the other, we have overlap
+            // if any point of either segment lies within the other, we have overlap
         } else if (isPointOnSegment(segment1, segment2.first) or isPointOnSegment(segment1, segment2.second) or
                    isPointOnSegment(segment2, segment1.first) or isPointOnSegment(segment2, segment1.second)) {
             return true;
 
-        // the two segments do not overlap
+            // the two segments do not overlap
         } else {
             return false;
         }
@@ -143,7 +145,8 @@ namespace wrench {
      * @param segment2: second segment
      * @return bool
      */
-    bool isSegmentOverlappingYAxis(std::pair<unsigned long long, unsigned long long> segment1, std::pair<unsigned long long, unsigned long long> segment2) {
+    bool isSegmentOverlappingYAxis(std::pair<unsigned long long, unsigned long long> segment1,
+                                   std::pair<unsigned long long, unsigned long long> segment2) {
         if (segment1.second == segment2.first or segment2.second == segment1.first) {
             return false;
             // if any point of either segment lies within the other, we have overlap
@@ -175,9 +178,9 @@ namespace wrench {
         WorkflowTaskExecutionInstance &current_execution_instance = data.at(index);
 
         auto current_rect_x_range = std::pair<unsigned long long, unsigned long long>(
-                    current_execution_instance.whole_task.first * PRECISION,
-                    current_execution_instance.getTaskEndTime() * PRECISION
-                );
+                current_execution_instance.whole_task.first * PRECISION,
+                current_execution_instance.getTaskEndTime() * PRECISION
+        );
 
         unsigned long long num_cores_allocated = current_execution_instance.num_cores_allocated;
         unsigned long long execution_host_num_cores = current_execution_instance.host_num_cores;
@@ -190,13 +193,13 @@ namespace wrench {
 //      std::cout << spaces + "task = " << index <<"\n";
 
 
-      /*
-       * For each possible vertical position that an event can be in, we perform a check to see that its vertical
-       * position doesn't make the event (a rectangle on the graph) overlap with any of the other events. If it does not
-       * overlap, then we can evaluate all events up to this one with the next event in the list (recursive call). If
-       * it does overlap, then we try another vertical position. If it doesn't overlap and this is the last item in the list,
-       * we have found a valid layout.
-       */
+        /*
+         * For each possible vertical position that an event can be in, we perform a check to see that its vertical
+         * position doesn't make the event (a rectangle on the graph) overlap with any of the other events. If it does not
+         * overlap, then we can evaluate all events up to this one with the next event in the list (recursive call). If
+         * it does overlap, then we try another vertical position. If it doesn't overlap and this is the last item in the list,
+         * we have found a valid layout.
+         */
         for (std::size_t vertical_position = 0; vertical_position < num_vertical_positions; ++vertical_position) {
             // Set the vertical positions as we go so the entire graph layout is set when the function returns
             current_execution_instance.vertical_position = vertical_position;
@@ -268,7 +271,8 @@ namespace wrench {
      */
     void generateHostUtilizationGraphLayout(std::vector<WorkflowTaskExecutionInstance> &data) {
         if (not searchForLayout(data, 0)) {
-            throw std::runtime_error("SimulationOutput::generateHostUtilizationGraphLayout() could not find a valid layout.");
+            throw std::runtime_error(
+                    "SimulationOutput::generateHostUtilizationGraphLayout() could not find a valid layout.");
         }
     }
 
@@ -321,7 +325,8 @@ namespace wrench {
       *
       * @throws std::invalid_argument
       */
-    void SimulationOutput::dumpWorkflowExecutionJSON(Workflow *workflow, std::string file_path, bool generate_host_utilization_layout) {
+    void SimulationOutput::dumpWorkflowExecutionJSON(Workflow *workflow, std::string file_path,
+                                                     bool generate_host_utilization_layout) {
         if (workflow == nullptr || file_path.empty()) {
             throw std::invalid_argument("SimulationOutput::dumpTaskDataJSON() requires a valid workflow and file_path");
         }
@@ -341,20 +346,27 @@ namespace wrench {
 
                 current_execution_instance.task_id = task->getID();
 
-                current_execution_instance.hostname       = current_task_execution.execution_host;
-                current_execution_instance.host_flop_rate =  Simulation::getHostFlopRate(current_task_execution.execution_host);
-                current_execution_instance.host_memory    =  Simulation::getHostMemoryCapacity(current_task_execution.execution_host);
-                current_execution_instance.host_num_cores = Simulation::getHostNumCores(current_task_execution.execution_host);
+                current_execution_instance.hostname = current_task_execution.execution_host;
+                current_execution_instance.host_flop_rate = Simulation::getHostFlopRate(
+                        current_task_execution.execution_host);
+                current_execution_instance.host_memory = Simulation::getHostMemoryCapacity(
+                        current_task_execution.execution_host);
+                current_execution_instance.host_num_cores = Simulation::getHostNumCores(
+                        current_task_execution.execution_host);
 
                 current_execution_instance.num_cores_allocated = current_task_execution.num_cores_allocated;
-                current_execution_instance.vertical_position   = 0;
+                current_execution_instance.vertical_position = 0;
 
-                current_execution_instance.whole_task = std::make_pair(current_task_execution.task_start,         current_task_execution.task_end);
-                current_execution_instance.read       = std::make_pair(current_task_execution.read_input_start,   current_task_execution.read_input_end);
-                current_execution_instance.compute    = std::make_pair(current_task_execution.computation_start,  current_task_execution.computation_end);
-                current_execution_instance.write      = std::make_pair(current_task_execution.write_output_start, current_task_execution.write_output_end);
+                current_execution_instance.whole_task = std::make_pair(current_task_execution.task_start,
+                                                                       current_task_execution.task_end);
+                current_execution_instance.read = std::make_pair(current_task_execution.read_input_start,
+                                                                 current_task_execution.read_input_end);
+                current_execution_instance.compute = std::make_pair(current_task_execution.computation_start,
+                                                                    current_task_execution.computation_end);
+                current_execution_instance.write = std::make_pair(current_task_execution.write_output_start,
+                                                                  current_task_execution.write_output_end);
 
-                current_execution_instance.failed     = current_task_execution.task_failed;
+                current_execution_instance.failed = current_task_execution.task_failed;
                 current_execution_instance.terminated = current_task_execution.task_terminated;
 
                 data.push_back(current_execution_instance);
@@ -424,23 +436,23 @@ namespace wrench {
         // add the task vertices
         for (const auto &task : workflow->getTasks()) {
             vertices.push_back({
-                                    {"type", "task"},
-                                    {"id", task->getID()},
-                                    {"flops", task->getFlops()},
-                                    {"min_cores", task->getMinNumCores()},
-                                    {"max_cores", task->getMaxNumCores()},
-                                    {"parallel_efficiency", task->getParallelEfficiency()},
-                                    {"memory", task->getMemoryRequirement()}
-                            });
+                                       {"type",                "task"},
+                                       {"id",                  task->getID()},
+                                       {"flops",               task->getFlops()},
+                                       {"min_cores",           task->getMinNumCores()},
+                                       {"max_cores",           task->getMaxNumCores()},
+                                       {"parallel_efficiency", task->getParallelEfficiency()},
+                                       {"memory",              task->getMemoryRequirement()}
+                               });
         }
 
         // add the file vertices
         for (const auto &file : workflow->getFiles()) {
             vertices.push_back({
-                                    {"type", "file"},
-                                    {"id", file->getID()},
-                                    {"size", file->getSize()}
-                            });
+                                       {"type", "file"},
+                                       {"id",   file->getID()},
+                                       {"size", file->getSize()}
+                               });
         }
 
         // add the edges
@@ -465,7 +477,7 @@ namespace wrench {
                 }
             } else if (has_children) {
                 // then create the edges from the current task to its children tasks (if it has not output files)
-                for (const auto & child : workflow->getTaskChildren(task)) {
+                for (const auto &child : workflow->getTaskChildren(task)) {
                     edges.push_back({
                                             {"source", task->getID()},
                                             {"target", child->getID()}});
@@ -561,14 +573,14 @@ namespace wrench {
                     if (host->get_core_count() == 1) {
                         datum["pstates"].push_back({
                                                            {"pstate",  pstate},
-                                                           {"speed",   host->get_pstate_speed((int)pstate)},
+                                                           {"speed",   host->get_pstate_speed((int) pstate)},
                                                            {"idle",    current_state_watts.at(0)},
                                                            {"running", current_state_watts.at(1)}
                                                    });
                     } else {
                         datum["pstates"].push_back({
                                                            {"pstate",    pstate},
-                                                           {"speed",     host->get_pstate_speed((int)pstate)},
+                                                           {"speed",     host->get_pstate_speed((int) pstate)},
                                                            {"idle",      current_state_watts.at(0)},
                                                            {"one_core",  current_state_watts.at(1)},
                                                            {"all_cores", current_state_watts.at(2)}
@@ -585,7 +597,7 @@ namespace wrench {
                 for (const auto &pstate_timestamp : this->getTrace<SimulationTimestampPstateSet>()) {
                     if (host->get_name() == pstate_timestamp->getContent()->getHostname()) {
                         datum["pstate_trace"].push_back({
-                                                                {"time", pstate_timestamp->getDate()},
+                                                                {"time",   pstate_timestamp->getDate()},
                                                                 {"pstate", pstate_timestamp->getContent()->getPstate()}
                                                         });
                     }
@@ -595,7 +607,7 @@ namespace wrench {
                 for (const auto &energy_consumption_timestamp : this->getTrace<SimulationTimestampEnergyConsumption>()) {
                     if (host->get_name() == energy_consumption_timestamp->getContent()->getHostname()) {
                         datum["consumed_energy_trace"].push_back({
-                                                                         {"time", energy_consumption_timestamp->getDate()},
+                                                                         {"time",   energy_consumption_timestamp->getDate()},
                                                                          {"joules", energy_consumption_timestamp->getContent()->getConsumption()}
                                                                  });
                     }
@@ -698,25 +710,26 @@ namespace wrench {
         // add all hosts to the list of vertices
         for (const auto &host : hosts) {
             platform_graph_json["vertices"].push_back({
-                                                           {"type", "host"},
-                                                           {"id", host->get_name()},
-                                                           {"cluster_id", host_to_cluster[host->get_name()]},
-                                                           {"flop_rate", host->get_speed()},
-                                                           {"memory", Simulation::getHostMemoryCapacity(host->get_name())},
-                                                           {"cores", host->get_core_count()}
-            });
+                                                              {"type",       "host"},
+                                                              {"id",         host->get_name()},
+                                                              {"cluster_id", host_to_cluster[host->get_name()]},
+                                                              {"flop_rate",  host->get_speed()},
+                                                              {"memory",     Simulation::getHostMemoryCapacity(
+                                                                      host->get_name())},
+                                                              {"cores",      host->get_core_count()}
+                                                      });
         }
 
         // add all network links to the list of vertices
         std::vector<simgrid::s4u::Link *> links = simgrid_engine->get_all_links();
         for (const auto &link : links) {
-            if (not (link->get_name() == "__loopback__")) { // Ignore loopback link
+            if (not(link->get_name() == "__loopback__")) { // Ignore loopback link
                 platform_graph_json["vertices"].push_back({
-                                                               {"type",      "link"},
-                                                               {"id",        link->get_name()},
-                                                               {"bandwidth", link->get_bandwidth()},
-                                                               {"latency",   link->get_latency()}
-                                                       });
+                                                                  {"type",      "link"},
+                                                                  {"id",        link->get_name()},
+                                                                  {"bandwidth", link->get_bandwidth()},
+                                                                  {"latency",   link->get_latency()}
+                                                          });
             }
         }
 
@@ -757,7 +770,8 @@ namespace wrench {
                 bool is_route_equal = true;
                 if (route_forward.size() == route_backward.size()) {
                     for (size_t i = 0; i < route_forward.size(); ++i) {
-                        if (route_forward.at(i)->get_name() != route_backward.at(route_backward.size() - 1 - i)->get_name()) {
+                        if (route_forward.at(i)->get_name() !=
+                            route_backward.at(route_backward.size() - 1 - i)->get_name()) {
                             is_route_equal = false;
                             break;
                         }
@@ -802,7 +816,8 @@ namespace wrench {
         std::string target_id;
 
         // for each route, add "host<-->link" and "link<-->link" connections
-        for (nlohmann::json::iterator route_itr = platform_graph_json["routes"].begin(); route_itr != platform_graph_json["routes"].end(); ++route_itr) {
+        for (nlohmann::json::iterator route_itr = platform_graph_json["routes"].begin();
+             route_itr != platform_graph_json["routes"].end(); ++route_itr) {
 
             source_id = (*route_itr)["source"].get<std::string>();
             source_string = HOST + ":" + source_id;
@@ -812,8 +827,7 @@ namespace wrench {
 
             // check that the undirected edge doesn't already exist in set of edges
             if (edges.find(source_string + "-" + target_string) == edges.end() and
-                edges.find(target_string + "-" + source_string) == edges.end())
-            {
+                edges.find(target_string + "-" + source_string) == edges.end()) {
 
                 edges.insert(source_string + "-" + target_string);
 
@@ -836,7 +850,8 @@ namespace wrench {
 
 
             // add graph edges comprising only network links
-            for (nlohmann::json::iterator link_itr = (*route_itr)["route"].begin(); link_itr != (*route_itr)["route"].end(); ++link_itr) {
+            for (nlohmann::json::iterator link_itr = (*route_itr)["route"].begin();
+                 link_itr != (*route_itr)["route"].end(); ++link_itr) {
                 auto next_link_itr = link_itr + 1;
 
                 if (next_link_itr != (*route_itr)["route"].end()) {

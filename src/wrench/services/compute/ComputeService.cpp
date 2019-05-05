@@ -27,14 +27,14 @@ namespace wrench {
 
     // Create SCRATCH as share_ptr to a boogus ptr, with a noop destructor!
     std::shared_ptr<StorageService> ComputeService::SCRATCH =
-            std::shared_ptr<StorageService>((StorageService*)666, [](void *ptr) {});
+            std::shared_ptr<StorageService>((StorageService *) 666, [](void *ptr) {});
 
     /**
      * @brief Stop the compute service - must be called by the stop()
      *        method of derived classes
      */
     void ComputeService::stop() {
-      Service::stop();
+        Service::stop();
     }
 
 
@@ -59,28 +59,28 @@ namespace wrench {
      */
     void ComputeService::submitJob(WorkflowJob *job, std::map<std::string, std::string> service_specific_args) {
 
-      if (job == nullptr) {
-        throw std::invalid_argument("ComputeService::submitJob(): invalid argument");
-      }
-
-      assertServiceIsUp();
-
-      try {
-        switch (job->getType()) {
-          case WorkflowJob::STANDARD: {
-            this->submitStandardJob((StandardJob *) job, service_specific_args);
-            break;
-          }
-          case WorkflowJob::PILOT: {
-            this->submitPilotJob((PilotJob *) job, service_specific_args);
-            break;
-          }
+        if (job == nullptr) {
+            throw std::invalid_argument("ComputeService::submitJob(): invalid argument");
         }
-      } catch (WorkflowExecutionException &e) {
-        throw;
-      } catch (std::runtime_error &e) {
-        throw;
-      }
+
+        assertServiceIsUp();
+
+        try {
+            switch (job->getType()) {
+                case WorkflowJob::STANDARD: {
+                    this->submitStandardJob((StandardJob *) job, service_specific_args);
+                    break;
+                }
+                case WorkflowJob::PILOT: {
+                    this->submitPilotJob((PilotJob *) job, service_specific_args);
+                    break;
+                }
+            }
+        } catch (WorkflowExecutionException &e) {
+            throw;
+        } catch (std::runtime_error &e) {
+            throw;
+        }
     }
 
     /**
@@ -94,28 +94,28 @@ namespace wrench {
      */
     void ComputeService::terminateJob(WorkflowJob *job) {
 
-      if (job == nullptr) {
-        throw std::invalid_argument("ComputeService::terminateJob(): invalid argument");
-      }
-
-      assertServiceIsUp();
-
-      try {
-        switch (job->getType()) {
-          case WorkflowJob::STANDARD: {
-            this->terminateStandardJob((StandardJob *) job);
-            break;
-          }
-          case WorkflowJob::PILOT: {
-            this->terminatePilotJob((PilotJob *) job);
-            break;
-          }
+        if (job == nullptr) {
+            throw std::invalid_argument("ComputeService::terminateJob(): invalid argument");
         }
-      } catch (WorkflowExecutionException &e) {
-        throw;
-      } catch (std::runtime_error &e) {
-        throw;
-      }
+
+        assertServiceIsUp();
+
+        try {
+            switch (job->getType()) {
+                case WorkflowJob::STANDARD: {
+                    this->terminateStandardJob((StandardJob *) job);
+                    break;
+                }
+                case WorkflowJob::PILOT: {
+                    this->terminatePilotJob((PilotJob *) job);
+                    break;
+                }
+            }
+        } catch (WorkflowExecutionException &e) {
+            throw;
+        } catch (std::runtime_error &e) {
+            throw;
+        }
     }
 
     /**
@@ -132,20 +132,20 @@ namespace wrench {
                                    double scratch_space_size) :
             Service(hostname, service_name, mailbox_name_prefix) {
 
-      this->state = ComputeService::UP;
+        this->state = ComputeService::UP;
 
-      if (scratch_space_size > 0) {
-        try {
-          this->scratch_space_storage_service =
-                  std::shared_ptr<StorageService>(new SimpleStorageService(hostname, scratch_space_size));
-          this->scratch_space_storage_service_shared_ptr = std::shared_ptr<StorageService>(
-                  this->scratch_space_storage_service);
-        } catch (std::runtime_error &e) {
-          throw;
+        if (scratch_space_size > 0) {
+            try {
+                this->scratch_space_storage_service =
+                        std::shared_ptr<StorageService>(new SimpleStorageService(hostname, scratch_space_size));
+                this->scratch_space_storage_service_shared_ptr = std::shared_ptr<StorageService>(
+                        this->scratch_space_storage_service);
+            } catch (std::runtime_error &e) {
+                throw;
+            }
+        } else {
+            this->scratch_space_storage_service = nullptr;
         }
-      } else {
-        this->scratch_space_storage_service = nullptr;
-      }
     }
 
     /**
@@ -162,8 +162,8 @@ namespace wrench {
                                    std::shared_ptr<StorageService> scratch_space) :
             Service(hostname, service_name, mailbox_name_prefix) {
 
-      this->state = ComputeService::UP;
-      this->scratch_space_storage_service = scratch_space;
+        this->state = ComputeService::UP;
+        this->scratch_space_storage_service = scratch_space;
     }
 
     /**
@@ -171,7 +171,7 @@ namespace wrench {
      * @return true or false
      */
     bool ComputeService::supportsStandardJobs() {
-      return getPropertyValueAsBoolean(ComputeServiceProperty::SUPPORTS_STANDARD_JOBS);
+        return getPropertyValueAsBoolean(ComputeServiceProperty::SUPPORTS_STANDARD_JOBS);
     }
 
     /**
@@ -179,7 +179,7 @@ namespace wrench {
      * @return true or false
      */
     bool ComputeService::supportsPilotJobs() {
-      return getPropertyValueAsBoolean(ComputeServiceProperty::SUPPORTS_PILOT_JOBS);
+        return getPropertyValueAsBoolean(ComputeServiceProperty::SUPPORTS_PILOT_JOBS);
     }
 
     /**
@@ -191,20 +191,20 @@ namespace wrench {
      */
     unsigned long ComputeService::getNumHosts() {
 
-      std::map<std::string, std::map<std::string, double>> dict;
-      try {
-        dict = this->getServiceResourceInformation();
-      } catch (WorkflowExecutionException &e) {
-        throw;
-      } catch (std::runtime_error &e) {
-        throw;
-      }
+        std::map<std::string, std::map<std::string, double>> dict;
+        try {
+            dict = this->getServiceResourceInformation();
+        } catch (WorkflowExecutionException &e) {
+            throw;
+        } catch (std::runtime_error &e) {
+            throw;
+        }
 
-      if (dict.find("num_hosts") != dict.end()) {
-        return (unsigned long) (*(dict["num_hosts"].begin())).second;
-      } else {
-        return 0;
-      }
+        if (dict.find("num_hosts") != dict.end()) {
+            return (unsigned long) (*(dict["num_hosts"].begin())).second;
+        } else {
+            return 0;
+        }
     }
 
 
@@ -217,24 +217,24 @@ namespace wrench {
       */
     std::map<std::string, unsigned long> ComputeService::getPerHostNumCores() {
 
-      std::map<std::string, std::map<std::string, double>> dict;
-      try {
-        dict = this->getServiceResourceInformation();
-      } catch (WorkflowExecutionException &e) {
-        throw;
-      } catch (std::runtime_error &e) {
-        throw;
-      }
-
-      std::map<std::string, unsigned long> to_return;
-
-      if (dict.find("num_cores") != dict.end()) {
-        for (auto x : dict["num_cores"]) {
-          to_return.insert(std::make_pair(x.first, (unsigned long) x.second));
+        std::map<std::string, std::map<std::string, double>> dict;
+        try {
+            dict = this->getServiceResourceInformation();
+        } catch (WorkflowExecutionException &e) {
+            throw;
+        } catch (std::runtime_error &e) {
+            throw;
         }
-      }
 
-      return to_return;
+        std::map<std::string, unsigned long> to_return;
+
+        if (dict.find("num_cores") != dict.end()) {
+            for (auto x : dict["num_cores"]) {
+                to_return.insert(std::make_pair(x.first, (unsigned long) x.second));
+            }
+        }
+
+        return to_return;
     }
 
     /**
@@ -246,24 +246,24 @@ namespace wrench {
       */
     unsigned long ComputeService::getTotalNumCores() {
 
-      std::map<std::string, std::map<std::string, double>> dict;
-      try {
-        dict = this->getServiceResourceInformation();
-      } catch (WorkflowExecutionException &e) {
-        throw;
-      } catch (std::runtime_error &e) {
-        throw;
-      }
-
-      if (dict.find("num_cores") != dict.end()) {
-        unsigned long count = 0;
-        for (auto x : dict["num_cores"]) {
-          count += (unsigned long) x.second;
+        std::map<std::string, std::map<std::string, double>> dict;
+        try {
+            dict = this->getServiceResourceInformation();
+        } catch (WorkflowExecutionException &e) {
+            throw;
+        } catch (std::runtime_error &e) {
+            throw;
         }
-        return count;
-      } else {
-        return 0;
-      }
+
+        if (dict.find("num_cores") != dict.end()) {
+            unsigned long count = 0;
+            for (auto x : dict["num_cores"]) {
+                count += (unsigned long) x.second;
+            }
+            return count;
+        } else {
+            return 0;
+        }
     }
 
 
@@ -276,24 +276,24 @@ namespace wrench {
      */
     std::map<std::string, unsigned long> ComputeService::getPerHostNumIdleCores() {
 
-      std::map<std::string, std::map<std::string, double>> dict;
-      try {
-        dict = this->getServiceResourceInformation();
-      } catch (WorkflowExecutionException &e) {
-        throw;
-      } catch (std::runtime_error &e) {
-        throw;
-      }
-
-      std::map<std::string, unsigned long> to_return;
-
-      if (dict.find("num_idle_cores") != dict.end()) {
-        for (auto x : dict["num_idle_cores"]) {
-          to_return.insert(std::make_pair(x.first, (unsigned long) x.second));
+        std::map<std::string, std::map<std::string, double>> dict;
+        try {
+            dict = this->getServiceResourceInformation();
+        } catch (WorkflowExecutionException &e) {
+            throw;
+        } catch (std::runtime_error &e) {
+            throw;
         }
-      }
 
-      return to_return;
+        std::map<std::string, unsigned long> to_return;
+
+        if (dict.find("num_idle_cores") != dict.end()) {
+            for (auto x : dict["num_idle_cores"]) {
+                to_return.insert(std::make_pair(x.first, (unsigned long) x.second));
+            }
+        }
+
+        return to_return;
     }
 
     /**
@@ -305,25 +305,25 @@ namespace wrench {
      */
     unsigned long ComputeService::getTotalNumIdleCores() {
 
-      std::map<std::string, std::map<std::string, double>> dict;
-      try {
-        dict = this->getServiceResourceInformation();
-      } catch (WorkflowExecutionException &e) {
-        throw;
-      } catch (std::runtime_error &e) {
-        throw;
-      }
-
-
-      if (dict.find("num_cores") != dict.end()) {
-        unsigned long count = 0;
-        for (auto x : dict["num_idle_cores"]) {
-          count += (unsigned long)x.second;
+        std::map<std::string, std::map<std::string, double>> dict;
+        try {
+            dict = this->getServiceResourceInformation();
+        } catch (WorkflowExecutionException &e) {
+            throw;
+        } catch (std::runtime_error &e) {
+            throw;
         }
-        return count;
-      } else {
-        return 0;
-      }
+
+
+        if (dict.find("num_cores") != dict.end()) {
+            unsigned long count = 0;
+            for (auto x : dict["num_idle_cores"]) {
+                count += (unsigned long) x.second;
+            }
+            return count;
+        } else {
+            return 0;
+        }
     }
 
     /**
@@ -334,23 +334,23 @@ namespace wrench {
     */
     std::map<std::string, double> ComputeService::getCoreFlopRate() {
 
-      std::map<std::string, std::map<std::string, double>> dict;
-      try {
-        dict = this->getServiceResourceInformation();
-      } catch (WorkflowExecutionException &e) {
-        throw;
-      } catch (std::runtime_error &e) {
-        throw;
-      }
-
-      std::map<std::string, double> to_return;
-      if (dict.find("flop_rates") != dict.end()) {
-        for (auto x : dict["flop_rates"]) {
-          to_return.insert(std::make_pair(x.first, x.second));
+        std::map<std::string, std::map<std::string, double>> dict;
+        try {
+            dict = this->getServiceResourceInformation();
+        } catch (WorkflowExecutionException &e) {
+            throw;
+        } catch (std::runtime_error &e) {
+            throw;
         }
-      }
 
-      return to_return;
+        std::map<std::string, double> to_return;
+        if (dict.find("flop_rates") != dict.end()) {
+            for (auto x : dict["flop_rates"]) {
+                to_return.insert(std::make_pair(x.first, x.second));
+            }
+        }
+
+        return to_return;
     }
 
     /**
@@ -361,24 +361,24 @@ namespace wrench {
     */
     std::map<std::string, double> ComputeService::getMemoryCapacity() {
 
-      std::map<std::string, std::map<std::string, double>> dict;
-      try {
-        dict = this->getServiceResourceInformation();
-      } catch (WorkflowExecutionException &e) {
-        throw;
-      } catch (std::runtime_error &e) {
-        throw;
-      }
-
-      std::map<std::string, double> to_return;
-
-      if (dict.find("ram_capacities") != dict.end()) {
-        for (auto x : dict["ram_capacities"]) {
-          to_return.insert(std::make_pair(x.first, x.second));
+        std::map<std::string, std::map<std::string, double>> dict;
+        try {
+            dict = this->getServiceResourceInformation();
+        } catch (WorkflowExecutionException &e) {
+            throw;
+        } catch (std::runtime_error &e) {
+            throw;
         }
-      }
 
-      return to_return;
+        std::map<std::string, double> to_return;
+
+        if (dict.find("ram_capacities") != dict.end()) {
+            for (auto x : dict["ram_capacities"]) {
+                to_return.insert(std::make_pair(x.first, x.second));
+            }
+        }
+
+        return to_return;
     }
 
     /**
@@ -389,16 +389,16 @@ namespace wrench {
      */
     double ComputeService::getTTL() {
 
-      std::map<std::string, std::map<std::string, double>> dict;
-      try {
-        dict = this->getServiceResourceInformation();
-      } catch (WorkflowExecutionException &e) {
-        throw;
-      } catch (std::runtime_error &e) {
-        throw;
-      }
+        std::map<std::string, std::map<std::string, double>> dict;
+        try {
+            dict = this->getServiceResourceInformation();
+        } catch (WorkflowExecutionException &e) {
+            throw;
+        } catch (std::runtime_error &e) {
+            throw;
+        }
 
-      return (*(dict["ttl"].begin())).second;
+        return (*(dict["ttl"].begin())).second;
     }
 
     /**
@@ -407,36 +407,36 @@ namespace wrench {
      */
     std::map<std::string, std::map<std::string, double>> ComputeService::getServiceResourceInformation() {
 
-      assertServiceIsUp();
+        assertServiceIsUp();
 
-      // send a "info request" message to the daemon's mailbox_name
-      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("get_service_info");
+        // send a "info request" message to the daemon's mailbox_name
+        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("get_service_info");
 
-      try {
-        S4U_Mailbox::putMessage(this->mailbox_name, new ComputeServiceResourceInformationRequestMessage(
-                answer_mailbox,
-                this->getMessagePayloadValue(
-                        ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
-      }
+        try {
+            S4U_Mailbox::putMessage(this->mailbox_name, new ComputeServiceResourceInformationRequestMessage(
+                    answer_mailbox,
+                    this->getMessagePayloadValue(
+                            ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD)));
+        } catch (std::shared_ptr<NetworkError> &cause) {
+            throw WorkflowExecutionException(cause);
+        }
 
-      // Get the reply
-      std::shared_ptr<SimulationMessage> message = nullptr;
-      try {
-        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
-      }
+        // Get the reply
+        std::shared_ptr<SimulationMessage> message = nullptr;
+        try {
+            message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
+        } catch (std::shared_ptr<NetworkError> &cause) {
+            throw WorkflowExecutionException(cause);
+        }
 
-      if (auto msg = std::dynamic_pointer_cast<ComputeServiceResourceInformationAnswerMessage>(message)) {
-        return msg->info;
+        if (auto msg = std::dynamic_pointer_cast<ComputeServiceResourceInformationAnswerMessage>(message)) {
+            return msg->info;
 
-      } else {
-        throw std::runtime_error(
-                "BareMetalComputeService::getServiceResourceInformation(): unexpected [" + msg->getName() +
-                "] message");
-      }
+        } else {
+            throw std::runtime_error(
+                    "BareMetalComputeService::getServiceResourceInformation(): unexpected [" + msg->getName() +
+                    "] message");
+        }
     }
 
     /**
@@ -444,7 +444,7 @@ namespace wrench {
      * @return a size (in bytes)
      */
     double ComputeService::getTotalScratchSpaceSize() {
-      return this->scratch_space_storage_service ? this->scratch_space_storage_service->getTotalSpace() : 0.0;
+        return this->scratch_space_storage_service ? this->scratch_space_storage_service->getTotalSpace() : 0.0;
     }
 
     /**
@@ -452,7 +452,7 @@ namespace wrench {
      * @return a size (in bytes)
      */
     double ComputeService::getFreeScratchSpaceSize() {
-      return this->scratch_space_storage_service ? this->scratch_space_storage_service->getFreeSpace() : 0.0;
+        return this->scratch_space_storage_service ? this->scratch_space_storage_service->getFreeSpace() : 0.0;
     }
 
     /**
@@ -460,7 +460,7 @@ namespace wrench {
     * @return a pointer to the shared scratch space
     */
     std::shared_ptr<StorageService> ComputeService::getScratch() {
-      return this->scratch_space_storage_service;
+        return this->scratch_space_storage_service;
     }
 
     /**
@@ -468,7 +468,7 @@ namespace wrench {
     * @return a shared pointer to the shared scratch space
     */
     std::shared_ptr<StorageService> ComputeService::getScratchSharedPtr() {
-      return this->scratch_space_storage_service_shared_ptr;
+        return this->scratch_space_storage_service_shared_ptr;
     }
 
     /**
@@ -476,7 +476,7 @@ namespace wrench {
     * @return true if the compute service has some scratch storage space, false otherwise
     */
     bool ComputeService::hasScratch() {
-      return (this->scratch_space_storage_service != nullptr);
+        return (this->scratch_space_storage_service != nullptr);
     }
 
 };

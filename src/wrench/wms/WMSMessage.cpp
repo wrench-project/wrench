@@ -26,6 +26,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    AlarmWMSDeferredStartMessage::AlarmWMSDeferredStartMessage(double payload) : WMSMessage("WMS_START_TIME", payload) {}
+    AlarmWMSDeferredStartMessage::AlarmWMSDeferredStartMessage(double payload) : WMSMessage("WMS_START_TIME",
+                                                                                            payload) {}
 
 };

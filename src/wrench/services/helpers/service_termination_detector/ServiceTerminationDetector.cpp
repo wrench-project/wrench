@@ -28,7 +28,8 @@ wrench::ServiceTerminationDetector::ServiceTerminationDetector(std::string host_
                                                                std::string mailbox_to_notify,
                                                                bool notify_on_crash,
                                                                bool notify_on_termination) :
-        Service(host_on_which_to_run, "failure_detector_for_" + service_to_monitor->getName(), "failure_detector_for" + service_to_monitor->getName()){
+        Service(host_on_which_to_run, "failure_detector_for_" + service_to_monitor->getName(),
+                "failure_detector_for" + service_to_monitor->getName()) {
 
     this->service_to_monitor = service_to_monitor;
     this->mailbox_to_notify = mailbox_to_notify;
@@ -50,13 +51,16 @@ int wrench::ServiceTerminationDetector::main() {
 
     if (this->notify_on_crash and (not service_has_returned_from_main)) {
         // Failure detected!
-        WRENCH_INFO("Detected crash of service %s (notifying mailbox %s)", this->service_to_monitor->getName().c_str(), this->mailbox_to_notify.c_str());
+        WRENCH_INFO("Detected crash of service %s (notifying mailbox %s)", this->service_to_monitor->getName().c_str(),
+                    this->mailbox_to_notify.c_str());
         S4U_Mailbox::putMessage(this->mailbox_to_notify, new ServiceHasCrashedMessage(this->service_to_monitor));
     }
     if (this->notify_on_termination and (service_has_returned_from_main)) {
         // Failure detected!
-        WRENCH_INFO("Detected termination of service %s (notifying mailbox %s)", this->service_to_monitor->getName().c_str(), this->mailbox_to_notify.c_str());
-        S4U_Mailbox::putMessage(this->mailbox_to_notify, new ServiceHasTerminatedMessage(this->service_to_monitor, return_value_from_main));
+        WRENCH_INFO("Detected termination of service %s (notifying mailbox %s)",
+                    this->service_to_monitor->getName().c_str(), this->mailbox_to_notify.c_str());
+        S4U_Mailbox::putMessage(this->mailbox_to_notify,
+                                new ServiceHasTerminatedMessage(this->service_to_monitor, return_value_from_main));
     }
 
     this->service_to_monitor = nullptr;  // released, so that it can be freed in case refount = 0

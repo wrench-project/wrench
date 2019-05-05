@@ -28,15 +28,15 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void MessageManager::manageMessage(const std::string &mailbox, SimulationMessage *msg) {
-      if (msg == nullptr) {
-        throw std::runtime_error(
-                "MessageManager::manageMessage()::Null Message cannot be managed by MessageManager"
-        );
-      }
-      if (mailbox_messages.find(mailbox) == mailbox_messages.end()) {
-        mailbox_messages.insert({mailbox, {}});
-      }
-      mailbox_messages[mailbox].insert(msg);
+        if (msg == nullptr) {
+            throw std::runtime_error(
+                    "MessageManager::manageMessage()::Null Message cannot be managed by MessageManager"
+            );
+        }
+        if (mailbox_messages.find(mailbox) == mailbox_messages.end()) {
+            mailbox_messages.insert({mailbox, {}});
+        }
+        mailbox_messages[mailbox].insert(msg);
 //      WRENCH_INFO("MESSAGE_MANAGER: INSERTING [%s]:%s (%lu)", mailbox.c_str(), msg->getName().c_str(), (unsigned long)msg);
     }
 
@@ -45,22 +45,22 @@ namespace wrench {
      * @param mailbox: the mailbox name
      */
     void MessageManager::cleanUpMessages(const std::string &mailbox) {
-      if (mailbox_messages.find(mailbox) != mailbox_messages.end()) {
-        for (auto msg : mailbox_messages[mailbox]) {
-            delete msg;
+        if (mailbox_messages.find(mailbox) != mailbox_messages.end()) {
+            for (auto msg : mailbox_messages[mailbox]) {
+                delete msg;
+            }
+            mailbox_messages[mailbox].clear();
+            mailbox_messages.erase(mailbox);
         }
-        mailbox_messages[mailbox].clear();
-        mailbox_messages.erase(mailbox);
-      }
     }
 
     /**
      * @brief Clean up all the messages that MessageManager has stored (so as to free up memory)
      */
     void MessageManager::cleanUpAllMessages() {
-      for (auto m : mailbox_messages) {
-        cleanUpMessages(m.first);
-      }
+        for (auto m : mailbox_messages) {
+            cleanUpMessages(m.first);
+        }
     }
 
     /**
@@ -82,26 +82,26 @@ namespace wrench {
 //      if (mailbox_messages.find(mailbox) != mailbox_messages.end()) {
 //        if (mailbox_messages[mailbox].find(msg) != mailbox_messages[mailbox].end()) {
 //            WRENCH_INFO("MESSAGE_MANAGER: REMOVING [%s]:%s (%lu)", mailbox.c_str(), msg->getName().c_str(), (unsigned long)msg);
-          mailbox_messages[mailbox].erase(msg);
+        mailbox_messages[mailbox].erase(msg);
 //          if (mailbox_messages[mailbox].empty()) {
 //              mailbox_messages.erase(mailbox);
 //          }
 //        }
 //      }
 
-      #if 0
-      std::map<std::string, std::vector<SimulationMessage *>>::iterator msg_itr;
-      for (msg_itr = mailbox_messages.begin(); msg_itr != mailbox_messages.end(); msg_itr++) {
-        if ((*msg_itr).first == mailbox) {
-          std::vector<SimulationMessage *>::iterator it;
-          for (it = (*msg_itr).second.begin(); it != (*msg_itr).second.end(); it++) {
-            if ((*it) == msg) {
-              it = (*msg_itr).second.erase(it);
-              break;
+#if 0
+        std::map<std::string, std::vector<SimulationMessage *>>::iterator msg_itr;
+        for (msg_itr = mailbox_messages.begin(); msg_itr != mailbox_messages.end(); msg_itr++) {
+          if ((*msg_itr).first == mailbox) {
+            std::vector<SimulationMessage *>::iterator it;
+            for (it = (*msg_itr).second.begin(); it != (*msg_itr).second.end(); it++) {
+              if ((*it) == msg) {
+                it = (*msg_itr).second.erase(it);
+                break;
+              }
             }
           }
         }
-      }
-      #endif
+#endif
     }
 }

@@ -58,7 +58,7 @@ namespace wrench {
             std::string callback_mailbox,
             std::shared_ptr<Workunit> workunit,
             std::shared_ptr<StorageService> scratch_space,
-            StandardJob* job,
+            StandardJob *job,
             double thread_startup_overhead,
             bool simulate_computation_as_sleep) :
             Service(hostname, "workunit_executor", "workunit_executor") {
@@ -84,8 +84,10 @@ namespace wrench {
 
     void WorkunitExecutor::cleanup(bool has_returned_from_main, int return_value) {
 
-        WRENCH_DEBUG("In on_exit.cleanup(): WorkunitExecutor: %s has_returned_from_main = %d (return_value = %d, job forcefully terminated = %d)",
-                     this->getName().c_str(), has_returned_from_main, return_value, this->terminated_due_job_being_forcefully_terminated);
+        WRENCH_DEBUG(
+                "In on_exit.cleanup(): WorkunitExecutor: %s has_returned_from_main = %d (return_value = %d, job forcefully terminated = %d)",
+                this->getName().c_str(), has_returned_from_main, return_value,
+                this->terminated_due_job_being_forcefully_terminated);
         if ((not has_returned_from_main) and (this->task_start_timestamp_has_been_inserted) and
             (not this->task_failure_time_stamp_has_already_been_generated)) {
             if (this->workunit->task != nullptr) {
@@ -130,7 +132,6 @@ namespace wrench {
     }
 
 
-
     /**
     * @brief Main method of the worker thread daemon
     *
@@ -142,12 +143,13 @@ namespace wrench {
 
 
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_BLUE);
-        WRENCH_INFO("New work_unit_executor starting (%s) to do: %ld pre file copies, %d tasks, %ld post file copies, %ld file deletions",
-                    this->mailbox_name.c_str(),
-                    this->workunit->pre_file_copies.size(),
-                    (this->workunit->task != nullptr) ? 1 : 0,
-                    this->workunit->post_file_copies.size(),
-                    this->workunit->cleanup_file_deletions.size());
+        WRENCH_INFO(
+                "New work_unit_executor starting (%s) to do: %ld pre file copies, %d tasks, %ld post file copies, %ld file deletions",
+                this->mailbox_name.c_str(),
+                this->workunit->pre_file_copies.size(),
+                (this->workunit->task != nullptr) ? 1 : 0,
+                this->workunit->post_file_copies.size(),
+                this->workunit->cleanup_file_deletions.size());
 
         SimulationMessage *msg_to_send_back = nullptr;
         bool success;
@@ -226,14 +228,16 @@ namespace wrench {
             std::shared_ptr<StorageService> src = std::get<1>(file_copy);
             if (src == ComputeService::SCRATCH) {
                 if (this->scratch_space == nullptr) {
-                    throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new NoScratchSpace("WorkunitExecutor::performWork(): Scratch Space was asked to be used as source but is null")));
+                    throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new NoScratchSpace(
+                            "WorkunitExecutor::performWork(): Scratch Space was asked to be used as source but is null")));
                 }
                 src = this->scratch_space;
             }
             std::shared_ptr<StorageService> dst = std::get<2>(file_copy);
             if (dst == ComputeService::SCRATCH) {
                 if (this->scratch_space == nullptr) {
-                    throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new NoScratchSpace("WorkunitExecutor::performWork(): Scratch Space was asked to be used as destination but is null")));
+                    throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new NoScratchSpace(
+                            "WorkunitExecutor::performWork(): Scratch Space was asked to be used as destination but is null")));
                 } else {
                     dst = this->scratch_space;
                 }
@@ -253,7 +257,8 @@ namespace wrench {
                 if (dst == this->scratch_space) {
                     dst->copyFile(file, src, nullptr, job);
                 } else {
-                    dst->copyFile(file, src, nullptr, nullptr); // if there is no scratch space, then there is no notion of job's partition, it is always to / partition in such case
+                    dst->copyFile(file, src, nullptr,
+                                  nullptr); // if there is no scratch space, then there is no notion of job's partition, it is always to / partition in such case
                 }
             } catch (WorkflowExecutionException &e) {
 
@@ -276,7 +281,8 @@ namespace wrench {
             task->setNumCoresAllocated(this->num_cores);
 
             this->simulation->getOutput().addTimestamp<SimulationTimestampTaskStart>(new
-                                                                                             SimulationTimestampTaskStart(task));
+                                                                                             SimulationTimestampTaskStart(
+                    task));
             this->task_start_timestamp_has_been_inserted = true;
 
             // Read  all input files
@@ -298,7 +304,8 @@ namespace wrench {
 
             try {
                 task->setComputationStartDate(S4U_Simulation::getClock());
-                runMulticoreComputation(task->getFlops(), task->getParallelEfficiency(), this->simulate_computation_as_sleep);
+                runMulticoreComputation(task->getFlops(), task->getParallelEfficiency(),
+                                        this->simulate_computation_as_sleep);
                 task->setComputationEndDate(S4U_Simulation::getClock());
             } catch (WorkflowExecutionEvent &e) {
                 this->failure_timestamp_should_be_generated = true;
@@ -306,7 +313,8 @@ namespace wrench {
                 throw;
             }
 
-            WRENCH_INFO("Writing the %ld output files for task %s", task->getOutputFiles().size(), task->getID().c_str());
+            WRENCH_INFO("Writing the %ld output files for task %s", task->getOutputFiles().size(),
+                        task->getID().c_str());
 
             // Write all output files
             try {
@@ -401,7 +409,8 @@ namespace wrench {
      * @param flops: the number of flops
      * @param parallel_efficiency: the parallel efficiency
      */
-    void WorkunitExecutor::runMulticoreComputation(double flops, double parallel_efficiency, bool simulate_computation_as_sleep) {
+    void WorkunitExecutor::runMulticoreComputation(double flops, double parallel_efficiency,
+                                                   bool simulate_computation_as_sleep) {
         double effective_flops = (flops / (this->num_cores * parallel_efficiency));
 
         std::string tmp_mailbox = S4U_Mailbox::generateUniqueMailboxName("workunit_executor");
@@ -414,7 +423,7 @@ namespace wrench {
             S4U_Simulation::sleep(this->num_cores * this->thread_startup_overhead);
 
             // Then sleep for the computation duration
-            double sleep_time = (flops / (this->num_cores  * parallel_efficiency)) / Simulation::getFlopRate();
+            double sleep_time = (flops / (this->num_cores * parallel_efficiency)) / Simulation::getFlopRate();
             Simulation::sleep(sleep_time);
 
         } else {
@@ -439,7 +448,8 @@ namespace wrench {
                 std::shared_ptr<ComputeThread> compute_thread;
                 try {
                     compute_thread = std::shared_ptr<ComputeThread>(
-                            new ComputeThread(this->simulation, S4U_Simulation::getHostName(), effective_flops, tmp_mailbox));
+                            new ComputeThread(this->simulation, S4U_Simulation::getHostName(), effective_flops,
+                                              tmp_mailbox));
                     compute_thread->start(compute_thread, true, false); // Daemonized, no auto-restart
                 } catch (std::exception &e) {
                     // Some internal SimGrid exceptions...????

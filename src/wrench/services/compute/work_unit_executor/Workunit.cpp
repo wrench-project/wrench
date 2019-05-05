@@ -33,17 +33,17 @@ namespace wrench {
             std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>, std::shared_ptr<StorageService>>> pre_file_copies,
             WorkflowTask *task,
             std::map<WorkflowFile *, std::shared_ptr<StorageService>> file_locations,
-            std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService> , std::shared_ptr<StorageService> >> post_file_copies,
+            std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>, std::shared_ptr<StorageService> >> post_file_copies,
             std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService> >> cleanup_file_deletions) {
 
-      this->num_pending_parents = 0;
+        this->num_pending_parents = 0;
 
-      this->job = job;
-      this->pre_file_copies = pre_file_copies;
-      this->task = task;
-      this->file_locations = file_locations;
-      this->post_file_copies = post_file_copies;
-      this->cleanup_file_deletions = cleanup_file_deletions;
+        this->job = job;
+        this->pre_file_copies = pre_file_copies;
+        this->task = task;
+        this->file_locations = file_locations;
+        this->post_file_copies = post_file_copies;
+        this->cleanup_file_deletions = cleanup_file_deletions;
 
     }
 
@@ -57,18 +57,18 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     void Workunit::addDependency(std::shared_ptr<Workunit> parent, std::shared_ptr<Workunit> child) {
-      if ((parent == nullptr) || (child == nullptr)) {
-        throw std::invalid_argument("Workunit::addDependency(): Invalid arguments");
-      }
+        if ((parent == nullptr) || (child == nullptr)) {
+            throw std::invalid_argument("Workunit::addDependency(): Invalid arguments");
+        }
 
-      // If dependency already exits, do nothing
-      if (parent->children.find(child) != parent->children.end()) {
+        // If dependency already exits, do nothing
+        if (parent->children.find(child) != parent->children.end()) {
+            return;
+        }
+
+        parent->children.insert(child);
+        child->num_pending_parents++;
         return;
-      }
-
-      parent->children.insert(child);
-      child->num_pending_parents++;
-      return;
     }
 
     Workunit::~Workunit() {
@@ -81,107 +81,109 @@ namespace wrench {
      */
     std::set<std::shared_ptr<Workunit>> Workunit::createWorkunits(StandardJob *job) {
 
-      std::shared_ptr<Workunit> pre_file_copies_work_unit = nullptr;
-      std::vector<std::shared_ptr<Workunit>> task_work_units;
-      std::shared_ptr<Workunit> post_file_copies_work_unit = nullptr;
-      std::shared_ptr<Workunit> cleanup_workunit = nullptr;
+        std::shared_ptr<Workunit> pre_file_copies_work_unit = nullptr;
+        std::vector<std::shared_ptr<Workunit>> task_work_units;
+        std::shared_ptr<Workunit> post_file_copies_work_unit = nullptr;
+        std::shared_ptr<Workunit> cleanup_workunit = nullptr;
 
-      std::set<std::shared_ptr<Workunit>> all_work_units;
+        std::set<std::shared_ptr<Workunit>> all_work_units;
 
-      // Create the cleanup workunit, if any
-      if (not job->cleanup_file_deletions.empty()) {
-        cleanup_workunit = std::make_shared<Workunit>(job,
-                                                      (std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService> , std::shared_ptr<StorageService> >>){},
-                                                      nullptr,
-                                                      (std::map<WorkflowFile *, std::shared_ptr<StorageService> >){},
-                                                      (std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService> , std::shared_ptr<StorageService> >>){}, job->cleanup_file_deletions);
-      }
+        // Create the cleanup workunit, if any
+        if (not job->cleanup_file_deletions.empty()) {
+            cleanup_workunit = std::make_shared<Workunit>(job,
+                                                          (std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>, std::shared_ptr<StorageService> >>) {},
+                                                          nullptr,
+                                                          (std::map<WorkflowFile *, std::shared_ptr<StorageService> >) {},
+                                                          (std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>, std::shared_ptr<StorageService> >>) {},
+                                                          job->cleanup_file_deletions);
+        }
 
-      // Create the pre_file_copies work unit, if any
-      if (not job->pre_file_copies.empty()) {
-        pre_file_copies_work_unit = std::make_shared<Workunit>(job,
-                                                               job->pre_file_copies,
-                                                               nullptr,
-                                                               (std::map<WorkflowFile *, std::shared_ptr<StorageService> >){},
-                                                               (std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService> , std::shared_ptr<StorageService> >>){},
-                                                               (std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService> >>){});
-      }
+        // Create the pre_file_copies work unit, if any
+        if (not job->pre_file_copies.empty()) {
+            pre_file_copies_work_unit = std::make_shared<Workunit>(job,
+                                                                   job->pre_file_copies,
+                                                                   nullptr,
+                                                                   (std::map<WorkflowFile *, std::shared_ptr<StorageService> >) {},
+                                                                   (std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>, std::shared_ptr<StorageService> >>) {},
+                                                                   (std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService> >>) {});
+        }
 
-      // Create the post_file_copies work unit, if any
-      if (not job->post_file_copies.empty()) {
-        post_file_copies_work_unit = std::make_shared<Workunit>(job,
-                                                                (std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService> , std::shared_ptr<StorageService> >>){},
-                                                                nullptr,
-                                                                (std::map<WorkflowFile *, std::shared_ptr<StorageService> >){},
-                                                                job->post_file_copies,
-                                                                (std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService> >>){});
-      }
+        // Create the post_file_copies work unit, if any
+        if (not job->post_file_copies.empty()) {
+            post_file_copies_work_unit = std::make_shared<Workunit>(job,
+                                                                    (std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>, std::shared_ptr<StorageService> >>) {},
+                                                                    nullptr,
+                                                                    (std::map<WorkflowFile *, std::shared_ptr<StorageService> >) {},
+                                                                    job->post_file_copies,
+                                                                    (std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService> >>) {});
+        }
 
-      // Create the task work units, if any
-      for (auto const &task : job->tasks) {
-        task_work_units.push_back(std::make_shared<Workunit>(job,
-                                                             (std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService> , std::shared_ptr<StorageService> >>){},
-                                                             task,
-                                                             job->file_locations,
-                                                             (std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService> , std::shared_ptr<StorageService> >>){},
-                                                             (std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService> >>){}));
-      }
+        // Create the task work units, if any
+        for (auto const &task : job->tasks) {
+            task_work_units.push_back(std::make_shared<Workunit>(job,
+                                                                 (std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>, std::shared_ptr<StorageService> >>) {},
+                                                                 task,
+                                                                 job->file_locations,
+                                                                 (std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>, std::shared_ptr<StorageService> >>) {},
+                                                                 (std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService> >>) {}));
+        }
 
-      // Add dependencies between task work units, if any
-      for (auto const &task_work_unit : task_work_units) {
-        const WorkflowTask *task = task_work_unit->task;
+        // Add dependencies between task work units, if any
+        for (auto const &task_work_unit : task_work_units) {
+            const WorkflowTask *task = task_work_unit->task;
 
-        if (task->getInternalState() != WorkflowTask::InternalState::TASK_READY) {
-          std::vector<WorkflowTask *> current_task_parents = task->getWorkflow()->getTaskParents(task);
+            if (task->getInternalState() != WorkflowTask::InternalState::TASK_READY) {
+                std::vector<WorkflowTask *> current_task_parents = task->getWorkflow()->getTaskParents(task);
 
-          for (auto const &potential_parent_task_work_unit : task_work_units) {
-            if (std::find(current_task_parents.begin(), current_task_parents.end(), potential_parent_task_work_unit->task) != current_task_parents.end()) {
-              Workunit::addDependency(potential_parent_task_work_unit, task_work_unit);
+                for (auto const &potential_parent_task_work_unit : task_work_units) {
+                    if (std::find(current_task_parents.begin(), current_task_parents.end(),
+                                  potential_parent_task_work_unit->task) != current_task_parents.end()) {
+                        Workunit::addDependency(potential_parent_task_work_unit, task_work_unit);
+                    }
+                }
             }
-          }
         }
-      }
 
-      // Add dependencies from pre copies to possible successors
-      if (pre_file_copies_work_unit != nullptr) {
-        if (not task_work_units.empty()) {
-          for (auto const &twu: task_work_units) {
-            Workunit::addDependency(pre_file_copies_work_unit, twu);
-          }
-        } else if (post_file_copies_work_unit != nullptr) {
-          Workunit::addDependency(pre_file_copies_work_unit, post_file_copies_work_unit);
-        } else if (cleanup_workunit != nullptr) {
-          Workunit::addDependency(pre_file_copies_work_unit, cleanup_workunit);
+        // Add dependencies from pre copies to possible successors
+        if (pre_file_copies_work_unit != nullptr) {
+            if (not task_work_units.empty()) {
+                for (auto const &twu: task_work_units) {
+                    Workunit::addDependency(pre_file_copies_work_unit, twu);
+                }
+            } else if (post_file_copies_work_unit != nullptr) {
+                Workunit::addDependency(pre_file_copies_work_unit, post_file_copies_work_unit);
+            } else if (cleanup_workunit != nullptr) {
+                Workunit::addDependency(pre_file_copies_work_unit, cleanup_workunit);
+            }
         }
-      }
 
-      // Add dependencies from tasks to possible successors
-      for (auto const &twu: task_work_units) {
+        // Add dependencies from tasks to possible successors
+        for (auto const &twu: task_work_units) {
+            if (post_file_copies_work_unit != nullptr) {
+                Workunit::addDependency(twu, post_file_copies_work_unit);
+            } else if (cleanup_workunit != nullptr) {
+                Workunit::addDependency(twu, cleanup_workunit);
+            }
+        }
+
+        // Add dependencies from post copies to possible successors
         if (post_file_copies_work_unit != nullptr) {
-          Workunit::addDependency(twu, post_file_copies_work_unit);
-        } else if (cleanup_workunit != nullptr) {
-          Workunit::addDependency(twu, cleanup_workunit);
+            if (cleanup_workunit != nullptr) {
+                Workunit::addDependency(post_file_copies_work_unit, cleanup_workunit);
+            }
         }
-      }
 
-      // Add dependencies from post copies to possible successors
-      if (post_file_copies_work_unit != nullptr) {
-        if (cleanup_workunit != nullptr) {
-          Workunit::addDependency(post_file_copies_work_unit, cleanup_workunit);
+        // Create a list of all work units
+        if (pre_file_copies_work_unit) all_work_units.insert(pre_file_copies_work_unit);
+        for (auto const &twu : task_work_units) {
+            all_work_units.insert(twu);
         }
-      }
+        if (post_file_copies_work_unit) all_work_units.insert(post_file_copies_work_unit);
+        if (cleanup_workunit) all_work_units.insert(cleanup_workunit);
 
-      // Create a list of all work units
-      if (pre_file_copies_work_unit) all_work_units.insert(pre_file_copies_work_unit);
-      for (auto const &twu : task_work_units) {
-        all_work_units.insert(twu);
-      }
-      if (post_file_copies_work_unit) all_work_units.insert(post_file_copies_work_unit);
-      if (cleanup_workunit) all_work_units.insert(cleanup_workunit);
+        task_work_units.clear();
 
-      task_work_units.clear();
-
-      return all_work_units;
+        return all_work_units;
 
     }
 
@@ -190,7 +192,7 @@ namespace wrench {
      * @return a standard job
      */
     StandardJob *Workunit::getJob() {
-      return this->job;
+        return this->job;
     }
 
 };
