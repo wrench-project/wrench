@@ -13,6 +13,7 @@
 #ifdef MESSAGE_MANAGER
 #include <wrench/util/MessageManager.h>
 #endif
+
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/simgrid_S4U_util/S4U_PendingCommunication.h"
 #include "wrench/simulation/SimulationMessage.h"
@@ -100,8 +101,9 @@ namespace wrench {
         } catch (simgrid::TimeoutError &e) {
             one_comm_failed = true;
         } catch (std::exception &e) {
-            throw std::runtime_error("S4U_PendingCommunication::waitForSomethingToHappen(): Unexpected std::exception  (" +
-                                     std::string(e.what()) + ")");
+            throw std::runtime_error(
+                    "S4U_PendingCommunication::waitForSomethingToHappen(): Unexpected std::exception  (" +
+                    std::string(e.what()) + ")");
         }
 
         if (one_comm_failed) {

@@ -25,7 +25,6 @@ void wrench::HostStateChangeDetector::cleanup(bool has_returned_from_main, int r
 }
 
 
-
 /**
  * @brief Constructor
  * @param host_on_which_to_run: hosts on which this service runs
@@ -61,18 +60,18 @@ wrench::HostStateChangeDetector::HostStateChangeDetector(std::string host_on_whi
 }
 
 void wrench::HostStateChangeDetector::hostStateChangeCallback(std::string const &hostname) {
-    if (std::find(this->hosts_to_monitor.begin(), this->hosts_to_monitor.end(), hostname) != this->hosts_to_monitor.end()) {
+    if (std::find(this->hosts_to_monitor.begin(), this->hosts_to_monitor.end(), hostname) !=
+        this->hosts_to_monitor.end()) {
         auto host = simgrid::s4u::Host::by_name(hostname);
         this->hosts_that_have_recently_changed_state.push_back(std::make_pair(hostname, host->is_on()));
     }
 }
 
 
-
 int wrench::HostStateChangeDetector::main() {
 
     WRENCH_INFO("Starting");
-    while(true) {
+    while (true) {
         if (creator->getState() == State::DOWN) {
             WRENCH_INFO("My Creator has terminated/died, so must I...");
             break;
@@ -84,7 +83,7 @@ int wrench::HostStateChangeDetector::main() {
             auto host_info = this->hosts_that_have_recently_changed_state.at(0);
             std::string hostname = std::get<0>(host_info);
             bool new_state_is_on = std::get<1>(host_info);
-            bool new_state_is_off  = not new_state_is_on;
+            bool new_state_is_off = not new_state_is_on;
             this->hosts_that_have_recently_changed_state.erase(this->hosts_that_have_recently_changed_state.begin());
 
             HostStateChangeDetectorMessage *msg;

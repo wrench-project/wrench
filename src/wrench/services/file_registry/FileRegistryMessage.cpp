@@ -32,11 +32,12 @@ namespace wrench {
                                                                                WorkflowFile *file, double payload) :
             FileRegistryMessage("FILE_LOOKUP_REQUEST", payload) {
 
-      if ((answer_mailbox == "") || file == nullptr) {
-        throw std::invalid_argument("FileRegistryFileLookupRequestMessage::FileRegistryFileLookupRequestMessage(): Invalid argument");
-      }
-      this->answer_mailbox = answer_mailbox;
-      this->file = file;
+        if ((answer_mailbox == "") || file == nullptr) {
+            throw std::invalid_argument(
+                    "FileRegistryFileLookupRequestMessage::FileRegistryFileLookupRequestMessage(): Invalid argument");
+        }
+        this->answer_mailbox = answer_mailbox;
+        this->file = file;
     }
 
     /**
@@ -49,11 +50,12 @@ namespace wrench {
                                                                              std::set<std::shared_ptr<StorageService>> locations,
                                                                              double payload) :
             FileRegistryMessage("FILE_LOOKUP_ANSWER", payload) {
-      if (file == nullptr) {
-        throw std::invalid_argument("FileRegistryFileLookupAnswerMessage::FileRegistryFileLookupAnswerMessage(): Invalid argument");
-      }
-      this->file = file;
-      this->locations = locations;
+        if (file == nullptr) {
+            throw std::invalid_argument(
+                    "FileRegistryFileLookupAnswerMessage::FileRegistryFileLookupAnswerMessage(): Invalid argument");
+        }
+        this->file = file;
+        this->locations = locations;
     }
 
     /**
@@ -67,9 +69,11 @@ namespace wrench {
     FileRegistryFileLookupByProximityRequestMessage::FileRegistryFileLookupByProximityRequestMessage(
             std::string answer_mailbox, WorkflowFile *file, std::string reference_host,
             std::shared_ptr<NetworkProximityService> network_proximity_service, double payload) :
-    FileRegistryMessage("FILE_LOOKUP_BY_PROXIMITY_REQUEST", payload) {
-        if ((file == nullptr) || (answer_mailbox == "") || (reference_host == "") || (network_proximity_service == nullptr)) {
-            throw std::invalid_argument("FileRegistryFileLookupByProximityRequestMessage::FileRegistryFileLookupByProximityRequestMessage(): Invalid Argument");
+            FileRegistryMessage("FILE_LOOKUP_BY_PROXIMITY_REQUEST", payload) {
+        if ((file == nullptr) || (answer_mailbox == "") || (reference_host == "") ||
+            (network_proximity_service == nullptr)) {
+            throw std::invalid_argument(
+                    "FileRegistryFileLookupByProximityRequestMessage::FileRegistryFileLookupByProximityRequestMessage(): Invalid Argument");
         }
         this->answer_mailbox = answer_mailbox;
         this->file = file;
@@ -97,6 +101,7 @@ namespace wrench {
         this->reference_host = reference_host;
         this->locations = locations;
     }
+
     /**
      * @brief Constructor
      * @param answer_mailbox: the mailbox to which the answer message should be sent
@@ -109,12 +114,13 @@ namespace wrench {
                                                                                  std::shared_ptr<StorageService> storage_service,
                                                                                  double payload) :
             FileRegistryMessage("REMOVE_ENTRY_REQUEST", payload) {
-      if ((answer_mailbox == "") || (file == nullptr) || (storage_service == nullptr)) {
-        throw std::invalid_argument("FileRegistryRemoveEntryRequestMessage::FileRegistryRemoveEntryRequestMessage(): Invalid argument");
-      }
-      this->answer_mailbox = answer_mailbox;
-      this->file = file;
-      this->storage_service = storage_service;
+        if ((answer_mailbox == "") || (file == nullptr) || (storage_service == nullptr)) {
+            throw std::invalid_argument(
+                    "FileRegistryRemoveEntryRequestMessage::FileRegistryRemoveEntryRequestMessage(): Invalid argument");
+        }
+        this->answer_mailbox = answer_mailbox;
+        this->file = file;
+        this->storage_service = storage_service;
     }
 
 
@@ -126,7 +132,7 @@ namespace wrench {
     FileRegistryRemoveEntryAnswerMessage::FileRegistryRemoveEntryAnswerMessage(bool success,
                                                                                double payload) :
             FileRegistryMessage("REMOVE_ENTRY_ANSWER", payload) {
-      this->success = success;
+        this->success = success;
     }
 
     /**
@@ -141,12 +147,13 @@ namespace wrench {
                                                                            std::shared_ptr<StorageService> storage_service,
                                                                            double payload) :
             FileRegistryMessage("ADD_ENTRY_REQUEST", payload) {
-      if ((answer_mailbox == "") || (file == nullptr) || (storage_service == nullptr)) {
-        throw std::invalid_argument("FileRegistryAddEntryRequestMessage::FileRegistryAddEntryRequestMessage(): Invalid argument");
-      }
-      this->answer_mailbox = answer_mailbox;
-      this->file = file;
-      this->storage_service = storage_service;
+        if ((answer_mailbox == "") || (file == nullptr) || (storage_service == nullptr)) {
+            throw std::invalid_argument(
+                    "FileRegistryAddEntryRequestMessage::FileRegistryAddEntryRequestMessage(): Invalid argument");
+        }
+        this->answer_mailbox = answer_mailbox;
+        this->file = file;
+        this->storage_service = storage_service;
 
     }
 

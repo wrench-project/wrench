@@ -33,32 +33,36 @@ namespace wrench {
      * @param ack_mailbox: the mailbox to which an ack should be sent when the connection completes/fails
      * @param start_timestamp: a pointer to a SimulationTimestampFileCopyStart if this connection is part of a file copy
      */
-    NetworkConnection::NetworkConnection(int type, WorkflowFile *file, std::string file_partition, std::string mailbox, std::string ack_mailbox, SimulationTimestampFileCopyStart *start_timestamp) {
-      this->type = type;
-      this->file = file;
-      this->mailbox = mailbox;
-      this->ack_mailbox = ack_mailbox;
-      this->file_partition = file_partition;
-      this->start_timestamp = start_timestamp;
+    NetworkConnection::NetworkConnection(int type, WorkflowFile *file, std::string file_partition, std::string mailbox,
+                                         std::string ack_mailbox, SimulationTimestampFileCopyStart *start_timestamp) {
+        this->type = type;
+        this->file = file;
+        this->mailbox = mailbox;
+        this->ack_mailbox = ack_mailbox;
+        this->file_partition = file_partition;
+        this->start_timestamp = start_timestamp;
 
-      if (this->mailbox.empty()) {
-        throw std::invalid_argument("NetworkConnection::NetworkConnection(): empty mailbox_name");
-      }
-      if (type == NetworkConnection::INCOMING_DATA or this->type == NetworkConnection::OUTGOING_DATA) {
-        if (this->file == nullptr) {
-          throw std::invalid_argument("NetworkConnection::NetworkConnection(): file cannot be nullptr for data connections");
+        if (this->mailbox.empty()) {
+            throw std::invalid_argument("NetworkConnection::NetworkConnection(): empty mailbox_name");
         }
-      }
-      if (this->type == NetworkConnection::OUTGOING_DATA or this->type == NetworkConnection::INCOMING_CONTROL) {
-        if (not this->ack_mailbox.empty()) {
-          throw std::invalid_argument("NetworkConnection::NetworkConnection(): ack_mailbox should not be set for outgoing data or incoming control connection");
+        if (type == NetworkConnection::INCOMING_DATA or this->type == NetworkConnection::OUTGOING_DATA) {
+            if (this->file == nullptr) {
+                throw std::invalid_argument(
+                        "NetworkConnection::NetworkConnection(): file cannot be nullptr for data connections");
+            }
         }
-      }
-      if (this->type == NetworkConnection::INCOMING_CONTROL) {
-        if (this->file != nullptr) {
-          throw std::invalid_argument("NetworkConnection::NetworkConnection(): file should be nullptr for incoming control connection");
+        if (this->type == NetworkConnection::OUTGOING_DATA or this->type == NetworkConnection::INCOMING_CONTROL) {
+            if (not this->ack_mailbox.empty()) {
+                throw std::invalid_argument(
+                        "NetworkConnection::NetworkConnection(): ack_mailbox should not be set for outgoing data or incoming control connection");
+            }
         }
-      }
+        if (this->type == NetworkConnection::INCOMING_CONTROL) {
+            if (this->file != nullptr) {
+                throw std::invalid_argument(
+                        "NetworkConnection::NetworkConnection(): file should be nullptr for incoming control connection");
+            }
+        }
     }
 
     /**
@@ -68,41 +72,41 @@ namespace wrench {
      */
     bool NetworkConnection::start() {
 
-      switch (this->type) {
-        case NetworkConnection::INCOMING_DATA:
-        WRENCH_INFO("Asynchronously receiving file %s...",
-                    this->file->getID().c_str());
-          try {
-            this->comm = S4U_Mailbox::igetMessage(mailbox);
-          } catch (std::shared_ptr<NetworkError> &cause) {
-            WRENCH_INFO("NetworkConnection::start(): got a NetworkError... giving up");
-            return false;
-          }
-          break;
-        case NetworkConnection::OUTGOING_DATA:
-        WRENCH_INFO("Asynchronously sending file %s to mailbox_name %s...",
-                    this->file->getID().c_str(), this->mailbox.c_str() );
-          try {
-            this->comm = S4U_Mailbox::iputMessage(this->mailbox, new
-                    StorageServiceFileContentMessage(this->file));
-          } catch (std::shared_ptr<NetworkError> &cause) {
-            WRENCH_INFO("NetworkConnection::start(): got a NetworkError... giving up");
-            return false;
-          }
-          break;
-        case NetworkConnection::INCOMING_CONTROL:
-        WRENCH_DEBUG("Asynchronously receiving a control message...");
-          try {
-            this->comm = S4U_Mailbox::igetMessage(this->mailbox);
-          } catch (std::shared_ptr<NetworkError> &cause) {
-            WRENCH_INFO("NetworkConnection::start(): got a NetworkError... giving up");
-            return false;
-          }
-          break;
-        default:
-          throw std::runtime_error("NetworkConnection::start(): Invalid connection type");
-      }
-      return true;
+        switch (this->type) {
+            case NetworkConnection::INCOMING_DATA:
+            WRENCH_INFO("Asynchronously receiving file %s...",
+                        this->file->getID().c_str());
+                try {
+                    this->comm = S4U_Mailbox::igetMessage(mailbox);
+                } catch (std::shared_ptr<NetworkError> &cause) {
+                    WRENCH_INFO("NetworkConnection::start(): got a NetworkError... giving up");
+                    return false;
+                }
+                break;
+            case NetworkConnection::OUTGOING_DATA:
+            WRENCH_INFO("Asynchronously sending file %s to mailbox_name %s...",
+                        this->file->getID().c_str(), this->mailbox.c_str());
+                try {
+                    this->comm = S4U_Mailbox::iputMessage(this->mailbox, new
+                            StorageServiceFileContentMessage(this->file));
+                } catch (std::shared_ptr<NetworkError> &cause) {
+                    WRENCH_INFO("NetworkConnection::start(): got a NetworkError... giving up");
+                    return false;
+                }
+                break;
+            case NetworkConnection::INCOMING_CONTROL:
+            WRENCH_DEBUG("Asynchronously receiving a control message...");
+                try {
+                    this->comm = S4U_Mailbox::igetMessage(this->mailbox);
+                } catch (std::shared_ptr<NetworkError> &cause) {
+                    WRENCH_INFO("NetworkConnection::start(): got a NetworkError... giving up");
+                    return false;
+                }
+                break;
+            default:
+                throw std::runtime_error("NetworkConnection::start(): Invalid connection type");
+        }
+        return true;
     }
 
     /**
@@ -110,32 +114,38 @@ namespace wrench {
      * @return true or false
      */
     bool NetworkConnection::hasFailed() {
-      try {
-        this->comm->comm_ptr->test();
-      } catch (simgrid::NetworkFailureException &e) {
-        if (this->type == NetworkConnection::OUTGOING_DATA) {
-          this->failure_cause = std::shared_ptr<NetworkError>(new NetworkError(NetworkError::SENDING, NetworkError::FAILURE, this->mailbox));
-        } else {
-          this->failure_cause = std::shared_ptr<NetworkError>(new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, this->mailbox));
+        try {
+            this->comm->comm_ptr->test();
+        } catch (simgrid::NetworkFailureException &e) {
+            if (this->type == NetworkConnection::OUTGOING_DATA) {
+                this->failure_cause = std::shared_ptr<NetworkError>(
+                        new NetworkError(NetworkError::SENDING, NetworkError::FAILURE, this->mailbox));
+            } else {
+                this->failure_cause = std::shared_ptr<NetworkError>(
+                        new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, this->mailbox));
+            }
+            return true;
+        } catch (simgrid::TimeoutError &e) {
+            if (this->type == NetworkConnection::OUTGOING_DATA) {
+                this->failure_cause = std::shared_ptr<NetworkError>(
+                        new NetworkError(NetworkError::SENDING, NetworkError::TIMEOUT, this->mailbox));
+            } else {
+                this->failure_cause = std::shared_ptr<NetworkError>(
+                        new NetworkError(NetworkError::RECEIVING, NetworkError::TIMEOUT, this->mailbox));
+            }
+            return true;
+        } catch (std::exception &e) {
+            // This is likely paranoid
+            if (this->type == NetworkConnection::OUTGOING_DATA) {
+                this->failure_cause = std::shared_ptr<NetworkError>(
+                        new NetworkError(NetworkError::SENDING, NetworkError::FAILURE, this->mailbox));
+            } else {
+                this->failure_cause = std::shared_ptr<NetworkError>(
+                        new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, this->mailbox));
+            }
+            return true;
         }
-        return true;
-      } catch (simgrid::TimeoutError &e) {
-        if (this->type == NetworkConnection::OUTGOING_DATA) {
-          this->failure_cause = std::shared_ptr<NetworkError>(new NetworkError(NetworkError::SENDING, NetworkError::TIMEOUT, this->mailbox));
-        } else {
-          this->failure_cause = std::shared_ptr<NetworkError>(new NetworkError(NetworkError::RECEIVING, NetworkError::TIMEOUT, this->mailbox));
-        }
-        return true;
-      } catch (std::exception &e) {
-        // This is likely paranoid
-        if (this->type == NetworkConnection::OUTGOING_DATA) {
-          this->failure_cause = std::shared_ptr<NetworkError>(new NetworkError(NetworkError::SENDING, NetworkError::FAILURE, this->mailbox));
-        } else {
-          this->failure_cause = std::shared_ptr<NetworkError>(new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, this->mailbox));
-        }
-        return true;
-      }
-      return false;
+        return false;
     }
 
     /**
@@ -144,20 +154,20 @@ namespace wrench {
      */
     std::shared_ptr<SimulationMessage> NetworkConnection::getMessage() {
 
-      WRENCH_DEBUG("Getting the message from connection");
-      if (this->type == NetworkConnection::OUTGOING_DATA) {
-        throw std::runtime_error("NetworkConnection::getMessage(): Cannot be called on an outgoing connection");
-      }
-      if (this->hasFailed()) {
-        return nullptr;
-      }
-      std::shared_ptr<SimulationMessage> message;
-      try {
-        message = this->comm->wait();
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        return nullptr;
-      }
-      return message;
+        WRENCH_DEBUG("Getting the message from connection");
+        if (this->type == NetworkConnection::OUTGOING_DATA) {
+            throw std::runtime_error("NetworkConnection::getMessage(): Cannot be called on an outgoing connection");
+        }
+        if (this->hasFailed()) {
+            return nullptr;
+        }
+        std::shared_ptr<SimulationMessage> message;
+        try {
+            message = this->comm->wait();
+        } catch (std::shared_ptr<NetworkError> &cause) {
+            return nullptr;
+        }
+        return message;
     }
 
 };

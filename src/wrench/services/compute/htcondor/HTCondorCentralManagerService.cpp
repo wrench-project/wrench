@@ -44,8 +44,10 @@ namespace wrench {
             throw std::invalid_argument("At least one compute service should be provided");
         }
         for (auto const &cs : compute_resources) {
-            if (dynamic_cast<CloudComputeService *>(cs) and (not dynamic_cast<VirtualizedClusterComputeService *>(cs))) {
-                throw std::invalid_argument("An HTCondorCentralManagerService cannot use a CloudComputeService - use a VirtualizedClusterComputeService instead");
+            if (dynamic_cast<CloudComputeService *>(cs) and
+                (not dynamic_cast<VirtualizedClusterComputeService *>(cs))) {
+                throw std::invalid_argument(
+                        "An HTCondorCentralManagerService cannot use a CloudComputeService - use a VirtualizedClusterComputeService instead");
             }
         }
 
@@ -185,7 +187,8 @@ namespace wrench {
                     }
 
                 } else if (auto cloud = dynamic_cast<CloudComputeService *>(cs)) {
-                    throw std::runtime_error("An HTCondorCentralManagerService cannot use a CloudComputeService - use a VirtualizedClusterComputeService instead");
+                    throw std::runtime_error(
+                            "An HTCondorCentralManagerService cannot use a CloudComputeService - use a VirtualizedClusterComputeService instead");
                 } else {
 
                     // set the number of available cores
@@ -203,15 +206,17 @@ namespace wrench {
             // starting an HTCondor negotiator
             if (not this->dispatching_jobs && not this->pending_jobs.empty() && not this->resources_unavailable) {
                 this->dispatching_jobs = true;
-                auto negotiator = std::shared_ptr<HTCondorNegotiatorService>(new HTCondorNegotiatorService(this->hostname, this->compute_resources_map,
-                                                                              this->running_jobs,
-                                                                              this->pending_jobs, this->mailbox_name));
+                auto negotiator = std::shared_ptr<HTCondorNegotiatorService>(
+                        new HTCondorNegotiatorService(this->hostname, this->compute_resources_map,
+                                                      this->running_jobs,
+                                                      this->pending_jobs, this->mailbox_name));
                 negotiator->simulation = this->simulation;
                 negotiator->start(negotiator, true, false); // Daemonized, no auto-restart
             }
         }
 
-        WRENCH_INFO("HTCondorCentralManager Service on host %s cleanly terminating!", S4U_Simulation::getHostName().c_str());
+        WRENCH_INFO("HTCondorCentralManager Service on host %s cleanly terminating!",
+                    S4U_Simulation::getHostName().c_str());
         return 0;
     }
 
@@ -290,7 +295,8 @@ namespace wrench {
             S4U_Mailbox::dputMessage(
                     answer_mailbox,
                     new ComputeServiceSubmitStandardJobAnswerMessage(
-                            job, this->getSharedPtr<HTCondorCentralManagerService>(), true, nullptr, this->getMessagePayloadValue(
+                            job, this->getSharedPtr<HTCondorCentralManagerService>(), true, nullptr,
+                            this->getMessagePayloadValue(
                                     HTCondorCentralManagerServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
         }

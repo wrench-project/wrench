@@ -54,7 +54,8 @@ namespace wrench {
         // Clean up state in case of a restart
         for (auto host : this->compute_resources) {
             this->total_num_cores += std::get<0>(host.second);
-            this->ram_availabilities.insert(std::make_pair(host.first, S4U_Simulation::getHostMemoryCapacity(host.first)));
+            this->ram_availabilities.insert(
+                    std::make_pair(host.first, S4U_Simulation::getHostMemoryCapacity(host.first)));
             this->running_thread_counts.insert(std::make_pair(host.first, 0));
         }
 
@@ -220,7 +221,8 @@ namespace wrench {
             }
         } else {
             throw std::runtime_error(
-                    "ComputeService::submitStandardJob(): Received an unexpected [" + message->getName() + "] message!");
+                    "ComputeService::submitStandardJob(): Received an unexpected [" + message->getName() +
+                    "] message!");
         }
     }
 
@@ -361,9 +363,9 @@ namespace wrench {
             double ttl,
             PilotJob *pj,
             std::string suffix, std::shared_ptr<StorageService> scratch_space) : ComputeService(hostname,
-                                                                                "bare_metal" + suffix,
-                                                                                "bare_metal" + suffix,
-                                                                                scratch_space) {
+                                                                                                "bare_metal" + suffix,
+                                                                                                "bare_metal" + suffix,
+                                                                                                scratch_space) {
 
         initiateInstance(hostname,
                          std::move(compute_resources),
@@ -497,7 +499,8 @@ namespace wrench {
         this->total_num_cores = 0;
         for (auto host : this->compute_resources) {
             this->total_num_cores += std::get<0>(host.second);
-            this->ram_availabilities.insert(std::make_pair(host.first, S4U_Simulation::getHostMemoryCapacity(host.first)));
+            this->ram_availabilities.insert(
+                    std::make_pair(host.first, S4U_Simulation::getHostMemoryCapacity(host.first)));
             this->running_thread_counts.insert(std::make_pair(host.first, 0));
         }
 
@@ -533,7 +536,8 @@ namespace wrench {
                                                 this->getSharedPtr<Service>(), this->mailbox_name,
                                                 {{HostStateChangeDetectorProperty::MONITORING_PERIOD, "1.0"}}));
             this->host_state_change_monitor->simulation = this->simulation;
-            this->host_state_change_monitor->start(this->host_state_change_monitor, true, false); // Daemonized, no auto-restart
+            this->host_state_change_monitor->start(this->host_state_change_monitor, true,
+                                                   false); // Daemonized, no auto-restart
         }
 
 //        simgrid::s4u::Host::on_state_change.connect( [this] (simgrid::s4u::Host const &h) { this->someHostIsBackOn(h);});
@@ -718,13 +722,15 @@ namespace wrench {
                 workunit_executor->start(workunit_executor, true, false); // Daemonized, no auto-restart
             } catch (std::shared_ptr<HostError> &e) {
                 // This is an error on the target host!!
-                throw std::runtime_error("BareMetalComputeService::dispatchReadyWorkunits(): got a host error on the target host - this shouldn't happen");
+                throw std::runtime_error(
+                        "BareMetalComputeService::dispatchReadyWorkunits(): got a host error on the target host - this shouldn't happen");
             }
 
 
             // Start a failure detector for this workunit executor (which will send me a message in case the
             // work unit executor has died)
-            auto failure_detector = std::shared_ptr<ServiceTerminationDetector>(new ServiceTerminationDetector(this->hostname, workunit_executor, this->mailbox_name, true, false));
+            auto failure_detector = std::shared_ptr<ServiceTerminationDetector>(
+                    new ServiceTerminationDetector(this->hostname, workunit_executor, this->mailbox_name, true, false));
             failure_detector->simulation = this->simulation;
             failure_detector->start(failure_detector, true, false); // Daemonized, no auto-restart
 
@@ -785,7 +791,8 @@ namespace wrench {
             return true;
         } else if (auto msg = std::dynamic_pointer_cast<HostHasTurnedOffMessage>(message)) {
             // If all hosts being off should not cause the service to terminate, then nevermind
-            if (this->getPropertyValueAsString(BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN) == "false") {
+            if (this->getPropertyValueAsString(
+                    BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN) == "false") {
                 return true;
             } else {
 
@@ -794,7 +801,8 @@ namespace wrench {
                 // So we don't want to just quit right now. We'll
                 //  get a WUE Crash message, at which point we'll check whether all hosts are down again
                 if (not this->areAllComputeResourcesDownWithNoWUERunning()) {
-                    WRENCH_INFO("Not terminating as there are still non-down resources and/or WUE executors that haven't reported back yet");
+                    WRENCH_INFO(
+                            "Not terminating as there are still non-down resources and/or WUE executors that haven't reported back yet");
                     return true;
                 }
 
@@ -843,11 +851,13 @@ namespace wrench {
             auto service = msg->service;
             auto workunit_executor = std::dynamic_pointer_cast<WorkunitExecutor>(service);
             if (not workunit_executor) {
-                throw std::runtime_error("Received a FailureDetectorServiceHasFailedMessage message, but that service is not a WorkUnitExecutor!");
+                throw std::runtime_error(
+                        "Received a FailureDetectorServiceHasFailedMessage message, but that service is not a WorkUnitExecutor!");
             }
             processWorkunitExecutorCrash(workunit_executor);
             // If all hosts being off should not cause the service to terminate, then nevermind
-            if (this->getPropertyValueAsString(BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN) == "false") {
+            if (this->getPropertyValueAsString(
+                    BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN) == "false") {
                 return true;
             } else {
 
@@ -888,7 +898,8 @@ namespace wrench {
         try {
             S4U_Mailbox::putMessage(job->popCallbackMailbox(),
                                     new ComputeServiceStandardJobFailedMessage(
-                                            job, this->getSharedPtr<BareMetalComputeService>(), cause, this->getMessagePayloadValue(
+                                            job, this->getSharedPtr<BareMetalComputeService>(), cause,
+                                            this->getMessagePayloadValue(
                                                     BareMetalComputeServiceMessagePayload::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
             return;
@@ -987,7 +998,8 @@ namespace wrench {
 
 
         for (auto job : this->running_jobs) {
-            this->failRunningStandardJob(job, std::shared_ptr<FailureCause>(new JobKilled(job, this->getSharedPtr<BareMetalComputeService>())));
+            this->failRunningStandardJob(job, std::shared_ptr<FailureCause>(
+                    new JobKilled(job, this->getSharedPtr<BareMetalComputeService>())));
         }
     }
 
@@ -1019,7 +1031,8 @@ namespace wrench {
             try {
                 S4U_Mailbox::putMessage(this->containing_pilot_job->popCallbackMailbox(),
                                         new ComputeServicePilotJobExpiredMessage(
-                                                this->containing_pilot_job, this->getSharedPtr<BareMetalComputeService>(),
+                                                this->containing_pilot_job,
+                                                this->getSharedPtr<BareMetalComputeService>(),
                                                 this->getMessagePayloadValue(
                                                         BareMetalComputeServiceMessagePayload::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD)));
             } catch (std::shared_ptr<NetworkError> &cause) {
@@ -1121,9 +1134,10 @@ namespace wrench {
                 // Make sure the child's tasks ready (paranoid)
                 if (child->task != nullptr) {
                     if (child->task->getInternalState() != WorkflowTask::InternalState::TASK_READY) {
-                        throw std::runtime_error("BareMetalComputeService::processWorkunitExecutorCompletion(): Weird task state " +
-                                                 std::to_string(child->task->getInternalState()) + " for task " +
-                                                 child->task->getID());
+                        throw std::runtime_error(
+                                "BareMetalComputeService::processWorkunitExecutorCompletion(): Weird task state " +
+                                std::to_string(child->task->getInternalState()) + " for task " +
+                                child->task->getID());
                     }
                 }
                 // Move the workunit to ready
@@ -1241,7 +1255,8 @@ namespace wrench {
         if (this->all_workunits.find(job) == this->all_workunits.end()) {
             WRENCH_INFO("Trying to terminate a standard job that's not (no longer?) running!");
             ComputeServiceTerminateStandardJobAnswerMessage *answer_message = new ComputeServiceTerminateStandardJobAnswerMessage(
-                    job, this->getSharedPtr<BareMetalComputeService>(), false, std::shared_ptr<FailureCause>(new JobCannotBeTerminated(job)),
+                    job, this->getSharedPtr<BareMetalComputeService>(), false,
+                    std::shared_ptr<FailureCause>(new JobCannotBeTerminated(job)),
                     this->getMessagePayloadValue(
                             BareMetalComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD));
             try {
@@ -1306,7 +1321,8 @@ namespace wrench {
             }
 
             // Parse the service-specific argument
-            std::tuple<std::string, unsigned long> parsed_spec = parseResourceSpec(service_specific_arguments[t->getID()]);
+            std::tuple<std::string, unsigned long> parsed_spec = parseResourceSpec(
+                    service_specific_arguments[t->getID()]);
             std::string desired_host = std::get<0>(parsed_spec);
             unsigned long desired_num_cores = std::get<1>(parsed_spec);
 
@@ -1358,7 +1374,9 @@ namespace wrench {
                 S4U_Mailbox::dputMessage(
                         answer_mailbox,
                         new ComputeServiceSubmitStandardJobAnswerMessage(
-                                job, this->getSharedPtr<BareMetalComputeService>(), false, std::shared_ptr<FailureCause>(new JobTypeNotSupported(job, this->getSharedPtr<BareMetalComputeService>())),
+                                job, this->getSharedPtr<BareMetalComputeService>(), false,
+                                std::shared_ptr<FailureCause>(
+                                        new JobTypeNotSupported(job, this->getSharedPtr<BareMetalComputeService>())),
                                 this->getMessagePayloadValue(
                                         ComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
             } catch (std::shared_ptr<NetworkError> &cause) {
@@ -1373,7 +1391,9 @@ namespace wrench {
                 S4U_Mailbox::dputMessage(
                         answer_mailbox,
                         new ComputeServiceSubmitStandardJobAnswerMessage(
-                                job, this->getSharedPtr<BareMetalComputeService>(), false, std::shared_ptr<FailureCause>(new NotEnoughResources(job, this->getSharedPtr<BareMetalComputeService>())),
+                                job, this->getSharedPtr<BareMetalComputeService>(), false,
+                                std::shared_ptr<FailureCause>(
+                                        new NotEnoughResources(job, this->getSharedPtr<BareMetalComputeService>())),
                                 this->getMessagePayloadValue(
                                         BareMetalComputeServiceMessagePayload::NOT_ENOUGH_CORES_MESSAGE_PAYLOAD)));
             } catch (std::shared_ptr<NetworkError> &cause) {
@@ -1413,7 +1433,8 @@ namespace wrench {
             S4U_Mailbox::dputMessage(
                     answer_mailbox,
                     new ComputeServiceSubmitStandardJobAnswerMessage(
-                            job, this->getSharedPtr<BareMetalComputeService>(), true, nullptr, this->getMessagePayloadValue(
+                            job, this->getSharedPtr<BareMetalComputeService>(), true, nullptr,
+                            this->getMessagePayloadValue(
                                     ComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
             return;
@@ -1438,7 +1459,9 @@ namespace wrench {
             try {
                 S4U_Mailbox::dputMessage(
                         answer_mailbox, new ComputeServiceSubmitPilotJobAnswerMessage(
-                                job, this->getSharedPtr<BareMetalComputeService>(), false, std::shared_ptr<FailureCause>(new JobTypeNotSupported(job, this->getSharedPtr<BareMetalComputeService>())),
+                                job, this->getSharedPtr<BareMetalComputeService>(), false,
+                                std::shared_ptr<FailureCause>(
+                                        new JobTypeNotSupported(job, this->getSharedPtr<BareMetalComputeService>())),
                                 this->getMessagePayloadValue(
                                         BareMetalComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
             } catch (std::shared_ptr<NetworkError> &cause) {
@@ -1476,7 +1499,8 @@ namespace wrench {
         for (auto r : this->running_thread_counts) {
             unsigned long cores = std::get<0>(this->compute_resources[r.first]);
             unsigned long running_threads = r.second;
-            num_idle_cores.insert(std::make_pair(r.first, (double) (std::max<unsigned long>(cores - running_threads, 0))));
+            num_idle_cores.insert(
+                    std::make_pair(r.first, (double) (std::max<unsigned long>(cores - running_threads, 0))));
         }
         dict.insert(std::make_pair("num_idle_cores", num_idle_cores));
 

@@ -27,23 +27,24 @@ namespace wrench {
     EnergyMeter::EnergyMeter(std::shared_ptr<WMS> wms, const std::map<std::string, double> &measurement_periods) :
             Service(wms->hostname, "energy_meter", "energy_meter") {
 
-      if (measurement_periods.empty()) {
-        throw std::invalid_argument("EnergyMeter::EnergyMeter(): no host to meter!");
-      }
-
-      this->wms = wms;
-
-      for (auto &h : measurement_periods) {
-        if (not S4U_Simulation::hostExists(h.first)) {
-          throw std::invalid_argument("EnergyMeter::EnergyMeter(): unknown host " + h.first);
+        if (measurement_periods.empty()) {
+            throw std::invalid_argument("EnergyMeter::EnergyMeter(): no host to meter!");
         }
-        if (h.second < 1.0) {
-          throw std::invalid_argument(
-                  "EnergyMeter::EnergyMeter(): measurement period must be at least 1 second (host " + h.first + ")");
+
+        this->wms = wms;
+
+        for (auto &h : measurement_periods) {
+            if (not S4U_Simulation::hostExists(h.first)) {
+                throw std::invalid_argument("EnergyMeter::EnergyMeter(): unknown host " + h.first);
+            }
+            if (h.second < 1.0) {
+                throw std::invalid_argument(
+                        "EnergyMeter::EnergyMeter(): measurement period must be at least 1 second (host " + h.first +
+                        ")");
+            }
+            this->measurement_periods[h.first] = h.second;
+            this->time_to_next_measurement[h.first] = 0.0;  // We begin by taking a measurement
         }
-        this->measurement_periods[h.first] = h.second;
-        this->time_to_next_measurement[h.first] = 0.0;  // We begin by taking a measurement
-      }
     }
 
     /**
@@ -53,32 +54,33 @@ namespace wrench {
      * @param hostnames: the list of metered hosts, as hostnames
      * @param measurement_period: the measurement period
      */
-    EnergyMeter::EnergyMeter(std::shared_ptr<WMS> wms, const std::vector<std::string> &hostnames, double measurement_period) :
+    EnergyMeter::EnergyMeter(std::shared_ptr<WMS> wms, const std::vector<std::string> &hostnames,
+                             double measurement_period) :
             Service(wms->hostname, "energy_meter", "energy_meter") {
 
-      if (hostnames.empty()) {
-        throw std::invalid_argument("EnergyMeter::EnergyMeter(): no host to meter!");
-      }
-      if (measurement_period < 1) {
-        throw std::invalid_argument("EnergyMeter::EnergyMeter(): measurement period must be at least 1 second");
-      }
-
-      this->wms = wms;
-
-      for (auto const &h : hostnames) {
-        if (not S4U_Simulation::hostExists(h)) {
-          throw std::invalid_argument("EnergyMeter::EnergyMeter(): unknown host " + h);
+        if (hostnames.empty()) {
+            throw std::invalid_argument("EnergyMeter::EnergyMeter(): no host to meter!");
         }
-        this->measurement_periods[h] = measurement_period;
-        this->time_to_next_measurement[h] = 0.0;  // We begin by taking a measurement
-      }
+        if (measurement_period < 1) {
+            throw std::invalid_argument("EnergyMeter::EnergyMeter(): measurement period must be at least 1 second");
+        }
+
+        this->wms = wms;
+
+        for (auto const &h : hostnames) {
+            if (not S4U_Simulation::hostExists(h)) {
+                throw std::invalid_argument("EnergyMeter::EnergyMeter(): unknown host " + h);
+            }
+            this->measurement_periods[h] = measurement_period;
+            this->time_to_next_measurement[h] = 0.0;  // We begin by taking a measurement
+        }
     }
 
     /**
      * @brief Kill the energy meter (brutally terminate the daemon)
      */
     void EnergyMeter::kill() {
-      this->killActor();
+        this->killActor();
     }
 
     /**
@@ -88,11 +90,11 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void EnergyMeter::stop() {
-      try {
-        S4U_Mailbox::putMessage(this->mailbox_name, new ServiceStopDaemonMessage("", 0.0));
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
-      }
+        try {
+            S4U_Mailbox::putMessage(this->mailbox_name, new ServiceStopDaemonMessage("", 0.0));
+        } catch (std::shared_ptr<NetworkError> &cause) {
+            throw WorkflowExecutionException(cause);
+        }
     }
 
     /**
@@ -101,50 +103,50 @@ namespace wrench {
      */
     int EnergyMeter::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
+        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
 
-      WRENCH_INFO("New Energy Meter Manager starting (%s)", this->mailbox_name.c_str());
+        WRENCH_INFO("New Energy Meter Manager starting (%s)", this->mailbox_name.c_str());
 
 
-      /** Main loop **/
-      while (true) {
-        S4U_Simulation::computeZeroFlop();
+        /** Main loop **/
+        while (true) {
+            S4U_Simulation::computeZeroFlop();
 
-        // Find the minimum of the times to next measurements
-        auto min_el = std::min_element(
-                this->time_to_next_measurement.begin(),
-                this->time_to_next_measurement.end(),
-                [](decltype(this->time_to_next_measurement)::value_type &lhs,
-                   decltype(this->time_to_next_measurement)::value_type &rhs) {
-                    return lhs.second < rhs.second;
-                });
+            // Find the minimum of the times to next measurements
+            auto min_el = std::min_element(
+                    this->time_to_next_measurement.begin(),
+                    this->time_to_next_measurement.end(),
+                    [](decltype(this->time_to_next_measurement)::value_type &lhs,
+                       decltype(this->time_to_next_measurement)::value_type &rhs) {
+                        return lhs.second < rhs.second;
+                    });
 
-        double time_to_next_measurement = min_el->second;
-        double before = Simulation::getCurrentSimulatedDate();
+            double time_to_next_measurement = min_el->second;
+            double before = Simulation::getCurrentSimulatedDate();
 
-        if (time_to_next_measurement > 0) {
-          if (not processNextMessage(time_to_next_measurement)) {
-            break;
-          }
+            if (time_to_next_measurement > 0) {
+                if (not processNextMessage(time_to_next_measurement)) {
+                    break;
+                }
+            }
+
+            // Update time-to-next-measurement for all hosts
+            for (auto &h : this->time_to_next_measurement) {
+                h.second = std::max<double>(0, h.second - (Simulation::getCurrentSimulatedDate() - before));
+            }
+
+            // Take measurements
+            for (auto &h : this->time_to_next_measurement) {
+                if (h.second < EPSILON) {
+                    this->simulation->getEnergyConsumed(h.first, true);
+                    this->time_to_next_measurement[h.first] = this->measurement_periods[h.first];
+                }
+            }
         }
 
-        // Update time-to-next-measurement for all hosts
-        for (auto &h : this->time_to_next_measurement) {
-          h.second = std::max<double>(0, h.second - (Simulation::getCurrentSimulatedDate() - before));
-        }
+        WRENCH_INFO("Energy Meter Manager terminating");
 
-        // Take measurements
-        for (auto &h : this->time_to_next_measurement) {
-          if (h.second < EPSILON) {
-            this->simulation->getEnergyConsumed(h.first, true);
-            this->time_to_next_measurement[h.first] = this->measurement_periods[h.first];
-          }
-        }
-      }
-
-      WRENCH_INFO("Energy Meter Manager terminating");
-
-      return 0;
+        return 0;
     }
 
     /**
@@ -155,27 +157,27 @@ namespace wrench {
      */
     bool EnergyMeter::processNextMessage(double timeout) {
 
-      std::shared_ptr<SimulationMessage> message = nullptr;
+        std::shared_ptr<SimulationMessage> message = nullptr;
 
-      try {
-        message = S4U_Mailbox::getMessage(this->mailbox_name, timeout);
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        return true;
-      }
+        try {
+            message = S4U_Mailbox::getMessage(this->mailbox_name, timeout);
+        } catch (std::shared_ptr<NetworkError> &cause) {
+            return true;
+        }
 
-      if (message == nullptr) {
-        WRENCH_INFO("Got a NULL message... Likely this means we're all done. Aborting!");
-        return false;
-      }
+        if (message == nullptr) {
+            WRENCH_INFO("Got a NULL message... Likely this means we're all done. Aborting!");
+            return false;
+        }
 
-      WRENCH_INFO("Data Movement Manager got a %s message", message->getName().c_str());
+        WRENCH_INFO("Data Movement Manager got a %s message", message->getName().c_str());
 
-      if (std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
-        // There shouldn't be any need to clean any state up
-        return false;
-      }
+        if (std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
+            // There shouldn't be any need to clean any state up
+            return false;
+        }
 
-      throw std::runtime_error("EnergyMeter::waitForNextMessage(): Unexpected [" + message->getName() + "] message");
+        throw std::runtime_error("EnergyMeter::waitForNextMessage(): Unexpected [" + message->getName() + "] message");
 
     }
 

@@ -13,6 +13,7 @@
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include <wrench/logging/TerminalOutput.h>
 #include <boost/algorithm/string.hpp>
+
 #ifdef MESSAGE_MANAGER
 #include <wrench/util/MessageManager.h>
 #endif
@@ -112,8 +113,9 @@ namespace wrench {
     void S4U_Daemon::cleanup(bool has_returned_from_main, int return_value) {
         // Default behavior is to throw in case of any problem
         if ((not has_returned_from_main) and (not S4U_Simulation::isHostOn(hostname))) {
-            throw std::runtime_error("S4U_Daemon::cleanup(): This daemon has died due to a failure of its host, but does not override cleanup() "
-                                     "(so that is can implement fault-tolerance or explicitly ignore fault) ");
+            throw std::runtime_error(
+                    "S4U_Daemon::cleanup(): This daemon has died due to a failure of its host, but does not override cleanup() "
+                    "(so that is can implement fault-tolerance or explicitly ignore fault) ");
         }
     }
 

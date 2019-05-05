@@ -34,12 +34,13 @@ namespace wrench {
      */
     class NetworkProximityLookupRequestMessage : public NetworkProximityMessage {
     public:
-        NetworkProximityLookupRequestMessage(std::string answer_mailbox, std::pair<std::string,std::string> hosts, double payload);
+        NetworkProximityLookupRequestMessage(std::string answer_mailbox, std::pair<std::string, std::string> hosts,
+                                             double payload);
 
         /** @brief The mailbox to which the answer message should be sent */
         std::string answer_mailbox;
         /** @brief The hosts between which to calculate a proximity value */
-        std::pair<std::string,std::string> hosts;
+        std::pair<std::string, std::string> hosts;
     };
 
 
@@ -48,10 +49,11 @@ namespace wrench {
      */
     class NetworkProximityLookupAnswerMessage : public NetworkProximityMessage {
     public:
-        NetworkProximityLookupAnswerMessage(std::pair<std::string,std::string> hosts, double proximity_value, double timestamp, double payload);
+        NetworkProximityLookupAnswerMessage(std::pair<std::string, std::string> hosts, double proximity_value,
+                                            double timestamp, double payload);
 
         /** @brief The hosts whose proximity values were calculated */
-        std::pair<std::string,std::string> hosts;
+        std::pair<std::string, std::string> hosts;
         /** @brief The calculated proximity value */
         double proximity_value;
         /** @brief The timestamp of the oldest measurement data used to calculate the proximity value */
@@ -64,10 +66,11 @@ namespace wrench {
      */
     class NetworkProximityComputeAnswerMessage : public NetworkProximityMessage {
     public:
-        NetworkProximityComputeAnswerMessage(std::pair<std::string,std::string> hosts,double proximity_value,double payload);
+        NetworkProximityComputeAnswerMessage(std::pair<std::string, std::string> hosts, double proximity_value,
+                                             double payload);
 
         /** @brief The hosts whose proximity values were calculated */
-        std::pair<std::string,std::string> hosts;
+        std::pair<std::string, std::string> hosts;
         /** @brief The computed proximity value */
         double proximity_value;
     };
@@ -97,7 +100,9 @@ namespace wrench {
      */
     class NextContactDaemonAnswerMessage : public NetworkProximityMessage {
     public:
-        NextContactDaemonAnswerMessage(std::string next_host_to_send, std::shared_ptr<NetworkProximityDaemon> next_daemon_to_send, std::string next_mailbox_to_send,double payload);
+        NextContactDaemonAnswerMessage(std::string next_host_to_send,
+                                       std::shared_ptr<NetworkProximityDaemon> next_daemon_to_send,
+                                       std::string next_mailbox_to_send, double payload);
 
         /** @brief The next host for the NetworkProximityDaemon to contact */
         std::string next_host_to_send;
@@ -112,7 +117,7 @@ namespace wrench {
     /**
      * @brief A message sent to a NetworkProximityService to request a coordinate lookup
      */
-    class CoordinateLookupRequestMessage: public NetworkProximityMessage {
+    class CoordinateLookupRequestMessage : public NetworkProximityMessage {
     public:
         CoordinateLookupRequestMessage(std::string answer_mailbox, std::string requested_host, double payload);
 
@@ -126,9 +131,10 @@ namespace wrench {
     /**
      * @brief A message sent by a NetworkProximityService in answer to a coordinate lookup request
      */
-    class CoordinateLookupAnswerMessage: public NetworkProximityMessage {
+    class CoordinateLookupAnswerMessage : public NetworkProximityMessage {
     public:
-        CoordinateLookupAnswerMessage(std::string requested_host, std::pair<double, double> xy_coordinate, double timestamp, double payload);
+        CoordinateLookupAnswerMessage(std::string requested_host, std::pair<double, double> xy_coordinate,
+                                      double timestamp, double payload);
 
         /** @brief The name of the host whose coordinates were requested  */
         std::string requested_host;

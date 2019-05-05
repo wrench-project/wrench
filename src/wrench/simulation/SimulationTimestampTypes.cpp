@@ -7,7 +7,7 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(simulation_timestamps, "Log category for Simulation
 
 namespace wrench {
 
-    SimulationTimestampType::SimulationTimestampType(){
+    SimulationTimestampType::SimulationTimestampType() {
         this->date = S4U_Simulation::getClock();
     }
 
@@ -22,7 +22,7 @@ namespace wrench {
     /**
      * @brief Constructor
      */
-    SimulationTimestampPair::SimulationTimestampPair() : endpoint(nullptr){
+    SimulationTimestampPair::SimulationTimestampPair() : endpoint(nullptr) {
 
     }
 
@@ -50,7 +50,8 @@ namespace wrench {
      */
     SimulationTimestampTask::SimulationTimestampTask(WorkflowTask *task) : task(task) {
         if (task == nullptr) {
-            throw std::invalid_argument("SimulationTimestampTask::SimulationTimestampTask() requires a pointer to a Workflowtask");
+            throw std::invalid_argument(
+                    "SimulationTimestampTask::SimulationTimestampTask() requires a pointer to a Workflowtask");
         }
     }
 
@@ -91,7 +92,9 @@ namespace wrench {
             // the SimulationTimestampTaskStart is no longer waiting to be matched with an end timestamp, remove it from the map
             pending_task_timestamps.erase(pending_tasks_itr);
         } else {
-            throw std::runtime_error("SimulationTimestampTask::setEndpoints() could not find a SimulationTimestampTaskStart object with taskID: " + this->task->getID());
+            throw std::runtime_error(
+                    "SimulationTimestampTask::setEndpoints() could not find a SimulationTimestampTaskStart object with taskID: " +
+                    this->task->getID());
         }
     }
 
@@ -104,7 +107,8 @@ namespace wrench {
         WRENCH_DEBUG("Inserting a Taskstart timestamp for task '%s'", task->getID().c_str());
 
         if (task == nullptr) {
-            throw std::invalid_argument("SimulationTimestampTaskStart::SimulationTimestampTaskStart() requires a valid pointer to a WorkflowTask object");
+            throw std::invalid_argument(
+                    "SimulationTimestampTaskStart::SimulationTimestampTaskStart() requires a valid pointer to a WorkflowTask object");
         }
 
         /*
@@ -124,7 +128,8 @@ namespace wrench {
         WRENCH_DEBUG("Inserting a TaskFailure timestamp for task '%s'", task->getID().c_str());
 
         if (task == nullptr) {
-            throw std::invalid_argument("SimulationTimestampTaskFailure::SimulationTimestampTaskFailure() requires a valid pointer to a WorkflowTask object");
+            throw std::invalid_argument(
+                    "SimulationTimestampTaskFailure::SimulationTimestampTaskFailure() requires a valid pointer to a WorkflowTask object");
         }
 
         // match this timestamp with a SimulationTimestampTaskStart
@@ -140,7 +145,8 @@ namespace wrench {
         WRENCH_DEBUG("Inserting a TaskCompletion timestamp for task '%s'", task->getID().c_str());
 
         if (task == nullptr) {
-            throw std::invalid_argument("SimulationTimestampTaskCompletion::SimulationTimestampTaskCompletion() requires a valid pointer to a WorkflowTask object");
+            throw std::invalid_argument(
+                    "SimulationTimestampTaskCompletion::SimulationTimestampTaskCompletion() requires a valid pointer to a WorkflowTask object");
         }
 
         // match this timestamp with a SimulationTimestampTaskStart
@@ -151,11 +157,13 @@ namespace wrench {
      * @brief Constructor
      * @param task: the WorkflowTask associated with this timestamp
      */
-    SimulationTimestampTaskTermination::SimulationTimestampTaskTermination(WorkflowTask *task) : SimulationTimestampTask(task) {
+    SimulationTimestampTaskTermination::SimulationTimestampTaskTermination(WorkflowTask *task)
+            : SimulationTimestampTask(task) {
         WRENCH_DEBUG("Inserting a TaskTerminated timestamp for task '%s'", task->getID().c_str());
 
         if (task == nullptr) {
-            throw std::invalid_argument("SimulationTimestampTaskTerminated::SimulationTimestampTaskTerminated() requires a valid pointer to a WorkflowTask object");
+            throw std::invalid_argument(
+                    "SimulationTimestampTaskTerminated::SimulationTimestampTaskTerminated() requires a valid pointer to a WorkflowTask object");
         }
 
         // match this timestamp with a SimulationTimestampTaskStart
@@ -171,15 +179,20 @@ namespace wrench {
      * @param dst_partition: the partition in the destination StorageService where this file will be copied
      * @param start_timestamp: the timestamp for the file copy start
      */
-    SimulationTimestampFileCopy::SimulationTimestampFileCopy(WorkflowFile *file, std::shared_ptr<StorageService> src, std::string src_partition, std::shared_ptr<StorageService> dst, std::string dst_partition, SimulationTimestampFileCopyStart *start_timestamp) :
-            SimulationTimestampPair(start_timestamp), file(file), source(FileLocation(src, src_partition)), destination(FileLocation(dst, dst_partition)) {
+    SimulationTimestampFileCopy::SimulationTimestampFileCopy(WorkflowFile *file, std::shared_ptr<StorageService> src,
+                                                             std::string src_partition,
+                                                             std::shared_ptr<StorageService> dst,
+                                                             std::string dst_partition,
+                                                             SimulationTimestampFileCopyStart *start_timestamp) :
+            SimulationTimestampPair(start_timestamp), file(file), source(FileLocation(src, src_partition)),
+            destination(FileLocation(dst, dst_partition)) {
     }
 
     /**
      * @brief retrieves the WorkflowFile being copied
      * @return a pointer to the WorkflowFile associated with this copy
      */
-    WorkflowFile* SimulationTimestampFileCopy::getFile() {
+    WorkflowFile *SimulationTimestampFileCopy::getFile() {
         return this->file;
     }
 
@@ -216,8 +229,11 @@ namespace wrench {
      * @param dst_partition: the partition in the destination StorageService where this file will be copied
      * @throw std::invalid_argument
      */
-    SimulationTimestampFileCopyStart::SimulationTimestampFileCopyStart(WorkflowFile *file, std::shared_ptr<StorageService> src, std::string src_partition,
-                                                                       std::shared_ptr<StorageService> dst, std::string dst_partition) :
+    SimulationTimestampFileCopyStart::SimulationTimestampFileCopyStart(WorkflowFile *file,
+                                                                       std::shared_ptr<StorageService> src,
+                                                                       std::string src_partition,
+                                                                       std::shared_ptr<StorageService> dst,
+                                                                       std::string dst_partition) :
             SimulationTimestampFileCopy(file, src, src_partition, dst, dst_partition) {
 
         // all information about a file copy should be passed
@@ -227,7 +243,8 @@ namespace wrench {
             || (this->destination.storage_service == nullptr)
             || (this->destination.partition.empty())) {
 
-            throw std::invalid_argument("SimulationTimestampFileCopyStart::SimulationTimestampFileCopyStart() cannot take nullptr or empty strings");
+            throw std::invalid_argument(
+                    "SimulationTimestampFileCopyStart::SimulationTimestampFileCopyStart() cannot take nullptr or empty strings");
         }
     }
 
@@ -237,12 +254,14 @@ namespace wrench {
      * @param start_timestamp: a pointer to the SimulationTimestampFileCopyStart associated with this timestamp
      * @throw std::invalid_argument
      */
-    SimulationTimestampFileCopyFailure::SimulationTimestampFileCopyFailure(SimulationTimestampFileCopyStart *start_timestamp) :
+    SimulationTimestampFileCopyFailure::SimulationTimestampFileCopyFailure(
+            SimulationTimestampFileCopyStart *start_timestamp) :
             SimulationTimestampFileCopy(nullptr, nullptr, "", nullptr, "", start_timestamp) {
 
         // a corresponding start timestamp must be passed
         if (start_timestamp == nullptr) {
-            throw std::invalid_argument("SimulationTimestampFileCopyFailure::SimulationTimestampFileCopyFailure() start_timestamp cannot be nullptr");
+            throw std::invalid_argument(
+                    "SimulationTimestampFileCopyFailure::SimulationTimestampFileCopyFailure() start_timestamp cannot be nullptr");
         } else {
             this->file = start_timestamp->file;
             this->source = start_timestamp->source;
@@ -256,16 +275,20 @@ namespace wrench {
      * @param start_timestamp: a pointer to the SimulationTimestampFileCopyStart associated with this timestamp
      * @throw std::invalid_argument
      */
-    SimulationTimestampFileCopyCompletion::SimulationTimestampFileCopyCompletion(SimulationTimestampFileCopyStart *start_timestamp) :
+    SimulationTimestampFileCopyCompletion::SimulationTimestampFileCopyCompletion(
+            SimulationTimestampFileCopyStart *start_timestamp) :
             SimulationTimestampFileCopy(nullptr, nullptr, "", nullptr, "", start_timestamp) {
 
         // a corresponding start timestamp must be passed
         if (start_timestamp == nullptr) {
-            throw std::invalid_argument("SimulationTimestampFileCopyCompletion::SimulationTimestampFileCopyCompletion() start_timestamp cannot be nullptr");
+            throw std::invalid_argument(
+                    "SimulationTimestampFileCopyCompletion::SimulationTimestampFileCopyCompletion() start_timestamp cannot be nullptr");
         } else {
             this->file = start_timestamp->file;
-            this->source = SimulationTimestampFileCopy::FileLocation(start_timestamp->source.storage_service, start_timestamp->source.partition);
-            this->destination = SimulationTimestampFileCopy::FileLocation(start_timestamp->destination.storage_service, start_timestamp->destination.partition);
+            this->source = SimulationTimestampFileCopy::FileLocation(start_timestamp->source.storage_service,
+                                                                     start_timestamp->source.partition);
+            this->destination = SimulationTimestampFileCopy::FileLocation(start_timestamp->destination.storage_service,
+                                                                          start_timestamp->destination.partition);
             start_timestamp->endpoint = this;
         }
     }
@@ -279,7 +302,8 @@ namespace wrench {
             hostname(hostname), pstate(pstate) {
 
         if (hostname.empty()) {
-            throw std::invalid_argument("SimulationTimestampPstateSet::SimulationTimestampPstateSet() requires a valid hostname");
+            throw std::invalid_argument(
+                    "SimulationTimestampPstateSet::SimulationTimestampPstateSet() requires a valid hostname");
         }
     }
 

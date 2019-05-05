@@ -40,7 +40,7 @@ namespace wrench {
      */
     class ComputeServiceSubmitStandardJobRequestMessage : public ComputeServiceMessage {
     public:
-        ComputeServiceSubmitStandardJobRequestMessage(std::string answer_mailbox, StandardJob *,
+        ComputeServiceSubmitStandardJobRequestMessage(const std::string answer_mailbox, StandardJob *,
                                                       std::map<std::string, std::string> &service_specific_args,
                                                       double payload);
 

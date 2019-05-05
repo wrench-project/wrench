@@ -23,6 +23,7 @@
 #include "wrench/simulation/Simulation.h"
 #include "simgrid/plugins/energy.h"
 #include "wrench/simgrid_S4U_util/S4U_VirtualMachine.h"
+
 #ifdef MESSAGE_MANAGER
 #include <wrench/util/MessageManager.h>
 #endif
@@ -292,7 +293,8 @@ namespace wrench {
 
         for (const auto &wms : this->wmses) {
             if (wms->getWorkflow() == nullptr) {
-                throw std::runtime_error("The WMS on host '" + wms->getHostname() + "' was not given a workflow to execute");
+                throw std::runtime_error(
+                        "The WMS on host '" + wms->getHostname() + "' was not given a workflow to execute");
             }
         }
 
@@ -360,7 +362,8 @@ namespace wrench {
             for (const auto &compute_service : this->compute_services) {
                 if (compute_service->hasScratch()) {
                     compute_service->getScratch()->simulation = this;
-                    compute_service->getScratch()->start(compute_service->getScratchSharedPtr(), true, false); // Daemonized, no auto-restart
+                    compute_service->getScratch()->start(compute_service->getScratchSharedPtr(), true,
+                                                         false); // Daemonized, no auto-restart
                 }
             }
 
@@ -457,8 +460,6 @@ namespace wrench {
     }
 
 
-
-
     /**
         * @brief Stage a copy of a file on a storage service (to the "/" partition)
         *
@@ -488,7 +489,8 @@ namespace wrench {
      * @throw std::runtime_error
      * @throw std::invalid_argument
      */
-    void Simulation::stageFile(WorkflowFile *file, std::shared_ptr<StorageService> storage_service, std::string partition) {
+    void
+    Simulation::stageFile(WorkflowFile *file, std::shared_ptr<StorageService> storage_service, std::string partition) {
         if ((file == nullptr) || (storage_service == nullptr)) {
             throw std::invalid_argument("Simulation::stageFile(): Invalid arguments");
         }
@@ -532,7 +534,8 @@ namespace wrench {
    * @throw std::runtime_error
    * @throw std::invalid_argument
    */
-    void Simulation::stageFiles(std::map<std::string, WorkflowFile *> files, std::shared_ptr<StorageService> storage_service) {
+    void Simulation::stageFiles(std::map<std::string, WorkflowFile *> files,
+                                std::shared_ptr<StorageService> storage_service) {
         try {
             this->stageFiles(files, storage_service, "/");
         } catch (std::runtime_error &e) {
@@ -552,7 +555,9 @@ namespace wrench {
   * @throw std::runtime_error
   * @throw std::invalid_argument
   */
-    void Simulation::stageFiles(std::map<std::string, WorkflowFile *> files, std::shared_ptr<StorageService> storage_service, std::string partition) {
+    void
+    Simulation::stageFiles(std::map<std::string, WorkflowFile *> files, std::shared_ptr<StorageService> storage_service,
+                           std::string partition) {
 
         if (storage_service == nullptr) {
             throw std::invalid_argument("Simulation::stageFiles(): Invalid arguments");
@@ -697,7 +702,8 @@ namespace wrench {
         double consumption = S4U_Simulation::getEnergyConsumedByHost(hostname);
 
         if (record_as_time_stamp) {
-            this->getOutput().addTimestamp<SimulationTimestampEnergyConsumption>(new SimulationTimestampEnergyConsumption(hostname, consumption));
+            this->getOutput().addTimestamp<SimulationTimestampEnergyConsumption>(
+                    new SimulationTimestampEnergyConsumption(hostname, consumption));
         }
 
         return consumption;
@@ -711,7 +717,8 @@ namespace wrench {
     * @return current energy consumption in joules for each host, as a map indexed by hostnames
     * @throws std::invalid_argument
     */
-    std::map<std::string, double> Simulation::getEnergyConsumed(const std::vector<std::string> &hostnames, bool record_as_time_stamps) {
+    std::map<std::string, double>
+    Simulation::getEnergyConsumed(const std::vector<std::string> &hostnames, bool record_as_time_stamps) {
         if (hostnames.empty()) {
             throw std::invalid_argument("Simulation::getEnergyConsumed() requires a valid hostname");
         }
@@ -730,7 +737,8 @@ namespace wrench {
      */
     void Simulation::setPstate(const std::string &hostname, int pstate) {
         S4U_Simulation::setPstate(hostname, pstate);
-        this->getOutput().addTimestamp<SimulationTimestampPstateSet>(new SimulationTimestampPstateSet(hostname, pstate));
+        this->getOutput().addTimestamp<SimulationTimestampPstateSet>(
+                new SimulationTimestampPstateSet(hostname, pstate));
     }
 
     /**
@@ -822,7 +830,7 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    std::shared_ptr<StorageService>Simulation::startNewService(StorageService *service) {
+    std::shared_ptr<StorageService> Simulation::startNewService(StorageService *service) {
 
         if (service == nullptr) {
             throw std::invalid_argument("Simulation::startNewService(): invalid argument (nullptr service)");

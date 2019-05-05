@@ -37,14 +37,14 @@ namespace wrench {
             : Service(hostname, "htcondor_negotiator", "htcondor_negotiator"), reply_mailbox(reply_mailbox),
               compute_resources(&compute_resources), running_jobs(&running_jobs), pending_jobs(pending_jobs) {
 
-      this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
+        this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
     }
 
     /**
      * @brief Destructor
      */
     HTCondorNegotiatorService::~HTCondorNegotiatorService() {
-      this->pending_jobs.clear();
+        this->pending_jobs.clear();
     }
 
     /**
@@ -56,21 +56,21 @@ namespace wrench {
      * @return whether the priority of the left-hand-side standard job is higher
      */
     bool HTCondorNegotiatorService::JobPriorityComparator::operator()(StandardJob *&lhs, StandardJob *&rhs) {
-      long lhs_max_priority = 0;
-      long rhs_max_priority = 0;
+        long lhs_max_priority = 0;
+        long rhs_max_priority = 0;
 
-      for (auto task : lhs->getTasks()) {
-        if (task->getPriority() > lhs_max_priority) {
-          lhs_max_priority = task->getPriority();
+        for (auto task : lhs->getTasks()) {
+            if (task->getPriority() > lhs_max_priority) {
+                lhs_max_priority = task->getPriority();
+            }
         }
-      }
-      for (auto task : rhs->getTasks()) {
-        if (task->getPriority() > rhs_max_priority) {
-          rhs_max_priority = task->getPriority();
+        for (auto task : rhs->getTasks()) {
+            if (task->getPriority() > rhs_max_priority) {
+                rhs_max_priority = task->getPriority();
+            }
         }
-      }
 
-      return lhs_max_priority > rhs_max_priority;
+        return lhs_max_priority > rhs_max_priority;
     }
 
     /**
@@ -80,48 +80,49 @@ namespace wrench {
      */
     int HTCondorNegotiatorService::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_BLUE);
-      WRENCH_INFO("HTCondor Negotiator Service starting on host %s listening on mailbox_name %s",
-                  this->hostname.c_str(), this->mailbox_name.c_str());
+        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_BLUE);
+        WRENCH_INFO("HTCondor Negotiator Service starting on host %s listening on mailbox_name %s",
+                    this->hostname.c_str(), this->mailbox_name.c_str());
 
-      // TODO: check how to pass the service specific arguments
-      std::map<std::string, std::string> specific_args;
-      std::vector<StandardJob *> scheduled_jobs;
+        // TODO: check how to pass the service specific arguments
+        std::map<std::string, std::string> specific_args;
+        std::vector<StandardJob *> scheduled_jobs;
 
-      // sort tasks by priority
-      std::sort(this->pending_jobs.begin(), this->pending_jobs.end(), JobPriorityComparator());
+        // sort tasks by priority
+        std::sort(this->pending_jobs.begin(), this->pending_jobs.end(), JobPriorityComparator());
 
-      for (auto job : this->pending_jobs) {
-        for (auto &item : *this->compute_resources) {
-          if (item.second >= job->getMinimumRequiredNumCores()) {
-            WRENCH_INFO("Dispatching job %s with %ld tasks", job->getName().c_str(), job->getTasks().size());
-            for (auto task : job->getTasks()) {
-              WRENCH_INFO("    Task ID: %s", task->getID().c_str());
+        for (auto job : this->pending_jobs) {
+            for (auto &item : *this->compute_resources) {
+                if (item.second >= job->getMinimumRequiredNumCores()) {
+                    WRENCH_INFO("Dispatching job %s with %ld tasks", job->getName().c_str(), job->getTasks().size());
+                    for (auto task : job->getTasks()) {
+                        WRENCH_INFO("    Task ID: %s", task->getID().c_str());
+                    }
+
+                    job->pushCallbackMailbox(this->reply_mailbox);
+                    item.first->submitStandardJob(job, specific_args);
+                    this->running_jobs->insert(std::make_pair(job, item.first));
+                    scheduled_jobs.push_back(job);
+                    item.second -= job->getMinimumRequiredNumCores();
+                    WRENCH_INFO("Dispatched job %s with %ld tasks", job->getName().c_str(), job->getTasks().size());
+                    break;
+                }
             }
-
-            job->pushCallbackMailbox(this->reply_mailbox);
-            item.first->submitStandardJob(job, specific_args);
-            this->running_jobs->insert(std::make_pair(job, item.first));
-            scheduled_jobs.push_back(job);
-            item.second -= job->getMinimumRequiredNumCores();
-            WRENCH_INFO("Dispatched job %s with %ld tasks", job->getName().c_str(), job->getTasks().size());
-            break;
-          }
         }
-      }
 
-      // Send the callback to the originator
-      try {
-        S4U_Mailbox::putMessage(
-                this->reply_mailbox, new NegotiatorCompletionMessage(
-                        scheduled_jobs, this->getMessagePayloadValue(
-                                HTCondorCentralManagerServiceMessagePayload::HTCONDOR_NEGOTIATOR_DONE_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        return 1;
-      }
+        // Send the callback to the originator
+        try {
+            S4U_Mailbox::putMessage(
+                    this->reply_mailbox, new NegotiatorCompletionMessage(
+                            scheduled_jobs, this->getMessagePayloadValue(
+                                    HTCondorCentralManagerServiceMessagePayload::HTCONDOR_NEGOTIATOR_DONE_MESSAGE_PAYLOAD)));
+        } catch (std::shared_ptr<NetworkError> &cause) {
+            return 1;
+        }
 
-      WRENCH_INFO("HTCondorNegotiator Service on host %s cleanly terminating!", S4U_Simulation::getHostName().c_str());
-      return 0;
+        WRENCH_INFO("HTCondorNegotiator Service on host %s cleanly terminating!",
+                    S4U_Simulation::getHostName().c_str());
+        return 0;
     }
 
 }

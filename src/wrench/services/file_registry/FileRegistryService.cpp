@@ -37,7 +37,7 @@ namespace wrench {
                                              std::map<std::string, std::string> property_list,
                                              std::map<std::string, double> messagepayload_list
     ) :
-            FileRegistryService(hostname, property_list, messagepayload_list,  "") {
+            FileRegistryService(hostname, property_list, messagepayload_list, "") {
 
     }
 
@@ -55,13 +55,13 @@ namespace wrench {
             std::string suffix) :
             Service(hostname, "file_registry" + suffix, "file_registry" + suffix) {
 
-      this->setProperties(this->default_property_values, property_list);
-      this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
+        this->setProperties(this->default_property_values, property_list);
+        this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
     }
 
 
     FileRegistryService::~FileRegistryService() {
-      this->default_property_values.clear();
+        this->default_property_values.clear();
     }
 
     /**
@@ -75,37 +75,38 @@ namespace wrench {
      */
     std::set<std::shared_ptr<StorageService>> FileRegistryService::lookupEntry(WorkflowFile *file) {
 
-      if (file == nullptr) {
-        throw std::invalid_argument("FileRegistryService::lookupEntry(): Invalid argument");
-      }
+        if (file == nullptr) {
+            throw std::invalid_argument("FileRegistryService::lookupEntry(): Invalid argument");
+        }
 
-      assertServiceIsUp();
+        assertServiceIsUp();
 
-      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("lookup_entry");
+        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("lookup_entry");
 
-      try {
-        S4U_Mailbox::putMessage(this->mailbox_name, new FileRegistryFileLookupRequestMessage(answer_mailbox, file,
-                                                                                             this->getMessagePayloadValue(
-                                                                                                     FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
-      }
+        try {
+            S4U_Mailbox::putMessage(this->mailbox_name, new FileRegistryFileLookupRequestMessage(answer_mailbox, file,
+                                                                                                 this->getMessagePayloadValue(
+                                                                                                         FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
+        } catch (std::shared_ptr<NetworkError> &cause) {
+            throw WorkflowExecutionException(cause);
+        }
 
-      std::shared_ptr<SimulationMessage> message = nullptr;
+        std::shared_ptr<SimulationMessage> message = nullptr;
 
-      try {
-        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
-      }
+        try {
+            message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
+        } catch (std::shared_ptr<NetworkError> &cause) {
+            throw WorkflowExecutionException(cause);
+        }
 
-      if (auto msg = std::dynamic_pointer_cast<FileRegistryFileLookupAnswerMessage>(message)) {
-        std::set<std::shared_ptr<StorageService>> result = msg->locations;
+        if (auto msg = std::dynamic_pointer_cast<FileRegistryFileLookupAnswerMessage>(message)) {
+            std::set<std::shared_ptr<StorageService>> result = msg->locations;
 //        msg->locations.clear(); // TODO: Understand why this removes a memory leak
-        return result;
-      } else {
-        throw std::runtime_error("FileRegistryService::lookupEntry(): Unexpected [" + message->getName() + "] message");
-      }
+            return result;
+        } else {
+            throw std::runtime_error(
+                    "FileRegistryService::lookupEntry(): Unexpected [" + message->getName() + "] message");
+        }
 
 
     }
@@ -119,44 +120,50 @@ namespace wrench {
      * @return a map of <distance , storage service> pairs
      */
     std::map<double, std::shared_ptr<StorageService>> FileRegistryService::lookupEntry(WorkflowFile *file,
-                                                                        std::string reference_host,
-                                                                        std::shared_ptr<NetworkProximityService> network_proximity_service) {
+                                                                                       std::string reference_host,
+                                                                                       std::shared_ptr<NetworkProximityService> network_proximity_service) {
 
-      if (file == nullptr) {
-        throw std::invalid_argument("FileRegistryService::lookupEntryByProximity(): Invalid argument, no file");
-      }
+        if (file == nullptr) {
+            throw std::invalid_argument("FileRegistryService::lookupEntryByProximity(): Invalid argument, no file");
+        }
 
-      assertServiceIsUp();
+        assertServiceIsUp();
 
-      // check to see if the 'reference_host' is valid
-      std::vector<std::string> monitored_hosts = network_proximity_service->getHostnameList();
-      if(std::find(monitored_hosts.cbegin(), monitored_hosts.cend(), reference_host) == monitored_hosts.cend()) {
-        throw std::invalid_argument("FileRegistryService::lookupEntryByProximity(): Invalid argument, host " + reference_host + " does not exist");
-      }
+        // check to see if the 'reference_host' is valid
+        std::vector<std::string> monitored_hosts = network_proximity_service->getHostnameList();
+        if (std::find(monitored_hosts.cbegin(), monitored_hosts.cend(), reference_host) == monitored_hosts.cend()) {
+            throw std::invalid_argument(
+                    "FileRegistryService::lookupEntryByProximity(): Invalid argument, host " + reference_host +
+                    " does not exist");
+        }
 
-      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("lookup_entry_by_proximity");
+        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("lookup_entry_by_proximity");
 
-      try {
-        S4U_Mailbox::putMessage(this->mailbox_name, new FileRegistryFileLookupByProximityRequestMessage(answer_mailbox, file, reference_host, network_proximity_service,
-                                                                                                        this->getMessagePayloadValue(
-                                                                                                                FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
-      }
+        try {
+            S4U_Mailbox::putMessage(this->mailbox_name,
+                                    new FileRegistryFileLookupByProximityRequestMessage(answer_mailbox, file,
+                                                                                        reference_host,
+                                                                                        network_proximity_service,
+                                                                                        this->getMessagePayloadValue(
+                                                                                                FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
+        } catch (std::shared_ptr<NetworkError> &cause) {
+            throw WorkflowExecutionException(cause);
+        }
 
-      std::shared_ptr<SimulationMessage> message = nullptr;
+        std::shared_ptr<SimulationMessage> message = nullptr;
 
-      try {
-        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
-      }
+        try {
+            message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
+        } catch (std::shared_ptr<NetworkError> &cause) {
+            throw WorkflowExecutionException(cause);
+        }
 
-      if (auto msg = std::dynamic_pointer_cast<FileRegistryFileLookupByProximityAnswerMessage> (message)) {
-        return msg->locations;
-      } else {
-        throw std::runtime_error("FileRegistryService::lookupEntry(): Unexpected [" + message->getName() + "] message");
-      }
+        if (auto msg = std::dynamic_pointer_cast<FileRegistryFileLookupByProximityAnswerMessage>(message)) {
+            return msg->locations;
+        } else {
+            throw std::runtime_error(
+                    "FileRegistryService::lookupEntry(): Unexpected [" + message->getName() + "] message");
+        }
     }
 
     /**
@@ -170,36 +177,36 @@ namespace wrench {
      */
     void FileRegistryService::addEntry(WorkflowFile *file, std::shared_ptr<StorageService> storage_service) {
 
-      if ((file == nullptr) || (storage_service == nullptr)) {
-        throw std::invalid_argument("FileRegistryService::addEntry(): Invalid  argument");
-      }
+        if ((file == nullptr) || (storage_service == nullptr)) {
+            throw std::invalid_argument("FileRegistryService::addEntry(): Invalid  argument");
+        }
 
-      assertServiceIsUp();
+        assertServiceIsUp();
 
-      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("add_entry");
+        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("add_entry");
 
-      try {
-        S4U_Mailbox::putMessage(this->mailbox_name,
-                                new FileRegistryAddEntryRequestMessage(answer_mailbox, file, storage_service,
-                                                                       this->getMessagePayloadValue(
-                                                                               FileRegistryServiceMessagePayload::ADD_ENTRY_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
-      }
+        try {
+            S4U_Mailbox::putMessage(this->mailbox_name,
+                                    new FileRegistryAddEntryRequestMessage(answer_mailbox, file, storage_service,
+                                                                           this->getMessagePayloadValue(
+                                                                                   FileRegistryServiceMessagePayload::ADD_ENTRY_REQUEST_MESSAGE_PAYLOAD)));
+        } catch (std::shared_ptr<NetworkError> &cause) {
+            throw WorkflowExecutionException(cause);
+        }
 
-      std::shared_ptr<SimulationMessage> message = nullptr;
+        std::shared_ptr<SimulationMessage> message = nullptr;
 
-      try {
-        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
-      }
+        try {
+            message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
+        } catch (std::shared_ptr<NetworkError> &cause) {
+            throw WorkflowExecutionException(cause);
+        }
 
-      if (auto msg = std::dynamic_pointer_cast<FileRegistryAddEntryAnswerMessage>(message)) {
-        return;
-      } else {
-        std::runtime_error("FileRegistryService::addEntry(): Unexpected [" + message->getName() + "] message");
-      }
+        if (auto msg = std::dynamic_pointer_cast<FileRegistryAddEntryAnswerMessage>(message)) {
+            return;
+        } else {
+            std::runtime_error("FileRegistryService::addEntry(): Unexpected [" + message->getName() + "] message");
+        }
     }
 
     /**
@@ -213,40 +220,40 @@ namespace wrench {
      */
     void FileRegistryService::removeEntry(WorkflowFile *file, std::shared_ptr<StorageService> storage_service) {
 
-      if ((file == nullptr) || (storage_service == nullptr)) {
-        throw std::invalid_argument(" FileRegistryService::removeEntry(): Invalid input argument");
-      }
-
-      assertServiceIsUp();
-
-      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("remove_entry");
-
-      try {
-        S4U_Mailbox::putMessage(this->mailbox_name,
-                                new FileRegistryRemoveEntryRequestMessage(answer_mailbox, file, storage_service,
-                                                                          this->getMessagePayloadValue(
-                                                                                  FileRegistryServiceMessagePayload::REMOVE_ENTRY_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
-      }
-
-      std::shared_ptr<SimulationMessage> message = nullptr;
-
-      try {
-        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
-      }
-
-      if (auto msg = std::dynamic_pointer_cast<FileRegistryRemoveEntryAnswerMessage>(message)) {
-        if (!msg->success) {
-          WRENCH_WARN("Attempted to remove non-existent (%s,%s) entry from file registry service (ignored)",
-                      file->getID().c_str(), storage_service->getName().c_str());
+        if ((file == nullptr) || (storage_service == nullptr)) {
+            throw std::invalid_argument(" FileRegistryService::removeEntry(): Invalid input argument");
         }
-        return;
-      } else {
-        std::runtime_error("FileRegistryService::removeEntry(): Unexpected [" + message->getName() + "] message");
-      }
+
+        assertServiceIsUp();
+
+        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("remove_entry");
+
+        try {
+            S4U_Mailbox::putMessage(this->mailbox_name,
+                                    new FileRegistryRemoveEntryRequestMessage(answer_mailbox, file, storage_service,
+                                                                              this->getMessagePayloadValue(
+                                                                                      FileRegistryServiceMessagePayload::REMOVE_ENTRY_REQUEST_MESSAGE_PAYLOAD)));
+        } catch (std::shared_ptr<NetworkError> &cause) {
+            throw WorkflowExecutionException(cause);
+        }
+
+        std::shared_ptr<SimulationMessage> message = nullptr;
+
+        try {
+            message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
+        } catch (std::shared_ptr<NetworkError> &cause) {
+            throw WorkflowExecutionException(cause);
+        }
+
+        if (auto msg = std::dynamic_pointer_cast<FileRegistryRemoveEntryAnswerMessage>(message)) {
+            if (!msg->success) {
+                WRENCH_WARN("Attempted to remove non-existent (%s,%s) entry from file registry service (ignored)",
+                            file->getID().c_str(), storage_service->getName().c_str());
+            }
+            return;
+        } else {
+            std::runtime_error("FileRegistryService::removeEntry(): Unexpected [" + message->getName() + "] message");
+        }
     }
 
 
@@ -257,17 +264,17 @@ namespace wrench {
      */
     int FileRegistryService::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
+        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
 
-      WRENCH_INFO("File Registry Service starting on host %s!", S4U_Simulation::getHostName().c_str());
+        WRENCH_INFO("File Registry Service starting on host %s!", S4U_Simulation::getHostName().c_str());
 
-      /** Main loop **/
-      while (this->processNextMessage()) {
+        /** Main loop **/
+        while (this->processNextMessage()) {
 
-      }
+        }
 
-      WRENCH_INFO("File Registry Service on host %s cleanly terminating!", S4U_Simulation::getHostName().c_str());
-      return 0;
+        WRENCH_INFO("File Registry Service on host %s cleanly terminating!", S4U_Simulation::getHostName().c_str());
+        return 0;
     }
 
 
@@ -277,110 +284,113 @@ namespace wrench {
      */
     bool FileRegistryService::processNextMessage() {
 
-      S4U_Simulation::computeZeroFlop();
+        S4U_Simulation::computeZeroFlop();
 
-      // Wait for a message
-      std::shared_ptr<SimulationMessage> message = nullptr;
+        // Wait for a message
+        std::shared_ptr<SimulationMessage> message = nullptr;
 
-      try {
-        message = S4U_Mailbox::getMessage(this->mailbox_name);
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        return true;
-      }
-
-      if (message == nullptr) {
-        WRENCH_INFO("Got a NULL message... Likely this means we're all done. Aborting!");
-        return false;
-      }
-
-      WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
-
-      if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
-        // This is Synchronous
         try {
-          S4U_Mailbox::putMessage(msg->ack_mailbox,
-                                  new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
-                                          FileRegistryServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+            message = S4U_Mailbox::getMessage(this->mailbox_name);
         } catch (std::shared_ptr<NetworkError> &cause) {
-          return false;
-        }
-        return false;
-
-      } else if (auto msg = std::dynamic_pointer_cast<FileRegistryFileLookupRequestMessage>(message)) {
-        std::set<std::shared_ptr<StorageService>> locations;
-        if (this->entries.find(msg->file) != this->entries.end()) {
-          locations = this->entries[msg->file];
-        }
-        // Simulate a lookup overhead
-        S4U_Simulation::compute(getPropertyValueAsDouble(FileRegistryServiceProperty::LOOKUP_COMPUTE_COST));
-        try {
-          S4U_Mailbox::dputMessage(msg->answer_mailbox,
-                                   new FileRegistryFileLookupAnswerMessage(msg->file, locations,
-                                                                           this->getMessagePayloadValue(
-                                                                                   FileRegistryServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-          return true;
-        }
-        return true;
-
-      } else if (auto msg = std::dynamic_pointer_cast<FileRegistryFileLookupByProximityRequestMessage> (message)) {
-
-        std::string reference_host = msg->reference_host;
-
-        std::map<double, std::shared_ptr<StorageService>> locations;
-        std::set<std::shared_ptr<StorageService>> storage_services_with_file;
-        if (this->entries.find(msg->file) != this->entries.end()) {
-          storage_services_with_file = this->entries[msg->file];
+            return true;
         }
 
-        double proximity;
-        auto locations_itr = locations.cbegin();
-
-        for (auto &storage_service: storage_services_with_file) {
-          proximity = std::get<0>(msg->network_proximity_service->getHostPairDistance(
-                  std::make_pair(reference_host, storage_service->hostname)));
-          locations_itr = locations.insert(locations_itr, std::make_pair(proximity, storage_service));
+        if (message == nullptr) {
+            WRENCH_INFO("Got a NULL message... Likely this means we're all done. Aborting!");
+            return false;
         }
 
-        S4U_Simulation::compute(getPropertyValueAsDouble(FileRegistryServiceProperty::LOOKUP_COMPUTE_COST));
-        try {
-          S4U_Mailbox::dputMessage(msg->answer_mailbox, new FileRegistryFileLookupByProximityAnswerMessage(msg->file,
-                                                                                                           msg->reference_host, locations,
-                                                                                                           this->getMessagePayloadValue(
-                                                                                                                   FileRegistryServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-          return true;
+        WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
+
+        if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
+            // This is Synchronous
+            try {
+                S4U_Mailbox::putMessage(msg->ack_mailbox,
+                                        new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
+                                                FileRegistryServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+            } catch (std::shared_ptr<NetworkError> &cause) {
+                return false;
+            }
+            return false;
+
+        } else if (auto msg = std::dynamic_pointer_cast<FileRegistryFileLookupRequestMessage>(message)) {
+            std::set<std::shared_ptr<StorageService>> locations;
+            if (this->entries.find(msg->file) != this->entries.end()) {
+                locations = this->entries[msg->file];
+            }
+            // Simulate a lookup overhead
+            S4U_Simulation::compute(getPropertyValueAsDouble(FileRegistryServiceProperty::LOOKUP_COMPUTE_COST));
+            try {
+                S4U_Mailbox::dputMessage(msg->answer_mailbox,
+                                         new FileRegistryFileLookupAnswerMessage(msg->file, locations,
+                                                                                 this->getMessagePayloadValue(
+                                                                                         FileRegistryServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
+            } catch (std::shared_ptr<NetworkError> &cause) {
+                return true;
+            }
+            return true;
+
+        } else if (auto msg = std::dynamic_pointer_cast<FileRegistryFileLookupByProximityRequestMessage>(message)) {
+
+            std::string reference_host = msg->reference_host;
+
+            std::map<double, std::shared_ptr<StorageService>> locations;
+            std::set<std::shared_ptr<StorageService>> storage_services_with_file;
+            if (this->entries.find(msg->file) != this->entries.end()) {
+                storage_services_with_file = this->entries[msg->file];
+            }
+
+            double proximity;
+            auto locations_itr = locations.cbegin();
+
+            for (auto &storage_service: storage_services_with_file) {
+                proximity = std::get<0>(msg->network_proximity_service->getHostPairDistance(
+                        std::make_pair(reference_host, storage_service->hostname)));
+                locations_itr = locations.insert(locations_itr, std::make_pair(proximity, storage_service));
+            }
+
+            S4U_Simulation::compute(getPropertyValueAsDouble(FileRegistryServiceProperty::LOOKUP_COMPUTE_COST));
+            try {
+                S4U_Mailbox::dputMessage(msg->answer_mailbox,
+                                         new FileRegistryFileLookupByProximityAnswerMessage(msg->file,
+                                                                                            msg->reference_host,
+                                                                                            locations,
+                                                                                            this->getMessagePayloadValue(
+                                                                                                    FileRegistryServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
+            } catch (std::shared_ptr<NetworkError> &cause) {
+                return true;
+            }
+            return true;
+
+        } else if (auto msg = std::dynamic_pointer_cast<FileRegistryAddEntryRequestMessage>(message)) {
+            addEntryToDatabase(msg->file, msg->storage_service);
+            try {
+                S4U_Mailbox::dputMessage(msg->answer_mailbox,
+                                         new FileRegistryAddEntryAnswerMessage(this->getMessagePayloadValue(
+                                                 FileRegistryServiceMessagePayload::ADD_ENTRY_ANSWER_MESSAGE_PAYLOAD)));
+            } catch (std::shared_ptr<NetworkError> &cause) {
+                return true;
+            }
+            return true;
+
+        } else if (auto msg = std::dynamic_pointer_cast<FileRegistryRemoveEntryRequestMessage>(message)) {
+
+            bool success = removeEntryFromDatabase(msg->file, msg->storage_service);
+            try {
+                S4U_Mailbox::dputMessage(msg->answer_mailbox,
+                                         new FileRegistryRemoveEntryAnswerMessage(success,
+                                                                                  this->getMessagePayloadValue(
+                                                                                          FileRegistryServiceMessagePayload::REMOVE_ENTRY_ANSWER_MESSAGE_PAYLOAD)));
+            } catch (std::shared_ptr<NetworkError> &cause) {
+                return true;
+            }
+            return true;
+
+        } else {
+            throw std::runtime_error(
+                    "FileRegistryService::waitForNextMessage(): Unknown message type: " +
+                    std::to_string(message->payload));
         }
-        return true;
-
-      } else if (auto msg = std::dynamic_pointer_cast<FileRegistryAddEntryRequestMessage>(message)) {
-        addEntryToDatabase(msg->file, msg->storage_service);
-        try {
-          S4U_Mailbox::dputMessage(msg->answer_mailbox,
-                                   new FileRegistryAddEntryAnswerMessage(this->getMessagePayloadValue(
-                                           FileRegistryServiceMessagePayload::ADD_ENTRY_ANSWER_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-          return true;
-        }
-        return true;
-
-      } else if (auto msg = std::dynamic_pointer_cast<FileRegistryRemoveEntryRequestMessage>(message)) {
-
-        bool success = removeEntryFromDatabase(msg->file, msg->storage_service);
-        try {
-          S4U_Mailbox::dputMessage(msg->answer_mailbox,
-                                   new FileRegistryRemoveEntryAnswerMessage(success,
-                                                                            this->getMessagePayloadValue(
-                                                                                    FileRegistryServiceMessagePayload::REMOVE_ENTRY_ANSWER_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-          return true;
-        }
-        return true;
-
-      } else {
-        throw std::runtime_error(
-                "FileRegistryService::waitForNextMessage(): Unknown message type: " + std::to_string(message->payload));
-      }
     }
 
     /**
@@ -389,11 +399,11 @@ namespace wrench {
      * @param storage_service: a storage_service
      */
     void FileRegistryService::addEntryToDatabase(WorkflowFile *file, std::shared_ptr<StorageService> storage_service) {
-      if (this->entries.find(file) != this->entries.end()) {
-        this->entries[file].insert(storage_service);
-      } else {
-        this->entries[file] = {storage_service};
-      }
+        if (this->entries.find(file) != this->entries.end()) {
+            this->entries[file].insert(storage_service);
+        } else {
+            this->entries[file] = {storage_service};
+        }
     }
 
     /**
@@ -403,17 +413,18 @@ namespace wrench {
      *
      * @return true if an entry was removed
      */
-    bool FileRegistryService::removeEntryFromDatabase(WorkflowFile *file, std::shared_ptr<StorageService> storage_service) {
-      if (this->entries.find(file) != this->entries.end()) {
-        if (this->entries[file].find(storage_service) != this->entries[file].end()) {
-          this->entries[file].erase(storage_service);
+    bool
+    FileRegistryService::removeEntryFromDatabase(WorkflowFile *file, std::shared_ptr<StorageService> storage_service) {
+        if (this->entries.find(file) != this->entries.end()) {
+            if (this->entries[file].find(storage_service) != this->entries[file].end()) {
+                this->entries[file].erase(storage_service);
+            } else {
+                return false;
+            }
         } else {
-          return false;
+            return false;
         }
-      } else {
-        return false;
-      }
-      return true;
+        return true;
     }
 
 

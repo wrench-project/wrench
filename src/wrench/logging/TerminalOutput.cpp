@@ -34,32 +34,32 @@ namespace wrench {
      * @param color: a terminal output color
      */
     void TerminalOutput::setThisProcessLoggingColor(Color color) {
-      TerminalOutput::colormap[simgrid::s4u::Actor::self()] = TerminalOutput::color_codes[color];
+        TerminalOutput::colormap[simgrid::s4u::Actor::self()] = TerminalOutput::color_codes[color];
     }
 
     /**
      * @brief Turn on colored output for the calling process
      */
     void TerminalOutput::beginThisProcessColor() {
-      if (TerminalOutput::color_enabled) {
-        std::cerr << TerminalOutput::getThisProcessLoggingColor();
-      }
+        if (TerminalOutput::color_enabled) {
+            std::cerr << TerminalOutput::getThisProcessLoggingColor();
+        }
     }
 
     /**
      * @brief Turn off colored output for the calling process
      */
     void TerminalOutput::endThisProcessColor() {
-      if (TerminalOutput::color_enabled) {
-        std::cerr << "\033[0m";
-      }
+        if (TerminalOutput::color_enabled) {
+            std::cerr << "\033[0m";
+        }
     }
 
     /**
      * @brief Disable color terminal output for all processes
      */
     void TerminalOutput::disableColor() {
-      TerminalOutput::color_enabled = false;
+        TerminalOutput::color_enabled = false;
     }
 
     /**
@@ -68,12 +68,12 @@ namespace wrench {
      */
     std::string TerminalOutput::getThisProcessLoggingColor() {
 
-      if (simgrid::s4u::this_actor::is_maestro() ||
-              (TerminalOutput::colormap.find(simgrid::s4u::Actor::self()) == TerminalOutput::colormap.end())) {
-        return "";
-      } else {
-        return TerminalOutput::colormap[simgrid::s4u::Actor::self()];
-      }
+        if (simgrid::s4u::this_actor::is_maestro() ||
+            (TerminalOutput::colormap.find(simgrid::s4u::Actor::self()) == TerminalOutput::colormap.end())) {
+            return "";
+        } else {
+            return TerminalOutput::colormap[simgrid::s4u::Actor::self()];
+        }
     }
 
 };

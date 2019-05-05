@@ -36,10 +36,11 @@ namespace wrench {
      * @throw std::runtime_error
      */
     VirtualizedClusterComputeService::VirtualizedClusterComputeService(const std::string &hostname,
-                                                         std::vector<std::string> &execution_hosts,
-                                                         double scratch_space_size,
-                                                         std::map<std::string, std::string> property_list,
-                                                         std::map<std::string, double> messagepayload_list) :
+                                                                       std::vector<std::string> &execution_hosts,
+                                                                       double scratch_space_size,
+                                                                       std::map<std::string, std::string> property_list,
+                                                                       std::map<std::string, double> messagepayload_list)
+            :
             CloudComputeService(hostname, execution_hosts, scratch_space_size) {
 
         // Set default and specified properties
@@ -60,13 +61,15 @@ namespace wrench {
      * @throw WorkflowExecutionException
      * @throw std::invalid_argument
      */
-    std::shared_ptr<BareMetalComputeService> VirtualizedClusterComputeService::startVM(const std::string &vm_name, const std::string &pm_name) {
+    std::shared_ptr<BareMetalComputeService>
+    VirtualizedClusterComputeService::startVM(const std::string &vm_name, const std::string &pm_name) {
 
         if (this->vm_list.find(vm_name) == this->vm_list.end()) {
             throw std::invalid_argument("CloudComputeService::startVM(): Unknown VM name '" + vm_name + "'");
         }
 
-        if ((not pm_name.empty()) and (std::find(this->execution_hosts.begin(), this->execution_hosts.end(), pm_name) == this->execution_hosts.end())) {
+        if ((not pm_name.empty()) and (std::find(this->execution_hosts.begin(), this->execution_hosts.end(), pm_name) ==
+                                       this->execution_hosts.end())) {
             throw std::invalid_argument("Trying to start a VM on an unknown (at least to this service) physical host");
         }
 
@@ -87,7 +90,8 @@ namespace wrench {
             }
             return msg->cs;
         } else {
-            throw std::runtime_error("CloudComputeService::startVM(): Unexpected [" + answer_message->getName() + "] message");
+            throw std::runtime_error(
+                    "CloudComputeService::startVM(): Unexpected [" + answer_message->getName() + "] message");
         }
     }
 
@@ -102,7 +106,8 @@ namespace wrench {
     void VirtualizedClusterComputeService::migrateVM(const std::string &vm_name, const std::string &dest_pm_hostname) {
 
         if (this->vm_list.find(vm_name) == this->vm_list.end()) {
-            throw std::invalid_argument("VirtualizedClusterComputeService::migrateVM(): Unknown VM name '" + vm_name + "'");
+            throw std::invalid_argument(
+                    "VirtualizedClusterComputeService::migrateVM(): Unknown VM name '" + vm_name + "'");
         }
 
         // send a "migrate vm" message to the daemon's mailbox_name
@@ -115,12 +120,14 @@ namespace wrench {
                         this->getMessagePayloadValue(
                                 VirtualizedClusterComputeServiceMessagePayload::MIGRATE_VM_REQUEST_MESSAGE_PAYLOAD)));
 
-        if (auto msg = std::dynamic_pointer_cast<VirtualizedClusterComputeServiceMigrateVMAnswerMessage>(answer_message)) {
+        if (auto msg = std::dynamic_pointer_cast<VirtualizedClusterComputeServiceMigrateVMAnswerMessage>(
+                answer_message)) {
             if (not msg->success) {
                 throw WorkflowExecutionException(msg->failure_cause);
             }
         } else {
-            throw std::runtime_error("VirtualizedClusterComputeService::migrateVM(): Unexpected [" + msg->getName() + "] message");
+            throw std::runtime_error(
+                    "VirtualizedClusterComputeService::migrateVM(): Unexpected [" + msg->getName() + "] message");
         }
         return;
     }
@@ -142,7 +149,8 @@ namespace wrench {
             // no specific action
         }
 
-        WRENCH_INFO("Virtualized Cluster Service on host %s cleanly terminating!", S4U_Simulation::getHostName().c_str());
+        WRENCH_INFO("Virtualized Cluster Service on host %s cleanly terminating!",
+                    S4U_Simulation::getHostName().c_str());
         return 0;
     }
 
@@ -194,7 +202,8 @@ namespace wrench {
             return true;
 
         } else if (auto msg = std::dynamic_pointer_cast<CloudComputeServiceCreateVMRequestMessage>(message)) {
-            processCreateVM(msg->answer_mailbox, msg->num_cores, msg->ram_memory, msg->property_list, msg->messagepayload_list);
+            processCreateVM(msg->answer_mailbox, msg->num_cores, msg->ram_memory, msg->property_list,
+                            msg->messagepayload_list);
             return true;
 
         } else if (auto msg = std::dynamic_pointer_cast<CloudComputeServiceShutdownVMRequestMessage>(message)) {
@@ -213,7 +222,8 @@ namespace wrench {
             processResumeVM(msg->answer_mailbox, msg->vm_name);
             return true;
 
-        } else if (auto msg = std::dynamic_pointer_cast<VirtualizedClusterComputeServiceMigrateVMRequestMessage>(message)) {
+        } else if (auto msg = std::dynamic_pointer_cast<VirtualizedClusterComputeServiceMigrateVMRequestMessage>(
+                message)) {
             processMigrateVM(msg->answer_mailbox, msg->vm_name, msg->dest_pm_hostname);
             return true;
 
@@ -229,7 +239,8 @@ namespace wrench {
             if (auto bmcs = std::dynamic_pointer_cast<BareMetalComputeService>(msg->service)) {
                 processBareMetalComputeServiceTermination(bmcs, msg->exit_code);
             } else {
-                throw std::runtime_error("VirtualizedClusterComputeService::processNextMessage(): Received a service termination message for a non-BareMetalComputeService!");
+                throw std::runtime_error(
+                        "VirtualizedClusterComputeService::processNextMessage(): Received a service termination message for a non-BareMetalComputeService!");
             }
             return true;
         } else {
@@ -246,8 +257,9 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void VirtualizedClusterComputeService::processMigrateVM(const std::string &answer_mailbox, const std::string &vm_name,
-                                                     const std::string &dest_pm_hostname) {
+    void
+    VirtualizedClusterComputeService::processMigrateVM(const std::string &answer_mailbox, const std::string &vm_name,
+                                                       const std::string &dest_pm_hostname) {
 
 
         WRENCH_INFO("Asked to migrate the VM %s to PM %s", vm_name.c_str(), dest_pm_hostname.c_str());
@@ -259,12 +271,15 @@ namespace wrench {
         auto vm = vm_pair.first;
 
         // Check that the target host has sufficient resources
-        double dest_available_ram = Simulation::getHostMemoryCapacity(dest_pm_hostname) - this->used_ram_per_execution_host[dest_pm_hostname];
-        double dest_available_cores = Simulation::getHostNumCores(dest_pm_hostname) - this->used_cores_per_execution_host[dest_pm_hostname];
+        double dest_available_ram = Simulation::getHostMemoryCapacity(dest_pm_hostname) -
+                                    this->used_ram_per_execution_host[dest_pm_hostname];
+        double dest_available_cores =
+                Simulation::getHostNumCores(dest_pm_hostname) - this->used_cores_per_execution_host[dest_pm_hostname];
         if ((dest_available_ram < vm->getMemory()) or (dest_available_cores < vm->getNumCores())) {
             msg_to_send_back = new VirtualizedClusterComputeServiceMigrateVMAnswerMessage(
                     false,
-                    std::shared_ptr<FailureCause>(new NotEnoughResources(nullptr, this->getSharedPtr<VirtualizedClusterComputeService>())),
+                    std::shared_ptr<FailureCause>(
+                            new NotEnoughResources(nullptr, this->getSharedPtr<VirtualizedClusterComputeService>())),
                     this->getMessagePayloadValue(
                             VirtualizedClusterComputeServiceMessagePayload::MIGRATE_VM_ANSWER_MESSAGE_PAYLOAD));
 

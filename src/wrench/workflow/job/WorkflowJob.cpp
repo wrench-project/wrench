@@ -22,7 +22,7 @@ namespace wrench {
     /**
      * @brief Destructor
      */
-     WorkflowJob::~WorkflowJob() {
+    WorkflowJob::~WorkflowJob() {
     }
 
     /**
@@ -31,8 +31,8 @@ namespace wrench {
      * @param type: job type
      */
     WorkflowJob::WorkflowJob(Type type) : type(type) {
-      this->parent_compute_service = nullptr;
-      this->submit_date = -1.0;
+        this->parent_compute_service = nullptr;
+        this->submit_date = -1.0;
     }
 
 
@@ -42,7 +42,7 @@ namespace wrench {
      * @return the type
      */
     WorkflowJob::Type WorkflowJob::getType() {
-      return this->type;
+        return this->type;
     }
 
     /**
@@ -52,18 +52,18 @@ namespace wrench {
      * @throw std::runtime_error
      */
     std::string WorkflowJob::getTypeAsString() {
-      switch (this->type) {
-        case STANDARD: {
-          return "Standard";
+        switch (this->type) {
+            case STANDARD: {
+                return "Standard";
+            }
+            case PILOT: {
+                return "Pilot";
+            }
+            default: {
+                throw std::runtime_error("WorkflowJob::getTypeAsString(): WorkflowJob type '" +
+                                         std::to_string(this->type) + "' cannot be converted to a string");
+            }
         }
-        case PILOT: {
-          return "Pilot";
-        }
-        default: {
-          throw std::runtime_error("WorkflowJob::getTypeAsString(): WorkflowJob type '" +
-                                   std::to_string(this->type) + "' cannot be converted to a string");
-        }
-      }
     }
 
     /**
@@ -72,7 +72,7 @@ namespace wrench {
      * @return the name as a string
      */
     std::string WorkflowJob::getName() {
-      return this->name;
+        return this->name;
     }
 
     /**
@@ -82,10 +82,10 @@ namespace wrench {
      * @return the next callback mailbox
      */
     std::string WorkflowJob::getCallbackMailbox() {
-      if (this->callback_mailbox_stack.empty()) {
-        return this->workflow->getCallbackMailbox();
-      }
-      return this->callback_mailbox_stack.top();
+        if (this->callback_mailbox_stack.empty()) {
+            return this->workflow->getCallbackMailbox();
+        }
+        return this->callback_mailbox_stack.top();
     }
 
     /**
@@ -94,7 +94,7 @@ namespace wrench {
      * @return the next callback mailbox
      */
     std::string WorkflowJob::getOriginCallbackMailbox() {
-      return this->workflow->getCallbackMailbox();
+        return this->workflow->getCallbackMailbox();
     }
 
 
@@ -106,12 +106,12 @@ namespace wrench {
      * @return the next callback mailbox
      */
     std::string WorkflowJob::popCallbackMailbox() {
-      if (this->callback_mailbox_stack.empty()) {
-        return this->workflow->getCallbackMailbox();
-      }
-      std::string mailbox = this->callback_mailbox_stack.top();
-      this->callback_mailbox_stack.pop();
-      return mailbox;
+        if (this->callback_mailbox_stack.empty()) {
+            return this->workflow->getCallbackMailbox();
+        }
+        std::string mailbox = this->callback_mailbox_stack.top();
+        this->callback_mailbox_stack.pop();
+        return mailbox;
     }
 
     /**
@@ -120,7 +120,7 @@ namespace wrench {
      * @param mailbox: the mailbox name
      */
     void WorkflowJob::pushCallbackMailbox(std::string mailbox) {
-      this->callback_mailbox_stack.push(mailbox);
+        this->callback_mailbox_stack.push(mailbox);
     }
 
     /**
@@ -129,8 +129,8 @@ namespace wrench {
      * @return a unique number
      */
     unsigned long WorkflowJob::getNewUniqueNumber() {
-      static unsigned long sequence_number = 0;
-      return (sequence_number++);
+        static unsigned long sequence_number = 0;
+        return (sequence_number++);
     }
 
     /**
@@ -138,7 +138,7 @@ namespace wrench {
     * @param compute_service: a compute service
     */
     void WorkflowJob::setParentComputeService(std::shared_ptr<ComputeService> compute_service) {
-      this->parent_compute_service = compute_service;
+        this->parent_compute_service = compute_service;
     }
 
     /**
@@ -147,15 +147,15 @@ namespace wrench {
      * @return a compute service
      */
     std::shared_ptr<ComputeService> WorkflowJob::getParentComputeService() {
-       return this->parent_compute_service;
-     }
+        return this->parent_compute_service;
+    }
 
     /**
      * @brief Get the date at which the job was last submitted (<0 means "never submitted")
      * @return the submit date
      */
     double WorkflowJob::getSubmitDate() {
-      return this->submit_date;
+        return this->submit_date;
     }
 
     /**
@@ -163,6 +163,6 @@ namespace wrench {
      * @return a map of argument name/values
      */
     std::map<std::string, std::string> WorkflowJob::getServiceSpecificArguments() {
-      return this->service_specific_args;
+        return this->service_specific_args;
     }
 };
