@@ -28,7 +28,7 @@ namespace wrench {
      */
     ServiceHasCrashedMessage::ServiceHasCrashedMessage(std::shared_ptr<Service> service) :
             ServiceTerminationDetectorMessage("ServiceHasCrashedMessage") {
-      this->service = service;
+        this->service = service;
     }
 
     /**

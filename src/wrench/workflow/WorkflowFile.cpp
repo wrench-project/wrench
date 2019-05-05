@@ -25,7 +25,7 @@ namespace wrench {
      */
     WorkflowFile::WorkflowFile(const std::string name, double s) :
             id(name), size(s), output_of(nullptr) {
-      this->input_of = {};
+        this->input_of = {};
     };
 
     /**
@@ -33,7 +33,7 @@ namespace wrench {
      * @return a size in bytes
      */
     double WorkflowFile::getSize() {
-      return this->size;
+        return this->size;
     }
 
     /**
@@ -41,7 +41,7 @@ namespace wrench {
      * @return the id
      */
     std::string WorkflowFile::getID() {
-      return this->id;
+        return this->id;
     }
 
     /**
@@ -49,8 +49,8 @@ namespace wrench {
      *
      * @param task: a task
      */
-    void WorkflowFile::setOutputOf(WorkflowTask * const task) {
-      this->output_of = task;
+    void WorkflowFile::setOutputOf(WorkflowTask *const task) {
+        this->output_of = task;
     }
 
     /**
@@ -59,7 +59,7 @@ namespace wrench {
      * @return a task
      */
     WorkflowTask *WorkflowFile::getOutputOf() {
-      return this->output_of;
+        return this->output_of;
     }
 
     /**
@@ -68,7 +68,7 @@ namespace wrench {
      * @param task: a task
      */
     void WorkflowFile::setInputOf(WorkflowTask *task) {
-      this->input_of[task->getID()] = task;
+        this->input_of[task->getID()] = task;
     }
 
     /**
@@ -77,7 +77,7 @@ namespace wrench {
      * @return a map of tasks index by task ids
      */
     std::map<std::string, WorkflowTask *> WorkflowFile::getInputOf() {
-      return this->input_of;
+        return this->input_of;
     }
 
     /**
@@ -85,7 +85,7 @@ namespace wrench {
      * @return a workflow
      */
     Workflow *WorkflowFile::getWorkflow() {
-      return this->workflow;
+        return this->workflow;
     }
 
     /**
@@ -93,7 +93,7 @@ namespace wrench {
      * @return true or false
      */
     bool WorkflowFile::isOutput() {
-      return (this->output_of != nullptr);
+        return (this->output_of != nullptr);
     };
 
 };

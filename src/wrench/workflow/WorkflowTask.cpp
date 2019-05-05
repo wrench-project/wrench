@@ -54,16 +54,16 @@ namespace wrench {
      * @param file: the file
      */
     void WorkflowTask::addInputFile(WorkflowFile *file) {
-      addFileToMap(input_files, output_files, file);
+        addFileToMap(input_files, output_files, file);
 
-      file->setInputOf(this);
+        file->setInputOf(this);
 
-      WRENCH_DEBUG("Adding file '%s' as input to task %s",
-                   file->getID().c_str(), this->getID().c_str());
+        WRENCH_DEBUG("Adding file '%s' as input to task %s",
+                     file->getID().c_str(), this->getID().c_str());
 
-      if (file->getOutputOf()) {
-        workflow->addControlDependency(file->getOutputOf(), this);
-      }
+        if (file->getOutputOf()) {
+            workflow->addControlDependency(file->getOutputOf(), this);
+        }
     }
 
     /**
@@ -72,15 +72,15 @@ namespace wrench {
      * @param file: the file
      */
     void WorkflowTask::addOutputFile(WorkflowFile *file) {
-      WRENCH_DEBUG("Adding file '%s' as output t task %s",
-                   file->getID().c_str(), this->getID().c_str());
+        WRENCH_DEBUG("Adding file '%s' as output t task %s",
+                     file->getID().c_str(), this->getID().c_str());
 
-      addFileToMap(output_files, input_files, file);
-      file->setOutputOf(this);
+        addFileToMap(output_files, input_files, file);
+        file->setOutputOf(this);
 
-      for (auto const &x : file->getInputOf()) {
-        workflow->addControlDependency(this, x.second);
-      }
+        for (auto const &x : file->getInputOf()) {
+            workflow->addControlDependency(this, x.second);
+        }
 
     }
 
@@ -90,7 +90,7 @@ namespace wrench {
      * @return an id as a string
      */
     std::string WorkflowTask::getID() const {
-      return this->id;
+        return this->id;
     }
 
     /**
@@ -99,7 +99,7 @@ namespace wrench {
      * @return a number of flops
      */
     double WorkflowTask::getFlops() const {
-      return this->flops;
+        return this->flops;
     }
 
     /**
@@ -108,7 +108,7 @@ namespace wrench {
      * @return a number of cores
      */
     unsigned long WorkflowTask::getMinNumCores() const {
-      return this->min_num_cores;
+        return this->min_num_cores;
     }
 
     /**
@@ -117,7 +117,7 @@ namespace wrench {
      * @return a number of cores
      */
     unsigned long WorkflowTask::getMaxNumCores() const {
-      return this->max_num_cores;
+        return this->max_num_cores;
     }
 
     /**
@@ -126,7 +126,7 @@ namespace wrench {
      * @return a parallel efficiency (number between 0.0 and 1.0)
      */
     double WorkflowTask::getParallelEfficiency() const {
-      return this->parallel_efficiency;
+        return this->parallel_efficiency;
     }
 
     /**
@@ -135,7 +135,7 @@ namespace wrench {
      * @return a memory requirement (in bytes)
      */
     double WorkflowTask::getMemoryRequirement() const {
-      return this->memory_requirement;
+        return this->memory_requirement;
     }
 
 
@@ -145,11 +145,11 @@ namespace wrench {
      * @return a number of children
      */
     int WorkflowTask::getNumberOfChildren() const {
-      int count = 0;
-      for (lemon::ListDigraph::OutArcIt a(*DAG, DAG_node); a != lemon::INVALID; ++a) {
-        ++count;
-      }
-      return count;
+        int count = 0;
+        for (lemon::ListDigraph::OutArcIt a(*DAG, DAG_node); a != lemon::INVALID; ++a) {
+            ++count;
+        }
+        return count;
     }
 
     /**
@@ -158,11 +158,11 @@ namespace wrench {
      * @return a number of parents
      */
     int WorkflowTask::getNumberOfParents() const {
-      int count = 0;
-      for (lemon::ListDigraph::InArcIt a(*DAG, DAG_node); a != lemon::INVALID; ++a) {
-        ++count;
-      }
-      return count;
+        int count = 0;
+        for (lemon::ListDigraph::InArcIt a(*DAG, DAG_node); a != lemon::INVALID; ++a) {
+            ++count;
+        }
+        return count;
     }
 
     /**
@@ -171,7 +171,7 @@ namespace wrench {
      * @return a task state
      */
     WorkflowTask::State WorkflowTask::getState() const {
-      return this->visible_state;
+        return this->visible_state;
     }
 
     /**
@@ -180,7 +180,7 @@ namespace wrench {
     * @return a task state
     */
     WorkflowTask::State WorkflowTask::getUpcomingState() const {
-      return this->upcoming_visible_state;
+        return this->upcoming_visible_state;
     }
 
 
@@ -190,7 +190,7 @@ namespace wrench {
      * @return a task state
      */
     WorkflowTask::InternalState WorkflowTask::getInternalState() const {
-      return this->internal_state;
+        return this->internal_state;
     }
 
     /**
@@ -199,20 +199,20 @@ namespace wrench {
      * @return a string
      */
     std::string WorkflowTask::stateToString(WorkflowTask::State state) {
-      switch (state) {
-        case NOT_READY:
-          return "NOT READY";
-        case READY:
-          return "READY";
-        case PENDING:
-          return "PENDING";
-        case COMPLETED:
-          return "COMPLETED";
-        case UNKNOWN:
-          return "UNKNOWN";
-        default:
-          return "INVALID";
-      }
+        switch (state) {
+            case NOT_READY:
+                return "NOT READY";
+            case READY:
+                return "READY";
+            case PENDING:
+                return "PENDING";
+            case COMPLETED:
+                return "COMPLETED";
+            case UNKNOWN:
+                return "UNKNOWN";
+            default:
+                return "INVALID";
+        }
     }
 
     /**
@@ -224,20 +224,20 @@ namespace wrench {
      */
     std::string WorkflowTask::stateToString(WorkflowTask::InternalState state) {
 
-      switch (state) {
-        case TASK_NOT_READY:
-          return "NOT READY";
-        case TASK_READY:
-          return "READY";
-        case TASK_RUNNING:
-          return "RUNNING";
-        case TASK_COMPLETED:
-          return "COMPLETED";
-        case TASK_FAILED:
-          return "FAILED";
-        default:
-          return "UNKNOWN STATE";
-      }
+        switch (state) {
+            case TASK_NOT_READY:
+                return "NOT READY";
+            case TASK_READY:
+                return "READY";
+            case TASK_RUNNING:
+                return "RUNNING";
+            case TASK_COMPLETED:
+                return "COMPLETED";
+            case TASK_FAILED:
+                return "FAILED";
+            default:
+                return "UNKNOWN STATE";
+        }
     }
 
     /**
@@ -245,7 +245,7 @@ namespace wrench {
      * @return a workflow
      */
     Workflow *WorkflowTask::getWorkflow() const {
-      return this->workflow;
+        return this->workflow;
     }
 
     /**
@@ -255,7 +255,7 @@ namespace wrench {
      */
     void WorkflowTask::setInternalState(WorkflowTask::InternalState state) {
 //      WRENCH_INFO("SETTING %s's INTERNAL STATE TO %s", this->getID().c_str(), WorkflowTask::stateToString(state).c_str());
-      this->internal_state = state;
+        this->internal_state = state;
     }
 
     /**
@@ -267,45 +267,45 @@ namespace wrench {
 
 //      WRENCH_INFO("WorkflowTask::setState(): SETTING %s's VISIBLE STATE TO %s", this->getID().c_str(), WorkflowTask::stateToString(state).c_str());
 
-      // Sanity check
-      bool sane = true;
-      switch (state) {
-        case NOT_READY:
-          if ((this->internal_state != WorkflowTask::InternalState::TASK_NOT_READY) and
-              (this->internal_state != WorkflowTask::InternalState::TASK_FAILED)) {
-            sane = false;
-          }
-          break;
-        case READY:
-          if ((this->internal_state != WorkflowTask::InternalState::TASK_READY) and
-              (this->internal_state != WorkflowTask::InternalState::TASK_FAILED)) {
-            sane = false;
-          }
-          break;
-        case PENDING:
-          if ((this->internal_state != WorkflowTask::InternalState::TASK_READY) and
-              (this->internal_state != WorkflowTask::InternalState::TASK_NOT_READY) and
-              (this->internal_state != WorkflowTask::InternalState::TASK_RUNNING)) {
-            sane = false;
-          }
-          break;
-        case COMPLETED:
-          if (this->internal_state != WorkflowTask::InternalState::TASK_COMPLETED) {
-            sane = false;
-          }
-          break;
-        case UNKNOWN:
-          sane = false;
-          break;
-      }
+        // Sanity check
+        bool sane = true;
+        switch (state) {
+            case NOT_READY:
+                if ((this->internal_state != WorkflowTask::InternalState::TASK_NOT_READY) and
+                    (this->internal_state != WorkflowTask::InternalState::TASK_FAILED)) {
+                    sane = false;
+                }
+                break;
+            case READY:
+                if ((this->internal_state != WorkflowTask::InternalState::TASK_READY) and
+                    (this->internal_state != WorkflowTask::InternalState::TASK_FAILED)) {
+                    sane = false;
+                }
+                break;
+            case PENDING:
+                if ((this->internal_state != WorkflowTask::InternalState::TASK_READY) and
+                    (this->internal_state != WorkflowTask::InternalState::TASK_NOT_READY) and
+                    (this->internal_state != WorkflowTask::InternalState::TASK_RUNNING)) {
+                    sane = false;
+                }
+                break;
+            case COMPLETED:
+                if (this->internal_state != WorkflowTask::InternalState::TASK_COMPLETED) {
+                    sane = false;
+                }
+                break;
+            case UNKNOWN:
+                sane = false;
+                break;
+        }
 
-      if (not sane) {
-        throw std::runtime_error("WorkflowTask::setState(): Cannot set " +
-                                 this->getID() + "'s visible state to " +
-                                 stateToString(state) + " when its internal " +
-                                 "state is " + stateToString(this->internal_state));
-      }
-      this->visible_state = state;
+        if (not sane) {
+            throw std::runtime_error("WorkflowTask::setState(): Cannot set " +
+                                     this->getID() + "'s visible state to " +
+                                     stateToString(state) + " when its internal " +
+                                     "state is " + stateToString(this->internal_state));
+        }
+        this->visible_state = state;
     }
 
     /**
@@ -314,7 +314,7 @@ namespace wrench {
      * @param state: the task state
      */
     void WorkflowTask::setUpcomingState(WorkflowTask::State state) {
-      this->upcoming_visible_state = state;
+        this->upcoming_visible_state = state;
     }
 
     /**
@@ -323,7 +323,7 @@ namespace wrench {
      * @param job: the job
      */
     void WorkflowTask::setJob(WorkflowJob *job) {
-      this->job = job;
+        this->job = job;
     }
 
     /**
@@ -331,7 +331,7 @@ namespace wrench {
      * @return job: the job
      */
     WorkflowJob *WorkflowTask::getJob() const {
-      return this->job;
+        return this->job;
     }
 
     /**
@@ -339,7 +339,7 @@ namespace wrench {
      * @return a cluster id, or an empty string
      */
     std::string WorkflowTask::getClusterID() const {
-      return this->cluster_id;
+        return this->cluster_id;
     }
 
     /**
@@ -348,7 +348,7 @@ namespace wrench {
      * @param id: cluster id the task belongs to
      */
     void WorkflowTask::setClusterID(std::string id) {
-      this->cluster_id = id;
+        this->cluster_id = id;
     }
 
     /**
@@ -356,7 +356,7 @@ namespace wrench {
      * @return a workflow task type
      */
     WorkflowTask::TaskType WorkflowTask::getTaskType() const {
-      return this->task_type;
+        return this->task_type;
     }
 
     /**
@@ -364,7 +364,7 @@ namespace wrench {
      * @param task_type: task type
      */
     void WorkflowTask::setTaskType(wrench::WorkflowTask::TaskType task_type) {
-      this->task_type = task_type;
+        this->task_type = task_type;
     }
 
     /**
@@ -372,7 +372,7 @@ namespace wrench {
      * @return the task priority
      */
     long WorkflowTask::getPriority() const {
-      return this->priority;
+        return this->priority;
     }
 
     /**
@@ -380,7 +380,7 @@ namespace wrench {
      * @param priority: task priority
      */
     void WorkflowTask::setPriority(long priority) {
-      this->priority = priority;
+        this->priority = priority;
     }
 
     /**
@@ -388,7 +388,7 @@ namespace wrench {
      * @return the task average CPU usage
      */
     double WorkflowTask::getAverageCPU() const {
-      return this->average_cpu;
+        return this->average_cpu;
     }
 
     /**
@@ -396,7 +396,7 @@ namespace wrench {
      * @param average_cpu: task average CPU usage
      */
     void WorkflowTask::setAverageCPU(double average_cpu) {
-      this->average_cpu = average_cpu;
+        this->average_cpu = average_cpu;
     }
 
     /**
@@ -404,7 +404,7 @@ namespace wrench {
      * @return number of bytes read by the task in KB
      */
     unsigned long WorkflowTask::getBytesRead() const {
-      return this->bytes_read;
+        return this->bytes_read;
     }
 
     /**
@@ -412,7 +412,7 @@ namespace wrench {
      * @param bytes_read: number of bytes read by the task in KB
      */
     void WorkflowTask::setBytesRead(unsigned long bytes_read) {
-      this->bytes_read = bytes_read;
+        this->bytes_read = bytes_read;
     }
 
     /**
@@ -420,7 +420,7 @@ namespace wrench {
      * @return number of bytes written by the task in KB
      */
     unsigned long WorkflowTask::getBytesWritten() const {
-      return this->bytes_written;
+        return this->bytes_written;
     }
 
     /**
@@ -428,7 +428,7 @@ namespace wrench {
      * @param bytes_written: number of bytes written by the task in KB
      */
     void WorkflowTask::setBytesWritten(unsigned long bytes_written) {
-      this->bytes_written = bytes_written;
+        this->bytes_written = bytes_written;
     }
 
     /**
@@ -437,7 +437,7 @@ namespace wrench {
      * @param date: the start date
      */
     void WorkflowTask::setStartDate(double date) {
-      this->execution_history.push(WorkflowTask::WorkflowTaskExecution(date));
+        this->execution_history.push(WorkflowTask::WorkflowTaskExecution(date));
     }
 
     /**
@@ -447,11 +447,11 @@ namespace wrench {
      * @throws std::runtime_error
      */
     void WorkflowTask::setEndDate(double date) {
-      if (not this->execution_history.empty()) {
-        this->execution_history.top().task_end = date;
-      } else {
-        throw std::runtime_error("WorkflowTask::setEndDate() cannot be called before WorkflowTask::setStartDate()");
-      }
+        if (not this->execution_history.empty()) {
+            this->execution_history.top().task_end = date;
+        } else {
+            throw std::runtime_error("WorkflowTask::setEndDate() cannot be called before WorkflowTask::setStartDate()");
+        }
     }
 
     /**
@@ -461,12 +461,12 @@ namespace wrench {
      * @throws std::runtime_error
      */
     void WorkflowTask::setComputationStartDate(double date) {
-      if (not this->execution_history.empty()) {
-        this->execution_history.top().computation_start = date;
-      } else {
-        throw std::runtime_error(
-                "WorkflowTask::setComputationStartDate() cannot be called before WorkflowTask::setStartDate()");
-      }
+        if (not this->execution_history.empty()) {
+            this->execution_history.top().computation_start = date;
+        } else {
+            throw std::runtime_error(
+                    "WorkflowTask::setComputationStartDate() cannot be called before WorkflowTask::setStartDate()");
+        }
     }
 
     /**
@@ -476,12 +476,12 @@ namespace wrench {
      * @throws std::runtime_error
      */
     void WorkflowTask::setComputationEndDate(double date) {
-      if (not this->execution_history.empty()) {
-        this->execution_history.top().computation_end = date;
-      } else {
-        throw std::runtime_error(
-                "WorkflowTask::setComputationEndDate() cannot be called before WorkflowTask::setStartDate()");
-      }
+        if (not this->execution_history.empty()) {
+            this->execution_history.top().computation_end = date;
+        } else {
+            throw std::runtime_error(
+                    "WorkflowTask::setComputationEndDate() cannot be called before WorkflowTask::setStartDate()");
+        }
     }
 
     /**
@@ -491,12 +491,12 @@ namespace wrench {
      * @throws std::runtime_error
      */
     void WorkflowTask::setReadInputStartDate(double date) {
-      if (not this->execution_history.empty()) {
-        this->execution_history.top().read_input_start = date;
-      } else {
-        throw std::runtime_error(
-                "WorkflowTask::setReadInputStartDate() cannot be called before WorkflowTask::setStartDate()");
-      }
+        if (not this->execution_history.empty()) {
+            this->execution_history.top().read_input_start = date;
+        } else {
+            throw std::runtime_error(
+                    "WorkflowTask::setReadInputStartDate() cannot be called before WorkflowTask::setStartDate()");
+        }
     }
 
     /**
@@ -506,12 +506,12 @@ namespace wrench {
      * @throws std::runtime_error
      */
     void WorkflowTask::setReadInputEndDate(double date) {
-      if (not this->execution_history.empty()) {
-        this->execution_history.top().read_input_end = date;
-      } else {
-        throw std::runtime_error(
-                "WorkflowTask::setReadInputEndDate() cannot be called before WorkflowTask::setStartDate()");
-      }
+        if (not this->execution_history.empty()) {
+            this->execution_history.top().read_input_end = date;
+        } else {
+            throw std::runtime_error(
+                    "WorkflowTask::setReadInputEndDate() cannot be called before WorkflowTask::setStartDate()");
+        }
     }
 
     /**
@@ -521,12 +521,12 @@ namespace wrench {
      * @throws std::runtime_error
      */
     void WorkflowTask::setWriteOutputStartDate(double date) {
-      if (not this->execution_history.empty()) {
-        this->execution_history.top().write_output_start = date;
-      } else {
-        throw std::runtime_error(
-                "WorkflowTask::setWriteOutputStartDate() cannot be called before WorkflowTask::setStartDate()");
-      }
+        if (not this->execution_history.empty()) {
+            this->execution_history.top().write_output_start = date;
+        } else {
+            throw std::runtime_error(
+                    "WorkflowTask::setWriteOutputStartDate() cannot be called before WorkflowTask::setStartDate()");
+        }
     }
 
     /**
@@ -536,12 +536,12 @@ namespace wrench {
      * @throws std::runtime_error
      */
     void WorkflowTask::setWriteOutputEndDate(double date) {
-      if (not this->execution_history.empty()) {
-        this->execution_history.top().write_output_end = date;
-      } else {
-        throw std::runtime_error(
-                "WorkflowTask::setWriteOutputEndDate() cannot be called before WorkflowTask::setStartDate()");
-      }
+        if (not this->execution_history.empty()) {
+            this->execution_history.top().write_output_end = date;
+        } else {
+            throw std::runtime_error(
+                    "WorkflowTask::setWriteOutputEndDate() cannot be called before WorkflowTask::setStartDate()");
+        }
     }
 
     /**
@@ -550,11 +550,12 @@ namespace wrench {
      * @param date: the date when the task has failed
      */
     void WorkflowTask::setFailureDate(double date) {
-      if (not this->execution_history.empty()) {
-        this->execution_history.top().task_failed = date;
-      } else {
-        throw std::runtime_error("WorkflowTask::setFailureDate() cannot be called before WorkflowTask::setStartDate()");
-      }
+        if (not this->execution_history.empty()) {
+            this->execution_history.top().task_failed = date;
+        } else {
+            throw std::runtime_error(
+                    "WorkflowTask::setFailureDate() cannot be called before WorkflowTask::setStartDate()");
+        }
     }
 
     /**
@@ -563,12 +564,12 @@ namespace wrench {
      * @param date: the date when the task was terminated
      */
     void WorkflowTask::setTerminationDate(double date) {
-      if (not this->execution_history.empty()) {
-        this->execution_history.top().task_terminated = date;
-      } else {
-        throw std::runtime_error(
-                "WorkflowTask::setTerminationDate() cannot be called before WorkflowTask::setStartDate()");
-      }
+        if (not this->execution_history.empty()) {
+            this->execution_history.top().task_terminated = date;
+        } else {
+            throw std::runtime_error(
+                    "WorkflowTask::setTerminationDate() cannot be called before WorkflowTask::setStartDate()");
+        }
     }
 
     /**
@@ -577,7 +578,7 @@ namespace wrench {
      * @return a stack of WorkflowTaskExecution objects, one for each attempted execution of the task
      */
     std::stack<WorkflowTask::WorkflowTaskExecution> WorkflowTask::getExecutionHistory() {
-      return this->execution_history;
+        return this->execution_history;
     }
 
     /**
@@ -593,15 +594,15 @@ namespace wrench {
                                     std::map<std::string, WorkflowFile *> &map_to_check,
                                     WorkflowFile *f) {
 
-      if (map_to_check.find(f->id) != map_to_check.end()) {
-        throw std::invalid_argument(
-                "WorkflowTask::addFileToMap(): File ID '" + f->id + "' is already used as input or output file");
-      }
+        if (map_to_check.find(f->id) != map_to_check.end()) {
+            throw std::invalid_argument(
+                    "WorkflowTask::addFileToMap(): File ID '" + f->id + "' is already used as input or output file");
+        }
 
-      if (map_to_insert.find(f->id) != map_to_insert.end()) {
-        throw std::invalid_argument("WorkflowTask::addFileToMap(): File ID '" + f->id + "' already exists");
-      }
-      map_to_insert[f->id] = f;
+        if (map_to_insert.find(f->id) != map_to_insert.end()) {
+            throw std::invalid_argument("WorkflowTask::addFileToMap(): File ID '" + f->id + "' already exists");
+        }
+        map_to_insert[f->id] = f;
     }
 
     /**
@@ -609,14 +610,14 @@ namespace wrench {
      * @return a failure count
      */
     unsigned int WorkflowTask::getFailureCount() {
-      return this->failure_count;
+        return this->failure_count;
     }
 
     /**
      * @brief Increment the failure count of a task
      */
     void WorkflowTask::incrementFailureCount() {
-      this->failure_count++;
+        this->failure_count++;
     }
 
     /**
@@ -624,12 +625,12 @@ namespace wrench {
      * @return a set workflow files
      */
     std::set<WorkflowFile *> WorkflowTask::getInputFiles() {
-      std::set<WorkflowFile *> input;
+        std::set<WorkflowFile *> input;
 
-      for (auto f: this->input_files) {
-        input.insert(f.second);
-      }
-      return input;
+        for (auto f: this->input_files) {
+            input.insert(f.second);
+        }
+        return input;
     }
 
     /**
@@ -637,12 +638,12 @@ namespace wrench {
      * @return a set of workflow files
      */
     std::set<WorkflowFile *> WorkflowTask::getOutputFiles() {
-      std::set<WorkflowFile *> output;
+        std::set<WorkflowFile *> output;
 
-      for (auto f: this->output_files) {
-        output.insert(f.second);
-      }
-      return output;
+        for (auto f: this->output_files) {
+            output.insert(f.second);
+        }
+        return output;
     }
 
     /**
@@ -650,7 +651,7 @@ namespace wrench {
      * @return a start date (-1 if task has not started yet)
      */
     double WorkflowTask::getStartDate() {
-      return (not this->execution_history.empty()) ? this->execution_history.top().task_start : -1.0;
+        return (not this->execution_history.empty()) ? this->execution_history.top().task_start : -1.0;
     }
 
     /**
@@ -658,7 +659,7 @@ namespace wrench {
      * @return a end date (-1 if task has not completed yet or if no execution history exists for this task yet)
      */
     double WorkflowTask::getEndDate() {
-      return (not this->execution_history.empty()) ? this->execution_history.top().task_end : -1.0;
+        return (not this->execution_history.empty()) ? this->execution_history.top().task_end : -1.0;
     }
 
     /**
@@ -666,7 +667,7 @@ namespace wrench {
      * @return the date when the computation portion of a task started (-1 if computation has not started yet or if no execution history exists for this task yet)
      */
     double WorkflowTask::getComputationStartDate() {
-      return (not this->execution_history.empty()) ? this->execution_history.top().computation_start : -1.0;
+        return (not this->execution_history.empty()) ? this->execution_history.top().computation_start : -1.0;
     }
 
     /**
@@ -674,7 +675,7 @@ namespace wrench {
      * @return the date when the computation portion of a task ended (-1 if computation has not ended yet or if no execution history exists for this task yet)
      */
     double WorkflowTask::getComputationEndDate() {
-      return (not this->execution_history.empty()) ? this->execution_history.top().computation_end : -1.0;
+        return (not this->execution_history.empty()) ? this->execution_history.top().computation_end : -1.0;
     }
 
     /**
@@ -682,7 +683,7 @@ namespace wrench {
      * @return the date when the read input portion of the task has begun (-1 if it has not yet begun or if no execution history exists for this task yet)
      */
     double WorkflowTask::getReadInputStartDate() {
-      return (not this->execution_history.empty()) ? this->execution_history.top().read_input_start : -1.0;
+        return (not this->execution_history.empty()) ? this->execution_history.top().read_input_start : -1.0;
     }
 
     /**
@@ -690,7 +691,7 @@ namespace wrench {
      * @return the date when the read input portion of the task has completed (-1 if it has not begun or if no execution history exists for this task yet)
      */
     double WorkflowTask::getReadInputEndDate() {
-      return (not this->execution_history.empty()) ? this->execution_history.top().read_input_end : -1.0;
+        return (not this->execution_history.empty()) ? this->execution_history.top().read_input_end : -1.0;
     }
 
     /**
@@ -698,7 +699,7 @@ namespace wrench {
      * @return the date when the write output portion of a task has begun (-1 if it has not yet started or if no execution history exists for this task yet)
      */
     double WorkflowTask::getWriteOutputStartDate() {
-      return (not this->execution_history.empty()) ? this->execution_history.top().write_output_start : -1.0;
+        return (not this->execution_history.empty()) ? this->execution_history.top().write_output_start : -1.0;
     }
 
     /**
@@ -706,7 +707,7 @@ namespace wrench {
      * @return the date when the write output portion of a task has completed (-1 if it has not completed yet or if no execution history exists for this task yet)
      */
     double WorkflowTask::getWriteOutputEndDate() {
-      return (not this->execution_history.empty()) ? this->execution_history.top().write_output_end : -1.0;
+        return (not this->execution_history.empty()) ? this->execution_history.top().write_output_end : -1.0;
     }
 
     /**
@@ -714,7 +715,7 @@ namespace wrench {
      * @return the date when the task failed (-1 if it didn't fail or if no execution history exists for this task yet)
      */
     double WorkflowTask::getFailureDate() {
-      return (not this->execution_history.empty()) ? this->execution_history.top().task_failed : -1.0;
+        return (not this->execution_history.empty()) ? this->execution_history.top().task_failed : -1.0;
     }
 
     /**
@@ -722,7 +723,7 @@ namespace wrench {
      * @return the date when the task was terminated (-1 if it wasn't terminated or if not execution history exists for this task yet)
      */
     double WorkflowTask::getTerminationDate() {
-      return (not this->execution_history.empty()) ? this->execution_history.top().task_terminated : -1.0;
+        return (not this->execution_history.empty()) ? this->execution_history.top().task_terminated : -1.0;
     }
 
     /**
@@ -730,21 +731,21 @@ namespace wrench {
      * @return the task's updated top level
      */
     unsigned long WorkflowTask::updateTopLevel() {
-      std::vector<WorkflowTask *> parents = this->workflow->getTaskParents(this);
-      if (parents.empty()) {
-        this->toplevel = 0;
-      } else {
-        unsigned long max_toplevel = 0;
-        for (auto parent : parents) {
-          max_toplevel = (max_toplevel < parent->toplevel ? parent->toplevel : max_toplevel);
+        std::vector<WorkflowTask *> parents = this->workflow->getTaskParents(this);
+        if (parents.empty()) {
+            this->toplevel = 0;
+        } else {
+            unsigned long max_toplevel = 0;
+            for (auto parent : parents) {
+                max_toplevel = (max_toplevel < parent->toplevel ? parent->toplevel : max_toplevel);
+            }
+            this->toplevel = 1 + max_toplevel;
         }
-        this->toplevel = 1 + max_toplevel;
-      }
-      std::vector<WorkflowTask *> children = this->workflow->getTaskChildren(this);
-      for (auto child : children) {
-        child->updateTopLevel();
-      }
-      return this->toplevel;
+        std::vector<WorkflowTask *> children = this->workflow->getTaskChildren(this);
+        for (auto child : children) {
+            child->updateTopLevel();
+        }
+        return this->toplevel;
     }
 
     /**
@@ -753,7 +754,7 @@ namespace wrench {
      * @return
      */
     unsigned long WorkflowTask::getTopLevel() {
-      return this->toplevel;
+        return this->toplevel;
     }
 
     /**
@@ -762,7 +763,7 @@ namespace wrench {
      * @return hostname
      */
     std::string WorkflowTask::getExecutionHost() {
-      return (not this->execution_history.empty()) ? this->execution_history.top().execution_host : "";
+        return (not this->execution_history.empty()) ? this->execution_history.top().execution_host : "";
     }
 
     /**
@@ -770,7 +771,7 @@ namespace wrench {
      * @return number of cores
      */
     unsigned long WorkflowTask::getNumCoresAllocated() {
-      return (not this->execution_history.empty()) ? this->execution_history.top().num_cores_allocated : 0;
+        return (not this->execution_history.empty()) ? this->execution_history.top().num_cores_allocated : 0;
     }
 
     /**
@@ -779,12 +780,12 @@ namespace wrench {
      * @param hostname: the host name
      */
     void WorkflowTask::setExecutionHost(std::string hostname) {
-      if (not this->execution_history.empty()) {
-        this->execution_history.top().execution_host = hostname;
-      } else {
-        throw std::runtime_error(
-                "WorkflowTask::setExecutionHost() cannot be called before WorkflowTask::setStartDate()");
-      }
+        if (not this->execution_history.empty()) {
+            this->execution_history.top().execution_host = hostname;
+        } else {
+            throw std::runtime_error(
+                    "WorkflowTask::setExecutionHost() cannot be called before WorkflowTask::setStartDate()");
+        }
     }
 
     /**
@@ -792,12 +793,12 @@ namespace wrench {
      * @param num_cores: the number of cores allocated to this task
      */
     void WorkflowTask::setNumCoresAllocated(unsigned long num_cores) {
-      if (not this->execution_history.empty()) {
-        this->execution_history.top().num_cores_allocated = num_cores;
-      } else {
-        throw std::runtime_error(
-                "WorkflowTask::setNumCoresAllocated() cannot be called before WorkflowTask::setStartDate()");
-      }
+        if (not this->execution_history.empty()) {
+            this->execution_history.top().num_cores_allocated = num_cores;
+        } else {
+            throw std::runtime_error(
+                    "WorkflowTask::setNumCoresAllocated() cannot be called before WorkflowTask::setStartDate()");
+        }
     }
 
     /**
@@ -806,7 +807,7 @@ namespace wrench {
      * @return transfer src and dst pair
      */
     std::map<WorkflowFile *, std::pair<std::string, std::string>> WorkflowTask::getFileTransfers() const {
-      return this->fileTransfers;
+        return this->fileTransfers;
     }
 
     /**
@@ -818,9 +819,9 @@ namespace wrench {
      * @param dst: destination hostname
      */
     void WorkflowTask::addSrcDest(WorkflowFile *workflow_file, const std::string &src, const std::string &dst) {
-      if (this->fileTransfers.find(workflow_file) == this->fileTransfers.end()) {
-        this->fileTransfers.insert(std::make_pair(workflow_file, std::make_pair(src, dst)));
-      }
+        if (this->fileTransfers.find(workflow_file) == this->fileTransfers.end()) {
+            this->fileTransfers.insert(std::make_pair(workflow_file, std::make_pair(src, dst)));
+        }
     }
 
 };

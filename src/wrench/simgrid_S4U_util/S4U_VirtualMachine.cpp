@@ -33,8 +33,8 @@ namespace wrench {
                                            unsigned long num_cores, double ram_memory,
                                            std::map<std::string, std::string> property_list,
                                            std::map<std::string, double> messagepayload_list) :
-                                           vm_name(vm_name), num_cores(num_cores), ram_memory(ram_memory),
-                                           property_list(property_list), messagepayload_list(messagepayload_list) {
+            vm_name(vm_name), num_cores(num_cores), ram_memory(ram_memory),
+            property_list(property_list), messagepayload_list(messagepayload_list) {
 
         this->state = State::DOWN;
     }
@@ -75,7 +75,8 @@ namespace wrench {
     void S4U_VirtualMachine::start(std::string &pm_name) {
 
         if (this->state != State::DOWN) {
-            throw std::runtime_error("S4U_VirtualMachine::suspend(): Cannot suspend a VM that's in state " + this->getStateAsString());
+            throw std::runtime_error(
+                    "S4U_VirtualMachine::suspend(): Cannot suspend a VM that's in state " + this->getStateAsString());
         }
 
         simgrid::s4u::Host *physical_host = simgrid::s4u::Host::by_name_or_null(pm_name);
@@ -84,8 +85,8 @@ namespace wrench {
         }
         this->vm = new simgrid::s4u::VirtualMachine(this->vm_name,
                                                     physical_host,
-                                                    (int)this->num_cores,
-                                                    (size_t)this->ram_memory);
+                                                    (int) this->num_cores,
+                                                    (size_t) this->ram_memory);
         this->vm->start();
         this->state = State::RUNNING;
         this->pm_name = pm_name;
@@ -96,7 +97,8 @@ namespace wrench {
      */
     void S4U_VirtualMachine::suspend() {
         if (this->state != State::RUNNING) {
-            throw std::runtime_error("S4U_VirtualMachine::suspend(): Cannot suspend a VM that's in state " + this->getStateAsString());
+            throw std::runtime_error(
+                    "S4U_VirtualMachine::suspend(): Cannot suspend a VM that's in state " + this->getStateAsString());
         }
         this->vm->suspend();
         this->state = State::SUSPENDED;
@@ -107,7 +109,8 @@ namespace wrench {
      */
     void S4U_VirtualMachine::resume() {
         if (this->state != State::SUSPENDED) {
-            throw std::runtime_error("S4U_VirtualMachine::resume(): Cannot resume a VM that's in state " + this->getStateAsString());
+            throw std::runtime_error(
+                    "S4U_VirtualMachine::resume(): Cannot resume a VM that's in state " + this->getStateAsString());
         }
         this->vm->resume();
         this->state = State::RUNNING;
@@ -118,7 +121,8 @@ namespace wrench {
      */
     void S4U_VirtualMachine::shutdown() {
         if (this->state == State::DOWN) {
-            throw std::runtime_error("S4U_VirtualMachine::shutdown(): Cannot shutdown a VM that's in state " + this->getStateAsString());
+            throw std::runtime_error(
+                    "S4U_VirtualMachine::shutdown(): Cannot shutdown a VM that's in state " + this->getStateAsString());
         }
         this->state = State::DOWN; // Doing this first before a possible context switch
         this->vm->shutdown();

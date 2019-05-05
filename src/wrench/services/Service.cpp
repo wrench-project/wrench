@@ -107,7 +107,6 @@ namespace wrench {
     }
 
 
-
     /**
     * @brief Set a message payload of the Service
     * @param messagepayload: the message payload (which must a a string representation of a >=0 double)
@@ -124,6 +123,7 @@ namespace wrench {
         }
         this->messagepayload_list[messagepayload] = value;
     }
+
     /**
      * @brief Get a property of the Service as a string
      * @param property: the property
@@ -133,8 +133,9 @@ namespace wrench {
      */
     std::string Service::getPropertyValueAsString(std::string property) {
         if (this->property_list.find(property) == this->property_list.end()) {
-            throw std::invalid_argument("Service::getPropertyValueAsString(): Cannot find value for property " + property +
-                                        " (perhaps a derived service class does not provide a default value?)");
+            throw std::invalid_argument(
+                    "Service::getPropertyValueAsString(): Cannot find value for property " + property +
+                    " (perhaps a derived service class does not provide a default value?)");
         }
         return this->property_list[property];
     }
@@ -179,7 +180,8 @@ namespace wrench {
         }
         if (sscanf(string_value.c_str(), "%lu", &value) != 1) {
             throw std::invalid_argument(
-                    "Service::getPropertyValueAsUnsignedLong(): Invalid unsigned long property value " + property + " " +
+                    "Service::getPropertyValueAsUnsignedLong(): Invalid unsigned long property value " + property +
+                    " " +
                     this->getPropertyValueAsString(property));
         }
         return value;
@@ -194,12 +196,12 @@ namespace wrench {
      */
     double Service::getMessagePayloadValue(std::string message_payload) {
         if (this->messagepayload_list.find(message_payload) == this->messagepayload_list.end()) {
-            throw std::invalid_argument("Service::getMessagePayloadValue(): Cannot find value for message_payload " + message_payload +
-                                        " (perhaps a derived service class does not provide a default value?)");
+            throw std::invalid_argument(
+                    "Service::getMessagePayloadValue(): Cannot find value for message_payload " + message_payload +
+                    " (perhaps a derived service class does not provide a default value?)");
         }
         return this->messagepayload_list[message_payload];
     }
-
 
 
     /**
@@ -332,7 +334,8 @@ namespace wrench {
       */
     void Service::resume() {
         if (this->state != Service::SUSPENDED) {
-            throw std::runtime_error("Service::resume(): Service cannot be resumed because it is not in the suspended state");
+            throw std::runtime_error(
+                    "Service::resume(): Service cannot be resumed because it is not in the suspended state");
         }
         this->resumeActor();
         this->state = Service::UP;
@@ -429,10 +432,12 @@ namespace wrench {
      */
     void Service::assertServiceIsUp() {
         if (this->state == Service::DOWN) {
-            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this->getSharedPtr<Service>())));
+            throw WorkflowExecutionException(
+                    std::shared_ptr<FailureCause>(new ServiceIsDown(this->getSharedPtr<Service>())));
         }
         if (this->state == Service::SUSPENDED) {
-            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsSuspended(this->getSharedPtr<Service>())));
+            throw WorkflowExecutionException(
+                    std::shared_ptr<FailureCause>(new ServiceIsSuspended(this->getSharedPtr<Service>())));
         }
     }
 };

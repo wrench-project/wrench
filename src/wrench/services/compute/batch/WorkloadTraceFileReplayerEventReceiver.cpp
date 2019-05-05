@@ -27,7 +27,7 @@ namespace wrench {
         WRENCH_INFO("Starting!");
         while (true) {
 
-            StandardJob *job = nullptr ;
+            StandardJob *job = nullptr;
 
             // Wait for the workflow execution event
             WRENCH_INFO("Waiting for job completion...");
@@ -43,7 +43,7 @@ namespace wrench {
                     job = real_event->standard_job;
                     WRENCH_INFO("Received job failure notification: %s",
                                 real_event->failure_cause->toString().c_str());
-                } else  {
+                } else {
                     throw std::runtime_error(
                             "WorkloadTraceFileReplayerEventReceiver::main(): Unexpected workflow execution event");
                 }

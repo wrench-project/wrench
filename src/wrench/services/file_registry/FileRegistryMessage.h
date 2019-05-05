@@ -51,7 +51,8 @@ namespace wrench {
      */
     class FileRegistryFileLookupAnswerMessage : public FileRegistryMessage {
     public:
-        FileRegistryFileLookupAnswerMessage(WorkflowFile *file, std::set<std::shared_ptr<StorageService>> locations, double payload);
+        FileRegistryFileLookupAnswerMessage(WorkflowFile *file, std::set<std::shared_ptr<StorageService>> locations,
+                                            double payload);
 
         /** @brief The file that was looked up */
         WorkflowFile *file;
@@ -68,7 +69,7 @@ namespace wrench {
         FileRegistryFileLookupByProximityRequestMessage(std::string answer_mailbox, WorkflowFile *file,
                                                         std::string reference_host,
                                                         std::shared_ptr<NetworkProximityService> network_proximity_service,
-                                                                double payload);
+                                                        double payload);
 
         /** @brief The mailbox to which the answer message should be sent */
         std::string answer_mailbox;

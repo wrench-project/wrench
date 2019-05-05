@@ -18,7 +18,8 @@ namespace wrench {
      * @param name: the message name
      * @param payload: the message size in bytes
      */
-    VirtualizedClusterComputeServiceMessage::VirtualizedClusterComputeServiceMessage(const std::string &name, double payload) :
+    VirtualizedClusterComputeServiceMessage::VirtualizedClusterComputeServiceMessage(const std::string &name,
+                                                                                     double payload) :
             ComputeServiceMessage("VirtualizedClusterComputeServiceMessage::" + name, payload) {
     }
 
@@ -55,11 +56,12 @@ namespace wrench {
      * @param failure_cause: a failure cause (or nullptr if success)
      * @param payload: the message size in bytes
      */
-    VirtualizedClusterComputeServiceMigrateVMAnswerMessage::VirtualizedClusterComputeServiceMigrateVMAnswerMessage(bool success,
-                                                                                                     std::shared_ptr<FailureCause> failure_cause,
-                                                                                                     double payload) :
-            VirtualizedClusterComputeServiceMessage("MIGRATE_VM_ANSWER", payload), success(success), failure_cause(failure_cause) {}
-
+    VirtualizedClusterComputeServiceMigrateVMAnswerMessage::VirtualizedClusterComputeServiceMigrateVMAnswerMessage(
+            bool success,
+            std::shared_ptr<FailureCause> failure_cause,
+            double payload) :
+            VirtualizedClusterComputeServiceMessage("MIGRATE_VM_ANSWER", payload), success(success),
+            failure_cause(failure_cause) {}
 
 
 }

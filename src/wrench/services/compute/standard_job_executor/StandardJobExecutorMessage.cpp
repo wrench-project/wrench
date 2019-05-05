@@ -35,8 +35,8 @@ namespace wrench {
             std::shared_ptr<Workunit> workunit,
             double payload) :
             StandardJobExecutorMessage("WORK_UNIT_EXECUTOR_DONE", payload) {
-      this->workunit_executor = workunit_executor;
-      this->workunit = workunit;
+        this->workunit_executor = workunit_executor;
+        this->workunit = workunit;
     }
 
     /**
@@ -50,11 +50,11 @@ namespace wrench {
             std::shared_ptr<WorkunitExecutor> workunit_executor,
             std::shared_ptr<Workunit> workunit,
             std::shared_ptr<FailureCause> cause,
-            double payload):
+            double payload) :
             StandardJobExecutorMessage("WORK_UNIT_EXECUTOR_FAILED", payload) {
-      this->workunit_executor = workunit_executor;
-      this->workunit = workunit;
-      this->cause = cause;
+        this->workunit_executor = workunit_executor;
+        this->workunit = workunit;
+        this->cause = cause;
     }
 
     /**
@@ -68,8 +68,8 @@ namespace wrench {
             std::shared_ptr<StandardJobExecutor> executor,
             double payload) :
             StandardJobExecutorMessage("STANDARD_JOB_COMPLETED", payload) {
-      this->job = job;
-      this->executor = executor;
+        this->job = job;
+        this->executor = executor;
     }
 
     /**
@@ -85,9 +85,9 @@ namespace wrench {
             std::shared_ptr<FailureCause> cause,
             double payload) :
             StandardJobExecutorMessage("STANDARD_JOB_FAILED", payload) {
-      this->job = job;
-      this->executor = executor;
-      this->cause = cause;
+        this->job = job;
+        this->executor = executor;
+        this->cause = cause;
 
     }
 
@@ -98,8 +98,6 @@ namespace wrench {
     ComputeThreadDoneMessage::ComputeThreadDoneMessage() :
             StandardJobExecutorMessage("COMPUTE_THREAD_DONE", 0) {
     }
-
-
 
 
 };

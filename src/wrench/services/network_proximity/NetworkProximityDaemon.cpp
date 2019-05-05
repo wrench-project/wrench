@@ -170,9 +170,10 @@ namespace wrench {
 
                     try {
                         S4U_Mailbox::dputMessage(this->network_proximity_service_mailbox,
-                                                 new NextContactDaemonRequestMessage(this->getSharedPtr<NetworkProximityDaemon>(),
-                                                                                     this->getMessagePayloadValue(
-                                                                                             NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD)));
+                                                 new NextContactDaemonRequestMessage(
+                                                         this->getSharedPtr<NetworkProximityDaemon>(),
+                                                         this->getMessagePayloadValue(
+                                                                 NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD)));
                     } catch (std::shared_ptr<NetworkError> &cause) {
                         // Couldn't find out who to talk to next... aborting
                         life = false;

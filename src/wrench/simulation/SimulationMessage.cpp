@@ -19,7 +19,7 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(simulation_message, "Log category for SimulatinMess
 namespace wrench {
 
 
-    SimulationMessage::~SimulationMessage(){
+    SimulationMessage::~SimulationMessage() {
 //        WRENCH_INFO("DELETE: %s (%lu)", name.c_str(), (unsigned long)(this));
     };
 
@@ -30,11 +30,11 @@ namespace wrench {
      * @param payload: message size in bytes
      */
     SimulationMessage::SimulationMessage(std::string name, double payload) {
-      if ((name.empty()) || (payload < 0)) {
-        throw std::invalid_argument("SimulationMessage::SimulationMessage(): Invalid arguments");
-      }
-      this->name = name;
-      this->payload = payload;
+        if ((name.empty()) || (payload < 0)) {
+            throw std::invalid_argument("SimulationMessage::SimulationMessage(): Invalid arguments");
+        }
+        this->name = name;
+        this->payload = payload;
     }
 
     /**
@@ -42,10 +42,8 @@ namespace wrench {
      * @return the name
      */
     std::string SimulationMessage::getName() {
-      return this->name;
+        return this->name;
     }
-
-
 
 
 };

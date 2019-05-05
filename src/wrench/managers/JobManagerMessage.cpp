@@ -28,12 +28,13 @@ namespace wrench {
      * @param necessary_state_changes: necessary task state changes
      */
     JobManagerStandardJobDoneMessage::JobManagerStandardJobDoneMessage(StandardJob *job,
-                                                                       std::shared_ptr<ComputeService>  compute_service,
-                                                                       std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes) :
+                                                                       std::shared_ptr<ComputeService> compute_service,
+                                                                       std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes)
+            :
             JobManagerMessage("JobManagerStandardJobDoneMessage") {
-      this->job = job;
-      this->compute_service = compute_service;
-      this->necessary_state_changes = necessary_state_changes;
+        this->job = job;
+        this->compute_service = compute_service;
+        this->necessary_state_changes = necessary_state_changes;
     }
 
     /**
@@ -45,16 +46,16 @@ namespace wrench {
      * @param cause: the cause of the failure
      */
     JobManagerStandardJobFailedMessage::JobManagerStandardJobFailedMessage(StandardJob *job,
-                                                                           std::shared_ptr<ComputeService>  compute_service,
+                                                                           std::shared_ptr<ComputeService> compute_service,
                                                                            std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes,
                                                                            std::set<WorkflowTask *> necessary_failure_count_increments,
                                                                            std::shared_ptr<FailureCause> cause) :
             JobManagerMessage("JobManagerStandardJobFailedMessage") {
-      this->job = job;
-      this->compute_service = compute_service;
-      this->necessary_state_changes = necessary_state_changes;
-      this->necessary_failure_count_increments = necessary_failure_count_increments;
-      this->cause = cause;
+        this->job = job;
+        this->compute_service = compute_service;
+        this->necessary_state_changes = necessary_state_changes;
+        this->necessary_failure_count_increments = necessary_failure_count_increments;
+        this->cause = cause;
     }
 
 

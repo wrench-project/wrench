@@ -76,7 +76,8 @@ namespace wrench {
             std::map<std::string, double> messagepayload_list,
             double payload) :
             CloudComputeServiceMessage("CREATE_VM_REQUEST", payload),
-            num_cores(num_cores), ram_memory(ram_memory), property_list(property_list), messagepayload_list(messagepayload_list)  {
+            num_cores(num_cores), ram_memory(ram_memory), property_list(property_list),
+            messagepayload_list(messagepayload_list) {
 
         if (answer_mailbox.empty() || (ram_memory < 0.0)) {
 //        std::cerr << answer_mailbox << " - " << pm_hostname << " - " << vm_name << std::endl;
@@ -95,10 +96,11 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     CloudComputeServiceCreateVMAnswerMessage::CloudComputeServiceCreateVMAnswerMessage(bool success,
-                                                                         std::string &vm_name,
-                                                                         std::shared_ptr<FailureCause> failure_cause,
-                                                                         double payload) :
-            CloudComputeServiceMessage("CREATE_VM_ANSWER", payload), success(success), vm_name(vm_name), failure_cause(failure_cause) {}
+                                                                                       std::string &vm_name,
+                                                                                       std::shared_ptr<FailureCause> failure_cause,
+                                                                                       double payload) :
+            CloudComputeServiceMessage("CREATE_VM_ANSWER", payload), success(success), vm_name(vm_name),
+            failure_cause(failure_cause) {}
 
     /**
      * @brief Constructor
@@ -131,9 +133,9 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     CloudComputeServiceShutdownVMAnswerMessage::CloudComputeServiceShutdownVMAnswerMessage(bool success,
-                                                                             std::shared_ptr<FailureCause> failure_cause,
-                                                                             double payload) :
-            CloudComputeServiceMessage("SHUTDOWN_VM_ANSWER", payload), success(success), failure_cause(failure_cause)  {}
+                                                                                           std::shared_ptr<FailureCause> failure_cause,
+                                                                                           double payload) :
+            CloudComputeServiceMessage("SHUTDOWN_VM_ANSWER", payload), success(success), failure_cause(failure_cause) {}
 
     /**
      * @brief Constructor
@@ -170,10 +172,11 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     CloudComputeServiceStartVMAnswerMessage::CloudComputeServiceStartVMAnswerMessage(bool success,
-                                                                       std::shared_ptr<BareMetalComputeService> cs,
-                                                                       std::shared_ptr<FailureCause> failure_cause,
-                                                                       double payload) :
-            CloudComputeServiceMessage("START_VM_ANSWER", payload), success(success), cs(cs), failure_cause(failure_cause) {}
+                                                                                     std::shared_ptr<BareMetalComputeService> cs,
+                                                                                     std::shared_ptr<FailureCause> failure_cause,
+                                                                                     double payload) :
+            CloudComputeServiceMessage("START_VM_ANSWER", payload), success(success), cs(cs),
+            failure_cause(failure_cause) {}
 
     /**
      * @brief Constructor
@@ -206,8 +209,8 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     CloudComputeServiceSuspendVMAnswerMessage::CloudComputeServiceSuspendVMAnswerMessage(bool success,
-                                                                           std::shared_ptr<FailureCause> failure_cause,
-                                                                           double payload) :
+                                                                                         std::shared_ptr<FailureCause> failure_cause,
+                                                                                         double payload) :
             CloudComputeServiceMessage("SUSPEND_VM_ANSWER", payload), success(success), failure_cause(failure_cause) {}
 
     /**
@@ -241,9 +244,9 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     CloudComputeServiceResumeVMAnswerMessage::CloudComputeServiceResumeVMAnswerMessage(bool success,
-                                                                         std::shared_ptr<FailureCause> failure_cause,
-                                                                         double payload) :
-            CloudComputeServiceMessage("RESUME_VM_ANSWER", payload), success(success), failure_cause(failure_cause)  {}
+                                                                                       std::shared_ptr<FailureCause> failure_cause,
+                                                                                       double payload) :
+            CloudComputeServiceMessage("RESUME_VM_ANSWER", payload), success(success), failure_cause(failure_cause) {}
 
 
     /**
@@ -277,11 +280,9 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     CloudComputeServiceDestroyVMAnswerMessage::CloudComputeServiceDestroyVMAnswerMessage(bool success,
-                                                                           std::shared_ptr<FailureCause> failure_cause,
-                                                                           double payload) :
+                                                                                         std::shared_ptr<FailureCause> failure_cause,
+                                                                                         double payload) :
             CloudComputeServiceMessage("DESTROY_VM_ANSWER", payload), success(success), failure_cause(failure_cause) {}
-
-
 
 
 }

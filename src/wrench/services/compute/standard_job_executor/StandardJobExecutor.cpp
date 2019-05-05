@@ -32,6 +32,7 @@
 #include <exception>
 
 #include "wrench/util/PointerUtil.h"
+
 XBT_LOG_NEW_DEFAULT_CATEGORY(standard_job_executor, "Log category for Standard Job Executor");
 
 namespace wrench {
@@ -70,7 +71,7 @@ namespace wrench {
                                              std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
                                              std::shared_ptr<StorageService> scratch_space,
                                              bool part_of_pilot_job,
-                                             PilotJob* parent_pilot_job,
+                                             PilotJob *parent_pilot_job,
                                              std::map<std::string, std::string> property_list,
                                              std::map<std::string, double> messagepayload_list
     ) :
@@ -83,19 +84,22 @@ namespace wrench {
         // Check that hosts exist!
         for (auto h : compute_resources) {
             if (not S4U_Simulation::hostExists(std::get<0>(h))) {
-                throw std::invalid_argument("StandardJobExecutor::StandardJobExecutor(): Host '" + std::get<0>(h) + "' does not exit!");
+                throw std::invalid_argument(
+                        "StandardJobExecutor::StandardJobExecutor(): Host '" + std::get<0>(h) + "' does not exit!");
             }
         }
 
         // Check that there is at least one core per host but not too many cores
         for (auto host : compute_resources) {
             if (std::get<0>(host.second) == 0) {
-                throw std::invalid_argument("StandardJobExecutor::StandardJobExecutor(): there should be at least one core per host");
+                throw std::invalid_argument(
+                        "StandardJobExecutor::StandardJobExecutor(): there should be at least one core per host");
             }
             if (std::get<0>(host.second) < ComputeService::ALL_CORES) {
                 if (std::get<0>(host.second) > S4U_Simulation::getHostNumCores(host.first)) {
                     throw std::invalid_argument("StandardJobExecutor::StandardJobExecutor(): host " + host.first +
-                                                " has only " + std::to_string(S4U_Simulation::getHostNumCores(host.first)) + " cores");
+                                                " has only " +
+                                                std::to_string(S4U_Simulation::getHostNumCores(host.first)) + " cores");
                 }
             } else {
                 // Set the num_cores to the maximum
@@ -106,7 +110,8 @@ namespace wrench {
         // Check that there is at least zero byte of memory per host, but not too many bytes
         for (auto host : compute_resources) {
             if (std::get<1>(host.second) < 0) {
-                throw std::invalid_argument("StandardJobExecutor::StandardJobExecutor(): the number of bytes per host should be non-negative");
+                throw std::invalid_argument(
+                        "StandardJobExecutor::StandardJobExecutor(): the number of bytes per host should be non-negative");
             }
             if (std::get<1>(host.second) < ComputeService::ALL_RAM) {
                 double host_memory_capacity = S4U_Simulation::getHostMemoryCapacity(host.first);
@@ -125,7 +130,8 @@ namespace wrench {
         // Check that there are enough cores to run the computational tasks
         unsigned long max_min_required_num_cores = 0;
         for (auto task : job->tasks) {
-            max_min_required_num_cores = (max_min_required_num_cores < task->getMinNumCores() ? task->getMinNumCores() : max_min_required_num_cores);
+            max_min_required_num_cores = (max_min_required_num_cores < task->getMinNumCores() ? task->getMinNumCores()
+                                                                                              : max_min_required_num_cores);
         }
 
         bool enough_cores = false;
@@ -142,14 +148,16 @@ namespace wrench {
         }
 
         if (!enough_cores) {
-            throw std::invalid_argument("StandardJobExecutor::StandardJobExecutor(): insufficient core resources to run the job");
+            throw std::invalid_argument(
+                    "StandardJobExecutor::StandardJobExecutor(): insufficient core resources to run the job");
         }
 
 
         // Check that there is enough RAM to run the computational tasks
         double max_required_ram = 0.0;
         for (auto task : job->tasks) {
-            max_required_ram = (max_required_ram < task->getMemoryRequirement() ? task->getMemoryRequirement() : max_required_ram);
+            max_required_ram = (max_required_ram < task->getMemoryRequirement() ? task->getMemoryRequirement()
+                                                                                : max_required_ram);
         }
 
 
@@ -163,7 +171,8 @@ namespace wrench {
 
 
         if (!enough_ram) {
-            throw std::invalid_argument("StandardJobExecutor::StandardJobExecutor(): insufficient memory resources to run the job");
+            throw std::invalid_argument(
+                    "StandardJobExecutor::StandardJobExecutor(): insufficient memory resources to run the job");
         }
 
         // Set instance variables
@@ -199,7 +208,7 @@ namespace wrench {
                 ram = simulation->getHostMemoryCapacity(host.first);
             }
             this->total_ram += ram;
-            this->ram_availabilities.insert(std::make_pair(host.first,  ram));
+            this->ram_availabilities.insert(std::make_pair(host.first, ram));
         }
 
         // Create my compute resources record
@@ -269,7 +278,8 @@ namespace wrench {
 
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_RED);
         WRENCH_INFO("New StandardJobExecutor starting (%s) with %d cores and %.2le bytes of RAM over %ld hosts: ",
-                    this->mailbox_name.c_str(), this->total_num_cores, this->total_ram, this->core_availabilities.size());
+                    this->mailbox_name.c_str(), this->total_num_cores, this->total_ram,
+                    this->core_availabilities.size());
         for (auto h : this->core_availabilities) {
             WRENCH_INFO("  %s: %ld cores", std::get<0>(h).c_str(), std::get<1>(h));
         }
@@ -280,7 +290,8 @@ namespace wrench {
             hosts_to_monitor.push_back(h.first);
         }
         this->host_state_monitor = std::shared_ptr<HostStateChangeDetector>(
-                new HostStateChangeDetector(this->hostname, hosts_to_monitor, true, false, this->getSharedPtr<Service>(), this->mailbox_name));
+                new HostStateChangeDetector(this->hostname, hosts_to_monitor, true, false,
+                                            this->getSharedPtr<Service>(), this->mailbox_name));
         this->host_state_monitor->simulation = this->simulation;
         this->host_state_monitor->start(this->host_state_monitor, true, false); // Daemonized, no auto-restart
 
@@ -318,7 +329,8 @@ namespace wrench {
             }
 
             /** Detect Termination **/
-            if (this->non_ready_workunits.empty() and  this->ready_workunits.empty() and  this->running_workunits.empty()) {
+            if (this->non_ready_workunits.empty() and this->ready_workunits.empty() and
+                this->running_workunits.empty()) {
                 break;
             }
 
@@ -368,8 +380,9 @@ namespace wrench {
             } else if (core_allocation_algorithm == "minimum") {
                 desired_num_cores = wu->task->getMinNumCores();
             } else {
-                throw std::runtime_error("StandardjobExecutor::computeWorkUnitDesiredNumCores(): Unknown StandardJobExecutorProperty::CORE_ALLOCATION_ALGORITHM property '"
-                                         + core_allocation_algorithm + "'");
+                throw std::runtime_error(
+                        "StandardjobExecutor::computeWorkUnitDesiredNumCores(): Unknown StandardJobExecutorProperty::CORE_ALLOCATION_ALGORITHM property '"
+                        + core_allocation_algorithm + "'");
             }
         }
 
@@ -440,8 +453,9 @@ namespace wrench {
             std::string target_host = "";
             unsigned long target_num_cores = 0;
 
-            WRENCH_INFO("Looking for a host to run a work unit that needs at least %ld cores, and would like %ld cores, and requires %.2ef bytes of RAM",
-                        minimum_num_cores, desired_num_cores, required_ram);
+            WRENCH_INFO(
+                    "Looking for a host to run a work unit that needs at least %ld cores, and would like %ld cores, and requires %.2ef bytes of RAM",
+                    minimum_num_cores, desired_num_cores, required_ram);
             std::string host_selection_algorithm =
                     this->getPropertyValueAsString(StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM);
 
@@ -542,7 +556,8 @@ namespace wrench {
 
             // Start a failure detector for this workunit executor (which will send me a message in case the
             // work unit executor has died)
-            auto failure_detector = std::shared_ptr<ServiceTerminationDetector>(new ServiceTerminationDetector(this->hostname, workunit_executor, this->mailbox_name, true, false));
+            auto failure_detector = std::shared_ptr<ServiceTerminationDetector>(
+                    new ServiceTerminationDetector(this->hostname, workunit_executor, this->mailbox_name, true, false));
             failure_detector->simulation = this->simulation;
             failure_detector->start(failure_detector, true, false); // Daemonized, no auto-restart
 
@@ -619,7 +634,8 @@ namespace wrench {
             auto service = msg->service;
             auto workunit_executor = std::dynamic_pointer_cast<WorkunitExecutor>(service);
             if (not workunit_executor) {
-                throw std::runtime_error("Received a FailureDetectorServiceHasFailedMessage message, but that service is not a WorkUnitExecutor!");
+                throw std::runtime_error(
+                        "Received a FailureDetectorServiceHasFailedMessage message, but that service is not a WorkUnitExecutor!");
             }
             processWorkunitExecutorCrash(workunit_executor);
             return true;
@@ -627,7 +643,6 @@ namespace wrench {
             throw std::runtime_error("Unexpected [" + message->getName() + "] message");
         }
     }
-
 
 
 /**
@@ -652,7 +667,8 @@ namespace wrench {
         // Remove the workunit executor from the workunit executor list
         for (auto it = this->running_workunit_executors.begin(); it != this->running_workunit_executors.end(); it++) {
             if ((*it) == workunit_executor) {
-                PointerUtil::moveSharedPtrFromSetToSet(it, &(this->running_workunit_executors), &(this->finished_workunit_executors));
+                PointerUtil::moveSharedPtrFromSetToSet(it, &(this->running_workunit_executors),
+                                                       &(this->finished_workunit_executors));
                 break;
             }
         }
@@ -691,7 +707,8 @@ namespace wrench {
 
             try {
                 S4U_Mailbox::putMessage(this->callback_mailbox,
-                                        new StandardJobExecutorDoneMessage(this->job, this->getSharedPtr<StandardJobExecutor>(),
+                                        new StandardJobExecutorDoneMessage(this->job,
+                                                                           this->getSharedPtr<StandardJobExecutor>(),
                                                                            this->getMessagePayloadValue(
                                                                                    StandardJobExecutorMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD)));
             } catch (std::shared_ptr<NetworkError> &cause) {
@@ -707,8 +724,10 @@ namespace wrench {
                     // Make the child's tasks ready
                     if (child->task != nullptr) {
                         if (child->task->getInternalState() != WorkflowTask::InternalState::TASK_READY) {
-                            throw std::runtime_error("StandardJobExecutor::processWorkunitExecutorCompletion(): Weird task state " +
-                                                     std::to_string(child->task->getInternalState()) + " for task " + child->task->getID());
+                            throw std::runtime_error(
+                                    "StandardJobExecutor::processWorkunitExecutorCompletion(): Weird task state " +
+                                    std::to_string(child->task->getInternalState()) + " for task " +
+                                    child->task->getID());
                         }
                     }
 
@@ -762,7 +781,8 @@ namespace wrench {
         // Don't kill me while I am doing this
         this->acquireDaemonLock();
 
-        WRENCH_INFO("A workunit executor has failed to complete a workunit on behalf of job '%s'", this->job->getName().c_str());
+        WRENCH_INFO("A workunit executor has failed to complete a workunit on behalf of job '%s'",
+                    this->job->getName().c_str());
 
         // Update core availabilities
         this->core_availabilities[workunit_executor->getHostname()] += workunit_executor->getNumCores();
@@ -772,7 +792,8 @@ namespace wrench {
         // Remove the workunit executor from the workunit executor list and put it in the failed list
         for (auto it = this->running_workunit_executors.begin(); it != this->running_workunit_executors.end(); it++) {
             if ((*it) == workunit_executor) {
-                PointerUtil::moveSharedPtrFromSetToSet(it, &(this->running_workunit_executors), &(this->failed_workunit_executors));
+                PointerUtil::moveSharedPtrFromSetToSet(it, &(this->running_workunit_executors),
+                                                       &(this->failed_workunit_executors));
                 break;
             }
         }
@@ -810,7 +831,9 @@ namespace wrench {
         // Send the notification back
         try {
             S4U_Mailbox::putMessage(this->callback_mailbox,
-                                    new StandardJobExecutorFailedMessage(this->job, this->getSharedPtr<StandardJobExecutor>(), cause,
+                                    new StandardJobExecutorFailedMessage(this->job,
+                                                                         this->getSharedPtr<StandardJobExecutor>(),
+                                                                         cause,
                                                                          this->getMessagePayloadValue(
                                                                                  StandardJobExecutorMessagePayload::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
@@ -820,7 +843,6 @@ namespace wrench {
         this->releaseDaemonLock();
 
     }
-
 
 
     /**
@@ -842,7 +864,8 @@ namespace wrench {
             }
         }
         if (not found_it) {
-            throw std::runtime_error("StandardJobExecutor::processWorkunitExecutorCrash(): Received a WorkunitExecutorCrash message for a non-running WorkunitExecutor!");
+            throw std::runtime_error(
+                    "StandardJobExecutor::processWorkunitExecutorCrash(): Received a WorkunitExecutorCrash message for a non-running WorkunitExecutor!");
         }
 
         // Get the scratch files that executor may have generated
@@ -894,8 +917,8 @@ namespace wrench {
 
         // using function as comp
         std::sort(sorted_workunits.begin(), sorted_workunits.end(),
-                  [selection_algorithm](const std::shared_ptr<Workunit>  wu1, const std::shared_ptr<Workunit>  wu2) -> bool
-                  {
+                  [selection_algorithm](const std::shared_ptr<Workunit> wu1,
+                                        const std::shared_ptr<Workunit> wu2) -> bool {
 //                    std::cerr << "IN LAMBDA1: " << wu1 << "  " << wu2 << "\n";
 //                    std::cerr << "IN LAMBDA2: " << wu1->tasks.size() << "  " << wu2->tasks.size() << "\n";
                       // Non-computational workunits have higher priority
@@ -912,7 +935,7 @@ namespace wrench {
 
                       if (selection_algorithm == "maximum_flops") {
                           if (wu1->task->getFlops() == wu2->task->getFlops()) {
-                              return (wu1->task->getID() >  wu2->task->getID());
+                              return (wu1->task->getID() > wu2->task->getID());
                           }
                           return (wu1->task->getFlops() > wu2->task->getFlops());
 
@@ -928,8 +951,9 @@ namespace wrench {
                           }
                           return (wu1->task->getTopLevel() < wu2->task->getTopLevel());
                       } else {
-                          throw std::runtime_error("Unknown StandardJobExecutorProperty::TASK_SELECTION_ALGORITHM property '"
-                                                   + selection_algorithm + "'");
+                          throw std::runtime_error(
+                                  "Unknown StandardJobExecutorProperty::TASK_SELECTION_ALGORITHM property '"
+                                  + selection_algorithm + "'");
                       }
                   });
 
@@ -961,13 +985,13 @@ namespace wrench {
         // First fetch all the files stored in scratch by all the workunit executors running inside a standardjob
         // Files in scratch by finished workunit executors
         for (auto it = this->finished_workunit_executors.begin(); it != this->finished_workunit_executors.end(); it++) {
-            std::set<WorkflowFile*> files_in_scratch_by_single_workunit = (*it)->getFilesStoredInScratch();
+            std::set<WorkflowFile *> files_in_scratch_by_single_workunit = (*it)->getFilesStoredInScratch();
             this->files_stored_in_scratch.insert(files_in_scratch_by_single_workunit.begin(),
                                                  files_in_scratch_by_single_workunit.end());
         }
         // Files in scratch by failed workunit executors
         for (auto it = this->failed_workunit_executors.begin(); it != this->failed_workunit_executors.end(); it++) {
-            std::set<WorkflowFile*> files_in_scratch_by_single_workunit = (*it)->getFilesStoredInScratch();
+            std::set<WorkflowFile *> files_in_scratch_by_single_workunit = (*it)->getFilesStoredInScratch();
             this->files_stored_in_scratch.insert(files_in_scratch_by_single_workunit.begin(),
                                                  files_in_scratch_by_single_workunit.end());
         }
@@ -978,7 +1002,7 @@ namespace wrench {
      *
      * @return a set of files
      */
-    std::set<WorkflowFile*> StandardJobExecutor::getFilesInScratch() {
+    std::set<WorkflowFile *> StandardJobExecutor::getFilesInScratch() {
         return this->files_stored_in_scratch;
     }
 
@@ -995,11 +1019,9 @@ namespace wrench {
      * @brief Get the executor's compute resources
      * @return a set of compute resources as <hostname, num cores, bytes of RAM> tuples
      */
-    std::map<std::string, std::tuple<unsigned long, double>>  StandardJobExecutor::getComputeResources() {
+    std::map<std::string, std::tuple<unsigned long, double>> StandardJobExecutor::getComputeResources() {
         return this->compute_resources;
     }
-
-
 
 
 };

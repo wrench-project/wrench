@@ -34,7 +34,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     std::shared_ptr<WorkflowExecutionEvent> WorkflowExecutionEvent::waitForNextExecutionEvent(std::string mailbox) {
-      return WorkflowExecutionEvent::waitForNextExecutionEvent(mailbox, -1);
+        return WorkflowExecutionEvent::waitForNextExecutionEvent(mailbox, -1);
     }
 
     /**
@@ -48,59 +48,63 @@ namespace wrench {
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
      */
-    std::shared_ptr<WorkflowExecutionEvent> WorkflowExecutionEvent::waitForNextExecutionEvent(std::string mailbox, double timeout) {
+    std::shared_ptr<WorkflowExecutionEvent>
+    WorkflowExecutionEvent::waitForNextExecutionEvent(std::string mailbox, double timeout) {
 
-      // Get the message from the mailbox_name
-      std::shared_ptr<SimulationMessage> message = nullptr;
-      try {
-        message = S4U_Mailbox::getMessage(mailbox, timeout);
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        if (cause->isTimeout()) {
-          return nullptr;
+        // Get the message from the mailbox_name
+        std::shared_ptr<SimulationMessage> message = nullptr;
+        try {
+            message = S4U_Mailbox::getMessage(mailbox, timeout);
+        } catch (std::shared_ptr<NetworkError> &cause) {
+            if (cause->isTimeout()) {
+                return nullptr;
+            }
+            throw WorkflowExecutionException(cause);
         }
-        throw WorkflowExecutionException(cause);
-      }
 
-      if (auto m = std::dynamic_pointer_cast<JobManagerStandardJobDoneMessage>(message)) {
-        // Update task states
-        for (auto state_update : m->necessary_state_changes) {
-          WorkflowTask *task = state_update.first;
-          WorkflowTask::State state = state_update.second;
-          task->setState(state);
-        }
-        return std::shared_ptr<StandardJobCompletedEvent>(new StandardJobCompletedEvent(m->job, m->compute_service));
+        if (auto m = std::dynamic_pointer_cast<JobManagerStandardJobDoneMessage>(message)) {
+            // Update task states
+            for (auto state_update : m->necessary_state_changes) {
+                WorkflowTask *task = state_update.first;
+                WorkflowTask::State state = state_update.second;
+                task->setState(state);
+            }
+            return std::shared_ptr<StandardJobCompletedEvent>(
+                    new StandardJobCompletedEvent(m->job, m->compute_service));
 
-      } else if (auto m = std::dynamic_pointer_cast<JobManagerStandardJobFailedMessage>(message)) {
-        // Update task states
-        for (auto state_update : m->necessary_state_changes) {
-          WorkflowTask *task = state_update.first;
-          WorkflowTask::State state = state_update.second;
-          task->setState(state);
-        }
-        // Update task failure counts
-        for (auto task : m->necessary_failure_count_increments) {
-          task->incrementFailureCount();
-        }
-        return std::shared_ptr<StandardJobFailedEvent>(new StandardJobFailedEvent(m->job, m->compute_service, m->cause));
+        } else if (auto m = std::dynamic_pointer_cast<JobManagerStandardJobFailedMessage>(message)) {
+            // Update task states
+            for (auto state_update : m->necessary_state_changes) {
+                WorkflowTask *task = state_update.first;
+                WorkflowTask::State state = state_update.second;
+                task->setState(state);
+            }
+            // Update task failure counts
+            for (auto task : m->necessary_failure_count_increments) {
+                task->incrementFailureCount();
+            }
+            return std::shared_ptr<StandardJobFailedEvent>(
+                    new StandardJobFailedEvent(m->job, m->compute_service, m->cause));
 
-      } else if (auto m = std::dynamic_pointer_cast<ComputeServicePilotJobStartedMessage>(message)) {
-        return std::shared_ptr<PilotJobStartedEvent>(new PilotJobStartedEvent(m->job, m->compute_service));
+        } else if (auto m = std::dynamic_pointer_cast<ComputeServicePilotJobStartedMessage>(message)) {
+            return std::shared_ptr<PilotJobStartedEvent>(new PilotJobStartedEvent(m->job, m->compute_service));
 
-      } else if (auto m = std::dynamic_pointer_cast<ComputeServicePilotJobExpiredMessage>(message)) {
-        return std::shared_ptr<PilotJobExpiredEvent>(new PilotJobExpiredEvent(m->job, m->compute_service));
+        } else if (auto m = std::dynamic_pointer_cast<ComputeServicePilotJobExpiredMessage>(message)) {
+            return std::shared_ptr<PilotJobExpiredEvent>(new PilotJobExpiredEvent(m->job, m->compute_service));
 
-      } else if (auto m = std::dynamic_pointer_cast<StorageServiceFileCopyAnswerMessage>(message)) {
-        if (m->success) {
-          return std::shared_ptr<FileCopyCompletedEvent>(new FileCopyCompletedEvent(
-                  m->file, m->storage_service, m->file_registry_service, m->file_registry_service_updated));
+        } else if (auto m = std::dynamic_pointer_cast<StorageServiceFileCopyAnswerMessage>(message)) {
+            if (m->success) {
+                return std::shared_ptr<FileCopyCompletedEvent>(new FileCopyCompletedEvent(
+                        m->file, m->storage_service, m->file_registry_service, m->file_registry_service_updated));
 
+            } else {
+                return std::shared_ptr<FileCopyFailedEvent>(
+                        new FileCopyFailedEvent(m->file, m->storage_service, m->failure_cause));
+            }
         } else {
-          return std::shared_ptr<FileCopyFailedEvent>(new FileCopyFailedEvent(m->file, m->storage_service, m->failure_cause));
+            throw std::runtime_error(
+                    "WorkflowExecutionEvent::waitForNextExecutionEvent(): Non-handled message type when generating execution event");
         }
-      } else {
-        throw std::runtime_error(
-                "WorkflowExecutionEvent::waitForNextExecutionEvent(): Non-handled message type when generating execution event");
-      }
     }
 
 };
