@@ -240,7 +240,7 @@ namespace wrench {
      *             this many cores, but will choose the host on which to run it.
      *           - If a "hostname:num_cores" value is provided for a task, then the service will run that
      *             task with the specified number of cores on that host.
-     *      - to a BatchComputeService: {{"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requestes cores per host)}}
+     *      - to a BatchComputeService: {{"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}}
      *      - to a VirtualizedClusterComputeService: {} (in which case the service will pick the vm) or {{"-vm":"<vm name>"}}
      *      - to a CloudComputeService: {} (in which case the service will pick the vm) or {{"-vm":"<vm name>"}}
      *
@@ -680,7 +680,7 @@ namespace wrench {
                     }
                 }
 
-                // remove the job from the "pending" listf
+                // remove the job from the "pending" list
                 this->pending_standard_jobs.erase(job);
                 // put it in the "failed" list
                 this->failed_standard_jobs.insert(job);
