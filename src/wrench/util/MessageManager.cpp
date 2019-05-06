@@ -64,7 +64,7 @@ namespace wrench {
     }
 
     /**
-     * @brief A debug function to pring the content of the message manager
+     * @brief A debug function to print the content of the message manager
      */
     void MessageManager::print() {
         WRENCH_INFO("MESSAGE_MANAGER DB:");
