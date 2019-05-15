@@ -42,7 +42,8 @@ before_install:
 script:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
       docker exec -w /home/wrench/wrench/build -it wrench cmake -DENABLE_BATSCHED=${BATSCHED} -DCMAKE_VERBOSE_MAKEFILE=ON -DCOVERAGE=1 ..;
-      docker exec -w /home/wrench/wrench/build -it wrench make all unit_tests doc-gh;
+      #docker exec -w /home/wrench/wrench/build -it wrench make all unit_tests doc-gh;
+      docker exec -w /home/wrench/wrench/build -it wrench make all unit_tests;
       docker exec -w /home/wrench/wrench/build -it wrench ./unit_tests;
     fi
 
