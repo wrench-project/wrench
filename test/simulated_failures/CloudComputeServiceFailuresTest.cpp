@@ -392,7 +392,7 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        unsigned long NUM_TRIALS = 1000;
+        unsigned long NUM_TRIALS = 500;
 
         auto cloud_service = *(this->getAvailableComputeServices<wrench::CloudComputeService>().begin());
 

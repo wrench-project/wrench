@@ -361,7 +361,7 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        unsigned long NUM_TRIALS =1000;
+        unsigned long NUM_TRIALS =500;
 
         for (unsigned long trial=0; trial < NUM_TRIALS; trial++) {
 
