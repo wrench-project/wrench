@@ -34,7 +34,7 @@ And, one of the following:
 
 ### Required Dependencies
 
-- [SimGrid](http://simgrid.gforge.inria.fr/) - version 3.21
+- [SimGrid](https://framagit.org/simgrid/simgrid/uploads/8f3c1608d9420d92c668534633c1208d/SimGrid-3.22.2.tar.gz) - version 3.22.2
 - [Lemon C++ library](http://lemon.cs.elte.hu/) - version 1.3.1 or higher 
 - [PugiXML](http://pugixml.org/) - version 1.8 or higher 
 - [JSON for Modern C++](https://github.com/nlohmann/json) - version 3.1.0 or higher 
