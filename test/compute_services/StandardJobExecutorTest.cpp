@@ -2679,7 +2679,7 @@ private:
         // Initialize with deterministic seed!
         rng.seed(666);
 
-        unsigned long NUM_TRIALS = 200;
+        unsigned long NUM_TRIALS = 150;
 
         for (unsigned long trial = 0; trial < NUM_TRIALS; trial++) {
             WRENCH_INFO("Trial %lu", trial);
