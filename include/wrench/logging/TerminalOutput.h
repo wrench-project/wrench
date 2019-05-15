@@ -71,6 +71,7 @@ namespace wrench {
         static void endThisProcessColor();
 
         static void disableColor();
+        static void disableLog();
 
         /***********************/
         /** \endcond           */
@@ -85,6 +86,7 @@ namespace wrench {
         static std::string getThisProcessLoggingColor();
 
         static bool color_enabled;
+        static bool wrench_no_log;
 
     };
 
