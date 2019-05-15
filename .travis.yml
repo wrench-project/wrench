@@ -17,7 +17,6 @@ env:
   - DIST=ubuntu-xenial COMPILER=gcc6 BATSCHED=off
   - DIST=ubuntu-bionic COMPILER=gcc7 BATSCHED=off
   - DIST=ubuntu-bionic COMPILER=gcc7-batsched BATSCHED=on
-  - DIST=ubuntu-bionic COMPILER=gcc6 BATSCHED=off
   - DIST=ubuntu-bionic COMPILER=clang BATSCHED=off
   - DIST=debian-stretch COMPILER=gcc6 BATSCHED=off
 
