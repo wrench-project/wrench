@@ -27,6 +27,7 @@ namespace wrench {
 
     std::map<simgrid::s4u::Actor *, std::string> TerminalOutput::colormap;
     bool TerminalOutput::color_enabled = true;
+    bool TerminalOutput::wrench_no_log = true;
 
     /**
      * @brief Set the color of log messages printed to the terminal
@@ -41,7 +42,7 @@ namespace wrench {
      * @brief Turn on colored output for the calling process
      */
     void TerminalOutput::beginThisProcessColor() {
-        if (TerminalOutput::color_enabled) {
+        if ((not TerminalOutput::wrench_no_log) and (TerminalOutput::color_enabled)) {
             std::cerr << TerminalOutput::getThisProcessLoggingColor();
         }
     }
@@ -50,7 +51,7 @@ namespace wrench {
      * @brief Turn off colored output for the calling process
      */
     void TerminalOutput::endThisProcessColor() {
-        if (TerminalOutput::color_enabled) {
+        if ((not TerminalOutput::wrench_no_log) and (TerminalOutput::color_enabled)) {
             std::cerr << "\033[0m";
         }
     }
@@ -60,6 +61,13 @@ namespace wrench {
      */
     void TerminalOutput::disableColor() {
         TerminalOutput::color_enabled = false;
+    }
+
+    /**
+    * @brief Disable log altogether
+    */
+    void TerminalOutput::disableLog() {
+        TerminalOutput::wrench_no_log = false;
     }
 
     /**
