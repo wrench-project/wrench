@@ -297,7 +297,8 @@ namespace wrench {
 /**
  * @brief Join (i.e., wait for) the daemon.
  *
- * @return true if the daemon terminated cleanly (i.e., main() returned), or false otherwise
+ * @return a pair <A,B> where A is boolean (true if the daemon terminated cleanly (i.e., main() returned), or false otherwise)
+ *          and B is the int returned from main() (if main returned).
  */
     std::pair<bool, int> S4U_Daemon::join() {
 //        if (this->hasReturnedFromMain()) {
