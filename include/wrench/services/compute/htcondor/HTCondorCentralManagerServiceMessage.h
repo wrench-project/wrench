@@ -13,6 +13,8 @@
 #include "wrench/services/ServiceMessage.h"
 #include "wrench/workflow/job/WorkflowJob.h"
 
+#include <vector>
+
 namespace wrench {
 
     /**
