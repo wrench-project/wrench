@@ -9,11 +9,11 @@
 
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
-#include "wrench/services/compute/htcondor/HTCondorService.h"
+#include "wrench/services/compute/htcondor/HTCondorComputeService.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(HTCondor, "Log category for HTCondorService Scheduler");
+XBT_LOG_NEW_DEFAULT_CATEGORY(HTCondor, "Log category for HTCondorComputeService Scheduler");
 
 namespace wrench {
 
@@ -28,7 +28,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    HTCondorService::HTCondorService(const std::string &hostname,
+    HTCondorComputeService::HTCondorComputeService(const std::string &hostname,
                                      const std::string &pool_name,
                                      std::set<ComputeService *> compute_resources,
                                      std::map<std::string, std::string> property_list,
@@ -54,7 +54,7 @@ namespace wrench {
     /**
      * @brief Destructor
      */
-    HTCondorService::~HTCondorService() {
+    HTCondorComputeService::~HTCondorComputeService() {
       this->central_manager = nullptr;
       this->default_property_values.clear();
       this->default_messagepayload_values.clear();
@@ -69,7 +69,7 @@ namespace wrench {
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
      */
-    void HTCondorService::submitStandardJob(StandardJob *job,
+    void HTCondorComputeService::submitStandardJob(StandardJob *job,
                                             std::map<std::string, std::string> &service_specific_args) {
 
       serviceSanityCheck();
@@ -116,7 +116,7 @@ namespace wrench {
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
      */
-    void HTCondorService::submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_args) {
+    void HTCondorComputeService::submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_args) {
       serviceSanityCheck();
 
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_pilot_job");
@@ -158,8 +158,8 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void HTCondorService::terminateStandardJob(StandardJob *job) {
-      throw std::runtime_error("HTCondorService::terminateStandardJob(): Not implemented yet!");
+    void HTCondorComputeService::terminateStandardJob(StandardJob *job) {
+      throw std::runtime_error("HTCondorComputeService::terminateStandardJob(): Not implemented yet!");
     }
 
     /**
@@ -168,15 +168,15 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void HTCondorService::terminatePilotJob(PilotJob *job) {
-      throw std::runtime_error("HTCondorService::terminatePilotJob(): Not implemented yet!");
+    void HTCondorComputeService::terminatePilotJob(PilotJob *job) {
+      throw std::runtime_error("HTCondorComputeService::terminatePilotJob(): Not implemented yet!");
     }
 
     /**
      * @brief Get the service's local storage service
      * @return the local storage service object
      */
-    std::shared_ptr<StorageService> HTCondorService::getLocalStorageService() const {
+    std::shared_ptr<StorageService> HTCondorComputeService::getLocalStorageService() const {
       return this->local_storage_service;
     }
 
@@ -184,7 +184,7 @@ namespace wrench {
      * @brief Set the service's local storage service
      * @param local_storage_service: a storage service
      */
-    void HTCondorService::setLocalStorageService(std::shared_ptr<wrench::StorageService> local_storage_service) {
+    void HTCondorComputeService::setLocalStorageService(std::shared_ptr<wrench::StorageService> local_storage_service) {
       this->local_storage_service = local_storage_service;
     }
 
@@ -193,7 +193,7 @@ namespace wrench {
      *
      * @return 0 on termination
      */
-    int HTCondorService::main() {
+    int HTCondorComputeService::main() {
 
       TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
       WRENCH_INFO("HTCondor Service starting on host %s listening on mailbox_name %s", this->hostname.c_str(),
@@ -220,7 +220,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    bool HTCondorService::processNextMessage() {
+    bool HTCondorComputeService::processNextMessage() {
       // Wait for a message
       std::shared_ptr<SimulationMessage> message;
 
@@ -271,7 +271,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void HTCondorService::processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
+    void HTCondorComputeService::processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
                                                    std::map<std::string, std::string> &service_specific_args) {
 
       WRENCH_INFO("Asked to run a standard job with %ld tasks", job->getNumTasks());
@@ -280,8 +280,8 @@ namespace wrench {
           S4U_Mailbox::dputMessage(
                   answer_mailbox,
                   new ComputeServiceSubmitStandardJobAnswerMessage(
-                          job, this->getSharedPtr<HTCondorService>(), false, std::shared_ptr<FailureCause>(
-                                  new JobTypeNotSupported(job, this->getSharedPtr<HTCondorService>())),
+                          job, this->getSharedPtr<HTCondorComputeService>(), false, std::shared_ptr<FailureCause>(
+                                  new JobTypeNotSupported(job, this->getSharedPtr<HTCondorComputeService>())),
                           this->getMessagePayloadValue(
                                   HTCondorServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
@@ -297,7 +297,7 @@ namespace wrench {
         S4U_Mailbox::dputMessage(
                 answer_mailbox,
                 new ComputeServiceSubmitStandardJobAnswerMessage(
-                        job, this->getSharedPtr<HTCondorService>(), true, nullptr, this->getMessagePayloadValue(
+                        job, this->getSharedPtr<HTCondorComputeService>(), true, nullptr, this->getMessagePayloadValue(
                                 HTCondorServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
         return;
       } catch (std::shared_ptr<NetworkError> &cause) {
@@ -314,7 +314,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void HTCondorService::processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job,
+    void HTCondorComputeService::processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job,
                                                 std::map<std::string, std::string> &service_specific_args) {
 
       WRENCH_INFO("Asked to run a pilot job");
@@ -323,8 +323,8 @@ namespace wrench {
           S4U_Mailbox::dputMessage(
                   answer_mailbox,
                   new ComputeServiceSubmitPilotJobAnswerMessage(
-                          job, this->getSharedPtr<HTCondorService>(), false, std::shared_ptr<FailureCause>(
-                                  new JobTypeNotSupported(job, this->getSharedPtr<HTCondorService>())),
+                          job, this->getSharedPtr<HTCondorComputeService>(), false, std::shared_ptr<FailureCause>(
+                                  new JobTypeNotSupported(job, this->getSharedPtr<HTCondorComputeService>())),
                           this->getMessagePayloadValue(
                                   HTCondorServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
@@ -340,7 +340,7 @@ namespace wrench {
         S4U_Mailbox::dputMessage(
                 answer_mailbox,
                 new ComputeServiceSubmitPilotJobAnswerMessage(
-                        job, this->getSharedPtr<HTCondorService>(), true, nullptr, this->getMessagePayloadValue(
+                        job, this->getSharedPtr<HTCondorComputeService>(), true, nullptr, this->getMessagePayloadValue(
                                 HTCondorServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
         return;
       } catch (std::shared_ptr<NetworkError> &cause) {
@@ -351,7 +351,7 @@ namespace wrench {
     /**
      * @brief Terminate the daemon.
      */
-    void HTCondorService::terminate() {
+    void HTCondorComputeService::terminate() {
       this->setStateToDown();
       this->central_manager->stop();
       this->default_property_values.clear();
