@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2019. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -65,6 +65,8 @@ namespace wrench {
         StandardJob::State getState();
 
         std::map<WorkflowFile *, std::shared_ptr<StorageService>> getFileLocations();
+
+        unsigned long getPriority();
 
         /** @brief The job's computational tasks */
         std::vector<WorkflowTask *> tasks;

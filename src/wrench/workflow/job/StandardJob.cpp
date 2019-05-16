@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2019. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,28 +50,28 @@ namespace wrench {
             cleanup_file_deletions(cleanup_file_deletions),
             state(StandardJob::State::NOT_SUBMITTED) {
 
-        // Check that this is a ready sub-graph
-        for (auto t : tasks) {
-            if (t->getState() != WorkflowTask::State::READY) {
-                std::vector<WorkflowTask *> parents = t->getWorkflow()->getTaskParents(t);
-                for (auto parent : parents) {
-                    if (parent->getState() != WorkflowTask::State::COMPLETED) {
-                        if (std::find(tasks.begin(), tasks.end(), parent) == tasks.end()) {
-                            throw std::invalid_argument("StandardJob::StandardJob(): Task '" + t->getID() +
-                                                        "' has non-completed parents not included in the job");
-                        }
-                    }
-                }
+      // Check that this is a ready sub-graph
+      for (auto t : tasks) {
+        if (t->getState() != WorkflowTask::State::READY) {
+          std::vector<WorkflowTask *> parents = t->getWorkflow()->getTaskParents(t);
+          for (auto parent : parents) {
+            if (parent->getState() != WorkflowTask::State::COMPLETED) {
+              if (std::find(tasks.begin(), tasks.end(), parent) == tasks.end()) {
+                throw std::invalid_argument("StandardJob::StandardJob(): Task '" + t->getID() +
+                                            "' has non-completed parents not included in the job");
+              }
             }
+          }
         }
+      }
 
-        for (auto t : tasks) {
-            this->tasks.push_back(t);
-            t->setJob(this);
-            this->total_flops += t->getFlops();
-        }
-        this->workflow = workflow;
-        this->name = "standard_job_" + std::to_string(WorkflowJob::getNewUniqueNumber());
+      for (auto t : tasks) {
+        this->tasks.push_back(t);
+        t->setJob(this);
+        this->total_flops += t->getFlops();
+      }
+      this->workflow = workflow;
+      this->name = "standard_job_" + std::to_string(WorkflowJob::getNewUniqueNumber());
     };
 
     /**
@@ -80,13 +80,13 @@ namespace wrench {
      * @return the number of cores
      */
     unsigned long StandardJob::getMinimumRequiredNumCores() {
-        unsigned long min_num_cores = 1;
-        for (auto t : tasks) {
-            if (min_num_cores < t->getMinNumCores()) {
-                min_num_cores = t->getMinNumCores();
-            }
+      unsigned long min_num_cores = 1;
+      for (auto t : tasks) {
+        if (min_num_cores < t->getMinNumCores()) {
+          min_num_cores = t->getMinNumCores();
         }
-        return min_num_cores;
+      }
+      return min_num_cores;
     }
 
     /**
@@ -95,14 +95,14 @@ namespace wrench {
      * @return the number of tasks
      */
     unsigned long StandardJob::getNumTasks() {
-        return this->tasks.size();
+      return this->tasks.size();
     }
 
     /**
      * @brief Increment "the number of completed tasks" counter
      */
     void StandardJob::incrementNumCompletedTasks() {
-        this->num_completed_tasks++;
+      this->num_completed_tasks++;
     }
 
     /**
@@ -111,7 +111,7 @@ namespace wrench {
      * @return the number of completed tasks
      */
     unsigned long StandardJob::getNumCompletedTasks() {
-        return this->num_completed_tasks;
+      return this->num_completed_tasks;
     }
 
     /**
@@ -120,7 +120,7 @@ namespace wrench {
      * @return a vector of workflow tasks
      */
     std::vector<WorkflowTask *> StandardJob::getTasks() {
-        return this->tasks;
+      return this->tasks;
     }
 
     /**
@@ -129,7 +129,22 @@ namespace wrench {
      * @return a map of files to storage services
      */
     std::map<WorkflowFile *, std::shared_ptr<StorageService> > StandardJob::getFileLocations() {
-        return this->file_locations;
+      return this->file_locations;
+    }
+
+    /**
+     * @brief Get the workflow priority value (the maximum priority from all tasks)
+     *
+     * @return the job priority value
+     */
+    unsigned long StandardJob::getPriority() {
+      unsigned long max_priority = 0;
+      for (auto task : tasks) {
+        if (task->getPriority() > max_priority) {
+          max_priority = task->getPriority();
+        }
+      }
+      return max_priority;
     }
 
     /**
@@ -137,7 +152,7 @@ namespace wrench {
      * @return the state
      */
     StandardJob::State StandardJob::getState() {
-        return this->state;
+      return this->state;
     }
 
 };
