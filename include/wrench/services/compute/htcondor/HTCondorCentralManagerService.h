@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2019. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ namespace wrench {
                                std::map<std::string, std::string> &service_specific_arguments) override;
 
         void submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_arguments) override;
-            
+
         /***********************/
         /** \endcond          **/
         /***********************/
@@ -74,16 +74,19 @@ namespace wrench {
         void processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
                                       std::map<std::string, std::string> &service_specific_args);
 
+        void processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job,
+                                   std::map<std::string, std::string> &service_specific_args);
+
         void processStandardJobCompletion(StandardJob *job);
 
-        void processNegotiatorCompletion(std::vector<StandardJob *> pending_jobs);
+        void processNegotiatorCompletion(std::vector<WorkflowJob *> pending_jobs);
 
         void terminate();
 
         /** set of compute resources **/
         std::set<ComputeService *> compute_resources;
         /** queue of pending jobs **/
-        std::vector<StandardJob *> pending_jobs;
+        std::vector<WorkflowJob *> pending_jobs;
         /** whether a negotiator is dispatching jobs **/
         bool dispatching_jobs = false;
         /** whether a negotiator could not dispach jobs **/
@@ -91,7 +94,7 @@ namespace wrench {
         /** **/
         std::map<std::shared_ptr<ComputeService>, unsigned long> compute_resources_map;
         /** **/
-        std::map<StandardJob *, std::shared_ptr<ComputeService>> running_jobs;
+        std::map<WorkflowJob *, std::shared_ptr<ComputeService>> running_jobs;
     };
 
 }
