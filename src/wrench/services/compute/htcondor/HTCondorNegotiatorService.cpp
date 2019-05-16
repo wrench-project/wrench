@@ -14,6 +14,8 @@
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 #include "wrench/workflow/WorkflowTask.h"
+#include "wrench/workflow/job/PilotJob.h"
+#include "wrench/workflow/job/StandardJob.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(htcondor_negotiator, "Log category for HTCondorNegotiator");
 
@@ -97,8 +99,13 @@ namespace wrench {
               break;
             }
           }
+
+        } else if (auto pilot_job = dynamic_cast<PilotJob *>(job)) {
+          // TODO: handle pilot job
+          for (auto &item : *this->compute_resources) {
+
+          }
         }
-        // TODO: handle pilot job
       }
 
       // Send the callback to the originator

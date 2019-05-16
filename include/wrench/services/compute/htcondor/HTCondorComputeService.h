@@ -24,7 +24,7 @@ namespace wrench {
      * @brief A workload management framework compute service
      *
      */
-    class HTCondorService : public ComputeService {
+    class HTCondorComputeService : public ComputeService {
     private:
         std::map<std::string, std::string> default_property_values = {
                 {HTCondorServiceProperty::SUPPORTS_PILOT_JOBS,    "true"},
@@ -43,7 +43,7 @@ namespace wrench {
         };
 
     public:
-        HTCondorService(const std::string &hostname,
+        HTCondorComputeService(const std::string &hostname,
                         const std::string &pool_name,
                         std::set<ComputeService*> compute_resources,
                         std::map<std::string, std::string> property_list = {},
@@ -71,7 +71,7 @@ namespace wrench {
         /** \cond INTERNAL    */
         /***********************/
 
-        ~HTCondorService() override;
+        ~HTCondorComputeService() override;
 
         void terminateStandardJob(StandardJob *job) override;
 
