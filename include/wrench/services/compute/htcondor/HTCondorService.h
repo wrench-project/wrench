@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2019. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,6 +15,7 @@
 #include "wrench/services/compute/htcondor/HTCondorCentralManagerService.h"
 #include "wrench/services/compute/htcondor/HTCondorServiceProperty.h"
 #include "wrench/services/compute/htcondor/HTCondorServiceMessagePayload.h"
+#include "wrench/workflow/job/PilotJob.h"
 #include "wrench/workflow/job/StandardJob.h"
 
 namespace wrench {
@@ -86,6 +87,9 @@ namespace wrench {
         bool processNextMessage();
 
         void processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
+                                      std::map<std::string, std::string> &service_specific_args);
+
+        void processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job,
                                       std::map<std::string, std::string> &service_specific_args);
 
         void terminate();

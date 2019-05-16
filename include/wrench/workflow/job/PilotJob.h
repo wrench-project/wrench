@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2019. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,6 +49,8 @@ namespace wrench {
         std::shared_ptr<ComputeService> getComputeService();
 
         PilotJob::State getState();
+
+        unsigned long getPriority();
 
         /***********************/
         /** \cond INTERNAL     */
