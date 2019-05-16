@@ -241,8 +241,9 @@ namespace wrench {
      *           - If a "hostname:num_cores" value is provided for a task, then the service will run that
      *             task with the specified number of cores on that host.
      *      - to a BatchComputeService: {{"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}}
-     *      - to a VirtualizedClusterComputeService: {} (in which case the service will pick the vm) or {{"-vm":"<vm name>"}}
-     *      - to a CloudComputeService: {} (in which case the service will pick the vm) or {{"-vm":"<vm name>"}}
+     *      - to a VirtualizedClusterComputeService: {}
+     *      - to a CloudComputeService: {}
+     *      - to a HTCondorService: {}
      *
      * @throw std::invalid_argument
      * @throw WorkflowExecutionException
