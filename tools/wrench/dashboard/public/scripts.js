@@ -17,7 +17,6 @@ function initialise() {
     } else {
         noFileDiv.style.display = "none"
         mainBodyDiv.style.display = "block"
-        populateMetadata()
         generateGraph(data.contents, "graph-container")
         populateLegend("taskView")
         populateWorkflowTaskDataTable(data.contents)
