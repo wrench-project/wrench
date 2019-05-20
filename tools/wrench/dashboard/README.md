@@ -17,7 +17,7 @@ Welcome to the Wrench Dashboard! This is where you can fulfill all of your data 
 
 The dashboard works by parsing a JSON dump file from a simulation and creating graphs in local HTML file that you can then view in your browser.
 
-To populate the HTML file with the data from the simulation just run the graphing script with './wrench-dashboard.sh <file path to JSON dump file>'. You can also run the script with an energy JSON dump file to see those additional graphs with './wrench-dashboard.sh <file path to JSON dump file> <file path to JSON energy dump file>'.
+To populate the HTML file with the data from the simulation just run the graphing script with `./wrench-dashboard.sh <file path to JSON dump file>`. You can also run the script with an energy JSON dump file to see those additional graphs with `./wrench-dashboard.sh <file path to JSON dump file> <file path to JSON energy dump file>`.
 
 The resulting HTML file is called `index.html` and is located in this directory, you can open it at any time in your browser to view the graphs.
 
