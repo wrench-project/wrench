@@ -22,6 +22,7 @@ function initialise() {
         populateLegend("taskView")
         populateWorkflowTaskDataTable(data.contents)
         getOverallWorkflowMetrics(data.contents)
+        generate3dGraph(data.contents)
     }
 }
 
@@ -815,4 +816,176 @@ function toggleView() {
         informationImg.style.display = "none"
         currGraphState = "taskView"
     }
+}
+
+function determineTaskEnd(d) {
+    var taskEnd
+    if (d.terminated !== -1) {
+        taskEnd = d.terminated
+    } else if (d.failed !== -1) {
+        taskEnd = d.failed
+    } else {
+        taskEnd = d.whole_task.end
+    }
+    return taskEnd
+}
+
+function determineTaskOverlap(data) {
+    var taskOverlap = {}
+    data.forEach(function(d) {
+        var taskStart = d.whole_task.start
+        var taskEnd = determineTaskEnd(d)
+        if (Object.keys(taskOverlap).length === 0) {
+            taskOverlap[0] = []
+            taskOverlap[0].push(d)
+        } else {
+            var i = 0
+            var placed = false
+            while (!placed) {
+                if (taskOverlap[i] === undefined) {
+                    taskOverlap[i] = []
+                }
+                var overlap = false
+                for (var j = 0; j < taskOverlap[i].length; j++) {
+                    var t = taskOverlap[i][j]
+                    var currTaskStart = t.whole_task.start
+                    var currTaskEnd = determineTaskEnd(t)
+                    if ((taskStart >= currTaskStart && taskStart <= currTaskEnd) || (taskEnd >= currTaskStart && taskEnd <= currTaskEnd)) {
+                        i++
+                        overlap = true
+                        break
+                    }
+                }
+                if (!overlap) {
+                    taskOverlap[i].push(d)
+                    placed = true
+                }
+            }
+        }
+    })
+    return taskOverlap
+}
+
+function determineMaxNumCoresAllocated(data) {
+    var max = 0
+    data.forEach(function(d) {
+        if (d.num_cores_allocated >= max) {
+            max = d.num_cores_allocated
+        }
+    })
+    return max
+}
+
+var origin = [0, 400]
+startAngle = Math.PI/4
+var scale = 20
+var key = function(d) { return d.task_id; }
+
+function processData(data, tt){
+
+    var grid3d = d3._3d()
+        .shape('GRID', 20)
+        .origin(origin)
+        .rotateY( startAngle)
+        .rotateX(-startAngle)
+        .scale(scale);
+
+    var yScale3d = d3._3d()
+        .shape('LINE_STRIP')
+        .origin(origin)
+        .rotateY( startAngle)
+        .rotateX(-startAngle)
+        .scale(scale);
+
+    var svg    = d3.select('#three-d-graph-svg').append('g');
+
+    /* ----------- GRID ----------- */
+
+    var xGrid = svg.selectAll('path.grid').data(data[0], key);
+
+    xGrid
+        .enter()
+        .append('path')
+        .attr('class', '_3d grid')
+        .merge(xGrid)
+        .attr('stroke', 'black')
+        .attr('stroke-width', 0.3)
+        .attr('fill', function(d){ return d.ccw ? 'lightgrey' : '#717171'; })
+        .attr('fill-opacity', 0.9)
+        .attr('d', grid3d.draw);
+
+    xGrid.exit().remove();
+
+     /* ----------- y-Scale ----------- */
+
+    var yScale = svg.selectAll('path.yScale').data(data[1]);
+
+    console.log(yScale)
+
+    yScale
+        .enter()
+        .append('path')
+        .attr('class', '_3d yScale')
+        .merge(yScale)
+        .attr('stroke', 'black')
+        .attr('stroke-width', .5)
+        .attr('d', yScale3d.draw);
+
+    yScale.exit().remove();
+
+        /* ----------- y-Scale Text ----------- */
+
+    var yText = svg.selectAll('text.yText').data(data[1][0]);
+
+    yText
+        .enter()
+        .append('text')
+        .attr('class', '_3d yText')
+        .attr('dx', '.3em')
+        .merge(yText)
+        .each(function(d){
+            d.centroid = {x: d.rotated.x, y: d.rotated.y, z: d.rotated.z};
+        })
+        .attr('x', function(d){ return d.projected.x; })
+        .attr('y', function(d){ return d.projected.y; })
+        .text(function(d){ return d[1] <= 0 ? d[1] : ''; });
+
+    yText.exit().remove();
+}
+
+function generate3dGraph(data) {
+    var grid3d = d3._3d()
+        .shape('GRID', 20)
+        .origin(origin)
+        .rotateY( startAngle)
+        .rotateX(-startAngle)
+        .scale(scale);
+
+    var yScale3d = d3._3d()
+        .shape('LINE_STRIP')
+        .origin(origin)
+        .rotateY( startAngle)
+        .rotateX(-startAngle)
+        .scale(scale);
+    var j = 10
+    var maxTime = d3.max(data, function(d) {
+        return Math.max(d['whole_task'].end, d['failed'], d['terminated'])
+    })
+    var taskOverlap = determineTaskOverlap(data)
+    var maxNumCoresAllocated = determineMaxNumCoresAllocated(data)
+    xGrid = [], scatter = [], yLine = [];
+    for(var z = 0; z < Object.keys(taskOverlap).length; z++){
+        for(var x = 0; x < maxTime; x++) {
+            xGrid.push([x, 1, z]);
+        }
+    }
+
+    d3.range(-1, maxNumCoresAllocated + 1, 1).forEach(function(d) { yLine.push([0, -d, 0]); });
+
+    var data = [
+        grid3d(xGrid),
+        yScale3d([yLine])
+    ];
+    processData(data, 1000);
+
 }
