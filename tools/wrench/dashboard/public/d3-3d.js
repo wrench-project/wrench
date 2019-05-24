@@ -6,6 +6,8 @@
 
 function ccw(polygon) {
 
+    // console.log(polygon)
+
     var _p = polygon.slice(0), sum = 0;
 
     _p.push(_p[0]);
@@ -171,6 +173,10 @@ function gridPlane(grid, options, point$$1, angles){
 
             var p1 = j + i * numPts, p4 = p1 - 1, p2 = p4 - numPts + 1, p3 = p2 - 1;
             var pl = [points[p1], points[p2], points[p3], points[p4]];
+
+            if (p3 < 0) {
+                continue
+            }
 
             pl.plane    = 'plane_' + cnt++;
             pl.ccw      = ccw(pl);
