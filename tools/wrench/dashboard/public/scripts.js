@@ -877,7 +877,7 @@ function determineMaxNumCoresAllocated(data) {
 }
 
 var origin = [0, 400]
-startAngle = Math.PI/4
+var startAngle = Math.PI/4
 var scale = 20
 var key = function(d) { return d.task_id; }
 
@@ -1069,6 +1069,8 @@ function generate3dGraph(data) {
         cube.height = h
         cubesData.push(cube)
     })
+
+    console.log(xGrid)
 
     var data = [
         grid3d(xGrid),
