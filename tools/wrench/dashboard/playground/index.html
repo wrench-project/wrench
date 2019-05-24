@@ -14,6 +14,7 @@ button {
 <script>
     var origin = [480, 300], j = 10, scale = 20, scatter = [], yLine = [], xGrid = [], beta = 0, alpha = 0, key = function(d){ return d.id; }, startAngle = Math.PI/4;
     var svg    = d3.select('svg').call(d3.drag().on('drag', dragged).on('start', dragStart).on('end', dragEnd)).append('g');
+    var cubesGroup = svg.append('g').attr('class', 'cubes');
     var color  = d3.scaleOrdinal(d3.schemeCategory20);
     var mx, my, mouseX, mouseY;
 
@@ -38,6 +39,16 @@ button {
         .origin(origin)
         .rotateY( startAngle)
         .rotateX(-startAngle)
+        .scale(scale);
+
+    var cubes3D = d3._3d()
+        .shape('CUBE')
+        .x(function(d){ return d.x; })
+        .y(function(d){ return d.y; })
+        .z(function(d){ return d.z; })
+        .rotateY( startAngle)
+        .rotateX(-startAngle)
+        .origin(origin)
         .scale(scale);
 
     function processData(data, tt){
@@ -85,8 +96,6 @@ button {
 
         var yScale = svg.selectAll('path.yScale').data(data[2]);
 
-        console.log(yScale)
-
         yScale
             .enter()
             .append('path')
@@ -120,12 +129,57 @@ button {
         d3.selectAll('._3d').sort(d3._3d().sort);
     }
 
+    function processCubesData(data, tt) {
+        /* --------- CUBES ---------*/
+
+        var cubes = cubesGroup.selectAll('g.cube').data(data, function(d){ return d.id });
+
+        var ce = cubes
+            .enter()
+            .append('g')
+            .attr('class', 'cube')
+            .attr('fill', function(d){ return color(d.id); })
+            .attr('stroke', function(d){ return d3.color(color(d.id)).darker(2); })
+            .merge(cubes)
+            .sort(cubes3D.sort);
+
+        cubes.exit().remove();
+
+        /* --------- FACES ---------*/
+
+        var faces = cubes.merge(ce).selectAll('path.face').data(function(d){ return d.faces; }, function(d){ return d.face; });
+
+        faces.enter()
+            .append('path')
+            .attr('class', 'face')
+            .attr('fill-opacity', 0.95)
+            .classed('_3d', true)
+            .merge(faces)
+            .transition().duration(tt)
+            .attr('d', cubes3D.draw);
+
+        faces.exit().remove();
+    }
+
     function posPointX(d){
         return d.projected.x;
     }
 
     function posPointY(d){
         return d.projected.y;
+    }
+
+    function makeCube(h, x, z){
+        return [
+            {x: x - 1, y: h, z: z + 1}, // FRONT TOP LEFT
+            {x: x - 1, y: 0, z: z + 1}, // FRONT BOTTOM LEFT
+            {x: x + 1, y: 0, z: z + 1}, // FRONT BOTTOM RIGHT
+            {x: x + 1, y: h, z: z + 1}, // FRONT TOP RIGHT
+            {x: x - 1, y: h, z: z - 1}, // BACK  TOP LEFT
+            {x: x - 1, y: 0, z: z - 1}, // BACK  BOTTOM LEFT
+            {x: x + 1, y: 0, z: z - 1}, // BACK  BOTTOM RIGHT
+            {x: x + 1, y: h, z: z - 1}, // BACK  TOP RIGHT
+        ];
     }
 
 	function init(){
@@ -140,9 +194,22 @@ button {
 
         d3.range(-1, 11, 1).forEach(function(d){ yLine.push([-j, -d, -j]); });
 
+        cubesData = [];
+        var cnt = 0;
+        for(var z = -j/2; z <= j/2; z = z + 5){
+            for(var x = -j; x <= j; x = x + 5){
+            var h = d3.randomUniform(-2, -7)();
+            var _cube = makeCube(h, x, z);
+                _cube.id = 'cube_' + cnt++;
+                _cube.height = h;
+                cubesData.push(_cube);
+            }
+        }
+        // processCubesData(cubes3D(cubesData), 1000);
+
         var data = [
             grid3d(xGrid),
-            point3d(scatter),
+            // point3d(scatter),
             yScale3d([yLine])
         ];
         processData(data, 1000);

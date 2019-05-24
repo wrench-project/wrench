@@ -881,6 +881,32 @@ startAngle = Math.PI/4
 var scale = 20
 var key = function(d) { return d.task_id; }
 
+function searchOverlap(taskId, taskOverlap) {
+    for (var key in taskOverlap) {
+        if (taskOverlap.hasOwnProperty(key)) {
+            var currOverlap = taskOverlap[key]
+            for (var i = 0; i < currOverlap.length; i++) {
+                if (currOverlap[i].task_id === taskId) {
+                    return key
+                }
+            }
+        }
+    }
+}
+
+function makeCube(h, x, z){
+    return [
+        {x: x - 1, y: h, z: z + 1}, // FRONT TOP LEFT
+        {x: x - 1, y: 0, z: z + 1}, // FRONT BOTTOM LEFT
+        {x: x + 1, y: 0, z: z + 1}, // FRONT BOTTOM RIGHT
+        {x: x + 1, y: h, z: z + 1}, // FRONT TOP RIGHT
+        {x: x - 1, y: h, z: z - 1}, // BACK  TOP LEFT
+        {x: x - 1, y: 0, z: z - 1}, // BACK  BOTTOM LEFT
+        {x: x + 1, y: 0, z: z - 1}, // BACK  BOTTOM RIGHT
+        {x: x + 1, y: h, z: z - 1}, // BACK  TOP RIGHT
+    ];
+}
+
 function processData(data, tt){
 
     var grid3d = d3._3d()
@@ -897,7 +923,19 @@ function processData(data, tt){
         .rotateX(-startAngle)
         .scale(scale);
 
-    var svg    = d3.select('#three-d-graph-svg').append('g');
+    var cubes3d = d3._3d()
+        .shape('CUBE')
+        .x(function(d){ return d.x; })
+        .y(function(d){ return d.y; })
+        .z(function(d){ return d.z; })
+        .rotateY( startAngle)
+        .rotateX(-startAngle)
+        .origin(origin)
+        .scale(scale)
+
+    var svg    = d3.select('#three-d-graph-svg').append('g')
+    var cubesGroup = svg.append('g').attr('class', 'cubes')
+    var color  = d3.scaleOrdinal(d3.schemeCategory20)
 
     /* ----------- GRID ----------- */
 
@@ -919,8 +957,6 @@ function processData(data, tt){
      /* ----------- y-Scale ----------- */
 
     var yScale = svg.selectAll('path.yScale').data(data[1]);
-
-    console.log(yScale)
 
     yScale
         .enter()
@@ -951,6 +987,36 @@ function processData(data, tt){
         .text(function(d){ return d[1] <= 0 ? d[1] : ''; });
 
     yText.exit().remove();
+
+    /* --------- CUBES ---------*/
+
+    var cubes = cubesGroup.selectAll('g.cube').data(data[2], function(d){ return d.id });
+
+    var ce = cubes
+        .enter()
+        .append('g')
+        .attr('class', 'cube')
+        .attr('fill', function(d){ return color(d.id); })
+        .attr('stroke', function(d){ return d3.color(color(d.id)); })
+        .merge(cubes)
+        .sort(cubes3d.sort);
+
+    cubes.exit().remove();
+
+    /* --------- FACES ---------*/
+
+    var faces = cubes.merge(ce).selectAll('path.face').data(function(d){ return d.faces; }, function(d){ return d.face; });
+
+    faces.enter()
+        .append('path')
+        .attr('class', 'face')
+        .attr('fill-opacity', 0.95)
+        .classed('_3d', true)
+        .merge(faces)
+        .transition().duration(tt)
+        .attr('d', cubes3d.draw);
+
+    faces.exit().remove();
 }
 
 function generate3dGraph(data) {
@@ -959,32 +1025,55 @@ function generate3dGraph(data) {
         .origin(origin)
         .rotateY( startAngle)
         .rotateX(-startAngle)
-        .scale(scale);
+        .scale(scale)
 
     var yScale3d = d3._3d()
         .shape('LINE_STRIP')
         .origin(origin)
         .rotateY( startAngle)
         .rotateX(-startAngle)
-        .scale(scale);
+        .scale(scale)
+
+    var cubes3d = d3._3d()
+        .shape('CUBE')
+        .x(function(d){ return d.x; })
+        .y(function(d){ return d.y; })
+        .z(function(d){ return d.z; })
+        .rotateY( startAngle)
+        .rotateX(-startAngle)
+        .origin(origin)
+        .scale(scale)
+
     var j = 10
     var maxTime = d3.max(data, function(d) {
         return Math.max(d['whole_task'].end, d['failed'], d['terminated'])
     })
     var taskOverlap = determineTaskOverlap(data)
     var maxNumCoresAllocated = determineMaxNumCoresAllocated(data)
-    xGrid = [], scatter = [], yLine = [];
+    xGrid = [], scatter = [], yLine = []
     for(var z = 0; z < Object.keys(taskOverlap).length; z++){
         for(var x = 0; x < maxTime; x++) {
-            xGrid.push([x, 1, z]);
+            xGrid.push([x, 1, z])
         }
     }
 
-    d3.range(-1, maxNumCoresAllocated + 1, 1).forEach(function(d) { yLine.push([0, -d, 0]); });
+    d3.range(-1, maxNumCoresAllocated + 1, 1).forEach(function(d) { yLine.push([0, -d, 0]); })
+
+    cubesData = []
+    data.forEach(function(d) {
+        var h = d.num_cores_allocated
+        var x = d.whole_task.start
+        var z = searchOverlap(d.task_id, taskOverlap)
+        // console.log(h + ' ' + x + ' ' + z)
+        var cube = makeCube(h, x, z)
+        cube.height = h
+        cubesData.push(cube)
+    })
 
     var data = [
         grid3d(xGrid),
-        yScale3d([yLine])
+        yScale3d([yLine]),
+        cubes3d(cubesData)
     ];
     processData(data, 1000);
 
