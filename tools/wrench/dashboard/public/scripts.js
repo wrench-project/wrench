@@ -1,4 +1,5 @@
-var data={"modified":"2019-03-12T10:28:22.009Z","file":"test_data/workflow_data.json","contents":[{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_1","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task0","terminated":-1,"vertical_position":0,"whole_task":{"end":3827.6378817372047,"start":0.007199838144329895},"write":{"end":3827.6378817372047,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_1","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task1","terminated":-1,"vertical_position":1,"whole_task":{"end":3827.635010247309,"start":0.007199838144329895},"write":{"end":3827.635010247309,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_1","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task10","terminated":-1,"vertical_position":2,"whole_task":{"end":3827.639191182566,"start":0.007199838144329895},"write":{"end":3827.639191182566,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_2","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task11","terminated":-1,"vertical_position":0,"whole_task":{"end":3827.6411369314314,"start":0.007199838144329895},"write":{"end":3827.6411369314314,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_2","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task12","terminated":-1,"vertical_position":1,"whole_task":{"end":3827.641331233935,"start":0.007199838144329895},"write":{"end":3827.641331233935,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_2","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task13","terminated":-1,"vertical_position":2,"whole_task":{"end":3827.6414647120796,"start":0.007199838144329895},"write":{"end":3827.6414647120796,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_3","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task14","terminated":-1,"vertical_position":0,"whole_task":{"end":3827.641553979021,"start":0.007199838144329895},"write":{"end":3827.641553979021,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_3","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task15","terminated":-1,"vertical_position":1,"whole_task":{"end":3827.641607708093,"start":0.007199838144329895},"write":{"end":3827.641607708093,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_3","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task16","terminated":-1,"vertical_position":2,"whole_task":{"end":3827.6416322071746,"start":0.007199838144329895},"write":{"end":3827.6416322071746,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_4","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task17","terminated":-1,"vertical_position":0,"whole_task":{"end":3827.640506539679,"start":0.007199838144329895},"write":{"end":3827.640506539679,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_4","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task18","terminated":-1,"vertical_position":1,"whole_task":{"end":3827.6399793833903,"start":0.007199838144329895},"write":{"end":3827.6399793833903,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_4","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task19","terminated":-1,"vertical_position":2,"whole_task":{"end":3827.6408767314315,"start":0.007199838144329895},"write":{"end":3827.6408767314315,"start":3807.8470265752576}},{"compute":{"end":7566.212108144485,"start":3966.2118479444844},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_1","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":3966.2118479444844,"start":3827.6507028638657},"task_id":"task2","terminated":-1,"vertical_position":0,"whole_task":{"end":7579.408645646651,"start":3827.6507028638657},"write":{"end":7579.408645646651,"start":7566.212108144485}},{"compute":{"end":7912.423338350066,"start":7612.4230781500655},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_1","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":7612.4230781500655,"start":7579.417740802427},"task_id":"task20","terminated":-1,"vertical_position":0,"whole_task":{"end":7929.747237014191,"start":7579.417740802427},"write":{"end":7929.747237014191,"start":7912.423338350066}},{"compute":{"end":7566.212108144485,"start":3966.2118479444844},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_1","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":3966.2118479444844,"start":3827.6507028638657},"task_id":"task3","terminated":-1,"vertical_position":1,"whole_task":{"end":7579.408772085021,"start":3827.6507028638657},"write":{"end":7579.408772085021,"start":7566.212108144485}},{"compute":{"end":7566.212108144485,"start":3966.2118479444844},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_1","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":3966.2118479444844,"start":3827.6507028638657},"task_id":"task4","terminated":-1,"vertical_position":2,"whole_task":{"end":7579.408734069057,"start":3827.6507028638657},"write":{"end":7579.408734069057,"start":7566.212108144485}},{"compute":{"end":7566.212108144485,"start":3966.2118479444844},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_2","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":3966.2118479444844,"start":3827.6507028638657},"task_id":"task5","terminated":-1,"vertical_position":0,"whole_task":{"end":7579.405173391115,"start":3827.6507028638657},"write":{"end":7579.405173391115,"start":7566.212108144485}},{"compute":{"end":7566.212108144485,"start":3966.2118479444844},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_2","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":3966.2118479444844,"start":3827.6507028638657},"task_id":"task6","terminated":-1,"vertical_position":1,"whole_task":{"end":7579.4070007028695,"start":3827.6507028638657},"write":{"end":7579.4070007028695,"start":7566.212108144485}},{"compute":{"end":7566.212108144485,"start":3966.2118479444844},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_2","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":3966.2118479444844,"start":3827.6507028638657},"task_id":"task7","terminated":-1,"vertical_position":2,"whole_task":{"end":7579.407786370086,"start":3827.6507028638657},"write":{"end":7579.407786370086,"start":7566.212108144485}},{"compute":{"end":7566.212108144485,"start":3966.2118479444844},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_3","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":3966.2118479444844,"start":3827.6507028638657},"task_id":"task8","terminated":-1,"vertical_position":0,"whole_task":{"end":7579.408224259434,"start":3827.6507028638657},"write":{"end":7579.408224259434,"start":7566.212108144485}},{"compute":{"end":7566.212108144485,"start":3966.2118479444844},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_3","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":3966.2118479444844,"start":3827.6507028638657},"task_id":"task9","terminated":-1,"vertical_position":1,"whole_task":{"end":7579.4084844594345,"start":3827.6507028638657},"write":{"end":7579.4084844594345,"start":7566.212108144485}}]}
+var data={"modified":"2019-04-03T03:40:12.000Z","file":"./test_data/data.json","contents":[{"compute":{"end":-1,"start":-1},"execution_host":"Host1","failed":2,"num_cores_allocated":1,"read":{"end":-1,"start":0},"task_id":"ID00000","terminated":-1,"whole_task":{"end":-1,"start":0},"write":{"end":-1,"start":-1}},{"compute":{"end":-1,"start":13},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":13,"start":10},"task_id":"ID00001","terminated":14,"whole_task":{"end":-1,"start":10},"write":{"end":-1,"start":-1}},{"compute":{"end":26,"start":23},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":23,"start":20},"task_id":"ID00002","terminated":28,"whole_task":{"end":-1,"start":20},"write":{"end":-1,"start":26}}]}
+var energyData=[{"consumed_energy_trace":[{"time":0,"joules":0},{"time":2,"joules":400},{"time":4,"joules":800},{"time":6,"joules":1200}],"hostname":"host1","pstate_trace":[{"pstate":1,"time":0},{"pstate":0,"time":2}],"pstates":[{"idle":"100.0","pstate":0,"running":"200.0","speed":100000000},{"idle":" 93.0","pstate":1,"running":"170.0","speed":50000000},{"idle":" 90.0","pstate":2,"running":"150.0","speed":20000000}],"watt_off":"10"},{"consumed_energy_trace":[{"time":0,"joules":0},{"time":2,"joules":200},{"time":4,"joules":400},{"time":6,"joules":600}],"hostname":"host2","pstate_trace":[{"pstate":0,"time":0},{"pstate":1,"time":2}],"pstates":[{"idle":"100.0","pstate":0,"running":"200.0","speed":100000000},{"idle":" 93.0","pstate":1,"running":"170.0","speed":50000000},{"idle":" 90.0","pstate":2,"running":"150.0","speed":20000000}],"watt_off":"10"}]
 var currGraphState = "taskView"
 var hostColours = {}
 var currentlySelectedHost = {hostName: "", id: ""}
@@ -23,6 +24,129 @@ function initialise() {
         populateWorkflowTaskDataTable(data.contents)
         getOverallWorkflowMetrics(data.contents)
     }
+}
+
+function generateConsumedEnergyGraph() {
+    eData = [];
+    xAxisMarks = ["x"];
+    // Iterate through data for each host
+    for(var i = 0; i < energyData.length; i++) {
+        var hostData = energyData[i]["consumed_energy_trace"];
+
+        consumedEnergyData = []
+
+        // Iterate through each energy trace for a host
+        for(var j = 0; j < hostData.length; j++) {
+            var trace = hostData[j];
+
+            if (xAxisMarks.length <= hostData.length) {
+                xAxisMarks.push(trace["time"])
+            }
+
+            consumedEnergyData.push(trace["joules"])
+        }
+
+        // Add host name to the front of the data for graph labeling
+        consumedEnergyData.unshift(energyData[i]["hostname"])
+        eData.push(consumedEnergyData)
+    }
+    
+    eData.push(xAxisMarks)
+
+    bb.generate({
+        bindto: "#consumedEnergyGraph",
+        data: {
+            x : "x",
+            columns: eData,
+        },
+        axis: {
+            x: {
+                min: 0,
+                padding: {
+                    left: 0.5,
+                    right: 0.5,
+                },
+                label: "Time",
+                tick: {
+                    count: xAxisMarks.length,
+                    values: xAxisMarks,
+                },
+            },
+            y: {
+                label: "Energy Consumed (joules)",
+            }
+        },
+        legend: {
+            show: true,
+            position: "right",
+            contents: {
+                bindto: "#consumedEnergyGraphLegend",
+                template: "<span style='color:#fff;padding:10px;background-color:{=COLOR}'>{=TITLE}</span>"
+            }
+        }
+    });
+}
+
+function generatePStateGraph() {
+    pStateData = [];
+    xAxisMarks = ["x"];
+    // Iterate through data for each host
+    for(var i = 0; i < energyData.length; i++) {
+        var hostData = energyData[i]["pstate_trace"];
+
+        consumedEnergyData = []
+
+        // Iterate through each energy trace for a host
+        for(var j = 0; j < hostData.length; j++) {
+            var trace = hostData[j]
+
+            if (xAxisMarks.length <= hostData.length) {
+                xAxisMarks.push(trace["time"])
+                // console.log(trace["time"])
+            }
+
+            consumedEnergyData.push(trace["pstate"])
+        }
+
+        // Add host name to the front of the data for graph labeling
+        consumedEnergyData.unshift(energyData[i]["hostname"])
+        pStateData.push(consumedEnergyData)
+    }
+    
+    pStateData.push(xAxisMarks)
+
+    bb.generate({
+        bindto: "#pStateGraph",
+        data: {
+            x : "x",
+            columns: pStateData,
+        },
+        axis: {
+            x: {
+                min: 0,
+                padding: {
+                    left: 0.5,
+                    right: 0.5,
+                },
+                label: "Time",
+                tick: {
+                    count: xAxisMarks.length,
+                    values: xAxisMarks,
+                },
+            },
+            y: {
+                label: "Power State",
+            }
+        },
+        legend: {
+            show: true,
+            position: "right",
+            contents: {
+                bindto: "#pStateGraphLegend",
+                template: "<span style='color:#fff;padding:10px;background-color:{=COLOR}'>{=TITLE}</span>"
+            }
+        }
+    });
 }
 
 /**
