@@ -1,4 +1,5 @@
-var data={"modified":"2019-03-09T11:43:42.977Z","file":"test_data/test_data.json","contents":[{"compute":{"end":-1,"start":-1},"execution_host":"Host1","failed":2,"num_cores_allocated":1,"read":{"end":-1,"start":0},"task_id":"ID00000","terminated":-1,"whole_task":{"end":-1,"start":0},"write":{"end":-1,"start":-1}},{"compute":{"end":-1,"start":13},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":13,"start":10},"task_id":"ID00001","terminated":14,"whole_task":{"end":-1,"start":10},"write":{"end":-1,"start":-1}},{"compute":{"end":26,"start":23},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":23,"start":20},"task_id":"ID00002","terminated":28,"whole_task":{"end":-1,"start":20},"write":{"end":-1,"start":26}}]}
+var data={}
+var energyData=[{}]
 var currGraphState = "taskView"
 var hostColours = {}
 var currentlySelectedHost = {hostName: "", id: ""}
@@ -22,6 +23,129 @@ function initialise() {
         populateWorkflowTaskDataTable(data.contents)
         getOverallWorkflowMetrics(data.contents)
     }
+}
+
+function generateConsumedEnergyGraph() {
+    eData = [];
+    xAxisMarks = ["x"];
+    // Iterate through data for each host
+    for(var i = 0; i < energyData.length; i++) {
+        var hostData = energyData[i]["consumed_energy_trace"];
+
+        consumedEnergyData = []
+
+        // Iterate through each energy trace for a host
+        for(var j = 0; j < hostData.length; j++) {
+            var trace = hostData[j];
+
+            if (xAxisMarks.length <= hostData.length) {
+                xAxisMarks.push(trace["time"])
+            }
+
+            consumedEnergyData.push(trace["joules"])
+        }
+
+        // Add host name to the front of the data for graph labeling
+        consumedEnergyData.unshift(energyData[i]["hostname"])
+        eData.push(consumedEnergyData)
+    }
+    
+    eData.push(xAxisMarks)
+
+    bb.generate({
+        bindto: "#consumedEnergyGraph",
+        data: {
+            x : "x",
+            columns: eData,
+        },
+        axis: {
+            x: {
+                min: 0,
+                padding: {
+                    left: 0.5,
+                    right: 0.5,
+                },
+                label: "Time",
+                tick: {
+                    count: xAxisMarks.length,
+                    values: xAxisMarks,
+                },
+            },
+            y: {
+                label: "Energy Consumed (joules)",
+            }
+        },
+        legend: {
+            show: true,
+            position: "right",
+            contents: {
+                bindto: "#consumedEnergyGraphLegend",
+                template: "<span style='color:#fff;padding:10px;background-color:{=COLOR}'>{=TITLE}</span>"
+            }
+        }
+    });
+}
+
+function generatePStateGraph() {
+    pStateData = [];
+    xAxisMarks = ["x"];
+    // Iterate through data for each host
+    for(var i = 0; i < energyData.length; i++) {
+        var hostData = energyData[i]["pstate_trace"];
+
+        consumedEnergyData = []
+
+        // Iterate through each energy trace for a host
+        for(var j = 0; j < hostData.length; j++) {
+            var trace = hostData[j]
+
+            if (xAxisMarks.length <= hostData.length) {
+                xAxisMarks.push(trace["time"])
+                // console.log(trace["time"])
+            }
+
+            consumedEnergyData.push(trace["pstate"])
+        }
+
+        // Add host name to the front of the data for graph labeling
+        consumedEnergyData.unshift(energyData[i]["hostname"])
+        pStateData.push(consumedEnergyData)
+    }
+    
+    pStateData.push(xAxisMarks)
+
+    bb.generate({
+        bindto: "#pStateGraph",
+        data: {
+            x : "x",
+            columns: pStateData,
+        },
+        axis: {
+            x: {
+                min: 0,
+                padding: {
+                    left: 0.5,
+                    right: 0.5,
+                },
+                label: "Time",
+                tick: {
+                    count: xAxisMarks.length,
+                    values: xAxisMarks,
+                },
+            },
+            y: {
+                label: "Power State",
+            }
+        },
+        legend: {
+            show: true,
+            position: "right",
+            contents: {
+                bindto: "#pStateGraphLegend",
+                template: "<span style='color:#fff;padding:10px;background-color:{=COLOR}'>{=TITLE}</span>"
+            }
+        }
+    });
 }
 
 /**
