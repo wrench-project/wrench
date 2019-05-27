@@ -13,8 +13,8 @@
 #include "wrench/services/compute/ComputeServiceMessage.h"
 #include "wrench/services/compute/ComputeService.h"
 #include "wrench/services/compute/htcondor/HTCondorCentralManagerService.h"
-#include "wrench/services/compute/htcondor/HTCondorServiceProperty.h"
-#include "wrench/services/compute/htcondor/HTCondorServiceMessagePayload.h"
+#include "wrench/services/compute/htcondor/HTCondorComputeServiceProperty.h"
+#include "wrench/services/compute/htcondor/HTCondorComputeServiceMessagePayload.h"
 #include "wrench/workflow/job/PilotJob.h"
 #include "wrench/workflow/job/StandardJob.h"
 
@@ -27,19 +27,19 @@ namespace wrench {
     class HTCondorComputeService : public ComputeService {
     private:
         std::map<std::string, std::string> default_property_values = {
-                {HTCondorServiceProperty::SUPPORTS_PILOT_JOBS,    "true"},
-                {HTCondorServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}
+                {HTCondorComputeServiceProperty::SUPPORTS_PILOT_JOBS,    "true"},
+                {HTCondorComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}
         };
 
         std::map<std::string, double> default_messagepayload_values = {
-                {HTCondorServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,                  1024},
-                {HTCondorServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,               1024},
-                {HTCondorServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {HTCondorServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD,  1024},
-                {HTCondorServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD,  512000000},
-                {HTCondorServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,   1024},
-                {HTCondorServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,     1024},
-                {HTCondorServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,      1024}
+                {HTCondorComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,                  1024},
+                {HTCondorComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,               1024},
+                {HTCondorComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD, 1024},
+                {HTCondorComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD,  1024},
+                {HTCondorComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD,  512000000},
+                {HTCondorComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,   1024},
+                {HTCondorComputeServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,     1024},
+                {HTCondorComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,      1024}
         };
 
     public:

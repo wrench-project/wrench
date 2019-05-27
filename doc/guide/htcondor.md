@@ -23,14 +23,14 @@ daemons (including initialization and completion).
 HTCondor is composed of a pool of resources in which jobs are submitted to
 perform their computation. In WRENCH, an HTCondor service represents a 
 compute service (`wrench::ComputeService`), which is defined by the 
-`wrench::HTCondorService` class. An instantiation of an HTCondor 
+`wrench::HTCondorComputeService` class. An instantiation of an HTCondor 
 service requires the following parameters:
 
 - A hostname on which to start the service;
 - The HTCondor pool name;
 - A `std::set` of `wrench::ComputeService` available to the HTCondor pool; and
-- A `std::map` of properties (`wrench::HTCondorServiceProperty`) and message 
-  payloads (`wrench::HTCondorServiceMessagePayload`).
+- A `std::map` of properties (`wrench::HTCondorComputeServiceProperty`) and message 
+  payloads (`wrench::HTCondorComputeServiceMessagePayload`).
   
 The set of compute services may represent any computing instance natively 
 provided by WRENCH (e.g., bare-metal servers, cloud platforms, batch-scheduled
@@ -54,10 +54,10 @@ compute_services.insert(new wrench::BareMetalComputeService(
           100000000000.0));
 
 auto compute_service = simulation->add(
-          new wrench::HTCondorService(hostname, 
+          new wrench::HTCondorComputeService(hostname, 
                                       "local", 
                                       std::move(compute_services),
-                                      {{wrench::HTCondorServiceProperty::SUPPORTS_PILOT_JOBS, "false"}}
+                                      {{wrench::HTCondorComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}}
                                       ));
 ~~~~~~~~~~~~~
 
@@ -85,7 +85,7 @@ WRENCH HTCondor service implementation spawns two additional services during
 execution: wrench::HTCondorCentralManagerService and wrench::HTCondorNegotiatorService.
 
 The wrench::HTCondorCentralManagerService coordinates the execution of jobs
-submitted to the HTCondor pool. Jobs submitted to the wrench::HTCondorService
+submitted to the HTCondor pool. Jobs submitted to the wrench::HTCondorComputeService
 are then queued in a `std::vector<wrench::StandardJob *>`, which are then 
 consumed as resources become available. The Central Manager also spawns the
 execution of the wrench::HTCondorNegotiatorService, which performs matchmaking

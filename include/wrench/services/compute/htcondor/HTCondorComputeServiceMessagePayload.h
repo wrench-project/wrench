@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2019. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -7,8 +7,8 @@
  * (at your option) any later version.
  */
 
-#ifndef WRENCH_HTCONDORSERVICEMESSAGEPAYLOAD_H
-#define WRENCH_HTCONDORSERVICEMESSAGEPAYLOAD_H
+#ifndef WRENCH_HTCONDORCOMPUTESERVICEMESSAGEPAYLOAD_H
+#define WRENCH_HTCONDORCOMPUTESERVICEMESSAGEPAYLOAD_H
 
 #include "wrench/services/compute/ComputeServiceMessagePayload.h"
 
@@ -17,9 +17,9 @@ namespace wrench {
     /**
      * @brief Configurable message payloads for an HTCondorService
      */
-    class HTCondorServiceMessagePayload : public ComputeServiceMessagePayload {
+    class HTCondorComputeServiceMessagePayload : public ComputeServiceMessagePayload {
 
     };
 }
 
-#endif //WRENCH_HTCONDORSERVICEMESSAGEPAYLOAD_H
+#endif //WRENCH_HTCONDORCOMPUTESERVICEMESSAGEPAYLOAD_H
