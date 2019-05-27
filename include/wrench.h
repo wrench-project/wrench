@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2019. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
 #include "wrench/services/compute/batch/BatchComputeService.h"
 #include "wrench/services/compute/batch/BatchComputeServiceProperty.h"
 #include "wrench/services/compute/htcondor/HTCondorComputeService.h"
-#include "wrench/services/compute/htcondor/HTCondorServiceProperty.h"
+#include "wrench/services/compute/htcondor/HTCondorComputeServiceProperty.h"
 #include "wrench/services/network_proximity/NetworkProximityService.h"
 #include "wrench/services/network_proximity/NetworkProximityServiceProperty.h"
 

@@ -83,6 +83,8 @@ set(HEADER_FILES
         include/wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessage.h
         include/wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessagePayload.h
         include/wrench/services/compute/htcondor/HTCondorNegotiatorService.h
+        include/wrench/services/compute/htcondor/HTCondorComputeServiceProperty.h
+        include/wrench/services/compute/htcondor/HTCondorComputeServiceMessagePayload.h
         include/wrench/services/storage/StorageService.h
         include/wrench/services/storage/StorageServiceProperty.h
         include/wrench/services/storage/StorageServiceMessagePayload.h
