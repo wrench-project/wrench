@@ -1,5 +1,5 @@
-var data={"modified":"2019-04-03T03:40:12.000Z","file":"./test_data/data.json","contents":[{"compute":{"end":-1,"start":-1},"execution_host":"Host1","failed":2,"num_cores_allocated":1,"read":{"end":-1,"start":0},"task_id":"ID00000","terminated":-1,"whole_task":{"end":-1,"start":0},"write":{"end":-1,"start":-1}},{"compute":{"end":-1,"start":13},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":13,"start":10},"task_id":"ID00001","terminated":14,"whole_task":{"end":-1,"start":10},"write":{"end":-1,"start":-1}},{"compute":{"end":26,"start":23},"execution_host":"Host1","failed":-1,"num_cores_allocated":1,"read":{"end":23,"start":20},"task_id":"ID00002","terminated":28,"whole_task":{"end":-1,"start":20},"write":{"end":-1,"start":26}}]}
-var energyData=[{"consumed_energy_trace":[{"time":0,"joules":0},{"time":2,"joules":400},{"time":4,"joules":800},{"time":6,"joules":1200}],"hostname":"host1","pstate_trace":[{"pstate":1,"time":0},{"pstate":0,"time":2}],"pstates":[{"idle":"100.0","pstate":0,"running":"200.0","speed":100000000},{"idle":" 93.0","pstate":1,"running":"170.0","speed":50000000},{"idle":" 90.0","pstate":2,"running":"150.0","speed":20000000}],"watt_off":"10"},{"consumed_energy_trace":[{"time":0,"joules":0},{"time":2,"joules":200},{"time":4,"joules":400},{"time":6,"joules":600}],"hostname":"host2","pstate_trace":[{"pstate":0,"time":0},{"pstate":1,"time":2}],"pstates":[{"idle":"100.0","pstate":0,"running":"200.0","speed":100000000},{"idle":" 93.0","pstate":1,"running":"170.0","speed":50000000},{"idle":" 90.0","pstate":2,"running":"150.0","speed":20000000}],"watt_off":"10"}]
+var data={}
+var energyData=[{}]
 var currGraphState = "taskView"
 var hostColours = {}
 var currentlySelectedHost = {hostName: "", id: ""}
@@ -18,7 +18,6 @@ function initialise() {
     } else {
         noFileDiv.style.display = "none"
         mainBodyDiv.style.display = "block"
-        populateMetadata()
         generateGraph(data.contents, "graph-container")
         populateLegend("taskView")
         populateWorkflowTaskDataTable(data.contents)
@@ -456,7 +455,10 @@ function populateWorkflowTaskDataTable(data) {
         var write_end        = convertToTableFormat(task, "write", "end")
         var write_duration   = getDuration(write_start, write_end)
 
-        var task_duration    = Math.abs(getDuration(write_end, read_start))
+        var task_duration    = getDuration(write_end, read_start)
+        if (Number.isNaN(task_duration)) {
+            task_duration = Math.abs(task_duration)
+        }
 
         var tr = task_details_table_body
             .append("tr")
