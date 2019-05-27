@@ -13,6 +13,12 @@
         <link rel="icon" href="public/favicon.ico" />
         <script src="public/d3.min.js" type="text/javascript"></script>
         <script src="public/jQueryRotate.js" type="text/javascript"></script>
+
+        <!-- billboard.js scripts -->
+        <script src="https://d3js.org/d3.v5.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/billboard.js/dist/billboard.min.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/billboard.js/dist/billboard.min.css">
+
     </head>
     <body>
         
@@ -122,9 +128,37 @@
                 </div>
 
             </div>
+
+            <div class='element-and-title-container'>
+                <div class='title-container' onclick='showHideArrow("energy-graph", "energy-graph-arrow")'>
+                    <h6 class='title-text'>Energy Graphs</h6>
+                    <div class='arrow-div'>
+                        <span class='arrow-helper'></span>
+                        <img id='energy-graph-arrow' class='arrow-img' src='public/expand-arrow.png'/>
+                    </div>
+                </div>
+
+                <div class='hidden' id='energy-graph' style="padding: 10px">
+                    <!-- Markup -->
+                    <b><p style="align-content: center">Consumed Energy Graph</p></b>
+                    <div id="consumedEnergyGraph" style="margin: 10px"></div>
+                    <div id="consumedEnergyGraphLegend" style="margin-left: 35px; margin-bottom: 10px"></div>
+
+                    <b><p style="align-content: center">Power State Graph</p></b>
+                    <div id="pStateGraph" style="margin: 20px"></div>
+                    <div id="pStateGraphLegend" style="margin-left: 35px"></div>
+                    
+                </div>
+
+            </div>
+
         </div>
     </body>
     <script>
+        if (energyData != []) {
+            generateConsumedEnergyGraph()
+            generatePStateGraph()
+        }
         initialise()
     </script>
 </html>
