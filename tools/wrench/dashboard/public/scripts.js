@@ -876,7 +876,7 @@ function determineMaxNumCoresAllocated(data) {
     return max
 }
 
-var origin = [0, 400]
+var origin = [480, 300]
 var startAngle = Math.PI/4
 var taskOverlap = determineTaskOverlap(data.contents)
 var maxTaskOverlap = Object.keys(taskOverlap).length
@@ -925,16 +925,16 @@ function searchOverlap(taskId, taskOverlap) {
     }
 }
 
-function makeCube(h, x, z){
+function makeCube(h, x, z, duration){
     return [
-        {x: x - 1, y: h, z: z + 1}, // FRONT TOP LEFT
-        {x: x - 1, y: 0, z: z + 1}, // FRONT BOTTOM LEFT
-        {x: x + 1, y: 0, z: z + 1}, // FRONT BOTTOM RIGHT
-        {x: x + 1, y: h, z: z + 1}, // FRONT TOP RIGHT
-        {x: x - 1, y: h, z: z - 1}, // BACK  TOP LEFT
-        {x: x - 1, y: 0, z: z - 1}, // BACK  BOTTOM LEFT
-        {x: x + 1, y: 0, z: z - 1}, // BACK  BOTTOM RIGHT
-        {x: x + 1, y: h, z: z - 1}, // BACK  TOP RIGHT
+        {x: x    , y: h, z: z + duration}, // FRONT TOP LEFT
+        {x: x    , y: 0, z: z + duration}, // FRONT BOTTOM LEFT
+        {x: x + 1, y: 0, z: z + duration}, // FRONT BOTTOM RIGHT
+        {x: x + 1, y: h, z: z + duration}, // FRONT TOP RIGHT
+        {x: x    , y: h, z: z}, // BACK  TOP LEFT
+        {x: x    , y: 0, z: z}, // BACK  BOTTOM LEFT
+        {x: x + 1, y: 0, z: z}, // BACK  BOTTOM RIGHT
+        {x: x + 1, y: h, z: z}, // BACK  TOP RIGHT
     ];
 }
 
@@ -1021,10 +1021,11 @@ function processData(data, tt){
         .enter()
         .append('g')
         .attr('class', 'cube')
-        .attr('fill', function(d){ return color(d.id); })
+        // .attr('fill', function(d){ console.log(d.id + " " + color(d.id)); return color(d.id); })
+        .attr('fill', function(d){ return getRandomColour() })
         .attr('stroke', function(d){ return d3.color(color(d.id)); })
         .merge(cubes)
-        .sort(cubes3d.sort);
+        // .sort(cubes3d.sort);
 
     cubes.exit().remove();
 
@@ -1061,15 +1062,17 @@ function generate3dGraph(data) {
     cubesData = []
     data.forEach(function(d) {
         var h = d.num_cores_allocated
-        var x = d.whole_task.start / timeScalingFactor
-        var z = searchOverlap(d.task_id, taskOverlap)
+        var z = d.whole_task.start / timeScalingFactor
+        var x = searchOverlap(d.task_id, taskOverlap)
+        var duration = (determineTaskEnd(d) - d.whole_task.start) / timeScalingFactor
         // console.log(h + ' ' + x + ' ' + z)
-        var cube = makeCube(h, x, z)
+        var cube = makeCube(h, x, z, duration)
         cube.height = h
+        cube.id = d.task_id
         cubesData.push(cube)
     })
 
-    console.log(xGrid)
+    console.log(cubesData)
 
     var data = [
         grid3d(xGrid),
