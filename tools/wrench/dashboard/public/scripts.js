@@ -1008,8 +1008,8 @@ function processData(data, tt){
         })
         .attr('x', function(d){ return d.projected.x; })
         .attr('y', function(d){ return d.projected.y; })
-        .text(function(d){ return d[1] <= 0 ? d[1] : ''; })
-        .attr('transform', 'translate(0, 32)')
+        .text(function(d){ return d[1] <= 0 ? d[1] - 1 : ''; })
+        // .attr('transform', 'translate(0, 32)')
 
     yText.exit().remove();
 
@@ -1070,8 +1070,6 @@ function generate3dGraph(data) {
         cube.id = d.task_id
         cubesData.push(cube)
     })
-
-    console.log(cubesData)
 
     var data = [
         grid3d(xGrid),
