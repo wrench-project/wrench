@@ -973,8 +973,7 @@ function processData(data, tt){
         .merge(xGrid)
         .attr('stroke', 'black')
         .attr('stroke-width', 0.3)
-        .attr('fill', function(d){ return d.ccw ? 'lightgrey' : '#717171'; })
-        .attr('fill-opacity', 0.9)
+        .attr('fill-opacity', 0)
         .attr('d', grid3d.draw);
 
     xGrid.exit().remove();
@@ -990,7 +989,7 @@ function processData(data, tt){
         .merge(yScale)
         .attr('stroke', 'black')
         .attr('stroke-width', .5)
-        .attr('d', yScale3d.draw);
+        .attr('d', yScale3d.draw)
 
     yScale.exit().remove();
 
@@ -1009,7 +1008,8 @@ function processData(data, tt){
         })
         .attr('x', function(d){ return d.projected.x; })
         .attr('y', function(d){ return d.projected.y; })
-        .text(function(d){ return d[1] <= 0 ? d[1] : ''; });
+        .text(function(d){ return d[1] <= 0 ? d[1] : ''; })
+        .attr('transform', 'translate(0, 32)')
 
     yText.exit().remove();
 
@@ -1065,7 +1065,6 @@ function generate3dGraph(data) {
         var z = d.whole_task.start / timeScalingFactor
         var x = searchOverlap(d.task_id, taskOverlap)
         var duration = (determineTaskEnd(d) - d.whole_task.start) / timeScalingFactor
-        // console.log(h + ' ' + x + ' ' + z)
         var cube = makeCube(h, parseInt(x), z, duration)
         cube.height = h
         cube.id = d.task_id
