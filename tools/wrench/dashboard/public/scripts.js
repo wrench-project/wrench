@@ -881,6 +881,7 @@ var startAngle = Math.PI/4
 var taskOverlap = determineTaskOverlap(data.contents)
 var maxTaskOverlap = Object.keys(taskOverlap).length
 var scale = maxTaskOverlap * 2
+var timeScalingFactor = 500
 var key = function(d) { return d.task_id; }
 var svg    = d3.select('#three-d-graph-svg').call(d3.drag().on('drag', dragged).on('start', dragStart).on('end', dragEnd)).append('g')
 var cubesGroup = svg.append('g').attr('class', 'cubes')
@@ -1044,14 +1045,13 @@ function processData(data, tt){
 }
 
 function generate3dGraph(data) {
-    var j = 10
     var maxTime = d3.max(data, function(d) {
         return Math.max(d['whole_task'].end, d['failed'], d['terminated'])
     })
     xGrid = [], scatter = [], yLine = []
-    for(var z = 0; z < maxTime; z++){
+    for(var z = 0; z < maxTime; z+=timeScalingFactor){
         for(var x = 0; x < maxTaskOverlap; x++) {
-            xGrid.push([x, 1, z])
+            xGrid.push([x, 1, z/timeScalingFactor])
         }
     }
 
@@ -1061,7 +1061,7 @@ function generate3dGraph(data) {
     cubesData = []
     data.forEach(function(d) {
         var h = d.num_cores_allocated
-        var x = d.whole_task.start
+        var x = d.whole_task.start / timeScalingFactor
         var z = searchOverlap(d.task_id, taskOverlap)
         // console.log(h + ' ' + x + ' ' + z)
         var cube = makeCube(h, x, z)
