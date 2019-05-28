@@ -879,7 +879,7 @@ function determineMaxNumCoresAllocated(data) {
 var origin = [480, 300]
 var startAngle = Math.PI/4
 var taskOverlap = determineTaskOverlap(data.contents)
-var maxTaskOverlap = Object.keys(taskOverlap).length
+var maxTaskOverlap = Object.keys(taskOverlap).length + 1
 var scale = maxTaskOverlap * 2
 var timeScalingFactor = 500
 var key = function(d) { return d.task_id; }
@@ -1050,7 +1050,7 @@ function generate3dGraph(data) {
         return Math.max(d['whole_task'].end, d['failed'], d['terminated'])
     })
     xGrid = [], scatter = [], yLine = []
-    for(var z = 0; z < maxTime; z+=timeScalingFactor){
+    for(var z = 0; z <= maxTime + timeScalingFactor; z+=timeScalingFactor){
         for(var x = 0; x < maxTaskOverlap; x++) {
             xGrid.push([x, 1, z/timeScalingFactor])
         }
@@ -1066,7 +1066,7 @@ function generate3dGraph(data) {
         var x = searchOverlap(d.task_id, taskOverlap)
         var duration = (determineTaskEnd(d) - d.whole_task.start) / timeScalingFactor
         // console.log(h + ' ' + x + ' ' + z)
-        var cube = makeCube(h, x, z, duration)
+        var cube = makeCube(h, parseInt(x), z, duration)
         cube.height = h
         cube.id = d.task_id
         cubesData.push(cube)
