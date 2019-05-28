@@ -878,14 +878,16 @@ function determineMaxNumCoresAllocated(data) {
 
 var origin = [0, 400]
 var startAngle = Math.PI/4
-var scale = 20
+var taskOverlap = determineTaskOverlap(data.contents)
+var maxTaskOverlap = Object.keys(taskOverlap).length
+var scale = maxTaskOverlap * 2
 var key = function(d) { return d.task_id; }
 var svg    = d3.select('#three-d-graph-svg').call(d3.drag().on('drag', dragged).on('start', dragStart).on('end', dragEnd)).append('g')
 var cubesGroup = svg.append('g').attr('class', 'cubes')
 var color  = d3.scaleOrdinal(d3.schemeCategory20)
 var mx, my, mouseX, mouseY
 var grid3d = d3._3d()
-    .shape('GRID', 20)
+    .shape('GRID', maxTaskOverlap)
     .origin(origin)
     .rotateY( startAngle)
     .rotateX(-startAngle)
@@ -933,6 +935,29 @@ function makeCube(h, x, z){
         {x: x + 1, y: 0, z: z - 1}, // BACK  BOTTOM RIGHT
         {x: x + 1, y: h, z: z - 1}, // BACK  TOP RIGHT
     ];
+}
+
+function dragged(){
+    mouseX = mouseX || 0;
+    mouseY = mouseY || 0;
+    beta   = (d3.event.x - mx + mouseX) * Math.PI / 230 ;
+    alpha  = (d3.event.y - my + mouseY) * Math.PI / 230  * (-1);
+    var data = [
+        grid3d.rotateY(beta + startAngle).rotateX(alpha - startAngle)(xGrid),
+        yScale3d.rotateY(beta + startAngle).rotateX(alpha - startAngle)([yLine]),
+        cubes3d.rotateY(beta + startAngle).rotateX(alpha - startAngle)(cubesData),
+    ];
+    processData(data, 0);
+}
+
+function dragStart(){
+    mx = d3.event.x;
+    my = d3.event.y;
+}
+
+function dragEnd(){
+    mouseX = d3.event.x - mx + mouseX;
+    mouseY = d3.event.y - my + mouseY;
 }
 
 function processData(data, tt){
@@ -1023,15 +1048,14 @@ function generate3dGraph(data) {
     var maxTime = d3.max(data, function(d) {
         return Math.max(d['whole_task'].end, d['failed'], d['terminated'])
     })
-    var taskOverlap = determineTaskOverlap(data)
-    var maxNumCoresAllocated = determineMaxNumCoresAllocated(data)
     xGrid = [], scatter = [], yLine = []
-    for(var z = 0; z < Object.keys(taskOverlap).length; z++){
-        for(var x = 0; x < maxTime; x++) {
+    for(var z = 0; z < maxTime; z++){
+        for(var x = 0; x < maxTaskOverlap; x++) {
             xGrid.push([x, 1, z])
         }
     }
 
+    var maxNumCoresAllocated = determineMaxNumCoresAllocated(data)
     d3.range(-1, maxNumCoresAllocated + 1, 1).forEach(function(d) { yLine.push([0, -d, 0]); })
 
     cubesData = []
