@@ -880,6 +880,10 @@ var origin = [0, 400]
 var startAngle = Math.PI/4
 var scale = 20
 var key = function(d) { return d.task_id; }
+var svg    = d3.select('#three-d-graph-svg').call(d3.drag().on('drag', dragged).on('start', dragStart).on('end', dragEnd)).append('g')
+var cubesGroup = svg.append('g').attr('class', 'cubes')
+var color  = d3.scaleOrdinal(d3.schemeCategory20)
+var mx, my, mouseX, mouseY
 var grid3d = d3._3d()
     .shape('GRID', 20)
     .origin(origin)
@@ -932,10 +936,6 @@ function makeCube(h, x, z){
 }
 
 function processData(data, tt){
-    var svg    = d3.select('#three-d-graph-svg').append('g')
-    var cubesGroup = svg.append('g').attr('class', 'cubes')
-    var color  = d3.scaleOrdinal(d3.schemeCategory20)
-
     /* ----------- GRID ----------- */
 
     var xGrid = svg.selectAll('path.grid').data(data[0], key);
