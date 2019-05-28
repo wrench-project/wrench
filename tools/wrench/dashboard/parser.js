@@ -50,12 +50,12 @@ else if (numProgramArguments == 2) {
     parseFile(process.argv[2])
         .then(function(content) {
             opn('index.html')
-            process.exit()
 
                 energyFilePath = process.argv[3];
                 energyData = JSON.parse(fs.readFileSync(energyFilePath));
         
                 addToHTMLFile(content, energyData);
+                process.exit()
         })
         .catch(function(err) {
                 console.log(err);
