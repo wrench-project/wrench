@@ -981,6 +981,13 @@ function processData(data, tt){
 
      /* ----------- y-Scale ----------- */
 
+    // var dataWithoutAxisLabel = data[1]
+    // dataWithoutAxisLabel[0].forEach(function(d) {
+    //     if (isNaN(d[1])) {
+    //         d[1]
+    //     }
+    // })
+
     var yScale = svg.selectAll('path.yScale').data(data[1]);
 
     yScale
@@ -1010,7 +1017,16 @@ function processData(data, tt){
         .attr('x', function(d){ return d.projected.x; })
         .attr('y', function(d){ return d.projected.y; })
         .attr('font-size', '0.5em')
-        .text(function(d){ return d[1] <= 0 ? d[1] - 1 : ''; })
+        .text(function(d, i){
+            if (i+1 === (data[1][0]).length) {
+                return "Cores Allocated"
+            }
+            if (d[1] <= 0) {
+                return d[1] - 1
+            } else {
+                return ''
+            }
+        })
 
     yText.exit().remove();
 
@@ -1092,8 +1108,10 @@ function generate3dGraph(data) {
 
     var maxNumCoresAllocated = determineMaxNumCoresAllocated(data)
     d3.range(-1, maxNumCoresAllocated + 1, 1).forEach(function(d) { yLine.push([0, -d, 0]) })
+    // yLine.push([0, "Cores Allocated", 0])
 
     d3.range(0, maxTime, timeScalingFactor).forEach(function(d) { xLine.push([0, 1, d / timeScalingFactor, d]) })
+    xLine.push([0,1,(maxTime / timeScalingFactor) + 1, "Time (seconds)"])
 
 
     cubesData = []
