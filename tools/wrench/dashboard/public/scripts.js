@@ -1106,29 +1106,65 @@ function processData(data, tt){
         .classed('_3d', true)
         .merge(faces)
         .transition().duration(tt)
-        .attr('d', cubes3d.draw);
+        .attr('d', cubes3d.draw)
+        .text("hello")
+        
 
     faces.exit().remove();
+
+    // /* --------- TEXT ---------*/ //adjust y position and angle to make it flat on top
+
+    // var texts = cubes.merge(ce).selectAll('text.text').data(function(d){
+    //     var _t = d.faces.filter(function(d){
+    //         return d.face === 'top';
+    //     });
+    //     return [{height: d.height, centroid: _t[0].centroid}];
+    // });
+
+    // texts
+    //     .enter()
+    //     .append('text')
+    //     .attr('class', 'text')
+    //     .attr('dy', '-.7em')
+    //     .attr('text-anchor', 'middle')
+    //     .attr('font-family', 'sans-serif')
+    //     .attr('font-weight', 'bolder')
+    //     .attr('x', function(d){ return origin[0] + scale * d.centroid.x })
+    //     // .attr('y', function(d){ return origin[1] + scale * d.centroid.y + 300})
+    //     .classed('_3d', true)
+    //     .merge(texts)
+    //     .transition().duration(tt)
+    //     .attr('fill', 'black')
+    //     .attr('stroke', 'none')
+    //     .attr('x', function(d){ return origin[0] + scale * d.centroid.x })
+    //     .attr('y', function(d){ return origin[1] + scale * d.centroid.y + 15 })
+    //     .tween('text', function(d) {
+    //         // return "hello"
+    //         var that = d3.select(this);
+    //         var i = d3.interpolateNumber(+that.text(), Math.abs(d.height));
+    //         return function(t){
+    //             that.text(i(t).toFixed(1));
+    //         };
+    //     });
+
+    // texts.exit().remove();
+
 }
 
 function generate3dGraph(data) {
     xGrid = [], scatter = [], yLine = [], xLine = []
     for(var z = 0; z <= maxTime + timeScalingFactor; z+=timeScalingFactor){
-        console.log("outer " + z)
         for(var x = 0; x < maxTaskOverlap; x++) {
-            console.log("inner " + x)
             xGrid.push([x, 1, z/timeScalingFactor])
         }
     }
 
-    console.log("done")
     var maxNumCoresAllocated = determineMaxNumCoresAllocated(data)
     d3.range(-1, maxNumCoresAllocated + 1, 1).forEach(function(d) { yLine.push([0, -d, 0]) })
 
     d3.range(0, maxTime, timeScalingFactor).forEach(function(d) { xLine.push([0, 1, d / timeScalingFactor, d]) })
     xLine.push([0,1,(maxTime / timeScalingFactor) + 1, "Time (seconds)"]) // for axis label
 
-    console.log("hello")
     cubesData = []
     data.forEach(function(d) {
         var h = d.num_cores_allocated
