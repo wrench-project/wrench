@@ -876,12 +876,16 @@ function determineMaxNumCoresAllocated(data) {
     return max
 }
 
-var origin = [480, 300]
+var origin = [0, 500]
 var startAngle = Math.PI/4
 var taskOverlap = determineTaskOverlap(data.contents)
 var maxTaskOverlap = Object.keys(taskOverlap).length + 1
+var maxTime = d3.max(data.contents, function(d) {
+    return Math.max(d['whole_task'].end, d['failed'], d['terminated'])
+})
 var scale = maxTaskOverlap * 2
-var timeScalingFactor = 500
+var timeScalingFactor = maxTime / 32 // 32 is the ideal number of columns for the width of the space
+timeScalingFactor = Math.round(timeScalingFactor / 10) * 10 // round to the nearest 10
 var key = function(d) { return d.task_id; }
 var svg    = d3.select('#three-d-graph-svg').call(d3.drag().on('drag', dragged).on('start', dragStart).on('end', dragEnd)).append('g')
 var cubesGroup = svg.append('g').attr('class', 'cubes')
@@ -980,13 +984,6 @@ function processData(data, tt){
     xGrid.exit().remove();
 
      /* ----------- y-Scale ----------- */
-
-    // var dataWithoutAxisLabel = data[1]
-    // dataWithoutAxisLabel[0].forEach(function(d) {
-    //     if (isNaN(d[1])) {
-    //         d[1]
-    //     }
-    // })
 
     var yScale = svg.selectAll('path.yScale').data(data[1]);
 
@@ -1096,9 +1093,6 @@ function processData(data, tt){
 }
 
 function generate3dGraph(data) {
-    var maxTime = d3.max(data, function(d) {
-        return Math.max(d['whole_task'].end, d['failed'], d['terminated'])
-    })
     xGrid = [], scatter = [], yLine = [], xLine = []
     for(var z = 0; z <= maxTime + timeScalingFactor; z+=timeScalingFactor){
         for(var x = 0; x < maxTaskOverlap; x++) {
@@ -1108,10 +1102,9 @@ function generate3dGraph(data) {
 
     var maxNumCoresAllocated = determineMaxNumCoresAllocated(data)
     d3.range(-1, maxNumCoresAllocated + 1, 1).forEach(function(d) { yLine.push([0, -d, 0]) })
-    // yLine.push([0, "Cores Allocated", 0])
 
     d3.range(0, maxTime, timeScalingFactor).forEach(function(d) { xLine.push([0, 1, d / timeScalingFactor, d]) })
-    xLine.push([0,1,(maxTime / timeScalingFactor) + 1, "Time (seconds)"])
+    xLine.push([0,1,(maxTime / timeScalingFactor) + 1, "Time (seconds)"]) // for axis label
 
 
     cubesData = []
