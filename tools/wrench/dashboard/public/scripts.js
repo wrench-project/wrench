@@ -1035,8 +1035,6 @@ function processData(data, tt){
 
     var xText = svg.selectAll('text.xText').data(data[3][0]);
 
-    console.log(data[3][0])
-
     xText
         .enter()
         .append('text')
@@ -1048,8 +1046,7 @@ function processData(data, tt){
         })
         .attr('x', function(d){ return d.projected.x; })
         .attr('y', function(d){ return d.projected.y; })
-        .text(function(d){ console.log(d[2] >= 0); return d[2] >= 0 ? d[2] - 1 : ''; })
-        // .attr('transform', 'translate(0, 32)')
+        .text(function(d){  console.log(d); return d[3] })
 
     xText.exit().remove();
 
@@ -1061,11 +1058,9 @@ function processData(data, tt){
         .enter()
         .append('g')
         .attr('class', 'cube')
-        // .attr('fill', function(d){ console.log(d.id + " " + color(d.id)); return color(d.id); })
         .attr('fill', function(d){ return getRandomColour() })
         .attr('stroke', function(d){ return d3.color(color(d.id)); })
         .merge(cubes)
-        // .sort(cubes3d.sort);
 
     cubes.exit().remove();
 
@@ -1099,7 +1094,7 @@ function generate3dGraph(data) {
     var maxNumCoresAllocated = determineMaxNumCoresAllocated(data)
     d3.range(-1, maxNumCoresAllocated + 1, 1).forEach(function(d) { yLine.push([0, -d, 0]) })
 
-    d3.range(0, maxTime, timeScalingFactor).forEach(function(d) { xLine.push([0, 1, d]) })
+    d3.range(0, maxTime, timeScalingFactor).forEach(function(d) { xLine.push([0, 1, d / timeScalingFactor, d]) })
 
 
     cubesData = []
