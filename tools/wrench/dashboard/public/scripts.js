@@ -917,8 +917,11 @@ var cubes3d = d3._3d()
 
 var originXBox = document.getElementById('origin-x')
 var originYBox = document.getElementById('origin-y')
+var timeIntervalBox = document.getElementById('time-interval')
+
 originXBox.value = origin[0]
 originYBox.value = origin[1]
+timeIntervalBox.value = timeScalingFactor
 
 originXBox.onchange = function(e) {
     changeOrigin([parseInt(e.target.value), origin[1]])
@@ -926,6 +929,10 @@ originXBox.onchange = function(e) {
 
 originYBox.onchange = function(e) {
     changeOrigin([origin[0], parseInt(e.target.value)])
+}
+
+timeIntervalBox.onchange = function(e) {
+    changeScalingFactor(parseInt(e.target.value))
 }
 
 function searchOverlap(taskId, taskOverlap) {
@@ -1107,18 +1114,21 @@ function processData(data, tt){
 function generate3dGraph(data) {
     xGrid = [], scatter = [], yLine = [], xLine = []
     for(var z = 0; z <= maxTime + timeScalingFactor; z+=timeScalingFactor){
+        console.log("outer " + z)
         for(var x = 0; x < maxTaskOverlap; x++) {
+            console.log("inner " + x)
             xGrid.push([x, 1, z/timeScalingFactor])
         }
     }
 
+    console.log("done")
     var maxNumCoresAllocated = determineMaxNumCoresAllocated(data)
     d3.range(-1, maxNumCoresAllocated + 1, 1).forEach(function(d) { yLine.push([0, -d, 0]) })
 
     d3.range(0, maxTime, timeScalingFactor).forEach(function(d) { xLine.push([0, 1, d / timeScalingFactor, d]) })
     xLine.push([0,1,(maxTime / timeScalingFactor) + 1, "Time (seconds)"]) // for axis label
 
-
+    console.log("hello")
     cubesData = []
     data.forEach(function(d) {
         var h = d.num_cores_allocated
@@ -1172,5 +1182,10 @@ function changeOrigin(newOrigin) {
         cubes3d(cubesData),
         scale3d([xLine])
     ]
-    processData(data, 0)
+    processData(data, 1000)
+}
+
+function changeScalingFactor(factor) {
+    timeScalingFactor = factor
+    generate3dGraph(data.contents)
 }
