@@ -915,6 +915,18 @@ var cubes3d = d3._3d()
     .origin(origin)
     .scale(scale)
 
+var originXBox = document.getElementById('origin-x')
+var originYBox = document.getElementById('origin-y')
+originXBox.value = origin[0]
+originYBox.value = origin[1]
+
+originXBox.onchange = function(e) {
+    changeOrigin([parseInt(e.target.value), origin[1]])
+}
+
+originYBox.onchange = function(e) {
+    changeOrigin([origin[0], parseInt(e.target.value)])
+}
 
 function searchOverlap(taskId, taskOverlap) {
     for (var key in taskOverlap) {
@@ -1127,4 +1139,38 @@ function generate3dGraph(data) {
     ];
     processData(data, 1000);
 
+}
+
+function changeOrigin(newOrigin) {
+    origin = newOrigin
+    grid3d = d3._3d()
+        .shape('GRID', maxTaskOverlap)
+        .origin(origin)
+        .rotateY( startAngle)
+        .rotateX(-startAngle)
+        .scale(scale)
+
+    scale3d = d3._3d()
+        .shape('LINE_STRIP')
+        .origin(origin)
+        .rotateY( startAngle)
+        .rotateX(-startAngle)
+        .scale(scale)
+
+    cubes3d = d3._3d()
+        .shape('CUBE')
+        .x(function(d){ return d.x; })
+        .y(function(d){ return d.y; })
+        .z(function(d){ return d.z; })
+        .rotateY( startAngle)
+        .rotateX(-startAngle)
+        .origin(origin)
+        .scale(scale)
+    var data = [
+        grid3d(xGrid),
+        scale3d([yLine]),
+        cubes3d(cubesData),
+        scale3d([xLine])
+    ]
+    processData(data, 0)
 }
