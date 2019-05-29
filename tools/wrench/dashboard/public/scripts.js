@@ -1009,16 +1009,14 @@ function processData(data, tt){
         })
         .attr('x', function(d){ return d.projected.x; })
         .attr('y', function(d){ return d.projected.y; })
+        .attr('font-size', '0.5em')
         .text(function(d){ return d[1] <= 0 ? d[1] - 1 : ''; })
-        // .attr('transform', 'translate(0, 32)')
 
     yText.exit().remove();
 
     /* ----------- x-Scale ----------- */
 
     var xScale = svg.selectAll('path.xScale').data(data[3]);
-
-    console.log(data[3])
 
     xScale
         .enter()
@@ -1046,7 +1044,8 @@ function processData(data, tt){
         })
         .attr('x', function(d){ return d.projected.x; })
         .attr('y', function(d){ return d.projected.y; })
-        .text(function(d){  console.log(d); return d[3] })
+        .attr('font-size', '0.5em')
+        .text(function(d){ return d[3] })
 
     xText.exit().remove();
 
