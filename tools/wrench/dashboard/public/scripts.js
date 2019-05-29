@@ -894,7 +894,7 @@ var grid3d = d3._3d()
     .rotateX(-startAngle)
     .scale(scale)
 
-var yScale3d = d3._3d()
+var scale3d = d3._3d()
     .shape('LINE_STRIP')
     .origin(origin)
     .rotateY( startAngle)
@@ -945,8 +945,9 @@ function dragged(){
     alpha  = (d3.event.y - my + mouseY) * Math.PI / 230  * (-1);
     var data = [
         grid3d.rotateY(beta + startAngle).rotateX(alpha - startAngle)(xGrid),
-        yScale3d.rotateY(beta + startAngle).rotateX(alpha - startAngle)([yLine]),
+        scale3d.rotateY(beta + startAngle).rotateX(alpha - startAngle)([yLine]),
         cubes3d.rotateY(beta + startAngle).rotateX(alpha - startAngle)(cubesData),
+        scale3d.rotateY(beta + startAngle).rotateX(alpha - startAngle)([xLine])
     ];
     processData(data, 0);
 }
@@ -989,7 +990,7 @@ function processData(data, tt){
         .merge(yScale)
         .attr('stroke', 'black')
         .attr('stroke-width', .5)
-        .attr('d', yScale3d.draw)
+        .attr('d', scale3d.draw)
 
     yScale.exit().remove();
 
@@ -1012,6 +1013,45 @@ function processData(data, tt){
         // .attr('transform', 'translate(0, 32)')
 
     yText.exit().remove();
+
+    /* ----------- x-Scale ----------- */
+
+    var xScale = svg.selectAll('path.xScale').data(data[3]);
+
+    console.log(data[3])
+
+    xScale
+        .enter()
+        .append('path')
+        .attr('class', '_3d xScale')
+        .merge(xScale)
+        .attr('stroke', 'black')
+        .attr('stroke-width', .5)
+        .attr('d', scale3d.draw)
+
+    xScale.exit().remove();
+
+        /* ----------- x-Scale Text ----------- */
+
+    var xText = svg.selectAll('text.xText').data(data[3][0]);
+
+    console.log(data[3][0])
+
+    xText
+        .enter()
+        .append('text')
+        .attr('class', '_3d xText')
+        .attr('dx', '.3em')
+        .merge(xText)
+        .each(function(d){
+            d.centroid = {x: d.rotated.x, y: d.rotated.y, z: d.rotated.z};
+        })
+        .attr('x', function(d){ return d.projected.x; })
+        .attr('y', function(d){ return d.projected.y; })
+        .text(function(d){ console.log(d[2] >= 0); return d[2] >= 0 ? d[2] - 1 : ''; })
+        // .attr('transform', 'translate(0, 32)')
+
+    xText.exit().remove();
 
     /* --------- CUBES ---------*/
 
@@ -1049,7 +1089,7 @@ function generate3dGraph(data) {
     var maxTime = d3.max(data, function(d) {
         return Math.max(d['whole_task'].end, d['failed'], d['terminated'])
     })
-    xGrid = [], scatter = [], yLine = []
+    xGrid = [], scatter = [], yLine = [], xLine = []
     for(var z = 0; z <= maxTime + timeScalingFactor; z+=timeScalingFactor){
         for(var x = 0; x < maxTaskOverlap; x++) {
             xGrid.push([x, 1, z/timeScalingFactor])
@@ -1057,7 +1097,10 @@ function generate3dGraph(data) {
     }
 
     var maxNumCoresAllocated = determineMaxNumCoresAllocated(data)
-    d3.range(-1, maxNumCoresAllocated + 1, 1).forEach(function(d) { yLine.push([0, -d, 0]); })
+    d3.range(-1, maxNumCoresAllocated + 1, 1).forEach(function(d) { yLine.push([0, -d, 0]) })
+
+    d3.range(0, maxTime, timeScalingFactor).forEach(function(d) { xLine.push([0, 1, d]) })
+
 
     cubesData = []
     data.forEach(function(d) {
@@ -1073,8 +1116,9 @@ function generate3dGraph(data) {
 
     var data = [
         grid3d(xGrid),
-        yScale3d([yLine]),
-        cubes3d(cubesData)
+        scale3d([yLine]),
+        cubes3d(cubesData),
+        scale3d([xLine])
     ];
     processData(data, 1000);
 
