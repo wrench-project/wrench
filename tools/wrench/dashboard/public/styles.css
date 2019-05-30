@@ -219,3 +219,7 @@ td {
 #time-interval-container {
     float: right
 }
+
+#three-d-legend {
+    word-wrap: break-word;
+}
