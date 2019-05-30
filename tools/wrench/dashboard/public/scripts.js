@@ -891,6 +891,7 @@ var svg    = d3.select('#three-d-graph-svg').call(d3.drag().on('drag', dragged).
 var cubesGroup = svg.append('g').attr('class', 'cubes')
 var color  = d3.scaleOrdinal(d3.schemeCategory20)
 var mx, my, mouseX, mouseY
+var threeDColourMap = {}
 var grid3d = d3._3d()
     .shape('GRID', maxTaskOverlap)
     .origin(origin)
@@ -966,13 +967,14 @@ function dragged(){
     mouseY = mouseY || 0;
     beta   = (d3.event.x - mx + mouseX) * Math.PI / 230 ;
     alpha  = (d3.event.y - my + mouseY) * Math.PI / 230  * (-1);
-    var data = [
+    var rotatedData = [
         grid3d.rotateY(beta + startAngle).rotateX(alpha - startAngle)(xGrid),
         scale3d.rotateY(beta + startAngle).rotateX(alpha - startAngle)([yLine]),
         cubes3d.rotateY(beta + startAngle).rotateX(alpha - startAngle)(cubesData),
-        scale3d.rotateY(beta + startAngle).rotateX(alpha - startAngle)([xLine])
+        scale3d.rotateY(beta + startAngle).rotateX(alpha - startAngle)([xLine]),
+        data.contents
     ];
-    processData(data, 0);
+    processData(rotatedData, 0);
 }
 
 function dragStart(){
@@ -983,6 +985,18 @@ function dragStart(){
 function dragEnd(){
     mouseX = d3.event.x - mx + mouseX;
     mouseY = d3.event.y - my + mouseY;
+}
+
+function sort3dLegend() {
+    var legend = document.getElementById('three-d-legend')
+    var legendItems = Array.from(legend.children)
+    legendItems.sort(function(a, b) {
+        return a.innerHTML.toLowerCase().localeCompare(b.innerHTML.toLowerCase(), undefined, {numeric: true, sensitivity: 'base'})
+    })
+    legend.innerHTML = ''
+    legendItems.forEach(function(l) {
+        legend.appendChild(l)
+    })
 }
 
 function processData(data, tt){
@@ -1085,13 +1099,25 @@ function processData(data, tt){
 
     var cubes = cubesGroup.selectAll('g.cube').data(data[2], function(d){ return d.id });
 
+    var legend = d3.select('#three-d-legend')
+
     var ce = cubes
         .enter()
         .append('g')
         .attr('class', 'cube')
-        .attr('fill', function(d){ return getRandomColour() })
+        .attr('fill', function(d, i){
+            var colour = getRandomColour()
+            // threeDColourMap[data[4][i].task_id] = colour // populate legend
+            legend.append("small")
+                .attr("class", "inline-block")
+                .style("border-left", `15px solid ${colour}`)
+                .text(data[4][i].task_id)
+            return colour
+        })
         .attr('stroke', function(d){ return d3.color(color(d.id)); })
         .merge(cubes)
+
+    sort3dLegend()
 
     cubes.exit().remove();
 
@@ -1106,48 +1132,9 @@ function processData(data, tt){
         .classed('_3d', true)
         .merge(faces)
         .transition().duration(tt)
-        .attr('d', cubes3d.draw)
-        .text("hello")
-        
+        .attr('d', cubes3d.draw)        
 
     faces.exit().remove();
-
-    // /* --------- TEXT ---------*/ //adjust y position and angle to make it flat on top
-
-    // var texts = cubes.merge(ce).selectAll('text.text').data(function(d){
-    //     var _t = d.faces.filter(function(d){
-    //         return d.face === 'top';
-    //     });
-    //     return [{height: d.height, centroid: _t[0].centroid}];
-    // });
-
-    // texts
-    //     .enter()
-    //     .append('text')
-    //     .attr('class', 'text')
-    //     .attr('dy', '-.7em')
-    //     .attr('text-anchor', 'middle')
-    //     .attr('font-family', 'sans-serif')
-    //     .attr('font-weight', 'bolder')
-    //     .attr('x', function(d){ return origin[0] + scale * d.centroid.x })
-    //     // .attr('y', function(d){ return origin[1] + scale * d.centroid.y + 300})
-    //     .classed('_3d', true)
-    //     .merge(texts)
-    //     .transition().duration(tt)
-    //     .attr('fill', 'black')
-    //     .attr('stroke', 'none')
-    //     .attr('x', function(d){ return origin[0] + scale * d.centroid.x })
-    //     .attr('y', function(d){ return origin[1] + scale * d.centroid.y + 15 })
-    //     .tween('text', function(d) {
-    //         // return "hello"
-    //         var that = d3.select(this);
-    //         var i = d3.interpolateNumber(+that.text(), Math.abs(d.height));
-    //         return function(t){
-    //             that.text(i(t).toFixed(1));
-    //         };
-    //     });
-
-    // texts.exit().remove();
 
 }
 
@@ -1177,13 +1164,14 @@ function generate3dGraph(data) {
         cubesData.push(cube)
     })
 
-    var data = [
+    var threeDdata = [
         grid3d(xGrid),
         scale3d([yLine]),
         cubes3d(cubesData),
-        scale3d([xLine])
+        scale3d([xLine]),
+        data
     ];
-    processData(data, 1000);
+    processData(threeDdata, 1000);
 
 }
 
@@ -1212,13 +1200,14 @@ function changeOrigin(newOrigin) {
         .rotateX(-startAngle)
         .origin(origin)
         .scale(scale)
-    var data = [
+    var newOriginData = [
         grid3d(xGrid),
         scale3d([yLine]),
         cubes3d(cubesData),
-        scale3d([xLine])
+        scale3d([xLine]), 
+        data.contents
     ]
-    processData(data, 1000)
+    processData(newOriginData, 1000)
 }
 
 function changeScalingFactor(factor) {
