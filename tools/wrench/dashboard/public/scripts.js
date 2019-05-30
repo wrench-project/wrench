@@ -892,6 +892,8 @@ var cubesGroup = svg.append('g').attr('class', 'cubes')
 var color  = d3.scaleOrdinal(d3.schemeCategory20)
 var mx, my, mouseX, mouseY
 var threeDColourMap = {}
+var currentlySelectedCube
+var cubeIsClicked = false
 var grid3d = d3._3d()
     .shape('GRID', maxTaskOverlap)
     .origin(origin)
@@ -996,6 +998,37 @@ function sort3dLegend() {
     legend.innerHTML = ''
     legendItems.forEach(function(l) {
         legend.appendChild(l)
+    })
+}
+
+function selectCube(taskId, hover) {
+    if (currentlySelectedCube == taskId && !hover) {
+        deselectCube()
+        return
+    }
+    var currData = data.contents
+    if (!hover) {
+        currentlySelectedCube = taskId
+    }
+    currData.forEach(function(d) {
+        if (d.task_id === taskId) {
+            document.getElementById(`three-d-legend-${taskId}`).style.fontWeight = 'bold'
+            document.getElementById(`cube-${taskId}`).style.fill = threeDColourMap[taskId]
+        } else {
+            document.getElementById(`three-d-legend-${d.task_id}`).style.fontWeight = 'normal'
+            document.getElementById(`cube-${d.task_id}`).style.fill = 'gray'
+        }
+    })
+}
+
+function deselectCube(hover) {
+    if (!hover) {
+        currentlySelectedCube = ''
+    }
+    var currData = data.contents
+    currData.forEach(function(d) {
+        document.getElementById(`cube-${d.task_id}`).style.fill = threeDColourMap[d.task_id]
+        document.getElementById(`three-d-legend-${d.task_id}`).style.fontWeight = 'normal'
     })
 }
 
@@ -1105,13 +1138,35 @@ function processData(data, tt){
         .enter()
         .append('g')
         .attr('class', 'cube')
+        .attr('id', function(d, i) {
+            return `cube-${data[4][i].task_id}`
+        })
         .attr('fill', function(d, i){
             var colour = getRandomColour()
-            // threeDColourMap[data[4][i].task_id] = colour // populate legend
+            threeDColourMap[data[4][i].task_id] = colour
             legend.append("small")
                 .attr("class", "inline-block")
+                .attr("id", `three-d-legend-${data[4][i].task_id}`)
                 .style("border-left", `15px solid ${colour}`)
                 .text(data[4][i].task_id)
+                .on('click', function() {
+                    selectCube(data[4][i].task_id, false)
+                    if (currentlySelectedCube === '' ) {
+                        cubeIsClicked = false
+                    } else {
+                        cubeIsClicked = true
+                    }
+                })
+                .on('mouseover', function() {
+                    selectCube(data[4][i].task_id, true)
+                })
+                .on('mouseout', function() {
+                    if (!cubeIsClicked) {
+                        deselectCube(true)
+                    } else {
+                        selectCube(currentlySelectedCube, true)
+                    }
+                })
             return colour
         })
         .attr('stroke', function(d){ return d3.color(color(d.id)); })
