@@ -4,6 +4,7 @@ var currGraphState = "taskView"
 var hostColours = {}
 var currentlySelectedHost = {hostName: "", id: ""}
 var firstVisit
+var toFiveDecimalPlaces = d3.format('.5f')
 
 function initialise() {
     var noFileDiv = document.getElementById("no-file")
@@ -239,7 +240,6 @@ function generateGraph(data, containerId) {
     const CONTAINER_WIDTH = 1000
     const CONTAINER_HEIGHT = 1000
     const PADDING = 60
-    var toFiveDecimalPlaces = d3.format('.5f')
     var svg = container
         .append("svg")
         .attr('width', CONTAINER_WIDTH)
@@ -407,7 +407,6 @@ function generateGraph(data, containerId) {
 }
 
 function convertToTableFormat(d, section, startEnd) {
-    var toFiveDecimalPlaces = d3.format('.5f')
     var metric = d[section][startEnd]
     if (metric === -1) {
         if (d.failed !== -1) {
@@ -421,7 +420,6 @@ function convertToTableFormat(d, section, startEnd) {
 }
 
 function getDuration(start, end) {
-    var toFiveDecimalPlaces = d3.format('.5f')
     if (start === "Failed" || start === "Terminated") {
         return start
     }
@@ -502,8 +500,6 @@ function populateWorkflowTaskDataTable(data) {
 }
 
 function getOverallWorkflowMetrics(data) {
-    var toFiveDecimalPlaces = d3.format('.5f')
-
     var hosts = new Set()
     var noFailed = 0
     var noTerminated = 0
@@ -1001,6 +997,28 @@ function sort3dLegend() {
     })
 }
 
+function showAndPopulateTooltip(d) {
+    var toolTipContainer = document.getElementById('three-d-tooltip-container')
+    toolTipContainer.style.visibility = 'visible'
+
+
+    var tooltipTaskId = d3.select('#three-d-tooltip-task-id')
+    var tooltipHost = d3.select('#three-d-tooltip-host')
+    var tooltipDuration = d3.select('#three-d-tooltip-task-operation-duration')
+
+    tooltipTaskId.text('TaskID: ' + d.task_id)
+
+    tooltipHost.text('Host Name: ' + d.execution_host.hostname)
+
+    var durationFull = findDuration(data.contents, d.task_id, "whole_task")
+    tooltipDuration.text('Duration: ' + toFiveDecimalPlaces(durationFull) + 's')
+}
+
+function hideTooltip() {
+    var toolTipContainer = document.getElementById('three-d-tooltip-container')
+    toolTipContainer.style.visibility = 'hidden'
+}
+
 function selectCube(taskId, hover) {
     if (currentlySelectedCube == taskId && !hover) {
         deselectCube()
@@ -1014,6 +1032,7 @@ function selectCube(taskId, hover) {
         if (d.task_id === taskId) {
             document.getElementById(`three-d-legend-${taskId}`).style.fontWeight = 'bold'
             document.getElementById(`cube-${taskId}`).style.fill = threeDColourMap[taskId]
+            showAndPopulateTooltip(d)
         } else {
             document.getElementById(`three-d-legend-${d.task_id}`).style.fontWeight = 'normal'
             document.getElementById(`cube-${d.task_id}`).style.fill = 'gray'
@@ -1030,6 +1049,7 @@ function deselectCube(hover) {
         document.getElementById(`cube-${d.task_id}`).style.fill = threeDColourMap[d.task_id]
         document.getElementById(`three-d-legend-${d.task_id}`).style.fontWeight = 'normal'
     })
+    hideTooltip()
 }
 
 function processData(data, tt){
