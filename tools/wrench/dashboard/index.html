@@ -158,14 +158,18 @@
                     </div>
                 </div> -->
                 <div id='three-d-graph-container'>
-                    <p>Origin:</p>
-                    X: <input type='number' id='origin-x'><br>
-                    Y: <input type='number' id='origin-y'>
-                    <div id='time-interval-container'>
-                        Time interval: <input type='number' step='10' id='time-interval'>
-                    </div>
-                    <div id='scale-input-container'>
-                        Scale: <input type='number' id='scale-input'>
+                    <div id='three-d-graph-config'>
+                        <div id='three-d-origin' class='three-d-graph-config'>
+                            Origin:<br>
+                            X: <input type='number' id='origin-x'>
+                            Y: <input type='number' id='origin-y'>
+                        </div>
+                        <div id='time-interval-container' class='three-d-graph-config'>
+                            Time interval: <br><input type='number' step='10' id='time-interval'>
+                        </div>
+                        <div id='scale-input-container' class='three-d-graph-config'>
+                            Scale: <br><input type='number' id='scale-input'>
+                        </div>
                     </div>
                     <p>Legend:</p>
                     <div class="container legend" id="three-d-legend"></div>
