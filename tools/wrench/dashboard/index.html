@@ -65,11 +65,11 @@
                 <div class='hidden' id='overall-graph-container'>
                     <div id='button-and-information-container'>
                         <button id='toggle-view-button' onclick="toggleView()">Switch to Host View</button>
-                        <img id='information-img' src='public/information.png' onclick='showHostInstructions()'/>
+                        <img id='information-img' class='information-img' src='public/information.png' onclick='showInstructions("host-instructions", "information-img")'/>
                     </div>
-                    <div id='host-instructions'>
-                        <div id='host-instructions-close-button-container'>
-                            <img id='host-instructions-close-button' src='public/close-button.png' onclick='hideHostInstructions()'/>
+                    <div id='host-instructions' class='instructions-container'>
+                        <div id='host-instructions-close-button-container' class='instructions-close-button-container'>
+                            <img id='host-instructions-close-button' class='instructions-close-button' src='public/close-button.png' onclick='hideInstructions("host-instructions", "information-img")'/>
                         </div>
                         <p id='host-instructions-text'>Hover over or click on a host on the legend to isolate that host on the graph. Click on a selected host to deselect it. or just select a different host on the legend</p>
                     </div>
@@ -158,6 +158,13 @@
                     </div>
                 </div> -->
                 <div id='three-d-graph-container'>
+                    <img id='three-d-information-img' class='information-img' src='public/information.png' onclick='showInstructions("three-d-instructions", "three-d-information-img")'/>
+                    <div id='three-d-instructions' class='instructions-container'>
+                        <div id='three-d-instructions-close-button-container' class='instructions-close-button-container'>
+                            <img id='three-d-instructions-close-button' class='instructions-close-button' src='public/close-button.png' onclick='hideInstructions("three-d-instructions", "three-d-information-img")'/>
+                        </div>
+                        <p id='three-d-instructions-text'>Hover over or click on a host on the legend to isolate that host on the graph. Click on a selected host to deselect it. or just select a different host on the legend</p>
+                    </div>
                     <div id='three-d-graph-config'>
                         <div id='three-d-origin' class='three-d-graph-config'>
                             Origin:<br>
@@ -173,10 +180,6 @@
                     </div>
                     <p>Legend:</p>
                     <div class="container legend" id="three-d-legend"></div>
-                    <div class="container legend" id="three-d-legend-terminated-failed">
-                        <small id="three-d-legend-failed">Failed During Execution</small>
-                        <small id="three-d-legend-terminated">Terminated by User</small>
-                    </div>
                     <div class="text-left" id="three-d-tooltip-container">
                         <span id="three-d-tooltip-task-id"></span><br>
                         <span id="three-d-tooltip-host"></span><br>

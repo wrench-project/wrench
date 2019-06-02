@@ -773,16 +773,16 @@ function populateLegend(currView) {
     }
 }
 
-function showHostInstructions() {
-    var hostInstructions = document.getElementById("host-instructions")
-    var informationImg = document.getElementById("information-img")
+function showInstructions(instructions, img) {
+    var hostInstructions = document.getElementById(instructions)
+    var informationImg = document.getElementById(img)
     hostInstructions.style.display = "block"
     informationImg.style.display = "none"
 }
 
-function hideHostInstructions() {
-    var hostInstructions = document.getElementById("host-instructions")
-    var informationImg = document.getElementById("information-img")
+function hideInstructions(instructions, img) {
+    var hostInstructions = document.getElementById(instructions)
+    var informationImg = document.getElementById(img)
     hostInstructions.style.display = "none"
     informationImg.style.display = "inline-block"
 }
