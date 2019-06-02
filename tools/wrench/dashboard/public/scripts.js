@@ -1005,11 +1005,18 @@ function dragEnd(){
 function sort3dLegend() {
     var legend = document.getElementById('three-d-legend')
     var legendItems = Array.from(legend.children)
+    var ftItems = []
     legendItems.sort(function(a, b) {
         return a.innerHTML.toLowerCase().localeCompare(b.innerHTML.toLowerCase(), undefined, {numeric: true, sensitivity: 'base'})
     })
     legend.innerHTML = ''
     legendItems.forEach(function(l) {
+        if (l.innerHTML === "Failed During Execution" || l.innerHTML === "Terminated by User") {
+            ftItems.push(l)
+        }
+        legend.appendChild(l)
+    })
+    ftItems.forEach(function(l) {
         legend.appendChild(l)
     })
 }
@@ -1049,12 +1056,18 @@ function selectCube(taskId, hover) {
         if (d.task_id === taskId) {
             document.getElementById(`three-d-legend-${taskId}`).style.fontWeight = 'bold'
             document.getElementById(`cube-${taskId}`).style.fill = threeDColourMap[taskId]
-            document.getElementById(`cube-ft-${taskId}`).style.visibility = 'visible'
+            var ftCube = document.getElementById(`cube-ft-${taskId}`)
+            if (ftCube !== null) {
+                ftCube.style.visibility = 'visible'
+            }
             showAndPopulateTooltip(d)
         } else {
             document.getElementById(`three-d-legend-${d.task_id}`).style.fontWeight = 'normal'
             document.getElementById(`cube-${d.task_id}`).style.fill = 'gray'
-            document.getElementById(`cube-ft-${d.task_id}`).style.visibility = 'hidden'
+            var ftCube = document.getElementById(`cube-ft-${d.task_id}`)
+            if (ftCube !== null) {
+                ftCube.style.visibility = 'hidden'
+            }
         }
     })
 }
@@ -1067,7 +1080,10 @@ function deselectCube(hover) {
     currData.forEach(function(d) {
         document.getElementById(`cube-${d.task_id}`).style.fill = threeDColourMap[d.task_id]
         document.getElementById(`three-d-legend-${d.task_id}`).style.fontWeight = 'normal'
-        document.getElementById(`cube-ft-${d.task_id}`).style.visibility = 'visible'
+        var ftCube = document.getElementById(`cube-ft-${d.task_id}`)
+        if (ftCube !== null) {
+            ftCube.style.visibility = 'visible'
+        }
     })
     hideTooltip()
 }
@@ -1173,6 +1189,16 @@ function processData(data, tt){
     var cubes = cubesGroup.selectAll('g.cube').data(data[2], function(d){ return d.id });
 
     var legend = d3.select('#three-d-legend')
+
+    legend.append("small")
+        .attr("class", "inline-block")
+        .style("border-left", "15px solid orange")
+        .text("Terminated by User")
+
+    legend.append("small")
+        .attr("class", "inline-block")
+        .style("border-left", "15px solid red")
+        .text("Failed During Execution")
 
     var ce = cubes
         .enter()
