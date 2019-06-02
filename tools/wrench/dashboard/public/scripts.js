@@ -23,7 +23,7 @@ function initialise() {
         populateLegend("taskView")
         populateWorkflowTaskDataTable(data.contents)
         getOverallWorkflowMetrics(data.contents)
-        generate3dGraph(data.contents)
+        generate3dGraph(data.contents, true)
     }
 }
 
@@ -872,7 +872,7 @@ function determineMaxNumCoresAllocated(data) {
     return max
 }
 
-var origin = [0, 500]
+var origin = [0, 200]
 var startAngle = Math.PI/4
 var yAngle = startAngle
 var xAngle = -startAngle
@@ -920,32 +920,6 @@ var cubes3d = d3._3d()
     .origin(origin)
     .scale(scale)
 
-var originXBox = document.getElementById('origin-x')
-var originYBox = document.getElementById('origin-y')
-var timeIntervalBox = document.getElementById('time-interval')
-var scaleBox = document.getElementById('scale-input')
-
-originXBox.value = origin[0]
-originYBox.value = origin[1]
-timeIntervalBox.value = timeScalingFactor
-scaleBox.value = scale
-
-originXBox.onchange = function(e) {
-    changeOriginOrScale([parseInt(e.target.value), origin[1]], scale)
-}
-
-originYBox.onchange = function(e) {
-    changeOriginOrScale([origin[0], parseInt(e.target.value)], scale)
-}
-
-timeIntervalBox.onchange = function(e) {
-    changeTimeScalingFactor(parseInt(e.target.value))
-}
-
-scaleBox.onchange = function(e) {
-    changeOriginOrScale(origin, e.target.value)
-}
-
 function searchOverlap(taskId, taskOverlap) {
     for (var key in taskOverlap) {
         if (taskOverlap.hasOwnProperty(key)) {
@@ -989,7 +963,7 @@ function dragged(){
         data.contents,
         cubes3d.rotateY(beta + startAngle).rotateX(alpha - startAngle)(ftCubesData)
     ];
-    processData(rotatedData, 0);
+    processData(rotatedData, 0, false);
 }
 
 function dragStart(){
@@ -1088,7 +1062,7 @@ function deselectCube(hover) {
     hideTooltip()
 }
 
-function processData(data, tt){
+function processData(data, tt, populateLegend){
     /* ----------- GRID ----------- */
 
     var xGrid = svg.selectAll('path.grid').data(data[0], key);
@@ -1190,15 +1164,17 @@ function processData(data, tt){
 
     var legend = d3.select('#three-d-legend')
 
-    legend.append("small")
-        .attr("class", "inline-block")
-        .style("border-left", "15px solid orange")
-        .text("Terminated by User")
+    if (populateLegend) {
+        legend.append("small")
+            .attr("class", "inline-block")
+            .style("border-left", "15px solid orange")
+            .text("Terminated by User")
 
-    legend.append("small")
-        .attr("class", "inline-block")
-        .style("border-left", "15px solid red")
-        .text("Failed During Execution")
+        legend.append("small")
+            .attr("class", "inline-block")
+            .style("border-left", "15px solid red")
+            .text("Failed During Execution")
+    }
 
     var ce = cubes
         .enter()
@@ -1289,7 +1265,37 @@ function processData(data, tt){
 
 }
 
-function generate3dGraph(data) {
+function generate3dGraph(data, populateLegend) {
+    var originXBox = document.getElementById('origin-x')
+    var originYBox = document.getElementById('origin-y')
+    var timeIntervalBox = document.getElementById('time-interval')
+    var scaleBox = document.getElementById('scale-input')
+
+    originXBox.value = origin[0]
+    originYBox.value = origin[1]
+    timeIntervalBox.value = timeScalingFactor
+    scaleBox.value = scale
+
+    originXBox.onchange = function(e) {
+        changeOriginOrScale([parseInt(e.target.value), origin[1]], scale)
+    }
+
+    originYBox.onchange = function(e) {
+        changeOriginOrScale([origin[0], parseInt(e.target.value)], scale)
+    }
+
+    timeIntervalBox.onchange = function(e) {
+        changeTimeScalingFactor(parseInt(e.target.value))
+    }
+
+    scaleBox.onchange = function(e) {
+        changeOriginOrScale(origin, e.target.value)
+    }
+
+    if (firstVisit) {
+        showInstructions("three-d-instructions", "three-d-information-img")
+    }
+
     xGrid = [], scatter = [], yLine = [], xLine = []
     for(var z = 0; z <= maxTime + timeScalingFactor; z+=timeScalingFactor){
         for(var x = 0; x < maxTaskOverlap; x++) {
@@ -1332,7 +1338,7 @@ function generate3dGraph(data) {
         data,
         cubes3d(ftCubesData)
     ];
-    processData(threeDdata, 1000);
+    processData(threeDdata, 1000, populateLegend);
 
 }
 
@@ -1371,10 +1377,10 @@ function changeOriginOrScale(newOrigin, newScale) {
         data.contents,
         cubes3d(ftCubesData)
     ]
-    processData(newOriginData, 1000)
+    processData(newOriginData, 1000, false)
 }
 
 function changeTimeScalingFactor(factor) {
     timeScalingFactor = factor
-    generate3dGraph(data.contents)
+    generate3dGraph(data.contents, false)
 }
