@@ -165,27 +165,30 @@ td {
     text-align: center;
 }
 
-#host-instructions {
+.instructions-container {
     display: none;
     background-color: rgba(0, 255, 204, 0.2);
     text-align: center;
     padding-bottom: 6px;
 }
 
-#information-img {
-    display: none;
+.information-img {
     width: 25px;
     cursor: pointer;
     margin-left: 5px;
 }
 
-#host-instructions-close-button-container {
+#information-img {
+    display: none;
+}
+
+.instructions-close-button-container {
     text-align: right;
     margin-right: 16px;
     padding-top: 2px;
 }
 
-#host-instructions-close-button {
+.instructions-close-button {
     width: 13px;
     cursor: pointer;
 }
@@ -242,4 +245,12 @@ td {
 
 #three-d-legend-terminated {
     border-left: 15px solid orange
+}
+
+#time-interval {
+    width: 387px;
+}
+
+#scale-input {
+    width: 387px;
 }
