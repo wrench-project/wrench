@@ -1,4 +1,4 @@
-var data={"modified":"2019-06-02T03:09:44.509Z","file":"test_data/test_data_host.json","contents":[{"compute":{"end":-1,"start":-1},"execution_host":{"hostname":"Host1"},"failed":2,"num_cores_allocated":1,"read":{"end":-1,"start":0},"task_id":"ID00000","terminated":-1,"whole_task":{"end":-1,"start":0},"write":{"end":-1,"start":-1}},{"compute":{"end":-1,"start":13},"execution_host":{"hostname":"Host2"},"failed":-1,"num_cores_allocated":1,"read":{"end":13,"start":10},"task_id":"ID00001","terminated":14,"whole_task":{"end":-1,"start":10},"write":{"end":-1,"start":-1}},{"compute":{"end":26,"start":23},"execution_host":{"hostname":"Host3"},"failed":-1,"num_cores_allocated":1,"read":{"end":23,"start":20},"task_id":"ID00002","terminated":28,"whole_task":{"end":-1,"start":20},"write":{"end":-1,"start":26}}]}
+var data={"modified":"2019-06-02T03:09:44.509Z","file":"test_data/workflow_data.json","contents":[{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_1","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task0","terminated":-1,"vertical_position":0,"whole_task":{"end":3827.6378817372047,"start":0.007199838144329895},"write":{"end":3827.6378817372047,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_1","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task1","terminated":-1,"vertical_position":1,"whole_task":{"end":3827.635010247309,"start":0.007199838144329895},"write":{"end":3827.635010247309,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_1","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task10","terminated":-1,"vertical_position":2,"whole_task":{"end":3827.639191182566,"start":0.007199838144329895},"write":{"end":3827.639191182566,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_2","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task11","terminated":-1,"vertical_position":0,"whole_task":{"end":3827.6411369314314,"start":0.007199838144329895},"write":{"end":3827.6411369314314,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_2","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task12","terminated":-1,"vertical_position":1,"whole_task":{"end":3827.641331233935,"start":0.007199838144329895},"write":{"end":3827.641331233935,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_2","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task13","terminated":-1,"vertical_position":2,"whole_task":{"end":3827.6414647120796,"start":0.007199838144329895},"write":{"end":3827.6414647120796,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_3","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task14","terminated":-1,"vertical_position":0,"whole_task":{"end":3827.641553979021,"start":0.007199838144329895},"write":{"end":3827.641553979021,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_3","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task15","terminated":-1,"vertical_position":1,"whole_task":{"end":3827.641607708093,"start":0.007199838144329895},"write":{"end":3827.641607708093,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_3","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task16","terminated":-1,"vertical_position":2,"whole_task":{"end":3827.6416322071746,"start":0.007199838144329895},"write":{"end":3827.6416322071746,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_4","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task17","terminated":-1,"vertical_position":0,"whole_task":{"end":3827.640506539679,"start":0.007199838144329895},"write":{"end":3827.640506539679,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_4","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task18","terminated":-1,"vertical_position":1,"whole_task":{"end":3827.6399793833903,"start":0.007199838144329895},"write":{"end":3827.6399793833903,"start":3807.8470265752576}},{"compute":{"end":3807.8470265752576,"start":207.84676637525777},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_4","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":207.84676637525777,"start":0.007199838144329895},"task_id":"task19","terminated":-1,"vertical_position":2,"whole_task":{"end":3827.6408767314315,"start":0.007199838144329895},"write":{"end":3827.6408767314315,"start":3807.8470265752576}},{"compute":{"end":7566.212108144485,"start":3966.2118479444844},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_1","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":3966.2118479444844,"start":3827.6507028638657},"task_id":"task2","terminated":-1,"vertical_position":0,"whole_task":{"end":7579.408645646651,"start":3827.6507028638657},"write":{"end":7579.408645646651,"start":7566.212108144485}},{"compute":{"end":7912.423338350066,"start":7612.4230781500655},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_1","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":7612.4230781500655,"start":7579.417740802427},"task_id":"task20","terminated":-1,"vertical_position":0,"whole_task":{"end":7929.747237014191,"start":7579.417740802427},"write":{"end":7929.747237014191,"start":7912.423338350066}},{"compute":{"end":7566.212108144485,"start":3966.2118479444844},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_1","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":3966.2118479444844,"start":3827.6507028638657},"task_id":"task3","terminated":-1,"vertical_position":1,"whole_task":{"end":7579.408772085021,"start":3827.6507028638657},"write":{"end":7579.408772085021,"start":7566.212108144485}},{"compute":{"end":7566.212108144485,"start":3966.2118479444844},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_1","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":3966.2118479444844,"start":3827.6507028638657},"task_id":"task4","terminated":-1,"vertical_position":2,"whole_task":{"end":7579.408734069057,"start":3827.6507028638657},"write":{"end":7579.408734069057,"start":7566.212108144485}},{"compute":{"end":7566.212108144485,"start":3966.2118479444844},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_2","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":3966.2118479444844,"start":3827.6507028638657},"task_id":"task5","terminated":-1,"vertical_position":0,"whole_task":{"end":7579.405173391115,"start":3827.6507028638657},"write":{"end":7579.405173391115,"start":7566.212108144485}},{"compute":{"end":7566.212108144485,"start":3966.2118479444844},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_2","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":3966.2118479444844,"start":3827.6507028638657},"task_id":"task6","terminated":-1,"vertical_position":1,"whole_task":{"end":7579.4070007028695,"start":3827.6507028638657},"write":{"end":7579.4070007028695,"start":7566.212108144485}},{"compute":{"end":7566.212108144485,"start":3966.2118479444844},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_2","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":3966.2118479444844,"start":3827.6507028638657},"task_id":"task7","terminated":-1,"vertical_position":2,"whole_task":{"end":7579.407786370086,"start":3827.6507028638657},"write":{"end":7579.407786370086,"start":7566.212108144485}},{"compute":{"end":7566.212108144485,"start":3966.2118479444844},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_3","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":3966.2118479444844,"start":3827.6507028638657},"task_id":"task8","terminated":-1,"vertical_position":0,"whole_task":{"end":7579.408224259434,"start":3827.6507028638657},"write":{"end":7579.408224259434,"start":7566.212108144485}},{"compute":{"end":7566.212108144485,"start":3966.2118479444844},"execution_host":{"cores":12,"flop_rate":1000000000000,"hostname":"hpc.edu/node_3","memory":32000000000},"failed":-1,"num_cores_allocated":1,"read":{"end":3966.2118479444844,"start":3827.6507028638657},"task_id":"task9","terminated":-1,"vertical_position":1,"whole_task":{"end":7579.4084844594345,"start":3827.6507028638657},"write":{"end":7579.4084844594345,"start":7566.212108144485}}]}
 var energyData=[{"consumed_energy_trace":[{"time":0,"joules":0},{"time":2,"joules":400},{"time":4,"joules":800},{"time":6,"joules":1200}],"hostname":"host1","pstate_trace":[{"pstate":1,"time":0},{"pstate":0,"time":2}],"pstates":[{"idle":"100.0","pstate":0,"running":"200.0","speed":100000000},{"idle":" 93.0","pstate":1,"running":"170.0","speed":50000000},{"idle":" 90.0","pstate":2,"running":"150.0","speed":20000000}],"watt_off":"10"},{"consumed_energy_trace":[{"time":0,"joules":0},{"time":2,"joules":200},{"time":4,"joules":400},{"time":6,"joules":600}],"hostname":"host2","pstate_trace":[{"pstate":0,"time":0},{"pstate":1,"time":2}],"pstates":[{"idle":"100.0","pstate":0,"running":"200.0","speed":100000000},{"idle":" 93.0","pstate":1,"running":"170.0","speed":50000000},{"idle":" 90.0","pstate":2,"running":"150.0","speed":20000000}],"watt_off":"10"}]
 var currGraphState = "taskView"
 var hostColours = {}
@@ -959,7 +959,7 @@ function searchOverlap(taskId, taskOverlap) {
     }
 }
 
-function makeCube(h, x, z, duration){
+function makeCube(h, x, z, duration, colour){
     return [
         {x: x    , y: h, z: z + duration}, // FRONT TOP LEFT
         {x: x    , y: 0, z: z + duration}, // FRONT BOTTOM LEFT
@@ -969,6 +969,7 @@ function makeCube(h, x, z, duration){
         {x: x    , y: 0, z: z}, // BACK  BOTTOM LEFT
         {x: x + 1, y: 0, z: z}, // BACK  BOTTOM RIGHT
         {x: x + 1, y: h, z: z}, // BACK  TOP RIGHT
+        { colour },
     ];
 }
 
@@ -984,7 +985,8 @@ function dragged(){
         scale3d.rotateY(beta + startAngle).rotateX(alpha - startAngle)([yLine]),
         cubes3d.rotateY(beta + startAngle).rotateX(alpha - startAngle)(cubesData),
         scale3d.rotateY(beta + startAngle).rotateX(alpha - startAngle)([xLine]),
-        data.contents
+        data.contents,
+        cubes3d.rotateY(beta + startAngle).rotateX(alpha - startAngle)(ftCubesData)
     ];
     processData(rotatedData, 0);
 }
@@ -1225,6 +1227,36 @@ function processData(data, tt){
 
     faces.exit().remove();
 
+    /* --------- FT CUBES ---------*/
+
+    var ftCubes = cubesGroup.selectAll('g.cube').data(data[5], function(d){ return d.id });
+
+    var ftCE = ftCubes
+        .enter()
+        .append('g')
+        .attr('class', 'cube')
+        .attr('id', function(d, i) {
+            return `cube-${data[4][i].task_id}`
+        })
+        .attr('fill', function(d, i){
+            return d[8].colour
+        })
+        .attr('stroke', function(d){ return d3.color(color(d.id)); })
+        .merge(cubes)
+    
+    /* --------- FT FACES ---------*/
+
+    var ftFaces = ftCubes.merge(ftCE).selectAll('path.face').data(function(d){ return d.faces; }, function(d){ return d.face; });
+
+    ftFaces.enter()
+        .append('path')
+        .attr('class', 'face')
+        .attr('fill-opacity', 0.95)
+        .classed('_3d', true)
+        .merge(ftFaces)
+        .transition().duration(tt)
+        .attr('d', cubes3d.draw)    
+
 }
 
 function generate3dGraph(data) {
@@ -1242,6 +1274,7 @@ function generate3dGraph(data) {
     xLine.push([0,1,(maxTime / timeScalingFactor) + 1, "Time (seconds)"]) // for axis label
 
     cubesData = []
+    ftCubesData = []
     data.forEach(function(d) {
         var h = d.num_cores_allocated
         var z = d.whole_task.start / timeScalingFactor
@@ -1251,6 +1284,14 @@ function generate3dGraph(data) {
         cube.height = h
         cube.id = d.task_id
         cubesData.push(cube)
+        if (d.failed !== -1) {
+            var failedCube = makeCube(h, parseInt(x), z + duration, 0.00001, "red")
+            ftCubesData.push(failedCube)
+        }
+        if (d.terminated !== -1) {
+            var terminatedCube = makeCube(h, parseInt(x), z + duration, 0.00001, "orange")
+            ftCubesData.push(terminatedCube)
+        }
     })
 
     var threeDdata = [
@@ -1258,7 +1299,8 @@ function generate3dGraph(data) {
         scale3d([yLine]),
         cubes3d(cubesData),
         scale3d([xLine]),
-        data
+        data,
+        cubes3d(ftCubesData)
     ];
     processData(threeDdata, 1000);
 
@@ -1296,7 +1338,8 @@ function changeOriginOrScale(newOrigin, newScale) {
         scale3d([yLine]),
         cubes3d(cubesData),
         scale3d([xLine]), 
-        data.contents
+        data.contents,
+        cubes3d(ftCubesData)
     ]
     processData(newOriginData, 1000)
 }
