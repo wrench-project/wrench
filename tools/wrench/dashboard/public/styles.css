@@ -216,10 +216,6 @@ td {
     margin-bottom: 4px;
 }
 
-#time-interval-container {
-    float: right
-}
-
 #three-d-legend {
     word-wrap: break-word;
 }
@@ -234,4 +230,8 @@ td {
     pointer-events: none;
     font-family: sans-serif;
     font-size: 12px;
+}
+
+.three-d-graph-config {
+    margin-bottom: 20px;
 }
