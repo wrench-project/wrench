@@ -1,5 +1,5 @@
-var data={}
-var energyData=[{}]
+var data={"modified":"2019-06-02T03:09:44.509Z","file":"test_data/test_data_host.json","contents":[{"compute":{"end":-1,"start":-1},"execution_host":{"hostname":"Host1"},"failed":2,"num_cores_allocated":1,"read":{"end":-1,"start":0},"task_id":"ID00000","terminated":-1,"whole_task":{"end":-1,"start":0},"write":{"end":-1,"start":-1}},{"compute":{"end":-1,"start":13},"execution_host":{"hostname":"Host2"},"failed":-1,"num_cores_allocated":1,"read":{"end":13,"start":10},"task_id":"ID00001","terminated":14,"whole_task":{"end":-1,"start":10},"write":{"end":-1,"start":-1}},{"compute":{"end":26,"start":23},"execution_host":{"hostname":"Host3"},"failed":-1,"num_cores_allocated":1,"read":{"end":23,"start":20},"task_id":"ID00002","terminated":28,"whole_task":{"end":-1,"start":20},"write":{"end":-1,"start":26}}]}
+var energyData=[{"consumed_energy_trace":[{"time":0,"joules":0},{"time":2,"joules":400},{"time":4,"joules":800},{"time":6,"joules":1200}],"hostname":"host1","pstate_trace":[{"pstate":1,"time":0},{"pstate":0,"time":2}],"pstates":[{"idle":"100.0","pstate":0,"running":"200.0","speed":100000000},{"idle":" 93.0","pstate":1,"running":"170.0","speed":50000000},{"idle":" 90.0","pstate":2,"running":"150.0","speed":20000000}],"watt_off":"10"},{"consumed_energy_trace":[{"time":0,"joules":0},{"time":2,"joules":200},{"time":4,"joules":400},{"time":6,"joules":600}],"hostname":"host2","pstate_trace":[{"pstate":0,"time":0},{"pstate":1,"time":2}],"pstates":[{"idle":"100.0","pstate":0,"running":"200.0","speed":100000000},{"idle":" 93.0","pstate":1,"running":"170.0","speed":50000000},{"idle":" 90.0","pstate":2,"running":"150.0","speed":20000000}],"watt_off":"10"}]
 var currGraphState = "taskView"
 var hostColours = {}
 var currentlySelectedHost = {hostName: "", id: ""}
@@ -874,14 +874,20 @@ function determineMaxNumCoresAllocated(data) {
 
 var origin = [0, 500]
 var startAngle = Math.PI/4
+var yAngle = startAngle
+var xAngle = -startAngle
 var taskOverlap = determineTaskOverlap(data.contents)
 var maxTaskOverlap = Object.keys(taskOverlap).length + 1
 var maxTime = d3.max(data.contents, function(d) {
     return Math.max(d['whole_task'].end, d['failed'], d['terminated'])
 })
-var scale = maxTaskOverlap * 2
 var timeScalingFactor = maxTime / 32 // 32 is the ideal number of columns for the width of the space
-timeScalingFactor = Math.round(timeScalingFactor / 10) * 10 // round to the nearest 10
+if (timeScalingFactor < 10) {
+    timeScalingFactor = 10
+} else {
+    timeScalingFactor = Math.round(timeScalingFactor / 10) * 10 // round to the nearest 10
+}
+var scale = maxTaskOverlap * 2
 var key = function(d) { return d.task_id; }
 var svg    = d3.select('#three-d-graph-svg').call(d3.drag().on('drag', dragged).on('start', dragStart).on('end', dragEnd)).append('g')
 var cubesGroup = svg.append('g').attr('class', 'cubes')
@@ -917,21 +923,27 @@ var cubes3d = d3._3d()
 var originXBox = document.getElementById('origin-x')
 var originYBox = document.getElementById('origin-y')
 var timeIntervalBox = document.getElementById('time-interval')
+var scaleBox = document.getElementById('scale-input')
 
 originXBox.value = origin[0]
 originYBox.value = origin[1]
 timeIntervalBox.value = timeScalingFactor
+scaleBox.value = scale
 
 originXBox.onchange = function(e) {
-    changeOrigin([parseInt(e.target.value), origin[1]])
+    changeOriginOrScale([parseInt(e.target.value), origin[1]], scale)
 }
 
 originYBox.onchange = function(e) {
-    changeOrigin([origin[0], parseInt(e.target.value)])
+    changeOriginOrScale([origin[0], parseInt(e.target.value)], scale)
 }
 
 timeIntervalBox.onchange = function(e) {
-    changeScalingFactor(parseInt(e.target.value))
+    changeTimeScalingFactor(parseInt(e.target.value))
+}
+
+scaleBox.onchange = function(e) {
+    changeOriginOrScale(origin, e.target.value)
 }
 
 function searchOverlap(taskId, taskOverlap) {
@@ -965,6 +977,8 @@ function dragged(){
     mouseY = mouseY || 0;
     beta   = (d3.event.x - mx + mouseX) * Math.PI / 230 ;
     alpha  = (d3.event.y - my + mouseY) * Math.PI / 230  * (-1);
+    yAngle = beta + startAngle
+    xAngle = alpha - startAngle
     var rotatedData = [
         grid3d.rotateY(beta + startAngle).rotateX(alpha - startAngle)(xGrid),
         scale3d.rotateY(beta + startAngle).rotateX(alpha - startAngle)([yLine]),
@@ -1250,20 +1264,21 @@ function generate3dGraph(data) {
 
 }
 
-function changeOrigin(newOrigin) {
+function changeOriginOrScale(newOrigin, newScale) {
     origin = newOrigin
+    scale = newScale
     grid3d = d3._3d()
         .shape('GRID', maxTaskOverlap)
         .origin(origin)
-        .rotateY( startAngle)
-        .rotateX(-startAngle)
+        .rotateY(yAngle)
+        .rotateX(xAngle)
         .scale(scale)
 
     scale3d = d3._3d()
         .shape('LINE_STRIP')
         .origin(origin)
-        .rotateY( startAngle)
-        .rotateX(-startAngle)
+        .rotateY(yAngle)
+        .rotateX(xAngle)
         .scale(scale)
 
     cubes3d = d3._3d()
@@ -1271,10 +1286,11 @@ function changeOrigin(newOrigin) {
         .x(function(d){ return d.x; })
         .y(function(d){ return d.y; })
         .z(function(d){ return d.z; })
-        .rotateY( startAngle)
-        .rotateX(-startAngle)
+        .rotateY(yAngle)
+        .rotateX(xAngle)
         .origin(origin)
         .scale(scale)
+
     var newOriginData = [
         grid3d(xGrid),
         scale3d([yLine]),
@@ -1285,7 +1301,7 @@ function changeOrigin(newOrigin) {
     processData(newOriginData, 1000)
 }
 
-function changeScalingFactor(factor) {
+function changeTimeScalingFactor(factor) {
     timeScalingFactor = factor
     generate3dGraph(data.contents)
 }
