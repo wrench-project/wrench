@@ -235,3 +235,11 @@ td {
 .three-d-graph-config {
     margin-bottom: 20px;
 }
+
+#three-d-legend-failed {
+    border-left: 15px solid red
+}
+
+#three-d-legend-terminated {
+    border-left: 15px solid orange
+}
