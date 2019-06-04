@@ -245,7 +245,6 @@ private:
         resurector->simulation = this->simulation;
         resurector->start(resurector, true, false); // Daemonized, no auto-restart
 
-
         wrench::Simulation::sleep(10);
 
         // Create a VM on the Cloud Service
