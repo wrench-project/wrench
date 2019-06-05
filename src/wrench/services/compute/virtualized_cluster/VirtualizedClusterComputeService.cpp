@@ -202,7 +202,7 @@ namespace wrench {
             return true;
 
         } else if (auto msg = std::dynamic_pointer_cast<CloudComputeServiceCreateVMRequestMessage>(message)) {
-            processCreateVM(msg->answer_mailbox, msg->num_cores, msg->ram_memory, msg->property_list,
+            processCreateVM(msg->answer_mailbox, msg->num_cores, msg->ram_memory, msg->desired_vm_name, msg->property_list,
                             msg->messagepayload_list);
             return true;
 
