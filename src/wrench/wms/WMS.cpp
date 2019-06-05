@@ -189,6 +189,8 @@ namespace wrench {
             processEventFileCopyCompletion(real_event);
         } else if (auto real_event = std::dynamic_pointer_cast<FileCopyFailedEvent>(event)) {
             processEventFileCopyFailure(real_event);
+        } else if (auto real_event = std::dynamic_pointer_cast<TimerEvent>(event)) {
+            processEventTimer(real_event);
         } else {
             throw std::runtime_error("SimpleWMS::main(): Unknown workflow execution event: " + event->toString());
         }
@@ -197,9 +199,9 @@ namespace wrench {
     }
 
     /**
-     * @brief Process a WorkflowExecutionEvent::STANDARD_JOB_COMPLETION
+     * @brief Process a standard job completion event
      *
-     * @param event: a workflow execution event
+     * @param event: a StandardJobCompletedEvent
      */
     void WMS::processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent> event) {
         auto standard_job = event->standard_job;
@@ -207,48 +209,57 @@ namespace wrench {
     }
 
     /**
-     * @brief Process a WorkflowExecutionEvent::STANDARD_JOB_FAILURE event
+     * @brief Process a standard job failure event
      *
-     * @param event: a workflow execution event
+     * @param event: a StandardJobFailedEvent
      */
     void WMS::processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent> event) {
         WRENCH_INFO("Notified that a standard job has failed (all its tasks are back in the ready state)");
     }
 
     /**
-     * @brief Process a WorkflowExecutionEvent::PILOT_JOB_START event
+     * @brief Process a pilot job start event
      *
-     * @param event: a workflow execution event
+     * @param event: a PilotJobStartedEvent
      */
     void WMS::processEventPilotJobStart(std::shared_ptr<PilotJobStartedEvent> event) {
         WRENCH_INFO("Notified that a pilot job has started!");
     }
 
     /**
-     * @brief Process a WorkflowExecutionEvent::PILOT_JOB_EXPIRATION event
+     * @brief Process a pilot job expiration event
      *
-     * @param event: a workflow execution event
+     * @param event: a PilotJobExpiredEvent
      */
     void WMS::processEventPilotJobExpiration(std::shared_ptr<PilotJobExpiredEvent> event) {
         WRENCH_INFO("Notified that a pilot job has expired!");
     }
 
     /**
-     * @brief Process a WorkflowExecutionEvent::FILE_COPY_COMPLETION event
+     * @brief Process a file copy completion event
      *
-     * @param event: a workflow execution event
+     * @param event: a FileCopyCompletedEvent
      */
     void WMS::processEventFileCopyCompletion(std::shared_ptr<FileCopyCompletedEvent> event) {
         WRENCH_INFO("Notified that a file copy is completed!");
     }
 
     /**
-     * @brief Process a WorkflowExecutionEvent::FILE_COPY_FAILURE event
+     * @brief Process a file copy failure event
      *
-     * @param event: a workflow execution event
+     * @param event: a FileCopyFailedEvent
      */
     void WMS::processEventFileCopyFailure(std::shared_ptr<FileCopyFailedEvent> event) {
         WRENCH_INFO("Notified that a file copy has failed!");
+    }
+
+    /**
+     * @brief Process a timer event
+     *
+     * @param event: a TimerEvent
+     */
+    void WMS::processEventTimer(std::shared_ptr<TimerEvent> event) {
+        WRENCH_INFO("Notified that a time has gone off!");
     }
 
     /**
@@ -362,7 +373,8 @@ namespace wrench {
     }
 
 
-    /** @brief Get the WMS's pilot scheduler
+    /**
+     * @brief Get the WMS's pilot scheduler
      * 
      * @return the pilot scheduler, or nullptr if none
      */
@@ -370,12 +382,25 @@ namespace wrench {
         return (this->pilot_job_scheduler).get();
     }
 
-    /** @brief Get the WMS's pilot scheduler
+    /**
+     * @brief Get the WMS's pilot scheduler
      * 
      * @return the pilot scheduler, or nullptr if none
      */
     StandardJobScheduler *WMS::getStandardJobScheduler() {
         return (this->standard_job_scheduler).get();
+    }
+
+    /**
+     * @brief Sets a timer (which, when it goes off, will generate a TimerEvent)
+     * @param date: the date at which the timer should go off
+     * @param message: a string message that will be in the generated TimerEvent
+     */
+    void WMS::setTimer(double date, std::string message) {
+
+        Alarm::createAndStartAlarm(this->simulation, date, this->hostname, this->getWorkflow()->callback_mailbox,
+                                   new AlarmWMSTimerMessage(message, 0), "wms_timer");
+
     }
 
 };

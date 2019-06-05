@@ -29,4 +29,15 @@ namespace wrench {
     AlarmWMSDeferredStartMessage::AlarmWMSDeferredStartMessage(double payload) : WMSMessage("WMS_START_TIME",
                                                                                             payload) {}
 
+
+    /**
+     * @brief Constructor
+     * @param payload: message size in bytes
+     *
+     * @throw std::invalid_argument
+     */
+    AlarmWMSTimerMessage::AlarmWMSTimerMessage(std::string message, double payload) : WMSMessage("WMS_START_TIME",
+                                                                                            payload), message(message) {}
+
+
 };
