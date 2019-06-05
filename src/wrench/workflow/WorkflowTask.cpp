@@ -75,6 +75,14 @@ namespace wrench {
         WRENCH_DEBUG("Adding file '%s' as output t task %s",
                      file->getID().c_str(), this->getID().c_str());
 
+//        if (file->getOutputOf() != nullptr) {
+//            std::cerr << "Trying to set file '" + file->getID() + "' as output of task '" + this->getID() +
+//                                        "', but this file is already the output of task '" + file->getOutputOf()->getID()+ "'\n";
+//            throw std::invalid_argument("Trying to set file '" + file->getID() + "' as output of task '" + this->getID() +
+//            "', but this file is already the output of task '" + file->getOutputOf()->getID()+ "'");
+//
+//        }
+
         addFileToMap(output_files, input_files, file);
         file->setOutputOf(this);
 
