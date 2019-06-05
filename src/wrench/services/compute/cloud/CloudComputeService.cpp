@@ -124,6 +124,28 @@ namespace wrench {
                                               double ram_memory,
                                               std::map<std::string, std::string> property_list,
                                               std::map<std::string, double> messagepayload_list) {
+        return this->createVM(num_cores, ram_memory, "", property_list, messagepayload_list);
+    }
+
+    /**
+     * @brief Create a BareMetalComputeService VM (balances load on execution hosts)
+     *
+     * @param num_cores: the number of cores for the VM
+     * @param ram_memory: the VM's RAM memory capacity
+     * @param desired_vm_name: the VM's desired name ("" means "pick a name for me")
+     * @param property_list: a property list for the BareMetalComputeService that will run on the VM ({} means "use all defaults")
+     * @param messagepayload_list: a message payload list for the BareMetalComputeService that will run on the VM ({} means "use all defaults")
+     *
+     * @return A VM name
+     *
+     * @throw WorkflowExecutionException
+     * @throw std::runtime_error
+     */
+    std::string CloudComputeService::createVM(unsigned long num_cores,
+                                              double ram_memory,
+                                              std::string desired_vm_name,
+                                              std::map<std::string, std::string> property_list,
+                                              std::map<std::string, double> messagepayload_list) {
 
 
         if (num_cores == ComputeService::ALL_CORES) {
@@ -144,7 +166,7 @@ namespace wrench {
                 answer_mailbox,
                 new CloudComputeServiceCreateVMRequestMessage(
                         answer_mailbox,
-                        num_cores, ram_memory, property_list, messagepayload_list,
+                        num_cores, ram_memory, desired_vm_name, property_list, messagepayload_list,
                         this->getMessagePayloadValue(
                                 CloudComputeServiceMessagePayload::CREATE_VM_REQUEST_MESSAGE_PAYLOAD)));
 
@@ -628,7 +650,7 @@ namespace wrench {
             return true;
 
         } else if (auto msg = std::dynamic_pointer_cast<CloudComputeServiceCreateVMRequestMessage>(message)) {
-            processCreateVM(msg->answer_mailbox, msg->num_cores, msg->ram_memory, msg->property_list,
+            processCreateVM(msg->answer_mailbox, msg->num_cores, msg->ram_memory, msg->desired_vm_name, msg->property_list,
                             msg->messagepayload_list);
             return true;
 
@@ -700,6 +722,7 @@ namespace wrench {
      * @param answer_mailbox: the mailbox to which the answer message should be sent
      * @param requested_num_cores: the number of cores the service can use
      * @param requested_ram: the VM's RAM memory capacity
+     * @param desired_vm_name: the desired VM name ("" means "pick a name for me")
      * @param property_list: a property list for the BareMetalComputeService that will run on the VM ({} means "use all defaults")
      * @param messagepayload_list: a message payload list for the BareMetalComputeService that will run on the VM ({} means "use all defaults")
      *
@@ -708,6 +731,7 @@ namespace wrench {
     void CloudComputeService::processCreateVM(const std::string &answer_mailbox,
                                               unsigned long requested_num_cores,
                                               double requested_ram,
+                                              std::string desired_vm_name,
                                               std::map<std::string, std::string> property_list,
                                               std::map<std::string, double> messagepayload_list) {
 
@@ -744,25 +768,45 @@ namespace wrench {
         } else {
 
             // Pick a VM name (and being paranoid about mistakenly picking an actual hostname!)
-            std::string vm_name;
-            do {
-                vm_name = this->getName() + "_vm" + std::to_string(CloudComputeService::VM_ID++);
-            } while (S4U_Simulation::hostExists(vm_name));
+            std::string vm_name = "";
 
-            // Create the VM
-            auto vm = std::shared_ptr<S4U_VirtualMachine>(
-                    new S4U_VirtualMachine(vm_name, requested_num_cores, requested_ram, property_list,
-                                           messagepayload_list));
+            if (desired_vm_name.empty()) {
+                do {
+                    vm_name = this->getName() + "_vm" + std::to_string(CloudComputeService::VM_ID++);
+                } while (S4U_Simulation::hostExists(vm_name));
+            } else {
+                if (this->vm_list.find(desired_vm_name) == this->vm_list.end()) {
+                    vm_name = desired_vm_name;
+                }
+            }
 
-            // Add the VM to the list of VMs, with (for now) a nullptr compute service
-            this->vm_list[vm_name] = std::make_pair(vm, nullptr);
+            if (vm_name.empty()) {
+                std::string empty = std::string();
+                std::string error_msg = "Invalid requested VM name";
+                msg_to_send_back = new CloudComputeServiceCreateVMAnswerMessage(
+                        false,
+                        empty,
+                        std::shared_ptr<FailureCause>(
+                                new NotAllowed(this->getSharedPtr<CloudComputeService>(), error_msg)),
+                        this->getMessagePayloadValue(
+                                CloudComputeServiceMessagePayload::CREATE_VM_ANSWER_MESSAGE_PAYLOAD));
+            } else {
 
-            msg_to_send_back = new CloudComputeServiceCreateVMAnswerMessage(
-                    true,
-                    vm_name,
-                    nullptr,
-                    this->getMessagePayloadValue(
-                            CloudComputeServiceMessagePayload::CREATE_VM_ANSWER_MESSAGE_PAYLOAD));
+                // Create the VM
+                auto vm = std::shared_ptr<S4U_VirtualMachine>(
+                        new S4U_VirtualMachine(vm_name, requested_num_cores, requested_ram, property_list,
+                                               messagepayload_list));
+
+                // Add the VM to the list of VMs, with (for now) a nullptr compute service
+                this->vm_list[vm_name] = std::make_pair(vm, nullptr);
+
+                msg_to_send_back = new CloudComputeServiceCreateVMAnswerMessage(
+                        true,
+                        vm_name,
+                        nullptr,
+                        this->getMessagePayloadValue(
+                                CloudComputeServiceMessagePayload::CREATE_VM_ANSWER_MESSAGE_PAYLOAD));
+            }
         }
 
         // Send reply

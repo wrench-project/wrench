@@ -62,6 +62,7 @@ namespace wrench {
         CloudComputeServiceCreateVMRequestMessage(const std::string &answer_mailbox,
                                                   unsigned long num_cores,
                                                   double ram_memory,
+                                                  std::string desired_vm_name,
                                                   std::map<std::string, std::string> property_list,
                                                   std::map<std::string, double> messagepayload_list,
                                                   double payload);
@@ -73,6 +74,8 @@ namespace wrench {
         unsigned long num_cores;
         /** @brief The VM RAM memory capacity (0 means "use all memory available on the host", this can be lead to out of memory issue) */
         double ram_memory;
+        /** @brief The desired name for the VM ("" means "pick for me") */
+        std::string desired_vm_name;
         /** @brief A property list for the BareMetalComputeService that will run on the VM ({} means "use all defaults") */
         std::map<std::string, std::string> property_list;
         /** @brief A message payload list for the BareMetalComputeService that will run on the VM ({} means "use all defaults") */

@@ -85,6 +85,12 @@ namespace wrench {
                                      std::map<std::string, std::string> property_list = {},
                                      std::map<std::string, double> messagepayload_list = {});
 
+        virtual std::string createVM(unsigned long num_cores,
+                                     double ram_memory,
+                                     std::string desired_vm_name,
+                                     std::map<std::string, std::string> property_list = {},
+                                     std::map<std::string, double> messagepayload_list = {});
+
         virtual void shutdownVM(const std::string &vm_name);
 
         virtual std::shared_ptr<BareMetalComputeService> startVM(const std::string &vm_name);
@@ -145,6 +151,7 @@ namespace wrench {
         virtual void processCreateVM(const std::string &answer_mailbox,
                                      unsigned long requested_num_cores,
                                      double requested_ram,
+                                     std::string desired_vm_name,
                                      std::map<std::string, std::string> property_list,
                                      std::map<std::string, double> messagepayload_list
         );
