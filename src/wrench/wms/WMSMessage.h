@@ -36,6 +36,17 @@ namespace wrench {
 
     };
 
+    /**
+     * @brief Message sent when a timer set by a WMS goes off
+     */
+    class AlarmWMSTimerMessage : public WMSMessage {
+    public:
+        explicit AlarmWMSTimerMessage(std::string message, double payload);
+        std::string message;
+
+    };
+
+
     /***********************/
     /** \endcond           */
     /***********************/

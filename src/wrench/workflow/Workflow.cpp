@@ -582,7 +582,6 @@ namespace wrench {
                 std::string link = uses.attribute("link").value();
                 // Check whether the file already exists
                 WorkflowFile *file = nullptr;
-
                 try {
                     file = this->getFileByID(id);
                 } catch (std::invalid_argument &e) {
@@ -713,6 +712,7 @@ namespace wrench {
                         std::string link = f.at("link");
                         std::string id = f.at("name");
                         wrench::WorkflowFile *workflow_file = nullptr;
+                        // Check whether the file already exists
                         try {
                             workflow_file = this->getFileByID(id);
                         } catch (const std::invalid_argument &ia) {

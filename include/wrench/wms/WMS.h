@@ -63,6 +63,8 @@ namespace wrench {
 
         void checkDeferredStart();
 
+        void setTimer(double date, std::string message);
+
         std::shared_ptr<JobManager> createJobManager();
         std::shared_ptr<DataMovementManager> createDataMovementManager();
         std::shared_ptr<EnergyMeter> createEnergyMeter(const std::map<std::string, double> &measurement_periods);
@@ -138,6 +140,8 @@ namespace wrench {
         virtual void processEventFileCopyCompletion(std::shared_ptr<FileCopyCompletedEvent>);
 
         virtual void processEventFileCopyFailure(std::shared_ptr<FileCopyFailedEvent>);
+
+        virtual void processEventTimer(std::shared_ptr<TimerEvent>);
 
         /***********************/
         /** \endcond           */
