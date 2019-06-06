@@ -65,7 +65,7 @@ namespace wrench {
         task->workflow = this;
         task->DAG = this->DAG.get();
         task->DAG_node = DAG->addNode();
-        task->toplevel = 0; // upon creation, a task is an entry task
+        task->toplevel = 0; // upon creation, a task is an exit task
 
         // Add it to the DAG node's metadata
         (*DAG_node_map)[task->DAG_node] = task;
@@ -496,6 +496,7 @@ namespace wrench {
         return input_files;
     }
 
+
     /**
      * @brief Get the total number of flops for a list of tasks
      *
@@ -653,7 +654,7 @@ namespace wrench {
         try {
             workflowJobs = j.at("workflow");
         } catch (std::out_of_range &e) {
-            throw std::invalid_argument("Workflow::loadFromJson(): Could not find a workflow entry");
+            throw std::invalid_argument("Workflow::loadFromJson(): Could not find a workflow exit");
         }
 
         wrench::WorkflowTask *task;
@@ -806,13 +807,47 @@ namespace wrench {
     }
 
     /**
+     * @brief Get the exit tasks of the workflow, i.e., those tasks
+     *        that don't have parents
+     * @return A map of tasks indexed by their IDs
+     */
+    std::map<std::string, WorkflowTask *> Workflow::getEntryTasks() const {
+        // TODO: This could be done more efficiently at the Lemon level
+        std::map<std::string, WorkflowTask *> entry_tasks;
+        for (auto const &t : this->tasks) {
+            auto task = t.second.get();
+            if (task->getNumberOfParents() == 0) {
+                entry_tasks[task->getID()] = task;
+            }
+        }
+        return entry_tasks;
+    }
+
+    /**
+     * @brief Get the exit tasks of the workflow, i.e., those tasks
+     *        that don't have children
+     * @return A map of tasks indexed by their IDs
+     */
+    std::map<std::string, WorkflowTask *> Workflow::getExitTasks() const {
+        // TODO: This could be done more efficiently at the lemon level
+        std::map<std::string, WorkflowTask *> exit_tasks;
+        for (auto const &t : this->tasks) {
+            auto task = t.second.get();
+            if (task->getNumberOfChildren() == 0) {
+                exit_tasks[task->getID()] = task;
+            }
+        }
+        return exit_tasks;
+    }
+    
+    /**
      * @brief Returns the number of levels in the workflow
      * @return the number of levels
      */
     unsigned long Workflow::getNumLevels() {
         unsigned long max_top_level = 0;
         for (auto const &t : this->tasks) {
-            wrench::WorkflowTask *task = t.second.get();
+            auto task = t.second.get();
             if (task->getNumberOfChildren() == 0) {
                 if (1 + task->getTopLevel() > max_top_level) {
                     max_top_level = 1 + task->getTopLevel();
