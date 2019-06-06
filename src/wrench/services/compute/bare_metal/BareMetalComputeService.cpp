@@ -532,7 +532,7 @@ namespace wrench {
                 hosts_to_monitor.push_back(h.first);
             }
             this->host_state_change_monitor = std::shared_ptr<HostStateChangeDetector>(
-                    new HostStateChangeDetector(this->hostname, hosts_to_monitor, true, true, false,
+                    new HostStateChangeDetector(this->hostname, hosts_to_monitor, true, true, true,
                                                 this->getSharedPtr<Service>(), this->mailbox_name,
                                                 {{HostStateChangeDetectorProperty::MONITORING_PERIOD, "1.0"}}));
             this->host_state_change_monitor->simulation = this->simulation;
@@ -792,6 +792,9 @@ namespace wrench {
 
         WRENCH_INFO("Got a [%s] message", message->getName().c_str());
         if (auto msg = std::dynamic_pointer_cast<HostHasTurnedOnMessage>(message)) {
+            // Do nothing, just wake up
+            return true;
+        } else if (auto msg = std::dynamic_pointer_cast<HostHasChangedSpeedMessage>(message)) {
             // Do nothing, just wake up
             return true;
         } else if (auto msg = std::dynamic_pointer_cast<HostHasTurnedOffMessage>(message)) {
