@@ -36,6 +36,7 @@ namespace wrench {
                                          std::vector<std::string> hosts_to_monitor,
                                          bool notify_when_turned_on,
                                          bool notify_when_turned_off,
+                                         bool notify_when_speed_change,
                                          std::shared_ptr<S4U_Daemon> creator,
                                          std::string mailbox_to_notify,
                                          std::map<std::string, std::string> property_list = {}
@@ -48,14 +49,17 @@ namespace wrench {
 
         void cleanup(bool has_terminated_cleanly, int return_value) override;
         void hostStateChangeCallback(std::string const &hostname);
+        void hostSpeedChangeCallback(std::string const &hostname);
 
         std::vector<std::string> hosts_to_monitor;
         bool notify_when_turned_on;
         bool notify_when_turned_off;
+        bool notify_when_speed_change;
         std::string mailbox_to_notify;
         int main() override;
 
         std::vector<std::pair<std::string, bool>> hosts_that_have_recently_changed_state;
+        std::vector<std::pair<std::string, double>> hosts_that_have_recently_changed_speed;
 
         std::shared_ptr<S4U_Daemon> creator;
 
@@ -63,6 +67,7 @@ namespace wrench {
         std::vector<std::string> hosts_that_have_recently_turned_off;
 
         unsigned int on_state_change_call_back_id;
+        unsigned int on_speed_change_call_back_id;
 
     };
 

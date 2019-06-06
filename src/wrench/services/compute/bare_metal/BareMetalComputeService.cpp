@@ -532,7 +532,7 @@ namespace wrench {
                 hosts_to_monitor.push_back(h.first);
             }
             this->host_state_change_monitor = std::shared_ptr<HostStateChangeDetector>(
-                    new HostStateChangeDetector(this->hostname, hosts_to_monitor, true, true,
+                    new HostStateChangeDetector(this->hostname, hosts_to_monitor, true, true, false,
                                                 this->getSharedPtr<Service>(), this->mailbox_name,
                                                 {{HostStateChangeDetectorProperty::MONITORING_PERIOD, "1.0"}}));
             this->host_state_change_monitor->simulation = this->simulation;
@@ -589,6 +589,11 @@ namespace wrench {
 
             // If the host is down, then don't look at it
             if (not Simulation::isHostOn(r.first)) {
+                continue;
+            }
+
+            // If the host has compute speed zero, then don't look at it
+            if (Simulation::getHostFlopRate(r.first) <= 0.0) {
                 continue;
             }
 
