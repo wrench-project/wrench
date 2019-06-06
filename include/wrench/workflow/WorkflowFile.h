@@ -32,6 +32,7 @@ namespace wrench {
         std::string getID();
 
         WorkflowTask *getOutputOf();
+        std::map<std::string, WorkflowTask *> getInputOf();
 
         bool isOutput();
 
@@ -50,7 +51,6 @@ namespace wrench {
 
         void setInputOf(WorkflowTask *task);
 
-        std::map<std::string, WorkflowTask *> getInputOf();
 
         Workflow *workflow; // Containing workflow
         WorkflowFile(const std::string, double);
