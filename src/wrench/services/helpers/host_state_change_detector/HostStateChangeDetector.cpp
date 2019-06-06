@@ -22,6 +22,7 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(host_state_change_detector, "Log category for HostS
 void wrench::HostStateChangeDetector::cleanup(bool has_returned_from_main, int return_value) {
     // Unregister the callback!
     simgrid::s4u::Host::on_state_change.disconnect(this->on_state_change_call_back_id);
+    simgrid::s4u::Host::on_speed_change.disconnect(this->on_speed_change_call_back_id);
 }
 
 
@@ -31,6 +32,7 @@ void wrench::HostStateChangeDetector::cleanup(bool has_returned_from_main, int r
  * @param hosts_to_monitor: the list of hosts to monitor
  * @param notify_when_turned_on: whether to send a notifications when hosts turn on
  * @param notify_when_turned_off: whether to send a notifications when hosts turn off
+ * @param notify_when_speed_change: whether to send a notification when hosts change speed
  * @param creator: the service that created this service (when its creator dies, so does this service)
  * @param mailbox_to_notify: the mailbox to notify
  * @param property_list: a property list
@@ -38,7 +40,7 @@ void wrench::HostStateChangeDetector::cleanup(bool has_returned_from_main, int r
  */
 wrench::HostStateChangeDetector::HostStateChangeDetector(std::string host_on_which_to_run,
                                                          std::vector<std::string> hosts_to_monitor,
-                                                         bool notify_when_turned_on, bool notify_when_turned_off,
+                                                         bool notify_when_turned_on, bool notify_when_turned_off, bool notify_when_speed_change,
                                                          std::shared_ptr<S4U_Daemon> creator,
                                                          std::string mailbox_to_notify,
                                                          std::map<std::string, std::string> property_list) :
@@ -46,6 +48,7 @@ wrench::HostStateChangeDetector::HostStateChangeDetector(std::string host_on_whi
     this->hosts_to_monitor = hosts_to_monitor;
     this->notify_when_turned_on = notify_when_turned_on;
     this->notify_when_turned_off = notify_when_turned_off;
+    this->notify_when_speed_change = notify_when_speed_change;
     this->mailbox_to_notify = mailbox_to_notify;
     this->creator = creator;
 
@@ -57,6 +60,13 @@ wrench::HostStateChangeDetector::HostStateChangeDetector(std::string host_on_whi
             [this](simgrid::s4u::Host const &h) {
                 this->hostStateChangeCallback(h.get_name());
             });
+
+    // Connect my member method to the on_speed_change signal from SimGrid regarding Hosts
+    this->on_speed_change_call_back_id = simgrid::s4u::Host::on_speed_change.connect(
+            [this](simgrid::s4u::Host const &h) {
+                this->hostSpeedChangeCallback(h.get_name());
+            });
+
 }
 
 void wrench::HostStateChangeDetector::hostStateChangeCallback(std::string const &hostname) {
@@ -64,6 +74,15 @@ void wrench::HostStateChangeDetector::hostStateChangeCallback(std::string const 
         this->hosts_to_monitor.end()) {
         auto host = simgrid::s4u::Host::by_name(hostname);
         this->hosts_that_have_recently_changed_state.push_back(std::make_pair(hostname, host->is_on()));
+    }
+}
+
+void wrench::HostStateChangeDetector::hostSpeedChangeCallback(std::string const &hostname) {
+    if (std::find(this->hosts_to_monitor.begin(), this->hosts_to_monitor.end(), hostname) !=
+        this->hosts_to_monitor.end()) {
+        auto host = simgrid::s4u::Host::by_name(hostname);
+        double speed = host->get_speed();
+        this->hosts_that_have_recently_changed_speed.push_back(std::make_pair(hostname, speed));
     }
 }
 
@@ -79,6 +98,7 @@ int wrench::HostStateChangeDetector::main() {
         // Sleeping for my monitoring period
         Simulation::sleep(this->getPropertyValueAsDouble(HostStateChangeDetectorProperty::MONITORING_PERIOD));
 
+        // State Changes
         while (not this->hosts_that_have_recently_changed_state.empty()) {
             auto host_info = this->hosts_that_have_recently_changed_state.at(0);
             std::string hostname = std::get<0>(host_info);
@@ -104,8 +124,33 @@ int wrench::HostStateChangeDetector::main() {
                 WRENCH_INFO("Network error '%s' while notifying mailbox of a host state change ... ignoring",
                             e->toString().c_str());
             }
-
         }
+
+        // Speed Changes
+        while (not this->hosts_that_have_recently_changed_speed.empty()) {
+            auto host_info = this->hosts_that_have_recently_changed_speed.at(0);
+            std::string hostname = std::get<0>(host_info);
+            double new_speed = std::get<1>(host_info);
+            this->hosts_that_have_recently_changed_speed.erase(this->hosts_that_have_recently_changed_speed.begin());
+
+            HostStateChangeDetectorMessage *msg;
+
+            if (this->notify_when_speed_change) {
+                msg = new HostHasChangedSpeedMessage(hostname, new_speed);
+                continue;
+            }
+
+            WRENCH_INFO("Notifying mailbox '%s' that host '%s' has changed speed", this->mailbox_to_notify.c_str(),
+                        hostname.c_str());
+            try {
+                S4U_Mailbox::dputMessage(this->mailbox_to_notify, msg);
+            } catch (std::shared_ptr<NetworkError> &e) {
+                WRENCH_INFO("Network error '%s' while notifying mailbox of a speed state change ... ignoring",
+                            e->toString().c_str());
+            }
+        }
+
+
     }
     return 0;
 }

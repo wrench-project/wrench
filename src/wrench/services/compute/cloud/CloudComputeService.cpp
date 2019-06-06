@@ -894,6 +894,11 @@ namespace wrench {
                 continue;
             }
 
+            // Check that host has a non-zero compute speed
+            if (Simulation::getHostFlopRate(host) <= 0) {
+                continue;
+            }
+
             // Check for RAM
             auto total_ram = Simulation::getHostMemoryCapacity(host);
             auto available_ram = total_ram - this->used_ram_per_execution_host[host];
