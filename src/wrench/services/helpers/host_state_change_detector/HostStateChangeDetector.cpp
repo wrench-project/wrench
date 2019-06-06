@@ -137,6 +137,7 @@ int wrench::HostStateChangeDetector::main() {
 
             if (this->notify_when_speed_change) {
                 msg = new HostHasChangedSpeedMessage(hostname, new_speed);
+            } else {
                 continue;
             }
 
