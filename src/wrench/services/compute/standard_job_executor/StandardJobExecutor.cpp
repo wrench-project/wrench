@@ -474,6 +474,11 @@ namespace wrench {
                         continue;
                     }
 
+                    // Does the host have non-zero compute speed?
+                    if (Simulation::getHostFlopRate(hostname) <= 0.0) {
+                        continue;
+                    }
+
                     // Does the host have enough cores?
                     unsigned long num_available_cores = this->core_availabilities[hostname];
                     if (num_available_cores < minimum_num_cores) {
@@ -621,6 +626,9 @@ namespace wrench {
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
 
         if (auto msg = std::dynamic_pointer_cast<HostHasTurnedOnMessage>(message)) {
+            // Do nothing, just wake up
+            return true;
+        } else if (auto msg = std::dynamic_pointer_cast<HostHasChangedSpeedMessage>(message)) {
             // Do nothing, just wake up
             return true;
         } else if (auto msg = std::dynamic_pointer_cast<WorkunitExecutorDoneMessage>(message)) {
