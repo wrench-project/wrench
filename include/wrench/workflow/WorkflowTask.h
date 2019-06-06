@@ -38,9 +38,11 @@ namespace wrench {
 
         double getMemoryRequirement() const;
 
-        int getNumberOfChildren() const;
+        unsigned long getNumberOfChildren() const;
+        std::vector<WorkflowTask *> getChildren() const;
 
-        int getNumberOfParents() const;
+        unsigned long getNumberOfParents() const;
+        std::vector<WorkflowTask *> getParents() const;
 
         void addInputFile(WorkflowFile *file);
 
