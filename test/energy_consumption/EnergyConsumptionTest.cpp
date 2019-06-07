@@ -184,7 +184,7 @@ private:
           throw std::runtime_error(
                   "Should not have been able to read the energy for dummy hosts"
           );
-        } catch (std::exception e) {
+        } catch (std::exception &e) {
           WRENCH_INFO("Expected exception as we were trying to measure the energy for a dummy host that is not available");
         }
 
@@ -193,7 +193,7 @@ private:
           throw std::runtime_error(
                   "Should not have been able to read the energy for dummy hosts"
           );
-        } catch (std::exception e) {
+        } catch (std::exception &e) {
           WRENCH_INFO("Expected exception as we were trying to measure the energy for a dummy host that is not available");
         }
 
@@ -202,7 +202,7 @@ private:
           throw std::runtime_error(
                   "Should not have been able to read the energy for dummy hosts"
           );
-        } catch (std::exception e) {
+        } catch (std::exception &e) {
           WRENCH_INFO("Expected exception as we were trying to measure the energy for a dummy host that is not available");
         }
 
@@ -211,7 +211,7 @@ private:
           throw std::runtime_error(
                   "Should not have been able to read the energy for dummy hosts"
           );
-        } catch (std::exception e) {
+        } catch (std::exception &e) {
           WRENCH_INFO("Expected exception as we were trying to access energy plugin for a dummy host that is not available");
         }
 
@@ -220,7 +220,7 @@ private:
           throw std::runtime_error(
                   "Should not have been able to read the energy for dummy hosts"
           );
-        } catch (std::exception e) {
+        } catch (std::exception &e) {
           WRENCH_INFO("Expected exception as we were trying to access energy plugin for a dummy host that is not available");
         }
 
@@ -229,7 +229,7 @@ private:
           throw std::runtime_error(
                   "Should not have been able to read the energy for dummy hosts"
           );
-        } catch (std::exception e) {
+        } catch (std::exception &e) {
           WRENCH_INFO("Unexpected exception as we were trying to access energy plugin for a correct host that is available");
         }
       }
