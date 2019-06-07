@@ -132,7 +132,7 @@ int main(int argc, char **argv) {
      * These files are then staged on the storage service.
      */
     std::cerr << "Staging input files..." << std::endl;
-    std::map<std::string, wrench::WorkflowFile *> input_files = workflow.getInputFiles();
+    auto input_files = workflow.getInputFiles();
     for (auto f : input_files) {
         std::cerr << "---> " << f.second->getID() << "\n";
     }
