@@ -165,27 +165,30 @@ td {
     text-align: center;
 }
 
-#host-instructions {
+.instructions-container {
     display: none;
     background-color: rgba(0, 255, 204, 0.2);
     text-align: center;
     padding-bottom: 6px;
 }
 
-#information-img {
-    display: none;
+.information-img {
     width: 25px;
     cursor: pointer;
     margin-left: 5px;
 }
 
-#host-instructions-close-button-container {
+#information-img {
+    display: none;
+}
+
+.instructions-close-button-container {
     text-align: right;
     margin-right: 16px;
     padding-top: 2px;
 }
 
-#host-instructions-close-button {
+.instructions-close-button {
     width: 13px;
     cursor: pointer;
 }
@@ -196,4 +199,58 @@ td {
 
 #button-and-information-container {
     margin-top: 6px;
+}
+
+#three-d-graph-container {
+    width: 1000px;
+    margin: auto;
+}
+
+#up-down-arrow-container {
+    width: 30px;
+    display: inline-block;
+}
+
+.up-down-arrow {
+    width: 100%;
+}
+
+#up-arrow {
+    margin-bottom: 4px;
+}
+
+#three-d-legend {
+    word-wrap: break-word;
+}
+
+#three-d-tooltip-container {
+    visibility: hidden;
+    width: 100%;
+    padding: 10px;
+    background-color: #f2f2f2;
+    border-radius: 2px;
+    border: 0px solid #000;
+    pointer-events: none;
+    font-family: sans-serif;
+    font-size: 12px;
+}
+
+.three-d-graph-config {
+    margin-bottom: 20px;
+}
+
+#three-d-legend-failed {
+    border-left: 15px solid red
+}
+
+#three-d-legend-terminated {
+    border-left: 15px solid orange
+}
+
+#time-interval {
+    width: 387px;
+}
+
+#scale-input {
+    width: 387px;
 }
