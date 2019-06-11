@@ -6,24 +6,22 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <title>WRENCH Dashboard</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <script src="public/scripts.js"></script>
         <script src="public/bootstrap.min.css"></script>
         <link rel="stylesheet" href="public/bootstrap.min.css">
         <link rel="stylesheet" href="public/styles.css">
         <link rel="icon" href="public/favicon.ico" />
         <script src="public/d3.min.js" type="text/javascript"></script>
         <script src="public/jQueryRotate.js" type="text/javascript"></script>
-
+        <script src="public/d3-3d.js" type="text/javascript"></script>
         <!-- billboard.js scripts -->
         <script src="https://cdn.jsdelivr.net/npm/billboard.js/dist/billboard.min.js"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/billboard.js/dist/billboard.min.css">
-
     </head>
     <body>
         
         <div id='info-container'>
             <img src='public/logo-vertical.png' id=logo>
-            <h3>Wrench Dashboard</h3>
+            <h3>WRENCH Dashboard</h3>
             <p id='updated'></p>
         </div>
         <div id="no-file">
@@ -67,11 +65,11 @@
                 <div class='hidden' id='overall-graph-container'>
                     <div id='button-and-information-container'>
                         <button id='toggle-view-button' onclick="toggleView()">Switch to Host View</button>
-                        <img id='information-img' src='public/information.png' onclick='showHostInstructions()'/>
+                        <img id='information-img' class='information-img' src='public/information.png' onclick='showInstructions("host-instructions", "information-img")'/>
                     </div>
-                    <div id='host-instructions'>
-                        <div id='host-instructions-close-button-container'>
-                            <img id='host-instructions-close-button' src='public/close-button.png' onclick='hideHostInstructions()'/>
+                    <div id='host-instructions' class='instructions-container'>
+                        <div id='host-instructions-close-button-container' class='instructions-close-button-container'>
+                            <img id='host-instructions-close-button' class='instructions-close-button' src='public/close-button.png' onclick='hideInstructions("host-instructions", "information-img")'/>
                         </div>
                         <p id='host-instructions-text'>Hover over or click on a host on the legend to isolate that host on the graph. Click on a selected host to deselect it. or just select a different host on the legend</p>
                     </div>
@@ -151,8 +149,58 @@
 
             </div>
 
+            <div class='element-and-title-container'>
+                <div class='title-container' onclick='showHideArrow("three-d-graph-container", "three-d-graph-arrow")'>
+                    <h6 class='title-text'>3D Visualisation</h6>
+                    <div class='arrow-div'>
+                        <span class='arrow-helper'></span>
+                        <img id='three-d-graph-arrow' class='arrow-img' src='public/expand-arrow.png'/>
+                    </div>
+                </div>
+                <div id='three-d-graph-container' class='hidden'>
+                    <img id='three-d-information-img' class='information-img' src='public/information.png' onclick='showInstructions("three-d-instructions", "three-d-information-img")'/>
+                    <div id='three-d-instructions' class='instructions-container' style='text-align: left'>
+                        <div id='three-d-instructions-close-button-container' class='instructions-close-button-container'>
+                            <img id='three-d-instructions-close-button' class='instructions-close-button' src='public/close-button.png' onclick='hideInstructions("three-d-instructions", "three-d-information-img")'/>
+                        </div>
+                        <p id='three-d-instructions-text'>
+                            Each cube in this 3D graph represents a task. The color to task ID mapping can be found in the legend below. Hover over or click a task in the legend to view more details about the task and highlight it in the graph. You can click and drag the graph to adjust the angle. 
+                        </p>
+                        <p>
+                            Use these configurations to change how you view the graph:
+                        </p>
+                        <ul>
+                            <li>Origin: change where the origin is on the page</li>
+                            <li>Time interval: adjust how much time a square on the grid represents</li>
+                            <li>Scale: alter the size of of the squares</li>
+                        </ul>
+                    </div>
+                    <div id='three-d-graph-config'>
+                        <div id='three-d-origin' class='three-d-graph-config'>
+                            Origin:<br>
+                            X: <input type='number' id='origin-x'>
+                            Y: <input type='number' id='origin-y'>
+                        </div>
+                        <div id='time-interval-container' class='three-d-graph-config'>
+                            Time interval: <br><input type='number' step='10' id='time-interval'>
+                        </div>
+                        <div id='scale-input-container' class='three-d-graph-config'>
+                            Scale: <br><input type='number' id='scale-input'>
+                        </div>
+                    </div>
+                    <p>Legend:</p>
+                    <div class="container legend" id="three-d-legend"></div>
+                    <div class="text-left" id="three-d-tooltip-container">
+                        <span id="three-d-tooltip-task-id"></span><br>
+                        <span id="three-d-tooltip-host"></span><br>
+                        <span id="three-d-tooltip-task-operation-duration"></span>
+                    </div>
+                    <svg width="100%" height="1000px" id='three-d-graph-svg'></svg>
+                </div>
+            </div>
         </div>
     </body>
+    <script src="public/scripts.js"></script>
     <script>
         if (energyData != []) {
             generateConsumedEnergyGraph()
