@@ -83,7 +83,7 @@ namespace wrench {
                 new ComputeServiceSubmitStandardJobRequestMessage(
                         answer_mailbox, job, service_specific_args,
                         this->getMessagePayloadValue(
-                                HTCondorServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
+                                HTCondorComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -128,7 +128,7 @@ namespace wrench {
                 new ComputeServiceSubmitPilotJobRequestMessage(
                         answer_mailbox, job, service_specific_args,
                         this->getMessagePayloadValue(
-                                HTCondorServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
+                                HTCondorComputeServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -243,7 +243,7 @@ namespace wrench {
         try {
           S4U_Mailbox::putMessage(msg->ack_mailbox,
                                   new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
-                                          HTCondorServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+                                          HTCondorComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
           return false;
         }
@@ -283,7 +283,7 @@ namespace wrench {
                           job, this->getSharedPtr<HTCondorComputeService>(), false, std::shared_ptr<FailureCause>(
                                   new JobTypeNotSupported(job, this->getSharedPtr<HTCondorComputeService>())),
                           this->getMessagePayloadValue(
-                                  HTCondorServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
+                                  HTCondorComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
           return;
         }
@@ -298,7 +298,7 @@ namespace wrench {
                 answer_mailbox,
                 new ComputeServiceSubmitStandardJobAnswerMessage(
                         job, this->getSharedPtr<HTCondorComputeService>(), true, nullptr, this->getMessagePayloadValue(
-                                HTCondorServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
+                                HTCondorComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
         return;
       } catch (std::shared_ptr<NetworkError> &cause) {
         return;
@@ -326,7 +326,7 @@ namespace wrench {
                           job, this->getSharedPtr<HTCondorComputeService>(), false, std::shared_ptr<FailureCause>(
                                   new JobTypeNotSupported(job, this->getSharedPtr<HTCondorComputeService>())),
                           this->getMessagePayloadValue(
-                                  HTCondorServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
+                                  HTCondorComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
           return;
         }
@@ -341,7 +341,7 @@ namespace wrench {
                 answer_mailbox,
                 new ComputeServiceSubmitPilotJobAnswerMessage(
                         job, this->getSharedPtr<HTCondorComputeService>(), true, nullptr, this->getMessagePayloadValue(
-                                HTCondorServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
+                                HTCondorComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
         return;
       } catch (std::shared_ptr<NetworkError> &cause) {
         return;
