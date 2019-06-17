@@ -103,7 +103,12 @@ namespace wrench {
         } else if (auto pilot_job = dynamic_cast<PilotJob *>(job)) {
           // TODO: handle pilot job
           for (auto &item : *this->compute_resources) {
-
+            pilot_job->pushCallbackMailbox(this->reply_mailbox);
+            item.first->submitPilotJob(pilot_job, specific_args);
+            this->running_jobs->insert(std::make_pair(job, item.first));
+            scheduled_jobs.push_back(job);
+            WRENCH_INFO("Dispatched pilot job %s", pilot_job->getName().c_str());
+            break;
           }
         }
       }
