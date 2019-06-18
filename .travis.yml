@@ -43,7 +43,7 @@ script:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
       docker exec -w /home/wrench/wrench/build -it wrench cmake -DENABLE_BATSCHED=${BATSCHED} -DCMAKE_VERBOSE_MAKEFILE=ON -DCOVERAGE=1 ..;
       docker exec -w /home/wrench/wrench/build -it wrench make all unit_tests;
-      travis_wait docker exec -w /home/wrench/wrench/build -it wrench ./unit_tests;
+      travis_wait sleep infinity & docker exec -w /home/wrench/wrench/build -it wrench ./unit_tests;
     fi
 
 after_success:
