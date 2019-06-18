@@ -250,7 +250,7 @@ namespace wrench {
             // Start the daemon for the service
             this->startDaemon(daemonize, auto_restart);
             // Print some information a out the currently tracked daemons
-            WRENCH_INFO("MAP SIZE = %ld    NUM_TERMINATED_SERVICES = %ld",
+            WRENCH_DEBUG("MAP SIZE = %ld    NUM_TERMINATED_SERVICES = %ld",
                         Service::service_shared_ptr_map.size(), Service::num_terminated_services);
             if ((Service::service_shared_ptr_map.size() > 1000) or
                 (Service::num_terminated_services > Service::service_shared_ptr_map.size() / 2)) {
