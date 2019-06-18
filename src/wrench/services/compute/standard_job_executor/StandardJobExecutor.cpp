@@ -290,7 +290,7 @@ namespace wrench {
             hosts_to_monitor.push_back(h.first);
         }
         this->host_state_monitor = std::shared_ptr<HostStateChangeDetector>(
-                new HostStateChangeDetector(this->hostname, hosts_to_monitor, true, false,
+                new HostStateChangeDetector(this->hostname, hosts_to_monitor, true, false, false,
                                             this->getSharedPtr<Service>(), this->mailbox_name));
         this->host_state_monitor->simulation = this->simulation;
         this->host_state_monitor->start(this->host_state_monitor, true, false); // Daemonized, no auto-restart
@@ -474,6 +474,11 @@ namespace wrench {
                         continue;
                     }
 
+                    // Does the host have non-zero compute speed?
+                    if (Simulation::getHostFlopRate(hostname) <= 0.0) {
+                        continue;
+                    }
+
                     // Does the host have enough cores?
                     unsigned long num_available_cores = this->core_availabilities[hostname];
                     if (num_available_cores < minimum_num_cores) {
@@ -621,6 +626,9 @@ namespace wrench {
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
 
         if (auto msg = std::dynamic_pointer_cast<HostHasTurnedOnMessage>(message)) {
+            // Do nothing, just wake up
+            return true;
+        } else if (auto msg = std::dynamic_pointer_cast<HostHasChangedSpeedMessage>(message)) {
             // Do nothing, just wake up
             return true;
         } else if (auto msg = std::dynamic_pointer_cast<WorkunitExecutorDoneMessage>(message)) {

@@ -11,6 +11,7 @@
 
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <managers/JobManagerMessage.h>
+#include <wms/WMSMessage.h>
 
 #include "wrench/simulation/SimulationMessage.h"
 #include "wrench/services/compute/ComputeServiceMessage.h"
@@ -101,6 +102,8 @@ namespace wrench {
                 return std::shared_ptr<FileCopyFailedEvent>(
                         new FileCopyFailedEvent(m->file, m->storage_service, m->failure_cause));
             }
+        } else if (auto m = std::dynamic_pointer_cast<AlarmWMSTimerMessage>(message)) {
+            return std::shared_ptr<TimerEvent>(new TimerEvent(m->message));
         } else {
             throw std::runtime_error(
                     "WorkflowExecutionEvent::waitForNextExecutionEvent(): Non-handled message type when generating execution event");

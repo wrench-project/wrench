@@ -73,6 +73,9 @@ namespace wrench {
 
         std::map<std::string, WorkflowFile *> getInputFiles();
 
+        std::map<std::string, WorkflowTask *> getEntryTasks() const;
+        std::map<std::string, WorkflowTask *> getExitTasks() const;
+
         bool isDone();
 
         /***********************/

@@ -50,6 +50,18 @@ namespace wrench {
         std::string hostname;
     };
 
+    /**
+     * @brief A message sent by the HostStateChangeDetector to notify some listener that a host has changed speed
+     */
+    class HostHasChangedSpeedMessage : public HostStateChangeDetectorMessage {
+    public:
+        explicit HostHasChangedSpeedMessage(std::string hostname, double speed);
+        /** @brief The name of the host that has tuned off */
+        std::string hostname;
+        /** @brief The host's (new) speed */
+        double speed;
+    };
+
     /***********************/
     /** \endcond           */
     /***********************/

@@ -89,6 +89,23 @@ TEST_F(WorkflowTest, WorkflowStructure) {
   ASSERT_NE(std::find(top_level_equal_to_1_or_2.begin(), top_level_equal_to_1_or_2.end(), t4),
             top_level_equal_to_1_or_2.end());
 
+
+  // Get Entry tasks and check they all are in the top level, as expected
+  auto entry_tasks = workflow->getEntryTasks();
+  auto top_level = workflow->getTasksInTopLevelRange(0, 0);
+  for (auto const &t : top_level) {
+      ASSERT_TRUE(entry_tasks.find(t->getID()) != entry_tasks.end());
+  }
+  // Being paranoid, check that they don't have parents
+  for (auto const &t : entry_tasks) {
+      ASSERT_EQ(t.second->getNumberOfParents(), 0);
+  }
+
+  // Get Exit tasks
+  auto exit_tasks = workflow->getExitTasks();
+  ASSERT_EQ(exit_tasks.size(), 1);
+  ASSERT_TRUE(exit_tasks.begin()->second == t4);
+
   // remove tasks
   workflow->removeTask(t4);
   ASSERT_EQ(0, workflow->getTaskChildren(t3).size());

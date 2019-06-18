@@ -7,6 +7,9 @@ add_definitions("-Wall -Wno-unused-variable -Wno-unused-private-field")
 if (ENABLE_BATSCHED)
     add_definitions(-DENABLE_BATSCHED)
 endif ()
+if (ENABLE_MESSAGE_MANAGER)
+    add_definitions(-DMESSAGE_MANAGER)
+endif ()
 
 set(CMAKE_CXX_STANDARD 11)
 

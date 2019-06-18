@@ -99,10 +99,13 @@ TEST_F(WorkflowTaskTest, TaskStructure) {
   ASSERT_EQ(t2->getJob(), nullptr);
 
   ASSERT_EQ(t1->getNumberOfParents(), 0);
+  ASSERT_EQ(t1->getParents().size(), 0);
   ASSERT_EQ(t2->getNumberOfParents(), 1);
-
+  ASSERT_EQ(t2->getParents().size(), 1);
   ASSERT_EQ(t1->getNumberOfChildren(), 1);
+  ASSERT_EQ(t1->getChildren().size(), 1);
   ASSERT_EQ(t2->getNumberOfChildren(), 0);
+  ASSERT_EQ(t2->getChildren().size(), 0);
 
   ASSERT_EQ(t1->getClusterID(), "");
 }
