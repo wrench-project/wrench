@@ -34,11 +34,23 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param hostname: the name of the host that has turned of
+     * @param hostname: the name of the host that has turned off
      */
     HostHasTurnedOffMessage::HostHasTurnedOffMessage(std::string hostname) :
             HostStateChangeDetectorMessage("HostHasTurnedOffMessage") {
         this->hostname = hostname;
+    }
+
+    /**
+     * @brief Constructor
+     *
+     * @param hostname: the name of the host that has changed speed
+     * @param speed: the host's new speed
+     */
+    HostHasChangedSpeedMessage::HostHasChangedSpeedMessage(std::string hostname, double speed) :
+            HostStateChangeDetectorMessage("HostHasChangedSpeedMessage") {
+        this->hostname = hostname;
+        this->speed = speed;
     }
 
 }

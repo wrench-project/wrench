@@ -188,7 +188,7 @@ private:
       if ((idle_core_counts.size() != 2) or
           (idle_core_counts[0] != 1) or
           (idle_core_counts[1] != 2)) {
-        throw std::runtime_error("getNumIdleCores() should return {1,2} or {2,1} for compute service #1");
+        throw std::runtime_error("getPerHostNumIdleCores() should return {1,2} or {2,1} for compute service #1");
       }
 
       if (this->test->compute_service1->getTotalNumIdleCores() != 3) {

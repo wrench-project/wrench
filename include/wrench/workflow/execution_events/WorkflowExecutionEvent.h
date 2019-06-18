@@ -44,30 +44,6 @@ namespace wrench {
 
     public:
 
-#if 0
-        /** @brief Workflow execution event types */
-        enum EventType {
-            /** @brief An error type */
-                    UNDEFINED,
-            /** @brief A standard job successfully completed */
-                    STANDARD_JOB_COMPLETION,
-            /** @brief A standard job failed */
-                    STANDARD_JOB_FAILURE,
-            /** @brief A pilot job started */
-                    PILOT_JOB_START,
-            /** @brief A pilot job expired */
-                    PILOT_JOB_EXPIRATION,
-            /** @brief A file copy operation completed */
-                    FILE_COPY_COMPLETION,
-            /** @brief A file copy operation failed */
-                    FILE_COPY_FAILURE,
-        };
-#endif
-
-//        /** @brief The event type */
-//        WorkflowExecutionEvent::EventType type;
-
-
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
@@ -308,6 +284,34 @@ namespace wrench {
          */
         std::string toString() override { return "FileCopyFailedEvent (file: " + this->file->getID() + "; ss = " + this->storage_service->getName() +
                                         "; cause: " + this->failure_cause->toString() + ")";}
+
+    };
+
+    /**
+     * @brief A "timer went off" WorkflowExecutionEvent
+     */
+    class TimerEvent : public WorkflowExecutionEvent {
+
+    private:
+
+        friend class WorkflowExecutionEvent;
+        /**
+         * @brief Constructor
+         * @param content: some arbitrary message
+         */
+        TimerEvent(std::string message)
+                : message(message) {}
+
+    public:
+
+        /** @brief The message */
+        std::string message;
+
+        /**
+         * @brief Get a textual description of the event
+         * @return a text string
+         */
+        std::string toString() override { return "TimerEvent (message: " + this->message + ")";}
 
     };
 

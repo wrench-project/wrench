@@ -54,13 +54,13 @@ namespace wrench {
 
         if (time_to_sleep > 0) {
             S4U_Simulation::sleep(time_to_sleep);
-            WRENCH_INFO("Alarm Service Sending a message to %s", this->reply_mailbox_name.c_str());
-            try {
-                S4U_Mailbox::putMessage(this->reply_mailbox_name,
-                                        msg);
-            } catch (std::shared_ptr<NetworkError> &cause) {
-                WRENCH_WARN("AlarmService was not able to send the trigger to its upper service");
-            }
+        }
+
+        WRENCH_INFO("Alarm Service Sending a message to %s", this->reply_mailbox_name.c_str());
+        try {
+            S4U_Mailbox::putMessage(this->reply_mailbox_name, msg);
+        } catch (std::shared_ptr<NetworkError> &cause) {
+            WRENCH_WARN("AlarmService was not able to send the trigger to its upper service");
         }
 
         this->setStateToDown();
