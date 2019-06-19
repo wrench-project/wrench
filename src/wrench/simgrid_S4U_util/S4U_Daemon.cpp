@@ -89,7 +89,7 @@ namespace wrench {
          *  shouldn't do blocking things.... So it's commented-out for now
          */
 #if (CLEAN_UP_MAILBOX_TO_AVOID_MEMORY_LEAK == 1)
-        simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::by_name(this->mailbox_name);
+         auto mailbox = simgrid::s4u::Mailbox::by_name(this->mailbox_name);
          mailbox->set_receiver(nullptr);
 #endif
 
