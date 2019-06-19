@@ -24,7 +24,7 @@
 
 #include <boost/algorithm/string.hpp>
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(network_proximity_service, "Log category for Network Proximity Service");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(network_proximity_service, "Log category for Network Proximity Service");
 
 namespace wrench {
 

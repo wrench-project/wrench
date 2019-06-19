@@ -22,7 +22,7 @@
 #include "wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h"
 #include "wrench/services/compute/batch/BatchComputeService.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(wms, "Log category for WMS");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(wms, "Log category for WMS");
 
 namespace wrench {
 

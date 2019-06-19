@@ -15,7 +15,7 @@
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 #include "wrench/workflow/WorkflowTask.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(htcondor_negotiator, "Log category for HTCondorNegotiator");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(htcondor_negotiator, "Log category for HTCondorNegotiator");
 
 namespace wrench {
 

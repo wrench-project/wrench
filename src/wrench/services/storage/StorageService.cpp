@@ -17,7 +17,7 @@
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/simulation/Simulation.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(storage_service, "Log category for Storage Service");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(storage_service, "Log category for Storage Service");
 
 
 namespace wrench {

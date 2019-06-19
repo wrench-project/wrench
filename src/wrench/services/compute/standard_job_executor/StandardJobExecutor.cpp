@@ -33,7 +33,7 @@
 
 #include "wrench/util/PointerUtil.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(standard_job_executor, "Log category for Standard Job Executor");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(standard_job_executor, "Log category for Standard Job Executor");
 
 namespace wrench {
 

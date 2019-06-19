@@ -39,7 +39,7 @@
 
 #endif
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(batch_service, "Log category for Batch Service");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(batch_service, "Log category for Batch Service");
 
 namespace wrench {
 

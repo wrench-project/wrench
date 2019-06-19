@@ -16,7 +16,7 @@
 #include <wrench/services/helpers/HostStateChangeDetector.h>
 
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(host_state_change_detector, "Log category for HostStateChangeDetector");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(host_state_change_detector, "Log category for HostStateChangeDetector");
 
 
 void wrench::HostStateChangeDetector::cleanup(bool has_returned_from_main, int return_value) {

@@ -9,7 +9,6 @@
  */
 
 #include <iostream>
-//#include <xbt/ex.hpp>
 #include <set>
 #include <cfloat>
 #include <wrench/services/compute/ComputeService.h>
@@ -20,7 +19,7 @@
 
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(s4u_simulation, "Log category for S4U_Simulation");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(s4u_simulation, "Log category for S4U_Simulation");
 
 
 namespace wrench {

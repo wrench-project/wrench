@@ -8,7 +8,7 @@
  */
 
 #include <lemon/list_graph.h>
-#include <xbt.h>
+#include "wrench/logging/TerminalOutput.h"
 
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/workflow/WorkflowTask.h"
@@ -18,7 +18,7 @@
 #include "wrench/simulation/Simulation.h"
 #include "wrench/simulation/SimulationTimestampTypes.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(workflow_task, "Log category for WorkflowTask");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(workflow_task, "Log category for WorkflowTask");
 
 namespace wrench {
 
