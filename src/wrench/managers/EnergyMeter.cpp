@@ -14,7 +14,7 @@
 
 #define EPSILON 0.0001
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(energy_meter, "Log category for Energy Meter");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(energy_meter, "Log category for Energy Meter");
 
 namespace wrench {
 

@@ -26,11 +26,11 @@
 #include "ComputeThread.h"
 #include "wrench/simulation/Simulation.h"
 
-#include <xbt.h>
+#include "wrench/logging/TerminalOutput.h"
 #include <wrench/services/compute/ComputeService.h>
 
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(workunit_executor, "Log category for Multicore Workunit Executor");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(workunit_executor, "Log category for Multicore Workunit Executor");
 
 //#define S4U_KILL_JOIN_WORKS
 

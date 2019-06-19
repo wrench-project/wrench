@@ -8,12 +8,12 @@
  */
 
 #include <map>
-#include <xbt.h>
+#include "wrench/logging/TerminalOutput.h"
 
 #include "wrench/workflow/WorkflowFile.h"
 #include "wrench/workflow/WorkflowTask.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(workflowFile, "Log category for WorkflowFile");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(workflowFile, "Log category for WorkflowFile");
 
 namespace wrench {
 
