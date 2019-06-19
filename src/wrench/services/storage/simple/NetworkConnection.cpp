@@ -16,7 +16,7 @@
 //#include <xbt/ex.hpp>
 
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(simple_storage_service_data_connection, "Log category for Data Connection");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(simple_storage_service_data_connection, "Log category for Data Connection");
 
 namespace wrench {
 

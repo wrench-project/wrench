@@ -17,7 +17,7 @@
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/services/ServiceMessagePayload.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(service, "Log category for Service");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(service, "Log category for Service");
 
 
 namespace wrench {

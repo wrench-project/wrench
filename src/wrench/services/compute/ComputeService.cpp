@@ -17,7 +17,7 @@
 #include "wrench/services/compute/ComputeServiceMessage.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(compute_service, "Log category for Compute Service");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(compute_service, "Log category for Compute Service");
 
 namespace wrench {
 

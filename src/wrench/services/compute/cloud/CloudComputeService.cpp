@@ -21,7 +21,7 @@
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(cloud_service, "Log category for Cloud Service");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(cloud_service, "Log category for Cloud Service");
 
 namespace wrench {
 

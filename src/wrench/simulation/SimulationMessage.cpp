@@ -8,12 +8,11 @@
  *
  */
 
-#include <xbt/log.h>
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/simulation/SimulationMessage.h"
 #include "wrench/workflow/WorkflowFile.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(simulation_message, "Log category for SimulatinMessage");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(simulation_message, "Log category for SimulatinMessage");
 
 
 namespace wrench {

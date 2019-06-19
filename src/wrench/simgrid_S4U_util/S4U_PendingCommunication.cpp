@@ -19,7 +19,7 @@
 #include "wrench/simulation/SimulationMessage.h"
 #include "wrench/workflow/execution_events/FailureCause.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(pending_communication, "Log category for Pending Communication");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(pending_communication, "Log category for Pending Communication");
 
 namespace wrench {
 

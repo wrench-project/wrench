@@ -22,7 +22,7 @@
 #include <wrench/services/network_proximity/NetworkProximityService.h>
 #include <algorithm>
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(file_registry_service, "Log category for File Registry Service");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(file_registry_service, "Log category for File Registry Service");
 
 namespace wrench {
 
