@@ -9,10 +9,14 @@
 
 #include <gtest/gtest.h>
 #include <xbt.h>
+#include <wrench/logging/TerminalOutput.h>
 
 int main(int argc, char **argv) {
-  // disable log
-   xbt_log_control_set("root.thresh:critical");
+    // disable color for testing
+    wrench::TerminalOutput::disableColor();
+
+    // disable log
+    xbt_log_control_set("root.thresh:critical");
 
 
 //   Example selective log enabling
@@ -24,7 +28,7 @@ int main(int argc, char **argv) {
 //   xbt_log_control_set("simple_storage_service.thresh:info");
 //   xbt_log_control_set("multicore_compute_service.thresh:info");
 
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 
 }
