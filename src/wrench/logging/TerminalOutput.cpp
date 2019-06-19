@@ -10,6 +10,7 @@
 #include <string>
 #include <simgrid/s4u/Actor.hpp>
 #include <iostream>
+#include <xbt/log.h>
 #include "wrench/logging/TerminalOutput.h"
 
 namespace wrench {
@@ -42,6 +43,7 @@ namespace wrench {
      * @brief Turn on colored output for the calling process
      */
     void TerminalOutput::beginThisProcessColor() {
+
         if ((not TerminalOutput::wrench_no_log) and (TerminalOutput::color_enabled)) {
             std::cerr << TerminalOutput::getThisProcessLoggingColor();
         }
