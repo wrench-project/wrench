@@ -58,7 +58,7 @@ public:
     void do_JobTerminationTestAtRandomTimes_test();
 
     void do_WorkUnit_test();
-
+    
     static bool isJustABitGreater(double base, double variable) {
         return ((variable > base) && (variable < base + EPSILON));
     }
@@ -3020,3 +3020,5 @@ void StandardJobExecutorTest::do_NoTaskTest_test() {
     free(argv[0]);
     free(argv);
 }
+
+

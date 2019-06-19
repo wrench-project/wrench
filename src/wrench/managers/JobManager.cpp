@@ -67,6 +67,7 @@ namespace wrench {
         try {
             S4U_Mailbox::putMessage(this->mailbox_name, new ServiceStopDaemonMessage("", 0.0));
         } catch (std::shared_ptr<NetworkError> &cause) {
+            std::cerr << "THROWING\n";
             throw WorkflowExecutionException(cause);
         }
     }
@@ -241,8 +242,8 @@ namespace wrench {
      *           - If a "hostname:num_cores" value is provided for a task, then the service will run that
      *             task with the specified number of cores on that host.
      *      - to a BatchComputeService: {{"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}}
-     *      - to a VirtualizedClusterComputeService: {} (in which case the service will pick the vm) or {{"-vm":"<vm name>"}}
-     *      - to a CloudComputeService: {} (in which case the service will pick the vm) or {{"-vm":"<vm name>"}}
+     *      - to a VirtualizedClusterComputeService: {} (jobs should not be submitted directly to the service)}
+     *      - to a CloudComputeService: {} (jobs should not be submitted directly to the service)}
      *
      * @throw std::invalid_argument
      * @throw WorkflowExecutionException
@@ -723,8 +724,9 @@ namespace wrench {
                 PilotJob *job = msg->job;
                 job->state = PilotJob::State::EXPIRED;
 
-                // Remove the job from the "running" list
+                // Remove the job from the "running" list and put it in the completed list
                 this->running_pilot_jobs.erase(job);
+                this->completed_pilot_jobs.insert(job);
 
                 // Forward the notification to the source
                 WRENCH_INFO("Forwarding to %s", job->getOriginCallbackMailbox().c_str());

@@ -13,8 +13,8 @@
 #include <thread>
 #include <chrono>
 
-#include "../include/TestWithFork.h"
-#include "../include/UniqueTmpPathPrefix.h"
+#include "../../include/TestWithFork.h"
+#include "../../include/UniqueTmpPathPrefix.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(virtualized_cluster_service_test, "Log category for VirtualizedClusterServiceTest");
 
@@ -37,6 +37,8 @@ public:
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service = nullptr;
 
+    void do_ConstructorTest_test();
+
     void do_StandardJobTaskTest_test();
 
     void do_StandardJobTaskWithCustomVMNameTest_test();
@@ -58,7 +60,6 @@ public:
     void do_VMShutdownWhileJobIsRunning_test();
 
     void do_VMComputeServiceStopWhileJobIsRunning_test();
-
 
 protected:
     VirtualizedClusterServiceTest() {
@@ -119,6 +120,62 @@ protected:
 };
 
 /**********************************************************************/
+/**  CONSTRUCTOR TEST                                                **/
+/**********************************************************************/
+
+
+
+TEST_F(VirtualizedClusterServiceTest, ConstructorTest) {
+    DO_TEST_WITH_FORK(do_ConstructorTest_test);
+}
+
+void VirtualizedClusterServiceTest::do_ConstructorTest_test() {
+
+    // Create and initialize a simulation
+    auto *simulation = new wrench::Simulation();
+    int argc = 1;
+    auto argv = (char **) calloc(1, sizeof(char *));
+    argv[0] = strdup("cloud_service_test");
+
+    ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+    // Setting up the platform
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    // Get a hostname
+    std::string hostname = simulation->getHostnameList()[0];
+    std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
+
+    // Create a Cloud Service (WRONG PROPERTIES)
+    ASSERT_THROW(compute_service = simulation->add(
+            new wrench::CloudComputeService(hostname, execution_hosts, 100,
+                                            {{wrench::CloudComputeServiceProperty::SUPPORTS_PILOT_JOBS, "true"}})),
+                                                    std::invalid_argument);
+
+    ASSERT_THROW(compute_service = simulation->add(
+            new wrench::CloudComputeService(hostname, execution_hosts, 100,
+                                            {{wrench::CloudComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}})),
+                 std::invalid_argument);
+
+    ASSERT_THROW(compute_service = simulation->add(
+            new wrench::CloudComputeService(hostname, execution_hosts, 100,
+                                            {{wrench::CloudComputeServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS, "-1.0"}})),
+                 std::invalid_argument);
+
+    ASSERT_THROW(compute_service = simulation->add(
+            new wrench::CloudComputeService(hostname, execution_hosts, 100,
+                                            {{wrench::CloudComputeServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM, "bogus"}})),
+                 std::invalid_argument);
+
+    delete simulation;
+    free(argv[0]);
+    free(argv);
+}
+
+
+
+
+/**********************************************************************/
 /**  STANDARD JOB SUBMISSION TASK SIMULATION TEST ON ONE HOST        **/
 /**********************************************************************/
 
@@ -140,15 +197,44 @@ private:
     int main() {
         auto cs = *(this->getAvailableComputeServices<wrench::CloudComputeService>().begin());
 
-
         // Non-existent VM operations (for coverage)
         try {
             cs->startVM("NON_EXISTENT_VM");
+            throw std::runtime_error("Shouldn't be able to interact with a non-existent VM");
+        } catch (std::invalid_argument &e) {
+            // do nothing, since it is the expected behavior
+        }
+        try {
             cs->shutdownVM("NON_EXISTENT_VM");
+            throw std::runtime_error("Shouldn't be able to interact with a non-existent VM");
+        } catch (std::invalid_argument &e) {
+            // do nothing, since it is the expected behavior
+        }
+        try {
             cs->suspendVM("NON_EXISTENT_VM");
+            throw std::runtime_error("Shouldn't be able to interact with a non-existent VM");
+        } catch (std::invalid_argument &e) {
+            // do nothing, since it is the expected behavior
+        }
+        try {
             cs->resumeVM("NON_EXISTENT_VM");
+            throw std::runtime_error("Shouldn't be able to interact with a non-existent VM");
+        } catch (std::invalid_argument &e) {
+            // do nothing, since it is the expected behavior
+        }
+        try {
             cs->isVMRunning("NON_EXISTENT_VM");
+            throw std::runtime_error("Shouldn't be able to interact with a non-existent VM");
+        } catch (std::invalid_argument &e) {
+            // do nothing, since it is the expected behavior
+        }
+        try {
             cs->isVMDown("NON_EXISTENT_VM");
+            throw std::runtime_error("Shouldn't be able to interact with a non-existent VM");
+        } catch (std::invalid_argument &e) {
+            // do nothing, since it is the expected behavior
+        }
+        try {
             cs->isVMSuspended("NON_EXISTENT_VM");
             throw std::runtime_error("Shouldn't be able to interact with a non-existent VM");
         } catch (std::invalid_argument &e) {
@@ -162,17 +248,16 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create a 2-task job
-        wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {},
-                                                                           {std::make_tuple(this->test->input_file,
-                                                                                            this->test->storage_service,
-                                                                                            wrench::ComputeService::SCRATCH)},
-                                                                           {}, {});
-
+        auto two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {},
+                                                           {std::make_tuple(this->test->input_file,
+                                                                            this->test->storage_service,
+                                                                            wrench::ComputeService::SCRATCH)},
+                                                           {}, {});
 
         // Try to submit the job directly to the CloudComputeService (which fails)
         try {
             job_manager->submitJob(two_task_job, cs);
-            throw std::runtime_error("Should not be able to submit a job directly to the Cloud service");
+            throw std::runtime_error("Should not be able to submit a standard job directly to the Cloud service");
         } catch (wrench::WorkflowExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::JobTypeNotSupported>(e.getCause());
             if (not cause) {
@@ -182,7 +267,32 @@ private:
 
         }
 
-        // Create and start a VM
+        // Just for kicks (coverage), do the same with a pilot job
+        auto pilot_job = job_manager->createPilotJob();
+        try {
+            job_manager->submitJob(pilot_job, cs, {});
+            throw std::runtime_error("Should not be able to submit a pilot job directly to the Cloud service");
+        } catch (wrench::WorkflowExecutionException &e) {
+            auto cause = std::dynamic_pointer_cast<wrench::JobTypeNotSupported>(e.getCause());
+            if (not cause) {
+                throw std::runtime_error("Invalid failure cause: " + e.getCause()->toString()+
+                                         " (expected: JobTypeNotSupported");
+            }
+
+        }
+
+        // Invalid VM creations for coverage
+        try {
+            auto vm_name = cs->createVM(wrench::ComputeService::ALL_CORES, 10);
+            throw std::runtime_error("Should not be able to pass ALL_CORES to createVM()");
+        } catch (std::invalid_argument &e) { }
+        try {
+            auto vm_name = cs->createVM(2, wrench::ComputeService::ALL_RAM);
+            throw std::runtime_error("Should not be able to pass ALL_RAM to createVM()");
+        } catch (std::invalid_argument &e) { }
+
+
+        // Create a VM
         auto vm_name = cs->createVM(2, 10);
 
         // Check the state
@@ -190,6 +300,24 @@ private:
             throw std::runtime_error("A just created VM should be down");
         }
 
+        // Try to shutdown the VM, which doesn't work
+        try {
+            cs->shutdownVM(vm_name);
+            throw std::runtime_error("Should not be able to shutdown a non-running VM");
+        } catch (wrench::WorkflowExecutionException &e) {
+            auto cause = std::dynamic_pointer_cast<wrench::NotAllowed>(e.getCause());
+            if (not cause) {
+                throw std::runtime_error("Invalid failure cause: " + e.getCause()->toString() +
+                                         " (expected: NotAllowed)");
+            }
+            auto error_msg = cause->toString(); // coverage
+            if (cause->getService() != cs) {
+                throw std::runtime_error("Failure cause does not point to the (correct) service");
+            }
+
+        }
+
+        // Start the VM
         auto vm_cs = cs->startVM(vm_name);
 
         // Check the state
@@ -214,6 +342,15 @@ private:
         if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
+
+        // Shutdown the VM, because why not
+        cs->shutdownVM(vm_name);
+
+        // Shutdown a bogus VM, for coverage
+        try {
+            cs->shutdownVM("bogus");
+            throw std::runtime_error("Should not be able to shutdown a non-existing VM");
+        } catch (std::invalid_argument &e)  { }
 
         return 0;
     }
@@ -279,9 +416,9 @@ class CloudStandardJobWithCustomVMNameTestWMS : public wrench::WMS {
 
 public:
     CloudStandardJobWithCustomVMNameTestWMS(VirtualizedClusterServiceTest *test,
-                            const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                            const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                            std::string &hostname) :
+                                            const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                            const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                                            std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -845,6 +982,18 @@ private:
             // do nothing, should have thrown an exception since there are no resources available
         }
 
+        // Try to suspend it again, wrongly, for coverage
+        try {
+            cs->suspendVM(std::get<0>(vm_list[3]));
+            throw std::runtime_error("Should not be able to suspend a non-running VM");
+        } catch (wrench::WorkflowExecutionException &e) {
+            auto cause = std::dynamic_pointer_cast<wrench::NotAllowed>(e.getCause());
+            if (not cause) {
+                throw std::runtime_error("Unexpected failure cause " + e.getCause()->toString() +
+                                         " (Expected: NotAllowed)");
+            }
+        }
+
         try {
             cs->resumeVM(std::get<0>(vm_list[3]));
             if (not cs->isVMRunning(std::get<0>(vm_list[3]))) {
@@ -883,7 +1032,6 @@ private:
                                                                                         this->test->storage_service)});
 
         try {
-            WRENCH_INFO("Submitting a job");
             job_manager->submitJob(other_job, std::get<1>(vm_list[3]));
         } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error("Should be able to submit the other job");
