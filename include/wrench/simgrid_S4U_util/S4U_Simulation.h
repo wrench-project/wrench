@@ -37,6 +37,7 @@ namespace wrench {
 		static std::string getHostName();
 		static bool hostExists(std::string hostname);
 		static unsigned int getHostNumCores(std::string hostname);
+		static unsigned int getNumCores();
 		static double getHostFlopRate(std::string hostname);
 		static bool isHostOn(std::string hostname);
 		static double getFlopRate();

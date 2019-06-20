@@ -165,6 +165,14 @@ namespace wrench {
     }
 
     /**
+     * @brief Get the number of cores of the current host
+     * @return a number of cores
+     */
+    unsigned int S4U_Simulation::getNumCores() {
+        return simgrid::s4u::Host::current()->get_core_count();
+    }
+
+    /**
      * @brief Get the flop rate of a host
      *
      * @param hostname: the name of the host
@@ -250,7 +258,13 @@ namespace wrench {
      * @return a memory capacity in bytes
      */
     double S4U_Simulation::getHostMemoryCapacity(std::string hostname) {
-        return getHostMemoryCapacity(simgrid::s4u::Host::by_name(hostname));
+        double mem = 0;
+        try {
+            mem = getHostMemoryCapacity(simgrid::s4u::Host::by_name(hostname));
+        } catch (std::out_of_range &e) {
+            throw std::invalid_argument("Unknown hostname " + hostname);
+        }
+        return mem;
     }
 
     /**
@@ -298,8 +312,16 @@ namespace wrench {
      * @return a string relating to the property specified in the platform file
      */
     std::string S4U_Simulation::getHostProperty(std::string hostname, std::string property_name) {
-        std::cerr << "The host is " << hostname << " and the property to look for is " << property_name << "\n";
-        return simgrid::s4u::Host::by_name(hostname)->get_property(property_name);
+        simgrid::s4u::Host *h = nullptr;
+        try {
+            h = simgrid::s4u::Host::by_name(hostname);
+        } catch (std::out_of_range &e) {
+            throw std::invalid_argument("Unknown hostname " + hostname);
+        }
+        if (h->get_properties()->find(property_name) == h->get_properties()->end()) {
+            throw std::invalid_argument("Unknown property " + property_name);
+        }
+        return h->get_property(property_name);
     }
 
     /**
