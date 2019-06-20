@@ -634,7 +634,7 @@ namespace wrench {
      * @return a memory capacity in bytes
      */
     double Simulation::getMemoryCapacity() {
-        return S4U_Simulation::getHostMemoryCapacity(S4U_Simulation::getHostName());
+        return S4U_Simulation::getMemoryCapacity();
     }
 
     /**
@@ -642,7 +642,7 @@ namespace wrench {
      * @return a number of cores
      */
     unsigned long Simulation::getNumCores() {
-        return S4U_Simulation::getHostNumCores(S4U_Simulation::getHostName());
+        return S4U_Simulation::getNumCores();
     }
 
     /**
@@ -650,7 +650,7 @@ namespace wrench {
      * @return a flop rate
      */
     double Simulation::getFlopRate() {
-        return S4U_Simulation::getHostFlopRate(S4U_Simulation::getHostName());
+        return S4U_Simulation::getFlopRate();
     }
 
     /**

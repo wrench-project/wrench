@@ -284,6 +284,7 @@ set(TEST_FILES
         test/simulation/simulation_output/SimulationTimestampEnergyTest.cpp
         test/compute_services/ScratchSpaceTest.cpp
         test/simulation/S4U_DaemonTest.cpp
+        test/simulation/S4U_SimulationTest.cpp
         test/pilot_job/CriticalPathSchedulerTest.cpp
         test/misc/PointerUtilTest.cpp
         examples/simple-example/scheduler/pilot_job/CriticalPathPilotJobScheduler.cpp
