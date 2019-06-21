@@ -232,6 +232,7 @@ private:
         } catch (std::exception &e) {
           WRENCH_INFO("Unexpected exception as we were trying to access energy plugin for a correct host that is available");
         }
+
       }
 
       return 0;

@@ -94,9 +94,33 @@ private:
         auto batch = this->test->cs_batch;
 
         // Get a "PILOT JOB STARTED" event (default handler)
+        // This pilot job takes the whole machine!
         wrench::PilotJob *job2 = job_manager->createPilotJob();
-        job_manager->submitJob(job2, batch, {{"-N", "1"}, {"-t", "50"}, {"-c", "1"}});
+        job_manager->submitJob(job2, batch, {{"-N", "1"}, {"-t", "50"}, {"-c", "4"}});
         this->waitForAndProcessNextEvent();
+
+        // Get the list of running pilot jobs
+        auto running_pilot_jobs = job_manager->getRunningPilotJobs();
+        if (running_pilot_jobs.size() != 1) {
+            throw std::runtime_error("Should see 1 running pilot job");
+        }
+        if (*running_pilot_jobs.begin() != job2) {
+            throw std::runtime_error("Pilot job should be seen in list of running pilot jobs");
+        }
+
+#if 0 // TODO: FIX THIS! WEIRD BATCHSED PROBLEM
+        // Submit another pilot job, which won't be running for a while
+        wrench::PilotJob *job2_1 = job_manager->createPilotJob();
+        job_manager->submitJob(job2_1, batch, {{"-N", "1"}, {"-t", "50"}, {"-c", "4"}});
+        // Get the list of pending pilot jobs
+        auto pending_pilot_jobs = job_manager->getPendingPilotJobs();
+        if (pending_pilot_jobs.size() != 1) {
+            throw std::runtime_error("Should see 1 pending pilot job");
+        }
+        if (*pending_pilot_jobs.begin() != job2_1) {
+            throw std::runtime_error("Pilot job should be seen in list of pending pilot jobs");
+        }
+#endif
 
         // Get a "STANDARD JOB FAILED" and "PILOT JOB EXPIRED" event (default handler)
         wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task2", 100.0, 1, 1, 1.0, 0);
