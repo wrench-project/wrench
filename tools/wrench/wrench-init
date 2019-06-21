@@ -213,9 +213,9 @@ def _write_main(project_dir, compute_service):
         file_contents.extend([
             '  // Instantiate a batch service and add it to the simulation',
             '  try {',
-            '    auto batch_service = new wrench::BatchService(',
+            '    auto batch_service = new wrench::BatchComputeService(',
             '          wms_host, hostname_list, 0, {},',
-            '          {{wrench::BatchServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 2048}});',
+            '          {{wrench::BatchComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 2048}});',
             '',
             '    compute_services.insert(simulation.add(batch_service));',
             '  } catch (std::invalid_argument &e) {',
@@ -500,14 +500,14 @@ def _write_simple_scheduler(project_dir, compute_service):
 
     elif compute_service == 'batch':
         file_contents.extend([
-            '  wrench::BatchService *batch_service;',
-            '  if (not(batch_service = dynamic_cast<wrench::BatchService *>(compute_service))) {',
+            '  std::shared_ptr<wrench::BatchComputeService> batch_service;',
+            '  if (not(batch_service = std::dynamic_pointer_cast<wrench::BatchComputeService>(compute_service))) {',
             '    throw std::runtime_error("This example Batch Scheduler can only handle a batch service");',
             '  }',
             '',
             '  WRENCH_INFO("There are %ld ready tasks to schedule", tasks.size());',
             '  for (auto task : tasks) {',
-            '    std::map<wrench::WorkflowFile *, wrench::StorageService *> file_locations;',
+            '    std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>> file_locations;',
             '    for (auto f : task->getInputFiles()) {',
             '      file_locations.insert(std::make_pair(f, default_storage_service));',
             '    }',

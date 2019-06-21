@@ -67,7 +67,6 @@ namespace wrench {
         try {
             S4U_Mailbox::putMessage(this->mailbox_name, new ServiceStopDaemonMessage("", 0.0));
         } catch (std::shared_ptr<NetworkError> &cause) {
-            std::cerr << "THROWING\n";
             throw WorkflowExecutionException(cause);
         }
     }

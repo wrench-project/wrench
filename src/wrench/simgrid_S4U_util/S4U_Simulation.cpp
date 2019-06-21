@@ -343,26 +343,26 @@ namespace wrench {
         return energy_consumed;
     }
 
-    /**
-     * @brief Get the total energy consumed by a set of hosts
-     * @param hostnames: the list of hostnames
-     * @return The total energy consumed by all the hosts in Joules
-     * @throw std::runtime_error
-     */
-    double S4U_Simulation::getTotalEnergyConsumed(const std::vector<std::string> &hostnames) {
-        double total_energy = 0;
-        try {
-            for (auto hostname: hostnames) {
-                total_energy += sg_host_get_consumed_energy(simgrid::s4u::Host::by_name(hostname));
-            }
-        } catch (std::exception &e) {
-            throw std::runtime_error(
-                    "S4U_Simulation::getTotalEnergyConsumed(): Was not able to get the total energy consumed by the host. Make sure energy plugin is enabled and "
-                    "the host name is correct"
-            );
-        }
-        return total_energy;
-    }
+//    /**
+//     * @brief Get the total energy consumed by a set of hosts
+//     * @param hostnames: the list of hostnames
+//     * @return The total energy consumed by all the hosts in Joules
+//     * @throw std::runtime_error
+//     */
+//    double S4U_Simulation::getTotalEnergyConsumed(const std::vector<std::string> &hostnames) {
+//        double total_energy = 0;
+//        try {
+//            for (auto hostname: hostnames) {
+//                total_energy += sg_host_get_consumed_energy(simgrid::s4u::Host::by_name(hostname));
+//            }
+//        } catch (std::exception &e) {
+//            throw std::runtime_error(
+//                    "S4U_Simulation::getTotalEnergyConsumed(): Was not able to get the total energy consumed by the host. Make sure energy plugin is enabled and "
+//                    "the host name is correct"
+//            );
+//        }
+//        return total_energy;
+//    }
 
     /**
      * @brief Set the power state of the host
