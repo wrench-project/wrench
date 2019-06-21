@@ -51,7 +51,7 @@ namespace wrench {
 
 		//start energy related calls
 		static double getEnergyConsumedByHost(const std::string &hostname);
-		static double getTotalEnergyConsumed(const std::vector<std::string> &hostnames);
+//		static double getTotalEnergyConsumed(const std::vector<std::string> &hostnames);
 		static void setPstate(const std::string &hostname, int pstate);
 		static int getNumberofPstates(const std::string &hostname);
 		static int getCurrentPstate(const std::string &hostname);
