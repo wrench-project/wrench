@@ -56,7 +56,7 @@ namespace wrench {
     Simulation::Simulation() {
 
         // Customize the logging format
-        xbt_log_control_set("root.fmt:[%d][%h:%t(%i)]%e%m%n");
+        xbt_log_control_set("root.fmt:[%.20d][%h:%t(%i)]%e%m%n");
 
         // Setup the SIGABRT handler
         auto previous_handler = std::signal(SIGABRT, signal_handler);
