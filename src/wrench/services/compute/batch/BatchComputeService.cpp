@@ -1748,8 +1748,8 @@ namespace wrench {
                 try {
                     cs->start(cs, true, false); // Daemonized, no auto-restart
                     batch_job->setBeginTimeStamp(S4U_Simulation::getClock());
-                    double timeout_timestamp = (double) allocated_time;
-                    batch_job->setEndingTimeStamp(S4U_Simulation::getClock() + timeout_timestamp);
+                    double ending_timestamp = S4U_Simulation::getClock() + (double)allocated_time;
+                    batch_job->setEndingTimeStamp(ending_timestamp);
                 } catch (std::runtime_error &e) {
                     throw;
                 }
@@ -2169,6 +2169,9 @@ namespace wrench {
 
 #ifdef ENABLE_BATSCHED
 
+// This is a tiny tine offset that's used to avoid some Batsched assert from failing
+// when Batshced compares the "now" with the "timestamp"
+
     /**
      *  @brief: Start a batsched process
      *           - exit code 1: unsupported algorithm
@@ -2307,7 +2310,6 @@ namespace wrench {
             zmq::context_t context(1);
             zmq::socket_t socket(context, ZMQ_REQ);
             socket.connect("tcp://localhost:" + std::to_string(this->batsched_port));
-
 
             nlohmann::json simulation_ends_msg;
             simulation_ends_msg["now"] = S4U_Simulation::getClock();
@@ -2484,6 +2486,11 @@ namespace wrench {
                 return;
             }
 
+            // IMPORTANT: We always as for more time, so that when the alarm goes
+            // of at the right time, we can respond to it before the Batsched
+            // time slice has expired!
+            double BATSCHED_JOB_EXTRA_TIME = 1.0;
+
             // Send ALL Queued jobs to batsched, and move them all to the WAITING queue
             // The WAITING queue is: those jobs that I need to hear from Batsched about
 
@@ -2507,7 +2514,7 @@ namespace wrench {
                 batch_submission_data["events"][i]["data"]["job"]["id"] = std::to_string(batch_job->getJobID());
                 batch_submission_data["events"][i]["data"]["job"]["res"] = num_nodes_asked_for;
                 batch_submission_data["events"][i]["data"]["job"]["core"] = cores_per_node_asked_for;
-                batch_submission_data["events"][i]["data"]["job"]["walltime"] = allocated_time;
+                batch_submission_data["events"][i]["data"]["job"]["walltime"] = allocated_time + BATSCHED_JOB_EXTRA_TIME;
 
                 this->pending_jobs.erase(it);
                 this->waiting_jobs.insert(batch_job);
