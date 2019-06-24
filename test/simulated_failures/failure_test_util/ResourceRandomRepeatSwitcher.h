@@ -7,23 +7,29 @@
  * (at your option) any later version.
  */
 
-#ifndef WRENCH_HOSTRANDOMREPEATSWITCHER_H
-#define WRENCH_HOSTRANDOMREPEATSWITCHER_H
+#ifndef WRENCH_RESOURCERANDOMREPEATSWITCHER_H
+#define WRENCH_RESOURCERANDOMREPEATSWITCHER_H
 
 #include <wrench/services/Service.h>
 #include "wrench/simgrid_S4U_util/S4U_Daemon.h"
 
 namespace wrench {
 
-    class HostRandomRepeatSwitcher : public Service {
+    class ResourceRandomRepeatSwitcher : public Service {
 
     public:
 
+        enum ResourceType {
+           HOST,
+           LINK
+        };
 
-        explicit HostRandomRepeatSwitcher(std::string host_on_which_to_run, double seed,
+
+        explicit ResourceRandomRepeatSwitcher(std::string host_on_which_to_run, double seed,
                                           double min_sleep_before_off_time, double max_sleep_before_off_time,
                                           double min_sleep_before_on_time, double max_sleep_before_on_time,
-                                          std::string host_to_switch);
+                                          std::string resource_to_switch,
+                                          ResourceType resource_type);
 
         void kill();
 
@@ -38,7 +44,8 @@ namespace wrench {
         double max_sleep_before_off_time;
         double min_sleep_before_on_time;
         double max_sleep_before_on_time;
-        std::string host_to_switch;
+        std::string resource_to_switch;
+        ResourceType resource_type;
         int main();
 
     };
@@ -51,4 +58,4 @@ namespace wrench {
 };
 
 
-#endif //WRENCH_HOSTRANDOMREPEATSWITCHER_H
+#endif //WRENCH_RESOURCERANDOMREPEATSWITCHER_H
