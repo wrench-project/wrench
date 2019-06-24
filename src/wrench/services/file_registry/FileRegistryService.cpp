@@ -27,33 +27,18 @@ WRENCH_LOG_NEW_DEFAULT_CATEGORY(file_registry_service, "Log category for File Re
 namespace wrench {
 
 
-    /**
-     * @brief Constructor
-     * @param hostname: the hostname on which to start the service
-     * @param property_list: a property list ({} means "use all defaults")
-     * @param messagepayload_list: a message payload list ({} means "use all defaults")
-     */
-    FileRegistryService::FileRegistryService(std::string hostname,
-                                             std::map<std::string, std::string> property_list,
-                                             std::map<std::string, double> messagepayload_list
-    ) :
-            FileRegistryService(hostname, property_list, messagepayload_list, "") {
-
-    }
 
     /**
      * @brief Constructor
      * @param hostname: the hostname on which to start the service
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
-     * @param suffix: suffix to append to the service name and mailbox
      */
     FileRegistryService::FileRegistryService(
             std::string hostname,
             std::map<std::string, std::string> property_list,
-            std::map<std::string, double> messagepayload_list,
-            std::string suffix) :
-            Service(hostname, "file_registry" + suffix, "file_registry" + suffix) {
+            std::map<std::string, double> messagepayload_list) :
+            Service(hostname, "file_registry", "file_registry" ) {
 
         this->setProperties(this->default_property_values, property_list);
         this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
@@ -83,21 +68,27 @@ namespace wrench {
 
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("lookup_entry");
 
+        WRENCH_INFO("LOOKUP 1");
         try {
             S4U_Mailbox::putMessage(this->mailbox_name, new FileRegistryFileLookupRequestMessage(answer_mailbox, file,
                                                                                                  this->getMessagePayloadValue(
                                                                                                          FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
+        WRENCH_INFO("LOOKUP 1 THROW");
             throw WorkflowExecutionException(cause);
         }
+        WRENCH_INFO("LOOKUP 2");
 
         std::shared_ptr<SimulationMessage> message = nullptr;
 
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
+
+             WRENCH_INFO("LOOKUP 2 THROW");
             throw WorkflowExecutionException(cause);
         }
+        WRENCH_INFO("LOOKUP 3");
 
         if (auto msg = std::dynamic_pointer_cast<FileRegistryFileLookupAnswerMessage>(message)) {
             std::set<std::shared_ptr<StorageService>> result = msg->locations;

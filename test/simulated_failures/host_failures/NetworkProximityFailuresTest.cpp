@@ -12,9 +12,9 @@
 #include <wrench-dev.h>
 #include <boost/algorithm/string.hpp>
 
-#include "../include/TestWithFork.h"
-#include "../include/UniqueTmpPathPrefix.h"
-#include "failure_test_util/HostSwitcher.h"
+#include "../../include/TestWithFork.h"
+#include "../../include/UniqueTmpPathPrefix.h"
+#include "../failure_test_util/HostSwitcher.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(network_proximity_failures, "Log category for NetworkProximityFailuresTest");
 

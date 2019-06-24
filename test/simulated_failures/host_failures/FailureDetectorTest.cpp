@@ -11,12 +11,12 @@
 #include <wrench-dev.h>
 #include <wrench/services/helpers/ServiceTerminationDetectorMessage.h>
 
-#include "../include/TestWithFork.h"
-#include "../include/UniqueTmpPathPrefix.h"
-#include "failure_test_util/HostSwitcher.h"
+#include "../../include/TestWithFork.h"
+#include "../../include/UniqueTmpPathPrefix.h"
+#include "../failure_test_util/HostSwitcher.h"
 #include "wrench/services/helpers/ServiceTerminationDetector.h"
-#include "failure_test_util/SleeperVictim.h"
-#include "failure_test_util/ComputerVictim.h"
+#include "../failure_test_util/SleeperVictim.h"
+#include "../failure_test_util/ComputerVictim.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(failure_detector_test, "Log category for FailureDetectorTest");
 

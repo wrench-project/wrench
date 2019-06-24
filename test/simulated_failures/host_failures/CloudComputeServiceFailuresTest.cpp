@@ -11,12 +11,12 @@
 #include <wrench-dev.h>
 #include <wrench/services/helpers/ServiceTerminationDetectorMessage.h>
 
-#include "../include/TestWithFork.h"
-#include "../include/UniqueTmpPathPrefix.h"
-#include "failure_test_util/HostSwitcher.h"
+#include "../../include/TestWithFork.h"
+#include "../../include/UniqueTmpPathPrefix.h"
+#include "../failure_test_util/HostSwitcher.h"
 #include "wrench/services/helpers/ServiceTerminationDetector.h"
-#include "failure_test_util/SleeperVictim.h"
-#include "failure_test_util/HostRandomRepeatSwitcher.h"
+#include "../failure_test_util/SleeperVictim.h"
+#include "../failure_test_util/ResourceRandomRepeatSwitcher.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(cloud_compute_service_simulated_failures_test, "Log category for CloudServiceSimulatedFailuresTests");
 
@@ -401,15 +401,17 @@ private:
 
             // Starting a FailedHost1 random repeat switch!!
             unsigned long seed1 = trial * 2 + 37;
-            auto switch1 = std::shared_ptr<wrench::HostRandomRepeatSwitcher>(
-                    new wrench::HostRandomRepeatSwitcher("StableHost", seed1, 10, 100, 10, 100, "FailedHost1"));
+            auto switch1 = std::shared_ptr<wrench::ResourceRandomRepeatSwitcher>(
+                    new wrench::ResourceRandomRepeatSwitcher("StableHost", seed1, 10, 100, 10, 100,
+                            "FailedHost1", wrench::ResourceRandomRepeatSwitcher::ResourceType::HOST));
             switch1->simulation = this->simulation;
             switch1->start(switch1, true, false); // Daemonized, no auto-restart
 
             // Starting a FailedHost2 random repeat switch!!
             unsigned long seed2 = trial * 17 + 42;
-            auto switch2 = std::shared_ptr<wrench::HostRandomRepeatSwitcher>(
-                    new wrench::HostRandomRepeatSwitcher("StableHost", seed1, 10, 100, 10, 100, "FailedHost2"));
+            auto switch2 = std::shared_ptr<wrench::ResourceRandomRepeatSwitcher>(
+                    new wrench::ResourceRandomRepeatSwitcher("StableHost", seed1, 10, 100, 10, 100,
+                            "FailedHost2", wrench::ResourceRandomRepeatSwitcher::ResourceType::HOST));
             switch2->simulation = this->simulation;
             switch2->start(switch1, true, false); // Daemonized, no auto-restart
 

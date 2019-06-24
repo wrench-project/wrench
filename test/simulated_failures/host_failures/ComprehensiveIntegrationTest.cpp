@@ -11,13 +11,13 @@
 #include <wrench-dev.h>
 #include <wrench/services/helpers/ServiceTerminationDetectorMessage.h>
 
-#include "../include/TestWithFork.h"
-#include "../include/UniqueTmpPathPrefix.h"
-#include "failure_test_util/HostSwitcher.h"
+#include "../../include/TestWithFork.h"
+#include "../../include/UniqueTmpPathPrefix.h"
+#include "../failure_test_util/HostSwitcher.h"
 #include "wrench/services/helpers/ServiceTerminationDetector.h"
-#include "./failure_test_util/SleeperVictim.h"
-#include "./failure_test_util/ComputerVictim.h"
-#include "failure_test_util/HostRandomRepeatSwitcher.h"
+#include "../failure_test_util/SleeperVictim.h"
+#include "../failure_test_util/ComputerVictim.h"
+#include "../failure_test_util/ResourceRandomRepeatSwitcher.h"
 
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(comprehensive_failure_integration_test, "Log category for ComprehesiveIntegrationFailureTest");
@@ -168,11 +168,11 @@ private:
     void createMonkey(std::string victimhost, double alpha = 1.0) {
         static unsigned long seed = 666;
         seed = seed * 17 + 37;
-        auto switcher = std::shared_ptr<wrench::HostRandomRepeatSwitcher>(
-                new wrench::HostRandomRepeatSwitcher("WMSHost", seed,
+        auto switcher = std::shared_ptr<wrench::ResourceRandomRepeatSwitcher>(
+                new wrench::ResourceRandomRepeatSwitcher("WMSHost", seed,
                                                      CHAOS_MONKEY_MIN_SLEEP_BEFORE_OFF, CHAOS_MONKEY_MAX_SLEEP_BEFORE_OFF,
                                                      CHAOS_MONKEY_MIN_SLEEP_BEFORE_ON, CHAOS_MONKEY_MAX_SLEEP_BEFORE_ON,
-                                                     victimhost));
+                                                     victimhost, wrench::ResourceRandomRepeatSwitcher::ResourceType::HOST));
         switcher->simulation = this->simulation;
         switcher->start(switcher, true, false); // Daemonized, no auto-restart
     }
