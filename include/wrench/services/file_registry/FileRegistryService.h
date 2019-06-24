@@ -56,7 +56,7 @@ namespace wrench {
 
 
         // Public Constructor
-        FileRegistryService(std::string hostname,
+        explicit FileRegistryService(std::string hostname,
                             std::map<std::string, std::string> property_list = {},
                             std::map<std::string, double> messagepayload_list = {}
         );
@@ -91,12 +91,6 @@ namespace wrench {
     private:
 
         friend class Simulation;
-
-        FileRegistryService(std::string hostname,
-                            std::map<std::string, std::string> property_list,
-                            std::map<std::string, double> messagepayload_list,
-                            std::string suffix = "");
-
 
         void addEntryToDatabase(WorkflowFile *file, std::shared_ptr<StorageService> storage_service);
 
