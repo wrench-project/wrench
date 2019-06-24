@@ -294,22 +294,23 @@ set(TEST_FILES
         test/compute_services/HTCondorServiceTest.cpp
         src/wrench/managers/EnergyMeter.cpp
         include/wrench/managers/EnergyMeter.h
-        test/simulated_failures/ServiceStartReStartTest.cpp
-        test/simulated_failures/ComprehensiveIntegrationTest.cpp
-        test/simulated_failures/FailureDetectorTest.cpp
-        test/simulated_failures/BareMetalComputeServiceFailuresTest.cpp
-        test/simulated_failures/CloudComputeServiceFailuresTest.cpp
-        test/simulated_failures/StandardJobExecutorFailuresTest.cpp
-        test/simulated_failures/NetworkProximityFailuresTest.cpp
-        test/simulated_failures/StorageServiceReStartTest.cpp
+        test/simulated_failures/host_failures/ServiceStartReStartTest.cpp
+        test/simulated_failures/host_failures/ComprehensiveIntegrationTest.cpp
+        test/simulated_failures/host_failures/FailureDetectorTest.cpp
+        test/simulated_failures/host_failures/BareMetalComputeServiceFailuresTest.cpp
+        test/simulated_failures/host_failures/CloudComputeServiceFailuresTest.cpp
+        test/simulated_failures/host_failures/StandardJobExecutorFailuresTest.cpp
+        test/simulated_failures/host_failures/NetworkProximityFailuresTest.cpp
+        test/simulated_failures/host_failures/StorageServiceReStartTest.cpp
+        test/simulated_failures/link_failures/FileRegistryTest.cpp
         test/simulated_failures/failure_test_util/HostSwitcher.cpp
         test/simulated_failures/failure_test_util/HostSwitcher.h
         test/simulated_failures/failure_test_util/SleeperVictim.cpp
         test/simulated_failures/failure_test_util/SleeperVictim.h
         test/simulated_failures/failure_test_util/ComputerVictim.cpp
         test/simulated_failures/failure_test_util/ComputerVictim.h
-        test/simulated_failures/failure_test_util/HostRandomRepeatSwitcher.cpp
-        test/simulated_failures/failure_test_util/HostRandomRepeatSwitcher.h
+        test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.cpp
+        test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.h
         )
 
 # wrench library
