@@ -233,6 +233,7 @@ namespace wrench {
         try {
             message = S4U_Mailbox::getMessage(this->mailbox_name);
         } catch (std::shared_ptr<NetworkError> &cause) {
+            WRENCH_INFO("Oops... somebody tried to send a message, but that failed...");
             return true;
         }
 
