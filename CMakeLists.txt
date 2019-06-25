@@ -303,6 +303,7 @@ set(TEST_FILES
         test/simulated_failures/host_failures/NetworkProximityFailuresTest.cpp
         test/simulated_failures/host_failures/StorageServiceReStartTest.cpp
         test/simulated_failures/link_failures/FileRegistryTest.cpp
+        test/simulated_failures/link_failures/StorageServiceTest.cpp
         test/simulated_failures/failure_test_util/HostSwitcher.cpp
         test/simulated_failures/failure_test_util/HostSwitcher.h
         test/simulated_failures/failure_test_util/SleeperVictim.cpp

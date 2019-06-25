@@ -17,6 +17,8 @@
 
 #include "../failure_test_util/ResourceRandomRepeatSwitcher.h"
 
+#define NUM_FILES 100
+#define NUM_STORAGE_SERVICES 10
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(file_registry_link_failure_test, "Log category for FileRegistryLinkFailureTest");
 
@@ -80,7 +82,7 @@ private:
 
         // Create a bunch of files
         std::vector<wrench::WorkflowFile *> files;
-        for (unsigned int i=0; i < 100; i++) {
+        for (unsigned int i=0; i < NUM_FILES; i++) {
             files.push_back(this->getWorkflow()->addFile("file_" + std::to_string(i) , 100.0));
         }
 
@@ -143,7 +145,7 @@ void FileRegistryLinkFailureTest::do_FileRegistryLinkFailureSimpleRandom_Test() 
     std::string hostname = simulation->getHostnameList()[0];
 
     // Create a bunch of storage services
-    for (unsigned int i = 0; i < 10; i++) {
+    for (unsigned int i = 0; i < NUM_STORAGE_SERVICES; i++) {
         storage_services.push_back(simulation->add(
                 new wrench::SimpleStorageService(hostname, 100000000.0)));
     }
@@ -176,8 +178,6 @@ void FileRegistryLinkFailureTest::do_FileRegistryLinkFailureSimpleRandom_Test() 
                     this, "Host1")));
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow));
-
-    WRENCH_INFO("LAUNCHING");
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());

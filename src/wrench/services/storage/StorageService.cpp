@@ -72,8 +72,8 @@ namespace wrench {
             this->stored_files["/"] = {file}; // By default all the staged files will go to the "/" partition
         }
         this->occupied_space += file->getSize();
-        WRENCH_INFO("Stored file %s (storage usage: %.4lf%%)", file->getID().c_str(),
-                    100.0 * this->occupied_space / this->capacity);
+//        WRENCH_INFO("Stored file %s (storage usage: %.4lf%%)", file->getID().c_str(),
+//                    100.0 * this->occupied_space / this->capacity);
     }
 
 
@@ -889,8 +889,11 @@ namespace wrench {
         std::shared_ptr<SimulationMessage> message = nullptr;
 
         try {
+            WRENCH_INFO("GETTING MESSAGE ON COPY_FILE");
             message = S4U_Mailbox::getMessage(answer_mailbox);
+            WRENCH_INFO("GOT IT!!");
         } catch (std::shared_ptr<NetworkError> &cause) {
+            WRENCH_INFO("THROWING!");
             throw WorkflowExecutionException(cause);
         }
 
