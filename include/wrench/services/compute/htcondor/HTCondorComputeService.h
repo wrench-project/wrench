@@ -44,10 +44,10 @@ namespace wrench {
 
     public:
         HTCondorComputeService(const std::string &hostname,
-                        const std::string &pool_name,
-                        std::set<ComputeService*> compute_resources,
-                        std::map<std::string, std::string> property_list = {},
-                        std::map<std::string, double> messagepayload_list = {});
+                               const std::string &pool_name,
+                               std::set<ComputeService *> compute_resources,
+                               std::map<std::string, std::string> property_list = {},
+                               std::map<std::string, double> messagepayload_list = {});
 
         /***********************/
         /** \cond DEVELOPER   **/
@@ -57,6 +57,9 @@ namespace wrench {
                                std::map<std::string, std::string> &service_specific_arguments) override;
 
         void submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_arguments) override;
+
+        void scheduleStandardJobForPilot(StandardJob *job, std::string &job_manager_mailbox_name,
+                                         std::map<std::string, std::string> &service_specific_arguments);
 
         std::shared_ptr<StorageService> getLocalStorageService() const;
 
@@ -90,13 +93,13 @@ namespace wrench {
                                       std::map<std::string, std::string> &service_specific_args);
 
         void processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job,
-                                      std::map<std::string, std::string> &service_specific_args);
+                                   std::map<std::string, std::string> &service_specific_args);
 
         void terminate();
 
         std::string pool_name;
         std::shared_ptr<StorageService> local_storage_service;
-        std::shared_ptr <HTCondorCentralManagerService> central_manager;
+        std::shared_ptr<HTCondorCentralManagerService> central_manager;
     };
 }
 
