@@ -7,6 +7,7 @@
  * (at your option) any later version.
  */
 
+#include <wrench/services/compute/htcondor/HTCondorComputeServiceMessagePayload.h>
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h"
@@ -165,6 +166,27 @@ namespace wrench {
     }
 
     /**
+     * @brief Add a StandardJob to the queue of jobs to run within pilot jobs
+     *
+     * @param job: a standard job
+     * @param job_manager_mailbox_name: JobManager mailbox name
+     * @param service_specific_arguments: service specific arguments
+     *
+     * @throw WorkflowExecutionException
+     * @throw std::runtime_error
+     */
+    void HTCondorCentralManagerService::scheduleStandardJobForPilot(
+            StandardJob *job, std::string &job_manager_mailbox_name,
+            std::map<std::string, std::string> &service_specific_arguments) {
+
+      serviceSanityCheck();
+      //TODO: send as message
+      std::cerr << "----- SCHEDULING: " << job->getName().c_str() << std::endl;
+      job->pushCallbackMailbox(job_manager_mailbox_name);
+      this->pilot_pending_jobs.push_back(job);
+    }
+
+    /**
      * @brief Terminate a standard job to the compute service (virtual)
      * @param job: the job
      *
@@ -234,7 +256,8 @@ namespace wrench {
       // main loop
       while (this->processNextMessage()) {
         // starting an HTCondor negotiator
-        if (not this->dispatching_jobs && not this->pending_jobs.empty() && not this->resources_unavailable) {
+        if (not this->dispatching_jobs && (not this->pending_jobs.empty() || not this->pilot_pending_jobs.empty()) &&
+            not this->resources_unavailable) {
           this->dispatching_jobs = true;
           auto negotiator = std::shared_ptr<HTCondorNegotiatorService>(
                   new HTCondorNegotiatorService(this->hostname, this->compute_resources_map,
@@ -294,6 +317,14 @@ namespace wrench {
 
       } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceSubmitPilotJobRequestMessage>(message)) {
         processSubmitPilotJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
+        return true;
+
+      } else if (auto msg = std::dynamic_pointer_cast<ComputeServicePilotJobStartedMessage>(message)) {
+        processPilotJobStarted(msg->job);
+        return true;
+
+      } else if (auto msg = std::dynamic_pointer_cast<ComputeServicePilotJobExpiredMessage>(message)) {
+        processPilotJobCompletion(msg->job);
         return true;
 
       } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceStandardJobDoneMessage>(message)) {
@@ -364,6 +395,85 @@ namespace wrench {
     }
 
     /**
+     * @brief Process a pilot job started event
+     *
+     * @param job: the pilot job
+     *
+     * @throw std::runtime_error
+     */
+    void HTCondorCentralManagerService::processPilotJobStarted(wrench::PilotJob *pilot_job) {
+
+      std::vector<WorkflowJob *> scheduled_jobs;
+
+      std::cerr << "TO SCHEDULE: " << this->pilot_pending_jobs.size() << std::endl;
+
+      unsigned long cs_total_idle_cores = pilot_job->getComputeService()->getTotalNumIdleCores();
+
+      for (auto job : this->pilot_pending_jobs) {
+        job->pushCallbackMailbox(this->mailbox_name);
+        if (cs_total_idle_cores >= 1) {
+          pilot_job->getComputeService()->submitJob(job);
+          scheduled_jobs.push_back(job);
+          cs_total_idle_cores--;
+        }
+      }
+
+      std::cerr << "SCHEDULED: " << scheduled_jobs.size() << std::endl;
+
+      for (auto sjob : scheduled_jobs) {
+        for (auto it = this->pilot_pending_jobs.begin(); it != this->pilot_pending_jobs.end(); ++it) {
+          auto pjob = *it;
+          if (sjob == pjob) {
+            this->pilot_pending_jobs.erase(it);
+            break;
+          }
+        }
+      }
+
+//      this->pilot_pending_jobs.erase(scheduled_jobs.begin(), scheduled_jobs.end());
+    }
+
+    /**
+     * @brief Process a pilot job completion
+     *
+     * @param job: the pilot job
+     *
+     * @throw std::runtime_error
+     */
+    void HTCondorCentralManagerService::processPilotJobCompletion(wrench::PilotJob *job) {
+      // Remove the job from the running job list
+//      StandardJob *wf_job = nullptr;
+//      for (auto const &rj : this->running_jobs) {
+//        if (rj.first == job) {
+//          wf_job = (StandardJob *) rj.first;
+//          break;
+//        }
+//      }
+//
+//      if (wf_job == nullptr) {
+//        throw std::runtime_error(
+//                "HTCondorCentralManagerService::processPilotJobCompletion(): Pilot job completion message received but no such pilot jobs found in queue"
+//        );
+//      }
+
+//      auto cs = this->running_jobs.find(wf_job);
+//      auto cs_map = this->compute_resources_map.find(cs->second);
+//      cs_map->second = cs_map->second + wf_job->getMinimumRequiredNumCores();
+//      this->running_jobs.erase(wf_job);
+
+      // Forward the notification
+      try {
+        S4U_Mailbox::dputMessage(job->popCallbackMailbox(),
+                                 new ComputeServicePilotJobExpiredMessage(
+                                         job, this->getSharedPtr<HTCondorCentralManagerService>(),
+                                         this->getMessagePayloadValue(
+                                                 HTCondorComputeServiceMessagePayload::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD)));
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        return; // ignore
+      }
+    }
+
+    /**
      * @brief Process a standard job completion
      *
      * @param job: the job
@@ -399,7 +509,7 @@ namespace wrench {
      * @param scheduled_jobs: list of scheduled jobs upon negotiator cycle completion
      */
     void HTCondorCentralManagerService::processNegotiatorCompletion(
-            std::vector<wrench::WorkflowJob *> scheduled_jobs) {
+            std::vector<wrench::WorkflowJob *> &scheduled_jobs) {
 
       if (scheduled_jobs.empty()) {
         this->resources_unavailable = true;
