@@ -68,16 +68,13 @@ namespace wrench {
 
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("lookup_entry");
 
-        WRENCH_INFO("LOOKUP 1");
         try {
             S4U_Mailbox::putMessage(this->mailbox_name, new FileRegistryFileLookupRequestMessage(answer_mailbox, file,
                                                                                                  this->getMessagePayloadValue(
                                                                                                          FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
-        WRENCH_INFO("LOOKUP 1 THROW");
             throw WorkflowExecutionException(cause);
         }
-        WRENCH_INFO("LOOKUP 2");
 
         std::shared_ptr<SimulationMessage> message = nullptr;
 
@@ -85,10 +82,8 @@ namespace wrench {
             message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
 
-             WRENCH_INFO("LOOKUP 2 THROW");
             throw WorkflowExecutionException(cause);
         }
-        WRENCH_INFO("LOOKUP 3");
 
         if (auto msg = std::dynamic_pointer_cast<FileRegistryFileLookupAnswerMessage>(message)) {
             std::set<std::shared_ptr<StorageService>> result = msg->locations;
