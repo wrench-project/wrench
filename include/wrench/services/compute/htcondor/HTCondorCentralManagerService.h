@@ -28,9 +28,12 @@ namespace wrench {
                 {HTCondorCentralManagerServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,               1024},
                 {HTCondorCentralManagerServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD,  256000000},
                 {HTCondorCentralManagerServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,   256000000},
+                {HTCondorCentralManagerServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,     256000000},
+                {HTCondorCentralManagerServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,      256000000},
                 {HTCondorCentralManagerServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD, 196000000},
                 {HTCondorCentralManagerServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD,  196000000},
                 {HTCondorCentralManagerServiceMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD,            512000000},
+                {HTCondorCentralManagerServiceMessagePayload::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD,            1024},
         };
 
     public:
@@ -47,6 +50,9 @@ namespace wrench {
                                std::map<std::string, std::string> &service_specific_arguments) override;
 
         void submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_arguments) override;
+
+        void scheduleStandardJobForPilot(StandardJob *job, std::string &job_manager_mailbox_name,
+                                         std::map<std::string, std::string> &service_specific_arguments);
 
         /***********************/
         /** \endcond          **/
@@ -77,9 +83,13 @@ namespace wrench {
         void processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job,
                                    std::map<std::string, std::string> &service_specific_args);
 
+        void processPilotJobStarted(PilotJob *job);
+
+        void processPilotJobCompletion(PilotJob *job);
+
         void processStandardJobCompletion(StandardJob *job);
 
-        void processNegotiatorCompletion(std::vector<WorkflowJob *> pending_jobs);
+        void processNegotiatorCompletion(std::vector<WorkflowJob *> &pending_jobs);
 
         void terminate();
 
@@ -87,6 +97,8 @@ namespace wrench {
         std::set<ComputeService *> compute_resources;
         /** queue of pending jobs **/
         std::vector<WorkflowJob *> pending_jobs;
+        /** queue of pending jobs for pilot jobs **/
+        std::vector<WorkflowJob *> pilot_pending_jobs;
         /** whether a negotiator is dispatching jobs **/
         bool dispatching_jobs = false;
         /** whether a negotiator could not dispach jobs **/
