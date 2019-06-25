@@ -98,30 +98,22 @@ private:
 
         // Do a bunch of file registry operations
         for (unsigned int i=0; i < 10000; i++) {
-            WRENCH_INFO("***** i=%u", i);
             try {
                 // Do a random add
                 wrench::Simulation::sleep(1.0);
-                WRENCH_INFO("ADDINGENTRY");
                 this->test->file_registry_service->addEntry(files.at(dist_files(rng)),
                                                             this->test->storage_services.at(dist_storage(rng)));
-                WRENCH_INFO("DONE ADDINGENTRY");
 
                 // Do a random delete
                 wrench::Simulation::sleep(1.0);
-                WRENCH_INFO("REMOVEINGENTRY");
                 this->test->file_registry_service->removeEntry(files.at(dist_files(rng)),
                                                                this->test->storage_services.at(dist_storage(rng)));
-                WRENCH_INFO("DONE REMOVEINGENTRY");
 
                 // Do a random lookup
                 wrench::Simulation::sleep(1.0);
-                WRENCH_INFO("LOOKUP");
                 this->test->file_registry_service->lookupEntry(files.at(dist_files(rng)));
-                WRENCH_INFO("DONE LOOKUP");
 
             } catch (wrench::WorkflowExecutionException &e) {
-                WRENCH_INFO("OOPS");
             }
         }
 
