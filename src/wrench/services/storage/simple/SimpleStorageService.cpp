@@ -607,14 +607,9 @@ namespace wrench {
                     // do nothing
                 }
 
-//          // finally, add the timestamp. the 'send ack' may have failed but the file copy itself is complete
-//          this->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyCompletion>(new SimulationTimestampFileCopyCompletion(
-//                  connection->start_timestamp
-//          ));
             }
-
-
             return true;
+
         } else {
             throw std::runtime_error(
                     "SimpleStorageService::processControlMessage(): Unexpected [" + message->getName() + "] message");

@@ -512,7 +512,7 @@ namespace wrench {
             partition = "/";
         }
 
-        XBT_INFO("Staging file %s (%lf)", file->getID().c_str(), file->getSize());
+//        XBT_INFO("Staging file %s (%lf)", file->getID().c_str(), file->getSize());
         // Put the file on the storage service (not via the service daemon)
         try {
             storage_service->stageFile(file);
