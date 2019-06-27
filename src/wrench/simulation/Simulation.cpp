@@ -31,7 +31,7 @@
 #include <nlohmann/json.hpp>
 #include <fstream>
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(simulation, "Log category for Simulation");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(simulation, "Log category for Simulation");
 
 namespace wrench {
 
@@ -56,7 +56,7 @@ namespace wrench {
     Simulation::Simulation() {
 
         // Customize the logging format
-        xbt_log_control_set("root.fmt:[%d][%h:%t(%i)]%e%m%n");
+        xbt_log_control_set("root.fmt:[%.20d][%h:%t(%i)]%e%m%n");
 
         // Setup the SIGABRT handler
         auto previous_handler = std::signal(SIGABRT, signal_handler);
@@ -634,7 +634,7 @@ namespace wrench {
      * @return a memory capacity in bytes
      */
     double Simulation::getMemoryCapacity() {
-        return S4U_Simulation::getHostMemoryCapacity(S4U_Simulation::getHostName());
+        return S4U_Simulation::getMemoryCapacity();
     }
 
     /**
@@ -642,7 +642,7 @@ namespace wrench {
      * @return a number of cores
      */
     unsigned long Simulation::getNumCores() {
-        return S4U_Simulation::getHostNumCores(S4U_Simulation::getHostName());
+        return S4U_Simulation::getNumCores();
     }
 
     /**
@@ -650,7 +650,7 @@ namespace wrench {
      * @return a flop rate
      */
     double Simulation::getFlopRate() {
-        return S4U_Simulation::getHostFlopRate(S4U_Simulation::getHostName());
+        return S4U_Simulation::getFlopRate();
     }
 
     /**

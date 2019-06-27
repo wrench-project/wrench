@@ -12,7 +12,7 @@
 #include "wrench/workflow/Workflow.h"
 #include "wrench/workflow/job/StandardJob.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(standard_job, "Log category for StandardJob");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(standard_job, "Log category for StandardJob");
 
 
 namespace wrench {

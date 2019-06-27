@@ -272,7 +272,8 @@ set(TEST_FILES
         test/wms/WMSTest.cpp
         test/wms/MultipleWMSTest.cpp
         test/wms/WMSOptimizationsTest.cpp
-        test/compute_services/VirtualizedClusterServiceTest.cpp
+        test/compute_services/VirtualizedClusterService/VirtualizedClusterServiceTest.cpp
+        test/compute_services/VirtualizedClusterService/VirtualizedClusterServiceResourceAllocationAlgorithmTest.cpp
         test/network_proximity_services/NetworkProximityTest.cpp
         test/file_registry_services/FileRegistryTest.cpp
         test/wms/JobManagerTest.cpp
@@ -285,6 +286,7 @@ set(TEST_FILES
         test/simulation/simulation_output/SimulationTimestampEnergyTest.cpp
         test/compute_services/ScratchSpaceTest.cpp
         test/simulation/S4U_DaemonTest.cpp
+        test/simulation/S4U_SimulationTest.cpp
         test/pilot_job/CriticalPathSchedulerTest.cpp
         test/misc/PointerUtilTest.cpp
         examples/simple-example/scheduler/pilot_job/CriticalPathPilotJobScheduler.cpp

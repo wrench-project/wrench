@@ -8,13 +8,11 @@
  * (at your option) any later version.
  */
 
-#include <xbt.h>
+#include "wrench/logging/TerminalOutput.h"
 #include <wrench-dev.h>
 #include "ComputeThread.h"
 
-
-XBT_LOG_NEW_DEFAULT_CATEGORY(compute_thread, "Log category for ComputeThread");
-
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(compute_thread, "Log category for ComputeThread");
 
 namespace wrench {
 

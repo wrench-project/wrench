@@ -23,7 +23,7 @@
 #include "wrench/workflow/Workflow.h"
 #include "wrench/managers/DataMovementManager.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(data_movement_manager, "Log category for Data Movement Manager");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(data_movement_manager, "Log category for Data Movement Manager");
 
 namespace wrench {
 

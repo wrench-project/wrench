@@ -101,9 +101,9 @@ namespace wrench {
                                std::set<WorkflowFile*>& files_in_scratch,
                                WorkflowJob* job = nullptr);
 
-        static void deleteFiles(std::set<WorkflowFile *> files,
-                                std::map<WorkflowFile *, std::shared_ptr<StorageService>> file_locations,
-                                std::shared_ptr<StorageService> default_storage_service);
+//        static void deleteFiles(std::set<WorkflowFile *> files,
+//                                std::map<WorkflowFile *, std::shared_ptr<StorageService>> file_locations,
+//                                std::shared_ptr<StorageService> default_storage_service);
 
         StorageService(const std::string &hostname,
                        const std::string &service_name,

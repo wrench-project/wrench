@@ -727,11 +727,22 @@ private:
         {
             // Create a pilot job that needs 1 host, 1 code, 0 bytes of RAM and 30 seconds
             wrench::PilotJob *pilot_job = job_manager->createPilotJob();
+            // Forgetting the job right-away for coverage
+            job_manager->forgetJob(pilot_job);
+            // Forgetting the job again, which is wrong,for coverage
+            try {
+                job_manager->forgetJob(pilot_job);
+                throw std::runtime_error("Should not be able to forget already forgotten pilot job");
+            } catch (std::invalid_argument &e) {
+            }
+            // Re-creating it
+            pilot_job = job_manager->createPilotJob();
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "1";
             batch_job_args["-t"] = "1"; //time in minutes
             batch_job_args["-c"] = "4"; //number of cores per node
+
 
             // Submit a pilot job
             try {
@@ -742,7 +753,17 @@ private:
                 );
             }
 
-            // Wait for a workflow execution event
+            // Trying to forget the job right now, which is wrong
+            try {
+                job_manager->forgetJob(pilot_job);
+                throw std::runtime_error("Shouldn't be able to forget a running/pending pilot job");
+            } catch (wrench::WorkflowExecutionException &e) {
+                if (not std::dynamic_pointer_cast<wrench::JobCannotBeForgotten>(e.getCause())) {
+                    throw std::runtime_error("Unexpected failure cause: " + e.getCause()->toString());
+                }
+            }
+
+            // Wait for a workflow execution event (pilot job started)
             std::shared_ptr<wrench::WorkflowExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
@@ -753,6 +774,7 @@ private:
                 throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
 
+            // Wait for another workflow execution event (pilot job terminated)
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
             } catch (wrench::WorkflowExecutionException &e) {
@@ -761,6 +783,10 @@ private:
             if (not std::dynamic_pointer_cast<wrench::PilotJobExpiredEvent>(event)) {
                 throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
+
+            // Forget the job!
+            job_manager->forgetJob(pilot_job);
+
         }
 
         return 0;

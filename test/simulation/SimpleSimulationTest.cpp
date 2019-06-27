@@ -152,10 +152,37 @@ private:
         } catch (std::invalid_argument &e) {
         }
 
-        // Create a 2-core VM
+        // Get pointer to cloud service
         auto cs = *(this->getAvailableComputeServices<wrench::CloudComputeService>().begin());
+
+        // Create a bogus VM
+        try {
+            cs->createVM(1000,10000000);
+            throw std::runtime_error("Should not be able to create a VM that exceeds the capacity of all hosts on the service");
+        } catch (wrench::WorkflowExecutionException &e) {
+            auto cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
+            if (not cause) {
+                throw std::runtime_error("Unexpected failure cause: " + e.getCause()->toString() +
+                                         "(Was expecting NotEnoughResources");
+            }
+        }
+
+        // Create a 2-core VM
         auto vm_name = cs->createVM(2, 10);
+
+        // Start the VM
         auto vm_cs = cs->startVM(vm_name);
+        // Try to, wrongly, start it again
+        try {
+            cs->startVM(vm_name);
+            throw std::runtime_error("Should not be able to start an already-started VM");
+        } catch (wrench::WorkflowExecutionException &e) {
+            auto cause = std::dynamic_pointer_cast<wrench::NotAllowed>(e.getCause());
+            if (not cause) {
+                throw std::runtime_error("Unexpected Failure Cause " + e.getCause()->toString() +
+                                         " (Expected: NotAllowed");
+            }
+        }
 
         wrench::StandardJob *one_task_jobs[5];
         int job_index = 0;
@@ -251,8 +278,12 @@ private:
         std::map<std::string, std::vector<std::string>> clusters =
                 wrench::Simulation::getHostnameListByCluster();
 
+        cs->stop();
+
         data_movement_manager->kill();
         job_manager->kill();
+
+
 
         return 0;
     }

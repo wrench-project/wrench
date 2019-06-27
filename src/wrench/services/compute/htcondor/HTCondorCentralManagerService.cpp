@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2019. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,9 +19,7 @@
 #include "wrench/services/compute/htcondor/HTCondorNegotiatorService.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 
-#include <mutex>
-
-XBT_LOG_NEW_DEFAULT_CATEGORY(HTCondorCentralManager, "Log category for HTCondorCentralManagerService");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(HTCondorCentralManager, "Log category for HTCondorCentralManagerService");
 
 namespace wrench {
 

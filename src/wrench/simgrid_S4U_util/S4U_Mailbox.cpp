@@ -24,7 +24,7 @@
 #include "wrench/simgrid_S4U_util/S4U_PendingCommunication.h"
 #include "wrench/simulation/SimulationMessage.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(mailbox, "Mailbox");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(mailbox, "Mailbox");
 
 
 namespace wrench {

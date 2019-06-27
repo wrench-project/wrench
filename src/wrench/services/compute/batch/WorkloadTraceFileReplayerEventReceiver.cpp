@@ -12,7 +12,7 @@
 #include <wrench-dev.h>
 #include "WorkloadTraceFileReplayerEventReceiver.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(one_job_wms, "Log category for One Job WMS");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(one_job_wms, "Log category for One Job WMS");
 
 namespace wrench {
 

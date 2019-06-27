@@ -21,7 +21,7 @@
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(cloud_service, "Log category for Cloud Service");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(cloud_service, "Log category for Cloud Service");
 
 namespace wrench {
 
@@ -374,9 +374,7 @@ namespace wrench {
      * @brief Submit a standard job to the cloud service
      *
      * @param job: a standard job
-     * @param service_specific_args: batch-specific arguments
-     *      - optional: "-vm": name of vm on which to start the job
-     *        (if not provided, the service will pick the vm)
+     * @param service_specific_args: always {} (i.e., no service-specific arguments supported)
      *
      * @throw WorkflowExecutionException
      * @throw std::invalid_argument
@@ -386,20 +384,6 @@ namespace wrench {
                                                 std::map<std::string, std::string> &service_specific_args) {
 
         assertServiceIsUp();
-
-        for (auto const &arg : service_specific_args) {
-            if (arg.first != "-vm") {
-                throw std::invalid_argument(
-                        "CloudComputeService::submitStandardJob(): Invalid service-specific argument key '" +
-                        arg.first + "'");
-            }
-            if (this->vm_list.find(arg.second) == this->vm_list.end()) {
-                throw std::invalid_argument(
-                        "CloudComputeService::submitStandardJob(): In service-specific argument value: Unknown VM name '" +
-                        arg.second + "'");
-            }
-        }
-
 
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_standard_job");
 
@@ -425,9 +409,7 @@ namespace wrench {
      * @brief Asynchronously submit a pilot job to the cloud service
      *
      * @param job: a pilot job
-     * @param service_specific_args: service specific arguments
-     *      - optional: "-vm": name of vm on which to start the job
-     *        (if not provided, the service will pick the vm)
+     * @param service_specific_args: always {} (i.e., no service-specific arguments supported)
      *
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
@@ -435,19 +417,6 @@ namespace wrench {
     void CloudComputeService::submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_args) {
 
         assertServiceIsUp();
-
-        for (auto const &arg : service_specific_args) {
-            if (arg.first != "-vm") {
-                throw std::invalid_argument(
-                        "CloudComputeService::submitPilotJob(): Invalid service-specific argument key '" + arg.first +
-                        "'");
-            }
-            if (this->vm_list.find(arg.second) == this->vm_list.end()) {
-                throw std::invalid_argument(
-                        "CloudComputeService::submitPilotJob(): In service-specific argument value: Unknown VM name '" +
-                        arg.second + "'");
-            }
-        }
 
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_pilot_job");
 
@@ -797,6 +766,9 @@ namespace wrench {
                         new S4U_VirtualMachine(vm_name, requested_num_cores, requested_ram, property_list,
                                                messagepayload_list));
 
+                WRENCH_INFO("Created a VM called %s with %lu cores and %lf RAM",
+                            vm_name.c_str(), requested_num_cores, requested_ram);
+
                 // Add the VM to the list of VMs, with (for now) a nullptr compute service
                 this->vm_list[vm_name] = std::make_pair(vm, nullptr);
 
@@ -885,6 +857,7 @@ namespace wrench {
         std::vector<std::string> possible_hosts;
         for (auto const &host : this->execution_hosts) {
 
+
             if ((not desired_host.empty()) and (host != desired_host)) {
                 continue;
             }
@@ -914,7 +887,6 @@ namespace wrench {
             }
 
             possible_hosts.push_back(host);
-            break;
         }
 
         // Did we find a viable host?
@@ -922,10 +894,12 @@ namespace wrench {
             return "";
         }
 
+
+
         std::string vm_resource_allocation_algorithm = this->getPropertyValueAsString(
                 CloudComputeServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM);
         if (vm_resource_allocation_algorithm == "first-fit") {
-            //don't sort the possibvle hosts
+            //don't sort the possible hosts
         } else if (vm_resource_allocation_algorithm == "best-fit-ram-first") {
             // Sort the possible hosts to implement best fit (using RAM first)
             std::sort(possible_hosts.begin(), possible_hosts.end(),
@@ -1009,6 +983,8 @@ namespace wrench {
                                 this->getMessagePayloadValue(
                                         CloudComputeServiceMessagePayload::START_VM_ANSWER_MESSAGE_PAYLOAD));
             } else {
+
+                WRENCH_INFO("Starting VM %s on host %s", vm_name.c_str(), picked_host.c_str());
 
                 // Sleep for the VM booting overhead
                 Simulation::sleep(
@@ -1444,7 +1420,7 @@ namespace wrench {
         }
 
         if ((!success) or (vm_boot_overhead < 0)) {
-            throw std::invalid_argument("Invalid THREAD_STARTUP_OVERHEAD property specification: " +
+            throw std::invalid_argument("Invalid VM_BOOT_OVERHEAD_IN_SECONDS property specification: " +
                                         this->getPropertyValueAsString(
                                                 CloudComputeServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS));
         }

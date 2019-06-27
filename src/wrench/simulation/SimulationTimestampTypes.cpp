@@ -2,7 +2,7 @@
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 #include <wrench-dev.h>
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(simulation_timestamps, "Log category for SimulationTimeStamps");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(simulation_timestamps, "Log category for SimulationTimeStamps");
 
 
 namespace wrench {
