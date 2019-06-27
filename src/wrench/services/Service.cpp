@@ -26,23 +26,6 @@ namespace wrench {
     unsigned long Service::num_terminated_services = 0;
 
     /**
-    * @brief Get the master shared pointer to the service
-    * @return the master shared pointer
-    */
-//    template <class T>
-//    std::shared_ptr<T> Service::getSharedPtr() {
-//        if (Service::service_shared_ptr_map.find(this) == Service::service_shared_ptr_map.end()) {
-//            throw std::runtime_error("Service::getSharedPtr(): master shared_ptr to service not found! This should happen only "
-//                                     "if the service has not been started, in which case this method shouldn't have been called");
-//        }
-//        auto shared_ptr = std::dynamic_pointer_cast<T>(Service::service_shared_ptr_map[this]);
-//        if (not shared_ptr) {
-//            throw std::runtime_error("Service::getSharedPtr(): Invalid provided template");
-//        }
-//        return shared_ptr;
-//    }
-
-    /**
      * @brief Increase the completed service count
      */
     void Service::increaseNumCompletedServicesCount() {
