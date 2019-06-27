@@ -301,42 +301,6 @@ namespace wrench {
             negotiator->start(negotiator, true, false); // Daemonized, no auto-restart
 
           }
-
-//          // assigning standard jobs to pilot jobs
-//          if (not this->pilot_pending_jobs.empty() && not this->pilot_idle_jobs.empty()) {
-//
-//            std::cerr << "TO SCHEDULE: " << this->pilot_pending_jobs.size() << std::endl;
-//            std::map<std::string, std::string> service_specific_args;
-//
-//            for (auto it = this->pilot_pending_jobs.begin(); it != this->pilot_pending_jobs.end(); ++it) {
-//              auto job = *it;
-//              bool scheduled = false;
-//              std::cerr << "---- PENDING JOBS: " << this->pilot_pending_jobs.size() << std::endl;
-//
-//              for (auto itp = this->pilot_idle_jobs.begin(); itp != this->pilot_idle_jobs.end(); ++itp) {
-//                auto pilot_job = *itp;
-//                unsigned long cs_total_idle_cores = pilot_job->getComputeService()->getTotalNumIdleCores();
-//
-//                if (cs_total_idle_cores >= job->getMinimumRequiredNumCores()) {
-//                  job->pushCallbackMailbox(this->mailbox_name);
-//                  pilot_job->getComputeService()->submitStandardJob(job, service_specific_args);
-//                  for (auto task : job->getTasks()) {
-//                    task->setState(WorkflowTask::State::PENDING);
-//                  }
-//
-//                  std::cerr << "SCHEDULED: " << job->getName() << std::endl;
-//                  this->pilot_running_jobs.insert(std::make_pair(job, pilot_job));
-//                  this->pilot_idle_jobs.erase(itp);
-//                  scheduled = true;
-//                  break;
-//                }
-//              }
-//              if (scheduled) {
-//                this->pilot_pending_jobs.erase(it);
-//                break;
-//              }
-//            }
-//          }
         }
       }
 
@@ -390,10 +354,6 @@ namespace wrench {
       } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceSubmitPilotJobRequestMessage>(message)) {
         processSubmitPilotJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
         return true;
-
-//      } else if (auto msg = std::dynamic_pointer_cast<ScheduleStandardJobForPilotMessage>(message)) {
-//        processScheduleStandardJobForPilot(msg->answer_mailbox, msg->job, msg->service_specific_arguments);
-//        return true;
 
       } else if (auto msg = std::dynamic_pointer_cast<ComputeServicePilotJobStartedMessage>(message)) {
         processPilotJobStarted(msg->job);
@@ -470,33 +430,6 @@ namespace wrench {
       }
     }
 
-//    /**
-//     * @brief Process a schedule StandardJob for running in a pilot job event
-//     *
-//     * @param answer_mailbox:
-//     * @param job: the standard job
-//     * @param service_specific_arguments:
-//     *
-//     * @throw std::runtime_error
-//     */
-//    void HTCondorCentralManagerService::processScheduleStandardJobForPilot(
-//            const std::string &answer_mailbox,
-//            wrench::StandardJob *job,
-//            std::map<std::string, std::string> &service_specific_arguments) {
-//
-//      this->pilot_pending_jobs.push_back(job);
-//
-//      try {
-//        S4U_Mailbox::dputMessage(
-//                answer_mailbox,
-//                new ScheduleStandardJobForPilotAnswerMessage(
-//                        true, nullptr,
-//                        this->getMessagePayloadValue(
-//                                HTCondorCentralManagerServiceMessagePayload::HTCONDOR_SCHEDULE_FOR_PILOT_ANSWER_MESSAGE_PAYLOAD)));
-//      } catch (std::shared_ptr<NetworkError> &cause) {
-//      }
-//    }
-
     /**
      * @brief Process a pilot job started event
      *
@@ -562,14 +495,6 @@ namespace wrench {
       }
 
       auto cs = this->running_jobs.find(job);
-//      if (cs == this->running_jobs.end()) {
-//        // probably running on a pilot job
-//        auto it = this->pilot_running_jobs.find(job);
-//        this->pilot_idle_jobs.insert(it->second);
-//        this->pilot_running_jobs.erase(job);
-//        std::cout << "---- PILOT RUNNING JOBS: " << this->pilot_running_jobs.size() << std::endl;
-//      }
-//
       auto cs_map = this->compute_resources_map.find(cs->second);
       cs_map->second = cs_map->second + job->getMinimumRequiredNumCores();
       this->running_jobs.erase(job);

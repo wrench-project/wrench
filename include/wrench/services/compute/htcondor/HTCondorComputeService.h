@@ -58,9 +58,6 @@ namespace wrench {
 
         void submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_arguments) override;
 
-        void scheduleStandardJobForPilot(StandardJob *job, std::string &job_manager_mailbox_name,
-                                         std::map<std::string, std::string> &service_specific_arguments);
-
         std::shared_ptr<StorageService> getLocalStorageService() const;
 
         void setLocalStorageService(std::shared_ptr<StorageService> local_storage_service);

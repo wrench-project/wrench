@@ -74,9 +74,6 @@ namespace wrench {
 
       // TODO: check how to pass the service specific arguments
       std::map<std::string, std::string> specific_args;
-      specific_args["-N"] = "1";
-      specific_args["-t"] = "10"; //time in minutes
-      specific_args["-c"] = "1"; //number of cores per node
       std::vector<WorkflowJob *> scheduled_jobs;
 
       // sort tasks by priority
@@ -104,6 +101,12 @@ namespace wrench {
           }
 
         } else if (auto pilot_job = dynamic_cast<PilotJob *>(job)) {
+
+          // TODO: fix specific args
+          specific_args["-N"] = "1";
+          specific_args["-t"] = "10"; //time in minutes
+          specific_args["-c"] = "1"; //number of cores per node
+
           for (auto &item : *this->compute_resources) {
             pilot_job->pushCallbackMailbox(this->reply_mailbox);
             item.first->submitPilotJob(pilot_job, specific_args);
