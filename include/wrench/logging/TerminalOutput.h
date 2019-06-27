@@ -26,21 +26,21 @@ namespace wrench {
 
 #define WRENCH_LOG_NEW_DEFAULT_CATEGORY(cname, desc) XBT_LOG_NEW_DEFAULT_CATEGORY(cname, desc)
 
-#define WRENCH_INFO(...)  \
+#define WRENCH_INFO(...);  \
     if (_XBT_LOG_ISENABLEDV((*_simgrid_log_category__default), xbt_log_priority_info)) { \
       wrench::TerminalOutput::beginThisProcessColor();  \
       XBT_INFO(__VA_ARGS__) ;  \
       wrench::TerminalOutput::endThisProcessColor(); \
     }
 
-#define WRENCH_DEBUG(...)  \
+#define WRENCH_DEBUG(...);  \
     if (_XBT_LOG_ISENABLEDV((*_simgrid_log_category__default), xbt_log_priority_debug)) { \
       wrench::TerminalOutput::beginThisProcessColor();  \
       XBT_DEBUG(__VA_ARGS__) ;  \
       wrench::TerminalOutput::endThisProcessColor(); \
     }
 
-#define WRENCH_WARN(...)  \
+#define WRENCH_WARN(...);  \
     if (_XBT_LOG_ISENABLEDV((*_simgrid_log_category__default), xbt_log_priority_warning)) { \
       wrench::TerminalOutput::beginThisProcessColor();  \
       XBT_WARN(__VA_ARGS__) ;  \

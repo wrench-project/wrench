@@ -175,12 +175,20 @@ private:
 
     int main() {
 
-        // Create a link switcher on/off er
-        auto switcher = std::shared_ptr<wrench::ResourceRandomRepeatSwitcher>(
-                new wrench::ResourceRandomRepeatSwitcher("Host1", 123, 1, 15, 1, 5,
+        // Create a link switcher on/off er for link1
+        auto switcher1 = std::shared_ptr<wrench::ResourceRandomRepeatSwitcher>(
+                new wrench::ResourceRandomRepeatSwitcher("Host1", 123, 1, 1045, 1, 5,
                                                          "link1", wrench::ResourceRandomRepeatSwitcher::ResourceType::LINK));
-        switcher->simulation = this->simulation;
-        switcher->start(switcher, true, false); // Daemonized, no auto-restart
+        switcher1->simulation = this->simulation;
+        switcher1->start(switcher1, true, false); // Daemonized, no auto-restart
+
+        // Create a link switcher on/off er for link2
+        auto switcher2 = std::shared_ptr<wrench::ResourceRandomRepeatSwitcher>(
+                new wrench::ResourceRandomRepeatSwitcher("Host1", 234, 1, 15, 1, 5,
+                                                         "link2", wrench::ResourceRandomRepeatSwitcher::ResourceType::LINK));
+        switcher2->simulation = this->simulation;
+        switcher2->start(switcher2, true, false); // Daemonized, no auto-restart
+
 
         this->data_movement_manager = this->createDataMovementManager();
 
@@ -193,7 +201,6 @@ private:
 
             // Do a random synchronous file copy
             try {
-                WRENCH_INFO("*** SYNCHRONOUS FILE COPY **");
                 this->doRandomSynchronousFileCopy();
             } catch (wrench::WorkflowExecutionException &e) {
                 if (std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause())) {
@@ -205,10 +212,8 @@ private:
 
             // Do a random asynchronous copy
             try {
-                WRENCH_INFO("*** ASYNCHRONOUS FILE COPY **");
                 this->doRandomAsynchronousFileCopy();
             } catch (wrench::WorkflowExecutionException &e) {
-                WRENCH_INFO("EXCEPTION: %s", e.getCause()->toString().c_str());
                 if (std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause())) {
                     network_failure_2++;
                 }
@@ -218,7 +223,6 @@ private:
 
             // Do a random delete
             try {
-                WRENCH_INFO("*** FILE DELETE **");
                 this->doRandomFileDelete();
             } catch (wrench::WorkflowExecutionException &e) {
                 if (std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause())) {
@@ -233,6 +237,7 @@ private:
         WRENCH_INFO("NETWORK FAILURES Sync   %lu", network_failure_1);
         WRENCH_INFO("NETWORK FAILURES Async  %lu", network_failure_2);
         WRENCH_INFO("NETWORK FAILURES Delete %lu", network_failure_3);
+
         return 0;
     }
 };
