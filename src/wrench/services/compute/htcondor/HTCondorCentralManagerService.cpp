@@ -19,6 +19,8 @@
 #include "wrench/services/compute/htcondor/HTCondorNegotiatorService.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 
+#include <mutex>
+
 XBT_LOG_NEW_DEFAULT_CATEGORY(HTCondorCentralManager, "Log category for HTCondorCentralManagerService");
 
 namespace wrench {
@@ -180,10 +182,40 @@ namespace wrench {
             std::map<std::string, std::string> &service_specific_arguments) {
 
       serviceSanityCheck();
-      //TODO: send as message
-      std::cerr << "----- SCHEDULING: " << job->getName().c_str() << std::endl;
-      job->pushCallbackMailbox(job_manager_mailbox_name);
-      this->pilot_pending_jobs.push_back(job);
+
+      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("schedule_for_pilot_job");
+
+      //  send a "run a pilot job" message to the daemon's mailbox_name
+      try {
+        job->pushCallbackMailbox(job_manager_mailbox_name);
+        S4U_Mailbox::putMessage(
+                this->mailbox_name,
+                new ScheduleStandardJobForPilotMessage(
+                        answer_mailbox, job, service_specific_arguments,
+                        this->getMessagePayloadValue(
+                                HTCondorCentralManagerServiceMessagePayload::HTCONDOR_SCHEDULE_FOR_PILOT_MESSAGE_PAYLOAD)));
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      }
+
+      // Get the answer
+      std::shared_ptr<SimulationMessage> message = nullptr;
+      try {
+        message = S4U_Mailbox::getMessage(answer_mailbox);
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      }
+
+      if (auto msg = std::dynamic_pointer_cast<ScheduleStandardJobForPilotAnswerMessage>(message)) {
+        // If no success, throw an exception
+        if (not msg->success) {
+          throw WorkflowExecutionException(msg->failure_cause);
+        }
+      } else {
+        throw std::runtime_error(
+                "HTCondorCentralManagerService::scheduleStandardJobForPilot(): Received an unexpected [" +
+                message->getName() + "] message!");
+      }
     }
 
     /**
@@ -255,16 +287,56 @@ namespace wrench {
 
       // main loop
       while (this->processNextMessage()) {
-        // starting an HTCondor negotiator
-        if (not this->dispatching_jobs && (not this->pending_jobs.empty() || not this->pilot_pending_jobs.empty()) &&
-            not this->resources_unavailable) {
-          this->dispatching_jobs = true;
-          auto negotiator = std::shared_ptr<HTCondorNegotiatorService>(
-                  new HTCondorNegotiatorService(this->hostname, this->compute_resources_map,
-                                                this->running_jobs,
-                                                this->pending_jobs, this->mailbox_name));
-          negotiator->simulation = this->simulation;
-          negotiator->start(negotiator, true, false); // Daemonized, no auto-restart
+        if (not this->dispatching_jobs && not this->resources_unavailable) {
+
+          // dispatching standard or pilot jobs
+          if (not this->pending_jobs.empty()) {
+
+            this->dispatching_jobs = true;
+            auto negotiator = std::shared_ptr<HTCondorNegotiatorService>(
+                    new HTCondorNegotiatorService(this->hostname, this->compute_resources_map,
+                                                  this->running_jobs,
+                                                  this->pending_jobs, this->mailbox_name));
+            negotiator->simulation = this->simulation;
+            negotiator->start(negotiator, true, false); // Daemonized, no auto-restart
+
+          }
+
+//          // assigning standard jobs to pilot jobs
+//          if (not this->pilot_pending_jobs.empty() && not this->pilot_idle_jobs.empty()) {
+//
+//            std::cerr << "TO SCHEDULE: " << this->pilot_pending_jobs.size() << std::endl;
+//            std::map<std::string, std::string> service_specific_args;
+//
+//            for (auto it = this->pilot_pending_jobs.begin(); it != this->pilot_pending_jobs.end(); ++it) {
+//              auto job = *it;
+//              bool scheduled = false;
+//              std::cerr << "---- PENDING JOBS: " << this->pilot_pending_jobs.size() << std::endl;
+//
+//              for (auto itp = this->pilot_idle_jobs.begin(); itp != this->pilot_idle_jobs.end(); ++itp) {
+//                auto pilot_job = *itp;
+//                unsigned long cs_total_idle_cores = pilot_job->getComputeService()->getTotalNumIdleCores();
+//
+//                if (cs_total_idle_cores >= job->getMinimumRequiredNumCores()) {
+//                  job->pushCallbackMailbox(this->mailbox_name);
+//                  pilot_job->getComputeService()->submitStandardJob(job, service_specific_args);
+//                  for (auto task : job->getTasks()) {
+//                    task->setState(WorkflowTask::State::PENDING);
+//                  }
+//
+//                  std::cerr << "SCHEDULED: " << job->getName() << std::endl;
+//                  this->pilot_running_jobs.insert(std::make_pair(job, pilot_job));
+//                  this->pilot_idle_jobs.erase(itp);
+//                  scheduled = true;
+//                  break;
+//                }
+//              }
+//              if (scheduled) {
+//                this->pilot_pending_jobs.erase(it);
+//                break;
+//              }
+//            }
+//          }
         }
       }
 
@@ -318,6 +390,10 @@ namespace wrench {
       } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceSubmitPilotJobRequestMessage>(message)) {
         processSubmitPilotJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
         return true;
+
+//      } else if (auto msg = std::dynamic_pointer_cast<ScheduleStandardJobForPilotMessage>(message)) {
+//        processScheduleStandardJobForPilot(msg->answer_mailbox, msg->job, msg->service_specific_arguments);
+//        return true;
 
       } else if (auto msg = std::dynamic_pointer_cast<ComputeServicePilotJobStartedMessage>(message)) {
         processPilotJobStarted(msg->job);
@@ -394,6 +470,33 @@ namespace wrench {
       }
     }
 
+//    /**
+//     * @brief Process a schedule StandardJob for running in a pilot job event
+//     *
+//     * @param answer_mailbox:
+//     * @param job: the standard job
+//     * @param service_specific_arguments:
+//     *
+//     * @throw std::runtime_error
+//     */
+//    void HTCondorCentralManagerService::processScheduleStandardJobForPilot(
+//            const std::string &answer_mailbox,
+//            wrench::StandardJob *job,
+//            std::map<std::string, std::string> &service_specific_arguments) {
+//
+//      this->pilot_pending_jobs.push_back(job);
+//
+//      try {
+//        S4U_Mailbox::dputMessage(
+//                answer_mailbox,
+//                new ScheduleStandardJobForPilotAnswerMessage(
+//                        true, nullptr,
+//                        this->getMessagePayloadValue(
+//                                HTCondorCentralManagerServiceMessagePayload::HTCONDOR_SCHEDULE_FOR_PILOT_ANSWER_MESSAGE_PAYLOAD)));
+//      } catch (std::shared_ptr<NetworkError> &cause) {
+//      }
+//    }
+
     /**
      * @brief Process a pilot job started event
      *
@@ -401,36 +504,17 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void HTCondorCentralManagerService::processPilotJobStarted(wrench::PilotJob *pilot_job) {
-
-      std::vector<WorkflowJob *> scheduled_jobs;
-
-      std::cerr << "TO SCHEDULE: " << this->pilot_pending_jobs.size() << std::endl;
-
-      unsigned long cs_total_idle_cores = pilot_job->getComputeService()->getTotalNumIdleCores();
-
-      for (auto job : this->pilot_pending_jobs) {
-        job->pushCallbackMailbox(this->mailbox_name);
-        if (cs_total_idle_cores >= 1) {
-          pilot_job->getComputeService()->submitJob(job);
-          scheduled_jobs.push_back(job);
-          cs_total_idle_cores--;
-        }
+    void HTCondorCentralManagerService::processPilotJobStarted(wrench::PilotJob *job) {
+      // Forward the notification
+      try {
+        S4U_Mailbox::dputMessage(job->popCallbackMailbox(),
+                                 new ComputeServicePilotJobStartedMessage(
+                                         job, this->getSharedPtr<HTCondorCentralManagerService>(),
+                                         this->getMessagePayloadValue(
+                                                 HTCondorComputeServiceMessagePayload::PILOT_JOB_STARTED_MESSAGE_PAYLOAD)));
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        return; // ignore
       }
-
-      std::cerr << "SCHEDULED: " << scheduled_jobs.size() << std::endl;
-
-      for (auto sjob : scheduled_jobs) {
-        for (auto it = this->pilot_pending_jobs.begin(); it != this->pilot_pending_jobs.end(); ++it) {
-          auto pjob = *it;
-          if (sjob == pjob) {
-            this->pilot_pending_jobs.erase(it);
-            break;
-          }
-        }
-      }
-
-//      this->pilot_pending_jobs.erase(scheduled_jobs.begin(), scheduled_jobs.end());
     }
 
     /**
@@ -441,26 +525,6 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void HTCondorCentralManagerService::processPilotJobCompletion(wrench::PilotJob *job) {
-      // Remove the job from the running job list
-//      StandardJob *wf_job = nullptr;
-//      for (auto const &rj : this->running_jobs) {
-//        if (rj.first == job) {
-//          wf_job = (StandardJob *) rj.first;
-//          break;
-//        }
-//      }
-//
-//      if (wf_job == nullptr) {
-//        throw std::runtime_error(
-//                "HTCondorCentralManagerService::processPilotJobCompletion(): Pilot job completion message received but no such pilot jobs found in queue"
-//        );
-//      }
-
-//      auto cs = this->running_jobs.find(wf_job);
-//      auto cs_map = this->compute_resources_map.find(cs->second);
-//      cs_map->second = cs_map->second + wf_job->getMinimumRequiredNumCores();
-//      this->running_jobs.erase(wf_job);
-
       // Forward the notification
       try {
         S4U_Mailbox::dputMessage(job->popCallbackMailbox(),
@@ -481,7 +545,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void HTCondorCentralManagerService::processStandardJobCompletion(StandardJob *job) {
-      WRENCH_INFO("A standard job has completed job %s", job->getName().c_str());
+      WRENCH_INFO("A standard job has completed: %s", job->getName().c_str());
       std::string callback_mailbox = job->popCallbackMailbox();
       for (auto task : job->getTasks()) {
         WRENCH_INFO("    Task completed: %s (%s)", task->getID().c_str(), callback_mailbox.c_str());
@@ -498,6 +562,14 @@ namespace wrench {
       }
 
       auto cs = this->running_jobs.find(job);
+//      if (cs == this->running_jobs.end()) {
+//        // probably running on a pilot job
+//        auto it = this->pilot_running_jobs.find(job);
+//        this->pilot_idle_jobs.insert(it->second);
+//        this->pilot_running_jobs.erase(job);
+//        std::cout << "---- PILOT RUNNING JOBS: " << this->pilot_running_jobs.size() << std::endl;
+//      }
+//
       auto cs_map = this->compute_resources_map.find(cs->second);
       cs_map->second = cs_map->second + job->getMinimumRequiredNumCores();
       this->running_jobs.erase(job);

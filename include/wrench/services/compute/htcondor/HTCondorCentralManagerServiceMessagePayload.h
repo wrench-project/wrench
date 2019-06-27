@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2019. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,10 @@ namespace wrench {
     public:
         /** @brief The number of bytes in the control message sent by the daemon to state that the negotiator has been completed **/
         DECLARE_MESSAGEPAYLOAD_NAME(HTCONDOR_NEGOTIATOR_DONE_MESSAGE_PAYLOAD);
+        /** @brief  **/
+        DECLARE_MESSAGEPAYLOAD_NAME(HTCONDOR_SCHEDULE_FOR_PILOT_MESSAGE_PAYLOAD);
+        /** @brief  **/
+        DECLARE_MESSAGEPAYLOAD_NAME(HTCONDOR_SCHEDULE_FOR_PILOT_ANSWER_MESSAGE_PAYLOAD);
     };
 }
 
