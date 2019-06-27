@@ -889,11 +889,8 @@ namespace wrench {
         std::shared_ptr<SimulationMessage> message = nullptr;
 
         try {
-            WRENCH_INFO("GETTING MESSAGE ON COPY_FILE");
             message = S4U_Mailbox::getMessage(answer_mailbox);
-            WRENCH_INFO("GOT IT!!");
         } catch (std::shared_ptr<NetworkError> &cause) {
-            WRENCH_INFO("THROWING!");
             throw WorkflowExecutionException(cause);
         }
 
