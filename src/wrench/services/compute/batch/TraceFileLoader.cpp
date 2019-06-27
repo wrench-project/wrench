@@ -8,12 +8,12 @@
  */
 
 #include <fstream>
-#include <xbt/log.h>
+#include "wrench/logging/TerminalOutput.h"
 #include <wrench-dev.h>
 #include <nlohmann/json.hpp>
 #include "wrench/util/TraceFileLoader.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(trace_file_loader, "Log category for Trace File Loader");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(trace_file_loader, "Log category for Trace File Loader");
 
 namespace wrench {
 

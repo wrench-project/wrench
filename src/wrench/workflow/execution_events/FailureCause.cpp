@@ -16,7 +16,7 @@
 #include "wrench/services/storage/StorageService.h"
 #include "wrench/services/compute/ComputeService.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(falure_cause, "Log category for FailureCause");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(falure_cause, "Log category for FailureCause");
 
 
 namespace wrench {

@@ -105,6 +105,7 @@ private:
             sleeper->start(sleeper, true, true); // Daemonized, auto-restart!!
         } catch (std::shared_ptr<wrench::HostError> &e) {
             // Expected exception
+            e->toString(); // for coverage
             return 0;
         }
         throw std::runtime_error("Should have gotten a HostFailure exception");

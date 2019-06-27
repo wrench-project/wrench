@@ -94,9 +94,31 @@ private:
         auto batch = this->test->cs_batch;
 
         // Get a "PILOT JOB STARTED" event (default handler)
+        // This pilot job takes the whole machine!
         wrench::PilotJob *job2 = job_manager->createPilotJob();
-        job_manager->submitJob(job2, batch, {{"-N", "1"}, {"-t", "50"}, {"-c", "1"}});
+        job_manager->submitJob(job2, batch, {{"-N", "1"}, {"-t", "50"}, {"-c", "4"}});
         this->waitForAndProcessNextEvent();
+
+        // Get the list of running pilot jobs
+        auto running_pilot_jobs = job_manager->getRunningPilotJobs();
+        if (running_pilot_jobs.size() != 1) {
+            throw std::runtime_error("Should see 1 running pilot job");
+        }
+        if (*running_pilot_jobs.begin() != job2) {
+            throw std::runtime_error("Pilot job should be seen in list of running pilot jobs");
+        }
+
+        // Submit another pilot job, which won't be running for a while
+        wrench::PilotJob *job2_1 = job_manager->createPilotJob();
+        job_manager->submitJob(job2_1, batch, {{"-N", "1"}, {"-t", "50"}, {"-c", "4"}});
+        // Get the list of pending pilot jobs
+        auto pending_pilot_jobs = job_manager->getPendingPilotJobs();
+        if (pending_pilot_jobs.size() != 1) {
+            throw std::runtime_error("Should see 1 pending pilot job");
+        }
+        if (*pending_pilot_jobs.begin() != job2_1) {
+            throw std::runtime_error("Pilot job should be seen in list of pending pilot jobs");
+        }
 
         // Get a "STANDARD JOB FAILED" and "PILOT JOB EXPIRED" event (default handler)
         wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task2", 100.0, 1, 1, 1.0, 0);
@@ -104,6 +126,12 @@ private:
         job_manager->submitJob(job3, job2->getComputeService());
         this->waitForAndProcessNextEvent();
         this->waitForAndProcessNextEvent();
+
+        // Get a "PILOT JOB STARTED" event (default handler)  (for job2_1)
+        this->waitForAndProcessNextEvent();
+        // Get a "PILOT JOB EXPIRED" event (default handler)   (for job2_1)
+        this->waitForAndProcessNextEvent();
+
 
         // Get a "FILE COPY COMPLETION" event (default handler)
         data_movement_manager->initiateAsynchronousFileCopy(this->test->small_file,
@@ -120,7 +148,9 @@ private:
         this->setTimer(timer_off_date, "timer went off");
         this->waitForAndProcessNextEvent();
         if (std::abs( wrench::Simulation::getCurrentSimulatedDate() - timer_off_date) > 0.1) {
-            throw std::runtime_error("Did not get the timer event at the right date");
+            throw std::runtime_error("Did not get the timer event at the right date (" +
+            std::to_string(wrench::Simulation::getCurrentSimulatedDate()) + " instead of " +
+            std::to_string(timer_off_date) + ")");
         }
 
         return 0;
@@ -165,7 +195,10 @@ void WMSTest::do_DefaultHandlerWMS_test() {
     std::vector<std::string> batch_hosts;
     batch_hosts.push_back(hostname2);
     ASSERT_NO_THROW(cs_batch = simulation->add(
-            new wrench::BatchComputeService(hostname2, batch_hosts, 100.0, {}, {})));
+            new wrench::BatchComputeService(hostname2, batch_hosts, 100.0,
+                    {},
+//                    {{wrench::BatchComputeServiceProperty::BATSCHED_LOGGING_MUTED, "false"}},
+                    {})));
 
 
     // Create a WMS
@@ -288,7 +321,10 @@ private:
         this->setTimer(timer_off_date, "timer went off");
         this->waitForAndProcessNextEvent();
         if (std::abs( wrench::Simulation::getCurrentSimulatedDate() - timer_off_date) > 0.1) {
-            throw std::runtime_error("Did not get the timer event at the right date");
+            throw std::runtime_error("Did not get the timer event at the right date (" +
+                                     std::to_string(wrench::Simulation::getCurrentSimulatedDate()) +
+                                      " instead of " +
+                                      std::to_string(timer_off_date));
         }
         if (this->counter != 7) {
             std::cerr << "this->counter = " << this->counter << "\n";

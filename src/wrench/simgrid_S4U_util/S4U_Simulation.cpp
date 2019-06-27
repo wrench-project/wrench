@@ -9,7 +9,6 @@
  */
 
 #include <iostream>
-//#include <xbt/ex.hpp>
 #include <set>
 #include <cfloat>
 #include <wrench/services/compute/ComputeService.h>
@@ -20,7 +19,7 @@
 
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(s4u_simulation, "Log category for S4U_Simulation");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(s4u_simulation, "Log category for S4U_Simulation");
 
 
 namespace wrench {
@@ -166,6 +165,14 @@ namespace wrench {
     }
 
     /**
+     * @brief Get the number of cores of the current host
+     * @return a number of cores
+     */
+    unsigned int S4U_Simulation::getNumCores() {
+        return simgrid::s4u::Host::current()->get_core_count();
+    }
+
+    /**
      * @brief Get the flop rate of a host
      *
      * @param hostname: the name of the host
@@ -251,7 +258,13 @@ namespace wrench {
      * @return a memory capacity in bytes
      */
     double S4U_Simulation::getHostMemoryCapacity(std::string hostname) {
-        return getHostMemoryCapacity(simgrid::s4u::Host::by_name(hostname));
+        double mem = 0;
+        try {
+            mem = getHostMemoryCapacity(simgrid::s4u::Host::by_name(hostname));
+        } catch (std::out_of_range &e) {
+            throw std::invalid_argument("Unknown hostname " + hostname);
+        }
+        return mem;
     }
 
     /**
@@ -299,8 +312,16 @@ namespace wrench {
      * @return a string relating to the property specified in the platform file
      */
     std::string S4U_Simulation::getHostProperty(std::string hostname, std::string property_name) {
-        std::cerr << "The host is " << hostname << " and the property to look for is " << property_name << "\n";
-        return simgrid::s4u::Host::by_name(hostname)->get_property(property_name);
+        simgrid::s4u::Host *h = nullptr;
+        try {
+            h = simgrid::s4u::Host::by_name(hostname);
+        } catch (std::out_of_range &e) {
+            throw std::invalid_argument("Unknown hostname " + hostname);
+        }
+        if (h->get_properties()->find(property_name) == h->get_properties()->end()) {
+            throw std::invalid_argument("Unknown property " + property_name);
+        }
+        return h->get_property(property_name);
     }
 
     /**
@@ -322,26 +343,26 @@ namespace wrench {
         return energy_consumed;
     }
 
-    /**
-     * @brief Get the total energy consumed by a set of hosts
-     * @param hostnames: the list of hostnames
-     * @return The total energy consumed by all the hosts in Joules
-     * @throw std::runtime_error
-     */
-    double S4U_Simulation::getTotalEnergyConsumed(const std::vector<std::string> &hostnames) {
-        double total_energy = 0;
-        try {
-            for (auto hostname: hostnames) {
-                total_energy += sg_host_get_consumed_energy(simgrid::s4u::Host::by_name(hostname));
-            }
-        } catch (std::exception &e) {
-            throw std::runtime_error(
-                    "S4U_Simulation::getTotalEnergyConsumed(): Was not able to get the total energy consumed by the host. Make sure energy plugin is enabled and "
-                    "the host name is correct"
-            );
-        }
-        return total_energy;
-    }
+//    /**
+//     * @brief Get the total energy consumed by a set of hosts
+//     * @param hostnames: the list of hostnames
+//     * @return The total energy consumed by all the hosts in Joules
+//     * @throw std::runtime_error
+//     */
+//    double S4U_Simulation::getTotalEnergyConsumed(const std::vector<std::string> &hostnames) {
+//        double total_energy = 0;
+//        try {
+//            for (auto hostname: hostnames) {
+//                total_energy += sg_host_get_consumed_energy(simgrid::s4u::Host::by_name(hostname));
+//            }
+//        } catch (std::exception &e) {
+//            throw std::runtime_error(
+//                    "S4U_Simulation::getTotalEnergyConsumed(): Was not able to get the total energy consumed by the host. Make sure energy plugin is enabled and "
+//                    "the host name is correct"
+//            );
+//        }
+//        return total_energy;
+//    }
 
     /**
      * @brief Set the power state of the host

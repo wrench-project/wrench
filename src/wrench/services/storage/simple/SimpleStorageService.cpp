@@ -21,7 +21,7 @@
 #include "wrench/simulation/SimulationTimestampTypes.h"
 
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(simple_storage_service, "Log category for Simple Storage Service");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(simple_storage_service, "Log category for Simple Storage Service");
 
 
 namespace wrench {
