@@ -154,25 +154,6 @@ namespace wrench {
     }
 
     /**
-     * @brief Add a StandardJob to the queue of jobs to run within pilot jobs
-     *
-     * @param job: a standard job
-     * @param job_manager_mailbox_name: JobManager mailbox name
-     * @param service_specific_arguments: service specific arguments
-     *
-     * @throw WorkflowExecutionException
-     * @throw std::runtime_error
-     */
-    void HTCondorComputeService::scheduleStandardJobForPilot(
-            StandardJob *job, std::string &job_manager_mailbox_name,
-            std::map<std::string, std::string> &service_specific_arguments) {
-
-      serviceSanityCheck();
-      //TODO: send as message
-      this->central_manager->scheduleStandardJobForPilot(job, job_manager_mailbox_name, service_specific_arguments);
-    }
-
-    /**
      * @brief Terminate a standard job to the compute service (virtual)
      * @param job: the job
      *
