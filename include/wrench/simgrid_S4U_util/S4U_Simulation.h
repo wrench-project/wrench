@@ -37,6 +37,7 @@ namespace wrench {
 		static std::string getHostName();
 		static bool hostExists(std::string hostname);
 		static unsigned int getHostNumCores(std::string hostname);
+		static unsigned int getNumCores();
 		static double getHostFlopRate(std::string hostname);
 		static bool isHostOn(std::string hostname);
 		static double getFlopRate();
@@ -50,7 +51,7 @@ namespace wrench {
 
 		//start energy related calls
 		static double getEnergyConsumedByHost(const std::string &hostname);
-		static double getTotalEnergyConsumed(const std::vector<std::string> &hostnames);
+//		static double getTotalEnergyConsumed(const std::vector<std::string> &hostnames);
 		static void setPstate(const std::string &hostname, int pstate);
 		static int getNumberofPstates(const std::string &hostname);
 		static int getCurrentPstate(const std::string &hostname);

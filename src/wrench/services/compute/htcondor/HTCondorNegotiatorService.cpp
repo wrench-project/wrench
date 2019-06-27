@@ -17,7 +17,7 @@
 #include "wrench/workflow/job/PilotJob.h"
 #include "wrench/workflow/job/StandardJob.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(htcondor_negotiator, "Log category for HTCondorNegotiator");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(htcondor_negotiator, "Log category for HTCondorNegotiator");
 
 namespace wrench {
 

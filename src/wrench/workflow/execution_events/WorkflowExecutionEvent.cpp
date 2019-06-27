@@ -19,7 +19,7 @@
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(workflow_execution_event, "Log category for Workflow Execution Event");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(workflow_execution_event, "Log category for Workflow Execution Event");
 
 
 namespace wrench {

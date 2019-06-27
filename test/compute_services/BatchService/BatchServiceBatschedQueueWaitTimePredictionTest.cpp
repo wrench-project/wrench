@@ -794,6 +794,10 @@ private:
 
             auto batch_service = (*this->getAvailableComputeServices<wrench::BatchComputeService>().begin());
 
+            /** Note that below we have extra seconds since when submitting
+             *  Jobs to batsched we always ask for one extra second
+             *  (the BATSCHED_JOB_EXTRA_TIME constant in BatchComputeService::sendAllQueuedJobsToBatsched()
+             */
             std::string job_id = "my_job1";
             unsigned int nodes = 1;
             double walltime_seconds = 400;
@@ -801,8 +805,8 @@ private:
             std::set<std::tuple<std::string,unsigned int,unsigned int, double>> set_of_jobs = {my_job};
             std::map<std::string,double> jobs_estimated_start_times = batch_service->getStartTimeEstimates(set_of_jobs);
 
-            if ((jobs_estimated_start_times[job_id] - 900) > 1) {
-                throw std::runtime_error("Estimated queue start time incorrect (expected: " + std::to_string(900) + ", got: " + std::to_string(jobs_estimated_start_times[job_id]) + ")");
+            if ((jobs_estimated_start_times[job_id] - 903) > 1) {
+                throw std::runtime_error("A) Estimated queue start time incorrect (expected: " + std::to_string(903) + ", got: " + std::to_string(jobs_estimated_start_times[job_id]) + ")");
             }
 
             job_id = "my_job2";
@@ -812,8 +816,8 @@ private:
             set_of_jobs = {my_job};
             jobs_estimated_start_times = batch_service->getStartTimeEstimates(set_of_jobs);
 
-            if (std::abs(jobs_estimated_start_times[job_id] - 300) > 1) {
-                throw std::runtime_error("Estimated start time incorrect (expected: " + std::to_string(300) + ", got: " + std::to_string(jobs_estimated_start_times[job_id]) + ")");
+            if (std::abs(jobs_estimated_start_times[job_id] - 301) > 1) {
+                throw std::runtime_error("B) Estimated start time incorrect (expected: " + std::to_string(301) + ", got: " + std::to_string(jobs_estimated_start_times[job_id]) + ")");
             }
 
 
@@ -824,8 +828,8 @@ private:
             set_of_jobs = {my_job};
             jobs_estimated_start_times = batch_service->getStartTimeEstimates(set_of_jobs);
 
-            if (std::abs(jobs_estimated_start_times[job_id] - 300) > 1) {
-                throw std::runtime_error("Estimated start time incorrect (expected: " + std::to_string(300) + ", got: " + std::to_string(jobs_estimated_start_times[job_id]) + ")");
+            if (std::abs(jobs_estimated_start_times[job_id] - 301) > 1) {
+                throw std::runtime_error("C) Estimated start time incorrect (expected: " + std::to_string(301) + ", got: " + std::to_string(jobs_estimated_start_times[job_id]) + ")");
             }
 
 
@@ -836,8 +840,8 @@ private:
             set_of_jobs = {my_job};
             jobs_estimated_start_times = batch_service->getStartTimeEstimates(set_of_jobs);
 
-            if (std::abs(jobs_estimated_start_times[job_id] - 900) > 1) {
-                throw std::runtime_error("Estimated start time incorrect (expected: " + std::to_string(900) + ", got: " + std::to_string(jobs_estimated_start_times[job_id]) + ")");
+            if (std::abs(jobs_estimated_start_times[job_id] - 903) > 1) {
+                throw std::runtime_error("D) Estimated start time incorrect (expected: " + std::to_string(903) + ", got: " + std::to_string(jobs_estimated_start_times[job_id]) + ")");
             }
 
 

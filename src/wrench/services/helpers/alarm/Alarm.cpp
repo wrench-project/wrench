@@ -14,7 +14,7 @@
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 #include "wrench/workflow/execution_events/FailureCause.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(alarm_service, "Log category for Alarm Service");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(alarm_service, "Log category for Alarm Service");
 
 namespace wrench {
 
@@ -48,7 +48,7 @@ namespace wrench {
      */
     int Alarm::main() {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
-        WRENCH_INFO("Alarm Service starting");
+        WRENCH_INFO("Alarm Service starting with alarm date = %.20f", this->date);
 
         double time_to_sleep = this->date - S4U_Simulation::getClock();
 

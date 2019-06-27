@@ -11,7 +11,7 @@
 #include <wrench/simgrid_S4U_util/S4U_PendingCommunication.h>
 #include <wrench-dev.h>
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(network_connection_manager, "Log category for Network Connection Manager");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(network_connection_manager, "Log category for Network Connection Manager");
 
 
 namespace wrench {

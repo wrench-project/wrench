@@ -13,7 +13,7 @@
 #define WRENCH_SIM4U_DAEMONACTOR_H
 
 
-#include <xbt.h>
+#include "wrench/logging/TerminalOutput.h"
 #include <string>
 #include <vector>
 #include <iostream>

@@ -26,7 +26,7 @@
 #include "JobManagerMessage.h"
 
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(job_manager, "Log category for Job Manager");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(job_manager, "Log category for Job Manager");
 
 namespace wrench {
 
@@ -241,9 +241,8 @@ namespace wrench {
      *           - If a "hostname:num_cores" value is provided for a task, then the service will run that
      *             task with the specified number of cores on that host.
      *      - to a BatchComputeService: {{"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}}
-     *      - to a VirtualizedClusterComputeService: {}
-     *      - to a CloudComputeService: {}
-     *      - to a HTCondorService: {}
+     *      - to a VirtualizedClusterComputeService: {} (jobs should not be submitted directly to the service)}
+     *      - to a CloudComputeService: {} (jobs should not be submitted directly to the service)}
      *
      * @throw std::invalid_argument
      * @throw WorkflowExecutionException
@@ -724,8 +723,9 @@ namespace wrench {
                 PilotJob *job = msg->job;
                 job->state = PilotJob::State::EXPIRED;
 
-                // Remove the job from the "running" list
+                // Remove the job from the "running" list and put it in the completed list
                 this->running_pilot_jobs.erase(job);
+                this->completed_pilot_jobs.insert(job);
 
                 // Forward the notification to the source
                 WRENCH_INFO("Forwarding to %s", job->getOriginCallbackMailbox().c_str());

@@ -12,7 +12,7 @@
 
 #include "wrench/util/MessageManager.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(message_manager, "Log category for MessageManager");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(message_manager, "Log category for MessageManager");
 
 
 namespace wrench {

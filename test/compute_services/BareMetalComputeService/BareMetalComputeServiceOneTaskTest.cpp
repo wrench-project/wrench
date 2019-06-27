@@ -46,6 +46,8 @@ public:
     void do_ExecutionWithNotEnoughRAM_test();
 
     void do_ExecutionWithDownService_test();
+    
+    void do_ExecutionWithSuspendedService_test();
 
 
 
@@ -1585,6 +1587,131 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithDownService_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new ExecutionWithDownServiceTestWMS(
+                    this,  {
+                            compute_service
+                    }, {
+                            storage_service1
+                    }, hostname)));
+
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+
+    // Staging the input_file on the storage service
+    ASSERT_NO_THROW(simulation->stageFiles({{input_file->getID(), input_file}}, storage_service1));
+
+    // Running a "run a single task" simulation
+    ASSERT_NO_THROW(simulation->launch());
+
+    delete simulation;
+
+    free(argv[0]);
+    free(argv);
+}
+
+
+
+/**********************************************************************/
+/** EXECUTION WITH SUSPENDED SERVICE SIMULATION TEST                 **/
+/**********************************************************************/
+
+class ExecutionWithSuspendedServiceTestWMS : public wrench::WMS {
+
+public:
+    ExecutionWithSuspendedServiceTestWMS(BareMetalComputeServiceOneTaskTest *test,
+                                    const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                    const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                                    std::string &hostname) :
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
+        this->test = test;
+    }
+
+
+private:
+
+    BareMetalComputeServiceOneTaskTest *test;
+
+    int main() {
+
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+        wrench::StandardJob *job = nullptr;
+
+        // Suspend the service
+        test->compute_service->suspend();
+
+        // Create a job
+        job = job_manager->createStandardJob(test->task,
+                                             {{test->input_file,  test->storage_service1},
+                                              {test->output_file, test->storage_service1}});
+
+        // Submit the job
+        try {
+            job_manager->submitJob(job, test->compute_service);
+            throw std::runtime_error("Should not be able to submit a job to a service that is down");
+        } catch (wrench::WorkflowExecutionException &e) {
+            auto cause = std::dynamic_pointer_cast<wrench::ServiceIsSuspended>(e.getCause());
+            if (not cause) {
+                throw std::runtime_error("Got the expected exception, but an expected failure cause: " +
+                                         e.getCause()->toString() + "(expected: ServiceIsSuspended)");
+            }
+            std::string error_msg = cause->toString();
+            if (cause->getService() != test->compute_service) {
+                throw std::runtime_error(
+                        "Got the expected failure, but the failure cause does not point to the right compute service");
+            }
+        }
+
+        // Resume the service
+        test->compute_service->resume();
+
+        // Submit the job again
+        try {
+            job_manager->submitJob(job, test->compute_service);
+        } catch (wrench::WorkflowExecutionException &e) {
+            throw std::runtime_error("Should  be able to submit a job to a service that has been resumed");
+        }
+
+        return 0;
+    }
+};
+
+TEST_F(BareMetalComputeServiceOneTaskTest, ExecutionWithSuspendedService) {
+    DO_TEST_WITH_FORK(do_ExecutionWithSuspendedService_test);
+}
+
+void BareMetalComputeServiceOneTaskTest::do_ExecutionWithSuspendedService_test() {
+
+    // Create and initialize a simulation
+    auto *simulation = new wrench::Simulation();
+    int argc = 1;
+    auto **argv = (char **) calloc(1, sizeof(char *));
+    argv[0] = strdup("one_task_test");
+
+    simulation->init(&argc, argv);
+
+    // Setting up the platform
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    // Get a hostname
+    std::string hostname = simulation->getHostnameList()[0];
+
+    // Create a Compute Service
+    ASSERT_NO_THROW(compute_service = simulation->add(
+            new wrench::BareMetalComputeService(hostname,
+                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                {})));
+
+    // Create a Storage Service
+    ASSERT_NO_THROW(storage_service1 = simulation->add(
+            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+
+    // Create a File Registry Service
+    ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
+
+    // Create a WMS
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    ASSERT_NO_THROW(wms = simulation->add(
+            new ExecutionWithSuspendedServiceTestWMS(
                     this,  {
                             compute_service
                     }, {
