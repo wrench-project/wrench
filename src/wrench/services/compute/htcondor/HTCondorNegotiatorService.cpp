@@ -104,7 +104,7 @@ namespace wrench {
 
           // TODO: fix specific args
           specific_args["-N"] = "1";
-          specific_args["-t"] = "10"; //time in minutes
+          specific_args["-t"] = "1000"; //time in minutes
           specific_args["-c"] = "1"; //number of cores per node
 
           for (auto &item : *this->compute_resources) {
