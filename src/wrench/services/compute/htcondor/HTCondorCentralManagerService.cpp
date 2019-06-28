@@ -166,57 +166,6 @@ namespace wrench {
     }
 
     /**
-     * @brief Add a StandardJob to the queue of jobs to run within pilot jobs
-     *
-     * @param job: a standard job
-     * @param job_manager_mailbox_name: JobManager mailbox name
-     * @param service_specific_arguments: service specific arguments
-     *
-     * @throw WorkflowExecutionException
-     * @throw std::runtime_error
-     */
-    void HTCondorCentralManagerService::scheduleStandardJobForPilot(
-            StandardJob *job, std::string &job_manager_mailbox_name,
-            std::map<std::string, std::string> &service_specific_arguments) {
-
-      serviceSanityCheck();
-
-      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("schedule_for_pilot_job");
-
-      //  send a "run a pilot job" message to the daemon's mailbox_name
-      try {
-        job->pushCallbackMailbox(job_manager_mailbox_name);
-        S4U_Mailbox::putMessage(
-                this->mailbox_name,
-                new ScheduleStandardJobForPilotMessage(
-                        answer_mailbox, job, service_specific_arguments,
-                        this->getMessagePayloadValue(
-                                HTCondorCentralManagerServiceMessagePayload::HTCONDOR_SCHEDULE_FOR_PILOT_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
-      }
-
-      // Get the answer
-      std::shared_ptr<SimulationMessage> message = nullptr;
-      try {
-        message = S4U_Mailbox::getMessage(answer_mailbox);
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
-      }
-
-      if (auto msg = std::dynamic_pointer_cast<ScheduleStandardJobForPilotAnswerMessage>(message)) {
-        // If no success, throw an exception
-        if (not msg->success) {
-          throw WorkflowExecutionException(msg->failure_cause);
-        }
-      } else {
-        throw std::runtime_error(
-                "HTCondorCentralManagerService::scheduleStandardJobForPilot(): Received an unexpected [" +
-                message->getName() + "] message!");
-      }
-    }
-
-    /**
      * @brief Terminate a standard job to the compute service (virtual)
      * @param job: the job
      *
