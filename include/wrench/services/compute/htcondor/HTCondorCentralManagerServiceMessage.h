@@ -37,37 +37,6 @@ namespace wrench {
         /** @brief List of scheduled jobs */
         std::vector<WorkflowJob *> scheduled_jobs;
     };
-
-    /**
-     * @brief
-     */
-    class ScheduleStandardJobForPilotMessage : public HTCondorCentralManagerServiceMessage {
-    public:
-        ScheduleStandardJobForPilotMessage(const std::string &answer_mailbox, StandardJob *job,
-                                           std::map<std::string, std::string> &service_specific_arguments,
-                                           double payload
-        );
-
-        std::string answer_mailbox;
-        /** **/
-        StandardJob *job;
-        /** **/
-        std::map<std::string, std::string> service_specific_arguments;
-    };
-
-    /**
-     * @brief
-     */
-    class ScheduleStandardJobForPilotAnswerMessage : public HTCondorCentralManagerServiceMessage {
-    public:
-        ScheduleStandardJobForPilotAnswerMessage(bool success, std::shared_ptr<FailureCause> failure_cause,
-                                                 double payload);
-
-        /** **/
-        bool success;
-        /** @brief The failure cause (or nullptr if success) */
-        std::shared_ptr<FailureCause> failure_cause;
-    };
 }
 
 #endif //WRENCH_HTCONDORCENTRALMANAGERSERVICEMESSAGE_H

@@ -28,30 +28,5 @@ namespace wrench {
      */
     NegotiatorCompletionMessage::NegotiatorCompletionMessage(std::vector<WorkflowJob *> scheduled_jobs, double payload)
             : HTCondorCentralManagerServiceMessage("NEGOTIATOR_DONE", payload), scheduled_jobs(scheduled_jobs) {}
-
-    /**
-     * @brief
-     *
-     * @param job:
-     * @param service_specific_arguments:
-     * @param payload:
-     */
-    ScheduleStandardJobForPilotMessage::ScheduleStandardJobForPilotMessage(
-            const std::string &answer_mailbox, StandardJob *job,
-            std::map<std::string, std::string> &service_specific_arguments, double payload) :
-            HTCondorCentralManagerServiceMessage("SCHEDULE_JOB_FOR_PILOT", payload), answer_mailbox(answer_mailbox),
-            job(job), service_specific_arguments(service_specific_arguments) {}
-
-    /**
-     * @brief
-     *
-     * @param success:
-     * @param payload:
-     */
-    ScheduleStandardJobForPilotAnswerMessage::ScheduleStandardJobForPilotAnswerMessage(
-            bool success,
-            std::shared_ptr<FailureCause> failure_cause,
-            double payload)
-            : HTCondorCentralManagerServiceMessage("SCHEDULED_FOR_PILOT_ANSWER", payload), success(success),
-              failure_cause(failure_cause) {}
+            
 }

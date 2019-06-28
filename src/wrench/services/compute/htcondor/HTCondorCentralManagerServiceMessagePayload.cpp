@@ -11,7 +11,4 @@
 
 namespace wrench {
     SET_MESSAGEPAYLOAD_NAME(HTCondorCentralManagerServiceMessagePayload, HTCONDOR_NEGOTIATOR_DONE_MESSAGE_PAYLOAD);
-    SET_MESSAGEPAYLOAD_NAME(HTCondorCentralManagerServiceMessagePayload, HTCONDOR_SCHEDULE_FOR_PILOT_MESSAGE_PAYLOAD);
-    SET_MESSAGEPAYLOAD_NAME(HTCondorCentralManagerServiceMessagePayload,
-                            HTCONDOR_SCHEDULE_FOR_PILOT_ANSWER_MESSAGE_PAYLOAD);
 }
