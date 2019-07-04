@@ -540,10 +540,6 @@ namespace wrench {
                                                    false); // Daemonized, no auto-restart
         }
 
-//        simgrid::s4u::Host::on_state_change.connect( [this] (simgrid::s4u::Host const &h) { this->someHostIsBackOn(h);});
-//        simgrid::s4u::Host::on_state_change.connect( [this] (simgrid::s4u::Host const &h) { this->someHostIsBackOn(h);});
-
-
         // Set an alarm for my timely death, if necessary
         if (this->has_ttl) {
             this->death_date = S4U_Simulation::getClock() + this->ttl;
