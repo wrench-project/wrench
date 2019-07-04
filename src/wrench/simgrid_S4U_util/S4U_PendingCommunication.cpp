@@ -39,7 +39,7 @@ namespace wrench {
         } catch (simgrid::NetworkFailureException &e) {
             throw std::shared_ptr<NetworkError>(
                     new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, mailbox_name));
-        } catch (simgrid::TimeoutError &e) {
+        } catch (simgrid::TimeoutException &e) {
             throw std::shared_ptr<NetworkError>(
                     new NetworkError(NetworkError::RECEIVING, NetworkError::TIMEOUT, mailbox_name));
         }
@@ -98,7 +98,7 @@ namespace wrench {
 #endif
         } catch (simgrid::NetworkFailureException &e) {
             one_comm_failed = true;
-        } catch (simgrid::TimeoutError &e) {
+        } catch (simgrid::TimeoutException &e) {
             one_comm_failed = true;
         } catch (std::exception &e) {
             throw std::runtime_error(
@@ -112,7 +112,7 @@ namespace wrench {
                     pending_s4u_comms[index]->test();
                 } catch (simgrid::NetworkFailureException &e) {
                     break;
-                } catch (simgrid::TimeoutError &e) {
+                } catch (simgrid::TimeoutException &e) {
                     break;
                 } catch (std::exception &e) {
                     throw std::runtime_error(
