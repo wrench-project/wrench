@@ -125,7 +125,7 @@ namespace wrench {
                         new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, this->mailbox));
             }
             return true;
-        } catch (simgrid::TimeoutError &e) {
+        } catch (simgrid::TimeoutException &e) {
             if (this->type == NetworkConnection::OUTGOING_DATA) {
                 this->failure_cause = std::shared_ptr<NetworkError>(
                         new NetworkError(NetworkError::SENDING, NetworkError::TIMEOUT, this->mailbox));

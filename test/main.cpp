@@ -28,8 +28,6 @@ int main(int argc, char **argv) {
 //   Disable color for test logs
 //   wrench::TerminalOutput::disableColor();
 
-
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
-
 }
