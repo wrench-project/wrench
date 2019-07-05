@@ -13,7 +13,7 @@
 
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
-#include "../failure_test_util/HostSwitcher.h"
+#include "../failure_test_util/ResourceSwitcher.h"
 #include "wrench/services/helpers/ServiceTerminationDetector.h"
 #include "../failure_test_util/SleeperVictim.h"
 #include "../failure_test_util/ComputerVictim.h"
@@ -177,12 +177,14 @@ private:
         sleeper->start(sleeper, true, true); // Daemonized, auto-restart!!
 
         // Starting a host-switcher-offer
-        auto death = std::shared_ptr<wrench::HostSwitcher>(new wrench::HostSwitcher("StableHost", 10, "FailedHost", wrench::HostSwitcher::Action::TURN_OFF));
+        auto death = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 10, "FailedHost",
+                wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
         death->simulation = this->simulation;
         death->start(death, true, false); // Daemonized, no auto-restart
 
         // Starting a host-switcher-oner
-        auto life = std::shared_ptr<wrench::HostSwitcher>(new wrench::HostSwitcher("StableHost", 30, "FailedHost", wrench::HostSwitcher::Action::TURN_ON));
+        auto life = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 30, "FailedHost",
+                wrench::ResourceSwitcher::Action::TURN_ON, wrench::ResourceSwitcher::ResourceType::HOST));
         life->simulation = this->simulation;
         life->start(life, true, false); // Daemonized, no auto-restart
 

@@ -7,24 +7,28 @@
  * (at your option) any later version.
  */
 
-#ifndef WRENCH_HOSTSWITCHER_H
-#define WRENCH_HOSTSWITCHER_H
+#ifndef WRENCH_RESOURCESWITCHER_H
+#define WRENCH_RESOURCESWITCHER_H
 
 #include <wrench/services/Service.h>
 #include "wrench/simgrid_S4U_util/S4U_Daemon.h"
 
 namespace wrench {
 
-class HostSwitcher : public Service {
+    class ResourceSwitcher : public Service {
 
     public:
+        enum ResourceType {
+            HOST,
+            LINK
+        };
 
         enum Action {
             TURN_ON,
             TURN_OFF
         };
 
-        explicit HostSwitcher(std::string host_on_which_to_run, double sleep_time, std::string host_to_switch, Action action);
+        explicit ResourceSwitcher(std::string host_on_which_to_run, double sleep_time, std::string host_to_switch, Action action, ResourceType resource_type);
 
         /***********************/
         /** \endcond           */
@@ -33,8 +37,9 @@ class HostSwitcher : public Service {
     private:
 
         double sleep_time;
-        std::string host_to_switch;
+        std::string resource_to_switch;
         Action action;
+        ResourceType resource_type;
         int main();
 
     };
@@ -51,4 +56,4 @@ class HostSwitcher : public Service {
 
 
 
-#endif //WRENCH_HOSTSWITCHER_H
+#endif //WRENCH_RESOURCESWITCHER_H

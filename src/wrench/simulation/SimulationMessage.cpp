@@ -20,7 +20,7 @@ namespace wrench {
 
     SimulationMessage::~SimulationMessage() {
 //        WRENCH_INFO("DELETE: %s (%lu)", name.c_str(), (unsigned long)(this));
-    };
+    }
 
 
     /**

@@ -13,7 +13,7 @@
 
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
-#include "../failure_test_util/HostSwitcher.h"
+#include "../failure_test_util/ResourceSwitcher.h"
 #include "wrench/services/helpers/ServiceTerminationDetector.h"
 #include "../failure_test_util/SleeperVictim.h"
 #include "../failure_test_util/ResourceRandomRepeatSwitcher.h"
@@ -104,7 +104,8 @@ private:
     int main() override {
 
         // Starting a FailedHost1 murderer!!
-        auto murderer = std::shared_ptr<wrench::HostSwitcher>(new wrench::HostSwitcher("StableHost", 100, "FailedHost1", wrench::HostSwitcher::Action::TURN_OFF));
+        auto murderer = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 100, "FailedHost1",
+                wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
         murderer->simulation = this->simulation;
         murderer->start(murderer, true, false); // Daemonized, no auto-restart
 
@@ -236,12 +237,14 @@ private:
     int main() override {
 
         // Starting a FailedHost1 murderer!!
-        auto murderer = std::shared_ptr<wrench::HostSwitcher>(new wrench::HostSwitcher("StableHost", 100, "FailedHost1", wrench::HostSwitcher::Action::TURN_OFF));
+        auto murderer = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 100, "FailedHost1",
+                wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
         murderer->simulation = this->simulation;
         murderer->start(murderer, true, false); // Daemonized, no auto-restart
 
         // Starting a FailedHost1 resurector!!
-        auto resurector = std::shared_ptr<wrench::HostSwitcher>(new wrench::HostSwitcher("StableHost", 1000, "FailedHost1", wrench::HostSwitcher::Action::TURN_ON));
+        auto resurector = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 1000, "FailedHost1",
+                wrench::ResourceSwitcher::Action::TURN_ON, wrench::ResourceSwitcher::ResourceType::HOST));
         resurector->simulation = this->simulation;
         resurector->start(resurector, true, false); // Daemonized, no auto-restart
 

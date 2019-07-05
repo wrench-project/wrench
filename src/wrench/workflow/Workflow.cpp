@@ -405,7 +405,7 @@ namespace wrench {
      *
      * @return the mailbox name
      */
-    std::string Workflow::getCallbackMailbox() {
+    std::string Workflow::getCallbackMailbox()  {
         return this->callback_mailbox;
     }
 
