@@ -13,7 +13,7 @@
 
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
-#include "../failure_test_util/HostSwitcher.h"
+#include "../failure_test_util/ResourceSwitcher.h"
 #include "wrench/services/helpers/ServiceTerminationDetector.h"
 #include "../failure_test_util/SleeperVictim.h"
 #include "../failure_test_util/ComputerVictim.h"
@@ -102,7 +102,8 @@ private:
         victim1->start(victim1, true, false); // Daemonized, no auto-restart
 
         // Starting its nemesis!
-        auto murderer = std::shared_ptr<wrench::HostSwitcher>(new wrench::HostSwitcher("StableHost", 50, "FailedHost", wrench::HostSwitcher::Action::TURN_OFF));
+        auto murderer = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 50, "FailedHost",
+                wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
         murderer->simulation = this->simulation;
         murderer->start(murderer, true, false); // Daemonized, no auto-restart
 
@@ -224,7 +225,8 @@ private:
         victim1->start(victim1, true, false); // Daemonized, no auto-restart
 
         // Starting its nemesis!
-        auto murderer = std::shared_ptr<wrench::HostSwitcher>(new wrench::HostSwitcher("StableHost", 50, "FailedHost", wrench::HostSwitcher::Action::TURN_OFF));
+        auto murderer = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 50, "FailedHost",
+                wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
         murderer->simulation = this->simulation;
         murderer->start(murderer, true, false); // Daemonized, no auto-restart
 

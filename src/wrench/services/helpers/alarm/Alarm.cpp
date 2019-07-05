@@ -60,9 +60,8 @@ namespace wrench {
         try {
             S4U_Mailbox::putMessage(this->reply_mailbox_name, msg);
         } catch (std::shared_ptr<NetworkError> &cause) {
-            WRENCH_WARN("AlarmService was not able to send the trigger to its upper service");
+            WRENCH_WARN("AlarmService was not able to send its message");
         }
-
         this->setStateToDown();
         return 0;
     }
