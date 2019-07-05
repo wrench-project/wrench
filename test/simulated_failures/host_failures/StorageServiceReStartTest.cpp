@@ -14,7 +14,7 @@
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
 #include "wrench/services/helpers/ServiceTerminationDetector.h"
-#include "../failure_test_util/HostSwitcher.h"
+#include "../failure_test_util/ResourceSwitcher.h"
 #include "../failure_test_util/SleeperVictim.h"
 #include "../failure_test_util/ComputerVictim.h"
 
@@ -55,16 +55,16 @@ protected:
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"FailedHost\" speed=\"1f\" core=\"1\"/> "
                           "       <host id=\"FailedHostTrace\" speed=\"1f\" state_file=\""+  trace_file_path +"\"  core=\"1\"/> "
-                          "       <host id=\"StableHost\" speed=\"1f\" core=\"1\"/> "
-                          "       <link id=\"link1\" bandwidth=\"1kBps\" latency=\"0\"/>"
-                          "       <route src=\"FailedHost\" dst=\"StableHost\">"
-                          "           <link_ctn id=\"link1\"/>"
-                          "       </route>"
-                          "       <route src=\"FailedHostTrace\" dst=\"StableHost\">"
-                          "           <link_ctn id=\"link1\"/>"
-                          "       </route>"
-                          "   </zone> "
-                          "</platform>";
+                                                                                                              "       <host id=\"StableHost\" speed=\"1f\" core=\"1\"/> "
+                                                                                                              "       <link id=\"link1\" bandwidth=\"1kBps\" latency=\"0\"/>"
+                                                                                                              "       <route src=\"FailedHost\" dst=\"StableHost\">"
+                                                                                                              "           <link_ctn id=\"link1\"/>"
+                                                                                                              "       </route>"
+                                                                                                              "       <route src=\"FailedHostTrace\" dst=\"StableHost\">"
+                                                                                                              "           <link_ctn id=\"link1\"/>"
+                                                                                                              "       </route>"
+                                                                                                              "   </zone> "
+                                                                                                              "</platform>";
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
@@ -96,12 +96,14 @@ private:
     int main() override {
 
         // Starting a FailedHost murderer!!
-        auto murderer = std::shared_ptr<wrench::HostSwitcher>(new wrench::HostSwitcher("StableHost", 100, "FailedHost", wrench::HostSwitcher::Action::TURN_OFF));
+        auto murderer = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 100, "FailedHost",
+                                                                                               wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
         murderer->simulation = this->simulation;
         murderer->start(murderer, true, false); // Daemonized, no auto-restart
 
         // Starting a FailedHost resurector!!
-        auto resurector = std::shared_ptr<wrench::HostSwitcher>(new wrench::HostSwitcher("StableHost", 500, "FailedHost", wrench::HostSwitcher::Action::TURN_ON));
+        auto resurector = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 500, "FailedHost",
+                                                                                                 wrench::ResourceSwitcher::Action::TURN_ON, wrench::ResourceSwitcher::ResourceType::HOST));
         resurector->simulation = this->simulation;
         resurector->start(murderer, true, false); // Daemonized, no auto-restart
 
@@ -121,12 +123,14 @@ private:
         }
 
         // Starting a FailedHost murderer!!
-        murderer = std::shared_ptr<wrench::HostSwitcher>(new wrench::HostSwitcher("StableHost", 100, "FailedHost", wrench::HostSwitcher::Action::TURN_OFF));
+        murderer = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 100, "FailedHost",
+                                                                                          wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
         murderer->simulation = this->simulation;
         murderer->start(murderer, true, false); // Daemonized, no auto-restart
 
         // Starting a FailedHost resurector!!
-        resurector = std::shared_ptr<wrench::HostSwitcher>(new wrench::HostSwitcher("StableHost", 500, "FailedHost", wrench::HostSwitcher::Action::TURN_ON));
+        resurector = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 500, "FailedHost",
+                                                                                            wrench::ResourceSwitcher::Action::TURN_ON, wrench::ResourceSwitcher::ResourceType::HOST));
         resurector->simulation = this->simulation;
         resurector->start(murderer, true, false); // Daemonized, no auto-restart
 

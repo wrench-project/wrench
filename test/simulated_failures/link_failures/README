@@ -1,4 +1,4 @@
-This tests are about coverage (for the catch clauses of network communications),
+These tests are about coverage (for the catch clauses of network communications),
 not about "is WRENCH robust to link failures".  Link failures are a whole can of
 worms that take us into difficult distributed computing issues that would likely
 be relevant to very, very few users anyway.
