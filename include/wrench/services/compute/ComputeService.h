@@ -88,7 +88,7 @@ namespace wrench {
 
         std::map<std::string, unsigned long> getPerHostNumIdleCores();
 
-        unsigned long  getTotalNumIdleCores();
+        virtual unsigned long getTotalNumIdleCores();
 
         std::map<std::string, double> getMemoryCapacity();
 
@@ -115,7 +115,8 @@ namespace wrench {
          * @param job: The job being submitted
          * @param service_specific_arguments: the set of service-specific arguments
          */
-        virtual void submitStandardJob(StandardJob *job, std::map<std::string, std::string> &service_specific_arguments) = 0;
+        virtual void
+        submitStandardJob(StandardJob *job, std::map<std::string, std::string> &service_specific_arguments) = 0;
 
         /** 
          * @brief Method to submit a pilot job to the service
@@ -143,7 +144,6 @@ namespace wrench {
                        double scratch_space_size);
 
 
-
     protected:
 
         ComputeService(const std::string &hostname,
@@ -163,6 +163,7 @@ namespace wrench {
         /***********************/
 
         std::shared_ptr<StorageService> getScratch();
+
         std::shared_ptr<StorageService> getScratchSharedPtr();
 
         /***********************/
@@ -172,6 +173,7 @@ namespace wrench {
     private:
 
         std::shared_ptr<StorageService> scratch_space_storage_service_shared_ptr;
+
         std::map<std::string, std::map<std::string, double>> getServiceResourceInformation();
 
     };

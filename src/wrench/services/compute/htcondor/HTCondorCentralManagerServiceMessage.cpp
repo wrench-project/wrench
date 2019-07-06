@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2019. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ namespace wrench {
      * @param scheduled_jobs: list of pending jobs upon negotiator completion
      * @param payload: the message size in bytes
      */
-    NegotiatorCompletionMessage::NegotiatorCompletionMessage(std::vector<wrench::StandardJob *> scheduled_jobs,
-                                                             double payload)
+    NegotiatorCompletionMessage::NegotiatorCompletionMessage(std::vector<WorkflowJob *> scheduled_jobs, double payload)
             : HTCondorCentralManagerServiceMessage("NEGOTIATOR_DONE", payload), scheduled_jobs(scheduled_jobs) {}
+            
 }
