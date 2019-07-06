@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2019. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -12,6 +12,9 @@
 
 #include "wrench/services/ServiceMessage.h"
 #include "wrench/workflow/job/StandardJob.h"
+#include "wrench/workflow/job/WorkflowJob.h"
+
+#include <vector>
 
 namespace wrench {
 
@@ -24,14 +27,15 @@ namespace wrench {
     };
 
     /**
-     * @brief A message received by a HTCondorCentralManagerService so that it is notified of a negotiator cycle completion
+     * @brief A message received by a HTCondorCentralManagerService so that it is notified of a negotiator
+     *        cycle completion
      */
     class NegotiatorCompletionMessage : public HTCondorCentralManagerServiceMessage {
     public:
-        NegotiatorCompletionMessage(std::vector<StandardJob *> scheduled_jobs, double payload);
+        NegotiatorCompletionMessage(std::vector<WorkflowJob *> scheduled_jobs, double payload);
 
         /** @brief List of scheduled jobs */
-        std::vector<StandardJob *> scheduled_jobs;
+        std::vector<WorkflowJob *> scheduled_jobs;
     };
 }
 

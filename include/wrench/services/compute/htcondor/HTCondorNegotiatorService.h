@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2019. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 #include "wrench/services/Service.h"
 #include "wrench/services/compute/ComputeService.h"
 #include "wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessagePayload.h"
-#include "wrench/workflow/job/StandardJob.h"
+#include "wrench/workflow/job/WorkflowJob.h"
 
 namespace wrench {
 
@@ -35,8 +35,8 @@ namespace wrench {
 
         HTCondorNegotiatorService(std::string &hostname,
                                   std::map<std::shared_ptr<ComputeService>, unsigned long> &compute_resources,
-                                  std::map<StandardJob *, std::shared_ptr<ComputeService>> &running_jobs,
-                                  std::vector<StandardJob *> &pending_jobs,
+                                  std::map<WorkflowJob *, std::shared_ptr<ComputeService>> &running_jobs,
+                                  std::vector<WorkflowJob *> &pending_jobs,
                                   std::string &reply_mailbox);
 
         ~HTCondorNegotiatorService();
@@ -45,16 +45,16 @@ namespace wrench {
         int main() override;
 
         struct JobPriorityComparator {
-            bool operator()(StandardJob *&lhs, StandardJob *&rhs);
+            bool operator()(WorkflowJob *&lhs, WorkflowJob *&rhs);
         };
 
         /** mailbox to reply **/
         std::string reply_mailbox;
         /** set of compute resources **/
         std::map<std::shared_ptr<ComputeService>, unsigned long> *compute_resources;
-        std::map<StandardJob *, std::shared_ptr<ComputeService>> *running_jobs;
+        std::map<WorkflowJob *, std::shared_ptr<ComputeService>> *running_jobs;
         /** queue of pending jobs **/
-        std::vector<StandardJob *> pending_jobs;
+        std::vector<WorkflowJob *> pending_jobs;
     };
 
     /***********************/

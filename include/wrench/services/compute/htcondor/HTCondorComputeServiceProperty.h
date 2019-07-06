@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2019. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -7,8 +7,8 @@
  * (at your option) any later version.
  */
 
-#ifndef WRENCH_HTCONDORSERVICEPROPERTY_H
-#define WRENCH_HTCONDORSERVICEPROPERTY_H
+#ifndef WRENCH_HTCONDORCOMPUTESERVICEPROPERTY_H
+#define WRENCH_HTCONDORCOMPUTESERVICEPROPERTY_H
 
 #include "wrench/services/compute/ComputeServiceProperty.h"
 
@@ -17,11 +17,11 @@ namespace wrench {
     /**
      * @brief Properties for an HTCondor service
      */
-    class HTCondorServiceProperty : public ComputeServiceProperty {
+    class HTCondorComputeServiceProperty : public ComputeServiceProperty {
 
     public:
 
     };
 }
 
-#endif //WRENCH_HTCONDORSERVICEPROPERTY_H
+#endif //WRENCH_HTCONDORCOMPUTESERVICEPROPERTY_H
