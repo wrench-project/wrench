@@ -269,7 +269,7 @@ namespace wrench {
 //          S4U_Simulation::sleep(0.0001);
                 this->s4u_actor->kill();
 
-            } catch (xbt_ex &e) {
+            } catch (simgrid::Exception &) {
                 throw std::shared_ptr<FatalFailure>(new FatalFailure());
             } catch (std::exception &e) {
                 throw std::shared_ptr<FatalFailure>(new FatalFailure());

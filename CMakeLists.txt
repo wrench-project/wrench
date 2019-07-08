@@ -307,6 +307,7 @@ set(TEST_FILES
         test/simulated_failures/link_failures/FileRegistryTest.cpp
         test/simulated_failures/link_failures/StorageServiceTest.cpp
         test/simulated_failures/link_failures/AlarmTest.cpp
+        test/simulated_failures/link_failures/BareMetalComputeServiceTest.cpp
         test/simulated_failures/failure_test_util/ResourceSwitcher.cpp
         test/simulated_failures/failure_test_util/ResourceSwitcher.h
         test/simulated_failures/failure_test_util/SleeperVictim.cpp
