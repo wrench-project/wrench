@@ -317,7 +317,7 @@ set(TEST_FILES
 # wrench library
 find_library(SIMGRID_LIBRARY NAMES simgrid)
 find_library(PUGIXML_LIBRARY NAMES pugixml)
-find_library(LEMON_LIBRARY NAMES emon)
+find_library(LEMON_LIBRARY NAMES emon lemon)
 find_library(GTEST_LIBRARY NAMES gtest)
 
 add_library(wrench STATIC ${SOURCE_FILES} src/wrench/managers/EnergyMeter.cpp include/wrench/managers/EnergyMeter.h)
