@@ -207,7 +207,7 @@ namespace wrench {
                 BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE);
         if (not workload_file.empty()) {
             try {
-                this->workload_trace = TraceFileLoader::loadFromTraceFile(workload_file, 0);
+                this->workload_trace = TraceFileLoader::loadFromTraceFile(workload_file, this->getPropertyValueAsBoolean(BatchComputeServiceProperty::IGNORE_INVALID_JOBS_IN_WORLOAD_TRACE_FILE), 0);
             } catch (std::exception &e) {
                 throw;
             }
@@ -1877,7 +1877,7 @@ namespace wrench {
                                               this->getSharedPtr<BatchComputeService>(),
                                               this->num_cores_per_node,
                                               this->getPropertyValueAsBoolean(
-                                                      BatchComputeServiceProperty::USE_REAL_RUNTIMES_AS_REQUESTED_RUNTIMES),
+                                                      BatchComputeServiceProperty::USE_REAL_RUNTIMES_AS_REQUESTED_RUNTIMES_IN_WORKLOAD_TRACE_FILE),
                                               this->workload_trace)
         );
         try {
