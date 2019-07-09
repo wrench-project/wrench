@@ -32,9 +32,9 @@ And, one of the following:
 
 ## Dependencies
 
-### Required Dependencies
+### Required Dependencies 
 
-- [SimGrid](https://framagit.org/simgrid/simgrid/uploads/8f3c1608d9420d92c668534633c1208d/SimGrid-3.22.2.tar.gz) - version 3.22.2
+- [SimGrid](https://framagit.org/simgrid/simgrid/uploads/3534bcfaad8eabe95546e99961a01a20/SimGrid-3.23.2.tar.gz) - version 3.23.2
 - [Lemon C++ library](http://lemon.cs.elte.hu/) - version 1.3.1 or higher 
 - [PugiXML](http://pugixml.org/) - version 1.8 or higher 
 - [JSON for Modern C++](https://github.com/nlohmann/json) - version 3.1.0 or higher 
@@ -51,15 +51,24 @@ If all dependencies are installed, compiling and installing WRENCH is as simple 
 ```bash
 cmake .
 make
-make install  # try "sudo make install" if you don't have the permission to write
+sudo make install
 ```
 
 For enabling the use of Batsched:
 ```bash
 cmake -DENABLE_BATSCHED=on .
 make
-make install  # try "sudo make install" if you don't have the permission to write
+sudo make install
 ```
+
+To use a non-standard SimGrid installation path:
+```bash
+cmake -DSIMGRID_INSTALL_PATH=/my/simgrid/path/ .
+make
+sudo make install 
+```
+
+
 
 ## Get in Touch
 
