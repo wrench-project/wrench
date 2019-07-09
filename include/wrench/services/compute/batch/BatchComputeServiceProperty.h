@@ -88,7 +88,16 @@ namespace wrench {
          *      - "true": use real runtimes as requested runtimes
          *      - "false": use requested times from the trace file
          */
-        DECLARE_PROPERTY_NAME(USE_REAL_RUNTIMES_AS_REQUESTED_RUNTIMES);
+        DECLARE_PROPERTY_NAME(USE_REAL_RUNTIMES_AS_REQUESTED_RUNTIMES_IN_WORKLOAD_TRACE_FILE);
+
+        /**
+         * @brief Whether, when simulating a workload trace file, to abort when there
+         * is an invalid job specification (e.g., negative times, negative allocations),
+         * or to simply print a warning.
+         *      - "true": merely print a warning whenever there is an invalid job
+         *      - "false": abort whenever there is an invalid job
+         */
+        DECLARE_PROPERTY_NAME(IGNORE_INVALID_JOBS_IN_WORLOAD_TRACE_FILE);
 
         /**
          * @brief Path to a to-be-generated Batsim-style CSV trace file (e.g. for b3atch schedule visualization purposes).
@@ -115,7 +124,9 @@ namespace wrench {
          *        and only simulation-valid
         *         if one is sure that cores are space shared (i.e., only a single compute thread can ever
         *         run on a core at once). Since space-sharing at the core level is typically the case in batch-scheduled
-         *        clusters, this is likely fine. Possible values are "false" (the default) or "true".
+         *        clusters, this is likely fine.
+         *           - "true": simulate computation as sleep
+         *           - "false": do not simulate computation as sleep (default)
         */
         DECLARE_PROPERTY_NAME(SIMULATE_COMPUTATION_AS_SLEEP);
 

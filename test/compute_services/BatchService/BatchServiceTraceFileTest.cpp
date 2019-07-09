@@ -105,10 +105,10 @@ private:
             std::vector<std::tuple<std::string, double, double, double, double, unsigned int>> trace_file_jobs;
             //Let's load the trace file
             try {
-                trace_file_jobs = wrench::TraceFileLoader::loadFromTraceFile("../test/trace_files/NASA-iPSC-1993-3.swf", 0);
+                trace_file_jobs = wrench::TraceFileLoader::loadFromTraceFile("../test/trace_files/NASA-iPSC-1993-3.swf", false, 0);
             } catch (std::invalid_argument &e) {
                 // Ignore and try alternate path
-                trace_file_jobs = wrench::TraceFileLoader::loadFromTraceFile("test/trace_files/NASA-iPSC-1993-3.swf", 0);
+                trace_file_jobs = wrench::TraceFileLoader::loadFromTraceFile("test/trace_files/NASA-iPSC-1993-3.swf", false, 0);
                 // If this doesn't work, then we have a problem, so we simply let the exception be uncaught
             }
 
@@ -546,7 +546,7 @@ void BatchServiceTest::do_WorkloadTraceFileTestSWF_test() {
                                             {"Host1", "Host2", "Host3", "Host4"}, 0,
                                             {
                                                     {wrench::BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path},
-                                                    {wrench::BatchComputeServiceProperty::USE_REAL_RUNTIMES_AS_REQUESTED_RUNTIMES, "true"}
+                                                    {wrench::BatchComputeServiceProperty::USE_REAL_RUNTIMES_AS_REQUESTED_RUNTIMES_IN_WORKLOAD_TRACE_FILE, "true"}
                                             }
             )));
 
@@ -713,7 +713,7 @@ void BatchServiceTest::do_WorkloadTraceFileRequestedTimesTestSWF_test() {
                                                     {wrench::BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path},
                                                     {wrench::BatchComputeServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP, "true"},
                                                     {wrench::BatchComputeServiceProperty::BATSCHED_LOGGING_MUTED, "true"},
-                                                    {wrench::BatchComputeServiceProperty::USE_REAL_RUNTIMES_AS_REQUESTED_RUNTIMES, "false"}
+                                                    {wrench::BatchComputeServiceProperty::USE_REAL_RUNTIMES_AS_REQUESTED_RUNTIMES_IN_WORKLOAD_TRACE_FILE, "false"}
                                             }
             )));
 
