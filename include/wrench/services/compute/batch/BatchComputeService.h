@@ -67,7 +67,8 @@ namespace wrench {
         #endif
                 {BatchComputeServiceProperty::BATCH_RJMS_DELAY,                            "0"},
                 {BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE,               ""},
-                {BatchComputeServiceProperty::USE_REAL_RUNTIMES_AS_REQUESTED_RUNTIMES,     "false"},
+                {BatchComputeServiceProperty::USE_REAL_RUNTIMES_AS_REQUESTED_RUNTIMES_IN_WORKLOAD_TRACE_FILE,     "false"},
+                {BatchComputeServiceProperty::IGNORE_INVALID_JOBS_IN_WORLOAD_TRACE_FILE,     "false"},
                 {BatchComputeServiceProperty::OUTPUT_CSV_JOB_LOG,                          ""},
                 {BatchComputeServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP,               "false"},
                 {BatchComputeServiceProperty::BATSCHED_LOGGING_MUTED,                      "true"},
