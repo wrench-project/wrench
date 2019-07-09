@@ -77,7 +77,6 @@ namespace wrench {
         this->has_returned_from_main = false;
     }
 
-
 #define CLEAN_UP_MAILBOX_TO_AVOID_MEMORY_LEAK 0
 
     S4U_Daemon::~S4U_Daemon() {
