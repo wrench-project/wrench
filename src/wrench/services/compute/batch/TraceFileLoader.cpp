@@ -21,6 +21,7 @@ namespace wrench {
     * @brief Load the workflow trace file
     *
     * @param filename: the path to the trace file in SWF format or in JSON format
+    * @param ignore_invalid_jobs: whether to ignore invalid job specifications
     * @param load_time_compensation: an offset to add to submit times in the trace file
     *
     * @return  a vector of tuples, where each tuple is a job description with the following fields:
@@ -34,7 +35,7 @@ namespace wrench {
     * @throw std::invalid_argument
     */
     std::vector<std::tuple<std::string, double, double, double, double, unsigned int>>
-    TraceFileLoader::loadFromTraceFile(std::string filename, double load_time_compensation) {
+    TraceFileLoader::loadFromTraceFile(std::string filename, bool ignore_invalid_jobs, double load_time_compensation) {
 
         std::istringstream ss(filename);
         std::string token;
@@ -50,9 +51,9 @@ namespace wrench {
         }
         std::string extension = tokens[tokens.size() - 1];
         if (extension == "swf") {
-            return loadFromTraceFileSWF(filename, load_time_compensation);
+            return loadFromTraceFileSWF(filename, ignore_invalid_jobs, load_time_compensation);
         } else if (extension == "json") {
-            return loadFromTraceFileJSON(filename, load_time_compensation);
+            return loadFromTraceFileJSON(filename, ignore_invalid_jobs, load_time_compensation);
         } else {
             throw std::invalid_argument(
                     "TraceFileLoader::loadFromTraceFile(): batch workload trace file name must end with '.swf' or '.json'");
@@ -63,6 +64,7 @@ namespace wrench {
     * @brief Load the workflow SWF trace file
     *
     * @param filename: the path to the trace file in SWF format
+    * @param ignore_invalid_jobs: whether to ignore invalid job specifications
     * @param load_time_compensation: an offset to add to submit times in the trace file
     *
     * @return  a vector of tuples, where each tuple is a job description with the following fields:
@@ -76,7 +78,7 @@ namespace wrench {
     * @throw std::invalid_argument
     */
     std::vector<std::tuple<std::string, double, double, double, double, unsigned int>>
-    TraceFileLoader::loadFromTraceFileSWF(std::string filename, double load_time_compensation) {
+    TraceFileLoader::loadFromTraceFileSWF(std::string filename, bool ignore_invalid_jobs, double load_time_compensation) {
 
         std::vector<std::tuple<std::string, double, double, double, double, unsigned int>> trace_file_jobs = {};
 
@@ -86,14 +88,22 @@ namespace wrench {
                     "TraceFileLoader::loadFromTraceFileSWF(): Cannot open batch workload trace file " + filename);
         }
 
-        try {
-            std::string line;
-            while (std::getline(infile, line)) {
-                if (line[0] != ';') {
-                    std::istringstream iss(line);
-                    std::vector<std::string> tokens{std::istream_iterator<std::string>{iss},
-                                                    std::istream_iterator<std::string>{}};
+        std::string line;
+        while (std::getline(infile, line)) {
 
+            if (line[0] != ';') {
+                std::istringstream iss(line);
+                std::vector<std::string> tokens{std::istream_iterator<std::string>{iss},
+                                                std::istream_iterator<std::string>{}};
+
+                std::string id;
+                double time = -1, requested_time = -1, requested_ram = -1;
+                int itemnum = 0;
+                double sub_time = -1;
+                int requested_num_nodes = -1;
+                int num_nodes = -1;
+
+                try {
                     if (tokens.size() < 10) {
                         throw std::invalid_argument(
                                 "TraceFileLoader::loadFromTraceFileSWF(): Seeing less than 10 fields per line in batch workload trace file '" +
@@ -101,12 +111,6 @@ namespace wrench {
                                 "'");
                     }
 
-                    std::string id;
-                    double time = -1, requested_time = -1, requested_ram = -1;
-                    int itemnum = 0;
-                    double sub_time = -1;
-                    int requested_num_nodes = -1;
-                    int num_nodes = -1;
                     for (auto const &item : tokens) {
                         switch (itemnum) {
                             case 0: // Job ID
@@ -155,7 +159,8 @@ namespace wrench {
                                 //assuming flops and runtime are the same (in seconds)
                                 if (sscanf(item.c_str(), "%lf", &requested_time) != 1) {
                                     throw std::invalid_argument(
-                                            "TraceFileLoader::loadFromTraceFileSWF(): Invalid requested time '" + item +
+                                            "TraceFileLoader::loadFromTraceFileSWF(): Invalid requested time '" +
+                                            item +
                                             "' in batch workload trace file");
                                 }
                                 break;
@@ -223,18 +228,22 @@ namespace wrench {
                         throw std::invalid_argument(
                                 "TraceFileLoader::loadFromTraceFileSWF(): invalid job with negative (requested) number of node in batch workload trace file");
                     }
-
-                    // Add the job to the list
-                    std::tuple<std::string, double, double, double, double, unsigned int> job =
-                            std::tuple<std::string, double, double, double, double, unsigned int>(
-                                    id, sub_time, time, requested_time, requested_ram,
-                                    (unsigned int) requested_num_nodes);
-                    trace_file_jobs.push_back(job);
+                } catch (std::invalid_argument &e) {
+                    if (ignore_invalid_jobs) {
+                        WRENCH_WARN("%s (in batch workload file %s)", e.what(), filename.c_str());
+                        continue;
+                    } else {
+                        throw std::invalid_argument("Error while reading batch workload trace file " + filename + ": " +  e.what());
+                    }
                 }
+
+                // Add the job to the list
+                std::tuple<std::string, double, double, double, double, unsigned int> job =
+                        std::tuple<std::string, double, double, double, double, unsigned int>(
+                                id, sub_time, time, requested_time, requested_ram,
+                                (unsigned int) requested_num_nodes);
+                trace_file_jobs.push_back(job);
             }
-        } catch (std::exception &e) {
-            throw std::invalid_argument(
-                    "Errors while reading batch workload trace file '" + filename + "': " + e.what());
         }
         return trace_file_jobs;
     }
@@ -243,6 +252,7 @@ namespace wrench {
     * @brief Load the workflow JSON trace file
     *
     * @param filename: the path to the trace file in JSON format
+    * @param ignore_invalid_jobs: whether to ignore invalid job specifications
     * @param load_time_compensation: an offset to add to submit times in the trace file
     *
     * @return  a vector of tuples, where each tuple is a job description with the following fields:
@@ -256,7 +266,7 @@ namespace wrench {
     * @throw std::invalid_argument
     */
     std::vector<std::tuple<std::string, double, double, double, double, unsigned int>>
-    TraceFileLoader::loadFromTraceFileJSON(std::string filename, double load_time_compensation) {
+    TraceFileLoader::loadFromTraceFileJSON(std::string filename, bool ignore_invalid_jobs, double load_time_compensation) {
 
         std::vector<std::tuple<std::string, double, double, double, double, unsigned int>> trace_file_jobs = {};
 
@@ -291,38 +301,49 @@ namespace wrench {
 
         for (nlohmann::json::iterator it = jobs.begin(); it != jobs.end(); ++it) {
             nlohmann::json json_job = it.value();
-            if (not json_job.is_object()) {
-                // Broken JSON
-                throw std::invalid_argument(
-                        "TraceFileLoader::loadFromTraceFileJSON(): broken job specification in JSON batch workload trace file");
-            }
-
             unsigned id;
             unsigned long res;
             double subtime;
             double walltime;
+            double requested_time;
 
             try {
-                id = json_job.at("id");
-                res = json_job.at("res");
-                subtime = json_job.at("subtime");
-                walltime = json_job.at("walltime");
-            } catch (std::exception &e) {
-                throw std::invalid_argument(
-                        "TraceFileLoader::loadFromTraceFileJSON(): invalid job specification in JSON batch workload trace file");
-            }
+                if (not json_job.is_object()) {
+                    // Broken JSON
+                    throw std::invalid_argument(
+                            "TraceFileLoader::loadFromTraceFileJSON(): broken job specification in JSON batch workload trace file");
+                }
 
-            // Fix/check values
-            if ((res <= 0) or (subtime < 0) or (walltime < 0)) {
-                throw std::invalid_argument(
-                        "TraceFileLoader::loadFromTraceFileJSON(): invalid job specification in JSON batch workload trace file");
-            }
-            subtime += load_time_compensation;
 
-            // It seems the Batsim JSON format does not include requested
-            // runtimes, and so we set the requested runtime to the walltime
-            // (i.e., users always ask exactly for what they need)
-            double requested_time = walltime;
+                try {
+                    id = json_job.at("id");
+                    res = json_job.at("res");
+                    subtime = json_job.at("subtime");
+                    walltime = json_job.at("walltime");
+                } catch (std::exception &e) {
+                    throw std::invalid_argument(
+                            "TraceFileLoader::loadFromTraceFileJSON(): invalid job specification in JSON batch workload trace file");
+                }
+
+                // Fix/check values
+                if ((res <= 0) or (subtime < 0) or (walltime < 0)) {
+                    throw std::invalid_argument(
+                            "TraceFileLoader::loadFromTraceFileJSON(): invalid job specification in JSON batch workload trace file");
+                }
+                subtime += load_time_compensation;
+
+                // It seems the Batsim JSON format does not include requested
+                // runtimes, and so we set the requested runtime to the walltime
+                // (i.e., users always ask exactly for what they need)
+                requested_time = walltime;
+            } catch (std::invalid_argument &e) {
+                if (ignore_invalid_jobs) {
+                    WRENCH_WARN("%s (in batch workload file %s)", e.what(), filename.c_str());
+                    continue;
+                } else {
+                    throw std::invalid_argument("Error while reading batch workload trace file " + filename + ": " +  e.what());
+                }
+            }
 
 //      // Add the job to the list
             std::tuple<std::string, double, double, double, double, unsigned int> job =
