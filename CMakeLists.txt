@@ -11,6 +11,8 @@ if (ENABLE_MESSAGE_MANAGER)
     add_definitions(-DMESSAGE_MANAGER)
 endif ()
 
+set(SIMGRID_INSTALL_PATH "/usr/local/" CACHE PATH "The path to SimGrid's installation directory")
+
 set(CMAKE_CXX_STANDARD 11)
 
 # build the version number
@@ -31,7 +33,7 @@ endif ()
 
 message(STATUS "Building WRENCH Version: ${WRENCH_RELEASE_VERSION}")
 
-include_directories(src/wrench/ include/ /usr/include /usr/local/include /opt/local/include)
+include_directories(src/wrench/ include/ ${SIMGRID_INSTALL_PATH}/include /usr/include  /usr/local/include /opt/local/include)
 
 
 # library header files
@@ -315,7 +317,11 @@ set(TEST_FILES
         )
 
 # wrench library
-find_library(SIMGRID_LIBRARY NAMES simgrid)
+find_library(SIMGRID_LIBRARY NAMES simgrid HINTS ${SIMGRID_INSTALL_PATH}/lib NO_DEFAULT_PATH)
+if (NOT SIMGRID_LIBRARY)
+    message(FATAL_ERROR "SimGrid library not found. Perhaps an invalid SIMGRID_INSTALL_PATH specification?")
+endif()
+
 find_library(PUGIXML_LIBRARY NAMES pugixml)
 find_library(LEMON_LIBRARY NAMES emon)
 find_library(GTEST_LIBRARY NAMES gtest)
