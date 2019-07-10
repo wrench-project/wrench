@@ -191,10 +191,10 @@ namespace wrench {
             return true;
         }
 
-        if (message == nullptr) {
-            WRENCH_INFO("Got a NULL message. This likely means that we're all done...Aborting!");
-            return false;
-        }
+//        if (message == nullptr) {
+//            WRENCH_INFO("Got a NULL message. This likely means that we're all done...Aborting!");
+//            return false;
+//        }
 
 
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());

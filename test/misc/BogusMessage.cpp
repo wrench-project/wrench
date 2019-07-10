@@ -15,12 +15,15 @@
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
 
+XBT_LOG_NEW_DEFAULT_CATEGORY(bogus_message_test, "Log category for BogusMessageTest");
+
+
 class BogusMessageTest : public ::testing::Test {
 
 public:
-    std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
+    std::shared_ptr<wrench::Service> service = nullptr;
 
-    void do_BogusMessage_Test();
+    void do_BogusMessage_Test(std::string service_type);
 
 protected:
     BogusMessageTest() {
@@ -75,12 +78,12 @@ protected:
 
 class BogusMessageTestWMS : public wrench::WMS {
 
-class BogusMessage : public wrench::SimulationMessage {
+    class BogusMessage : public wrench::SimulationMessage {
 
-public:
-    BogusMessage() : wrench::SimulationMessage("bogus", 1) {
-    }
-};
+    public:
+        BogusMessage() : wrench::SimulationMessage("bogus", 1) {
+        }
+    };
 
 public:
     BogusMessageTestWMS(BogusMessageTest *test,
@@ -95,26 +98,25 @@ private:
 
     int main() {
 
-        auto msg = new BogusMessage();
-        std::string mailbox;
-
-        // Send a bogus message to a FileRegistryService
-        mailbox = this->test->file_registry_service->mailbox_name;
         try {
-            wrench::S4U_Mailbox::putMessage(mailbox, msg);
-            throw std::runtime_error("Was expecting a runtime_error for bogus message send to FileRegistryService");
-        } catch (std::runtime_error &e) {
-        }
+            wrench::S4U_Mailbox::putMessage(this->test->service->mailbox_name, new BogusMessage());
+            throw std::runtime_error("Was expecting a runtime_error for bogus message send to service " + this->test->service->getName());
+        } catch (std::runtime_error &e) {}
 
+        wrench::Simulation::sleep(1000);
         return 0;
     }
 };
 
-TEST_F(BogusMessageTest, SimpleFunctionality) {
-    DO_TEST_WITH_FORK_EXPECT_FATAL_FAILURE(do_BogusMessage_Test, true);
+TEST_F(BogusMessageTest, FileRegistryService) {
+    DO_TEST_WITH_FORK_ONE_ARG_EXPECT_FATAL_FAILURE(do_BogusMessage_Test, "file_registry", true);
 }
 
-void BogusMessageTest::do_BogusMessage_Test() {
+TEST_F(BogusMessageTest, SimpleStorage) {
+    DO_TEST_WITH_FORK_ONE_ARG_EXPECT_FATAL_FAILURE(do_BogusMessage_Test, "simple_storage", true);
+}
+
+void BogusMessageTest::do_BogusMessage_Test(std::string service_type) {
 
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
@@ -130,8 +132,12 @@ void BogusMessageTest::do_BogusMessage_Test() {
     // Get a hostname
     std::string hostname = wrench::Simulation::getHostnameList()[0];
 
-    // Create a file registry service
-    this->file_registry_service = simulation->add(new wrench::FileRegistryService(hostname));
+    // Create a service
+    if (service_type == "file_registry") {
+        this->service = simulation->add(new wrench::FileRegistryService(hostname));
+    } else if (service_type == "simple_storage") {
+        this->service = simulation->add(new wrench::SimpleStorageService(hostname, 10.0));
+    }
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -140,8 +146,7 @@ void BogusMessageTest::do_BogusMessage_Test() {
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
-    // Running a "run a single task" simulation
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
 

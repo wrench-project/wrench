@@ -375,7 +375,7 @@ namespace wrench {
 
         } else {
             throw std::runtime_error(
-                    "FileRegistryService::waitForNextMessage(): Unexpected  message type: " + message->name);
+                    "FileRegistryService::processNextMessage(): Unexpected [" + message->getName() + "] message");
         }
     }
 
