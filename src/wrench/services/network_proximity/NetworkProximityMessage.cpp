@@ -138,11 +138,13 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param requested_host: the name of the host whose coordinates are being requested
+     * @param success: whether coordinates where found or not
      * @param xy_coordinate: the (x,y) coordinate of the host
      * @param timestamp: the timestamp for the coordinates
      * @param payload: the message size in bytes
      */
     CoordinateLookupAnswerMessage::CoordinateLookupAnswerMessage(std::string requested_host,
+                                                                 bool success,
                                                                  std::pair<double, double> xy_coordinate,
                                                                  double timestamp,
                                                                  double payload) :
@@ -152,6 +154,7 @@ namespace wrench {
                     "CoordinateLookupAnswerMessage::CoordinateLookupAnswerMessage(): Invalid argument");
         }
         this->requested_host = requested_host;
+        this->success = success;
         this->xy_coordinate = xy_coordinate;
         this->timestamp = timestamp;
     }

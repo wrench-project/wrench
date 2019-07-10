@@ -572,11 +572,11 @@ namespace wrench {
  */
     void BatchComputeService::sendPilotJobExpirationNotification(PilotJob *job) {
 //        try {
-            S4U_Mailbox::dputMessage(job->popCallbackMailbox(),
-                                     new ComputeServicePilotJobExpiredMessage(
-                                             job, this->getSharedPtr<BatchComputeService>(),
-                                             this->getMessagePayloadValue(
-                                                     BatchComputeServiceMessagePayload::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD)));
+        S4U_Mailbox::dputMessage(job->popCallbackMailbox(),
+                                 new ComputeServicePilotJobExpiredMessage(
+                                         job, this->getSharedPtr<BatchComputeService>(),
+                                         this->getMessagePayloadValue(
+                                                 BatchComputeServiceMessagePayload::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD)));
 //        } catch (std::shared_ptr<NetworkError> &cause) {
 //            return; // ignore
 //        }
@@ -1203,8 +1203,7 @@ namespace wrench {
 #endif
         } else {
             throw std::runtime_error(
-                    "BatchComputeService::processNextMessage(): Unknown message type: " +
-                    std::to_string(message->payload));
+                    "BatchComputeService::processNextMessage(): Unexpected [" + message->getName() + "] message");
             return false;
         }
     }
@@ -1225,17 +1224,17 @@ namespace wrench {
         if ((job->getWorkflowJob()->getType() == WorkflowJob::STANDARD) and
             (not getPropertyValueAsBoolean(BatchComputeServiceProperty::SUPPORTS_STANDARD_JOBS))) {
 //            try {
-                S4U_Mailbox::dputMessage(answer_mailbox,
-                                         new ComputeServiceSubmitStandardJobAnswerMessage(
-                                                 (StandardJob *) job->getWorkflowJob(),
-                                                 this->getSharedPtr<BatchComputeService>(),
-                                                 false,
-                                                 std::shared_ptr<FailureCause>(
-                                                         new JobTypeNotSupported(
-                                                                 job->getWorkflowJob(),
-                                                                 this->getSharedPtr<BatchComputeService>())),
-                                                 this->getMessagePayloadValue(
-                                                         BatchComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
+            S4U_Mailbox::dputMessage(answer_mailbox,
+                                     new ComputeServiceSubmitStandardJobAnswerMessage(
+                                             (StandardJob *) job->getWorkflowJob(),
+                                             this->getSharedPtr<BatchComputeService>(),
+                                             false,
+                                             std::shared_ptr<FailureCause>(
+                                                     new JobTypeNotSupported(
+                                                             job->getWorkflowJob(),
+                                                             this->getSharedPtr<BatchComputeService>())),
+                                             this->getMessagePayloadValue(
+                                                     BatchComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
 //            } catch (std::shared_ptr<NetworkError> &cause) {
 //                return;
 //            }
@@ -1244,17 +1243,17 @@ namespace wrench {
                    (not getPropertyValueAsBoolean(BatchComputeServiceProperty::SUPPORTS_PILOT_JOBS)
                    )) {
 //            try {
-                S4U_Mailbox::dputMessage(answer_mailbox,
-                                         new ComputeServiceSubmitPilotJobAnswerMessage(
-                                                 (PilotJob *) job->getWorkflowJob(),
-                                                 this->getSharedPtr<BatchComputeService>(),
-                                                 false,
-                                                 std::shared_ptr<FailureCause>(
-                                                         new JobTypeNotSupported(
-                                                                 job->getWorkflowJob(),
-                                                                 this->getSharedPtr<BatchComputeService>())),
-                                                 this->getMessagePayloadValue(
-                                                         BatchComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
+            S4U_Mailbox::dputMessage(answer_mailbox,
+                                     new ComputeServiceSubmitPilotJobAnswerMessage(
+                                             (PilotJob *) job->getWorkflowJob(),
+                                             this->getSharedPtr<BatchComputeService>(),
+                                             false,
+                                             std::shared_ptr<FailureCause>(
+                                                     new JobTypeNotSupported(
+                                                             job->getWorkflowJob(),
+                                                             this->getSharedPtr<BatchComputeService>())),
+                                             this->getMessagePayloadValue(
+                                                     BatchComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
 //            } catch (std::shared_ptr<NetworkError> &cause) {
 //                return;
 //            }
@@ -1280,18 +1279,18 @@ namespace wrench {
 
                 {
 //                    try {
-                        S4U_Mailbox::dputMessage(
-                                answer_mailbox,
-                                new ComputeServiceSubmitStandardJobAnswerMessage(
-                                        (StandardJob *) job->getWorkflowJob(),
-                                        this->getSharedPtr<BatchComputeService>(),
-                                        false,
-                                        std::shared_ptr<FailureCause>(
-                                                new NotEnoughResources(
-                                                        job->getWorkflowJob(),
-                                                        this->getSharedPtr<BatchComputeService>())),
-                                        this->getMessagePayloadValue(
-                                                BatchComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
+                    S4U_Mailbox::dputMessage(
+                            answer_mailbox,
+                            new ComputeServiceSubmitStandardJobAnswerMessage(
+                                    (StandardJob *) job->getWorkflowJob(),
+                                    this->getSharedPtr<BatchComputeService>(),
+                                    false,
+                                    std::shared_ptr<FailureCause>(
+                                            new NotEnoughResources(
+                                                    job->getWorkflowJob(),
+                                                    this->getSharedPtr<BatchComputeService>())),
+                                    this->getMessagePayloadValue(
+                                            BatchComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
 //                    } catch (std::shared_ptr<NetworkError> &cause) {}
                     return;
                 }
@@ -1302,48 +1301,40 @@ namespace wrench {
             (requested_num_cores_per_host >
              Simulation::getHostNumCores(this->available_nodes_to_cores.begin()->first))) {
 //            try {
-                S4U_Mailbox::dputMessage(answer_mailbox,
-                                         new ComputeServiceSubmitPilotJobAnswerMessage(
-                                                 (PilotJob *) job->getWorkflowJob(),
-                                                 this->getSharedPtr<BatchComputeService>(),
-                                                 false,
-                                                 std::shared_ptr<FailureCause>(
-                                                         new NotEnoughResources(
-                                                                 job->getWorkflowJob(),
-                                                                 this->getSharedPtr<BatchComputeService>())),
-                                                 this->getMessagePayloadValue(
-                                                         BatchComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
+            S4U_Mailbox::dputMessage(answer_mailbox,
+                                     new ComputeServiceSubmitPilotJobAnswerMessage(
+                                             (PilotJob *) job->getWorkflowJob(),
+                                             this->getSharedPtr<BatchComputeService>(),
+                                             false,
+                                             std::shared_ptr<FailureCause>(
+                                                     new NotEnoughResources(
+                                                             job->getWorkflowJob(),
+                                                             this->getSharedPtr<BatchComputeService>())),
+                                             this->getMessagePayloadValue(
+                                                     BatchComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
 //            } catch (std::shared_ptr<NetworkError> &cause) {}
             return;
         }
 
         if (job->getWorkflowJob()->getType() == WorkflowJob::STANDARD) {
 
-            try {
-                S4U_Mailbox::dputMessage(answer_mailbox,
-                                         new ComputeServiceSubmitStandardJobAnswerMessage(
-                                                 (StandardJob *) job->getWorkflowJob(),
-                                                 this->getSharedPtr<BatchComputeService>(),
-                                                 true,
-                                                 nullptr,
-                                                 this->getMessagePayloadValue(
-                                                         BatchComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
-            } catch (std::shared_ptr<NetworkError> &cause) {
-                return;
-            }
+            S4U_Mailbox::dputMessage(answer_mailbox,
+                                     new ComputeServiceSubmitStandardJobAnswerMessage(
+                                             (StandardJob *) job->getWorkflowJob(),
+                                             this->getSharedPtr<BatchComputeService>(),
+                                             true,
+                                             nullptr,
+                                             this->getMessagePayloadValue(
+                                                     BatchComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
         } else if (job->getWorkflowJob()->getType() == WorkflowJob::PILOT) {
-            try {
-                S4U_Mailbox::dputMessage(answer_mailbox,
-                                         new ComputeServiceSubmitPilotJobAnswerMessage(
-                                                 (PilotJob *) job->getWorkflowJob(),
-                                                 this->getSharedPtr<BatchComputeService>(),
-                                                 true,
-                                                 nullptr,
-                                                 this->getMessagePayloadValue(
-                                                         BatchComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
-            } catch (std::shared_ptr<NetworkError> &cause) {
-                return;
-            }
+            S4U_Mailbox::dputMessage(answer_mailbox,
+                                     new ComputeServiceSubmitPilotJobAnswerMessage(
+                                             (PilotJob *) job->getWorkflowJob(),
+                                             this->getSharedPtr<BatchComputeService>(),
+                                             true,
+                                             nullptr,
+                                             this->getMessagePayloadValue(
+                                                     BatchComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
         }
 
         // Add the RJMS delay to the job's requested time
@@ -1413,11 +1404,7 @@ namespace wrench {
                         job, this->getSharedPtr<BatchComputeService>(), true, nullptr,
                         this->getMessagePayloadValue(
                                 BatchComputeServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
-                try {
-                    S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
-                } catch (std::shared_ptr<NetworkError> &cause) {
-                    return;
-                }
+                S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
 #ifdef ENABLE_BATSCHED
                 // forward this notification to batsched
                 this->notifyJobEventsToBatSched(job_id, "TIMEOUT", "NOT_SUBMITTED", "", "JOB_COMPLETED");
@@ -1437,11 +1424,7 @@ namespace wrench {
                         job, this->getSharedPtr<BatchComputeService>(), true, nullptr,
                         this->getMessagePayloadValue(
                                 BatchComputeServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
-                try {
-                    S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
-                } catch (std::shared_ptr<NetworkError> &cause) {
-                    return;
-                }
+                S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
 #ifdef ENABLE_BATSCHED
                 // forward this notification to batsched
                 this->notifyJobEventsToBatSched(job_id, "TIMEOUT", "NOT_SUBMITTED", "", "JOB_COMPLETED");
@@ -1467,12 +1450,7 @@ namespace wrench {
                         job, this->getSharedPtr<BatchComputeService>(), true, nullptr,
                         this->getMessagePayloadValue(
                                 BatchComputeServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
-                try {
-                    S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
-                } catch (std::shared_ptr<NetworkError> &cause) {
-                    return;
-                }
-                //this is the list of raw pointers
+                S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
 
 
 #ifdef ENABLE_BATSCHED
@@ -1498,11 +1476,7 @@ namespace wrench {
                 std::shared_ptr<FailureCause>(new JobCannotBeTerminated(job)),
                 this->getMessagePayloadValue(
                         BatchComputeServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
-        try {
-            S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            return;
-        }
+        S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
     }
 
 /**
@@ -1565,15 +1539,11 @@ namespace wrench {
 #endif
 
         // Send the callback to the originator
-        try {
-            S4U_Mailbox::dputMessage(job->popCallbackMailbox(),
-                                     new ComputeServiceStandardJobDoneMessage(
-                                             job, this->getSharedPtr<BatchComputeService>(),
-                                             this->getMessagePayloadValue(
-                                                     BatchComputeServiceMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            return;
-        }
+        S4U_Mailbox::dputMessage(job->popCallbackMailbox(),
+                                 new ComputeServiceStandardJobDoneMessage(
+                                         job, this->getSharedPtr<BatchComputeService>(),
+                                         this->getMessagePayloadValue(
+                                                 BatchComputeServiceMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD)));
 
         //Free the job from the global (pending, running, waiting) job list, (doing this at the end of this method to make sure
         // this job is not used anymore anywhere)
@@ -1765,15 +1735,11 @@ namespace wrench {
                 // Send the "Pilot job has started" callback
                 // Note the getCallbackMailbox instead of the popCallbackMailbox, because
                 // there will be another callback upon termination.
-                try {
-                    S4U_Mailbox::dputMessage(job->getCallbackMailbox(),
-                                             new ComputeServicePilotJobStartedMessage(
-                                                     job, this->getSharedPtr<BatchComputeService>(),
-                                                     this->getMessagePayloadValue(
-                                                             BatchComputeServiceMessagePayload::PILOT_JOB_STARTED_MESSAGE_PAYLOAD)));
-                } catch (std::shared_ptr<NetworkError> &cause) {
-                    throw WorkflowExecutionException(cause);
-                }
+                S4U_Mailbox::dputMessage(job->getCallbackMailbox(),
+                                         new ComputeServicePilotJobStartedMessage(
+                                                 job, this->getSharedPtr<BatchComputeService>(),
+                                                 this->getMessagePayloadValue(
+                                                         BatchComputeServiceMessagePayload::PILOT_JOB_STARTED_MESSAGE_PAYLOAD)));
 
                 SimulationMessage *msg =
                         new AlarmJobTimeOutMessage(batch_job, 0);
@@ -1853,11 +1819,7 @@ namespace wrench {
                 dict,
                 this->getMessagePayloadValue(
                         ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD));
-        try {
-            S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            return;
-        }
+        S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
     }
 
 /**
@@ -2121,11 +2083,7 @@ namespace wrench {
                                             job)),
                             this->getMessagePayloadValue(
                                     BatchComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD));
-            try {
-                S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
-            } catch (std::shared_ptr<NetworkError> &cause) {
-                return;
-            }
+            S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
         }
 
 
@@ -2154,11 +2112,7 @@ namespace wrench {
                         job, this->getSharedPtr<BatchComputeService>(), true, nullptr,
                         this->getMessagePayloadValue(
                                 BatchComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD));
-        try {
-            S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            return;
-        }
+        S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
 
     }
 
@@ -2169,7 +2123,7 @@ namespace wrench {
 
 #ifdef ENABLE_BATSCHED
 
-// This is a tiny tine offset that's used to avoid some Batsched assert from failing
+    // This is a tiny tine offset that's used to avoid some Batsched assert from failing
 // when Batshced compares the "now" with the "timestamp"
 
     /**
