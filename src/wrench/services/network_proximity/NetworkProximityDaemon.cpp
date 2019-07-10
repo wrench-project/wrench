@@ -232,8 +232,7 @@ namespace wrench {
 
         } else {
             throw std::runtime_error(
-                    "NetworkProximityService::waitForNextMessage(): Unknown message type: " +
-                    std::to_string(message->payload));
+                    "NetworkProximityService::waitForNextMessage(): Unexpected [" + message->getName() + "] message");
         }
     }
 

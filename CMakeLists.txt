@@ -232,6 +232,7 @@ set(SOURCE_FILES
         src/wrench/services/helpers/host_state_change_detector/HostStateChangeDetectorProperty.cpp
         src/wrench/services/helpers/host_state_change_detector/HostStateChangeDetectorMessage.cpp
         src/wrench/util/PointerUtil.cpp
+        src/wrench/util/PointerUtil.cpp
         src/wrench/util/MessageManager.cpp
         src/wrench/services/compute/batch/TraceFileLoader.cpp
         src/wrench/services/storage/simple/NetworkConnectionManager.cpp
@@ -291,6 +292,7 @@ set(TEST_FILES
         test/simulation/S4U_SimulationTest.cpp
         test/pilot_job/CriticalPathSchedulerTest.cpp
         test/misc/PointerUtilTest.cpp
+        test/misc/BogusMessage.cpp
         examples/simple-example/scheduler/pilot_job/CriticalPathPilotJobScheduler.cpp
         test/compute_services/ScratchSpaceTest.cpp
         test/energy_consumption/EnergyConsumptionTest.cpp

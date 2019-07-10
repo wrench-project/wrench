@@ -147,9 +147,9 @@ namespace wrench {
 
         try {
             S4U_Mailbox::putMessage(this->mailbox_name,
-                                     new NetworkProximityLookupRequestMessage(answer_mailbox, std::move(hosts),
-                                                                              this->getMessagePayloadValue(
-                                                                                      NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
+                                    new NetworkProximityLookupRequestMessage(answer_mailbox, std::move(hosts),
+                                                                             this->getMessagePayloadValue(
+                                                                                     NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw WorkflowExecutionException(cause);
         }
@@ -310,10 +310,10 @@ namespace wrench {
             }
 
 //            try {
-                S4U_Mailbox::dputMessage(msg->answer_mailbox,
-                                         new NetworkProximityLookupAnswerMessage(msg->hosts, proximity_value, timestamp,
-                                                                                 this->getMessagePayloadValue(
-                                                                                         NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
+            S4U_Mailbox::dputMessage(msg->answer_mailbox,
+                                     new NetworkProximityLookupAnswerMessage(msg->hosts, proximity_value, timestamp,
+                                                                             this->getMessagePayloadValue(
+                                                                                     NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
 //            }
 //            catch (std::shared_ptr<NetworkError> &cause) {
 //                return true;
@@ -341,12 +341,12 @@ namespace wrench {
 //            unsigned long randNum = (std::rand()%(this->hosts_in_network.size()));
 
 //            try {
-                S4U_Mailbox::dputMessage(msg->daemon->mailbox_name,
-                                         new NextContactDaemonAnswerMessage(chosen_peer->getHostname(),
-                                                                            chosen_peer,
-                                                                            chosen_peer->mailbox_name,
-                                                                            this->getMessagePayloadValue(
-                                                                                    NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD)));
+            S4U_Mailbox::dputMessage(msg->daemon->mailbox_name,
+                                     new NextContactDaemonAnswerMessage(chosen_peer->getHostname(),
+                                                                        chosen_peer,
+                                                                        chosen_peer->mailbox_name,
+                                                                        this->getMessagePayloadValue(
+                                                                                NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD)));
 //            } catch (std::shared_ptr<NetworkError> &cause) {
 //                return true;
 //            }
@@ -354,25 +354,33 @@ namespace wrench {
         } else if (auto msg = std::dynamic_pointer_cast<CoordinateLookupRequestMessage>(message)) {
             std::string requested_host = msg->requested_host;
             auto const coordinate_itr = this->coordinate_lookup_table.find(requested_host);
+            CoordinateLookupAnswerMessage *msg_to_send_back = nullptr;
+
             if (coordinate_itr != this->coordinate_lookup_table.cend()) {
-                try {
-                    S4U_Mailbox::dputMessage(msg->answer_mailbox,
-                                             new CoordinateLookupAnswerMessage(requested_host,
-                                                                               std::make_pair(
-                                                                                       coordinate_itr->second.first.real(),
-                                                                                       coordinate_itr->second.first.imag()),
-                                                                               coordinate_itr->second.second,
-                                                                               this->getMessagePayloadValue(
-                                                                                       NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD)));
-                } catch (std::shared_ptr<NetworkError> &cause) {
-                    return true;
-                }
+                msg_to_send_back  = new CoordinateLookupAnswerMessage(requested_host,
+                                                                      true,
+                                                                      std::make_pair(
+                                                                              coordinate_itr->second.first.real(),
+                                                                              coordinate_itr->second.first.imag()),
+                                                                      coordinate_itr->second.second,
+                                                                      this->getMessagePayloadValue(
+                                                                              NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD));
+            } else {
+                msg_to_send_back = new CoordinateLookupAnswerMessage(requested_host,
+                                                                     false,
+                                                                     std::make_pair(
+                                                                             0,
+                                                                             0),
+                                                                     0,
+                                                                     this->getMessagePayloadValue(
+                                                                             NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD));
             }
+
+            S4U_Mailbox::dputMessage(msg->answer_mailbox,                     msg_to_send_back);
             return true;
         } else {
             throw std::runtime_error(
-                    "NetworkProximityService::processNextMessage(): Unknown message type: " +
-                    std::to_string(message->payload));
+                    "NetworkProximityService::processNextMessage(): Unexpected [" + message->getName() + "] message");
         }
         return false;
     }
