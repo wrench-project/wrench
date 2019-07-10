@@ -293,13 +293,13 @@ namespace wrench {
                             VirtualizedClusterComputeServiceMessagePayload::MIGRATE_VM_ANSWER_MESSAGE_PAYLOAD));
         }
 
-        try {
+//        try {
             S4U_Mailbox::dputMessage(
                     answer_mailbox,
                     msg_to_send_back);
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            // ignore
-        }
+//        } catch (std::shared_ptr<NetworkError> &cause) {
+//            // ignore
+//        }
         return;
     }
 

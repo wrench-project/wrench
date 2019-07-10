@@ -339,15 +339,15 @@ namespace wrench {
       this->pending_jobs.push_back(job);
       this->resources_unavailable = false;
 
-      try {
+//      try {
         S4U_Mailbox::dputMessage(
                 answer_mailbox,
                 new ComputeServiceSubmitStandardJobAnswerMessage(
                         job, this->getSharedPtr<HTCondorCentralManagerService>(), true, nullptr,
                         this->getMessagePayloadValue(
                                 HTCondorCentralManagerServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> &cause) {
-      }
+//      } catch (std::shared_ptr<NetworkError> &cause) {
+//      }
     }
 
     /**
@@ -366,15 +366,15 @@ namespace wrench {
       this->pending_jobs.push_back(job);
       this->resources_unavailable = false;
 
-      try {
+//      try {
         S4U_Mailbox::dputMessage(
                 answer_mailbox,
                 new ComputeServiceSubmitPilotJobAnswerMessage(
                         job, this->getSharedPtr<HTCondorCentralManagerService>(), true, nullptr,
                         this->getMessagePayloadValue(
                                 HTCondorCentralManagerServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> &cause) {
-      }
+//      } catch (std::shared_ptr<NetworkError> &cause) {
+//      }
     }
 
     /**
@@ -386,15 +386,15 @@ namespace wrench {
      */
     void HTCondorCentralManagerService::processPilotJobStarted(wrench::PilotJob *job) {
       // Forward the notification
-      try {
+//      try {
         S4U_Mailbox::dputMessage(job->popCallbackMailbox(),
                                  new ComputeServicePilotJobStartedMessage(
                                          job, this->getSharedPtr<HTCondorCentralManagerService>(),
                                          this->getMessagePayloadValue(
                                                  HTCondorComputeServiceMessagePayload::PILOT_JOB_STARTED_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        return; // ignore
-      }
+//      } catch (std::shared_ptr<NetworkError> &cause) {
+//        return; // ignore
+//      }
     }
 
     /**
@@ -406,15 +406,15 @@ namespace wrench {
      */
     void HTCondorCentralManagerService::processPilotJobCompletion(wrench::PilotJob *job) {
       // Forward the notification
-      try {
+//      try {
         S4U_Mailbox::dputMessage(job->popCallbackMailbox(),
                                  new ComputeServicePilotJobExpiredMessage(
                                          job, this->getSharedPtr<HTCondorCentralManagerService>(),
                                          this->getMessagePayloadValue(
                                                  HTCondorComputeServiceMessagePayload::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        return; // ignore
-      }
+//      } catch (std::shared_ptr<NetworkError> &cause) {
+//        return; // ignore
+//      }
     }
 
     /**
@@ -432,14 +432,14 @@ namespace wrench {
       }
 
       // Send the callback to the originator
-      try {
+//      try {
         S4U_Mailbox::dputMessage(
                 callback_mailbox, new ComputeServiceStandardJobDoneMessage(
                         job, this->getSharedPtr<HTCondorCentralManagerService>(), this->getMessagePayloadValue(
                                 HTCondorCentralManagerServiceMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD)));
         this->resources_unavailable = false;
-      } catch (std::shared_ptr<NetworkError> &cause) {
-      }
+//      } catch (std::shared_ptr<NetworkError> &cause) {
+//      }
 
       auto cs = this->running_jobs.find(job);
       auto cs_map = this->compute_resources_map.find(cs->second);

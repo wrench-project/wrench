@@ -276,7 +276,7 @@ namespace wrench {
 
             WRENCH_INFO("Forwarding status message");
             // Forward it back
-            try {
+//            try {
                 S4U_Mailbox::dputMessage(msg->file->getWorkflow()->getCallbackMailbox(),
                                          new StorageServiceFileCopyAnswerMessage(msg->file,
                                                                                  msg->storage_service,
@@ -287,9 +287,9 @@ namespace wrench {
                                                                                  std::move(msg->failure_cause),
                                                                                  0
                                          ));
-            } catch (std::shared_ptr<NetworkError> &cause) {
-                return true;
-            }
+//            } catch (std::shared_ptr<NetworkError> &cause) {
+//                return true;
+//            }
             return true;
 
         } else {

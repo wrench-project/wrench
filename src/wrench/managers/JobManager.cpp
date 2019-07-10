@@ -595,13 +595,13 @@ namespace wrench {
                 // Forward the notification along the notification chain
                 std::string callback_mailbox = job->popCallbackMailbox();
                 if (not callback_mailbox.empty()) {
-                    try {
+//                    try {
                         auto augmented_msg = new JobManagerStandardJobDoneMessage(
                                 job, msg->compute_service, necessary_state_changes);
                         S4U_Mailbox::dputMessage(callback_mailbox, augmented_msg);
-                    } catch (std::shared_ptr<NetworkError> &cause) {
-                        // ignore
-                    }
+//                    } catch (std::shared_ptr<NetworkError> &cause) {
+//                        // ignore
+//                    }
                 }
                 keep_going = true;
 
@@ -686,16 +686,16 @@ namespace wrench {
                 this->failed_standard_jobs.insert(job);
 
                 // Forward the notification along the notification chain
-                try {
+//                try {
                     JobManagerStandardJobFailedMessage *augmented_message =
                             new JobManagerStandardJobFailedMessage(job, msg->compute_service,
                                                                    necessary_state_changes,
                                                                    necessary_failure_count_increments,
                                                                    std::move(msg->cause));
                     S4U_Mailbox::dputMessage(job->popCallbackMailbox(), augmented_message);
-                } catch (std::shared_ptr<NetworkError> &cause) {
+//                } catch (std::shared_ptr<NetworkError> &cause) {
+//                }
                     keep_going = true;
-                }
 
             } else if (auto msg = std::dynamic_pointer_cast<ComputeServicePilotJobStartedMessage>(message)) {
 
@@ -710,12 +710,12 @@ namespace wrench {
 
                 // Forward the notification to the source
                 WRENCH_INFO("Forwarding to %s", job->getOriginCallbackMailbox().c_str());
-                try {
+//                try {
                     S4U_Mailbox::dputMessage(job->getOriginCallbackMailbox(),
                                              new ComputeServicePilotJobStartedMessage(job, msg->compute_service, 0.0));
-                } catch (std::shared_ptr<NetworkError> &cause) {
+//                } catch (std::shared_ptr<NetworkError> &cause) {
                     keep_going = true;
-                }
+//                }
 
             } else if (auto msg = std::dynamic_pointer_cast<ComputeServicePilotJobExpiredMessage>(message)) {
 
@@ -729,12 +729,12 @@ namespace wrench {
 
                 // Forward the notification to the source
                 WRENCH_INFO("Forwarding to %s", job->getOriginCallbackMailbox().c_str());
-                try {
+//                try {
                     S4U_Mailbox::dputMessage(job->getOriginCallbackMailbox(),
                                              new ComputeServicePilotJobExpiredMessage(job, msg->compute_service, 0.0));
-                } catch (std::shared_ptr<NetworkError> &cause) {
+//                } catch (std::shared_ptr<NetworkError> &cause) {
                     keep_going = true;
-                }
+//                }
 
             } else {
                 throw std::runtime_error("JobManager::main(): Unexpected [" + message->getName() + "] message");
