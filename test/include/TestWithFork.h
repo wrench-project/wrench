@@ -42,6 +42,24 @@
                                       } \
                                    }
 
+#define DO_TEST_WITH_FORK_ONE_ARG_EXPECT_FATAL_FAILURE(function, arg, no_stderr){ \
+                                      pid_t pid = fork(); \
+                                      if (pid) { \
+                                        int exit_code; \
+                                        waitpid(pid, &exit_code, 0); \
+                                        ASSERT_NE(WEXITSTATUS(exit_code), 255); \
+                                        ASSERT_NE(WEXITSTATUS(exit_code), 0); \
+                                        if (not no_stderr) { \
+                                             std::cerr << "[ ** Observed a fatal failure (exit code: " + std::to_string(WEXITSTATUS(exit_code)) + "), as expected **]\n"; \
+                                          } \
+                                      } else { \
+                                        if (no_stderr) { close(2); } \
+                                        this->function(arg); \
+                                        exit((::testing::Test::HasFailure() ? 255 : 0)); \
+                                      } \
+                                   }
+
+
 #define DO_TEST_WITH_FORK_ONE_ARG(function, arg){ \
                                       pid_t pid = fork(); \
                                       if (pid) { \
