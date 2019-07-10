@@ -288,8 +288,7 @@ namespace wrench {
                                           msg->answer_mailbox, msg->start_timestamp);
 
         } else {
-            throw std::runtime_error(
-                    "SimpleStorageService::processControlMessage(): Unexpected [" + message->getName() + "] message");
+            throw std::runtime_error("SimpleStorageService::processControlMessage(): Unexpected [" + message->getName() + "] message");
         }
     }
 
