@@ -553,7 +553,7 @@ namespace wrench {
         serviceSanityCheck();
 
         try {
-            S4U_Mailbox::dputMessage(this->mailbox_name, message);
+            S4U_Mailbox::putMessage(this->mailbox_name, message);
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw WorkflowExecutionException(cause);
         }
@@ -673,16 +673,16 @@ namespace wrench {
      */
     void CloudComputeService::processGetExecutionHosts(const std::string &answer_mailbox) {
 
-        try {
+//        try {
             S4U_Mailbox::dputMessage(
                     answer_mailbox,
                     new CloudComputeServiceGetExecutionHostsAnswerMessage(
                             this->execution_hosts,
                             this->getMessagePayloadValue(
                                     CloudComputeServiceMessagePayload::GET_EXECUTION_HOSTS_ANSWER_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            return;
-        }
+//        } catch (std::shared_ptr<NetworkError> &cause) {
+//            return;
+//        }
     }
 
     /**
@@ -782,11 +782,11 @@ namespace wrench {
         }
 
         // Send reply
-        try {
+//        try {
             S4U_Mailbox::dputMessage(answer_mailbox, msg_to_send_back);
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            // Ignore
-        }
+//        } catch (std::shared_ptr<NetworkError> &cause) {
+//            // Ignore
+//        }
         return;
     }
 
@@ -835,11 +835,11 @@ namespace wrench {
                             CloudComputeServiceMessagePayload::SHUTDOWN_VM_ANSWER_MESSAGE_PAYLOAD));
         }
 
-        try {
+//        try {
             S4U_Mailbox::dputMessage(answer_mailbox, msg_to_send_back);
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            // ignore
-        }
+//        } catch (std::shared_ptr<NetworkError> &cause) {
+//            // ignore
+//        }
         return;
     }
 
@@ -1043,12 +1043,12 @@ namespace wrench {
             }
         }
 
-        try {
+//        try {
             S4U_Mailbox::dputMessage(
                     answer_mailbox, msg_to_send_back);
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            // ignore
-        }
+//        } catch (std::shared_ptr<NetworkError> &cause) {
+//            // ignore
+//        }
         return;
     }
 
@@ -1095,11 +1095,11 @@ namespace wrench {
                                     CloudComputeServiceMessagePayload::SUSPEND_VM_ANSWER_MESSAGE_PAYLOAD));
         }
 
-        try {
+//        try {
             S4U_Mailbox::dputMessage(answer_mailbox, msg_to_send_back);
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            // ignore
-        }
+//        } catch (std::shared_ptr<NetworkError> &cause) {
+//            // ignore
+//        }
         return;
     }
 
@@ -1139,11 +1139,11 @@ namespace wrench {
                             CloudComputeServiceMessagePayload::RESUME_VM_ANSWER_MESSAGE_PAYLOAD));
         }
 
-        try {
+//        try {
             S4U_Mailbox::dputMessage(answer_mailbox, msg_to_send_back);
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            // ignore
-        }
+//        } catch (std::shared_ptr<NetworkError> &cause) {
+//            // ignore
+//        }
         return;
     }
 
@@ -1180,11 +1180,11 @@ namespace wrench {
                             CloudComputeServiceMessagePayload::DESTROY_VM_ANSWER_MESSAGE_PAYLOAD));
         }
 
-        try {
+//        try {
             S4U_Mailbox::dputMessage(answer_mailbox, msg_to_send_back);
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            // do nothing, just return
-        }
+//        } catch (std::shared_ptr<NetworkError> &cause) {
+//            // do nothing, just return
+//        }
     }
 
 
@@ -1201,16 +1201,16 @@ namespace wrench {
                                                        std::map<std::string, std::string> &service_specific_args) {
 
         if (not this->supportsStandardJobs()) {
-            try {
+//            try {
                 S4U_Mailbox::dputMessage(
                         answer_mailbox, new ComputeServiceSubmitStandardJobAnswerMessage(
                                 job, this->getSharedPtr<CloudComputeService>(), false, std::shared_ptr<FailureCause>(
                                         new JobTypeNotSupported(job, this->getSharedPtr<CloudComputeService>())),
                                 this->getMessagePayloadValue(
                                         CloudComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
-            } catch (std::shared_ptr<NetworkError> &cause) {
-                return;
-            }
+//            } catch (std::shared_ptr<NetworkError> &cause) {
+//                return;
+//            }
             return;
         } else {
             throw std::runtime_error(
@@ -1232,16 +1232,16 @@ namespace wrench {
                                                     std::map<std::string, std::string> &service_specific_args) {
 
         if (not this->supportsPilotJobs()) {
-            try {
+//            try {
                 S4U_Mailbox::dputMessage(
                         answer_mailbox, new ComputeServiceSubmitPilotJobAnswerMessage(
                                 job, this->getSharedPtr<CloudComputeService>(), false, std::shared_ptr<FailureCause>(
                                         new JobTypeNotSupported(job, this->getSharedPtr<CloudComputeService>())),
                                 this->getMessagePayloadValue(
                                         CloudComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
-            } catch (std::shared_ptr<NetworkError> &cause) {
-                return;
-            }
+//            } catch (std::shared_ptr<NetworkError> &cause) {
+//                return;
+//            }
             return;
         } else {
             throw std::runtime_error(
@@ -1318,11 +1318,11 @@ namespace wrench {
                 dict,
                 this->getMessagePayloadValue(
                         ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD));
-        try {
+//        try {
             S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            return;
-        }
+//        } catch (std::shared_ptr<NetworkError> &cause) {
+//            return;
+//        }
     }
 
     /**

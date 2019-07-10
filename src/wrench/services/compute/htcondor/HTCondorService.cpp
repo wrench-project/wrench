@@ -241,7 +241,7 @@ namespace wrench {
 
         WRENCH_INFO("Asked to run a standard job with %ld tasks", job->getNumTasks());
         if (not this->supportsStandardJobs()) {
-            try {
+//            try {
                 S4U_Mailbox::dputMessage(
                         answer_mailbox,
                         new ComputeServiceSubmitStandardJobAnswerMessage(
@@ -249,25 +249,25 @@ namespace wrench {
                                         new JobTypeNotSupported(job, this->getSharedPtr<HTCondorService>())),
                                 this->getMessagePayloadValue(
                                         HTCondorServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
-            } catch (std::shared_ptr<NetworkError> &cause) {
-                return;
-            }
+//            } catch (std::shared_ptr<NetworkError> &cause) {
+//                return;
+//            }
             return;
         }
 
         this->central_manager->submitStandardJob(job, service_specific_args);
 
         // send positive answer
-        try {
+//        try {
             S4U_Mailbox::dputMessage(
                     answer_mailbox,
                     new ComputeServiceSubmitStandardJobAnswerMessage(
                             job, this->getSharedPtr<HTCondorService>(), true, nullptr, this->getMessagePayloadValue(
                                     HTCondorServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
-            return;
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            return;
-        }
+//            return;
+//        } catch (std::shared_ptr<NetworkError> &cause) {
+//            return;
+//        }
     }
 
     /**

@@ -146,7 +146,7 @@ namespace wrench {
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("network_query_entry");
 
         try {
-            S4U_Mailbox::dputMessage(this->mailbox_name,
+            S4U_Mailbox::putMessage(this->mailbox_name,
                                      new NetworkProximityLookupRequestMessage(answer_mailbox, std::move(hosts),
                                                                               this->getMessagePayloadValue(
                                                                                       NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
@@ -309,15 +309,15 @@ namespace wrench {
                 }
             }
 
-            try {
+//            try {
                 S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                          new NetworkProximityLookupAnswerMessage(msg->hosts, proximity_value, timestamp,
                                                                                  this->getMessagePayloadValue(
                                                                                          NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
-            }
-            catch (std::shared_ptr<NetworkError> &cause) {
-                return true;
-            }
+//            }
+//            catch (std::shared_ptr<NetworkError> &cause) {
+//                return true;
+//            }
             return true;
 
         } else if (auto msg = std::dynamic_pointer_cast<NetworkProximityComputeAnswerMessage>(message)) {
@@ -340,16 +340,16 @@ namespace wrench {
 
 //            unsigned long randNum = (std::rand()%(this->hosts_in_network.size()));
 
-            try {
+//            try {
                 S4U_Mailbox::dputMessage(msg->daemon->mailbox_name,
                                          new NextContactDaemonAnswerMessage(chosen_peer->getHostname(),
                                                                             chosen_peer,
                                                                             chosen_peer->mailbox_name,
                                                                             this->getMessagePayloadValue(
                                                                                     NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD)));
-            } catch (std::shared_ptr<NetworkError> &cause) {
-                return true;
-            }
+//            } catch (std::shared_ptr<NetworkError> &cause) {
+//                return true;
+//            }
             return true;
         } else if (auto msg = std::dynamic_pointer_cast<CoordinateLookupRequestMessage>(message)) {
             std::string requested_host = msg->requested_host;

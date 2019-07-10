@@ -281,10 +281,10 @@ namespace wrench {
             return true;
         }
 
-        if (message == nullptr) {
-            WRENCH_INFO("Got a NULL message... Likely this means we're all done. Aborting!");
-            return false;
-        }
+//        if (message == nullptr) {
+//            WRENCH_INFO("Got a NULL message... Likely this means we're all done. Aborting!");
+//            return false;
+//        }
 
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
 
@@ -306,14 +306,15 @@ namespace wrench {
             }
             // Simulate a lookup overhead
             S4U_Simulation::compute(getPropertyValueAsDouble(FileRegistryServiceProperty::LOOKUP_COMPUTE_COST));
-            try {
+
+//            try {
                 S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                          new FileRegistryFileLookupAnswerMessage(msg->file, locations,
                                                                                  this->getMessagePayloadValue(
                                                                                          FileRegistryServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
-            } catch (std::shared_ptr<NetworkError> &cause) {
-                return true;
-            }
+//            } catch (std::shared_ptr<NetworkError> &cause) {
+//                return true;
+//            }
             return true;
 
         } else if (auto msg = std::dynamic_pointer_cast<FileRegistryFileLookupByProximityRequestMessage>(message)) {
@@ -336,40 +337,40 @@ namespace wrench {
             }
 
             S4U_Simulation::compute(getPropertyValueAsDouble(FileRegistryServiceProperty::LOOKUP_COMPUTE_COST));
-            try {
+//            try {
                 S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                          new FileRegistryFileLookupByProximityAnswerMessage(msg->file,
                                                                                             msg->reference_host,
                                                                                             locations,
                                                                                             this->getMessagePayloadValue(
                                                                                                     FileRegistryServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
-            } catch (std::shared_ptr<NetworkError> &cause) {
-                return true;
-            }
+//            } catch (std::shared_ptr<NetworkError> &cause) {
+//                return true;
+//            }
             return true;
 
         } else if (auto msg = std::dynamic_pointer_cast<FileRegistryAddEntryRequestMessage>(message)) {
             addEntryToDatabase(msg->file, msg->storage_service);
-            try {
+//            try {
                 S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                          new FileRegistryAddEntryAnswerMessage(this->getMessagePayloadValue(
                                                  FileRegistryServiceMessagePayload::ADD_ENTRY_ANSWER_MESSAGE_PAYLOAD)));
-            } catch (std::shared_ptr<NetworkError> &cause) {
-                return true;
-            }
+//            } catch (std::shared_ptr<NetworkError> &cause) {
+//                return true;
+//            }
             return true;
 
         } else if (auto msg = std::dynamic_pointer_cast<FileRegistryRemoveEntryRequestMessage>(message)) {
 
             bool success = removeEntryFromDatabase(msg->file, msg->storage_service);
-            try {
+//            try {
                 S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                          new FileRegistryRemoveEntryAnswerMessage(success,
                                                                                   this->getMessagePayloadValue(
                                                                                           FileRegistryServiceMessagePayload::REMOVE_ENTRY_ANSWER_MESSAGE_PAYLOAD)));
-            } catch (std::shared_ptr<NetworkError> &cause) {
-                return true;
-            }
+//            } catch (std::shared_ptr<NetworkError> &cause) {
+//                return true;
+//            }
             return true;
 
         } else {

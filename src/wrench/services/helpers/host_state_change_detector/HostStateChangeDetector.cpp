@@ -118,12 +118,12 @@ int wrench::HostStateChangeDetector::main() {
 
             WRENCH_INFO("Notifying mailbox '%s' that host '%s' has changed state", this->mailbox_to_notify.c_str(),
                         hostname.c_str());
-            try {
+//            try {
                 S4U_Mailbox::dputMessage(this->mailbox_to_notify, msg);
-            } catch (std::shared_ptr<NetworkError> &e) {
-                WRENCH_INFO("Network error '%s' while notifying mailbox of a host state change ... ignoring",
-                            e->toString().c_str());
-            }
+//            } catch (std::shared_ptr<NetworkError> &e) {
+//                WRENCH_INFO("Network error '%s' while notifying mailbox of a host state change ... ignoring",
+//                            e->toString().c_str());
+//            }
         }
 
         // Speed Changes
@@ -143,12 +143,12 @@ int wrench::HostStateChangeDetector::main() {
 
             WRENCH_INFO("Notifying mailbox '%s' that host '%s' has changed speed", this->mailbox_to_notify.c_str(),
                         hostname.c_str());
-            try {
+//            try {
                 S4U_Mailbox::dputMessage(this->mailbox_to_notify, msg);
-            } catch (std::shared_ptr<NetworkError> &e) {
-                WRENCH_INFO("Network error '%s' while notifying mailbox of a speed state change ... ignoring",
-                            e->toString().c_str());
-            }
+//            } catch (std::shared_ptr<NetworkError> &e) {
+//                WRENCH_INFO("Network error '%s' while notifying mailbox of a speed state change ... ignoring",
+//                            e->toString().c_str());
+//            }
         }
 
 

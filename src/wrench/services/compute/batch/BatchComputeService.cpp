@@ -571,15 +571,15 @@ namespace wrench {
  * @param job
  */
     void BatchComputeService::sendPilotJobExpirationNotification(PilotJob *job) {
-        try {
+//        try {
             S4U_Mailbox::dputMessage(job->popCallbackMailbox(),
                                      new ComputeServicePilotJobExpiredMessage(
                                              job, this->getSharedPtr<BatchComputeService>(),
                                              this->getMessagePayloadValue(
                                                      BatchComputeServiceMessagePayload::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            return; // ignore
-        }
+//        } catch (std::shared_ptr<NetworkError> &cause) {
+//            return; // ignore
+//        }
     }
 
 /**
@@ -1224,7 +1224,7 @@ namespace wrench {
         // Check whether the job type is supported
         if ((job->getWorkflowJob()->getType() == WorkflowJob::STANDARD) and
             (not getPropertyValueAsBoolean(BatchComputeServiceProperty::SUPPORTS_STANDARD_JOBS))) {
-            try {
+//            try {
                 S4U_Mailbox::dputMessage(answer_mailbox,
                                          new ComputeServiceSubmitStandardJobAnswerMessage(
                                                  (StandardJob *) job->getWorkflowJob(),
@@ -1236,14 +1236,14 @@ namespace wrench {
                                                                  this->getSharedPtr<BatchComputeService>())),
                                                  this->getMessagePayloadValue(
                                                          BatchComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
-            } catch (std::shared_ptr<NetworkError> &cause) {
-                return;
-            }
+//            } catch (std::shared_ptr<NetworkError> &cause) {
+//                return;
+//            }
             return;
         } else if ((job->getWorkflowJob()->getType() == WorkflowJob::PILOT) and
                    (not getPropertyValueAsBoolean(BatchComputeServiceProperty::SUPPORTS_PILOT_JOBS)
                    )) {
-            try {
+//            try {
                 S4U_Mailbox::dputMessage(answer_mailbox,
                                          new ComputeServiceSubmitPilotJobAnswerMessage(
                                                  (PilotJob *) job->getWorkflowJob(),
@@ -1255,9 +1255,9 @@ namespace wrench {
                                                                  this->getSharedPtr<BatchComputeService>())),
                                                  this->getMessagePayloadValue(
                                                          BatchComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
-            } catch (std::shared_ptr<NetworkError> &cause) {
-                return;
-            }
+//            } catch (std::shared_ptr<NetworkError> &cause) {
+//                return;
+//            }
             return;
         }
 
@@ -1279,7 +1279,7 @@ namespace wrench {
                  Simulation::getHostMemoryCapacity(this->available_nodes_to_cores.begin()->first))) {
 
                 {
-                    try {
+//                    try {
                         S4U_Mailbox::dputMessage(
                                 answer_mailbox,
                                 new ComputeServiceSubmitStandardJobAnswerMessage(
@@ -1292,7 +1292,7 @@ namespace wrench {
                                                         this->getSharedPtr<BatchComputeService>())),
                                         this->getMessagePayloadValue(
                                                 BatchComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
-                    } catch (std::shared_ptr<NetworkError> &cause) {}
+//                    } catch (std::shared_ptr<NetworkError> &cause) {}
                     return;
                 }
             }
@@ -1301,7 +1301,7 @@ namespace wrench {
         if ((requested_hosts > this->available_nodes_to_cores.size()) or
             (requested_num_cores_per_host >
              Simulation::getHostNumCores(this->available_nodes_to_cores.begin()->first))) {
-            try {
+//            try {
                 S4U_Mailbox::dputMessage(answer_mailbox,
                                          new ComputeServiceSubmitPilotJobAnswerMessage(
                                                  (PilotJob *) job->getWorkflowJob(),
@@ -1313,7 +1313,7 @@ namespace wrench {
                                                                  this->getSharedPtr<BatchComputeService>())),
                                                  this->getMessagePayloadValue(
                                                          BatchComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
-            } catch (std::shared_ptr<NetworkError> &cause) {}
+//            } catch (std::shared_ptr<NetworkError> &cause) {}
             return;
         }
 

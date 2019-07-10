@@ -107,7 +107,7 @@ namespace wrench {
         double time_for_next_measurement = this->getTimeUntilNextMeasurement();
 
         try {
-            S4U_Mailbox::dputMessage(this->network_proximity_service_mailbox,
+            S4U_Mailbox::putMessage(this->network_proximity_service_mailbox,
                                      new NextContactDaemonRequestMessage(this->getSharedPtr<NetworkProximityDaemon>(),
                                                                          this->getMessagePayloadValue(
                                                                                  NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD)));
@@ -150,14 +150,14 @@ namespace wrench {
                     std::pair<std::string, std::string> hosts;
                     hosts = std::make_pair(S4U_Simulation::getHostName(), this->next_host_to_send);
 
-                    try {
+//                    try {
                         S4U_Mailbox::dputMessage(this->network_proximity_service_mailbox,
                                                  new NetworkProximityComputeAnswerMessage(hosts, proximityValue,
                                                                                           this->getMessagePayloadValue(
                                                                                                   NetworkProximityServiceMessagePayload::NETWORK_DAEMON_MEASUREMENT_REPORTING_PAYLOAD)));
-                    } catch (std::shared_ptr<NetworkError> &cause) {
-                        // Couldn't report measurement... oh well.. ignoring
-                    }
+//                    } catch (std::shared_ptr<NetworkError> &cause) {
+//                        // Couldn't report measurement... oh well.. ignoring
+//                    }
 
                     next_host_to_send = "";
                     next_mailbox_to_send = "";
@@ -167,9 +167,8 @@ namespace wrench {
                 } else {
                     time_for_next_measurement = this->getTimeUntilNextMeasurement();
 
-
                     try {
-                        S4U_Mailbox::dputMessage(this->network_proximity_service_mailbox,
+                        S4U_Mailbox::putMessage(this->network_proximity_service_mailbox,
                                                  new NextContactDaemonRequestMessage(
                                                          this->getSharedPtr<NetworkProximityDaemon>(),
                                                          this->getMessagePayloadValue(
