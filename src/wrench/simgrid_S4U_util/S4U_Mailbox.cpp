@@ -53,11 +53,11 @@ namespace wrench {
             throw std::shared_ptr<NetworkError>(
                     new NetworkError(NetworkError::RECEIVING, NetworkError::TIMEOUT, mailbox_name));
         }
-        // This is just because it seems that after something like a killAll() we get a nullptr
-        if (msg == nullptr) {
-            throw std::shared_ptr<NetworkError>(
-                    new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, mailbox_name));
-        }
+//        // This is just because it seems that after something like a killAll() we get a nullptr
+//        if (msg == nullptr) {
+//            throw std::shared_ptr<NetworkError>(
+//                    new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, mailbox_name));
+//        }
 
 #ifdef MESSAGE_MANAGER
             MessageManager::removeReceivedMessage(mailbox_name, msg);
@@ -96,11 +96,11 @@ namespace wrench {
                     new NetworkError(NetworkError::RECEIVING, NetworkError::TIMEOUT, mailbox_name));
         }
 
-        // This is just because it seems that after something like a killAll() we get a nullptr
-        if (data == nullptr) {
-            throw std::shared_ptr<NetworkError>(
-                    new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, mailbox_name));
-        }
+//        // This is just because it seems that after something like a killAll() we get a nullptr
+//        if (data == nullptr) {
+//            throw std::shared_ptr<NetworkError>(
+//                    new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, mailbox_name));
+//        }
 
         auto msg = static_cast<SimulationMessage *>(data);
 
@@ -146,7 +146,6 @@ namespace wrench {
      * @param mailbox_name: the mailbox name
      * @param msg: the SimulationMessage
      *
-     * @throw std::shared_ptr<NetworkError>
      */
     void S4U_Mailbox::dputMessage(std::string mailbox_name, SimulationMessage *msg) {
 
@@ -158,18 +157,18 @@ namespace wrench {
 
         simgrid::s4u::Mailbox *mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
 
-        try {
+//        try {
 #ifdef MESSAGE_MANAGER
             MessageManager::manageMessage(mailbox_name, msg);
 #endif
             mailbox->put_init(msg, (uint64_t) msg->payload)->detach();
-        } catch (simgrid::NetworkFailureException &e) {
-            throw std::shared_ptr<NetworkError>(
-                    new NetworkError(NetworkError::SENDING, NetworkError::FAILURE, mailbox_name));
-        } catch (simgrid::TimeoutException &e) {
-            throw std::shared_ptr<NetworkError>(
-                    new NetworkError(NetworkError::SENDING, NetworkError::TIMEOUT, mailbox_name));
-        }
+//        } catch (simgrid::NetworkFailureException &e) {
+//            throw std::shared_ptr<NetworkError>(
+//                    new NetworkError(NetworkError::SENDING, NetworkError::FAILURE, mailbox_name));
+//        } catch (simgrid::TimeoutException &e) {
+//            throw std::shared_ptr<NetworkError>(
+//                    new NetworkError(NetworkError::SENDING, NetworkError::TIMEOUT, mailbox_name));
+//        }
     }
 
     /**

@@ -151,7 +151,7 @@ void FileRegistryLinkFailureTest::do_FileRegistryLinkFailureSimpleRandom_Test() 
     }
 
     // Create a file registry service
-    double message_payload = 1;
+    double message_payload = 2;
     std::map<std::string, double> payloads =
             {
                     {wrench::FileRegistryServiceMessagePayload::ADD_ENTRY_REQUEST_MESSAGE_PAYLOAD, message_payload},

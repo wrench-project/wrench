@@ -212,14 +212,14 @@ namespace wrench {
         } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFreeSpaceRequestMessage>(message)) {
             double free_space = this->capacity - this->occupied_space;
 
-            try {
+//            try {
                 S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                          new StorageServiceFreeSpaceAnswerMessage(free_space,
                                                                                   this->getMessagePayloadValue(
                                                                                           SimpleStorageServiceMessagePayload::FREE_SPACE_ANSWER_MESSAGE_PAYLOAD)));
-            } catch (std::shared_ptr<NetworkError> &cause) {
-                return false;
-            }
+//            } catch (std::shared_ptr<NetworkError> &cause) {
+//                return false;
+//            }
             return true;
 
         } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFileDeleteRequestMessage>(message)) {
@@ -243,7 +243,7 @@ namespace wrench {
 
 
             // Send an asynchronous reply
-            try {
+//            try {
                 S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                          new StorageServiceFileDeleteAnswerMessage(msg->file,
                                                                                    this->getSharedPtr<SimpleStorageService>(),
@@ -251,9 +251,9 @@ namespace wrench {
                                                                                    failure_cause,
                                                                                    this->getMessagePayloadValue(
                                                                                            SimpleStorageServiceMessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD)));
-            } catch (std::shared_ptr<NetworkError> &cause) {
-                return true;
-            }
+//            } catch (std::shared_ptr<NetworkError> &cause) {
+//                return true;
+//            }
 
             return true;
 
@@ -262,14 +262,14 @@ namespace wrench {
             std::set<WorkflowFile *> files = this->stored_files[msg->dst_partition];
 
             bool file_found = (files.find(msg->file) != files.end());
-            try {
+//            try {
                 S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                          new StorageServiceFileLookupAnswerMessage(msg->file, file_found,
                                                                                    this->getMessagePayloadValue(
                                                                                            SimpleStorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
-            } catch (std::shared_ptr<NetworkError> &cause) {
-                return true;
-            }
+//            } catch (std::shared_ptr<NetworkError> &cause) {
+//                return true;
+//            }
 
             return true;
 
@@ -336,7 +336,7 @@ namespace wrench {
         std::string file_reception_mailbox = S4U_Mailbox::generateUniqueMailboxName("file_reception");
 
         // Reply with a "go ahead, send me the file" message
-        try {
+//        try {
             S4U_Mailbox::dputMessage(answer_mailbox,
                                      new StorageServiceFileWriteAnswerMessage(file,
                                                                               this->getSharedPtr<SimpleStorageService>(),
@@ -345,9 +345,9 @@ namespace wrench {
                                                                               file_reception_mailbox,
                                                                               this->getMessagePayloadValue(
                                                                                       SimpleStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            return true;
-        }
+//        } catch (std::shared_ptr<NetworkError> &cause) {
+//            return true;
+//        }
         this->network_connection_manager->addConnection(std::unique_ptr<NetworkConnection>(
                 new NetworkConnection(NetworkConnection::INCOMING_DATA, file, dst_partition, file_reception_mailbox,
                                       "")));
@@ -388,16 +388,16 @@ namespace wrench {
         }
 
         // Send back the corresponding ack, asynchronously and in a "fire and forget" fashion
-        try {
+//        try {
             S4U_Mailbox::dputMessage(answer_mailbox,
                                      new StorageServiceFileReadAnswerMessage(file,
                                                                              this->getSharedPtr<SimpleStorageService>(),
                                                                              success, failure_cause,
                                                                              this->getMessagePayloadValue(
                                                                                      SimpleStorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            return true;
-        }
+//        } catch (std::shared_ptr<NetworkError> &cause) {
+//            return true;
+//        }
 
         // If success, then follow up with sending the file (ASYNCHRONOUSLY!)
         if (success) {
@@ -554,7 +554,7 @@ namespace wrench {
                         new SimulationTimestampFileCopyFailure(connection->start_timestamp));
             }
 
-            try {
+//            try {
                 S4U_Mailbox::dputMessage(connection->ack_mailbox,
                                          new StorageServiceFileCopyAnswerMessage(connection->file,
                                                                                  this->getSharedPtr<SimpleStorageService>(),
@@ -563,9 +563,9 @@ namespace wrench {
                                                                                  false, connection->failure_cause,
                                                                                  this->getMessagePayloadValue(
                                                                                          SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
-            } catch (std::shared_ptr<NetworkError> &cause) {
-                return true;
-            }
+//            } catch (std::shared_ptr<NetworkError> &cause) {
+//                return true;
+//            }
             return true;
         }
 
@@ -592,7 +592,7 @@ namespace wrench {
             if (not connection->ack_mailbox.empty()) {
                 WRENCH_INFO(
                         "Sending back an ack since this was a file copy and some client is waiting for me to say something");
-                try {
+//                try {
                     S4U_Mailbox::dputMessage(connection->ack_mailbox,
                                              new StorageServiceFileCopyAnswerMessage(connection->file,
                                                                                      this->getSharedPtr<SimpleStorageService>(),
@@ -603,9 +603,9 @@ namespace wrench {
                                                                                      nullptr,
                                                                                      this->getMessagePayloadValue(
                                                                                              SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
-                } catch (std::shared_ptr<NetworkError> &cause) {
-                    // do nothing
-                }
+//                } catch (std::shared_ptr<NetworkError> &cause) {
+//                    // do nothing
+//                }
 
             }
             return true;

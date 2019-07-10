@@ -277,7 +277,7 @@ namespace wrench {
 
       WRENCH_INFO("Asked to run a standard job with %ld tasks", job->getNumTasks());
       if (not this->supportsStandardJobs()) {
-        try {
+//        try {
           S4U_Mailbox::dputMessage(
                   answer_mailbox,
                   new ComputeServiceSubmitStandardJobAnswerMessage(
@@ -285,25 +285,25 @@ namespace wrench {
                                   new JobTypeNotSupported(job, this->getSharedPtr<HTCondorComputeService>())),
                           this->getMessagePayloadValue(
                                   HTCondorComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-          return;
-        }
+//        } catch (std::shared_ptr<NetworkError> &cause) {
+//          return;
+//        }
         return;
       }
 
       this->central_manager->submitStandardJob(job, service_specific_args);
 
       // send positive answer
-      try {
+//      try {
         S4U_Mailbox::dputMessage(
                 answer_mailbox,
                 new ComputeServiceSubmitStandardJobAnswerMessage(
                         job, this->getSharedPtr<HTCondorComputeService>(), true, nullptr, this->getMessagePayloadValue(
                                 HTCondorComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
         return;
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        return;
-      }
+//      } catch (std::shared_ptr<NetworkError> &cause) {
+//        return;
+//      }
     }
 
     /**
@@ -320,7 +320,7 @@ namespace wrench {
 
       WRENCH_INFO("Asked to run a pilot job");
       if (not this->supportsPilotJobs()) {
-        try {
+//        try {
           S4U_Mailbox::dputMessage(
                   answer_mailbox,
                   new ComputeServiceSubmitPilotJobAnswerMessage(
@@ -328,25 +328,25 @@ namespace wrench {
                                   new JobTypeNotSupported(job, this->getSharedPtr<HTCondorComputeService>())),
                           this->getMessagePayloadValue(
                                   HTCondorComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-          return;
-        }
+//        } catch (std::shared_ptr<NetworkError> &cause) {
+//          return;
+//        }
         return;
       }
 
       this->central_manager->submitPilotJob(job, service_specific_args);
 
       // send positive answer
-      try {
+//      try {
         S4U_Mailbox::dputMessage(
                 answer_mailbox,
                 new ComputeServiceSubmitPilotJobAnswerMessage(
                         job, this->getSharedPtr<HTCondorComputeService>(), true, nullptr, this->getMessagePayloadValue(
                                 HTCondorComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
         return;
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        return;
-      }
+//      } catch (std::shared_ptr<NetworkError> &cause) {
+//        return;
+//      }
     }
 
     /**
