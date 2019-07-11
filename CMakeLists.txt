@@ -325,7 +325,7 @@ set(TEST_FILES
 # wrench library
 find_library(SIMGRID_LIBRARY NAMES simgrid HINTS ${SIMGRID_INSTALL_PATH}/lib NO_DEFAULT_PATH)
 if (NOT SIMGRID_LIBRARY)
-    message(FATAL_ERROR "SimGrid library not found. Perhaps an invalid SIMGRID_INSTALL_PATH specification (${SIMGRID_INSTALL_PATH}?")
+    message(FATAL_ERROR "SimGrid library not found. Perhaps an invalid SIMGRID_INSTALL_PATH specification (${SIMGRID_INSTALL_PATH})?")
 endif()
 
 find_library(PUGIXML_LIBRARY NAMES pugixml)
