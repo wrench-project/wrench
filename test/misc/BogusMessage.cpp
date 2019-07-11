@@ -115,6 +115,9 @@ TEST_F(BogusMessageTest, FileRegistryService) {
 TEST_F(BogusMessageTest, SimpleStorage) {
     DO_TEST_WITH_FORK_ONE_ARG_EXPECT_FATAL_FAILURE(do_BogusMessage_Test, "simple_storage", true);
 }
+TEST_F(BogusMessageTest, BareMetalCompute) {
+    DO_TEST_WITH_FORK_ONE_ARG_EXPECT_FATAL_FAILURE(do_BogusMessage_Test, "bare_metal_compute", true);
+}
 
 void BogusMessageTest::do_BogusMessage_Test(std::string service_type) {
 
@@ -137,6 +140,11 @@ void BogusMessageTest::do_BogusMessage_Test(std::string service_type) {
         this->service = simulation->add(new wrench::FileRegistryService(hostname));
     } else if (service_type == "simple_storage") {
         this->service = simulation->add(new wrench::SimpleStorageService(hostname, 10.0));
+    } else if (service_type == "bare_metal_compute") {
+        this->service = simulation->add(
+                new wrench::BareMetalComputeService(hostname,
+                                                    {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},100.0,
+                                                    {}));
     }
 
     // Create a WMS
