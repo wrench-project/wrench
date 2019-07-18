@@ -153,6 +153,7 @@ private:
         } catch (std::invalid_argument &) {
         }
 
+
         // Copy a file to a storage service that doesn't have enough space
         try {
             this->test->storage_service_100->copyFile(this->test->file_500, this->test->storage_service_1000);
@@ -172,7 +173,6 @@ private:
         } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error("Should be able to store a file to a storage service that has enough capacity");
         }
-
 
         // Send a free space request
         double free_space;
