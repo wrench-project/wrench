@@ -126,8 +126,6 @@ set(HEADER_FILES
         include/wrench/util/PointerUtil.h
         include/wrench/util/MessageManager.h
         include/wrench/util/TraceFileLoader.h
-        include/wrench/services/storage/simple/NetworkConnectionManager.h
-        include/wrench/services/storage/simple/NetworkConnection.h
         include/wrench/wms/scheduler/PilotJobScheduler.h
         include/wrench/wms/scheduler/StandardJobScheduler.h
         include/wrench/util/UnitParser.h
@@ -165,6 +163,8 @@ set(SOURCE_FILES
         src/wrench/services/file_registry/FileRegistryService.cpp
         src/wrench/services/storage/StorageService.cpp
         src/wrench/services/storage/simple/SimpleStorageService.cpp
+        src/wrench/services/storage/storage_helpers/DataCommunicationThread.cpp
+        src/wrench/services/storage/storage_helpers/DataCommunicationThread.h
         src/wrench/services/Service.cpp
         src/wrench/services/ServiceProperty.cpp
         src/wrench/services/ServiceMessagePayload.cpp
@@ -235,8 +235,6 @@ set(SOURCE_FILES
         src/wrench/util/PointerUtil.cpp
         src/wrench/util/MessageManager.cpp
         src/wrench/services/compute/batch/TraceFileLoader.cpp
-        src/wrench/services/storage/simple/NetworkConnectionManager.cpp
-        src/wrench/services/storage/simple/NetworkConnection.cpp
         src/wrench/util/UnitParser.cpp
         src/wrench/simulation/SimulationTimestampTypes.cpp
         )
@@ -254,7 +252,6 @@ set(TEST_FILES
         test/workflow/WorkflowLoadFromDAXTest.cpp
         test/workflow/WorkflowLoadFromJSONTest.cpp
         test/compute_services/BareMetalComputeService/BareMetalComputeServiceOneTaskTest.cpp
-        test/storage_services/SimpleStorageService/InternalNetworkConnectionTest.cpp
         test/storage_services/SimpleStorageService/SimpleStorageServiceFunctionalTest.cpp
         test/storage_services/SimpleStorageService/SimpleStorageServicePerformanceTest.cpp
         test/storage_services/SimpleStorageService/SimpleStorageServiceLimitedConnectionsTest.cpp
@@ -320,6 +317,9 @@ set(TEST_FILES
         test/simulated_failures/failure_test_util/ComputerVictim.h
         test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.cpp
         test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.h
+        src/wrench/services/storage/storage_helpers/DataCommunicationThread.cpp
+        src/wrench/services/storage/storage_helpers/DataCommunicationThread.h
+        src/wrench/services/storage/storage_helpers/DataCommunicationThreadMessage.h
         )
 
 # wrench library
