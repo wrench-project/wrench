@@ -11,8 +11,6 @@
 #define WRENCH_SIMPLESTORAGESERVICE_H
 
 
-#include <wrench/services/storage/simple/NetworkConnection.h>
-#include <wrench/services/storage/simple/NetworkConnectionManager.h>
 #include <services/storage/storage_helpers/DataCommunicationThread.h>
 #include "wrench/services/storage/StorageService.h"
 #include "SimpleStorageServiceProperty.h"
@@ -118,8 +116,6 @@ namespace wrench {
                 SimulationTimestampFileCopyStart *start_timestamp);
 
         unsigned long num_concurrent_connections;
-
-//        std::unique_ptr<NetworkConnectionManager> network_connection_manager;
 
         void startPendingDataCommunications();
 

@@ -17,6 +17,7 @@
 namespace wrench {
 
     class WorkflowFile;
+    class SimulationTimestampFileCopyStart;
 
     /** @brief A help class that implements the concept of a communication
      *  thread that performs a data communication
