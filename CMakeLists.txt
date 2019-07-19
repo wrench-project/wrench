@@ -320,7 +320,7 @@ set(TEST_FILES
         src/wrench/services/storage/storage_helpers/DataCommunicationThread.cpp
         src/wrench/services/storage/storage_helpers/DataCommunicationThread.h
         src/wrench/services/storage/storage_helpers/DataCommunicationThreadMessage.h
-        )
+        test/simulation/S4U_MailboxTest.cpp test/simulation/S4U_MailboxTest.h)
 
 # wrench library
 find_library(SIMGRID_LIBRARY NAMES simgrid HINTS ${SIMGRID_INSTALL_PATH}/lib NO_DEFAULT_PATH)
