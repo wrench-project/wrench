@@ -74,17 +74,28 @@ private:
             /** SENDER **/
 
             // One send
-            auto pending_send = wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox_name, new wrench::SimulationMessage("foo", 10));
+            auto pending_send = wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox_name, new wrench::SimulationMessage("foo", 100));
             pending_send->wait();
 
             // Two sends, no timeout
             std::vector<std::shared_ptr<wrench::S4U_PendingCommunication>> sends;
-            sends.push_back(wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox_name, new wrench::SimulationMessage("foo1", 10)));
-            sends.push_back(wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox_name, new wrench::SimulationMessage("foo2", 10)));
+            sends.push_back(wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox_name, new wrench::SimulationMessage("foo1", 100)));
+            sends.push_back(wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox_name, new wrench::SimulationMessage("foo2", 100)));
             index = wrench::S4U_PendingCommunication::waitForSomethingToHappen(sends, -1);
             sends.at(index)->wait();
             index = wrench::S4U_PendingCommunication::waitForSomethingToHappen(sends, -1);
             sends.at(index)->wait();
+
+            // Two sends, timeout
+            std::vector<std::shared_ptr<wrench::S4U_PendingCommunication>> sends_timeout;
+            sends_timeout.push_back(wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox_name, new wrench::SimulationMessage("foo1", 100)));
+            sends_timeout.push_back(wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox_name, new wrench::SimulationMessage("foo2", 100)));
+            WRENCH_INFO("===> HERE");
+            index = wrench::S4U_PendingCommunication::waitForSomethingToHappen(sends, 1);
+            WRENCH_INFO("===> THERE: %ld", index);
+            sends_timeout.at(index)->wait();
+            index = wrench::S4U_PendingCommunication::waitForSomethingToHappen(sends, 1);
+            sends_timeout.at(index)->wait();
 
         } else {
             /** RECEIVER **/
@@ -101,6 +112,10 @@ private:
             recvs.at(index)->wait();
             index = wrench::S4U_PendingCommunication::waitForSomethingToHappen(recvs, -1);
             recvs.at(index)->wait();
+
+            // Two recvs (sends are timing out)
+            wrench::S4U_Mailbox::getMessage(this->test->wms2->mailbox_name);
+            wrench::S4U_Mailbox::getMessage(this->test->wms2->mailbox_name);
 
         }
 
