@@ -291,16 +291,17 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param operation_type: NetworkError:OperationType::SENDING or NetworkError::OperationType::RECEIVING
+     * @param operation_type: NetworkError:OperationType::SENDING or NetworkError::OperationType::RECEIVING or
+     *        NetworkError::OperationType::UNKNOWN
      * @param error_type: the error type 
-     * @param mailbox: the name of a mailbox
+     * @param mailbox: the name of a mailbox (or "" if unknown)
      */
     NetworkError::NetworkError(NetworkError::OperationType operation_type,
                                NetworkError::ErrorType error_type,
                                std::string mailbox) {
-        if (mailbox.empty()) {
-            throw std::invalid_argument("NetworkError::NetworkError(): invalid arguments");
-        }
+//        if (mailbox.empty()) {
+//            throw std::invalid_argument("NetworkError::NetworkError(): invalid arguments");
+//        }
         this->operation_type = operation_type;
         this->error_type = error_type;
         this->mailbox = mailbox;
