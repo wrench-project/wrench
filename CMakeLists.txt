@@ -163,8 +163,8 @@ set(SOURCE_FILES
         src/wrench/services/file_registry/FileRegistryService.cpp
         src/wrench/services/storage/StorageService.cpp
         src/wrench/services/storage/simple/SimpleStorageService.cpp
-        src/wrench/services/storage/storage_helpers/DataCommunicationThread.cpp
-        src/wrench/services/storage/storage_helpers/DataCommunicationThread.h
+        src/wrench/services/storage/storage_helpers/FileTransferThread.cpp
+        src/wrench/services/storage/storage_helpers/FileTransferThread.h
         src/wrench/services/Service.cpp
         src/wrench/services/ServiceProperty.cpp
         src/wrench/services/ServiceMessagePayload.cpp
@@ -317,9 +317,9 @@ set(TEST_FILES
         test/simulated_failures/failure_test_util/ComputerVictim.h
         test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.cpp
         test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.h
-        src/wrench/services/storage/storage_helpers/DataCommunicationThread.cpp
-        src/wrench/services/storage/storage_helpers/DataCommunicationThread.h
-        src/wrench/services/storage/storage_helpers/DataCommunicationThreadMessage.h
+        src/wrench/services/storage/storage_helpers/FileTransferThread.cpp
+        src/wrench/services/storage/storage_helpers/FileTransferThread.h
+        src/wrench/services/storage/storage_helpers/FileTransferThreadMessage.h
         test/simulation/S4U_MailboxTest.cpp)
 
 # wrench library

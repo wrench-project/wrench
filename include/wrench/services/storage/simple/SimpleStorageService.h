@@ -11,7 +11,7 @@
 #define WRENCH_SIMPLESTORAGESERVICE_H
 
 
-#include <services/storage/storage_helpers/DataCommunicationThread.h>
+#include <services/storage/storage_helpers/FileTransferThread.h>
 #include "wrench/services/storage/StorageService.h"
 #include "SimpleStorageServiceProperty.h"
 #include "SimpleStorageServiceMessagePayload.h"
@@ -33,7 +33,7 @@ namespace wrench {
     private:
         std::map<std::string, std::string> default_property_values = {
                  {SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS,  "infinity"},
-                 {SimpleStorageServiceProperty::SELF_CONNECTION_DELAY,  "0"},
+                 {SimpleStorageServiceProperty::LOCAL_COPY_DATA_RATE,  "infinity"},
                 };
 
         std::map<std::string, double> default_messagepayload_values = {
@@ -90,10 +90,6 @@ namespace wrench {
 
         bool processNextMessage();
 
-//        bool processDataConnection(std::unique_ptr<NetworkConnection> connection);
-//        bool processIncomingDataConnection(std::unique_ptr<NetworkConnection> connection);
-//        bool processOutgoingDataConnection(std::unique_ptr<NetworkConnection> connection);
-
         unsigned long getNewUniqueNumber();
 
         bool processFileWriteRequest(WorkflowFile *file, std::string dst_dir, std::string answer_mailbox);
@@ -105,11 +101,11 @@ namespace wrench {
                 std::string src_dir, std::string dst_dir,
                 std::string answer_mailbox, SimulationTimestampFileCopyStart *start_timestamp);
 
-        bool processDataCommunicationThreadNotification(
-                std::shared_ptr<DataCommunicationThread> dct,
+        bool processFileTransferThreadNotification(
+                std::shared_ptr<FileTransferThread> ftt,
                 WorkflowFile *file,
-                DataCommunicationThread::DataCommunicationType communication_type,
-                std::string partition,
+                std::pair<FileTransferThread::LocationType, std::string> src,
+                std::pair<FileTransferThread::LocationType, std::string> dst,
                 bool success,
                 std::shared_ptr<FailureCause> failure_cause,
                 std::string answer_mailbox_if_copy,
@@ -117,10 +113,12 @@ namespace wrench {
 
         unsigned long num_concurrent_connections;
 
-        void startPendingDataCommunications();
+        void startPendingFileTransferThread();
 
-        std::deque<std::shared_ptr<DataCommunicationThread>> pending_data_communications;
-        std::set<std::shared_ptr<DataCommunicationThread>> running_data_communications;
+        std::deque<std::shared_ptr<FileTransferThread>> pending_file_transfer_threads;
+        std::set<std::shared_ptr<FileTransferThread>> running_file_transfer_threads;
+
+        double local_copy_data_transfer_rate;
 
 
     };

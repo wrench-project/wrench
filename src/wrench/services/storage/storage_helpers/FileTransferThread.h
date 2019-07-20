@@ -7,8 +7,8 @@
  * (at your option) any later version.
  */
 
-#ifndef WRENCH_DATACOMMUNICATIONTHREAD_H
-#define WRENCH_DATACOMMUNICATIONTHREAD_H
+#ifndef WRENCH_FILETRANSFERTHREAD_H
+#define WRENCH_FILETRANSFERTHREAD_H
 
 #include <string>
 #include <wrench/simgrid_S4U_util/S4U_Daemon.h>
@@ -20,43 +20,45 @@ namespace wrench {
     class SimulationTimestampFileCopyStart;
 
     /** @brief A help class that implements the concept of a communication
-     *  thread that performs a data communication
+     *  thread that performs a file transfer
      */
-    class DataCommunicationThread : public Service {
+    class FileTransferThread : public Service {
 
     public:
-        /** @brief An enumerated type that denotes whether the communication thread is
-         * sending or receiving data
+
+        /** @brief An enumerated type that denotes whether a src/dst
+         * is local partition or a (remote) mailbox
          */
-        enum DataCommunicationType {
-            RECEIVING,
-            SENDING,
+        enum LocationType {
+            LOCAL_PARTITION,
+            MAILBOX
         };
 
-        DataCommunicationThread(std::string hostname,
+
+        FileTransferThread(std::string hostname,
                                 WorkflowFile *file,
-                                std::string partition,
-                                DataCommunicationType communication_type,
-                                std::string data_mailbox,
+                                std::pair<LocationType, std::string> src,
+                                std::pair<LocationType, std::string> dst,
                                 std::string answer_mailbox_if_copy,
                                 std::string mailbox_to_notify,
+                                double local_copy_data_transfer_rate,
                                 SimulationTimestampFileCopyStart *start_timestamp = nullptr);
 
         int main() override;
         void cleanup(bool has_returned_from_main, int return_value) override;
 
 
-            private:
+    private:
         WorkflowFile *file;
-        std::string partition;
-        DataCommunicationType communication_type;
-        std::string data_mailbox;
+        std::pair<LocationType, std::string> src;
+        std::pair<LocationType, std::string> dst;
         std::string answer_mailbox_if_copy;
         std::string mailbox_to_notify;
+        double local_copy_data_transfer_rate;
         SimulationTimestampFileCopyStart *start_timestamp;
     };
 
 }
 
-#endif //WRENCH_DATACOMMUNICATIONTHREAD_H
+#endif //WRENCH_FILETRANSFERTHREAD_H
 
