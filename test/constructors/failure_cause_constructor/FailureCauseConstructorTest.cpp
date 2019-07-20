@@ -38,8 +38,11 @@ TEST_F(FailureCauseConstructorTest, NetworkError) {
   ASSERT_NO_THROW(cause = new wrench::NetworkError(wrench::NetworkError::RECEIVING, wrench::NetworkError::TIMEOUT, "mailbox"));
   ASSERT_NO_THROW(cause = new wrench::NetworkError(wrench::NetworkError::SENDING, wrench::NetworkError::FAILURE, "mailbox"));
   ASSERT_NO_THROW(cause = new wrench::NetworkError(wrench::NetworkError::RECEIVING, wrench::NetworkError::FAILURE, "mailbox"));
+  ASSERT_NO_THROW(cause = new wrench::NetworkError(wrench::NetworkError::UNKNOWN, wrench::NetworkError::FAILURE, "mailbox"));
+  ASSERT_NO_THROW(cause = new wrench::NetworkError(wrench::NetworkError::UNKNOWN, wrench::NetworkError::TIMEOUT, "mailbox"));
 
-  ASSERT_THROW(cause = new wrench::NetworkError(wrench::NetworkError::SENDING, wrench::NetworkError::TIMEOUT, ""), std::invalid_argument);
+  ASSERT_NO_THROW(cause = new wrench::NetworkError(wrench::NetworkError::UNKNOWN, wrench::NetworkError::TIMEOUT, ""));
+
 
   ASSERT_NO_THROW(cause = new wrench::NetworkError(wrench::NetworkError::SENDING, wrench::NetworkError::TIMEOUT, "mailbox"));
   ASSERT_EQ(cause->isTimeout(), true);
