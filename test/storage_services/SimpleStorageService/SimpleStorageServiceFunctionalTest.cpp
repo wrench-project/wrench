@@ -532,6 +532,10 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
     ASSERT_THROW(storage_service_100 = simulation->add(
             new wrench::SimpleStorageService(hostname, -100.0)), std::invalid_argument);
 
+    // Create a Storage Service with a bogus property
+    ASSERT_THROW(storage_service_100 = simulation->add(
+            new wrench::SimpleStorageService(hostname, -100.0, {{wrench::SimpleStorageServiceProperty::LOCAL_COPY_DATA_RATE, "BOGUS"}})), std::invalid_argument);
+
     // Create Three Storage Services
     ASSERT_NO_THROW(storage_service_100 = simulation->add(
             new wrench::SimpleStorageService(hostname, 100.0)));

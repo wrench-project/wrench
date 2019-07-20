@@ -64,26 +64,24 @@ namespace wrench {
     ) :
             SimpleStorageService(std::move(hostname), capacity, property_list, messagepayload_list,
                                  "_" + std::to_string(getNewUniqueNumber())) {
-        if (this->getPropertyValueAsString("MAX_NUM_CONCURRENT_DATA_CONNECTIONS") == "infinity") {
-            this->num_concurrent_connections = ULONG_MAX;
-        } else {
-            this->num_concurrent_connections = (unsigned long) (this->getPropertyValueAsDouble(
-                    "MAX_NUM_CONCURRENT_DATA_CONNECTIONS"));
-        }
 
+        this->num_concurrent_connections =  this->getPropertyValueAsUnsignedLong(
+                SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS);
+        this->local_copy_data_transfer_rate = this->getPropertyValueAsDouble(
+                SimpleStorageServiceProperty::LOCAL_COPY_DATA_RATE);
 
     }
 
-    /**
-     * @brief Private constructor
-     *
-     * @param hostname: the name of the host on which to start the service
-     * @param capacity: the storage capacity in bytes
-     * @param property_list: the property list
-     * @param suffix: the suffix (for the service name)
-     *
-     * @throw std::invalid_argument
-     */
+/**
+ * @brief Private constructor
+ *
+ * @param hostname: the name of the host on which to start the service
+ * @param capacity: the storage capacity in bytes
+ * @param property_list: the property list
+ * @param suffix: the suffix (for the service name)
+ *
+ * @throw std::invalid_argument
+ */
     SimpleStorageService::SimpleStorageService(
             std::string hostname,
             double capacity,
@@ -108,11 +106,11 @@ namespace wrench {
 
     }
 
-    /**
-     * @brief Main method of the daemon
-     *
-     * @return 0 on termination
-     */
+/**
+ * @brief Main method of the daemon
+ *
+ * @return 0 on termination
+ */
     int SimpleStorageService::main() {
 
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_CYAN);
@@ -148,11 +146,11 @@ namespace wrench {
     }
 
 
-    /**
-     * @brief Process a received control message
-     *
-     * @return false if the daemon should terminate
-     */
+/**
+ * @brief Process a received control message
+ *
+ * @return false if the daemon should terminate
+ */
     bool SimpleStorageService::processNextMessage() {
 
         S4U_Simulation::computeZeroFlop();
@@ -258,14 +256,14 @@ namespace wrench {
         }
     }
 
-    /**
-     * @brief Handle a file write request
-     *
-     * @param file: the file to write
-     * @param dst_partition: the file partition to write the file to
-     * @param answer_mailbox: the mailbox to which the reply should be sent
-     * @return true if this process should keep running
-     */
+/**
+ * @brief Handle a file write request
+ *
+ * @param file: the file to write
+ * @param dst_partition: the file partition to write the file to
+ * @param answer_mailbox: the mailbox to which the reply should be sent
+ * @return true if this process should keep running
+ */
     bool SimpleStorageService::processFileWriteRequest(WorkflowFile *file, std::string dst_partition,
                                                        std::string answer_mailbox) {
 
@@ -325,14 +323,14 @@ namespace wrench {
     }
 
 
-    /**
-     * @brief Handle a file read request
-     * @param file: the file
-     * @param src_partition: the file partition to read the file from
-     * @param answer_mailbox: the mailbox to which the answer should be sent
-     * @param mailbox_to_receive_the_file_content: the mailbox to which the file will be sent
-     * @return
-     */
+/**
+ * @brief Handle a file read request
+ * @param file: the file
+ * @param src_partition: the file partition to read the file from
+ * @param answer_mailbox: the mailbox to which the answer should be sent
+ * @param mailbox_to_receive_the_file_content: the mailbox to which the file will be sent
+ * @return
+ */
     bool SimpleStorageService::processFileReadRequest(WorkflowFile *file, std::string src_partition,
                                                       std::string answer_mailbox,
                                                       std::string mailbox_to_receive_the_file_content) {
@@ -380,15 +378,15 @@ namespace wrench {
         return true;
     }
 
-    /**
-     * @brief Handle a file copy request
-     * @param file: the file
-     * @param src: the storage service that holds the file
-     * @param src_partition: the file partition from where the file will be copied
-     * @param dst_partition: the file partition to where the file will be copied
-     * @param answer_mailbox: the mailbox to which the answer should be sent
-     * @return
-     */
+/**
+ * @brief Handle a file copy request
+ * @param file: the file
+ * @param src: the storage service that holds the file
+ * @param src_partition: the file partition from where the file will be copied
+ * @param dst_partition: the file partition to where the file will be copied
+ * @param answer_mailbox: the mailbox to which the answer should be sent
+ * @return
+ */
     bool
     SimpleStorageService::processFileCopyRequest(WorkflowFile *file, std::shared_ptr<StorageService> src,
                                                  std::string src_partition, std::string dst_partition,
@@ -483,9 +481,9 @@ namespace wrench {
         return true;
     }
 
-    /**
-     * @brief Start pending file transfer threads if any and if possible
-     */
+/**
+ * @brief Start pending file transfer threads if any and if possible
+ */
     void SimpleStorageService::startPendingFileTransferThread() {
         while ((not this->pending_file_transfer_threads.empty()) and
                (this->running_file_transfer_threads.size() < this->num_concurrent_connections)) {
@@ -498,26 +496,26 @@ namespace wrench {
     }
 
 
-    /**
-     * @brief Process a notification received from a file transfer thread
-     * @param ftt: the file transfer thread
-     * @param file: the file
-     * @param src: the transfer src
-     * @param dst: the transfer dst
-     * @param success: whether the transfer succeeded or not
-     * @param failure_cause: the failure cause (nullptr if success)
-     * @param answer_mailbox_if_copy: the mailbox to send a copy notification ("" if not a copy)
-     * @param start_timestamp: a start file copy time stamp
-     * @return false if the daemon should terminate
-     */
+/**
+ * @brief Process a notification received from a file transfer thread
+ * @param ftt: the file transfer thread
+ * @param file: the file
+ * @param src: the transfer src
+ * @param dst: the transfer dst
+ * @param success: whether the transfer succeeded or not
+ * @param failure_cause: the failure cause (nullptr if success)
+ * @param answer_mailbox_if_copy: the mailbox to send a copy notification ("" if not a copy)
+ * @param start_timestamp: a start file copy time stamp
+ * @return false if the daemon should terminate
+ */
     bool SimpleStorageService::processFileTransferThreadNotification(std::shared_ptr<FileTransferThread> ftt,
-                                                                          WorkflowFile *file,
-                                                                          std::pair<FileTransferThread::LocationType, std::string> src,
-                                                                          std::pair<FileTransferThread::LocationType, std::string> dst,
-                                                                          bool success,
-                                                                          std::shared_ptr<FailureCause> failure_cause,
-                                                                          std::string answer_mailbox_if_copy,
-                                                                          SimulationTimestampFileCopyStart *start_timestamp) {
+                                                                     WorkflowFile *file,
+                                                                     std::pair<FileTransferThread::LocationType, std::string> src,
+                                                                     std::pair<FileTransferThread::LocationType, std::string> dst,
+                                                                     bool success,
+                                                                     std::shared_ptr<FailureCause> failure_cause,
+                                                                     std::string answer_mailbox_if_copy,
+                                                                     SimulationTimestampFileCopyStart *start_timestamp) {
 
         // Remove the ftt from the list of running ftt
         if (this->running_file_transfer_threads.find(ftt) == this->running_file_transfer_threads.end()) {
