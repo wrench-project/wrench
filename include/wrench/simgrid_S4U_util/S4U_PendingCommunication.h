@@ -29,7 +29,13 @@ namespace wrench {
     /** @brief This is a simple wrapper class around S4U asynchronous communication checking methods */
     class S4U_PendingCommunication {
     public:
-        S4U_PendingCommunication(std::string mailbox);
+
+        enum OperationType {
+            SENDING,
+            RECEIVING
+        };
+
+        S4U_PendingCommunication(std::string mailbox_name, OperationType operation_type) : mailbox_name(mailbox_name), operation_type(operation_type) {}
 
         std::shared_ptr<SimulationMessage> wait();
 
@@ -41,7 +47,7 @@ namespace wrench {
                 std::vector<S4U_PendingCommunication*> pending_comms,
                 double timeout);
 
-        ~S4U_PendingCommunication();
+//        ~S4U_PendingCommunication() default;
 
         /** @brief The SimGrid communication handle */
         simgrid::s4u::CommPtr comm_ptr;
@@ -49,6 +55,8 @@ namespace wrench {
         std::shared_ptr<SimulationMessage> simulation_message;
         /** @brief The mailbox name */
         std::string mailbox_name;
+        /** @brief The operation type */
+        OperationType operation_type;
     };
 
     /*******************/
