@@ -206,7 +206,7 @@ namespace wrench {
         }
 
         std::shared_ptr<S4U_PendingCommunication> pending_communication = std::shared_ptr<S4U_PendingCommunication>(
-                new S4U_PendingCommunication(mailbox_name));
+                new S4U_PendingCommunication(mailbox_name, S4U_PendingCommunication::OperationType::SENDING));
         pending_communication->comm_ptr = comm_ptr;
         return pending_communication;
     }
@@ -227,7 +227,7 @@ namespace wrench {
         WRENCH_DEBUG("Igetting a message from mailbox_name '%s'", mailbox_name.c_str());
 
         std::shared_ptr<S4U_PendingCommunication> pending_communication = std::shared_ptr<S4U_PendingCommunication>(
-                new S4U_PendingCommunication(mailbox_name));
+                new S4U_PendingCommunication(mailbox_name, S4U_PendingCommunication::OperationType::RECEIVING));
 
         simgrid::s4u::Mailbox *mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
         try {
