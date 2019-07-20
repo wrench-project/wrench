@@ -73,6 +73,14 @@ private:
         if (this == this->test->wms1.get()) {
             /** SENDER **/
 
+            // Empty set of pending comms
+            std::vector<wrench::S4U_PendingCommunication *> empty_pending_comms;
+            try {
+                wrench::S4U_PendingCommunication::waitForSomethingToHappen(empty_pending_comms, -1);
+                throw std::runtime_error("Was expecting a std::invalid_argument exception");
+            } catch (std::invalid_argument &) {
+            }
+
             // One send
             auto pending_send = wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox_name, new wrench::SimulationMessage("foo", 100));
             pending_send->wait();
