@@ -8,8 +8,8 @@
  */
 
 
-#ifndef WRENCH_DATACOMMUNICATIONTHREADMESSAGE_H
-#define WRENCH_DATACOMMUNICATIONTHREADMESSAGE_H
+#ifndef WRENCH_FILETRANSFERTHREADMESSAGE_H
+#define WRENCH_FILETRANSFERTHREADMESSAGE_H
 
 
 #include <memory>
@@ -20,7 +20,7 @@
 #include <wrench/simulation/SimulationTimestampTypes.h>
 #include <wrench/simulation/Simulation.h>
 #include <wrench/simulation/SimulationOutput.h>
-#include "DataCommunicationThread.h"
+#include "FileTransferThread.h"
 
 namespace wrench {
 
@@ -31,41 +31,42 @@ namespace wrench {
     /**
      * @brief Top-level class for messages received/sent by a DataCommunicationThread
      */
-    class DataCommunicationThreadMessage : public ServiceMessage {
+    class FileTransferThreadMessage : public ServiceMessage {
     protected:
-        DataCommunicationThreadMessage(std::string name, double payload) :
-                ServiceMessage("DataCommunicationThreadMessage::" + name, payload) {}
+        FileTransferThreadMessage(std::string name, double payload) :
+                ServiceMessage("FileTransferThreadMessage::" + name, payload) {}
     };
 
 
     /**
-     * @brief A message sent to by a DataCommunicationThread to report on success/failure of the communication
+     * @brief A message sent to by a FileTransferThread to report on success/failure of the transfer
      */
-    class DataCommunicationThreadNotificationMessage : public DataCommunicationThreadMessage {
+    class FileTransferThreadNotificationMessage : public FileTransferThreadMessage {
     public:
-        DataCommunicationThreadNotificationMessage(std::shared_ptr<DataCommunicationThread> data_communication_thread,
-                                                   WorkflowFile *file, std::string partition,
-                                                   DataCommunicationThread::DataCommunicationType communication_type,
+        FileTransferThreadNotificationMessage(std::shared_ptr<FileTransferThread> file_transfer_thread,
+                                                   WorkflowFile *file,
+                                                   std::pair<FileTransferThread::LocationType, std::string> src,
+                                                   std::pair<FileTransferThread::LocationType, std::string> dst,
                                                    std::string answer_mailbox_if_copy,
                                                    bool success, std::shared_ptr<FailureCause> failure_cause,
                                                    SimulationTimestampFileCopyStart *start_time_stamp) :
-                DataCommunicationThreadMessage("DataCommunicationThreadNotificationMessage", 0),
-                data_communication_thread(data_communication_thread),
-                file(file), partition(partition), communication_type(communication_type),
+                FileTransferThreadMessage("FileTransferThreadNotificationMessage", 0),
+                file_transfer_thread(file_transfer_thread),
+                file(file), src(src), dst(dst),
                 answer_mailbox_if_copy(answer_mailbox_if_copy), success(success),
                 failure_cause(failure_cause), start_time_stamp(start_time_stamp) {}
 
-        /** @brief Data communiucation thread that sent this message */
-        std::shared_ptr<DataCommunicationThread> data_communication_thread;
+        /** @brief File transfer thread that sent this message */
+        std::shared_ptr<FileTransferThread> file_transfer_thread;
         /** @brief File that was being communicated */
         WorkflowFile *file;
-        /** @brief Partition */
-        std::string partition;
-        /** @brief Communication type (SENDING or RECEIVING) */
-        DataCommunicationThread::DataCommunicationType communication_type;
+        /** @brief Source */
+        std::pair<FileTransferThread::LocationType, std::string> src;
+        /** @brief Destination */
+        std::pair<FileTransferThread::LocationType, std::string> dst;
         /** @brief If this was a file copy, the mailbox to which an answer should be send */
         std::string answer_mailbox_if_copy;
-        /** @brief Whether the communication succeeded or not */
+        /** @brief Whether the transfer succeeded or not */
         bool success;
         /** @brief The failure cause is case of a failure */
         std::shared_ptr<FailureCause> failure_cause;
@@ -81,4 +82,4 @@ namespace wrench {
 };
 
 
-#endif //WRENCH_DATACOMMUNICATIONTHREADMESSAGE_H
+#endif //WRENCH_FILETRANSFERTHREADMESSAGE_H
