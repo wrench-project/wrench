@@ -164,6 +164,9 @@ namespace wrench {
         } catch (std::invalid_argument &e) {
             throw;
         }
+        if (string_value == "infinity") {
+            return ULONG_MAX;
+        }
         if (sscanf(string_value.c_str(), "%lu", &value) != 1) {
             throw std::invalid_argument(
                     "Service::getPropertyValueAsUnsignedLong(): Invalid unsigned long property value " + property +
