@@ -291,9 +291,10 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param operation_type: NetworkError:OperationType::SENDING or NetworkError::OperationType::RECEIVING
+     * @param operation_type: NetworkError:OperationType::SENDING or NetworkError::OperationType::RECEIVING or
+     *        NetworkError::OperationType::UNKNOWN
      * @param error_type: the error type 
-     * @param mailbox: the name of a mailbox
+     * @param mailbox: the name of a mailbox (or "" if unknown)
      */
     NetworkError::NetworkError(NetworkError::OperationType operation_type,
                                NetworkError::ErrorType error_type,

@@ -11,8 +11,7 @@
 #define WRENCH_SIMPLESTORAGESERVICE_H
 
 
-#include <wrench/services/storage/simple/NetworkConnection.h>
-#include <wrench/services/storage/simple/NetworkConnectionManager.h>
+#include <services/storage/storage_helpers/DataCommunicationThread.h>
 #include "wrench/services/storage/StorageService.h"
 #include "SimpleStorageServiceProperty.h"
 #include "SimpleStorageServiceMessagePayload.h"
@@ -89,11 +88,11 @@ namespace wrench {
 
         int main() override;
 
-        bool processControlMessage(std::unique_ptr<NetworkConnection> connection);
+        bool processNextMessage();
 
-        bool processDataConnection(std::unique_ptr<NetworkConnection> connection);
-        bool processIncomingDataConnection(std::unique_ptr<NetworkConnection> connection);
-        bool processOutgoingDataConnection(std::unique_ptr<NetworkConnection> connection);
+//        bool processDataConnection(std::unique_ptr<NetworkConnection> connection);
+//        bool processIncomingDataConnection(std::unique_ptr<NetworkConnection> connection);
+//        bool processOutgoingDataConnection(std::unique_ptr<NetworkConnection> connection);
 
         unsigned long getNewUniqueNumber();
 
@@ -106,9 +105,22 @@ namespace wrench {
                 std::string src_dir, std::string dst_dir,
                 std::string answer_mailbox, SimulationTimestampFileCopyStart *start_timestamp);
 
+        bool processDataCommunicationThreadNotification(
+                std::shared_ptr<DataCommunicationThread> dct,
+                WorkflowFile *file,
+                DataCommunicationThread::DataCommunicationType communication_type,
+                std::string partition,
+                bool success,
+                std::shared_ptr<FailureCause> failure_cause,
+                std::string answer_mailbox_if_copy,
+                SimulationTimestampFileCopyStart *start_timestamp);
+
         unsigned long num_concurrent_connections;
 
-        std::unique_ptr<NetworkConnectionManager> network_connection_manager;
+        void startPendingDataCommunications();
+
+        std::deque<std::shared_ptr<DataCommunicationThread>> pending_data_communications;
+        std::set<std::shared_ptr<DataCommunicationThread>> running_data_communications;
 
 
     };

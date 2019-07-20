@@ -37,11 +37,13 @@ namespace wrench {
                 this->comm_ptr->wait();
             }
         } catch (simgrid::NetworkFailureException &e) {
-            throw std::shared_ptr<NetworkError>(
-                    new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, mailbox_name));
-        } catch (simgrid::TimeoutException &e) {
-            throw std::shared_ptr<NetworkError>(
-                    new NetworkError(NetworkError::RECEIVING, NetworkError::TIMEOUT, mailbox_name));
+            if (this->operation_type == S4U_PendingCommunication::OperationType::SENDING) {
+                throw std::shared_ptr<NetworkError>(
+                        new NetworkError(NetworkError::OperationType::SENDING, NetworkError::FAILURE, mailbox_name));
+            } else {
+                throw std::shared_ptr<NetworkError>(
+                        new NetworkError(NetworkError::OperationType::RECEIVING, NetworkError::FAILURE, mailbox_name));
+            }
         }
         return std::move(this->simulation_message);
     }
@@ -59,7 +61,6 @@ namespace wrench {
             std::vector<std::shared_ptr<S4U_PendingCommunication>> pending_comms, double timeout) {
         std::vector<S4U_PendingCommunication *> raw_pointer_comms;
         for (auto const &pc : pending_comms) {
-//      for (auto it = pending_comms.begin(); it != pending_comms.end(); it++) {
             raw_pointer_comms.push_back(pc.get());
         }
         return S4U_PendingCommunication::waitForSomethingToHappen(raw_pointer_comms, timeout);
@@ -71,14 +72,13 @@ namespace wrench {
      * @param pending_comms: a list of pending communications
      * @param timeout: timeout value in seconds (-1 means no timeout)
      *
-     * @return the index of the comm to which something happened (success or failure)
+     * @return the index of the comm to which something happened (success or failure), or
+     *         ULONG_MAX if nothing happened before the timeout expired
      *
      * @throw std::invalid_argument
      */
     unsigned long S4U_PendingCommunication::waitForSomethingToHappen(
             std::vector<S4U_PendingCommunication *> pending_comms, double timeout) {
-
-//      std::set<S4U_PendingCommunication *> completed_comms;
 
         if (pending_comms.empty()) {
             throw std::invalid_argument("S4U_PendingCommunication::waitForSomethingToHappen(): invalid argument");
@@ -89,7 +89,7 @@ namespace wrench {
             pending_s4u_comms.push_back((*it)->comm_ptr);
         }
 
-        unsigned long index;
+        int index = 0;
         bool one_comm_failed = false;
         try {
             index = (unsigned long) simgrid::s4u::Comm::wait_any_for(&pending_s4u_comms, timeout);
@@ -104,6 +104,10 @@ namespace wrench {
             throw std::runtime_error(
                     "S4U_PendingCommunication::waitForSomethingToHappen(): Unexpected std::exception  (" +
                     std::string(e.what()) + ")");
+        }
+
+        if (index == -1) {
+            return ULONG_MAX;
         }
 
         if (one_comm_failed) {
@@ -123,20 +127,6 @@ namespace wrench {
         }
 
         return index;
-    }
-
-    /**
-     * @brief Constructor
-     *
-     * @param mailbox: a mailbox name
-     */
-    S4U_PendingCommunication::S4U_PendingCommunication(std::string mailbox) : mailbox_name(mailbox) {
-    }
-
-    /**
-     * @brief Destructor
-     */
-    S4U_PendingCommunication::~S4U_PendingCommunication() {
     }
 
 };
