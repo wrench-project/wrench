@@ -393,7 +393,8 @@ namespace wrench {
          */
         enum OperationType {
             SENDING,
-            RECEIVING
+            RECEIVING,
+            UNKNOWN
         };
 
         /** @brief Enumerated type to describe the type of the network error
