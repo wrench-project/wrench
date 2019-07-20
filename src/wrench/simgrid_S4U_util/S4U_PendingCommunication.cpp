@@ -71,14 +71,13 @@ namespace wrench {
      * @param pending_comms: a list of pending communications
      * @param timeout: timeout value in seconds (-1 means no timeout)
      *
-     * @return the index of the comm to which something happened (success or failure)
+     * @return the index of the comm to which something happened (success or failure), or
+     *         ULONG_MAX if nothing happened before the timeout expired
      *
      * @throw std::invalid_argument
      */
     unsigned long S4U_PendingCommunication::waitForSomethingToHappen(
             std::vector<S4U_PendingCommunication *> pending_comms, double timeout) {
-
-//      std::set<S4U_PendingCommunication *> completed_comms;
 
         if (pending_comms.empty()) {
             throw std::invalid_argument("S4U_PendingCommunication::waitForSomethingToHappen(): invalid argument");
@@ -89,7 +88,7 @@ namespace wrench {
             pending_s4u_comms.push_back((*it)->comm_ptr);
         }
 
-        unsigned long index;
+        int index = 0;
         bool one_comm_failed = false;
         try {
             index = (unsigned long) simgrid::s4u::Comm::wait_any_for(&pending_s4u_comms, timeout);
@@ -104,6 +103,10 @@ namespace wrench {
             throw std::runtime_error(
                     "S4U_PendingCommunication::waitForSomethingToHappen(): Unexpected std::exception  (" +
                     std::string(e.what()) + ")");
+        }
+
+        if (index == -1) {
+            return ULONG_MAX;
         }
 
         if (one_comm_failed) {
