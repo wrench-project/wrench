@@ -100,10 +100,6 @@ namespace wrench {
             one_comm_failed = true;
         } catch (simgrid::TimeoutException &e) {
             one_comm_failed = true;
-        } catch (std::exception &e) {
-            throw std::runtime_error(
-                    "S4U_PendingCommunication::waitForSomethingToHappen(): Unexpected std::exception  (" +
-                    std::string(e.what()) + ")");
         }
 
         if (index == -1) {
@@ -118,10 +114,6 @@ namespace wrench {
                     break;
                 } catch (simgrid::TimeoutException &e) {
                     break;
-                } catch (std::exception &e) {
-                    throw std::runtime_error(
-                            "S4U_PendingCommunication::waitForSomethingToHappen(): Unexpected std::exception  (" +
-                            std::string(e.what()) + ")");
                 }
             }
         }
