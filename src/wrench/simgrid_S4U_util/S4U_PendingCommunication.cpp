@@ -37,11 +37,13 @@ namespace wrench {
                 this->comm_ptr->wait();
             }
         } catch (simgrid::NetworkFailureException &e) {
-            throw std::shared_ptr<NetworkError>(
-                    new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, mailbox_name));
-        } catch (simgrid::TimeoutException &e) {
-            throw std::shared_ptr<NetworkError>(
-                    new NetworkError(NetworkError::RECEIVING, NetworkError::TIMEOUT, mailbox_name));
+            if (this->operation_type == S4U_PendingCommunication::OperationType::SENDING) {
+                throw std::shared_ptr<NetworkError>(
+                        new NetworkError(NetworkError::OperationType::SENDING, NetworkError::FAILURE, mailbox_name));
+            } else {
+                throw std::shared_ptr<NetworkError>(
+                        new NetworkError(NetworkError::OperationType::RECEIVING, NetworkError::FAILURE, mailbox_name));
+            }
         }
         return std::move(this->simulation_message);
     }
@@ -59,7 +61,6 @@ namespace wrench {
             std::vector<std::shared_ptr<S4U_PendingCommunication>> pending_comms, double timeout) {
         std::vector<S4U_PendingCommunication *> raw_pointer_comms;
         for (auto const &pc : pending_comms) {
-//      for (auto it = pending_comms.begin(); it != pending_comms.end(); it++) {
             raw_pointer_comms.push_back(pc.get());
         }
         return S4U_PendingCommunication::waitForSomethingToHappen(raw_pointer_comms, timeout);
@@ -126,20 +127,6 @@ namespace wrench {
         }
 
         return index;
-    }
-
-    /**
-     * @brief Constructor
-     *
-     * @param mailbox: a mailbox name
-     */
-    S4U_PendingCommunication::S4U_PendingCommunication(std::string mailbox) : mailbox_name(mailbox) {
-    }
-
-    /**
-     * @brief Destructor
-     */
-    S4U_PendingCommunication::~S4U_PendingCommunication() {
     }
 
 };
