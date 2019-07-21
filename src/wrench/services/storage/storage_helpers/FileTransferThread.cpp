@@ -66,7 +66,8 @@ namespace wrench {
     int FileTransferThread::main() {
 
         // Perform the transfer
-        FileTransferThreadNotificationMessage *msg_to_send_back = nullptr;
+//        FileTransferThreadNotificationMessage *msg_to_send_back = nullptr;
+        bool success = true;
         std::shared_ptr<NetworkError> failure_cause = nullptr;
 
         WRENCH_INFO("New DataCommunicationThread (file=%s, src=%s, dst=%s, answer_mailbox_if_copy=%s",
@@ -81,65 +82,35 @@ namespace wrench {
             try {
                 S4U_Mailbox::putMessage(this->dst.second,
                                         new StorageServiceFileContentMessage(this->file));
-
-                msg_to_send_back = new FileTransferThreadNotificationMessage(
-                        this->getSharedPtr<FileTransferThread>(),
-                        this->file,
-                        this->src,
-                        this->dst,
-                        this->answer_mailbox_if_copy,
-                        true, nullptr,
-                        this->start_timestamp);
-            } catch (std::shared_ptr<NetworkError> &failure_cause) {
+            } catch (std::shared_ptr<NetworkError> &e) {
                 WRENCH_INFO("DataCommunicationThread::main(): Network error (%s)", failure_cause->toString().c_str());
-                msg_to_send_back = new FileTransferThreadNotificationMessage(
-                        this->getSharedPtr<FileTransferThread>(),
-                        this->file,
-                        this->src,
-                        this->dst,
-                        this->answer_mailbox_if_copy,
-                        false, failure_cause,
-                        this->start_timestamp);
+               success = false;
+               failure_cause = e;
             }
         } else if ((src.first == LocationType::MAILBOX) && (dst.first == LocationType::LOCAL_PARTITION)) {
             /** Sending a local file to the network **/
 
             try {
                 S4U_Mailbox::getMessage(this->src.second);
-
-                msg_to_send_back = new FileTransferThreadNotificationMessage(
-                        this->getSharedPtr<FileTransferThread>(),
-                        this->file,
-                        this->src,
-                        this->dst,
-                        this->answer_mailbox_if_copy,
-                        true, nullptr,
-                        this->start_timestamp);
-            } catch (std::shared_ptr<NetworkError> &failure_cause) {
+            } catch (std::shared_ptr<NetworkError> &e) {
                 WRENCH_INFO("DataCommunicationThread::main(): Network error (%s)", failure_cause->toString().c_str());
-                msg_to_send_back = new FileTransferThreadNotificationMessage(
-                        this->getSharedPtr<FileTransferThread>(),
-                        this->file,
-                        this->src,
-                        this->dst,
-                        this->answer_mailbox_if_copy,
-                        false, failure_cause,
-                        this->start_timestamp);
+                success = false;
+                failure_cause = e;
             }
         } else if ((src.first == LocationType::LOCAL_PARTITION) && (dst.first == LocationType::LOCAL_PARTITION)) {
 
             Simulation::sleep(this->file->getSize() / this->local_copy_data_transfer_rate);
-            msg_to_send_back = new FileTransferThreadNotificationMessage(
-                    this->getSharedPtr<FileTransferThread>(),
-                    this->file,
-                    this->src,
-                    this->dst,
-                    this->answer_mailbox_if_copy,
-                    true, nullptr,
-                    this->start_timestamp);
         }
 
         // Send report
+        auto msg_to_send_back = new FileTransferThreadNotificationMessage(
+                this->getSharedPtr<FileTransferThread>(),
+                this->file,
+                this->src,
+                this->dst,
+                this->answer_mailbox_if_copy,
+                success, failure_cause,
+                this->start_timestamp);
         S4U_Mailbox::dputMessage(this->mailbox_to_notify, msg_to_send_back);
 
         return 0;
