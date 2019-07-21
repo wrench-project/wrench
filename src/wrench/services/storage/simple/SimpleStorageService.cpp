@@ -115,10 +115,6 @@ namespace wrench {
 
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_CYAN);
 
-//        // Create a new network connection manager object
-//        this->network_connection_manager = std::unique_ptr<NetworkConnectionManager>(
-//                new NetworkConnectionManager(this->num_concurrent_connections));
-
         // number of files staged
         unsigned long num_stored_files = 0;
 
@@ -430,8 +426,9 @@ namespace wrench {
         // Create a unique mailbox_name on which to receive the file
         std::string file_reception_mailbox = S4U_Mailbox::generateUniqueMailboxName("file_reception");
 
-        // Initiate an ASYNCHRONOUS file read from the source if I am not the source
+        // If I am not the source
         if (src.get() != this) {
+            // Initiate a file read from the source
             try {
                 src->initiateFileRead(file_reception_mailbox, file, src_partition);
             } catch (WorkflowExecutionException &e) {
@@ -452,31 +449,31 @@ namespace wrench {
                 }
                 return true;
             }
-        }
 
-        std::shared_ptr<FileTransferThread> ftt;
-
-        if (src.get() == this) {
-            ftt = std::shared_ptr<FileTransferThread>(
-                    new FileTransferThread(this->hostname, file,
-                                           {FileTransferThread::LocationType::LOCAL_PARTITION, src_partition},
-                                           {FileTransferThread::LocationType::LOCAL_PARTITION, dst_partition},
-                                           answer_mailbox, this->mailbox_name,
-                                           this->local_copy_data_transfer_rate, start_timestamp));
-        } else {
-
-            ftt = std::shared_ptr<FileTransferThread>(
+            // Creat a file transfer thread
+            auto ftt = std::shared_ptr<FileTransferThread>(
                     new FileTransferThread(this->hostname, file,
                                            {FileTransferThread::LocationType::MAILBOX, file_reception_mailbox},
                                            {FileTransferThread::LocationType::LOCAL_PARTITION, dst_partition},
                                            answer_mailbox, this->mailbox_name,
                                            this->local_copy_data_transfer_rate, start_timestamp));
+            ftt->simulation = this->simulation;
+            // Add it to the Pool of pending data communications
+            this->pending_file_transfer_threads.push_front(ftt);
+
+        } else { // If I am the source
+
+            // Creat a file transfer thread
+           auto ftt = std::shared_ptr<FileTransferThread>(
+                    new FileTransferThread(this->hostname, file,
+                                           {FileTransferThread::LocationType::LOCAL_PARTITION, src_partition},
+                                           {FileTransferThread::LocationType::LOCAL_PARTITION, dst_partition},
+                                           answer_mailbox, this->mailbox_name,
+                                           this->local_copy_data_transfer_rate, start_timestamp));
+            ftt->simulation = this->simulation;
+            // Add it to the Pool of pending data communications
+            this->pending_file_transfer_threads.push_front(ftt);
         }
-
-        ftt->simulation = this->simulation;
-
-        // Add it to the Pool of pending data communications
-        this->pending_file_transfer_threads.push_front(ftt);
 
         return true;
     }
