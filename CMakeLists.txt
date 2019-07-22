@@ -258,6 +258,7 @@ set(TEST_FILES
         test/storage_services/SimpleStorageService/StorageServiceDeleteRegisterTest.cpp
         test/storage_services/SimpleStorageService/DataMovementManagerCopyRegisterTest.cpp
         test/storage_services/SimpleStorageService/ZeroSizeFileTest.cpp
+        test/storage_services/SimpleStorageService/ChunkingTest.cpp
         test/compute_services/BareMetalComputeService/BareMetalComputeServiceTestStandardJobs.cpp
         test/compute_services/BareMetalComputeService/BareMetalComputeServiceTestPilotJobs.cpp
         test/compute_services/BareMetalComputeService/BareMetalComputeServiceSchedulingTest.cpp

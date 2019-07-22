@@ -23,12 +23,14 @@ namespace wrench {
 
     public:
 
-        /** @brief The maximum number of concurrent data connections supported by the service (default = "infinity") **/
-        DECLARE_PROPERTY_NAME(MAX_NUM_CONCURRENT_DATA_CONNECTIONS);
-
-        /** @brief The simulated local copy data rate in byte/sec (default = "infinity") **/
-        DECLARE_PROPERTY_NAME(LOCAL_COPY_DATA_RATE);
-
+        /** @brief Buffer size used when data is being sent by the service from a local
+         *         disk to the network:
+         *   - "infinity" (default): full buffering (load and forward model)
+         *   - "0": an ideal fluid model
+         *   - any integral value in between: an actual buffer size (the smaller the buffer size, the
+         *     slower the simulation)
+         **/
+        DECLARE_PROPERTY_NAME(COPY_BUFFER_SIZE);
     };
 
 };
