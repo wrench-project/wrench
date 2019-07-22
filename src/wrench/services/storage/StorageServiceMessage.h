@@ -272,12 +272,15 @@ namespace wrench {
     /**
     * @brief A message sent/received by a StorageService that has a file size as a payload
     */
-    class StorageServiceFileContentMessage : public StorageServiceMessage {
+    class StorageServiceFileContentChunkMessage : public StorageServiceMessage {
     public:
-        explicit StorageServiceFileContentMessage(WorkflowFile *file);
+        explicit StorageServiceFileContentChunkMessage(WorkflowFile *file,
+                unsigned long chunk_size, bool last_chunk);
 
         /** @brief The file */
         WorkflowFile *file;
+        /** @brief Whether this is the last file chunk */
+        bool last_chunk;
     };
 
     /***********************/

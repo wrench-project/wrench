@@ -14,8 +14,7 @@
 
 namespace wrench {
 
-    SET_PROPERTY_NAME(StorageServiceProperty, MAX_NUM_CONCURRENT_DATA_CONNECTIONS);
-    SET_PROPERTY_NAME(StorageServiceProperty, LOCAL_COPY_DATA_RATE);
+    SET_PROPERTY_NAME(StorageServiceProperty, COPY_BUFFER_SIZE);
 
 };
 

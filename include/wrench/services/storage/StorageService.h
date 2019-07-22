@@ -134,6 +134,7 @@ namespace wrench {
 
     private:
 
+
         enum FileOperation {
             READ,
             WRITE,

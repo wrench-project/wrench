@@ -324,8 +324,8 @@ TEST_F(MessageConstructorTest, StorageServiceMessages) {
   ASSERT_THROW(new wrench::StorageServiceFileReadAnswerMessage(file, storage_service, true, failure_cause, 666), std::invalid_argument);
   ASSERT_THROW(new wrench::StorageServiceFileReadAnswerMessage(file, storage_service, false, nullptr, 666), std::invalid_argument);
 
-  ASSERT_NO_THROW(new wrench::StorageServiceFileContentMessage(file));
-  ASSERT_THROW(new wrench::StorageServiceFileContentMessage(nullptr), std::invalid_argument);
+  ASSERT_NO_THROW(new wrench::StorageServiceFileContentChunkMessage(file, 666, true));
+  ASSERT_THROW(new wrench::StorageServiceFileContentChunkMessage(nullptr, 666, true), std::invalid_argument);
 }
 
 TEST_F(MessageConstructorTest, NetworkProximityMessages) {

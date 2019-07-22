@@ -42,6 +42,7 @@ namespace wrench {
                                 std::string answer_mailbox_if_copy,
                                 std::string mailbox_to_notify,
                                 double local_copy_data_transfer_rate,
+                                unsigned long copy_buffer_size,
                                 SimulationTimestampFileCopyStart *start_timestamp = nullptr);
 
         int main() override;
@@ -55,7 +56,12 @@ namespace wrench {
         std::string answer_mailbox_if_copy;
         std::string mailbox_to_notify;
         double local_copy_data_transfer_rate;
+        unsigned long copy_buffer_size;
         SimulationTimestampFileCopyStart *start_timestamp;
+
+        void receiveFileFromNetwork(WorkflowFile *file, std::string partition, std::string mailbox);
+        void sendLocalFileToNetwork(WorkflowFile *file, std::string partition, std::string mailbox);
+
     };
 
 }

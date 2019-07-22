@@ -34,6 +34,7 @@ namespace wrench {
         std::map<std::string, std::string> default_property_values = {
                  {SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS,  "infinity"},
                  {SimpleStorageServiceProperty::LOCAL_COPY_DATA_RATE,  "infinity"},
+                 {SimpleStorageServiceProperty::COPY_BUFFER_SIZE,  "infinity"},
                 };
 
         std::map<std::string, double> default_messagepayload_values = {
@@ -119,7 +120,9 @@ namespace wrench {
         std::set<std::shared_ptr<FileTransferThread>> running_file_transfer_threads;
 
         double local_copy_data_transfer_rate;
+        unsigned long copy_buffer_size;
 
+        void validateProperties();
 
     };
 
