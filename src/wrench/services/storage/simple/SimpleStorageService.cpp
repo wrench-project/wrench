@@ -64,13 +64,6 @@ namespace wrench {
     ) :
             SimpleStorageService(std::move(hostname), capacity, property_list, messagepayload_list,
                                  "_" + std::to_string(getNewUniqueNumber())) {
-        if (this->getPropertyValueAsString("MAX_NUM_CONCURRENT_DATA_CONNECTIONS") == "infinity") {
-            this->num_concurrent_connections = ULONG_MAX;
-        } else {
-            this->num_concurrent_connections = (unsigned long) (this->getPropertyValueAsDouble(
-                    "MAX_NUM_CONCURRENT_DATA_CONNECTIONS"));
-        }
-
 
     }
 
@@ -94,18 +87,11 @@ namespace wrench {
 
         this->setProperties(this->default_property_values, property_list);
         this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
+        this->validateProperties();
 
-        if (this->getPropertyValueAsString(SimpleStorageServiceProperty::LOCAL_COPY_DATA_RATE) == "infinity") {
-            this->local_copy_data_transfer_rate = DBL_MAX;
-        } else {
-            try {
-                this->local_copy_data_transfer_rate = this->getPropertyValueAsDouble(
-                        SimpleStorageServiceProperty::LOCAL_COPY_DATA_RATE);
-            } catch (std::invalid_argument &e) {
-                throw;
-            }
-        }
-
+        this->num_concurrent_connections = this->getPropertyValueAsUnsignedLong(SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS);
+        this->local_copy_data_transfer_rate = this->getPropertyValueAsDouble(SimpleStorageServiceProperty::LOCAL_COPY_DATA_RATE);
+        this->copy_buffer_size = this->getPropertyValueAsUnsignedLong(SimpleStorageServiceProperty::COPY_BUFFER_SIZE);
     }
 
     /**
@@ -116,10 +102,6 @@ namespace wrench {
     int SimpleStorageService::main() {
 
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_CYAN);
-
-//        // Create a new network connection manager object
-//        this->network_connection_manager = std::unique_ptr<NetworkConnectionManager>(
-//                new NetworkConnectionManager(this->num_concurrent_connections));
 
         // number of files staged
         unsigned long num_stored_files = 0;
@@ -315,7 +297,9 @@ namespace wrench {
                                        file,
                                        {FileTransferThread::LocationType::MAILBOX, file_reception_mailbox},
                                        {FileTransferThread::LocationType::LOCAL_PARTITION, dst_partition},
-                                       "", this->mailbox_name, this->local_copy_data_transfer_rate));
+                                       "", this->mailbox_name,
+                                       this->local_copy_data_transfer_rate,
+                                       this->copy_buffer_size));
         ftt->simulation = this->simulation;
 
         // Add it to the Pool of pending data communications
@@ -370,7 +354,8 @@ namespace wrench {
                     new FileTransferThread(this->hostname, file,
                                            {FileTransferThread::LocationType::LOCAL_PARTITION, src_partition},
                                            {FileTransferThread::LocationType::MAILBOX, mailbox_to_receive_the_file_content},
-                                           "", this->mailbox_name, this->local_copy_data_transfer_rate));
+                                           "", this->mailbox_name, this->local_copy_data_transfer_rate,
+                                           this->copy_buffer_size));
             ftt->simulation = this->simulation;
 
             // Add it to the Pool of pending data communications
@@ -464,7 +449,8 @@ namespace wrench {
                                            {FileTransferThread::LocationType::LOCAL_PARTITION, src_partition},
                                            {FileTransferThread::LocationType::LOCAL_PARTITION, dst_partition},
                                            answer_mailbox, this->mailbox_name,
-                                           this->local_copy_data_transfer_rate, start_timestamp));
+                                           this->local_copy_data_transfer_rate,
+                                           this->copy_buffer_size, start_timestamp));
         } else {
 
             ftt = std::shared_ptr<FileTransferThread>(
@@ -472,7 +458,8 @@ namespace wrench {
                                            {FileTransferThread::LocationType::MAILBOX, file_reception_mailbox},
                                            {FileTransferThread::LocationType::LOCAL_PARTITION, dst_partition},
                                            answer_mailbox, this->mailbox_name,
-                                           this->local_copy_data_transfer_rate, start_timestamp));
+                                           this->local_copy_data_transfer_rate,
+                                           this->copy_buffer_size, start_timestamp));
         }
 
         ftt->simulation = this->simulation;
@@ -511,13 +498,13 @@ namespace wrench {
      * @return false if the daemon should terminate
      */
     bool SimpleStorageService::processFileTransferThreadNotification(std::shared_ptr<FileTransferThread> ftt,
-                                                                          WorkflowFile *file,
-                                                                          std::pair<FileTransferThread::LocationType, std::string> src,
-                                                                          std::pair<FileTransferThread::LocationType, std::string> dst,
-                                                                          bool success,
-                                                                          std::shared_ptr<FailureCause> failure_cause,
-                                                                          std::string answer_mailbox_if_copy,
-                                                                          SimulationTimestampFileCopyStart *start_timestamp) {
+                                                                     WorkflowFile *file,
+                                                                     std::pair<FileTransferThread::LocationType, std::string> src,
+                                                                     std::pair<FileTransferThread::LocationType, std::string> dst,
+                                                                     bool success,
+                                                                     std::shared_ptr<FailureCause> failure_cause,
+                                                                     std::string answer_mailbox_if_copy,
+                                                                     SimulationTimestampFileCopyStart *start_timestamp) {
 
         // Remove the ftt from the list of running ftt
         if (this->running_file_transfer_threads.find(ftt) == this->running_file_transfer_threads.end()) {
@@ -565,8 +552,7 @@ namespace wrench {
 
         // Send back the corresponding ack if this was a copy
         if (not answer_mailbox_if_copy.empty()) {
-            WRENCH_INFO(
-                    "Sending back an ack since this was a file copy and some client is waiting for me to say something");
+            WRENCH_INFO("Sending back an ack since this was a file copy and some client is waiting for me to say something");
             S4U_Mailbox::dputMessage(answer_mailbox_if_copy,
                                      new StorageServiceFileCopyAnswerMessage(file,
                                                                              this->getSharedPtr<SimpleStorageService>(),
@@ -581,6 +567,22 @@ namespace wrench {
 
 
         return true;
+    }
+
+    /**
+     * @brief Helper method to validate propery values
+     * throw std::invalid_argument
+     */
+    void SimpleStorageService::validateProperties() {
+
+        unsigned long p_ulong;
+        double p_double;
+        p_ulong = this->getPropertyValueAsUnsignedLong(SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS);
+        p_ulong = this->getPropertyValueAsUnsignedLong(SimpleStorageServiceProperty::COPY_BUFFER_SIZE);
+        p_double = this->getPropertyValueAsDouble(SimpleStorageServiceProperty::LOCAL_COPY_DATA_RATE);
+        if (p_double < 0) {
+            throw std::invalid_argument("SimpleStorageService::validateProperties(): LOCAL_COPY_DATA_RATE cannot be <0");
+        }
     }
 
 };

@@ -19,7 +19,17 @@ namespace wrench {
     * @brief Configurable properties for a SimpleStorageService
     */
     class SimpleStorageServiceProperty : public StorageServiceProperty {
+
     public:
+
+        /** @brief The maximum number of concurrent data connections supported by the service (default = "infinity") **/
+        DECLARE_PROPERTY_NAME(MAX_NUM_CONCURRENT_DATA_CONNECTIONS);
+
+        /** @brief The simulated local copy data rate in byte/sec (default = "infinity") (this will eventually
+         *  disappear once I/O simulation is more realistic using SimGrid **/
+        DECLARE_PROPERTY_NAME(LOCAL_COPY_DATA_RATE);
+
+
 
     };
 

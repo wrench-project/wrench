@@ -358,14 +358,15 @@ namespace wrench {
     * @brief Constructor
     * @param file: the workflow data file
     */
-    StorageServiceFileContentMessage::StorageServiceFileContentMessage(WorkflowFile *file) : StorageServiceMessage(
-            "FILE_CONTENT", 0) {
+    StorageServiceFileContentChunkMessage::StorageServiceFileContentChunkMessage(
+            WorkflowFile *file, unsigned long chunk_size, bool last_chunk) : StorageServiceMessage(
+            "FILE_CHUNK", chunk_size) {
         if (file == nullptr) {
             throw std::invalid_argument(
-                    "StorageServiceFileContentMessage::StorageServiceFileContentMessage(): Invalid arguments");
+                    "StorageServiceFileContentChunkMessage::StorageServiceFileContentChunkMessage(): Invalid arguments");
         }
-        this->payload += file->getSize();
         this->file = file;
+        this->last_chunk = last_chunk;
     }
 
 };

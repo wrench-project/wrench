@@ -7,6 +7,7 @@
  * (at your option) any later version.
  */
 
+#include <wrench/services/storage/StorageServiceProperty.h>
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/storage/StorageService.h"
@@ -355,20 +356,24 @@ namespace wrench {
                 throw WorkflowExecutionException(cause);
             }
 
-            // Otherwise, retrieve  the file
-            std::shared_ptr<SimulationMessage> file_content_message = nullptr;
-            try {
-                file_content_message = S4U_Mailbox::getMessage(answer_mailbox);
-            } catch (std::shared_ptr<NetworkError> &cause) {
-                throw WorkflowExecutionException(cause);
-            }
+            // Otherwise, retrieve the file chunks until the last one is received
+            while (true) {
+                std::shared_ptr<SimulationMessage> file_content_message = nullptr;
+                try {
+                    file_content_message = S4U_Mailbox::getMessage(answer_mailbox);
+                } catch (std::shared_ptr<NetworkError> &cause) {
+                    throw WorkflowExecutionException(cause);
+                }
 
-            if (auto file_content_msg = std::dynamic_pointer_cast<StorageServiceFileContentMessage>(
-                    file_content_message)) {
-                // do nothing
-            } else {
-                throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
-                                         file_content_message->getName() + "] message!");
+                if (auto file_content_chunk_msg = std::dynamic_pointer_cast<StorageServiceFileContentChunkMessage>(
+                        file_content_message)) {
+                    if (file_content_chunk_msg->last_chunk) {
+                        break;
+                    }
+                } else {
+                    throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
+                                             file_content_message->getName() + "] message!");
+                }
             }
 
         } else {
@@ -460,11 +465,25 @@ namespace wrench {
                 throw WorkflowExecutionException(msg->failure_cause);
             }
 
-            // Otherwise, synchronously send the file up!
-            try {
-                S4U_Mailbox::putMessage(msg->data_write_mailbox_name, new StorageServiceFileContentMessage(file));
-            } catch (std::shared_ptr<NetworkError> &cause) {
-                throw WorkflowExecutionException(cause);
+            // Otherwise, synchronously send the file chunks
+            double copy_buffer_size = this->getPropertyValueAsDouble(StorageServiceProperty::COPY_BUFFER_SIZE);
+
+            if (copy_buffer_size == 0) {
+                throw std::runtime_error("StorageService::writeFile(): Zero buffer size not implemented yet");
+            } else {
+                try {
+                    double remaining = file->getSize();
+                    while (remaining > copy_buffer_size) {
+                        S4U_Mailbox::putMessage(msg->data_write_mailbox_name, new StorageServiceFileContentChunkMessage(
+                                file, copy_buffer_size, false));
+                        remaining -= copy_buffer_size;
+                    }
+                    S4U_Mailbox::putMessage(msg->data_write_mailbox_name, new StorageServiceFileContentChunkMessage(
+                            file, copy_buffer_size, true));
+
+                } catch (std::shared_ptr<NetworkError> &cause) {
+                    throw WorkflowExecutionException(cause);
+                }
             }
 
         } else {
