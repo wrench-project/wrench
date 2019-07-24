@@ -236,6 +236,7 @@ namespace wrench {
         StorageServiceFileReadRequestMessage(std::string answer_mailbox,
                                              std::string mailbox_to_receive_the_file_content,
                                              WorkflowFile *file, std::string &src_partition,
+                                             unsigned long buffer_size,
                                              double payload);
 
         /** @brief The mailbox to which the answer message should be sent */
@@ -246,6 +247,8 @@ namespace wrench {
         WorkflowFile *file;
         /** @brief The source partition from which to read the file */
         std::string src_partition;
+        /** @brief The requested buffer size */
+        unsigned long buffer_size;
     };
 
     /**

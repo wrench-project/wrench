@@ -1057,4 +1057,121 @@ namespace wrench {
     double StorageService::getTotalSpace() {
         return this->capacity;
     }
+
+    /**
+     * @brief Download a file to a local partition
+     * @param file: the file to download
+     * @param local_partition: the local partition
+     * @param buffer_size: buffer size to use (0 means use "ideal fluid model")
+     */
+    void StorageService::downloadFile(WorkflowFile *file, std::string local_partition, unsigned long buffer_size) {
+        std::string src_partition = "/";
+        this->downloadFile(file, src_partition, local_partition, buffer_size);
+    }
+
+    /**
+     * @brief Download a file to a local partition/disk
+     * @param file: the file to download
+     * @param src_partition: the source dir/partition/disk
+     * @param local_partition: the local disk
+     * @param buffer_size: buffer size to use (0 means use "ideal fluid model")
+     */
+    void StorageService::downloadFile(WorkflowFile *file, std::string src_partition, std::string local_partition, unsigned long buffer_size) {
+        WRENCH_INFO("Initiating a file read operation for file %s on storage service %s",
+                    file->getID().c_str(), this->getName().c_str());
+
+        if (file == nullptr) {
+            throw std::invalid_argument("StorageService::downloadFile(): Invalid arguments");
+        }
+
+        // Check that the service is up
+        assertServiceIsUp();
+
+        // Check that the buffer size is compatible
+        if (((buffer_size == 0) && (this->copy_buffer_size != 0)) or
+            ((buffer_size != 0) && (this->copy_buffer_size == 0))) {
+            throw std::invalid_argument("StorageService::downloadFile(): Incompatible buffer size specs (both must be zero, or both must be non-zero");
+        }
+
+        // Empty partition means "/"
+        if (src_partition.empty()) {
+            src_partition = "/";
+        }
+        if (local_partition.empty()) {
+            local_partition = "/";
+        }
+
+        // Send a message to the daemon
+        std::string request_answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("read_file_request");
+        std::string mailbox_that_should_receive_file_content = S4U_Mailbox::generateUniqueMailboxName("read_file_chunks");
+
+        try {
+            S4U_Mailbox::putMessage(this->mailbox_name,
+                                    new StorageServiceFileReadRequestMessage(request_answer_mailbox,
+                                                                             mailbox_that_should_receive_file_content,
+                                                                             file,
+                                                                             src_partition,
+                                                                             buffer_size,
+                                                                             this->getMessagePayloadValue(
+                                                                                     StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
+        } catch (std::shared_ptr<NetworkError> &cause) {
+            throw WorkflowExecutionException(cause);
+        }
+
+
+        // Wait for a reply to the request
+        std::shared_ptr<SimulationMessage> message = nullptr;
+
+        try {
+            message = S4U_Mailbox::getMessage(request_answer_mailbox, this->network_timeout);
+        } catch (std::shared_ptr<NetworkError> &cause) {
+            throw WorkflowExecutionException(cause);
+        }
+
+        if (auto msg = std::dynamic_pointer_cast<StorageServiceFileReadAnswerMessage>(message)) {
+            // If it's not a success, throw an exception
+            if (not msg->success) {
+                throw WorkflowExecutionException(msg->failure_cause);
+            }
+        } else {
+            throw std::runtime_error("StorageService::downloadFile(): Received an unexpected [" +
+                                     message->getName() + "] message!");
+        }
+
+        WRENCH_INFO("File read request accepted (will receive file content on mailbox_name %s)",
+                    mailbox_that_should_receive_file_content.c_str());
+
+        bool done = false;
+        // Receive the first chunk
+        auto msg = S4U_Mailbox::getMessage(mailbox_that_should_receive_file_content);
+        if (auto file_content_chunk_msg =
+                std::dynamic_pointer_cast<StorageServiceFileContentChunkMessage>(msg)) {
+            done = file_content_chunk_msg->last_chunk;
+        } else {
+            throw std::runtime_error("FileTransferThread::downloadFile() : Received an unexpected [" +
+                                     msg->getName() + "] message!");
+        }
+
+        // Receive chunks and write them to disk
+        while (not done) {
+            // Issue the receive
+            auto req = S4U_Mailbox::igetMessage(mailbox_that_should_receive_file_content);
+            // Do the I/O
+            S4U_Simulation::writeToDisk(msg->payload, local_partition);
+
+            // Wait for the comm to finish
+            msg = req->wait();
+            if (auto file_content_chunk_msg =
+                    std::dynamic_pointer_cast<StorageServiceFileContentChunkMessage>(msg)) {
+                done = file_content_chunk_msg->last_chunk;
+            } else {
+                throw std::runtime_error("FileTransferThread::downloadFile() : Received an unexpected [" +
+                                         msg->getName() + "] message!");
+            }
+        }
+        // Do the I/O for the last chunk
+        S4U_Simulation::writeToDisk(msg->payload, local_partition);
+
+
+    }
 };
