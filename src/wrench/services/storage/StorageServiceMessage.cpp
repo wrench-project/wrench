@@ -305,6 +305,7 @@ namespace wrench {
    * @param mailbox_to_receive_the_file_content: the mailbox to which to send the file content
    * @param file: the file
    * @param src_partition: the partition where the file is stored
+   * @param buffer_size: the requested buffer size
    * @param payload: the message size in bytes
    *
    * @throw std::invalid_argument
@@ -313,6 +314,7 @@ namespace wrench {
                                                                                std::string mailbox_to_receive_the_file_content,
                                                                                WorkflowFile *file,
                                                                                std::string &src_partition,
+                                                                               unsigned long buffer_size,
                                                                                double payload) : StorageServiceMessage(
             "FILE_READ_REQUEST",
             payload) {
@@ -324,6 +326,7 @@ namespace wrench {
         this->mailbox_to_receive_the_file_content = mailbox_to_receive_the_file_content;
         this->file = file;
         this->src_partition = src_partition;
+        this->buffer_size = buffer_size;
     }
 
     /**

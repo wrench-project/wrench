@@ -254,8 +254,7 @@ namespace wrench {
     /**
      * @brief A "service is down" failure cause
      */
-    class
-    ServiceIsDown : public FailureCause {
+    class ServiceIsDown : public FailureCause {
     public:
         /***********************/
         /** \cond INTERNAL     */
@@ -275,8 +274,7 @@ namespace wrench {
     /**
      * @brief A "service is suspended" failure cause
      */
-    class
-    ServiceIsSuspended : public FailureCause {
+    class ServiceIsSuspended : public FailureCause {
     public:
         /***********************/
         /** \cond INTERNAL     */

@@ -120,7 +120,6 @@ namespace wrench {
         std::set<std::shared_ptr<FileTransferThread>> running_file_transfer_threads;
 
         double local_copy_data_transfer_rate;
-        unsigned long copy_buffer_size;
 
         void validateProperties();
 

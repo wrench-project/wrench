@@ -419,6 +419,11 @@ namespace wrench {
 
         // Initiate an ASYNCHRONOUS file read from the source if I am not the source
         if (src.get() != this) {
+            if ((src->state == Service::DOWN) or (src->state == Service::SUSPENDED) {
+                throw WorkflowExecutionException(
+                        std::shared_ptr<FailureCause>(new ServiceIsSuspended(this->getSharedPtr<Service>())));
+            }
+
             try {
                 src->initiateFileRead(file_reception_mailbox, file, src_partition);
             } catch (WorkflowExecutionException &e) {
@@ -441,6 +446,8 @@ namespace wrench {
             }
         }
 
+
+        // Create a file transfer thread
         std::shared_ptr<FileTransferThread> ftt;
 
         if (src.get() == this) {
