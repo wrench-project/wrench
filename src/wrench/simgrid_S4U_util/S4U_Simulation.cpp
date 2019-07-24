@@ -238,6 +238,30 @@ namespace wrench {
     }
 
     /**
+     * @brief Simulates a disk write
+     * @param num_bytes: bumber of written bytes
+     * @param partition_name: partition name
+     */
+    void S4U_Simulation::writeToDisk(double num_bytes, std::string partition_name) {
+        // TODO: Change this once I/O in SimGrid is better: the data transfer rate
+        // should be based on the I/O device associated to the partition
+        // Right now, this takes ZERO time!!!
+    }
+
+    /**
+     * @brief Simulates a disk read
+     * @param num_bytes: bumber of read bytes
+     * @param partition_name: partition name
+     */
+    void S4U_Simulation::readFromDisk(double num_bytes, std::string partition_name) {
+        // TODO: Change this once I/O in SimGrid is better: the data transfer rate
+        // should be based on the I/O device associated to the partition
+        // Right now, this takes ZERO time!!!
+    }
+
+
+
+    /**
      * @brief Simulates a sleep
      * @param duration: the number of seconds to sleep
      */
