@@ -128,11 +128,9 @@ namespace wrench {
             WRENCH_INFO("SEDINGING BACK REPORT");
             // (TODO: making this a dput causes a problem... perhaps a dput right before death bug in SimGrid (again?))
             S4U_Mailbox::putMessage(this->parent->mailbox_name, msg_to_send_back);
-            WRENCH_INFO("DONE SENDING");
         } catch (std::shared_ptr<NetworkError> &e) {
             // oh well...
         }
-        WRENCH_INFO("TREAMINING");
 
         return 0;
     }
