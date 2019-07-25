@@ -119,16 +119,14 @@ void SimpleStorageServiceChunkingTest::do_ChunkingTest(std::string mode) {
     // Create One Storage Service
     ASSERT_NO_THROW(storage_service_1 = simulation->add(
             new wrench::SimpleStorageService("StorageHost", 1000,
-                                             {{wrench::SimpleStorageServiceProperty::COPY_BUFFER_SIZE, "5"},
-                                              {wrench::SimpleStorageServiceProperty::LOCAL_COPY_DATA_RATE, "1"},
+                                             {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "5"},
                                               {wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "10"}}
             )));
 
     // Create Another Storage Service
     ASSERT_NO_THROW(storage_service_2 = simulation->add(
             new wrench::SimpleStorageService("StorageHost", 1000,
-                                             {{wrench::SimpleStorageServiceProperty::COPY_BUFFER_SIZE, "10"},
-                                              {wrench::SimpleStorageServiceProperty::LOCAL_COPY_DATA_RATE, "2"},
+                                             {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10"},
                                               {wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "10"}}
             )));
 
