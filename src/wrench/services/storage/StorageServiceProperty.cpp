@@ -14,7 +14,7 @@
 
 namespace wrench {
 
-    SET_PROPERTY_NAME(StorageServiceProperty, COPY_BUFFER_SIZE);
+    SET_PROPERTY_NAME(StorageServiceProperty, BUFFER_SIZE);
 
 };
 

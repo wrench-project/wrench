@@ -323,12 +323,10 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
 
     // Create a Storage Service
     ASSERT_THROW(storage_service = simulation->add(
-            new wrench::SimpleStorageService(hostname, 100.0,
-                                             {{wrench::SimpleStorageServiceProperty::LOCAL_COPY_DATA_RATE, "BOGUS"}},
+            new wrench::SimpleStorageService(hostname, 100.0, {},
                                              {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, -1}})), std::invalid_argument);
     storage_service = simulation->add(
-            new wrench::SimpleStorageService(hostname, 100.0,
-                                             {{wrench::SimpleStorageServiceProperty::LOCAL_COPY_DATA_RATE, "infinity"}},
+            new wrench::SimpleStorageService(hostname, 100.0, {},
                                              {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 123}}));
 
 
@@ -336,8 +334,6 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     ASSERT_THROW(storage_service->getPropertyValueAsString("BOGUS"), std::invalid_argument);
     ASSERT_THROW(storage_service->getPropertyValueAsDouble("BOGUS"), std::invalid_argument);
     ASSERT_THROW(storage_service->getPropertyValueAsBoolean("BOGUS"), std::invalid_argument);
-    // Try to get a non-double double property (property value is "infinity", which is not a number)
-    ASSERT_NO_THROW(storage_service->getPropertyValueAsDouble(wrench::SimpleStorageServiceProperty::LOCAL_COPY_DATA_RATE));
 
     ASSERT_THROW(storage_service->getMessagePayloadValue("BOGUS"), std::invalid_argument);
     ASSERT_EQ(123, storage_service->getMessagePayloadValue(

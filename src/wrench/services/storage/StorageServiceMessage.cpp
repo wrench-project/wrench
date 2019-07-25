@@ -249,6 +249,7 @@ namespace wrench {
     * @param answer_mailbox: the mailbox to which to send the answer
     * @param file: the file
     * @param dst_partition: the destination partition
+    * @param buffer_size: the buffer size
     * @param payload: the message size in bytes
     *
     * @throw std::invalid_argument
@@ -256,6 +257,7 @@ namespace wrench {
     StorageServiceFileWriteRequestMessage::StorageServiceFileWriteRequestMessage(std::string answer_mailbox,
                                                                                  WorkflowFile *file,
                                                                                  std::string &dst_partition,
+                                                                                 unsigned long buffer_size,
                                                                                  double payload)
             : StorageServiceMessage("FILE_WRITE_REQUEST",
                                     payload) {
@@ -267,6 +269,7 @@ namespace wrench {
         this->answer_mailbox = answer_mailbox;
         this->file = file;
         this->dst_partition = dst_partition;
+        this->buffer_size = buffer_size;
     }
 
     /**

@@ -133,7 +133,7 @@ private:
         // Dynamically create a Storage Service on this host
         auto dynamically_created_storage_service = simulation->startNewService(
                 new wrench::SimpleStorageService(hostname, 100.0,
-                                                 {{wrench::SimpleStorageServiceProperty::LOCAL_COPY_DATA_RATE, "infinity"}},
+                                                 {},
                                                  {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 123}}));
 
 
@@ -236,7 +236,7 @@ void DynamicServiceCreationTest::do_getReadyTasksTest_test() {
     // Create a Storage Service
     storage_service = simulation->add(
             new wrench::SimpleStorageService(hostname, 100.0,
-                                             {{wrench::SimpleStorageServiceProperty::LOCAL_COPY_DATA_RATE, "infinity"}},
+                                             {},
                                              {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 123}}));
 
 
