@@ -90,8 +90,7 @@ namespace wrench {
         this->validateProperties();
 
         this->num_concurrent_connections = this->getPropertyValueAsUnsignedLong(SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS);
-        this->local_copy_data_transfer_rate = this->getPropertyValueAsDouble(SimpleStorageServiceProperty::LOCAL_COPY_DATA_RATE);
-        this->copy_buffer_size = this->getPropertyValueAsUnsignedLong(SimpleStorageServiceProperty::COPY_BUFFER_SIZE);
+        this->buffer_size = this->getPropertyValueAsUnsignedLong(StorageServiceProperty::BUFFER_SIZE);
     }
 
     /**
@@ -212,12 +211,12 @@ namespace wrench {
 
         } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFileWriteRequestMessage>(message)) {
 
-            return processFileWriteRequest(msg->file, msg->dst_partition, msg->answer_mailbox);
+            return processFileWriteRequest(msg->file, msg->dst_partition, msg->answer_mailbox, msg->buffer_size);
 
         } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFileReadRequestMessage>(message)) {
 
             return processFileReadRequest(msg->file, msg->src_partition, msg->answer_mailbox,
-                                          msg->mailbox_to_receive_the_file_content);
+                                          msg->mailbox_to_receive_the_file_content, msg->buffer_size);
 
         } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFileCopyRequestMessage>(message)) {
 
@@ -246,10 +245,11 @@ namespace wrench {
      * @param file: the file to write
      * @param dst_partition: the file partition to write the file to
      * @param answer_mailbox: the mailbox to which the reply should be sent
+     * @param buffer_size: the buffer size to use
      * @return true if this process should keep running
      */
     bool SimpleStorageService::processFileWriteRequest(WorkflowFile *file, std::string dst_partition,
-                                                       std::string answer_mailbox) {
+                                                       std::string answer_mailbox, unsigned long buffer_size) {
 
         // If the file is not already there, do a capacity check/update
         // (If the file is already there, then there will just be an overwrite. Note that
@@ -294,12 +294,12 @@ namespace wrench {
         // Create a FileTransferThread
         auto ftt = std::shared_ptr<FileTransferThread>(
                 new FileTransferThread(this->hostname,
+                                       this->getSharedPtr<StorageService>(),
                                        file,
                                        {FileTransferThread::LocationType::MAILBOX, file_reception_mailbox},
                                        {FileTransferThread::LocationType::LOCAL_PARTITION, dst_partition},
-                                       "", this->mailbox_name,
-                                       this->local_copy_data_transfer_rate,
-                                       this->copy_buffer_size));
+                                       "",
+                                       buffer_size));
         ftt->simulation = this->simulation;
 
         // Add it to the Pool of pending data communications
@@ -315,11 +315,13 @@ namespace wrench {
      * @param src_partition: the file partition to read the file from
      * @param answer_mailbox: the mailbox to which the answer should be sent
      * @param mailbox_to_receive_the_file_content: the mailbox to which the file will be sent
+     * @param buffer_size: the buffer_size to use
      * @return
      */
     bool SimpleStorageService::processFileReadRequest(WorkflowFile *file, std::string src_partition,
                                                       std::string answer_mailbox,
-                                                      std::string mailbox_to_receive_the_file_content) {
+                                                      std::string mailbox_to_receive_the_file_content,
+                                                      unsigned long buffer_size) {
 
 
 
@@ -351,11 +353,13 @@ namespace wrench {
         if (success) {
             // Create a FileTransferThread
             auto ftt = std::shared_ptr<FileTransferThread>(
-                    new FileTransferThread(this->hostname, file,
+                    new FileTransferThread(this->hostname,
+                                           this->getSharedPtr<StorageService>(),
+                                           file,
                                            {FileTransferThread::LocationType::LOCAL_PARTITION, src_partition},
                                            {FileTransferThread::LocationType::MAILBOX, mailbox_to_receive_the_file_content},
-                                           "", this->mailbox_name, this->local_copy_data_transfer_rate,
-                                           this->copy_buffer_size));
+                                           "",
+                                           buffer_size));
             ftt->simulation = this->simulation;
 
             // Add it to the Pool of pending data communications
@@ -414,59 +418,29 @@ namespace wrench {
                     file->getID().c_str(),
                     src->getName().c_str());
 
-        // Create a unique mailbox_name on which to receive the file
-        std::string file_reception_mailbox = S4U_Mailbox::generateUniqueMailboxName("file_reception");
-
-        // Initiate an ASYNCHRONOUS file read from the source if I am not the source
-        if (src.get() != this) {
-            if ((src->state == Service::DOWN) or (src->state == Service::SUSPENDED) {
-                throw WorkflowExecutionException(
-                        std::shared_ptr<FailureCause>(new ServiceIsSuspended(this->getSharedPtr<Service>())));
-            }
-
-            try {
-                src->initiateFileRead(file_reception_mailbox, file, src_partition);
-            } catch (WorkflowExecutionException &e) {
-                try {
-                    S4U_Mailbox::putMessage(answer_mailbox,
-                                            new StorageServiceFileCopyAnswerMessage(file,
-                                                                                    this->getSharedPtr<StorageService>(),
-                                                                                    dst_partition, nullptr, false,
-                                                                                    false, e.getCause(),
-                                                                                    this->getMessagePayloadValue(
-                                                                                            SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
-
-                    this->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyFailure>(
-                            new SimulationTimestampFileCopyFailure(start_timestamp));
-
-                } catch (std::shared_ptr<NetworkError> &cause) {
-                    return true;
-                }
-                return true;
-            }
-        }
 
 
         // Create a file transfer thread
         std::shared_ptr<FileTransferThread> ftt;
 
-        if (src.get() == this) {
+        if (src.get() == this) { // Local copy
             ftt = std::shared_ptr<FileTransferThread>(
-                    new FileTransferThread(this->hostname, file,
+                    new FileTransferThread(this->hostname,
+                                           this->getSharedPtr<StorageService>(),
+                                           file,
                                            {FileTransferThread::LocationType::LOCAL_PARTITION, src_partition},
                                            {FileTransferThread::LocationType::LOCAL_PARTITION, dst_partition},
-                                           answer_mailbox, this->mailbox_name,
-                                           this->local_copy_data_transfer_rate,
-                                           this->copy_buffer_size, start_timestamp));
+                                           answer_mailbox,
+                                           this->buffer_size, start_timestamp));
         } else {
-
             ftt = std::shared_ptr<FileTransferThread>(
-                    new FileTransferThread(this->hostname, file,
-                                           {FileTransferThread::LocationType::MAILBOX, file_reception_mailbox},
+                    new FileTransferThread(this->hostname,
+                                           this->getSharedPtr<StorageService>(),
+                                           file,
+                                           {FileTransferThread::LocationType::STORAGE_SERVICE, src->getName() + ":" + src_partition},
                                            {FileTransferThread::LocationType::LOCAL_PARTITION, dst_partition},
-                                           answer_mailbox, this->mailbox_name,
-                                           this->local_copy_data_transfer_rate,
-                                           this->copy_buffer_size, start_timestamp));
+                                           answer_mailbox,
+                                           this->buffer_size, start_timestamp));
         }
 
         ftt->simulation = this->simulation;
@@ -519,30 +493,7 @@ namespace wrench {
         }
         this->running_file_transfer_threads.erase(ftt);
 
-        if ((dst.first == FileTransferThread::LocationType::LOCAL_PARTITION) and
-            (src.first == FileTransferThread::LocationType::MAILBOX)) {
-            /** MAILBOX -> LOCAL PARTITION **/
-            if (success) {
-                //Add the file to my storage (this will not add a duplicate in case of an overwrite, because it's a set)
-                this->stored_files[dst.second].insert(file);
-                // Deal with time stamps
-                if (start_timestamp != nullptr) {
-                    this->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyCompletion>(
-                            new SimulationTimestampFileCopyCompletion(start_timestamp));
-                }
-            } else {
-                // Process the failure, meaning, just re-decrease the occupied space
-                this->occupied_space -= file->getSize();
-            }
-
-        } else if ((FileTransferThread::LocationType::LOCAL_PARTITION) and
-                   (dst.first == FileTransferThread::LocationType::MAILBOX)) {
-            /** LOCAL PARTITION -> MAILBOX **/
-            // Do nothing... (our storage state wasn't going to be modified anyway)
-
-        } else if ((src.first == FileTransferThread::LocationType::LOCAL_PARTITION) and
-                   (dst.first == FileTransferThread::LocationType::LOCAL_PARTITION)) {
-            /** LOCAL PARTITION -> LOCAL PARTITION **/
+        if (dst.first == FileTransferThread::LocationType::LOCAL_PARTITION) {
             if (success) {
                 //Add the file to my storage (this will not add a duplicate in case of an overwrite, because it's a set)
                 this->stored_files[dst.second].insert(file);
@@ -585,11 +536,7 @@ namespace wrench {
         unsigned long p_ulong;
         double p_double;
         p_ulong = this->getPropertyValueAsUnsignedLong(SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS);
-        p_ulong = this->getPropertyValueAsUnsignedLong(SimpleStorageServiceProperty::COPY_BUFFER_SIZE);
-        p_double = this->getPropertyValueAsDouble(SimpleStorageServiceProperty::LOCAL_COPY_DATA_RATE);
-        if (p_double < 0) {
-            throw std::invalid_argument("SimpleStorageService::validateProperties(): LOCAL_COPY_DATA_RATE cannot be <0");
-        }
+        p_ulong = this->getPropertyValueAsUnsignedLong(SimpleStorageServiceProperty::BUFFER_SIZE);
     }
 
 };

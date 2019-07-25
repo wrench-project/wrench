@@ -194,6 +194,7 @@ namespace wrench {
     public:
         StorageServiceFileWriteRequestMessage(std::string answer_mailbox, WorkflowFile *file,
                                               std::string &dst_partition,
+                                              unsigned long buffer_size,
                                               double payload);
 
         /** @brief Mailbox to which the answer message should be sent */
@@ -202,6 +203,8 @@ namespace wrench {
         WorkflowFile *file;
         /** @brief The file partition to write the file to */
         std::string dst_partition;
+        /** @brief The buffer size to use */
+        unsigned long buffer_size;
     };
 
     /**

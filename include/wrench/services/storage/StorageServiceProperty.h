@@ -23,14 +23,13 @@ namespace wrench {
 
     public:
 
-        /** @brief Buffer size used when data is being sent by the service from a local
-         *         disk to the network:
-         *   - "infinity" (default): full buffering (load and forward model)
+        /** @brief Buffer size used when copying/communicating data:
+         *   - "infinity" (default): full buffering (read/write and forward model)
          *   - "0": an ideal fluid model
          *   - any integral value in between: an actual buffer size (the smaller the buffer size, the
          *     slower the simulation)
          **/
-        DECLARE_PROPERTY_NAME(COPY_BUFFER_SIZE);
+        DECLARE_PROPERTY_NAME(BUFFER_SIZE);
     };
 
 };

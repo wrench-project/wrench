@@ -77,8 +77,6 @@ namespace wrench {
                                       std::string src_dir,
                                       std::string dst_dir);
 
-        virtual void initiateFileRead(std::string mailbox_that_should_receive_file_content, WorkflowFile *file, std::string src_dir);
-
 
         virtual void deleteFile(WorkflowFile *file, WorkflowJob* job, std::shared_ptr<FileRegistryService> file_registry_service=nullptr);
         virtual bool lookupFile(WorkflowFile *file, WorkflowJob*);
@@ -114,6 +112,7 @@ namespace wrench {
 
         friend class Simulation;
         friend class FileRegistryService;
+        friend class FileTransferThread;
 
 
         void stageFile(WorkflowFile *);
@@ -127,13 +126,15 @@ namespace wrench {
         /** @brief The storage service's occupied space */
         double occupied_space = 0;
 
+        /** @brief The service's buffer size */
+        unsigned long buffer_size;
+
         /***********************/
         /** \endcond          **/
         /***********************/
 
     private:
 
-        unsigned long copy_buffer_size;
 
         enum FileOperation {
             READ,
