@@ -100,7 +100,6 @@ namespace wrench {
 
             try {
                 receiveFileFromNetwork(this->file, this->src.second, this->dst.second);
-
             } catch (std::shared_ptr<NetworkError> &failure_cause) {
                 WRENCH_INFO("FileTransferThread::main() Network error (%s)", failure_cause->toString().c_str());
                 msg_to_send_back->success = false;
@@ -110,6 +109,7 @@ namespace wrench {
         } else if ((src.first == LocationType::LOCAL_PARTITION) && (dst.first == LocationType::LOCAL_PARTITION)) {
             /** Copying a file local file */
             copyFileLocally(this->file, src.second, dst.second);
+
         } else if ((src.first == LocationType::STORAGE_SERVICE) && (dst.first == LocationType::LOCAL_PARTITION)) {
             /** Downloading a file from another storage service */
             try {
@@ -117,7 +117,7 @@ namespace wrench {
             } catch (std::shared_ptr<FailureCause> &failure_cause) {
                 msg_to_send_back->success = false;
                 msg_to_send_back->failure_cause = failure_cause;
-            } 
+            }
         } else {
             throw std::runtime_error("FileTransferThread::main(): Invalid src/dst combination");
         }
@@ -125,11 +125,14 @@ namespace wrench {
 
         try {
             // Send report back to the service
+            WRENCH_INFO("SEDINGING BACK REPORT");
             // (TODO: making this a dput causes a problem... perhaps a dput right before death bug in SimGrid (again?))
             S4U_Mailbox::putMessage(this->parent->mailbox_name, msg_to_send_back);
+            WRENCH_INFO("DONE SENDING");
         } catch (std::shared_ptr<NetworkError> &e) {
             // oh well...
         }
+        WRENCH_INFO("TREAMINING");
 
         return 0;
     }
@@ -156,24 +159,29 @@ namespace wrench {
                                      msg->getName() + "] message!");
         }
 
-        // Receive chunks and write them to disk
-        while (not done) {
-            // Issue the receive
-            auto req = S4U_Mailbox::igetMessage(mailbox);
-            // Write to disk
-            S4U_Simulation::writeToDisk(msg->payload, partition);
-            // Wait for the comm to finish
-            msg = req->wait();
-            if (auto file_content_chunk_msg =
-                    std::dynamic_pointer_cast<StorageServiceFileContentChunkMessage>(msg)) {
-                done = file_content_chunk_msg->last_chunk;
-            } else {
-                throw std::runtime_error("FileTransferThread::receiveFileFromNetwork() : Received an unexpected [" +
-                                         msg->getName() + "] message!");
+        try {
+
+            // Receive chunks and write them to disk
+            while (not done) {
+                // Issue the receive
+                auto req = S4U_Mailbox::igetMessage(mailbox);
+                // Write to disk
+                S4U_Simulation::writeToDisk(msg->payload, partition);
+                // Wait for the comm to finish
+                msg = req->wait();
+                if (auto file_content_chunk_msg =
+                        std::dynamic_pointer_cast<StorageServiceFileContentChunkMessage>(msg)) {
+                    done = file_content_chunk_msg->last_chunk;
+                } else {
+                    throw std::runtime_error("FileTransferThread::receiveFileFromNetwork() : Received an unexpected [" +
+                                             msg->getName() + "] message!");
+                }
             }
+            // Sleep to simulate I/O for the last chunk
+            S4U_Simulation::writeToDisk(msg->payload, partition);
+        } catch (std::shared_ptr<NetworkError> &e) {
+            throw;
         }
-        // Sleep to simulate I/O for the last chunk
-        S4U_Simulation::writeToDisk(msg->payload, partition);
 
     }
 
@@ -196,24 +204,28 @@ namespace wrench {
 
         } else {
 
-            /** Non-zero buffer size */
-            std::shared_ptr<S4U_PendingCommunication> req = nullptr;
-            // Sending a zero-byte file is really sending a 1-byte file
-            double remaining = std::max<double>(1, file->getSize());
+            try {
+                /** Non-zero buffer size */
+                std::shared_ptr<S4U_PendingCommunication> req = nullptr;
+                // Sending a zero-byte file is really sending a 1-byte file
+                double remaining = std::max<double>(1, file->getSize());
 
-            while (remaining > 0) {
-                double chunk_size = std::min<double>(this->buffer_size, remaining);
-                S4U_Simulation::readFromDisk(chunk_size, partition);
-                remaining -= this->buffer_size;
-                if (req) {
-                    req->wait();
+                while (remaining > 0) {
+                    double chunk_size = std::min<double>(this->buffer_size, remaining);
+                    S4U_Simulation::readFromDisk(chunk_size, partition);
+                    remaining -= this->buffer_size;
+                    if (req) {
+                        req->wait();
+                    }
+                    req = S4U_Mailbox::iputMessage(mailbox,
+                                                   new StorageServiceFileContentChunkMessage(
+                                                           this->file,
+                                                           chunk_size, (remaining <= 0)));
                 }
-                req = S4U_Mailbox::iputMessage(mailbox,
-                                               new StorageServiceFileContentChunkMessage(
-                                                       this->file,
-                                                       chunk_size, (remaining < 0)));
+                req->wait();
+            } catch (std::shared_ptr<NetworkError> &e) {
+                throw;
             }
-            req->wait();
 
         }
     }
