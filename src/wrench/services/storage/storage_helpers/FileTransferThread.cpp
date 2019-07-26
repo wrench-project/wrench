@@ -29,7 +29,8 @@ namespace wrench {
      * @param file: the file corresponding to the connection
      * @param src: the transfer source
      * @param dst: the transfer destination
-     * @param answer_mailbox_if_copy: the mailbox to send an answer to in case this was a file copy ("" if none)
+     * @param answer_mailbox_if_copy: the mailbox to send an answer to in case this was a file copy ("" if none). This
+     *        will simply be reported to the parent service, who may use it as needed
      * @param buffer_size: the buffer size to use
      * @param start_timestamp: if this is a file copy, a start timestamp associated with it
      */
@@ -50,10 +51,6 @@ namespace wrench {
             buffer_size(buffer_size),
             start_timestamp(start_timestamp)
     {
-        if ((src.first == FileTransferThread::LocationType::MAILBOX) and
-            (dst.first == FileTransferThread::LocationType::MAILBOX)) {
-            throw std::invalid_argument("FileTransferThread::FileTransferThread(): the source and the destination cannot both be of type MAILBOX");
-        }
 
     }
 
@@ -125,7 +122,6 @@ namespace wrench {
 
         try {
             // Send report back to the service
-            WRENCH_INFO("SEDINGING BACK REPORT");
             // (TODO: making this a dput causes a problem... perhaps a dput right before death bug in SimGrid (again?))
             S4U_Mailbox::putMessage(this->parent->mailbox_name, msg_to_send_back);
         } catch (std::shared_ptr<NetworkError> &e) {
@@ -145,40 +141,51 @@ namespace wrench {
     */
     void FileTransferThread::receiveFileFromNetwork(WorkflowFile *file, std::string mailbox, std::string partition) {
 
-        bool done = false;
+        /** Ideal Fluid model buffer size */
+        if (this->buffer_size == 0) {
 
-        // Receive the first chunk
-        auto msg = S4U_Mailbox::getMessage(mailbox);
-        if (auto file_content_chunk_msg =
-                std::dynamic_pointer_cast<StorageServiceFileContentChunkMessage>(msg)) {
-            done = file_content_chunk_msg->last_chunk;
+            throw std::runtime_error(
+                    "FileTransferThread::receiveFileFromNetwork(): Zero buffer size not implemented yet");
+
         } else {
-            throw std::runtime_error("FileTransferThread::receiveFileFromNetwork() : Received an unexpected [" +
-                                     msg->getName() + "] message!");
-        }
+            /** Non-zero buffer size */
 
-        try {
+            bool done = false;
 
-            // Receive chunks and write them to disk
-            while (not done) {
-                // Issue the receive
-                auto req = S4U_Mailbox::igetMessage(mailbox);
-                // Write to disk
-                S4U_Simulation::writeToDisk(msg->payload, partition);
-                // Wait for the comm to finish
-                msg = req->wait();
-                if (auto file_content_chunk_msg =
-                        std::dynamic_pointer_cast<StorageServiceFileContentChunkMessage>(msg)) {
-                    done = file_content_chunk_msg->last_chunk;
-                } else {
-                    throw std::runtime_error("FileTransferThread::receiveFileFromNetwork() : Received an unexpected [" +
-                                             msg->getName() + "] message!");
-                }
+            // Receive the first chunk
+            auto msg = S4U_Mailbox::getMessage(mailbox);
+            if (auto file_content_chunk_msg =
+                    std::dynamic_pointer_cast<StorageServiceFileContentChunkMessage>(msg)) {
+                done = file_content_chunk_msg->last_chunk;
+            } else {
+                throw std::runtime_error("FileTransferThread::receiveFileFromNetwork() : Received an unexpected [" +
+                                         msg->getName() + "] message!");
             }
-            // Sleep to simulate I/O for the last chunk
-            S4U_Simulation::writeToDisk(msg->payload, partition);
-        } catch (std::shared_ptr<NetworkError> &e) {
-            throw;
+
+            try {
+
+                // Receive chunks and write them to disk
+                while (not done) {
+                    // Issue the receive
+                    auto req = S4U_Mailbox::igetMessage(mailbox);
+                    // Write to disk
+                    S4U_Simulation::writeToDisk(msg->payload, partition);
+                    // Wait for the comm to finish
+                    msg = req->wait();
+                    if (auto file_content_chunk_msg =
+                            std::dynamic_pointer_cast<StorageServiceFileContentChunkMessage>(msg)) {
+                        done = file_content_chunk_msg->last_chunk;
+                    } else {
+                        throw std::runtime_error(
+                                "FileTransferThread::receiveFileFromNetwork() : Received an unexpected [" +
+                                msg->getName() + "] message!");
+                    }
+                }
+                // Sleep to simulate I/O for the last chunk
+                S4U_Simulation::writeToDisk(msg->payload, partition);
+            } catch (std::shared_ptr<NetworkError> &e) {
+                throw;
+            }
         }
 
     }
@@ -249,7 +256,7 @@ namespace wrench {
 
         // Download the file
         try {
-            ss->downloadFile(file, src_partition, partition, this->parent->buffer_size);
+            ss->downloadFile(file, src_partition, partition, this->buffer_size);
         } catch (WorkflowExecutionException &e) {
             throw e.getCause();
         }
@@ -265,18 +272,26 @@ namespace wrench {
         double remaining = file->getSize();
         double to_send = std::min<double>(this->buffer_size, remaining);
 
-        // Read the first chunk
-        S4U_Simulation::readFromDisk(to_send, src_partition);
-        // start the pipeline
-        while (remaining > this->buffer_size) {
-            // Write to disk. TODO: Make this asynchronous!
-            S4U_Simulation::writeToDisk(this->buffer_size, dst_partition);
-            S4U_Simulation::readFromDisk(this->buffer_size, src_partition);
+        /** Ideal Fluid model buffer size */
+        if (this->buffer_size == 0) {
 
-            remaining -= this->buffer_size;
+            throw std::runtime_error(
+                    "FileTransferThread::copyFileLocally(): Zero buffer size not implemented yet");
+
+        } else {
+            // Read the first chunk
+            S4U_Simulation::readFromDisk(to_send, src_partition);
+            // start the pipeline
+            while (remaining > this->buffer_size) {
+                // Write to disk. TODO: Make this asynchronous!
+                S4U_Simulation::writeToDisk(this->buffer_size, dst_partition);
+                S4U_Simulation::readFromDisk(this->buffer_size, src_partition);
+
+                remaining -= this->buffer_size;
+            }
+            // Write the last chunk
+            S4U_Simulation::writeToDisk(remaining, dst_partition);
         }
-        // Write the last chunk
-        S4U_Simulation::writeToDisk(remaining, dst_partition);
 
     }
 

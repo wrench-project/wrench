@@ -487,7 +487,6 @@ namespace wrench {
                                                                      std::string answer_mailbox_if_copy,
                                                                      SimulationTimestampFileCopyStart *start_timestamp) {
 
-        WRENCH_INFO("GOT A NOTIFICATION!");
         // Remove the ftt from the list of running ftt
         if (this->running_file_transfer_threads.find(ftt) == this->running_file_transfer_threads.end()) {
             WRENCH_INFO("Got a notification from a non-existing Data Communication Thread. Perhaps this is from a former life... ignoring");

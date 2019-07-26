@@ -325,7 +325,6 @@ namespace wrench {
             src_partition = "/";
         }
 
-
         // Send a message to the daemon
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("read_file");
         try {
@@ -358,23 +357,30 @@ namespace wrench {
                 throw WorkflowExecutionException(cause);
             }
 
-            // Otherwise, retrieve the file chunks until the last one is received
-            while (true) {
-                std::shared_ptr<SimulationMessage> file_content_message = nullptr;
-                try {
-                    file_content_message = S4U_Mailbox::getMessage(answer_mailbox);
-                } catch (std::shared_ptr<NetworkError> &cause) {
-                    throw WorkflowExecutionException(cause);
-                }
+            if (this->buffer_size == 0) {
 
-                if (auto file_content_chunk_msg = std::dynamic_pointer_cast<StorageServiceFileContentChunkMessage>(
-                        file_content_message)) {
-                    if (file_content_chunk_msg->last_chunk) {
-                        break;
+                throw std::runtime_error("StorageService::writeFile(): Zero buffer size not implemented yet");
+
+            } else {
+
+                // Otherwise, retrieve the file chunks until the last one is received
+                while (true) {
+                    std::shared_ptr<SimulationMessage> file_content_message = nullptr;
+                    try {
+                        file_content_message = S4U_Mailbox::getMessage(answer_mailbox);
+                    } catch (std::shared_ptr<NetworkError> &cause) {
+                        throw WorkflowExecutionException(cause);
                     }
-                } else {
-                    throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
-                                             file_content_message->getName() + "] message!");
+
+                    if (auto file_content_chunk_msg = std::dynamic_pointer_cast<StorageServiceFileContentChunkMessage>(
+                            file_content_message)) {
+                        if (file_content_chunk_msg->last_chunk) {
+                            break;
+                        }
+                    } else {
+                        throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
+                                                 file_content_message->getName() + "] message!");
+                    }
                 }
             }
 
@@ -1072,27 +1078,15 @@ namespace wrench {
         WRENCH_INFO("File read request accepted (will receive file content on mailbox_name %s)",
                     mailbox_that_should_receive_file_content.c_str());
 
-        try {
-            bool done = false;
-            // Receive the first chunk
-            auto msg = S4U_Mailbox::getMessage(mailbox_that_should_receive_file_content);
-            if (auto file_content_chunk_msg =
-                    std::dynamic_pointer_cast<StorageServiceFileContentChunkMessage>(msg)) {
-                done = file_content_chunk_msg->last_chunk;
-            } else {
-                throw std::runtime_error("FileTransferThread::downloadFile() : Received an unexpected [" +
-                                         msg->getName() + "] message!");
-            }
+        if (this->buffer_size == 0) {
 
-            // Receive chunks and write them to disk
-            while (not done) {
-                // Issue the receive
-                auto req = S4U_Mailbox::igetMessage(mailbox_that_should_receive_file_content);
-                // Do the I/O
-                S4U_Simulation::writeToDisk(msg->payload, local_partition);
+            throw std::runtime_error("downloadFile::writeFile(): Zero buffer size not implemented yet");
 
-                // Wait for the comm to finish
-                msg = req->wait();
+        } else {
+            try {
+                bool done = false;
+                // Receive the first chunk
+                auto msg = S4U_Mailbox::getMessage(mailbox_that_should_receive_file_content);
                 if (auto file_content_chunk_msg =
                         std::dynamic_pointer_cast<StorageServiceFileContentChunkMessage>(msg)) {
                     done = file_content_chunk_msg->last_chunk;
@@ -1100,11 +1094,29 @@ namespace wrench {
                     throw std::runtime_error("FileTransferThread::downloadFile() : Received an unexpected [" +
                                              msg->getName() + "] message!");
                 }
+
+                // Receive chunks and write them to disk
+                while (not done) {
+                    // Issue the receive
+                    auto req = S4U_Mailbox::igetMessage(mailbox_that_should_receive_file_content);
+                    // Do the I/O
+                    S4U_Simulation::writeToDisk(msg->payload, local_partition);
+
+                    // Wait for the comm to finish
+                    msg = req->wait();
+                    if (auto file_content_chunk_msg =
+                            std::dynamic_pointer_cast<StorageServiceFileContentChunkMessage>(msg)) {
+                        done = file_content_chunk_msg->last_chunk;
+                    } else {
+                        throw std::runtime_error("FileTransferThread::downloadFile() : Received an unexpected [" +
+                                                 msg->getName() + "] message!");
+                    }
+                }
+                // Do the I/O for the last chunk
+                S4U_Simulation::writeToDisk(msg->payload, local_partition);
+            } catch (std::shared_ptr<NetworkError> &e) {
+                throw WorkflowExecutionException(e);
             }
-            // Do the I/O for the last chunk
-            S4U_Simulation::writeToDisk(msg->payload, local_partition);
-        } catch (std::shared_ptr<NetworkError> &e) {
-            throw WorkflowExecutionException(e);
         }
 
     }
