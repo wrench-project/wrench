@@ -76,6 +76,30 @@ namespace wrench {
     }
 
     /**
+     * @brief Remove a file from the workflow. WARNING: this method de-allocated
+     *        memory for the file, making any pointer to the file invalid
+     * @param file: a file
+     *
+     * @throw std::invalid_argument
+     */
+    void Workflow::removeFile(WorkflowFile *file) {
+
+        if (file->getOutputOf() != nullptr) {
+            throw std::invalid_argument("Workflow::removeFile(): File " +
+                                        file->getID() + " cannot be removed because it is output of task " +
+                                        file->getOutputOf()->getID());
+        }
+
+        if (file->getInputOf().size() > 0) {
+            throw std::invalid_argument("Workflow::removeFile(): File " +
+                                        file->getID() + " cannot be removed because it is input to " +
+                                        std::to_string(file->getInputOf().size()) + " tasks");
+        }
+
+        this->files.erase(file->getID());
+    }
+
+    /**
      * @brief Remove a task from the workflow. WARNING: this method de-allocated
      *        memory for the task, making any pointer to the task invalid
      *
@@ -94,12 +118,20 @@ namespace wrench {
             throw std::invalid_argument("Workflow::removeTask(): Task '" + task->id + "' does not exist");
         }
 
-        std::vector<wrench::WorkflowTask *> children = this->getTaskChildren(task);
+        // Fix all files
+        for (auto &f : task->getInputFiles()) {
+            f->getInputOf().erase(task->getID());
+        }
+        for (auto &f : task->getOutputFiles()) {
+            f->setOutputOf(nullptr);
+        }
 
+        // Update the DAG
+        std::vector<wrench::WorkflowTask *> children = this->getTaskChildren(task);
         DAG->erase(task->DAG_node);
         tasks.erase(tasks.find(task->id));
 
-        // Brute-force a top-level update all all the children of the removed task
+        // Brute-force update of the top-level of all the children of the removed task
         for (auto const &child : children) {
             child->updateTopLevel();
         }
@@ -839,7 +871,7 @@ namespace wrench {
         }
         return exit_tasks;
     }
-    
+
     /**
      * @brief Returns the number of levels in the workflow
      * @return the number of levels

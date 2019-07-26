@@ -26,6 +26,7 @@ namespace wrench {
     WorkflowFile::WorkflowFile(const std::string name, double s) :
             id(name), size(s), output_of(nullptr) {
         this->input_of = {};
+        this->output_of = nullptr;
     };
 
     /**
@@ -47,7 +48,7 @@ namespace wrench {
     /**
      * @brief Define the task that outputs this file
      *
-     * @param task: a task
+     * @param task: a task (or nullptr to state that the file is output of no task)
      */
     void WorkflowFile::setOutputOf(WorkflowTask *const task) {
         this->output_of = task;

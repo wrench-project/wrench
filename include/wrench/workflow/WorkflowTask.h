@@ -290,9 +290,9 @@ namespace wrench {
         WorkflowJob *job;
 
         // Private helper function
-        void addFileToMap(std::map<std::string, WorkflowFile *> &map_to_insert,
-                          std::map<std::string, WorkflowFile *> &map_to_check,
-                          WorkflowFile *f);
+//        void addFileToMap(std::map<std::string, WorkflowFile *> &map_to_insert,
+//                          std::map<std::string, WorkflowFile *> &map_to_check,
+//                          WorkflowFile *f);
 
         std::stack<WorkflowTaskExecution> execution_history;
     };
