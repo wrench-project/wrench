@@ -32,6 +32,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     * @param message: the (string) message to be sent
      * @param payload: message size in bytes
      *
      * @throw std::invalid_argument

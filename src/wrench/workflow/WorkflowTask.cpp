@@ -624,29 +624,6 @@ namespace wrench {
         return this->execution_history;
     }
 
-//    /**
-//     * @brief Helper method to add a file to a map if necessary
-//     *
-//     * @param map_to_insert: the map of workflow files to insert
-//     * @param map_to_check: the map of workflow files to check
-//     * @param f: a workflow file
-//     *
-//     * @throw std::invalid_argument
-//     */
-//    void WorkflowTask::addFileToMap(std::map<std::string, WorkflowFile *> &map_to_insert,
-//                                    std::map<std::string, WorkflowFile *> &map_to_check,
-//                                    WorkflowFile *f) {
-//
-//        if (map_to_check.find(f->id) != map_to_check.end()) {
-//            throw std::invalid_argument(
-//                    "WorkflowTask::addFileToMap(): File ID '" + f->id + "' is already used as input or output file");
-//        }
-//
-//        if (map_to_insert.find(f->id) != map_to_insert.end()) {
-//            throw std::invalid_argument("WorkflowTask::addFileToMap(): File ID '" + f->id + "' already exists");
-//        }
-//        map_to_insert[f->id] = f;
-//    }
 
     /**
      * @brief Get the number of times a task has failed

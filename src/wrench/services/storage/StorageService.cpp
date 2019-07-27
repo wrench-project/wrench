@@ -729,39 +729,41 @@ namespace wrench {
         }
     }
 
-//    /**
-//     * @brief Synchronously and sequentially delete a set of files from storage services
-//     *
-//     * @param files: the set of files to delete
-//     * @param file_locations: a map of files to storage services (all must be in the "/" partition of their storage services)
-//     * @param default_storage_service: the storage service to use when files don't appear in the file_locations map (or nullptr if none)
-//     *
-//     * @throw WorkflowExecutionException
-//     * @throw std::runtime_error
-//     */
-//    void StorageService::deleteFiles(std::set<WorkflowFile *> files,
-//                                     std::map<WorkflowFile *, std::shared_ptr<StorageService>> file_locations,
-//                                     std::shared_ptr<StorageService> default_storage_service) {
-//        for (auto f : files) {
-//            // Identify the Storage Service
-//            std::shared_ptr<StorageService> storage_service = default_storage_service;
-//            if (file_locations.find(f) != file_locations.end()) {
-//                storage_service = file_locations[f];
-//            }
-//            if (storage_service == nullptr) {
-//                throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new NoStorageServiceForFile(f)));
-//            }
-//
-//            // Remove the file
-//            try {
-//                storage_service->deleteFile(f);
-//            } catch (WorkflowExecutionException &e) {
-//                throw;
-//            } catch (std::runtime_error &e) {
-//                throw;
-//            }
-//        }
-//    }
+#if 0
+    /**
+     * @brief Synchronously and sequentially delete a set of files from storage services
+     *
+     * @param files: the set of files to delete
+     * @param file_locations: a map of files to storage services (all must be in the "/" partition of their storage services)
+     * @param default_storage_service: the storage service to use when files don't appear in the file_locations map (or nullptr if none)
+     *
+     * @throw WorkflowExecutionException
+     * @throw std::runtime_error
+     */
+    void StorageService::deleteFiles(std::set<WorkflowFile *> files,
+                                     std::map<WorkflowFile *, std::shared_ptr<StorageService>> file_locations,
+                                     std::shared_ptr<StorageService> default_storage_service) {
+        for (auto f : files) {
+            // Identify the Storage Service
+            std::shared_ptr<StorageService> storage_service = default_storage_service;
+            if (file_locations.find(f) != file_locations.end()) {
+                storage_service = file_locations[f];
+            }
+            if (storage_service == nullptr) {
+                throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new NoStorageServiceForFile(f)));
+            }
+
+            // Remove the file
+            try {
+                storage_service->deleteFile(f);
+            } catch (WorkflowExecutionException &e) {
+                throw;
+            } catch (std::runtime_error &e) {
+                throw;
+            }
+        }
+    }
+#endif
 
 
     /**
@@ -769,6 +771,7 @@ namespace wrench {
      *
      * @param file: the file to copy
      * @param src: the storage service from which to read the file
+     *
      * @throw WorkflowExecutionException
      * @throw std::invalid_argument
      */

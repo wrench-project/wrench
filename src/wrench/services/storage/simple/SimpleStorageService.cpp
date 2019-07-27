@@ -43,6 +43,12 @@ namespace wrench {
         this->default_property_values.clear();
     }
 
+    /**
+     * @brief Cleanup method
+     *
+     * @param has_returned_from_main: whether main() returned
+     * @param return_value: the return value (if main() returned)
+     */
     void SimpleStorageService::cleanup(bool has_returned_from_main, int return_value) {
         this->pending_file_transfer_threads.clear();
         this->running_file_transfer_threads.clear();

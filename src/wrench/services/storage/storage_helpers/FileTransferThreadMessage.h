@@ -33,6 +33,11 @@ namespace wrench {
      */
     class FileTransferThreadMessage : public ServiceMessage {
     protected:
+        /**
+         * @brief Constructor
+         * @param name: the message name
+         * @param payload: the message payload
+         */
         FileTransferThreadMessage(std::string name, double payload) :
                 ServiceMessage("FileTransferThreadMessage::" + name, payload) {}
     };
@@ -43,6 +48,18 @@ namespace wrench {
      */
     class FileTransferThreadNotificationMessage : public FileTransferThreadMessage {
     public:
+        /**
+         * @brief Constructor
+         *
+         * @param file_transfer_thread: the FileTransferThread that sent this message
+         * @param file: the file that was being transfered
+         * @param src: the source of the transfer
+         * @param dst: the destination of the transfer
+         * @param answer_mailbox_if_copy: the mailbox that a "copy is done/failed" may be sent if necessary
+         * @param success: whether the transfer succeeded
+         * @param failure_cause: the failure cause (nullptr if success)
+         * @param start_time_stamp: the start time stamp
+         */
         FileTransferThreadNotificationMessage(std::shared_ptr<FileTransferThread> file_transfer_thread,
                                                    WorkflowFile *file,
                                                    std::pair<FileTransferThread::LocationType, std::string> src,
