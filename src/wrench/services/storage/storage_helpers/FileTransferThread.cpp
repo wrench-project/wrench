@@ -122,7 +122,7 @@ namespace wrench {
 
         try {
             // Send report back to the service
-            // (TODO: making this a dput causes a problem... perhaps a dput right before death bug in SimGrid (again?))
+            // (a dput() right before death is always dicey, so this is a put())
             S4U_Mailbox::putMessage(this->parent->mailbox_name, msg_to_send_back);
         } catch (std::shared_ptr<NetworkError> &e) {
             // oh well...
