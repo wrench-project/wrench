@@ -182,7 +182,7 @@ TEST_F(WorkflowTaskTest, GetSet) {
   t1->incrementFailureCount();
   ASSERT_EQ(t1->getFailureCount(), 1);
 
-  ASSERT_EQ(t1->getTaskType(), wrench::WorkflowTask::TaskType::COMPUTE);
+//  ASSERT_EQ(t1->getTaskType(), wrench::WorkflowTask::TaskType::COMPUTE);
 
   ASSERT_EQ(t1->getBytesRead(), -1);
   ASSERT_EQ(t1->getBytesWritten(), -1);

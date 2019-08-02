@@ -33,7 +33,6 @@ namespace wrench {
      * @param max_num_cores: the maximum number of cores that can be used by the task (use INT_MAX for infinity)
      * @param parallel_efficiency: the multi-core parallel efficiency (number between 0.0 and 1.0)
      * @param memory_requirement: memory requirement (in bytes)
-     * @param type: workflow task type (WorkflowTask::TaskType)
      *
      * @return the WorkflowTask instance
      *
@@ -44,8 +43,7 @@ namespace wrench {
                                     unsigned long min_num_cores,
                                     unsigned long max_num_cores,
                                     double parallel_efficiency,
-                                    double memory_requirement,
-                                    const WorkflowTask::TaskType type) {
+                                    double memory_requirement) {
 
 
         if ((flops < 0.0) || (min_num_cores < 1) || (min_num_cores > max_num_cores) ||
@@ -60,7 +58,7 @@ namespace wrench {
 
         // Create the WorkflowTask object
         WorkflowTask *task = new WorkflowTask(id, flops, min_num_cores, max_num_cores, parallel_efficiency,
-                                              memory_requirement, type);
+                                              memory_requirement);
         // Create a DAG node for it
         task->workflow = this;
         task->DAG = this->DAG.get();
