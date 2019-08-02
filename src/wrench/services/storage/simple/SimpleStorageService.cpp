@@ -535,11 +535,8 @@ namespace wrench {
      * throw std::invalid_argument
      */
     void SimpleStorageService::validateProperties() {
-
-        unsigned long p_ulong;
-        double p_double;
-        p_ulong = this->getPropertyValueAsUnsignedLong(SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS);
-        p_ulong = this->getPropertyValueAsUnsignedLong(SimpleStorageServiceProperty::BUFFER_SIZE);
+        this->getPropertyValueAsUnsignedLong(SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS);
+        this->getPropertyValueAsUnsignedLong(SimpleStorageServiceProperty::BUFFER_SIZE);
     }
 
 };
