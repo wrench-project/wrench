@@ -544,6 +544,7 @@ namespace wrench {
         return total_flops;
     }
 
+#if 0
     /**
      * @brief Create a workflow based on a DAX file
      *
@@ -735,6 +736,10 @@ namespace wrench {
                         task->setTaskType(WorkflowTask::TaskType::TRANSFER);
                     } else if (type == "auxiliary") {
                         task->setTaskType(WorkflowTask::TaskType::AUXILIARY);
+                    } else if (type == "compute") {
+                        task->setTaskType(WorkflowTask::TaskType::COMPUTE);
+                    } else {
+                        throw std::invalid_argument("Workflow::loadFromJson(): Job " + name + " has uknown type " + type);
                     }
 
                     // task files
@@ -821,6 +826,8 @@ namespace wrench {
                     "Workflow::loadFromDAXorJSON(): workflow file name must end with '.dax' or '.json'");
         }
     }
+
+#endif
 
     /**
      * @brief Returns all tasks with top-levels in a range
