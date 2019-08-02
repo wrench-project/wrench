@@ -12,6 +12,7 @@
 #include "wrench/workflow/WorkflowFile.h"
 #include "wrench/workflow/Workflow.h"
 #include "../include/UniqueTmpPathPrefix.h"
+#include "../../tools/pegasus/include/PegasusWorkflowParser.h"
 
 class WorkflowLoadFromJSONTest : public ::testing::Test {
 protected:
@@ -3185,14 +3186,14 @@ protected:
     std::string json_file_path = UNIQUE_TMP_PATH_PREFIX + "workflow.json";
 };
 
-TEST_F(WorkflowLoadFromJSONTest, LoadValidJSON) {
+TEST_F(WorkflowLoadFromJSONTest, DISABLED_LoadValidJSON) {
 
   std::unique_ptr<wrench::Workflow> workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
 
-  auto *workflow = workflow_unique_ptr.get();
+  wrench::Workflow *workflow = nullptr;
 
-  ASSERT_THROW(workflow->loadFromJSON("bogus", "1f"), std::invalid_argument);
-  ASSERT_NO_THROW(workflow->loadFromJSON(this->json_file_path, "1f"));
+  ASSERT_THROW(workflow = wrench::PegasusWorkflowParser::createWorkflowFromJSON("bogus", "1f"), std::invalid_argument);
+  ASSERT_NO_THROW(workflow = wrench::PegasusWorkflowParser::createWorkflowFromJSON(this->json_file_path, "1f"));
   ASSERT_EQ(workflow->getNumberOfTasks(), 71);
   ASSERT_EQ(workflow->getFiles().size(), 69);
 

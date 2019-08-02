@@ -54,6 +54,12 @@ namespace wrench {
 
     }
 
+    /**
+     * @brief Cleanup method
+     *
+     * @param has_returned_from_main: whether main() returned
+     * @param return_value: the return value (if main() returned)
+     */
     void FileTransferThread::cleanup(bool has_returned_from_main, int return_value) {
         // Do nothing. It's fine to just die
     }

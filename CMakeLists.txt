@@ -182,6 +182,7 @@ set(SOURCE_FILES
         src/wrench/managers/JobManagerMessage.cpp
         src/wrench/managers/JobManagerMessage.h
         src/wrench/services/ServiceMessage.cpp
+        src/wrench/managers/EnergyMeter.cpp
         src/wrench/services/compute/ComputeServiceMessage.cpp
         src/wrench/services/storage/StorageServiceMessage.cpp
         src/wrench/services/storage/StorageServiceMessage.h
@@ -323,7 +324,7 @@ set(TEST_FILES
         src/wrench/services/storage/storage_helpers/FileTransferThreadMessage.h
         test/simulation/S4U_MailboxTest.cpp)
 
-# wrench library
+# sigmgrid library
 find_library(SIMGRID_LIBRARY NAMES simgrid HINTS ${SIMGRID_INSTALL_PATH}/lib NO_DEFAULT_PATH)
 if (NOT SIMGRID_LIBRARY)
     message(FATAL_ERROR "SimGrid library not found. Perhaps an invalid SIMGRID_INSTALL_PATH specification (${SIMGRID_INSTALL_PATH}?")
@@ -333,22 +334,21 @@ find_library(PUGIXML_LIBRARY NAMES pugixml)
 find_library(LEMON_LIBRARY NAMES emon lemon)
 find_library(GTEST_LIBRARY NAMES gtest)
 
-add_library(wrench STATIC ${SOURCE_FILES} src/wrench/managers/EnergyMeter.cpp include/wrench/managers/EnergyMeter.h)
+add_library(wrench STATIC ${SOURCE_FILES})
 set_target_properties(wrench PROPERTIES VERSION ${WRENCH_RELEASE_VERSION})
 target_link_libraries(wrench ${SIMGRID_LIBRARY} ${PUGIXML_LIBRARY} ${LEMON_LIBRARY})
 
 # wrench version
-add_custom_command(TARGET wrench PRE_LINK COMMAND ${CMAKE_COMMAND} -DPROJECT_SOURCE_DIR=${PROJECT_SOURCE_DIR} -DWRENCH_RELEASE_VERSION=${WRENCH_RELEASE_VERSION} -P ${CMAKE_HOME_DIRECTORY}/tools/cmake/Version.cmake)
+add_custom_command(TARGET wrench PRE_LINK COMMAND ${CMAKE_COMMAND} -DPROJECT_SOURCE_DIR=${PROJECT_SOURCE_DIR} -DWRENCH_RELEASE_VERSION=${WRENCH_RELEASE_VERSION} -P ${CMAKE_HOME_DIRECTORY}/conf/cmake/Version.cmake)
 
 install(TARGETS wrench DESTINATION lib)
-install(DIRECTORY include/ DESTINATION include)
 
 # generate unit tests
 add_executable(unit_tests EXCLUDE_FROM_ALL ${SOURCE_FILES} ${HEADER_FILES} ${TEST_FILES})
 if (ENABLE_BATSCHED)
-    target_link_libraries(unit_tests ${GTEST_LIBRARY} wrench -lpthread -lm -lzmq)
+    target_link_libraries(unit_tests ${GTEST_LIBRARY} wrenchpegasusworkflowparser wrench -lpthread -lm -lzmq)
 else ()
-    target_link_libraries(unit_tests ${GTEST_LIBRARY} wrench -lpthread -lm)
+    target_link_libraries(unit_tests ${GTEST_LIBRARY} wrenchpegasusworkflowparser wrench -lpthread -lm)
 endif ()
 
 
@@ -358,13 +358,14 @@ add_custom_command(TARGET unit_tests COMMAND find . -name *.gcda -delete)
 
 
 # additional packages
-include(${CMAKE_HOME_DIRECTORY}/tools/cmake/DefinePackages.cmake)
-
-# build examples
-include(${CMAKE_HOME_DIRECTORY}/tools/cmake/Examples.cmake)
-
-# build documentation
-include(${CMAKE_HOME_DIRECTORY}/tools/cmake/Documentation.cmake)
+include(${CMAKE_HOME_DIRECTORY}/conf/cmake/DefinePackages.cmake)
 
 # build tools
-include(${CMAKE_HOME_DIRECTORY}/tools/cmake/Tools.cmake)
+include(${CMAKE_HOME_DIRECTORY}/conf/cmake/Tools.cmake)
+
+# build examples
+include(${CMAKE_HOME_DIRECTORY}/conf/cmake/Examples.cmake)
+
+# build documentation
+include(${CMAKE_HOME_DIRECTORY}/conf/cmake/Documentation.cmake)
+

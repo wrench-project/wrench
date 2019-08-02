@@ -33,7 +33,6 @@ namespace wrench {
      * @param max_num_cores: the maximum number of cores that can be used by the task (use INT_MAX for infinity)
      * @param parallel_efficiency: the multi-core parallel efficiency (number between 0.0 and 1.0)
      * @param memory_requirement: memory requirement (in bytes)
-     * @param type: workflow task type (WorkflowTask::TaskType)
      *
      * @return the WorkflowTask instance
      *
@@ -44,8 +43,7 @@ namespace wrench {
                                     unsigned long min_num_cores,
                                     unsigned long max_num_cores,
                                     double parallel_efficiency,
-                                    double memory_requirement,
-                                    const WorkflowTask::TaskType type) {
+                                    double memory_requirement) {
 
 
         if ((flops < 0.0) || (min_num_cores < 1) || (min_num_cores > max_num_cores) ||
@@ -60,7 +58,7 @@ namespace wrench {
 
         // Create the WorkflowTask object
         WorkflowTask *task = new WorkflowTask(id, flops, min_num_cores, max_num_cores, parallel_efficiency,
-                                              memory_requirement, type);
+                                              memory_requirement);
         // Create a DAG node for it
         task->workflow = this;
         task->DAG = this->DAG.get();
@@ -73,6 +71,30 @@ namespace wrench {
         tasks[task->id] = std::unique_ptr<WorkflowTask>(task); // owner
 
         return task;
+    }
+
+    /**
+     * @brief Remove a file from the workflow. WARNING: this method de-allocated
+     *        memory for the file, making any pointer to the file invalid
+     * @param file: a file
+     *
+     * @throw std::invalid_argument
+     */
+    void Workflow::removeFile(WorkflowFile *file) {
+
+        if (file->getOutputOf() != nullptr) {
+            throw std::invalid_argument("Workflow::removeFile(): File " +
+                                        file->getID() + " cannot be removed because it is output of task " +
+                                        file->getOutputOf()->getID());
+        }
+
+        if (file->getInputOf().size() > 0) {
+            throw std::invalid_argument("Workflow::removeFile(): File " +
+                                        file->getID() + " cannot be removed because it is input to " +
+                                        std::to_string(file->getInputOf().size()) + " tasks");
+        }
+
+        this->files.erase(file->getID());
     }
 
     /**
@@ -94,12 +116,20 @@ namespace wrench {
             throw std::invalid_argument("Workflow::removeTask(): Task '" + task->id + "' does not exist");
         }
 
-        std::vector<wrench::WorkflowTask *> children = this->getTaskChildren(task);
+        // Fix all files
+        for (auto &f : task->getInputFiles()) {
+            f->getInputOf().erase(task->getID());
+        }
+        for (auto &f : task->getOutputFiles()) {
+            f->setOutputOf(nullptr);
+        }
 
+        // Update the DAG
+        std::vector<wrench::WorkflowTask *> children = this->getTaskChildren(task);
         DAG->erase(task->DAG_node);
         tasks.erase(tasks.find(task->id));
 
-        // Brute-force a top-level update all all the children of the removed task
+        // Brute-force update of the top-level of all the children of the removed task
         for (auto const &child : children) {
             child->updateTopLevel();
         }
@@ -512,6 +542,7 @@ namespace wrench {
         return total_flops;
     }
 
+#if 0
     /**
      * @brief Create a workflow based on a DAX file
      *
@@ -703,6 +734,10 @@ namespace wrench {
                         task->setTaskType(WorkflowTask::TaskType::TRANSFER);
                     } else if (type == "auxiliary") {
                         task->setTaskType(WorkflowTask::TaskType::AUXILIARY);
+                    } else if (type == "compute") {
+                        task->setTaskType(WorkflowTask::TaskType::COMPUTE);
+                    } else {
+                        throw std::invalid_argument("Workflow::loadFromJson(): Job " + name + " has uknown type " + type);
                     }
 
                     // task files
@@ -790,6 +825,8 @@ namespace wrench {
         }
     }
 
+#endif
+
     /**
      * @brief Returns all tasks with top-levels in a range
      * @param min: the low end of the range (inclusive)
@@ -839,7 +876,7 @@ namespace wrench {
         }
         return exit_tasks;
     }
-    
+
     /**
      * @brief Returns the number of levels in the workflow
      * @return the number of levels
