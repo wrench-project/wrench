@@ -12,6 +12,7 @@
 
 #include "SimpleWMS.h"
 #include "scheduler/CloudStandardJobScheduler.h"
+#include "../../tools/pegasus/include/PegasusWorkflowParser.h"
 
 /**
  * @brief An example that demonstrate how to run a simulation of a simple Workflow
@@ -51,9 +52,8 @@ int main(int argc, char **argv) {
 
     /* Reading and parsing the workflow description file to create a wrench::Workflow object */
     std::cerr << "Loading workflow..." << std::endl;
-    wrench::Workflow workflow;
-    workflow.loadFromDAXorJSON(workflow_file, "1000Gf");
-    std::cerr << "The workflow has " << workflow.getNumberOfTasks() << " tasks " << std::endl;
+    auto workflow = wrench::PegasusWorkflowParser::createWorkflowFromDAXorJSON(workflow_file, "1000Gf");
+    std::cerr << "The workflow has " << workflow->getNumberOfTasks() << " tasks " << std::endl;
     std::cerr.flush();
 
     /* Reading and parsing the platform description file to instantiate a simulated platform */
@@ -126,7 +126,7 @@ int main(int argc, char **argv) {
                     new wrench::CloudStandardJobScheduler(storage_service)),
                                   nullptr, compute_services, storage_services, wms_host));
 
-    wms->addWorkflow(&workflow);
+    wms->addWorkflow(workflow);
 
     /* Instantiate a file registry service to be started on some host. This service is
      * essentially a replica catalog that stores <file , storage service> pairs so that
@@ -154,7 +154,7 @@ int main(int argc, char **argv) {
      * These files are then staged on the storage service.
      */
     std::cerr << "Staging input files..." << std::endl;
-    auto input_files = workflow.getInputFiles();
+    auto input_files = workflow->getInputFiles();
     try {
         simulation.stageFiles(input_files, storage_service);
     } catch (std::runtime_error &e) {

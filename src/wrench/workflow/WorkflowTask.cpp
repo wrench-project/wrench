@@ -31,12 +31,11 @@ namespace wrench {
      * @param max_cores: the maximum number of cores that the task can use (infinity: ULONG_MAX)
      * @param parallel_efficiency: the multi-core parallel efficiency
      * @param memory_requirement: memory requirement in bytes
-     * @param type: the type of the task (WorkflowTask::TaskType)
      */
     WorkflowTask::WorkflowTask(const std::string id, const double flops, const unsigned long min_num_cores,
                                const unsigned long max_num_cores, const double parallel_efficiency,
-                               const double memory_requirement, const TaskType type) :
-            id(id), task_type(type), flops(flops),
+                               const double memory_requirement) :
+            id(id), flops(flops),
             min_num_cores(min_num_cores),
             max_num_cores(max_num_cores),
             parallel_efficiency(parallel_efficiency),
@@ -52,15 +51,28 @@ namespace wrench {
      * @brief Add an input file to the task
      *
      * @param file: the file
+     * @throw std::invalid_argument
      */
     void WorkflowTask::addInputFile(WorkflowFile *file) {
-        addFileToMap(input_files, output_files, file);
 
+        WRENCH_DEBUG("Adding file '%s' as input to task %s", file->getID().c_str(), this->getID().c_str());
+
+        // If the file is alreadxy an input file of the task, complain
+        if (this->input_files.find(file->getID()) != this->input_files.end()) {
+            throw std::invalid_argument(" WorkflowTask::addInputFile(): File ID '" + file->getID() + "' is already an input file of task '" + this->getID() + "'");
+        }
+
+        // If file is already an output file of the task, complain
+        if (this->output_files.find(file->getID()) != this->output_files.end()) {
+            throw std::invalid_argument(" WorkflowTask::addInputFile(): File ID '" + file->getID() + "' is already an output file of task '" + this->getID() + "'");
+        }
+
+
+        // Add the file
+        this->input_files[file->getID()] = file;
         file->setInputOf(this);
 
-        WRENCH_DEBUG("Adding file '%s' as input to task %s",
-                     file->getID().c_str(), this->getID().c_str());
-
+        // Add control dependency
         if (file->getOutputOf()) {
             workflow->addControlDependency(file->getOutputOf(), this);
         }
@@ -72,18 +84,22 @@ namespace wrench {
      * @param file: the file
      */
     void WorkflowTask::addOutputFile(WorkflowFile *file) {
-        WRENCH_DEBUG("Adding file '%s' as output t task %s",
-                     file->getID().c_str(), this->getID().c_str());
 
-//        if (file->getOutputOf() != nullptr) {
-//            std::cerr << "Trying to set file '" + file->getID() + "' as output of task '" + this->getID() +
-//                                        "', but this file is already the output of task '" + file->getOutputOf()->getID()+ "'\n";
-//            throw std::invalid_argument("Trying to set file '" + file->getID() + "' as output of task '" + this->getID() +
-//            "', but this file is already the output of task '" + file->getOutputOf()->getID()+ "'");
-//
-//        }
+        WRENCH_DEBUG("Adding file '%s' as output t task %s", file->getID().c_str(), this->getID().c_str());
 
-        addFileToMap(output_files, input_files, file);
+        // If the file is already input, complain
+        if (this->input_files.find(file->getID()) != this->input_files.end()) {
+            throw std::invalid_argument("WorkflowTask::addOutputFile(): File ID '" + file->getID() + "' is already an input file of task '" + this->getID() + "'");
+        }
+
+        // If the file is already output of another task, complain
+        if (file->getOutputOf() != nullptr) {
+            throw std::invalid_argument("WorkflowTask::addOutputFile(): File ID '" + file->getID() + "' is already an output file of another task (task '" +
+            file->getOutputOf()->getID() + "')");
+        }
+
+        // Otherwise proceeed
+        this->output_files[file->getID()] = file;
         file->setOutputOf(this);
 
         for (auto const &x : file->getInputOf()) {
@@ -377,21 +393,21 @@ namespace wrench {
         this->cluster_id = id;
     }
 
-    /**
-     * @brief Get the workflow task type
-     * @return a workflow task type
-     */
-    WorkflowTask::TaskType WorkflowTask::getTaskType() const {
-        return this->task_type;
-    }
-
-    /**
-     * @brief Set the task type
-     * @param task_type: task type
-     */
-    void WorkflowTask::setTaskType(wrench::WorkflowTask::TaskType task_type) {
-        this->task_type = task_type;
-    }
+//    /**
+//     * @brief Get the workflow task type
+//     * @return a workflow task type
+//     */
+//    WorkflowTask::TaskType WorkflowTask::getTaskType() const {
+//        return this->task_type;
+//    }
+//
+//    /**
+//     * @brief Set the task type
+//     * @param task_type: task type
+//     */
+//    void WorkflowTask::setTaskType(wrench::WorkflowTask::TaskType task_type) {
+//        this->task_type = task_type;
+//    }
 
     /**
      * @brief Get the task priority. By default, priority is 0.
@@ -607,29 +623,6 @@ namespace wrench {
         return this->execution_history;
     }
 
-    /**
-     * @brief Helper method to add a file to a map if necessary
-     *
-     * @param map_to_insert: the map of workflow files to insert
-     * @param map_to_check: the map of workflow files to check
-     * @param f: a workflow file
-     *
-     * @throw std::invalid_argument
-     */
-    void WorkflowTask::addFileToMap(std::map<std::string, WorkflowFile *> &map_to_insert,
-                                    std::map<std::string, WorkflowFile *> &map_to_check,
-                                    WorkflowFile *f) {
-
-        if (map_to_check.find(f->id) != map_to_check.end()) {
-            throw std::invalid_argument(
-                    "WorkflowTask::addFileToMap(): File ID '" + f->id + "' is already used as input or output file");
-        }
-
-        if (map_to_insert.find(f->id) != map_to_insert.end()) {
-            throw std::invalid_argument("WorkflowTask::addFileToMap(): File ID '" + f->id + "' already exists");
-        }
-        map_to_insert[f->id] = f;
-    }
 
     /**
      * @brief Get the number of times a task has failed

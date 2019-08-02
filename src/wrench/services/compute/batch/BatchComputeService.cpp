@@ -1027,8 +1027,11 @@ namespace wrench {
 
 
     /**
-    * @brief Terminate the daemon, dealing with pending/running jobs
-    */
+     * @brief Cleanup method
+     *
+     * @param has_returned_from_main: whether main() returned
+     * @param return_value: the return value (if main() returned)
+     */
     void BatchComputeService::cleanup(bool has_returned_from_main, int return_value) {
 
 #ifdef ENABLE_BATSCHED

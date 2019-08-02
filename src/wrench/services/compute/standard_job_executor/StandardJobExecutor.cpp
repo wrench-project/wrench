@@ -226,6 +226,12 @@ namespace wrench {
 
     }
 
+    /**
+     * @brief Cleanup method
+     *
+     * @param has_returned_from_main: whether main() returned
+     * @param return_value: the return value (if main() returned)
+     */
     void StandardJobExecutor::cleanup(bool has_returned_from_main, int return_value) {
 
         // Do the default behavior (which will throw as this is not a fault-tolerant service)

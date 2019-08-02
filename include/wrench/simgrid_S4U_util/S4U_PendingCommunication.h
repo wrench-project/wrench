@@ -30,11 +30,20 @@ namespace wrench {
     class S4U_PendingCommunication {
     public:
 
+        /**
+         * @brief The communication operation's type
+         */
         enum OperationType {
             SENDING,
             RECEIVING
         };
 
+        /**
+         * @brief Constructor
+         *
+         * @param mailbox_name: the mailbox name
+         * @param operation_type: the operation type
+         */
         S4U_PendingCommunication(std::string mailbox_name, OperationType operation_type) : mailbox_name(mailbox_name), operation_type(operation_type) {}
 
         std::shared_ptr<SimulationMessage> wait();

@@ -36,10 +36,11 @@ namespace wrench {
                               unsigned long min_num_cores,
                               unsigned long max_num_cores,
                               double parallel_efficiency,
-                              double memory_requirement,
-                              WorkflowTask::TaskType type = WorkflowTask::TaskType::COMPUTE);
+                              double memory_requirement);
 
         void removeTask(WorkflowTask *task);
+
+        void removeFile(WorkflowFile *file);
 
         WorkflowTask *getTaskByID(const std::string &id);
 
@@ -51,17 +52,17 @@ namespace wrench {
 
         void addControlDependency(WorkflowTask *src, WorkflowTask *dest, bool redundant_dependencies = false);
 
-        void loadFromDAX(const std::string &filename,
-                         const std::string &reference_flop_rate,
-                         bool redundant_dependencies = false);
-
-        void loadFromJSON(const std::string &filename,
-                          const std::string &reference_flop_rate,
-                          bool redundant_dependencies = false);
-
-        void loadFromDAXorJSON(const std::string &filename,
-                               const std::string &reference_flop_rate,
-                               bool redundant_dependencies = false);
+//        void loadFromDAX(const std::string &filename,
+//                         const std::string &reference_flop_rate,
+//                         bool redundant_dependencies = false);
+//
+//        void loadFromJSON(const std::string &filename,
+//                          const std::string &reference_flop_rate,
+//                          bool redundant_dependencies = false);
+//
+//        void loadFromDAXorJSON(const std::string &filename,
+//                               const std::string &reference_flop_rate,
+//                               bool redundant_dependencies = false);
 
         unsigned long getNumberOfTasks();
 
