@@ -30,8 +30,6 @@ public:
     std::shared_ptr<wrench::StorageService> storage_service1 = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service2 = nullptr;
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
-    wrench::Simulation *simulation;
-
 
     void do_BatchJobBrokenEstimateWaitingTimeTest_test();
 
@@ -219,7 +217,6 @@ void BatchServiceTest::do_BatchJobBrokenEstimateWaitingTimeTest_test() {
             new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
     // Create a Batch Service
-//  #ifdef ENABLE_BATSCHED
     ASSERT_THROW(compute_service = simulation->add(
             new wrench::BatchComputeService(hostname,
                                             {"Host1", "Host2", "Host3", "Host4"}, 0,  {
@@ -413,9 +410,6 @@ void BatchServiceTest::do_BatchJobBasicEstimateWaitingTimeTest_test() {
             this, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
     ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
-
-//  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
-//          new wrench::FileRegistryService(hostname));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -695,7 +689,7 @@ private:
             // Submit the first job for 300 seconds and using 4 full cores
             wrench::WorkflowTask *task = this->getWorkflow()->addTask("task", 299, 1, 1, 1.0, 0);
             task->addInputFile(this->getWorkflow()->getFileByID("input_file"));
-            task->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
+            task->addOutputFile(this->getWorkflow()->getFileByID("output_file1"));
 
 
             // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
@@ -730,7 +724,7 @@ private:
             // Submit the second job for next 300 seconds and using 2 cores
             wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 299, 1, 1, 1.0, 0);
             task1->addInputFile(this->getWorkflow()->getFileByID("input_file"));
-            task1->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
+            task1->addOutputFile(this->getWorkflow()->getFileByID("output_file2"));
 
 
             // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
@@ -763,7 +757,7 @@ private:
             // Submit the third job for next 300 seconds and using 4 cores
             wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task2", 299, 1, 1, 1.0, 0);
             task2->addInputFile(this->getWorkflow()->getFileByID("input_file"));
-            task2->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
+            task2->addOutputFile(this->getWorkflow()->getFileByID("output_file3"));
 
             // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
 
@@ -844,9 +838,7 @@ private:
                 throw std::runtime_error("D) Estimated start time incorrect (expected: " + std::to_string(903) + ", got: " + std::to_string(jobs_estimated_start_times[job_id]) + ")");
             }
 
-
-
-            for (int i=0; i<3; i++) {
+            for (unsigned char i=0; i<3; i++) {
 
                 // Wait for a workflow execution event
                 std::shared_ptr<wrench::WorkflowExecutionEvent> event;
@@ -878,8 +870,6 @@ TEST_F(BatchServiceTest, DISABLED_BatchJobLittleComplexEstimateWaitingTimeTest)
 {
     DO_TEST_WITH_FORK(do_BatchJobLittleComplexEstimateWaitingTimeTest_test);
 }
-
-
 
 void BatchServiceTest::do_BatchJobLittleComplexEstimateWaitingTimeTest_test() {
 
@@ -920,18 +910,17 @@ void BatchServiceTest::do_BatchJobLittleComplexEstimateWaitingTimeTest_test() {
 
     ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
 
-//  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
-//          new wrench::FileRegistryService(hostname));
-
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create two workflow files
-    wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
-    wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
+    auto input_file = this->workflow->addFile("input_file", 10000.0);
+    this->workflow->addFile("output_file", 20000.0);
+    this->workflow->addFile("output_file1", 20000.0);
+    this->workflow->addFile("output_file2", 20000.0);
+    this->workflow->addFile("output_file3", 20000.0);
 
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
-
 
     // Running a "run a single task" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
