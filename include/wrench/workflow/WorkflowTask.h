@@ -54,12 +54,12 @@ namespace wrench {
         /** \cond DEVELOPER    */
         /***********************/
 
-        /** @brief Task types */
-        enum TaskType {
-            COMPUTE,
-            AUXILIARY,
-            TRANSFER
-        };
+//        /** @brief Task types */
+//        enum TaskType {
+//            COMPUTE,
+//            AUXILIARY,
+//            TRANSFER
+//        };
 
         /** @brief Task states */
         enum State {
@@ -85,9 +85,9 @@ namespace wrench {
 
         void setClusterID(std::string);
 
-        void setTaskType(TaskType);
-
-        TaskType getTaskType() const;
+//        void setTaskType(TaskType);
+//
+//        TaskType getTaskType() const;
 
         void setPriority(long);
 
@@ -253,7 +253,7 @@ namespace wrench {
 
         std::string id;                    // Task ID
         std::string cluster_id;            // ID for clustered task
-        TaskType task_type;                // Task type
+//        TaskType task_type;                // Task type
         double flops;                      // Number of flops
         double average_cpu = -1;           // Average CPU utilization
         unsigned long bytes_read = -1;     // Total bytes read in KB
@@ -283,8 +283,7 @@ namespace wrench {
                      unsigned long min_num_cores,
                      unsigned long max_num_cores,
                      double parallel_efficiency,
-                     double memory_requirement,
-                     TaskType type);
+                     double memory_requirement);
 
         // Containing job
         WorkflowJob *job;

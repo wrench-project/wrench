@@ -31,12 +31,11 @@ namespace wrench {
      * @param max_cores: the maximum number of cores that the task can use (infinity: ULONG_MAX)
      * @param parallel_efficiency: the multi-core parallel efficiency
      * @param memory_requirement: memory requirement in bytes
-     * @param type: the type of the task (WorkflowTask::TaskType)
      */
     WorkflowTask::WorkflowTask(const std::string id, const double flops, const unsigned long min_num_cores,
                                const unsigned long max_num_cores, const double parallel_efficiency,
-                               const double memory_requirement, const TaskType type) :
-            id(id), task_type(type), flops(flops),
+                               const double memory_requirement) :
+            id(id), flops(flops),
             min_num_cores(min_num_cores),
             max_num_cores(max_num_cores),
             parallel_efficiency(parallel_efficiency),
@@ -394,21 +393,21 @@ namespace wrench {
         this->cluster_id = id;
     }
 
-    /**
-     * @brief Get the workflow task type
-     * @return a workflow task type
-     */
-    WorkflowTask::TaskType WorkflowTask::getTaskType() const {
-        return this->task_type;
-    }
-
-    /**
-     * @brief Set the task type
-     * @param task_type: task type
-     */
-    void WorkflowTask::setTaskType(wrench::WorkflowTask::TaskType task_type) {
-        this->task_type = task_type;
-    }
+//    /**
+//     * @brief Get the workflow task type
+//     * @return a workflow task type
+//     */
+//    WorkflowTask::TaskType WorkflowTask::getTaskType() const {
+//        return this->task_type;
+//    }
+//
+//    /**
+//     * @brief Set the task type
+//     * @param task_type: task type
+//     */
+//    void WorkflowTask::setTaskType(wrench::WorkflowTask::TaskType task_type) {
+//        this->task_type = task_type;
+//    }
 
     /**
      * @brief Get the task priority. By default, priority is 0.

@@ -3186,7 +3186,7 @@ protected:
     std::string json_file_path = UNIQUE_TMP_PATH_PREFIX + "workflow.json";
 };
 
-TEST_F(WorkflowLoadFromJSONTest, LoadValidJSON) {
+TEST_F(WorkflowLoadFromJSONTest, DISABLED_LoadValidJSON) {
 
   std::unique_ptr<wrench::Workflow> workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
 

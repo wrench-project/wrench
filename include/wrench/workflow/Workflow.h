@@ -36,8 +36,7 @@ namespace wrench {
                               unsigned long min_num_cores,
                               unsigned long max_num_cores,
                               double parallel_efficiency,
-                              double memory_requirement,
-                              WorkflowTask::TaskType type = WorkflowTask::TaskType::COMPUTE);
+                              double memory_requirement);
 
         void removeTask(WorkflowTask *task);
 
