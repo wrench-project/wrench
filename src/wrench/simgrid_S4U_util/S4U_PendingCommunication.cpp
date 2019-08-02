@@ -107,7 +107,7 @@ namespace wrench {
         }
 
         if (one_comm_failed) {
-            for (index = 0; index < pending_s4u_comms.size(); index++) {
+            for (index = 0; index < (int) pending_s4u_comms.size(); index++) {
                 try {
                     pending_s4u_comms[index]->test();
                 } catch (simgrid::NetworkFailureException &e) {
