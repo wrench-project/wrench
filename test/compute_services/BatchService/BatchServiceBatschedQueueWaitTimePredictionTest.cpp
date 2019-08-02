@@ -21,7 +21,7 @@
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(batch_service_queue_wait_time_prediction_test, "Log category for BatchServiceTest");
+XBT_LOG_NEW_DEFAULT_CATEGORY(batch_service_queue_wait_time_prediction_test, "Log category for BatchServiceBatschedQueueWaitTimePredictionTest");
 
 
 class BatchServiceBatschedQueueWaitTimePredictionTest : public ::testing::Test {
@@ -186,7 +186,7 @@ private:
 #ifdef ENABLE_BATSCHED
 TEST_F(BatchServiceBatschedQueueWaitTimePredictionTest, BatchJobBrokenEstimateWaitingTimeTest)
 #else
-TEST_F(BatchServiceTest, DISABLED_BatchJobBrokenEstimateWaitingTimeTest)
+TEST_F(BatchServiceBatschedQueueWaitTimePredictionTest, DISABLED_BatchJobBrokenEstimateWaitingTimeTest)
 #endif
 {
     DO_TEST_WITH_FORK(do_BatchJobBrokenEstimateWaitingTimeTest_test);
@@ -377,7 +377,7 @@ private:
 #ifdef ENABLE_BATSCHED
 TEST_F(BatchServiceBatschedQueueWaitTimePredictionTest, BatchJobBasicEstimateWaitingTimeTest)
 #else
-TEST_F(BatchServiceTest, DISABLED_BatchJobBasicEstimateWaitingTimeTest)
+TEST_F(BatchServiceBatschedQueueWaitTimePredictionTest, DISABLED_BatchJobBasicEstimateWaitingTimeTest)
 #endif
 {
     DO_TEST_WITH_FORK(do_BatchJobBasicEstimateWaitingTimeTest_test);
@@ -603,7 +603,7 @@ private:
 #ifdef ENABLE_BATSCHED
 TEST_F(BatchServiceBatschedQueueWaitTimePredictionTest, BatchJobEstimateWaitingTimeTest)
 #else
-TEST_F(BatchServiceTest, DISABLED_BatchJobEstimateWaitingTimeTest)
+TEST_F(BatchServiceBatschedQueueWaitTimePredictionTest, DISABLED_BatchJobEstimateWaitingTimeTest)
 #endif
 {
     DO_TEST_WITH_FORK(do_BatchJobEstimateWaitingTimeTest_test);
@@ -877,7 +877,7 @@ private:
 #ifdef ENABLE_BATSCHED
 TEST_F(BatchServiceBatschedQueueWaitTimePredictionTest, BatchJobLittleComplexEstimateWaitingTimeTest)
 #else
-TEST_F(BatchServiceTest, DISABLED_BatchJobLittleComplexEstimateWaitingTimeTest)
+TEST_F(BatchServiceBatschedQueueWaitTimePredictionTest, DISABLED_BatchJobLittleComplexEstimateWaitingTimeTest)
 #endif
 {
     DO_TEST_WITH_FORK(do_BatchJobLittleComplexEstimateWaitingTimeTest_test);
