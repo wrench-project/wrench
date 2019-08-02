@@ -375,15 +375,15 @@ namespace wrench {
         return true;
     }
 
-/**
- * @brief Handle a file copy request
- * @param file: the file
- * @param src: the storage service that holds the file
- * @param src_partition: the file partition from where the file will be copied
- * @param dst_partition: the file partition to where the file will be copied
- * @param answer_mailbox: the mailbox to which the answer should be sent
- * @return
- */
+    /**
+     * @brief Handle a file copy request
+     * @param file: the file
+     * @param src: the storage service that holds the file
+     * @param src_partition: the file partition from where the file will be copied
+     * @param dst_partition: the file partition to where the file will be copied
+     * @param answer_mailbox: the mailbox to which the answer should be sent
+     * @return
+     */
     bool
     SimpleStorageService::processFileCopyRequest(WorkflowFile *file, std::shared_ptr<StorageService> src,
                                                  std::string src_partition, std::string dst_partition,
@@ -424,12 +424,11 @@ namespace wrench {
                     file->getID().c_str(),
                     src->getName().c_str());
 
-
-
         // Create a file transfer thread
         std::shared_ptr<FileTransferThread> ftt;
 
         if (src.get() == this) { // Local copy
+            WRENCH_INFO("LOCAL COPY");
             ftt = std::shared_ptr<FileTransferThread>(
                     new FileTransferThread(this->hostname,
                                            this->getSharedPtr<StorageService>(),
@@ -439,6 +438,7 @@ namespace wrench {
                                            answer_mailbox,
                                            this->buffer_size, start_timestamp));
         } else {
+            WRENCH_INFO("FROM REMOTE TO LOCAL PARTITION");
             ftt = std::shared_ptr<FileTransferThread>(
                     new FileTransferThread(this->hostname,
                                            this->getSharedPtr<StorageService>(),
@@ -448,6 +448,8 @@ namespace wrench {
                                            answer_mailbox,
                                            this->buffer_size, start_timestamp));
         }
+        ftt->simulation = this->simulation;
+        this->pending_file_transfer_threads.push_back(ftt);
 
         return true;
     }
