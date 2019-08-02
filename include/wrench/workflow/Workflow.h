@@ -53,17 +53,17 @@ namespace wrench {
 
         void addControlDependency(WorkflowTask *src, WorkflowTask *dest, bool redundant_dependencies = false);
 
-        void loadFromDAX(const std::string &filename,
-                         const std::string &reference_flop_rate,
-                         bool redundant_dependencies = false);
-
-        void loadFromJSON(const std::string &filename,
-                          const std::string &reference_flop_rate,
-                          bool redundant_dependencies = false);
-
-        void loadFromDAXorJSON(const std::string &filename,
-                               const std::string &reference_flop_rate,
-                               bool redundant_dependencies = false);
+//        void loadFromDAX(const std::string &filename,
+//                         const std::string &reference_flop_rate,
+//                         bool redundant_dependencies = false);
+//
+//        void loadFromJSON(const std::string &filename,
+//                          const std::string &reference_flop_rate,
+//                          bool redundant_dependencies = false);
+//
+//        void loadFromDAXorJSON(const std::string &filename,
+//                               const std::string &reference_flop_rate,
+//                               bool redundant_dependencies = false);
 
         unsigned long getNumberOfTasks();
 
