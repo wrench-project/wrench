@@ -75,8 +75,6 @@ namespace wrench {
 
     private:
 
-
-
         friend class Simulation;
 
         // Low-level Constructor

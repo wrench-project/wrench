@@ -454,9 +454,9 @@ namespace wrench {
         return true;
     }
 
-/**
- * @brief Start pending file transfer threads if any and if possible
- */
+    /**
+     * @brief Start pending file transfer threads if any and if possible
+     */
     void SimpleStorageService::startPendingFileTransferThread() {
         while ((not this->pending_file_transfer_threads.empty()) and
                (this->running_file_transfer_threads.size() < this->num_concurrent_connections)) {
@@ -469,18 +469,18 @@ namespace wrench {
     }
 
 
-/**
- * @brief Process a notification received from a file transfer thread
- * @param ftt: the file transfer thread
- * @param file: the file
- * @param src: the transfer src
- * @param dst: the transfer dst
- * @param success: whether the transfer succeeded or not
- * @param failure_cause: the failure cause (nullptr if success)
- * @param answer_mailbox_if_copy: the mailbox to send a copy notification ("" if not a copy)
- * @param start_timestamp: a start file copy time stamp
- * @return false if the daemon should terminate
- */
+    /**
+     * @brief Process a notification received from a file transfer thread
+     * @param ftt: the file transfer thread
+     * @param file: the file
+     * @param src: the transfer src
+     * @param dst: the transfer dst
+     * @param success: whether the transfer succeeded or not
+     * @param failure_cause: the failure cause (nullptr if success)
+     * @param answer_mailbox_if_copy: the mailbox to send a copy notification ("" if not a copy)
+     * @param start_timestamp: a start file copy time stamp
+     * @return false if the daemon should terminate
+     */
     bool SimpleStorageService::processFileTransferThreadNotification(std::shared_ptr<FileTransferThread> ftt,
                                                                      WorkflowFile *file,
                                                                      std::pair<FileTransferThread::LocationType, std::string> src,
