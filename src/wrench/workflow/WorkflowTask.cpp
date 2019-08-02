@@ -413,7 +413,7 @@ namespace wrench {
      * @brief Get the task priority. By default, priority is 0.
      * @return the task priority
      */
-    long WorkflowTask::getPriority() const {
+    unsigned long WorkflowTask::getPriority() const {
         return this->priority;
     }
 

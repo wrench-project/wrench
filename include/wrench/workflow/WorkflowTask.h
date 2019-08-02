@@ -91,7 +91,7 @@ namespace wrench {
 
         void setPriority(long);
 
-        long getPriority() const;
+        unsigned long getPriority() const;
 
         void setAverageCPU(double);
 
@@ -262,7 +262,7 @@ namespace wrench {
         unsigned long max_num_cores;
         double parallel_efficiency;
         double memory_requirement;
-        long priority = 0;                 // Task priority
+        unsigned long priority = 0;        // Task priority
         unsigned long toplevel;            // 0 if entry task
         unsigned int failure_count = 0;    // Number of times the tasks has failed
         std::string execution_host;        // Host on which the task executed ("" if not executed successfully - yet)
