@@ -360,12 +360,13 @@ private:
 
             // Add a task to the workflow
             auto task = this->test->workflow->addTask("task_" + std::to_string(trial), 80, 1, 1, 1.0, 0);
+            auto output_file = this->test->workflow->addFile("output_file_" + std::to_string(trial), 20000.0);
             task->addInputFile(this->test->input_file);
-            task->addOutputFile(this->test->output_file);
+            task->addOutputFile(output_file);
 
             // Create a standard job
             auto job = job_manager->createStandardJob(task, {{this->test->input_file, this->test->storage_service},
-                                                             {this->test->output_file, this->test->storage_service}});
+                                                             {output_file, this->test->storage_service}});
 
             // Submit the standard job to the compute service, making it sure it runs on FailedHost1
             job_manager->submitJob(job, this->test->compute_service, {});
@@ -381,6 +382,7 @@ private:
 
             wrench::Simulation::sleep(10.0);
             this->test->workflow->removeTask(task);
+            this->test->workflow->removeFile(output_file);
 
         }
 

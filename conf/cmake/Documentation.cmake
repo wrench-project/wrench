@@ -17,7 +17,7 @@ if (DOXYGEN_FOUND)
         endif ()
 
         set(WRENCH_SECTIONS_OUTPUT ${SECTION_LOWER})
-        configure_file(${CMAKE_HOME_DIRECTORY}/tools/doxygen/Doxyfile.in ${DOXYGEN_OUT} @ONLY)
+        configure_file(${CMAKE_HOME_DIRECTORY}/conf/doxygen/Doxyfile.in ${DOXYGEN_OUT} @ONLY)
 
         add_custom_target(doc-${SECTION_LOWER}
                 WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}

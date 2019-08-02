@@ -22,6 +22,8 @@ public:
     wrench::WorkflowFile *output_file2;
     wrench::WorkflowFile *output_file3;
     wrench::WorkflowFile *output_file4;
+    wrench::WorkflowFile *output_file5;
+    wrench::WorkflowFile *output_file6;
     wrench::WorkflowTask *task1;
     wrench::WorkflowTask *task2;
     wrench::WorkflowTask *task3;
@@ -46,6 +48,8 @@ protected:
         output_file2 = workflow->addFile("output_file2", 10.0);
         output_file3 = workflow->addFile("output_file3", 10.0);
         output_file4 = workflow->addFile("output_file4", 10.0);
+        output_file5 = workflow->addFile("output_file5", 10.0);
+        output_file6 = workflow->addFile("output_file6", 10.0);
 
         // Create the tasks
         task1 = workflow->addTask("task_1_10s_1core", 10.0, 1, 1, 1.0, 0);
@@ -72,8 +76,8 @@ protected:
         task2->addOutputFile(output_file2);
         task3->addOutputFile(output_file3);
         task4->addOutputFile(output_file4);
-        task5->addOutputFile(output_file3);
-        task6->addOutputFile(output_file4);
+        task5->addOutputFile(output_file5);
+        task6->addOutputFile(output_file6);
 
         workflow->addControlDependency(task4, task5);
 

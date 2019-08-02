@@ -12,6 +12,7 @@
 #include "wrench/workflow/WorkflowFile.h"
 #include "wrench/workflow/Workflow.h"
 #include "../include/UniqueTmpPathPrefix.h"
+#include "../../tools/pegasus/include/PegasusWorkflowParser.h"
 
 class WorkflowLoadFromDAXTest : public ::testing::Test {
 protected:
@@ -354,10 +355,10 @@ protected:
 
 TEST_F(WorkflowLoadFromDAXTest, LoadValidDAX) {
 
-  auto workflow = new wrench::Workflow();
+  wrench::Workflow *workflow = nullptr;
 
-  ASSERT_THROW(workflow->loadFromDAX("bogus", "1f"), std::invalid_argument);
-  ASSERT_NO_THROW(workflow->loadFromDAX(this->dax_file_path, "1f"));
+  ASSERT_THROW(workflow = wrench::PegasusWorkflowParser::createWorkflowFromDAX("bogus", "1f"), std::invalid_argument);
+  ASSERT_NO_THROW(workflow = wrench::PegasusWorkflowParser::createWorkflowFromDAX(this->dax_file_path, "1f"));
   ASSERT_EQ(workflow->getNumberOfTasks(), 36);
   ASSERT_EQ(workflow->getFiles().size(), 56);
 
@@ -382,12 +383,12 @@ TEST_F(WorkflowLoadFromDAXTest, LoadValidDAX) {
 
   delete workflow;
 
-  auto one_task_workflow = new wrench::Workflow();
-  ASSERT_NO_THROW(one_task_workflow->loadFromDAX(this->one_task_dax_file_path, "1f"));
+  wrench::Workflow *one_task_workflow = nullptr;
+  ASSERT_NO_THROW(one_task_workflow = wrench::PegasusWorkflowParser::createWorkflowFromDAX(this->one_task_dax_file_path, "1f"));
   delete one_task_workflow;
 
-  auto one_task_bad_attribute_workflow = new wrench::Workflow();
-  ASSERT_THROW(one_task_bad_attribute_workflow->loadFromDAX(this->one_task_bad_attribute_file_path, "1f"), std::invalid_argument);
+  wrench::Workflow *one_task_bad_attribute_workflow = nullptr;
+  ASSERT_THROW(one_task_bad_attribute_workflow = wrench::PegasusWorkflowParser::createWorkflowFromDAX(this->one_task_bad_attribute_file_path, "1f"), std::invalid_argument);
   delete one_task_bad_attribute_workflow;
 
 }
