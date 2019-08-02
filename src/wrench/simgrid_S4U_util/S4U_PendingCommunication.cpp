@@ -89,7 +89,7 @@ namespace wrench {
             pending_s4u_comms.push_back((*it)->comm_ptr);
         }
 
-        int index = 0;
+        unsigned long index = 0;
         bool one_comm_failed = false;
         try {
             index = (unsigned long) simgrid::s4u::Comm::wait_any_for(&pending_s4u_comms, timeout);
