@@ -17,6 +17,9 @@
 #include <pugixml.hpp>
 #include <nlohmann/json.hpp>
 
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(pegasus_workflow_parser, "Log category for PegasusWorkflowParser");
+
+
 namespace wrench {
 
    /**
@@ -149,11 +152,9 @@ namespace wrench {
                     // task type
                     std::string type = job.at("type");
                     if (type == "transfer") {
-                        task->setTaskType(WorkflowTask::TaskType::TRANSFER);
+                        // TODO: DO SOMETHING APPROPRIATE HERE
                     } else if (type == "auxiliary") {
-                        task->setTaskType(WorkflowTask::TaskType::AUXILIARY);
-                    } else if (type == "compute") {
-                        task->setTaskType(WorkflowTask::TaskType::COMPUTE);
+                        // TODO: DO SOMETHING APPROPRIATE HERE
                     } else {
                         throw std::invalid_argument("Workflow::createWorkflowFromJson(): Job " + name + " has uknown type " + type);
                     }
@@ -223,6 +224,7 @@ namespace wrench {
     Workflow *PegasusWorkflowParser::createWorkflowFromDAX(const std::string &filename, const std::string &reference_flop_rate,
                                bool redundant_dependencies) {
 
+        WRENCH_INFO("HERE");
         pugi::xml_document dax_tree;
 
         auto *workflow = new Workflow();
