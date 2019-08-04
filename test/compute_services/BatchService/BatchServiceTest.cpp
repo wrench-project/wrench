@@ -728,9 +728,11 @@ private:
             // Create a pilot job that needs 1 host, 1 code, 0 bytes of RAM and 30 seconds
             wrench::PilotJob *pilot_job = job_manager->createPilotJob();
             // Forgetting the job right-away for coverage
+            WRENCH_INFO("FORGETTINGJOB");
             job_manager->forgetJob(pilot_job);
             // Forgetting the job again, which is wrong,for coverage
             try {
+            WRENCH_INFO("FORGETTINGJOB AGAIN");
                 job_manager->forgetJob(pilot_job);
                 throw std::runtime_error("Should not be able to forget already forgotten pilot job");
             } catch (std::invalid_argument &e) {
