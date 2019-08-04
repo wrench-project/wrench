@@ -431,6 +431,11 @@ namespace wrench {
             throw std::invalid_argument("JobManager::forgetJob(): invalid argument");
         }
 
+        // Check the job is somewhere
+        if (this->jobs.find(job) == this->jobs.end()) {
+            throw std::invalid_argument("JobManager::forgetJob(): unknown job");
+        }
+
         if (job->getType() == WorkflowJob::STANDARD) {
 
             if ((this->pending_standard_jobs.find((StandardJob *) job) != this->pending_standard_jobs.end()) ||
