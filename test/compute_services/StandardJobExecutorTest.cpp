@@ -303,8 +303,8 @@ private:
         job = job_manager->createStandardJob(
                 {task_too_many_cores},
                 {
-                        {*(task->getInputFiles().begin()),  this->test->storage_service1},
-                        {*(task->getOutputFiles().begin()), this->test->storage_service2}
+                        {*(task_too_many_cores->getInputFiles().begin()),  this->test->storage_service1},
+                        {*(task_too_many_cores->getOutputFiles().begin()), this->test->storage_service2}
                 },
                 {},
                 {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
@@ -348,8 +348,8 @@ private:
         job = job_manager->createStandardJob(
                 {task_too_much_ram},
                 {
-                        {*(task->getInputFiles().begin()),  this->test->storage_service1},
-                        {*(task->getOutputFiles().begin()), this->test->storage_service2}
+                        {*(task_too_much_ram->getInputFiles().begin()),  this->test->storage_service1},
+                        {*(task_too_much_ram->getOutputFiles().begin()), this->test->storage_service2}
                 },
                 {},
                 {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
@@ -380,6 +380,11 @@ private:
 
         // Forget the previous job!
         job_manager->forgetJob(job);
+
+        this->getWorkflow()->removeTask(task_too_much_ram);
+        task = this->getWorkflow()->addTask("task", 3600, 1, 1, 1.0, 0);
+        task->addInputFile(this->getWorkflow()->getFileByID("input_file"));
+        task->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
 
         // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
         job = job_manager->createStandardJob(
