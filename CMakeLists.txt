@@ -282,6 +282,7 @@ set(TEST_FILES
         test/simulation/SimpleSimulationTest.cpp
         test/simulation/DynamicServiceCreationTest.cpp
         test/simulation/SimulationCommandLineArgumentsTest.cpp
+        test/simulation/SimulationLoggingTest.cpp
         test/simulation/simulation_output/SimulationOutputTest.cpp
         test/simulation/simulation_output/SimulationTimestampTaskTest.cpp
         test/simulation/simulation_output/SimulationTimestampFileCopyTest.cpp

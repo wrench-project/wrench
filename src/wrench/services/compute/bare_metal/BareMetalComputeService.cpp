@@ -34,7 +34,8 @@
 #include "wrench/services/helpers/ServiceTerminationDetector.h"
 #include "wrench/services/helpers/HostStateChangeDetector.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(baremetal_compute_service, "Log category for BareMetalComputeService");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(bare_metal_compute_service, "Log category for BareMetalComputeService");
+
 
 namespace wrench {
 
