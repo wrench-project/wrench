@@ -9,7 +9,7 @@ set(PEGASUS_WORKFLOW_PARSER_SOURCE_FILES
         )
 
 set(PEGASUS_WORKFLOW_PARSER_HEADER_FILES
-        include/tools/pegasus/PegasusWorkflowParser.h
+        include/wrench/tools/pegasus/PegasusWorkflowParser.h
         )
 
 add_library(wrenchpegasusworkflowparser STATIC ${PEGASUS_WORKFLOW_PARSER_SOURCE_FILES} )
