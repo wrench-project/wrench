@@ -571,15 +571,11 @@ namespace wrench {
  * @param job
  */
     void BatchComputeService::sendPilotJobExpirationNotification(PilotJob *job) {
-//        try {
         S4U_Mailbox::dputMessage(job->popCallbackMailbox(),
                                  new ComputeServicePilotJobExpiredMessage(
                                          job, this->getSharedPtr<BatchComputeService>(),
                                          this->getMessagePayloadValue(
                                                  BatchComputeServiceMessagePayload::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD)));
-//        } catch (std::shared_ptr<NetworkError> &cause) {
-//            return; // ignore
-//        }
     }
 
 /**
@@ -1155,47 +1151,11 @@ namespace wrench {
             return true;
 
         } else if (auto msg = std::dynamic_pointer_cast<AlarmJobTimeOutMessage>(message)) {
-            if (this->running_jobs.find(msg->job) == this->running_jobs.end()) {
-                WRENCH_INFO("Received a time out message (%ld) for an unknown batch job (%ld)... ignoring",
-                            (unsigned long) (message.get()),
-                            (unsigned long) msg->job);
-//          WRENCH_INFO("----> %ld", (unsigned long) msg->job->getWorkflowJob());
-                return true;
-            }
-            if (msg->job->getWorkflowJob()->getType() == WorkflowJob::STANDARD) {
-                this->processStandardJobTimeout((StandardJob *) (msg->job->getWorkflowJob()));
-                this->removeJobFromRunningList(msg->job);
-                this->freeUpResources(msg->job->getResourcesAllocated());
-                this->sendStandardJobFailureNotification((StandardJob *) msg->job->getWorkflowJob(),
-                                                         std::to_string(msg->job->getJobID()),
-                                                         std::shared_ptr<FailureCause>(
-                                                                 new JobTimeout(msg->job->getWorkflowJob())));
-                return true;
-            } else if (msg->job->getWorkflowJob()->getType() == WorkflowJob::PILOT) {
-                WRENCH_INFO("Terminating pilot job %s", msg->job->getWorkflowJob()->getName().c_str());
-                auto *pilot_job = (PilotJob *) msg->job->getWorkflowJob();
-                auto cs = pilot_job->getComputeService();
-                try {
-                    cs->stop();
-                } catch (wrench::WorkflowExecutionException &e) {
-                    throw std::runtime_error(
-                            "BatchComputeService::processNextMessage(): Not able to terminate the pilot job"
-                    );
-                }
-                this->processPilotJobCompletion(pilot_job);
-                return true;
-            } else {
-                throw std::runtime_error(
-                        "BatchComputeService::processNextMessage(): Alarm about unknown job type " +
-                        std::to_string(msg->job->getWorkflowJob()->getType())
-                );
-            }
+            processAlarmJobTimeout(msg->job);
+            return true;
+            
 
 #ifdef ENABLE_BATSCHED
-            //      } else if (auto msg = std::dynamic_pointer_cast<BatchSchedReadyMessage>(message)) {
-//        is_bat_sched_ready = true;
-//        return true;
-
         } else if (auto msg = std::dynamic_pointer_cast<BatchExecuteJobFromBatSchedMessage>(message)) {
             processExecuteJobFromBatSched(msg->batsched_decision_reply);
             return true;
@@ -2118,6 +2078,49 @@ namespace wrench {
         S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
 
     }
+
+
+    /**
+     * @brief Process a Batch job timeout
+     * @param job: the batch job
+     */
+    void BatchComputeService::processAlarmJobTimeout(BatchJob *job) {
+
+        if (this->running_jobs.find(job) == this->running_jobs.end()) {
+            WRENCH_INFO("BatchComputeService::processAlarmJobTimeout(): Received a time out message for an unknown batch job (%ld)... ignoring",
+                        (unsigned long) job);
+            return;
+        }
+        if (job->getWorkflowJob()->getType() == WorkflowJob::STANDARD) {
+            this->processStandardJobTimeout((StandardJob *) (job->getWorkflowJob()));
+            this->removeJobFromRunningList(job);
+            this->freeUpResources(job->getResourcesAllocated());
+            this->sendStandardJobFailureNotification((StandardJob *) job->getWorkflowJob(),
+                                                     std::to_string(job->getJobID()),
+                                                     std::shared_ptr<FailureCause>(
+                                                             new JobTimeout(job->getWorkflowJob())));
+            return;
+        } else if (job->getWorkflowJob()->getType() == WorkflowJob::PILOT) {
+            WRENCH_INFO("Terminating pilot job %s", job->getWorkflowJob()->getName().c_str());
+            auto *pilot_job = (PilotJob *) job->getWorkflowJob();
+            auto cs = pilot_job->getComputeService();
+            try {
+                cs->stop();
+            } catch (wrench::WorkflowExecutionException &e) {
+                throw std::runtime_error(
+                        "BatchComputeService::processAlarmJobTimeout(): Not able to terminate the pilot job"
+                );
+            }
+            this->processPilotJobCompletion(pilot_job);
+            return;
+        } else {
+            throw std::runtime_error(
+                    "BatchComputeService::processAlarmJobTimeout(): Alarm about unknown job type " +
+                    std::to_string(job->getWorkflowJob()->getType())
+            );
+        }
+    }
+
 
 
 /********************************************************************************************/

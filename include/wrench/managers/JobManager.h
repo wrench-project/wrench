@@ -90,8 +90,15 @@ namespace wrench {
 		private:
 
 				int main() override;
+                bool processNextMessage();
+                void processStandardJobCompletion(StandardJob *job, std::shared_ptr<ComputeService> compute_service);
+                void processStandardJobFailure(StandardJob *job, std::shared_ptr<ComputeService> compute_service, std::shared_ptr<FailureCause> cause);
+                void processPilotJobStart(PilotJob *job, std::shared_ptr<ComputeService> compute_service);
+                void processPilotJobExpiration(PilotJob *job, std::shared_ptr<ComputeService> compute_service);
 
-				// Relevant WMS
+
+
+            // Relevant WMS
 				std::shared_ptr<WMS> wms;
 
 				// Job map
