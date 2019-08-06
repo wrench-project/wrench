@@ -276,20 +276,16 @@ namespace wrench {
 
             WRENCH_INFO("Forwarding status message");
             // Forward it back
-//            try {
-                S4U_Mailbox::dputMessage(msg->file->getWorkflow()->getCallbackMailbox(),
-                                         new StorageServiceFileCopyAnswerMessage(msg->file,
-                                                                                 msg->storage_service,
-                                                                                 msg->dst_partition,
-                                                                                 request.file_registry_service,
-                                                                                 file_registry_service_updated,
-                                                                                 msg->success,
-                                                                                 std::move(msg->failure_cause),
-                                                                                 0
-                                         ));
-//            } catch (std::shared_ptr<NetworkError> &cause) {
-//                return true;
-//            }
+            S4U_Mailbox::dputMessage(msg->file->getWorkflow()->getCallbackMailbox(),
+                                     new StorageServiceFileCopyAnswerMessage(msg->file,
+                                                                             msg->storage_service,
+                                                                             msg->dst_partition,
+                                                                             request.file_registry_service,
+                                                                             file_registry_service_updated,
+                                                                             msg->success,
+                                                                             std::move(msg->failure_cause),
+                                                                             0
+                                     ));
             return true;
 
         } else {

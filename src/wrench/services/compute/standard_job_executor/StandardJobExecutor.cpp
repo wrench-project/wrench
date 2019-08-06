@@ -312,12 +312,10 @@ namespace wrench {
                 auto wu = *wu_it;
                 all_work_units.erase(wu_it);
                 this->ready_workunits.insert(wu);
-//          PointerUtil::moveUniquePtrFromSetToSet<Workunit>(wu, &all_work_units, &(this->ready_workunits));
             } else {
                 auto wu = *wu_it;
                 all_work_units.erase(wu_it);
                 this->non_ready_workunits.insert(wu);
-//          PointerUtil::moveUniquePtrFromSetToSet<Workunit>(wu, &all_work_units, &(this->non_ready_workunits));
             }
         }
 
@@ -348,9 +346,6 @@ namespace wrench {
             /*** Clean up everything in the scratch space ***/
             cleanUpScratch();
         }
-
-        // Kill the host state monitor (if the host went down, it died anyway)
-//        this->host_state_monitor->kill();
 
         WRENCH_INFO("Standard Job Executor on host %s cleanly terminating!", S4U_Simulation::getHostName().c_str());
         return 0;
@@ -586,7 +581,6 @@ namespace wrench {
                     auto tomove = *wu_it;
                     this->ready_workunits.erase(wu_it);
                     this->running_workunits.insert(tomove);
-//            PointerUtil::moveUniquePtrFromSetToSet(it, &(this->ready_workunits), &(this->running_workunits));
                     break;
                 }
             }
@@ -694,7 +688,6 @@ namespace wrench {
                 auto tomove = *it;
                 this->running_workunits.erase(it);
                 this->completed_workunits.insert(tomove);
-//          PointerUtil::moveUniquePtrFromSetToSet(it, &(this->running_workunits), &(this->completed_workunits));
                 found_it = true;
                 break;
             }
@@ -753,7 +746,6 @@ namespace wrench {
                             auto tomove = *it;
                             this->non_ready_workunits.erase(it);
                             this->ready_workunits.insert(tomove);
-//                PointerUtil::moveUniquePtrFromSetToSet(it, &(this->non_ready_workunits), &(this->ready_workunits));
                             found_it = true;
                             break;
                         }
@@ -763,29 +755,20 @@ namespace wrench {
                                 "BareMetalComputeService::processWorkCompletion(): couldn't find non-ready child in non-ready set!");
                     }
 
-
-//            if (this->non_ready_workunits.find(child) == this->non_ready_workunits.end()) {
-//              throw std::runtime_error(
-//                      "BareMetalComputeService::processWorkCompletion(): can't find non-ready child in non-ready set!");
-//            }
-//            this->non_ready_workunits.erase(child);
-//            this->ready_workunits.insert(child);
                 }
             }
         }
 
         this->releaseDaemonLock();
-
     }
 
 
-/**
- * @brief Process a work failure
- * @param worker_thread: the worker thread that did the work
- * @param workunit: the workunit
- * @param cause: the cause of the failure
- */
-
+    /**
+     * @brief Process a work failure
+     * @param worker_thread: the worker thread that did the work
+     * @param workunit: the workunit
+     * @param cause: the cause of the failure
+     */
     void StandardJobExecutor::processWorkunitExecutorFailure(
             std::shared_ptr<WorkunitExecutor> workunit_executor,
             std::shared_ptr<Workunit> workunit,
@@ -855,7 +838,6 @@ namespace wrench {
         }
 
         this->releaseDaemonLock();
-
     }
 
 
@@ -897,7 +879,6 @@ namespace wrench {
             // Reset the internal task state to READY (it may have been completed actually, but we just redo the whole workunit)
             workunit->task->setInternalState(WorkflowTask::InternalState::TASK_READY);
         }
-
 
         // Put the WorkUnit back in the ready list (at the end)
         WRENCH_INFO("Putting task back in the ready queue");
@@ -1019,7 +1000,6 @@ namespace wrench {
     std::set<WorkflowFile *> StandardJobExecutor::getFilesInScratch() {
         return this->files_stored_in_scratch;
     }
-
 
     /**
      * @brief Get the executor's job
