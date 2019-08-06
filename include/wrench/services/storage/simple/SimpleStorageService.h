@@ -11,7 +11,7 @@
 #define WRENCH_SIMPLESTORAGESERVICE_H
 
 
-#include <services/storage/storage_helpers/FileTransferThread.h>
+#include <wrench/services/storage/storage_helpers/FileTransferThread.h>
 #include "wrench/services/storage/StorageService.h"
 #include "SimpleStorageServiceProperty.h"
 #include "SimpleStorageServiceMessagePayload.h"

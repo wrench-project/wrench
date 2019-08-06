@@ -20,7 +20,7 @@
 #include <wrench/simulation/SimulationTimestampTypes.h>
 #include <wrench/simulation/Simulation.h>
 #include <wrench/simulation/SimulationOutput.h>
-#include "FileTransferThread.h"
+#include "wrench/services/storage/storage_helpers/FileTransferThread.h"
 
 namespace wrench {
 
