@@ -273,7 +273,10 @@ namespace wrench {
         //process pilot job termination request
         void processPilotJobTerminationRequest(PilotJob *job, std::string answer_mailbox);
 
-        //Process standardjob timeout
+        // process a batch job tiemout event
+        void processAlarmJobTimeout(BatchJob *job);
+
+        //Process pilot job timeout
         void processPilotJobTimeout(PilotJob *job);
 
         //free up resources

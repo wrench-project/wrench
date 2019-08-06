@@ -489,265 +489,283 @@ namespace wrench {
 
         WRENCH_INFO("New Job Manager starting (%s)", this->mailbox_name.c_str());
 
-        bool keep_going = true;
-        while (keep_going) {
-            std::shared_ptr<SimulationMessage> message = nullptr;
-            try {
-                message = S4U_Mailbox::getMessage(this->mailbox_name);
-            } catch (std::shared_ptr<NetworkError> &cause) {
-                continue;
-            }
+        while (processNextMessage()) { }
 
-            if (message == nullptr) {
-                WRENCH_INFO("Got a NULL message... Likely this means we're all done. Aborting!");
-                break;
-            }
-            // Clear finished asynchronous dputMessage()
-//        S4U_Mailbox::clear_dputs();
+        return 0;
+    }
 
-            WRENCH_INFO("Job Manager got a %s message", message->getName().c_str());
+    /**
+     * @brief Method to process an incoming message
+     * @return
+     */
 
-            if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
-                // There shouldn't be any need to clean any state up
-                keep_going = false;
+    bool JobManager::processNextMessage() {
 
-            } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceStandardJobDoneMessage>(message)) {
-                // update job state
-                StandardJob *job = msg->job;
-                job->state = StandardJob::State::COMPLETED;
+        std::shared_ptr<SimulationMessage> message = nullptr;
+        try {
+            message = S4U_Mailbox::getMessage(this->mailbox_name);
+        } catch (std::shared_ptr<NetworkError> &cause) {
+            WRENCH_INFO("Error while receiving message... ignoring");
+            return true;
+        }
 
-                // Determine all task state changes
-                std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes;
-                for (auto task : job->tasks) {
+        if (message == nullptr) {
+            WRENCH_INFO("Got a NULL message... Likely this means we're all done. Aborting!");
+            return false;
+        }
 
-                    if (task->getInternalState() == WorkflowTask::InternalState::TASK_COMPLETED) {
-                        if (task->getUpcomingState() != WorkflowTask::State::COMPLETED) {
-                            if (necessary_state_changes.find(task) == necessary_state_changes.end()) {
-                                necessary_state_changes.insert(std::make_pair(task, WorkflowTask::State::COMPLETED));
-                            } else {
-                                necessary_state_changes[task] = WorkflowTask::State::COMPLETED;
-                            }
-                        }
+        WRENCH_INFO("Job Manager got a %s message", message->getName().c_str());
+
+        if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
+            // There shouldn't be any need to clean up any state
+            return false;
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceStandardJobDoneMessage>(message)) {
+            processStandardJobCompletion(msg->job, msg->compute_service);
+            return true;
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceStandardJobFailedMessage>(message)) {
+            processStandardJobFailure(msg->job, msg->compute_service, msg->cause);
+            return true;
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServicePilotJobStartedMessage>(message)) {
+            processPilotJobStart(msg->job, msg->compute_service);
+            return true;
+        } else if (auto msg = std::dynamic_pointer_cast<ComputeServicePilotJobExpiredMessage>(message)) {
+            processPilotJobExpiration(msg->job, msg->compute_service);
+            return true;
+        } else {
+            throw std::runtime_error("JobManager::main(): Unexpected [" + message->getName() + "] message");
+        }
+    }
+
+
+    /**
+     * @brief Process a standard job completion
+     * @param job: the job that completed
+     * @param compute_service: the compute service on which the job was executed
+     */
+    void JobManager::processStandardJobCompletion(StandardJob *job, std::shared_ptr<ComputeService> compute_service) {
+
+        // update job state
+        job->state = StandardJob::State::COMPLETED;
+
+        // Determine all task state changes
+        std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes;
+        for (auto task : job->tasks) {
+
+            if (task->getInternalState() == WorkflowTask::InternalState::TASK_COMPLETED) {
+                if (task->getUpcomingState() != WorkflowTask::State::COMPLETED) {
+                    if (necessary_state_changes.find(task) == necessary_state_changes.end()) {
+                        necessary_state_changes.insert(std::make_pair(task, WorkflowTask::State::COMPLETED));
                     } else {
-                        throw std::runtime_error("JobManager::main(): got a 'job done' message, but task " +
-                                                 task->getID() + " does not have a TASK_COMPLETED internal state (" +
-                                                 WorkflowTask::stateToString(task->getInternalState()) + ")");
-                    }
-                    auto children = task->getWorkflow()->getTaskChildren(task);
-                    for (auto child : children) {
-                        switch (child->getInternalState()) {
-                            case WorkflowTask::InternalState::TASK_NOT_READY:
-                                if (child->getState() != WorkflowTask::State::NOT_READY) {
-                                    throw std::runtime_error(
-                                            "JobManager::main(): Child's internal state if NOT READY, but child's visible state is " +
-                                            WorkflowTask::stateToString(child->getState()));
-                                }
-                            case WorkflowTask::InternalState::TASK_COMPLETED:
-                                break;
-                            case WorkflowTask::InternalState::TASK_FAILED:
-                            case WorkflowTask::InternalState::TASK_RUNNING:
-                                // no nothing
-                                throw std::runtime_error("JobManager::main(): should never happen: " +
-                                                         WorkflowTask::stateToString(child->getInternalState()));
-                                break;
-                            case WorkflowTask::InternalState::TASK_READY:
-                                if (child->getState() == WorkflowTask::State::NOT_READY) {
-                                    bool all_parents_visibly_completed = true;
-                                    for (auto parent : child->getWorkflow()->getTaskParents(child)) {
-                                        if (parent->getState() == WorkflowTask::State::COMPLETED) {
-                                            continue; // COMPLETED FROM BEFORE
-                                        }
-                                        if (parent->getUpcomingState() == WorkflowTask::State::COMPLETED) {
-                                            continue; // COMPLETED FROM BEFORE, BUT NOT YET SEEN BY WMS
-                                        }
-                                        if ((necessary_state_changes.find(parent) != necessary_state_changes.end()) &&
-                                            (necessary_state_changes[parent] == WorkflowTask::State::COMPLETED)) {
-                                            continue; // ABOUT TO BECOME COMPLETED
-                                        }
-                                        all_parents_visibly_completed = false;
-                                        break;
-                                    }
-                                    if (all_parents_visibly_completed) {
-                                        if (necessary_state_changes.find(child) == necessary_state_changes.end()) {
-                                            necessary_state_changes.insert(
-                                                    std::make_pair(child, WorkflowTask::State::READY));
-                                        } else {
-                                            necessary_state_changes[child] = WorkflowTask::State::READY;
-                                        }
-                                    }
-                                }
-                                break;
-                        }
+                        necessary_state_changes[task] = WorkflowTask::State::COMPLETED;
                     }
                 }
-
-                // move the job from the "pending" list to the "completed" list
-                this->pending_standard_jobs.erase(job);
-                this->completed_standard_jobs.insert(job);
-
-                /*
-                WRENCH_INFO("HERE ARE NECESSARY STATE CHANGES");
-                for (auto s : necessary_state_changes) {
-                  WRENCH_INFO("  STATE(%s) = %s", s.first->getID().c_str(),
-                  WorkflowTask::stateToString(s.second).c_str());
-                }
-                */
-
-                for (auto s : necessary_state_changes) {
-                    s.first->setUpcomingState(s.second);
-                }
-
-                // Forward the notification along the notification chain
-                std::string callback_mailbox = job->popCallbackMailbox();
-                if (not callback_mailbox.empty()) {
-//                    try {
-                        auto augmented_msg = new JobManagerStandardJobDoneMessage(
-                                job, msg->compute_service, necessary_state_changes);
-                        S4U_Mailbox::dputMessage(callback_mailbox, augmented_msg);
-//                    } catch (std::shared_ptr<NetworkError> &cause) {
-//                        // ignore
-//                    }
-                }
-                keep_going = true;
-
-            } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceStandardJobFailedMessage>(message)) {
-
-                // update job state
-                StandardJob *job = msg->job;
-                job->state = StandardJob::State::FAILED;
-
-                // Determine all task state changes and failure count updates
-                std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes;
-                std::set<WorkflowTask *> necessary_failure_count_increments;
-
-                for (auto t: job->getTasks()) {
-
-                    if (t->getInternalState() == WorkflowTask::InternalState::TASK_COMPLETED) {
-//              t->setState(WorkflowTask::State::COMPLETED);
-                        if (necessary_state_changes.find(t) == necessary_state_changes.end()) {
-                            necessary_state_changes.insert(std::make_pair(t, WorkflowTask::State::COMPLETED));
-                        } else {
-                            necessary_state_changes[t] = WorkflowTask::State::COMPLETED;
-                        }
-                        for (auto child : this->wms->getWorkflow()->getTaskChildren(t)) {
-                            switch (child->getInternalState()) {
-                                case WorkflowTask::InternalState::TASK_NOT_READY:
-                                case WorkflowTask::InternalState::TASK_RUNNING:
-                                case WorkflowTask::InternalState::TASK_FAILED:
-                                case WorkflowTask::InternalState::TASK_COMPLETED:
-                                    // no nothing
-                                    break;
-                                case WorkflowTask::InternalState::TASK_READY:
-//                    child->setState(WorkflowTask::State::READY);
-                                    if (necessary_state_changes.find(child) == necessary_state_changes.end()) {
-                                        necessary_state_changes.insert(
-                                                std::make_pair(child, WorkflowTask::State::READY));
-                                    } else {
-                                        necessary_state_changes[child] = WorkflowTask::State::READY;
-                                    }
-                                    break;
-                            }
-                        }
-
-                    } else if (t->getInternalState() == WorkflowTask::InternalState::TASK_READY) {
-//              t->setState(WorkflowTask::State::READY);
-                        if (necessary_state_changes.find(t) == necessary_state_changes.end()) {
-                            necessary_state_changes.insert(std::make_pair(t, WorkflowTask::State::READY));
-                        } else {
-                            necessary_state_changes[t] = WorkflowTask::State::READY;
-                        }
-//              t->incrementFailureCount();
-                        necessary_failure_count_increments.insert(t);
-
-                    } else if (t->getInternalState() == WorkflowTask::InternalState::TASK_FAILED) {
-                        bool ready = true;
-                        for (auto parent : this->wms->getWorkflow()->getTaskParents(t)) {
-                            if ((parent->getInternalState() != WorkflowTask::InternalState::TASK_COMPLETED) and
-                                (parent->getUpcomingState() != WorkflowTask::State::COMPLETED)) {
-                                ready = false;
-                            }
-                        }
-                        if (ready) {
-                            t->setState(WorkflowTask::State::READY);
-                            if (necessary_state_changes.find(t) == necessary_state_changes.end()) {
-                                necessary_state_changes.insert(std::make_pair(t, WorkflowTask::State::READY));
-                            } else {
-                                necessary_state_changes[t] = WorkflowTask::State::READY;
-                            }
-                        } else {
-                            t->setState(WorkflowTask::State::NOT_READY);
-                            if (necessary_state_changes.find(t) == necessary_state_changes.end()) {
-                                necessary_state_changes.insert(std::make_pair(t, WorkflowTask::State::NOT_READY));
-                            } else {
-                                necessary_state_changes[t] = WorkflowTask::State::NOT_READY;
-                            }
-                        }
-                    }
-                }
-
-                // remove the job from the "pending" list
-                this->pending_standard_jobs.erase(job);
-                // put it in the "failed" list
-                this->failed_standard_jobs.insert(job);
-
-                // Forward the notification along the notification chain
-//                try {
-                    JobManagerStandardJobFailedMessage *augmented_message =
-                            new JobManagerStandardJobFailedMessage(job, msg->compute_service,
-                                                                   necessary_state_changes,
-                                                                   necessary_failure_count_increments,
-                                                                   std::move(msg->cause));
-                    S4U_Mailbox::dputMessage(job->popCallbackMailbox(), augmented_message);
-//                } catch (std::shared_ptr<NetworkError> &cause) {
-//                }
-                    keep_going = true;
-
-            } else if (auto msg = std::dynamic_pointer_cast<ComputeServicePilotJobStartedMessage>(message)) {
-
-                // update job state
-                PilotJob *job = msg->job;
-                job->state = PilotJob::State::RUNNING;
-
-                // move the job from the "pending" list to the "running" list
-                this->pending_pilot_jobs.erase(job);
-                this->running_pilot_jobs.insert(job);
-
-
-                // Forward the notification to the source
-                WRENCH_INFO("Forwarding to %s", job->getOriginCallbackMailbox().c_str());
-//                try {
-                    S4U_Mailbox::dputMessage(job->getOriginCallbackMailbox(),
-                                             new ComputeServicePilotJobStartedMessage(job, msg->compute_service, 0.0));
-//                } catch (std::shared_ptr<NetworkError> &cause) {
-                    keep_going = true;
-//                }
-
-            } else if (auto msg = std::dynamic_pointer_cast<ComputeServicePilotJobExpiredMessage>(message)) {
-
-                // update job state
-                PilotJob *job = msg->job;
-                job->state = PilotJob::State::EXPIRED;
-
-                // Remove the job from the "running" list and put it in the completed list
-                this->running_pilot_jobs.erase(job);
-                this->completed_pilot_jobs.insert(job);
-
-                // Forward the notification to the source
-                WRENCH_INFO("Forwarding to %s", job->getOriginCallbackMailbox().c_str());
-//                try {
-                    S4U_Mailbox::dputMessage(job->getOriginCallbackMailbox(),
-                                             new ComputeServicePilotJobExpiredMessage(job, msg->compute_service, 0.0));
-//                } catch (std::shared_ptr<NetworkError> &cause) {
-                    keep_going = true;
-//                }
-
             } else {
-                throw std::runtime_error("JobManager::main(): Unexpected [" + message->getName() + "] message");
+                throw std::runtime_error("JobManager::main(): got a 'job done' message, but task " +
+                                         task->getID() + " does not have a TASK_COMPLETED internal state (" +
+                                         WorkflowTask::stateToString(task->getInternalState()) + ")");
+            }
+            auto children = task->getWorkflow()->getTaskChildren(task);
+            for (auto child : children) {
+                switch (child->getInternalState()) {
+                    case WorkflowTask::InternalState::TASK_NOT_READY:
+                        if (child->getState() != WorkflowTask::State::NOT_READY) {
+                            throw std::runtime_error(
+                                    "JobManager::main(): Child's internal state if NOT READY, but child's visible state is " +
+                                    WorkflowTask::stateToString(child->getState()));
+                        }
+                    case WorkflowTask::InternalState::TASK_COMPLETED:
+                        break;
+                    case WorkflowTask::InternalState::TASK_FAILED:
+                    case WorkflowTask::InternalState::TASK_RUNNING:
+                        // no nothing
+                        throw std::runtime_error("JobManager::main(): should never happen: " +
+                                                 WorkflowTask::stateToString(child->getInternalState()));
+                        break;
+                    case WorkflowTask::InternalState::TASK_READY:
+                        if (child->getState() == WorkflowTask::State::NOT_READY) {
+                            bool all_parents_visibly_completed = true;
+                            for (auto parent : child->getWorkflow()->getTaskParents(child)) {
+                                if (parent->getState() == WorkflowTask::State::COMPLETED) {
+                                    continue; // COMPLETED FROM BEFORE
+                                }
+                                if (parent->getUpcomingState() == WorkflowTask::State::COMPLETED) {
+                                    continue; // COMPLETED FROM BEFORE, BUT NOT YET SEEN BY WMS
+                                }
+                                if ((necessary_state_changes.find(parent) != necessary_state_changes.end()) &&
+                                    (necessary_state_changes[parent] == WorkflowTask::State::COMPLETED)) {
+                                    continue; // ABOUT TO BECOME COMPLETED
+                                }
+                                all_parents_visibly_completed = false;
+                                break;
+                            }
+                            if (all_parents_visibly_completed) {
+                                if (necessary_state_changes.find(child) == necessary_state_changes.end()) {
+                                    necessary_state_changes.insert(
+                                            std::make_pair(child, WorkflowTask::State::READY));
+                                } else {
+                                    necessary_state_changes[child] = WorkflowTask::State::READY;
+                                }
+                            }
+                        }
+                        break;
+                }
             }
         }
 
-        WRENCH_INFO("Job Manager terminating");
-        return 0;
+        // move the job from the "pending" list to the "completed" list
+        this->pending_standard_jobs.erase(job);
+        this->completed_standard_jobs.insert(job);
+
+        /*
+        WRENCH_INFO("HERE ARE NECESSARY STATE CHANGES");
+        for (auto s : necessary_state_changes) {
+          WRENCH_INFO("  STATE(%s) = %s", s.first->getID().c_str(),
+          WorkflowTask::stateToString(s.second).c_str());
+        }
+        */
+
+        for (auto s : necessary_state_changes) {
+            s.first->setUpcomingState(s.second);
+        }
+
+        // Forward the notification along the notification chain
+        std::string callback_mailbox = job->popCallbackMailbox();
+        if (not callback_mailbox.empty()) {
+            auto augmented_msg = new JobManagerStandardJobDoneMessage(
+                    job, compute_service, necessary_state_changes);
+            S4U_Mailbox::dputMessage(callback_mailbox, augmented_msg);
+        }
     }
+
+
+    /**
+     * @brief Process a standard job failure
+     * @param job: the job that failure
+     * @param compute_service: the compute service on which the job has failed
+     * @param failure_cause: the cause of the failure
+     */
+    void JobManager::processStandardJobFailure(StandardJob *job, std::shared_ptr<ComputeService> compute_service, std::shared_ptr<FailureCause> cause) {
+
+        // update job state
+        job->state = StandardJob::State::FAILED;
+
+        // Determine all task state changes and failure count updates
+        std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes;
+        std::set<WorkflowTask *> necessary_failure_count_increments;
+
+        for (auto t: job->getTasks()) {
+
+            if (t->getInternalState() == WorkflowTask::InternalState::TASK_COMPLETED) {
+                if (necessary_state_changes.find(t) == necessary_state_changes.end()) {
+                    necessary_state_changes.insert(std::make_pair(t, WorkflowTask::State::COMPLETED));
+                } else {
+                    necessary_state_changes[t] = WorkflowTask::State::COMPLETED;
+                }
+                for (auto child : this->wms->getWorkflow()->getTaskChildren(t)) {
+                    switch (child->getInternalState()) {
+                        case WorkflowTask::InternalState::TASK_NOT_READY:
+                        case WorkflowTask::InternalState::TASK_RUNNING:
+                        case WorkflowTask::InternalState::TASK_FAILED:
+                        case WorkflowTask::InternalState::TASK_COMPLETED:
+                            // no nothing
+                            break;
+                        case WorkflowTask::InternalState::TASK_READY:
+                            if (necessary_state_changes.find(child) == necessary_state_changes.end()) {
+                                necessary_state_changes.insert(
+                                        std::make_pair(child, WorkflowTask::State::READY));
+                            } else {
+                                necessary_state_changes[child] = WorkflowTask::State::READY;
+                            }
+                            break;
+                    }
+                }
+
+            } else if (t->getInternalState() == WorkflowTask::InternalState::TASK_READY) {
+                if (necessary_state_changes.find(t) == necessary_state_changes.end()) {
+                    necessary_state_changes.insert(std::make_pair(t, WorkflowTask::State::READY));
+                } else {
+                    necessary_state_changes[t] = WorkflowTask::State::READY;
+                }
+                necessary_failure_count_increments.insert(t);
+
+            } else if (t->getInternalState() == WorkflowTask::InternalState::TASK_FAILED) {
+                bool ready = true;
+                for (auto parent : this->wms->getWorkflow()->getTaskParents(t)) {
+                    if ((parent->getInternalState() != WorkflowTask::InternalState::TASK_COMPLETED) and
+                        (parent->getUpcomingState() != WorkflowTask::State::COMPLETED)) {
+                        ready = false;
+                    }
+                }
+                if (ready) {
+                    t->setState(WorkflowTask::State::READY);
+                    if (necessary_state_changes.find(t) == necessary_state_changes.end()) {
+                        necessary_state_changes.insert(std::make_pair(t, WorkflowTask::State::READY));
+                    } else {
+                        necessary_state_changes[t] = WorkflowTask::State::READY;
+                    }
+                } else {
+                    t->setState(WorkflowTask::State::NOT_READY);
+                    if (necessary_state_changes.find(t) == necessary_state_changes.end()) {
+                        necessary_state_changes.insert(std::make_pair(t, WorkflowTask::State::NOT_READY));
+                    } else {
+                        necessary_state_changes[t] = WorkflowTask::State::NOT_READY;
+                    }
+                }
+            }
+        }
+
+        // remove the job from the "pending" list
+        this->pending_standard_jobs.erase(job);
+        // put it in the "failed" list
+        this->failed_standard_jobs.insert(job);
+
+        // Forward the notification along the notification chain
+        JobManagerStandardJobFailedMessage *augmented_message =
+                new JobManagerStandardJobFailedMessage(job, compute_service,
+                                                       necessary_state_changes,
+                                                       necessary_failure_count_increments,
+                                                       std::move(cause));
+        S4U_Mailbox::dputMessage(job->popCallbackMailbox(), augmented_message);
+    }
+
+    /**
+     * @brief Process a pilot job starting
+     * @param job: the pilot job that started
+     * @param compute_service: the compute service on which it started
+     */
+    void JobManager::processPilotJobStart(PilotJob *job, std::shared_ptr<ComputeService> compute_service) {
+        // update job state
+        job->state = PilotJob::State::RUNNING;
+
+        // move the job from the "pending" list to the "running" list
+        this->pending_pilot_jobs.erase(job);
+        this->running_pilot_jobs.insert(job);
+
+        // Forward the notification to the source
+        WRENCH_INFO("Forwarding to %s", job->getOriginCallbackMailbox().c_str());
+        S4U_Mailbox::dputMessage(job->getOriginCallbackMailbox(),
+                                 new ComputeServicePilotJobStartedMessage(job, compute_service, 0.0));
+    }
+
+    /**
+     * @brief Process a pilot job expiring
+     * @param job: the pilot job that expired
+     * @param compute_service: the compute service on which it was running
+     */
+    void JobManager::processPilotJobExpiration(PilotJob *job, std::shared_ptr<ComputeService> compute_service) {
+        // update job state
+        job->state = PilotJob::State::EXPIRED;
+
+        // Remove the job from the "running" list and put it in the completed list
+        this->running_pilot_jobs.erase(job);
+        this->completed_pilot_jobs.insert(job);
+
+        // Forward the notification to the source
+        WRENCH_INFO("Forwarding to %s", job->getOriginCallbackMailbox().c_str());
+        S4U_Mailbox::dputMessage(job->getOriginCallbackMailbox(),
+                                 new ComputeServicePilotJobExpiredMessage(job, compute_service, 0.0));
+
+    }
+
 
 };

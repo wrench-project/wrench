@@ -66,7 +66,9 @@ private:
 
         wrench::TerminalOutput::setThisProcessLoggingColor(wrench::TerminalOutput::COLOR_BLUE);
         WRENCH_INFO("Testing WRENCH_INFO");
+        wrench::TerminalOutput::setThisProcessLoggingColor(wrench::TerminalOutput::COLOR_YELLOW);
         WRENCH_WARN("Testing WRENCH_WARN");
+        wrench::TerminalOutput::setThisProcessLoggingColor(wrench::TerminalOutput::COLOR_GREEN);
         WRENCH_DEBUG("Testing WRENCH_DEBUG");
 
         // Sleep for 1 second
