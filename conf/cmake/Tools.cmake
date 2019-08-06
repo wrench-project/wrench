@@ -15,5 +15,5 @@ set(PEGASUS_WORKFLOW_PARSER_HEADER_FILES
 add_library(wrenchpegasusworkflowparser STATIC ${PEGASUS_WORKFLOW_PARSER_SOURCE_FILES} )
 install(TARGETS wrenchpegasusworkflowparser DESTINATION lib)
 install(FILES "${PEGASUS_WORKFLOW_PARSER_HEADER_FILES}"
-        DESTINATION include/wrench-tools/
+        DESTINATION include/wrench/tools/pegasus/
         )

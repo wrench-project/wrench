@@ -164,7 +164,7 @@ set(SOURCE_FILES
         src/wrench/services/storage/StorageService.cpp
         src/wrench/services/storage/simple/SimpleStorageService.cpp
         src/wrench/services/storage/storage_helpers/FileTransferThread.cpp
-        src/wrench/services/storage/storage_helpers/FileTransferThread.h
+        include/wrench/services/storage/storage_helpers/FileTransferThread.h
         src/wrench/services/Service.cpp
         src/wrench/services/ServiceProperty.cpp
         src/wrench/services/ServiceMessagePayload.cpp
@@ -321,7 +321,7 @@ set(TEST_FILES
         test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.cpp
         test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.h
         src/wrench/services/storage/storage_helpers/FileTransferThread.cpp
-        src/wrench/services/storage/storage_helpers/FileTransferThread.h
+        include/wrench/services/storage/storage_helpers/FileTransferThread.h
         src/wrench/services/storage/storage_helpers/FileTransferThreadMessage.h
         test/simulation/S4U_MailboxTest.cpp)
 
@@ -343,6 +343,8 @@ target_link_libraries(wrench ${SIMGRID_LIBRARY} ${PUGIXML_LIBRARY} ${LEMON_LIBRA
 add_custom_command(TARGET wrench PRE_LINK COMMAND ${CMAKE_COMMAND} -DPROJECT_SOURCE_DIR=${PROJECT_SOURCE_DIR} -DWRENCH_RELEASE_VERSION=${WRENCH_RELEASE_VERSION} -P ${CMAKE_HOME_DIRECTORY}/conf/cmake/Version.cmake)
 
 install(TARGETS wrench DESTINATION lib)
+install(DIRECTORY include/ DESTINATION include)
+
 
 # generate unit tests
 add_executable(unit_tests EXCLUDE_FROM_ALL ${SOURCE_FILES} ${HEADER_FILES} ${TEST_FILES})
