@@ -12,7 +12,7 @@
 
 #include "SimpleWMS.h"
 #include "scheduler/CloudStandardJobScheduler.h"
-#include "../../tools/pegasus/include/PegasusWorkflowParser.h"
+#include <wrench/tools/pegasus/PegasusWorkflowParser.h>
 
 /**
  * @brief An example that demonstrate how to run a simulation of a simple Workflow

@@ -12,7 +12,7 @@
 
 #include "SimpleWMS.h"
 #include "scheduler/BatchStandardJobScheduler.h"
-#include "../../tools/pegasus/include/PegasusWorkflowParser.h"
+#include <wrench/tools/pegasus/PegasusWorkflowParser.h>
 
 int main(int argc, char **argv) {
 
