@@ -409,7 +409,7 @@ namespace wrench {
 
 
     /**
-     * @brief Helper function called by terminateStandardJob() and terminateWorkJob() to process a job submission
+     * @brief Helper function called by terminateStandardJob() and terminatePilotJob() to process a job submission
      * @param job
      */
     void BatchComputeService::terminateWorkflowJob(WorkflowJob *job) {

@@ -90,6 +90,8 @@ namespace wrench {
 
         unsigned long getNewUniqueNumber();
 
+        bool processFileDeleteRequest(WorkflowFile *file, std::string dst_partition, std::string answer_mailbox);
+
         bool processFileWriteRequest(WorkflowFile *file, std::string dst_dir, std::string answer_mailbox, unsigned long buffer_size);
 
         bool processFileReadRequest(WorkflowFile *file, std::string src_dir, std::string answer_mailbox,
