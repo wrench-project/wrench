@@ -177,32 +177,7 @@ namespace wrench {
 
         } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFileDeleteRequestMessage>(message)) {
 
-            bool success = true;
-            std::shared_ptr<FailureCause> failure_cause = nullptr;
-            if (this->stored_files.find(msg->dst_partition) != this->stored_files.end()) {
-                std::set<WorkflowFile *> files = this->stored_files[msg->dst_partition];
-                if (files.find(msg->file) == files.end()) {
-                    success = false;
-                    failure_cause = std::shared_ptr<FailureCause>(
-                            new FileNotFound(msg->file, this->getSharedPtr<SimpleStorageService>()));
-                } else {
-                    this->removeFileFromStorage(msg->file, msg->dst_partition);
-                }
-            } else {
-                success = false;
-                failure_cause = std::shared_ptr<FailureCause>(
-                        new FileNotFound(msg->file, this->getSharedPtr<SimpleStorageService>()));
-            }
-
-
-            S4U_Mailbox::dputMessage(msg->answer_mailbox,
-                                     new StorageServiceFileDeleteAnswerMessage(msg->file,
-                                                                               this->getSharedPtr<SimpleStorageService>(),
-                                                                               success,
-                                                                               failure_cause,
-                                                                               this->getMessagePayloadValue(
-                                                                                       SimpleStorageServiceMessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD)));
-            return true;
+            return processFileDeleteRequest(msg->file, msg->dst_partition, msg->answer_mailbox);
 
         } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFileLookupRequestMessage>(message)) {
 
@@ -530,6 +505,42 @@ namespace wrench {
         return true;
     }
 
+
+    /**
+     * @brief Process a file deletion request
+     * @param file: the file to delete
+     * @param dst_partition: the partition in which it is
+     * @param answer_mailbox: the mailbox to which the notification should be sent
+     * @return false if the daemon should terminate
+     */
+    bool SimpleStorageService::processFileDeleteRequest(WorkflowFile *file, std::string dst_partition, std::string answer_mailbox) {
+        bool success = true;
+        std::shared_ptr<FailureCause> failure_cause = nullptr;
+        if (this->stored_files.find(dst_partition) != this->stored_files.end()) {
+            std::set<WorkflowFile *> files = this->stored_files[dst_partition];
+            if (files.find(file) == files.end()) {
+                success = false;
+                failure_cause = std::shared_ptr<FailureCause>(
+                        new FileNotFound(file, this->getSharedPtr<SimpleStorageService>()));
+            } else {
+                this->removeFileFromStorage(file, dst_partition);
+            }
+        } else {
+            success = false;
+            failure_cause = std::shared_ptr<FailureCause>(
+                    new FileNotFound(file, this->getSharedPtr<SimpleStorageService>()));
+        }
+
+        S4U_Mailbox::dputMessage(answer_mailbox,
+                                 new StorageServiceFileDeleteAnswerMessage(file,
+                                                                           this->getSharedPtr<SimpleStorageService>(),
+                                                                           success,
+                                                                           failure_cause,
+                                                                           this->getMessagePayloadValue(
+                                                                                   SimpleStorageServiceMessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD)));
+        return true;
+    }
+
     /**
      * @brief Helper method to validate propery values
      * throw std::invalid_argument
@@ -538,5 +549,6 @@ namespace wrench {
         this->getPropertyValueAsUnsignedLong(SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS);
         this->getPropertyValueAsUnsignedLong(SimpleStorageServiceProperty::BUFFER_SIZE);
     }
+
 
 };
