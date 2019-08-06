@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include "../include/PegasusWorkflowParser.h"
+#include "wrench/tools/pegasus/PegasusWorkflowParser.h"
 #include <wrench-dev.h>
 #include <wrench/util/UnitParser.h>
 
