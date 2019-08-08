@@ -45,7 +45,7 @@ int main(int argc, char **argv) {
 
     /* Reading and parsing the workflow description file to create a wrench::Workflow object */
     std::cerr << "Loading workflow..." << std::endl;
-    auto workflow = wrench::PegasusWorkflowParser::createWorkflowFromDAXorJSON(workflow_file, "1000Gf");
+    auto workflow = wrench::PegasusWorkflowParser::createWorkflowFromDAXorJSON(workflow_file, "1000Gf", false);
     std::cerr << "The workflow has " << workflow->getNumberOfTasks() << " tasks " << std::endl;
     std::cerr.flush();
 
@@ -54,7 +54,7 @@ int main(int argc, char **argv) {
     simulation.instantiatePlatform(platform_file);
 
     /* Get a vector of all the hosts in the simulated platform */
-    std::vector<std::string> hostname_list = simulation.getHostnameList();
+    std::vector<std::string> hostname_list = wrench::Simulation::getHostnameList();
 
     /* Create a list of storage services that will be used by the WMS */
     std::set<std::shared_ptr<wrench::StorageService>> storage_services;
