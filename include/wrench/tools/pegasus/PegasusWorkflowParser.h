@@ -20,9 +20,17 @@ namespace wrench {
 
     public:
 
-        static Workflow *createWorkflowFromDAXorJSON(const std::string &filename, const std::string &reference_flop_rate, bool redundant_dependencies = false);
-        static Workflow *createWorkflowFromDAX(const std::string &filename, const std::string &reference_flop_rate, bool redundant_dependencies = false);
-        static Workflow *createWorkflowFromJSON(const std::string &filename, const std::string &reference_flop_rate, bool redundant_dependencies = false);
+        static Workflow *createWorkflowFromDAXorJSON(const std::string &filename, const std::string &reference_flop_rate,
+                bool redundant_dependencies, bool abstract_workflow = true);
+
+
+    private:
+
+        static Workflow *createAbstractWorkflowFromDAX(const std::string &filename, const std::string &reference_flop_rate, bool redundant_dependencies);
+        static Workflow *createNonAbstractWorkflowFromDAX(const std::string &filename, const std::string &reference_flop_rate, bool redundant_dependencies);
+
+        static Workflow *createAbstractWorkflowFromJSON(const std::string &filename, const std::string &reference_flop_rate, bool redundant_dependencies);
+        static Workflow *createNonAbstractWorkflowFromJSON(const std::string &filename, const std::string &reference_flop_rate, bool redundant_dependencies);
 
     };
 
