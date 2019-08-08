@@ -3192,8 +3192,8 @@ TEST_F(WorkflowLoadFromJSONTest, DISABLED_LoadValidJSON) {
 
   wrench::Workflow *workflow = nullptr;
 
-  ASSERT_THROW(workflow = wrench::PegasusWorkflowParser::createWorkflowFromJSON("bogus", "1f"), std::invalid_argument);
-  ASSERT_NO_THROW(workflow = wrench::PegasusWorkflowParser::createWorkflowFromJSON(this->json_file_path, "1f"));
+  ASSERT_THROW(workflow = wrench::PegasusWorkflowParser::createWorkflowFromJSON("bogus", "1f", false), std::invalid_argument);
+  ASSERT_NO_THROW(workflow = wrench::PegasusWorkflowParser::createWorkflowFromJSON(this->json_file_path, "1f", false));
   ASSERT_EQ(workflow->getNumberOfTasks(), 71);
   ASSERT_EQ(workflow->getFiles().size(), 69);
 

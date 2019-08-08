@@ -22,22 +22,35 @@ WRENCH_LOG_NEW_DEFAULT_CATEGORY(pegasus_workflow_parser, "Log category for Pegas
 
 namespace wrench {
 
-   /**
-    * @brief Create a workflow based on a DAX or a JSON file
-    *
-    * @param filename: the path to the DAX (with .dax extension) or JSON (with .json extension) file
-    * @param reference_flop_rate: a reference compute speed (in flops/sec), assuming a task's computation is purely flops.
-    *                             This is needed because JSON files specify task execution times in seconds,
-    *                             but the WRENCH simulation needs some notion of "amount of computation" to
-    *                             apply reasonable scaling. (Because the XML platform description specifies host
-    *                             compute speeds in flops/sec). The times in the JSON file are thus assumed to be
-     *                            obtained on an machine with flop rate reference_flop_rate.
-    * @param redundant_dependencies: whether DAG redundant dependencies should be kept in the graph
-    *
-    * @throw std::invalid_argument
-    */
+    /**
+     * @brief Create a workflow based on a DAX or a JSON file
+     *
+     * @param filename: the path to the DAX (with .dax extension) or JSON (with .json extension) file
+     * @param reference_flop_rate: a reference compute speed (in flops/sec), assuming a task's computation is purely flops.
+     *                             This is needed because JSON files specify task execution times in seconds,
+     *                             but the WRENCH simulation needs some notion of "amount of computation" to
+     *                             apply reasonable scaling. (Because the XML platform description specifies host
+     *                             compute speeds in flops/sec). The times in the JSON file are thus assumed to be
+     *                             obtained on an machine with flop rate reference_flop_rate.
+     * @param redundant_dependencies: Workflows provided by Pegasus
+     *                             sometimes include control/data dependencies between tasks that are already induced by
+     *                             other control/data dependencies (i.e., they correspond to transitive
+     *                             closures or existing edges in the workflow graphs). Passing redundant_dependencies=true
+     *                             force these "redundant" dependencies to be added as edges in the workflow. Passing
+     *                             redundant_dependencies=false will ignore these "redundant" dependencies. Most users
+     *                             would likely pass "false".
+     * @param abstract_workflow: Workflows provided by the Pegasus project are "realized" workflows that include
+     *                           information pertaining to the workflow's execution plan. This information is only relevant
+     *                           for Pegasus. Passing abstract_workflow=false ignores this information and will load the
+     *                           workflow as an "abstract" workflow, e.g., for use with any generic simulator (but still
+     *                           using Pegasus-provided workflow configurations).
+     *                           Passing abstract_workflow=true includes this information, as needed if implementing/using
+     *                           a Pegasus simulator.  (Default: "true")
+     *
+     * @throw std::invalid_argument
+     */
     Workflow *PegasusWorkflowParser::createWorkflowFromDAXorJSON(const std::string &filename, const std::string &reference_flop_rate,
-                                     bool redundant_dependencies) {
+                                                                 bool redundant_dependencies, bool abstract_workflow) {
         std::istringstream ss(filename);
         std::string token;
         std::vector<std::string> tokens;
@@ -53,9 +66,17 @@ namespace wrench {
         std::string extension = tokens[tokens.size() - 1];
 
         if (extension == "dax") {
-            return createWorkflowFromDAX(filename, reference_flop_rate, redundant_dependencies);
+            if (abstract_workflow) {
+                return createAbstractWorkflowFromDAX(filename, reference_flop_rate, redundant_dependencies);
+            } else {
+                return createNonAbstractWorkflowFromDAX(filename, reference_flop_rate, redundant_dependencies);
+            }
         } else if (extension == "json") {
-            return createWorkflowFromJSON(filename, reference_flop_rate, redundant_dependencies);
+            if (abstract_workflow) {
+                return createAbstractWorkflowFromJSON(filename, reference_flop_rate, redundant_dependencies);
+            } else {
+                return createNonAbstractWorkflowFromJSON(filename, reference_flop_rate, redundant_dependencies);
+            }
         } else {
             throw std::invalid_argument(
                     "Workflow::createWorkflowFromDAXorJSON(): workflow file name must end with '.dax' or '.json'");
@@ -64,7 +85,7 @@ namespace wrench {
 
 
     /**
-     * @brief Create a workflow based on a JSON file
+     * @brief Create an abstract workflow based on a JSON file
      *
      * @param filename: the path to the JSON file
      * @param reference_flop_rate: a reference compute speed (in flops/sec), assuming a task's computation is purely flops.
@@ -73,15 +94,23 @@ namespace wrench {
      *                             apply reasonable scaling. (Because the XML platform description specifies host
      *                             compute speeds in flops/sec). The times in the JSON file are thus assumed to be
      *                             obtained on an machine with flop rate reference_flop_rate.
-     * @param redundant_dependencies: whether DAG redundant dependencies should be kept in the graph
-     *
+     * @param redundant_dependencies: Workflows provided by Pegasus
+     *                             sometimes include control/data dependencies between tasks that are already induced by
+     *                             other control/data dependencies (i.e., they correspond to transitive
+     *                             closures or existing edges in the workflow graphs). Passing redundant_dependencies=true
+     *                             force these "redundant" dependencies to be added as edges in the workflow. Passing
+     *                             redundant_dependencies=false will ignore these "redundant" dependencies. Most users
+     *                             would likely pass "false".
      * @throw std::invalid_argument
+     *
      */
-    Workflow *PegasusWorkflowParser::createWorkflowFromJSON(const std::string &filename, const std::string &reference_flop_rate,
-                                bool redundant_dependencies) {
+    Workflow *PegasusWorkflowParser::createAbstractWorkflowFromJSON(const std::string &filename, const std::string &reference_flop_rate,
+                                                                    bool redundant_dependencies) {
 
         std::ifstream file;
         nlohmann::json j;
+        std::set<std::string> ignored_auxiliary_jobs;
+        std::set<std::string> ignored_transfer_jobs;
 
         auto *workflow = new Workflow();
 
@@ -119,6 +148,23 @@ namespace wrench {
                     std::string name = job.at("name");
                     double runtime = job.at("runtime");
                     unsigned long num_procs = 1;
+                    std::string type = job.at("type");
+
+                    if (type == "transfer") {
+                        // Ignore,  since this is an abstract workflow
+                        ignored_transfer_jobs.insert(name);
+                        continue;
+                    }
+                    if (type == "auxiliary") {
+                        // Ignore,  since this is an abstract workflow
+                        ignored_auxiliary_jobs.insert(name);
+                        continue;
+                    }
+
+                    if (type != "compute") {
+                        throw std::invalid_argument("Workflow::createWorkflowFromJson(): Job " + name + " has uknown type " + type);
+                    }
+
                     task = workflow->addTask(name, runtime * flop_rate, num_procs, num_procs, 1.0, 0.0);
 
                     // task priority
@@ -149,16 +195,6 @@ namespace wrench {
                         // do nothing
                     }
 
-                    // task type
-                    std::string type = job.at("type");
-                    if (type == "transfer") {
-                        // TODO: DO SOMETHING APPROPRIATE HERE
-                    } else if (type == "auxiliary") {
-                        // TODO: DO SOMETHING APPROPRIATE HERE
-                    } else {
-                        throw std::invalid_argument("Workflow::createWorkflowFromJson(): Job " + name + " has uknown type " + type);
-                    }
-
                     // task files
                     std::vector<nlohmann::json> files = job.at("files");
 
@@ -179,18 +215,29 @@ namespace wrench {
                         } else if (link == "output") {
                             task->addOutputFile(workflow_file);
                         }
-                        if (type == "transfer") {
-                            task->addSrcDest(workflow_file, f.at("src"), f.at("dest"));
-                        }
+
                     }
                 }
 
                 // since tasks may not be ordered in the JSON file, we need to iterate over all tasks again
                 for (auto &job : jobs) {
-                    task = workflow->getTaskByID(job.at("name"));
+                    try {
+                        task = workflow->getTaskByID(job.at("name"));
+                    } catch (std::invalid_argument &e) {
+                        // Ignored task
+                        continue;
+                    }
                     std::vector<nlohmann::json> parents = job.at("parents");
                     // task dependencies
                     for (auto &parent : parents) {
+                        // Ignore transfer jobs declared as parents
+                        if (ignored_transfer_jobs.find(parent) != ignored_transfer_jobs.end()) {
+                            continue;
+                        }
+                        // Ignore auxiliary jobs declared as parents
+                        if (ignored_auxiliary_jobs.find(parent) != ignored_auxiliary_jobs.end()) {
+                            continue;
+                        }
                         try {
                             WorkflowTask *parent_task = workflow->getTaskByID(parent);
                             workflow->addControlDependency(parent_task, task, redundant_dependencies);
@@ -206,9 +253,32 @@ namespace wrench {
         return workflow;
     }
 
+    /**
+     * @brief Create an NON-abstract workflow based on a JSON file
+     *
+     * @param filename: the path to the JSON file
+     * @param reference_flop_rate: a reference compute speed (in flops/sec), assuming a task's computation is purely flops.
+     *                             This is needed because JSON files specify task execution times in seconds,
+     *                             but the WRENCH simulation needs some notion of "amount of computation" to
+     *                             apply reasonable scaling. (Because the XML platform description specifies host
+     *                             compute speeds in flops/sec). The times in the JSON file are thus assumed to be
+     *                             obtained on an machine with flop rate reference_flop_rate.
+     * @param redundant_dependencies: Workflows provided by Pegasus
+     *                             sometimes include control/data dependencies between tasks that are already induced by
+     *                             other control/data dependencies (i.e., they correspond to transitive
+     *                             closures or existing edges in the workflow graphs). Passing redundant_dependencies=true
+     *                             force these "redundant" dependencies to be added as edges in the workflow. Passing
+     *                             redundant_dependencies=false will ignore these "redundant" dependencies. Most users
+     *                             woudl likely pass "false".
+     * @throw std::invalid_argument
+     */
+    Workflow *PegasusWorkflowParser::createNonAbstractWorkflowFromJSON(const std::string &filename, const std::string &reference_flop_rate,
+                                                                       bool redundant_dependencies) {
+        throw std::runtime_error("PegasusWorkflowParser::createNonAbstractWorkflowFromJSON(): not implemented yet");
+    }
 
     /**
-     * @brief Create a workflow based on a DAX file
+     * @brief Create an abstract workflow based on a DAX file
      *
      * @param filename: the path to the DAX file
      * @param reference_flop_rate: a reference compute speed (in flops/sec), assuming a task's computation is purely flops.
@@ -217,14 +287,19 @@ namespace wrench {
      *                             apply reasonable scaling. (Because the XML platform description specifies host
      *                             compute speeds in flops/sec). The times in the DAX file are thus assumed to be
      *                             obtained on an machine with flop rate reference_flop_rate.
-     * @param redundant_dependencies: whether DAG redundant dependencies should be kept in the graph
+     * @param redundant_dependencies: Workflows provided by Pegasus
+     *                             sometimes include control/data dependencies between tasks that are already induced by
+     *                             other control/data dependencies (i.e., they correspond to transitive
+     *                             closures or existing edges in the workflow graphs). Passing redundant_dependencies=true
+     *                             force these "redundant" dependencies to be added as edges in the workflow. Passing
+     *                             redundant_dependencies=false will ignore these "redundant" dependencies. Most users
+     *                             would likely pass "false".
      *
      * @throw std::invalid_argument
      */
-    Workflow *PegasusWorkflowParser::createWorkflowFromDAX(const std::string &filename, const std::string &reference_flop_rate,
-                               bool redundant_dependencies) {
+    Workflow *PegasusWorkflowParser::createAbstractWorkflowFromDAX(const std::string &filename, const std::string &reference_flop_rate,
+                                                                   bool redundant_dependencies) {
 
-        WRENCH_INFO("HERE");
         pugi::xml_document dax_tree;
 
         auto *workflow = new Workflow();
@@ -265,7 +340,6 @@ namespace wrench {
                     }
                 }
             }
-
 
             // Create the task
             // If the DAX says num_procs = x, then we set min_cores=1, max_cores=x, efficiency=1.0
@@ -313,4 +387,28 @@ namespace wrench {
         return workflow;
     }
 
+    /**
+     * @brief Create an NON-abstract workflow based on a DAX file
+     *
+     * @param filename: the path to the DAX file
+     * @param reference_flop_rate: a reference compute speed (in flops/sec), assuming a task's computation is purely flops.
+     *                             This is needed because DAX files specify task execution times in seconds,
+     *                             but the WRENCH simulation needs some notion of "amount of computation" to
+     *                             apply reasonable scaling. (Because the XML platform description specifies host
+     *                             compute speeds in flops/sec). The times in the DAX file are thus assumed to be
+     *                             obtained on an machine with flop rate reference_flop_rate.
+     * @param redundant_dependencies: Workflows provided by Pegasus
+     *                             sometimes include control/data dependencies between tasks that are already induced by
+     *                             other control/data dependencies (i.e., they correspond to transitive
+     *                             closures or existing edges in the workflow graphs). Passing redundant_dependencies=true
+     *                             force these "redundant" dependencies to be added as edges in the workflow. Passing
+     *                             redundant_dependencies=false will ignore these "redundant" dependencies. Most users
+     *                             would likely pass "false".
+     *
+     * @throw std::invalid_argument
+     */
+    Workflow *PegasusWorkflowParser::createNonAbstractWorkflowFromDAX(const std::string &filename, const std::string &reference_flop_rate,
+                                                                      bool redundant_dependencies) {
+        throw std::runtime_error("PegasusWorkflowParser::createNonAbstractWorkflowFromDAX(): not implemented yet");
+    }
 };
