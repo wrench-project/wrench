@@ -728,17 +728,28 @@ private:
             // Create a pilot job that needs 1 host, 1 code, 0 bytes of RAM and 30 seconds
             wrench::PilotJob *pilot_job = job_manager->createPilotJob();
             // Forgetting the job right-away for coverage
-            WRENCH_INFO("FORGETTINGJOB");
             job_manager->forgetJob(pilot_job);
             // Forgetting the job again, which is wrong,for coverage
             try {
-            WRENCH_INFO("FORGETTINGJOB AGAIN");
                 job_manager->forgetJob(pilot_job);
                 throw std::runtime_error("Should not be able to forget already forgotten pilot job");
             } catch (std::invalid_argument &e) {
             }
             // Re-creating it
             pilot_job = job_manager->createPilotJob();
+
+            std::map<std::string, std::string> bogus_batch_job_args;
+            bogus_batch_job_args["-N"] = "x";
+            bogus_batch_job_args["-t"] = "1"; //time in minutes
+            bogus_batch_job_args["-c"] = "4"; //number of cores per node
+
+            // Submit a pilot job with bogus batch jobs
+            try {
+                job_manager->submitJob((wrench::WorkflowJob *) pilot_job, this->test->compute_service, bogus_batch_job_args);
+                throw std::runtime_error("Should not be able to submit a pilot job with bogus arguments");
+            } catch (std::invalid_argument &e) {
+            }
+
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "1";
