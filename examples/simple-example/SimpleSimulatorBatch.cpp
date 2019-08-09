@@ -14,6 +14,18 @@
 #include "scheduler/BatchStandardJobScheduler.h"
 #include <wrench/tools/pegasus/PegasusWorkflowParser.h>
 
+static bool ends_with(const std::string& str, const std::string& suffix) {
+    return str.size() >= suffix.size() && 0 == str.compare(str.size()-suffix.size(), suffix.size(), suffix);
+}
+
+/**
+ * @brief An example that demonstrate how to run a simulation of a simple Workflow
+ *        Management System (WMS) (implemented in SimpleWMS.[cpp|h]).
+ *
+ * @param argc: argument count
+ * @param argv: argument array
+ * @return 0 if the simulation has successfully completed
+ */
 int main(int argc, char **argv) {
 
     /*
@@ -45,7 +57,15 @@ int main(int argc, char **argv) {
 
     /* Reading and parsing the workflow description file to create a wrench::Workflow object */
     std::cerr << "Loading workflow..." << std::endl;
-    auto workflow = wrench::PegasusWorkflowParser::createWorkflowFromDAXorJSON(workflow_file, "1000Gf");
+    wrench::Workflow *workflow;
+    if (ends_with(workflow_file, "dax")) {
+        workflow = wrench::PegasusWorkflowParser::createWorkflowFromDAX(workflow_file, "1000Gf");
+    } else if (ends_with(workflow_file,"json")) {
+        workflow = wrench::PegasusWorkflowParser::createWorkflowFromJSON(workflow_file, "1000Gf");
+    } else {
+        std::cerr << "Workflow file name must end with '.dax' or '.json'" << std::endl;
+        exit(1);
+    }
     std::cerr << "The workflow has " << workflow->getNumberOfTasks() << " tasks " << std::endl;
     std::cerr.flush();
 

@@ -22,47 +22,6 @@ WRENCH_LOG_NEW_DEFAULT_CATEGORY(pegasus_workflow_parser, "Log category for Pegas
 
 namespace wrench {
 
-   /**
-    * @brief Create a workflow based on a DAX or a JSON file
-    *
-    * @param filename: the path to the DAX (with .dax extension) or JSON (with .json extension) file
-    * @param reference_flop_rate: a reference compute speed (in flops/sec), assuming a task's computation is purely flops.
-    *                             This is needed because JSON files specify task execution times in seconds,
-    *                             but the WRENCH simulation needs some notion of "amount of computation" to
-    *                             apply reasonable scaling. (Because the XML platform description specifies host
-    *                             compute speeds in flops/sec). The times in the JSON file are thus assumed to be
-     *                            obtained on an machine with flop rate reference_flop_rate.
-    * @param redundant_dependencies: whether DAG redundant dependencies should be kept in the graph
-    *
-    * @throw std::invalid_argument
-    */
-    Workflow *PegasusWorkflowParser::createWorkflowFromDAXorJSON(const std::string &filename, const std::string &reference_flop_rate,
-                                     bool redundant_dependencies) {
-        std::istringstream ss(filename);
-        std::string token;
-        std::vector<std::string> tokens;
-
-        while (std::getline(ss, token, '.')) {
-            tokens.push_back(token);
-        }
-
-        if (tokens.size() < 2) {
-            throw std::invalid_argument(
-                    "PegasusWorkflowParser::createWorkflowFromDAXorJSON(): workflow file name must end with '.dax' or '.json'");
-        }
-        std::string extension = tokens[tokens.size() - 1];
-
-        if (extension == "dax") {
-            return createWorkflowFromDAX(filename, reference_flop_rate, redundant_dependencies);
-        } else if (extension == "json") {
-            return createWorkflowFromJSON(filename, reference_flop_rate, redundant_dependencies);
-        } else {
-            throw std::invalid_argument(
-                    "Workflow::createWorkflowFromDAXorJSON(): workflow file name must end with '.dax' or '.json'");
-        }
-    }
-
-
     /**
      * @brief Create a workflow based on a JSON file
      *
