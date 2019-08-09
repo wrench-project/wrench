@@ -23,68 +23,6 @@ WRENCH_LOG_NEW_DEFAULT_CATEGORY(pegasus_workflow_parser, "Log category for Pegas
 namespace wrench {
 
     /**
-     * @brief Create a workflow based on a DAX or a JSON file
-     *
-     * @param filename: the path to the DAX (with .dax extension) or JSON (with .json extension) file
-     * @param reference_flop_rate: a reference compute speed (in flops/sec), assuming a task's computation is purely flops.
-     *                             This is needed because JSON files specify task execution times in seconds,
-     *                             but the WRENCH simulation needs some notion of "amount of computation" to
-     *                             apply reasonable scaling. (Because the XML platform description specifies host
-     *                             compute speeds in flops/sec). The times in the JSON file are thus assumed to be
-     *                             obtained on an machine with flop rate reference_flop_rate.
-     * @param redundant_dependencies: Workflows provided by Pegasus
-     *                             sometimes include control/data dependencies between tasks that are already induced by
-     *                             other control/data dependencies (i.e., they correspond to transitive
-     *                             closures or existing edges in the workflow graphs). Passing redundant_dependencies=true
-     *                             force these "redundant" dependencies to be added as edges in the workflow. Passing
-     *                             redundant_dependencies=false will ignore these "redundant" dependencies. Most users
-     *                             would likely pass "false".
-     * @param abstract_workflow: Workflows provided by the Pegasus project are "realized" workflows that include
-     *                           information pertaining to the workflow's execution plan. This information is only relevant
-     *                           for Pegasus. Passing abstract_workflow=false ignores this information and will load the
-     *                           workflow as an "abstract" workflow, e.g., for use with any generic simulator (but still
-     *                           using Pegasus-provided workflow configurations).
-     *                           Passing abstract_workflow=true includes this information, as needed if implementing/using
-     *                           a Pegasus simulator.  (Default: "true")
-     *
-     * @throw std::invalid_argument
-     */
-    Workflow *PegasusWorkflowParser::createWorkflowFromDAXorJSON(const std::string &filename, const std::string &reference_flop_rate,
-                                                                 bool redundant_dependencies, bool abstract_workflow) {
-        std::istringstream ss(filename);
-        std::string token;
-        std::vector<std::string> tokens;
-
-        while (std::getline(ss, token, '.')) {
-            tokens.push_back(token);
-        }
-
-        if (tokens.size() < 2) {
-            throw std::invalid_argument(
-                    "PegasusWorkflowParser::createWorkflowFromDAXorJSON(): workflow file name must end with '.dax' or '.json'");
-        }
-        std::string extension = tokens[tokens.size() - 1];
-
-        if (extension == "dax") {
-            if (abstract_workflow) {
-                return createAbstractWorkflowFromDAX(filename, reference_flop_rate, redundant_dependencies);
-            } else {
-                return createNonAbstractWorkflowFromDAX(filename, reference_flop_rate, redundant_dependencies);
-            }
-        } else if (extension == "json") {
-            if (abstract_workflow) {
-                return createAbstractWorkflowFromJSON(filename, reference_flop_rate, redundant_dependencies);
-            } else {
-                return createNonAbstractWorkflowFromJSON(filename, reference_flop_rate, redundant_dependencies);
-            }
-        } else {
-            throw std::invalid_argument(
-                    "Workflow::createWorkflowFromDAXorJSON(): workflow file name must end with '.dax' or '.json'");
-        }
-    }
-
-
-    /**
      * @brief Create an abstract workflow based on a JSON file
      *
      * @param filename: the path to the JSON file
@@ -104,7 +42,7 @@ namespace wrench {
      * @throw std::invalid_argument
      *
      */
-    Workflow *PegasusWorkflowParser::createAbstractWorkflowFromJSON(const std::string &filename, const std::string &reference_flop_rate,
+    Workflow *PegasusWorkflowParser::createWorkflowFromJSON(const std::string &filename, const std::string &reference_flop_rate,
                                                                     bool redundant_dependencies) {
 
         std::ifstream file;
@@ -272,9 +210,9 @@ namespace wrench {
      *                             woudl likely pass "false".
      * @throw std::invalid_argument
      */
-    Workflow *PegasusWorkflowParser::createNonAbstractWorkflowFromJSON(const std::string &filename, const std::string &reference_flop_rate,
+    Workflow *PegasusWorkflowParser::createExecutableWorkflowFromJSON(const std::string &filename, const std::string &reference_flop_rate,
                                                                        bool redundant_dependencies) {
-        throw std::runtime_error("PegasusWorkflowParser::createNonAbstractWorkflowFromJSON(): not implemented yet");
+        throw std::runtime_error("PegasusWorkflowParser::createExecutableWorkflowFromJSON(): not implemented yet");
     }
 
     /**
@@ -297,7 +235,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    Workflow *PegasusWorkflowParser::createAbstractWorkflowFromDAX(const std::string &filename, const std::string &reference_flop_rate,
+    Workflow *PegasusWorkflowParser::createWorkflowFromDAX(const std::string &filename, const std::string &reference_flop_rate,
                                                                    bool redundant_dependencies) {
 
         pugi::xml_document dax_tree;
@@ -387,28 +325,4 @@ namespace wrench {
         return workflow;
     }
 
-    /**
-     * @brief Create an NON-abstract workflow based on a DAX file
-     *
-     * @param filename: the path to the DAX file
-     * @param reference_flop_rate: a reference compute speed (in flops/sec), assuming a task's computation is purely flops.
-     *                             This is needed because DAX files specify task execution times in seconds,
-     *                             but the WRENCH simulation needs some notion of "amount of computation" to
-     *                             apply reasonable scaling. (Because the XML platform description specifies host
-     *                             compute speeds in flops/sec). The times in the DAX file are thus assumed to be
-     *                             obtained on an machine with flop rate reference_flop_rate.
-     * @param redundant_dependencies: Workflows provided by Pegasus
-     *                             sometimes include control/data dependencies between tasks that are already induced by
-     *                             other control/data dependencies (i.e., they correspond to transitive
-     *                             closures or existing edges in the workflow graphs). Passing redundant_dependencies=true
-     *                             force these "redundant" dependencies to be added as edges in the workflow. Passing
-     *                             redundant_dependencies=false will ignore these "redundant" dependencies. Most users
-     *                             would likely pass "false".
-     *
-     * @throw std::invalid_argument
-     */
-    Workflow *PegasusWorkflowParser::createNonAbstractWorkflowFromDAX(const std::string &filename, const std::string &reference_flop_rate,
-                                                                      bool redundant_dependencies) {
-        throw std::runtime_error("PegasusWorkflowParser::createNonAbstractWorkflowFromDAX(): not implemented yet");
-    }
 };
