@@ -155,13 +155,11 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     unsigned int S4U_Simulation::getHostNumCores(std::string hostname) {
-        unsigned int num_cores = 0;
-        try {
-            num_cores = (unsigned int) simgrid::s4u::Host::by_name(hostname)->get_core_count();
-        } catch (std::out_of_range &e) {
+        auto host = simgrid::s4u::Host::by_name_or_null(hostname);
+        if (host == nullptr) {
             throw std::invalid_argument("Unknown hostname " + hostname);
         }
-        return num_cores;
+        return (unsigned int) host->get_core_count();
     }
 
     /**
@@ -181,13 +179,11 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     double S4U_Simulation::getHostFlopRate(std::string hostname) {
-        double flop_rate = 0;
-        try {
-            flop_rate = simgrid::s4u::Host::by_name(hostname)->get_speed(); // changed it to speed of the current pstate
-        } catch (std::out_of_range &e) {
+        auto host = simgrid::s4u::Host::by_name_or_null(hostname);
+        if (host == nullptr) {
             throw std::invalid_argument("Unknown hostname " + hostname);
         }
-        return flop_rate;
+        return host->get_speed();
     }
 
     /**
@@ -199,13 +195,11 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     bool S4U_Simulation::isHostOn(std::string hostname) {
-        bool is_on = 0;
-        try {
-            is_on = simgrid::s4u::Host::by_name(hostname)->is_on();
-        } catch (std::out_of_range &e) {
+        auto host = simgrid::s4u::Host::by_name_or_null(hostname);
+        if (host == nullptr) {
             throw std::invalid_argument("Unknown hostname " + hostname);
         }
-        return is_on;
+        return host->is_on();
     }
 
 
@@ -282,13 +276,11 @@ namespace wrench {
      * @return a memory capacity in bytes
      */
     double S4U_Simulation::getHostMemoryCapacity(std::string hostname) {
-        double mem = 0;
-        try {
-            mem = getHostMemoryCapacity(simgrid::s4u::Host::by_name(hostname));
-        } catch (std::out_of_range &e) {
+        auto host = simgrid::s4u::Host::by_name_or_null(hostname);
+        if (host == nullptr) {
             throw std::invalid_argument("Unknown hostname " + hostname);
         }
-        return mem;
+        return getHostMemoryCapacity(host);
     }
 
     /**
@@ -336,16 +328,14 @@ namespace wrench {
      * @return a string relating to the property specified in the platform file
      */
     std::string S4U_Simulation::getHostProperty(std::string hostname, std::string property_name) {
-        simgrid::s4u::Host *h = nullptr;
-        try {
-            h = simgrid::s4u::Host::by_name(hostname);
-        } catch (std::out_of_range &e) {
+        auto host = simgrid::s4u::Host::by_name_or_null(hostname);
+        if (host == nullptr) {
             throw std::invalid_argument("Unknown hostname " + hostname);
         }
-        if (h->get_properties()->find(property_name) == h->get_properties()->end()) {
+        if (host->get_properties()->find(property_name) == host->get_properties()->end()) {
             throw std::invalid_argument("Unknown property " + property_name);
         }
-        return h->get_property(property_name);
+        return host->get_property(property_name);
     }
 
     /**
