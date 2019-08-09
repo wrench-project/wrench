@@ -43,6 +43,7 @@ namespace wrench {
      * @brief Destructor
      */
     BareMetalComputeService::~BareMetalComputeService() {
+        WRENCH_INFO("IN DESTRUCTOR");
         this->default_property_values.clear();
     }
 
@@ -560,7 +561,7 @@ namespace wrench {
 
         }
 
-        WRENCH_INFO("Multicore Job Executor on host %s terminating cleanly!", S4U_Simulation::getHostName().c_str());
+        WRENCH_INFO("BareMetalComputeService on host %s terminating cleanly!", S4U_Simulation::getHostName().c_str());
         return this->exit_code;
     }
 
