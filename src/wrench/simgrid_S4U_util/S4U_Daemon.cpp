@@ -262,8 +262,6 @@ namespace wrench {
 
             } catch (simgrid::Exception &) {
                 throw std::shared_ptr<FatalFailure>(new FatalFailure());
-            } catch (std::exception &e) {
-                throw std::shared_ptr<FatalFailure>(new FatalFailure());
             }
             this->has_returned_from_main = true;
         }
