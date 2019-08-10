@@ -64,6 +64,7 @@ private:
 
     int main() {
 
+        WRENCH_INFO("Testing WRENCH_INFO without color");
         wrench::TerminalOutput::setThisProcessLoggingColor(wrench::TerminalOutput::COLOR_BLUE);
         WRENCH_INFO("Testing WRENCH_INFO");
         wrench::TerminalOutput::setThisProcessLoggingColor(wrench::TerminalOutput::COLOR_YELLOW);
