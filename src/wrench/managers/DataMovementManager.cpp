@@ -237,11 +237,6 @@ namespace wrench {
             return true;
         }
 
-        if (message == nullptr) {
-            WRENCH_INFO("Got a NULL message... Likely this means we're all done. Aborting!");
-            return false;
-        }
-
         WRENCH_INFO("Data Movement Manager got a %s message", message->getName().c_str());
 
         if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
