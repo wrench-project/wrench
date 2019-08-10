@@ -7,6 +7,8 @@
  * (at your option) any later version.
  */
 
+#ifdef MESSAGE_MANAGER
+
 #ifndef WRENCH_MESSAGEMANAGER_H
 #define WRENCH_MESSAGEMANAGER_H
 
@@ -16,6 +18,7 @@
 #include <wrench/simulation/SimulationMessage.h>
 
 namespace wrench {
+
 
     /***********************/
     /** \cond INTERNAL     */
@@ -47,3 +50,5 @@ namespace wrench {
 
 
 #endif //WRENCH_MESSAGEMANAGER_H
+
+#endif //MESSAGE_MANAGER
