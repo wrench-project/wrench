@@ -15,15 +15,14 @@
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
 
-class S4U_DaemonTest : public ::testing::Test {
+class AlarmTest : public ::testing::Test {
 
 public:
 
-    void do_basic_Test();
     void do_downHost_Test();
 
 protected:
-    S4U_DaemonTest() {
+    AlarmTest() {
 
         // Create the simplest workflow
         workflow = new wrench::Workflow();
@@ -69,144 +68,16 @@ protected:
 
 };
 
-/**********************************************************************/
-/**  BASIC TEST                                                      **/
-/**********************************************************************/
-
-class Sleep100Daemon : public wrench::S4U_Daemon {
-
-public:
-    Sleep100Daemon(std::string hostname) :
-            S4U_Daemon(hostname, "sleep100daemon", "sleep100daemon") {}
-
-    int main() override {
-        simgrid::s4u::this_actor::execute(100);
-        return 0;
-    }
-
-};
-
-class S4U_DaemonTestWMS : public wrench::WMS {
-
-public:
-    S4U_DaemonTestWMS(S4U_DaemonTest *test,
-                      std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
-        this->test = test;
-    }
-
-private:
-
-    S4U_DaemonTest *test;
-
-    int main() {
-
-        std::shared_ptr<Sleep100Daemon> daemon =
-                std::shared_ptr<Sleep100Daemon>(new Sleep100Daemon("Host1"));
-
-        // Start the daemon without a life saver
-        try {
-            daemon->startDaemon(false, false);
-            throw std::runtime_error("Should not be able to start a lifesaver-less daemon");
-        } catch (std::runtime_error &e) {
-        }
-
-        // Create the life saver
-        daemon->createLifeSaver(std::shared_ptr<Sleep100Daemon>(daemon));
-
-        // Create the life saver again (which is bogus)
-        try {
-            daemon->createLifeSaver(std::shared_ptr<Sleep100Daemon>(daemon));
-            throw std::runtime_error("Should not be able to create a second life saver");
-        } catch (std::runtime_error &e) {
-        }
-
-        // Start a daemon without a simulation pointer
-        try {
-            daemon->startDaemon(false, false);
-            throw std::runtime_error("Should not be able to start a simulation-less daemon");
-        } catch (std::runtime_error &e) {
-        }
-
-
-        // Start the daemon for real
-        daemon->simulation = this->simulation;
-        daemon->startDaemon(false, false);
-
-        daemon->isDaemonized(); // coverage
-
-        // sleep 10 seconds
-        wrench::Simulation::sleep(10);
-
-        // suspend the daemon
-        daemon->suspendActor();
-
-        // sleep another 10 seconds
-        wrench::Simulation::sleep(20);
-
-        // resume the daemon
-        daemon->resumeActor();
-
-        // Join and check that we get to the right time
-        daemon->join();
-
-        double now = simulation->getCurrentSimulatedDate();
-        if (std::abs(now - 120) > 1) {
-            throw std::runtime_error("Joining at time " + std::to_string(now) + " instead of expected 120");
-        }
-
-        return 0;
-    }
-};
-
-TEST_F(S4U_DaemonTest, Basic) {
-    DO_TEST_WITH_FORK(do_basic_Test);
-}
-
-void S4U_DaemonTest::do_basic_Test() {
-
-    // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
-    int argc = 1;
-    char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("file_registry_test");
-
-    simulation->init(&argc, argv);
-
-    // Setting up the platform
-    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
-
-    // Get a hostname
-    std::string hostname = "Host1";
-
-
-    // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
-    ASSERT_NO_THROW(wms = simulation->add(
-            new S4U_DaemonTestWMS(
-                    this, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
-
-    // Running a "run a single task" simulation
-    ASSERT_NO_THROW(simulation->launch());
-
-    delete simulation;
-
-    free(argv[0]);
-    free(argv);
-}
-
 
 /**********************************************************************/
 /**  DOWN HOST TEST                                                  **/
 /**********************************************************************/
 
 
-class S4U_DaemonDownHostTestWMS : public wrench::WMS {
+class AlarmDownHostTestWMS : public wrench::WMS {
 
 public:
-    S4U_DaemonDownHostTestWMS(S4U_DaemonTest *test,
+    AlarmDownHostTestWMS(AlarmTest *test,
                       std::string hostname) :
             wrench::WMS(nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -214,7 +85,7 @@ public:
 
 private:
 
-    S4U_DaemonTest *test;
+    AlarmTest *test;
 
     int main() {
 
@@ -227,18 +98,18 @@ private:
            wrench::Alarm::createAndStartAlarm(this->simulation, 10.0, "Host2", mailbox,
                                               new wrench::SimulationMessage("whatever", 1), "bogus");
             throw std::runtime_error("Should not be able to create an alarm on a down host");
-       } catch (wrench::HostError &e) {}
+       } catch (std::shared_ptr<wrench::HostError> &e) {}
 
 
         return 0;
     }
 };
 
-TEST_F(S4U_DaemonTest, DownHost) {
+TEST_F(AlarmTest, DownHost) {
     DO_TEST_WITH_FORK(do_downHost_Test);
 }
 
-void S4U_DaemonTest::do_downHost_Test() {
+void AlarmTest::do_downHost_Test() {
 
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
@@ -257,7 +128,7 @@ void S4U_DaemonTest::do_downHost_Test() {
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new S4U_DaemonDownHostTestWMS(this, hostname)));
+            new AlarmDownHostTestWMS(this, hostname)));
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow));
 

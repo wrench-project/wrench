@@ -271,7 +271,8 @@ set(TEST_FILES
         test/compute_services/BatchService/BatchServiceOutputCSVFileTest.cpp
         test/compute_services/BatchService/BatchServiceBatschedQueueWaitTimePredictionTest.cpp
         test/compute_services/BatchService/BatchServiceBatschedContiguityTest.cpp
-        test/helper_services/S4U_HostStateChangeTest.cpp
+        test/helper_services/HostStateChangeTest.cpp
+        test/helper_services/AlarmTest.cpp
         test/wms/WMSTest.cpp
         test/wms/MultipleWMSTest.cpp
         test/wms/WMSOptimizationsTest.cpp
