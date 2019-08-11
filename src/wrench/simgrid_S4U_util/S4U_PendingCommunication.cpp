@@ -99,6 +99,7 @@ namespace wrench {
         } catch (simgrid::NetworkFailureException &e) {
             one_comm_failed = true;
         } catch (simgrid::TimeoutException &e) {
+            // This likely doesn't happen, but let's keep it here for now
             one_comm_failed = true;
         }
 
