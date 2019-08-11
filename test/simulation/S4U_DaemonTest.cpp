@@ -20,7 +20,6 @@ class S4U_DaemonTest : public ::testing::Test {
 public:
 
     void do_basic_Test();
-    void do_downHost_Test();
 
 protected:
     S4U_DaemonTest() {
@@ -198,74 +197,3 @@ void S4U_DaemonTest::do_basic_Test() {
 }
 
 
-/**********************************************************************/
-/**  DOWN HOST TEST                                                  **/
-/**********************************************************************/
-
-
-class S4U_DaemonDownHostTestWMS : public wrench::WMS {
-
-public:
-    S4U_DaemonDownHostTestWMS(S4U_DaemonTest *test,
-                      std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
-        this->test = test;
-    }
-
-private:
-
-    S4U_DaemonTest *test;
-
-    int main() {
-
-       // Turn down Host2
-       simgrid::s4u::Host::by_name_or_null("Host2")->turn_off();
-
-       // Start an alarm
-       std::string mailbox = "mailbox";
-       try {
-           wrench::Alarm::createAndStartAlarm(this->simulation, 10.0, "Host2", mailbox,
-                                              new wrench::SimulationMessage("whatever", 1), "bogus");
-            throw std::runtime_error("Should not be able to create an alarm on a down host");
-       } catch (wrench::HostError &e) {}
-
-
-        return 0;
-    }
-};
-
-TEST_F(S4U_DaemonTest, DownHost) {
-    DO_TEST_WITH_FORK(do_downHost_Test);
-}
-
-void S4U_DaemonTest::do_downHost_Test() {
-
-    // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
-    int argc = 1;
-    char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("file_registry_test");
-
-    simulation->init(&argc, argv);
-
-    // Setting up the platform
-    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
-
-    // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
-
-    // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
-    ASSERT_NO_THROW(wms = simulation->add(
-            new S4U_DaemonDownHostTestWMS(this, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
-
-    // Running a "run a single task" simulation
-    ASSERT_NO_THROW(simulation->launch());
-
-    delete simulation;
-
-    free(argv[0]);
-    free(argv);
-}
