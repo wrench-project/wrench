@@ -206,7 +206,7 @@ TEST_F(WorkflowTaskTest, InputOutputFile) {
 
   ASSERT_THROW(t1->addInputFile(f2), std::invalid_argument);
   ASSERT_THROW(t1->addOutputFile(f1), std::invalid_argument);
-  
+
   ASSERT_THROW(workflow->removeFile(f1), std::invalid_argument);
   ASSERT_THROW(workflow->removeFile(f2), std::invalid_argument);
 
