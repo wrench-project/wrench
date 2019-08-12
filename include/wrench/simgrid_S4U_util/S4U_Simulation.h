@@ -40,6 +40,11 @@ namespace wrench {
 		static unsigned int getNumCores();
 		static double getHostFlopRate(std::string hostname);
 		static bool isHostOn(std::string hostname);
+		static void turnOffHost(std::string hostname);
+		static void turnOnHost(std::string hostname);
+        static bool isLinkOn(std::string linkname);
+        static void turnOffLink(std::string linkname);
+        static void turnOnLink(std::string linkname);
 		static double getFlopRate();
 		static double getHostMemoryCapacity(std::string hostname);
 		static double getMemoryCapacity();

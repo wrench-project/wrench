@@ -631,6 +631,49 @@ namespace wrench {
     }
 
     /**
+     * @brief Turns off a host
+     * @param hostname: the hostname
+     */
+    void Simulation::turnOffHost(std::string hostname) {
+        S4U_Simulation::turnOffHost(hostname);
+    }
+
+    /**
+     * @brief Turns on a host
+     * @param hostname: the hostname
+     */
+    void Simulation::turnOnHost(std::string hostname) {
+        S4U_Simulation::turnOnHost(hostname);
+    }
+
+
+    /**
+    * @brief Returns whether a link is on or not
+    * @param linkname: the linkname
+    * @return true or false
+    */
+    bool Simulation::isLinkOn(std::string linkname) {
+        return S4U_Simulation::isLinkOn(linkname);
+    }
+
+    /**
+     * @brief Turns off a link
+     * @param linkname: the linkname
+     */
+    void Simulation::turnOffLink(std::string linkname) {
+        S4U_Simulation::turnOffLink(linkname);
+    }
+
+    /**
+     * @brief Turns on a link
+     * @param linkname: the linkname
+     */
+    void Simulation::turnOnLink(std::string linkname) {
+        S4U_Simulation::turnOnLink(linkname);
+    }
+
+    
+    /**
      * @brief Get the memory capacity of the host on which the calling process is running
      * @return a memory capacity in bytes
      */

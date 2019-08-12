@@ -96,7 +96,7 @@ private:
 
         // Turn off FailedHost
         wrench::Simulation::sleep(10);
-        simgrid::s4u::Host::by_name("FailedHost")->turn_off();
+        wrench::Simulation::turnOffHost("FailedHost");
 
         // Starting a sleeper (that will reply with a bogus TTL Expiration message)
         auto sleeper = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHost", 100, new wrench::ServiceTTLExpiredMessage(1), this->mailbox_name));

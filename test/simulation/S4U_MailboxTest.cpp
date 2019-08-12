@@ -114,14 +114,14 @@ private:
             // One send, network failure
             pending_send = wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox_name, new wrench::SimulationMessage("foo", 100));
             wrench::Simulation::sleep(10);
-            simgrid::s4u::Link::by_name("1")->turn_off();
+            wrench::Simulation::turnOffLink("1");
             try {
                 pending_send->wait();
                 throw std::runtime_error("Should have gotten a NetworkError");
             } catch (std::shared_ptr<wrench::NetworkError> &e) {
             }
             wrench::Simulation::sleep(10);
-            simgrid::s4u::Link::by_name("1")->turn_on();
+            wrench::Simulation::turnOnLink("1");
             wrench::Simulation::sleep(10);
 
             // Two asynchronous sends, network failure
