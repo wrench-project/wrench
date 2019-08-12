@@ -58,7 +58,7 @@ namespace wrench {
             throw std::invalid_argument("StorageService::stageFile(): Invalid arguments");
         }
 
-        if (!this->simulation->isRunning()) {
+        if (this->simulation->isRunning()) {
             throw std::runtime_error("StorageService::stageFile(): Can only be called before the simulation is launched");
         }
 

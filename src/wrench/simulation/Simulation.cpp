@@ -259,16 +259,16 @@ namespace wrench {
             throw std::runtime_error("Simulation::launch(): " + std::string(e.what()));
         }
 
-        this->is_running = true;
 
         // Run the simulation
         try {
+            this->is_running = true;
             this->s4u_simulation->runSimulation();
+            this->is_running = false;
         } catch (std::runtime_error &e) {
             this->is_running = false;
             throw;
         }
-        this->is_running = false;
 
 
     }
@@ -685,7 +685,7 @@ namespace wrench {
         S4U_Simulation::turnOnLink(linkname);
     }
 
-    
+
     /**
      * @brief Get the memory capacity of the host on which the calling process is running
      * @return a memory capacity in bytes
