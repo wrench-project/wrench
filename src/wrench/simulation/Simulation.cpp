@@ -265,9 +265,22 @@ namespace wrench {
         try {
             this->s4u_simulation->runSimulation();
         } catch (std::runtime_error &e) {
+            this->is_running = false;
             throw;
         }
+        this->is_running = false;
 
+
+    }
+
+    /**
+     * @brief Checks whether the simulation is running or not
+     *
+     * @return true or false
+     *
+	 */
+    bool Simulation::isRunning() {
+        return this->is_running;
     }
 
     /**
