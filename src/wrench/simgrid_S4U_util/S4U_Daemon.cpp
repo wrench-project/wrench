@@ -132,6 +132,9 @@ namespace wrench {
      *
      * @param daemonized: whether the S4U actor should be daemonized
      * @param auto_restart: whether the S4U actor should automatically restart after a host reboot
+     *
+     * @throw std::runtime_error
+     * @throw std::shared_ptr<HostError>
      */
     void S4U_Daemon::startDaemon(bool daemonized, bool auto_restart) {
 
@@ -163,7 +166,7 @@ namespace wrench {
                                                           simgrid::s4u::Host::by_name(hostname),
                                                           S4U_DaemonActor(this));
         } catch (std::exception &e) {
-            throw std::shared_ptr<FatalFailure>(new FatalFailure());
+            throw std::runtime_error("S4U_Daemon::startDaemon(): SimGrid actor creation failed... shouldn't happen.");
         }
 
         // nullptr is returned if the host is off (not the current behavior in SimGrid... just paranoid here)
