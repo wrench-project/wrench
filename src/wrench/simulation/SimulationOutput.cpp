@@ -550,7 +550,7 @@ namespace wrench {
 
         try {
 
-            simgrid::s4u::Engine *simgrid_engine = simgrid::s4u::Engine::get_instance();
+            auto simgrid_engine = simgrid::s4u::Engine::get_instance();
             std::vector<simgrid::s4u::Host *> hosts = simgrid_engine->get_all_hosts();
 
             nlohmann::json hosts_energy_consumption_information;
