@@ -54,12 +54,12 @@ int wrench::ResourceRandomRepeatSwitcher::main() {
         switch (this->resource_type) {
             case ResourceType::HOST: {
                 WRENCH_INFO("Turning OFF host %s", this->resource_to_switch.c_str());
-                simgrid::s4u::Host::by_name(this->resource_to_switch)->turn_off();
+                wrench::Simulation::turnOffHost(this->resource_to_switch);
                 break;
             }
             case ResourceType::LINK: {
                 WRENCH_INFO("Turning OFF link %s", this->resource_to_switch.c_str());
-                simgrid::s4u::Link::by_name(this->resource_to_switch)->turn_off();
+                wrench::Simulation::turnOffLink(this->resource_to_switch);
                 break;
             }
         }
@@ -69,12 +69,12 @@ int wrench::ResourceRandomRepeatSwitcher::main() {
         switch (this->resource_type) {
             case ResourceType::HOST: {
                 WRENCH_INFO("Turning ON host %s", this->resource_to_switch.c_str());
-                simgrid::s4u::Host::by_name(this->resource_to_switch)->turn_on();
+                wrench::Simulation::turnOnHost(this->resource_to_switch);
                 break;
             }
             case ResourceType::LINK: {
                 WRENCH_INFO("Turning ON link %s", this->resource_to_switch.c_str());
-                simgrid::s4u::Link::by_name(this->resource_to_switch)->turn_on();
+                wrench::Simulation::turnOnLink(this->resource_to_switch);
                 break;
             }
         }
