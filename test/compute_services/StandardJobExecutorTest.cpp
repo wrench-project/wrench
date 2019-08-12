@@ -58,7 +58,7 @@ public:
     void do_JobTerminationTestAtRandomTimes_test();
 
     void do_WorkUnit_test();
-    
+
     static bool isJustABitGreater(double base, double variable) {
         return ((variable > base) && (variable < base + EPSILON));
     }
@@ -147,7 +147,7 @@ private:
                         this->getWorkflow()->getFileByID("output_file"), this->test->storage_service2,
                         this->test->storage_service1)},
                 {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("output_file"),
-                                                                              this->test->storage_service2)});
+                                                                                             this->test->storage_service2)});
 
         std::string my_mailbox = "test_callback_mailbox";
 
@@ -289,10 +289,13 @@ private:
 
 
         // Create a bogus StandardJobExecutor (not enough Cores specified)
+        WRENCH_INFO("REMOGING TASK");
+        this->getWorkflow()->removeTask(task);
         wrench::WorkflowTask *task_too_many_cores = this->getWorkflow()->addTask("task_too_many_cores", 3600, 20, 20, 1.0, 0);
         task_too_many_cores->addInputFile(this->getWorkflow()->getFileByID("input_file"));
+        WRENCH_INFO("HERE1");
         task_too_many_cores->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
-
+        WRENCH_INFO("HERE1");
 //        // Forget the previous job!
         job_manager->forgetJob(job);
 
@@ -300,15 +303,15 @@ private:
         job = job_manager->createStandardJob(
                 {task_too_many_cores},
                 {
-                        {*(task->getInputFiles().begin()),  this->test->storage_service1},
-                        {*(task->getOutputFiles().begin()), this->test->storage_service2}
+                        {*(task_too_many_cores->getInputFiles().begin()),  this->test->storage_service1},
+                        {*(task_too_many_cores->getOutputFiles().begin()), this->test->storage_service2}
                 },
                 {},
                 {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
                         this->getWorkflow()->getFileByID("output_file"), this->test->storage_service2,
                         this->test->storage_service1)},
                 {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("output_file"),
-                                                                              this->test->storage_service2)});
+                                                                                             this->test->storage_service2)});
 
         try {
             executor = std::shared_ptr<wrench::StandardJobExecutor>(
@@ -332,6 +335,8 @@ private:
         // Create a bogus StandardJobExecutor (not enough RAM specified)
 
 
+        this->getWorkflow()->removeTask(task_too_many_cores);
+        WRENCH_INFO("HERE");
         wrench::WorkflowTask *task_too_much_ram = this->getWorkflow()->addTask("task_too_much_ram", 3600, 1, 1, 1.0, 500.00);
         task_too_much_ram->addInputFile(this->getWorkflow()->getFileByID("input_file"));
         task_too_much_ram->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
@@ -343,15 +348,15 @@ private:
         job = job_manager->createStandardJob(
                 {task_too_much_ram},
                 {
-                        {*(task->getInputFiles().begin()),  this->test->storage_service1},
-                        {*(task->getOutputFiles().begin()), this->test->storage_service2}
+                        {*(task_too_much_ram->getInputFiles().begin()),  this->test->storage_service1},
+                        {*(task_too_much_ram->getOutputFiles().begin()), this->test->storage_service2}
                 },
                 {},
                 {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
                         this->getWorkflow()->getFileByID("output_file"), this->test->storage_service2,
                         this->test->storage_service1)},
                 {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("output_file"),
-                                                                              this->test->storage_service2)});
+                                                                                             this->test->storage_service2)});
 
         try {
             executor = std::shared_ptr<wrench::StandardJobExecutor>(
@@ -376,6 +381,11 @@ private:
         // Forget the previous job!
         job_manager->forgetJob(job);
 
+        this->getWorkflow()->removeTask(task_too_much_ram);
+        task = this->getWorkflow()->addTask("task", 3600, 1, 1, 1.0, 0);
+        task->addInputFile(this->getWorkflow()->getFileByID("input_file"));
+        task->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
+
         // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
         job = job_manager->createStandardJob(
                 {task},
@@ -388,7 +398,7 @@ private:
                         this->getWorkflow()->getFileByID("output_file"), this->test->storage_service2,
                         this->test->storage_service1)},
                 {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("output_file"),
-                                                                              this->test->storage_service2)});
+                                                                                             this->test->storage_service2)});
 
         try {
             executor = std::shared_ptr<wrench::StandardJobExecutor>(
@@ -539,7 +549,7 @@ private:
                             this->getWorkflow()->getFileByID("output_file"), this->test->storage_service2,
                             this->test->storage_service1)},
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("output_file"),
-                                                                                  this->test->storage_service2)});
+                                                                                                 this->test->storage_service2)});
 
             std::string my_mailbox = "test_callback_mailbox";
 
@@ -737,7 +747,7 @@ private:
                             this->test->storage_service1)},
                     {},
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("output_file"),
-                                                                                  this->test->storage_service2)});
+                                                                                                 this->test->storage_service2)});
 
 
             std::string my_mailbox = "test_callback_mailbox";
@@ -916,7 +926,7 @@ private:
                     {},
                     {},
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("output_file"),
-                                                                                  this->test->storage_service2)});
+                                                                                                 this->test->storage_service2)});
 
 
             std::string my_mailbox = "test_callback_mailbox";
@@ -1747,7 +1757,7 @@ private:
                             this->test->storage_service2)},
                     {},
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                  this->test->storage_service2)}
+                                                                                                 this->test->storage_service2)}
             );
 
             std::string my_mailbox = "test_callback_mailbox";
@@ -1807,8 +1817,8 @@ private:
                 throw std::runtime_error("Case 1: Unexpected task2 end date: " + std::to_string(task2->getEndDate()));
             }
 
-//        this->getWorkflow()->removeTask(task1);
-//        this->getWorkflow()->removeTask(task2);
+            this->getWorkflow()->removeTask(task1);
+            this->getWorkflow()->removeTask(task2);
 
             this->test->storage_service1->deleteFile(this->getWorkflow()->getFileByID("output_file"));
         }
@@ -1834,7 +1844,7 @@ private:
                             this->test->storage_service2)},
                     {},
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                  this->test->storage_service2)}
+                                                                                                 this->test->storage_service2)}
             );
 
             std::string my_mailbox = "test_callback_mailbox";
@@ -1893,8 +1903,8 @@ private:
                 throw std::runtime_error("Case 2: Unexpected task2 end date: " + std::to_string(task2->getEndDate()));
             }
 
-//        this->getWorkflow()->removeTask(task1);
-//        this->getWorkflow()->removeTask(task2);
+            this->getWorkflow()->removeTask(task1);
+            this->getWorkflow()->removeTask(task2);
             this->test->storage_service1->deleteFile(this->getWorkflow()->getFileByID("output_file"));
 
         }
@@ -1922,7 +1932,7 @@ private:
                             this->test->storage_service2)},
                     {},
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                  this->test->storage_service2)}
+                                                                                                 this->test->storage_service2)}
             );
 
             std::string my_mailbox = "test_callback_mailbox";
@@ -1986,9 +1996,9 @@ private:
                 throw std::runtime_error("Case 3: Unexpected task3 end date: " + std::to_string(task3->getEndDate()));
             }
 
-//        this->getWorkflow()->removeTask(task1);
-//        this->getWorkflow()->removeTask(task2);
-//        this->getWorkflow()->removeTask(task3);
+            this->getWorkflow()->removeTask(task1);
+            this->getWorkflow()->removeTask(task2);
+            this->getWorkflow()->removeTask(task3);
             this->test->storage_service1->deleteFile(this->getWorkflow()->getFileByID("output_file"));
 
         }
@@ -2111,7 +2121,7 @@ public:
                             this->test->storage_service2)},
                     {},
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                  this->test->storage_service2)}
+                                                                                                 this->test->storage_service2)}
             );
 
             std::string my_mailbox = "test_callback_mailbox";
@@ -2171,8 +2181,8 @@ public:
                 throw std::runtime_error("Case 1: Unexpected task2 end date: " + std::to_string(task2->getEndDate()));
             }
 
-//        this->getWorkflow()->removeTask(task1);
-//        this->getWorkflow()->removeTask(task2);
+            this->getWorkflow()->removeTask(task1);
+            this->getWorkflow()->removeTask(task2);
             this->test->storage_service1->deleteFile(this->getWorkflow()->getFileByID("output_file"));
 
         }
@@ -2199,7 +2209,7 @@ public:
                             this->test->storage_service2)},
                     {},
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                  this->test->storage_service2)}
+                                                                                                 this->test->storage_service2)}
             );
 
             std::string my_mailbox = "test_callback_mailbox";
@@ -2264,10 +2274,10 @@ public:
 //          throw std::runtime_error("Case 2: Unexpected task2 end date: " + std::to_string(task2->getEndDate()));
 //        }
 
-//        this->getWorkflow()->removeTask(task1);
-//        this->getWorkflow()->removeTask(task2);
-//        this->getWorkflow()->removeTask(task3);
-//        this->getWorkflow()->removeTask(task4);
+            this->getWorkflow()->removeTask(task1);
+            this->getWorkflow()->removeTask(task2);
+            this->getWorkflow()->removeTask(task3);
+            this->getWorkflow()->removeTask(task4);
         }
 
         return 0;
@@ -2373,9 +2383,9 @@ private:
             wrench::WorkflowTask *task3 = this->getWorkflow()->addTask("task1.3", 800, 7, 7, 1.0, 0);
             wrench::WorkflowTask *task4 = this->getWorkflow()->addTask("task1.4", 600, 2, 2, 1.0, 0);
             task1->addInputFile(this->getWorkflow()->getFileByID("input_file"));
-            task1->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
+            task1->addOutputFile(this->getWorkflow()->getFileByID("output_file1"));
             task2->addInputFile(this->getWorkflow()->getFileByID("input_file"));
-            task2->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
+            task2->addOutputFile(this->getWorkflow()->getFileByID("output_file2"));
 
             // Create a StandardJob with both tasks
             wrench::StandardJob *job = job_manager->createStandardJob(
@@ -2383,14 +2393,15 @@ private:
 //                {task1},
                     {
                             {this->getWorkflow()->getFileByID("input_file"),  this->test->storage_service1},
-                            {this->getWorkflow()->getFileByID("output_file"), this->test->storage_service1}
+                            {this->getWorkflow()->getFileByID("output_file1"), this->test->storage_service1},
+                            {this->getWorkflow()->getFileByID("output_file2"), this->test->storage_service1},
                     },
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
                             this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
                             this->test->storage_service2)},
                     {},
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                  this->test->storage_service2)}
+                                                                                                 this->test->storage_service2)}
             );
 
             std::string my_mailbox = "test_callback_mailbox";
@@ -2421,10 +2432,10 @@ private:
 
             // We should be good now, with nothing running
 
-//        this->getWorkflow()->removeTask(task1);
-//        this->getWorkflow()->removeTask(task2);
-//        this->getWorkflow()->removeTask(task3);
-//        this->getWorkflow()->removeTask(task4);
+            this->getWorkflow()->removeTask(task1);
+            this->getWorkflow()->removeTask(task2);
+            this->getWorkflow()->removeTask(task3);
+            this->getWorkflow()->removeTask(task4);
 
         }
 
@@ -2475,7 +2486,8 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringAComputation_test() {
 
     // Create two workflow files
     wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
-    wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
+    wrench::WorkflowFile *output_file1 = this->workflow->addFile("output_file1", 20000.0);
+    wrench::WorkflowFile *output_file2 = this->workflow->addFile("output_file2", 20000.0);
 
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
@@ -2527,23 +2539,24 @@ private:
             wrench::WorkflowTask *task3 = this->getWorkflow()->addTask("task1.3", 800, 7, 7, 1.0, 0);
             wrench::WorkflowTask *task4 = this->getWorkflow()->addTask("task1.4", 600, 2, 2, 1.0, 0);
             task1->addInputFile(this->getWorkflow()->getFileByID("input_file"));
-            task1->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
+            task1->addOutputFile(this->getWorkflow()->getFileByID("output_file1"));
             task2->addInputFile(this->getWorkflow()->getFileByID("input_file"));
-            task2->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
+            task2->addOutputFile(this->getWorkflow()->getFileByID("output_file2"));
 
             // Create a StandardJob with both tasks
             wrench::StandardJob *job = job_manager->createStandardJob(
                     {task1, task2, task3, task4},
                     {
                             {this->getWorkflow()->getFileByID("input_file"),  this->test->storage_service1},
-                            {this->getWorkflow()->getFileByID("output_file"), this->test->storage_service1}
+                            {this->getWorkflow()->getFileByID("output_file1"), this->test->storage_service1},
+                            {this->getWorkflow()->getFileByID("output_file2"), this->test->storage_service1}
                     },
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
                             this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
                             this->test->storage_service2)},
                     {},
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                  this->test->storage_service2)}
+                                                                                                 this->test->storage_service2)}
             );
 
             std::string my_mailbox = "test_callback_mailbox";
@@ -2574,10 +2587,10 @@ private:
 
             // We should be good now, with nothing running
 
-//        this->getWorkflow()->removeTask(task1);
-//        this->getWorkflow()->removeTask(task2);
-//        this->getWorkflow()->removeTask(task3);
-//        this->getWorkflow()->removeTask(task4);
+        this->getWorkflow()->removeTask(task1);
+        this->getWorkflow()->removeTask(task2);
+        this->getWorkflow()->removeTask(task3);
+        this->getWorkflow()->removeTask(task4);
         }
 
         return 0;
@@ -2627,7 +2640,8 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringATransfer_test() {
 
     // Create two workflow files
     wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
-    wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
+    wrench::WorkflowFile *output_file1 = this->workflow->addFile("output_file1", 20000.0);
+    wrench::WorkflowFile *output_file2 = this->workflow->addFile("output_file2", 20000.0);
 
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
@@ -2917,7 +2931,7 @@ private:
                         this->getWorkflow()->getFileByID("input_file"), this->test->storage_service2,
                         this->test->storage_service2)},
                 {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                              this->test->storage_service2)}
+                                                                                             this->test->storage_service2)}
         );
 
         std::string my_mailbox = "test_callback_mailbox";

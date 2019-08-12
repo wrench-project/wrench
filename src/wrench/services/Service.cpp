@@ -138,6 +138,9 @@ namespace wrench {
         } catch (std::invalid_argument &e) {
             throw;
         }
+        if (string_value == "infinity") {
+            return DBL_MAX;
+        }
         if (sscanf(string_value.c_str(), "%lf", &value) != 1) {
             throw std::invalid_argument(
                     "Service::getPropertyValueAsDouble(): Invalid double property value " + property + " " +
@@ -160,6 +163,9 @@ namespace wrench {
             string_value = this->getPropertyValueAsString(property);
         } catch (std::invalid_argument &e) {
             throw;
+        }
+        if (string_value == "infinity") {
+            return ULONG_MAX;
         }
         if (sscanf(string_value.c_str(), "%lu", &value) != 1) {
             throw std::invalid_argument(

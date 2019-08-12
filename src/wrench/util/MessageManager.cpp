@@ -7,6 +7,8 @@
  * (at your option) any later version.
  */
 
+#ifdef MESSAGE_MANAGER
+
 #include <iostream>
 #include "wrench/logging/TerminalOutput.h"
 
@@ -105,3 +107,5 @@ namespace wrench {
 #endif
     }
 }
+
+#endif //MESSAGE_MANAGER

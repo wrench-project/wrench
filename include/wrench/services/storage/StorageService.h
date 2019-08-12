@@ -54,24 +54,22 @@ namespace wrench {
 
         virtual void deleteFile(WorkflowFile *file, std::string dst_dir, std::shared_ptr<FileRegistryService>file_registry_service=nullptr);
 
+        virtual void readFile(WorkflowFile *file);
+        virtual void readFile(WorkflowFile *file, std::string src_dir);
+
+        virtual void writeFile(WorkflowFile *file);
+        virtual void writeFile(WorkflowFile *file, std::string dst_dir);
+
+        virtual void downloadFile(WorkflowFile *file, std::string local_partition, unsigned long buffer_size);
+        virtual void downloadFile(WorkflowFile *file, std::string src_dir, std::string local_partition, unsigned long buffer_size);
+
+
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
 
-
-        virtual void readFile(WorkflowFile *file, std::string src_dir);
-
-        virtual void writeFile(WorkflowFile *file, std::string dst_dir);
-
-        virtual void deleteFile(WorkflowFile *file, WorkflowJob* job, std::shared_ptr<FileRegistryService> file_registry_service=nullptr);
-
-        virtual bool lookupFile(WorkflowFile *file, WorkflowJob*);
-
         virtual void copyFile(WorkflowFile *file, std::shared_ptr<StorageService> src, std::string src_dir, std::string dst_dir);
-
         virtual void copyFile(WorkflowFile *file, std::shared_ptr<StorageService> src);
-
-        virtual void copyFile(WorkflowFile *file, std::shared_ptr<StorageService> src, WorkflowJob* src_job, WorkflowJob* dst_job);
 
         virtual void initiateFileCopy(std::string answer_mailbox,
                                       WorkflowFile *file,
@@ -79,16 +77,12 @@ namespace wrench {
                                       std::string src_dir,
                                       std::string dst_dir);
 
-        virtual void readFile(WorkflowFile *file);
 
+        virtual void deleteFile(WorkflowFile *file, WorkflowJob* job, std::shared_ptr<FileRegistryService> file_registry_service=nullptr);
+        virtual bool lookupFile(WorkflowFile *file, WorkflowJob*);
         virtual void readFile(WorkflowFile *file, WorkflowJob* job);
-
-        virtual void initiateFileRead(std::string mailbox_that_should_receive_file_content, WorkflowFile *file, std::string src_dir);
-
-        virtual void writeFile(WorkflowFile *file);
-
         virtual void writeFile(WorkflowFile *file, WorkflowJob* job);
-
+        virtual void copyFile(WorkflowFile *file, std::shared_ptr<StorageService> src, WorkflowJob* src_job, WorkflowJob* dst_job);
         static void readFiles(std::set<WorkflowFile *> files,
                               std::map<WorkflowFile *, std::shared_ptr<StorageService>> file_locations,
                               std::shared_ptr<StorageService> default_storage_service,
@@ -100,6 +94,9 @@ namespace wrench {
                                std::shared_ptr<StorageService> default_storage_service,
                                std::set<WorkflowFile*>& files_in_scratch,
                                WorkflowJob* job = nullptr);
+
+
+
 
 //        static void deleteFiles(std::set<WorkflowFile *> files,
 //                                std::map<WorkflowFile *, std::shared_ptr<StorageService>> file_locations,
@@ -115,6 +112,7 @@ namespace wrench {
 
         friend class Simulation;
         friend class FileRegistryService;
+        friend class FileTransferThread;
 
 
         void stageFile(WorkflowFile *);
@@ -128,11 +126,15 @@ namespace wrench {
         /** @brief The storage service's occupied space */
         double occupied_space = 0;
 
+        /** @brief The service's buffer size */
+        unsigned long buffer_size;
+
         /***********************/
         /** \endcond          **/
         /***********************/
 
     private:
+
 
         enum FileOperation {
             READ,
