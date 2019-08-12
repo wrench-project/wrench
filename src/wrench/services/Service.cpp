@@ -226,6 +226,7 @@ namespace wrench {
      * @param auto_restart: true if the daemon should restart automatically after a reboot or not
      *
      * @throw std::runtime_error
+     * @throw std::shared_ptr<HostError>
      */
     void Service::start(std::shared_ptr<Service> this_service, bool daemonize, bool auto_restart) {
         try {
@@ -247,8 +248,10 @@ namespace wrench {
                 Service::num_terminated_services = 0;
             }
 
-        } catch (std::invalid_argument &e) {
-            throw std::runtime_error("Service::start(): " + std::string(e.what()));
+        } catch (std::runtime_error &e) {
+            throw;
+        } catch (std::shared_ptr<HostError> &e) {
+            throw;
         }
     }
 
