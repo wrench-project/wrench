@@ -65,6 +65,8 @@ namespace wrench {
         static void turnOffLink(std::string linkname);
 
         void launch();
+        bool isRunning();
+
 
         /**
          * @brief Method to add a service to the simulation
@@ -105,6 +107,7 @@ namespace wrench {
         static double getMinPowerConsumption(const std::string &hostname);
         static double getMaxPowerConsumption(const std::string &hostname);
         static std::vector<int> getListOfPstates(const std::string &hostname);
+
 
 
         /***********************/
