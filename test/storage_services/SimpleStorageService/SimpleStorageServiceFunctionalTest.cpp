@@ -207,6 +207,27 @@ private:
         } catch (wrench::WorkflowExecutionException &e) {
         }
 
+        // Bogus download
+        try {
+            this->test->storage_service_100->downloadFile(nullptr, "/whatever", 10);
+            throw std::runtime_error("Should not be able to download nullptr file");
+        } catch (std::invalid_argument &e) {
+        }
+
+        // Download a file on a storage service
+        try {
+            this->test->storage_service_100->downloadFile(this->test->file_10, "/whatever", 10);
+        } catch (wrench::WorkflowExecutionException &e) {
+            throw std::runtime_error("Should be able to download a file available on a storage service");
+        }
+
+        // Download a file on a storage service that doesn't have that file
+        try {
+            this->test->storage_service_100->downloadFile(this->test->file_100, "/whatever", 10);
+            throw std::runtime_error("Should not be able to download a file unavailable a storage service");
+        } catch (wrench::WorkflowExecutionException &e) {
+        }
+
         // Delete a file on a storage service that doesnt' have it
         try {
             this->test->storage_service_100->deleteFile(this->test->file_100);
@@ -448,7 +469,7 @@ private:
 
         try {
             this->test->storage_service_100->readFile(this->test->file_1, nullptr);
-            throw std::runtime_error("Should not be able to lookup a file from a down service");
+            throw std::runtime_error("Should not be able to read a file from a down service");
         } catch (wrench::WorkflowExecutionException &e) {
             // Check Exception
             auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(e.getCause());
@@ -464,8 +485,25 @@ private:
         }
 
         try {
+            this->test->storage_service_100->downloadFile(this->test->file_1, "/whatever", 10);
+            throw std::runtime_error("Should not be able to download a file from a DOWN service");
+        } catch (wrench::WorkflowExecutionException &e) {
+            // Check Exception
+            auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(e.getCause());
+            if (not cause) {
+                throw std::runtime_error("Got an exception, as expected, but of the unexpected failure cause: " +
+                                         e.getCause()->toString() + " (expected: ServiceIsDown)");
+            }
+            // Check Exception details
+            if (cause->getService() != this->test->storage_service_100) {
+                throw std::runtime_error(
+                        "Got the expected 'service is down' exception, but the failure cause does not point to the correct storage service");
+            }
+        }
+
+        try {
             this->test->storage_service_100->writeFile(this->test->file_1, nullptr);
-            throw std::runtime_error("Should not be able to lookup a file from a DOWN service");
+            throw std::runtime_error("Should not be able to write a file from a DOWN service");
         } catch (wrench::WorkflowExecutionException &e) {
             // Check Exception
             auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(e.getCause());
@@ -531,6 +569,10 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
     // Create a bad Storage Service
     ASSERT_THROW(storage_service_100 = simulation->add(
             new wrench::SimpleStorageService(hostname, -100.0)), std::invalid_argument);
+
+    // Create a Storage Service with a bogus property
+    ASSERT_THROW(storage_service_100 = simulation->add(
+            new wrench::SimpleStorageService(hostname, -100.0, {{wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "BOGUS"}})), std::invalid_argument);
 
     // Create Three Storage Services
     ASSERT_NO_THROW(storage_service_100 = simulation->add(

@@ -92,18 +92,15 @@ namespace wrench {
         int index = 0;
         bool one_comm_failed = false;
         try {
-            index = (unsigned long) simgrid::s4u::Comm::wait_any_for(&pending_s4u_comms, timeout);
+            index =  simgrid::s4u::Comm::wait_any_for(&pending_s4u_comms, timeout);
 #ifdef MESSAGE_MANAGER
             MessageManager::removeReceivedMessage(pending_comms[index]->mailbox_name, pending_comms[index]->simulation_message.get());
 #endif
         } catch (simgrid::NetworkFailureException &e) {
             one_comm_failed = true;
         } catch (simgrid::TimeoutException &e) {
+            // This likely doesn't happen, but let's keep it here for now
             one_comm_failed = true;
-        } catch (std::exception &e) {
-            throw std::runtime_error(
-                    "S4U_PendingCommunication::waitForSomethingToHappen(): Unexpected std::exception  (" +
-                    std::string(e.what()) + ")");
         }
 
         if (index == -1) {
@@ -111,22 +108,18 @@ namespace wrench {
         }
 
         if (one_comm_failed) {
-            for (index = 0; index < pending_s4u_comms.size(); index++) {
+            for (index = 0; index < (int) pending_s4u_comms.size(); index++) {
                 try {
                     pending_s4u_comms[index]->test();
                 } catch (simgrid::NetworkFailureException &e) {
                     break;
                 } catch (simgrid::TimeoutException &e) {
                     break;
-                } catch (std::exception &e) {
-                    throw std::runtime_error(
-                            "S4U_PendingCommunication::waitForSomethingToHappen(): Unexpected std::exception  (" +
-                            std::string(e.what()) + ")");
                 }
             }
         }
 
-        return index;
+        return (unsigned long)index;
     }
 
 };

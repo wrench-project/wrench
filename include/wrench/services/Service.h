@@ -129,6 +129,22 @@ namespace wrench {
             return shared_ptr;
         }
 
+        /**
+         * @brief Method to retrieve the shared_ptr to a service based on the service's name (not efficient)
+         * @tparam T: the class of the service (the base class is Service)
+         * @param name: the service's name
+         * @return a shared_ptr (or nullptr if not found)
+         */
+        template <class T>
+        static std::shared_ptr<T> getServiceByName(std::string name) {
+            for (auto const &s : Service::service_shared_ptr_map) {
+                if (s.first->getName() == name) {
+                    return std::dynamic_pointer_cast<T>(s.second);
+                }
+            }
+            return nullptr;
+        }
+
 
     private:
         bool shutting_down = false;

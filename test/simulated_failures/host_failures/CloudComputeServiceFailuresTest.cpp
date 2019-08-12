@@ -420,12 +420,14 @@ private:
 
             // Add a task to the workflow
             auto task = this->test->workflow->addTask("task_" + std::to_string(trial), 50, 1, 1, 1.0, 0);
+            auto output_file = this->test->workflow->addFile("output_file_" + std::to_string(trial), 2000);
+
             task->addInputFile(this->test->input_file);
-            task->addOutputFile(this->test->output_file);
+            task->addOutputFile(output_file);
 
             // Create a standard job
             auto job = job_manager->createStandardJob(task, {{this->test->input_file,  this->test->storage_service},
-                                                             {this->test->output_file, this->test->storage_service}});
+                                                             {output_file, this->test->storage_service}});
 
             // Create a VM
             auto vm_name = cloud_service->createVM(task->getMinNumCores(), task->getMemoryRequirement());
@@ -466,6 +468,7 @@ private:
 
             wrench::Simulation::sleep(10.0);
             this->test->workflow->removeTask(task);
+            this->test->workflow->removeFile(output_file);
         }
 
         return 0;

@@ -249,6 +249,7 @@ namespace wrench {
     * @param answer_mailbox: the mailbox to which to send the answer
     * @param file: the file
     * @param dst_partition: the destination partition
+    * @param buffer_size: the buffer size
     * @param payload: the message size in bytes
     *
     * @throw std::invalid_argument
@@ -256,6 +257,7 @@ namespace wrench {
     StorageServiceFileWriteRequestMessage::StorageServiceFileWriteRequestMessage(std::string answer_mailbox,
                                                                                  WorkflowFile *file,
                                                                                  std::string &dst_partition,
+                                                                                 unsigned long buffer_size,
                                                                                  double payload)
             : StorageServiceMessage("FILE_WRITE_REQUEST",
                                     payload) {
@@ -267,6 +269,7 @@ namespace wrench {
         this->answer_mailbox = answer_mailbox;
         this->file = file;
         this->dst_partition = dst_partition;
+        this->buffer_size = buffer_size;
     }
 
     /**
@@ -305,6 +308,7 @@ namespace wrench {
    * @param mailbox_to_receive_the_file_content: the mailbox to which to send the file content
    * @param file: the file
    * @param src_partition: the partition where the file is stored
+   * @param buffer_size: the requested buffer size
    * @param payload: the message size in bytes
    *
    * @throw std::invalid_argument
@@ -313,6 +317,7 @@ namespace wrench {
                                                                                std::string mailbox_to_receive_the_file_content,
                                                                                WorkflowFile *file,
                                                                                std::string &src_partition,
+                                                                               unsigned long buffer_size,
                                                                                double payload) : StorageServiceMessage(
             "FILE_READ_REQUEST",
             payload) {
@@ -324,6 +329,7 @@ namespace wrench {
         this->mailbox_to_receive_the_file_content = mailbox_to_receive_the_file_content;
         this->file = file;
         this->src_partition = src_partition;
+        this->buffer_size = buffer_size;
     }
 
     /**
@@ -358,14 +364,15 @@ namespace wrench {
     * @brief Constructor
     * @param file: the workflow data file
     */
-    StorageServiceFileContentMessage::StorageServiceFileContentMessage(WorkflowFile *file) : StorageServiceMessage(
-            "FILE_CONTENT", 0) {
+    StorageServiceFileContentChunkMessage::StorageServiceFileContentChunkMessage(
+            WorkflowFile *file, unsigned long chunk_size, bool last_chunk) : StorageServiceMessage(
+            "FILE_CHUNK", chunk_size) {
         if (file == nullptr) {
             throw std::invalid_argument(
-                    "StorageServiceFileContentMessage::StorageServiceFileContentMessage(): Invalid arguments");
+                    "StorageServiceFileContentChunkMessage::StorageServiceFileContentChunkMessage(): Invalid arguments");
         }
-        this->payload += file->getSize();
         this->file = file;
+        this->last_chunk = last_chunk;
     }
 
 };
