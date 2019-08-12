@@ -76,7 +76,7 @@ private:
         ssd->start(ssd, true, false);
 
         wrench::Simulation::sleep(10);
-        simgrid::s4u::Host::by_name("Host2")->turn_off();
+        wrench::Simulation::turnOffHost("Host2");
 
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
