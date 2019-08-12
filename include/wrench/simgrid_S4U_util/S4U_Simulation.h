@@ -46,7 +46,10 @@ namespace wrench {
 		static void compute(double);
 		static void sleep(double);
 		static void computeZeroFlop();
-		static void yield();
+        static void writeToDisk(double num_bytes, std::string partition_name);
+        static void readFromDisk(double num_bytes, std::string partition_name);
+
+            static void yield();
 		static std::string getHostProperty(std::string hostname, std::string property_name);
 
 		//start energy related calls

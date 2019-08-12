@@ -12,7 +12,20 @@
 
 #include "SimpleWMS.h"
 #include "scheduler/BatchStandardJobScheduler.h"
+#include <wrench/tools/pegasus/PegasusWorkflowParser.h>
 
+static bool ends_with(const std::string& str, const std::string& suffix) {
+    return str.size() >= suffix.size() && 0 == str.compare(str.size()-suffix.size(), suffix.size(), suffix);
+}
+
+/**
+ * @brief An example that demonstrate how to run a simulation of a simple Workflow
+ *        Management System (WMS) (implemented in SimpleWMS.[cpp|h]).
+ *
+ * @param argc: argument count
+ * @param argv: argument array
+ * @return 0 if the simulation has successfully completed
+ */
 int main(int argc, char **argv) {
 
     /*
@@ -44,9 +57,16 @@ int main(int argc, char **argv) {
 
     /* Reading and parsing the workflow description file to create a wrench::Workflow object */
     std::cerr << "Loading workflow..." << std::endl;
-    wrench::Workflow workflow;
-    workflow.loadFromDAXorJSON(workflow_file, "1000Gf");
-    std::cerr << "The workflow has " << workflow.getNumberOfTasks() << " tasks " << std::endl;
+    wrench::Workflow *workflow;
+    if (ends_with(workflow_file, "dax")) {
+        workflow = wrench::PegasusWorkflowParser::createWorkflowFromDAX(workflow_file, "1000Gf");
+    } else if (ends_with(workflow_file,"json")) {
+        workflow = wrench::PegasusWorkflowParser::createWorkflowFromJSON(workflow_file, "1000Gf");
+    } else {
+        std::cerr << "Workflow file name must end with '.dax' or '.json'" << std::endl;
+        exit(1);
+    }
+    std::cerr << "The workflow has " << workflow->getNumberOfTasks() << " tasks " << std::endl;
     std::cerr.flush();
 
     /* Reading and parsing the platform description file to instantiate a simulated platform */
@@ -54,7 +74,7 @@ int main(int argc, char **argv) {
     simulation.instantiatePlatform(platform_file);
 
     /* Get a vector of all the hosts in the simulated platform */
-    std::vector<std::string> hostname_list = simulation.getHostnameList();
+    std::vector<std::string> hostname_list = wrench::Simulation::getHostnameList();
 
     /* Create a list of storage services that will be used by the WMS */
     std::set<std::shared_ptr<wrench::StorageService>> storage_services;
@@ -115,7 +135,7 @@ int main(int argc, char **argv) {
                     new wrench::BatchStandardJobScheduler(storage_service)),
                                   nullptr, compute_services, storage_services, wms_host));
 
-    wms->addWorkflow(&workflow);
+    wms->addWorkflow(workflow);
 
     /* Instantiate a file registry service to be started on some host. This service is
      * essentially a replica catalog that stores <file , storage service> pairs so that
@@ -132,7 +152,7 @@ int main(int argc, char **argv) {
      * These files are then staged on the storage service.
      */
     std::cerr << "Staging input files..." << std::endl;
-    auto input_files = workflow.getInputFiles();
+    auto input_files = workflow->getInputFiles();
     for (auto f : input_files) {
         std::cerr << "---> " << f.second->getID() << "\n";
     }

@@ -19,6 +19,12 @@
 WRENCH_LOG_NEW_DEFAULT_CATEGORY(host_state_change_detector, "Log category for HostStateChangeDetector");
 
 
+/**
+ * @brief Cleanup method
+ *
+ * @param has_returned_from_main: whether main() returned
+ * @param return_value: the return value (if main() returned)
+ */
 void wrench::HostStateChangeDetector::cleanup(bool has_returned_from_main, int return_value) {
     // Unregister the callback!
     simgrid::s4u::Host::on_state_change.disconnect(this->on_state_change_call_back_id);

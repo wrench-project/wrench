@@ -194,6 +194,7 @@ namespace wrench {
     public:
         StorageServiceFileWriteRequestMessage(std::string answer_mailbox, WorkflowFile *file,
                                               std::string &dst_partition,
+                                              unsigned long buffer_size,
                                               double payload);
 
         /** @brief Mailbox to which the answer message should be sent */
@@ -202,6 +203,8 @@ namespace wrench {
         WorkflowFile *file;
         /** @brief The file partition to write the file to */
         std::string dst_partition;
+        /** @brief The buffer size to use */
+        unsigned long buffer_size;
     };
 
     /**
@@ -236,6 +239,7 @@ namespace wrench {
         StorageServiceFileReadRequestMessage(std::string answer_mailbox,
                                              std::string mailbox_to_receive_the_file_content,
                                              WorkflowFile *file, std::string &src_partition,
+                                             unsigned long buffer_size,
                                              double payload);
 
         /** @brief The mailbox to which the answer message should be sent */
@@ -246,6 +250,8 @@ namespace wrench {
         WorkflowFile *file;
         /** @brief The source partition from which to read the file */
         std::string src_partition;
+        /** @brief The requested buffer size */
+        unsigned long buffer_size;
     };
 
     /**
@@ -272,12 +278,15 @@ namespace wrench {
     /**
     * @brief A message sent/received by a StorageService that has a file size as a payload
     */
-    class StorageServiceFileContentMessage : public StorageServiceMessage {
+    class StorageServiceFileContentChunkMessage : public StorageServiceMessage {
     public:
-        explicit StorageServiceFileContentMessage(WorkflowFile *file);
+        explicit StorageServiceFileContentChunkMessage(WorkflowFile *file,
+                unsigned long chunk_size, bool last_chunk);
 
         /** @brief The file */
         WorkflowFile *file;
+        /** @brief Whether this is the last file chunk */
+        bool last_chunk;
     };
 
     /***********************/

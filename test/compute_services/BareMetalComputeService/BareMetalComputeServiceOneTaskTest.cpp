@@ -14,6 +14,8 @@
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
 
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(bare_metal_compute_service_test, "Log category for BareMetalComputeServiceOneTask test");
+
 
 class BareMetalComputeServiceOneTaskTest : public ::testing::Test {
 
@@ -274,6 +276,9 @@ private:
         data_movement_manager->stop();
 
         wrench::Simulation::sleep(1);
+
+        // Stop the Compute service manually, for coverage
+        (*(this->getAvailableComputeServices<wrench::BareMetalComputeService>().begin()))->stop();
 
         return 0;
     }

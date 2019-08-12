@@ -7,6 +7,7 @@
  * (at your option) any later version.
  */
 
+#include <wrench/services/storage/StorageServiceProperty.h>
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/storage/StorageService.h"
@@ -16,6 +17,7 @@
 #include "wrench/services/storage/StorageServiceMessagePayload.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/simulation/Simulation.h"
+#include "wrench/simgrid_S4U_util/S4U_PendingCommunication.h"
 
 WRENCH_LOG_NEW_DEFAULT_CATEGORY(storage_service, "Log category for Storage Service");
 
@@ -323,7 +325,6 @@ namespace wrench {
             src_partition = "/";
         }
 
-
         // Send a message to the daemon
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("read_file");
         try {
@@ -333,6 +334,7 @@ namespace wrench {
                                             answer_mailbox,
                                             file,
                                             src_partition,
+                                            this->buffer_size,
                                             this->getMessagePayloadValue(
                                                     StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
@@ -355,20 +357,31 @@ namespace wrench {
                 throw WorkflowExecutionException(cause);
             }
 
-            // Otherwise, retrieve  the file
-            std::shared_ptr<SimulationMessage> file_content_message = nullptr;
-            try {
-                file_content_message = S4U_Mailbox::getMessage(answer_mailbox);
-            } catch (std::shared_ptr<NetworkError> &cause) {
-                throw WorkflowExecutionException(cause);
-            }
+            if (this->buffer_size == 0) {
 
-            if (auto file_content_msg = std::dynamic_pointer_cast<StorageServiceFileContentMessage>(
-                    file_content_message)) {
-                // do nothing
+                throw std::runtime_error("StorageService::writeFile(): Zero buffer size not implemented yet");
+
             } else {
-                throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
-                                         file_content_message->getName() + "] message!");
+
+                // Otherwise, retrieve the file chunks until the last one is received
+                while (true) {
+                    std::shared_ptr<SimulationMessage> file_content_message = nullptr;
+                    try {
+                        file_content_message = S4U_Mailbox::getMessage(answer_mailbox);
+                    } catch (std::shared_ptr<NetworkError> &cause) {
+                        throw WorkflowExecutionException(cause);
+                    }
+
+                    if (auto file_content_chunk_msg = std::dynamic_pointer_cast<StorageServiceFileContentChunkMessage>(
+                            file_content_message)) {
+                        if (file_content_chunk_msg->last_chunk) {
+                            break;
+                        }
+                    } else {
+                        throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
+                                                 file_content_message->getName() + "] message!");
+                    }
+                }
             }
 
         } else {
@@ -439,6 +452,7 @@ namespace wrench {
                                             answer_mailbox,
                                             file,
                                             dst_partition,
+                                            this->buffer_size,
                                             this->getMessagePayloadValue(
                                                     StorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
@@ -460,11 +474,22 @@ namespace wrench {
                 throw WorkflowExecutionException(msg->failure_cause);
             }
 
-            // Otherwise, synchronously send the file up!
-            try {
-                S4U_Mailbox::putMessage(msg->data_write_mailbox_name, new StorageServiceFileContentMessage(file));
-            } catch (std::shared_ptr<NetworkError> &cause) {
-                throw WorkflowExecutionException(cause);
+            if (this->buffer_size == 0) {
+                throw std::runtime_error("StorageService::writeFile(): Zero buffer size not implemented yet");
+            } else {
+                try {
+                    double remaining = file->getSize();
+                    while (remaining > this->buffer_size) {
+                        S4U_Mailbox::putMessage(msg->data_write_mailbox_name, new StorageServiceFileContentChunkMessage(
+                                file, this->buffer_size, false));
+                        remaining -= this->buffer_size;
+                    }
+                    S4U_Mailbox::putMessage(msg->data_write_mailbox_name, new StorageServiceFileContentChunkMessage(
+                            file, remaining, true));
+
+                } catch (std::shared_ptr<NetworkError> &cause) {
+                    throw WorkflowExecutionException(cause);
+                }
             }
 
         } else {
@@ -729,39 +754,41 @@ namespace wrench {
         }
     }
 
-//    /**
-//     * @brief Synchronously and sequentially delete a set of files from storage services
-//     *
-//     * @param files: the set of files to delete
-//     * @param file_locations: a map of files to storage services (all must be in the "/" partition of their storage services)
-//     * @param default_storage_service: the storage service to use when files don't appear in the file_locations map (or nullptr if none)
-//     *
-//     * @throw WorkflowExecutionException
-//     * @throw std::runtime_error
-//     */
-//    void StorageService::deleteFiles(std::set<WorkflowFile *> files,
-//                                     std::map<WorkflowFile *, std::shared_ptr<StorageService>> file_locations,
-//                                     std::shared_ptr<StorageService> default_storage_service) {
-//        for (auto f : files) {
-//            // Identify the Storage Service
-//            std::shared_ptr<StorageService> storage_service = default_storage_service;
-//            if (file_locations.find(f) != file_locations.end()) {
-//                storage_service = file_locations[f];
-//            }
-//            if (storage_service == nullptr) {
-//                throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new NoStorageServiceForFile(f)));
-//            }
-//
-//            // Remove the file
-//            try {
-//                storage_service->deleteFile(f);
-//            } catch (WorkflowExecutionException &e) {
-//                throw;
-//            } catch (std::runtime_error &e) {
-//                throw;
-//            }
-//        }
-//    }
+#if 0
+    /**
+     * @brief Synchronously and sequentially delete a set of files from storage services
+     *
+     * @param files: the set of files to delete
+     * @param file_locations: a map of files to storage services (all must be in the "/" partition of their storage services)
+     * @param default_storage_service: the storage service to use when files don't appear in the file_locations map (or nullptr if none)
+     *
+     * @throw WorkflowExecutionException
+     * @throw std::runtime_error
+     */
+    void StorageService::deleteFiles(std::set<WorkflowFile *> files,
+                                     std::map<WorkflowFile *, std::shared_ptr<StorageService>> file_locations,
+                                     std::shared_ptr<StorageService> default_storage_service) {
+        for (auto f : files) {
+            // Identify the Storage Service
+            std::shared_ptr<StorageService> storage_service = default_storage_service;
+            if (file_locations.find(f) != file_locations.end()) {
+                storage_service = file_locations[f];
+            }
+            if (storage_service == nullptr) {
+                throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new NoStorageServiceForFile(f)));
+            }
+
+            // Remove the file
+            try {
+                storage_service->deleteFile(f);
+            } catch (WorkflowExecutionException &e) {
+                throw;
+            } catch (std::runtime_error &e) {
+                throw;
+            }
+        }
+    }
+#endif
 
 
     /**
@@ -769,6 +796,7 @@ namespace wrench {
      *
      * @param file: the file to copy
      * @param src: the storage service from which to read the file
+     *
      * @throw WorkflowExecutionException
      * @throw std::invalid_argument
      */
@@ -963,35 +991,59 @@ namespace wrench {
 
 
     /**
-     * @brief Asynchronously read a file from the storage service
-     *
-     * @param mailbox_that_should_receive_file_content: the mailbox to which the file should be sent
-     * @param file: the file
-     * @param src_partition: the partition in which the file will be read
-     *
-     * @throw WorkflowExecutionException
-     * @throw std::runtime_error
-     * @throw std::invalid_arguments
+     * @brief Get the total static capacity of the storage service (in zero simulation time)
+     * @return capacity of the storage service (double)
      */
-    void StorageService::initiateFileRead(std::string mailbox_that_should_receive_file_content, WorkflowFile *file,
-                                          std::string src_partition) {
+    double StorageService::getTotalSpace() {
+        return this->capacity;
+    }
 
+    /**
+     * @brief Download a file to a local partition
+     * @param file: the file to download
+     * @param local_partition: the local partition
+     * @param buffer_size: buffer size to use (0 means use "ideal fluid model")
+     */
+    void StorageService::downloadFile(WorkflowFile *file, std::string local_partition, unsigned long buffer_size) {
+        std::string src_partition = "/";
+        this->downloadFile(file, src_partition, local_partition, buffer_size);
+    }
+
+    /**
+     * @brief Download a file to a local partition/disk
+     * @param file: the file to download
+     * @param src_partition: the source dir/partition/disk
+     * @param local_partition: the local disk
+     * @param downloader_buffer_size: buffer size of the downloaderd (0 means use "ideal fluid model")
+     */
+    void StorageService::downloadFile(WorkflowFile *file, std::string src_partition, std::string local_partition, unsigned long downloader_buffer_size) {
         WRENCH_INFO("Initiating a file read operation for file %s on storage service %s",
                     file->getID().c_str(), this->getName().c_str());
 
         if (file == nullptr) {
-            throw std::invalid_argument("StorageService::initiateFileRead(): Invalid arguments");
+            throw std::invalid_argument("StorageService::downloadFile(): Invalid arguments");
         }
 
+        // Check that the service is up
         assertServiceIsUp();
+
+        // Check that the buffer size is compatible
+        if (((downloader_buffer_size == 0) && (this->buffer_size != 0)) or
+            ((downloader_buffer_size != 0) && (this->buffer_size == 0))) {
+            throw std::invalid_argument("StorageService::downloadFile(): Incompatible buffer size specs (both must be zero, or both must be non-zero");
+        }
 
         // Empty partition means "/"
         if (src_partition.empty()) {
             src_partition = "/";
         }
+        if (local_partition.empty()) {
+            local_partition = "/";
+        }
 
         // Send a message to the daemon
-        std::string request_answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("read_file");
+        std::string request_answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("read_file_request");
+        std::string mailbox_that_should_receive_file_content = S4U_Mailbox::generateUniqueMailboxName("read_file_chunks");
 
         try {
             S4U_Mailbox::putMessage(this->mailbox_name,
@@ -999,6 +1051,7 @@ namespace wrench {
                                                                              mailbox_that_should_receive_file_content,
                                                                              file,
                                                                              src_partition,
+                                                                             std::min<unsigned long>(this->buffer_size, downloader_buffer_size),
                                                                              this->getMessagePayloadValue(
                                                                                      StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
@@ -1021,21 +1074,53 @@ namespace wrench {
                 throw WorkflowExecutionException(msg->failure_cause);
             }
         } else {
-            throw std::runtime_error("StorageService::initiateFileRead(): Received an unexpected [" +
+            throw std::runtime_error("StorageService::downloadFile(): Received an unexpected [" +
                                      message->getName() + "] message!");
         }
 
         WRENCH_INFO("File read request accepted (will receive file content on mailbox_name %s)",
                     mailbox_that_should_receive_file_content.c_str());
-        // At this point, the file should show up at some point on the mailbox_that_should_receive_file_content
 
-    }
+        if (this->buffer_size == 0) {
 
-    /**
-     * @brief Get the total static capacity of the storage service (in zero simulation time)
-     * @return capacity of the storage service (double)
-     */
-    double StorageService::getTotalSpace() {
-        return this->capacity;
+            throw std::runtime_error("downloadFile::writeFile(): Zero buffer size not implemented yet");
+
+        } else {
+            try {
+                bool done = false;
+                // Receive the first chunk
+                auto msg = S4U_Mailbox::getMessage(mailbox_that_should_receive_file_content);
+                if (auto file_content_chunk_msg =
+                        std::dynamic_pointer_cast<StorageServiceFileContentChunkMessage>(msg)) {
+                    done = file_content_chunk_msg->last_chunk;
+                } else {
+                    throw std::runtime_error("FileTransferThread::downloadFile() : Received an unexpected [" +
+                                             msg->getName() + "] message!");
+                }
+
+                // Receive chunks and write them to disk
+                while (not done) {
+                    // Issue the receive
+                    auto req = S4U_Mailbox::igetMessage(mailbox_that_should_receive_file_content);
+                    // Do the I/O
+                    S4U_Simulation::writeToDisk(msg->payload, local_partition);
+
+                    // Wait for the comm to finish
+                    msg = req->wait();
+                    if (auto file_content_chunk_msg =
+                            std::dynamic_pointer_cast<StorageServiceFileContentChunkMessage>(msg)) {
+                        done = file_content_chunk_msg->last_chunk;
+                    } else {
+                        throw std::runtime_error("FileTransferThread::downloadFile() : Received an unexpected [" +
+                                                 msg->getName() + "] message!");
+                    }
+                }
+                // Do the I/O for the last chunk
+                S4U_Simulation::writeToDisk(msg->payload, local_partition);
+            } catch (std::shared_ptr<NetworkError> &e) {
+                throw WorkflowExecutionException(e);
+            }
+        }
+
     }
 };

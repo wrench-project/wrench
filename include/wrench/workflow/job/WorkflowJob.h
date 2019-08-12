@@ -98,7 +98,7 @@ namespace wrench {
         std::shared_ptr<ComputeService> parent_compute_service;
 
     private:
-        bool forward_notification_to_original_source;
+//        bool forward_notification_to_original_source;
 
         /***********************/
         /** \endcond           */

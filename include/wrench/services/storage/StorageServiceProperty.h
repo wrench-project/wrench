@@ -23,12 +23,13 @@ namespace wrench {
 
     public:
 
-        /** @brief The maximum number of concurrent data connections supported by the service (default = "infinity") **/
-        DECLARE_PROPERTY_NAME(MAX_NUM_CONCURRENT_DATA_CONNECTIONS);
-
-        /** @brief The simulated delay when a storage service connects to itself (default = "0") **/
-        DECLARE_PROPERTY_NAME(SELF_CONNECTION_DELAY);
-
+        /** @brief Buffer size used when copying/communicating data:
+         *   - "infinity" (default): full buffering (read/write and forward model)
+         *   - "0": an ideal fluid model
+         *   - any integral value in between: an actual buffer size (the smaller the buffer size, the
+         *     slower the simulation)
+         **/
+        DECLARE_PROPERTY_NAME(BUFFER_SIZE);
     };
 
 };

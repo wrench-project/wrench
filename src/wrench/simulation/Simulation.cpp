@@ -77,6 +77,7 @@ namespace wrench {
         // Clearing all tracked service, which will cause all services that are not
         // pointed to by main() to be deleted.
         Service::clearTrackedServices();
+        this->compute_services.clear();
     }
 
     /**
