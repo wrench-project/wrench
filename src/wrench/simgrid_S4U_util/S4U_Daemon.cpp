@@ -165,7 +165,7 @@ namespace wrench {
             this->s4u_actor = simgrid::s4u::Actor::create(this->process_name.c_str(),
                                                           simgrid::s4u::Host::by_name(hostname),
                                                           S4U_DaemonActor(this));
-        } catch (std::exception &e) {
+        } catch (simgrid::Exception &e) {
             throw std::runtime_error("S4U_Daemon::startDaemon(): SimGrid actor creation failed... shouldn't happen.");
         }
 
