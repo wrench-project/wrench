@@ -410,16 +410,6 @@ namespace wrench {
 
     }
 
-//    void BareMetalComputeService::someHostIsBackOn(simgrid::s4u::Host const &h) {
-//        for (auto const &c : this->compute_resources) {
-//            if ((c.first == h.get_name()) and (h.is_on())) {
-////                WRENCH_INFO("HOST %s CAME BACK ON!!!", h.get_cname());
-//                this->host_back_on = true;
-//                break;
-//            }
-//        }
-//    }
-
 
     /**
      * @brief Helper method called by all constructors to initiate object instance
