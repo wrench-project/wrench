@@ -289,6 +289,7 @@ set(TEST_FILES
         test/simulation/simulation_output/SimulationTimestampTaskTest.cpp
         test/simulation/simulation_output/SimulationTimestampFileCopyTest.cpp
         test/simulation/simulation_output/SimulationTimestampEnergyTest.cpp
+        test/simulation/InvalidXMLTest.cpp
         test/compute_services/ScratchSpaceTest.cpp
         test/simulation/S4U_DaemonTest.cpp
         test/simulation/S4U_SimulationTest.cpp

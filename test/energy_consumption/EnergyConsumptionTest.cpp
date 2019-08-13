@@ -42,6 +42,8 @@ public:
 
     void do_SimpleApiChecksEnergy_test();
 
+    void do_PluginNotActive_test();
+
     std::unique_ptr<wrench::Workflow> workflow;
 
 protected:
@@ -251,7 +253,7 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionTests_test() {
   simulation = new wrench::Simulation();
   int argc = 2;
   auto argv = (char **) calloc(argc, sizeof(char *));
-  argv[0] = strdup("energy_consumption_test");
+  argv[0] = strdup("unit_test");
   argv[1] = strdup("--activate-energy");
 
   EXPECT_NO_THROW(simulation->init(&argc, argv));
@@ -406,7 +408,7 @@ void EnergyConsumptionTest::do_EnergyConsumption_test() {
   simulation = new wrench::Simulation();
   int argc = 2;
   auto argv = (char **) calloc(argc, sizeof(char *));
-  argv[0] = strdup("energy_consumption_test");
+  argv[0] = strdup("unit_test");
   argv[1] = strdup("--activate-energy");
 
   EXPECT_NO_THROW(simulation->init(&argc, argv));
@@ -559,7 +561,7 @@ void EnergyConsumptionTest::do_SimpleApiChecksEnergy_test() {
   simulation = new wrench::Simulation();
   int argc = 2;
   auto argv = (char **) calloc(argc, sizeof(char *));
-  argv[0] = strdup("energy_consumption_test");
+  argv[0] = strdup("unit_test");
   argv[1] = strdup("--activate-energy");
 
   EXPECT_NO_THROW(simulation->init(&argc, argv));
@@ -795,7 +797,7 @@ void EnergyConsumptionTest::do_EnergyConsumptionPStateChange_test() {
   simulation = new wrench::Simulation();
   int argc = 2;
   auto argv = (char **) calloc(argc, sizeof(char *));
-  argv[0] = strdup("energy_consumption_test");
+  argv[0] = strdup("unit_test");
   argv[1] = strdup("--activate-energy");
 
   EXPECT_NO_THROW(simulation->init(&argc, argv));
@@ -848,5 +850,96 @@ void EnergyConsumptionTest::do_EnergyConsumptionPStateChange_test() {
   free(argv[0]);
   free(argv[1]);
   free(argv);
+}
+
+
+
+/**********************************************************************/
+/**                     PLUGIN NOT ACTIVATED TEST                    **/
+/**********************************************************************/
+
+class PluginNotActivatedTestWMS : public wrench::WMS {
+
+public:
+    PluginNotActivatedTestWMS(EnergyConsumptionTest *test,
+                                         const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                         std::string& hostname) :
+            wrench::WMS(nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
+                        "test") {
+        this->test = test;
+    }
+
+private:
+
+    EnergyConsumptionTest *test;
+
+    int main() {
+
+        //The tests is just to switch pstate and check if energy consumed is +ve and we don't have any segfaults or something
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+        {
+            std::vector<std::string> simulation_hosts = test->simulation->getHostnameList();
+
+            double after_current_energy_consumed_by_host1 = this->simulation->getEnergyConsumed(simulation_hosts[1]);
+
+            //switch pstate
+            int max_pstate_possible = this->simulation->getNumberofPstates(simulation_hosts[1]);
+            //let's directly switch to pstate 2
+
+            //Second energy consumption test
+            wrench::Simulation::sleep(10);
+            double before_current_energy_consumed_by_host2 = this->simulation->getEnergyConsumed(simulation_hosts[1]);
+
+        }
+
+        return 0;
+    }
+};
+
+TEST_F(EnergyConsumptionTest, DISABLED_PluginNotActivated) {
+    DO_TEST_WITH_FORK(do_PluginNotActive_test);
+}
+
+
+void EnergyConsumptionTest::do_PluginNotActive_test() {
+
+
+    // Create and initialize a simulation
+    simulation = new wrench::Simulation();
+    int argc = 1;
+    auto argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
+
+    EXPECT_NO_THROW(simulation->init(&argc, argv));
+
+    // Setting up the platform
+    EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    // Get a hostname
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
+
+    // Create a Compute Service
+    EXPECT_NO_THROW(compute_service = simulation->add(
+            new wrench::BareMetalComputeService(hostname,
+                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                10000000000000.0, {})));
+
+    simulation->add(new wrench::FileRegistryService(hostname));
+
+    // Create a WMS
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    EXPECT_NO_THROW(wms = simulation->add(
+            new PluginNotActivatedTestWMS(this,  {compute_service}, hostname)));
+
+    EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+
+    EXPECT_NO_THROW(simulation->launch());
+
+    delete simulation;
+
+    free(argv[0]);
+    free(argv);
 }
 
