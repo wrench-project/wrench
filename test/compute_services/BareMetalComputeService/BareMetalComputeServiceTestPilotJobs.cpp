@@ -143,7 +143,7 @@ void BareMetalComputeServiceTestPilotJobs::do_UnsupportedPilotJobs_test() {
     wrench::Simulation *simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("unsupported_pilot_job_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 

@@ -131,7 +131,7 @@ void JobManagerTest::do_JobManagerConstructorTest_test() {
     simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 
@@ -236,7 +236,7 @@ void JobManagerTest::do_JobManagerCreateJobTest_test() {
     simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 
@@ -325,7 +325,7 @@ void JobManagerTest::do_JobManagerSubmitJobTest_test() {
     simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 
@@ -458,7 +458,7 @@ void JobManagerTest::do_JobManagerResubmitJobTest_test() {
     simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 
@@ -601,7 +601,7 @@ void JobManagerTest::do_JobManagerTerminateJobTest_test() {
     simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 

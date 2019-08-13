@@ -198,7 +198,7 @@ bool compareLinks(const nlohmann::json &lhs, const nlohmann::json &rhs) {
 void SimulationDumpJSONTest::do_SimulationDumpWorkflowExecutionJSON_test() {
     int argc = 1;
     auto argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("simulation_dump_workflow_execution_test");
+    argv[0] = strdup("unit_test");
 
     std::unique_ptr<wrench::Simulation> simulation = std::unique_ptr<wrench::Simulation>(new wrench::Simulation());
 
@@ -350,7 +350,7 @@ TEST_F(SimulationDumpJSONTest, SimulationDumpWorkflowExecutionJSONTest) {
 void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_test() {
     int argc = 1;
     auto argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("simulation_search_for_host_utilization_graph_layout_test");
+    argv[0] = strdup("unit_test");
 
     std::unique_ptr<wrench::Simulation> simulation = std::unique_ptr<wrench::Simulation>(new wrench::Simulation());
 
@@ -760,10 +760,11 @@ TEST_F(SimulationDumpJSONTest, SimulationSearchForHostUtilizationGraphLayoutTest
 /**********************************************************************/
 /**         SimulationDumpWorkflowGraphJSONTest                      **/
 /**********************************************************************/
+
 void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
     int argc = 1;
     auto argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("simulation_dump_workflow_execution_test");
+    argv[0] = strdup("unit_test");
 
     std::unique_ptr<wrench::Simulation> simulation = std::unique_ptr<wrench::Simulation>(new wrench::Simulation());
 
@@ -1208,7 +1209,7 @@ void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
     auto simulation = new wrench::Simulation();
     int argc = 2;
     auto argv = (char **)calloc(argc, sizeof(char *));
-    argv[0] = strdup("simulation_dump_host_energy_consumption_test");
+    argv[0] = strdup("unit_test");
     argv[1] = strdup("--activate-energy");
 
     EXPECT_NO_THROW(simulation->init(&argc, argv));
@@ -1378,7 +1379,7 @@ void SimulationDumpJSONTest::do_SimulationDumpPlatformGraphJSON_test() {
     auto simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **)calloc(argc, sizeof(char *));
-    argv[0] = strdup("simulation_dump_platform_graph_test");
+    argv[0] = strdup("unit_test");
 
     EXPECT_NO_THROW(simulation->init(&argc, argv));
     EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path3));

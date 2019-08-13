@@ -100,7 +100,7 @@ void SimulationTimestampEnergyTest::do_SimulationTimestampPstateSet_test() {
     auto simulation = new wrench::Simulation();
     int argc = 2;
     auto argv = (char **)calloc(argc, sizeof(char *));
-    argv[0] = strdup("simulation_timestamp_pstate_set_test");
+    argv[0] = strdup("unit_test");
     argv[1] = strdup("--activate-energy");
 
     EXPECT_NO_THROW(simulation->init(&argc, argv));
