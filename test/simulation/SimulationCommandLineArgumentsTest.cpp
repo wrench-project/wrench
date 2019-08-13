@@ -94,7 +94,7 @@ void SimulationCommandLineArgumentsTest::do_versionArgument_test() {
   auto *simulation = new wrench::Simulation();
   int argc = 2;
   auto argv = (char **) calloc(argc, sizeof(char *));
-  argv[0] = strdup("command_line_args_test");
+  argv[0] = strdup("unit_test");
   argv[1] = strdup("--version");
 
   pid_t pid = fork();
@@ -157,7 +157,7 @@ void SimulationCommandLineArgumentsTest::do_HelpWrenchArgument_test() {
   auto *simulation = new wrench::Simulation();
   int argc = 2;
   auto argv = (char **) calloc(argc, sizeof(char *));
-  argv[0] = strdup("command_line_args_test");
+  argv[0] = strdup("unit_test");
   argv[1] = strdup("--help-wrench");
 
   pid_t pid = fork();
@@ -211,7 +211,7 @@ void SimulationCommandLineArgumentsTest::do_HelpSimGridArgument_test() {
   auto *simulation = new wrench::Simulation();
   int argc = 2;
   auto argv = (char **) calloc(argc, sizeof(char *));
-  argv[0] = strdup("command_line_args_test");
+  argv[0] = strdup("unit_tests");
   argv[1] = strdup("--help-simgrid");
 
   pid_t pid = fork();
@@ -270,7 +270,7 @@ void SimulationCommandLineArgumentsTest::do_HelpArgument_test() {
   auto *simulation = new wrench::Simulation();
   int argc = 2;
   auto argv = (char **) calloc(argc, sizeof(char *));
-  argv[0] = strdup("command_line_args_test");
+  argv[0] = strdup("unit_test");
   argv[1] = strdup("--help");
 
   ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -299,7 +299,7 @@ void SimulationCommandLineArgumentsTest::do_NoColorArgument_test() {
   auto *simulation = new wrench::Simulation();
   int argc = 2;
   auto argv = (char **) calloc(argc, sizeof(char *));
-  argv[0] = strdup("command_line_args_test");
+  argv[0] = strdup("unit_test");
   argv[1] = strdup("--wrench-no-color");
 
   ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -376,7 +376,7 @@ void SimulationCommandLineArgumentsTest::do_NoLogArgument_test() {
   auto *simulation = new wrench::Simulation();
   int argc = 2;
   auto argv = (char **) calloc(argc, sizeof(char *));
-  argv[0] = strdup("command_line_args_test");
+  argv[0] = strdup("unit_test");
   argv[1] = strdup("--wrench-no-log");
 
   ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -441,7 +441,7 @@ void SimulationCommandLineArgumentsTest::do_ActivateEnergyArgument_test() {
   auto *simulation = new wrench::Simulation();
   int argc = 2;
   auto argv = (char **) calloc(argc, sizeof(char *));
-  argv[0] = strdup("command_line_args_test");
+  argv[0] = strdup("unit_test");
   argv[1] = strdup("--activate-energy");
 
   pid_t pid = fork();

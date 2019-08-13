@@ -303,7 +303,7 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     auto *simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("cloud_service_test");
+    argv[0] = strdup("unit_test");
 
 
     // Adding services to an uninitialized simulation

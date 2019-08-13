@@ -139,7 +139,7 @@ void VirtualizedClusterServiceTest::do_ConstructorTest_test() {
     auto *simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("cloud_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -370,7 +370,7 @@ void VirtualizedClusterServiceTest::do_StandardJobTaskTest_test() {
     auto *simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("cloud_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -497,7 +497,7 @@ void VirtualizedClusterServiceTest::do_StandardJobTaskWithCustomVMNameTest_test(
     auto *simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("cloud_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -620,7 +620,7 @@ void VirtualizedClusterServiceTest::do_VMMigrationTest_test() {
     auto *simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("virtualized_cluster_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -740,7 +740,7 @@ void VirtualizedClusterServiceTest::do_NumCoresTest_test() {
     auto *simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("cloud_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -847,7 +847,7 @@ void VirtualizedClusterServiceTest::do_StopAllVMsTest_test() {
     auto *simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("virtualized_cluster_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1097,7 +1097,7 @@ void VirtualizedClusterServiceTest::do_ShutdownVMTest_test() {
     auto *simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("virtualized_cluster_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1232,7 +1232,7 @@ void VirtualizedClusterServiceTest::do_ShutdownVMAndThenShutdownServiceTest_test
     auto *simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("virtualized_cluster_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1390,7 +1390,7 @@ void VirtualizedClusterServiceTest::do_SubmitToVMTest_test() {
     auto *simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("virtualized_cluster_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1493,7 +1493,7 @@ void VirtualizedClusterServiceTest::do_VMStartShutdownStartShutdown_test() {
     auto *simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("failure_test");
+    argv[0] = strdup("unit_test");
 
 
     simulation->init(&argc, argv);
@@ -1621,7 +1621,7 @@ void VirtualizedClusterServiceTest::do_VMShutdownWhileJobIsRunning_test() {
     auto *simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("failure_test");
+    argv[0] = strdup("unit_test");
 
 
     simulation->init(&argc, argv);
@@ -1754,7 +1754,7 @@ void VirtualizedClusterServiceTest::do_VMComputeServiceStopWhileJobIsRunning_tes
     auto *simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("failure_test");
+    argv[0] = strdup("unit_test");
 
 
     simulation->init(&argc, argv);

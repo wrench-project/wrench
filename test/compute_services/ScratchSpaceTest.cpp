@@ -157,7 +157,7 @@ void ScratchSpaceTest::do_SimpleScratchSpace_test() {
     auto simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("scratch_space_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -363,7 +363,7 @@ void ScratchSpaceTest::do_ScratchSpaceFailure_test() {
     auto simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("scratch_space_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -590,7 +590,7 @@ void ScratchSpaceTest::do_PilotJobScratchSpace_test() {
     auto simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("scratch_space_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -736,7 +736,7 @@ void ScratchSpaceTest::do_RaceConditionTest_test() {
     auto *simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("scratch_space_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -925,7 +925,7 @@ void ScratchSpaceTest::do_PartitionsTest_test() {
     auto *simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("scratch_space_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 

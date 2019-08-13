@@ -450,7 +450,7 @@ void StandardJobExecutorTest::do_StandardJobExecutorConstructorTest_test() {
     simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 
@@ -642,7 +642,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskTest_test() {
     simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 
@@ -821,7 +821,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskBogusPreFileCopyTest_test() {
     simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_tess");
 
     simulation->init(&argc, argv);
 
@@ -1000,7 +1000,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskMissingFileTest_test() {
     simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 
@@ -1208,7 +1208,7 @@ void StandardJobExecutorTest::do_DependentTasksTest_test() {
     simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 
@@ -1347,7 +1347,7 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase1_test() {
     simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_tes");
 
     simulation->init(&argc, argv);
 
@@ -1502,7 +1502,7 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase2_test() {
     simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 
@@ -1659,7 +1659,7 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase3_test() {
     simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 
@@ -2017,7 +2017,7 @@ void StandardJobExecutorTest::do_TwoMultiCoreTasksTest_test() {
     simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 
@@ -2294,7 +2294,7 @@ void StandardJobExecutorTest::do_MultiHostTest_test() {
     simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 
@@ -2453,7 +2453,7 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringAComputation_test() {
     simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 
@@ -2607,7 +2607,7 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringATransfer_test() {
     simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 
@@ -2783,7 +2783,7 @@ void StandardJobExecutorTest::do_JobTerminationTestAtRandomTimes_test() {
     simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 
@@ -2850,7 +2850,7 @@ void StandardJobExecutorTest::do_WorkUnit_test() {
     simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 
@@ -2982,7 +2982,7 @@ void StandardJobExecutorTest::do_NoTaskTest_test() {
     simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 

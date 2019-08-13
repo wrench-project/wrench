@@ -170,7 +170,7 @@ void S4U_DaemonTest::do_basic_Test() {
     auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("file_registry_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 
@@ -247,7 +247,7 @@ void S4U_DaemonTest::do_noCleanup_Test() {
     auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("file_registry_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 
