@@ -215,7 +215,7 @@ private:
                 this->doRandomAsynchronousFileCopy();
             } catch (wrench::WorkflowExecutionException &e) {
                 if (std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause())) {
-                    network_failure_2++;
+                    e.getCause()->toString();
                 }
             }
 
