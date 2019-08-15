@@ -1116,6 +1116,8 @@ private:
                 throw std::runtime_error(
                         "Got the expected exception and failure cause, but the failure cause does not point to the right job");
             }
+            cause->getJob();
+            cause->toString();
         }
 
         return 0;
