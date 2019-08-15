@@ -454,8 +454,8 @@ namespace wrench {
                 std::shared_ptr<ComputeThread> compute_thread;
                 try {
                     compute_thread = std::shared_ptr<ComputeThread>(
-                            new ComputeThread(this->simulation, S4U_Simulation::getHostName(), effective_flops,
-                                              tmp_mailbox));
+                            new ComputeThread(S4U_Simulation::getHostName(), effective_flops, tmp_mailbox));
+                    compute_thread->simulation = this->simulation;
                     compute_thread->start(compute_thread, true, false); // Daemonized, no auto-restart
                 } catch (std::exception &e) {
                     // Some internal SimGrid exceptions...????
