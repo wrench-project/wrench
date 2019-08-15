@@ -17,7 +17,7 @@
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(standard_job_executor_test, "Log category for Simple SandardJobExecutorTest");
+XBT_LOG_NEW_DEFAULT_CATEGORY(standard_job_executor_test, "Log category for Simple StandardJobExecutorTest");
 
 #define EPSILON 0.05
 
@@ -40,8 +40,6 @@ public:
     void do_OneMultiCoreTaskTestCase1_test();
     void do_OneMultiCoreTaskTestCase2_test();
     void do_OneMultiCoreTaskTestCase3_test();
-
-    void do_OneMultiCoreTaskTest_test();
 
     void do_DependentTasksTest_test();
 

@@ -8,8 +8,8 @@
  */
 
 
-#ifndef WRENCH_COMPUTETHREAD_H
-#define WRENCH_COMPUTETHREAD_H
+#ifndef WRENCH_COMPUTETHREADTEST_H
+#define WRENCH_COMPUTETHREADTEST_H
 
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
@@ -33,7 +33,7 @@ namespace wrench {
 
     public:
 
-        ComputeThread(Simulation *simulation, std::string hostname, double flops, std::string reply_mailbox);
+        ComputeThread(std::string hostname, double flops, std::string reply_mailbox);
 
         int main() override;
 
@@ -52,4 +52,4 @@ namespace wrench {
     /***********************/
 };
 
-#endif //WRENCH_COMPUTETHREAD_H
+#endif //WRENCH_COMPUTETHREADTEST_H
