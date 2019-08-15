@@ -1618,7 +1618,6 @@ private:
         try {
             message = wrench::S4U_Mailbox::getMessage(my_mailbox);
         } catch (std::shared_ptr<wrench::NetworkError> &cause) {
-            std::string error_msg = cause->toString();
             throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
         }
 

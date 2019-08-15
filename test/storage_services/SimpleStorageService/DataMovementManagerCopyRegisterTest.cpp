@@ -265,7 +265,7 @@ private:
         if (!this->test->dst_storage_service->lookupFile(this->test->src2_file_2, nullptr)) {
             throw std::runtime_error("Asynchronous file copy should have completed even though the FileRegistryService was down.");
         }
-        
+
         // Stop the data movement manager
         data_movement_manager->stop();
 
