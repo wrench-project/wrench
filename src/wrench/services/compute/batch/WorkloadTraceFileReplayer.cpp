@@ -92,7 +92,7 @@ namespace wrench {
             std::vector<WorkflowTask *> to_submit;
             for (int i = 0; i < num_nodes; i++) {
                 double time_fudge = 1; // 1 second seems to make it all work!
-                double task_flops = num_cores_per_node * (core_flop_rate * (time - time_fudge));
+                double task_flops = num_cores_per_node * (core_flop_rate * std::max<double>(0, time - time_fudge));
                 double parallel_efficiency = 1.0;
                 WorkflowTask *task = workflow->addTask(
                         this->getName() + "_job_" + std::to_string(job_count) + "_task_" + std::to_string(i),
