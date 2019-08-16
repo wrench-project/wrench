@@ -206,11 +206,12 @@ namespace wrench {
                     }
                     if ((requested_time < 0) or (time < 0)) {
                         throw std::invalid_argument(
-                                "TraceFileLoader::loadFromTraceFileSWF(): invalid job with negative flops and negative requested flops in batch workload trace file");
+                                "TraceFileLoader::loadFromTraceFileSWF(): invalid job with negative flops (" +
+                                std::to_string(time) + ") and negative requested flops ("+ std::to_string(requested_time) + ") in batch workload trace file");
                     }
                     if (requested_time < time) {
                         WRENCH_WARN(
-                                "TraceFileLoader::loadFromTraceFileSWF(): invalid job with requested time smaller than actual time in batch workload trace file [fixing it]");
+                                "TraceFileLoader::loadFromTraceFileSWF(): invalid job with requested time (%lf) smaller than actual time (%lf) in batch workload trace file [fixing it]", requested_time, time);
                         requested_time = time;
                     }
 
@@ -230,7 +231,7 @@ namespace wrench {
                     }
                 } catch (std::invalid_argument &e) {
                     if (ignore_invalid_jobs) {
-                        WRENCH_WARN("%s (in batch workload file %s)", e.what(), filename.c_str());
+                        WRENCH_WARN("%s (in batch workload file %s) IGNORING", e.what(), filename.c_str());
                         continue;
                     } else {
                         throw std::invalid_argument("Error while reading batch workload trace file " + filename + ": " +  e.what());
