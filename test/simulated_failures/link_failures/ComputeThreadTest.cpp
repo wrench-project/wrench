@@ -92,10 +92,35 @@ private:
 
         // Sleep 10 seconds and turn off link 23
         wrench::Simulation::sleep(10);
+
+        try {
+            wrench::S4U_Simulation::turnOffLink("bogus");
+            throw std::runtime_error("Should not be able to call turnOffLink on a boguys link");
+        } catch (std::invalid_argument &e) {
+
+        }
         wrench::Simulation::turnOffLink("23");
+
+        // Coverage
+        wrench::S4U_Simulation::isLinkOn("23");
+        try {
+            wrench::S4U_Simulation::isLinkOn("bogus");
+            throw std::runtime_error("Should not be able to call isLinkOn on a boguys link");
+        } catch (std::invalid_argument &e) {
+
+        }
 
         // Sleep 100 seconds
         wrench::Simulation::sleep(1000);
+
+
+        // Coverage
+        try {
+            wrench::S4U_Simulation::turnOnLink("bogus");
+            throw std::runtime_error("Should not be able to call turnOnLink on a boguys link");
+        } catch (std::invalid_argument &e) {
+
+        }
 
         // Done
         return 0;
