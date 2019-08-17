@@ -282,7 +282,17 @@ private:
         std::map<std::string, std::vector<std::string>> clusters =
                 wrench::Simulation::getHostnameListByCluster();
 
+        cs->suspend();
+        cs->suspend();
+        cs->resume();
         cs->stop();
+        cs->suspend();
+
+        try {
+            cs->resume();
+            throw std::runtime_error("Should not be able to resume a service that's down");
+        } catch (wrench::WorkflowExecutionException &e) {
+        }
 
         data_movement_manager->kill();
         job_manager->kill();
@@ -337,6 +347,7 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     // Try to get a bogus property as string or double
     ASSERT_THROW(storage_service->getPropertyValueAsString("BOGUS"), std::invalid_argument);
     ASSERT_THROW(storage_service->getPropertyValueAsDouble("BOGUS"), std::invalid_argument);
+    ASSERT_THROW(storage_service->getPropertyValueAsUnsignedLong("BOGUS"), std::invalid_argument);
     ASSERT_THROW(storage_service->getPropertyValueAsBoolean("BOGUS"), std::invalid_argument);
 
     ASSERT_THROW(storage_service->getMessagePayloadValue("BOGUS"), std::invalid_argument);
@@ -347,7 +358,14 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     std::vector<std::string> execution_hosts = {"QuadCoreHost"};
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::CloudComputeService(hostname, execution_hosts, 100.0,
-                                            { {wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
+                                            { {wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"},
+                                              {wrench::BareMetalComputeServiceProperty::THREAD_STARTUP_OVERHEAD, "0"}
+                                              })));
+
+    // Try to get the property in bogus ways, for coverage
+    ASSERT_THROW(compute_service->getPropertyValueAsDouble(wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS), std::invalid_argument);
+    ASSERT_THROW(compute_service->getPropertyValueAsUnsignedLong(wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS), std::invalid_argument);
+    ASSERT_THROW(compute_service->getPropertyValueAsBoolean(wrench::BareMetalComputeServiceProperty::THREAD_STARTUP_OVERHEAD), std::invalid_argument);
 
     // Try to get a message payload value, just for kicks
     ASSERT_NO_THROW(compute_service->getMessagePayloadValue(wrench::ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD));
@@ -378,7 +396,12 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     ASSERT_THROW(simulation->stageFile(input_file, storage_service), std::runtime_error);
 
     // Create a file registry
-    ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
+    std::shared_ptr<wrench::FileRegistryService> file_registry_service;
+    ASSERT_NO_THROW(file_registry_service = simulation->add(new wrench::FileRegistryService(hostname)));
+
+    // Set the file registry's timeout value
+    file_registry_service->setNetworkTimeoutValue(100.0);
+    file_registry_service->getNetworkTimeoutValue();
 
     // Staging an invalid file on the storage service
     ASSERT_THROW(simulation->stageFile(output_file1, storage_service), std::runtime_error);
