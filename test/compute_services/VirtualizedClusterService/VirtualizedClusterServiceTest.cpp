@@ -1478,6 +1478,10 @@ private:
         wrench::Simulation::sleep(10);
         WRENCH_INFO("DESTROYING  THE VM");
         cloud_service->destroyVM(vm_name);
+        try {
+            cloud_service->destroyVM(vm_name);
+            throw std::runtime_error("Shouldn't be able to destroy an already destroyed VM");
+        } catch (std::invalid_argument &e) {}
 
         return 0;
     }
