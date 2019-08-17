@@ -241,7 +241,7 @@ namespace wrench {
             this->startDaemon(daemonize, auto_restart);
             // Print some information a out the currently tracked daemons
             WRENCH_DEBUG("MAP SIZE = %ld    NUM_TERMINATED_SERVICES = %ld",
-                        Service::service_shared_ptr_map.size(), Service::num_terminated_services);
+                         Service::service_shared_ptr_map.size(), Service::num_terminated_services);
             if ((Service::service_shared_ptr_map.size() > 1000) or
                 (Service::num_terminated_services > Service::service_shared_ptr_map.size() / 2)) {
                 Service::cleanupTrackedServices();
@@ -323,11 +323,14 @@ namespace wrench {
 
     /**
       * @brief Resume the service
+      *
+      * @throw WorkflowExecutionException
       */
     void Service::resume() {
         if (this->state != Service::SUSPENDED) {
-            throw std::runtime_error(
-                    "Service::resume(): Service cannot be resumed because it is not in the suspended state");
+            std::string what = "Service cannot be resumed because it is not in the suspended state";
+            throw WorkflowExecutionException(std::shared_ptr<NotAllowed>(
+                    new NotAllowed(this->getSharedPtr<Service>(), what)));
         }
         this->resumeActor();
         this->state = Service::UP;
