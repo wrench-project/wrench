@@ -13,6 +13,7 @@
 
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
+#include "../../src/wrench/services/compute/work_unit_executor/ComputeThread.h"
 
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
@@ -56,6 +57,8 @@ public:
     void do_JobTerminationTestAtRandomTimes_test();
 
     void do_WorkUnit_test();
+
+    void do_ComputeThread_test();
 
     static bool isJustABitGreater(double base, double variable) {
         return ((variable > base) && (variable < base + EPSILON));
@@ -2584,10 +2587,10 @@ private:
 
             // We should be good now, with nothing running
 
-        this->getWorkflow()->removeTask(task1);
-        this->getWorkflow()->removeTask(task2);
-        this->getWorkflow()->removeTask(task3);
-        this->getWorkflow()->removeTask(task4);
+            this->getWorkflow()->removeTask(task1);
+            this->getWorkflow()->removeTask(task2);
+            this->getWorkflow()->removeTask(task3);
+            this->getWorkflow()->removeTask(task4);
         }
 
         return 0;
@@ -2869,10 +2872,6 @@ void StandardJobExecutorTest::do_WorkUnit_test() {
                                                                                (std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>>){});
 
 
-
-
-
-
     ASSERT_THROW(wrench::Workunit::addDependency(wu1, nullptr), std::invalid_argument);
     ASSERT_THROW(wrench::Workunit::addDependency(nullptr, wu2), std::invalid_argument);
 
@@ -2916,17 +2915,14 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-
-        // Create a StandardJob with both tasks
+        // Create a StandardJob
         wrench::StandardJob *job = job_manager->createStandardJob(
                 {},
                 {},
                 {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
                         this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
                         this->test->storage_service2)},
-                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
-                        this->getWorkflow()->getFileByID("input_file"), this->test->storage_service2,
-                        this->test->storage_service2)},
+                {},
                 {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
                                                                                              this->test->storage_service2)}
         );
@@ -3007,7 +3003,7 @@ void StandardJobExecutorTest::do_NoTaskTest_test() {
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new TwoMultiCoreTasksTestWMS(
+            new NoTaskTestWMS(
                     this, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));

@@ -25,7 +25,6 @@ public:
 
     void do_LinkFailure_test();
 
-
 protected:
     ComputeThreadLinkFailureTest() {
 
@@ -160,5 +159,6 @@ void ComputeThreadLinkFailureTest::do_LinkFailure_test() {
     free(argv[0]);
     free(argv);
 }
+
 
 
