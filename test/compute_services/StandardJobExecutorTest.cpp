@@ -929,6 +929,9 @@ private:
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("output_file"),
                                                                                                  this->test->storage_service2)});
 
+            job->getFileLocations(); // coverage
+            job->getMinimumRequiredNumCores(); // coverage
+            job->getPriority(); // coverage
 
             std::string my_mailbox = "test_callback_mailbox";
 
