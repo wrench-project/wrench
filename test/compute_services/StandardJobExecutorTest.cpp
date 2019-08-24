@@ -332,7 +332,6 @@ private:
 
 
         this->getWorkflow()->removeTask(task_too_many_cores);
-        WRENCH_INFO("HERE");
         wrench::WorkflowTask *task_too_much_ram = this->getWorkflow()->addTask("task_too_much_ram", 3600, 1, 1, 1.0, 500.00);
         task_too_much_ram->addInputFile(this->getWorkflow()->getFileByID("input_file"));
         task_too_much_ram->addOutputFile(this->getWorkflow()->getFileByID("output_file"));

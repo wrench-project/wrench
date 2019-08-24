@@ -74,6 +74,8 @@ namespace wrench {
             throw std::invalid_argument("WorkunitExecutor::WorkunitExecutor(): thread_startup_overhead must be >= 0");
         }
 
+
+
         this->callback_mailbox = callback_mailbox;
         this->workunit = workunit;
         this->thread_startup_overhead = thread_startup_overhead;
@@ -163,28 +165,68 @@ namespace wrench {
         SimulationMessage *msg_to_send_back = nullptr;
         bool success;
 
-        try {
-            S4U_Simulation::computeZeroFlop();
-
-            performWork(this->workunit.get());
-
-            // build "success!" message
-            success = true;
-            msg_to_send_back = new WorkunitExecutorDoneMessage(
-                    this->getSharedPtr<WorkunitExecutor>(),
-                    this->workunit,
-                    0.0);
-
-        } catch (WorkflowExecutionException &e) {
-
-            // build "failed!" message
-            WRENCH_DEBUG("Got an exception while performing work: %s", e.getCause()->toString().c_str());
+        // Check that there is no Scratch Space weirdness
+        bool scratch_space_ok = true;
+        if (this->scratch_space == nullptr) {
+            for (auto const &pfc : workunit->pre_file_copies) {
+                if ((std::get<1>(pfc) == ComputeService::SCRATCH) ||
+                    (std::get<2>(pfc) == ComputeService::SCRATCH)) {
+                    scratch_space_ok = false;
+                    break;
+                }
+            }
+            for (auto const &fl : workunit->file_locations) {
+                if (std::get<1>(fl) == ComputeService::SCRATCH) {
+                    scratch_space_ok = false;
+                    break;
+                }
+            }
+            for (auto const &pfc : workunit->post_file_copies) {
+                if ((std::get<1>(pfc) == ComputeService::SCRATCH) ||
+                    (std::get<2>(pfc) == ComputeService::SCRATCH)) {
+                    scratch_space_ok = false;
+                    break;
+                }
+            }
+            for (auto const &cd : workunit->cleanup_file_deletions) {
+                if (std::get<1>(cd) == ComputeService::SCRATCH) {
+                    scratch_space_ok = false;
+                    break;
+                }
+            }
+        }
+        if (not scratch_space_ok) {
             success = false;
             msg_to_send_back = new WorkunitExecutorFailedMessage(
                     this->getSharedPtr<WorkunitExecutor>(),
                     this->workunit,
-                    e.getCause(),
+                    std::shared_ptr<NoScratchSpace>(new NoScratchSpace("No scratch space on compute service")),
                     0.0);
+        } else {
+
+            try {
+                S4U_Simulation::computeZeroFlop();
+
+                performWork(this->workunit.get());
+
+                // build "success!" message
+                success = true;
+                msg_to_send_back = new WorkunitExecutorDoneMessage(
+                        this->getSharedPtr<WorkunitExecutor>(),
+                        this->workunit,
+                        0.0);
+
+            } catch (WorkflowExecutionException &e) {
+
+                // build "failed!" message
+                WRENCH_DEBUG("Got an exception while performing work: %s", e.getCause()->toString().c_str());
+                success = false;
+                msg_to_send_back = new WorkunitExecutorFailedMessage(
+                        this->getSharedPtr<WorkunitExecutor>(),
+                        this->workunit,
+                        e.getCause(),
+                        0.0);
+            }
         }
 
         WRENCH_INFO("Work unit executor on host %s terminating!", S4U_Simulation::getHostName().c_str());
@@ -236,20 +278,11 @@ namespace wrench {
             //Even in the pre-file copies, the src can be the scratch itself???
             std::shared_ptr<StorageService> src = std::get<1>(file_copy);
             if (src == ComputeService::SCRATCH) {
-                if (this->scratch_space == nullptr) {
-                    throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new NoScratchSpace(
-                            "WorkunitExecutor::performWork(): Scratch Space was asked to be used as source but is null")));
-                }
                 src = this->scratch_space;
             }
             std::shared_ptr<StorageService> dst = std::get<2>(file_copy);
             if (dst == ComputeService::SCRATCH) {
-                if (this->scratch_space == nullptr) {
-                    throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new NoScratchSpace(
-                            "WorkunitExecutor::performWork(): Scratch Space was asked to be used as destination but is null")));
-                } else {
-                    dst = this->scratch_space;
-                }
+                dst = this->scratch_space;
             }
 
             if ((file == nullptr) || (src == nullptr) || (dst == nullptr)) {
