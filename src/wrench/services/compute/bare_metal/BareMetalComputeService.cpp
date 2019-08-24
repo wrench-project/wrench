@@ -703,8 +703,7 @@ namespace wrench {
             /** Dispatch it **/
             // Create a workunit executor on the target host
             std::shared_ptr<WorkunitExecutor> workunit_executor = std::shared_ptr<WorkunitExecutor>(
-                    new WorkunitExecutor(this->simulation,
-                                         target_host,
+                    new WorkunitExecutor(target_host,
                                          target_num_cores,
                                          required_ram,
                                          this->mailbox_name,
