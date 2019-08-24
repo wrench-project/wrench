@@ -33,7 +33,8 @@ public:
     wrench::Simulation *simulation;
 
 
-    void do_WorkunitExecutorConstructorTest_test();
+    void do_WorkunitExecutorConstructor_test();
+    void do_WorkunitExecutorBadScratchSpace_test();
 
 
 protected:
@@ -161,10 +162,10 @@ private:
 };
 
 TEST_F(WorkunitExecutorTest, ConstructorTest) {
-    DO_TEST_WITH_FORK(do_WorkunitExecutorConstructorTest_test);
+    DO_TEST_WITH_FORK(do_WorkunitExecutorConstructor_test);
 }
 
-void WorkunitExecutorTest::do_WorkunitExecutorConstructorTest_test() {
+void WorkunitExecutorTest::do_WorkunitExecutorConstructor_test() {
 
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
@@ -199,6 +200,267 @@ void WorkunitExecutorTest::do_WorkunitExecutorConstructorTest_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
             new WorkunitExecutorConstructorTestWMS(
+                    this,  {compute_service}, {storage_service1, storage_service2}, hostname)));
+
+    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
+
+    simulation->add(new wrench::FileRegistryService(hostname));
+
+    // Create two workflow files
+    wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000000.0);
+    wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
+
+    // Staging the input_file on the storage service
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+
+    // Running a "run a single task" simulation
+    // Note that in these tests the WMS creates workflow tasks, which a user would
+    // of course not be likely to do
+    ASSERT_NO_THROW(simulation->launch());
+
+    delete simulation;
+
+    free(argv[0]);
+    free(argv);
+}
+
+
+
+/**********************************************************************/
+/**  BAD SCRATCH TEST                                                **/
+/**********************************************************************/
+
+class WorkunitExecutorBadScratchSpaceTestWMS : public wrench::WMS {
+
+public:
+    WorkunitExecutorBadScratchSpaceTestWMS(WorkunitExecutorTest *test,
+                                           const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                           const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                                           std::string hostname) :
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
+        this->test = test;
+    }
+
+
+private:
+
+    WorkunitExecutorTest *test;
+
+    int main() {
+        auto input_file = this->getWorkflow()->getFileByID("input_file");
+        auto output_file = this->getWorkflow()->getFileByID("output_file");
+
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+        // Create some  standard job
+        auto task = this->getWorkflow()->addTask("task", 3600, 1, 1, 1.0, 0);
+        task->addInputFile(input_file);
+        task->addOutputFile(output_file);
+        auto job = job_manager->createStandardJob(
+                {task},
+                {},
+                {},
+                {},
+                {});
+
+        std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>> pre_file_copies;
+        std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>> file_locations;
+        std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService> >> post_file_copies;
+        std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService> >> cleanup_file_deletions;
+
+        /** BOGUS PRE **/
+        {
+            pre_file_copies.insert(
+                    std::make_tuple(input_file, this->test->storage_service1, wrench::ComputeService::SCRATCH));
+            file_locations[input_file] = this->test->storage_service2;
+            file_locations[output_file] = this->test->storage_service2;
+            post_file_copies.insert(
+                    std::make_tuple(output_file, this->test->storage_service2, this->test->storage_service1));
+            cleanup_file_deletions.insert(std::make_tuple(input_file, this->test->storage_service2));
+
+            auto wu = std::shared_ptr<wrench::Workunit>(new wrench::Workunit(
+                    job,
+                    pre_file_copies,
+                    task,
+                    file_locations,
+                    post_file_copies,
+                    cleanup_file_deletions
+            ));
+
+            auto wue = std::shared_ptr<wrench::WorkunitExecutor>(
+                    new wrench::WorkunitExecutor(this->hostname, 1, 1, this->mailbox_name,
+                                                 wu, nullptr, job, 1, true));
+            wue->simulation = this->simulation;
+            wue->start(wue, true, false);
+
+            auto msg = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
+            if (not std::dynamic_pointer_cast<wrench::WorkunitExecutorFailedMessage>(msg)) {
+                throw std::runtime_error("Was expecting a WorkunitExecutorFailedMessage message!");
+            } else {
+                auto real_msg = std::dynamic_pointer_cast<wrench::WorkunitExecutorFailedMessage>(msg);
+                if (not std::dynamic_pointer_cast<wrench::NoScratchSpace>(real_msg->cause)) {
+                    throw std::runtime_error(
+                            "Got the expected WorkunitExecutorFailedMessage message but not the expected NoScratchSpace failure cause");
+                }
+            }
+        }
+
+        /** BOGUS MAP **/
+        {
+            pre_file_copies.insert(
+                    std::make_tuple(input_file, this->test->storage_service1, this->test->storage_service2));
+            file_locations[input_file] = this->test->storage_service2;
+            file_locations[output_file] = wrench::ComputeService::SCRATCH;
+            post_file_copies.insert(
+                    std::make_tuple(output_file, this->test->storage_service2, this->test->storage_service1));
+            cleanup_file_deletions.insert(std::make_tuple(input_file, this->test->storage_service2));
+
+            auto wu = std::shared_ptr<wrench::Workunit>(new wrench::Workunit(
+                    job,
+                    pre_file_copies,
+                    task,
+                    file_locations,
+                    post_file_copies,
+                    cleanup_file_deletions
+            ));
+
+            auto wue = std::shared_ptr<wrench::WorkunitExecutor>(
+                    new wrench::WorkunitExecutor(this->hostname, 1, 1, this->mailbox_name,
+                                                 wu, nullptr, job, 1, true));
+            wue->simulation = this->simulation;
+            wue->start(wue, true, false);
+
+            auto msg = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
+            if (not std::dynamic_pointer_cast<wrench::WorkunitExecutorFailedMessage>(msg)) {
+                throw std::runtime_error("Was expecting a WorkunitExecutorFailedMessage message!");
+            } else {
+                auto real_msg = std::dynamic_pointer_cast<wrench::WorkunitExecutorFailedMessage>(msg);
+                if (not std::dynamic_pointer_cast<wrench::NoScratchSpace>(real_msg->cause)) {
+                    throw std::runtime_error(
+                            "Got the expected WorkunitExecutorFailedMessage message but not the expected NoScratchSpace failure cause");
+                }
+            }
+        }
+
+        /** BOGUS POST **/
+        {
+            pre_file_copies.insert(
+                    std::make_tuple(input_file, this->test->storage_service1, this->test->storage_service2));
+            file_locations[input_file] = this->test->storage_service2;
+            file_locations[output_file] = this->test->storage_service2;
+            post_file_copies.insert(
+                    std::make_tuple(output_file, wrench::ComputeService::SCRATCH, this->test->storage_service1));
+            cleanup_file_deletions.insert(std::make_tuple(input_file, this->test->storage_service2));
+
+            auto wu = std::shared_ptr<wrench::Workunit>(new wrench::Workunit(
+                    job,
+                    pre_file_copies,
+                    task,
+                    file_locations,
+                    post_file_copies,
+                    cleanup_file_deletions
+            ));
+
+            auto wue = std::shared_ptr<wrench::WorkunitExecutor>(
+                    new wrench::WorkunitExecutor(this->hostname, 1, 1, this->mailbox_name,
+                                                 wu, nullptr, job, 1, true));
+            wue->simulation = this->simulation;
+            wue->start(wue, true, false);
+
+            auto msg = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
+            if (not std::dynamic_pointer_cast<wrench::WorkunitExecutorFailedMessage>(msg)) {
+                throw std::runtime_error("Was expecting a WorkunitExecutorFailedMessage message!");
+            } else {
+                auto real_msg = std::dynamic_pointer_cast<wrench::WorkunitExecutorFailedMessage>(msg);
+                if (not std::dynamic_pointer_cast<wrench::NoScratchSpace>(real_msg->cause)) {
+                    throw std::runtime_error(
+                            "Got the expected WorkunitExecutorFailedMessage message but not the expected NoScratchSpace failure cause");
+                }
+            }
+        }
+
+        /** BOGUS CLEANUP **/
+        {
+            pre_file_copies.insert(
+                    std::make_tuple(input_file, this->test->storage_service1, this->test->storage_service2));
+            file_locations[input_file] = this->test->storage_service2;
+            file_locations[output_file] = this->test->storage_service2;
+            post_file_copies.insert(
+                    std::make_tuple(output_file, this->test->storage_service2, this->test->storage_service1));
+            cleanup_file_deletions.insert(std::make_tuple(input_file, wrench::ComputeService::SCRATCH));
+
+            auto wu = std::shared_ptr<wrench::Workunit>(new wrench::Workunit(
+                    job,
+                    pre_file_copies,
+                    task,
+                    file_locations,
+                    post_file_copies,
+                    cleanup_file_deletions
+            ));
+
+            auto wue = std::shared_ptr<wrench::WorkunitExecutor>(
+                    new wrench::WorkunitExecutor(this->hostname, 1, 1, this->mailbox_name,
+                                                 wu, nullptr, job, 1, true));
+            wue->simulation = this->simulation;
+            wue->start(wue, true, false);
+
+            auto msg = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
+            if (not std::dynamic_pointer_cast<wrench::WorkunitExecutorFailedMessage>(msg)) {
+                throw std::runtime_error("Was expecting a WorkunitExecutorFailedMessage message!");
+            } else {
+                auto real_msg = std::dynamic_pointer_cast<wrench::WorkunitExecutorFailedMessage>(msg);
+                if (not std::dynamic_pointer_cast<wrench::NoScratchSpace>(real_msg->cause)) {
+                    throw std::runtime_error(
+                            "Got the expected WorkunitExecutorFailedMessage message but not the expected NoScratchSpace failure cause");
+                }
+            }
+        }
+
+
+        return 0;
+    }
+};
+
+TEST_F(WorkunitExecutorTest, BadScratchSpaceTest) {
+    DO_TEST_WITH_FORK(do_WorkunitExecutorBadScratchSpace_test);
+}
+
+void WorkunitExecutorTest::do_WorkunitExecutorBadScratchSpace_test() {
+
+    // Create and initialize a simulation
+    simulation = new wrench::Simulation();
+    int argc = 1;
+    char **argv = (char **) calloc(1, sizeof(char *));
+    argv[0] = strdup("unit_test");
+
+    simulation->init(&argc, argv);
+
+    // Setting up the platform
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    // Get a hostname
+    std::string hostname = simulation->getHostnameList()[0];
+
+    // Create a Compute Service
+    std::shared_ptr<wrench::ComputeService> compute_service;
+    ASSERT_NO_THROW(compute_service = simulation->add(
+            new wrench::BareMetalComputeService(hostname,
+                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                {})));
+
+    // Create a Storage Service
+    ASSERT_NO_THROW(storage_service1 = simulation->add(
+            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+
+    // Create another Storage Service
+    ASSERT_NO_THROW(storage_service2 = simulation->add(
+            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+
+    // Create a WMS
+    std::shared_ptr<wrench::WMS> wms = nullptr;
+    ASSERT_NO_THROW(wms = simulation->add(
+            new WorkunitExecutorBadScratchSpaceTestWMS(
                     this,  {compute_service}, {storage_service1, storage_service2}, hostname)));
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));

@@ -136,7 +136,6 @@ private:
         }
 
         // Shutdown the proximity service
-        WRENCH_INFO("SHUTTING DOWN THE NPS");
         (*network_proximity_service)->stop();
 
         try {

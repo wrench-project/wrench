@@ -67,7 +67,6 @@ protected:
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
-        WRENCH_INFO("CREATED FILE %s", platform_file_path.c_str());
 
     }
 
@@ -202,15 +201,11 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobBrokenEstimateW
     auto argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("batch_service_test");
 
-    WRENCH_INFO("HERE");
-
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
-    WRENCH_INFO("HERE2: %s", platform_file_path.c_str());
     // Setting up the platform
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
-    WRENCH_INFO("HERE3");
     // Get a hostname
     std::string hostname = "Host1";
 
@@ -234,9 +229,6 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobBrokenEstimateW
                                                     {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "easy_bf"}
                                             })));
 
-    WRENCH_INFO("HERE");
-
-
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(new BatchJobBrokenEstimateWaitingTimeTestWMS(
@@ -256,15 +248,10 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobBrokenEstimateW
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-    WRENCH_INFO("HERE");
-
-
     // Running a "run a single task" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
-
-    WRENCH_INFO("HERE");
 
     delete simulation;
 
