@@ -58,8 +58,6 @@ public:
 
     void do_WorkUnit_test();
 
-    void do_ComputeThread_test();
-
     static bool isJustABitGreater(double base, double variable) {
         return ((variable > base) && (variable < base + EPSILON));
     }
@@ -290,13 +288,10 @@ private:
 
 
         // Create a bogus StandardJobExecutor (not enough Cores specified)
-        WRENCH_INFO("REMOGING TASK");
         this->getWorkflow()->removeTask(task);
         wrench::WorkflowTask *task_too_many_cores = this->getWorkflow()->addTask("task_too_many_cores", 3600, 20, 20, 1.0, 0);
         task_too_many_cores->addInputFile(this->getWorkflow()->getFileByID("input_file"));
-        WRENCH_INFO("HERE1");
         task_too_many_cores->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
-        WRENCH_INFO("HERE1");
 //        // Forget the previous job!
         job_manager->forgetJob(job);
 

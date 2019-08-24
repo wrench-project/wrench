@@ -264,6 +264,7 @@ set(TEST_FILES
         test/compute_services/BareMetalComputeService/BareMetalComputeServiceTestPilotJobs.cpp
         test/compute_services/BareMetalComputeService/BareMetalComputeServiceSchedulingTest.cpp
         test/compute_services/StandardJobExecutorTest.cpp
+        test/compute_services/WorkunitExecutorTest.cpp
         test/compute_services/BareMetalComputeService/BareMetalComputeServiceResourceInformationTest.cpp
         test/compute_services/BatchService/BatchServiceTest.cpp
         test/compute_services/BatchService/BatchServiceFCFSTest.cpp

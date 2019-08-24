@@ -39,7 +39,6 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param simulation: a pointer to the simulation object
      * @param hostname: the name of the host on which the workunit execution will run
      * @param num_cores: the number of cores available to the workunit executor
      * @param ram_utilization: the number of bytes of RAM used by the service
@@ -51,7 +50,6 @@ namespace wrench {
      * @param simulate_computation_as_sleep: simulate computation as a sleep instead of an actual compute thread (for simulation scalability reasons)
      */
     WorkunitExecutor::WorkunitExecutor(
-            Simulation *simulation,
             std::string hostname,
             unsigned long num_cores,
             double ram_utilization,
@@ -63,14 +61,19 @@ namespace wrench {
             bool simulate_computation_as_sleep) :
             Service(hostname, "workunit_executor", "workunit_executor") {
 
-        if (thread_startup_overhead < 0) {
-            throw std::invalid_argument("WorkunitExecutor::WorkunitExecutor(): thread_startup_overhead must be >= 0");
-        }
         if (num_cores < 1) {
             throw std::invalid_argument("WorkunitExecutor::WorkunitExecutor(): num_cores must be >= 1");
         }
+        if (ram_utilization < 0) {
+            throw std::invalid_argument("WorkunitExecutor::WorkunitExecutor(): ram_utilization must be >= 0");
+        }
+        if (workunit == nullptr) {
+            throw std::invalid_argument("WorkunitExecutor::WorkunitExecutor(): workunit cannot be nullptr");
+        }
+        if (thread_startup_overhead < 0) {
+            throw std::invalid_argument("WorkunitExecutor::WorkunitExecutor(): thread_startup_overhead must be >= 0");
+        }
 
-        this->simulation = simulation;
         this->callback_mailbox = callback_mailbox;
         this->workunit = workunit;
         this->thread_startup_overhead = thread_startup_overhead;
