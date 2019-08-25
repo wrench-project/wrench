@@ -33,6 +33,7 @@ public:
     wrench::Simulation *simulation;
 
 
+    void do_WorkunitConstructor_test();
     void do_WorkunitExecutorConstructor_test();
     void do_WorkunitExecutorBadScratchSpace_test();
 
@@ -74,7 +75,204 @@ protected:
 
 
 /**********************************************************************/
-/**  DO CONSTRUCTOR TEST                                             **/
+/**  DO WORKUNIT CONSTRUCTOR TEST                                    **/
+/**********************************************************************/
+
+
+TEST_F(WorkunitExecutorTest, WorkunitConstructorTest) {
+    DO_TEST_WITH_FORK(do_WorkunitConstructor_test);
+}
+
+void WorkunitExecutorTest::do_WorkunitConstructor_test() {
+
+    // Create and initialize a simulation
+    simulation = new wrench::Simulation();
+    int argc = 1;
+    char **argv = (char **) calloc(1, sizeof(char *));
+    argv[0] = strdup("unit_test");
+
+    simulation->init(&argc, argv);
+
+    // Setting up the platform
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    // Get a hostname
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
+
+    // Create a Storage Service
+    ASSERT_NO_THROW(storage_service1 = simulation->add(
+            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+
+    // Create another Storage Service
+    ASSERT_NO_THROW(storage_service2 = simulation->add(
+            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+
+    // Create workflow filess
+    wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000000.0);
+    wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 10000000.0);
+
+    // Create a task
+    auto task = this->workflow->addTask("task", 1.0, 1, 1, 1.0, 1.0);
+
+    {
+        std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>> pre_file_copies;
+        std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>> file_locations;
+        std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService> >> post_file_copies;
+        std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService> >> cleanup_file_deletions;
+
+        pre_file_copies.insert(std::make_tuple(input_file, this->storage_service1, this->storage_service2));
+        file_locations[input_file] = this->storage_service2;
+        post_file_copies.insert(std::make_tuple(output_file, this->storage_service2, this->storage_service1));
+        cleanup_file_deletions.insert(std::make_tuple(input_file, this->storage_service2));
+
+        ASSERT_NO_THROW(new wrench::Workunit((wrench::StandardJob *)666,
+                                             pre_file_copies, task, file_locations,
+                                             post_file_copies, cleanup_file_deletions));
+    }
+    {
+        std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>> pre_file_copies;
+        std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>> file_locations;
+        std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService> >> post_file_copies;
+        std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService> >> cleanup_file_deletions;
+
+        pre_file_copies.insert(std::make_tuple(nullptr, this->storage_service1, this->storage_service2));
+        file_locations[input_file] = this->storage_service2;
+        post_file_copies.insert(std::make_tuple(output_file, this->storage_service2, this->storage_service1));
+        cleanup_file_deletions.insert(std::make_tuple(input_file, this->storage_service2));
+
+        ASSERT_THROW(new wrench::Workunit((wrench::StandardJob *)666,
+                                          pre_file_copies, task, file_locations,
+                                          post_file_copies, cleanup_file_deletions), std::invalid_argument);
+    }
+    {
+        std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>> pre_file_copies;
+        std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>> file_locations;
+        std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService> >> post_file_copies;
+        std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService> >> cleanup_file_deletions;
+
+        pre_file_copies.insert(std::make_tuple(input_file, nullptr, this->storage_service2));
+        file_locations[input_file] = this->storage_service2;
+        post_file_copies.insert(std::make_tuple(output_file, this->storage_service2, this->storage_service1));
+        cleanup_file_deletions.insert(std::make_tuple(input_file, this->storage_service2));
+
+        ASSERT_THROW(new wrench::Workunit((wrench::StandardJob *)666,
+                                          pre_file_copies, task, file_locations,
+                                          post_file_copies, cleanup_file_deletions), std::invalid_argument);
+    }
+    {
+        std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>> pre_file_copies;
+        std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>> file_locations;
+        std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService> >> post_file_copies;
+        std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService> >> cleanup_file_deletions;
+
+        pre_file_copies.insert(std::make_tuple(input_file, this->storage_service1, nullptr));
+        file_locations[input_file] = this->storage_service2;
+        post_file_copies.insert(std::make_tuple(output_file, this->storage_service2, this->storage_service1));
+        cleanup_file_deletions.insert(std::make_tuple(input_file, this->storage_service2));
+
+        ASSERT_THROW(new wrench::Workunit((wrench::StandardJob *)666,
+                                          pre_file_copies, task, file_locations,
+                                          post_file_copies, cleanup_file_deletions), std::invalid_argument);
+    }
+    {
+        std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>> pre_file_copies;
+        std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>> file_locations;
+        std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService> >> post_file_copies;
+        std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService> >> cleanup_file_deletions;
+
+        pre_file_copies.insert(std::make_tuple(input_file, this->storage_service1, this->storage_service2));
+        file_locations[input_file] = nullptr;
+        post_file_copies.insert(std::make_tuple(output_file, this->storage_service2, this->storage_service1));
+        cleanup_file_deletions.insert(std::make_tuple(input_file, this->storage_service2));
+
+        ASSERT_THROW(new wrench::Workunit((wrench::StandardJob *)666,
+                                          pre_file_copies, task, file_locations,
+                                          post_file_copies, cleanup_file_deletions), std::invalid_argument);
+    }
+    {
+        std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>> pre_file_copies;
+        std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>> file_locations;
+        std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService> >> post_file_copies;
+        std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService> >> cleanup_file_deletions;
+
+        pre_file_copies.insert(std::make_tuple(input_file, this->storage_service1, this->storage_service2));
+        file_locations[input_file] = this->storage_service2;
+        post_file_copies.insert(std::make_tuple(nullptr, this->storage_service2, this->storage_service1));
+        cleanup_file_deletions.insert(std::make_tuple(input_file, this->storage_service2));
+
+        ASSERT_THROW(new wrench::Workunit((wrench::StandardJob *)666,
+                                          pre_file_copies, task, file_locations,
+                                          post_file_copies, cleanup_file_deletions), std::invalid_argument);
+    }
+    {
+        std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>> pre_file_copies;
+        std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>> file_locations;
+        std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService> >> post_file_copies;
+        std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService> >> cleanup_file_deletions;
+
+        pre_file_copies.insert(std::make_tuple(input_file, this->storage_service1, this->storage_service2));
+        file_locations[input_file] = this->storage_service2;
+        post_file_copies.insert(std::make_tuple(output_file, nullptr, this->storage_service1));
+        cleanup_file_deletions.insert(std::make_tuple(input_file, this->storage_service2));
+
+        ASSERT_THROW(new wrench::Workunit((wrench::StandardJob *)666,
+                                          pre_file_copies, task, file_locations,
+                                          post_file_copies, cleanup_file_deletions), std::invalid_argument);
+    }
+    {
+        std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>> pre_file_copies;
+        std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>> file_locations;
+        std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService> >> post_file_copies;
+        std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService> >> cleanup_file_deletions;
+
+        pre_file_copies.insert(std::make_tuple(input_file, this->storage_service1, this->storage_service2));
+        file_locations[input_file] = this->storage_service2;
+        post_file_copies.insert(std::make_tuple(output_file, this->storage_service2, nullptr));
+        cleanup_file_deletions.insert(std::make_tuple(input_file, this->storage_service2));
+
+        ASSERT_THROW(new wrench::Workunit((wrench::StandardJob *)666,
+                                          pre_file_copies, task, file_locations,
+                                          post_file_copies, cleanup_file_deletions), std::invalid_argument);
+    }
+    {
+        std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>> pre_file_copies;
+        std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>> file_locations;
+        std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService> >> post_file_copies;
+        std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService> >> cleanup_file_deletions;
+
+        pre_file_copies.insert(std::make_tuple(input_file, this->storage_service1, this->storage_service2));
+        file_locations[input_file] = this->storage_service2;
+        post_file_copies.insert(std::make_tuple(output_file, this->storage_service2, this->storage_service1));
+        cleanup_file_deletions.insert(std::make_tuple(nullptr, this->storage_service2));
+
+        ASSERT_THROW(new wrench::Workunit((wrench::StandardJob *)666,
+                                          pre_file_copies, task, file_locations,
+                                          post_file_copies, cleanup_file_deletions), std::invalid_argument);
+    }
+    {
+        std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>> pre_file_copies;
+        std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>> file_locations;
+        std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService> >> post_file_copies;
+        std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService> >> cleanup_file_deletions;
+
+        pre_file_copies.insert(std::make_tuple(input_file, this->storage_service1, this->storage_service2));
+        file_locations[input_file] = this->storage_service2;
+        post_file_copies.insert(std::make_tuple(output_file, this->storage_service2, this->storage_service1));
+        cleanup_file_deletions.insert(std::make_tuple(input_file, nullptr));
+
+        ASSERT_THROW(new wrench::Workunit((wrench::StandardJob *)666,
+                                          pre_file_copies, task, file_locations,
+                                          post_file_copies, cleanup_file_deletions), std::invalid_argument);
+    }
+
+    free(argv[0]);
+    free(argv);
+}
+
+
+
+/**********************************************************************/
+/**  DO WORKUNITEXECUTOR CONSTRUCTOR TEST                            **/
 /**********************************************************************/
 
 class WorkunitExecutorConstructorTestWMS : public wrench::WMS {
