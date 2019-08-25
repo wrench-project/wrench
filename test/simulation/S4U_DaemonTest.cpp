@@ -230,6 +230,25 @@ private:
         // sleep 10 seconds
         wrench::Simulation::sleep(10);
 
+
+        // Coverage
+        try {
+            wrench::Simulation::turnOnHost("bogus");
+            throw std::runtime_error("Should not be able to turn on bogus host");
+        } catch (std::invalid_argument &e) {}
+        try {
+            wrench::Simulation::turnOffHost("bogus");
+            throw std::runtime_error("Should not be able to turn off bogus host");
+        } catch (std::invalid_argument &e) {}
+        try {
+            wrench::Simulation::turnOnLink("bogus");
+            throw std::runtime_error("Should not be able to turn on bogus link");
+        } catch (std::invalid_argument &e) {}
+        try {
+            wrench::Simulation::turnOffLink("bogus");
+            throw std::runtime_error("Should not be able to turn off bogus link");
+        } catch (std::invalid_argument &e) {}
+
         // Turn off Host2
         wrench::Simulation::turnOffHost("Host2");
 
