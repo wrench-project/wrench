@@ -109,8 +109,11 @@ protected:
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"DualCoreHost\" speed=\"1f\" core=\"2\"/> "
                           "       <host id=\"QuadCoreHost\" speed=\"1f\" core=\"4\"/> "
+                          "       <host id=\"TinyHost\" speed=\"1f\" core=\"1\"/> "
                           "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
                           "       <route src=\"DualCoreHost\" dst=\"QuadCoreHost\"> <link_ctn id=\"1\"/> </route>"
+                          "       <route src=\"TinyHost\" dst=\"QuadCoreHost\"> <link_ctn id=\"1\"/> </route>"
+                          "       <route src=\"DualCoreHost\" dst=\"TinyHost\"> <link_ctn id=\"1\"/> </route>"
                           "   </zone> "
                           "</platform>";
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
@@ -200,6 +203,8 @@ private:
 
     int main() {
         auto cs = *(this->getAvailableComputeServices<wrench::CloudComputeService>().begin());
+
+        cs->getCoreFlopRate(); // coverage
 
         // Non-existent VM operations (for coverage)
         try {
@@ -575,21 +580,46 @@ private:
         // Submit the 2-task job for execution
         try {
             auto cs = *(this->getAvailableComputeServices<wrench::VirtualizedClusterComputeService>().begin());
-            std::string src_host = cs->getExecutionHosts()[0];
+
+            std::string src_host = "QuadCoreHost";
             auto vm_name = cs->createVM(2, 10);
+
+
+            try {
+                cs->startVM("NON-EXISTENT", src_host);
+                throw std::runtime_error("Shouldn't be able to start a bogus VM");
+            } catch (std::invalid_argument &e) {}
+
+            try {
+                cs->startVM(vm_name, "NON-EXISTENT");
+                throw std::runtime_error("Shouldn't be able to start a VM on a bogus host");
+            } catch (std::invalid_argument &e) {}
+
             auto vm_cs = cs->startVM(vm_name, src_host);
+
+            try {
+                cs->startVM(vm_name, src_host);
+                throw std::runtime_error("Shouldn't be able to start a VM that is not DOWN");
+            } catch (wrench::WorkflowExecutionException &e) {}
+
+
 
             job_manager->submitJob(two_task_job, vm_cs);
 
-            // migrating the VM
-            std::string dest_host = cs->getExecutionHosts()[1];
-            try { // try a bogus one for coverage
-                cs->migrateVM("NON-EXISTENT", dest_host);
-                throw std::runtime_error("Should not be able to migrate a non-existent VM");
-            } catch (std::invalid_argument &e) {
-            }
 
-            cs->migrateVM(vm_name, dest_host);
+            // migrating the VM
+
+            try { // try a bogus one for coverage
+                cs->migrateVM("NON-EXISTENT", "DualCoreHost");
+                throw std::runtime_error("Should not be able to migrate a non-existent VM");
+            } catch (std::invalid_argument &e) {}
+
+            try { // try a bogus one for coverage
+                cs->migrateVM(vm_name, "TinyHost");
+                throw std::runtime_error("Should not be able to migrate a VM to a host without sufficient resources");
+            } catch (wrench::WorkflowExecutionException &e) {}
+
+            cs->migrateVM(vm_name, "DualCoreHost");
 
         } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error(e.what());
