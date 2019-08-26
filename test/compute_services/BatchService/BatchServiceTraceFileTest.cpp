@@ -710,7 +710,7 @@ void BatchServiceTest::do_WorkloadTraceFileRequestedTimesTestSWF_test() {
                                             {"Host1", "Host2", "Host3", "Host4"}, 0,
                                             {
                                                     {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "easy_bf"},
-                                                    {wrench::BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path},
+//                                                    {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"},
                                                     {wrench::BatchComputeServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP, "true"},
                                                     {wrench::BatchComputeServiceProperty::BATSCHED_LOGGING_MUTED, "true"},
                                                     {wrench::BatchComputeServiceProperty::USE_REAL_RUNTIMES_AS_REQUESTED_RUNTIMES_IN_WORKLOAD_TRACE_FILE, "false"}
