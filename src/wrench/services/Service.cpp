@@ -248,8 +248,6 @@ namespace wrench {
                 Service::num_terminated_services = 0;
             }
 
-        } catch (std::runtime_error &e) {
-            throw;
         } catch (std::shared_ptr<HostError> &e) {
             throw;
         }
