@@ -92,8 +92,6 @@ namespace wrench {
             alarm_ptr->start(alarm_ptr, true, false); // Daemonized, no auto-restart
         } catch (std::shared_ptr<HostError> &e) {
             throw;
-        } catch (std::runtime_error &e) {
-            throw;
         }
         return alarm_ptr;
     }
