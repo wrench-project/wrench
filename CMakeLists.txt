@@ -306,17 +306,18 @@ set(TEST_FILES
         include/wrench/managers/EnergyMeter.h
         test/simulated_failures/host_failures/ServiceStartReStartTest.cpp
         test/simulated_failures/host_failures/ComprehensiveIntegrationTest.cpp
-        test/simulated_failures/host_failures/FailureDetectorTest.cpp
-        test/simulated_failures/host_failures/BareMetalComputeServiceFailuresTest.cpp
-        test/simulated_failures/host_failures/CloudComputeServiceFailuresTest.cpp
-        test/simulated_failures/host_failures/StandardJobExecutorFailuresTest.cpp
-        test/simulated_failures/host_failures/NetworkProximityFailuresTest.cpp
-        test/simulated_failures/host_failures/StorageServiceReStartTest.cpp
-        test/simulated_failures/link_failures/FileRegistryTest.cpp
-        test/simulated_failures/link_failures/StorageServiceTest.cpp
-        test/simulated_failures/link_failures/AlarmTest.cpp
-        test/simulated_failures/link_failures/BareMetalComputeServiceTest.cpp
-        test/simulated_failures/link_failures/ComputeThreadTest.cpp
+        test/simulated_failures/host_failures/FailureDetectorHostFailuresTest.cpp
+        test/simulated_failures/host_failures/BareMetalComputeServiceHostFailuresTest.cpp
+        test/simulated_failures/host_failures/CloudComputeServiceHostFailuresTest.cpp
+        test/simulated_failures/host_failures/StandardJobExecutorHostFailuresTest.cpp
+        test/simulated_failures/host_failures/NetworkProximityHostFailuresTest.cpp
+        test/simulated_failures/host_failures/StorageServiceReStartHostFailuresTest.cpp
+        test/simulated_failures/link_failures/FileRegistryLinkFailuresTest.cpp
+        test/simulated_failures/link_failures/StorageServiceLinkFailuresTest.cpp
+        test/simulated_failures/link_failures/AlarmLinkFailuresTest.cpp
+        test/simulated_failures/link_failures/BareMetalComputeServiceLinkFailuresTest.cpp
+        test/simulated_failures/link_failures/ComputeThreadLinkFailuresTest.cpp
+        test/simulated_failures/link_failures/NetworkProximityLinkFailuresTest.cpp
         test/simulated_failures/failure_test_util/ResourceSwitcher.cpp
         test/simulated_failures/failure_test_util/ResourceSwitcher.h
         test/simulated_failures/failure_test_util/SleeperVictim.cpp
