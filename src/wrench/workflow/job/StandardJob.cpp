@@ -80,13 +80,13 @@ namespace wrench {
      * @return the number of cores
      */
     unsigned long StandardJob::getMinimumRequiredNumCores() {
-      unsigned long min_num_cores = 1;
+      unsigned long max_min_num_cores = 1;
       for (auto t : tasks) {
-        if (min_num_cores < t->getMinNumCores()) {
-          min_num_cores = t->getMinNumCores();
+        if (max_min_num_cores < t->getMinNumCores()) {
+            max_min_num_cores = t->getMinNumCores();
         }
       }
-      return min_num_cores;
+      return max_min_num_cores;
     }
 
     /**
