@@ -123,8 +123,8 @@ namespace wrench {
      * @brief Look up a proximity value in database
      * @param hosts: the pair of hosts whose proximity is of interest
      * @return A pair:
-     *           - The proximity value between the pair of hosts
-     *           - The timestamp of the oldest measurement use to compute the proximity value
+     *           - The proximity value between the pair of hosts (or DBL_MAX if none)
+     *           - The timestamp of the oldest measurement use to compute the proximity value (or -1.0 if none)
      *
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
@@ -290,22 +290,29 @@ namespace wrench {
 
         } else if (auto msg = std::dynamic_pointer_cast<NetworkProximityLookupRequestMessage>(message)) {
             double proximity_value = NetworkProximityService::NOT_AVAILABLE;
-            double timestamp = -1;
+            double timestamp = NetworkProximityService::NOT_AVAILABLE;
+
 
             std::string network_service_type = this->getPropertyValueAsString("NETWORK_PROXIMITY_SERVICE_TYPE");
 
-            if (boost::iequals(network_service_type, "vivaldi")) {
-                auto host1 = this->coordinate_lookup_table.find(msg->hosts.first);
-                auto host2 = this->coordinate_lookup_table.find(msg->hosts.second);
+            if (msg->hosts.first == msg->hosts.second) {
+                proximity_value = 0.0;
+                timestamp = Simulation::getCurrentSimulatedDate();
+            } else {
 
-                if (host1 != this->coordinate_lookup_table.end() && host2 != this->coordinate_lookup_table.end()) {
-                    proximity_value = std::sqrt(norm(host2->second.first - host1->second.first));
-                    timestamp = std::min(host1->second.second, host2->second.second);
-                }
-            } else { // alltoall
-                if (this->entries.find(msg->hosts) != this->entries.end()) {
-                    proximity_value = std::get<0>(this->entries[msg->hosts]);
-                    timestamp = std::get<1>(this->entries[msg->hosts]);
+                if (boost::iequals(network_service_type, "vivaldi")) {
+                    auto host1 = this->coordinate_lookup_table.find(msg->hosts.first);
+                    auto host2 = this->coordinate_lookup_table.find(msg->hosts.second);
+
+                    if (host1 != this->coordinate_lookup_table.end() && host2 != this->coordinate_lookup_table.end()) {
+                        proximity_value = std::sqrt(norm(host2->second.first - host1->second.first));
+                        timestamp = std::min(host1->second.second, host2->second.second);
+                    }
+                } else { // alltoall
+                    if (this->entries.find(msg->hosts) != this->entries.end()) {
+                        proximity_value = std::get<0>(this->entries[msg->hosts]);
+                        timestamp = std::get<1>(this->entries[msg->hosts]);
+                    }
                 }
             }
 
