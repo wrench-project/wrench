@@ -120,6 +120,10 @@ namespace wrench {
         } catch (simgrid::NetworkFailureException &e) {
             throw std::shared_ptr<NetworkError>(
                     new NetworkError(NetworkError::SENDING, NetworkError::FAILURE, mailbox_name));
+        } catch (simgrid::TimeoutException &e) {
+            // Can happen if the other side is doing a timeout.... I think
+            throw std::shared_ptr<NetworkError>(
+                    new NetworkError(NetworkError::SENDING, NetworkError::TIMEOUT, mailbox_name));
         }
     }
 
