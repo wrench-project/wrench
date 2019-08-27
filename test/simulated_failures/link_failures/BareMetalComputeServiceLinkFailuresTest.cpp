@@ -18,10 +18,10 @@
 #include "../failure_test_util/ResourceRandomRepeatSwitcher.h"
 
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(bare_metal_compute_service_link_failure_test, "Log category for BareMetalComputeServiceLinkFailureTest");
+XBT_LOG_NEW_DEFAULT_CATEGORY(bare_metal_compute_service_link_failures_test, "Log category for BareMetalComputeServiceLinkFailuresTest");
 
 
-class BareMetalComputeServiceLinkFailureTest : public ::testing::Test {
+class BareMetalComputeServiceLinkFailuresTest : public ::testing::Test {
 
 public:
 
@@ -30,7 +30,7 @@ public:
     void do_ResourceInformationLinkFailure_test();
 
 protected:
-    BareMetalComputeServiceLinkFailureTest() {
+    BareMetalComputeServiceLinkFailuresTest() {
 
         // Create the simplest workflow
         workflow = new wrench::Workflow();
@@ -71,7 +71,7 @@ protected:
 class BareMetalComputeServiceResourceInformationTestWMS : public wrench::WMS {
 
 public:
-    BareMetalComputeServiceResourceInformationTestWMS(BareMetalComputeServiceLinkFailureTest *test,
+    BareMetalComputeServiceResourceInformationTestWMS(BareMetalComputeServiceLinkFailuresTest *test,
                                                       std::string hostname) :
             wrench::WMS(nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -79,7 +79,7 @@ public:
 
 private:
 
-    BareMetalComputeServiceLinkFailureTest *test;
+    BareMetalComputeServiceLinkFailuresTest *test;
 
     int main() {
 
@@ -115,11 +115,11 @@ private:
     }
 };
 
-TEST_F(BareMetalComputeServiceLinkFailureTest, ResourceInformationTest) {
+TEST_F(BareMetalComputeServiceLinkFailuresTest, ResourceInformationTest) {
     DO_TEST_WITH_FORK(do_ResourceInformationLinkFailure_test);
 }
 
-void BareMetalComputeServiceLinkFailureTest::do_ResourceInformationLinkFailure_test() {
+void BareMetalComputeServiceLinkFailuresTest::do_ResourceInformationLinkFailure_test() {
 
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();

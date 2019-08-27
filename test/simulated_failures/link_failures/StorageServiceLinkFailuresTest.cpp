@@ -22,10 +22,10 @@
 #define NUM_STORAGE_SERVICES 10
 #define STORAGE_SERVICE_CAPACITY (0.5 * NUM_FILES * FILE_SIZE)
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(storage_service_link_failure_test, "Log category for StorageServiceLinkFailureTest");
+XBT_LOG_NEW_DEFAULT_CATEGORY(storage_service_link_failures_test, "Log category for StorageServiceLinkFailuresTest");
 
 
-class StorageServiceLinkFailureTest : public ::testing::Test {
+class StorageServiceLinkFailuresTest : public ::testing::Test {
 
 public:
     std::vector<wrench::WorkflowFile *> files;
@@ -35,7 +35,7 @@ public:
     void do_StorageServiceLinkFailureSimpleRandom_Test();
 
 protected:
-    StorageServiceLinkFailureTest() {
+    StorageServiceLinkFailuresTest() {
 
         // Create the simplest workflow
         workflow = new wrench::Workflow();
@@ -73,10 +73,10 @@ protected:
 /**  LINK FAILURE TEST                                               **/
 /**********************************************************************/
 
-class StorageServiceLinkFailureTestWMS : public wrench::WMS {
+class StorageServiceLinkFailuresTestWMS : public wrench::WMS {
 
 public:
-    StorageServiceLinkFailureTestWMS(StorageServiceLinkFailureTest *test,
+    StorageServiceLinkFailuresTestWMS(StorageServiceLinkFailuresTest *test,
                                      std::string hostname) :
             wrench::WMS(nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -87,7 +87,7 @@ private:
 
     std::mt19937 rng;
 
-    StorageServiceLinkFailureTest *test;
+    StorageServiceLinkFailuresTest *test;
 
     std::shared_ptr<wrench::DataMovementManager> data_movement_manager;
 
@@ -242,11 +242,11 @@ private:
     }
 };
 
-TEST_F(StorageServiceLinkFailureTest, SimpleRandomTest) {
+TEST_F(StorageServiceLinkFailuresTest, SimpleRandomTest) {
     DO_TEST_WITH_FORK(do_StorageServiceLinkFailureSimpleRandom_Test);
 }
 
-void StorageServiceLinkFailureTest::do_StorageServiceLinkFailureSimpleRandom_Test() {
+void StorageServiceLinkFailuresTest::do_StorageServiceLinkFailureSimpleRandom_Test() {
 
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
@@ -325,7 +325,7 @@ void StorageServiceLinkFailureTest::do_StorageServiceLinkFailureSimpleRandom_Tes
 
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     wms = simulation->add(
-            new StorageServiceLinkFailureTestWMS(
+            new StorageServiceLinkFailuresTestWMS(
                     this, "Host1"));
 
     wms->addWorkflow(workflow);

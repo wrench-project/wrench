@@ -16,10 +16,10 @@
 #include "../../include/UniqueTmpPathPrefix.h"
 #include "../failure_test_util/ResourceSwitcher.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(network_proximity_failures, "Log category for NetworkProximityFailuresTest");
+XBT_LOG_NEW_DEFAULT_CATEGORY(network_proximity_failures, "Log category for NetworkProximityHostFailuresTest");
 
 
-class NetworkProximityFailuresTest : public ::testing::Test {
+class NetworkProximityHostFailuresTest : public ::testing::Test {
 
 public:
     wrench::WorkflowFile *input_file;
@@ -28,10 +28,10 @@ public:
     std::shared_ptr<wrench::StorageService> storage_service1 = nullptr;
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
 
-    void do_NetworkProximityFailures_Test();
+    void do_HostFailures_Test();
 
 protected:
-    NetworkProximityFailuresTest() {
+    NetworkProximityHostFailuresTest() {
 
         // Create the simplest workflow
         workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
@@ -85,7 +85,7 @@ protected:
 class NetworkProxFailuresTestWMS : public wrench::WMS {
 
 public:
-    NetworkProxFailuresTestWMS(NetworkProximityFailuresTest *test,
+    NetworkProxFailuresTestWMS(NetworkProximityHostFailuresTest *test,
                                std::set<std::shared_ptr<wrench::NetworkProximityService>> network_proximity_services,
                                std::string hostname) :
             wrench::WMS(nullptr, nullptr,  {}, {},
@@ -95,7 +95,7 @@ public:
 
 private:
 
-    NetworkProximityFailuresTest *test;
+    NetworkProximityHostFailuresTest *test;
 
     int main() {
 
@@ -174,11 +174,11 @@ private:
     }
 };
 
-TEST_F(NetworkProximityFailuresTest, FailingRestartingDaemons) {
-    DO_TEST_WITH_FORK(do_NetworkProximityFailures_Test);
+TEST_F(NetworkProximityHostFailuresTest, FailingRestartingDaemons) {
+    DO_TEST_WITH_FORK(do_HostFailures_Test);
 }
 
-void NetworkProximityFailuresTest::do_NetworkProximityFailures_Test() {
+void NetworkProximityHostFailuresTest::do_HostFailures_Test() {
 
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
