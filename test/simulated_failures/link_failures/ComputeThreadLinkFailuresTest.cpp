@@ -16,17 +16,17 @@
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(compute_thread_link_failure_test, "Log category for link failure with ComputeThread");
+XBT_LOG_NEW_DEFAULT_CATEGORY(compute_thread_link_failures_test, "Log category for link failure with ComputeThread");
 
 
-class ComputeThreadLinkFailureTest : public ::testing::Test {
+class ComputeThreadLinkFailuresTest : public ::testing::Test {
 
 public:
 
     void do_LinkFailure_test();
 
 protected:
-    ComputeThreadLinkFailureTest() {
+    ComputeThreadLinkFailuresTest() {
 
         // Create the simplest workflow
         workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
@@ -63,10 +63,10 @@ protected:
 /**  DO LINK FAILURE TEST                                            **/
 /**********************************************************************/
 
-class ComputeThreadLinkFailureTestWMS : public wrench::WMS {
+class ComputeThreadLinkFailuresTestWMS : public wrench::WMS {
 
 public:
-    ComputeThreadLinkFailureTestWMS(ComputeThreadLinkFailureTest *test,
+    ComputeThreadLinkFailuresTestWMS(ComputeThreadLinkFailuresTest *test,
                                           std::string hostname) :
             wrench::WMS(nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -75,7 +75,7 @@ public:
 
 private:
 
-    ComputeThreadLinkFailureTest *test;
+    ComputeThreadLinkFailuresTest *test;
 
     int main() {
 
@@ -126,11 +126,11 @@ private:
     }
 };
 
-TEST_F(ComputeThreadLinkFailureTest, SimpleLinkFailure) {
+TEST_F(ComputeThreadLinkFailuresTest, SimpleLinkFailure) {
     DO_TEST_WITH_FORK(do_LinkFailure_test);
 }
 
-void ComputeThreadLinkFailureTest::do_LinkFailure_test() {
+void ComputeThreadLinkFailuresTest::do_LinkFailure_test() {
 
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
@@ -148,7 +148,7 @@ void ComputeThreadLinkFailureTest::do_LinkFailure_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
-    ASSERT_NO_THROW(wms = simulation->add(new ComputeThreadLinkFailureTestWMS(this, hostname)));
+    ASSERT_NO_THROW(wms = simulation->add(new ComputeThreadLinkFailuresTestWMS(this, hostname)));
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 

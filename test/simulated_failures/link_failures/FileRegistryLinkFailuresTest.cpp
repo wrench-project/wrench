@@ -20,10 +20,10 @@
 #define NUM_FILES 100
 #define NUM_STORAGE_SERVICES 10
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(file_registry_link_failure_test, "Log category for FileRegistryLinkFailureTest");
+XBT_LOG_NEW_DEFAULT_CATEGORY(file_registry_link_failures_test, "Log category for FileRegistryLinkFailuresTest");
 
 
-class FileRegistryLinkFailureTest : public ::testing::Test {
+class FileRegistryLinkFailuresTest : public ::testing::Test {
 
 public:
     std::vector<std::shared_ptr<wrench::StorageService>> storage_services;
@@ -32,7 +32,7 @@ public:
     void do_FileRegistryLinkFailureSimpleRandom_Test();
 
 protected:
-    FileRegistryLinkFailureTest() {
+    FileRegistryLinkFailuresTest() {
 
         // Create the simplest workflow
         workflow = new wrench::Workflow();
@@ -65,10 +65,10 @@ protected:
 /**  LINK FAILURE  TEST                                              **/
 /**********************************************************************/
 
-class FileRegistryLinkFailureTestWMS : public wrench::WMS {
+class FileRegistryLinkFailuresTestWMS : public wrench::WMS {
 
 public:
-    FileRegistryLinkFailureTestWMS(FileRegistryLinkFailureTest *test,
+    FileRegistryLinkFailuresTestWMS(FileRegistryLinkFailuresTest *test,
                                    std::string hostname) :
             wrench::WMS(nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -76,7 +76,7 @@ public:
 
 private:
 
-    FileRegistryLinkFailureTest *test;
+    FileRegistryLinkFailuresTest *test;
 
     int main() {
 
@@ -124,11 +124,11 @@ private:
     }
 };
 
-TEST_F(FileRegistryLinkFailureTest, SimpleRandomTest) {
+TEST_F(FileRegistryLinkFailuresTest, SimpleRandomTest) {
     DO_TEST_WITH_FORK(do_FileRegistryLinkFailureSimpleRandom_Test);
 }
 
-void FileRegistryLinkFailureTest::do_FileRegistryLinkFailureSimpleRandom_Test() {
+void FileRegistryLinkFailuresTest::do_FileRegistryLinkFailureSimpleRandom_Test() {
 
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
@@ -174,7 +174,7 @@ void FileRegistryLinkFailureTest::do_FileRegistryLinkFailureSimpleRandom_Test() 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new FileRegistryLinkFailureTestWMS(
+            new FileRegistryLinkFailuresTestWMS(
                     this, "Host1")));
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow));

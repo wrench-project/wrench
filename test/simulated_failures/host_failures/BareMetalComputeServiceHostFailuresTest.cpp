@@ -18,10 +18,10 @@
 #include "../failure_test_util/SleeperVictim.h"
 #include "../failure_test_util/ResourceRandomRepeatSwitcher.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(bare_metal_compute_service_simulated_failures_test, "Log category for BareMetalComputeServiceSimulatedFailuresTests");
+XBT_LOG_NEW_DEFAULT_CATEGORY(bare_metal_compute_service_host_failures_test, "Log category for BareMetalComputeServiceSimulatedHostFailuresTests");
 
 
-class BareMetalComputeServiceSimulatedFailuresTest : public ::testing::Test {
+class BareMetalComputeServiceHostFailuresTest : public ::testing::Test {
 
 public:
     wrench::Workflow *workflow;
@@ -40,7 +40,7 @@ public:
 
 protected:
 
-    BareMetalComputeServiceSimulatedFailuresTest() {
+    BareMetalComputeServiceHostFailuresTest() {
         // Create the simplest workflow
         workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
         workflow = workflow_unique_ptr.get();
@@ -90,7 +90,7 @@ protected:
 class BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnAnotherHostTestWMS : public wrench::WMS {
 
 public:
-    BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnAnotherHostTestWMS(BareMetalComputeServiceSimulatedFailuresTest *test,
+    BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnAnotherHostTestWMS(BareMetalComputeServiceHostFailuresTest *test,
                                                                                 std::string &hostname, std::shared_ptr<wrench::ComputeService> cs,
                                                                                 std::shared_ptr<wrench::StorageService> ss) :
             wrench::WMS(nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
@@ -99,7 +99,7 @@ public:
 
 private:
 
-    BareMetalComputeServiceSimulatedFailuresTest *test;
+    BareMetalComputeServiceHostFailuresTest *test;
 
     int main() override {
 
@@ -143,11 +143,11 @@ private:
     }
 };
 
-TEST_F(BareMetalComputeServiceSimulatedFailuresTest, OneFailureCausingWorkUnitRestartOnAnotherHost) {
+TEST_F(BareMetalComputeServiceHostFailuresTest, OneFailureCausingWorkUnitRestartOnAnotherHost) {
     DO_TEST_WITH_FORK(do_BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnAnotherHost_test);
 }
 
-void BareMetalComputeServiceSimulatedFailuresTest::do_BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnAnotherHost_test() {
+void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnAnotherHost_test() {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
@@ -205,7 +205,7 @@ void BareMetalComputeServiceSimulatedFailuresTest::do_BareMetalComputeServiceOne
 class BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnSameHostTestWMS : public wrench::WMS {
 
 public:
-    BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnSameHostTestWMS(BareMetalComputeServiceSimulatedFailuresTest *test,
+    BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnSameHostTestWMS(BareMetalComputeServiceHostFailuresTest *test,
                                                                              std::string &hostname,
                                                                              std::shared_ptr<wrench::ComputeService> cs,
                                                                              std::shared_ptr<wrench::StorageService> ss) :
@@ -215,7 +215,7 @@ public:
 
 private:
 
-    BareMetalComputeServiceSimulatedFailuresTest *test;
+    BareMetalComputeServiceHostFailuresTest *test;
 
     int main() override {
 
@@ -259,11 +259,11 @@ private:
     }
 };
 
-TEST_F(BareMetalComputeServiceSimulatedFailuresTest, OneFailureCausingWorkUnitRestartOnSameHost) {
+TEST_F(BareMetalComputeServiceHostFailuresTest, OneFailureCausingWorkUnitRestartOnSameHost) {
     DO_TEST_WITH_FORK(do_BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnSameHost_test);
 }
 
-void BareMetalComputeServiceSimulatedFailuresTest::do_BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnSameHost_test() {
+void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnSameHost_test() {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
@@ -319,7 +319,7 @@ void BareMetalComputeServiceSimulatedFailuresTest::do_BareMetalComputeServiceOne
 class BareMetalComputeServiceRandomFailuresTestWMS : public wrench::WMS {
 
 public:
-    BareMetalComputeServiceRandomFailuresTestWMS(BareMetalComputeServiceSimulatedFailuresTest *test,
+    BareMetalComputeServiceRandomFailuresTestWMS(BareMetalComputeServiceHostFailuresTest *test,
                                                  std::string &hostname,
                                                  std::shared_ptr<wrench::ComputeService> cs,
                                                  std::shared_ptr<wrench::StorageService> ss) :
@@ -329,7 +329,7 @@ public:
 
 private:
 
-    BareMetalComputeServiceSimulatedFailuresTest *test;
+    BareMetalComputeServiceHostFailuresTest *test;
 
     int main() override {
 
@@ -390,11 +390,11 @@ private:
     }
 };
 
-TEST_F(BareMetalComputeServiceSimulatedFailuresTest, RandomFailures) {
+TEST_F(BareMetalComputeServiceHostFailuresTest, RandomFailures) {
     DO_TEST_WITH_FORK(do_BareMetalComputeServiceRandomFailures_test);
 }
 
-void BareMetalComputeServiceSimulatedFailuresTest::do_BareMetalComputeServiceRandomFailures_test() {
+void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceRandomFailures_test() {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
@@ -451,7 +451,7 @@ void BareMetalComputeServiceSimulatedFailuresTest::do_BareMetalComputeServiceRan
 class BareMetalComputeServiceFailureOnServiceThatTerminatesWhenAllItsResourcesAreDownTestWMS : public wrench::WMS {
 
 public:
-    BareMetalComputeServiceFailureOnServiceThatTerminatesWhenAllItsResourcesAreDownTestWMS(BareMetalComputeServiceSimulatedFailuresTest *test,
+    BareMetalComputeServiceFailureOnServiceThatTerminatesWhenAllItsResourcesAreDownTestWMS(BareMetalComputeServiceHostFailuresTest *test,
                                                                                            std::string &hostname, std::shared_ptr<wrench::ComputeService> cs,
                                                                                            std::shared_ptr<wrench::StorageService> ss) :
             wrench::WMS(nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
@@ -460,7 +460,7 @@ public:
 
 private:
 
-    BareMetalComputeServiceSimulatedFailuresTest *test;
+    BareMetalComputeServiceHostFailuresTest *test;
 
     int main() override {
 
@@ -491,11 +491,11 @@ private:
     }
 };
 
-TEST_F(BareMetalComputeServiceSimulatedFailuresTest, FailureOnServiceThatTerminatesWhenAllItsResourcesAreDown) {
+TEST_F(BareMetalComputeServiceHostFailuresTest, FailureOnServiceThatTerminatesWhenAllItsResourcesAreDown) {
     DO_TEST_WITH_FORK(do_BareMetalComputeServiceFailureOnServiceThatTerminatesWhenAllItsResourcesAreDown_test);
 }
 
-void BareMetalComputeServiceSimulatedFailuresTest::do_BareMetalComputeServiceFailureOnServiceThatTerminatesWhenAllItsResourcesAreDown_test() {
+void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceFailureOnServiceThatTerminatesWhenAllItsResourcesAreDown_test() {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();

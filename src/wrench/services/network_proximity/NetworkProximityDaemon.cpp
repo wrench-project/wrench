@@ -129,6 +129,7 @@ namespace wrench {
 
             double countdown = time_for_next_measurement - S4U_Simulation::getClock();
             if (countdown > 0) {
+                WRENCH_INFO("CALLING processNextMessage with %lf", countdown);
                 life = this->processNextMessage(countdown);
             } else {
                 if ((not this->next_mailbox_to_send.empty()) &&
@@ -199,6 +200,7 @@ namespace wrench {
         std::shared_ptr<SimulationMessage> message = nullptr;
 
         try {
+            WRENCH_INFO("HAH!");
             message = S4U_Mailbox::getMessage(this->mailbox_name, timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
             if (not cause->isTimeout()) {
