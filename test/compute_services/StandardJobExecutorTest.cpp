@@ -924,8 +924,9 @@ private:
                                                                                                  this->test->storage_service2)});
 
             job->getFileLocations(); // coverage
-            job->getMinimumRequiredNumCores(); // coverage
             job->getPriority(); // coverage
+            job->getMinimumRequiredNumCores(); // coverage
+
 
             std::string my_mailbox = "test_callback_mailbox";
 
