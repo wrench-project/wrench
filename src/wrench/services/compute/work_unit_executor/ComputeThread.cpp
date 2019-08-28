@@ -51,11 +51,7 @@ namespace wrench {
      * @brief Terminate (brutally) the compute thread
      */
     void ComputeThread::kill() {
-        try {
-            this->killActor();
-        } catch (std::shared_ptr<FatalFailure> &e) {
-            WRENCH_INFO("Failed to kill a compute thread.. .perhaps it's already dead... nevermind");
-        }
+        this->killActor();
     }
 
     /**
