@@ -12,8 +12,8 @@
 #include <wrench-dev.h>
 
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
-#include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
-#include "../../src/wrench/services/compute/work_unit_executor/ComputeThread.h"
+#include "../../src/wrench/services/compute/standard_job_executor/StandardJobExecutorMessage.h"
+
 
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"

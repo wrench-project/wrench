@@ -15,7 +15,7 @@
 #include "wrench/services/compute/workunit_executor/Workunit.h"
 #include "wrench/services/compute/workunit_executor/WorkunitExecutor.h"
 
-#include "../../src/wrench/services/compute/work_unit_executor/ComputeThread.h"
+#include "../../src/wrench/services/compute/standard_job_executor/StandardJobExecutorMessage.h"
 
 
 #include "../include/TestWithFork.h"

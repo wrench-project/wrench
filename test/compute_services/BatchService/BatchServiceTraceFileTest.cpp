@@ -35,6 +35,7 @@ public:
     void do_BatchTraceFileReplayTest_test();
 
     void do_WorkloadTraceFileTestSWF_test();
+    void do_WorkloadTraceFileTestSWFBatchServiceShutdown_test();
     void do_WorkloadTraceFileRequestedTimesTestSWF_test();
     void do_BatchTraceFileReplayTestWithFailedJob_test();
     void do_WorkloadTraceFileTestJSON_test();
@@ -293,6 +294,105 @@ void BatchServiceTest::do_BatchTraceFileReplayTestWithFailedJob_test() {
     ASSERT_NO_THROW(wms = simulation->add(
             new BatchTraceFileReplayTestWithFailedJobWMS(
                     this, {compute_service}, {}, hostname)));
+
+    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+
+    // Running a "run a single task" simulation
+    // Note that in these tests the WMS creates workflow tasks, which a user would
+    // of course not be likely to do
+    ASSERT_NO_THROW(simulation->launch());
+
+    delete simulation;
+
+    free(argv[0]);
+    free(argv);
+}
+
+/**********************************************************************/
+/**  WORKLOAD TRACE FILE TEST SWF BATCH SERVICE SHUTDOWN             **/
+/**********************************************************************/
+
+class WorkloadTraceFileSWFBatchServiceShutdownTestWMS : public wrench::WMS {
+
+public:
+    WorkloadTraceFileSWFBatchServiceShutdownTestWMS(BatchServiceTest *test,
+                                const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                                std::string hostname) :
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
+                        hostname, "test") {
+        this->test = test;
+    }
+
+private:
+
+    BatchServiceTest *test;
+
+    int main() {
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+        wrench::Simulation::sleep(20);
+
+        // Shutdown the batch service
+        (*(this->getAvailableComputeServices<wrench::ComputeService>().begin()))->stop();
+
+        // At this point there should be some warning messages from the
+        // Workload Trace file replayer (job failures, impossible to submit the last job)
+
+        wrench::Simulation::sleep(1000);
+        return 0;
+    }
+};
+
+TEST_F(BatchServiceTest, WorkloadTraceFileSWFBatchServiceShutdownTest) {
+    DO_TEST_WITH_FORK(do_WorkloadTraceFileTestSWFBatchServiceShutdown_test);
+}
+
+void BatchServiceTest::do_WorkloadTraceFileTestSWFBatchServiceShutdown_test() {
+
+    // Create and initialize a simulation
+    auto simulation = new wrench::Simulation();
+    int argc = 1;
+    auto argv = (char **) calloc(1, sizeof(char *));
+    argv[0] = strdup("batch_service_test");
+
+    ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+    // Setting up the platform
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    // Get a hostname
+    std::string hostname = "Host1";
+
+
+    std::string trace_file_path = UNIQUE_TMP_PATH_PREFIX + "swf_trace.swf";
+    FILE *trace_file;
+
+
+    // Create a Valid trace file (not the "wrong" estimates, which are ignored due to
+    // passing the correct option to the BatchComputeService constructor
+    trace_file = fopen(trace_file_path.c_str(), "w");
+    fprintf(trace_file, "1 0 -1 3600 -1 -1 -1 4 5600 -1\n");  // job that takes the whole machine
+    fprintf(trace_file, "2 1 -1 3600 -1 -1 -1 2 8666 -1\n");  // job that takes half the machine (and times out, for coverage)
+    fprintf(trace_file, "3 200 -1 3600 -1 -1 -1 2 500 -1\n");  // job that takes half the machine (and times out, for coverage)
+    fclose(trace_file);
+
+
+    // Create a Batch Service with a the valid trace file
+    ASSERT_NO_THROW(compute_service = simulation->add(
+            new wrench::BatchComputeService(hostname,
+                                            {"Host1", "Host2", "Host3", "Host4"}, 0,
+                                            {
+                                                    {wrench::BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path},
+                                                    {wrench::BatchComputeServiceProperty::USE_REAL_RUNTIMES_AS_REQUESTED_RUNTIMES_IN_WORKLOAD_TRACE_FILE, "true"}
+                                            }
+            )));
+
+    // Create a WMS
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    ASSERT_NO_THROW(wms = simulation->add(new WorkloadTraceFileSWFBatchServiceShutdownTestWMS(
+            this, {compute_service}, {}, hostname)));
 
     ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
 

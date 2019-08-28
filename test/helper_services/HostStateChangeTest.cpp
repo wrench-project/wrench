@@ -112,6 +112,8 @@ private:
             throw std::runtime_error("Did not get the expected 'host has changed speed' message");
         }
 
+        ssd->kill(); // coverage
+
 
         return 0;
     }

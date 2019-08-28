@@ -208,10 +208,6 @@ namespace wrench {
             return true;
         }
 
-        if (message == nullptr) {
-            return false;
-        }
-
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
 
         if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
