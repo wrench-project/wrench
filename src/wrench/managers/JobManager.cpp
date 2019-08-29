@@ -353,7 +353,8 @@ namespace wrench {
         }
 
         if (job->getParentComputeService() == nullptr) {
-            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new JobCannotBeTerminated(job)));
+            std::string err_msg = "Job cannot be terminated because it doesn't  have a parent compute service";
+            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new NotAllowed(nullptr, err_msg)));
         }
 
         try {
@@ -440,7 +441,8 @@ namespace wrench {
 
             if ((this->pending_standard_jobs.find((StandardJob *) job) != this->pending_standard_jobs.end()) ||
                 (this->running_standard_jobs.find((StandardJob *) job) != this->running_standard_jobs.end())) {
-                throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new JobCannotBeForgotten(job)));
+                std::string msg = "Job cannot be forgotten because it is pending or running";
+                throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new NotAllowed(job->getParentComputeService(), msg)));
             }
             if (this->completed_standard_jobs.find((StandardJob *) job) != this->completed_standard_jobs.end()) {
                 this->completed_standard_jobs.erase((StandardJob *) job);
@@ -463,7 +465,8 @@ namespace wrench {
         if (job->getType() == WorkflowJob::PILOT) {
             if ((this->pending_pilot_jobs.find((PilotJob *) job) != this->pending_pilot_jobs.end()) ||
                 (this->running_pilot_jobs.find((PilotJob *) job) != this->running_pilot_jobs.end())) {
-                throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new JobCannotBeForgotten(job)));
+                std::string msg = "Job cannot be forgotten because it is running or pending";
+                throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new NotAllowed(job->getParentComputeService(), msg)));
             }
             if (this->completed_pilot_jobs.find((PilotJob *) job) != this->completed_pilot_jobs.end()) {
                 this->jobs.erase(job);
