@@ -51,10 +51,18 @@ protected:
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
-                          "       <host id=\"Host1\" speed=\"1f\" core=\"10\"/> "
-                          "       <host id=\"Host2\" speed=\"1f\" core=\"10\"/> "
-                          "       <host id=\"Host3\" speed=\"1f\" core=\"10\"/> "
-                          "       <host id=\"Host4\" speed=\"1f\" core=\"10\"/> "
+                          "       <host id=\"Host1\" speed=\"1f\" core=\"10\"> "
+                          "           <prop id=\"ram\" value=\"2048\"/> "
+                          "       </host>"
+                          "       <host id=\"Host2\" speed=\"1f\" core=\"10\"> "
+                          "           <prop id=\"ram\" value=\"2048\"/> "
+                          "       </host>"
+                          "       <host id=\"Host3\" speed=\"1f\" core=\"10\"> "
+                          "           <prop id=\"ram\" value=\"2048\"/> "
+                          "       </host>"
+                          "       <host id=\"Host4\" speed=\"1f\" core=\"10\"> "
+                          "           <prop id=\"ram\" value=\"2048\"/> "
+                          "       </host>"
                           "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
                           "       <link id=\"2\" bandwidth=\"50000GBps\" latency=\"0us\"/>"
                           "       <link id=\"3\" bandwidth=\"50000GBps\" latency=\"0us\"/>"
@@ -278,6 +286,7 @@ void BatchServiceTest::do_BatchTraceFileReplayTestWithFailedJob_test() {
     FILE *trace_file = fopen(trace_file_path.c_str(), "w");
     fprintf(trace_file, "1 0 -1 3600 -1 -1 -1 4 3600 -1\n");  // job that takes the whole machine
     fprintf(trace_file, "2 1 -1 3600 -1 -1 -1 2 3600 -1\n");  // job that takes half the machine
+    fprintf(trace_file, "3 10000 -1 3600 -1 -1 -1 100 3600 -1\n");  // job that takes half the machine
     fclose(trace_file);
 
 
@@ -375,7 +384,7 @@ void BatchServiceTest::do_WorkloadTraceFileTestSWFBatchServiceShutdown_test() {
     trace_file = fopen(trace_file_path.c_str(), "w");
     fprintf(trace_file, "1 0 -1 3600 -1 -1 -1 4 5600 -1\n");  // job that takes the whole machine
     fprintf(trace_file, "2 1 -1 3600 -1 -1 -1 2 8666 -1\n");  // job that takes half the machine (and times out, for coverage)
-    fprintf(trace_file, "3 200 -1 3600 -1 -1 -1 2 500 -1\n");  // job that takes half the machine (and times out, for coverage)
+    fprintf(trace_file, "3 200 -1 3600 -1 -1 -1 2 500 100000\n");  // for TraceFileLoader coverage
     fclose(trace_file);
 
 
