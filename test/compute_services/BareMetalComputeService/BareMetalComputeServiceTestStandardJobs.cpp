@@ -1106,17 +1106,17 @@ private:
             job_manager->terminateJob(two_task_job);
             throw std::runtime_error("Trying to terminate a non-submitted job should have raised an exception!");
         } catch (wrench::WorkflowExecutionException &e) {
-            auto cause = std::dynamic_pointer_cast<wrench::JobCannotBeTerminated>(e.getCause());
+
+            auto cause = std::dynamic_pointer_cast<wrench::NotAllowed>(e.getCause());
             if (not cause) {
                 throw std::runtime_error(
                         "Got an expected exception but an unexpected failure cause: " +
                         e.getCause()->toString() + " (expected: JobCannotBeTerminated)");
             }
-            if (cause->getJob() != two_task_job) {
+            if (cause->getService() != nullptr) {
                 throw std::runtime_error(
-                        "Got the expected exception and failure cause, but the failure cause does not point to the right job");
+                        "Got the expected exception and failure cause, but the failure cause does not point to the right service (should be nullptr)");
             }
-            cause->getJob();
             cause->toString();
         }
 
