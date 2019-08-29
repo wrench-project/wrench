@@ -43,11 +43,8 @@ WRENCH_LOG_NEW_DEFAULT_CATEGORY(batch_service, "Log category for Batch Service")
 
 namespace wrench {
 
-    /**
-     * @brief Destructor
-     */
-    BatchComputeService::~BatchComputeService() {
-    }
+    // Do not remove
+    BatchComputeService::~BatchComputeService() {}
 
     /**
      * @brief Retrieve start time estimates for a set of job configurations
@@ -140,16 +137,6 @@ namespace wrench {
         this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
 
         // Basic checks
-        if (cores_per_host == 0) {
-            throw std::invalid_argument(
-                    "BatchComputeService::BatchComputeService(): compute hosts should have at least one core");
-        }
-
-        if (ram_per_host <= 0) {
-            throw std::invalid_argument(
-                    "BatchComputeService::BatchComputeService(): compute hosts should have at least some RAM");
-        }
-
         if (compute_hosts.empty()) {
             throw std::invalid_argument(
                     "BatchComputeService::BatchComputeService(): at least one compute hosts must be provided");
@@ -179,15 +166,6 @@ namespace wrench {
                         "BatchComputeService::BatchComputeService(): Compute hosts for a batch service need to be homogeneous (different RAM capacities detected)");
 
             }
-        }
-
-        // Check that ALL_CORES and ALL_RAM, or actual maximum values, were passed
-        // (this may change one day...)
-        if (((cores_per_host != ComputeService::ALL_CORES) and (cores_per_host != num_cores_available)) or
-            ((ram_per_host != ComputeService::ALL_RAM) and (ram_per_host != ram_available))) {
-            throw std::invalid_argument(
-                    "BatchComputeService::BatchComputeService(): A Batch Service must be given ALL core and RAM resources of hosts "
-                    "(e.g., passing ComputeService::ALL_CORES and ComputeService::ALL_RAM)");
         }
 
         //create a map for host to cores

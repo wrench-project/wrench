@@ -172,6 +172,8 @@ void BatchServiceTest::do_BogusSetupTest_test() {
                  std::invalid_argument);
 
 
+
+
     delete simulation;
 
     free(argv[0]);
