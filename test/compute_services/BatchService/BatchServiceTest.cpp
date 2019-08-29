@@ -439,6 +439,17 @@ private:
             if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
                 throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
+
+            // Try to terminate the already terminated job
+            try {
+                job_manager->terminateJob(job);
+            } catch (wrench::WorkflowExecutionException &e) {
+                WRENCH_INFO("---> %s", e.getCause()->toString().c_str());
+                if (not std::dynamic_pointer_cast<wrench::NotAllowed>(e.getCause())) {
+                   throw std::runtime_error("Got an expected exception, but the failure cause is not NotAllowed");
+                }
+            }
+
             this->getWorkflow()->removeTask(task);
 
             // Shutdown the compute service, for testing purposes
@@ -776,7 +787,7 @@ private:
                 job_manager->forgetJob(pilot_job);
                 throw std::runtime_error("Shouldn't be able to forget a running/pending pilot job");
             } catch (wrench::WorkflowExecutionException &e) {
-                if (not std::dynamic_pointer_cast<wrench::JobCannotBeForgotten>(e.getCause())) {
+                if (not std::dynamic_pointer_cast<wrench::NotAllowed>(e.getCause())) {
                     throw std::runtime_error("Unexpected failure cause: " + e.getCause()->toString());
                 }
             }

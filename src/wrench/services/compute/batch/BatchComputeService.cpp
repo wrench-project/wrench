@@ -1412,9 +1412,10 @@ namespace wrench {
 
         // If we got here, we're in trouble
         WRENCH_INFO("Trying to terminate a pilot job that's neither pending nor running!");
+        std::string msg = "Job cannot be terminated because it's neither pending nor running";
         ComputeServiceTerminatePilotJobAnswerMessage *answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
                 job, this->getSharedPtr<BatchComputeService>(), false,
-                std::shared_ptr<FailureCause>(new JobCannotBeTerminated(job)),
+                std::shared_ptr<FailureCause>(new NotAllowed(this->getSharedPtr<BatchComputeService>(), msg)),
                 this->getMessagePayloadValue(
                         BatchComputeServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
         S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
@@ -2016,12 +2017,13 @@ namespace wrench {
         }
 
         if (!is_pending && !is_running && !is_waiting) {
+            std::string msg = "Job cannot be terminated because it is neither pending, not running, not waiting";
             // Send a failure reply
             ComputeServiceTerminateStandardJobAnswerMessage *answer_message =
                     new ComputeServiceTerminateStandardJobAnswerMessage(
                             job, this->getSharedPtr<BatchComputeService>(), false, std::shared_ptr<FailureCause>(
-                                    new JobCannotBeTerminated(
-                                            job)),
+                                    new NotAllowed(this->getSharedPtr<BatchComputeService>(),
+                                            msg)),
                             this->getMessagePayloadValue(
                                     BatchComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD));
             S4U_Mailbox::dputMessage(answer_mailbox, answer_message);

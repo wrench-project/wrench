@@ -1246,9 +1246,10 @@ namespace wrench {
         // If the job doesn't exit, we reply right away
         if (this->all_workunits.find(job) == this->all_workunits.end()) {
             WRENCH_INFO("Trying to terminate a standard job that's not (no longer?) running!");
+            std::string msg = "Job cannot be terminated because it is not running";
             ComputeServiceTerminateStandardJobAnswerMessage *answer_message = new ComputeServiceTerminateStandardJobAnswerMessage(
                     job, this->getSharedPtr<BareMetalComputeService>(), false,
-                    std::shared_ptr<FailureCause>(new JobCannotBeTerminated(job)),
+                    std::shared_ptr<FailureCause>(new NotAllowed(this->getSharedPtr<BareMetalComputeService>(), msg)),
                     this->getMessagePayloadValue(
                             BareMetalComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD));
             S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
