@@ -565,6 +565,7 @@ namespace wrench {
         WRENCH_INFO("A standard job executor has failed because of timeout %s", job->getName().c_str());
 
 #ifdef ENABLE_BATSCHED
+
         this->notifyJobEventsToBatSched(job_id, "TIMEOUT", "COMPLETED_FAILED", "", "JOB_COMPLETED");
         BatchJob *batch_job = nullptr;
         for (auto const &j : this->all_jobs) {
@@ -1395,6 +1396,7 @@ namespace wrench {
 
 
 #ifdef ENABLE_BATSCHED
+
                 // forward this notification to batsched
                 this->notifyJobEventsToBatSched(job_id, "TIMEOUT", "COMPLETED_FAILED", "", "JOB_COMPLETED");
                 this->appendJobInfoToCSVOutputFile(*it1, "TERMINATED");
@@ -2027,14 +2029,18 @@ namespace wrench {
                             this->getMessagePayloadValue(
                                     BatchComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD));
             S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
+            return;
         }
 
 
 #ifdef ENABLE_BATSCHED
+
         //      throw std::runtime_error("BatchComputeService::processStandardJobTerminationRequest(): Not implemented for BATSCHED yet");
+
         notifyJobEventsToBatSched(job_id, "TIMEOUT", "COMPLETED_FAILED", "", "JOB_COMPLETED");
         this->appendJobInfoToCSVOutputFile(batch_job, "FAILED");
 #endif
+
         // Is it running?
         if (is_running) {
             terminateRunningStandardJob(job);
