@@ -43,7 +43,7 @@ namespace wrench {
      *        based on messages received on a mailbox, or until a timeout ooccurs
      *
      * @param mailbox: the name of the receiving mailbox
-     * @param timeout: a timeout value in seconds
+     * @param timeout: a timeout value in seconds (-1 means: no timeout)
      * @return a workflow execution event (or nullptr in case of a timeout)
      *
      * @throw WorkflowExecutionException
