@@ -297,7 +297,7 @@ set(TEST_FILES
         test/simulation/S4U_SimulationTest.cpp
         test/pilot_job/CriticalPathSchedulerTest.cpp
         test/misc/PointerUtilTest.cpp
-        test/misc/BogusMessage.cpp
+        test/misc/BogusMessageTest.cpp
         examples/simple-example/scheduler/pilot_job/CriticalPathPilotJobScheduler.cpp
         test/compute_services/ScratchSpaceTest.cpp
         test/energy_consumption/EnergyConsumptionTest.cpp
