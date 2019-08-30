@@ -497,8 +497,9 @@ void BatchServiceTest::do_OneStandardJobTaskTest_test() {
 
     // Create a Batch Service
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BatchComputeService(hostname, {"Host1", "Host2", "Host3", "Host4"},
-                                            {})));
+            new wrench::BatchComputeService(hostname, {"Host1", "Host2", "Host3", "Host4"}, 0,
+                                            {{wrench::BatchComputeServiceProperty::BATSCHED_LOGGING_MUTED, "false"}}
+                                            )));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
