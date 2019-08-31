@@ -29,6 +29,7 @@ void wrench::HostStateChangeDetector::cleanup(bool has_returned_from_main, int r
     // Unregister the callback!
     simgrid::s4u::Host::on_state_change.disconnect(this->on_state_change_call_back_id);
     simgrid::s4u::Host::on_speed_change.disconnect(this->on_speed_change_call_back_id);
+
 }
 
 
