@@ -820,27 +820,27 @@ namespace wrench {
         }
     }
 
-    /**
-     * @brief Get a map of src and dst hosts for file transfers
-     *        (only available for WorkflowTask::TaskType::TRANSFER_IN or WorkflowTask::TaskType::TRANSFER_OUT tasks)
-     * @return transfer src and dst pair
-     */
-    std::map<WorkflowFile *, std::pair<std::string, std::string>> WorkflowTask::getFileTransfers() const {
-        return this->fileTransfers;
-    }
-
-    /**
-     * @brief Set a pair of src and dest hosts for transfers (it is only meaningful for
-     *        WorkflowTask::TaskType::TRANSFER tasks)
-     *
-     * @param workflow_file: a pointer to a file to be transferred
-     * @param src: source hostname
-     * @param dst: destination hostname
-     */
-    void WorkflowTask::addSrcDest(WorkflowFile *workflow_file, const std::string &src, const std::string &dst) {
-        if (this->fileTransfers.find(workflow_file) == this->fileTransfers.end()) {
-            this->fileTransfers.insert(std::make_pair(workflow_file, std::make_pair(src, dst)));
-        }
-    }
+//    /**
+//     * @brief Get a map of src and dst hosts for file transfers
+//     *        (only available for WorkflowTask::TaskType::TRANSFER_IN or WorkflowTask::TaskType::TRANSFER_OUT tasks)
+//     * @return transfer src and dst pair
+//     */
+//    std::map<WorkflowFile *, std::pair<std::string, std::string>> WorkflowTask::getFileTransfers() const {
+//        return this->fileTransfers;
+//    }
+//
+//    /**
+//     * @brief Set a pair of src and dest hosts for transfers (it is only meaningful for
+//     *        WorkflowTask::TaskType::TRANSFER tasks)
+//     *
+//     * @param workflow_file: a pointer to a file to be transferred
+//     * @param src: source hostname
+//     * @param dst: destination hostname
+//     */
+//    void WorkflowTask::addSrcDest(WorkflowFile *workflow_file, const std::string &src, const std::string &dst) {
+//        if (this->fileTransfers.find(workflow_file) == this->fileTransfers.end()) {
+//            this->fileTransfers.insert(std::make_pair(workflow_file, std::make_pair(src, dst)));
+//        }
+//    }
 
 };
