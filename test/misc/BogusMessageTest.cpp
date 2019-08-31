@@ -11,11 +11,13 @@
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
 #include <algorithm>
+#include <exception>
 
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(bogus_message_test, "Log category for BogusMessageTest");
+
 
 class BogusMessageTest : public ::testing::Test {
 
@@ -27,6 +29,7 @@ public:
 
 protected:
     BogusMessageTest() {
+
 
         // Create the simplest workflow
         workflow = new wrench::Workflow();
@@ -133,9 +136,15 @@ private:
     }
 };
 
+/*************************************************************
+ ** WARNING: THESE TESTS ARE A NICE THOUGHT, AND THEY WORK
+ ** BUT ALTHOUGH THE "UNEXPECTED MESSAGE" EXECPTIONS ARE THROWN
+ ** THE LINES OF CODE THAT THROW ARE NOT MARKED AS COVERED
+ ** BY COVERALLS...
+ *************************************************************/
 
 TEST_F(BogusMessageTest, FileRegistryService) {
-    DO_TEST_WITH_FORK_ONE_ARG_EXPECT_FATAL_FAILURE(do_BogusMessage_Test, "file_registry", true);
+    DO_TEST_WITH_FORK_ONE_ARG_EXPECT_FATAL_FAILURE(do_BogusMessage_Test, "file_registry", false);
 }
 
 TEST_F(BogusMessageTest, SimpleStorage) {
@@ -194,7 +203,6 @@ void BogusMessageTest::do_BogusMessage_Test(std::string service_type) {
     ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     ASSERT_NO_THROW(simulation->launch());
-
 
     delete simulation;
 
