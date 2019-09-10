@@ -235,6 +235,7 @@ namespace wrench {
 		 */
     void Simulation::launch() {
 
+
         // Check that the simulation is correctly initialized
         try {
             this->checkSimulationSetup();
@@ -269,6 +270,7 @@ namespace wrench {
             this->is_running = false;
             throw;
         }
+
 
 
     }

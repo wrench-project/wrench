@@ -238,6 +238,8 @@ namespace wrench {
         Service::cleanup(has_returned_from_main, return_value);
 
         // Cleanup state in case of a restart
+        this->finished_workunit_executors.clear();
+        this->failed_workunit_executors.clear();
         for (auto wue: this->running_workunit_executors) {
             std::shared_ptr<Workunit> wu = wue->workunit;
             if (wu->task != nullptr) {
@@ -246,10 +248,12 @@ namespace wrench {
                 }
             }
         }
+
         this->non_ready_workunits.clear();
         this->ready_workunits.clear();
         this->running_workunits.clear();
         this->completed_workunits.clear();
+
 
 
     }
@@ -331,6 +335,7 @@ namespace wrench {
             if (!processNextMessage()) {
                 break;
             }
+
 
             /** Detect Termination **/
             if (this->non_ready_workunits.empty() and this->ready_workunits.empty() and
