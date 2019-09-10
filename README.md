@@ -94,6 +94,17 @@ it provides a recent and general overview on the framework.
 }
 ```
 
+## Funding Support
+
+WRENCH has been funded by the National Science Foundation (NSF), and the National Center for Scientific Research (CNRS).
+
+[![NSF Funding 20191][nsf-20191-badge]][nsf-20191-link]
+[![NSF Funding 20192][nsf-20192-badge]][nsf-20192-link]
+[![NSF Funding 20161][nsf-20161-badge]][nsf-20161-link]
+[![NSF Funding 20162][nsf-20162-badge]][nsf-20162-link]
+![CNRS Funding 2015][cnrs-2015-badge]
+
+
 [travis-badge]:             https://travis-ci.org/wrench-project/wrench.svg?branch=master
 [travis-link]:              https://travis-ci.org/wrench-project/wrench
 [license-badge]:            https://img.shields.io/badge/License-LGPL%20v3-blue.svg
@@ -107,3 +118,12 @@ it provides a recent and general overview on the framework.
 [sonarcloud-link]:          https://sonarcloud.io/dashboard?id=wrench
 [cii-badge]:                https://bestpractices.coreinfrastructure.org/projects/2357/badge
 [cii-link]:                 https://bestpractices.coreinfrastructure.org/projects/2357
+[nsf-20191-badge]:          https://img.shields.io/badge/NSF-1923539-blue
+[nsf-20191-link]:           https://nsf.gov/awardsearch/showAward?AWD_ID=1923539
+[nsf-20192-badge]:          https://img.shields.io/badge/NSF-1923621-blue
+[nsf-20192-link]:           https://nsf.gov/awardsearch/showAward?AWD_ID=1923621
+[nsf-20161-badge]:          https://img.shields.io/badge/NSF-1642369-blue
+[nsf-20161-link]:           https://nsf.gov/awardsearch/showAward?AWD_ID=1642369
+[nsf-20162-badge]:          https://img.shields.io/badge/NSF-1642335-blue
+[nsf-20162-link]:           https://nsf.gov/awardsearch/showAward?AWD_ID=1642335
+[cnrs-2015-badge]:          https://img.shields.io/badge/CNRS-PICS07239-blue
