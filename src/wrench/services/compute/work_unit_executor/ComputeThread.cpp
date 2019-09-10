@@ -43,7 +43,6 @@ namespace wrench {
             WRENCH_INFO("Couldn't report on my completion to my parent [ignoring and returning as if everything's ok]");
             return 0;
         }
-
         return 0;
     }
 

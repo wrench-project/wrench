@@ -47,6 +47,7 @@ namespace wrench {
 
         // TODO: Perhaps do this as one step?
         for (auto const &x : Service::service_shared_ptr_map) {
+//            WRENCH_DEBUG("---> %s (%ld)", x.second->getName().c_str(), x.second.use_count());
             if (x.second.use_count() == 1) {
                 to_cleanup.insert(x.first);
             }

@@ -130,6 +130,7 @@ namespace wrench {
                            "batch" + suffix,
                            scratch_space_size) {
 
+
         // Set default and specified properties
         this->setProperties(this->default_property_values, std::move(property_list));
 
@@ -1434,6 +1435,7 @@ namespace wrench {
     BatchComputeService::processStandardJobCompletion(std::shared_ptr<StandardJobExecutor> executor, StandardJob *job) {
         bool executor_on_the_list = false;
         std::set<std::shared_ptr<StandardJobExecutor>>::iterator it;
+
         for (it = this->running_standard_job_executors.begin();
              it != this->running_standard_job_executors.end(); it++) {
             if (*it == executor) {
@@ -1582,6 +1584,8 @@ namespace wrench {
                                   BatchJob *batch_job, unsigned long num_nodes_allocated,
                                   unsigned long allocated_time,
                                   unsigned long cores_per_node_asked_for) {
+
+
         switch (workflow_job->getType()) {
             case WorkflowJob::STANDARD: {
                 auto job = (StandardJob *) workflow_job;
