@@ -134,6 +134,7 @@ namespace wrench {
             WRENCH_INFO("Killing compute thread [%s]", compute_thread->getName().c_str());
             compute_thread->kill();
         }
+        this->compute_threads.clear();
 
         this->terminated_due_job_being_forcefully_terminated = job_termination;
         this->killActor();
@@ -544,6 +545,7 @@ namespace wrench {
         }
 #endif
             WRENCH_INFO("All compute threads have completed");
+            this->compute_threads.clear();
 
             if (!success) {
                 throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ComputeThreadHasDied()));
