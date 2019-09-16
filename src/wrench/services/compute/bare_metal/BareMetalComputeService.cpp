@@ -203,6 +203,9 @@ namespace wrench {
 
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_standard_job");
 
+        WRENCH_INFO("====> %lf", this->getMessagePayloadValue(
+                ComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD));
+
         //  send a "run a standard job" message to the daemon's mailbox_name
         try {
             S4U_Mailbox::putMessage(this->mailbox_name,
@@ -1496,11 +1499,11 @@ namespace wrench {
         dict.insert(std::make_pair("ram_capacities", ram_capacities));
 
         // RAM availability per host
-        std::map<std::string, double> ram_availabilities;
+        std::map<std::string, double> ram_availabilities_to_return;
         for (auto r : this->ram_availabilities) {
-            ram_availabilities.insert(std::make_pair(r.first, r.second));
+            ram_availabilities_to_return.insert(std::make_pair(r.first, r.second));
         }
-        dict.insert(std::make_pair("ram_availabilities", ram_availabilities));
+        dict.insert(std::make_pair("ram_availabilities", ram_availabilities_to_return));
 
         std::map<std::string, double> ttl;
         if (this->has_ttl) {
