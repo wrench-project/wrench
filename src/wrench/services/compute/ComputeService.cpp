@@ -297,6 +297,35 @@ namespace wrench {
     }
 
     /**
+     * @brief Get ram availability for each of the compute service's host
+     * @return the ram availability map (could be empty)
+     *
+     * @throw WorkflowExecutionException
+     * @throw std::runtime_error
+     */
+    std::map<std::string, double> ComputeService::getPerHostAvailableMemoryCapacity() {
+
+        std::map<std::string, std::map<std::string, double>> dict;
+        try {
+            dict = this->getServiceResourceInformation();
+        } catch (WorkflowExecutionException &e) {
+            throw;
+        } catch (std::runtime_error &e) {
+            throw;
+        }
+
+        std::map<std::string, double> to_return;
+
+        if (dict.find("ram_availabilities") != dict.end()) {
+            for (auto x : dict["ram_availabilities"]) {
+                to_return.insert(std::make_pair(x.first, (double) x.second));
+            }
+        }
+
+        return to_return;
+    }
+
+    /**
      * @brief Get the total idle core count for all hosts of the compute service
      * @return total idle core count
      *
