@@ -195,6 +195,8 @@ private:
         throw std::runtime_error("getTotalNumIdleCores() should return 3 for compute service #1");
       }
 
+      this->test->compute_service1->getPerHostAvailableMemoryCapacity(); // coverage
+
       // Wait for the workflow execution event
       auto event = this->getWorkflow()->waitForNextExecutionEvent();
       if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
