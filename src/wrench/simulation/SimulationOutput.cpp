@@ -14,6 +14,8 @@
 #include "simgrid/s4u.hpp"
 #include "simgrid/plugins/energy.h"
 
+#include <wrench-dev.h>
+
 #include <nlohmann/json.hpp>
 #include <boost/algorithm/string.hpp>
 
@@ -24,6 +26,9 @@
 #include <cmath>
 #include <string>
 #include <unordered_set>
+
+
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(simulation_output, "Log category for Simulation Output");
 
 namespace wrench {
 
@@ -745,6 +750,7 @@ namespace wrench {
             for (auto source = hosts.begin(); source != target; ++source) {
                 nlohmann::json route_forward_json;
 
+
                 // populate "route_forward" with an ordered list of network links along
                 // the route between source and target
                 (*source)->route_to(*target, route_forward, &route_forward_latency);
@@ -765,6 +771,11 @@ namespace wrench {
                 // so we need to add it if it is in fact different
                 nlohmann::json route_backward_json;
                 (*target)->route_to(*source, route_backward, &route_backward_latency);
+
+                if (route_forward.empty() and route_backward.empty()) {
+                    throw std::invalid_argument("Cannot generate platform graph because no route is found between hosts " +
+                                                (*source)->get_name() + " and " + (*target)->get_name());
+                }
 
                 // check to see if the route from source to target is the same as from target to source
                 bool is_route_equal = true;

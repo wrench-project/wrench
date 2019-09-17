@@ -37,6 +37,7 @@ public:
     void do_SimulationSearchForHostUtilizationGraphLayout_test();
     void do_SimulationDumpHostEnergyConsumptionJSON_test();
     void do_SimulationDumpPlatformGraphJSON_test();
+    void do_SimulationDumpPlatformGraphJSONBrokenRouting_test();
 
 protected:
     SimulationDumpJSONTest() {
@@ -110,6 +111,32 @@ protected:
         fprintf(platform_file3, "%s", xml3.c_str());
         fclose(platform_file3);
 
+        // 3 host platform with full routing but not all connections specified
+        std::string xml3_broken = "<?xml version='1.0'?>"
+                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                           "<platform version=\"4.1\"> "
+                           "   <zone id=\"AS0\" routing=\"Full\"> "
+                           "       <host id=\"host1\" speed=\"1f\" core=\"10\"> "
+                           "         <prop id=\"ram\" value=\"10\"/>"
+                           "       </host>"
+                           "       <host id=\"host2\" speed=\"1f\" core=\"20\"> "
+                           "          <prop id=\"ram\" value=\"20\"/> "
+                           "       </host> "
+                           "       <host id=\"host3\" speed=\"1f\" core=\"20\"> "
+                           "          <prop id=\"ram\" value=\"20\"/> "
+                           "       </host> "
+                           "       <link id=\"1\" bandwidth=\"1Gbps\" latency=\"1us\"/>"
+                           "       <link id=\"2\" bandwidth=\"1Gbps\" latency=\"1us\"/>"
+                           "       <link id=\"3\" bandwidth=\"1Gbps\" latency=\"1us\"/>"
+                           "       <route src=\"host1\" dst=\"host2\"> <link_ctn id=\"1\"/> </route>"
+                           "       <route src=\"host2\" dst=\"host3\"> <link_ctn id=\"2\"/> </route>"
+                           "   </zone> "
+                           "</platform>";
+        FILE *platform_file3_broken = fopen(platform_file_path3_broken.c_str(), "w");
+        fprintf(platform_file3_broken, "%s", xml3_broken.c_str());
+        fclose(platform_file3_broken);
+
+
         // platform with cluster
         std::string xml4 = "<?xml version='1.0'?>"
                            "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
@@ -150,6 +177,7 @@ protected:
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
     std::string platform_file_path2 = UNIQUE_TMP_PATH_PREFIX + "platform2.xml";
     std::string platform_file_path3 = UNIQUE_TMP_PATH_PREFIX + "platform3.xml";
+    std::string platform_file_path3_broken = UNIQUE_TMP_PATH_PREFIX + "platform3_broken.xml";
     std::string platform_file_path4 = UNIQUE_TMP_PATH_PREFIX + "platform4.xml";
     std::string execution_data_json_file_path = UNIQUE_TMP_PATH_PREFIX + "workflow_data.json";
     std::string workflow_graph_json_file_path = UNIQUE_TMP_PATH_PREFIX + "workflow_graph_data.json";
@@ -1564,4 +1592,24 @@ void SimulationDumpJSONTest::do_SimulationDumpPlatformGraphJSON_test() {
     delete simulation;
     free(argv[0]);
     free(argv);
+}
+
+/**********************************************************************/
+/**         SimulationDumpPlatformGraphJSONTest: Broken Routing      **/
+/**********************************************************************/
+
+TEST_F(SimulationDumpJSONTest, SimulationDumpPlatformGraphJSONWithBrokenRoutingTest) {
+    DO_TEST_WITH_FORK(do_SimulationDumpPlatformGraphJSONBrokenRouting_test);
+}
+
+void SimulationDumpJSONTest::do_SimulationDumpPlatformGraphJSONBrokenRouting_test() {
+    auto simulation = new wrench::Simulation();
+    int argc = 1;
+    auto argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
+
+    EXPECT_NO_THROW(simulation->init(&argc, argv));
+    EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path3_broken));
+
+    EXPECT_THROW(simulation->getOutput().dumpPlatformGraphJSON(this->platform_graph_json_file_path), std::invalid_argument);
 }
