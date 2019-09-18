@@ -201,7 +201,7 @@ void BareMetalComputeServiceTestStandardJobs::do_UnsupportedStandardJobs_test() 
     wrench::Simulation *simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("capacity_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -307,7 +307,7 @@ void BareMetalComputeServiceTestStandardJobs::do_BogusNumCores_test() {
     wrench::Simulation *simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("capacity_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -428,7 +428,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoSingleCoreTasks_test() {
     wrench::Simulation *simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("capacity_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -550,7 +550,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase1_test() {
     wrench::Simulation *simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("capacity_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -686,7 +686,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase2_test() {
     wrench::Simulation *simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("capacity_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -903,7 +903,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase3_test() {
     wrench::Simulation *simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("capacity_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1018,7 +1018,7 @@ void BareMetalComputeServiceTestStandardJobs::do_JobTermination_test() {
     auto *simulation = new wrench::Simulation();
     int argc = 1;
     auto **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("capacity_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1106,16 +1106,18 @@ private:
             job_manager->terminateJob(two_task_job);
             throw std::runtime_error("Trying to terminate a non-submitted job should have raised an exception!");
         } catch (wrench::WorkflowExecutionException &e) {
-            auto cause = std::dynamic_pointer_cast<wrench::JobCannotBeTerminated>(e.getCause());
+
+            auto cause = std::dynamic_pointer_cast<wrench::NotAllowed>(e.getCause());
             if (not cause) {
                 throw std::runtime_error(
                         "Got an expected exception but an unexpected failure cause: " +
                         e.getCause()->toString() + " (expected: JobCannotBeTerminated)");
             }
-            if (cause->getJob() != two_task_job) {
+            if (cause->getService() != nullptr) {
                 throw std::runtime_error(
-                        "Got the expected exception and failure cause, but the failure cause does not point to the right job");
+                        "Got the expected exception and failure cause, but the failure cause does not point to the right service (should be nullptr)");
             }
+            cause->toString();
         }
 
         return 0;
@@ -1132,7 +1134,7 @@ void BareMetalComputeServiceTestStandardJobs::do_NonSubmittedJobTermination_test
     auto *simulation = new wrench::Simulation();
     int argc = 1;
     auto **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("capacity_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1252,7 +1254,7 @@ void BareMetalComputeServiceTestStandardJobs::do_CompletedJobTermination_test() 
     auto *simulation = new wrench::Simulation();
     int argc = 1;
     auto **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("capacity_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1385,7 +1387,7 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownComputeServiceWhileJobI
     auto *simulation = new wrench::Simulation();
     int argc = 1;
     auto **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("capacity_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1512,7 +1514,7 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownStorageServiceBeforeJob
     auto *simulation = new wrench::Simulation();
     int argc = 1;
     auto **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("capacity_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 

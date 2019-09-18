@@ -109,8 +109,11 @@ protected:
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"DualCoreHost\" speed=\"1f\" core=\"2\"/> "
                           "       <host id=\"QuadCoreHost\" speed=\"1f\" core=\"4\"/> "
+                          "       <host id=\"TinyHost\" speed=\"1f\" core=\"1\"/> "
                           "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
                           "       <route src=\"DualCoreHost\" dst=\"QuadCoreHost\"> <link_ctn id=\"1\"/> </route>"
+                          "       <route src=\"TinyHost\" dst=\"QuadCoreHost\"> <link_ctn id=\"1\"/> </route>"
+                          "       <route src=\"DualCoreHost\" dst=\"TinyHost\"> <link_ctn id=\"1\"/> </route>"
                           "   </zone> "
                           "</platform>";
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
@@ -139,7 +142,7 @@ void VirtualizedClusterServiceTest::do_ConstructorTest_test() {
     auto *simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("cloud_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -200,6 +203,8 @@ private:
 
     int main() {
         auto cs = *(this->getAvailableComputeServices<wrench::CloudComputeService>().begin());
+
+        cs->getCoreFlopRate(); // coverage
 
         // Non-existent VM operations (for coverage)
         try {
@@ -370,7 +375,7 @@ void VirtualizedClusterServiceTest::do_StandardJobTaskTest_test() {
     auto *simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("cloud_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -497,7 +502,7 @@ void VirtualizedClusterServiceTest::do_StandardJobTaskWithCustomVMNameTest_test(
     auto *simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("cloud_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -575,21 +580,46 @@ private:
         // Submit the 2-task job for execution
         try {
             auto cs = *(this->getAvailableComputeServices<wrench::VirtualizedClusterComputeService>().begin());
-            std::string src_host = cs->getExecutionHosts()[0];
+
+            std::string src_host = "QuadCoreHost";
             auto vm_name = cs->createVM(2, 10);
+
+
+            try {
+                cs->startVM("NON-EXISTENT", src_host);
+                throw std::runtime_error("Shouldn't be able to start a bogus VM");
+            } catch (std::invalid_argument &e) {}
+
+            try {
+                cs->startVM(vm_name, "NON-EXISTENT");
+                throw std::runtime_error("Shouldn't be able to start a VM on a bogus host");
+            } catch (std::invalid_argument &e) {}
+
             auto vm_cs = cs->startVM(vm_name, src_host);
+
+            try {
+                cs->startVM(vm_name, src_host);
+                throw std::runtime_error("Shouldn't be able to start a VM that is not DOWN");
+            } catch (wrench::WorkflowExecutionException &e) {}
+
+
 
             job_manager->submitJob(two_task_job, vm_cs);
 
-            // migrating the VM
-            std::string dest_host = cs->getExecutionHosts()[1];
-            try { // try a bogus one for coverage
-                cs->migrateVM("NON-EXISTENT", dest_host);
-                throw std::runtime_error("Should not be able to migrate a non-existent VM");
-            } catch (std::invalid_argument &e) {
-            }
 
-            cs->migrateVM(vm_name, dest_host);
+            // migrating the VM
+
+            try { // try a bogus one for coverage
+                cs->migrateVM("NON-EXISTENT", "DualCoreHost");
+                throw std::runtime_error("Should not be able to migrate a non-existent VM");
+            } catch (std::invalid_argument &e) {}
+
+            try { // try a bogus one for coverage
+                cs->migrateVM(vm_name, "TinyHost");
+                throw std::runtime_error("Should not be able to migrate a VM to a host without sufficient resources");
+            } catch (wrench::WorkflowExecutionException &e) {}
+
+            cs->migrateVM(vm_name, "DualCoreHost");
 
         } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error(e.what());
@@ -620,7 +650,7 @@ void VirtualizedClusterServiceTest::do_VMMigrationTest_test() {
     auto *simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("virtualized_cluster_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -740,7 +770,7 @@ void VirtualizedClusterServiceTest::do_NumCoresTest_test() {
     auto *simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("cloud_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -847,7 +877,7 @@ void VirtualizedClusterServiceTest::do_StopAllVMsTest_test() {
     auto *simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("virtualized_cluster_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1097,7 +1127,7 @@ void VirtualizedClusterServiceTest::do_ShutdownVMTest_test() {
     auto *simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("virtualized_cluster_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1190,7 +1220,6 @@ private:
             std::string execution_host = cs->getExecutionHosts()[0];
 
             for (int i=0; i < 4; i++) {
-                WRENCH_INFO("CREATING A VM");
                 auto vm_name = cs->createVM(1, 10);
                 auto vm_cs = cs->startVM(vm_name, execution_host);
                 vm_list.push_back(std::make_tuple(vm_name, vm_cs));
@@ -1200,18 +1229,14 @@ private:
             throw std::runtime_error(e.what());
         }
 
-        WRENCH_INFO("VMHAVE EEN CREATED");
         // shutdown some VMs
         try {
-            WRENCH_INFO("SHUTTING DONW A VM");
             cs->shutdownVM(std::get<0>(vm_list.at(0)));
-            WRENCH_INFO("SHUTTING DONW A VM");
             cs->shutdownVM(std::get<0>(vm_list.at(2)));
         } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error(e.what());
         }
 
-        WRENCH_INFO("STOPPING SERVICE");
         // stop service
         cs->stop();
 
@@ -1232,7 +1257,7 @@ void VirtualizedClusterServiceTest::do_ShutdownVMAndThenShutdownServiceTest_test
     auto *simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("virtualized_cluster_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1390,7 +1415,7 @@ void VirtualizedClusterServiceTest::do_SubmitToVMTest_test() {
     auto *simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("virtualized_cluster_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1456,28 +1481,27 @@ private:
 
         // Start the VM
         wrench::Simulation::sleep(10);
-        WRENCH_INFO("STARTING THE VM");
         auto vm_cs = cloud_service->startVM(vm_name);
 
         // Shutdown the VM
         wrench::Simulation::sleep(10);
-        WRENCH_INFO("SHUTTING DOWN THE VM");
         cloud_service->shutdownVM(vm_name);
 
         // Start the VM
         wrench::Simulation::sleep(10);
-        WRENCH_INFO("STARTING THE VM");
         vm_cs = cloud_service->startVM(vm_name);
 
         // Shutdown the VM
         wrench::Simulation::sleep(10);
-        WRENCH_INFO("SHUTTING DOWN THE VM");
         cloud_service->shutdownVM(vm_name);
 
         // Destroying the VM
         wrench::Simulation::sleep(10);
-        WRENCH_INFO("DESTROYING  THE VM");
         cloud_service->destroyVM(vm_name);
+        try {
+            cloud_service->destroyVM(vm_name);
+            throw std::runtime_error("Shouldn't be able to destroy an already destroyed VM");
+        } catch (std::invalid_argument &e) {}
 
         return 0;
     }
@@ -1493,7 +1517,7 @@ void VirtualizedClusterServiceTest::do_VMStartShutdownStartShutdown_test() {
     auto *simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("failure_test");
+    argv[0] = strdup("unit_test");
 
 
     simulation->init(&argc, argv);
@@ -1621,7 +1645,7 @@ void VirtualizedClusterServiceTest::do_VMShutdownWhileJobIsRunning_test() {
     auto *simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("failure_test");
+    argv[0] = strdup("unit_test");
 
 
     simulation->init(&argc, argv);
@@ -1754,7 +1778,7 @@ void VirtualizedClusterServiceTest::do_VMComputeServiceStopWhileJobIsRunning_tes
     auto *simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("failure_test");
+    argv[0] = strdup("unit_test");
 
 
     simulation->init(&argc, argv);

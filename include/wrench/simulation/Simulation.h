@@ -58,8 +58,15 @@ namespace wrench {
         static unsigned long getHostNumCores(std::string hostname);
         static double getHostFlopRate(std::string hostname);
         static bool isHostOn(std::string hostname);
+        static void turnOnHost(std::string hostname);
+        static void turnOffHost(std::string hostname);
+        static bool isLinkOn(std::string linkname);
+        static void turnOnLink(std::string linkname);
+        static void turnOffLink(std::string linkname);
 
         void launch();
+        bool isRunning();
+
 
         /**
          * @brief Method to add a service to the simulation
@@ -100,6 +107,7 @@ namespace wrench {
         static double getMinPowerConsumption(const std::string &hostname);
         static double getMaxPowerConsumption(const std::string &hostname);
         static std::vector<int> getListOfPstates(const std::string &hostname);
+
 
 
         /***********************/

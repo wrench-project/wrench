@@ -39,7 +39,6 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param simulation: a pointer to the simulation object
      * @param hostname: the name of the host on which the workunit execution will run
      * @param num_cores: the number of cores available to the workunit executor
      * @param ram_utilization: the number of bytes of RAM used by the service
@@ -51,7 +50,6 @@ namespace wrench {
      * @param simulate_computation_as_sleep: simulate computation as a sleep instead of an actual compute thread (for simulation scalability reasons)
      */
     WorkunitExecutor::WorkunitExecutor(
-            Simulation *simulation,
             std::string hostname,
             unsigned long num_cores,
             double ram_utilization,
@@ -63,14 +61,21 @@ namespace wrench {
             bool simulate_computation_as_sleep) :
             Service(hostname, "workunit_executor", "workunit_executor") {
 
-        if (thread_startup_overhead < 0) {
-            throw std::invalid_argument("WorkunitExecutor::WorkunitExecutor(): thread_startup_overhead must be >= 0");
-        }
         if (num_cores < 1) {
             throw std::invalid_argument("WorkunitExecutor::WorkunitExecutor(): num_cores must be >= 1");
         }
+        if (ram_utilization < 0) {
+            throw std::invalid_argument("WorkunitExecutor::WorkunitExecutor(): ram_utilization must be >= 0");
+        }
+        if (workunit == nullptr) {
+            throw std::invalid_argument("WorkunitExecutor::WorkunitExecutor(): workunit cannot be nullptr");
+        }
+        if (thread_startup_overhead < 0) {
+            throw std::invalid_argument("WorkunitExecutor::WorkunitExecutor(): thread_startup_overhead must be >= 0");
+        }
 
-        this->simulation = simulation;
+
+
         this->callback_mailbox = callback_mailbox;
         this->workunit = workunit;
         this->thread_startup_overhead = thread_startup_overhead;
@@ -129,6 +134,7 @@ namespace wrench {
             WRENCH_INFO("Killing compute thread [%s]", compute_thread->getName().c_str());
             compute_thread->kill();
         }
+        this->compute_threads.clear();
 
         this->terminated_due_job_being_forcefully_terminated = job_termination;
         this->killActor();
@@ -160,28 +166,68 @@ namespace wrench {
         SimulationMessage *msg_to_send_back = nullptr;
         bool success;
 
-        try {
-            S4U_Simulation::computeZeroFlop();
-
-            performWork(this->workunit.get());
-
-            // build "success!" message
-            success = true;
-            msg_to_send_back = new WorkunitExecutorDoneMessage(
-                    this->getSharedPtr<WorkunitExecutor>(),
-                    this->workunit,
-                    0.0);
-
-        } catch (WorkflowExecutionException &e) {
-
-            // build "failed!" message
-            WRENCH_DEBUG("Got an exception while performing work: %s", e.getCause()->toString().c_str());
+        // Check that there is no Scratch Space weirdness
+        bool scratch_space_ok = true;
+        if (this->scratch_space == nullptr) {
+            for (auto const &pfc : workunit->pre_file_copies) {
+                if ((std::get<1>(pfc) == ComputeService::SCRATCH) ||
+                    (std::get<2>(pfc) == ComputeService::SCRATCH)) {
+                    scratch_space_ok = false;
+                    break;
+                }
+            }
+            for (auto const &fl : workunit->file_locations) {
+                if (std::get<1>(fl) == ComputeService::SCRATCH) {
+                    scratch_space_ok = false;
+                    break;
+                }
+            }
+            for (auto const &pfc : workunit->post_file_copies) {
+                if ((std::get<1>(pfc) == ComputeService::SCRATCH) ||
+                    (std::get<2>(pfc) == ComputeService::SCRATCH)) {
+                    scratch_space_ok = false;
+                    break;
+                }
+            }
+            for (auto const &cd : workunit->cleanup_file_deletions) {
+                if (std::get<1>(cd) == ComputeService::SCRATCH) {
+                    scratch_space_ok = false;
+                    break;
+                }
+            }
+        }
+        if (not scratch_space_ok) {
             success = false;
             msg_to_send_back = new WorkunitExecutorFailedMessage(
                     this->getSharedPtr<WorkunitExecutor>(),
                     this->workunit,
-                    e.getCause(),
+                    std::shared_ptr<NoScratchSpace>(new NoScratchSpace("No scratch space on compute service")),
                     0.0);
+        } else {
+
+            try {
+                S4U_Simulation::computeZeroFlop();
+
+                performWork(this->workunit.get());
+
+                // build "success!" message
+                success = true;
+                msg_to_send_back = new WorkunitExecutorDoneMessage(
+                        this->getSharedPtr<WorkunitExecutor>(),
+                        this->workunit,
+                        0.0);
+
+            } catch (WorkflowExecutionException &e) {
+
+                // build "failed!" message
+                WRENCH_DEBUG("Got an exception while performing work: %s", e.getCause()->toString().c_str());
+                success = false;
+                msg_to_send_back = new WorkunitExecutorFailedMessage(
+                        this->getSharedPtr<WorkunitExecutor>(),
+                        this->workunit,
+                        e.getCause(),
+                        0.0);
+            }
         }
 
         WRENCH_INFO("Work unit executor on host %s terminating!", S4U_Simulation::getHostName().c_str());
@@ -233,20 +279,11 @@ namespace wrench {
             //Even in the pre-file copies, the src can be the scratch itself???
             std::shared_ptr<StorageService> src = std::get<1>(file_copy);
             if (src == ComputeService::SCRATCH) {
-                if (this->scratch_space == nullptr) {
-                    throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new NoScratchSpace(
-                            "WorkunitExecutor::performWork(): Scratch Space was asked to be used as source but is null")));
-                }
                 src = this->scratch_space;
             }
             std::shared_ptr<StorageService> dst = std::get<2>(file_copy);
             if (dst == ComputeService::SCRATCH) {
-                if (this->scratch_space == nullptr) {
-                    throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new NoScratchSpace(
-                            "WorkunitExecutor::performWork(): Scratch Space was asked to be used as destination but is null")));
-                } else {
-                    dst = this->scratch_space;
-                }
+                dst = this->scratch_space;
             }
 
             if ((file == nullptr) || (src == nullptr) || (dst == nullptr)) {
@@ -454,8 +491,8 @@ namespace wrench {
                 std::shared_ptr<ComputeThread> compute_thread;
                 try {
                     compute_thread = std::shared_ptr<ComputeThread>(
-                            new ComputeThread(this->simulation, S4U_Simulation::getHostName(), effective_flops,
-                                              tmp_mailbox));
+                            new ComputeThread(S4U_Simulation::getHostName(), effective_flops, tmp_mailbox));
+                    compute_thread->simulation = this->simulation;
                     compute_thread->start(compute_thread, true, false); // Daemonized, no auto-restart
                 } catch (std::exception &e) {
                     // Some internal SimGrid exceptions...????
@@ -508,6 +545,7 @@ namespace wrench {
         }
 #endif
             WRENCH_INFO("All compute threads have completed");
+            this->compute_threads.clear();
 
             if (!success) {
                 throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ComputeThreadHasDied()));

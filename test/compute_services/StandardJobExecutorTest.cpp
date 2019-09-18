@@ -12,12 +12,13 @@
 #include <wrench-dev.h>
 
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
-#include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
+#include "../../src/wrench/services/compute/standard_job_executor/StandardJobExecutorMessage.h"
+
 
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(standard_job_executor_test, "Log category for Simple SandardJobExecutorTest");
+XBT_LOG_NEW_DEFAULT_CATEGORY(standard_job_executor_test, "Log category for Simple StandardJobExecutorTest");
 
 #define EPSILON 0.05
 
@@ -40,8 +41,6 @@ public:
     void do_OneMultiCoreTaskTestCase1_test();
     void do_OneMultiCoreTaskTestCase2_test();
     void do_OneMultiCoreTaskTestCase3_test();
-
-    void do_OneMultiCoreTaskTest_test();
 
     void do_DependentTasksTest_test();
 
@@ -289,13 +288,10 @@ private:
 
 
         // Create a bogus StandardJobExecutor (not enough Cores specified)
-        WRENCH_INFO("REMOGING TASK");
         this->getWorkflow()->removeTask(task);
         wrench::WorkflowTask *task_too_many_cores = this->getWorkflow()->addTask("task_too_many_cores", 3600, 20, 20, 1.0, 0);
         task_too_many_cores->addInputFile(this->getWorkflow()->getFileByID("input_file"));
-        WRENCH_INFO("HERE1");
         task_too_many_cores->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
-        WRENCH_INFO("HERE1");
 //        // Forget the previous job!
         job_manager->forgetJob(job);
 
@@ -336,7 +332,6 @@ private:
 
 
         this->getWorkflow()->removeTask(task_too_many_cores);
-        WRENCH_INFO("HERE");
         wrench::WorkflowTask *task_too_much_ram = this->getWorkflow()->addTask("task_too_much_ram", 3600, 1, 1, 1.0, 500.00);
         task_too_much_ram->addInputFile(this->getWorkflow()->getFileByID("input_file"));
         task_too_much_ram->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
@@ -450,7 +445,7 @@ void StandardJobExecutorTest::do_StandardJobExecutorConstructorTest_test() {
     simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 
@@ -642,7 +637,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskTest_test() {
     simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 
@@ -821,7 +816,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskBogusPreFileCopyTest_test() {
     simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_tess");
 
     simulation->init(&argc, argv);
 
@@ -928,6 +923,10 @@ private:
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("output_file"),
                                                                                                  this->test->storage_service2)});
 
+            job->getFileLocations(); // coverage
+            job->getPriority(); // coverage
+            job->getMinimumRequiredNumCores(); // coverage
+
 
             std::string my_mailbox = "test_callback_mailbox";
 
@@ -1000,7 +999,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskMissingFileTest_test() {
     simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 
@@ -1208,7 +1207,7 @@ void StandardJobExecutorTest::do_DependentTasksTest_test() {
     simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 
@@ -1347,7 +1346,7 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase1_test() {
     simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_tes");
 
     simulation->init(&argc, argv);
 
@@ -1502,7 +1501,7 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase2_test() {
     simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 
@@ -1618,7 +1617,6 @@ private:
         try {
             message = wrench::S4U_Mailbox::getMessage(my_mailbox);
         } catch (std::shared_ptr<wrench::NetworkError> &cause) {
-            std::string error_msg = cause->toString();
             throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
         }
 
@@ -1659,7 +1657,7 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase3_test() {
     simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 
@@ -2017,7 +2015,7 @@ void StandardJobExecutorTest::do_TwoMultiCoreTasksTest_test() {
     simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 
@@ -2294,7 +2292,7 @@ void StandardJobExecutorTest::do_MultiHostTest_test() {
     simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 
@@ -2453,7 +2451,7 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringAComputation_test() {
     simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 
@@ -2587,10 +2585,10 @@ private:
 
             // We should be good now, with nothing running
 
-        this->getWorkflow()->removeTask(task1);
-        this->getWorkflow()->removeTask(task2);
-        this->getWorkflow()->removeTask(task3);
-        this->getWorkflow()->removeTask(task4);
+            this->getWorkflow()->removeTask(task1);
+            this->getWorkflow()->removeTask(task2);
+            this->getWorkflow()->removeTask(task3);
+            this->getWorkflow()->removeTask(task4);
         }
 
         return 0;
@@ -2607,7 +2605,7 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringATransfer_test() {
     simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 
@@ -2783,7 +2781,7 @@ void StandardJobExecutorTest::do_JobTerminationTestAtRandomTimes_test() {
     simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 
@@ -2850,7 +2848,7 @@ void StandardJobExecutorTest::do_WorkUnit_test() {
     simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 
@@ -2870,10 +2868,6 @@ void StandardJobExecutorTest::do_WorkUnit_test() {
                                                                                (std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>){},
                                                                                (std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>>){},
                                                                                (std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>>){});
-
-
-
-
 
 
     ASSERT_THROW(wrench::Workunit::addDependency(wu1, nullptr), std::invalid_argument);
@@ -2919,17 +2913,14 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-
-        // Create a StandardJob with both tasks
+        // Create a StandardJob
         wrench::StandardJob *job = job_manager->createStandardJob(
                 {},
                 {},
                 {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
                         this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
                         this->test->storage_service2)},
-                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
-                        this->getWorkflow()->getFileByID("input_file"), this->test->storage_service2,
-                        this->test->storage_service2)},
+                {},
                 {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
                                                                                              this->test->storage_service2)}
         );
@@ -2982,7 +2973,7 @@ void StandardJobExecutorTest::do_NoTaskTest_test() {
     simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 
@@ -3010,7 +3001,7 @@ void StandardJobExecutorTest::do_NoTaskTest_test() {
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new TwoMultiCoreTasksTestWMS(
+            new NoTaskTestWMS(
                     this, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));

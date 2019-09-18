@@ -131,7 +131,7 @@ void JobManagerTest::do_JobManagerConstructorTest_test() {
     simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 
@@ -236,7 +236,7 @@ void JobManagerTest::do_JobManagerCreateJobTest_test() {
     simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 
@@ -325,7 +325,7 @@ void JobManagerTest::do_JobManagerSubmitJobTest_test() {
     simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 
@@ -458,7 +458,7 @@ void JobManagerTest::do_JobManagerResubmitJobTest_test() {
     simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 
@@ -533,8 +533,8 @@ private:
 
         // Add tasks to the workflow
         wrench::WorkflowTask *t1 = this->getWorkflow()->addTask("task1", 600, 10, 10, 1.0, 80);
-        wrench::WorkflowTask *t2 = this->getWorkflow()->addTask("task2", 600, 10, 10, 1.0, 80);
-        wrench::WorkflowTask *t3 = this->getWorkflow()->addTask("task3", 600, 10, 10, 1.0, 0);
+        wrench::WorkflowTask *t2 = this->getWorkflow()->addTask("task2", 600, 9, 10, 1.0, 80);
+        wrench::WorkflowTask *t3 = this->getWorkflow()->addTask("task3", 600, 8, 10, 1.0, 0);
         wrench::WorkflowTask *t4 = this->getWorkflow()->addTask("task4", 600, 10, 10, 1.0, 0);
 
         /* t1 and t2 can't run at the same time in this example, due to RAM */
@@ -543,8 +543,15 @@ private:
         this->getWorkflow()->addControlDependency(t2, t3);
         this->getWorkflow()->addControlDependency(t3, t4);
 
+        // Setting priorities for coverage
+        t1->setPriority(12);
+        t2->setPriority(3);
+        t3->setPriority(42);
+
         // Create a standard job
         wrench::StandardJob *job = job_manager->createStandardJob(this->getWorkflow()->getTasks(), {});
+        job->getMinimumRequiredNumCores(); // coverage
+        job->getPriority(); // coverage
 
         // Submit the standard job
         try {
@@ -601,7 +608,7 @@ void JobManagerTest::do_JobManagerTerminateJobTest_test() {
     simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 

@@ -25,6 +25,7 @@ public:
     wrench::WorkflowTask *task;
     std::shared_ptr<wrench::StorageService> storage_service1 = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service2 = nullptr;
+    std::shared_ptr<wrench::StorageService> storage_service3 = nullptr;
     std::shared_ptr<wrench::BareMetalComputeService> compute_service = nullptr;
 
     void do_BadSetup_test();
@@ -39,7 +40,11 @@ public:
 
     void do_ExecutionWithDefaultStorageService_test();
 
-    void do_ExecutionWithPrePostCopies_test();
+    void do_ExecutionWithPrePostCopiesTaskCleanup_test();
+
+    void do_ExecutionWithPrePostCopiesNoTaskNoCleanup_test();
+
+    void do_ExecutionWithPreNoPostCopiesNoTaskCleanup_test();
 
     void do_ExecutionWithMissingFile_test();
 
@@ -1051,11 +1056,11 @@ private:
     }
 };
 
-TEST_F(BareMetalComputeServiceOneTaskTest, ExecutionWithPrePostCopies) {
-    DO_TEST_WITH_FORK(do_ExecutionWithPrePostCopies_test)
+TEST_F(BareMetalComputeServiceOneTaskTest, ExecutionWithPrePostCopiesTaskCleanup) {
+    DO_TEST_WITH_FORK(do_ExecutionWithPrePostCopiesTaskCleanup_test)
 }
 
-void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPrePostCopies_test() {
+void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPrePostCopiesTaskCleanup_test() {
 
     // Create and initialize a simulation
     wrench::Simulation *simulation = new wrench::Simulation();
@@ -1123,6 +1128,251 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPrePostCopies_test() {
               task->getEndDate());
     ASSERT_EQ(simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>()[0]->getContent()->getTask(),
               task);
+
+    delete simulation;
+
+    free(argv[0]);
+    free(argv);
+}
+
+
+/*************************************************************************/
+/** EXECUTION WITH PRE/POST COPIES NO TASK  NO CLEANUP SIMULATION TEST  **/
+/*************************************************************************/
+
+class ExecutionWithPrePostCopiesNoTaskNoCleanupTestWMS : public wrench::WMS {
+
+public:
+    ExecutionWithPrePostCopiesNoTaskNoCleanupTestWMS(BareMetalComputeServiceOneTaskTest *test,
+                                                const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                                const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                                                std::string &hostname) :
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
+        this->test = test;
+    }
+
+
+private:
+
+    BareMetalComputeServiceOneTaskTest *test;
+
+    int main() {
+
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+        // Create a job
+        wrench::StandardJob *job = job_manager->createStandardJob({},
+                                                                  {}, //changed this since we don't have default storage now
+                                                                  {std::make_tuple(test->input_file, test->storage_service1, test->storage_service2)},
+                                                                  {std::make_tuple(test->input_file, test->storage_service2, test->storage_service3)},
+                                                                  {});
+        // Submit the job
+        job_manager->submitJob(job, test->compute_service);
+
+        // Wait for the workflow execution event
+        std::shared_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
+        if (std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
+            // do nothing
+        } else if (auto real_event = std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event)) {
+            throw std::runtime_error("Unexpected job failure: " +
+                                     real_event->failure_cause->toString());
+        } else {
+            throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
+        }
+
+        // Test file locations
+        if (!this->test->storage_service2->lookupFile(this->test->input_file, nullptr)) {
+            throw std::runtime_error("Input file should be on Storage Service #2");
+        }
+        if (!this->test->storage_service3->lookupFile(this->test->input_file, nullptr)) {
+            throw std::runtime_error("Input file should be on Storage Service #3");
+        }
+
+        return 0;
+    }
+};
+
+TEST_F(BareMetalComputeServiceOneTaskTest, ExecutionWithPrePostCopiesNoTaskNoCleanup) {
+    DO_TEST_WITH_FORK(do_ExecutionWithPrePostCopiesNoTaskNoCleanup_test)
+}
+
+void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPrePostCopiesNoTaskNoCleanup_test() {
+
+    // Create and initialize a simulation
+    wrench::Simulation *simulation = new wrench::Simulation();
+    int argc = 1;
+    char **argv = (char **) calloc(1, sizeof(char *));
+    argv[0] = strdup("one_task_test");
+
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+
+    simulation->init(&argc, argv);
+
+    // Setting up the platform
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+
+    // Get a hostname
+    std::string hostname = simulation->getHostnameList()[0];
+
+    // Create a Storage Service
+    ASSERT_NO_THROW(storage_service1 = simulation->add(
+            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+
+    // Create another Storage Service
+    ASSERT_NO_THROW(storage_service2 = simulation->add(
+            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+
+    // Create another Storage Service
+    ASSERT_NO_THROW(storage_service3 = simulation->add(
+            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+
+
+    // Create a Compute Service with default Storage Service #2
+    ASSERT_NO_THROW(compute_service = simulation->add(
+            new wrench::BareMetalComputeService(hostname,
+                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                {})));
+
+    // Create a WMS
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    ASSERT_NO_THROW(wms = simulation->add(
+            new ExecutionWithPrePostCopiesNoTaskNoCleanupTestWMS(this,
+                                                            { compute_service }, {
+                                                                    storage_service1, storage_service2
+                                                            }, hostname)));
+
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+
+    // Create a File Registry Service
+    ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
+
+    // Staging the input_file on storage service #1
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+
+    // Running a "run a single task" simulation
+    ASSERT_NO_THROW(simulation->launch());
+
+    delete simulation;
+
+    free(argv[0]);
+    free(argv);
+}
+
+
+/*************************************************************************/
+/** EXECUTION WITH PRE, NO POST COPIES NO TASK CLEANUP SIMULATION TEST  **/
+/*************************************************************************/
+
+class ExecutionWithPreNoPostCopiesNoTaskCleanupTestWMS : public wrench::WMS {
+
+public:
+    ExecutionWithPreNoPostCopiesNoTaskCleanupTestWMS(BareMetalComputeServiceOneTaskTest *test,
+                                                     const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                                     const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                                                     std::string &hostname) :
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
+        this->test = test;
+    }
+
+
+private:
+
+    BareMetalComputeServiceOneTaskTest *test;
+
+    int main() {
+
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+        // Create a job
+        wrench::StandardJob *job = job_manager->createStandardJob({},
+                                                                  {}, //changed this since we don't have default storage now
+                                                                  {std::make_tuple(test->input_file, test->storage_service1, test->storage_service2)},
+                                                                  {},
+                                                                  {std::make_tuple(test->input_file, test->storage_service2)});
+        // Submit the job
+        job_manager->submitJob(job, test->compute_service);
+
+        // Wait for the workflow execution event
+        std::shared_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
+        if (std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
+            // do nothing
+        } else if (auto real_event = std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event)) {
+            throw std::runtime_error("Unexpected job failure: " +
+                                     real_event->failure_cause->toString());
+        } else {
+            throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
+        }
+
+        // Test file locations
+        if (this->test->storage_service2->lookupFile(this->test->input_file, nullptr)) {
+            throw std::runtime_error("Input file should not be on Storage Service #2");
+        }
+
+        return 0;
+    }
+};
+
+TEST_F(BareMetalComputeServiceOneTaskTest, ExecutionWithPreNoPostCopiesNoTaskCleanup) {
+    DO_TEST_WITH_FORK(do_ExecutionWithPreNoPostCopiesNoTaskCleanup_test)
+}
+
+void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPreNoPostCopiesNoTaskCleanup_test() {
+
+    // Create and initialize a simulation
+    wrench::Simulation *simulation = new wrench::Simulation();
+    int argc = 1;
+    char **argv = (char **) calloc(1, sizeof(char *));
+    argv[0] = strdup("one_task_test");
+
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+
+    simulation->init(&argc, argv);
+
+    // Setting up the platform
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+
+    // Get a hostname
+    std::string hostname = simulation->getHostnameList()[0];
+
+    // Create a Storage Service
+    ASSERT_NO_THROW(storage_service1 = simulation->add(
+            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+
+    // Create another Storage Service
+    ASSERT_NO_THROW(storage_service2 = simulation->add(
+            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+
+
+    // Create a Compute Service with default Storage Service #2
+    ASSERT_NO_THROW(compute_service = simulation->add(
+            new wrench::BareMetalComputeService(hostname,
+                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                {})));
+
+    // Create a WMS
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    ASSERT_NO_THROW(wms = simulation->add(
+            new ExecutionWithPreNoPostCopiesNoTaskCleanupTestWMS(this,
+                                                            { compute_service }, {
+                                                                    storage_service1, storage_service2
+                                                            }, hostname)));
+
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+
+    // Create a File Registry Service
+    ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
+
+    // Staging the input_file on storage service #1
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+
+    // Running a "run a single task" simulation
+    ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
 

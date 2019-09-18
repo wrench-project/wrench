@@ -344,7 +344,7 @@ namespace wrench {
     void CloudComputeService::destroyVM(const std::string &vm_name) {
 
         if (this->vm_list.find(vm_name) == this->vm_list.end()) {
-            throw std::invalid_argument("CloudComputeService::resumeVM(): Unknown VM name '" + vm_name + "'");
+            throw std::invalid_argument("CloudComputeService::destroyVM(): Unknown VM name '" + vm_name + "'");
         }
 
         assertServiceIsUp();

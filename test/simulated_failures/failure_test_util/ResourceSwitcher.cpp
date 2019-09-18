@@ -31,18 +31,18 @@ int wrench::ResourceSwitcher::main() {
     if (this->action == ResourceSwitcher::Action::TURN_OFF) {
         if (this->resource_type == ResourceType::HOST) {
             WRENCH_INFO("Turning OFF host %s", this->resource_to_switch.c_str());
-            simgrid::s4u::Host::by_name(resource_to_switch)->turn_off();
+            wrench::Simulation::turnOffHost(resource_to_switch);
         } else if (this->resource_type == ResourceType::LINK) {
             WRENCH_INFO("Turning OFF link %s", this->resource_to_switch.c_str());
-            simgrid::s4u::Link::by_name(resource_to_switch)->turn_off();
+            wrench::Simulation::turnOffLink(resource_to_switch);
         }
     } else {
         if (this->resource_type == ResourceType::HOST) {
             WRENCH_INFO("Turning ON host %s", this->resource_to_switch.c_str());
-            simgrid::s4u::Host::by_name(resource_to_switch)->turn_on();
+            wrench::Simulation::turnOnHost(resource_to_switch);
         } else if (this->resource_type == ResourceType::LINK) {
             WRENCH_INFO("Turning OFF link %s", this->resource_to_switch.c_str());
-            simgrid::s4u::Link::by_name(resource_to_switch)->turn_on();
+            wrench::Simulation::turnOnLink(resource_to_switch);
         }
     }
 

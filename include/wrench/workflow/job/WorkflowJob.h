@@ -97,6 +97,7 @@ namespace wrench {
         /** @brief The compute service to which the job was submitted */
         std::shared_ptr<ComputeService> parent_compute_service;
 
+
     private:
 //        bool forward_notification_to_original_source;
 

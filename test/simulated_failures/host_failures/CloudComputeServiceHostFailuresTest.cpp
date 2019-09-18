@@ -18,10 +18,10 @@
 #include "../failure_test_util/SleeperVictim.h"
 #include "../failure_test_util/ResourceRandomRepeatSwitcher.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(cloud_compute_service_simulated_failures_test, "Log category for CloudServiceSimulatedFailuresTests");
+XBT_LOG_NEW_DEFAULT_CATEGORY(cloud_compute_service_host_failures_test, "Log category for CloudServiceHostFailuresTest");
 
 
-class CloudServiceSimulatedFailuresTest : public ::testing::Test {
+class CloudServiceHostFailuresTest : public ::testing::Test {
 
 public:
     wrench::Workflow *workflow;
@@ -39,7 +39,7 @@ public:
 
 protected:
 
-    CloudServiceSimulatedFailuresTest() {
+    CloudServiceHostFailuresTest() {
         // Create the simplest workflow
         workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
         workflow = workflow_unique_ptr.get();
@@ -90,7 +90,7 @@ protected:
 class CloudServiceFailureOfAVMTestWMS : public wrench::WMS {
 
 public:
-    CloudServiceFailureOfAVMTestWMS(CloudServiceSimulatedFailuresTest *test,
+    CloudServiceFailureOfAVMTestWMS(CloudServiceHostFailuresTest *test,
                                     std::string &hostname, std::shared_ptr<wrench::ComputeService> cs,
                                     std::shared_ptr<wrench::StorageService> ss) :
             wrench::WMS(nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
@@ -99,7 +99,7 @@ public:
 
 private:
 
-    CloudServiceSimulatedFailuresTest *test;
+    CloudServiceHostFailuresTest *test;
 
     int main() override {
 
@@ -160,11 +160,11 @@ private:
     }
 };
 
-TEST_F(CloudServiceSimulatedFailuresTest, FailureOfAVMWithRunningJob) {
+TEST_F(CloudServiceHostFailuresTest, FailureOfAVMWithRunningJob) {
     DO_TEST_WITH_FORK(do_CloudServiceFailureOfAVMWithRunningJob_test);
 }
 
-void CloudServiceSimulatedFailuresTest::do_CloudServiceFailureOfAVMWithRunningJob_test() {
+void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJob_test() {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
@@ -224,7 +224,7 @@ void CloudServiceSimulatedFailuresTest::do_CloudServiceFailureOfAVMWithRunningJo
 class CloudServiceFailureOfAVMAndRestartTestWMS : public wrench::WMS {
 
 public:
-    CloudServiceFailureOfAVMAndRestartTestWMS(CloudServiceSimulatedFailuresTest *test,
+    CloudServiceFailureOfAVMAndRestartTestWMS(CloudServiceHostFailuresTest *test,
                                               std::string &hostname, std::shared_ptr<wrench::ComputeService> cs, std::shared_ptr<wrench::StorageService> ss) :
             wrench::WMS(nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -232,7 +232,7 @@ public:
 
 private:
 
-    CloudServiceSimulatedFailuresTest *test;
+    CloudServiceHostFailuresTest *test;
 
     int main() override {
 
@@ -314,11 +314,11 @@ private:
     }
 };
 
-TEST_F(CloudServiceSimulatedFailuresTest, FailureOfAVMAndRestartWithRunningJobAndRestart) {
+TEST_F(CloudServiceHostFailuresTest, FailureOfAVMAndRestartWithRunningJobAndRestart) {
     DO_TEST_WITH_FORK(do_CloudServiceFailureOfAVMWithRunningJobFollowedByRestart_test);
 }
 
-void CloudServiceSimulatedFailuresTest::do_CloudServiceFailureOfAVMWithRunningJobFollowedByRestart_test() {
+void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJobFollowedByRestart_test() {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
@@ -378,7 +378,7 @@ void CloudServiceSimulatedFailuresTest::do_CloudServiceFailureOfAVMWithRunningJo
 class CloudServiceRandomFailuresTestWMS : public wrench::WMS {
 
 public:
-    CloudServiceRandomFailuresTestWMS(CloudServiceSimulatedFailuresTest *test,
+    CloudServiceRandomFailuresTestWMS(CloudServiceHostFailuresTest *test,
                                       std::string &hostname, std::shared_ptr<wrench::ComputeService> cs,
                                       std::shared_ptr<wrench::StorageService> ss) :
             wrench::WMS(nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
@@ -387,7 +387,7 @@ public:
 
 private:
 
-    CloudServiceSimulatedFailuresTest *test;
+    CloudServiceHostFailuresTest *test;
 
     int main() override {
 
@@ -475,11 +475,11 @@ private:
     }
 };
 
-TEST_F(CloudServiceSimulatedFailuresTest, RandomFailures) {
+TEST_F(CloudServiceHostFailuresTest, RandomFailures) {
     DO_TEST_WITH_FORK(do_CloudServiceRandomFailures_test);
 }
 
-void CloudServiceSimulatedFailuresTest::do_CloudServiceRandomFailures_test() {
+void CloudServiceHostFailuresTest::do_CloudServiceRandomFailures_test() {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();

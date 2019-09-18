@@ -119,8 +119,10 @@ namespace wrench {
         /** \endcond          **/
         /***********************/
 
-
     private:
+
+
+
         friend class WorkloadTraceFileReplayer;
 
         BatchComputeService(std::string hostname,

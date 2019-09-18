@@ -410,16 +410,6 @@ namespace wrench {
 
     }
 
-//    void BareMetalComputeService::someHostIsBackOn(simgrid::s4u::Host const &h) {
-//        for (auto const &c : this->compute_resources) {
-//            if ((c.first == h.get_name()) and (h.is_on())) {
-////                WRENCH_INFO("HOST %s CAME BACK ON!!!", h.get_cname());
-//                this->host_back_on = true;
-//                break;
-//            }
-//        }
-//    }
-
 
     /**
      * @brief Helper method called by all constructors to initiate object instance
@@ -713,8 +703,7 @@ namespace wrench {
             /** Dispatch it **/
             // Create a workunit executor on the target host
             std::shared_ptr<WorkunitExecutor> workunit_executor = std::shared_ptr<WorkunitExecutor>(
-                    new WorkunitExecutor(this->simulation,
-                                         target_host,
+                    new WorkunitExecutor(target_host,
                                          target_num_cores,
                                          required_ram,
                                          this->mailbox_name,
@@ -1257,9 +1246,10 @@ namespace wrench {
         // If the job doesn't exit, we reply right away
         if (this->all_workunits.find(job) == this->all_workunits.end()) {
             WRENCH_INFO("Trying to terminate a standard job that's not (no longer?) running!");
+            std::string msg = "Job cannot be terminated because it is not running";
             ComputeServiceTerminateStandardJobAnswerMessage *answer_message = new ComputeServiceTerminateStandardJobAnswerMessage(
                     job, this->getSharedPtr<BareMetalComputeService>(), false,
-                    std::shared_ptr<FailureCause>(new JobCannotBeTerminated(job)),
+                    std::shared_ptr<FailureCause>(new NotAllowed(this->getSharedPtr<BareMetalComputeService>(), msg)),
                     this->getMessagePayloadValue(
                             BareMetalComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD));
             S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
@@ -1506,11 +1496,11 @@ namespace wrench {
         dict.insert(std::make_pair("ram_capacities", ram_capacities));
 
         // RAM availability per host
-        std::map<std::string, double> ram_availabilities;
+        std::map<std::string, double> ram_availabilities_to_return;
         for (auto r : this->ram_availabilities) {
-            ram_availabilities.insert(std::make_pair(r.first, r.second));
+            ram_availabilities_to_return.insert(std::make_pair(r.first, r.second));
         }
-        dict.insert(std::make_pair("ram_availabilities", ram_availabilities));
+        dict.insert(std::make_pair("ram_availabilities", ram_availabilities_to_return));
 
         std::map<std::string, double> ttl;
         if (this->has_ttl) {

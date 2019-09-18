@@ -141,9 +141,9 @@ namespace wrench {
 
         WorkflowTask::State getState() const;
 
-        void addSrcDest(WorkflowFile *, const std::string &, const std::string &);
-
-        std::map<WorkflowFile *, std::pair<std::string, std::string>> getFileTransfers() const;
+//        void addSrcDest(WorkflowFile *, const std::string &, const std::string &);
+//
+//        std::map<WorkflowFile *, std::pair<std::string, std::string>> getFileTransfers() const;
 
         /***********************/
         /** \endcond           */
@@ -275,7 +275,7 @@ namespace wrench {
         lemon::ListDigraph::Node DAG_node;                    // pointer to the underlying DAG node
         std::map<std::string, WorkflowFile *> output_files;   // List of output files
         std::map<std::string, WorkflowFile *> input_files;    // List of input files
-        std::map<WorkflowFile *, std::pair<std::string, std::string>> fileTransfers;  // Map of transfer files and hosts
+//        std::map<WorkflowFile *, std::pair<std::string, std::string>> fileTransfers;  // Map of transfer files and hosts
 
         // Private constructor (called by Workflow)
         WorkflowTask(std::string id,
