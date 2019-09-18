@@ -19,15 +19,13 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param simulation: a pointer to the simulation object
      * @param hostname: the host on which the compute thread should run
      * @param flops: the number of flops to perform
      * @param reply_mailbox: the mailbox to which the "done/failed" message should be sent
      */
-    ComputeThread::ComputeThread(Simulation *simulation, std::string hostname, double flops, std::string reply_mailbox)
+    ComputeThread::ComputeThread(std::string hostname, double flops, std::string reply_mailbox)
             :
             Service(hostname, "compute_thread", "compute_thread") {
-        this->simulation = simulation;
         this->flops = flops;
         this->reply_mailbox = reply_mailbox;
     }
@@ -45,7 +43,6 @@ namespace wrench {
             WRENCH_INFO("Couldn't report on my completion to my parent [ignoring and returning as if everything's ok]");
             return 0;
         }
-
         return 0;
     }
 
@@ -53,11 +50,7 @@ namespace wrench {
      * @brief Terminate (brutally) the compute thread
      */
     void ComputeThread::kill() {
-        try {
-            this->killActor();
-        } catch (std::shared_ptr<FatalFailure> &e) {
-            WRENCH_INFO("Failed to kill a compute thread.. .perhaps it's already dead... nevermind");
-        }
+        this->killActor();
     }
 
     /**

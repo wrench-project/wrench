@@ -38,6 +38,41 @@ namespace wrench {
 
         this->num_pending_parents = 0;
 
+        // Double-check that there is no weirdness
+        for (auto const &pfc : pre_file_copies) {
+            auto file = std::get<0>(pfc);
+            auto src = std::get<1>(pfc);
+            auto dst = std::get<2>(pfc);
+            if ((file == nullptr) || (src == nullptr) || (dst == nullptr)) {
+                throw std::invalid_argument("Workunit::Workunit(): invalid pre file copy spec");
+            }
+        }
+
+        for (auto const &fl : file_locations) {
+            auto file = std::get<0>(fl);
+            auto ss = std::get<1>(fl);
+            if ((file == nullptr)  || (ss == nullptr)) {
+                throw std::invalid_argument("Workunit::Workunit(): invalid file location spec");
+            }
+        }
+
+        for (auto const &pfc : post_file_copies) {
+            auto file = std::get<0>(pfc);
+            auto src = std::get<1>(pfc);
+            auto dst = std::get<2>(pfc);
+            if ((file == nullptr) || (src == nullptr) || (dst == nullptr)) {
+                throw std::invalid_argument("Workunit::Workunit(): invalid post file copy spec");
+            }
+        }
+
+        for (auto const &cd : cleanup_file_deletions) {
+            auto file = std::get<0>(cd);
+            auto ss = std::get<1>(cd);
+            if ((file == nullptr)  || (ss == nullptr)) {
+                throw std::invalid_argument("Workunit::Workunit(): invalid file cleanup spec");
+            }
+        }
+
         this->job = job;
         this->pre_file_copies = pre_file_copies;
         this->task = task;

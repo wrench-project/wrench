@@ -136,7 +136,6 @@ private:
         }
 
         // Shutdown the proximity service
-        WRENCH_INFO("SHUTTING DOWN THE NPS");
         (*network_proximity_service)->stop();
 
         try {
@@ -170,7 +169,7 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
     wrench::Simulation *simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 
@@ -371,7 +370,7 @@ void NetworkProximityTest::do_CompareNetworkProximity_Test() {
     wrench::Simulation *simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 
@@ -546,7 +545,7 @@ void NetworkProximityTest::do_VivaldiConverge_Test() {
     wrench::Simulation *simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 
@@ -651,7 +650,7 @@ void NetworkProximityTest::do_ValidateProperties_Test() {
     wrench::Simulation *simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("validate_properties_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 

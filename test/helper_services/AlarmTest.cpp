@@ -89,8 +89,8 @@ private:
 
     int main() {
 
-       // Turn down Host2
-       simgrid::s4u::Host::by_name_or_null("Host2")->turn_off();
+       // Turn off Host2
+       wrench::Simulation::turnOffHost("Host2");
 
        // Start an alarm
        std::string mailbox = "mailbox";

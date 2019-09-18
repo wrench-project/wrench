@@ -104,7 +104,7 @@ private:
             data_movement_manager->doSynchronousFileCopy(this->test->src_file_1, this->test->src_storage_service,
                                                          this->test->dst_storage_service, file_registry_service);
 
-        } catch (wrench::WorkflowExecutionEvent) {
+        } catch (wrench::WorkflowExecutionEvent &e)  {
             throw std::runtime_error("Synchronous file copy failed");
         }
 
@@ -114,6 +114,24 @@ private:
         if (dst_search == src_file_1_locations.end()) {
             throw std::runtime_error("Synchronous file copy succeeded but file was not registered at DstHost");
         }
+
+        // Do the same thing but kill the FileRegistryService first
+
+        this->test->dst_storage_service->deleteFile(this->test->src_file_1, file_registry_service);
+        file_registry_service->stop();
+        try {
+            data_movement_manager->doSynchronousFileCopy(this->test->src_file_1, this->test->src_storage_service,
+                                                         this->test->dst_storage_service, file_registry_service);
+
+            throw std::runtime_error("Synchronous file copy failed");
+        } catch (wrench::WorkflowExecutionException &e)  {
+        }
+
+        // Create a new file registry service to resume normal testing
+        file_registry_service = std::shared_ptr<wrench::FileRegistryService>(
+                new wrench::FileRegistryService(this->hostname, {}, {}));
+        file_registry_service->simulation = this->simulation;
+        file_registry_service->start(file_registry_service, true, false);
 
 
         // try asynchronous copy and register
@@ -247,6 +265,9 @@ private:
         if (!this->test->dst_storage_service->lookupFile(this->test->src2_file_2, nullptr)) {
             throw std::runtime_error("Asynchronous file copy should have completed even though the FileRegistryService was down.");
         }
+
+        // Stop the data movement manager
+        data_movement_manager->stop();
 
         return 0;
     }

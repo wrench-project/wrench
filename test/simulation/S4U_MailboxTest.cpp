@@ -114,14 +114,16 @@ private:
             // One send, network failure
             pending_send = wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox_name, new wrench::SimulationMessage("foo", 100));
             wrench::Simulation::sleep(10);
-            simgrid::s4u::Link::by_name("1")->turn_off();
+            wrench::Simulation::turnOffLink("1");
             try {
                 pending_send->wait();
                 throw std::runtime_error("Should have gotten a NetworkError");
             } catch (std::shared_ptr<wrench::NetworkError> &e) {
+                e->toString();
+                e->getMailbox();
             }
             wrench::Simulation::sleep(10);
-            simgrid::s4u::Link::by_name("1")->turn_on();
+            wrench::Simulation::turnOnLink("1");
             wrench::Simulation::sleep(10);
 
             // Two asynchronous sends, network failure
@@ -135,12 +137,16 @@ private:
                 sends_failure.at(index)->wait();
                 throw std::runtime_error("Should have gotten a NetworkError");
             } catch (std::shared_ptr<wrench::NetworkError> &e) {
+                e->toString();
+                e->getMailbox();
             }
             index = wrench::S4U_PendingCommunication::waitForSomethingToHappen(sends_failure, 10000);
             try {
                 sends_failure.at(index)->wait();
                 throw std::runtime_error("Should have gotten a NetworkError");
             } catch (std::shared_ptr<wrench::NetworkError> &e) {
+                e->toString();
+                e->getMailbox();
             }
 
             // One synchronous sends, network failure
@@ -149,6 +155,8 @@ private:
                                                 new wrench::SimulationMessage("foo", 100));
                 throw std::runtime_error("Should have gotten a NetworkError");
             } catch (std::shared_ptr<wrench::NetworkError> &e) {
+                e->toString();
+                e->getMailbox();
             }
 
 

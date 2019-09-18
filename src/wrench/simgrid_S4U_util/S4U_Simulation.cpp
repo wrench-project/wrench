@@ -202,6 +202,81 @@ namespace wrench {
         return host->is_on();
     }
 
+    /**
+     * @brief Turn off a host
+     *
+     * @param hostname: the name of the host to turn off
+     *
+     * @throw std::invalid_argument
+     */
+    void S4U_Simulation::turnOffHost(std::string hostname) {
+        auto host = simgrid::s4u::Host::by_name_or_null(hostname);
+        if (host == nullptr) {
+            throw std::invalid_argument("Unknown hostname " + hostname);
+        }
+        host->turn_off();
+    }
+
+    /**
+     * @brief Turn on a host
+     *
+     * @param hostname: the name of the host to turn on
+     *
+     * @throw std::invalid_argument
+     */
+    void S4U_Simulation::turnOnHost(std::string hostname) {
+        auto host = simgrid::s4u::Host::by_name_or_null(hostname);
+        if (host == nullptr) {
+            throw std::invalid_argument("Unknown hostname " + hostname);
+        }
+        host->turn_on();
+    }
+
+    /**
+    * @brief Returns whether a link is on or not
+    *
+    * @param linkname: the name of the link
+    * @return true or false
+    *
+    * @throw std::invalid_argument
+    */
+    bool S4U_Simulation::isLinkOn(std::string linkname) {
+        auto link = simgrid::s4u::Link::by_name_or_null(linkname);
+        if (link == nullptr) {
+            throw std::invalid_argument("Unknown linkname " + linkname);
+        }
+        return link->is_on();
+    }
+
+    /**
+     * @brief Turn off a link
+     *
+     * @param linkname: the name of the link to turn off
+     *
+     * @throw std::invalid_argument
+     */
+    void S4U_Simulation::turnOffLink(std::string linkname) {
+        auto link = simgrid::s4u::Link::by_name_or_null(linkname);
+        if (link == nullptr) {
+            throw std::invalid_argument("Unknown linkname " + linkname);
+        }
+        link->turn_off();
+    }
+
+    /**
+     * @brief Turn on a link
+     *
+     * @param linkname: the name of the link to turn on
+     *
+     * @throw std::invalid_argument
+     */
+    void S4U_Simulation::turnOnLink(std::string linkname) {
+        auto link = simgrid::s4u::Link::by_name_or_null(linkname);
+        if (link == nullptr) {
+            throw std::invalid_argument("Unknown linkname " + linkname);
+        }
+        link->turn_on();
+    }
 
     /**
      * @brief Get the flop rate of the current host

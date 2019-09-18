@@ -11,6 +11,7 @@
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
 #include <algorithm>
+#include <exception>
 
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
@@ -22,11 +23,13 @@ class BogusMessageTest : public ::testing::Test {
 
 public:
     std::shared_ptr<wrench::Service> service = nullptr;
+    std::string dst_mailbox;
 
     void do_BogusMessage_Test(std::string service_type);
 
 protected:
     BogusMessageTest() {
+
 
         // Create the simplest workflow
         workflow = new wrench::Workflow();
@@ -97,19 +100,51 @@ private:
     BogusMessageTest *test;
 
     int main() {
-
-        try {
-            wrench::S4U_Mailbox::putMessage(this->test->service->mailbox_name, new BogusMessage());
-            throw std::runtime_error("Was expecting a runtime_error for bogus message send to service " + this->test->service->getName());
-        } catch (std::runtime_error &e) {}
-
         wrench::Simulation::sleep(1000);
+        try {
+            wrench::S4U_Mailbox::putMessage(this->test->dst_mailbox, new BogusMessage());
+        } catch (std::runtime_error &e) {
+        }
         return 0;
     }
 };
 
+
+class NoopWMS : public wrench::WMS {
+
+public:
+    NoopWMS(BogusMessageTest *test, std::string hostname, bool create_data_movement_manager) :
+            wrench::WMS(nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
+        this->test = test;
+        this->create_data_movement_manager = create_data_movement_manager;
+    }
+
+private:
+
+    BogusMessageTest *test;
+    bool create_data_movement_manager;
+
+    int main() {
+
+        if (this->create_data_movement_manager)
+        {
+            auto dmm = this->createDataMovementManager();
+            this->test->dst_mailbox = dmm->mailbox_name;
+        }
+        this->waitForAndProcessNextEvent();
+        return 0;
+    }
+};
+
+/*************************************************************
+ ** WARNING: THESE TESTS ARE A NICE THOUGHT, AND THEY WORK
+ ** BUT ALTHOUGH THE "UNEXPECTED MESSAGE" EXECPTIONS ARE THROWN
+ ** THE LINES OF CODE THAT THROW ARE NOT MARKED AS COVERED
+ ** BY COVERALLS...
+ *************************************************************/
+
 TEST_F(BogusMessageTest, FileRegistryService) {
-    DO_TEST_WITH_FORK_ONE_ARG_EXPECT_FATAL_FAILURE(do_BogusMessage_Test, "file_registry", true);
+    DO_TEST_WITH_FORK_ONE_ARG_EXPECT_FATAL_FAILURE(do_BogusMessage_Test, "file_registry", false);
 }
 
 TEST_F(BogusMessageTest, SimpleStorage) {
@@ -119,7 +154,16 @@ TEST_F(BogusMessageTest, BareMetalCompute) {
     DO_TEST_WITH_FORK_ONE_ARG_EXPECT_FATAL_FAILURE(do_BogusMessage_Test, "bare_metal_compute", true);
 }
 
+TEST_F(BogusMessageTest, WMS) {
+    DO_TEST_WITH_FORK_ONE_ARG_EXPECT_FATAL_FAILURE(do_BogusMessage_Test, "wms", true);
+}
+
+TEST_F(BogusMessageTest, DataMovementManager) {
+    DO_TEST_WITH_FORK_ONE_ARG_EXPECT_FATAL_FAILURE(do_BogusMessage_Test, "data_movement_manager", true);
+}
+
 void BogusMessageTest::do_BogusMessage_Test(std::string service_type) {
+
 
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
@@ -138,16 +182,23 @@ void BogusMessageTest::do_BogusMessage_Test(std::string service_type) {
     // Create a service
     if (service_type == "file_registry") {
         this->service = simulation->add(new wrench::FileRegistryService(hostname));
+        this->dst_mailbox = this->service->mailbox_name;
     } else if (service_type == "simple_storage") {
         this->service = simulation->add(new wrench::SimpleStorageService(hostname, 10.0));
-    } else if (service_type == "bare_metal_compute") {
-        this->service = simulation->add(
-                new wrench::BareMetalComputeService(hostname,
-                                                    {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},100.0,
-                                                    {}));
+        this->dst_mailbox = this->service->mailbox_name;
+    } else if (service_type == "wms") {
+        auto wms = new NoopWMS(this, hostname, false);
+        wms->addWorkflow(workflow);
+        this->service = simulation->add(wms);
+        this->dst_mailbox = workflow->getCallbackMailbox();
+    } else if (service_type == "data_movement_manager") {
+        auto wms = new NoopWMS(this, hostname, true);
+        wms->addWorkflow(workflow);
+        this->service = simulation->add(wms);
+        this->dst_mailbox = ""; // Will be set by the WMS on DMM is created
     }
 
-    // Create a WMS
+    // Create the Bogus Message WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new BogusMessageTestWMS(this, hostname)));

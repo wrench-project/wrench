@@ -42,7 +42,6 @@ namespace wrench {
     public:
 
         WorkunitExecutor(
-                     Simulation *simulation,
                      std::string hostname,
                      unsigned long num_cores,
                      double ram_utilization,

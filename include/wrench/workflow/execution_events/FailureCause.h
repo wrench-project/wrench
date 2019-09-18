@@ -445,46 +445,6 @@ namespace wrench {
 
 
     /**
-     * @brief A "job cannot be terminated" failure cause
-     */
-    class JobCannotBeTerminated : public FailureCause {
-    public:
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
-        JobCannotBeTerminated(WorkflowJob *job);
-        /***********************/
-        /** \endcond           */
-        /***********************/
-
-        WorkflowJob *getJob();
-        std::string toString();
-
-    private:
-        WorkflowJob *job;
-    };
-
-    /**
-    * @brief A "job cannot be forgotten" failure cause
-    */
-    class JobCannotBeForgotten : public FailureCause {
-    public:
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
-        JobCannotBeForgotten(WorkflowJob *job);
-        /***********************/
-        /** \endcond           */
-        /***********************/
-
-        WorkflowJob *getJob();
-        std::string toString();
-
-    private:
-        WorkflowJob *job;
-    };
-
-    /**
    * @brief A "compute thread has died" failure cause
    */
     class ComputeThreadHasDied : public FailureCause {

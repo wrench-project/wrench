@@ -21,7 +21,7 @@
 XBT_LOG_NEW_DEFAULT_CATEGORY(service_start_restart_test, "Log category for ServiceStartRestartTest");
 
 
-class SimulatedFailuresTest : public ::testing::Test {
+class ServiceReStartHostFailuresTest : public ::testing::Test {
 
 public:
     wrench::Workflow *workflow;
@@ -32,10 +32,11 @@ public:
 
 protected:
 
-    SimulatedFailuresTest() {
+    ServiceReStartHostFailuresTest() {
         // Create the simplest workflow
         workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
         workflow = workflow_unique_ptr.get();
+
 
         // up from 0 to 100, down from 100 to 200, up from 200 to 300, etc.
         std::string trace_file_content = "PERIODICITY 100\n"
@@ -82,7 +83,7 @@ protected:
 class StartServiceOnDownHostTestWMS : public wrench::WMS {
 
 public:
-    StartServiceOnDownHostTestWMS(SimulatedFailuresTest *test,
+    StartServiceOnDownHostTestWMS(ServiceReStartHostFailuresTest *test,
                                   std::string &hostname) :
             wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -90,13 +91,13 @@ public:
 
 private:
 
-    SimulatedFailuresTest *test;
+    ServiceReStartHostFailuresTest *test;
 
     int main() override {
 
         // Turn off FailedHost
         wrench::Simulation::sleep(10);
-        simgrid::s4u::Host::by_name("FailedHost")->turn_off();
+        wrench::Simulation::turnOffHost("FailedHost");
 
         // Starting a sleeper (that will reply with a bogus TTL Expiration message)
         auto sleeper = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHost", 100, new wrench::ServiceTTLExpiredMessage(1), this->mailbox_name));
@@ -114,11 +115,11 @@ private:
     }
 };
 
-TEST_F(SimulatedFailuresTest, StartServiceOnDownHostTest) {
+TEST_F(ServiceReStartHostFailuresTest, StartServiceOnDownHostTest) {
     DO_TEST_WITH_FORK(do_StartServiceOnDownHostTest_test);
 }
 
-void SimulatedFailuresTest::do_StartServiceOnDownHostTest_test() {
+void ServiceReStartHostFailuresTest::do_StartServiceOnDownHostTest_test() {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
@@ -159,7 +160,7 @@ void SimulatedFailuresTest::do_StartServiceOnDownHostTest_test() {
 class ServiceRestartTestWMS : public wrench::WMS {
 
 public:
-    ServiceRestartTestWMS(SimulatedFailuresTest *test,
+    ServiceRestartTestWMS(ServiceReStartHostFailuresTest *test,
                           std::string &hostname) :
             wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -167,7 +168,7 @@ public:
 
 private:
 
-    SimulatedFailuresTest *test;
+    ServiceReStartHostFailuresTest *test;
 
     int main() override {
 
@@ -204,11 +205,11 @@ private:
     }
 };
 
-TEST_F(SimulatedFailuresTest, ServiceRestartTest) {
+TEST_F(ServiceReStartHostFailuresTest, ServiceRestartTest) {
     DO_TEST_WITH_FORK(do_ServiceRestartTest_test);
 }
 
-void SimulatedFailuresTest::do_ServiceRestartTest_test() {
+void ServiceReStartHostFailuresTest::do_ServiceRestartTest_test() {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();

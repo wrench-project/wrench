@@ -76,7 +76,7 @@ private:
         ssd->start(ssd, true, false);
 
         wrench::Simulation::sleep(10);
-        simgrid::s4u::Host::by_name("Host2")->turn_off();
+        wrench::Simulation::turnOffHost("Host2");
 
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
@@ -111,6 +111,8 @@ private:
         if (not std::dynamic_pointer_cast<wrench::HostHasChangedSpeedMessage>(message)) {
             throw std::runtime_error("Did not get the expected 'host has changed speed' message");
         }
+
+        ssd->kill(); // coverage
 
 
         return 0;
