@@ -43,11 +43,8 @@ WRENCH_LOG_NEW_DEFAULT_CATEGORY(batch_service, "Log category for Batch Service")
 
 namespace wrench {
 
-    /**
-     * @brief Destructor
-     */
-    BatchComputeService::~BatchComputeService() {
-    }
+    // Do not remove
+    BatchComputeService::~BatchComputeService() {}
 
     /**
      * @brief Retrieve start time estimates for a set of job configurations
@@ -133,6 +130,7 @@ namespace wrench {
                            "batch" + suffix,
                            scratch_space_size) {
 
+
         // Set default and specified properties
         this->setProperties(this->default_property_values, std::move(property_list));
 
@@ -140,16 +138,6 @@ namespace wrench {
         this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
 
         // Basic checks
-        if (cores_per_host == 0) {
-            throw std::invalid_argument(
-                    "BatchComputeService::BatchComputeService(): compute hosts should have at least one core");
-        }
-
-        if (ram_per_host <= 0) {
-            throw std::invalid_argument(
-                    "BatchComputeService::BatchComputeService(): compute hosts should have at least some RAM");
-        }
-
         if (compute_hosts.empty()) {
             throw std::invalid_argument(
                     "BatchComputeService::BatchComputeService(): at least one compute hosts must be provided");
@@ -179,15 +167,6 @@ namespace wrench {
                         "BatchComputeService::BatchComputeService(): Compute hosts for a batch service need to be homogeneous (different RAM capacities detected)");
 
             }
-        }
-
-        // Check that ALL_CORES and ALL_RAM, or actual maximum values, were passed
-        // (this may change one day...)
-        if (((cores_per_host != ComputeService::ALL_CORES) and (cores_per_host != num_cores_available)) or
-            ((ram_per_host != ComputeService::ALL_RAM) and (ram_per_host != ram_available))) {
-            throw std::invalid_argument(
-                    "BatchComputeService::BatchComputeService(): A Batch Service must be given ALL core and RAM resources of hosts "
-                    "(e.g., passing ComputeService::ALL_CORES and ComputeService::ALL_RAM)");
         }
 
         //create a map for host to cores
@@ -587,6 +566,7 @@ namespace wrench {
         WRENCH_INFO("A standard job executor has failed because of timeout %s", job->getName().c_str());
 
 #ifdef ENABLE_BATSCHED
+
         this->notifyJobEventsToBatSched(job_id, "TIMEOUT", "COMPLETED_FAILED", "", "JOB_COMPLETED");
         BatchJob *batch_job = nullptr;
         for (auto const &j : this->all_jobs) {
@@ -1417,6 +1397,7 @@ namespace wrench {
 
 
 #ifdef ENABLE_BATSCHED
+
                 // forward this notification to batsched
                 this->notifyJobEventsToBatSched(job_id, "TIMEOUT", "COMPLETED_FAILED", "", "JOB_COMPLETED");
                 this->appendJobInfoToCSVOutputFile(*it1, "TERMINATED");
@@ -1434,9 +1415,10 @@ namespace wrench {
 
         // If we got here, we're in trouble
         WRENCH_INFO("Trying to terminate a pilot job that's neither pending nor running!");
+        std::string msg = "Job cannot be terminated because it's neither pending nor running";
         ComputeServiceTerminatePilotJobAnswerMessage *answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
                 job, this->getSharedPtr<BatchComputeService>(), false,
-                std::shared_ptr<FailureCause>(new JobCannotBeTerminated(job)),
+                std::shared_ptr<FailureCause>(new NotAllowed(this->getSharedPtr<BatchComputeService>(), msg)),
                 this->getMessagePayloadValue(
                         BatchComputeServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
         S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
@@ -1453,6 +1435,7 @@ namespace wrench {
     BatchComputeService::processStandardJobCompletion(std::shared_ptr<StandardJobExecutor> executor, StandardJob *job) {
         bool executor_on_the_list = false;
         std::set<std::shared_ptr<StandardJobExecutor>>::iterator it;
+
         for (it = this->running_standard_job_executors.begin();
              it != this->running_standard_job_executors.end(); it++) {
             if (*it == executor) {
@@ -1601,6 +1584,8 @@ namespace wrench {
                                   BatchJob *batch_job, unsigned long num_nodes_allocated,
                                   unsigned long allocated_time,
                                   unsigned long cores_per_node_asked_for) {
+
+
         switch (workflow_job->getType()) {
             case WorkflowJob::STANDARD: {
                 auto job = (StandardJob *) workflow_job;
@@ -2038,23 +2023,28 @@ namespace wrench {
         }
 
         if (!is_pending && !is_running && !is_waiting) {
+            std::string msg = "Job cannot be terminated because it is neither pending, not running, not waiting";
             // Send a failure reply
             ComputeServiceTerminateStandardJobAnswerMessage *answer_message =
                     new ComputeServiceTerminateStandardJobAnswerMessage(
                             job, this->getSharedPtr<BatchComputeService>(), false, std::shared_ptr<FailureCause>(
-                                    new JobCannotBeTerminated(
-                                            job)),
+                                    new NotAllowed(this->getSharedPtr<BatchComputeService>(),
+                                            msg)),
                             this->getMessagePayloadValue(
                                     BatchComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD));
             S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
+            return;
         }
 
 
 #ifdef ENABLE_BATSCHED
+
         //      throw std::runtime_error("BatchComputeService::processStandardJobTerminationRequest(): Not implemented for BATSCHED yet");
+
         notifyJobEventsToBatSched(job_id, "TIMEOUT", "COMPLETED_FAILED", "", "JOB_COMPLETED");
         this->appendJobInfoToCSVOutputFile(batch_job, "FAILED");
 #endif
+
         // Is it running?
         if (is_running) {
             terminateRunningStandardJob(job);

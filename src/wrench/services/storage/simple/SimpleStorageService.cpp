@@ -403,7 +403,6 @@ namespace wrench {
         std::shared_ptr<FileTransferThread> ftt;
 
         if (src.get() == this) { // Local copy
-            WRENCH_INFO("LOCAL COPY");
             ftt = std::shared_ptr<FileTransferThread>(
                     new FileTransferThread(this->hostname,
                                            this->getSharedPtr<StorageService>(),
@@ -413,7 +412,6 @@ namespace wrench {
                                            answer_mailbox,
                                            this->buffer_size, start_timestamp));
         } else {
-            WRENCH_INFO("FROM REMOTE TO LOCAL PARTITION");
             ftt = std::shared_ptr<FileTransferThread>(
                     new FileTransferThread(this->hostname,
                                            this->getSharedPtr<StorageService>(),

@@ -18,10 +18,10 @@
 #include "../failure_test_util/SleeperVictim.h"
 #include "../failure_test_util/ComputerVictim.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(failure_detector_test, "Log category for FailureDetectorTest");
+XBT_LOG_NEW_DEFAULT_CATEGORY(failure_detector_host_failure_test, "Log category for FailureDetectorHostFailuresTest");
 
 
-class SimulatedFailuresTest : public ::testing::Test {
+class FailureDetectorHostFailuresTest : public ::testing::Test {
 
 public:
     wrench::Workflow *workflow;
@@ -32,7 +32,7 @@ public:
 
 protected:
 
-    SimulatedFailuresTest() {
+    FailureDetectorHostFailuresTest() {
         // Create the simplest workflow
         workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
         workflow = workflow_unique_ptr.get();
@@ -83,7 +83,7 @@ protected:
 class FailureDetectorForSleeperTestWMS : public wrench::WMS {
 
 public:
-    FailureDetectorForSleeperTestWMS(SimulatedFailuresTest *test,
+    FailureDetectorForSleeperTestWMS(FailureDetectorHostFailuresTest *test,
                                       std::string &hostname) :
             wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -91,7 +91,7 @@ public:
 
 private:
 
-    SimulatedFailuresTest *test;
+    FailureDetectorHostFailuresTest *test;
 
     int main() override {
 
@@ -163,11 +163,11 @@ private:
     }
 };
 
-TEST_F(SimulatedFailuresTest, FailureDetectorForSleeperTest) {
+TEST_F(FailureDetectorHostFailuresTest, FailureDetectorForSleeperTest) {
     DO_TEST_WITH_FORK(do_FailureDetectorForSleeperTest_test);
 }
 
-void SimulatedFailuresTest::do_FailureDetectorForSleeperTest_test() {
+void FailureDetectorHostFailuresTest::do_FailureDetectorForSleeperTest_test() {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
@@ -207,7 +207,7 @@ void SimulatedFailuresTest::do_FailureDetectorForSleeperTest_test() {
 class FailureDetectorForComputerTestWMS : public wrench::WMS {
 
 public:
-    FailureDetectorForComputerTestWMS(SimulatedFailuresTest *test,
+    FailureDetectorForComputerTestWMS(FailureDetectorHostFailuresTest *test,
                                      std::string &hostname) :
             wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -215,7 +215,7 @@ public:
 
 private:
 
-    SimulatedFailuresTest *test;
+    FailureDetectorHostFailuresTest *test;
 
     int main() override {
 
@@ -283,11 +283,11 @@ private:
     }
 };
 
-TEST_F(SimulatedFailuresTest, FailureDetectorForComputerTest) {
+TEST_F(FailureDetectorHostFailuresTest, FailureDetectorForComputerTest) {
     DO_TEST_WITH_FORK(do_FailureDetectorForComputerTest_test);
 }
 
-void SimulatedFailuresTest::do_FailureDetectorForComputerTest_test() {
+void FailureDetectorHostFailuresTest::do_FailureDetectorForComputerTest_test() {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();

@@ -132,6 +132,9 @@ namespace wrench {
      *
      * @param daemonized: whether the S4U actor should be daemonized
      * @param auto_restart: whether the S4U actor should automatically restart after a host reboot
+     *
+     * @throw std::runtime_error
+     * @throw std::shared_ptr<HostError>
      */
     void S4U_Daemon::startDaemon(bool daemonized, bool auto_restart) {
 
@@ -162,8 +165,8 @@ namespace wrench {
             this->s4u_actor = simgrid::s4u::Actor::create(this->process_name.c_str(),
                                                           simgrid::s4u::Host::by_name(hostname),
                                                           S4U_DaemonActor(this));
-        } catch (std::exception &e) {
-            throw std::shared_ptr<FatalFailure>(new FatalFailure());
+        } catch (simgrid::Exception &e) {
+            throw std::runtime_error("S4U_Daemon::startDaemon(): SimGrid actor creation failed... shouldn't happen.");
         }
 
         // nullptr is returned if the host is off (not the current behavior in SimGrid... just paranoid here)
@@ -253,15 +256,18 @@ namespace wrench {
 
 
 /**
- * @brief Kill the daemon/actor.
+ * @brief Kill the daemon/actor (does nothing if already dead)
+ *
+ * @throw std::shared_ptr<FatalFailure>
  */
     void S4U_Daemon::killActor() {
+
+        // Do the kill only if valid actor and not already done
         if ((this->s4u_actor != nullptr) && (not this->has_returned_from_main)) {
             try {
                 this->s4u_actor->kill();
-
             } catch (simgrid::Exception &) {
-                throw std::shared_ptr<FatalFailure>(new FatalFailure());
+                throw std::runtime_error("simgrid::s4u::Actor::kill() failed... this shouldn't have happened");
             }
             this->has_returned_from_main = true;
         }

@@ -207,6 +207,9 @@ TEST_F(WorkflowTaskTest, InputOutputFile) {
   ASSERT_THROW(t1->addInputFile(f2), std::invalid_argument);
   ASSERT_THROW(t1->addOutputFile(f1), std::invalid_argument);
 
+  ASSERT_THROW(workflow->removeFile(f1), std::invalid_argument);
+  ASSERT_THROW(workflow->removeFile(f2), std::invalid_argument);
+
   wrench::WorkflowTask *t3 = workflow->addTask("task-03", 50, 2, 4, 1.0, 0);
   t3->addInputFile(f2);
 
@@ -290,7 +293,7 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
   auto simulation = new wrench::Simulation();
   int argc = 1;
   auto argv = (char **) calloc(1, sizeof(char *));
-  argv[0] = strdup("workflowtask_execution_history_test");
+  argv[0] = strdup("unit_test");
 
   ASSERT_NO_THROW(simulation->init(&argc, argv));
 

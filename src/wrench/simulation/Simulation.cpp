@@ -235,6 +235,7 @@ namespace wrench {
 		 */
     void Simulation::launch() {
 
+
         // Check that the simulation is correctly initialized
         try {
             this->checkSimulationSetup();
@@ -259,15 +260,29 @@ namespace wrench {
             throw std::runtime_error("Simulation::launch(): " + std::string(e.what()));
         }
 
-        this->is_running = true;
 
         // Run the simulation
         try {
+            this->is_running = true;
             this->s4u_simulation->runSimulation();
+            this->is_running = false;
         } catch (std::runtime_error &e) {
+            this->is_running = false;
             throw;
         }
 
+
+
+    }
+
+    /**
+     * @brief Checks whether the simulation is running or not
+     *
+     * @return true or false
+     *
+	 */
+    bool Simulation::isRunning() {
+        return this->is_running;
     }
 
     /**
@@ -629,6 +644,49 @@ namespace wrench {
     bool Simulation::isHostOn(std::string hostname) {
         return S4U_Simulation::isHostOn(hostname);
     }
+
+    /**
+     * @brief Turns off a host
+     * @param hostname: the hostname
+     */
+    void Simulation::turnOffHost(std::string hostname) {
+        S4U_Simulation::turnOffHost(hostname);
+    }
+
+    /**
+     * @brief Turns on a host
+     * @param hostname: the hostname
+     */
+    void Simulation::turnOnHost(std::string hostname) {
+        S4U_Simulation::turnOnHost(hostname);
+    }
+
+
+    /**
+    * @brief Returns whether a link is on or not
+    * @param linkname: the linkname
+    * @return true or false
+    */
+    bool Simulation::isLinkOn(std::string linkname) {
+        return S4U_Simulation::isLinkOn(linkname);
+    }
+
+    /**
+     * @brief Turns off a link
+     * @param linkname: the linkname
+     */
+    void Simulation::turnOffLink(std::string linkname) {
+        S4U_Simulation::turnOffLink(linkname);
+    }
+
+    /**
+     * @brief Turns on a link
+     * @param linkname: the linkname
+     */
+    void Simulation::turnOnLink(std::string linkname) {
+        S4U_Simulation::turnOnLink(linkname);
+    }
+
 
     /**
      * @brief Get the memory capacity of the host on which the calling process is running

@@ -92,6 +92,8 @@ namespace wrench {
 
         std::map<std::string, double> getMemoryCapacity();
 
+        std::map<std::string, double> getPerHostAvailableMemoryCapacity();
+
         std::map<std::string, double> getCoreFlopRate();
 
         double getTTL();

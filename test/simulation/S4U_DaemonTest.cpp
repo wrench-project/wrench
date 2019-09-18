@@ -20,6 +20,7 @@ class S4U_DaemonTest : public ::testing::Test {
 public:
 
     void do_basic_Test();
+    void do_noCleanup_Test();
 
 protected:
     S4U_DaemonTest() {
@@ -68,10 +69,6 @@ protected:
 
 };
 
-/**********************************************************************/
-/**  BASIC TEST                                                      **/
-/**********************************************************************/
-
 class Sleep100Daemon : public wrench::S4U_Daemon {
 
 public:
@@ -84,6 +81,11 @@ public:
     }
 
 };
+
+/**********************************************************************/
+/**  BASIC TEST                                                      **/
+/**********************************************************************/
+
 
 class S4U_DaemonTestWMS : public wrench::WMS {
 
@@ -168,7 +170,7 @@ void S4U_DaemonTest::do_basic_Test() {
     auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("file_registry_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 
@@ -196,4 +198,97 @@ void S4U_DaemonTest::do_basic_Test() {
     free(argv);
 }
 
+
+/**********************************************************************/
+/**  NO CLEANUP TEST                                                 **/
+/**********************************************************************/
+
+
+
+class S4U_DaemonNoCleanupTestWMS : public wrench::WMS {
+
+public:
+    S4U_DaemonNoCleanupTestWMS(S4U_DaemonTest *test,
+                      std::string hostname) :
+            wrench::WMS(nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
+        this->test = test;
+    }
+
+private:
+
+    S4U_DaemonTest *test;
+
+    int main() {
+
+        std::shared_ptr<Sleep100Daemon> daemon =
+                std::shared_ptr<Sleep100Daemon>(new Sleep100Daemon("Host2"));
+
+        daemon->createLifeSaver(std::shared_ptr<Sleep100Daemon>(daemon));
+        daemon->simulation = this->simulation;
+        daemon->startDaemon(false, false);
+
+        // sleep 10 seconds
+        wrench::Simulation::sleep(10);
+
+
+        // Coverage
+        try {
+            wrench::Simulation::turnOnHost("bogus");
+            throw std::runtime_error("Should not be able to turn on bogus host");
+        } catch (std::invalid_argument &e) {}
+        try {
+            wrench::Simulation::turnOffHost("bogus");
+            throw std::runtime_error("Should not be able to turn off bogus host");
+        } catch (std::invalid_argument &e) {}
+        try {
+            wrench::Simulation::turnOnLink("bogus");
+            throw std::runtime_error("Should not be able to turn on bogus link");
+        } catch (std::invalid_argument &e) {}
+        try {
+            wrench::Simulation::turnOffLink("bogus");
+            throw std::runtime_error("Should not be able to turn off bogus link");
+        } catch (std::invalid_argument &e) {}
+
+        // Turn off Host2
+        wrench::Simulation::turnOffHost("Host2");
+
+        return 0;
+    }
+};
+
+TEST_F(S4U_DaemonTest, NoCleanup) {
+    DO_TEST_WITH_FORK_EXPECT_FATAL_FAILURE(do_noCleanup_Test, true);
+}
+
+void S4U_DaemonTest::do_noCleanup_Test() {
+
+    // Create and initialize a simulation
+    auto simulation = new wrench::Simulation();
+    int argc = 1;
+    char **argv = (char **) calloc(1, sizeof(char *));
+    argv[0] = strdup("unit_test");
+
+    simulation->init(&argc, argv);
+
+    // Setting up the platform
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    // Get a hostname
+    std::string hostname = "Host1";
+
+    // Create a WMS
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    ASSERT_NO_THROW(wms = simulation->add(
+            new S4U_DaemonNoCleanupTestWMS(this, hostname)));
+
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+
+    // Running a "run a single task" simulation
+    ASSERT_NO_THROW(simulation->launch());
+
+    delete simulation;
+
+    free(argv[0]);
+    free(argv);
+}
 

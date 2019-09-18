@@ -359,58 +359,7 @@ namespace wrench {
         return "Network error (" + error + ") while " + operation + " mailbox_name " + this->mailbox;
     };
 
-    /**
-     * @brief Constructor
-     *
-     * @param job: the job that couldn't be terminated
-     */
-    JobCannotBeTerminated::JobCannotBeTerminated(WorkflowJob *job) {
-        this->job = job;
-    }
 
-
-    /**
-     * @brief Getter
-     * @return the job
-     */
-    WorkflowJob *JobCannotBeTerminated::getJob() {
-        return this->job;
-    }
-
-    /**
-     * @brief Get the human-readable failure message
-     * @return the message
-     */
-    std::string JobCannotBeTerminated::toString() {
-        return "Job cannot be terminated (because it's neither pending nor running)";
-    };
-
-
-    /**
-    * @brief Constructor
-    *
-    * @param job: the job that couldn't be forgotten
-    */
-    JobCannotBeForgotten::JobCannotBeForgotten(WorkflowJob *job) {
-        this->job = job;
-    }
-
-
-    /**
-     * @brief Getter
-     * @return the job
-     */
-    WorkflowJob *JobCannotBeForgotten::getJob() {
-        return this->job;
-    }
-
-    /**
-     * @brief Get the human-readable failure message
-     * @return the message
-     */
-    std::string JobCannotBeForgotten::toString() {
-        return "Job cannot be forgotten (because it's not completed or failed)";
-    };
 
 //    /**
 //     * @brief Constructor
@@ -609,7 +558,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param service: the service that cause the error
+     * @param service: the service that cause the error (or nullptr if no known service for the error)
      * @param error_message: a custom error message
      */
     NotAllowed::NotAllowed(std::shared_ptr<Service> service, std::string &error_message) {
@@ -630,8 +579,11 @@ namespace wrench {
      * @return the message
      */
     std::string NotAllowed::toString() {
-        return "The service (" + this->service->getName() + ") does not allow the operation (" + this->error_message +
-               ")";
+        if (this->service) {
+            return "The service (" + this->service->getName() + ") does not allow the operation (" + this->error_message + ")";
+        } else {
+            return "Operation not allowed (" + this->error_message + ")";
+        }
     }
 
 };

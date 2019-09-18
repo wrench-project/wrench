@@ -58,8 +58,8 @@ namespace wrench {
             throw std::invalid_argument("StorageService::stageFile(): Invalid arguments");
         }
 
-        if (!simgrid::s4u::this_actor::is_maestro()) {
-            throw std::runtime_error("StorageService::stageFile(): Can only be called before the simulation starts");
+        if (this->simulation->isRunning()) {
+            throw std::runtime_error("StorageService::stageFile(): Can only be called before the simulation is launched");
         }
 
         if (file->getSize() > (this->capacity - this->occupied_space)) {
@@ -1017,12 +1017,13 @@ namespace wrench {
      * @param downloader_buffer_size: buffer size of the downloaderd (0 means use "ideal fluid model")
      */
     void StorageService::downloadFile(WorkflowFile *file, std::string src_partition, std::string local_partition, unsigned long downloader_buffer_size) {
-        WRENCH_INFO("Initiating a file read operation for file %s on storage service %s",
-                    file->getID().c_str(), this->getName().c_str());
 
         if (file == nullptr) {
             throw std::invalid_argument("StorageService::downloadFile(): Invalid arguments");
         }
+
+        WRENCH_INFO("Initiating a file read operation for file %s on storage service %s",
+                    file->getID().c_str(), this->getName().c_str());
 
         // Check that the service is up
         assertServiceIsUp();
@@ -1057,7 +1058,6 @@ namespace wrench {
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw WorkflowExecutionException(cause);
         }
-
 
         // Wait for a reply to the request
         std::shared_ptr<SimulationMessage> message = nullptr;

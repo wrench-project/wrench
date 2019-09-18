@@ -20,7 +20,7 @@
 #include "../failure_test_util/ResourceRandomRepeatSwitcher.h"
 
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(comprehensive_failure_integration_test, "Log category for ComprehesiveIntegrationFailureTest");
+XBT_LOG_NEW_DEFAULT_CATEGORY(comprehensive_integration_host_failure_test, "Log category for ComprehensiveIntegrationHostFailuresTest");
 
 #define NUM_TASKS 100
 #define MAX_TASK_DURATION_WITH_ON_CORE 3600
@@ -29,7 +29,7 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(comprehensive_failure_integration_test, "Log catego
 #define CHAOS_MONKEY_MIN_SLEEP_BEFORE_ON 100
 #define CHAOS_MONKEY_MAX_SLEEP_BEFORE_ON 2000    // The bigger this number the more flaky the platform
 
-class IntegrationSimulatedFailuresTest : public ::testing::Test {
+class ComprehensiveIntegrationHostFailuresTest : public ::testing::Test {
 
 public:
     wrench::Workflow *workflow;
@@ -41,7 +41,7 @@ public:
     std::shared_ptr<wrench::CloudComputeService> cloud_service = nullptr;
     std::shared_ptr<wrench::BareMetalComputeService> baremetal_service = nullptr;
 
-    void do_IntegrationFailureTestTest_test(std::map<std::string, bool> args);
+    void do_IntegrationFailurTest_test(std::map<std::string, bool> args);
 
 
 protected:
@@ -56,7 +56,7 @@ protected:
         return to_return;
     }
 
-    IntegrationSimulatedFailuresTest() {
+    ComprehensiveIntegrationHostFailuresTest() {
         // Create the simplest workflow
         workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
         workflow = workflow_unique_ptr.get();
@@ -147,7 +147,7 @@ protected:
 class IntegrationFailureTestTestWMS : public wrench::WMS {
 
 public:
-    IntegrationFailureTestTestWMS(IntegrationSimulatedFailuresTest *test,
+    IntegrationFailureTestTestWMS(ComprehensiveIntegrationHostFailuresTest *test,
                                   std::string &hostname,
                                   std::set<std::shared_ptr<wrench::ComputeService>> compute_services,
                                   std::set<std::shared_ptr<wrench::StorageService>> storage_services
@@ -160,7 +160,7 @@ private:
 
     std::map<std::string, std::shared_ptr<wrench::BareMetalComputeService>> vms;
     std::map<std::shared_ptr<wrench::BareMetalComputeService>, bool> vm_used;
-    IntegrationSimulatedFailuresTest *test;
+    ComprehensiveIntegrationHostFailuresTest *test;
     std::shared_ptr<wrench::JobManager> job_manager;
     unsigned long num_jobs_on_baremetal_cs = 0;
     unsigned long max_num_jobs_on_baremetal_cs = 4;
@@ -334,67 +334,67 @@ private:
 
 };
 
-TEST_F(IntegrationSimulatedFailuresTest, OneNonFaultyStorageOneFaultyBareMetal) {
+TEST_F(ComprehensiveIntegrationHostFailuresTest, OneNonFaultyStorageOneFaultyBareMetal) {
     std::map<std::string, bool> args;
     args["storage1"] = false;
     args["baremetal"] = true;
-    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTestTest_test, args);
+    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailurTest_test, args);
 }
 
-TEST_F(IntegrationSimulatedFailuresTest, OneFaultyStorageOneNonFaultyBareMetal) {
+TEST_F(ComprehensiveIntegrationHostFailuresTest, OneFaultyStorageOneNonFaultyBareMetal) {
     std::map<std::string, bool> args;
     args["storage1"] = true;
     args["baremetal"] = false;
-    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTestTest_test, args);
+    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailurTest_test, args);
 }
 
-TEST_F(IntegrationSimulatedFailuresTest, OneFaultyStorageOneFaultyBareMetal) {
+TEST_F(ComprehensiveIntegrationHostFailuresTest, OneFaultyStorageOneFaultyBareMetal) {
     std::map<std::string, bool> args;
     args["storage1"] = true;
     args["baremetal"] = true;
-    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTestTest_test, args);
+    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailurTest_test, args);
 }
 
-TEST_F(IntegrationSimulatedFailuresTest, TwoFaultyStorageOneFaultyBareMetal) {
+TEST_F(ComprehensiveIntegrationHostFailuresTest, TwoFaultyStorageOneFaultyBareMetal) {
     std::map<std::string, bool> args;
     args["storage1"] = true;
     args["storage2"] = true;
     args["baremetal"] = true;
-    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTestTest_test, args);
+    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailurTest_test, args);
 }
 
-TEST_F(IntegrationSimulatedFailuresTest, OneNonFaultyStorageOneFaultyCloud) {
+TEST_F(ComprehensiveIntegrationHostFailuresTest, OneNonFaultyStorageOneFaultyCloud) {
     std::map<std::string, bool> args;
     args["storage1"] = false;
     args["cloud"] = true;
-    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTestTest_test, args);
+    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailurTest_test, args);
 }
 
-TEST_F(IntegrationSimulatedFailuresTest, OneFaultyStorageOneFaultyCloud) {
+TEST_F(ComprehensiveIntegrationHostFailuresTest, OneFaultyStorageOneFaultyCloud) {
     std::map<std::string, bool> args;
     args["storage1"] = true;
     args["cloud"] = true;
-    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTestTest_test, args);
+    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailurTest_test, args);
 }
 
-TEST_F(IntegrationSimulatedFailuresTest, TwoFaultyStorageOneFaultyCloud) {
+TEST_F(ComprehensiveIntegrationHostFailuresTest, TwoFaultyStorageOneFaultyCloud) {
     std::map<std::string, bool> args;
     args["storage1"] = true;
     args["storage2"] = true;
     args["cloud"] = true;
-    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTestTest_test, args);
+    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailurTest_test, args);
 }
 
-TEST_F(IntegrationSimulatedFailuresTest, WholeEnchilada) {
+TEST_F(ComprehensiveIntegrationHostFailuresTest, WholeEnchilada) {
     std::map<std::string, bool> args;
     args["storage1"] = true;
     args["storage2"] = true;
     args["baremetal"] = true;
     args["cloud"] = true;
-    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTestTest_test, args);
+    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailurTest_test, args);
 }
 
-void IntegrationSimulatedFailuresTest::do_IntegrationFailureTestTest_test(std::map<std::string, bool> args) {
+void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailurTest_test(std::map<std::string, bool> args) {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();

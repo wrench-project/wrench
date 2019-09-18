@@ -16,10 +16,10 @@
 #include "../failure_test_util/ResourceSwitcher.h"
 #include "../failure_test_util/ResourceRandomRepeatSwitcher.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(standard_job_executor_simulated_failures_test, "Log category for StandardJobExecutorSimulatedFailuresTests");
+XBT_LOG_NEW_DEFAULT_CATEGORY(standard_job_executor_host_failures_test, "Log category for StandardJobExecutorHostFailuresTests");
 
 
-class StandardJobExecutorSimulatedFailuresTest : public ::testing::Test {
+class StandardJobExecutorHostFailuresTest : public ::testing::Test {
 
 public:
     wrench::Workflow *workflow;
@@ -37,7 +37,7 @@ public:
 
 protected:
 
-    StandardJobExecutorSimulatedFailuresTest() {
+    StandardJobExecutorHostFailuresTest() {
         // Create the simplest workflow
         workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
         workflow = workflow_unique_ptr.get();
@@ -85,7 +85,7 @@ protected:
 class StandardJobExecutorOneFailureCausingWorkUnitRestartOnAnotherHostTestWMS : public wrench::WMS {
 
 public:
-    StandardJobExecutorOneFailureCausingWorkUnitRestartOnAnotherHostTestWMS(StandardJobExecutorSimulatedFailuresTest *test,
+    StandardJobExecutorOneFailureCausingWorkUnitRestartOnAnotherHostTestWMS(StandardJobExecutorHostFailuresTest *test,
                                                                             std::string &hostname, std::shared_ptr<wrench::StorageService> ss) :
             wrench::WMS(nullptr, nullptr, {}, {ss}, {}, nullptr, hostname, "testX") {
         this->test = test;
@@ -93,7 +93,7 @@ public:
 
 private:
 
-    StandardJobExecutorSimulatedFailuresTest *test;
+    StandardJobExecutorHostFailuresTest *test;
 
     int main() override {
 
@@ -165,11 +165,11 @@ private:
     }
 };
 
-TEST_F(StandardJobExecutorSimulatedFailuresTest, OneFailureCausingWorkUnitRestartOnAnotherHost) {
+TEST_F(StandardJobExecutorHostFailuresTest, OneFailureCausingWorkUnitRestartOnAnotherHost) {
     DO_TEST_WITH_FORK(do_StandardJobExecutorOneFailureCausingWorkUnitRestartOnAnotherHost_test);
 }
 
-void StandardJobExecutorSimulatedFailuresTest::do_StandardJobExecutorOneFailureCausingWorkUnitRestartOnAnotherHost_test() {
+void StandardJobExecutorHostFailuresTest::do_StandardJobExecutorOneFailureCausingWorkUnitRestartOnAnotherHost_test() {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
@@ -219,7 +219,7 @@ void StandardJobExecutorSimulatedFailuresTest::do_StandardJobExecutorOneFailureC
 class StandardJobExecutorOneFailureCausingWorkUnitRestartOnSameHostTestWMS : public wrench::WMS {
 
 public:
-    StandardJobExecutorOneFailureCausingWorkUnitRestartOnSameHostTestWMS(StandardJobExecutorSimulatedFailuresTest *test,
+    StandardJobExecutorOneFailureCausingWorkUnitRestartOnSameHostTestWMS(StandardJobExecutorHostFailuresTest *test,
                                                                          std::string &hostname, std::shared_ptr<wrench::StorageService> ss) :
             wrench::WMS(nullptr, nullptr, {}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -227,7 +227,7 @@ public:
 
 private:
 
-    StandardJobExecutorSimulatedFailuresTest *test;
+    StandardJobExecutorHostFailuresTest *test;
 
     int main() override {
 
@@ -298,11 +298,11 @@ private:
     }
 };
 
-TEST_F(StandardJobExecutorSimulatedFailuresTest, OneFailureCausingWorkUnitRestartOnSameHost) {
+TEST_F(StandardJobExecutorHostFailuresTest, OneFailureCausingWorkUnitRestartOnSameHost) {
     DO_TEST_WITH_FORK(do_StandardJobExecutorOneFailureCausingWorkUnitRestartOnSameHost_test);
 }
 
-void StandardJobExecutorSimulatedFailuresTest::do_StandardJobExecutorOneFailureCausingWorkUnitRestartOnSameHost_test() {
+void StandardJobExecutorHostFailuresTest::do_StandardJobExecutorOneFailureCausingWorkUnitRestartOnSameHost_test() {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
@@ -349,7 +349,7 @@ void StandardJobExecutorSimulatedFailuresTest::do_StandardJobExecutorOneFailureC
 class StandardJobExecutorRandomFailuresTestWMS : public wrench::WMS {
 
 public:
-    StandardJobExecutorRandomFailuresTestWMS(StandardJobExecutorSimulatedFailuresTest *test,
+    StandardJobExecutorRandomFailuresTestWMS(StandardJobExecutorHostFailuresTest *test,
                                              std::string &hostname, std::shared_ptr<wrench::StorageService> ss) :
             wrench::WMS(nullptr, nullptr, {}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -357,7 +357,7 @@ public:
 
 private:
 
-    StandardJobExecutorSimulatedFailuresTest *test;
+    StandardJobExecutorHostFailuresTest *test;
 
     int main() override {
 
@@ -456,11 +456,11 @@ private:
     }
 };
 
-TEST_F(StandardJobExecutorSimulatedFailuresTest, RandomFailures) {
+TEST_F(StandardJobExecutorHostFailuresTest, RandomFailures) {
     DO_TEST_WITH_FORK(do_StandardJobExecutorRandomFailures_test);
 }
 
-void StandardJobExecutorSimulatedFailuresTest::do_StandardJobExecutorRandomFailures_test() {
+void StandardJobExecutorHostFailuresTest::do_StandardJobExecutorRandomFailures_test() {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();

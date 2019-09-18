@@ -18,10 +18,10 @@
 #include "../failure_test_util/SleeperVictim.h"
 #include "../failure_test_util/ComputerVictim.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(storage_service_start_restart_test, "Log category for StorageServiceStartRestartTest");
+XBT_LOG_NEW_DEFAULT_CATEGORY(storage_service_start_restart_host_failures_test, "Log category for StorageServiceReStartHostFailuresTest");
 
 
-class SimulatedFailuresTest : public ::testing::Test {
+class StorageServiceReStartHostFailuresTest : public ::testing::Test {
 
 public:
     wrench::Workflow *workflow;
@@ -31,7 +31,7 @@ public:
 
 protected:
 
-    SimulatedFailuresTest() {
+    StorageServiceReStartHostFailuresTest() {
         // Create the simplest workflow
         workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
         workflow = workflow_unique_ptr.get();
@@ -47,6 +47,7 @@ protected:
         FILE *trace_file = fopen(trace_file_path.c_str(), "w");
         fprintf(trace_file, "%s", trace_file_content.c_str());
         fclose(trace_file);
+        WRENCH_INFO("CREATED TRACE FILE %s", trace_file_path.c_str());
 
         // Create a platform file
         std::string xml = "<?xml version='1.0'?>"
@@ -54,17 +55,18 @@ protected:
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"FailedHost\" speed=\"1f\" core=\"1\"/> "
-                          "       <host id=\"FailedHostTrace\" speed=\"1f\" state_file=\""+  trace_file_path +"\"  core=\"1\"/> "
-                                                                                                              "       <host id=\"StableHost\" speed=\"1f\" core=\"1\"/> "
-                                                                                                              "       <link id=\"link1\" bandwidth=\"1kBps\" latency=\"0\"/>"
-                                                                                                              "       <route src=\"FailedHost\" dst=\"StableHost\">"
-                                                                                                              "           <link_ctn id=\"link1\"/>"
-                                                                                                              "       </route>"
-                                                                                                              "       <route src=\"FailedHostTrace\" dst=\"StableHost\">"
-                                                                                                              "           <link_ctn id=\"link1\"/>"
-                                                                                                              "       </route>"
-                                                                                                              "   </zone> "
-                                                                                                              "</platform>";
+                          "       <host id=\"FailedHostTrace\" speed=\"1f\" state_file=\"" + trace_file_name +
+                          "\"  core=\"1\"/> "
+                          "       <host id=\"StableHost\" speed=\"1f\" core=\"1\"/> "
+                          "       <link id=\"link1\" bandwidth=\"1kBps\" latency=\"0\"/>"
+                          "       <route src=\"FailedHost\" dst=\"StableHost\">"
+                          "           <link_ctn id=\"link1\"/>"
+                          "       </route>"
+                          "       <route src=\"FailedHostTrace\" dst=\"StableHost\">"
+                          "           <link_ctn id=\"link1\"/>"
+                          "       </route>"
+                          "   </zone> "
+                          "</platform>";
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
@@ -81,7 +83,7 @@ protected:
 class StorageServiceRestartTestWMS : public wrench::WMS {
 
 public:
-    StorageServiceRestartTestWMS(SimulatedFailuresTest *test,
+    StorageServiceRestartTestWMS(StorageServiceReStartHostFailuresTest *test,
                                  std::string &hostname,
                                  std::shared_ptr<wrench::StorageService> storage_service
     ) :
@@ -91,7 +93,7 @@ public:
 
 private:
 
-    SimulatedFailuresTest *test;
+    StorageServiceReStartHostFailuresTest *test;
 
     int main() override {
 
@@ -151,11 +153,11 @@ private:
     }
 };
 
-TEST_F(SimulatedFailuresTest, StorageServiceReStartTest) {
+TEST_F(StorageServiceReStartHostFailuresTest, StorageServiceReStartTest) {
     DO_TEST_WITH_FORK(do_StorageServiceRestartTest_test);
 }
 
-void SimulatedFailuresTest::do_StorageServiceRestartTest_test() {
+void StorageServiceReStartHostFailuresTest::do_StorageServiceRestartTest_test() {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();

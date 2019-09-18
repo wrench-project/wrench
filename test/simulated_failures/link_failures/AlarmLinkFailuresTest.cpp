@@ -18,17 +18,17 @@
 #include "../failure_test_util/ResourceSwitcher.h"
 #include <wms/WMSMessage.h>
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(alarm_link_failure_test, "Log category for AlarmLinkFailureTest");
+XBT_LOG_NEW_DEFAULT_CATEGORY(alarm_link_failures_test, "Log category for AlarmLinkFailuresTest");
 
 
-class AlarmLinkFailureTest : public ::testing::Test {
+class AlarmLinkFailuresTest : public ::testing::Test {
 
 public:
 
     void do_AlarmLinkFailure_Test();
 
 protected:
-    AlarmLinkFailureTest() {
+    AlarmLinkFailuresTest() {
 
         // Create the simplest workflow
         workflow = new wrench::Workflow();
@@ -61,10 +61,10 @@ protected:
 /**  LINK FAILURE  TEST                                              **/
 /**********************************************************************/
 
-class AlarmLinkFailureTestWMS : public wrench::WMS {
+class AlarmLinkFailuresTestWMS : public wrench::WMS {
 
 public:
-    AlarmLinkFailureTestWMS(AlarmLinkFailureTest *test,
+    AlarmLinkFailuresTestWMS(AlarmLinkFailuresTest *test,
                             std::string hostname) :
             wrench::WMS(nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -72,7 +72,7 @@ public:
 
 private:
 
-    AlarmLinkFailureTest *test;
+    AlarmLinkFailuresTest *test;
 
     int main() {
 
@@ -94,17 +94,19 @@ private:
             message = wrench::S4U_Mailbox::getMessage(mailbox);
             throw std::runtime_error("Should never have gotten the alarm's message");
         } catch (std::shared_ptr<wrench::NetworkError> &error) {
+            error->toString();
+            error->getMailbox();
         }
 
         return 0;
     }
 };
 
-TEST_F(AlarmLinkFailureTest, SimpleRandomTest) {
+TEST_F(AlarmLinkFailuresTest, SimpleRandomTest) {
     DO_TEST_WITH_FORK(do_AlarmLinkFailure_Test);
 }
 
-void AlarmLinkFailureTest::do_AlarmLinkFailure_Test() {
+void AlarmLinkFailuresTest::do_AlarmLinkFailure_Test() {
 
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
@@ -120,7 +122,7 @@ void AlarmLinkFailureTest::do_AlarmLinkFailure_Test() {
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new AlarmLinkFailureTestWMS(
+            new AlarmLinkFailuresTestWMS(
                     this, "Host1")));
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow));

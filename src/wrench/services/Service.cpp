@@ -47,6 +47,7 @@ namespace wrench {
 
         // TODO: Perhaps do this as one step?
         for (auto const &x : Service::service_shared_ptr_map) {
+//            WRENCH_DEBUG("---> %s (%ld)", x.second->getName().c_str(), x.second.use_count());
             if (x.second.use_count() == 1) {
                 to_cleanup.insert(x.first);
             }
@@ -226,6 +227,7 @@ namespace wrench {
      * @param auto_restart: true if the daemon should restart automatically after a reboot or not
      *
      * @throw std::runtime_error
+     * @throw std::shared_ptr<HostError>
      */
     void Service::start(std::shared_ptr<Service> this_service, bool daemonize, bool auto_restart) {
         try {
@@ -240,15 +242,15 @@ namespace wrench {
             this->startDaemon(daemonize, auto_restart);
             // Print some information a out the currently tracked daemons
             WRENCH_DEBUG("MAP SIZE = %ld    NUM_TERMINATED_SERVICES = %ld",
-                        Service::service_shared_ptr_map.size(), Service::num_terminated_services);
+                         Service::service_shared_ptr_map.size(), Service::num_terminated_services);
             if ((Service::service_shared_ptr_map.size() > 1000) or
                 (Service::num_terminated_services > Service::service_shared_ptr_map.size() / 2)) {
                 Service::cleanupTrackedServices();
                 Service::num_terminated_services = 0;
             }
 
-        } catch (std::invalid_argument &e) {
-            throw std::runtime_error("Service::start(): " + std::string(e.what()));
+        } catch (std::shared_ptr<HostError> &e) {
+            throw;
         }
     }
 
@@ -320,11 +322,14 @@ namespace wrench {
 
     /**
       * @brief Resume the service
+      *
+      * @throw WorkflowExecutionException
       */
     void Service::resume() {
         if (this->state != Service::SUSPENDED) {
-            throw std::runtime_error(
-                    "Service::resume(): Service cannot be resumed because it is not in the suspended state");
+            std::string what = "Service cannot be resumed because it is not in the suspended state";
+            throw WorkflowExecutionException(std::shared_ptr<NotAllowed>(
+                    new NotAllowed(this->getSharedPtr<Service>(), what)));
         }
         this->resumeActor();
         this->state = Service::UP;
@@ -378,6 +383,7 @@ namespace wrench {
      */
     void Service::setMessagePayloads(std::map<std::string, double> default_messagepayload_values,
                                      std::map<std::string, double> overridden_messagepayload_values) {
+       
         // Set default messagepayloads
         for (auto const &p : default_messagepayload_values) {
             this->setMessagePayload(p.first, p.second);

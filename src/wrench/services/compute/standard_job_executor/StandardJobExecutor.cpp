@@ -238,6 +238,8 @@ namespace wrench {
         Service::cleanup(has_returned_from_main, return_value);
 
         // Cleanup state in case of a restart
+        this->finished_workunit_executors.clear();
+        this->failed_workunit_executors.clear();
         for (auto wue: this->running_workunit_executors) {
             std::shared_ptr<Workunit> wu = wue->workunit;
             if (wu->task != nullptr) {
@@ -246,10 +248,12 @@ namespace wrench {
                 }
             }
         }
+
         this->non_ready_workunits.clear();
         this->ready_workunits.clear();
         this->running_workunits.clear();
         this->completed_workunits.clear();
+
 
 
     }
@@ -332,6 +336,7 @@ namespace wrench {
                 break;
             }
 
+
             /** Detect Termination **/
             if (this->non_ready_workunits.empty() and this->ready_workunits.empty() and
                 this->running_workunits.empty()) {
@@ -346,6 +351,10 @@ namespace wrench {
             /*** Clean up everything in the scratch space ***/
             cleanUpScratch();
         }
+
+        this->host_state_monitor->kill();
+        this->host_state_monitor = nullptr; // Which will release the pointer to this service!
+
 
         WRENCH_INFO("Standard Job Executor on host %s cleanly terminating!", S4U_Simulation::getHostName().c_str());
         return 0;
@@ -537,8 +546,7 @@ namespace wrench {
 //        }
 
             std::shared_ptr<WorkunitExecutor> workunit_executor = std::shared_ptr<WorkunitExecutor>(
-                    new WorkunitExecutor(this->simulation,
-                                         target_host,
+                    new WorkunitExecutor(target_host,
                                          target_num_cores,
                                          required_ram,
                                          this->mailbox_name,
