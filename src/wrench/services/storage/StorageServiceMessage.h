@@ -52,10 +52,10 @@ namespace wrench {
      */
     class StorageServiceFreeSpaceAnswerMessage : public StorageServiceMessage {
     public:
-        StorageServiceFreeSpaceAnswerMessage(double free_space, double payload);
+        StorageServiceFreeSpaceAnswerMessage(std::map<std::string, double> free_space, double payload);
 
-        /** @brief The amount of free space in bytes */
-        double free_space;
+        /** @brief The amount of free space in bytes for each mount point, in a map */
+        std::map<std::string, double> free_space;
     };
 
     /**

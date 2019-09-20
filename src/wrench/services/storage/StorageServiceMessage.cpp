@@ -48,17 +48,20 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param free_space: the free space, in bytes
+     * @param free_space: the free space, in bytes, at each mount point, as a map
      * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */
-    StorageServiceFreeSpaceAnswerMessage::StorageServiceFreeSpaceAnswerMessage(double free_space, double payload)
+    StorageServiceFreeSpaceAnswerMessage::StorageServiceFreeSpaceAnswerMessage(
+            std::map<std::string, double> free_space, double payload)
             : StorageServiceMessage(
             "FREE_SPACE_ANSWER", payload) {
-        if ((free_space < 0.0)) {
-            throw std::invalid_argument(
-                    "StorageServiceFreeSpaceAnswerMessage::StorageServiceFreeSpaceAnswerMessage(): Invalid arguments");
+        for (auto const &f : free_space) {
+            if (f.second < 0) {
+                throw std::invalid_argument(
+                        "StorageServiceFreeSpaceAnswerMessage::StorageServiceFreeSpaceAnswerMessage(): Invalid arguments");
+            }
         }
         this->free_space = free_space;
     }

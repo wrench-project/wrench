@@ -59,16 +59,16 @@ namespace wrench {
      * @brief Public constructor
      *
      * @param hostname: the name of the host on which to start the service
-     * @param capacity: the storage capacity in bytes
+     * @param mount_points: the set of mount points
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      */
     SimpleStorageService::SimpleStorageService(std::string hostname,
-                                               double capacity,
+                                               std::set<std::string> mount_points,
                                                std::map<std::string, std::string> property_list,
                                                std::map<std::string, double> messagepayload_list
     ) :
-            SimpleStorageService(std::move(hostname), capacity, property_list, messagepayload_list,
+            SimpleStorageService(std::move(hostname), mount_points, property_list, messagepayload_list,
                                  "_" + std::to_string(getNewUniqueNumber())) {
 
     }
@@ -77,7 +77,7 @@ namespace wrench {
  * @brief Private constructor
  *
  * @param hostname: the name of the host on which to start the service
- * @param capacity: the storage capacity in bytes
+ * @param mount_points: the set of mount points
  * @param property_list: the property list
  * @param suffix: the suffix (for the service name)
  *
@@ -85,11 +85,11 @@ namespace wrench {
  */
     SimpleStorageService::SimpleStorageService(
             std::string hostname,
-            double capacity,
+            std::set<std::string> mount_points,
             std::map<std::string, std::string> property_list,
             std::map<std::string, double> messagepayload_list,
             std::string suffix) :
-            StorageService(std::move(hostname), "simple_storage" + suffix, "simple_storage" + suffix, capacity) {
+            StorageService(std::move(hostname), mount_points, "simple_storage" + suffix, "simple_storage" + suffix) {
 
         this->setProperties(this->default_property_values, property_list);
         this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
@@ -111,14 +111,19 @@ namespace wrench {
         // number of files staged
         unsigned long num_stored_files = 0;
 
-        for (auto partition : this->stored_files) {
-            num_stored_files += partition.second.size();
+        for (auto mp : this->stored_files) {
+            num_stored_files += mp.second.size();
+        }
+        double total_capacity = 0;
+        for (auto mp : this->capacities) {
+            total_capacity += mp.second;
         }
 
-        WRENCH_INFO("Simple Storage Service %s starting on host %s (capacity: %lf, holding %ld files, listening on %s)",
+        WRENCH_INFO("Simple Storage Service %s starting on host %s (# mount points: %lu, total capacity: %lf, holding %ld files, listening on %s)",
                     this->getName().c_str(),
                     S4U_Simulation::getHostName().c_str(),
-                    this->capacity,
+                    this->mount_points.size(),
+                    total_capacity,
                     num_stored_files,
                     this->mailbox_name.c_str());
 
@@ -167,7 +172,11 @@ namespace wrench {
             return false;
 
         } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFreeSpaceRequestMessage>(message)) {
-            double free_space = this->capacity - this->occupied_space;
+            std::map<std::string, double> free_space;
+
+            for (auto const &mp : this->mount_points) {
+                free_space[mp] = this->capacities[mp] - this->occupied_space[mp];
+            }
 
             S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                      new StorageServiceFreeSpaceAnswerMessage(free_space,
@@ -224,12 +233,12 @@ namespace wrench {
      * @brief Handle a file write request
      *
      * @param file: the file to write
-     * @param dst_partition: the file partition to write the file to
+     * @param dst_mount_point: the mount point to write the file to
      * @param answer_mailbox: the mailbox to which the reply should be sent
      * @param buffer_size: the buffer size to use
      * @return true if this process should keep running
      */
-    bool SimpleStorageService::processFileWriteRequest(WorkflowFile *file, std::string dst_partition,
+    bool SimpleStorageService::processFileWriteRequest(WorkflowFile *file, std::string dst_mount_point,
                                                        std::string answer_mailbox, unsigned long buffer_size) {
 
         // If the file is not already there, do a capacity check/update
@@ -238,7 +247,7 @@ namespace wrench {
         if (this->stored_files.find(file->getID()) == this->stored_files.end()) {
 
             // Check the file size and capacity, and reply "no" if not enough space
-            if (file->getSize() > (this->capacity - this->occupied_space)) {
+            if (file->getSize() > (this->capacities[dst_mount_point] - this->occupied_space[dst_mount_point])) {
                 try {
                     S4U_Mailbox::putMessage(answer_mailbox,
                                             new StorageServiceFileWriteAnswerMessage(file,
@@ -257,7 +266,7 @@ namespace wrench {
                 return true;
             }
             // Update occupied space, in advance (will have to be decreased later in case of failure)
-            this->occupied_space += file->getSize();
+            this->occupied_space[dst_mount_point] += file->getSize();
         }
 
         // Generate a mailbox_name name on which to receive the file
@@ -278,7 +287,7 @@ namespace wrench {
                                        this->getSharedPtr<StorageService>(),
                                        file,
                                        {FileTransferThread::LocationType::MAILBOX, file_reception_mailbox},
-                                       {FileTransferThread::LocationType::LOCAL_PARTITION, dst_partition},
+                                       {FileTransferThread::LocationType::LOCAL_PARTITION, dst_mount_point},
                                        "",
                                        buffer_size));
         ftt->simulation = this->simulation;
@@ -354,21 +363,21 @@ namespace wrench {
      * @brief Handle a file copy request
      * @param file: the file
      * @param src: the storage service that holds the file
-     * @param src_partition: the file partition from where the file will be copied
-     * @param dst_partition: the file partition to where the file will be copied
+     * @param src_mount_point: the mount point from where the file will be copied
+     * @param dst_mount_point: the mount point to where the file will be copied
      * @param answer_mailbox: the mailbox to which the answer should be sent
      * @return
      */
     bool
     SimpleStorageService::processFileCopyRequest(WorkflowFile *file, std::shared_ptr<StorageService> src,
-                                                 std::string src_partition, std::string dst_partition,
+                                                 std::string src_mount_point, std::string dst_mount_point,
                                                  std::string answer_mailbox,
                                                  SimulationTimestampFileCopyStart *start_timestamp) {
 
         // Do a capacity check/update
         // If the file is already there, then there will just be an overwrite. Note that
         // if the overwrite fails, then the file will disappear, just like in the real world.
-        if (file->getSize() > this->capacity - this->occupied_space) {
+        if (file->getSize() > this->capacities[dst_mount_point] - this->occupied_space[dst_mount_point]) {
             WRENCH_INFO("Cannot perform file copy due to lack of space");
 
             this->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyFailure>(
@@ -378,7 +387,7 @@ namespace wrench {
                 S4U_Mailbox::putMessage(answer_mailbox,
                                         new StorageServiceFileCopyAnswerMessage(file,
                                                                                 this->getSharedPtr<StorageService>(),
-                                                                                dst_partition, nullptr, false,
+                                                                                dst_mount_point, nullptr, false,
                                                                                 false,
                                                                                 std::shared_ptr<FailureCause>(
                                                                                         new StorageServiceNotEnoughSpace(
@@ -393,7 +402,7 @@ namespace wrench {
             }
             return true;
         }
-        this->occupied_space += file->getSize();
+        this->occupied_space[dst_mount_point] += file->getSize();
 
         WRENCH_INFO("Asynchronously copying file %s from storage service %s",
                     file->getID().c_str(),
@@ -407,8 +416,8 @@ namespace wrench {
                     new FileTransferThread(this->hostname,
                                            this->getSharedPtr<StorageService>(),
                                            file,
-                                           {FileTransferThread::LocationType::LOCAL_PARTITION, src_partition},
-                                           {FileTransferThread::LocationType::LOCAL_PARTITION, dst_partition},
+                                           {FileTransferThread::LocationType::LOCAL_PARTITION, src_mount_point},
+                                           {FileTransferThread::LocationType::LOCAL_PARTITION, dst_mount_point},
                                            answer_mailbox,
                                            this->buffer_size, start_timestamp));
         } else {
@@ -416,8 +425,8 @@ namespace wrench {
                     new FileTransferThread(this->hostname,
                                            this->getSharedPtr<StorageService>(),
                                            file,
-                                           {FileTransferThread::LocationType::STORAGE_SERVICE, src->getName() + ":" + src_partition},
-                                           {FileTransferThread::LocationType::LOCAL_PARTITION, dst_partition},
+                                           {FileTransferThread::LocationType::STORAGE_SERVICE, src->getName() + ":" + src_mount_point},
+                                           {FileTransferThread::LocationType::LOCAL_PARTITION, dst_mount_point},
                                            answer_mailbox,
                                            this->buffer_size, start_timestamp));
         }
@@ -480,7 +489,7 @@ namespace wrench {
                 }
             } else {
                 // Process the failure, meaning, just re-decrease the occupied space
-                this->occupied_space -= file->getSize();
+                this->occupied_space[dst.second] -= file->getSize();
             }
         }
 

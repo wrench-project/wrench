@@ -32,7 +32,7 @@ namespace wrench {
             StandardJob *job,
             std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>, std::shared_ptr<StorageService>>> pre_file_copies,
             WorkflowTask *task,
-            std::map<WorkflowFile *, std::shared_ptr<StorageService>> file_locations,
+            std::map<WorkflowFile *, std::pair<std::shared_ptr<StorageService>, std::string>> file_locations,
             std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>, std::shared_ptr<StorageService> >> post_file_copies,
             std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService> >> cleanup_file_deletions) {
 
@@ -51,7 +51,7 @@ namespace wrench {
         for (auto const &fl : file_locations) {
             auto file = std::get<0>(fl);
             auto ss = std::get<1>(fl);
-            if ((file == nullptr)  || (ss == nullptr)) {
+            if ((file == nullptr)  || (ss.first == nullptr)) {
                 throw std::invalid_argument("Workunit::Workunit(): invalid file location spec");
             }
         }
