@@ -57,7 +57,7 @@ namespace wrench {
 
         // Public Constructor
         SimpleStorageService(std::string hostname,
-                             double capacity,
+                             std::set<std::string> mount_points,
                              std::map<std::string, std::string> property_list = {},
                              std::map<std::string, double> messagepayload_list = {});
 
@@ -79,7 +79,7 @@ namespace wrench {
 
         // Low-level Constructor
         SimpleStorageService(std::string hostname,
-                             double capacity,
+                             std::set<std::string> mount_points,
                              std::map<std::string, std::string> property_list,
                              std::map<std::string, double> messagepayload_list,
                              std::string suffix);
@@ -90,7 +90,7 @@ namespace wrench {
 
         unsigned long getNewUniqueNumber();
 
-        bool processFileDeleteRequest(WorkflowFile *file, std::string dst_partition, std::string answer_mailbox);
+        bool processFileDeleteRequest(WorkflowFile *file, std::string dst_mount_point, std::string answer_mailbox);
 
         bool processFileWriteRequest(WorkflowFile *file, std::string dst_dir, std::string answer_mailbox, unsigned long buffer_size);
 
@@ -98,7 +98,7 @@ namespace wrench {
                                     std::string mailbox_to_receive_the_file_content, unsigned long buffer_size);
 
         bool processFileCopyRequest(WorkflowFile *file, std::shared_ptr<StorageService> src,
-                std::string src_dir, std::string dst_dir,
+                std::string src_mount_point, std::string dst_mount_point,
                 std::string answer_mailbox, SimulationTimestampFileCopyStart *start_timestamp);
 
         bool processFileTransferThreadNotification(

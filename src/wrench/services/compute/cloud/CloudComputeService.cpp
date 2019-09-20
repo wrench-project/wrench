@@ -33,7 +33,7 @@ namespace wrench {
      *
      * @param hostname: the hostname on which to start the service
      * @param execution_hosts: the list of the names of the hosts available for running virtual machines
-     * @param scratch_space_size: the size for the scratch storage pace of the cloud service
+     * @param scratch_space_mount_point: the mount point for the cloud sercvice's strach space ("" means none)
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      *
@@ -41,11 +41,11 @@ namespace wrench {
      */
     CloudComputeService::CloudComputeService(const std::string &hostname,
                                              std::vector<std::string> &execution_hosts,
-                                             double scratch_space_size,
+                                             std::string scratch_space_mount_point,
                                              std::map<std::string, std::string> property_list,
                                              std::map<std::string, double> messagepayload_list) :
             ComputeService(hostname, "cloud_service", "cloud_service",
-                           scratch_space_size) {
+                           scratch_space_mount_point) {
 
         if (execution_hosts.empty()) {
             throw std::invalid_argument(

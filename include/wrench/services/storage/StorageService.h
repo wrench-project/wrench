@@ -42,40 +42,42 @@ namespace wrench {
 
         void stop() override;
 
-        virtual double getFreeSpace();
+        virtual std::map<std::string, double> getFreeSpace();
 
-        double getTotalSpace();
+        virtual std::map<std::string, double> getTotalSpace();
+
+        std::set<std::string> getMountPoints();
 
         virtual bool lookupFile(WorkflowFile *file);
 
-        virtual bool lookupFile(WorkflowFile *file, std::string dst_dir);
+        virtual bool lookupFile(WorkflowFile *file, std::string dst_mountpoint);
 
         virtual void deleteFile(WorkflowFile *file, std::shared_ptr<FileRegistryService>file_registry_service=nullptr);
 
-        virtual void deleteFile(WorkflowFile *file, std::string dst_dir, std::shared_ptr<FileRegistryService>file_registry_service=nullptr);
+        virtual void deleteFile(WorkflowFile *file, std::string dst_mountpoint, std::shared_ptr<FileRegistryService>file_registry_service=nullptr);
 
         virtual void readFile(WorkflowFile *file);
-        virtual void readFile(WorkflowFile *file, std::string src_dir);
+        virtual void readFile(WorkflowFile *file, std::string src_mountpoint);
 
         virtual void writeFile(WorkflowFile *file);
-        virtual void writeFile(WorkflowFile *file, std::string dst_dir);
+        virtual void writeFile(WorkflowFile *file, std::string dst_mountpoint);
 
-        virtual void downloadFile(WorkflowFile *file, std::string local_partition, unsigned long buffer_size);
-        virtual void downloadFile(WorkflowFile *file, std::string src_dir, std::string local_partition, unsigned long buffer_size);
+        virtual void downloadFile(WorkflowFile *file, std::string dst_mountpoint, unsigned long buffer_size);
+        virtual void downloadFile(WorkflowFile *file, std::string src_mountpoint, std::string dst_mountpoint, unsigned long buffer_size);
 
 
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
 
-        virtual void copyFile(WorkflowFile *file, std::shared_ptr<StorageService> src, std::string src_dir, std::string dst_dir);
+        virtual void copyFile(WorkflowFile *file, std::shared_ptr<StorageService> src, std::string src_mountpoint, std::string dst_mountpoint);
         virtual void copyFile(WorkflowFile *file, std::shared_ptr<StorageService> src);
 
         virtual void initiateFileCopy(std::string answer_mailbox,
                                       WorkflowFile *file,
                                       std::shared_ptr<StorageService> src,
-                                      std::string src_dir,
-                                      std::string dst_dir);
+                                      std::string src_mountpoint,
+                                      std::string dst_mountpoint);
 
 
         virtual void deleteFile(WorkflowFile *file, WorkflowJob* job, std::shared_ptr<FileRegistryService> file_registry_service=nullptr);
@@ -84,13 +86,13 @@ namespace wrench {
         virtual void writeFile(WorkflowFile *file, WorkflowJob* job);
         virtual void copyFile(WorkflowFile *file, std::shared_ptr<StorageService> src, WorkflowJob* src_job, WorkflowJob* dst_job);
         static void readFiles(std::set<WorkflowFile *> files,
-                              std::map<WorkflowFile *, std::shared_ptr<StorageService>> file_locations,
+                              std::map<WorkflowFile *, std::pair<std::shared_ptr<StorageService>, std::string>> file_locations,
                               std::shared_ptr<StorageService> default_storage_service,
                               std::set<WorkflowFile*>& files_in_scratch,
                               WorkflowJob* job = nullptr);
 
         static void writeFiles(std::set<WorkflowFile *> files,
-                               std::map<WorkflowFile *, std::shared_ptr<StorageService>> file_locations,
+                               std::map<WorkflowFile *, std::pair<std::shared_ptr<StorageService>, std::string>> file_locations,
                                std::shared_ptr<StorageService> default_storage_service,
                                std::set<WorkflowFile*>& files_in_scratch,
                                WorkflowJob* job = nullptr);
@@ -98,14 +100,10 @@ namespace wrench {
 
 
 
-//        static void deleteFiles(std::set<WorkflowFile *> files,
-//                                std::map<WorkflowFile *, std::shared_ptr<StorageService>> file_locations,
-//                                std::shared_ptr<StorageService> default_storage_service);
-
         StorageService(const std::string &hostname,
+                       const std::set<std::string> mount_points,
                        const std::string &service_name,
-                       const std::string &data_mailbox_name_prefix,
-                       double capacity);
+                       const std::string &data_mailbox_name_prefix);
 
 
     protected:
@@ -116,18 +114,26 @@ namespace wrench {
 
 
         void stageFile(WorkflowFile *);
+        void stageFile(WorkflowFile *, std::string mountpoint);
 
-        void removeFileFromStorage(WorkflowFile *, std::string);
+        void removeFileFromStorage(WorkflowFile *, std::string mountpoint);
 
-        /** @brief The map of file directories and the set of files stored on those directories inside the storage service */
+        /** The mount points (each one corresponds to a  disk) **/
+        std::set<std::string> mount_points;
+
+        /** @brief The map of mount points and the set of files stored on those mount points inside the storage service */
         std::map<std::string, std::set<WorkflowFile *>> stored_files;
-        /** @brief The storage service's capacity */
-        double capacity;
-        /** @brief The storage service's occupied space */
-        double occupied_space = 0;
+
+        /** @brief The map of mount points and their total capacities*/
+        std::map<std::string, double> capacities;
+
+        /** @brief The map of mount points and their total occupied capacities */
+        /** @brief The  service's occupied space */
+        std::map<std::string, double> occupied_space;
 
         /** @brief The service's buffer size */
         unsigned long buffer_size;
+
 
         /***********************/
         /** \endcond          **/
@@ -142,7 +148,7 @@ namespace wrench {
         };
 
         static void writeOrReadFiles(FileOperation action, std::set<WorkflowFile *> files,
-                                     std::map<WorkflowFile *, std::shared_ptr<StorageService>> file_locations,
+                                     std::map<WorkflowFile *, std::pair<std::shared_ptr<StorageService>, std::string>> file_locations,
                                      std::shared_ptr<StorageService> default_storage_service,
                                      std::set<WorkflowFile*>& files_in_scratch,
                                      WorkflowJob* job);

@@ -21,6 +21,8 @@
 
 WRENCH_LOG_NEW_DEFAULT_CATEGORY(s4u_simulation, "Log category for S4U_Simulation");
 
+#include <simgrid/plugins/file_system.h>
+
 
 namespace wrench {
 
@@ -33,6 +35,7 @@ namespace wrench {
     void S4U_Simulation::initialize(int *argc, char **argv) {
         this->engine = new simgrid::s4u::Engine(argc, argv);
         this->initialized = true;
+        sg_storage_file_system_init();
     }
 
     /**
@@ -501,7 +504,7 @@ namespace wrench {
             return simgrid::s4u::Host::by_name(hostname)->get_pstate();
         } catch (std::exception &e) {
             throw std::runtime_error(
-                    "S4U_Simulation::getNumberofPstates(): Was not able to get the number of pstates of the host. Make sure energy plugin is enabled and "
+                    "S4U_Simulation::getCurrentPstate(): Was not able to get the number of pstates of the host. Make sure energy plugin is enabled and "
                     "the host name is correct"
             );
         }
@@ -519,7 +522,7 @@ namespace wrench {
                                           (simgrid::s4u::Host::by_name(hostname))->get_pstate());
         } catch (std::exception &e) {
             throw std::runtime_error(
-                    "S4U_Simulation::getMinPowerAvailable(): Was not able to get the min power available to the host. Make sure energy plugin is enabled and "
+                    "S4U_Simulation::getMinPowerConsumption(): Was not able to get the min power available to the host. Make sure energy plugin is enabled and "
                     "the host name is correct"
             );
         }
@@ -537,7 +540,7 @@ namespace wrench {
                                           (simgrid::s4u::Host::by_name(hostname))->get_pstate());
         } catch (std::exception &e) {
             throw std::runtime_error(
-                    "S4U_Simulation::getMaxPowerPossible():: Was not able to get the max power possible for the host. Make sure energy is plugin is enabled and "
+                    "S4U_Simulation::getMaxPowerConsumption():: Was not able to get the max power possible for the host. Make sure energy is plugin is enabled and "
                     "the host name is correct"
             );
         }
@@ -575,6 +578,124 @@ namespace wrench {
             S4U_Simulation::compute(0);
         }
     }
+
+
+    /**
+     * @brief Gets set of disks, i.e., mount points, available at a host
+     * @param hostname: the host's name
+     * @return a set of mount points
+     *
+     * @htrow std::invalid_argument
+     */
+    std::set<std::string> S4U_Simulation::getDisks(std::string hostname) {
+
+        simgrid::s4u::Host *host;
+        try {
+            host = simgrid::s4u::Host::by_name(hostname);
+        } catch (std::exception &e) {
+            throw std::invalid_argument("S4U_Simulation::getDisks(): Unknown host " + hostname);
+        }
+
+        std::set<std::string> mount_points;
+        for (auto const &d : host->get_disks()) {
+            // Get the disk's mount point
+            const char *p = d->get_property("mount");
+            if (!p) {
+                p = "/";
+            }
+            std::string mount_point = std::string(p);
+            if (mount_points.find(mount_point) != mount_points.end()) {
+                throw std::invalid_argument("S4U_Simulation::getDisks(): At host " + hostname +
+                " it seems that several disks share the same mount point (or have the same default '/' mount point)."
+                "You likely need to fix your platform XML");
+            }
+            mount_points.insert(mount_point);
+        }
+
+        return mount_points;
+    }
+
+    /**
+     * @brief Determines whether a mount point is defined at a host
+     * @param hostname: the host's name
+     * @param mount_point: the mount point
+     * @return true if the host has a disk attached to the specified mount point, false otherwise
+     */
+    bool S4U_Simulation::hostHasDisk(std::string hostname, std::string mount_point) {
+
+        simgrid::s4u::Host *host;
+        try {
+            host = simgrid::s4u::Host::by_name(hostname);
+        } catch (std::exception &e) {
+            throw std::invalid_argument("S4U_Simulation::getDisks(): Unknown host " + hostname);
+        }
+
+        std::set<std::string> mount_points;
+        for (auto const &d : host->get_disks()) {
+            // Get the disk's mount point
+            const char *p = d->get_property("mount");
+            if (!p) {
+                p = "/";
+            }
+            if (std::string(p) == mount_point) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    /**
+     * @brief Gets the capacity of a disk attached to some host for a given mount point
+     * @param hostname: the host's name
+     * @param mount_point: the mount point (e.g.,  "/home")
+     * @return the capacity of the disk / mount point
+     *
+     * @throw std::invalid_argument
+     */
+    double S4U_Simulation::getDiskCapacity(std::string hostname, std::string mount_point) {
+
+        simgrid::s4u::Host *host;
+        try {
+            host = simgrid::s4u::Host::by_name(hostname);
+        } catch (std::exception &e) {
+            throw std::invalid_argument("S4U_Simulation::getDiskCapacity(): Unknown host " + hostname);
+        }
+
+        for (auto const &d : host->get_disks()) {
+
+            // Get the disk's mount point
+            const char *mp = d->get_property("mount");
+            if (!mp) {
+                mp = "/";
+            }
+
+            // This is not the mount point you're looking for
+            if (strcmp(mp, mount_point.c_str()) != 0) {
+                continue;
+            }
+
+            double capacity;
+            const char *capacity_str = d->get_property("size");
+
+            if (capacity_str) {
+                try {
+                    capacity = UnitParser::parse_size(capacity_str);
+                } catch (std::invalid_argument &e) {
+                    throw std::invalid_argument("S4U_Simulation::getDiskCapacity(): Disk " + d->get_name() +
+                                                " at host " + hostname + " has invalid size");
+                }
+            } else {
+                capacity = DBL_MAX; // Default size if no size property specified
+            }
+
+            return capacity;
+        }
+
+        throw std::invalid_argument("S4U_Simulation::getDiskCapacity(): Unknown mount point " + mount_point);
+    }
+
 
 
 };

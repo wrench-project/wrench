@@ -177,7 +177,7 @@ namespace wrench {
                 }
             }
             for (auto const &fl : workunit->file_locations) {
-                if (std::get<1>(fl) == ComputeService::SCRATCH) {
+                if (std::get<1>(fl).first == ComputeService::SCRATCH) {
                     scratch_space_ok = false;
                     break;
                 }

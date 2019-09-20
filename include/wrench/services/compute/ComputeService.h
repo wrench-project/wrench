@@ -102,6 +102,8 @@ namespace wrench {
 
         double getFreeScratchSpaceSize();
 
+        std::shared_ptr<StorageService> getScratch();
+
         /***********************/
         /** \endcond          **/
         /***********************/
@@ -143,7 +145,7 @@ namespace wrench {
         ComputeService(const std::string &hostname,
                        std::string service_name,
                        std::string mailbox_name_prefix,
-                       double scratch_space_size);
+                       std::string scratch_space_mount_point);
 
 
     protected:
@@ -163,8 +165,6 @@ namespace wrench {
         /***********************/
         /** \cond DEVELOPER   **/
         /***********************/
-
-        std::shared_ptr<StorageService> getScratch();
 
         std::shared_ptr<StorageService> getScratchSharedPtr();
 

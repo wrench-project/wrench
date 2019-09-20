@@ -33,7 +33,7 @@ namespace wrench {
                                                    std::set<ComputeService *> compute_resources,
                                                    std::map<std::string, std::string> property_list,
                                                    std::map<std::string, double> messagepayload_list) :
-            ComputeService(hostname, "htcondor_service", "htcondor_service", 100) {
+            ComputeService(hostname, "htcondor_service", "htcondor_service", "") {
 
       if (pool_name.empty()) {
         throw std::runtime_error("A pool name for the HTCondor service should be provided.");
