@@ -296,21 +296,21 @@ namespace wrench {
      *        the compute resources available to this service.
      *          - use num_cores = ComputeService::ALL_CORES to use all cores available on the host
      *          - use memory = ComputeService::ALL_RAM to use all RAM available on the host
-     * @param scratch_space_size: size (in bytes) of the compute service's scratch storage paste
+     * @param scratch_space_mount_point: the compute service's scratch space's mount point ("" means none)
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      */
     BareMetalComputeService::BareMetalComputeService(
             const std::string &hostname,
             const std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
-            double scratch_space_size,
+            std::string scratch_space_mount_point,
             std::map<std::string, std::string> property_list,
             std::map<std::string, double> messagepayload_list
     ) :
             ComputeService(hostname,
                            "bare_metal",
                            "bare_metal",
-                           scratch_space_size) {
+                           scratch_space_mount_point) {
 
         initiateInstance(hostname,
                          std::move(compute_resources),
@@ -323,20 +323,20 @@ namespace wrench {
      * @param hostname: the name of the host on which the service should be started
      * @param compute_hosts:: the names of the hosts available as compute resources (the service
      *        will use all the cores and all the RAM of each host)
-     * @param scratch_space_size: size (in bytes) of the compute service's scratch storage paste
+     * @param scratch_space_mount_point: the compute service's scratch space's mount point ("" means none)
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      */
     BareMetalComputeService::BareMetalComputeService(const std::string &hostname,
                                                      const std::set<std::string> compute_hosts,
-                                                     double scratch_space_size,
+                                                     std::string scratch_space_mount_point,
                                                      std::map<std::string, std::string> property_list,
                                                      std::map<std::string, double> messagepayload_list
     ) :
             ComputeService(hostname,
                            "bare_metal",
                            "bare_metal",
-                           scratch_space_size) {
+                           scratch_space_mount_point) {
 
         std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
         for (auto h : compute_hosts) {

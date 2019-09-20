@@ -124,20 +124,21 @@ namespace wrench {
      * @param hostname: the name of the host on which the compute service runs
      * @param service_name: the name of the compute service
      * @param mailbox_name_prefix: the mailbox name prefix
-     * @param scratch_space_size: the size for the scratch storage space of the compute service (0 if none)
+     * @param scratch_space_mount_point: the service's scratch space's mount point ("" if none)
      */
     ComputeService::ComputeService(const std::string &hostname,
                                    const std::string service_name,
                                    const std::string mailbox_name_prefix,
-                                   double scratch_space_size) :
+                                   std::string scratch_space_mount_point) :
             Service(hostname, service_name, mailbox_name_prefix) {
 
         this->state = ComputeService::UP;
 
-        if (scratch_space_size > 0) {
+        if (not scratch_space_mount_point.empty()) {
+
             try {
                 this->scratch_space_storage_service =
-                        std::shared_ptr<StorageService>(new SimpleStorageService(hostname, scratch_space_size));
+                        std::shared_ptr<StorageService>(new SimpleStorageService(hostname, {scratch_space_mount_point}));
                 this->scratch_space_storage_service_shared_ptr = std::shared_ptr<StorageService>(
                         this->scratch_space_storage_service);
             } catch (std::runtime_error &e) {
@@ -473,7 +474,8 @@ namespace wrench {
      * @return a size (in bytes)
      */
     double ComputeService::getTotalScratchSpaceSize() {
-        return this->scratch_space_storage_service ? this->scratch_space_storage_service->getTotalSpace() : 0.0;
+        // A scratch space SS is always created with a single mount point
+        return this->scratch_space_storage_service ? this->scratch_space_storage_service->getTotalSpace().begin()->second : 0.0;
     }
 
     /**
@@ -481,7 +483,8 @@ namespace wrench {
      * @return a size (in bytes)
      */
     double ComputeService::getFreeScratchSpaceSize() {
-        return this->scratch_space_storage_service ? this->scratch_space_storage_service->getFreeSpace() : 0.0;
+        // A scratch space SS is always created with a single mount point
+        return this->scratch_space_storage_service ? this->scratch_space_storage_service->getFreeSpace().begin()->second : 0.0;
     }
 
     /**

@@ -39,7 +39,7 @@ namespace wrench {
                  std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>,
                          std::shared_ptr<StorageService>>> pre_file_copies,
                  WorkflowTask * task,
-                 std::map<WorkflowFile *, std::shared_ptr<StorageService>> file_locations,
+                 std::map<WorkflowFile *, std::pair<std::shared_ptr<StorageService>, std::string>> file_locations,
                  std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>, std::shared_ptr<StorageService>>> post_file_copies,
                  std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>>> cleanup_file_deletions);
 
@@ -62,7 +62,7 @@ namespace wrench {
         /** @brief Computational task to perform */
         WorkflowTask *task = nullptr;
         /** @brief Locations where computational tasks should read/write files */
-        std::map<WorkflowFile *, std::shared_ptr<StorageService>> file_locations;
+        std::map<WorkflowFile *, std::pair<std::shared_ptr<StorageService>, std::string>> file_locations;
         /** @brief File copies to perform after computational tasks completes */
         std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>, std::shared_ptr<StorageService>>> post_file_copies;
         /** @brief File deletions to perform last */
