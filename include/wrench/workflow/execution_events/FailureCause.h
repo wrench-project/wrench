@@ -229,26 +229,30 @@ namespace wrench {
     /**
      * @brief A "file is already being copied" failure cause
      */
+    class FileLocation;
     class FileAlreadyBeingCopied : public FailureCause {
+
 
     public:
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        FileAlreadyBeingCopied(WorkflowFile *file, std::shared_ptr<StorageService> dst, std::string dst_partition);
+        FileAlreadyBeingCopied(WorkflowFile *file,
+                               std::shared_ptr<FileLocation> src,
+                               std::shared_ptr<FileLocation> dst);
         /***********************/
         /** \endcond           */
         /***********************/
 
         WorkflowFile *getFile();
-        std::shared_ptr<StorageService> getStorageService();
-        std::string getPartition();
+        std::shared_ptr<FileLocation> getSourceLocation();
+        std::shared_ptr<FileLocation> getDestinationLocation();
         std::string toString();
 
     private:
         WorkflowFile *file;
-        std::shared_ptr<StorageService> storage_service;
-        std::string dst_partition;
+        std::shared_ptr<FileLocation> src_location;
+        std::shared_ptr<FileLocation> dst_location;
     };
 
     /**

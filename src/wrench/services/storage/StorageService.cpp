@@ -790,7 +790,7 @@ namespace wrench {
         }
     }
 
-#if 0
+#i
     /**
      * @brief Synchronously and sequentially delete a set of files from storage services
      *
