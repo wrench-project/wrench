@@ -976,7 +976,7 @@ namespace wrench {
             for (auto const &f : this->files_in_scratch[job]) {
                 try {
                     StorageService::deleteFile(f, FileLocation::LOCATION(this->getScratch(),
-                            this->getScratch()->getMountPoint(), "/"));
+                                                                         this->getScratch()->getMountPoint(), job->getName()));
                 } catch (WorkflowExecutionException &e) {
                     // ignore (perhaps it was never written)
                 }
@@ -1162,7 +1162,7 @@ namespace wrench {
         if (this->containing_pilot_job == nullptr) {
             for (auto const &f : this->files_in_scratch[job]) {
                 StorageService::deleteFile(f, FileLocation::LOCATION(this->getScratch(),
-                        this->getScratch()->getMountPoint(), "/"));
+                                                                     this->getScratch()->getMountPoint(), job->getName()));
             }
             this->files_in_scratch[job].clear();
             this->files_in_scratch.erase(job);
@@ -1533,7 +1533,10 @@ namespace wrench {
         for (auto const &j : this->files_in_scratch) {
             for (auto const &f : j.second) {
                 try {
-                    getScratch()->deleteFile(f, j.first, nullptr);
+                    StorageService::deleteFile(f,
+                                               FileLocation::LOCATION(this->getScratch(),
+                                                                      this->getScratch()->getMountPoint(),
+                                                                      j.first->getName()));
                 } catch (WorkflowExecutionException &e) {
                     throw;
                 }

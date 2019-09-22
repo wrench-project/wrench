@@ -401,14 +401,16 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param file: the file that is already being copied
-     * @param storage_service:  the storage service to which is is being copied
+     * @param src: the source location
+     * @param dst: the destination location
      * @param dst_partition: the destination partition
      */
-    FileAlreadyBeingCopied::FileAlreadyBeingCopied(WorkflowFile *file, std::shared_ptr<StorageService> storage_service,
-                                                   std::string dst_partition) {
+    FileAlreadyBeingCopied::FileAlreadyBeingCopied(WorkflowFile *file,
+                                                   std::shared_ptr<FileLocation> src,
+                                                   std::shared_ptr<FileLocation> dst) {
         this->file = file;
-        this->storage_service = storage_service;
-        this->dst_partition = dst_partition;
+        this->src_location = src;
+        this->dst_location = dst;
     }
 
     /**
@@ -421,10 +423,18 @@ namespace wrench {
 
     /**
      * @brief Getter
-     * @return the storage service
+     * @return the source location
      */
-    std::shared_ptr<StorageService> FileAlreadyBeingCopied::getStorageService() {
-        return this->storage_service;
+    std::shared_ptr<FileLocation> FileAlreadyBeingCopied::getSourceLocation() {
+        return this->src_location;
+    }
+
+    /**
+    * @brief Getter
+    * @return the source location
+    */
+    std::shared_ptr<FileLocation> FileAlreadyBeingCopied::getDestinationLocation() {
+        return this->dst_location;
     }
 
     /**

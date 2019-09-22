@@ -35,7 +35,12 @@ namespace wrench {
                                                       std::string mp,
                                                       std::string dir);
 
+        std::shared_ptr<StorageService> getStorageService();
+        std::string getMountPoint();
+        std::string getDirectory();
+
         std::string toString();
+
 
     private:
 

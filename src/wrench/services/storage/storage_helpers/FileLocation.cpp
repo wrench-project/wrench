@@ -71,6 +71,10 @@ namespace wrench {
             throw std::invalid_argument("FileLocation::LOCATION(): Storage service " + ss->getName() +
                                         " does not have mount point " + mp);
         }
+        if (dir.empty()) {
+            dir = "/";
+        }
+
         return std::shared_ptr<FileLocation>(new FileLocation(ss, mp, dir));
     }
 
@@ -79,6 +83,31 @@ namespace wrench {
      */
     std::string FileLocation::toString() {
         return this->storage_service->getName() + ":" + this->mount_point + ":" + this->directory;
+    }
+
+    /**
+     * @brief Get the location's storage service
+     * @return a storage service
+     */
+    std::shared_ptr<StorageService> FileLocation::getStorageService() {
+        return this->storage_service;
+    }
+
+    /**
+     * @brief Get the location's storage service's mount point
+     * @return
+     */
+    std::string FileLocation::getMountPoint() {
+        return this->mount_point;
+    }
+
+
+    /**
+     * @brief Get the location's directory
+     * @return
+     */
+    std::string FileLocation::getDirectory() {
+        return this->directory;
     }
 
 
