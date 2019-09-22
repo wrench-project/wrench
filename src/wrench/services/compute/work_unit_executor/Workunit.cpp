@@ -30,20 +30,20 @@ namespace wrench {
     */
     Workunit::Workunit(
             StandardJob *job,
-            std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>, std::shared_ptr<StorageService>>> pre_file_copies,
+            std::set<std::tuple<WorkflowFile *, std::tuple<std::shared_ptr<StorageService>, std::string, std::string>, std::tuple<std::shared_ptr<StorageService>, std::string, std::string>>> pre_file_copies,
             WorkflowTask *task,
-            std::map<WorkflowFile *, std::pair<std::shared_ptr<StorageService>, std::string>> file_locations,
-            std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>, std::shared_ptr<StorageService> >> post_file_copies,
-            std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService> >> cleanup_file_deletions) {
+            std::map<WorkflowFile *, std::tuple<std::shared_ptr<StorageService>, std::string, std::string>> file_locations,
+            std::set<std::tuple<WorkflowFile *, std::tuple<std::shared_ptr<StorageService>, std::string, std::string>, std::tuple<std::shared_ptr<StorageService>, std::string, std::string>>> post_file_copies,
+            std::set<std::tuple<WorkflowFile *, std::tuple<std::shared_ptr<StorageService>, std::string, std::string>>> cleanup_file_deletions) {
 
         this->num_pending_parents = 0;
 
-        // Double-check that there is no weirdness
+        // Double-check that there is no easily-detectable weirdness
         for (auto const &pfc : pre_file_copies) {
             auto file = std::get<0>(pfc);
             auto src = std::get<1>(pfc);
             auto dst = std::get<2>(pfc);
-            if ((file == nullptr) || (src == nullptr) || (dst == nullptr)) {
+            if ((file == nullptr) || (std::get<0>(src) == nullptr) || (std::get<0>(dst) == nullptr)) {
                 throw std::invalid_argument("Workunit::Workunit(): invalid pre file copy spec");
             }
         }
@@ -51,7 +51,7 @@ namespace wrench {
         for (auto const &fl : file_locations) {
             auto file = std::get<0>(fl);
             auto ss = std::get<1>(fl);
-            if ((file == nullptr)  || (ss.first == nullptr)) {
+            if ((file == nullptr)  || (std::get<0>(ss) == nullptr)) {
                 throw std::invalid_argument("Workunit::Workunit(): invalid file location spec");
             }
         }
@@ -60,7 +60,7 @@ namespace wrench {
             auto file = std::get<0>(pfc);
             auto src = std::get<1>(pfc);
             auto dst = std::get<2>(pfc);
-            if ((file == nullptr) || (src == nullptr) || (dst == nullptr)) {
+            if ((file == nullptr) || (std::get<0>(src) == nullptr) || (std::get<0>(dst) == nullptr)) {
                 throw std::invalid_argument("Workunit::Workunit(): invalid post file copy spec");
             }
         }
@@ -68,7 +68,7 @@ namespace wrench {
         for (auto const &cd : cleanup_file_deletions) {
             auto file = std::get<0>(cd);
             auto ss = std::get<1>(cd);
-            if ((file == nullptr)  || (ss == nullptr)) {
+            if ((file == nullptr)  || (std::get<0>(ss) == nullptr)) {
                 throw std::invalid_argument("Workunit::Workunit(): invalid file cleanup spec");
             }
         }

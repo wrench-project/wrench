@@ -151,7 +151,7 @@ namespace wrench {
     class FileRegistryAddEntryRequestMessage : public FileRegistryMessage {
     public:
         FileRegistryAddEntryRequestMessage(std::string answer_mailbox, WorkflowFile *file,
-                                           std::shared_ptr<StorageService> storage_service, double payload);
+                                           std::shared_ptr<FileLocation> location, double payload);
 
         /** @brief The mailbox to which the answer message should be sent */
         std::string answer_mailbox;

@@ -975,7 +975,8 @@ namespace wrench {
         if (this->containing_pilot_job == nullptr) {
             for (auto const &f : this->files_in_scratch[job]) {
                 try {
-                    this->getScratch()->deleteFile(f, job, nullptr);
+                    StorageService::deleteFile(f, FileLocation::LOCATION(this->getScratch(),
+                            this->getScratch()->getMountPoint(), "/"));
                 } catch (WorkflowExecutionException &e) {
                     // ignore (perhaps it was never written)
                 }
@@ -1160,7 +1161,8 @@ namespace wrench {
         // If not in a pilot job, remove all files in scratch
         if (this->containing_pilot_job == nullptr) {
             for (auto const &f : this->files_in_scratch[job]) {
-                this->getScratch()->deleteFile(f, job, nullptr);
+                StorageService::deleteFile(f, FileLocation::LOCATION(this->getScratch(),
+                        this->getScratch()->getMountPoint(), "/"));
             }
             this->files_in_scratch[job].clear();
             this->files_in_scratch.erase(job);

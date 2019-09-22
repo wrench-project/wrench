@@ -8,6 +8,7 @@
  */
 
 #include <wrench/services/storage/StorageServiceProperty.h>
+#include <services/storage/storage_helpers/LogicalFileSystem.h>
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/storage/StorageService.h"
@@ -47,15 +48,17 @@ namespace wrench {
         try {
             for (auto const &mp : mount_points) {
                 this->capacities[mp] = S4U_Simulation::getDiskCapacity(hostname, mp);
-                this->stored_files[mp] = {};
                 this->occupied_space[mp] = 0.0;
             }
         } catch (std::invalid_argument &e) {
             throw;
         }
 
+        for (auto mp : mount_points) {
+            this->file_systems[mp] = std::unique_ptr<LogicalFileSystem>(new LogicalFileSystem(mount_point));
+        }
+
         this->state = StorageService::UP;
-        this->mount_points = mount_points;
     }
 
     /**
@@ -112,33 +115,6 @@ namespace wrench {
         this->occupied_space[mount_point] += file->getSize();
     }
 
-
-    /**
-     * @brief Remove a file from storage (internal method)
-     *
-     * @param file: a file
-     * @param mount_point: the mount_point in which the file will be deleted
-     *
-     * @throw std::runtime_error
-     */
-    void StorageService::removeFileFromStorage(WorkflowFile *file, std::string mount_point) {
-
-        if (file == nullptr) {
-            throw std::invalid_argument("StorageService::removeFileFromStorage(): Cannot pass a nullptr file");
-        }
-
-        if (this->mount_points.find(mount_point) == this->mount_points.end()) {
-            throw std::invalid_argument("StorageService::removeFileFromStorage(): Unknown mount point "  + mount_point);
-        }
-
-        std::set<WorkflowFile *> files = this->stored_files[mount_point];
-        if (files.find(file) == files.end()) {
-            throw std::runtime_error(
-                    "StorageService::removeFileFromStorage(): Attempting to remove a file that is not on the storage service");
-        }
-        this->stored_files[mount_point].erase(file);
-        this->occupied_space[mount_point] -= file->getSize();
-    }
 
     /**
      * @brief Stop the service
@@ -551,21 +527,14 @@ namespace wrench {
      *
      * @param files: the set of files to read
      * @param file_locations: a map of files to storage services
-     * @param scratch_space: the storage service to use when files don't appear in the file_locations map (which must be the job's compute service's scratch space)
-     * @param files_in_scratch: the set of files that have been written to the the job's compute service's scratch space)
-     * @param job: the job which is doing the read of the files
      *
      * @throw std::runtime_error
      * @throw WorkflowExecutionException
      */
     void StorageService::readFiles(std::set<WorkflowFile *> files,
-                                   std::map<WorkflowFile *, std::pair<std::shared_ptr<StorageService>, std::string>> file_locations,
-                                   std::shared_ptr<StorageService> scratch_space,
-                                   std::set<WorkflowFile *> &files_in_scratch,
-                                   WorkflowJob *job) {
+                                   std::map<WorkflowFile *, std::tuple<std::shared_ptr<StorageService>, std::string, std::string>> file_locations) {
         try {
-            StorageService::writeOrReadFiles(READ, std::move(files), std::move(file_locations), scratch_space,
-                                             files_in_scratch, job);
+            StorageService::writeOrReadFiles(READ, std::move(files), std::move(file_locations));
         } catch (std::runtime_error &e) {
             throw;
         } catch (WorkflowExecutionException &e) {
@@ -578,23 +547,14 @@ namespace wrench {
      *
      * @param files: the set of files to write
      * @param file_locations: a map of files to storage services
-     * @param scratch_space: the storage service to use when files don't appear in the file_locations map (which must be the job's compute service's scratch storage)
-     * @param files_in_scratch: the set of files that have been written to the job's compute service's scratch space
-     * @param job: the job which is doing the write of the files
-     *
      *
      * @throw std::runtime_error
      * @throw WorkflowExecutionException
      */
     void StorageService::writeFiles(std::set<WorkflowFile *> files,
-                                    std::map<WorkflowFile *, std::pair<std::shared_ptr<StorageService>, std::string>> file_locations,
-                                    std::shared_ptr<StorageService> scratch_space,
-                                    std::set<WorkflowFile *> &files_in_scratch,
-                                    WorkflowJob *job) {
+                                    std::map<WorkflowFile *, std::pair<std::shared_ptr<StorageService>, std::string>> file_locations) {
         try {
-            StorageService::writeOrReadFiles(WRITE, std::move(files), std::move(file_locations),
-                                             scratch_space,
-                                             files_in_scratch, job);
+            StorageService::writeOrReadFiles(WRITE, std::move(files), std::move(file_locations);
         } catch (std::runtime_error &e) {
             throw;
         } catch (WorkflowExecutionException &e) {
@@ -608,19 +568,13 @@ namespace wrench {
      * @param action: FileOperation::READ (download) or FileOperation::WRITE
      * @param files: the set of files to read/write
      * @param file_locations: a map of files to storage services
-     * @param scratch_space: the storage service to use when files don't appear in the file_locations map (which must be the job's compute service's scratch space)
-     * @param files_in_scratch: the set of files that have been written to the job's compute service's scratch space
-     * @param job: the job associated to the write/read of the files
      *
      * @throw std::runtime_error
      * @throw WorkflowExecutionException
      */
     void StorageService::writeOrReadFiles(FileOperation action,
                                           std::set<WorkflowFile *> files,
-                                          std::map<WorkflowFile *, std::pair<std::shared_ptr<StorageService>, std::string>> file_locations,
-                                          std::shared_ptr<StorageService> scratch_space,
-                                          std::set<WorkflowFile *> &files_in_scratch,
-                                          WorkflowJob *job) {
+                                          std::map<WorkflowFile *, std::tuple<std::shared_ptr<StorageService>, std::string, std::string>> file_locations) {
 
         for (auto const &f : files) {
             if (f == nullptr) {
@@ -629,7 +583,7 @@ namespace wrench {
         }
 
         for (auto const &l : file_locations) {
-            if ((l.first == nullptr) || (l.second.first == nullptr)) {
+            if ((l.first == nullptr) || (std::get<0>(l.second) == nullptr)) {
                 throw std::invalid_argument("StorageService::writeOrReadFiles(): invalid file location argument");
             }
         }
@@ -642,10 +596,33 @@ namespace wrench {
 
         for (auto const &f : sorted_files) {
 
-            WorkflowFile *file = f.second;
+            auto file = f.second;
+            std::shared_ptr<StorageService> storage_service = nullptr;
+
+            if (file_locations.find(file) == file_locations.end()) {
+                // Scratch
+                storage_service = scratch_space;
+            } else {
+                // Not scratch
+                storage_service = std::get<0>(file_locations[file]);
+            }
+
+            if (storage_service == nullptr) {
+                throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new NoStorageServiceForFile(file)));
+            }
+
+            std::string mount_point;
+            std::string directory;
+            if (storage_service == scratch_space) {
+                mount_point = *(scratch_space->getMountPoints().begin());
+                directory = "/";
+            } else {
+
+            }
+
+
 
             // Identify the Storage Service
-            std::shared_ptr<StorageService> storage_service = scratch_space;
             std::string mountpoint = *(storage_service->getMountPoints().begin());
             if (file_locations.find(file) != file_locations.end()) {
                 storage_service = file_locations[file].first;
@@ -932,18 +909,18 @@ namespace wrench {
                     "takes a mount point argument");
         }
 
-        std::string src_partition = *(src->getMountPoints().begin());
+        std::string src_dir = *(src->getMountPoints().begin());
         if (src_job != nullptr) {
-            src_partition = *(src_job->getParentComputeService()->getScratch()->getMountPoints().begin());
+            src_dir = *(src_job->getParentComputeService()->getScratch()->getMountPoints().begin());
         }
 
-        std::string dst_partition = *(this->getMountPoints().begin());
+        std::string dst_dir = *(this->getMountPoints().begin());
 
         if (dst_job != nullptr) {
-            dst_partition = *(dst_job->getParentComputeService()->getScratch()->getMountPoints().begin());
+            dst_dir = *(dst_job->getParentComputeService()->getScratch()->getMountPoints().begin());
         }
 
-        this->copyFile(file, src, src_partition, dst_partition);
+        this->copyFile(file, src, src_dir, dst_dir);
     }
 
     /**
@@ -1078,15 +1055,51 @@ namespace wrench {
      * @return capacity of the storage service (double) for each mount point, in a map
      */
     std::map<std::string, double> StorageService::getTotalSpace() {
-        return this->capacities;
+        std::map<std::string, double> to_return;
+        for (auto const &fs : this->file_systems) {
+            to_return[fs.first] = fs.second->;
+        }
+        return to_return;
     }
+
+    /**
+     * @brief Get the mount point (will throw is more than one)
+     * @return the (sole) mount point of the service
+     */
+    std::string StorageService::getMountPoint() {
+        if (this->hasMultipleMountPoints()) {
+            throw std::invalid_argument("StorageService::getMountPoint(): The storage service has more than one mount point");
+        }
+        return this->file_systems.begin()->first;
+    }
+
 
     /**
      * @brief Get the set of mount points
      * @return the set of mount points
      */
     std::set<std::string> StorageService::getMountPoints() {
-        return this->mount_points;
+        std::set<std::string> to_return;
+        for (auto const &fs : this->file_systems) {
+            to_return.insert(fs.first);
+        }
+        return to_return;
+    }
+
+    /**
+     * @brief Checked whether the storage service has multiple mount points
+     * @return true whether the service has multiple mount points
+     */
+    bool StorageService::hasMultipleMountPoints() {
+        return (this->file_systems.size() > 1);
+    }
+
+    /**
+    * @brief Checked whether the storage service has a particular mount point
+    * @return true whether the service has that mount point
+    */
+    bool StorageService::hasMountPoint(std::string mp) {
+        return (this->file_systems.find(mp) != this->file_systems.end());
     }
 
     /**
@@ -1106,118 +1119,5 @@ namespace wrench {
         this->downloadFile(file, *(this->getMountPoints().begin()), dst_mountpoint, buffer_size);
     }
 
-    /**
-     * @brief Download a file to a local partition/disk
-     * @param file: the file to download
-     * @param src_mountpoint: the source mount point
-     * @param dst_mountpoint: the local mount point
-     * @param downloader_buffer_size: buffer size of the downloader (0 means use "ideal fluid model")
-     */
-    void StorageService::downloadFile(WorkflowFile *file, std::string src_mountpoint, std::string dst_mountpoint, unsigned long downloader_buffer_size) {
 
-        if (file == nullptr) {
-            throw std::invalid_argument("StorageService::downloadFile(): Invalid arguments");
-        }
-
-        WRENCH_INFO("Initiating a file read operation for file %s on storage service %s",
-                    file->getID().c_str(), this->getName().c_str());
-
-        // Check that the service is up
-        assertServiceIsUp();
-
-        // Check that the buffer size is compatible
-        if (((downloader_buffer_size == 0) && (this->buffer_size != 0)) or
-            ((downloader_buffer_size != 0) && (this->buffer_size == 0))) {
-            throw std::invalid_argument("StorageService::downloadFile(): Incompatible buffer size specs (both must be zero, or both must be non-zero");
-        }
-
-        // Empty partition means "/"
-        if (src_mountpoint.empty()) {
-            src_mountpoint = "/";
-        }
-        if (dst_mountpoint.empty()) {
-            dst_mountpoint = "/";
-        }
-
-        // Send a message to the daemon
-        std::string request_answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("read_file_request");
-        std::string mailbox_that_should_receive_file_content = S4U_Mailbox::generateUniqueMailboxName("read_file_chunks");
-
-        try {
-            S4U_Mailbox::putMessage(this->mailbox_name,
-                                    new StorageServiceFileReadRequestMessage(request_answer_mailbox,
-                                                                             mailbox_that_should_receive_file_content,
-                                                                             file,
-                                                                             src_mountpoint,
-                                                                             std::min<unsigned long>(this->buffer_size, downloader_buffer_size),
-                                                                             this->getMessagePayloadValue(
-                                                                                     StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
-        }
-
-        // Wait for a reply to the request
-        std::shared_ptr<SimulationMessage> message = nullptr;
-
-        try {
-            message = S4U_Mailbox::getMessage(request_answer_mailbox, this->network_timeout);
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
-        }
-
-        if (auto msg = std::dynamic_pointer_cast<StorageServiceFileReadAnswerMessage>(message)) {
-            // If it's not a success, throw an exception
-            if (not msg->success) {
-                throw WorkflowExecutionException(msg->failure_cause);
-            }
-        } else {
-            throw std::runtime_error("StorageService::downloadFile(): Received an unexpected [" +
-                                     message->getName() + "] message!");
-        }
-
-        WRENCH_INFO("File read request accepted (will receive file content on mailbox_name %s)",
-                    mailbox_that_should_receive_file_content.c_str());
-
-        if (this->buffer_size == 0) {
-
-            throw std::runtime_error("downloadFile::writeFile(): Zero buffer size not implemented yet");
-
-        } else {
-            try {
-                bool done = false;
-                // Receive the first chunk
-                auto msg = S4U_Mailbox::getMessage(mailbox_that_should_receive_file_content);
-                if (auto file_content_chunk_msg =
-                        std::dynamic_pointer_cast<StorageServiceFileContentChunkMessage>(msg)) {
-                    done = file_content_chunk_msg->last_chunk;
-                } else {
-                    throw std::runtime_error("FileTransferThread::downloadFile() : Received an unexpected [" +
-                                             msg->getName() + "] message!");
-                }
-
-                // Receive chunks and write them to disk
-                while (not done) {
-                    // Issue the receive
-                    auto req = S4U_Mailbox::igetMessage(mailbox_that_should_receive_file_content);
-                    // Do the I/O
-                    S4U_Simulation::writeToDisk(msg->payload, dst_mountpoint);
-
-                    // Wait for the comm to finish
-                    msg = req->wait();
-                    if (auto file_content_chunk_msg =
-                            std::dynamic_pointer_cast<StorageServiceFileContentChunkMessage>(msg)) {
-                        done = file_content_chunk_msg->last_chunk;
-                    } else {
-                        throw std::runtime_error("FileTransferThread::downloadFile() : Received an unexpected [" +
-                                                 msg->getName() + "] message!");
-                    }
-                }
-                // Do the I/O for the last chunk
-                S4U_Simulation::writeToDisk(msg->payload, dst_mountpoint);
-            } catch (std::shared_ptr<NetworkError> &e) {
-                throw WorkflowExecutionException(e);
-            }
-        }
-
-    }
 };

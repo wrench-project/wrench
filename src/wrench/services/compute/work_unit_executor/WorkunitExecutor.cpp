@@ -170,27 +170,33 @@ namespace wrench {
         bool scratch_space_ok = true;
         if (this->scratch_space == nullptr) {
             for (auto const &pfc : workunit->pre_file_copies) {
-                if ((std::get<1>(pfc) == ComputeService::SCRATCH) ||
-                    (std::get<2>(pfc) == ComputeService::SCRATCH)) {
+                auto src = std::get<1>(pfc);
+                auto dst = std::get<1>(pfc);
+
+                if ((std::get<0>(src) == ComputeService::SCRATCH) ||
+                    (std::get<0>(dst) == ComputeService::SCRATCH)) {
                     scratch_space_ok = false;
                     break;
                 }
             }
             for (auto const &fl : workunit->file_locations) {
-                if (std::get<1>(fl).first == ComputeService::SCRATCH) {
+                if (std::get<0>(fl.second) == ComputeService::SCRATCH) {
                     scratch_space_ok = false;
                     break;
                 }
             }
             for (auto const &pfc : workunit->post_file_copies) {
-                if ((std::get<1>(pfc) == ComputeService::SCRATCH) ||
-                    (std::get<2>(pfc) == ComputeService::SCRATCH)) {
+                auto src = std::get<1>(pfc);
+                auto dst = std::get<1>(pfc);
+                if ((std::get<0>(src) == ComputeService::SCRATCH) ||
+                    (std::get<0>(dst) == ComputeService::SCRATCH)) {
                     scratch_space_ok = false;
                     break;
                 }
             }
             for (auto const &cd : workunit->cleanup_file_deletions) {
-                if (std::get<1>(cd) == ComputeService::SCRATCH) {
+                auto location = std::get<1>(cd);
+                if (std::get<0>(location) == ComputeService::SCRATCH) {
                     scratch_space_ok = false;
                     break;
                 }
@@ -276,31 +282,34 @@ namespace wrench {
         /** Perform all pre file copies operations */
         for (auto file_copy : work->pre_file_copies) {
             WorkflowFile *file = std::get<0>(file_copy);
+            auto src_location = std::get<1>(file_copy);
+            auto dst_location = std::get<2>(file_copy);
             //Even in the pre-file copies, the src can be the scratch itself???
-            std::shared_ptr<StorageService> src = std::get<1>(file_copy);
-            if (src == ComputeService::SCRATCH) {
-                src = this->scratch_space;
+            std::shared_ptr<StorageService> src_ss = std::get<0>(src_location);
+            if (src_ss == ComputeService::SCRATCH) {
+                std::get<0>(src_location) = this->scratch_space;
             }
-            std::shared_ptr<StorageService> dst = std::get<2>(file_copy);
-            if (dst == ComputeService::SCRATCH) {
-                dst = this->scratch_space;
+            std::shared_ptr<StorageService> dst_ss = std::get<0>(dst_location);
+            if (dst_ss == ComputeService::SCRATCH) {
+                dst_ss = this->scratch_space;
             }
 
-            if ((file == nullptr) || (src == nullptr) || (dst == nullptr)) {
-                throw std::runtime_error("WorkunitExecutor::performWork(): internal error: malformed workunit");
+            if ((file == nullptr) || (src_ss == nullptr) || (dst_ss == nullptr)) {
+                throw std::runtime_error(
+                        "WorkunitExecutor::performWork(): internal error: malformed workunit");
             }
 
             try {
                 WRENCH_INFO("Copying file %s from %s to %s",
                             file->getID().c_str(),
-                            src->getName().c_str(),
-                            dst->getName().c_str());
+                            src_ss->getName().c_str(),
+                            dst_ss->getName().c_str());
 
                 S4U_Simulation::sleep(this->thread_startup_overhead);
-                if (dst == this->scratch_space) {
-                    dst->copyFile(file, src, nullptr, job);
+                if (dst_ss == this->scratch_space) {
+                    dst_ss->copyFile(file, src_ss, nullptr, job);
                 } else {
-                    dst->copyFile(file, src, nullptr,
+                    dst_ss->copyFile(file, src_ss, nullptr,
                                   nullptr); // if there is no scratch space, then there is no notion of job's partition, it is always to / partition in such case
                 }
             } catch (WorkflowExecutionException &e) {
@@ -308,7 +317,7 @@ namespace wrench {
                 throw;
             }
 
-            if (dst == this->scratch_space) {
+            if (dst_ss == this->scratch_space) {
                 files_stored_in_scratch.insert(file);
             }
         }

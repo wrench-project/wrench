@@ -161,9 +161,9 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    void FileRegistryService::addEntry(WorkflowFile *file, std::shared_ptr<StorageService> storage_service) {
+    void FileRegistryService::addEntry(WorkflowFile *file, std::shared_ptr<FileLocation> location) {
 
-        if ((file == nullptr) || (storage_service == nullptr)) {
+        if ((file == nullptr) || (location == nullptr)) {
             throw std::invalid_argument("FileRegistryService::addEntry(): Invalid  argument");
         }
 
@@ -173,7 +173,7 @@ namespace wrench {
 
         try {
             S4U_Mailbox::putMessage(this->mailbox_name,
-                                    new FileRegistryAddEntryRequestMessage(answer_mailbox, file, storage_service,
+                                    new FileRegistryAddEntryRequestMessage(answer_mailbox, file, location,
                                                                            this->getMessagePayloadValue(
                                                                                    FileRegistryServiceMessagePayload::ADD_ENTRY_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
@@ -204,9 +204,9 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    void FileRegistryService::removeEntry(WorkflowFile *file, std::shared_ptr<StorageService> storage_service) {
+    void FileRegistryService::removeEntry(WorkflowFile *file, std::shared_ptr<FileLocation> location) {
 
-        if ((file == nullptr) || (storage_service == nullptr)) {
+        if ((file == nullptr) || (location == nullptr)) {
             throw std::invalid_argument(" FileRegistryService::removeEntry(): Invalid input argument");
         }
 
@@ -216,7 +216,7 @@ namespace wrench {
 
         try {
             S4U_Mailbox::putMessage(this->mailbox_name,
-                                    new FileRegistryRemoveEntryRequestMessage(answer_mailbox, file, storage_service,
+                                    new FileRegistryRemoveEntryRequestMessage(answer_mailbox, file, location,
                                                                               this->getMessagePayloadValue(
                                                                                       FileRegistryServiceMessagePayload::REMOVE_ENTRY_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
@@ -234,7 +234,7 @@ namespace wrench {
         if (auto msg = std::dynamic_pointer_cast<FileRegistryRemoveEntryAnswerMessage>(message)) {
             if (!msg->success) {
                 WRENCH_WARN("Attempted to remove non-existent (%s,%s) entry from file registry service (ignored)",
-                            file->getID().c_str(), storage_service->getName().c_str());
+                            file->getID().c_str(), location->toString());
             }
             return;
         } else {
