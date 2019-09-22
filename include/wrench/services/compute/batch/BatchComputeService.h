@@ -129,7 +129,7 @@ namespace wrench {
                      std::vector<std::string> compute_hosts,
                      unsigned long cores_per_host,
                      double ram_per_host,
-                     std::sgrind scratch_space_mount_point,
+                     std::string scratch_space_mount_point,
                      std::map<std::string, std::string> property_list,
                      std::map<std::string, double> messagepayload_list,
                      std::string suffix

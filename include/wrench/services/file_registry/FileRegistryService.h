@@ -12,9 +12,12 @@
 #define WRENCH_FILEREGISTRYSERVICE_H
 
 #include <set>
-#include <wrench/services/network_proximity/NetworkProximityService.h>
 
-#include "wrench/services/Service.h"
+#include <wrench/services/Service.h>
+#include <wrench/services/network_proximity/NetworkProximityService.h>
+#include <wrench/services/storage/StorageService.h>
+#include <wrench/services/storage/storage_helpers/FileLocation.h>
+
 #include "FileRegistryServiceProperty.h"
 #include "FileRegistryServiceMessagePayload.h"
 
@@ -70,9 +73,9 @@ namespace wrench {
         std::map<double, std::shared_ptr<StorageService>> lookupEntry(WorkflowFile *file, std::string reference_host,
                                                        std::shared_ptr<NetworkProximityService> network_proximity_service);
 
-        void addEntry(WorkflowFile *file, std::shared_ptr<StorageService> storage_service);
+        void addEntry(WorkflowFile *file, std::shared_ptr<FileLocation> location);
 
-        void removeEntry(WorkflowFile *file, std::shared_ptr<StorageService> storage_service);
+        void removeEntry(WorkflowFile *file, std::shared_ptr<FileLocation> location);
 
         /****************************/
         /** \endcond                */
@@ -100,7 +103,7 @@ namespace wrench {
 
         bool processNextMessage();
 
-        std::map<WorkflowFile *, std::set<std::shared_ptr<StorageService>>> entries;
+        std::map<WorkflowFile *, std::set<std::shared_ptr<FileLocation>>> entries;
     };
 
 

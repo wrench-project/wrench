@@ -64,6 +64,7 @@ namespace wrench {
         void downloadFileFromStorageService(WorkflowFile *file, std::string partition, std::string storage_service_and_partition);
         void copyFileLocally(WorkflowFile *file, std::string src_partition, std::string dst_partition);
 
+        void downloadFile(WorkflowFile *file, std::string src_mountpoint, std::string dst_mountpoint, unsigned long downloader_buffer_size);
 
     };
 

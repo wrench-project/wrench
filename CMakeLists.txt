@@ -161,31 +161,33 @@ set(SOURCE_FILES
         src/wrench/simulation/SimulationTrace.cpp
         src/wrench/simulation/SimulationOutput.cpp
         src/wrench/services/file_registry/FileRegistryService.cpp
-        src/wrench/services/storage/StorageService.cpp
-        src/wrench/services/storage/simple/SimpleStorageService.cpp
-        src/wrench/services/storage/storage_helpers/FileTransferThread.cpp
-        include/wrench/services/storage/storage_helpers/FileTransferThread.h
         src/wrench/services/Service.cpp
         src/wrench/services/ServiceProperty.cpp
         src/wrench/services/ServiceMessagePayload.cpp
         src/wrench/services/compute/ComputeServiceProperty.cpp
         src/wrench/services/compute/ComputeServiceMessagePayload.cpp
-        src/wrench/services/storage/StorageServiceProperty.cpp
-        src/wrench/services/storage/StorageServiceMessagePayload.cpp
         src/wrench/services/file_registry/FileRegistryServiceProperty.cpp
         src/wrench/services/file_registry/FileRegistryServiceMessagePayload.cpp
         src/wrench/services/compute/bare_metal/BareMetalComputeServiceProperty.cpp
         src/wrench/services/compute/bare_metal/BareMetalComputeServiceMessagePayload.cpp
+        src/wrench/services/storage/StorageServiceProperty.cpp
+        src/wrench/services/storage/StorageServiceMessagePayload.cpp
         src/wrench/services/storage/simple/SimpleStorageServiceProperty.cpp
         src/wrench/services/storage/simple/SimpleStorageServiceMessagePayload.cpp
+        src/wrench/services/storage/StorageService.cpp
+        src/wrench/services/storage/simple/SimpleStorageService.cpp
+        src/wrench/services/storage/StorageServiceMessage.cpp
+        src/wrench/services/storage/StorageServiceMessage.h
+        include/wrench/services/storage/storage_helpers/FileTransferThread.h
+        src/wrench/services/storage/storage_helpers/FileTransferThread.cpp
+        include/wrench/services/storage/storage_helpers/FileLocation.h
+        src/wrench/services/storage/storage_helpers/FileLocation.cpp
         src/wrench/workflow/execution_events/FailureCause.cpp
         src/wrench/managers/JobManagerMessage.cpp
         src/wrench/managers/JobManagerMessage.h
         src/wrench/services/ServiceMessage.cpp
         src/wrench/managers/EnergyMeter.cpp
         src/wrench/services/compute/ComputeServiceMessage.cpp
-        src/wrench/services/storage/StorageServiceMessage.cpp
-        src/wrench/services/storage/StorageServiceMessage.h
         src/wrench/services/file_registry/FileRegistryMessage.cpp
         src/wrench/services/file_registry/FileRegistryMessage.h
         src/wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.cpp
@@ -327,6 +329,8 @@ set(TEST_FILES
         test/simulated_failures/failure_test_util/ComputerVictim.h
         test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.cpp
         test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.h
+        src/wrench/services/storage/storage_helpers/LocicalFileSystem.cpp
+        src/wrench/services/storage/storage_helpers/LogicalFileSystem.h
         src/wrench/services/storage/storage_helpers/FileTransferThread.cpp
         include/wrench/services/storage/storage_helpers/FileTransferThread.h
         src/wrench/services/storage/storage_helpers/FileTransferThreadMessage.h
