@@ -30,13 +30,13 @@ namespace wrench {
 
 
         FileTransferThread(std::string hostname,
-                                std::shared_ptr<StorageService> parent,
-                                WorkflowFile *file,
-                                std::string src_mailbox,
-                                std::shared_ptr<FileLocation> dst_location,
-                                std::string answer_mailbox_if_copy,
-                                unsigned long buffer_size,
-                                SimulationTimestampFileCopyStart *start_timestamp = nullptr);
+                           std::shared_ptr<StorageService> parent,
+                           WorkflowFile *file,
+                           std::string src_mailbox,
+                           std::shared_ptr<FileLocation> dst_location,
+                           std::string answer_mailbox_if_copy,
+                           unsigned long buffer_size,
+                           SimulationTimestampFileCopyStart *start_timestamp = nullptr);
 
         FileTransferThread(std::string hostname,
                            std::shared_ptr<StorageService> parent,
@@ -79,10 +79,9 @@ namespace wrench {
 
         void receiveFileFromNetwork(WorkflowFile *file, std::string mailbox, std::shared_ptr<FileLocation> location);
         void sendLocalFileToNetwork(WorkflowFile *file, std::shared_ptr<FileLocation> location, std::string mailbox);
-        void downloadFileFromStorageService(WorkflowFile *file, std::shared_ptr<FileLocation> src_location, std::shared_ptr<FileLocation> dst_location);
+        void downloadFileFromStorageService(WorkflowFile *file, std::shared_ptr<FileLocation> src_location,
+                                            std::shared_ptr<FileLocation> dst_location, unsigned long downloader_buffer_size);
         void copyFileLocally(WorkflowFile *file, std::shared_ptr<FileLocation> src_location, std::shared_ptr<FileLocation> dst_location);
-
-        void downloadFile(WorkflowFile *file, std::string src_mountpoint, std::string dst_mountpoint, unsigned long downloader_buffer_size);
 
     };
 

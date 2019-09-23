@@ -307,6 +307,7 @@ namespace wrench {
 
                 S4U_Simulation::sleep(this->thread_startup_overhead);
                 if (dst_ss == this->scratch_space) {
+                    StorageService::copyFile(file, )
                     dst_ss->copyFile(file, src_ss, nullptr, job);
                 } else {
                     dst_ss->copyFile(file, src_ss, nullptr,
