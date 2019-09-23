@@ -48,6 +48,7 @@ namespace wrench {
         bool getPropertyValueAsBoolean(std::string);
 
         void assertServiceIsUp();
+        static void assertServiceIsUp(std::shared_ptr<Service> s) { s->assertServiceIsUp(); };
 
         double getNetworkTimeoutValue();
         void setNetworkTimeoutValue(double value);

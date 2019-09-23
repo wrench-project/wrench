@@ -90,11 +90,11 @@ namespace wrench {
 
         unsigned long getNewUniqueNumber();
 
-        bool processFileDeleteRequest(WorkflowFile *file, std::string dst_mount_point, std::string answer_mailbox);
+        bool processFileDeleteRequest(WorkflowFile *file, std::shared_ptr<FileLocation> location, std::string answer_mailbox);
 
-        bool processFileWriteRequest(WorkflowFile *file, std::string dst_dir, std::string answer_mailbox, unsigned long buffer_size);
+        bool processFileWriteRequest(WorkflowFile *file, std::shared_ptr<FileLocation>, std::string answer_mailbox, unsigned long buffer_size);
 
-        bool processFileReadRequest(WorkflowFile *file, std::string src_dir, std::string answer_mailbox,
+        bool processFileReadRequest(WorkflowFile *file, std::shared_ptr<FileLocation> location, std::string answer_mailbox,
                                     std::string mailbox_to_receive_the_file_content, unsigned long buffer_size);
 
         bool processFileCopyRequest(WorkflowFile *file, std::shared_ptr<StorageService> src,

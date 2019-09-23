@@ -34,6 +34,7 @@ namespace wrench {
     class WorkflowFile;
     class SimulationOutput;
     class S4U_Simulation;
+    class FileLocation;
 
 
     /**
@@ -87,11 +88,8 @@ namespace wrench {
         void addService(std::shared_ptr<WMS> service);
         void addService(std::shared_ptr<FileRegistryService> service);
 
-        void stageFile(WorkflowFile *file, std::shared_ptr<StorageService> storage_service);
-        void stageFile(WorkflowFile *file, std::shared_ptr<StorageService> storage_service, std::string partition);
-
-        void stageFiles(std::map<std::string, WorkflowFile *> files, std::shared_ptr<StorageService>storage_service);
-        void stageFiles(std::map<std::string, WorkflowFile *> files, std::shared_ptr<StorageService>storage_service, std::string partition);
+        void stageFile(WorkflowFile *file, std::shared_ptr<FileLocation> location);
+        void stageFiles(std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations);
 
         SimulationOutput &getOutput();
 
