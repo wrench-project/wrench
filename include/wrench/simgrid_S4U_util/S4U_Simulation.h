@@ -51,8 +51,8 @@ namespace wrench {
         static void compute(double);
         static void sleep(double);
         static void computeZeroFlop();
-        static void writeToDisk(double num_bytes, std::string partition_name);
-        static void readFromDisk(double num_bytes, std::string partition_name);
+        static void writeToDisk(double num_bytes, std::string hostname, std::string diskname);
+        static void readFromDisk(double num_bytes, std::string hostname, std::string diskname);
         static double getDiskCapacity(std::string hostname, std::string mount_point);
         std::set<std::string> getDisks(std::string hostname);
         static bool hostHasDisk(std::string hostname, std::string mount_point);

@@ -32,8 +32,8 @@ namespace wrench {
         double getTotalCapacity();
         bool hasEnoughFreeSpace(double bytes);
         double getFreeSpace();
-        void decrementFreeSpace(double num_bytes);
-        void incrementFreeSpace(double num_bytes);
+        void decreaseFreeSpace(double num_bytes);
+        void increaseFreeSpace(double num_bytes);
 
         void createDirectory(std::string absolute_path);
         bool doesDirectoryExist(std::string absolute_path);
