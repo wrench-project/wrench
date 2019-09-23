@@ -438,21 +438,13 @@ namespace wrench {
     }
 
     /**
-    * @brief Getter
-    * @return the destination partition
-    */
-    std::string FileAlreadyBeingCopied::getPartition() {
-        return this->dst_partition;
-    }
-
-
-    /**
      * @brief Get the human-readable failure message
      * @return the message
      */
     std::string FileAlreadyBeingCopied::toString() {
-        return "File " + this->file->getID() + " is already being copied to  Storage Service " +
-               this->storage_service->getName();
+        return "File " + this->file->getID() + " is already being copied ("+
+               "src = " + this->src_location->toString() + "; " +
+               "dst = " + this->dst_location->toString() + ")";
     }
 
 

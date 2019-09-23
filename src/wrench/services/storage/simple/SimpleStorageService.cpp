@@ -19,6 +19,7 @@
 #include "wrench/workflow/WorkflowFile.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/simulation/SimulationTimestampTypes.h"
+#include "wrench/services/storage/storage_helpers/FileLocation.h"
 
 
 WRENCH_LOG_NEW_DEFAULT_CATEGORY(simple_storage_service, "Log category for Simple Storage Service");
@@ -108,24 +109,11 @@ namespace wrench {
 
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_CYAN);
 
-        // number of files staged
-        unsigned long num_stored_files = 0;
-
-        for (auto mp : this->stored_files) {
-            num_stored_files += mp.second.size();
+        std::string message = "Simple Storage service %s starting on host %s:";
+        for (auto const &fs : this->file_systems) {
+            message += "\n  - " + fs.first + ":" + std::to_string(fs.second->getTotalCapacity()/(1000*1000*1000)) + "GB";
         }
-        double total_capacity = 0;
-        for (auto mp : this->capacities) {
-            total_capacity += mp.second;
-        }
-
-        WRENCH_INFO("Simple Storage Service %s starting on host %s (# mount points: %lu, total capacity: %lf, holding %ld files, listening on %s)",
-                    this->getName().c_str(),
-                    S4U_Simulation::getHostName().c_str(),
-                    this->mount_points.size(),
-                    total_capacity,
-                    num_stored_files,
-                    this->mailbox_name.c_str());
+        WRENCH_INFO("%s", message.c_str());
 
         /** Main loop **/
         while (this->processNextMessage()) {
@@ -174,8 +162,8 @@ namespace wrench {
         } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFreeSpaceRequestMessage>(message)) {
             std::map<std::string, double> free_space;
 
-            for (auto const &mp : this->mount_points) {
-                free_space[mp] = this->capacities[mp] - this->occupied_space[mp];
+            for (auto const &mp : this->file_systems) {
+                free_space[mp.first] = mp.second->getFreeSpace();
             }
 
             S4U_Mailbox::dputMessage(msg->answer_mailbox,
@@ -186,13 +174,13 @@ namespace wrench {
 
         } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFileDeleteRequestMessage>(message)) {
 
-            return processFileDeleteRequest(msg->file, msg->dst_partition, msg->answer_mailbox);
+            return processFileDeleteRequest(msg->file, msg->location, msg->answer_mailbox);
 
         } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFileLookupRequestMessage>(message)) {
 
-            std::set<WorkflowFile *> files = this->stored_files[msg->dst_partition];
+            auto fs = this->file_systems[msg->location->getMountPoint()].get();
+            bool file_found = fs->isFileInDirectory(msg->file, msg->location->getDirectory());
 
-            bool file_found = (files.find(msg->file) != files.end());
             S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                      new StorageServiceFileLookupAnswerMessage(msg->file, file_found,
                                                                                this->getMessagePayloadValue(
@@ -201,11 +189,11 @@ namespace wrench {
 
         } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFileWriteRequestMessage>(message)) {
 
-            return processFileWriteRequest(msg->file, msg->dst_partition, msg->answer_mailbox, msg->buffer_size);
+            return processFileWriteRequest(msg->file, msg->location, msg->answer_mailbox, msg->buffer_size);
 
         } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFileReadRequestMessage>(message)) {
 
-            return processFileReadRequest(msg->file, msg->src_partition, msg->answer_mailbox,
+            return processFileReadRequest(msg->file, msg->location, msg->answer_mailbox,
                                           msg->mailbox_to_receive_the_file_content, msg->buffer_size);
 
         } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFileCopyRequestMessage>(message)) {
@@ -233,21 +221,25 @@ namespace wrench {
      * @brief Handle a file write request
      *
      * @param file: the file to write
-     * @param dst_mount_point: the mount point to write the file to
+     * @param location: the location to write the file to
      * @param answer_mailbox: the mailbox to which the reply should be sent
      * @param buffer_size: the buffer size to use
      * @return true if this process should keep running
      */
-    bool SimpleStorageService::processFileWriteRequest(WorkflowFile *file, std::string dst_mount_point,
+    bool SimpleStorageService::processFileWriteRequest(WorkflowFile *file, std::shared_ptr<FileLocation> location,
                                                        std::string answer_mailbox, unsigned long buffer_size) {
+
+        auto fs = this->file_systems[location->getMountPoint()].get();
 
         // If the file is not already there, do a capacity check/update
         // (If the file is already there, then there will just be an overwrite. Note that
         // if the overwrite fails, then the file will disappear, which is expected)
-        if (this->stored_files.find(file->getID()) == this->stored_files.end()) {
 
-            // Check the file size and capacity, and reply "no" if not enough space
-            if (file->getSize() > (this->capacities[dst_mount_point] - this->occupied_space[dst_mount_point])) {
+
+        if ((not fs->doesDirectoryExist(location->getDirectory())) or
+            (not fs->isFileInDirectory(file, location->getDirectory()))) {
+
+            if (not fs->hasEnoughFreeSpace(file->getSize())) {
                 try {
                     S4U_Mailbox::putMessage(answer_mailbox,
                                             new StorageServiceFileWriteAnswerMessage(file,
@@ -265,9 +257,10 @@ namespace wrench {
                 }
                 return true;
             }
-            // Update occupied space, in advance (will have to be decreased later in case of failure)
-            this->occupied_space[dst_mount_point] += file->getSize();
         }
+
+        // Update occupied space, in advance (will have to be decreased later in case of failure)
+        fs->decrementFreeSpace(file->getSize());
 
         // Generate a mailbox_name name on which to receive the file
         std::string file_reception_mailbox = S4U_Mailbox::generateUniqueMailboxName("file_reception");
@@ -308,7 +301,8 @@ namespace wrench {
      * @param buffer_size: the buffer_size to use
      * @return
      */
-    bool SimpleStorageService::processFileReadRequest(WorkflowFile *file, std::string src_partition,
+    bool SimpleStorageService::processFileReadRequest(WorkflowFile *file,
+                                                      std::shared_ptr<FileLocation> location,
                                                       std::string answer_mailbox,
                                                       std::string mailbox_to_receive_the_file_content,
                                                       unsigned long buffer_size) {
@@ -455,8 +449,8 @@ namespace wrench {
      * @brief Process a notification received from a file transfer thread
      * @param ftt: the file transfer thread
      * @param file: the file
-     * @param src: the transfer src
-     * @param dst: the transfer dst
+     * @param src: the transfer's src
+     * @param dst: the transfer's dst
      * @param success: whether the transfer succeeded or not
      * @param failure_cause: the failure cause (nullptr if success)
      * @param answer_mailbox_if_copy: the mailbox to send a copy notification ("" if not a copy)
@@ -520,31 +514,29 @@ namespace wrench {
      * @param answer_mailbox: the mailbox to which the notification should be sent
      * @return false if the daemon should terminate
      */
-    bool SimpleStorageService::processFileDeleteRequest(WorkflowFile *file, std::string dst_partition, std::string answer_mailbox) {
-        bool success = true;
+    bool SimpleStorageService::processFileDeleteRequest(WorkflowFile *file,
+                                                        std::shared_ptr<FileLocation> location,
+                                                        std::string answer_mailbox) {
         std::shared_ptr<FailureCause> failure_cause = nullptr;
-        if (this->stored_files.find(dst_partition) != this->stored_files.end()) {
-            std::set<WorkflowFile *> files = this->stored_files[dst_partition];
-            if (files.find(file) == files.end()) {
-                success = false;
-                failure_cause = std::shared_ptr<FailureCause>(
-                        new FileNotFound(file, this->getSharedPtr<SimpleStorageService>()));
-            } else {
-                this->removeFileFromStorage(file, dst_partition);
-            }
-        } else {
-            success = false;
+
+        auto fs = this->file_systems[location->getMountPoint()].get();
+
+        if ((not fs->doesDirectoryExist(location->getDirectory())) or
+            (not fs->isFileInDirectory(file, location->getDirectory()))) {
             failure_cause = std::shared_ptr<FailureCause>(
                     new FileNotFound(file, this->getSharedPtr<SimpleStorageService>()));
+        } else {
+            fs->removeFileFromDirectory(file, location->getDirectory());
         }
 
         S4U_Mailbox::dputMessage(answer_mailbox,
-                                 new StorageServiceFileDeleteAnswerMessage(file,
-                                                                           this->getSharedPtr<SimpleStorageService>(),
-                                                                           success,
-                                                                           failure_cause,
-                                                                           this->getMessagePayloadValue(
-                                                                                   SimpleStorageServiceMessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD)));
+                                 new StorageServiceFileDeleteAnswerMessage(
+                                         file,
+                                         this->getSharedPtr<SimpleStorageService>(),
+                                         (failure_cause == nullptr),
+                                         failure_cause,
+                                         this->getMessagePayloadValue(
+                                                 SimpleStorageServiceMessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD)));
         return true;
     }
 

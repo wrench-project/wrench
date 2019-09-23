@@ -70,24 +70,24 @@ namespace wrench {
     * @brief Constructor
     * @param answer_mailbox: the mailbox to which to send the answer
     * @param file: the file
-    * @param dst_partition: the file partition to look up the file for
+    * @param location: the file location (hopefully)
     * @param payload: the message size in bytes
     *
     * @throw std::invalid_argument
     */
     StorageServiceFileLookupRequestMessage::StorageServiceFileLookupRequestMessage(std::string answer_mailbox,
                                                                                    WorkflowFile *file,
-                                                                                   std::string &dst_partition,
+                                                                                   std::shared_ptr<FileLocation> location,
                                                                                    double payload)
             : StorageServiceMessage("FILE_LOOKUP_REQUEST",
                                     payload) {
-        if ((file == nullptr) || (answer_mailbox == "")) {
+        if ((file == nullptr) || (location == nullptr) || (answer_mailbox.empty())) {
             throw std::invalid_argument(
                     "StorageServiceFileLookupRequestMessage::StorageServiceFileLookupRequestMessage(): Invalid arguments");
         }
         this->answer_mailbox = answer_mailbox;
         this->file = file;
-        this->dst_partition = dst_partition;
+        this->location = location;
     }
 
     /**
@@ -123,17 +123,18 @@ namespace wrench {
      */
     StorageServiceFileDeleteRequestMessage::StorageServiceFileDeleteRequestMessage(std::string answer_mailbox,
                                                                                    WorkflowFile *file,
-                                                                                   std::string &dst_partition,
+                                                                                   std::shared_ptr<FileLocation> location,
                                                                                    double payload)
             : StorageServiceMessage("FILE_DELETE_REQUEST",
                                     payload) {
-        if ((answer_mailbox == "") || (file == nullptr)) {
+
+        if ((answer_mailbox == "") || (file == nullptr) || (location == nullptr)) {
             throw std::invalid_argument(
                     "StorageServiceFileDeleteRequestMessage::StorageServiceFileDeleteRequestMessage(): Invalid arguments");
         }
         this->file = file;
         this->answer_mailbox = answer_mailbox;
-        this->dst_partition = dst_partition;
+        this->location = location;
     }
 
     /**
@@ -169,10 +170,8 @@ namespace wrench {
     * @brief Constructor
     * @param answer_mailbox: the mailbox to which to send the answer
     * @param file: the file
-    * @param src: the source storage service
-    * @param src_partition: the file partition from where the file will be copied
-    * @param dst: the destination storage service
-    * @param dst_partition: the file partition where the file will be stored
+    * @param src: the source location
+    * @param dst: the destination location
     * @param file_registry_service: the file registry service to update (nullptr if none)
     * @param start_timestamp: the file copy start timestamp
     * @param payload: the message size in bytes
@@ -181,10 +180,8 @@ namespace wrench {
     */
     StorageServiceFileCopyRequestMessage::StorageServiceFileCopyRequestMessage(std::string answer_mailbox,
                                                                                WorkflowFile *file,
-                                                                               std::shared_ptr<StorageService> src,
-                                                                               std::string &src_partition,
-                                                                               std::shared_ptr<StorageService> dst,
-                                                                               std::string &dst_partition,
+                                                                               std::shared_ptr<FileLocation> src,
+                                                                               std::shared_ptr<FileLocation> dst,
                                                                                std::shared_ptr<FileRegistryService> file_registry_service,
                                                                                SimulationTimestampFileCopyStart *start_timestamp,
                                                                                double payload) : StorageServiceMessage(
@@ -197,10 +194,8 @@ namespace wrench {
         this->answer_mailbox = answer_mailbox;
         this->file = file;
         this->src = src;
-        this->file_registry_service = file_registry_service;
-        this->src_partition = src_partition;
-        this->dst_partition = dst_partition;
         this->dst = dst;
+        this->file_registry_service = file_registry_service;
         this->start_timestamp = start_timestamp;
 
         /**
@@ -211,8 +206,8 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param file: the file
-     * @param storage_service: the destination storage service
-     * @param dst_partition: the destination partition
+     * @param src: the source location
+     * @param dst: the destination location
      * @param file_registry_service: the file registry service to update (nullptr if none)
      * @param file_registry_service_updated: whether the file registry service was updated
      * @param success: true on success, false otherwise
@@ -222,15 +217,15 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     StorageServiceFileCopyAnswerMessage::StorageServiceFileCopyAnswerMessage(WorkflowFile *file,
-                                                                             std::shared_ptr<StorageService> storage_service,
-                                                                             std::string dst_partition,
+                                                                             std::shared_ptr<FileLocation> src,
+                                                                             std::shared_ptr<FileLocation> dst,
                                                                              std::shared_ptr<FileRegistryService> file_registry_service,
                                                                              bool file_registry_service_updated,
                                                                              bool success,
                                                                              std::shared_ptr<FailureCause> failure_cause,
                                                                              double payload)
             : StorageServiceMessage("FILE_COPY_ANSWER", payload) {
-        if ((file == nullptr) || (storage_service == nullptr) || (dst_partition.empty()) ||
+        if ((file == nullptr) || (src == nullptr) || (dst == nullptr) ||
             (success && (failure_cause != nullptr)) ||
             (!success && (failure_cause == nullptr)) ||
             ((file_registry_service == nullptr) and (file_registry_service_updated))) {
@@ -238,8 +233,8 @@ namespace wrench {
                     "StorageServiceFileCopyAnswerMessage::StorageServiceFileCopyAnswerMessage(): Invalid arguments");
         }
         this->file = file;
-        this->storage_service = storage_service;
-        this->dst_partition = dst_partition;
+        this->src = src;
+        this->dst = dst;
         this->file_registry_service = file_registry_service;
         this->file_registry_service_updated = file_registry_service_updated;
         this->success = success;
@@ -259,19 +254,20 @@ namespace wrench {
     */
     StorageServiceFileWriteRequestMessage::StorageServiceFileWriteRequestMessage(std::string answer_mailbox,
                                                                                  WorkflowFile *file,
-                                                                                 std::string &dst_partition,
+                                                                                 std::shared_ptr<FileLocation> location,
                                                                                  unsigned long buffer_size,
                                                                                  double payload)
             : StorageServiceMessage("FILE_WRITE_REQUEST",
                                     payload) {
-        if ((answer_mailbox == "") || (file == nullptr)) {
+
+        if ((answer_mailbox.empty()) || (file == nullptr) || (location == nullptr)) {
             throw std::invalid_argument(
                     "StorageServiceFileWriteRequestMessage::StorageServiceFileWriteRequestMessage(): Invalid arguments");
         }
         this->payload = payload;
         this->answer_mailbox = answer_mailbox;
         this->file = file;
-        this->dst_partition = dst_partition;
+        this->location = location;
         this->buffer_size = buffer_size;
     }
 
@@ -319,19 +315,20 @@ namespace wrench {
     StorageServiceFileReadRequestMessage::StorageServiceFileReadRequestMessage(std::string answer_mailbox,
                                                                                std::string mailbox_to_receive_the_file_content,
                                                                                WorkflowFile *file,
-                                                                               std::string &src_partition,
+                                                                               std::shared_ptr<FileLocation> location,
                                                                                unsigned long buffer_size,
                                                                                double payload) : StorageServiceMessage(
             "FILE_READ_REQUEST",
             payload) {
-        if ((answer_mailbox == "") || (mailbox_to_receive_the_file_content == "") || (file == nullptr)) {
+        if ((answer_mailbox == "") || (mailbox_to_receive_the_file_content == "") ||
+            (file == nullptr) || (location == nullptr)) {
             throw std::invalid_argument(
                     "StorageServiceFileReadRequestMessage::StorageServiceFileReadRequestMessage(): Invalid arguments");
         }
         this->answer_mailbox = answer_mailbox;
         this->mailbox_to_receive_the_file_content = mailbox_to_receive_the_file_content;
         this->file = file;
-        this->src_partition = src_partition;
+        this->location = location;
         this->buffer_size = buffer_size;
     }
 

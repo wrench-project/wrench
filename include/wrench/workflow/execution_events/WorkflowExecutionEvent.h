@@ -137,7 +137,7 @@ namespace wrench {
          * @return a text string
          */
         std::string toString() override { return "StandardJobFailedEvent (job: " + this->standard_job->getName() + "; cs = " +
-        this->compute_service->getName() + "; cause: " + this->failure_cause->toString() + ")";}
+                                                 this->compute_service->getName() + "; cause: " + this->failure_cause->toString() + ")";}
 
     };
 
@@ -217,23 +217,27 @@ namespace wrench {
         /**
          * @brief Constructor
          * @param file: a workflow file
-         * @param storage_service: a storage service
+         * @param src: the source location
+         * @param src: the destination location
          * @param file_registry_service: a file registry service
          * @param file_registry_service_updated: whether the file registry service has been updated
          */
         FileCopyCompletedEvent(WorkflowFile *file,
-                               std::shared_ptr<StorageService> storage_service,
+                               std::shared_ptr<FileLocation> src,
+                               std::shared_ptr<FileLocation> dst,
                                std::shared_ptr<FileRegistryService> file_registry_service,
                                bool file_registry_service_updated)
-                : file(file), storage_service(storage_service),
+                : file(file), src(src), dst(dst),
                   file_registry_service(file_registry_service),
                   file_registry_service_updated(file_registry_service_updated) {}
 
     public:
         /** @brief The workflow file that has successfully been copied */
         WorkflowFile *file;
-        /** @brief The storage service to which the file has been copied */
-        std::shared_ptr<StorageService> storage_service;
+        /** @brief The source location */
+        std::shared_ptr<FileLocation> src;
+        /** @brief The destination location */
+        std::shared_ptr<FileLocation> dst;
         /** @brief The file registry service that was supposed to be updated (or nullptr if none) */
         std::shared_ptr<FileRegistryService> file_registry_service;
         /** @brief Whether the file registry service (if any) has been successfully updated */
@@ -243,7 +247,11 @@ namespace wrench {
          * @brief Get a textual description of the event
          * @return a text string
          */
-        std::string toString() override { return "FileCopyCompletedEvent (file: " + this->file->getID() + "; ss = " + this->storage_service->getName() + ")";}
+        std::string toString() override {
+            return "FileCopyCompletedEvent (file: " + this->file->getID() +
+                   "; src = " + this->src->toString() +
+                   "; dst = "+ this->dst->toString();
+        }
 
     };
 
@@ -259,22 +267,26 @@ namespace wrench {
         /**
          * @brief Constructor
          * @param file: a workflow file
-         * @param storage_service: a storage service
+         * @param src: source location
+         * @param src: destination location
          * @param failure_cause: a failure cause
          */
         FileCopyFailedEvent(WorkflowFile *file,
-                            std::shared_ptr<StorageService> storage_service,
+                            std::shared_ptr<FileLocation> src,
+                            std::shared_ptr<FileLocation> dst,
                             std::shared_ptr<FailureCause> failure_cause
         )
-                : file(file), storage_service(storage_service),
+                : file(file), src(src), dst(dst),
                   failure_cause(failure_cause) {}
 
     public:
 
         /** @brief The workflow file that has failed to be copied */
         WorkflowFile *file;
-        /** @brief The storage service on which it was supposed to be copied */
-        std::shared_ptr<StorageService> storage_service;
+        /** @brief The source location */
+        std::shared_ptr<FileLocation> src;
+        /** @brief The destination location */
+        std::shared_ptr<FileLocation> dst;
         /** @brief The cause of the failure */
         std::shared_ptr<FailureCause> failure_cause;
 
@@ -282,8 +294,11 @@ namespace wrench {
          * @brief Get a textual description of the event
          * @return a text string
          */
-        std::string toString() override { return "FileCopyFailedEvent (file: " + this->file->getID() + "; ss = " + this->storage_service->getName() +
-                                        "; cause: " + this->failure_cause->toString() + ")";}
+        std::string toString() override {
+            return "FileCopyFailedEvent (file: " + this->file->getID() +
+                   "; src = " + this->src->toString() +
+                   "; dst = " + this->dst->toString() +
+                   "; cause: " + this->failure_cause->toString() + ")";}
 
     };
 
