@@ -42,6 +42,21 @@ namespace wrench {
         std::string toString();
 
 
+        bool operator==(const std::shared_ptr<FileLocation> &rhs) {
+            return ((this->getStorageService() == rhs->getStorageService()) and
+            (this->getMountPoint() == rhs->getMountPoint()) and
+            (this->getDirectory() == rhs->getDirectory()));
+        }
+
+        /**
+         * @brief Overloaded "not equal" operator
+         * @param rhs: right-hand side of the comparison
+         * @return true if different, false otherwise
+         */
+        bool operator!=(const std::shared_ptr<FileLocation> &rhs) {
+            return not FileLocation::operator==(rhs);
+        }
+
     private:
 
         /**

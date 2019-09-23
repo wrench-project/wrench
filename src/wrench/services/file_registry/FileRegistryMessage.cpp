@@ -139,21 +139,21 @@ namespace wrench {
      * @brief Constructor
      * @param answer_mailbox: the mailbox to which the answer message should be sent
      * @param file: the file for which an entry should be added
-     * @param storage_service: the storage service in that entry
+     * @param location: the location for the new entry
      * @param payload: the message size in bytes
      */
     FileRegistryAddEntryRequestMessage::FileRegistryAddEntryRequestMessage(std::string answer_mailbox,
                                                                            WorkflowFile *file,
-                                                                           std::shared_ptr<StorageService> storage_service,
+                                                                           std::shared_ptr<FileLocation> location,
                                                                            double payload) :
             FileRegistryMessage("ADD_ENTRY_REQUEST", payload) {
-        if ((answer_mailbox == "") || (file == nullptr) || (storage_service == nullptr)) {
+        if ((answer_mailbox == "") || (file == nullptr) || (location == nullptr)) {
             throw std::invalid_argument(
                     "FileRegistryAddEntryRequestMessage::FileRegistryAddEntryRequestMessage(): Invalid argument");
         }
         this->answer_mailbox = answer_mailbox;
         this->file = file;
-        this->storage_service = storage_service;
+        this->location = location;
 
     }
 

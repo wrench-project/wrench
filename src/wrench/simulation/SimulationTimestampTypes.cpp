@@ -223,28 +223,22 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param file: the WorkflowFile associated with this file copy
-     * @param src: the source StorageService from which this file is being copied
-     * @param src_partition: the partition in the source StorageService from which this file is being copied
-     * @param dst: the destination StorageService where this file will be copied
-     * @param dst_partition: the partition in the destination StorageService where this file will be copied
+     * @param src: the source location
+     * @param dst: the destination location
      * @throw std::invalid_argument
      */
     SimulationTimestampFileCopyStart::SimulationTimestampFileCopyStart(WorkflowFile *file,
-                                                                       std::shared_ptr<StorageService> src,
-                                                                       std::string src_partition,
-                                                                       std::shared_ptr<StorageService> dst,
-                                                                       std::string dst_partition) :
-            SimulationTimestampFileCopy(file, src, src_partition, dst, dst_partition) {
+                                                                       std::shared_ptr<FileLocation> src,
+                                                                       std::shared_ptr<FileLocation> dst) :
+            SimulationTimestampFileCopy(file, src, dst) {
 
         // all information about a file copy should be passed
         if ((this->file == nullptr)
-            || (this->source.storage_service == nullptr)
-            || (this->source.partition.empty())
-            || (this->destination.storage_service == nullptr)
-            || (this->destination.partition.empty())) {
+            || (this->src == nullptr)
+            || (this->dst == nullptr)) {
 
             throw std::invalid_argument(
-                    "SimulationTimestampFileCopyStart::SimulationTimestampFileCopyStart() cannot take nullptr or empty strings");
+                    "SimulationTimestampFileCopyStart::SimulationTimestampFileCopyStart() cannot take nullptr arguments");
         }
     }
 

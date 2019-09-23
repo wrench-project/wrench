@@ -30,6 +30,10 @@ namespace wrench {
         explicit LogicalFileSystem(std::string hostname, std::string mount_point);
 
         double getTotalCapacity();
+        bool hasEnoughFreeSpace(double bytes);
+        double getFreeSpace();
+        void decrementFreeSpace(double num_bytes);
+        void incrementFreeSpace(double num_bytes);
 
         void createDirectory(std::string absolute_path);
         bool doesDirectoryExist(std::string absolute_path);

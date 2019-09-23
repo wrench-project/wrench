@@ -486,29 +486,9 @@ namespace wrench {
         * @throw std::runtime_error
         * @throw std::invalid_argument
         */
-    void Simulation::stageFile(WorkflowFile *file, std::shared_ptr<StorageService> storage_service) {
-        try {
-            this->stageFile(file, storage_service, "/");
-        } catch (std::runtime_error &e) {
-            throw;
-        } catch (std::invalid_argument &e) {
-            throw;
-        }
-    }
+    void Simulation::stageFile(WorkflowFile *file, std::shared_ptr<FileLocation> location) {
 
-    /**
-     * @brief Stage a copy of a file on a storage service
-     *
-     * @param file: a file to stage on a storage service
-     * @param storage_service: the storage service
-     * @param partition: the partition on which to store the files
-     *
-     * @throw std::runtime_error
-     * @throw std::invalid_argument
-     */
-    void
-    Simulation::stageFile(WorkflowFile *file, std::shared_ptr<StorageService> storage_service, std::string partition) {
-        if ((file == nullptr) || (storage_service == nullptr)) {
+        if (file == nullptr) {
             throw std::invalid_argument("Simulation::stageFile(): Invalid arguments");
         }
 
@@ -524,21 +504,16 @@ namespace wrench {
                     "Simulation::stageFile(): Cannot stage a file that's the output of task that hasn't executed yet");
         }
 
-        if (partition.empty()) {
-            partition = "/";
-        }
-
-//        XBT_INFO("Staging file %s (%lf)", file->getID().c_str(), file->getSize());
         // Put the file on the storage service (not via the service daemon)
         try {
-            storage_service->stageFile(file);
-        } catch (std::runtime_error &e) {
+            StorageService::stageFile(file, location);
+        } catch (std::invalid_argument &e) {
             throw;
         }
 
         // Update all file registry services
         for (auto frs : this->file_registry_services) {
-            frs->addEntryToDatabase(file, storage_service);
+            frs->addEntryToDatabase(file, location);
         }
     }
 
@@ -551,51 +526,12 @@ namespace wrench {
    * @throw std::runtime_error
    * @throw std::invalid_argument
    */
-    void Simulation::stageFiles(std::map<std::string, WorkflowFile *> files,
-                                std::shared_ptr<StorageService> storage_service) {
-        try {
-            this->stageFiles(files, storage_service, "/");
-        } catch (std::runtime_error &e) {
-            throw e;
-        } catch (std::invalid_argument &e) {
-            throw e;
-        }
-    }
-
-/**
-  * @brief Stage file copies on a storage service
-  *
-  * @param files: a map of files (indexed by file ids) to stage on a storage service
-  * @param storage_service: the storage service
-  * @param partition: the partition on which to store the files
-  *
-  * @throw std::runtime_error
-  * @throw std::invalid_argument
-  */
-    void
-    Simulation::stageFiles(std::map<std::string, WorkflowFile *> files, std::shared_ptr<StorageService> storage_service,
-                           std::string partition) {
-
-        if (storage_service == nullptr) {
-            throw std::invalid_argument("Simulation::stageFiles(): Invalid arguments");
-        }
-
-        // Check that at least one  FileRegistryService has been set
-        if (this->file_registry_services.empty()) {
-            throw std::runtime_error(
-                    "Simulation::stageFiles(): A FileRegistryService must be instantiated and passed to Simulation.add() before files can be staged on storage services");
-        }
-
-        if (partition.empty()) {
-            partition = "/";
-        }
+    void Simulation::stageFiles(std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations) {
 
         try {
-            for (auto const &f : files) {
-                this->stageFile(f.second, storage_service, partition);
+            for (auto const &fl : file_locations) {
+                this->stageFile(fl.first, fl.second);
             }
-        } catch (std::runtime_error &e) {
-            throw;
         } catch (std::invalid_argument &e) {
             throw;
         }

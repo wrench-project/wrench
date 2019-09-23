@@ -26,10 +26,9 @@
 namespace wrench {
 
     class Simulation;
-
     class WorkflowFile;
-
     class FailureCause;
+    class FileRegistryService;
 
     /**
      * @brief The storage service base class
@@ -55,7 +54,8 @@ namespace wrench {
         bool hasMountPoint(std::string mp);
 
         static bool lookupFile(WorkflowFile *file, std::shared_ptr<FileLocation> location);
-        static void deleteFile(WorkflowFile *file, std::shared_ptr<FileLocation> location);
+        static void deleteFile(WorkflowFile *file, std::shared_ptr<FileLocation> location,
+                std::shared_ptr<FileRegistryService> file_registry_service = nullptr);
         static void readFile(WorkflowFile *file, std::shared_ptr<FileLocation> location);
         static void writeFile(WorkflowFile *file, std::shared_ptr<FileLocation> location);
 
@@ -75,11 +75,9 @@ namespace wrench {
                                       std::shared_ptr<FileLocation> src_location,
                                       std::shared_ptr<FileLocation> dst_location);
 
-        static void readFiles(std::set<WorkflowFile *> files,
-                              std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations);
+        static void readFiles(std::map<WorkflowFile *, std::shared_ptr<FileLocation>> locations);
 
-        static void writeFiles(std::set<WorkflowFile *> files,
-                               std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations);
+        static void writeFiles(std::map<WorkflowFile *, std::shared_ptr<FileLocation>> locations);
 
 
         StorageService(const std::string &hostname,
@@ -93,8 +91,6 @@ namespace wrench {
         friend class FileRegistryService;
         friend class FileTransferThread;
 
-        void stageFile(WorkflowFile *file);
-        void stageFile(WorkflowFile *file, std::string dir);
         static void stageFile(WorkflowFile *file , std::shared_ptr<FileLocation> location);
 
         /** @brief The service's buffer size */
@@ -103,8 +99,9 @@ namespace wrench {
         /** @brief File systems */
         std::map<std::string, std::unique_ptr<LogicalFileSystem>> file_systems;
 
-
         /***********************/
+
+
         /** \endcond          **/
         /***********************/
 
@@ -115,9 +112,10 @@ namespace wrench {
             WRITE,
         };
 
-        static void writeOrReadFiles(FileOperation action, std::set<WorkflowFile *> files,
-                                     std::map<WorkflowFile *, std::tuple<std::shared_ptr<StorageService>, std::string, std::string>> file_locations);
+        static void writeOrReadFiles(FileOperation action,
+                                     std::map<WorkflowFile *, std::shared_ptr<FileLocation>> locations);
 
+        void stageFile(WorkflowFile *file , std::string mountpoint,std::string directory);
 
 
     };

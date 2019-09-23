@@ -149,5 +149,44 @@ namespace wrench {
         return this->total_capacity;
     }
 
+    /**
+     * @brief Checks whether there is enough space to store some number of bytes
+     * @param bytes: a number of bytes
+     * @return true if the number of bytes can fit
+     */
+    bool LogicalFileSystem::hasEnoughFreeSpace(double bytes) {
+        return (this->total_capacity - this->occupied_space) >= bytes;
+    }
+
+    /**
+     * @brief Get the file system's free space
+     * @return the free space in bytes
+     */
+    double LogicalFileSystem::getFreeSpace() {
+        return (this->total_capacity - this->occupied_space);
+    }
+
+    /**
+     * @brief Decrement the amount of free space the service "thinks" it has
+     * @throw std::invalid_argument
+     */
+    void LogicalFileSystem::decrementFreeSpace(double num_bytes) {
+        if (this->total_capacity - this->occupied_space < num_bytes) {
+            throw std::invalid_argument("LogicalFileSystem::decrementFreeSpace(): Not enough free space");
+        }
+        this->occupied_space += num_bytes;
+    }
+
+    /**
+     * @brief Increment the amount of free space the service "thinks" it has
+     * @throw std::invalid_argument
+     */
+    void LogicalFileSystem::incrementFreeSpace(double num_bytes) {
+        if (this->occupied_space + num_bytes > this->total_capacity) {
+            throw std::invalid_argument("LogicalFileSystem::decrementFreeSpace(): No enough capacity");
+        }
+        this->occupied_space -= num_bytes;
+    }
+
 
 }
