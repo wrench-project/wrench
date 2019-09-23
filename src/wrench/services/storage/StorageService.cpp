@@ -485,9 +485,7 @@ namespace wrench {
             throw std::invalid_argument("StorageService::copyFile(): Invalid arguments");
         }
 
-        if ((src_location->getStorageService() == dst_location->getStorageService()) and
-            (src_location->getMountPoint() == dst_location->getMountPoint()) and
-            (src_location->getDirectory() == dst_location->getDirectory())) {
+        if (src_location == dst_location) {
             throw std::invalid_argument(
                     "StorageService::copyFile(): Cannot redundantly copy a file onto itself");
         }
@@ -498,19 +496,19 @@ namespace wrench {
         // Send a message to the daemon of the dst service
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("copy_file");
         auto start_timestamp = new SimulationTimestampFileCopyStart(file, src_location, dst_location);
-        this->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyStart>(start_timestamp);
+        src_location->getStorageService()->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyStart>(start_timestamp);
 
         try {
-            S4U_Mailbox::putMessage(this->mailbox_name, new StorageServiceFileCopyRequestMessage(
-                    answer_mailbox,
-                    file,
-                    src,
-                    src_mountpoint,
-                    this->getSharedPtr<StorageService>(),
-                    dst_mountpoint,
-                    nullptr,
-                    start_timestamp,
-                    this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
+            S4U_Mailbox::putMessage(
+                    dst_location->getStorageService()->mailbox_name,
+                    new StorageServiceFileCopyRequestMessage(
+                            answer_mailbox,
+                            file,
+                            src_location,
+                            dst_location,
+                            nullptr,
+                            start_timestamp,
+                            dst_location->getStorageService()->getMessagePayloadValue(StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw WorkflowExecutionException(cause);
         }
@@ -538,54 +536,45 @@ namespace wrench {
      *
      * @param answer_mailbox: the mailbox to which a notification message will be sent
      * @param file: the file
-     * @param src: the storage service from which to read the file
-     * @param src_mountpoint: the source mount point
-     * @param dst_mountpoint'': the destination mount point
+     * @param src_location: the source location
+     * @param dst_location: the destination location
      *
      * @throw WorkflowExecutionException
      * @throw std::invalid_argument
      *
      */
-    void StorageService::initiateFileCopy(std::string answer_mailbox, WorkflowFile *file,
-                                          std::shared_ptr<StorageService> src,
-                                          std::string src_mountpoint, std::string dst_mountpoint) {
 
-        if ((file == nullptr) || (src == nullptr)) {
+    void StorageService::initiateFileCopy(std::string answer_mailbox, WorkflowFile *file,
+                                          std::shared_ptr<FileLocation> src_location,
+                                          std::shared_ptr<FileLocation> dst_location) {
+
+        if ((file == nullptr) || (src_location == nullptr) || (dst_location == nullptr)) {
             throw std::invalid_argument("StorageService::initiateFileCopy(): Invalid arguments");
         }
 
-        // Empty mount point means "/"
-        if (src_mountpoint.empty()) {
-            src_mountpoint = "/";
-        }
-        if (dst_mountpoint.empty()) {
-            dst_mountpoint = "/";
-        }
-
-        if ((src.get() == this) && (src_mountpoint == dst_mountpoint)) {
+        if (src_location == dst_location) {
             throw std::invalid_argument(
-                    "StorageService::copyFile(): Cannot redundantly copy a file to the its own partition");
+                    "StorageService::initiateFileCopy(): Cannot redundantly copy a file onto itself");
         }
 
-        assertServiceIsUp();
+        assertServiceIsUp(src_location->getStorageService());
+        assertServiceIsUp(dst_location->getStorageService());
 
-        auto start_timestamp = new SimulationTimestampFileCopyStart(file, src, src_mountpoint,
-                                                                    this->getSharedPtr<StorageService>(),
-                                                                    dst_mountpoint);
-        this->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyStart>(start_timestamp);
+        auto start_timestamp = new SimulationTimestampFileCopyStart(file, src_location, dst_location);
+        src_location->getStorageService()->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyStart>(start_timestamp);
 
-        // Send a message to the daemon
+        // Send a message to the daemon on the dst location
         try {
-            S4U_Mailbox::putMessage(this->mailbox_name, new StorageServiceFileCopyRequestMessage(
-                    answer_mailbox,
-                    file,
-                    src,
-                    src_mountpoint,
-                    this->getSharedPtr<StorageService>(),
-                    dst_mountpoint,
-                    nullptr,
-                    start_timestamp,
-                    this->getMessagePayloadValue(StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
+            S4U_Mailbox::putMessage(
+                    dst_location->getStorageService()->mailbox_name,
+                    new StorageServiceFileCopyRequestMessage(
+                            answer_mailbox,
+                            file,
+                            src_location,
+                            dst_location,
+                            nullptr,
+                            start_timestamp,
+                            dst_location->getStorageService()->getMessagePayloadValue(StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw WorkflowExecutionException(cause);
         }
@@ -599,7 +588,7 @@ namespace wrench {
     std::map<std::string, double> StorageService::getTotalSpace() {
         std::map<std::string, double> to_return;
         for (auto const &fs : this->file_systems) {
-            to_return[fs.first] = fs.second->;
+            to_return[fs.first] = fs.second->getTotalCapacity();
         }
         return to_return;
     }
@@ -643,23 +632,5 @@ namespace wrench {
     bool StorageService::hasMountPoint(std::string mp) {
         return (this->file_systems.find(mp) != this->file_systems.end());
     }
-
-    /**
-     * @brief Download a file to a local destination mount point
-     * @param file: the file to download
-     * @param dst_mountpoint: the destination local mount point
-     * @param buffer_size: buffer size to use (0 means use "ideal fluid model")
-     */
-    void StorageService::downloadFile(WorkflowFile *file, std::string dst_mountpoint, unsigned long buffer_size) {
-        if (this->getMountPoints().size() > 1) {
-            throw std::invalid_argument(
-                    "StorageService::downloadFile(): This storage service has more than one mount point; you should "
-                    "specify which mount point should be used (i.e., call the version of this method that "
-                    "takes a mount point argument");
-        }
-
-        this->downloadFile(file, *(this->getMountPoints().begin()), dst_mountpoint, buffer_size);
-    }
-
 
 };

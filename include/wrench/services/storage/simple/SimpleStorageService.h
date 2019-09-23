@@ -97,15 +97,18 @@ namespace wrench {
         bool processFileReadRequest(WorkflowFile *file, std::shared_ptr<FileLocation> location, std::string answer_mailbox,
                                     std::string mailbox_to_receive_the_file_content, unsigned long buffer_size);
 
-        bool processFileCopyRequest(WorkflowFile *file, std::shared_ptr<StorageService> src,
-                std::string src_mount_point, std::string dst_mount_point,
+        bool processFileCopyRequest(WorkflowFile *file,
+                std::shared_ptr<FileLocation> src,
+                std::shared_ptr<FileLocation> dst,
                 std::string answer_mailbox, SimulationTimestampFileCopyStart *start_timestamp);
 
         bool processFileTransferThreadNotification(
                 std::shared_ptr<FileTransferThread> ftt,
                 WorkflowFile *file,
-                std::pair<FileTransferThread::LocationType, std::string> src,
-                std::pair<FileTransferThread::LocationType, std::string> dst,
+                std::string src_mailbox,
+                std::shared_ptr<FileLocation> src_location,
+                std::string dst_mailbox,
+                std::shared_ptr<FileLocation> dst_location,
                 bool success,
                 std::shared_ptr<FailureCause> failure_cause,
                 std::string answer_mailbox_if_copy,

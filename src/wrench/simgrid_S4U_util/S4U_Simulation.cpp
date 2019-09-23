@@ -311,24 +311,50 @@ namespace wrench {
 
     /**
      * @brief Simulates a disk write
-     * @param num_bytes: bumber of written bytes
-     * @param partition_name: partition name
+     *
+     * @param num_bytes: number of bytes to write
+     * @param hostname: name of host to which disk is attached
+     * @param diskname: name of disk
      */
-    void S4U_Simulation::writeToDisk(double num_bytes, std::string partition_name) {
-        // TODO: Change this once I/O in SimGrid is better: the data transfer rate
-        // should be based on the I/O device associated to the partition
-        // Right now, this takes ZERO time!!!
+    void S4U_Simulation::writeToDisk(double num_bytes, std::string hostname, std::string diskname) {
+        auto host = simgrid::s4u::Host::by_name_or_null(hostname);
+        if (not host) {
+            throw std::invalid_argument("S4U_Simulation::writeToDisk(): unknown host " + hostname);
+        }
+
+        auto disk_list = simgrid::s4u::Host::by_name(hostname)->get_disks();
+        for (auto disk : disk_list) {
+            if (disk->get_name() == diskname) {
+                disk->write(num_bytes);
+                return;
+            }
+        }
+        throw std::invalid_argument("S4U_Simulation::writeToDisk(): unknown disk " +
+                                    diskname + " at host " + hostname);
     }
 
     /**
      * @brief Simulates a disk read
-     * @param num_bytes: bumber of read bytes
-     * @param partition_name: partition name
+     *
+     * @param num_bytes: number of bytes to read
+     * @param hostname: name of host to which disk is attached
+     * @param diskname: name of disk
      */
-    void S4U_Simulation::readFromDisk(double num_bytes, std::string partition_name) {
-        // TODO: Change this once I/O in SimGrid is better: the data transfer rate
-        // should be based on the I/O device associated to the partition
-        // Right now, this takes ZERO time!!!
+    void S4U_Simulation::readFromDisk(double num_bytes, std::string hostname, std::string diskname) {
+        auto host = simgrid::s4u::Host::by_name_or_null(hostname);
+        if (not host) {
+            throw std::invalid_argument("S4U_Simulation::readFromDisk(): unknown host " + hostname);
+        }
+
+        auto disk_list = simgrid::s4u::Host::by_name(hostname)->get_disks();
+        for (auto disk : disk_list) {
+            if (disk->get_name() == diskname) {
+                disk->read(num_bytes);
+                return;
+            }
+        }
+        throw std::invalid_argument("S4U_Simulation::readFromDisk(): unknown disk " +
+                                    diskname + " at host " + hostname);
     }
 
 
@@ -606,8 +632,8 @@ namespace wrench {
             std::string mount_point = std::string(p);
             if (mount_points.find(mount_point) != mount_points.end()) {
                 throw std::invalid_argument("S4U_Simulation::getDisks(): At host " + hostname +
-                " it seems that several disks share the same mount point (or have the same default '/' mount point)."
-                "You likely need to fix your platform XML");
+                                            " it seems that several disks share the same mount point (or have the same default '/' mount point)."
+                                            "You likely need to fix your platform XML");
             }
             mount_points.insert(mount_point);
         }
