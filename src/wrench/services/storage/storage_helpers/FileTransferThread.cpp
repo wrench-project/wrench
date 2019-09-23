@@ -193,7 +193,7 @@ namespace wrench {
                     (this->dst_location->getStorageService() == this->parent))) {
             /** Downloading a file from another storage service */
             try {
-                downloadFileFromStorageService(this->file, this->src_location, this->dst_location);
+                downloadFileFromStorageService(this->file, this->src_location, this->dst_location, this->dst_location->getStorageService()->buffer_size);
             } catch (std::shared_ptr<FailureCause> &failure_cause) {
                 msg_to_send_back->success = false;
                 msg_to_send_back->failure_cause = failure_cause;
