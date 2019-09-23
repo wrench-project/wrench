@@ -167,10 +167,11 @@ namespace wrench {
     }
 
     /**
-     * @brief Decrement the amount of free space the service "thinks" it has
+     * @brief Decrease the amount of free space the service "thinks" it has
+     * @param num_bytes: the number of bytes by which to decrease
      * @throw std::invalid_argument
      */
-    void LogicalFileSystem::decrementFreeSpace(double num_bytes) {
+    void LogicalFileSystem::decreaseFreeSpace(double num_bytes) {
         if (this->total_capacity - this->occupied_space < num_bytes) {
             throw std::invalid_argument("LogicalFileSystem::decrementFreeSpace(): Not enough free space");
         }
@@ -178,10 +179,11 @@ namespace wrench {
     }
 
     /**
-     * @brief Increment the amount of free space the service "thinks" it has
+     * @brief Increase the amount of free space the service "thinks" it has
+     * @param num_bytes: the number of bytes by which to increase
      * @throw std::invalid_argument
      */
-    void LogicalFileSystem::incrementFreeSpace(double num_bytes) {
+    void LogicalFileSystem::increaseFreeSpace(double num_bytes) {
         if (this->occupied_space + num_bytes > this->total_capacity) {
             throw std::invalid_argument("LogicalFileSystem::decrementFreeSpace(): No enough capacity");
         }
