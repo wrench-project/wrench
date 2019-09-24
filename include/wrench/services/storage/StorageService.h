@@ -60,10 +60,11 @@ namespace wrench {
         static void writeFile(WorkflowFile *file, std::shared_ptr<FileLocation> location);
 
 
-
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
+        bool isScratch();
+        void setScratch();
 
         static void copyFile(WorkflowFile *file,
                                      std::shared_ptr<FileLocation> src_location,
@@ -116,6 +117,8 @@ namespace wrench {
                                      std::map<WorkflowFile *, std::shared_ptr<FileLocation>> locations);
 
         void stageFile(WorkflowFile *file , std::string mountpoint,std::string directory);
+
+        bool is_stratch;
 
 
     };
