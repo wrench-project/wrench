@@ -25,10 +25,6 @@ namespace wrench {
     constexpr unsigned long ComputeService::ALL_CORES;
     constexpr double ComputeService::ALL_RAM;
 
-    // Create SCRATCH as share_ptr to a boogus ptr, with a noop destructor!
-    std::shared_ptr<StorageService> ComputeService::SCRATCH =
-            std::shared_ptr<StorageService>((StorageService *) 666, [](void *ptr) {});
-
     /**
      * @brief Stop the compute service - must be called by the stop()
      *        method of derived classes
@@ -36,7 +32,6 @@ namespace wrench {
     void ComputeService::stop() {
         Service::stop();
     }
-
 
     /**
      * @brief Submit a job to the compute service
@@ -139,6 +134,7 @@ namespace wrench {
             try {
                 this->scratch_space_storage_service =
                         std::shared_ptr<StorageService>(new SimpleStorageService(hostname, {scratch_space_mount_point}));
+                this->scratch_space_storage_service->setScratch();
                 this->scratch_space_storage_service_shared_ptr = std::shared_ptr<StorageService>(
                         this->scratch_space_storage_service);
             } catch (std::runtime_error &e) {

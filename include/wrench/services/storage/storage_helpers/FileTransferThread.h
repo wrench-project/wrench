@@ -79,8 +79,7 @@ namespace wrench {
 
         void receiveFileFromNetwork(WorkflowFile *file, std::string mailbox, std::shared_ptr<FileLocation> location);
         void sendLocalFileToNetwork(WorkflowFile *file, std::shared_ptr<FileLocation> location, std::string mailbox);
-        void downloadFileFromStorageService(WorkflowFile *file, std::shared_ptr<FileLocation> src_location,
-                                            std::shared_ptr<FileLocation> dst_location, unsigned long downloader_buffer_size);
+        void downloadFileFromStorageService(WorkflowFile *file, std::shared_ptr<FileLocation> src_location, std::shared_ptr<FileLocation> dst_location);
         void copyFileLocally(WorkflowFile *file, std::shared_ptr<FileLocation> src_location, std::shared_ptr<FileLocation> dst_location);
 
     };

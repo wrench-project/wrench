@@ -55,6 +55,22 @@ namespace wrench {
         }
 
         this->state = StorageService::UP;
+        this->is_stratch = false;
+    }
+
+    /**
+     * @brief Determines whether the storage service is a scratch service of a ComputeService
+     * @return true if it is, false otherwise
+     */
+    bool StorageService::isScratch() {
+        return this->is_stratch;
+    }
+
+    /**
+     * @brief Indicate that this storace service is a scratch service of a ComputeService
+     */
+    void StorageService::setScratch() {
+        this->is_stratch = true;
     }
 
     /**

@@ -193,7 +193,7 @@ namespace wrench {
                     (this->dst_location->getStorageService() == this->parent))) {
             /** Downloading a file from another storage service */
             try {
-                downloadFileFromStorageService(this->file, this->src_location, this->dst_location, this->dst_location->getStorageService()->buffer_size);
+                downloadFileFromStorageService(this->file, this->src_location, this->dst_location);
             } catch (std::shared_ptr<FailureCause> &failure_cause) {
                 msg_to_send_back->success = false;
                 msg_to_send_back->failure_cause = failure_cause;
@@ -364,8 +364,7 @@ namespace wrench {
      */
     void FileTransferThread::downloadFileFromStorageService(WorkflowFile *file,
                                                             std::shared_ptr<FileLocation> src_location,
-                                                            std::shared_ptr<FileLocation> dst_location,
-                                                            unsigned long downloader_buffer_size) {
+                                                            std::shared_ptr<FileLocation> dst_location) {
 
         if (file == nullptr) {
             throw std::invalid_argument("StorageService::downloadFile(): Invalid arguments");
@@ -375,9 +374,10 @@ namespace wrench {
                     file->getID().c_str(), src_location->toString().c_str());
 
         // Check that the buffer size is compatible
-        if (((downloader_buffer_size == 0) && (src_location->getStorageService()->buffer_size != 0)) or
-            ((downloader_buffer_size != 0) && (src_location->getStorageService()->buffer_size == 0))) {
-            throw std::invalid_argument("FileTransferThread::downloadFileFromStorageService(): Incompatible buffer size specs (both must be zero, or both must be non-zero");
+        if (((this->buffer_size == 0) && (src_location->getStorageService()->buffer_size != 0)) or
+            ((this->buffer_size != 0) && (src_location->getStorageService()->buffer_size == 0))) {
+            throw std::invalid_argument("FileTransferThread::downloadFileFromStorageService(): "
+                                        "Incompatible buffer size specs (both must be zero, or both must be non-zero");
         }
 
         // Send a message to the source
@@ -390,7 +390,7 @@ namespace wrench {
                                                                              mailbox_that_should_receive_file_content,
                                                                              file,
                                                                              src_location,
-                                                                             std::min<unsigned long>(this->buffer_size, downloader_buffer_size),
+                                                                             std::min<unsigned long>(this->buffer_size, this->buffer_size),
                                                                              src_location->getStorageService()->getMessagePayloadValue(
                                                                                      StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
