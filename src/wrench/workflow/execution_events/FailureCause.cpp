@@ -64,11 +64,11 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param file: the file that could not be found
-     * @param storage_service: the storage service on which it was not found
+     * @param location: the location at which it could not be found
      */
-    FileNotFound::FileNotFound(WorkflowFile *file, std::shared_ptr<StorageService> storage_service) {
+    FileNotFound::FileNotFound(WorkflowFile *file, std::shared_ptr<FileLocation> location) {
         this->file = file;
-        this->storage_service = storage_service;
+        this->location = location;
     }
 
     /**
@@ -83,8 +83,8 @@ namespace wrench {
      * @brief Getter
      * @return the storage service
      */
-    std::shared_ptr<StorageService> FileNotFound::getStorageService() {
-        return this->storage_service;
+    std::shared_ptr<FileLocation> FileNotFound::getLocation() {
+        return this->location;
     }
 
     /**
@@ -92,7 +92,7 @@ namespace wrench {
      * @return the message
      */
     std::string FileNotFound::toString() {
-        return "Couldn't find file " + this->file->getID() + " at Storage Service " + this->storage_service->getName();
+        return "Couldn't find file " + this->file->getID() + " at location " + this->location->toString();
     }
 
     /**
