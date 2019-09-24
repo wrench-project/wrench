@@ -970,9 +970,9 @@ namespace wrench {
     void StandardJobExecutor::cleanUpScratch() {
         if (this->scratch_space != nullptr) {
             /** Perform scratch cleanup */
-            for (auto scratch_cleanup_file : files_stored_in_scratch) {
+            for (auto f : files_stored_in_scratch) {
                 try {
-                    this->scratch_space->deleteFile(scratch_cleanup_file, job, nullptr);
+                    StorageService::deleteFile(f, FileLocation::LOCATION(this->scratch_space, job->getName()));
                 } catch (WorkflowExecutionException &e) {
                     throw;
                 }
