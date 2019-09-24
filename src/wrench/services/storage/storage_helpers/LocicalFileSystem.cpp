@@ -13,8 +13,7 @@
 namespace wrench {
 
 
-    std::set<std::string> mount_points;
-
+    std::set<std::string> LogicalFileSystem::mount_points;
 
     /**
      * @brief Constructor
@@ -189,6 +188,5 @@ namespace wrench {
         }
         this->occupied_space -= num_bytes;
     }
-
 
 }

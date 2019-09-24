@@ -80,11 +80,26 @@ namespace wrench {
      * @param location: a file location
      *
      * @throw std::invalid_argument
-     * @throw std::runtime_error
      */
     void StorageService::stageFile(WorkflowFile *file, std::shared_ptr<FileLocation> location) {
 
         location->getStorageService()->stageFile(file, location->getMountPoint(), location->getDirectory());
+    }
+
+    /**
+     * @brief Store a file
+     * @param file: a file
+     * @param mountpoint: a mount point
+     * @param directory: a directory
+     */
+    void StorageService::stageFile(WorkflowFile *file, std::string mountpoint, std::string directory) {
+
+        auto fs = this->file_systems[mountpoint].get();
+
+        if (not fs->doesDirectoryExist(directory)) {
+            fs->createDirectory(directory);
+        }
+        fs->storeFileInDirectory(file, directory);
     }
 
     /**
@@ -648,5 +663,7 @@ namespace wrench {
     bool StorageService::hasMountPoint(std::string mp) {
         return (this->file_systems.find(mp) != this->file_systems.end());
     }
+
+
 
 };

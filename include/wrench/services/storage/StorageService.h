@@ -116,7 +116,7 @@ namespace wrench {
         static void writeOrReadFiles(FileOperation action,
                                      std::map<WorkflowFile *, std::shared_ptr<FileLocation>> locations);
 
-        void stageFile(WorkflowFile *file , std::string mountpoint,std::string directory);
+        void stageFile(WorkflowFile *file , std::string mountpoint, std::string directory);
 
         bool is_stratch;
 
