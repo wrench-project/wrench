@@ -85,7 +85,7 @@ int main(int argc, char **argv) {
      * of 10,000,000,000,000 bytes, and is a SimpleStorageService instance. The SimpleStorageService
      * is a barebone storage service implementation provided by WRENCH.
      * Throughout the simulation execution, input/output files of workflow tasks will be located
-     * in this storage service.
+     * in this storage service.s
      */
     std::string storage_host = hostname_list[(hostname_list.size() > 2) ? 2 : 1];
     std::cerr << "Instantiating a SimpleStorageService on " << storage_host << "..." << std::endl;
