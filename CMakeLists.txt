@@ -96,6 +96,7 @@ set(HEADER_FILES
         include/wrench/services/storage/simple/SimpleStorageService.h
         include/wrench/services/storage/simple/SimpleStorageServiceProperty.h
         include/wrench/services/storage/simple/SimpleStorageServiceMessagePayload.h
+        include/wrench/services/storage/storage_helpers/FileLocation.h
         include/wrench/services/file_registry/FileRegistryService.h
         include/wrench/services/file_registry/FileRegistryServiceProperty.h
         include/wrench/services/file_registry/FileRegistryServiceMessagePayload.h
@@ -179,8 +180,10 @@ set(SOURCE_FILES
         src/wrench/services/storage/StorageServiceMessage.cpp
         src/wrench/services/storage/StorageServiceMessage.h
         include/wrench/services/storage/storage_helpers/FileTransferThread.h
+        src/wrench/services/storage/storage_helpers/LocicalFileSystem.cpp
+        src/wrench/services/storage/storage_helpers/LogicalFileSystem.h
         src/wrench/services/storage/storage_helpers/FileTransferThread.cpp
-        include/wrench/services/storage/storage_helpers/FileLocation.h
+        src/wrench/services/storage/storage_helpers/FileTransferThreadMessage.h
         src/wrench/services/storage/storage_helpers/FileLocation.cpp
         src/wrench/workflow/execution_events/FailureCause.cpp
         src/wrench/managers/JobManagerMessage.cpp
@@ -329,11 +332,6 @@ set(TEST_FILES
         test/simulated_failures/failure_test_util/ComputerVictim.h
         test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.cpp
         test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.h
-        src/wrench/services/storage/storage_helpers/LocicalFileSystem.cpp
-        src/wrench/services/storage/storage_helpers/LogicalFileSystem.h
-        src/wrench/services/storage/storage_helpers/FileTransferThread.cpp
-        include/wrench/services/storage/storage_helpers/FileTransferThread.h
-        src/wrench/services/storage/storage_helpers/FileTransferThreadMessage.h
         test/simulation/S4U_MailboxTest.cpp)
 
 # sigmgrid library
