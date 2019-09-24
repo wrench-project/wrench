@@ -274,7 +274,7 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param file: the file
-     * @param storage_service: the storage service
+     * @param location: the file's location
      * @param success: whether the write operation succeeded
      * @param failure_cause: the cause of the failure (nullptr if success)
      * @param data_write_mailbox_name: the mailbox to which file content should be sent
@@ -283,19 +283,19 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     StorageServiceFileWriteAnswerMessage::StorageServiceFileWriteAnswerMessage(WorkflowFile *file,
-                                                                               std::shared_ptr<StorageService> storage_service,
+                                                                               std::shared_ptr<FileLocation> location,
                                                                                bool success,
                                                                                std::shared_ptr<FailureCause> failure_cause,
                                                                                std::string data_write_mailbox_name,
                                                                                double payload) : StorageServiceMessage(
             "FILE_WRITE_ANSWER", payload) {
-        if ((file == nullptr) || (storage_service == nullptr) || (data_write_mailbox_name == "") ||
+        if ((file == nullptr) || (location == nullptr) || (data_write_mailbox_name == "") ||
             (success && (failure_cause != nullptr)) || (!success && (failure_cause == nullptr))) {
             throw std::invalid_argument(
                     "StorageServiceFileWriteAnswerMessage::StorageServiceFileWriteAnswerMessage(): Invalid arguments");
         }
         this->file = file;
-        this->storage_service = storage_service;
+        this->location = location;
         this->success = success;
         this->failure_cause = failure_cause;
         this->data_write_mailbox_name = data_write_mailbox_name;
@@ -335,7 +335,7 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param file: the file
-     * @param storage_service: the storage service
+     * @param location: the location of the file
      * @param success: whether the read operation was successful
      * @param failure_cause: the cause of the failure (or nullptr on success)
      * @param payload: the message size in bytes
@@ -343,19 +343,19 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     StorageServiceFileReadAnswerMessage::StorageServiceFileReadAnswerMessage(WorkflowFile *file,
-                                                                             std::shared_ptr<StorageService> storage_service,
+                                                                             std::shared_ptr<FileLocation> location,
                                                                              bool success,
                                                                              std::shared_ptr<FailureCause> failure_cause,
                                                                              double payload) : StorageServiceMessage(
             "FILE_READ_ANSWER",
             payload) {
-        if ((file == nullptr) || (storage_service == nullptr) ||
+        if ((file == nullptr) || (location == nullptr) ||
             (success && (failure_cause != nullptr)) || (!success && (failure_cause == nullptr))) {
             throw std::invalid_argument(
                     "StorageServiceFileReadAnswerMessage::StorageServiceFileReadAnswerMessage(): Invalid arguments");
         }
         this->file = file;
-        this->storage_service = storage_service;
+        this->location = location;
         this->success = success;
         this->failure_cause = failure_cause;
     }
