@@ -187,7 +187,8 @@ namespace wrench {
     */
     class StorageServiceFileWriteRequestMessage : public StorageServiceMessage {
     public:
-        StorageServiceFileWriteRequestMessage(std::string answer_mailbox, WorkflowFile *file,
+        StorageServiceFileWriteRequestMessage(std::string answer_mailbox,
+                                              WorkflowFile *file,
                                               std::shared_ptr<FileLocation> location,
                                               unsigned long buffer_size,
                                               double payload);
@@ -208,7 +209,7 @@ namespace wrench {
     class StorageServiceFileWriteAnswerMessage : public StorageServiceMessage {
     public:
         StorageServiceFileWriteAnswerMessage(WorkflowFile *file,
-                                             std::shared_ptr<StorageService> storage_service,
+                                             std::shared_ptr<FileLocation> location,
                                              bool success,
                                              std::shared_ptr<FailureCause> failure_cause,
                                              std::string data_write_mailbox_name,
@@ -216,8 +217,8 @@ namespace wrench {
 
         /** @brief The workflow file that should be written */
         WorkflowFile *file;
-        /** @brief The storage service on which the file should be written */
-        std::shared_ptr<StorageService> storage_service;
+        /** @brief The location at which the file should be written */
+        std::shared_ptr<FileLocation> location;
         /** @brief Whether the write operation request was accepted or not */
         bool success;
         /** @brief The mailbox on which to send the file */
@@ -256,15 +257,15 @@ namespace wrench {
     class StorageServiceFileReadAnswerMessage : public StorageServiceMessage {
     public:
         StorageServiceFileReadAnswerMessage(WorkflowFile *file,
-                                            std::shared_ptr<StorageService> storage_service,
+                                            std::shared_ptr<FileLocation> location,
                                             bool success,
                                             std::shared_ptr<FailureCause> failure_cause,
                                             double payload);
 
         /** @brief The file that was read */
         WorkflowFile *file;
-        /** @brief The storage service on which the file was read */
-        std::shared_ptr<StorageService> storage_service;
+        /** @brief The location of the file */
+        std::shared_ptr<FileLocation> location;
         /** @brief Whether the read operation was successful or not */
         bool success;
         /** @brief The cause of the failure, or nullptr on success */

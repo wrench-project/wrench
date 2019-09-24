@@ -245,7 +245,7 @@ namespace wrench {
                     S4U_Mailbox::putMessage(answer_mailbox,
                                             new StorageServiceFileWriteAnswerMessage(
                                                     file,
-                                                    this->getSharedPtr<SimpleStorageService>(),
+                                                    location,
                                                     false,
                                                     std::shared_ptr<FailureCause>(
                                                             new StorageServiceNotEnoughSpace(
@@ -271,7 +271,7 @@ namespace wrench {
         S4U_Mailbox::dputMessage(answer_mailbox,
                                  new StorageServiceFileWriteAnswerMessage(
                                          file,
-                                         this->getSharedPtr<SimpleStorageService>(),
+                                         location,
                                          true,
                                          nullptr,
                                          file_reception_mailbox,
@@ -321,7 +321,7 @@ namespace wrench {
             (not fs->isFileInDirectory(file, location->getDirectory()))) {
             WRENCH_INFO("Received a a read request for a file I don't have (%s)", location->toString().c_str());
             failure_cause = std::shared_ptr<FailureCause>(
-                    new FileNotFound(file, this->getSharedPtr<SimpleStorageService>()));
+                    new FileNotFound(file, location));
         }
 
         bool success = (failure_cause == nullptr);;
@@ -330,7 +330,7 @@ namespace wrench {
         S4U_Mailbox::dputMessage(answer_mailbox,
                                  new StorageServiceFileReadAnswerMessage(
                                          file,
-                                         this->getSharedPtr<SimpleStorageService>(),
+                                         location,
                                          success,
                                          failure_cause,
                                          this->getMessagePayloadValue(
@@ -537,7 +537,7 @@ namespace wrench {
         if ((not fs->doesDirectoryExist(location->getDirectory())) or
             (not fs->isFileInDirectory(file, location->getDirectory()))) {
             failure_cause = std::shared_ptr<FailureCause>(
-                    new FileNotFound(file, this->getSharedPtr<SimpleStorageService>()));
+                    new FileNotFound(file, location));
         } else {
             fs->removeFileFromDirectory(file, location->getDirectory());
         }

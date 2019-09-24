@@ -23,6 +23,7 @@
 
 // Storage Services
 #include "wrench/services/storage/StorageService.h"
+#include "wrench/services/storage/storage_helpers/FileLocation.h"
 #include "wrench/services/storage/StorageServiceProperty.h"
 
 // File Registry Service
