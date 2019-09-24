@@ -71,6 +71,11 @@ namespace wrench {
             throw std::invalid_argument("FileLocation::LOCATION(): Storage service " + ss->getName() +
                                         " does not have mount point " + mp);
         }
+
+        if ((dir != "/") and ss->isScratch()) {
+            throw std::invalid_argument("FileLocation::LOCATION(): Cannot specify a non-\"/\" directory for a scratch storage service");
+        }
+
         if (dir.empty()) {
             dir = "/";
         }

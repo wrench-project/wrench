@@ -62,10 +62,6 @@ namespace wrench {
         /** \cond DEVELOPER   **/
         /***********************/
 
-        /** @brief A convenient constant to mean "the scratch storage space" of a ComputeService. This is used
-         *   to move data to a ComputeService's scratch storage space. **/
-        static std::shared_ptr<StorageService> SCRATCH;
-
         virtual ~ComputeService() {}
 
         void stop() override;
