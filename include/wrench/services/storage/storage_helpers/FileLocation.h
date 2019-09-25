@@ -29,23 +29,18 @@ namespace wrench {
         static std::shared_ptr<FileLocation> LOCATION(std::shared_ptr<StorageService> ss);
 
         static std::shared_ptr<FileLocation> LOCATION(std::shared_ptr<StorageService> ss,
-                                                      std::string mp);
-
-        static std::shared_ptr<FileLocation> LOCATION(std::shared_ptr<StorageService> ss,
-                                                      std::string mp,
-                                                      std::string dir);
+                                                      std::string absolute_path);
 
         std::shared_ptr<StorageService> getStorageService();
         std::string getMountPoint();
-        std::string getDirectory();
+        std::string getAbsolutePathAtMountPoint();
 
         std::string toString();
 
 
         bool operator==(const std::shared_ptr<FileLocation> &rhs) {
             return ((this->getStorageService() == rhs->getStorageService()) and
-            (this->getMountPoint() == rhs->getMountPoint()) and
-            (this->getDirectory() == rhs->getDirectory()));
+            (this->getAbsolutePathAtMountPoint() == rhs->getAbsolutePathAtMountPoint()));
         }
 
         /**
@@ -57,20 +52,24 @@ namespace wrench {
             return not FileLocation::operator==(rhs);
         }
 
+
     private:
+
+        friend class LogicalFileSystem;
 
         /**
          * @brief Constructor
          * @param ss: the storage service
-         * @param mp: the mount point
-         * @param dir: the directory
+         * @param ap: the absolute path
          */
-        FileLocation(std::shared_ptr<StorageService> ss, std::string mp, std::string dir) :
-                storage_service(ss), mount_point(mp), directory(dir) { }
+        FileLocation(std::shared_ptr<StorageService> ss, std::string mp, std::string apamp) :
+                storage_service(ss), mount_point(mp), absolute_path_at_mount_point(apamp) { }
 
         std::shared_ptr<StorageService> storage_service;
         std::string mount_point;
-        std::string directory;
+        std::string absolute_path_at_mount_point;
+
+        static std::string sanitizePath(std::string path);
 
     };
 

@@ -391,7 +391,7 @@ namespace wrench {
             for (auto const &l : this->entries[file]) {
                 if ((l->getStorageService() == location->getStorageService()) &&
                     (l->getMountPoint() == location->getMountPoint()) &&
-                    (l->getDirectory() == location->getDirectory())) {
+                    (l->getAbsolutePathAtMountPoint() == location->getAbsolutePathAtMountPoint())) {
                     this->entries[file].erase(l);
                     return true;
                 }
