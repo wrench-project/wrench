@@ -50,8 +50,20 @@ protected:
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"Host1\" speed=\"1f\"/> "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"" + std::to_string(STORAGE_SIZE) + "\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
                           "       <host id=\"Host2\" speed=\"1f\"/> "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"" + std::to_string(STORAGE_SIZE) + "\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
                           "       <host id=\"WMSHost\" speed=\"1f\"/> "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"" + std::to_string(STORAGE_SIZE) + "\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
                           "       <link id=\"link1\" bandwidth=\"10MBps\" latency=\"100us\"/>"
                           "       <link id=\"link2\" bandwidth=\"10MBps\" latency=\"100us\"/>"
                           "       <route src=\"WMSHost\" dst=\"Host1\">"
@@ -205,15 +217,15 @@ void SimpleStorageServiceLimitedConnectionsTest::do_ConcurrencyFileCopies_test()
 
     // Create a Local storage service with unlimited connections
     ASSERT_NO_THROW(storage_service_wms = simulation->add(
-            new wrench::SimpleStorageService("WMSHost", STORAGE_SIZE)));
+            new wrench::SimpleStorageService("WMSHost", {"/"})));
 
     // Create a Storage service with unlimited connections
     ASSERT_NO_THROW(storage_service_1 = simulation->add(
-            new wrench::SimpleStorageService("Host1", STORAGE_SIZE)));
+            new wrench::SimpleStorageService("Host1", {"/"})));
 
     // Create a Storage Service limited to 3 connections
     ASSERT_NO_THROW(storage_service_2 = simulation->add(
-            new wrench::SimpleStorageService("Host2", STORAGE_SIZE, {{"MAX_NUM_CONCURRENT_DATA_CONNECTIONS", "3"}})));
+            new wrench::SimpleStorageService("Host2", {"/"}, {{"MAX_NUM_CONCURRENT_DATA_CONNECTIONS", "3"}})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
@@ -229,7 +241,8 @@ void SimpleStorageServiceLimitedConnectionsTest::do_ConcurrencyFileCopies_test()
 
     // Staging all files on the WMS storage service
     for (int i=0; i < 10; i++) {
-        ASSERT_NO_THROW(simulation->stageFile(files[i], storage_service_wms));
+        ASSERT_NO_THROW(simulation->stageFile(files[i],
+                wrench::FileLocation::LOCATION(storage_service_wms)));
     }
 
     // Running a "run a single task" simulation

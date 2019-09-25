@@ -56,21 +56,32 @@ protected:
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
-                          "       <host id=\"SrcHost\" speed=\"1f\"/> "
-                          "       <host id=\"DstHost\" speed=\"1f\"/> "
-                          "       <host id=\"WMSHost\" speed=\"1f\"/> "
-                          "       <link id=\"link\" bandwidth=\"" + std::to_string(MBPS_BANDWIDTH) + "MBps\" latency=\"1us\"/>"
-                                                                                                     "       <route src=\"SrcHost\" dst=\"DstHost\">"
-                                                                                                     "         <link_ctn id=\"link\"/>"
-                                                                                                     "       </route>"
-                                                                                                     "       <route src=\"WMSHost\" dst=\"SrcHost\">"
-                                                                                                     "         <link_ctn id=\"link\"/>"
-                                                                                                     "       </route>"
-                                                                                                     "       <route src=\"WMSHost\" dst=\"DstHost\">"
-                                                                                                     "         <link_ctn id=\"link\"/>"
-                                                                                                     "       </route>"
-                                                                                                     "   </zone> "
-                                                                                                     "</platform>";
+                          "       <host id=\"SrcHost\" speed=\"1f\"> "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"" + std::to_string(STORAGE_SIZE) +"\"/>"
+                                                                                                    "             <prop id=\"mount\" value=\"/\"/>"
+                                                                                                    "          </disk>"
+                                                                                                    "       </host>"
+                                                                                                    "       <host id=\"DstHost\" speed=\"1f\"> "
+                                                                                                    "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                                                                                                    "             <prop id=\"size\" value=\"" + std::to_string(STORAGE_SIZE) + "\"/>"
+                                                                                                                                                                               "             <prop id=\"mount\" value=\"/\"/>"
+                                                                                                                                                                               "          </disk>"
+                                                                                                                                                                               "       </host>"
+                                                                                                                                                                               "       <host id=\"WMSHost\" speed=\"1f\"/> "
+                                                                                                                                                                               "       <link id=\"link\" bandwidth=\"" + std::to_string(MBPS_BANDWIDTH) + "MBps\" latency=\"1us\"/>"
+                                                                                                                                                                                                                                                          "       <route src=\"SrcHost\" dst=\"DstHost\">"
+                                                                                                                                                                                                                                                          "         <link_ctn id=\"link\"/>"
+                                                                                                                                                                                                                                                          "       </route>"
+                                                                                                                                                                                                                                                          "       <route src=\"WMSHost\" dst=\"SrcHost\">"
+                                                                                                                                                                                                                                                          "         <link_ctn id=\"link\"/>"
+                                                                                                                                                                                                                                                          "       </route>"
+                                                                                                                                                                                                                                                          "       <route src=\"WMSHost\" dst=\"DstHost\">"
+                                                                                                                                                                                                                                                          "         <link_ctn id=\"link\"/>"
+                                                                                                                                                                                                                                                          "       </route>"
+                                                                                                                                                                                                                                                          "   </zone> "
+                                                                                                                                                                                                                                                          "</platform>";
+
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
@@ -199,9 +210,9 @@ void SimpleStorageServicePerformanceTest::do_ConcurrentFileCopies_test() {
 
     // Create Two Storage Services
     ASSERT_NO_THROW(storage_service_1 = simulation->add(
-            new wrench::SimpleStorageService("SrcHost", STORAGE_SIZE)));
+            new wrench::SimpleStorageService("SrcHost", {"/"})));
     ASSERT_NO_THROW(storage_service_2 = simulation->add(
-            new wrench::SimpleStorageService("DstHost", STORAGE_SIZE)));
+            new wrench::SimpleStorageService("DstHost", {"/"})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
@@ -216,7 +227,9 @@ void SimpleStorageServicePerformanceTest::do_ConcurrentFileCopies_test() {
     simulation->add(new wrench::FileRegistryService("WMSHost"));
 
     // Staging all files on the Src storage service
-    ASSERT_NO_THROW(simulation->stageFiles({{file_1->getID(), file_1}, {file_2->getID(), file_2}, {file_3->getID(), file_3}}, storage_service_1));
+    ASSERT_NO_THROW(simulation->stageFile(file_1, wrench::FileLocation::LOCATION(storage_service_1)));
+    ASSERT_NO_THROW(simulation->stageFile(file_2, wrench::FileLocation::LOCATION(storage_service_1)));
+    ASSERT_NO_THROW(simulation->stageFile(file_3, wrench::FileLocation::LOCATION(storage_service_1)));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -293,7 +306,7 @@ void SimpleStorageServicePerformanceTest::do_FileRead_test() {
 
     // Create Two Storage Services
     ASSERT_NO_THROW(storage_service_1 = simulation->add(
-            new wrench::SimpleStorageService("SrcHost", STORAGE_SIZE)));
+            new wrench::SimpleStorageService("SrcHost", {"/"})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
@@ -308,7 +321,9 @@ void SimpleStorageServicePerformanceTest::do_FileRead_test() {
     simulation->add(new wrench::FileRegistryService("WMSHost"));
 
     // Staging all files on the  storage service
-    ASSERT_NO_THROW(simulation->stageFiles({{file_1->getID(), file_1}, {file_2->getID(), file_2}, {file_3->getID(), file_3}}, storage_service_1));
+    ASSERT_NO_THROW(simulation->stageFile(file_1, wrench::FileLocation::LOCATION(storage_service_1)));
+    ASSERT_NO_THROW(simulation->stageFile(file_2, wrench::FileLocation::LOCATION(storage_service_1)));
+    ASSERT_NO_THROW(simulation->stageFile(file_3, wrench::FileLocation::LOCATION(storage_service_1)));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
