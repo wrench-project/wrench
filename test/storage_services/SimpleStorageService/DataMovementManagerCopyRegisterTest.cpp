@@ -47,9 +47,24 @@ protected:
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
-                          "       <host id=\"SrcHost\" speed=\"1f\"/> "
-                          "       <host id=\"DstHost\" speed=\"1f\"/> "
-                          "       <host id=\"WMSHost\" speed=\"1f\"/> "
+                          "       <host id=\"SrcHost\" speed=\"1f\"> "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"" + std::to_string(STORAGE_SIZE) + "\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "       </host>"
+                          "       <host id=\"DstHost\" speed=\"1f\"> "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"" + std::to_string(STORAGE_SIZE) + "\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "       </host>"
+                          "       <host id=\"WMSHost\" speed=\"1f\"> "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"" + std::to_string(STORAGE_SIZE) + "\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "       </host>"
                           "       <link id=\"link\" bandwidth=\"10MBps\" latency=\"100us\"/>"
                           "       <route src=\"SrcHost\" dst=\"DstHost\">"
                           "         <link_ctn id=\"link\"/>"
@@ -101,15 +116,18 @@ private:
         // try synchronous copy and register
 
         try {
-            data_movement_manager->doSynchronousFileCopy(this->test->src_file_1, this->test->src_storage_service,
-                                                         this->test->dst_storage_service, file_registry_service);
+            data_movement_manager->doSynchronousFileCopy(this->test->src_file_1,
+                                                         wrench::FileLocation::LOCATION(this->test->src_storage_service),
+                                                         wrench::FileLocation::LOCATION(this->test->dst_storage_service),
+                                                         file_registry_service);
 
         } catch (wrench::WorkflowExecutionEvent &e)  {
             throw std::runtime_error("Synchronous file copy failed");
         }
 
         auto src_file_1_locations = file_registry_service->lookupEntry(this->test->src_file_1);
-        auto dst_search = src_file_1_locations.find(this->test->dst_storage_service);
+        auto dst_search = src_file_1_locations.find(
+                wrench::FileLocation::LOCATION(this->test->dst_storage_service));
 
         if (dst_search == src_file_1_locations.end()) {
             throw std::runtime_error("Synchronous file copy succeeded but file was not registered at DstHost");
@@ -117,11 +135,15 @@ private:
 
         // Do the same thing but kill the FileRegistryService first
 
-        this->test->dst_storage_service->deleteFile(this->test->src_file_1, file_registry_service);
+        wrench::StorageService::deleteFile(this->test->src_file_1,
+                                           wrench::FileLocation::LOCATION(this->test->dst_storage_service),
+                                           file_registry_service);
         file_registry_service->stop();
         try {
-            data_movement_manager->doSynchronousFileCopy(this->test->src_file_1, this->test->src_storage_service,
-                                                         this->test->dst_storage_service, file_registry_service);
+            data_movement_manager->doSynchronousFileCopy(this->test->src_file_1,
+                                                         wrench::FileLocation::LOCATION(this->test->src_storage_service),
+                                                         wrench::FileLocation::LOCATION(this->test->dst_storage_service),
+                                                         file_registry_service);
 
             throw std::runtime_error("Synchronous file copy failed");
         } catch (wrench::WorkflowExecutionException &e)  {
@@ -139,7 +161,8 @@ private:
 
         try {
             data_movement_manager->initiateAsynchronousFileCopy(this->test->src2_file_1,
-                                                                this->test->src2_storage_service, this->test->dst_storage_service,
+                                                                wrench::FileLocation::LOCATION(this->test->src2_storage_service),
+                                                                wrench::FileLocation::LOCATION(this->test->dst_storage_service),
                                                                 file_registry_service);
         } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error("Got an exception while trying to instantiate a file copy: " + std::string(e.what()));
@@ -156,7 +179,8 @@ private:
         }
 
         auto src2_file_1_locations = file_registry_service->lookupEntry(this->test->src2_file_1);
-        dst_search = src2_file_1_locations.find(this->test->dst_storage_service);
+        dst_search = src2_file_1_locations.find(
+                wrench::FileLocation::LOCATION(this->test->dst_storage_service));
 
         if (dst_search == src2_file_1_locations.end()) {
             throw std::runtime_error("Asynchronous file copy succeeded but file was not registered at DstHost.");
@@ -167,14 +191,14 @@ private:
         std::shared_ptr<wrench::WorkflowExecutionEvent> async_dual_copy_event;
 
         data_movement_manager->initiateAsynchronousFileCopy(this->test->src_file_2,
-                                                            this->test->src_storage_service,
-                                                            this->test->dst_storage_service,
+                                                            wrench::FileLocation::LOCATION(this->test->src_storage_service),
+                                                                                           wrench::FileLocation::LOCATION(this->test->dst_storage_service),
                                                             file_registry_service);
 
         try {
             data_movement_manager->doSynchronousFileCopy(this->test->src_file_2,
-                                                         this->test->src_storage_service,
-                                                         this->test->dst_storage_service,
+                                                         wrench::FileLocation::LOCATION(this->test->src_storage_service),
+                                                                                        wrench::FileLocation::LOCATION(this->test->dst_storage_service),
                                                          file_registry_service);
         } catch (wrench::WorkflowExecutionException &e) {
             double_copy_failed = true;
@@ -183,7 +207,7 @@ private:
         async_dual_copy_event = this->getWorkflow()->waitForNextExecutionEvent();
 
         auto src_file_2_locations = file_registry_service->lookupEntry(this->test->src_file_2);
-        dst_search = src_file_2_locations.find(this->test->dst_storage_service);
+        dst_search = src_file_2_locations.find(wrench::FileLocation::LOCATION(this->test->dst_storage_service));
 
         if (dst_search == src_file_2_locations.end()) {
             throw std::runtime_error("Asynchronous file copy succeeded but file was not registered at DstHost");
@@ -204,13 +228,15 @@ private:
 
 
         data_movement_manager->initiateAsynchronousFileCopy(this->test->src_file_3,
-                                                            this->test->src_storage_service,
-                                                            this->test->dst_storage_service, file_registry_service);
+                                                            wrench::FileLocation::LOCATION(this->test->src_storage_service),
+                                                            wrench::FileLocation::LOCATION(this->test->dst_storage_service),
+                                                            file_registry_service);
 
         try {
             data_movement_manager->doSynchronousFileCopy(this->test->src_file_3,
-                                                         this->test->src_storage_service,
-                                                         this->test->dst_storage_service, file_registry_service);
+                                                         wrench::FileLocation::LOCATION(this->test->src_storage_service),
+                                                                                        wrench::FileLocation::LOCATION(this->test->dst_storage_service),
+                                                                                        file_registry_service);
         } catch (wrench::WorkflowExecutionException &e) {
             if (std::dynamic_pointer_cast<wrench::FileAlreadyBeingCopied>(e.getCause())) {
                 double_copy_failed = true;
@@ -235,7 +261,7 @@ private:
         }
 
         auto src_file_3_locations = file_registry_service->lookupEntry(this->test->src_file_3);
-        dst_search = src_file_3_locations.find(this->test->dst_storage_service);
+        dst_search = src_file_3_locations.find(wrench::FileLocation::LOCATION(this->test->dst_storage_service));
 
         if (dst_search == src_file_3_locations.end()) {
             throw std::runtime_error("File was not registered after Asynchronous copy completed.");
@@ -245,8 +271,9 @@ private:
         std::shared_ptr<wrench::WorkflowExecutionEvent> async_copy_event2;
 
         data_movement_manager->initiateAsynchronousFileCopy(this->test->src2_file_2,
-                                                            this->test->src2_storage_service,
-                                                            this->test->dst_storage_service, file_registry_service);
+                                                            wrench::FileLocation::LOCATION(this->test->src2_storage_service),
+                                                            wrench::FileLocation::LOCATION(this->test->dst_storage_service),
+                                                            file_registry_service);
 
         file_registry_service->stop();
 
@@ -298,14 +325,14 @@ void DataMovementManagerCopyRegisterTest::do_CopyRegister_test() {
 
     // Create src and dst storage services
     ASSERT_NO_THROW(src_storage_service = simulation->add(
-            new wrench::SimpleStorageService("SrcHost", STORAGE_SIZE)));
+            new wrench::SimpleStorageService("SrcHost", {"/"})));
 
     ASSERT_NO_THROW(src2_storage_service = simulation->add(
-            new wrench::SimpleStorageService("WMSHost", STORAGE_SIZE)
+            new wrench::SimpleStorageService("WMSHost", {"/"})
     ));
 
     ASSERT_NO_THROW(dst_storage_service = simulation->add(
-            new wrench::SimpleStorageService("DstHost", STORAGE_SIZE)));
+            new wrench::SimpleStorageService("DstHost", {"/"})));
 
     // Create a file registry
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
@@ -319,13 +346,13 @@ void DataMovementManagerCopyRegisterTest::do_CopyRegister_test() {
     wms->addWorkflow(this->workflow);
 
     // Stage the 2 files on the StorageHost
-    ASSERT_NO_THROW(simulation->stageFiles({{src_file_1->getID(), src_file_1},
-                                            {src_file_2->getID(), src_file_2},
-                                            {src_file_3->getID(), src_file_3}}, src_storage_service));
+    ASSERT_NO_THROW(simulation->stageFile(src_file_1, wrench::FileLocation::LOCATION(src_storage_service)));
+    ASSERT_NO_THROW(simulation->stageFile(src_file_2, wrench::FileLocation::LOCATION(src_storage_service)));
+    ASSERT_NO_THROW(simulation->stageFile(src_file_3, wrench::FileLocation::LOCATION(src_storage_service)));
 
-    ASSERT_NO_THROW(simulation->stageFiles({{src2_file_1->getID(), src2_file_1},
-                                            {src2_file_2->getID(), src2_file_2},
-                                            {src2_file_3->getID(), src2_file_3}}, src2_storage_service));
+    ASSERT_NO_THROW(simulation->stageFile(src2_file_1, wrench::FileLocation::LOCATION(src2_storage_service)));
+    ASSERT_NO_THROW(simulation->stageFile(src2_file_2, wrench::FileLocation::LOCATION(src2_storage_service)));
+    ASSERT_NO_THROW(simulation->stageFile(src2_file_3, wrench::FileLocation::LOCATION(src2_storage_service)));
 
     ASSERT_NO_THROW(simulation->launch());
 

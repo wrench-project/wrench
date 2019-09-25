@@ -63,7 +63,20 @@ protected:
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
-                          "       <host id=\"SingleHost\" speed=\"1f\"/> "
+                          "       <host id=\"SingleHost\" speed=\"1f\""
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/disk100/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"510B\"/>"
+                          "             <prop id=\"mount\" value=\"/disk510/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"1000B\"/>"
+                          "             <prop id=\"mount\" value=\"/disk1000/\"/>"
+                          "          </disk>"
+                          "       </host>"
                           "   </zone> "
                           "</platform>";
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
@@ -436,7 +449,7 @@ private:
 
         try {
             wrench::StorageService::lookupFile(this->test->file_1,
-                    wrench::FileLocation::LOCATION(this->test->storage_service_100, "/", ""));
+                    wrench::FileLocation::LOCATION(this->test->storage_service_100, "/"));
             throw std::runtime_error("Should not be able to lookup a file from a DOWN service");
         } catch (wrench::WorkflowExecutionException &e) {
             // Check Exception
@@ -537,21 +550,25 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
                                                 {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
                                                                                           wrench::ComputeService::ALL_RAM))},
                                                 {})));
-    // Create a bad Storage Service
+    // Create a bad Storage Service (no mount point)
     ASSERT_THROW(storage_service_100 = simulation->add(
-            new wrench::SimpleStorageService(hostname, -100.0)), std::invalid_argument);
+            new wrench::SimpleStorageService(hostname, {})), std::invalid_argument);
+
+    // Create a bad Storage Service (invalid mountpoint)
+    ASSERT_THROW(storage_service_100 = simulation->add(
+            new wrench::SimpleStorageService(hostname, {"/bogus"})), std::invalid_argument);
 
     // Create a Storage Service with a bogus property
     ASSERT_THROW(storage_service_100 = simulation->add(
-            new wrench::SimpleStorageService(hostname, -100.0, {{wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "BOGUS"}})), std::invalid_argument);
+            new wrench::SimpleStorageService(hostname, {"/"}, {{wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "BOGUS"}})), std::invalid_argument);
 
     // Create Three Storage Services
     ASSERT_NO_THROW(storage_service_100 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 100.0)));
+            new wrench::SimpleStorageService(hostname, {"/disk100"})));
     ASSERT_NO_THROW(storage_service_510 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 500.0)));
+            new wrench::SimpleStorageService(hostname, {"/disk510"})));
     ASSERT_NO_THROW(storage_service_1000 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 1000.0)));
+            new wrench::SimpleStorageService(hostname, {"/disk1000"})));
 
 
     // Create a file registry
@@ -572,18 +589,18 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
     ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     // A bogus staging
-    ASSERT_THROW(simulation->stageFile(nullptr, storage_service_100), std::invalid_argument);
+    ASSERT_THROW(simulation->stageFile(nullptr, wrench::FileLocation::LOCATION(storage_service_100)), std::invalid_argument);
 
     // Another bogus staging
-    ASSERT_THROW(simulation->stageFile(file_500, storage_service_100), std::runtime_error);
+    ASSERT_THROW(simulation->stageFile(file_500, wrench::FileLocation::LOCATION(storage_service_100)), std::runtime_error);
 
-    // Staging all files on the 1000 storage service (in default "/" partition)
-    ASSERT_NO_THROW(simulation->stageFiles({{file_1->getID(),   file_1},
-                                            {file_10->getID(),  file_10}}, storage_service_1000));
+    // Staging all files on the 1000 storage service
+    ASSERT_NO_THROW(simulation->stageFile(file_1, wrench::FileLocation::LOCATION(storage_service_1000)));
+    ASSERT_NO_THROW(simulation->stageFile(file_10, wrench::FileLocation::LOCATION(storage_service_1000)));
 
-    // Staging all files on the 1000 storage service (in "" partition, which will end up being default "/")
-    ASSERT_NO_THROW(simulation->stageFiles({{file_100->getID(), file_100},
-                                            {file_500->getID(), file_500}}, storage_service_1000, ""));
+    // Staging all files on the 1000 storage service
+    ASSERT_NO_THROW(simulation->stageFile(file_100, wrench::FileLocation::LOCATION(storage_service_1000)));
+    ASSERT_NO_THROW(simulation->stageFile(file_500, wrench::FileLocation::LOCATION(storage_service_1000)));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
