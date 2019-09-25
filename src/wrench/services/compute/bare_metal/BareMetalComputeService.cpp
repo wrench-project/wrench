@@ -977,8 +977,8 @@ namespace wrench {
                 try {
                     StorageService::deleteFile(f,
                                                FileLocation::LOCATION(this->getScratch(),
-                                                                      this->getScratch()->getMountPoint(),
-                                                                      job->getName()),
+                                                                      this->getScratch()->getMountPoint() +
+                                                                      "/" + job->getName()),
                                                nullptr);
                 } catch (WorkflowExecutionException &e) {
                     // ignore (perhaps it was never written)
@@ -1166,8 +1166,7 @@ namespace wrench {
             for (auto const &f : this->files_in_scratch[job]) {
                 StorageService::deleteFile(f,
                                            FileLocation::LOCATION(this->getScratch(),
-                                                                  this->getScratch()->getMountPoint(),
-                                                                  job->getName()),
+                                                                  this->getScratch()->getMountPoint() + job->getName()),
                                            nullptr);
             }
             this->files_in_scratch[job].clear();
@@ -1523,11 +1522,7 @@ namespace wrench {
                 dict,
                 this->getMessagePayloadValue(
                         ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD));
-//        try {
         S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
-//        } catch (std::shared_ptr<NetworkError> &cause) {
-//            return;
-//        }
     }
 
 /**
@@ -1541,7 +1536,7 @@ namespace wrench {
                 try {
                     StorageService::deleteFile(f,
                                                FileLocation::LOCATION(this->getScratch(),
-                                                                      this->getScratch()->getMountPoint(),
+                                                                      this->getScratch()->getMountPoint() +
                                                                       j.first->getName()));
                 } catch (WorkflowExecutionException &e) {
                     throw;

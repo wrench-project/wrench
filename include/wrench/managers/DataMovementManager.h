@@ -84,8 +84,7 @@ namespace wrench {
             bool operator==(const CopyRequestSpecs &rhs) const {
                 return (file == rhs.file) &&
                        (dst->getStorageService() == rhs.dst->getStorageService())  &&
-                       (dst->getMountPoint()     == rhs.dst->getMountPoint())      &&
-                       (dst->getDirectory()      == rhs.dst->getDirectory());
+                       (dst->getAbsolutePathAtMountPoint()     == rhs.dst->getAbsolutePathAtMountPoint());
             }
         };
 

@@ -83,7 +83,7 @@ namespace wrench {
      */
     void StorageService::stageFile(WorkflowFile *file, std::shared_ptr<FileLocation> location) {
 
-        location->getStorageService()->stageFile(file, location->getMountPoint(), location->getDirectory());
+        location->getStorageService()->stageFile(file, location->getMountPoint(), location->getAbsolutePathAtMountPoint());
     }
 
     /**
@@ -630,7 +630,7 @@ namespace wrench {
      */
     std::string StorageService::getMountPoint() {
         if (this->hasMultipleMountPoints()) {
-            throw std::invalid_argument("StorageService::getMountPoint(): The storage service has more than one mount point");
+            throw std::invalid_argument("StorageService::getAbsolutePath(): The storage service has more than one mount point");
         }
         return this->file_systems.begin()->first;
     }
