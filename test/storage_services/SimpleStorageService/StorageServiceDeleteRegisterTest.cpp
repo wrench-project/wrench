@@ -35,7 +35,12 @@ protected:
               "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
               "<platform version=\"4.1\"> "
               "   <zone id=\"AS0\" routing=\"Full\"> "
-              "       <host id=\"StorageHost\" speed=\"1f\"/> "
+              "       <host id=\"StorageHost\" speed=\"1f\"> "
+              "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+              "             <prop id=\"size\" value=\"" + std::to_string(STORAGE_SIZE) + "\"/>"
+              "             <prop id=\"mount\" value=\"/\"/>"
+              "          </disk>"
+              "       </host>"
               "       <host id=\"WMSHost\" speed=\"1f\"/> "
               "       <link id=\"link\" bandwidth=\"10MBps\" latency=\"100us\"/>"
               "       <route src=\"WMSHost\" dst=\"StorageHost\">"
@@ -79,11 +84,11 @@ private:
       wrench::WorkflowFile *file_1 = this->test->file_1;
       wrench::WorkflowFile *file_2 = this->test->file_2;
 
-      file_registry_service->addEntry(file_1, storage_service);
-      file_registry_service->addEntry(file_2, storage_service);
+      file_registry_service->addEntry(file_1, wrench::FileLocation::LOCATION(storage_service));
+      file_registry_service->addEntry(file_2, wrench::FileLocation::LOCATION(storage_service));
 
       // delete file and don't unregister
-      storage_service->deleteFile(file_1);
+      wrench::StorageService::deleteFile(file_1, wrench::FileLocation::LOCATION(storage_service));
       if (storage_service->lookupFile(file_1, nullptr)) {
         throw std::runtime_error("StorageService should have deleted file_1");
       }
@@ -93,7 +98,8 @@ private:
       }
 
       // delete file and unregister
-      storage_service->deleteFile(file_2, file_registry_service);
+      wrench::StorageService::deleteFile(file_2,
+              wrench::FileLocation::LOCATION(storage_service), file_registry_service);
       if (storage_service->lookupFile(file_2, nullptr)) {
         throw std::runtime_error("StorageService should have deleted file_2");
       }
@@ -135,7 +141,7 @@ void SimpleStorageServiceDeleteRegisterTest::do_DeleteRegisterTest() {
 
   // Create One Storage Service
   ASSERT_NO_THROW(storage_service = simulation->add(
-          new wrench::SimpleStorageService("StorageHost", STORAGE_SIZE)));
+          new wrench::SimpleStorageService("StorageHost", {"/"})));
 
   // Create a file registry
   std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
@@ -151,8 +157,9 @@ void SimpleStorageServiceDeleteRegisterTest::do_DeleteRegisterTest() {
 
 
   // Stage the 2 files on the StorageHost
-  ASSERT_NO_THROW(simulation->stageFiles({{file_1->getID(), file_1},
-                                          {file_2->getID(), file_2}}, storage_service));
+  ASSERT_NO_THROW(simulation->stageFile(file_1, wrench::FileLocation::LOCATION(storage_service)));
+  ASSERT_NO_THROW(simulation->stageFile(file_2, wrench::FileLocation::LOCATION(storage_service)));
+
 
   ASSERT_NO_THROW(simulation->launch());
 
