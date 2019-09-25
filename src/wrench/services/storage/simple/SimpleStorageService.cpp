@@ -179,7 +179,7 @@ namespace wrench {
         } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFileLookupRequestMessage>(message)) {
 
             auto fs = this->file_systems[msg->location->getMountPoint()].get();
-            bool file_found = fs->isFileInDirectory(msg->file, msg->location->getDirectory());
+            bool file_found = fs->isFileInDirectory(msg->file, msg->location->getAbsolutePathAtMountPoint());
 
             S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                      new StorageServiceFileLookupAnswerMessage(msg->file, file_found,
@@ -230,15 +230,15 @@ namespace wrench {
     bool SimpleStorageService::processFileWriteRequest(WorkflowFile *file, std::shared_ptr<FileLocation> location,
                                                        std::string answer_mailbox, unsigned long buffer_size) {
 
-        auto fs = this->file_systems[location->getMountPoint()].get();
+        auto fs = this->file_systems[location->getAbsolutePathAtMountPoint()].get();
 
         // If the file is not already there, do a capacity check/update
         // (If the file is already there, then there will just be an overwrite. Note that
         // if the overwrite fails, then the file will disappear, which is expected)
 
 
-        if ((not fs->doesDirectoryExist(location->getDirectory())) or
-            (not fs->isFileInDirectory(file, location->getDirectory()))) {
+        if ((not fs->doesDirectoryExist(location->getAbsolutePathAtMountPoint())) or
+            (not fs->isFileInDirectory(file, location->getAbsolutePathAtMountPoint()))) {
 
             if (not fs->hasEnoughFreeSpace(file->getSize())) {
                 try {
@@ -315,10 +315,10 @@ namespace wrench {
         // Figure out whether this succeeds or not
         std::shared_ptr<FailureCause> failure_cause = nullptr;
 
-        auto fs = this->file_systems[location->getMountPoint()].get();
+        auto fs = this->file_systems[location->getAbsolutePathAtMountPoint()].get();
 
-        if ((not fs->doesDirectoryExist(location->getDirectory())) or
-            (not fs->isFileInDirectory(file, location->getDirectory()))) {
+        if ((not fs->doesDirectoryExist(location->getAbsolutePathAtMountPoint())) or
+            (not fs->isFileInDirectory(file, location->getAbsolutePathAtMountPoint()))) {
             WRENCH_INFO("Received a a read request for a file I don't have (%s)", location->toString().c_str());
             failure_cause = std::shared_ptr<FailureCause>(
                     new FileNotFound(file, location));
@@ -378,11 +378,11 @@ namespace wrench {
         // if the overwrite fails, then the file will disappear, which is expected)
 
         // File System at the destination
-        auto fs = this->file_systems[dst_location->getMountPoint()].get();
+        auto fs = this->file_systems[dst_location->getAbsolutePathAtMountPoint()].get();
 
 
-        if ((not fs->doesDirectoryExist(dst_location->getDirectory())) or
-            (not fs->isFileInDirectory(file, dst_location->getDirectory()))) {
+        if ((not fs->doesDirectoryExist(dst_location->getAbsolutePathAtMountPoint())) or
+            (not fs->isFileInDirectory(file, dst_location->getAbsolutePathAtMountPoint()))) {
 
             if (not fs->hasEnoughFreeSpace(file->getSize())) {
 
@@ -484,7 +484,7 @@ namespace wrench {
         if (dst_location and (dst_location->getStorageService().get() == this)) {
             if (success) {
                 this->file_systems[dst_location->getMountPoint()]->storeFileInDirectory(
-                        file, dst_location->getDirectory());
+                        file, dst_location->getAbsolutePathAtMountPoint());
                 // Deal with time stamps
                 if (start_timestamp != nullptr) {
                     this->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyCompletion>(
@@ -492,7 +492,7 @@ namespace wrench {
                 }
             } else {
                 // Process the failure, meaning, just un-decrease the free space
-                this->file_systems[dst_location->getMountPoint()]->increaseFreeSpace(file->getSize());
+                this->file_systems[dst_location->getAbsolutePathAtMountPoint()]->increaseFreeSpace(file->getSize());
             }
         }
 
@@ -532,14 +532,14 @@ namespace wrench {
                                                         std::string answer_mailbox) {
         std::shared_ptr<FailureCause> failure_cause = nullptr;
 
-        auto fs = this->file_systems[location->getMountPoint()].get();
+        auto fs = this->file_systems[location->getAbsolutePathAtMountPoint()].get();
 
-        if ((not fs->doesDirectoryExist(location->getDirectory())) or
-            (not fs->isFileInDirectory(file, location->getDirectory()))) {
+        if ((not fs->doesDirectoryExist(location->getAbsolutePathAtMountPoint())) or
+            (not fs->isFileInDirectory(file, location->getAbsolutePathAtMountPoint()))) {
             failure_cause = std::shared_ptr<FailureCause>(
                     new FileNotFound(file, location));
         } else {
-            fs->removeFileFromDirectory(file, location->getDirectory());
+            fs->removeFileFromDirectory(file, location->getAbsolutePathAtMountPoint());
         }
 
         S4U_Mailbox::dputMessage(answer_mailbox,

@@ -477,15 +477,29 @@ namespace wrench {
     }
 
 
+
+
     /**
-        * @brief Stage a copy of a file on a storage service (to the "/" partition)
-        *
-        * @param file: a file to stage on a storage service
-        * @param storage_service: the storage service
-        *
-        * @throw std::runtime_error
-        * @throw std::invalid_argument
-        */
+    * @brief Stage a copy of a file at the root of a mount point
+    *        of a disk of a storage service
+    *
+    * @param file: a file to stage on a storage service
+    * @param storage_service: a storage service
+    * @param absolute_path: the absolute path of the directory where the file should be stored
+    *
+    * @throw std::runtime_error
+    * @throw std::invalid_argument
+    */
+    void Simulation::stageFile(WorkflowFile *file, std::shared_ptr<StorageService> storage_service, std::string absolute_path) {
+        Simulation::stageFile(file, FileLocation::LOCATION(storage_service, absolute_path));
+    }
+
+
+    /**
+     * @brief State a copy of a file on a storage service (to the "/" partition)
+     * @param file
+     * @param location
+     */
     void Simulation::stageFile(WorkflowFile *file, std::shared_ptr<FileLocation> location) {
 
         if (file == nullptr) {
@@ -514,26 +528,6 @@ namespace wrench {
         // Update all file registry services
         for (auto frs : this->file_registry_services) {
             frs->addEntryToDatabase(file, location);
-        }
-    }
-
-    /**
-   * @brief Stage file copies on a storage service (to the "/" partition)
-   *
-   * @param files: a map of files (indexed by file ids) to stage on a storage service
-   * @param storage_service: the storage service
-   *
-   * @throw std::runtime_error
-   * @throw std::invalid_argument
-   */
-    void Simulation::stageFiles(std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations) {
-
-        try {
-            for (auto const &fl : file_locations) {
-                this->stageFile(fl.first, fl.second);
-            }
-        } catch (std::invalid_argument &e) {
-            throw;
         }
     }
 
