@@ -42,11 +42,38 @@ protected:
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
-                          "       <host id=\"Gateway\" speed=\"1f\" /> "
+                          "       <host id=\"Gateway\" speed=\"1f\" > "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host> "
                           "       <host id=\"4Cores10RAM\" speed=\"1f\" core=\"4\"> "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host> "
                           "         <prop id=\"ram\" value=\"10\"/> "
                           "       </host> "
                           "       <host id=\"2Cores20RAM\" speed=\"1f\" core=\"2\"> "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host> "
                           "         <prop id=\"ram\" value=\"20\"/> "
                           "       </host> "
                           "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
@@ -184,19 +211,19 @@ void VirtualizedClusterServiceResourceAllocationTest::do_VMResourceAllocationAlg
     cloud_service_first_fit = simulation->add(
             new wrench::CloudComputeService(hostname,
                                             compute_hosts,
-                                            100.0,
+                                            {"/scratch"},
                                             {{wrench::CloudComputeServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM, "first-fit"}}));
 
     cloud_service_best_fit_ram_first = simulation->add(
             new wrench::CloudComputeService(hostname,
                                             compute_hosts,
-                                            100.0,
+                                            {"/scratch"},
                                             {{wrench::CloudComputeServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM, "best-fit-ram-first"}}));
 
     cloud_service_best_fit_cores_first = simulation->add(
             new wrench::CloudComputeService(hostname,
                                             compute_hosts,
-                                            100.0,
+                                            {"/scratch"},
                                             {{wrench::CloudComputeServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM, "best-fit-cores-first"}}));
 
     // Create a WMS

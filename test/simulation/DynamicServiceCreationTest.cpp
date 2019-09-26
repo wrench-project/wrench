@@ -86,8 +86,26 @@ protected:
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
-                          "       <host id=\"DualCoreHost\" speed=\"1f\" core=\"2\"/> "
-                          "       <host id=\"QuadCoreHost\" speed=\"1f\" core=\"4\"/> "
+                          "       <host id=\"DualCoreHost\" speed=\"1f\" core=\"2\" > "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>"
+                          "       <host id=\"QuadCoreHost\" speed=\"1f\" core=\"4\" > "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>"
                           "       <link id=\"1\" bandwidth=\"500GBps\" latency=\"0us\"/>"
                           "       <route src=\"DualCoreHost\" dst=\"QuadCoreHost\"> <link_ctn id=\"1\"/> </route>"
                           "   </zone> "
@@ -136,7 +154,7 @@ private:
 
         // Dynamically create a Storage Service on this host
         auto dynamically_created_storage_service = simulation->startNewService(
-                new wrench::SimpleStorageService(hostname, 100.0,
+                new wrench::SimpleStorageService(hostname, {"/"},
                                                  {},
                                                  {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 123}}));
 
@@ -144,7 +162,7 @@ private:
         // Dynamically create a Cloud Service
         std::vector<std::string> execution_hosts = {"QuadCoreHost"};
         auto dynamically_created_compute_service = std::dynamic_pointer_cast<wrench::CloudComputeService>(simulation->startNewService(
-                new wrench::CloudComputeService(hostname, execution_hosts, 100.0,
+                new wrench::CloudComputeService(hostname, execution_hosts, "/scratch",
                                                 { {wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
         std::vector<wrench::WorkflowTask *> tasks = this->test->workflow->getReadyTasks();
 
@@ -157,8 +175,14 @@ private:
         int job_index = 0;
         for (auto task : tasks) {
             try {
-                one_task_jobs[job_index] = job_manager->createStandardJob({task}, {{this->test->input_file, this->test->storage_service}},
-                                                                          {}, {std::make_tuple(this->test->input_file, this->test->storage_service, dynamically_created_storage_service)}, {});
+                one_task_jobs[job_index] = job_manager->createStandardJob(
+                        {task},
+                        {{this->test->input_file, wrench::FileLocation::LOCATION(this->test->storage_service)}},
+                        {},
+                        {std::make_tuple(this->test->input_file,
+                                         wrench::FileLocation::LOCATION(this->test->storage_service),
+                                         wrench::FileLocation::LOCATION(dynamically_created_storage_service))},
+                        {});
 
                 if (one_task_jobs[job_index]->getNumTasks() != 1) {
                     throw std::runtime_error("A one-task job should say it has one task");
@@ -239,7 +263,7 @@ void DynamicServiceCreationTest::do_getReadyTasksTest_test() {
 
     // Create a Storage Service
     storage_service = simulation->add(
-            new wrench::SimpleStorageService(hostname, 100.0,
+            new wrench::SimpleStorageService(hostname, {"/"},
                                              {},
                                              {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 123}}));
 
@@ -263,7 +287,7 @@ void DynamicServiceCreationTest::do_getReadyTasksTest_test() {
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service)));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());

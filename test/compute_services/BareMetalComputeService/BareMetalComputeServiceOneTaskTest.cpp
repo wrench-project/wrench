@@ -612,12 +612,13 @@ void BareMetalComputeServiceOneTaskTest::do_StandardJobConstructor_test() {
     // Create a Compute Service
     compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname1,
-                                                {std::make_pair(hostname1, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},100.0,
+                                                {std::make_pair(hostname1, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                "scratch",
                                                 {}));
 
     // Create a Storage Service
     storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname1, 10000000000000.0));
+            new wrench::SimpleStorageService(hostname1, {"/"}));
 
     // Start a file registry service
     simulation->add(new wrench::FileRegistryService(hostname1));
@@ -630,7 +631,7 @@ void BareMetalComputeServiceOneTaskTest::do_StandardJobConstructor_test() {
     wms->addWorkflow(workflow);
 
     // Staging the input_file on the storage service
-    simulation->stageFiles({{input_file->getID(), input_file}}, storage_service1);
+    simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1));
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -718,12 +719,12 @@ void BareMetalComputeServiceOneTaskTest::do_HostMemory_test() {
     // Create a Compute Service
     compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname1,
-                                                {std::make_pair(hostname1, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},100.0,
+                                                {std::make_pair(hostname1, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},"/scratch'",
                                                 {}));
 
     // Create a Storage Service
     storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname1, 10000000000000.0));
+            new wrench::SimpleStorageService(hostname1, {"/"}));
 
     // Start a file registry service
     simulation->add(new wrench::FileRegistryService(hostname1));
@@ -736,7 +737,7 @@ void BareMetalComputeServiceOneTaskTest::do_HostMemory_test() {
     wms->addWorkflow(workflow);
 
     // Staging the input_file on the storage service
-    simulation->stageFiles({{input_file->getID(), input_file}}, storage_service1);
+    simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1));
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -847,11 +848,11 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithLocationMap_test() {
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname,
                                                 {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                {})));
+                                                "")));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/"})));
 
     // Create a File Registry Service
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
@@ -869,7 +870,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithLocationMap_test() {
     ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFiles({{input_file->getID(), input_file}}, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -935,7 +936,9 @@ private:
             throw std::runtime_error("Unexpected workflow execution event!");
         }
 
-        if (!this->test->storage_service1->lookupFile(this->test->output_file, job)) {
+        if (!this->test->storage_service1->lookupFile(
+                this->test->output_file,
+                wrench::FileLocation::LOCATION(this->test->storage_service1, "/scratch/" + job->getName()))) {
             throw std::runtime_error("Output file not written to storage service");
         }
 
@@ -969,7 +972,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithDefaultStorageService_t
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/"})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -990,7 +993,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithDefaultStorageService_t
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFiles({{input_file->getID(), input_file}}, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
 
 
     // Running a "run a single task" simulation
@@ -1064,16 +1067,22 @@ private:
         }
 
         // Test file locations
-        if (!this->test->storage_service1->lookupFile(this->test->input_file, nullptr)) {
+        if (!this->test->storage_service1->lookupFile(
+                this->test->input_file, nullptr)) {
             throw std::runtime_error("Input file should be on Storage Service #1");
         }
-        if (!this->test->storage_service1->lookupFile(this->test->output_file, nullptr)) {
+        if (!this->test->storage_service1->lookupFile(
+                this->test->output_file, nullptr)) {
             throw std::runtime_error("Output file should be on Storage Service #1");
         }
-        if (this->test->storage_service2->lookupFile(this->test->input_file,job)) {
+        if (this->test->storage_service2->lookupFile(
+                this->test->input_file,
+                wrench::FileLocation::LOCATION(this->test->storage_service2, "/" + job->getName()))) {
             throw std::runtime_error("Input file should not be on Storage Service #2");
         }
-        if (this->test->storage_service2->lookupFile(this->test->input_file,job)) {
+        if (this->test->storage_service2->lookupFile(
+                this->test->output_file,
+                wrench::FileLocation::LOCATION(this->test->storage_service2, "/" + job->getName()))) {
             throw std::runtime_error("Output file should not be on Storage Service #2");
         }
 
@@ -1107,11 +1116,11 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPrePostCopiesTaskCleanu
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/"})));
 
     // Create another Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/"})));
 
 
     // Create a Compute Service with default Storage Service #2
@@ -1134,7 +1143,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPrePostCopiesTaskCleanu
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on storage service #1
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1189,8 +1198,12 @@ private:
         // Create a job
         wrench::StandardJob *job = job_manager->createStandardJob({},
                                                                   {}, //changed this since we don't have default storage now
-                                                                  {std::make_tuple(test->input_file, wrench::FileLocation::LOCATION(test->storage_service1), wrench::FileLocation::LOCATION(test->storage_service2))},
-                                                                  {std::make_tuple(test->input_file, wrench::FileLocation::LOCATION(test->storage_service2), test->storage_service3)},
+                                                                  {std::make_tuple(test->input_file,
+                                                                                   wrench::FileLocation::LOCATION(test->storage_service1),
+                                                                                   wrench::FileLocation::LOCATION(test->storage_service2))},
+                                                                  {std::make_tuple(test->input_file,
+                                                                                   wrench::FileLocation::LOCATION(test->storage_service2),
+                                                                                   wrench::FileLocation::LOCATION(test->storage_service3))},
                                                                   {});
         // Submit the job
         job_manager->submitJob(job, test->compute_service);
@@ -1244,15 +1257,15 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPrePostCopiesNoTaskNoCl
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/"})));
 
     // Create another Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/"})));
 
     // Create another Storage Service
     ASSERT_NO_THROW(storage_service3 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/"})));
 
 
     // Create a Compute Service with default Storage Service #2
@@ -1275,7 +1288,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPrePostCopiesNoTaskNoCl
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on storage service #1
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1367,11 +1380,11 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPreNoPostCopiesNoTaskCl
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/"})));
 
     // Create another Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/"})));
 
 
     // Create a Compute Service with default Storage Service #2
@@ -1394,7 +1407,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPreNoPostCopiesNoTaskCl
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on storage service #1
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1431,7 +1444,8 @@ private:
         auto job_manager = this->createJobManager();
 
         // Remove the staged file!
-        this->wrench::FileLocation::LOCATION(test->storage_service1)->deleteFile(test->input_file);
+        wrench::StorageService::deleteFile(test->input_file,
+                wrench::FileLocation::LOCATION(test->storage_service1));
 
         // Create a job
         wrench::StandardJob *job = job_manager->createStandardJob({test->task},
@@ -1491,11 +1505,11 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithMissingFile_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/"})));
 
     // Create another Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/"})));
 
 
     // Create a Compute Service with no default Storage Service
@@ -1517,7 +1531,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithMissingFile_test() {
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on storage service #1
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1614,11 +1628,11 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithNotEnoughCores_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/"})));
 
     // Create another Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/"})));
 
 
     // Create a Compute Service with no default Storage Service
@@ -1640,7 +1654,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithNotEnoughCores_test() {
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on storage service #1
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1735,11 +1749,11 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithNotEnoughRAM_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/"})));
 
     // Create another Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/"})));
 
 
     // Create a Compute Service with no default Storage Service
@@ -1761,7 +1775,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithNotEnoughRAM_test() {
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on storage service #1
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1858,7 +1872,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithDownService_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/"})));
 
     // Create a File Registry Service
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
@@ -1876,7 +1890,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithDownService_test() {
     ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFiles({{input_file->getID(), input_file}}, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1983,7 +1997,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithSuspendedService_test()
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/"})));
 
     // Create a File Registry Service
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
@@ -2001,7 +2015,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithSuspendedService_test()
     ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFiles({{input_file->getID(), input_file}}, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
