@@ -778,16 +778,18 @@ private:
 
         // Initiate a file copy
         try {
-            data_movement_manager->initiateAsynchronousFileCopy(this->test->file_500, wrench::FileLocation::LOCATION(this->test->storage_service_1000),
-                                                                this->test->storage_service_510);
+            data_movement_manager->initiateAsynchronousFileCopy(this->test->file_500,
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_1000),
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_510));
         } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error("Got an exception while trying to initiate a file copy: " + std::string(e.what()));
         }
 
         // Initiate it again which should fail
         try {
-            data_movement_manager->initiateAsynchronousFileCopy(this->test->file_500, wrench::FileLocation::LOCATION(this->test->storage_service_1000),
-                                                                this->test->storage_service_510);
+            data_movement_manager->initiateAsynchronousFileCopy(this->test->file_500,
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_1000),
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_510));
             throw std::runtime_error("A duplicate asynchronous file copy should fail!");
         } catch (wrench::WorkflowExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::FileAlreadyBeingCopied>(e.getCause());
@@ -799,11 +801,11 @@ private:
             if (cause->getFile() != this->test->file_500) {
                 throw std::runtime_error("Got expected failure cause, but failure cause does not point to the right file");
             }
-            if (cause->getStorageService() != this->test->storage_service_510) {
+            if (cause->getDestinationLocation()->getStorageService() != this->test->storage_service_510) {
                 throw std::runtime_error("Got expected failure cause, but failure cause does not point to the right storage service");
             }
-            if (cause->getPartition() != "/") {
-                throw std::runtime_error("Got expected failure cause, but failure cause does not point to the right partition");
+            if (cause->getDestinationLocation()->getAbsolutePathAtMountPoint() != "/") {
+                throw std::runtime_error("Got expected failure cause, but failure cause does not point to the right path");
             }
             cause->toString(); // for coverage
         }
@@ -855,10 +857,10 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopy_test() {
 
     // Create 2 Storage Services
     ASSERT_NO_THROW(storage_service_1000 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 1000.0)));
+            new wrench::SimpleStorageService(hostname, {"/disk1000"})));
 
     ASSERT_NO_THROW(storage_service_510 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 500.0)));
+            new wrench::SimpleStorageService(hostname, {"/disk510"})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
@@ -873,7 +875,7 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopy_test() {
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Staging file_500 on the 1000-byte storage service
-    ASSERT_NO_THROW(simulation->stageFiles({{file_500->getID(), file_500}}, storage_service_1000));
+    ASSERT_NO_THROW(simulation->stageFile(file_500, wrench::FileLocation::LOCATION(storage_service_1000)));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -912,8 +914,9 @@ private:
 
         // Do the file copy while space doesn't fit
         try {
-            data_movement_manager->doSynchronousFileCopy(this->test->file_500, wrench::FileLocation::LOCATION(this->test->storage_service_1000),
-                                                         this->test->storage_service_100);
+            data_movement_manager->doSynchronousFileCopy(this->test->file_500,
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_1000),
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_100));
             throw std::runtime_error("Should have gotten a 'not enough space' exception");
         } catch (wrench::WorkflowExecutionException &e) {
             // Check Exception
@@ -936,8 +939,9 @@ private:
 
         // Do a file copy from myself
         try {
-            data_movement_manager->doSynchronousFileCopy(this->test->file_500, this->test->storage_service_510,
-                                                         this->test->storage_service_510);
+            data_movement_manager->doSynchronousFileCopy(this->test->file_500,
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_510),
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_510));
             throw std::runtime_error("Should have gotten a 'can't copy from myself' exception");
         } catch (std::invalid_argument &e) {
         }
@@ -945,11 +949,12 @@ private:
         // Do the file copy for a file that's not there
 
         // First delete the file (we used to have an "already there" error)
-        this->test->storage_service_1000->deleteFile(this->test->file_500);
+        wrench::StorageService::deleteFile(this->test->file_500, wrench::FileLocation::LOCATION(this->test->storage_service_1000);
 
         try {
-            data_movement_manager->doSynchronousFileCopy(this->test->file_500, wrench::FileLocation::LOCATION(this->test->storage_service_510),
-                                                         this->test->storage_service_1000);
+            data_movement_manager->doSynchronousFileCopy(this->test->file_500,
+                    wrench::FileLocation::LOCATION(this->test->storage_service_510),
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_1000));
             throw std::runtime_error("Should have gotten a 'file not found' exception");
         } catch (wrench::WorkflowExecutionException &e) {
             // Check Exception
@@ -963,7 +968,7 @@ private:
                 throw std::runtime_error(
                         "Got the expected 'file not found' exception, but the failure cause does not point to the correct file");
             }
-            if (cause->getStorageService() != wrench::FileLocation::LOCATION(this->test->storage_service_510)) {
+            if (cause->getLocation()->getStorageService() != wrench::FileLocation::LOCATION(this->test->storage_service_510)) {
                 throw std::runtime_error(
                         "Got the expected 'file not found' exception, but the failure cause does not point to the correct storage service");
             }
@@ -973,7 +978,8 @@ private:
         this->test->storage_service_1000->stop();
 
         try {
-            data_movement_manager->doSynchronousFileCopy(this->test->file_500, this->test->storage_service_1000,
+            data_movement_manager->doSynchronousFileCopy(this->test->file_500,
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_1000),
                                                          wrench::FileLocation::LOCATION(this->test->storage_service_510));
             throw std::runtime_error("Should have gotten a 'service is down' exception");
         } catch (wrench::WorkflowExecutionException &e) {
@@ -1045,13 +1051,13 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopyFailures_test() {
 
     // Create 3 Storage Services
     ASSERT_NO_THROW(storage_service_1000 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 1000.0)));
+            new wrench::SimpleStorageService(hostname, {"/disk1000"})));
 
     ASSERT_NO_THROW(storage_service_510 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 500.0)));
+            new wrench::SimpleStorageService(hostname, {"/disk510"})));
 
     ASSERT_NO_THROW(storage_service_100 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 100.0, {{"MAX_NUM_CONCURRENT_DATA_CONNECTIONS", "infinity"}})));
+            new wrench::SimpleStorageService(hostname, {"/disk100"}, {{"MAX_NUM_CONCURRENT_DATA_CONNECTIONS", "infinity"}})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
@@ -1264,13 +1270,13 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopyFailures_test() 
 
     // Create 3 Storage Services
     ASSERT_NO_THROW(storage_service_1000 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 1000.0)));
+            new wrench::SimpleStorageService(hostname, {"/disk1000"})));
 
     ASSERT_NO_THROW(storage_service_510 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 500.0)));
+            new wrench::SimpleStorageService(hostname, {"/disk510"})));
 
     ASSERT_NO_THROW(storage_service_100 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 100.0)));
+            new wrench::SimpleStorageService(hostname, {"/disk100"})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -1289,7 +1295,7 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopyFailures_test() 
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Staging file_500 on the 1000-byte storage service
-    ASSERT_NO_THROW(simulation->stageFiles({{file_500->getID(), file_500}}, storage_service_1000));
+    ASSERT_NO_THROW(simulation->stageFile(file_500, wrench::FileLocation::LOCATION(storage_service_1000)));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1350,8 +1356,9 @@ private:
         // Do a very similar copy, but with "empty" partitions that default to "/"
         // Copy storage_service_1000:/:file_10 to storage_service_510:/:file_10
         try {
-            data_movement_manager->initiateAsynchronousFileCopy(this->test->file_10, this->test->storage_service_1000, "",
-                                                                this->test->storage_service_510, "");
+            data_movement_manager->initiateAsynchronousFileCopy(this->test->file_10,
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_1000, "/disk1000/"),
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510"));
         } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error("Got an unexpected exception");
         }
@@ -1369,7 +1376,7 @@ private:
 
         // Remove the file at storage_service_510:/:file_10
         try {
-            wrench::FileLocation::LOCATION(this->test->storage_service_510)->deleteFile(this->test->file_10, "");
+            wrench::StorageService::deleteFile(this->test->file_10, wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510"));
         } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error("Should be able to delete file storage_service_510:/:file_10");
         }
@@ -1378,8 +1385,9 @@ private:
 
         // Copy storage_service_510:/:file_10 to storage_service_1000:foo:file_10: SHOULD NOT WORK
         try {
-            data_movement_manager->initiateAsynchronousFileCopy(this->test->file_10, wrench::FileLocation::LOCATION(this->test->storage_service_510), "/",
-                                                                this->test->storage_service_1000, "foo");
+            data_movement_manager->initiateAsynchronousFileCopy(this->test->file_10,
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_510),
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_1000, "/disk1000/foo"));
         } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error("Got an unexpected exception");
         }
@@ -1438,7 +1446,7 @@ private:
         try {
             data_movement_manager->initiateAsynchronousFileCopy(this->test->file_10,
                                                                 wrench::FileLocation::LOCATION(this->test->storage_service_510, "/large_disk/foo")),
-                                                                wrench::FileLocation::LOCATION(this->test->storage_service_510, "/large_disk/foo"));
+                    wrench::FileLocation::LOCATION(this->test->storage_service_510, "/large_disk/foo"));
             throw std::runtime_error("Should not be able to copy a file onto itself");
         } catch (std::invalid_argument &e) {
         }
@@ -1450,7 +1458,7 @@ private:
         if (not wrench::StorageService::lookupFile(this->test->file_10, wrench::FileLocation::LOCATION(this->test->storage_service_1000, "/large_disk"))) {
             throw std::runtime_error("File should be in storage_service_1000 at the mount point root");
         }
-        if (not wrench::StorageService::lookupFile(this->test->file_10, wrench::FileLocation::LOCATION(this->test->storage_service_510, "/large_disk/foo"))) {
+        if (not wrench::StorageService::lookupFile(this->test->file_10, wrench::FileLocation::LOCATION(wrench::FileLocation::LOCATION(this->test->storage_service_510), "/large_disk/foo"))) {
             throw std::runtime_error("File should be in storage_service_510 at path /large_disk/foo/");
         }
         if (not wrench::StorageService::lookupFile(this->test->file_10, wrench::FileLocation::LOCATION(this->test->storage_service_1000, "/large_disk/foo"))) {
@@ -1473,8 +1481,8 @@ private:
 
         // File copy from oneself to oneself!
         try {
-            data_movement_manager->initiateAsynchronousFileCopy(this->test->file_10, this->test->storage_service_510, "foo",
-                                                                this->test->storage_service_510, "faa");
+            data_movement_manager->initiateAsynchronousFileCopy(this->test->file_10, wrench::FileLocation::LOCATION(this->test->storage_service_510, "/foo"),
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_510, "/faa");
         } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error("Got an unexpected exception");
         }
@@ -1515,10 +1523,10 @@ void SimpleStorageServiceFunctionalTest::do_Partitions_test() {
 
     // Create 2 Storage Services
     ASSERT_NO_THROW(storage_service_1000 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 1000.0)));
+            new wrench::SimpleStorageService(hostname, {"/disk1000"})));
 
     ASSERT_NO_THROW(storage_service_510 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 500.0)));
+            new wrench::SimpleStorageService(hostname, {"/disk510"})));
 
 
     // Create a WMS
@@ -1646,7 +1654,7 @@ void SimpleStorageServiceFunctionalTest::do_FileWrite_test() {
 
     // Create 2 Storage Services
     ASSERT_NO_THROW(storage_service_100 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 100.0)));
+            new wrench::SimpleStorageService(hostname, {"/disk100"})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;

@@ -531,6 +531,7 @@ namespace wrench {
         }
     }
 
+
     /**
      * @brief Get the current simulated date
      * @return a date

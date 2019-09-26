@@ -426,7 +426,7 @@ void WMSTest::do_CustomHandlerWMS_test() {
     std::vector<std::string> batch_hosts;
     batch_hosts.push_back(hostname1);
     ASSERT_NO_THROW(cs_batch = simulation->add(
-            new wrench::BatchComputeService(hostname2, batch_hosts, 100.0, {}, {})));
+            new wrench::BatchComputeService(hostname2, batch_hosts, "/scratch", {}, {})));
 
 
     // Create a WMS
