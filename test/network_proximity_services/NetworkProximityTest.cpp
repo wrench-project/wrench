@@ -55,10 +55,46 @@ protected:
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
-                          "       <host id=\"Host1\" speed=\"1f\" core=\"10\"/> "
-                          "       <host id=\"Host2\" speed=\"1f\" core=\"10\"/> "
-                          "       <host id=\"Host3\" speed=\"1f\" core=\"10\"/> "
-                          "       <host id=\"Host4\" speed=\"1f\" core=\"10\"/> "
+                          "       <host id=\"Host1\" speed=\"1f\" core=\"10\" > "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"10000000000000\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"101\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>  "
+                          "       <host id=\"Host2\" speed=\"1f\" core=\"10\" > "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"10000000000000\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"101\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>  "
+                          "       <host id=\"Host3\" speed=\"1f\" core=\"10\" > "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"10000000000000\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"101\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>  "
+                          "       <host id=\"Host4\" speed=\"1f\" core=\"10\" > "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"10000000000000\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"101\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>  "
                           "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
                           "       <link id=\"2\" bandwidth=\"1000GBps\" latency=\"1000us\"/>"
                           "       <link id=\"3\" bandwidth=\"2000GBps\" latency=\"0us\"/>"
@@ -187,14 +223,14 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
                                                 {})));
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/"})));
 
 
     // Create a file registry service
     auto file_registry_service = simulation->add( new wrench::FileRegistryService(hostname));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
 
     // Get a host for network proximity host
     std::string network_proximity_db_hostname = simulation->getHostnameList()[1];
@@ -391,14 +427,15 @@ void NetworkProximityTest::do_CompareNetworkProximity_Test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/"})));
 
 
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFiles({std::make_pair(input_file->getID(), input_file)}, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file,
+            wrench::FileLocation::LOCATION(storage_service1)));
 
     // Get a host for network proximity host
     std::string network_proximity_db_hostname = simulation->getHostnameList()[1];
@@ -563,7 +600,7 @@ void NetworkProximityTest::do_VivaldiConverge_Test() {
                                                 {})));
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/"})));
 
 
 
@@ -571,7 +608,7 @@ void NetworkProximityTest::do_VivaldiConverge_Test() {
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
 
     // Get a host for network proximity host
     std::string network_proximity_db_hostname = simulation->getHostnameList()[1];
@@ -668,13 +705,13 @@ void NetworkProximityTest::do_ValidateProperties_Test() {
                                                 {})));
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/"})));
 
     // Create a file registry service
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
 
     // Get a host for network proximity host
     std::string network_proximity_db_hostname = simulation->getHostnameList()[1];

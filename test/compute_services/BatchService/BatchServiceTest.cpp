@@ -994,15 +994,17 @@ private:
             wrench::StandardJob *job = job_manager->createStandardJob(
                     {task},
                     {
-                            {*(task->getInputFiles().begin()),  this->test->storage_service1},
-                            {*(task->getOutputFiles().begin()), this->test->storage_service1}
+                            {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
+                            {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service1)}
                     },
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
-                            this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
-                            this->test->storage_service2)},
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service1),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                                 this->test->storage_service2)});
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "1";
@@ -1121,7 +1123,7 @@ void BatchServiceTest::do_StandardPlusPilotJobTaskTest_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
 
 
     // Running a "run a single task" simulation
@@ -1173,12 +1175,14 @@ private:
                             {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
                             {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service1)}
                     },
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
-                            this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
-                            this->test->storage_service2)},
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service1),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                                 this->test->storage_service2)});
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "1";
@@ -1252,7 +1256,7 @@ void BatchServiceTest::do_InsufficientCoresTaskTest_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
 
 
     // Running a "run a single task" simulation
@@ -1269,7 +1273,7 @@ void BatchServiceTest::do_InsufficientCoresTaskTest_test() {
 
 
 /**********************************************************************/
-/**  NO ARGUMENTS JOB SUBMISSION TASK SIMULATION TEST ON ONE-ONE HOST                **/
+/**  NO ARGUMENTS JOB SUBMISSION TASK SIMULATION TEST ON ONE-ONE HOST **/
 /**********************************************************************/
 
 class NoArgumentsJobSubmissionTestWMS : public wrench::WMS {
@@ -1305,12 +1309,14 @@ private:
                             {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
                             {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service1)}
                     },
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
-                            this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
-                            this->test->storage_service2)},
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service1),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                                 this->test->storage_service2)});
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
             std::map<std::string, std::string> batch_job_args;
             try {
@@ -1376,7 +1382,7 @@ void BatchServiceTest::do_noArgumentsJobSubmissionTest_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
 
 
     // Running a "run a single task" simulation
@@ -1430,12 +1436,14 @@ private:
                             {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
                             {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service1)}
                     },
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
-                            this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
-                            this->test->storage_service2)},
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service1),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                                 this->test->storage_service2)});
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "1";
@@ -1527,7 +1535,7 @@ void BatchServiceTest::do_StandardJobTimeOutTaskTest_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
 
 
     // Running a "run a single task" simulation
@@ -1658,7 +1666,7 @@ void BatchServiceTest::do_PilotJobTimeOutTaskTest_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
 
 
     // Running a "run a single task" simulation
@@ -1719,12 +1727,14 @@ private:
                             {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
                             {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service1)}
                     },
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
-                            this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
-                            this->test->storage_service2)},
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service1),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                                 this->test->storage_service2)});
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "1";
@@ -1744,12 +1754,14 @@ private:
                             {*(task1->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
                             {*(task1->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service1)}
                     },
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
-                            this->getWorkflow()->getFileByID("input_file_1"), wrench::FileLocation::LOCATION(this->test->storage_service1),
-                            this->test->storage_service2)},
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file_1"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service1),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file_1"),
-                                                                                                 this->test->storage_service2)});
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file_1"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
             std::map<std::string, std::string> task1_batch_job_args;
             task1_batch_job_args["-N"] = "1";
@@ -1769,12 +1781,14 @@ private:
                             {*(task2->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
                             {*(task2->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service1)}
                     },
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
-                            this->getWorkflow()->getFileByID("input_file_2"), wrench::FileLocation::LOCATION(this->test->storage_service1),
-                            this->test->storage_service2)},
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file_2"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service1),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file_2"),
-                                                                                                 this->test->storage_service2)});
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file_2"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
             std::map<std::string, std::string> task2_batch_job_args;
             task2_batch_job_args["-N"] = "1";
@@ -1878,9 +1892,9 @@ void BatchServiceTest::do_BestFitTaskTest_test() {
     wrench::WorkflowFile *output_file_2 = this->workflow->addFile("output_file_2", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFiles({{input_file->getID(), input_file},
-                                            {input_file_1->getID(), input_file_1},
-                                            {input_file_2->getID(), input_file_2}}, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file_1, wrench::FileLocation::LOCATION(storage_service1)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file_2, wrench::FileLocation::LOCATION(storage_service1)));
 
 
     // Running a "run a single task" simulation
@@ -1896,7 +1910,7 @@ void BatchServiceTest::do_BestFitTaskTest_test() {
 
 
 /**********************************************************************/
-/**  FIRST FIT STANDARD JOB SUBMISSION TASK SIMULATION TEST ON ONE-ONE HOST                **/
+/**  FIRST FIT STANDARD JOB SUBMISSION TASK SIMULATION TEST ON ONE-ONE HOST **/
 /**********************************************************************/
 
 class FirstFitStandardJobSubmissionTestWMS : public wrench::WMS {
@@ -2042,9 +2056,9 @@ void BatchServiceTest::do_FirstFitTaskTest_test() {
     wrench::WorkflowFile *output_file_2 = this->workflow->addFile("output_file_2", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFiles({{input_file->getID(), input_file},
-                                            {input_file_1->getID(), input_file_1},
-                                            {input_file_2->getID(), input_file_2}}, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file_1, wrench::FileLocation::LOCATION(storage_service1)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file_2, wrench::FileLocation::LOCATION(storage_service1)));
 
 
     // Running a "run a single task" simulation
@@ -2314,9 +2328,9 @@ void BatchServiceTest::do_RoundRobinTask_test() {
     wrench::WorkflowFile *output_file_2 = this->workflow->addFile("output_file_2", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFiles({{input_file->getID(), input_file},
-                                            {input_file_1->getID(), input_file_1},
-                                            {input_file_2->getID(), input_file_2}}, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file_1, wrench::FileLocation::LOCATION(storage_service1)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file_2, wrench::FileLocation::LOCATION(storage_service1)));
 
 
     // Running a "run a single task" simulation
@@ -2492,7 +2506,7 @@ void BatchServiceTest::do_StandardJobInsidePilotJobTimeOutTaskTest_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
 
 
     // Running a "run a single task" simulation
@@ -2571,12 +2585,14 @@ private:
                             {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
                             {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service1)}
                     },
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
-                            this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
-                            this->test->storage_service2)},
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service1),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                                 this->test->storage_service2)});
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
             try {
                 job_manager->submitJob(job, pilot_job->getComputeService(), {});
@@ -2654,7 +2670,7 @@ void BatchServiceTest::do_StandardJobInsidePilotJobSucessTaskTest_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
 
 
     // Running a "run a single task" simulation
@@ -2735,12 +2751,14 @@ private:
                             {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
                             {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service1)}
                     },
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
-                            this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
-                            this->test->storage_service2)},
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service1),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                                 this->test->storage_service2)});
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
             try {
                 job_manager->submitJob(job, pilot_job->getComputeService(), {{task->getID(), "5"}});
@@ -2806,7 +2824,7 @@ void BatchServiceTest::do_InsufficientCoresInsidePilotJobTaskTest_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
 
 
     // Running a "run a single task" simulation
@@ -2948,7 +2966,7 @@ void BatchServiceTest::do_MultipleStandardTaskTest_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
 
 
     // Running a "run a single task" simulation
@@ -3001,12 +3019,14 @@ private:
                             {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
                             {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service1)}
                     },
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
-                            this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
-                            this->test->storage_service2)},
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service1),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                                 this->test->storage_service2)});
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "1";
@@ -3097,7 +3117,7 @@ void BatchServiceTest::do_DifferentBatchAlgorithmsSubmissionTest_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
 
     // Running a "run a single task" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would

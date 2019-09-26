@@ -1014,7 +1014,9 @@ private:
 
         // Create a 2-task job
         wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {},
-                                                                           {std::make_tuple(this->test->input_file, wrench::FileLocation::LOCATION(this->storage_service), wrench::ComputeService::SCRATCH)},
+                                                                           {std::make_tuple(this->test->input_file,
+                                                                                   wrench::FileLocation::LOCATION(this->test->storage_service),
+                                                                                   wrench::FileLocation::LOCATION(this->test->compute_service->getScratch()))},
                                                                            {}, {});
 
         // Submit the 2-task job for execution
@@ -1252,7 +1254,9 @@ private:
 
         // Create a 2-task job
         wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {},
-                                                                           {std::make_tuple(this->test->input_file, wrench::FileLocation::LOCATION(this->storage_service), wrench::ComputeService::SCRATCH)},
+                                                                           {std::make_tuple(this->test->input_file,
+                                                                                   wrench::FileLocation::LOCATION(this->test->storage_service),
+                                                                                   wrench::FileLocation::LOCATION(this->test->compute_service->getScratch()))},
                                                                            {}, {});
 
         // Submit the 2-task job for execution
@@ -1307,7 +1311,8 @@ void BareMetalComputeServiceTestStandardJobs::do_CompletedJobTermination_test() 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                {std::make_pair(hostname,
+                                                        std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
                                                 "/scratch", {})));
 
     // Create a WMS
@@ -1564,13 +1569,13 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownStorageServiceBeforeJob
 
     // Create A Storage Services
     ASSERT_NO_THROW(storage_service = simulation->add(
-            new wrench::SimpleStorageService(hostname, 100.0)));
+            new wrench::SimpleStorageService(hostname, {"/"})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname,
                                                 {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                0, {})));
+                                                "", {})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -1585,7 +1590,7 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownStorageServiceBeforeJob
 
 
     // Staging the input file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service)));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
