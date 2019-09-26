@@ -25,7 +25,6 @@ namespace wrench {
 
     public:
 
-
         static std::shared_ptr<FileLocation> LOCATION(std::shared_ptr<StorageService> ss);
 
         static std::shared_ptr<FileLocation> LOCATION(std::shared_ptr<StorageService> ss,

@@ -268,7 +268,7 @@ private:
 
         double before_read = simulation->getCurrentSimulatedDate();
         try {
-            this->test->storage_service_1->readFile(this->test->file_1);
+            wrench::StorageService::readFile(this->test->file_1, wrench::FileLocation::LOCATION(this->test->storage_service_1));
         } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error(e.what());
         }

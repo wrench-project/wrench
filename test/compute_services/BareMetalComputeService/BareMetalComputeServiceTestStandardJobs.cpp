@@ -120,7 +120,7 @@ protected:
                           "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
                           "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
-                          "             <prop id=\"size\" value=\"100\"/>"
+                          "             <prop id=\"size\" value=\"101\"/>"
                           "             <prop id=\"mount\" value=\"/scratch\"/>"
                           "          </disk>"
                           "       </host>"
@@ -130,7 +130,7 @@ protected:
                           "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
                           "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
-                          "             <prop id=\"size\" value=\"100\"/>"
+                          "             <prop id=\"size\" value=\"101\"/>"
                           "             <prop id=\"mount\" value=\"/scratch\"/>"
                           "          </disk>"
                           "       </host>"
@@ -291,7 +291,9 @@ private:
 
         // Create a 1-task job
         auto two_core_task_job = job_manager->createStandardJob({this->test->task3}, {},
-                                                                {std::make_tuple(this->test->input_file, this->test->storage_service, wrench::ComputeService::SCRATCH)},
+                                                                {std::make_tuple(this->test->input_file,
+                                                                                 wrench::FileLocation::LOCATION(this->test->storage_service),
+                                                                                 wrench::FileLocation::LOCATION(this->test->compute_service->getScratch()))},
                                                                 {}, {});
 
         // Submit the 1-task job for execution with too few cores
@@ -333,7 +335,7 @@ void BareMetalComputeServiceTestStandardJobs::do_BogusNumCores_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = "DualCoreHost";
 
     // Create A Storage Services
     ASSERT_NO_THROW(storage_service = simulation->add(
@@ -342,8 +344,8 @@ void BareMetalComputeServiceTestStandardJobs::do_BogusNumCores_test() {
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))}, 101.0,
-                                                {}))); //scratch space of size 101
+                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                {"/scratch"}, {}))); //scratch space of size 101
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
@@ -400,9 +402,12 @@ private:
         auto file_registry_service = this->getAvailableFileRegistryService();
 
         // Create a 2-task job
-        wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {},
-                                                                           {std::make_tuple(this->test->input_file, this->test->storage_service, wrench::ComputeService::SCRATCH)},
-                                                                           {}, {});
+        wrench::StandardJob *two_task_job = job_manager->createStandardJob(
+                {this->test->task1, this->test->task2}, {},
+                {std::make_tuple(this->test->input_file,
+                                 wrench::FileLocation::LOCATION(this->test->storage_service),
+                                 wrench::FileLocation::LOCATION(this->test->compute_service->getScratch()))},
+                {}, {});
 
         // Submit the 2-task job for execution
         job_manager->submitJob(two_task_job, this->test->compute_service);
@@ -463,9 +468,11 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoSingleCoreTasks_test() {
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))}, 101.0,
-                                                {}))); //scratch space of size 101
+            new wrench::BareMetalComputeService(
+                    hostname,
+                    {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                    {"/scratch"},
+                    {}))); //scratch space of size 101
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
@@ -480,7 +487,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoSingleCoreTasks_test() {
 
 
     // Staging the input file on the storage service
-    ASSERT_NO_THROW(simulation->stageFiles({{input_file->getID(), input_file}}, storage_service));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service)));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -521,7 +528,9 @@ private:
 
         // Create a 2-task job
         wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task3, this->test->task4}, {},
-                                                                           {std::make_tuple(this->test->input_file, this->test->storage_service, wrench::ComputeService::SCRATCH)},
+                                                                           {std::make_tuple(this->test->input_file,
+                                                                                            wrench::FileLocation::LOCATION(this->test->storage_service),
+                                                                                            wrench::FileLocation::LOCATION(this->test->compute_service->getScratch()))},
                                                                            {}, {});
 
         // Submit the 2-task job for execution
@@ -587,7 +596,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase1_test() {
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname,
                                                 {std::make_pair("DualCoreHost", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                100.0, {})));
+                                                {"/scratch"}, {})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms;
@@ -601,7 +610,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase1_test() {
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Staging the input file on the storage service
-    ASSERT_NO_THROW(simulation->stageFiles({{input_file->getID(), input_file}}, storage_service));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service)));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -643,7 +652,9 @@ private:
 
         // Create a 2-task job
         wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task5, this->test->task6}, {},
-                                                                           {std::make_tuple(this->test->input_file, this->test->storage_service, wrench::ComputeService::SCRATCH)},
+                                                                           {std::make_tuple(this->test->input_file,
+                                                                                            wrench::FileLocation::LOCATION(this->test->storage_service),
+                                                                                            wrench::FileLocation::LOCATION(this->test->compute_service->getScratch())},
                                                                            {}, {});
 
         // Submit the 2-task job for execution
