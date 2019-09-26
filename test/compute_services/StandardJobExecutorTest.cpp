@@ -181,7 +181,7 @@ private:
                         this->getWorkflow()->getFileByID("output_file"), wrench::FileLocation::LOCATION(this->test->storage_service2),
                         wrench::FileLocation::LOCATION(this->test->storage_service1))},
                 {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("output_file"),
-                                                                                             wrench::FileLocation::LOCATION(this->test->storage_service2))});
+                                                                                           wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
         std::string my_mailbox = "test_callback_mailbox";
 
@@ -342,7 +342,7 @@ private:
                         this->getWorkflow()->getFileByID("output_file"), wrench::FileLocation::LOCATION(this->test->storage_service2),
                         wrench::FileLocation::LOCATION(this->test->storage_service1))},
                 {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("output_file"),
-                                                                                             wrench::FileLocation::LOCATION(this->test->storage_service2))});
+                                                                                           wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
         try {
             executor = std::shared_ptr<wrench::StandardJobExecutor>(
@@ -386,7 +386,7 @@ private:
                         this->getWorkflow()->getFileByID("output_file"), wrench::FileLocation::LOCATION(this->test->storage_service2),
                         wrench::FileLocation::LOCATION(this->test->storage_service1))},
                 {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("output_file"),
-                                                                                             wrench::FileLocation::LOCATION(this->test->storage_service2))});
+                                                                                           wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
         try {
             executor = std::shared_ptr<wrench::StandardJobExecutor>(
@@ -428,7 +428,7 @@ private:
                         this->getWorkflow()->getFileByID("output_file"), wrench::FileLocation::LOCATION(this->test->storage_service2),
                         wrench::FileLocation::LOCATION(this->test->storage_service1))},
                 {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("output_file"),
-                                                                                             wrench::FileLocation::LOCATION(this->test->storage_service2))});
+                                                                                           wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
         try {
             executor = std::shared_ptr<wrench::StandardJobExecutor>(
@@ -579,7 +579,7 @@ private:
                             this->getWorkflow()->getFileByID("output_file"), wrench::FileLocation::LOCATION(this->test->storage_service2),
                             wrench::FileLocation::LOCATION(this->test->storage_service1))},
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("output_file"),
-                                                                                                 wrench::FileLocation::LOCATION(this->test->storage_service2))});
+                                                                                               wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
             std::string my_mailbox = "test_callback_mailbox";
 
@@ -777,7 +777,7 @@ private:
                             wrench::FileLocation::LOCATION(this->test->storage_service1))},
                     {},
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("output_file"),
-                                                                                                 wrench::FileLocation::LOCATION(this->test->storage_service2))});
+                                                                                               wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
 
             std::string my_mailbox = "test_callback_mailbox";
@@ -891,7 +891,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskBogusPreFileCopyTest_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
 
 
     // Running a "run a single task" simulation
@@ -956,7 +956,7 @@ private:
                     {},
                     {},
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("output_file"),
-                                                                                                 wrench::FileLocation::LOCATION(this->test->storage_service2))});
+                                                                                               wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
             job->getFileLocations(); // coverage
             job->getPriority(); // coverage
@@ -1011,7 +1011,7 @@ private:
                 throw std::runtime_error(
                         "Got the expected 'file not found' exception, but the failure cause does not point to the correct file");
             }
-            if (cause->getStorageService() != wrench::FileLocation::LOCATION(this->test->storage_service2)) {
+            if (cause->getLocation()->getStorageService() != this->test->storage_service2) {
                 throw std::runtime_error(
                         "Got the expected 'file not found' exception, but the failure cause does not point to the correct storage service");
             }
@@ -1073,7 +1073,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskMissingFileTest_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
 
 
     // Running a "run a single task" simulation
@@ -1365,7 +1365,8 @@ private:
                     std::to_string(observed_duration) + ")");
         }
 
-        this->test->storage_service1->deleteFile(this->getWorkflow()->getFileByID("output_file"));
+        wrench::StorageService::deleteFile(this->getWorkflow()->getFileByID("output_file"),
+                                           wrench::FileLocation::LOCATION(this->test->storage_service1));
 
         return 0;
     }
@@ -1416,7 +1417,7 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase1_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
 
 
     // Running a "run a single task" simulation
@@ -1520,7 +1521,8 @@ private:
         }
 
 
-        this->test->storage_service1->deleteFile(this->getWorkflow()->getFileByID("output_file"));
+        wrench::StorageService::deleteFile(this->getWorkflow()->getFileByID("output_file"),
+                                           wrench::FileLocation::LOCATION(this->test->storage_service1));
 
         return 0;
     }
@@ -1571,7 +1573,8 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase2_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file,
+                                          wrench::FileLocation::LOCATION(storage_service1)));
 
 
     // Running a "run a single task" simulation
@@ -1676,7 +1679,9 @@ private:
                     std::to_string(observed_duration) + ")");
         }
 
-        this->test->storage_service1->deleteFile(this->getWorkflow()->getFileByID("output_file"));
+        wrench::StorageService::deleteFile(
+                this->getWorkflow()->getFileByID("output_file"),
+                wrench::FileLocation::LOCATION(this->test->storage_service1));
 
         return 0;
     }
@@ -1727,7 +1732,7 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase3_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
 
 
     // Running a "run a single task" simulation
@@ -1790,7 +1795,7 @@ private:
                             wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                                 wrench::FileLocation::LOCATION(this->test->storage_service2))}
+                                                                                               wrench::FileLocation::LOCATION(this->test->storage_service2))}
             );
 
             std::string my_mailbox = "test_callback_mailbox";
@@ -1853,7 +1858,8 @@ private:
             this->getWorkflow()->removeTask(task1);
             this->getWorkflow()->removeTask(task2);
 
-            this->test->storage_service1->deleteFile(this->getWorkflow()->getFileByID("output_file"));
+            wrench::StorageService::deleteFile(this->getWorkflow()->getFileByID("output_file"),
+                                               wrench::FileLocation::LOCATION(this->test->storage_service1));
         }
 
 
@@ -1877,7 +1883,7 @@ private:
                             wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                                 wrench::FileLocation::LOCATION(this->test->storage_service2))}
+                                                                                               wrench::FileLocation::LOCATION(this->test->storage_service2))}
             );
 
             std::string my_mailbox = "test_callback_mailbox";
@@ -1938,7 +1944,9 @@ private:
 
             this->getWorkflow()->removeTask(task1);
             this->getWorkflow()->removeTask(task2);
-            this->test->storage_service1->deleteFile(this->getWorkflow()->getFileByID("output_file"));
+            wrench::StorageService::deleteFile(
+                    this->getWorkflow()->getFileByID("output_file"),
+                    wrench::FileLocation::LOCATION(this->test->storage_service1));
 
         }
 
@@ -1961,11 +1969,13 @@ private:
                             {this->getWorkflow()->getFileByID("output_file"), wrench::FileLocation::LOCATION(this->test->storage_service1)}
                     },
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
-                            this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
+                            this->getWorkflow()->getFileByID("input_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service1),
                             wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                                 wrench::FileLocation::LOCATION(this->test->storage_service2))}
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))}
             );
 
             std::string my_mailbox = "test_callback_mailbox";
@@ -2032,7 +2042,9 @@ private:
             this->getWorkflow()->removeTask(task1);
             this->getWorkflow()->removeTask(task2);
             this->getWorkflow()->removeTask(task3);
-            this->test->storage_service1->deleteFile(this->getWorkflow()->getFileByID("output_file"));
+            wrench::StorageService::deleteFile(
+                    this->getWorkflow()->getFileByID("output_file"),
+                    wrench::FileLocation::LOCATION(this->test->storage_service1));
 
         }
 
@@ -2089,7 +2101,7 @@ void StandardJobExecutorTest::do_TwoMultiCoreTasksTest_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
 
 
     // Running a "run a single task" simulation
@@ -2154,7 +2166,7 @@ public:
                             wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                                 wrench::FileLocation::LOCATION(this->test->storage_service2))}
+                                                                                               wrench::FileLocation::LOCATION(this->test->storage_service2))}
             );
 
             std::string my_mailbox = "test_callback_mailbox";
@@ -2216,7 +2228,9 @@ public:
 
             this->getWorkflow()->removeTask(task1);
             this->getWorkflow()->removeTask(task2);
-            this->test->storage_service1->deleteFile(this->getWorkflow()->getFileByID("output_file"));
+            wrench::StorageService::deleteFile(
+                    this->getWorkflow()->getFileByID("output_file"),
+                    wrench::FileLocation::LOCATION(this->test->storage_service1));
 
         }
 
@@ -2242,7 +2256,7 @@ public:
                             wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                                 wrench::FileLocation::LOCATION(this->test->storage_service2))}
+                                                                                               wrench::FileLocation::LOCATION(this->test->storage_service2))}
             );
 
             std::string my_mailbox = "test_callback_mailbox";
@@ -2366,7 +2380,7 @@ void StandardJobExecutorTest::do_MultiHostTest_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
 
 
     // Running a "run a single task" simulation
@@ -2434,7 +2448,7 @@ private:
                             wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                                 wrench::FileLocation::LOCATION(this->test->storage_service2))}
+                                                                                               wrench::FileLocation::LOCATION(this->test->storage_service2))}
             );
 
             std::string my_mailbox = "test_callback_mailbox";
@@ -2523,7 +2537,7 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringAComputation_test() {
     wrench::WorkflowFile *output_file2 = this->workflow->addFile("output_file2", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
 
 
     // Running a "run a single task" simulation
@@ -2589,7 +2603,7 @@ private:
                             wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                                 wrench::FileLocation::LOCATION(this->test->storage_service2))}
+                                                                                               wrench::FileLocation::LOCATION(this->test->storage_service2))}
             );
 
             std::string my_mailbox = "test_callback_mailbox";
@@ -2677,7 +2691,7 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringATransfer_test() {
     wrench::WorkflowFile *output_file2 = this->workflow->addFile("output_file2", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
 
 
     // Running a "run a single task" simulation
@@ -2852,7 +2866,7 @@ void StandardJobExecutorTest::do_JobTerminationTestAtRandomTimes_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
 
 
     // Running a "run a single task" simulation
@@ -2957,7 +2971,7 @@ private:
                         wrench::FileLocation::LOCATION(this->test->storage_service2))},
                 {},
                 {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                             wrench::FileLocation::LOCATION(this->test->storage_service2))}
+                                                                                           wrench::FileLocation::LOCATION(this->test->storage_service2))}
         );
 
         std::string my_mailbox = "test_callback_mailbox";
@@ -3048,7 +3062,7 @@ void StandardJobExecutorTest::do_NoTaskTest_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
 
     // Running a "run a single task" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would

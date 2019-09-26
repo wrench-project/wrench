@@ -1320,7 +1320,7 @@ void VirtualizedClusterServiceTest::do_ShutdownVMAndThenShutdownServiceTest_test
             new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service)));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1363,11 +1363,7 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        wrench::StandardJob *job2 = job_manager->createStandardJob({this->test->task2}, {},
-                                                                   {std::make_tuple(this->test->input_file,
-                                                                                    this->test->storage_service,
-                                                                                    wrench::ComputeService::SCRATCH)},
-                                                                   {}, {});
+
         std::vector<std::tuple<std::string,std::shared_ptr<wrench::BareMetalComputeService>>> vm_list;
 
         auto cs = *(this->getAvailableComputeServices<wrench::VirtualizedClusterComputeService>().begin());
@@ -1463,12 +1459,12 @@ void VirtualizedClusterServiceTest::do_SubmitToVMTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
-            new wrench::SimpleStorageService(hostname, 100.0)));
+            new wrench::SimpleStorageService(hostname, {"/"})));
 
     // Create a Cloud Service
     std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::VirtualizedClusterComputeService(hostname, execution_hosts, 1000)));
+            new wrench::VirtualizedClusterComputeService(hostname, execution_hosts, "/scratch")));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -1481,7 +1477,7 @@ void VirtualizedClusterServiceTest::do_SubmitToVMTest_test() {
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service)));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1570,11 +1566,11 @@ void VirtualizedClusterServiceTest::do_VMStartShutdownStartShutdown_test() {
     compute_service = simulation->add(
             new wrench::CloudComputeService(hostname,
                                             compute_hosts,
-                                            100.0,
+                                            "/scratch",
                                             {}));
 
     // Create a Storage Service
-    storage_service = simulation->add(new wrench::SimpleStorageService(hostname, 10000000000000.0));
+    storage_service = simulation->add(new wrench::SimpleStorageService(hostname, {"/"}));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -1585,7 +1581,7 @@ void VirtualizedClusterServiceTest::do_VMStartShutdownStartShutdown_test() {
     // Staging the input_file on the storage service
     // Create a File Registry Service
     simulation->add(new wrench::FileRegistryService(hostname));
-    simulation->stageFiles({{input_file->getID(), input_file}}, storage_service);
+    simulation->stageFile(input_file,  wrench::FileLocation::LOCATION(storage_service));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1619,12 +1615,6 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        // Create a job
-        wrench::StandardJob *job = job_manager->createStandardJob({this->test->task1}, {},
-                                                                  {std::make_tuple(this->test->input_file,
-                                                                                   this->test->storage_service,
-                                                                                   wrench::ComputeService::SCRATCH)},
-                                                                  {}, {});
 
         // Create a VM on the Cloud Service
         auto vm_name = cloud_service->createVM(2, 1024);
@@ -1633,7 +1623,17 @@ private:
         wrench::Simulation::sleep(10);
         auto vm_cs = cloud_service->startVM(vm_name);
 
-        // Submit the job to it
+        // Create a job
+        wrench::StandardJob *job = job_manager->createStandardJob(
+                {this->test->task1}, {},
+                {std::make_tuple(
+                        this->test->input_file,
+                        wrench::FileLocation::LOCATION(this->test->storage_service),
+                        wrench::FileLocation::LOCATION(vm_cs->getScratch()))},
+                {}, {});
+
+
+        // Submit the job to the vm
         job_manager->submitJob(job, vm_cs);
 
         wrench::Simulation::sleep(10);
@@ -1698,11 +1698,11 @@ void VirtualizedClusterServiceTest::do_VMShutdownWhileJobIsRunning_test() {
     compute_service = simulation->add(
             new wrench::CloudComputeService(hostname,
                                             compute_hosts,
-                                            100.0,
+                                            "/scratch",
                                             {}));
 
     // Create a Storage Service
-    storage_service = simulation->add(new wrench::SimpleStorageService(hostname, 10000000000000.0));
+    storage_service = simulation->add(new wrench::SimpleStorageService(hostname, {"/"}));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -1713,7 +1713,7 @@ void VirtualizedClusterServiceTest::do_VMShutdownWhileJobIsRunning_test() {
     // Staging the input_file on the storage service
     // Create a File Registry Service
     simulation->add(new wrench::FileRegistryService(hostname));
-    simulation->stageFiles({{input_file->getID(), input_file}}, storage_service);
+    simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1749,12 +1749,6 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        // Create a job
-        wrench::StandardJob *job = job_manager->createStandardJob({this->test->task1}, {},
-                                                                  {std::make_tuple(this->test->input_file,
-                                                                                   this->test->storage_service,
-                                                                                   wrench::ComputeService::SCRATCH)},
-                                                                  {}, {});
 
         // Create a VM on the Cloud Service
         auto vm_name = cloud_service->createVM(2, 1024);
@@ -1763,7 +1757,15 @@ private:
         wrench::Simulation::sleep(10);
         auto vm_cs = cloud_service->startVM(vm_name);
 
-        // Submit the job to it
+        // Create a job
+        wrench::StandardJob *job = job_manager->createStandardJob(
+                {this->test->task1}, {},
+                {std::make_tuple(this->test->input_file,
+                                 wrench::FileLocation::LOCATION(this->test->storage_service),
+                                 wrench::FileLocation::LOCATION(vm_cs->getScratch()))},
+                {}, {});
+
+        // Submit the job to the VM
         job_manager->submitJob(job, vm_cs);
 
         wrench::Simulation::sleep(10);
@@ -1831,11 +1833,11 @@ void VirtualizedClusterServiceTest::do_VMComputeServiceStopWhileJobIsRunning_tes
     compute_service = simulation->add(
             new wrench::CloudComputeService(hostname,
                                             compute_hosts,
-                                            100.0,
+                                            "/scratch",
                                             {}));
 
     // Create a Storage Service
-    storage_service = simulation->add(new wrench::SimpleStorageService(hostname, 10000000000000.0));
+    storage_service = simulation->add(new wrench::SimpleStorageService(hostname, {"/"}));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -1846,7 +1848,7 @@ void VirtualizedClusterServiceTest::do_VMComputeServiceStopWhileJobIsRunning_tes
     // Staging the input_file on the storage service
     // Create a File Registry Service
     simulation->add(new wrench::FileRegistryService(hostname));
-    simulation->stageFiles({{input_file->getID(), input_file}}, storage_service);
+    simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());

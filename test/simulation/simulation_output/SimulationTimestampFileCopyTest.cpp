@@ -30,8 +30,26 @@ protected:
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
-                          "       <host id=\"Host1\" speed=\"1f\" core=\"1\"/> "
-                          "       <host id=\"Host2\" speed=\"1f\" core=\"1\"/> "
+                          "       <host id=\"Host1\" speed=\"1f\" core=\"1\" > "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100000000000000000000\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>"
+                          "       <host id=\"Host2\" speed=\"1f\" core=\"1\" > "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"10000000000\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>"
                           "       <link id=\"1\" bandwidth=\"1Gbps\" latency=\"10000us\"/>"
                           "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"1\"/> </route>"
                           "   </zone> "
@@ -75,19 +93,30 @@ protected:
         auto dmm = this->createDataMovementManager();
 
         // regular copy with successful completion
-        this->test->destination_storage_service->copyFile(this->test->file_1, this->test->source_storage_service);
+        dmm->doSynchronousFileCopy(this->test->file_1,
+                                   wrench::FileLocation::LOCATION(this->test->source_storage_service),
+                                   wrench::FileLocation::LOCATION(this->test->destination_storage_service));
 
-        dmm->initiateAsynchronousFileCopy(this->test->xl_file, this->test->source_storage_service, this->test->destination_storage_service);
-        dmm->doSynchronousFileCopy(this->test->file_2, this->test->source_storage_service, this->test->destination_storage_service);
+        dmm->initiateAsynchronousFileCopy(this->test->xl_file,
+                                          wrench::FileLocation::LOCATION(this->test->source_storage_service),
+                                          wrench::FileLocation::LOCATION(this->test->destination_storage_service));
 
-        this->test->destination_storage_service->copyFile(this->test->file_3, this->test->source_storage_service);
-        this->test->destination_storage_service->copyFile(this->test->file_3, this->test->source_storage_service);
+        dmm->doSynchronousFileCopy(this->test->file_2,
+                                   wrench::FileLocation::LOCATION(this->test->source_storage_service),
+                                   wrench::FileLocation::LOCATION(this->test->destination_storage_service));
+
+        dmm->doSynchronousFileCopy(this->test->file_3,
+                                   wrench::FileLocation::LOCATION(this->test->source_storage_service),
+                                   wrench::FileLocation::LOCATION(this->test->destination_storage_service));
 
         bool failed = false;
 
         // this should fail and a SimulationTimestampFileCopyFailure should be created
         try {
-            this->test->destination_storage_service->copyFile(this->test->too_large_file, this->test->source_storage_service);
+            dmm->doSynchronousFileCopy(this->test->too_large_file,
+                                       wrench::FileLocation::LOCATION(this->test->source_storage_service),
+                                       wrench::FileLocation::LOCATION(this->test->destination_storage_service));
+
         } catch(wrench::WorkflowExecutionException &e) {
             failed = true;
         }
@@ -132,8 +161,8 @@ void SimulationTimestampFileCopyTest::do_SimulationTimestampFileCopyBasic_test()
 
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
-    std::string host1 = simulation->getHostnameList()[0];
-    std::string host2 = simulation->getHostnameList()[1];
+    std::string host1 = "Host1";
+    std::string host2 = "Host2";
 
     ASSERT_NO_THROW(compute_service = simulation->add(new wrench::BareMetalComputeService(host1,
                                                                                           {std::make_pair(
@@ -142,8 +171,8 @@ void SimulationTimestampFileCopyTest::do_SimulationTimestampFileCopyBasic_test()
                                                                                                                   wrench::ComputeService::ALL_RAM))},
                                                                                           {})));
 
-    ASSERT_NO_THROW(source_storage_service = simulation->add(new wrench::SimpleStorageService(host1, 100000000000000000000.0)));
-    ASSERT_NO_THROW(destination_storage_service = simulation->add(new wrench::SimpleStorageService(host2, 10000000000)));
+    ASSERT_NO_THROW(source_storage_service = simulation->add(new wrench::SimpleStorageService(host1, {"/"})));
+    ASSERT_NO_THROW(destination_storage_service = simulation->add(new wrench::SimpleStorageService(host2, {"/"})));
 
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
     ASSERT_NO_THROW(file_registry_service = simulation->add(new wrench::FileRegistryService(host1)));
@@ -156,13 +185,11 @@ void SimulationTimestampFileCopyTest::do_SimulationTimestampFileCopyBasic_test()
     ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
     //stage files
-    std::map<std::string, wrench::WorkflowFile *> files_to_stage = {std::make_pair(file_1->getID(), file_1),
-                                                                    std::make_pair(file_2->getID(), file_2),
-                                                                    std::make_pair(file_3->getID(), file_3),
-                                                                    std::make_pair(xl_file->getID(), xl_file),
-                                                                    std::make_pair(too_large_file->getID(), too_large_file)};
+    std::set<wrench::WorkflowFile *> files_to_stage = {file_1, file_2, file_3, xl_file, too_large_file};
 
-    ASSERT_NO_THROW(simulation->stageFiles(files_to_stage, source_storage_service));
+    for (auto const &f  : files_to_stage) {
+        ASSERT_NO_THROW(simulation->stageFile(f, wrench::FileLocation::LOCATION(source_storage_service)));
+    }
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -217,26 +244,45 @@ void SimulationTimestampFileCopyTest::do_SimulationTimestampFileCopyBasic_test()
         ASSERT_GT(fc.second->getDate(), fc.first->getDate());
 
         // source and destinations should be set
-        ASSERT_EQ(this->source_storage_service, fc.first->getSource().storage_service);
-        ASSERT_EQ("/", fc.first->getSource().partition);
-        ASSERT_EQ(this->destination_storage_service, fc.first->getDestination().storage_service);
-        ASSERT_EQ("/", fc.first->getDestination().partition);
+        ASSERT_EQ(this->source_storage_service, fc.first->getSource()->getStorageService());
+        ASSERT_EQ("/", fc.first->getSource()->getAbsolutePathAtMountPoint());
+        ASSERT_EQ(this->destination_storage_service, fc.first->getDestination()->getStorageService());
+        ASSERT_EQ("/", fc.first->getDestination()->getAbsolutePathAtMountPoint());
 
-        ASSERT_EQ(this->source_storage_service, fc.second->getSource().storage_service);
-        ASSERT_EQ("/", fc.second->getSource().partition);
-        ASSERT_EQ(this->destination_storage_service, fc.second->getDestination().storage_service);
-        ASSERT_EQ("/", fc.second->getDestination().partition);
+        ASSERT_EQ(this->source_storage_service, fc.second->getSource()->getStorageService());
+        ASSERT_EQ("/", fc.second->getSource()->getAbsolutePathAtMountPoint());
+        ASSERT_EQ(this->destination_storage_service, fc.second->getDestination()->getStorageService());
+        ASSERT_EQ("/", fc.second->getDestination()->getAbsolutePathAtMountPoint());
 
         // file should be set
         ASSERT_EQ(fc.first->getFile(), fc.second->getFile());
     }
 
     // test constructors for invalid arguments
-    ASSERT_THROW(wrench::SimulationTimestampFileCopyStart(nullptr, this->source_storage_service, "/", this->destination_storage_service, "/"), std::invalid_argument);
-    ASSERT_THROW(wrench::SimulationTimestampFileCopyStart(this->file_1, nullptr, "/", this->destination_storage_service, "/"), std::invalid_argument);
-    ASSERT_THROW(wrench::SimulationTimestampFileCopyStart(this->file_1, this->source_storage_service, "", this->destination_storage_service, "/"), std::invalid_argument);
-    ASSERT_THROW(wrench::SimulationTimestampFileCopyStart(this->file_1, this->source_storage_service, "", nullptr, "/"), std::invalid_argument);
-    ASSERT_THROW(wrench::SimulationTimestampFileCopyStart(this->file_1, this->source_storage_service, "", this->destination_storage_service, ""), std::invalid_argument);
+    ASSERT_THROW(wrench::SimulationTimestampFileCopyStart(
+                         nullptr,
+                                 wrench::FileLocation::LOCATION(this->source_storage_service),
+                                 wrench::FileLocation::LOCATION(this->destination_storage_service)), std::invalid_argument);
+
+    ASSERT_THROW(wrench::SimulationTimestampFileCopyStart(
+                         this->file_1,
+                                 nullptr,
+                                 wrench::FileLocation::LOCATION(this->destination_storage_service, "/")), std::invalid_argument);
+
+    ASSERT_THROW(wrench::SimulationTimestampFileCopyStart(
+                         this->file_1,
+                                 wrench::FileLocation::LOCATION(this->source_storage_service),
+                                 wrench::FileLocation::LOCATION(this->destination_storage_service, "/")), std::invalid_argument);
+
+    ASSERT_THROW(wrench::SimulationTimestampFileCopyStart(
+                         this->file_1,
+                                 wrench::FileLocation::LOCATION(this->source_storage_service),
+                                 nullptr), std::invalid_argument);
+
+    ASSERT_THROW(wrench::SimulationTimestampFileCopyStart(
+                         this->file_1,
+                                 wrench::FileLocation::LOCATION(this->source_storage_service),
+                                 wrench::FileLocation::LOCATION(this->destination_storage_service)), std::invalid_argument);
 
     ASSERT_THROW(wrench::SimulationTimestampFileCopyFailure(nullptr), std::invalid_argument);
     ASSERT_THROW(wrench::SimulationTimestampFileCopyCompletion(nullptr), std::invalid_argument);
