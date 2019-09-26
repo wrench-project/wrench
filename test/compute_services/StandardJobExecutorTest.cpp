@@ -138,15 +138,15 @@ private:
         auto job = job_manager->createStandardJob(
                 {task},
                 {
-                        {*(task->getInputFiles().begin()),  this->test->storage_service1},
-                        {*(task->getOutputFiles().begin()), this->test->storage_service2}
+                        {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
+                        {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service2)}
                 },
                 {},
-                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
-                        this->getWorkflow()->getFileByID("output_file"), this->test->storage_service2,
-                        this->test->storage_service1)},
-                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("output_file"),
-                                                                                             this->test->storage_service2)});
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
+                        this->getWorkflow()->getFileByID("output_file"), wrench::FileLocation::LOCATION(this->test->storage_service2),
+                        wrench::FileLocation::LOCATION(this->test->storage_service1))},
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("output_file"),
+                                                                                             wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
         std::string my_mailbox = "test_callback_mailbox";
 
@@ -299,15 +299,15 @@ private:
         job = job_manager->createStandardJob(
                 {task_too_many_cores},
                 {
-                        {*(task_too_many_cores->getInputFiles().begin()),  this->test->storage_service1},
-                        {*(task_too_many_cores->getOutputFiles().begin()), this->test->storage_service2}
+                        {*(task_too_many_cores->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
+                        {*(task_too_many_cores->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service2)}
                 },
                 {},
-                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
-                        this->getWorkflow()->getFileByID("output_file"), this->test->storage_service2,
-                        this->test->storage_service1)},
-                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("output_file"),
-                                                                                             this->test->storage_service2)});
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
+                        this->getWorkflow()->getFileByID("output_file"), wrench::FileLocation::LOCATION(this->test->storage_service2),
+                        wrench::FileLocation::LOCATION(this->test->storage_service1))},
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("output_file"),
+                                                                                             wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
         try {
             executor = std::shared_ptr<wrench::StandardJobExecutor>(
@@ -343,15 +343,15 @@ private:
         job = job_manager->createStandardJob(
                 {task_too_much_ram},
                 {
-                        {*(task_too_much_ram->getInputFiles().begin()),  this->test->storage_service1},
-                        {*(task_too_much_ram->getOutputFiles().begin()), this->test->storage_service2}
+                        {*(task_too_much_ram->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
+                        {*(task_too_much_ram->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service2)}
                 },
                 {},
-                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
-                        this->getWorkflow()->getFileByID("output_file"), this->test->storage_service2,
-                        this->test->storage_service1)},
-                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("output_file"),
-                                                                                             this->test->storage_service2)});
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
+                        this->getWorkflow()->getFileByID("output_file"), wrench::FileLocation::LOCATION(this->test->storage_service2),
+                        wrench::FileLocation::LOCATION(this->test->storage_service1))},
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("output_file"),
+                                                                                             wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
         try {
             executor = std::shared_ptr<wrench::StandardJobExecutor>(
@@ -385,15 +385,15 @@ private:
         job = job_manager->createStandardJob(
                 {task},
                 {
-                        {*(task->getInputFiles().begin()),  this->test->storage_service1},
-                        {*(task->getOutputFiles().begin()), this->test->storage_service2}
+                        {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
+                        {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service2)}
                 },
                 {},
-                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
-                        this->getWorkflow()->getFileByID("output_file"), this->test->storage_service2,
-                        this->test->storage_service1)},
-                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("output_file"),
-                                                                                             this->test->storage_service2)});
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
+                        this->getWorkflow()->getFileByID("output_file"), wrench::FileLocation::LOCATION(this->test->storage_service2),
+                        wrench::FileLocation::LOCATION(this->test->storage_service1))},
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("output_file"),
+                                                                                             wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
         try {
             executor = std::shared_ptr<wrench::StandardJobExecutor>(
@@ -536,15 +536,15 @@ private:
             wrench::StandardJob *job = job_manager->createStandardJob(
                     {task},
                     {
-                            {*(task->getInputFiles().begin()),  this->test->storage_service1},
-                            {*(task->getOutputFiles().begin()), this->test->storage_service2}
+                            {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
+                            {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service2)}
                     },
                     {},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
-                            this->getWorkflow()->getFileByID("output_file"), this->test->storage_service2,
-                            this->test->storage_service1)},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("output_file"),
-                                                                                                 this->test->storage_service2)});
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("output_file"), wrench::FileLocation::LOCATION(this->test->storage_service2),
+                            wrench::FileLocation::LOCATION(this->test->storage_service1))},
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("output_file"),
+                                                                                                 wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
             std::string my_mailbox = "test_callback_mailbox";
 
@@ -734,15 +734,15 @@ private:
             wrench::StandardJob *job = job_manager->createStandardJob(
                     {task},
                     {
-                            {*(task->getInputFiles().begin()),  this->test->storage_service1},
-                            {*(task->getOutputFiles().begin()), this->test->storage_service2}
+                            {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
+                            {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service2)}
                     },
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
-                            this->getWorkflow()->getFileByID("input_file"), this->test->storage_service2,
-                            this->test->storage_service1)},
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service2),
+                            wrench::FileLocation::LOCATION(this->test->storage_service1))},
                     {},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("output_file"),
-                                                                                                 this->test->storage_service2)});
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("output_file"),
+                                                                                                 wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
 
             std::string my_mailbox = "test_callback_mailbox";
@@ -915,13 +915,13 @@ private:
             wrench::StandardJob *job = job_manager->createStandardJob(
                     {task},
                     {
-                            {*(task->getInputFiles().begin()),  this->test->storage_service2},
-                            {*(task->getOutputFiles().begin()), this->test->storage_service2}
+                            {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service2)},
+                            {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service2)}
                     },
                     {},
                     {},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("output_file"),
-                                                                                                 this->test->storage_service2)});
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("output_file"),
+                                                                                                 wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
             job->getFileLocations(); // coverage
             job->getPriority(); // coverage
@@ -976,7 +976,7 @@ private:
                 throw std::runtime_error(
                         "Got the expected 'file not found' exception, but the failure cause does not point to the correct file");
             }
-            if (cause->getStorageService() != this->test->storage_service2) {
+            if (cause->getStorageService() != wrench::FileLocation::LOCATION(this->test->storage_service2)) {
                 throw std::runtime_error(
                         "Got the expected 'file not found' exception, but the failure cause does not point to the correct storage service");
             }
@@ -1280,8 +1280,8 @@ private:
         wrench::StandardJob *job = job_manager->createStandardJob(
                 task,
                 {
-                        {*(task->getInputFiles().begin()),  this->test->storage_service1},
-                        {*(task->getOutputFiles().begin()), this->test->storage_service1}
+                        {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
+                        {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service1)}
                 });
 
         std::string my_mailbox = "test_callback_mailbox";
@@ -1431,8 +1431,8 @@ private:
         wrench::StandardJob *job = job_manager->createStandardJob(
                 task,
                 {
-                        {*(task->getInputFiles().begin()),  this->test->storage_service1},
-                        {*(task->getOutputFiles().begin()), this->test->storage_service1}
+                        {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
+                        {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service1)}
                 });
 
         std::string my_mailbox = "test_callback_mailbox";
@@ -1587,8 +1587,8 @@ private:
         wrench::StandardJob *job = job_manager->createStandardJob(
                 task,
                 {
-                        {*(task->getInputFiles().begin()),  this->test->storage_service1},
-                        {*(task->getOutputFiles().begin()), this->test->storage_service1}
+                        {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
+                        {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service1)}
                 });
 
         std::string my_mailbox = "test_callback_mailbox";
@@ -1747,15 +1747,15 @@ private:
             wrench::StandardJob *job = job_manager->createStandardJob(
                     {task1, task2},
                     {
-                            {this->getWorkflow()->getFileByID("input_file"),  this->test->storage_service1},
-                            {this->getWorkflow()->getFileByID("output_file"), this->test->storage_service1}
+                            {this->getWorkflow()->getFileByID("input_file"),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
+                            {this->getWorkflow()->getFileByID("output_file"), wrench::FileLocation::LOCATION(this->test->storage_service1)}
                     },
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
-                            this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
-                            this->test->storage_service2)},
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                                 this->test->storage_service2)}
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
+                                                                                                 wrench::FileLocation::LOCATION(this->test->storage_service2))}
             );
 
             std::string my_mailbox = "test_callback_mailbox";
@@ -1834,15 +1834,15 @@ private:
             wrench::StandardJob *job = job_manager->createStandardJob(
                     {task1, task2},
                     {
-                            {this->getWorkflow()->getFileByID("input_file"),  this->test->storage_service1},
-                            {this->getWorkflow()->getFileByID("output_file"), this->test->storage_service1}
+                            {this->getWorkflow()->getFileByID("input_file"),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
+                            {this->getWorkflow()->getFileByID("output_file"), wrench::FileLocation::LOCATION(this->test->storage_service1)}
                     },
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
-                            this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
-                            this->test->storage_service2)},
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                                 this->test->storage_service2)}
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
+                                                                                                 wrench::FileLocation::LOCATION(this->test->storage_service2))}
             );
 
             std::string my_mailbox = "test_callback_mailbox";
@@ -1922,15 +1922,15 @@ private:
             wrench::StandardJob *job = job_manager->createStandardJob(
                     {task1, task2, task3},
                     {
-                            {this->getWorkflow()->getFileByID("input_file"),  this->test->storage_service1},
-                            {this->getWorkflow()->getFileByID("output_file"), this->test->storage_service1}
+                            {this->getWorkflow()->getFileByID("input_file"),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
+                            {this->getWorkflow()->getFileByID("output_file"), wrench::FileLocation::LOCATION(this->test->storage_service1)}
                     },
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
-                            this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
-                            this->test->storage_service2)},
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                                 this->test->storage_service2)}
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
+                                                                                                 wrench::FileLocation::LOCATION(this->test->storage_service2))}
             );
 
             std::string my_mailbox = "test_callback_mailbox";
@@ -2111,15 +2111,15 @@ public:
             wrench::StandardJob *job = job_manager->createStandardJob(
                     {task1, task2},
                     {
-                            {this->getWorkflow()->getFileByID("input_file"),  this->test->storage_service1},
-                            {this->getWorkflow()->getFileByID("output_file"), this->test->storage_service1}
+                            {this->getWorkflow()->getFileByID("input_file"),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
+                            {this->getWorkflow()->getFileByID("output_file"), wrench::FileLocation::LOCATION(this->test->storage_service1)}
                     },
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
-                            this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
-                            this->test->storage_service2)},
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                                 this->test->storage_service2)}
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
+                                                                                                 wrench::FileLocation::LOCATION(this->test->storage_service2))}
             );
 
             std::string my_mailbox = "test_callback_mailbox";
@@ -2199,15 +2199,15 @@ public:
             wrench::StandardJob *job = job_manager->createStandardJob(
                     {task1, task2, task3, task4},
                     {
-                            {this->getWorkflow()->getFileByID("input_file"),  this->test->storage_service1},
-                            {this->getWorkflow()->getFileByID("output_file"), this->test->storage_service1}
+                            {this->getWorkflow()->getFileByID("input_file"),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
+                            {this->getWorkflow()->getFileByID("output_file"), wrench::FileLocation::LOCATION(this->test->storage_service1)}
                     },
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
-                            this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
-                            this->test->storage_service2)},
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                                 this->test->storage_service2)}
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
+                                                                                                 wrench::FileLocation::LOCATION(this->test->storage_service2))}
             );
 
             std::string my_mailbox = "test_callback_mailbox";
@@ -2390,16 +2390,16 @@ private:
                     {task1, task2, task3, task4},
 //                {task1},
                     {
-                            {this->getWorkflow()->getFileByID("input_file"),  this->test->storage_service1},
-                            {this->getWorkflow()->getFileByID("output_file1"), this->test->storage_service1},
-                            {this->getWorkflow()->getFileByID("output_file2"), this->test->storage_service1},
+                            {this->getWorkflow()->getFileByID("input_file"),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
+                            {this->getWorkflow()->getFileByID("output_file1"), wrench::FileLocation::LOCATION(this->test->storage_service1)},
+                            {this->getWorkflow()->getFileByID("output_file2"), wrench::FileLocation::LOCATION(this->test->storage_service1)},
                     },
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
-                            this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
-                            this->test->storage_service2)},
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                                 this->test->storage_service2)}
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
+                                                                                                 wrench::FileLocation::LOCATION(this->test->storage_service2))}
             );
 
             std::string my_mailbox = "test_callback_mailbox";
@@ -2545,16 +2545,16 @@ private:
             wrench::StandardJob *job = job_manager->createStandardJob(
                     {task1, task2, task3, task4},
                     {
-                            {this->getWorkflow()->getFileByID("input_file"),  this->test->storage_service1},
-                            {this->getWorkflow()->getFileByID("output_file1"), this->test->storage_service1},
-                            {this->getWorkflow()->getFileByID("output_file2"), this->test->storage_service1}
+                            {this->getWorkflow()->getFileByID("input_file"),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
+                            {this->getWorkflow()->getFileByID("output_file1"), wrench::FileLocation::LOCATION(this->test->storage_service1)},
+                            {this->getWorkflow()->getFileByID("output_file2"), wrench::FileLocation::LOCATION(this->test->storage_service1)}
                     },
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
-                            this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
-                            this->test->storage_service2)},
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                                 this->test->storage_service2)}
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
+                                                                                                 wrench::FileLocation::LOCATION(this->test->storage_service2))}
             );
 
             std::string my_mailbox = "test_callback_mailbox";
@@ -2712,21 +2712,21 @@ private:
                         {task1, task3},
 //                {task1},
                         {
-                                {this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1},
-//                          {workflow->getFileByID("output_file"), this->test->storage_service1}
+                                {this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1)},
+//                          {workflow->getFileByID("output_file"), wrench::FileLocation::LOCATION(this->test->storage_service1)}
                         },
                         {
-                                std::make_tuple(this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
-                                                this->test->storage_service2)
-//                        std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
-//                          workflow->getFileByID("input_file"), this->test->storage_service1,
-//                          this->test->storage_service2)
+                                std::make_tuple(this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
+                                                wrench::FileLocation::LOCATION(this->test->storage_service2))
+//                        std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
+//                          workflow->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
+//                          wrench::FileLocation::LOCATION(this->test->storage_service2))
                         },
                         {},
                         {
-                                std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(
+                                std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(
                                         this->getWorkflow()->getFileByID("input_file"),
-                                        this->test->storage_service2)
+                                        wrench::FileLocation::LOCATION(this->test->storage_service2))
                         }
                 );
 
@@ -2857,17 +2857,17 @@ void StandardJobExecutorTest::do_WorkUnit_test() {
 
     // Create two WorkUnits
     std::shared_ptr<wrench::Workunit> wu1 = std::make_shared<wrench::Workunit>(nullptr,
-                                                                               (std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>>){},
+                                                                               (std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>>){},
                                                                                nullptr,
                                                                                (std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>){},
-                                                                               (std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>>){},
-                                                                               (std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>>){});
+                                                                               (std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>>){},
+                                                                               (std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>>){});
     std::shared_ptr<wrench::Workunit> wu2 = std::make_shared<wrench::Workunit>(nullptr,
-                                                                               (std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>>){},
+                                                                               (std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>>){},
                                                                                nullptr,
                                                                                (std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>){},
-                                                                               (std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>>){},
-                                                                               (std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>>){});
+                                                                               (std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>>){},
+                                                                               (std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>>){});
 
 
     ASSERT_THROW(wrench::Workunit::addDependency(wu1, nullptr), std::invalid_argument);
@@ -2917,12 +2917,12 @@ private:
         wrench::StandardJob *job = job_manager->createStandardJob(
                 {},
                 {},
-                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
-                        this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
-                        this->test->storage_service2)},
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
+                        this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
+                        wrench::FileLocation::LOCATION(this->test->storage_service2))},
                 {},
-                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                             this->test->storage_service2)}
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
+                                                                                             wrench::FileLocation::LOCATION(this->test->storage_service2))}
         );
 
         std::string my_mailbox = "test_callback_mailbox";

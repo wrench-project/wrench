@@ -62,13 +62,75 @@ protected:
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
-                          "       <host id=\"Host1\" speed=\"1f\" core=\"10\"/> "
-                          "       <host id=\"Host2\" speed=\"1f\" core=\"10\"/> "
-                          "       <host id=\"Host3\" speed=\"1f\" core=\"10\"/> "
-                          "       <host id=\"Host4\" speed=\"1f\" core=\"10\"/> "
-                          "       <host id=\"HostFast\" speed=\"100f\" core=\"10\"/> "
-                          "       <host id=\"HostManyCores\" speed=\"1f\" core=\"100\"/> "
+                          "       <host id=\"Host1\" speed=\"1f\" core=\"10\"> "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"10000000000000\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>"
+                          "       <host id=\"Host2\" speed=\"1f\" core=\"10\"> "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"10000000000000\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>"
+                          "       <host id=\"Host3\" speed=\"1f\" core=\"10\"> "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"10000000000000\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>"
+                          "       <host id=\"Host4\" speed=\"1f\" core=\"10\"> "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"10000000000000\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>"
+                          "       <host id=\"HostFast\" speed=\"100f\" core=\"10\"> "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"10000000000000\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>"
+                          "       <host id=\"HostManyCores\" speed=\"1f\" core=\"100\"> "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"10000000000000\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>"
                           "       <host id=\"RAMHost\" speed=\"1f\" core=\"10\" > "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"10000000000000\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
                           "         <prop id=\"ram\" value=\"1024\" />"
                           "       </host> "
                           "       <link id=\"1\" bandwidth=\"50000GBps\" latency=\"0us\"/>"
@@ -221,14 +283,16 @@ private:
             job1 = job_manager->createStandardJob(
                     {task1},
                     {
-                            {*(task1->getInputFiles().begin()),  this->test->storage_service1}
+                            {*(task1->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)}
                     },
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
-                            this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
-                            this->test->storage_service2)},
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service1),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                                 this->test->storage_service2)});
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "4";
@@ -255,14 +319,17 @@ private:
             job2 = job_manager->createStandardJob(
                     {task2},
                     {
-                            {*(task2->getInputFiles().begin()),  this->test->storage_service1},
+                            {*(task2->getInputFiles().begin()),
+                                    wrench::FileLocation::LOCATION(this->test->storage_service1)},
                     },
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
-                            this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
-                            this->test->storage_service2)},
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service1),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                                 this->test->storage_service2)});
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "4";
@@ -329,11 +396,11 @@ void BatchServiceTest::do_TerminateStandardJobsTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
 
 
     // Create a Batch Service
@@ -357,7 +424,7 @@ void BatchServiceTest::do_TerminateStandardJobsTest_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
 
     // Running a "run a single task" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -406,15 +473,17 @@ private:
             wrench::StandardJob *job = job_manager->createStandardJob(
                     {task},
                     {
-                            {*(task->getInputFiles().begin()),  this->test->storage_service1},
-                            {*(task->getOutputFiles().begin()), this->test->storage_service1}
+                            {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
+                            {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service1)}
                     },
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
-                            this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
-                            this->test->storage_service2)},
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service1),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                                 this->test->storage_service2)});
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "2";
@@ -446,7 +515,7 @@ private:
             } catch (wrench::WorkflowExecutionException &e) {
                 WRENCH_INFO("---> %s", e.getCause()->toString().c_str());
                 if (not std::dynamic_pointer_cast<wrench::NotAllowed>(e.getCause())) {
-                   throw std::runtime_error("Got an expected exception, but the failure cause is not NotAllowed");
+                    throw std::runtime_error("Got an expected exception, but the failure cause is not NotAllowed");
                 }
             }
 
@@ -488,18 +557,18 @@ void BatchServiceTest::do_OneStandardJobTaskTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
 
 
     // Create a Batch Service
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BatchComputeService(hostname, {"Host1", "Host2", "Host3", "Host4"}, 0,
                                             {{wrench::BatchComputeServiceProperty::BATSCHED_LOGGING_MUTED, "false"}}
-                                            )));
+            )));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -513,11 +582,11 @@ void BatchServiceTest::do_OneStandardJobTaskTest_test() {
 
 
     // Create two workflow files
-    wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
-    wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
+    auto input_file = this->workflow->addFile("input_file", 10000.0);
+    auto output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
 
     // Running a "run a single task" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -675,11 +744,11 @@ void BatchServiceTest::do_TwoStandardJobSubmissionTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
 
     // Create a Batch Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -701,7 +770,7 @@ void BatchServiceTest::do_TwoStandardJobSubmissionTest_test() {
     auto output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
 
     // Running a "run a single task" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -845,11 +914,11 @@ void BatchServiceTest::do_PilotJobTaskTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
 
     // Create a Batch Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -875,7 +944,7 @@ void BatchServiceTest::do_PilotJobTaskTest_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
 
 
     // Running a "run a single task" simulation
@@ -929,7 +998,7 @@ private:
                             {*(task->getOutputFiles().begin()), this->test->storage_service1}
                     },
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
-                            this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
+                            this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
                             this->test->storage_service2)},
                     {},
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
@@ -1024,11 +1093,11 @@ void BatchServiceTest::do_StandardPlusPilotJobTaskTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
 
     // Create a Batch Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -1101,11 +1170,11 @@ private:
             wrench::StandardJob *job = job_manager->createStandardJob(
                     {task},
                     {
-                            {*(task->getInputFiles().begin()),  this->test->storage_service1},
-                            {*(task->getOutputFiles().begin()), this->test->storage_service1}
+                            {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
+                            {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service1)}
                     },
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
-                            this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
+                            this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
                             this->test->storage_service2)},
                     {},
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
@@ -1156,11 +1225,11 @@ void BatchServiceTest::do_InsufficientCoresTaskTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
 
     // Create a Batch Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -1233,11 +1302,11 @@ private:
             wrench::StandardJob *job = job_manager->createStandardJob(
                     {task},
                     {
-                            {*(task->getInputFiles().begin()),  this->test->storage_service1},
-                            {*(task->getOutputFiles().begin()), this->test->storage_service1}
+                            {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
+                            {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service1)}
                     },
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
-                            this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
+                            this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
                             this->test->storage_service2)},
                     {},
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
@@ -1280,11 +1349,11 @@ void BatchServiceTest::do_noArgumentsJobSubmissionTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
 
     // Create a Batch Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -1358,11 +1427,11 @@ private:
             wrench::StandardJob *job = job_manager->createStandardJob(
                     {task},
                     {
-                            {*(task->getInputFiles().begin()),  this->test->storage_service1},
-                            {*(task->getOutputFiles().begin()), this->test->storage_service1}
+                            {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
+                            {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service1)}
                     },
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
-                            this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
+                            this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
                             this->test->storage_service2)},
                     {},
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
@@ -1431,11 +1500,11 @@ void BatchServiceTest::do_StandardJobTimeOutTaskTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
 
     // Create a Batch Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -1562,11 +1631,11 @@ void BatchServiceTest::do_PilotJobTimeOutTaskTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
 
     // Create a Batch Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -1647,11 +1716,11 @@ private:
             wrench::StandardJob *job = job_manager->createStandardJob(
                     {task},
                     {
-                            {*(task->getInputFiles().begin()),  this->test->storage_service1},
-                            {*(task->getOutputFiles().begin()), this->test->storage_service1}
+                            {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
+                            {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service1)}
                     },
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
-                            this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
+                            this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
                             this->test->storage_service2)},
                     {},
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
@@ -1672,11 +1741,11 @@ private:
             wrench::StandardJob *job1 = job_manager->createStandardJob(
                     {task1},
                     {
-                            {*(task1->getInputFiles().begin()),  this->test->storage_service1},
-                            {*(task1->getOutputFiles().begin()), this->test->storage_service1}
+                            {*(task1->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
+                            {*(task1->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service1)}
                     },
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
-                            this->getWorkflow()->getFileByID("input_file_1"), this->test->storage_service1,
+                            this->getWorkflow()->getFileByID("input_file_1"), wrench::FileLocation::LOCATION(this->test->storage_service1),
                             this->test->storage_service2)},
                     {},
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file_1"),
@@ -1697,11 +1766,11 @@ private:
             wrench::StandardJob *job2 = job_manager->createStandardJob(
                     {task2},
                     {
-                            {*(task2->getInputFiles().begin()),  this->test->storage_service1},
-                            {*(task2->getOutputFiles().begin()), this->test->storage_service1}
+                            {*(task2->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
+                            {*(task2->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service1)}
                     },
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
-                            this->getWorkflow()->getFileByID("input_file_2"), this->test->storage_service1,
+                            this->getWorkflow()->getFileByID("input_file_2"), wrench::FileLocation::LOCATION(this->test->storage_service1),
                             this->test->storage_service2)},
                     {},
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file_2"),
@@ -1778,11 +1847,11 @@ void BatchServiceTest::do_BestFitTaskTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
 
     // Create a Batch Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -1942,11 +2011,11 @@ void BatchServiceTest::do_FirstFitTaskTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
 
     // Create a Batch Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -2214,11 +2283,11 @@ void BatchServiceTest::do_RoundRobinTask_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
 
     // Create a Batch Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -2324,7 +2393,7 @@ private:
 
             // Create a StandardJob with some pre-copies and post-deletions
             wrench::StandardJob *job = job_manager->createStandardJob(
-                    {task}, {{file1,this->test->storage_service1}}, {}, {}, {});
+                    {task}, {{file1,wrench::FileLocation::LOCATION(this->test->storage_service1)}}, {}, {}, {});
 
             try {
                 job_manager->submitJob(job, pilot_job->getComputeService(), {});
@@ -2397,11 +2466,11 @@ void BatchServiceTest::do_StandardJobInsidePilotJobTimeOutTaskTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
 
     // Create a Batch Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -2492,18 +2561,18 @@ private:
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
             if (not std::dynamic_pointer_cast<wrench::PilotJobStartedEvent>(event)) {
-                    throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
+                throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
 
             // Create a StandardJob with some pre-copies and post-deletions
             wrench::StandardJob *job = job_manager->createStandardJob(
                     {task},
                     {
-                            {*(task->getInputFiles().begin()),  this->test->storage_service1},
-                            {*(task->getOutputFiles().begin()), this->test->storage_service1}
+                            {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
+                            {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service1)}
                     },
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
-                            this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
+                            this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
                             this->test->storage_service2)},
                     {},
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
@@ -2558,11 +2627,11 @@ void BatchServiceTest::do_StandardJobInsidePilotJobSucessTaskTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
 
     // Create a Batch Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -2663,11 +2732,11 @@ private:
             wrench::StandardJob *job = job_manager->createStandardJob(
                     {task},
                     {
-                            {*(task->getInputFiles().begin()),  this->test->storage_service1},
-                            {*(task->getOutputFiles().begin()), this->test->storage_service1}
+                            {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
+                            {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service1)}
                     },
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
-                            this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
+                            this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
                             this->test->storage_service2)},
                     {},
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
@@ -2710,11 +2779,11 @@ void BatchServiceTest::do_InsufficientCoresInsidePilotJobTaskTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
 
     // Create a Batch Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -2852,11 +2921,11 @@ void BatchServiceTest::do_MultipleStandardTaskTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
 
     // Create a Batch Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -2929,11 +2998,11 @@ private:
             wrench::StandardJob *job = job_manager->createStandardJob(
                     {task},
                     {
-                            {*(task->getInputFiles().begin()),  this->test->storage_service1},
-                            {*(task->getOutputFiles().begin()), this->test->storage_service1}
+                            {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
+                            {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service1)}
                     },
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>(
-                            this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
+                            this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
                             this->test->storage_service2)},
                     {},
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
@@ -2998,11 +3067,11 @@ void BatchServiceTest::do_DifferentBatchAlgorithmsSubmissionTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
 
     // Create a Batch Service
     ASSERT_NO_THROW(compute_service = simulation->add(
