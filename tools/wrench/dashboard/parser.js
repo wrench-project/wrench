@@ -38,12 +38,13 @@ function addToHTMLFile(data, energyData) {
 }
 
 var numProgramArguments = process.argv.length-2;
-var energyData = null;
+var energyData = {};
 
-if (numProgramArguments == 0) {
-    console.log("Please provide the file name that holds the data as a command line argument")
-} 
-else if (numProgramArguments == 2) {
+if (numProgramArguments < 1) {
+    console.log("Please provide at least one file paths")
+} else if (numProgramArguments > 2) {
+    console.log("Please provide no more than two file paths")
+} else {
    
     // Add task data from file to index.html
     // var content = parseFile(process.argv[2])
@@ -51,8 +52,10 @@ else if (numProgramArguments == 2) {
         .then(function(content) {
             opn('index.html')
 
-                energyFilePath = process.argv[3];
-                energyData = JSON.parse(fs.readFileSync(energyFilePath));
+                if (numProgramArguments === 2) {
+                    energyFilePath = process.argv[3];
+                    energyData = JSON.parse(fs.readFileSync(energyFilePath));
+                }
         
                 addToHTMLFile(content, energyData);
                 process.exit()
@@ -62,7 +65,4 @@ else if (numProgramArguments == 2) {
             });
                 
     
-}
-else {  // Wrong number of arguments included
-    console.log("Please provide the only file name/path that holds the task data as a command line argument")
 }
