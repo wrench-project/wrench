@@ -682,6 +682,7 @@ namespace wrench {
      */
     double S4U_Simulation::getDiskCapacity(std::string hostname, std::string mount_point) {
 
+//        WRENCH_INFO("==== %s %s ==== ", hostname.c_str(), mount_point.c_str());
         simgrid::s4u::Host *host;
         try {
             host = simgrid::s4u::Host::by_name(hostname);
@@ -689,7 +690,10 @@ namespace wrench {
             throw std::invalid_argument("S4U_Simulation::getDiskCapacity(): Unknown host " + hostname);
         }
 
+        mount_point = FileLocation::sanitizePath(mount_point + "/");
+
         for (auto const &d : host->get_disks()) {
+
 
             // Get the disk's mount point
             const char *mp = d->get_property("mount");
@@ -697,8 +701,10 @@ namespace wrench {
                 mp = "/";
             }
 
+            std::string dmp = FileLocation::sanitizePath(std::string(mp) + "/");
+
             // This is not the mount point you're looking for
-            if (strcmp(mp, mount_point.c_str()) != 0) {
+            if (dmp != mount_point) {
                 continue;
             }
 

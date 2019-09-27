@@ -10,6 +10,9 @@
 #include <wrench-dev.h>
 #include "LogicalFileSystem.h"
 
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(logical_file_system, "Log category for Logical File System");
+
+
 namespace wrench {
 
     std::set<std::string> LogicalFileSystem::mount_points;
@@ -24,23 +27,32 @@ namespace wrench {
         if (mount_point.at(0) != '/') {
             mount_point = "/" + mount_point;
         }
-        if (mount_point.at(mount_point.length()) != '/') {
+        if (mount_point.at(mount_point.length()-1) != '/') {
             mount_point += "/";
         }
 
         mount_point = FileLocation::sanitizePath(mount_point);
 
+//        WRENCH_INFO("NEW %s", mount_point.c_str());
         // Check uniqueness
         if (LogicalFileSystem::mount_points.find(hostname+":"+mount_point) != LogicalFileSystem::mount_points.end()) {
             throw std::invalid_argument("LogicalFileSystem::LogicalFileSystem(): A FileSystem with mount point " +
                                         mount_point + " at host " + hostname + " already exists");
         }
-        // Check non-proper-prefixness
-        for (auto const &mp : LogicalFileSystem::mount_points) {
-            if ((mp.find(hostname+":"+mount_point) == 0) or ((hostname+":"+mount_point).find(mp) == 0)) {
-                throw std::invalid_argument("LogicalFileSystem::LogicalFileSystem(): An existing mount point that "
-                                            "has as prefix or is a prefix of '" + mount_point +
-                                            "' already exists at" + "host " + hostname);
+
+        if (mount_point != "/") { // "/" is obviously a prefix, but it's okstr(),
+
+            // Check non-proper-prefixness
+            for (auto const &mp : LogicalFileSystem::mount_points) {
+                if (mp == hostname+":"+"/") {
+                    continue;  // "/" is obviously a prefix, but it's ok
+                }
+//                WRENCH_INFO("COMPARING %s TO %s", (hostname + ":" + mount_point).c_str(), mp.c_str());
+                if ((mp.find(hostname + ":" + mount_point) == 0) or ((hostname + ":" + mount_point).find(mp) == 0)) {
+                    throw std::invalid_argument("LogicalFileSystem::LogicalFileSystem(): An existing mount point that "
+                                                "has as prefix or is a prefix of '" + mount_point +
+                                                "' already exists at host " + hostname);
+                }
             }
         }
 
