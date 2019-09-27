@@ -312,6 +312,7 @@ namespace wrench {
                            "bare_metal",
                            scratch_space_mount_point) {
 
+
         initiateInstance(hostname,
                          std::move(compute_resources),
                          std::move(property_list), std::move(messagepayload_list), DBL_MAX, nullptr);
