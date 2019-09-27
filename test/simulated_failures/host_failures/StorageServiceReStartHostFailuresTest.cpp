@@ -112,14 +112,14 @@ private:
         auto file = this->getWorkflow()->getFileByID("file");
         auto storage_service = *(this->getAvailableStorageServices().begin());
         try {
-            storage_service->readFile(file);
+            wrench::StorageService::readFile(file, wrench::FileLocation::LOCATION(storage_service));
             throw std::runtime_error("Should not have been able to read the file (first attempt)");
         } catch (wrench::WorkflowExecutionException &e) {
             // Expected
         }
         wrench::Simulation::sleep(1000);
         try {
-            storage_service->readFile(file);
+            wrench::StorageService::readFile(file, wrench::FileLocation::LOCATION(storage_service));
         } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error("Should  have been able to read the file (second attempt)");
         }
@@ -137,14 +137,14 @@ private:
         resurector->start(murderer, true, false); // Daemonized, no auto-restart
 
         try {
-            storage_service->readFile(file);
+            wrench::StorageService::readFile(file, wrench::FileLocation::LOCATION(storage_service));
             throw std::runtime_error("Should not have been able to read the file (first attempt)");
         } catch (wrench::WorkflowExecutionException &e) {
             // Expected
         }
         wrench::Simulation::sleep(1000);
         try {
-            storage_service->readFile(file);
+            wrench::StorageService::readFile(file, wrench::FileLocation::LOCATION(storage_service));
         } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error("Should  have been able to read the file (second attempt)");
         }
@@ -186,7 +186,7 @@ void StorageServiceReStartHostFailuresTest::do_StorageServiceRestartTest_test() 
 
     simulation->add(new wrench::FileRegistryService(stable_host));
 
-    simulation->stageFiles({{"file", file}}, storage_service);
+    simulation->stageFile(file, wrench::FileLocation::LOCATION(storage_service));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());

@@ -968,7 +968,7 @@ private:
                 throw std::runtime_error(
                         "Got the expected 'file not found' exception, but the failure cause does not point to the correct file");
             }
-            if (cause->getLocation()->getStorageService() != wrench::FileLocation::LOCATION(this->test->storage_service_510)) {
+            if (cause->getLocation()->getStorageService() != this->test->storage_service_510) {
                 throw std::runtime_error(
                         "Got the expected 'file not found' exception, but the failure cause does not point to the correct storage service");
             }

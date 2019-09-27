@@ -1016,9 +1016,9 @@ private:
         // Create a one-task job
         wrench::StandardJob *job = job_manager->createStandardJob(this->test->task1,
                                                                   {std::make_pair(this->test->input_file,
-                                                                                  this->test->storage_service),
+                                                                                  wrench::FileLocation::LOCATION(this->test->storage_service)),
                                                                    std::make_pair(this->test->output_file1,
-                                                                                  this->test->storage_service)});
+                                                                                  wrench::FileLocation::LOCATION(this->test->storage_service))});
 
         // Submit a job
         try {
@@ -1092,9 +1092,9 @@ private:
         // Submit a job and suspend the VM before that job finishes
         wrench::StandardJob *other_job = job_manager->createStandardJob(this->test->task2,
                                                                         {std::make_pair(this->test->input_file,
-                                                                                        this->test->storage_service),
+                                                                                        wrench::FileLocation::LOCATION(this->test->storage_service)),
                                                                          std::make_pair(this->test->output_file2,
-                                                                                        this->test->storage_service)});
+                                                                                        wrench::FileLocation::LOCATION(this->test->storage_service))});
 
         try {
             job_manager->submitJob(other_job, std::get<1>(vm_list[3]));

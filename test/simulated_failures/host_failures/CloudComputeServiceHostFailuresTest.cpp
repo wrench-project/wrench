@@ -58,9 +58,36 @@ protected:
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
-                          "       <host id=\"FailedHost1\" speed=\"1f\" core=\"1\"/> "
-                          "       <host id=\"FailedHost2\" speed=\"1f\" core=\"1\"/> "
-                          "       <host id=\"StableHost\" speed=\"1f\" core=\"1\"/> "
+                          "       <host id=\"FailedHost1\" speed=\"1f\" core=\"1\"> "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"10000000000000\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"101\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>  "
+                          "       <host id=\"FailedHost2\" speed=\"1f\" core=\"1\"> "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"10000000000000\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"101\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>  "
+                          "       <host id=\"StableHost\" speed=\"1f\" core=\"1\"> "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"10000000000000\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"101\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>  "
                           "       <link id=\"link1\" bandwidth=\"100kBps\" latency=\"0\"/>"
                           "       <route src=\"FailedHost1\" dst=\"StableHost\">"
                           "           <link_ctn id=\"link1\"/>"
@@ -120,8 +147,8 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create a standard job
-        auto job = job_manager->createStandardJob(this->test->task, {{this->test->input_file, this->test->storage_service},
-                                                                     {this->test->output_file, this->test->storage_service}});
+        auto job = job_manager->createStandardJob(this->test->task, {{this->test->input_file, wrench::FileLocation::LOCATION(this->test->storage_service)},
+                                                                     {this->test->output_file, wrench::FileLocation::LOCATION(this->test->storage_service)}});
 
         // Submit the standard job to the compute service, making it sure it runs on FailedHost1
         job_manager->submitJob(job, vm_cs);
@@ -187,11 +214,11 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJob_tes
     compute_service = simulation->add(
             new wrench::CloudComputeService(stable_host,
                                      compute_hosts,
-                                     100.0,
+                                     "/scratch",
                                      {}));
 
     // Create a Storage Service
-    storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, 10000000000000.0));
+    storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, {"/"}));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;

@@ -2908,13 +2908,13 @@ void StandardJobExecutorTest::do_WorkUnit_test() {
     std::shared_ptr<wrench::Workunit> wu1 = std::make_shared<wrench::Workunit>(nullptr,
                                                                                (std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>>){},
                                                                                nullptr,
-                                                                               (std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>){},
+                                                                               (std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>){},
                                                                                (std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>>){},
                                                                                (std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>>){});
     std::shared_ptr<wrench::Workunit> wu2 = std::make_shared<wrench::Workunit>(nullptr,
                                                                                (std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>>){},
                                                                                nullptr,
-                                                                               (std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>){},
+                                                                               (std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>){},
                                                                                (std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>>){},
                                                                                (std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>>){});
 
