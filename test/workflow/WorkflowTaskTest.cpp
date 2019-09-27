@@ -61,12 +61,11 @@ protected:
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"WMSHost\" speed=\"1f\" core=\"1\">"
                           "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
-                          "             <prop id=\"size\" value=\"100000000000000\"/>"
+                          "             <prop id=\"size\" value=\"100000000000000B\"/>"
                           "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
-                          "       </host>"
                           "          <disk id=\"other_large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
-                          "             <prop id=\"size\" value=\"100000000000000\"/>"
+                          "             <prop id=\"size\" value=\"100000000000000B\"/>"
                           "             <prop id=\"mount\" value=\"/backup\"/>"
                           "          </disk>"
                           "       </host>"
@@ -316,18 +315,20 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
 
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
-    std::string wms_host = simulation->getHostnameList()[1];
-    std::string execution_host = simulation->getHostnameList()[0];
+    std::string wms_host = "WMSHost";
+    std::string execution_host = "ExecutionHost";
 
-    ASSERT_NO_THROW(compute_service = simulation->add(new wrench::BareMetalComputeService(wms_host,
-                                                                                          {std::make_pair(
-                                                                                                  execution_host,
-                                                                                                  std::make_tuple(
-                                                                                                          wrench::ComputeService::ALL_CORES,
-                                                                                                          wrench::ComputeService::ALL_RAM))},
-                                                                                          {})));
+    ASSERT_NO_THROW(compute_service = simulation->add(new wrench::BareMetalComputeService(
+            wms_host,
+            {std::make_pair(
+                    execution_host,
+                    std::make_tuple(
+                            wrench::ComputeService::ALL_CORES,
+                            wrench::ComputeService::ALL_RAM))}, "",
+            {})));
 
     ASSERT_NO_THROW(storage_service = simulation->add(new wrench::SimpleStorageService(wms_host, {"/"})));
+
     ASSERT_NO_THROW(
             backup_storage_service = simulation->add(new wrench::SimpleStorageService(wms_host, {"/backup"})));
 

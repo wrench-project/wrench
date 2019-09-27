@@ -33,7 +33,7 @@ protected:
         task = workflow->addTask("task", 1, 1, 1, 1.0, 0);
         file = workflow->addFile("file", 1);
         storage_service = std::shared_ptr<wrench::StorageService>((wrench::StorageService *)(1234), [](void *ptr){});
-        location = wrench::FileLocation::LOCATION(storage_service, "/");
+        location = std::shared_ptr<wrench::FileLocation>((wrench::FileLocation *)1234);
         compute_service = std::shared_ptr<wrench::ComputeService>((wrench::ComputeService *)(1234), [](void *ptr){});
         network_proximity_service = std::shared_ptr<wrench::NetworkProximityService>((wrench::NetworkProximityService *)(1234), [](void *ptr){});
         network_proximity_daemon = std::shared_ptr<wrench::NetworkProximityDaemon>((wrench::NetworkProximityDaemon *)(1234), [](void *ptr){});

@@ -51,6 +51,7 @@ namespace wrench {
             return not FileLocation::operator==(rhs);
         }
 
+        static std::string sanitizePath(std::string path);
 
     private:
 
@@ -68,7 +69,6 @@ namespace wrench {
         std::string mount_point;
         std::string absolute_path_at_mount_point;
 
-        static std::string sanitizePath(std::string path);
 
     };
 

@@ -315,13 +315,19 @@ namespace wrench {
         // Figure out whether this succeeds or not
         std::shared_ptr<FailureCause> failure_cause = nullptr;
 
-        auto fs = this->file_systems[location->getAbsolutePathAtMountPoint()].get();
+        if (this->file_systems.find(location->getAbsolutePathAtMountPoint()) == this->file_systems.end()) {
+            failure_cause = std::shared_ptr<FailureCause>(new FileNotFound(file, location));
+        } else {
 
-        if ((not fs->doesDirectoryExist(location->getAbsolutePathAtMountPoint())) or
-            (not fs->isFileInDirectory(file, location->getAbsolutePathAtMountPoint()))) {
-            WRENCH_INFO("Received a a read request for a file I don't have (%s)", location->toString().c_str());
-            failure_cause = std::shared_ptr<FailureCause>(
-                    new FileNotFound(file, location));
+            auto fs = this->file_systems[location->getAbsolutePathAtMountPoint()].get();
+
+
+            if ((not fs->doesDirectoryExist(location->getAbsolutePathAtMountPoint())) or
+                (not fs->isFileInDirectory(file, location->getAbsolutePathAtMountPoint()))) { WRENCH_INFO(
+                        "Received a a read request for a file I don't have (%s)", location->toString().c_str());
+                failure_cause = std::shared_ptr<FailureCause>(
+                        new FileNotFound(file, location));
+            }
         }
 
         bool success = (failure_cause == nullptr);;
