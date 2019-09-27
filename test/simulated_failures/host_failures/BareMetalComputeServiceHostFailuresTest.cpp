@@ -61,7 +61,7 @@ protected:
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"FailedHost1\" speed=\"1f\" core=\"1\"> "
                           "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
-                          "             <prop id=\"size\" value=\"100\"/>"
+                          "             <prop id=\"size\" value=\"10000000000000\"/>"
                           "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
                           "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
@@ -71,7 +71,7 @@ protected:
                           "       </host>  "
                           "       <host id=\"FailedHost2\" speed=\"1f\" core=\"1\"> "
                           "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
-                          "             <prop id=\"size\" value=\"100\"/>"
+                          "             <prop id=\"size\" value=\"10000000000000\"/>"
                           "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
                           "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
@@ -80,7 +80,7 @@ protected:
                           "          </disk>"
                           "       </host>  "
                           "       <host id=\"StableHost\" speed=\"1f\" core=\"1\"> "
-                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "          <disk id=\"large_disk\" 10000000000000=\"100MBps\" write_bw=\"40MBps\">"
                           "             <prop id=\"size\" value=\"100\"/>"
                           "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
@@ -149,7 +149,7 @@ private:
         // Create a standard job
         auto job = job_manager->createStandardJob(this->test->task,
                                                   {{this->test->input_file, wrench::FileLocation::LOCATION(this->test->storage_service)},
-                                                  {this->test->output_file, wrench::FileLocation::LOCATION(this->test->storage_service)}});
+                                                   {this->test->output_file, wrench::FileLocation::LOCATION(this->test->storage_service)}});
 
         // Submit the standard job to the compute service, making it sure it runs on FailedHost1
         std::map<std::string, std::string> service_specific_args;
@@ -199,11 +199,11 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceOneFailu
                                                         std::make_pair("FailedHost1", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)),
                                                         std::make_pair("FailedHost2", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))
                                                 },
-                                                100.0,
+                                                "/scratch",
                                                 {}));
 
     // Create a Storage Service
-    storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, 10000000000000.0));
+    storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, {"/"}));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -214,7 +214,7 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceOneFailu
     // Staging the input_file on the storage service
     // Create a File Registry Service
     simulation->add(new wrench::FileRegistryService(stable_host));
-    simulation->stageFiles({{input_file->getID(), input_file}}, storage_service);
+    simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -264,8 +264,8 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create a standard job
-        auto job = job_manager->createStandardJob(this->test->task, {{this->test->input_file, this->test->storage_service},
-                                                                     {this->test->output_file, this->test->storage_service}});
+        auto job = job_manager->createStandardJob(this->test->task, {{this->test->input_file, wrench::FileLocation::LOCATION(this->test->storage_service)},
+                                                                     {this->test->output_file, wrench::FileLocation::LOCATION(this->test->storage_service)}});
 
         // Submit the standard job to the compute service, making it sure it runs on FailedHost1
         job_manager->submitJob(job, this->test->compute_service, {});
@@ -314,11 +314,11 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceOneFailu
                                                 (std::map<std::string, std::tuple<unsigned long, double>>){
                                                         std::make_pair("FailedHost1", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)),
                                                 },
-                                                100.0,
+                                                "/scratch",
                                                 {}));
 
     // Create a Storage Service
-    storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, 10000000000000.0));
+    storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, {"/"}));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -329,7 +329,7 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceOneFailu
     // Staging the input_file on the storage service
     // Create a File Registry Service
     simulation->add(new wrench::FileRegistryService(stable_host));
-    simulation->stageFiles({{input_file->getID(), input_file}}, storage_service);
+    simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -393,8 +393,10 @@ private:
             task->addOutputFile(output_file);
 
             // Create a standard job
-            auto job = job_manager->createStandardJob(task, {{this->test->input_file, this->test->storage_service},
-                                                             {output_file, this->test->storage_service}});
+            auto job = job_manager->createStandardJob(task, {{this->test->input_file,
+                                                                     wrench::FileLocation::LOCATION(this->test->storage_service)},
+                                                             {output_file,
+                                                                     wrench::FileLocation::LOCATION(this->test->storage_service)}});
 
             // Submit the standard job to the compute service, making it sure it runs on FailedHost1
             job_manager->submitJob(job, this->test->compute_service, {});
@@ -445,11 +447,11 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceRandomFa
                                                         std::make_pair("FailedHost1", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)),
                                                         std::make_pair("FailedHost2", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)),
                                                 },
-                                                100.0,
+                                                "/scratch",
                                                 {}));
 
     // Create a Storage Service
-    storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, 10000000000000.0));
+    storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, {"/"}));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -460,7 +462,7 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceRandomFa
     // Staging the input_file on the storage service
     // Create a File Registry Service
     simulation->add(new wrench::FileRegistryService(stable_host));
-    simulation->stageFiles({{input_file->getID(), input_file}}, storage_service);
+    simulation->stageFile(input_file, wrench::FileLocation::LOCATION((storage_service)));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -503,8 +505,10 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create a standard job
-        auto job = job_manager->createStandardJob(this->test->task, {{this->test->input_file, this->test->storage_service},
-                                                                     {this->test->output_file, this->test->storage_service}});
+        auto job = job_manager->createStandardJob(this->test->task, {{this->test->input_file,
+                                                                             wrench::FileLocation::LOCATION(this->test->storage_service)},
+                                                                     {this->test->output_file,
+                                                                             wrench::FileLocation::LOCATION(this->test->storage_service)}});
 
         // Submit the standard job to the compute service, making it sure it runs on FailedHost1
         job_manager->submitJob(job, this->test->compute_service, {});
@@ -542,17 +546,18 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceFailureO
 
     // Create a Compute Service that has access to one hosts
     compute_service = simulation->add(
-            new wrench::BareMetalComputeService(stable_host,
-                                                (std::map<std::string, std::tuple<unsigned long, double>>){
-                                                        std::make_pair("FailedHost1", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)),
-                                                },
-                                                100.0,
-                                                {
-                                                        {wrench::BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN, "true"}
-                                                }));
+            new wrench::BareMetalComputeService(
+                    stable_host,
+                    (std::map<std::string, std::tuple<unsigned long, double>>){
+                            std::make_pair("FailedHost1", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)),
+                    },
+                    "/scratch",
+                    {
+                            {wrench::BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN, "true"}
+                    }));
 
     // Create a Storage Service
-    storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, 10000000000000.0));
+    storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, {"/"}));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -563,7 +568,7 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceFailureO
     // Staging the input_file on the storage service
     // Create a File Registry Service
     simulation->add(new wrench::FileRegistryService(stable_host));
-    simulation->stageFiles({{input_file->getID(), input_file}}, storage_service);
+    simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
