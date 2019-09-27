@@ -1,5 +1,3 @@
-// import { getRandomColour, populateLegend } from '../util'
-
 var origin = [0, 200]
 var startAngle = Math.PI/4
 var yAngle = startAngle

@@ -1,5 +1,3 @@
-// import { convertToTableFormat, getDuration } from '../util'
-
 function populateWorkflowTaskDataTable(data) {
     d3.select("#task-details-table")
         .style('display', 'block')
