@@ -149,7 +149,7 @@ private:
                 },
                 {},
                 {},
-                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
                                                                                              wrench::FileLocation::LOCATION(this->test->storage_service))});
 
         // Create a StandardJobExecutor
@@ -226,7 +226,7 @@ void StandardJobExecutorHostFailuresTest::do_StandardJobExecutorOneFailureCausin
     // Staging the input_file on the storage service
     // Create a File Registry Service
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(stable_host)));
-    ASSERT_NO_THROW(simulation->stageFiles({{input_file->getID(), input_file}}, storage_service));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service)));
 
     // Running a "run a single task" simulation
 
@@ -278,13 +278,13 @@ private:
         auto job = job_manager->createStandardJob(
                 {this->test->task},
                 {
-                        {*(this->test->task->getInputFiles().begin()),  this->test->storage_service},
-                        {*(this->test->task->getOutputFiles().begin()), this->test->storage_service}
+                        {*(this->test->task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service)},
+                        {*(this->test->task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service)}
                 },
                 {},
                 {},
-                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                             this->test->storage_service)});
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
+                                                                                             wrench::FileLocation::LOCATION(this->test->storage_service))});
 
         // Create a StandardJobExecutor
         std::shared_ptr<wrench::StandardJobExecutor> executor;
@@ -347,7 +347,7 @@ void StandardJobExecutorHostFailuresTest::do_StandardJobExecutorOneFailureCausin
     std::string stable_host = "StableHost";
 
     // Create a Storage Service
-    storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, 10000000000000.0));
+    storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, {"/"}));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -358,7 +358,7 @@ void StandardJobExecutorHostFailuresTest::do_StandardJobExecutorOneFailureCausin
     // Staging the input_file on the storage service
     // Create a File Registry Service
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(stable_host)));
-    ASSERT_NO_THROW(simulation->stageFiles({{input_file->getID(), input_file}}, storage_service));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service)));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -425,13 +425,13 @@ private:
             auto job = job_manager->createStandardJob(
                     {task},
                     {
-                            {*(task->getInputFiles().begin()),  this->test->storage_service},
-                            {*(task->getOutputFiles().begin()), this->test->storage_service}
+                            {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service)},
+                            {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service)}
                     },
                     {},
                     {},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>>(
-                            output_file, this->test->storage_service)});
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(
+                            output_file, wrench::FileLocation::LOCATION(this->test->storage_service))});
 
             // Create a StandardJobExecutor
             std::shared_ptr<wrench::StandardJobExecutor> executor;
@@ -504,7 +504,7 @@ void StandardJobExecutorHostFailuresTest::do_StandardJobExecutorRandomFailures_t
     std::string stable_host = "StableHost";
 
     // Create a Storage Service
-    storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, 10000000000000.0));
+    storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, {"/"}));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -515,7 +515,7 @@ void StandardJobExecutorHostFailuresTest::do_StandardJobExecutorRandomFailures_t
     // Staging the input_file on the storage service
     // Create a File Registry Service
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(stable_host)));
-    ASSERT_NO_THROW(simulation->stageFiles({{input_file->getID(), input_file}}, storage_service));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service)));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
