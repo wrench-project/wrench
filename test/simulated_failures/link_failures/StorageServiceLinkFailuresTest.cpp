@@ -45,9 +45,36 @@ protected:
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
-                          "       <host id=\"Host1\" speed=\"1f\" core=\"10\"/> "
-                          "       <host id=\"Host2\" speed=\"1f\" core=\"10\"/> "
-                          "       <host id=\"Host3\" speed=\"1f\" core=\"10\"/> "
+                          "       <host id=\"Host1\" speed=\"1f\" core=\"10\"> "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\""+std::to_string(STORAGE_SERVICE_CAPACITY)+"\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"101\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>  "
+                          "       <host id=\"Host2\" speed=\"1f\" core=\"10\"> "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\""+std::to_string(STORAGE_SERVICE_CAPACITY)+"\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"101\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>  "
+                          "       <host id=\"Host3\" speed=\"1f\" core=\"10\"> "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\""+std::to_string(STORAGE_SERVICE_CAPACITY)+"\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"101\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>  "
                           "       <link id=\"link1\" bandwidth=\"1Bps\" latency=\"0us\"/>"
                           "       <link id=\"link2\" bandwidth=\"1Bps\" latency=\"0us\"/>"
                           "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"link1\""
@@ -96,7 +123,7 @@ private:
 
         for (int trial = 0; trial < NUM_FILES; trial++) {
             auto potential_file = this->test->files.at(dist_files(rng));
-            if (ss->lookupFile(potential_file)) {
+            if (ss->lookupFile(potential_file, wrench::FileLocation::LOCATION(ss))) {
                 return potential_file;
             }
         }
@@ -108,13 +135,13 @@ private:
         std::uniform_int_distribution<unsigned long> dist_storage(
                 0, this->test->storage_services.size()-1);
 
-        auto source = this->test->storage_services.at(dist_storage(rng));
-        auto destination = this->test->storage_services.at(dist_storage(rng));
+        auto source = wrench::FileLocation::LOCATION(this->test->storage_services.at(dist_storage(rng)));
+        auto destination = wrench::FileLocation::LOCATION(this->test->storage_services.at(dist_storage(rng)));
         while (destination == source)
-            destination = this->test->storage_services.at(dist_storage(rng));
+            destination = wrench::FileLocation::LOCATION(this->test->storage_services.at(dist_storage(rng)));
 
-        auto file = findRandomFileOnStorageService(source);
-        if ((file != nullptr) && (not destination->lookupFile(file))){
+        auto file = findRandomFileOnStorageService(source->getStorageService());
+        if ((file != nullptr) && (not destination->getStorageService()->lookupFile(file, destination))){
             this->data_movement_manager->doSynchronousFileCopy(
                     file, source, destination, this->test->file_registry_service);
         }
@@ -125,13 +152,13 @@ private:
         std::uniform_int_distribution<unsigned long> dist_storage(
                 0, this->test->storage_services.size()-1);
 
-        auto source = this->test->storage_services.at(dist_storage(rng));
-        auto destination = this->test->storage_services.at(dist_storage(rng));
+        auto source = wrench::FileLocation::LOCATION(this->test->storage_services.at(dist_storage(rng)));
+        auto destination = wrench::FileLocation::LOCATION(this->test->storage_services.at(dist_storage(rng)));
         while (destination == source)
-            destination = this->test->storage_services.at(dist_storage(rng));
+            destination = wrench::FileLocation::LOCATION(this->test->storage_services.at(dist_storage(rng)));
 
-        auto file = findRandomFileOnStorageService(source);
-        if ((file == nullptr) || (destination->lookupFile(file))) {
+        auto file = findRandomFileOnStorageService(source->getStorageService());
+        if ((file == nullptr) || (destination->getStorageService()->lookupFile(file, destination))) {
             return;
         }
 
@@ -162,14 +189,17 @@ private:
         std::uniform_int_distribution<unsigned long> dist_storage(
                 0, this->test->storage_services.size()-1);
 
-        auto source = this->test->storage_services.at(dist_storage(rng));
-        auto file = findRandomFileOnStorageService(source);
+        auto source = wrench::FileLocation::LOCATION(this->test->storage_services.at(dist_storage(rng)));
+        auto file = findRandomFileOnStorageService(source->getStorageService());
         if (file == nullptr) {
             return;
         }
-        double space = source->getFreeSpace();
-        if (space < STORAGE_SERVICE_CAPACITY * .25) {
-            source->deleteFile(file, this->test->file_registry_service);
+        auto space = source->getStorageService()->getFreeSpace();
+        if (space.size() > 1) {
+            throw std::runtime_error("There should be a single disk!");
+        }
+        if (space.begin()->second < STORAGE_SERVICE_CAPACITY * .25) {
+            wrench::StorageService::deleteFile(file, source,  this->test->file_registry_service);
         }
     }
 
@@ -288,7 +318,7 @@ void StorageServiceLinkFailuresTest::do_StorageServiceLinkFailureSimpleRandom_Te
             hostname = "Host3";
         }
         storage_services.push_back(simulation->add(
-                new wrench::SimpleStorageService(hostname, STORAGE_SERVICE_CAPACITY,
+                new wrench::SimpleStorageService(hostname, {"/"},
                                                  {{}}, payloads)));
     }
 
@@ -318,7 +348,7 @@ void StorageServiceLinkFailuresTest::do_StorageServiceLinkFailureSimpleRandom_Te
     for (auto const &ss : storage_services) {
         for (auto const &f : files) {
             if (not dist_stage(rng)) {
-                simulation->stageFile(f, ss);
+                simulation->stageFile(f, wrench::FileLocation::LOCATION(ss));
             }
         }
     }

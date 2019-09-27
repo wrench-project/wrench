@@ -42,8 +42,26 @@ protected:
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
-                          "       <host id=\"Host1\" speed=\"1f\" core=\"10\"/> "
-                          "       <host id=\"Host2\" speed=\"1f\" core=\"10\"/> "
+                          "       <host id=\"Host1\" speed=\"1f\" core=\"10\"> "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"101\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>  "
+                          "       <host id=\"Host2\" speed=\"1f\" core=\"10\"> "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"101\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>  "
                           "       <link id=\"link1\" bandwidth=\"1Bps\" latency=\"0us\"/>"
                           "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"link1\""
                           "       /> </route>"
@@ -104,12 +122,12 @@ private:
                 // Do a random add
                 wrench::Simulation::sleep(1.0);
                 this->test->file_registry_service->addEntry(files.at(dist_files(rng)),
-                                                            this->test->storage_services.at(dist_storage(rng)));
+                                                            wrench::FileLocation::LOCATION(this->test->storage_services.at(dist_storage(rng))));
 
                 // Do a random delete
                 wrench::Simulation::sleep(1.0);
                 this->test->file_registry_service->removeEntry(files.at(dist_files(rng)),
-                                                               this->test->storage_services.at(dist_storage(rng)));
+                                                               wrench::FileLocation::LOCATION(this->test->storage_services.at(dist_storage(rng))));
 
                 // Do a random lookup
                 wrench::Simulation::sleep(1.0);
@@ -147,7 +165,7 @@ void FileRegistryLinkFailuresTest::do_FileRegistryLinkFailureSimpleRandom_Test()
     // Create a bunch of storage services
     for (unsigned int i = 0; i < NUM_STORAGE_SERVICES; i++) {
         storage_services.push_back(simulation->add(
-                new wrench::SimpleStorageService(hostname, 100000000.0)));
+                new wrench::SimpleStorageService(hostname, {"/"})));
     }
 
     // Create a file registry service
