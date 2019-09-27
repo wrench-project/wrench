@@ -1,5 +1,3 @@
-// import { populateLegend } from '../util'
-
 function showHideArrow(id, arrowId) {
     var overallDiv = $(`#${id}`)
     var arrow = $(`#${arrowId}`)

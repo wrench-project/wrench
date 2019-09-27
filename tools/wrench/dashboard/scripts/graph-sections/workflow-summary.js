@@ -1,5 +1,3 @@
-// import { getDuration, toFiveDecimalPlaces } from '../util'
-
 function getOverallWorkflowMetrics(data) {
     var hosts = new Set()
     var noFailed = 0

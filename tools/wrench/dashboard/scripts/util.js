@@ -87,12 +87,3 @@ function populateLegend(currView) {
             .text("Terminated By User")
     }
 }
-
-// module.exports = {
-//     getDuration,
-//     toFiveDecimalPlaces,
-//     findDuration,
-//     convertToTableFormat,
-//     getRandomColour,
-//     populateLegend
-// }

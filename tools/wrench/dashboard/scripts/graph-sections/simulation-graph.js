@@ -1,5 +1,3 @@
-// import { toFiveDecimalPlaces, findDuration } from '../util'
-
 function getBoxWidth(d, section, scale) {
     if (d[section].start != -1) {
         if (d[section].end == -1) {
