@@ -7,12 +7,16 @@
  * (at your option) any later version.
  */
 
+
 #include <gtest/gtest.h>
 
 #include <wrench-dev.h>
 
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
+
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(workflow_task_test, "Log category for Workflow Task Test");
+
 
 class WorkflowTaskTest : public ::testing::Test {
 
@@ -272,11 +276,23 @@ private:
         job_manager->submitJob(job_that_will_fail, this->test->compute_service);
 
         // while large_input_file is being read, we delete small_input_file so that the one task job will fail
+        WRENCH_INFO("DELETING FILE!");
         wrench::StorageService::deleteFile(this->getWorkflow()->getFileByID("small_input_file"),
                                            wrench::FileLocation::LOCATION(this->test->storage_service),
                                            this->test->file_registry_service);
-        this->waitForAndProcessNextEvent();
 
+        std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+        try {
+            event = this->getWorkflow()->waitForNextExecutionEvent();
+        } catch (wrench::WorkflowExecutionException &e) {
+            throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+        }
+
+        if (not std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event)) {
+            throw std::runtime_error("Job should have failed!");
+        }
+
+        std::cerr << "JERE\n";
         wrench::StandardJob *job_that_will_complete = job_manager->createStandardJob(this->test->t4,
                                                                                      {{this->test->small_input_file,
                                                                                               wrench::FileLocation::LOCATION(this->test->storage_service)},
@@ -284,17 +300,23 @@ private:
                                                                                               wrench::FileLocation::LOCATION(this->test->storage_service)},
                                                                                       {this->test->t4_output_file,
                                                                                               wrench::FileLocation::LOCATION(this->test->storage_service)}});
+        std::cerr << "JERE1\n";
         job_manager->submitJob(job_that_will_complete, this->test->compute_service);
+        std::cerr << "JERE\n";
         this->waitForAndProcessNextEvent();
+        std::cerr << "JERE2\n";
+
 
         wrench::StandardJob *job_that_will_be_terminated = job_manager->createStandardJob(this->test->t5, {});
         job_manager->submitJob(job_that_will_be_terminated, this->test->compute_service);
         wrench::S4U_Simulation::sleep(10.0);
         job_manager->terminateJob(job_that_will_be_terminated);
+        std::cerr << "JERE3\n";
 
         wrench::StandardJob *job_that_will_fail_2 = job_manager->createStandardJob(this->test->t6, {});
         job_manager->submitJob(job_that_will_fail_2, this->test->compute_service);
         wrench::S4U_Simulation::sleep(10.0);
+        std::cerr << "JERE4\n";
         this->test->compute_service->stop();
 
         return 0;
@@ -350,6 +372,7 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
 
     ASSERT_NO_THROW(simulation->launch());
 
+
     auto t4_history = t4->getExecutionHistory();
 
 // t4 was executed twice, so its execution history should be of size 2
@@ -368,7 +391,7 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
             t4_successful_execution.task_end
     };
 
-// none of the values should be -1 except task_falure
+// none of the values should be -1 except task_failure
     for (auto &value : t4_successful_execution_history_values) {
         ASSERT_NE(value, -1.0);
     }

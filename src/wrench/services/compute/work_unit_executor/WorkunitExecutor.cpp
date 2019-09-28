@@ -353,7 +353,8 @@ namespace wrench {
                 throw;
             }
 
-            WRENCH_INFO("Writing the %ld output files for task %s", task->getOutputFiles().size(),
+            WRENCH_INFO("Writing the %ld output files for task %s",
+                        task->getOutputFiles().size(),
                         task->getID().c_str());
 
             // Write all output files
@@ -367,6 +368,7 @@ namespace wrench {
                         files_to_write[f] = FileLocation::LOCATION(this->scratch_space, job->getName());
                     }
                 }
+                StorageService::writeFiles(files_to_write);
                 task->setWriteOutputEndDate(S4U_Simulation::getClock());
             } catch (WorkflowExecutionException &e) {
                 this->failure_timestamp_should_be_generated = true;

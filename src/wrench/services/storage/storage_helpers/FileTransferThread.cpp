@@ -143,11 +143,11 @@ namespace wrench {
 
         WRENCH_INFO("New FileTransferThread (file=%s, src_mailbox=%s; src_location=%s; dst_mailbox=%s; dst_location=%s; answer_mailbox_if_copy=%s",
                     file->getID().c_str(),
-                    src_mailbox.c_str(),
-                    src_location->toString().c_str(),
-                    dst_mailbox.c_str(),
-                    dst_location->toString().c_str(),
-                    answer_mailbox_if_copy.c_str());
+                    (src_mailbox.empty() ? "none" : src_mailbox.c_str()),
+                    (src_location == nullptr ? "none" : src_location->toString().c_str()),
+                    (dst_mailbox.empty() ? "none" : dst_mailbox.c_str()),
+                    (dst_location == nullptr ? "none" : dst_location->toString().c_str()),
+                    (answer_mailbox_if_copy.empty() ? "none" : answer_mailbox_if_copy.c_str()));
 
         // Create a message to send back (some field of which may be overwritten below)
         msg_to_send_back = new FileTransferThreadNotificationMessage(

@@ -83,7 +83,8 @@ namespace wrench {
      */
     void StorageService::stageFile(WorkflowFile *file, std::shared_ptr<FileLocation> location) {
 
-        location->getStorageService()->stageFile(file, location->getMountPoint(), location->getAbsolutePathAtMountPoint());
+        location->getStorageService()->stageFile(file, location->getMountPoint(),
+                                                 location->getAbsolutePathAtMountPoint());
     }
 
     /**
@@ -95,6 +96,10 @@ namespace wrench {
     void StorageService::stageFile(WorkflowFile *file, std::string mountpoint, std::string directory) {
 
         auto fs = this->file_systems[mountpoint].get();
+
+        if (not fs->hasEnoughFreeSpace(file->getSize())) {
+            throw std::invalid_argument("StorageService::stageFile(): Not enough storage space at location to stage file");
+        }
 
         if (not fs->doesDirectoryExist(directory)) {
             fs->createDirectory(directory);

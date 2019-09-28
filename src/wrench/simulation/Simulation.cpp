@@ -502,7 +502,7 @@ namespace wrench {
      */
     void Simulation::stageFile(WorkflowFile *file, std::shared_ptr<FileLocation> location) {
 
-        if (file == nullptr) {
+        if ((file == nullptr) or (location == nullptr)) {
             throw std::invalid_argument("Simulation::stageFile(): Invalid arguments");
         }
 
