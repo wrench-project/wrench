@@ -84,7 +84,7 @@ namespace wrench {
      * @brief Give a <ss name>:<mount point>:<dir>" string for the location
      */
     std::string FileLocation::toString() {
-        return this->storage_service->getName() + ":" + this->mount_point + this->absolute_path_at_mount_point;
+        return this->storage_service->getName() + ":" + sanitizePath(this->mount_point + this->absolute_path_at_mount_point);
     }
 
     /**

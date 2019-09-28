@@ -81,7 +81,7 @@ protected:
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"SingleHost\" speed=\"1f\" core=\"2\"> "
                           "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
-                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"size\" value=\"30000B\"/>"
                           "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
                           "          <disk id=\"scratch_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
@@ -91,7 +91,7 @@ protected:
                           "       </host> "
                           "       <host id=\"OneCoreHost\" speed=\"1f\" core=\"1\"> "
                           "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
-                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"size\" value=\"30000B\"/>"
                           "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
                           "          <disk id=\"scratch_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
@@ -101,7 +101,7 @@ protected:
                           "       </host> "
                           "       <host id=\"RAMHost\" speed=\"1f\" core=\"1\" > "
                           "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
-                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"size\" value=\"10000B\"/>"
                           "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
                           "          <disk id=\"scratch_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
@@ -203,7 +203,7 @@ void BareMetalComputeServiceOneTaskTest::do_BadSetup_test() {
             new wrench::BareMetalComputeService(hostname,
                                                 {std::make_pair("bogus",
                                                                 std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                wrench::ComputeService::ALL_RAM))},
+                                                                                wrench::ComputeService::ALL_RAM))}, "",
                                                 {})), std::invalid_argument);
 
     // Bad number of cores
@@ -211,7 +211,7 @@ void BareMetalComputeServiceOneTaskTest::do_BadSetup_test() {
             new wrench::BareMetalComputeService(hostname,
                                                 {std::make_pair(hostname,
                                                                 std::make_tuple(0,
-                                                                                wrench::ComputeService::ALL_RAM))},
+                                                                                wrench::ComputeService::ALL_RAM))}, "",
                                                 {})), std::invalid_argument);
 
     // Bad number of cores
@@ -221,6 +221,7 @@ void BareMetalComputeServiceOneTaskTest::do_BadSetup_test() {
                                                                 std::make_tuple(100,
                                                                                 wrench::ComputeService::ALL_RAM))},
                                                 {})), std::invalid_argument);
+
 
     // Bad RAM
     ASSERT_THROW(compute_service = simulation->add(
@@ -238,14 +239,13 @@ void BareMetalComputeServiceOneTaskTest::do_BadSetup_test() {
                                                                                 100000.0))},
                                                 {})), std::invalid_argument);
 
-
     // Bad PROPERTIES
     ASSERT_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname,
                                                 {std::make_pair("RAMHost",
                                                                 std::make_tuple(wrench::ComputeService::ALL_CORES,
                                                                                 100000.0))},
-                                                0,
+                                                "",
                                                 {
                                                         std::make_pair(wrench::BareMetalComputeServiceProperty::THREAD_STARTUP_OVERHEAD, "-1.0")
                                                 },
@@ -375,11 +375,16 @@ void BareMetalComputeServiceOneTaskTest::do_Noop_test() {
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
+    WRENCH_INFO("LAUNCHING");
     ASSERT_THROW(simulation->stageFile(input_file, nullptr), std::invalid_argument);
+    WRENCH_INFO("LAUNCHING2");
     ASSERT_THROW(simulation->stageFile(nullptr, wrench::FileLocation::LOCATION(storage_service1)), std::invalid_argument);
+    WRENCH_INFO("LAUNCHING3");
 
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
+
+    WRENCH_INFO("LAUNCHING");
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -791,10 +796,25 @@ private:
         // Wait for the workflow execution event
         std::shared_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
         if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
-            throw std::runtime_error("Unexpected workflow execution event!");
+            throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
-        if (!this->test->storage_service1->lookupFile(this->test->output_file, nullptr)) {
+        // bogus lookup #1
+        try {
+            wrench::StorageService::lookupFile(nullptr, wrench::FileLocation::LOCATION(this->test->storage_service1));
+            throw std::runtime_error("Should not have been able to lookup a nullptr file");
+        } catch (std::invalid_argument &e) {
+        }
+
+        // bogus lookup #2
+        try {
+            wrench::StorageService::lookupFile(this->test->output_file, nullptr);
+            throw std::runtime_error("Should not have been able to lookup a nullptr location");
+        } catch (std::invalid_argument &e) {
+        }
+
+
+        if (!wrench::StorageService::lookupFile(this->test->output_file, wrench::FileLocation::LOCATION(this->test->storage_service1))) {
             throw std::runtime_error("Output file not written to storage service");
         }
 
@@ -842,7 +862,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithLocationMap_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -852,7 +872,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithLocationMap_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService("OneCoreHost", {"/"})));
 
     // Create a File Registry Service
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));

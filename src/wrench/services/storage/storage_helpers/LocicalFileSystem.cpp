@@ -119,6 +119,7 @@ namespace wrench {
     void LogicalFileSystem::storeFileInDirectory(WorkflowFile *file, std::string absolute_path) {
         assertDirectoryExist(absolute_path);
         this->content[absolute_path].insert(file);
+        this->occupied_space += file->getSize();
     }
 
 /**
@@ -131,6 +132,7 @@ namespace wrench {
     void LogicalFileSystem::removeFileFromDirectory(WorkflowFile *file, std::string absolute_path) {
         assertDirectoryExist(absolute_path);
         assertFileIsInDirectory(file, absolute_path);
+        this->content[absolute_path].erase(file);
     }
 
 /**
