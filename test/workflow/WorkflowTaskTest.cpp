@@ -292,7 +292,6 @@ private:
             throw std::runtime_error("Job should have failed!");
         }
 
-        std::cerr << "JERE\n";
         wrench::StandardJob *job_that_will_complete = job_manager->createStandardJob(this->test->t4,
                                                                                      {{this->test->small_input_file,
                                                                                               wrench::FileLocation::LOCATION(this->test->storage_service)},
@@ -300,23 +299,18 @@ private:
                                                                                               wrench::FileLocation::LOCATION(this->test->storage_service)},
                                                                                       {this->test->t4_output_file,
                                                                                               wrench::FileLocation::LOCATION(this->test->storage_service)}});
-        std::cerr << "JERE1\n";
         job_manager->submitJob(job_that_will_complete, this->test->compute_service);
-        std::cerr << "JERE\n";
         this->waitForAndProcessNextEvent();
-        std::cerr << "JERE2\n";
 
 
         wrench::StandardJob *job_that_will_be_terminated = job_manager->createStandardJob(this->test->t5, {});
         job_manager->submitJob(job_that_will_be_terminated, this->test->compute_service);
         wrench::S4U_Simulation::sleep(10.0);
         job_manager->terminateJob(job_that_will_be_terminated);
-        std::cerr << "JERE3\n";
 
         wrench::StandardJob *job_that_will_fail_2 = job_manager->createStandardJob(this->test->t6, {});
         job_manager->submitJob(job_that_will_fail_2, this->test->compute_service);
         wrench::S4U_Simulation::sleep(10.0);
-        std::cerr << "JERE4\n";
         this->test->compute_service->stop();
 
         return 0;

@@ -385,11 +385,19 @@ namespace wrench {
 
         // File System at the destination
         auto fs = this->file_systems[dst_location->getAbsolutePathAtMountPoint()].get();
+        WRENCH_INFO("HERE: %s", dst_location->getAbsolutePathAtMountPoint().c_str());
+
+
+        fs->doesDirectoryExist(dst_location->getAbsolutePathAtMountPoint());
+        WRENCH_INFO("ASD):");
+        fs->isFileInDirectory(file, dst_location->getAbsolutePathAtMountPoint());
+        WRENCH_INFO("ASD):");
 
 
         if ((not fs->doesDirectoryExist(dst_location->getAbsolutePathAtMountPoint())) or
             (not fs->isFileInDirectory(file, dst_location->getAbsolutePathAtMountPoint()))) {
 
+            WRENCH_INFO("123");
             if (not fs->hasEnoughFreeSpace(file->getSize())) {
 
                 this->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyFailure>(
@@ -416,6 +424,7 @@ namespace wrench {
                 return true;
             }
         }
+            WRENCH_INFO("123XZXZXX");
 
         fs->decreaseFreeSpace(file->getSize());
 

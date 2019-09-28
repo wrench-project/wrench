@@ -80,9 +80,13 @@ protected:
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"SingleHost\" speed=\"1f\" core=\"2\"> "
-                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
                           "             <prop id=\"size\" value=\"30000B\"/>"
-                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "             <prop id=\"mount\" value=\"/disk1\"/>"
+                          "          </disk>"
+                          "          <disk id=\"large_disk2\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"30000B\"/>"
+                          "             <prop id=\"mount\" value=\"/disk2\"/>"
                           "          </disk>"
                           "          <disk id=\"scratch_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
                           "             <prop id=\"size\" value=\"100B\"/>"
@@ -724,7 +728,7 @@ void BareMetalComputeServiceOneTaskTest::do_HostMemory_test() {
     // Create a Compute Service
     compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname1,
-                                                {std::make_pair(hostname1, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},"/scratch'",
+                                                {std::make_pair(hostname1, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))}, "/scratch",
                                                 {}));
 
     // Create a Storage Service
@@ -1132,15 +1136,15 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPrePostCopiesTaskCleanu
     ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname ="SingleHost";
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname, {"/disk1"})));
 
     // Create another Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname, {"/disk2"})));
 
 
     // Create a Compute Service with default Storage Service #2
