@@ -60,7 +60,9 @@ namespace wrench {
         LogicalFileSystem::mount_points.insert(hostname+":"+mount_point);
 
         this->mount_point = mount_point;
-        this->content["/"] = {};
+        this->content.insert(std::make_pair("/", (std::set<WorkflowFile*>){}));
+        WRENCH_INFO("INCONSTRU: %lu",  this->content.size());
+//        this->content["/"] = {};
         this->total_capacity = S4U_Simulation::getDiskCapacity(hostname, mount_point);
         this->occupied_space = 0;
     }
@@ -83,6 +85,9 @@ namespace wrench {
  * @return true if the directory exists
  */
     bool LogicalFileSystem::doesDirectoryExist(std::string absolute_path) {
+        WRENCH_INFO("WTF %s", absolute_path.c_str());
+        WRENCH_INFO("WTF %lu", this->content.size());
+        WRENCH_INFO("ASDADADASDASD");
         return (this->content.find(absolute_path) != this->content.end());
     }
 

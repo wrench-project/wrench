@@ -77,7 +77,7 @@ namespace wrench {
 
         absolute_path.replace(0, mount_point.length(), "/");
 
-        return std::shared_ptr<FileLocation>(new FileLocation(ss, mount_point, absolute_path));
+        return std::shared_ptr<FileLocation>(new FileLocation(ss, mount_point, sanitizePath(absolute_path)));
     }
 
     /**
