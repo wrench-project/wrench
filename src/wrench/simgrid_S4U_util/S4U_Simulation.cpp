@@ -330,7 +330,7 @@ namespace wrench {
             }
         }
         throw std::invalid_argument("S4U_Simulation::writeToDisk(): unknown path " +
-                                            absolute_path + " at host " + hostname);
+                                    absolute_path + " at host " + hostname);
     }
 
     /**
@@ -725,7 +725,8 @@ namespace wrench {
             return capacity;
         }
 
-        throw std::invalid_argument("S4U_Simulation::getDiskCapacity(): Unknown mount point " + mount_point);
+        throw std::invalid_argument("S4U_Simulation::getDiskCapacity(): Unknown mount point " +
+                                    mount_point + " at host " + hostname);
     }
 
 
