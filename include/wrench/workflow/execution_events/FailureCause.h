@@ -174,6 +174,33 @@ namespace wrench {
 //    };
 
     /**
+        * @brief A "unknown mount point storage service" failure cause
+        */
+    class InvalidDirectoryPath : public FailureCause {
+
+    public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        InvalidDirectoryPath(
+                std::shared_ptr<StorageService> storage_service,
+                std::string invalid_path);
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
+        std::shared_ptr<StorageService>  getStorageService();
+        std::string  getInvalidPath();
+        std::string toString();
+
+
+    private:
+        std::shared_ptr<StorageService>  storage_service;
+        std::string  invalid_path;
+    };
+
+
+    /**
      * @brief A "file is already being copied" failure cause
      */
     class FileLocation;

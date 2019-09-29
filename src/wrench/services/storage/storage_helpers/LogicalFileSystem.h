@@ -46,13 +46,13 @@ namespace wrench {
         std::set<WorkflowFile *> listFilesInDirectory(std::string absolute_path);
 
 
+        std::map<std::string, std::set<WorkflowFile*>> content;
     private:
 
         static std::set<std::string> mount_points;
 
 
         std::string mount_point;
-        std::map<std::string, std::set<WorkflowFile*>> content;
         double total_capacity;
         double occupied_space;
 

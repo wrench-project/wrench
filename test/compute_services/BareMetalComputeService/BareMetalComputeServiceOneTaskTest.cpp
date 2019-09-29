@@ -79,12 +79,16 @@ protected:
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
-                          "       <host id=\"SingleHost\" speed=\"1f\" core=\"2\"> "
+                          "       <host id=\"TwoCoreHost\" speed=\"1f\" core=\"2\"> "
                           "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
                           "             <prop id=\"size\" value=\"30000B\"/>"
                           "             <prop id=\"mount\" value=\"/disk1\"/>"
                           "          </disk>"
                           "          <disk id=\"large_disk2\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"30000B\"/>"
+                          "             <prop id=\"mount\" value=\"/disk2\"/>"
+                          "          </disk>"
+                          "          <disk id=\"large_disk3\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
                           "             <prop id=\"size\" value=\"30000B\"/>"
                           "             <prop id=\"mount\" value=\"/disk2\"/>"
                           "          </disk>"
@@ -94,9 +98,17 @@ protected:
                           "          </disk>"
                           "       </host> "
                           "       <host id=\"OneCoreHost\" speed=\"1f\" core=\"1\"> "
-                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
                           "             <prop id=\"size\" value=\"30000B\"/>"
-                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "             <prop id=\"mount\" value=\"/disk1\"/>"
+                          "          </disk>"
+                          "          <disk id=\"large_disk2\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"30000B\"/>"
+                          "             <prop id=\"mount\" value=\"/disk2\"/>"
+                          "          </disk>"
+                          "          <disk id=\"large_disk3\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"30000B\"/>"
+                          "             <prop id=\"mount\" value=\"/disk2\"/>"
                           "          </disk>"
                           "          <disk id=\"scratch_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
                           "             <prop id=\"size\" value=\"100B\"/>"
@@ -104,9 +116,17 @@ protected:
                           "          </disk>"
                           "       </host> "
                           "       <host id=\"RAMHost\" speed=\"1f\" core=\"1\" > "
-                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
-                          "             <prop id=\"size\" value=\"10000B\"/>"
-                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"30000B\"/>"
+                          "             <prop id=\"mount\" value=\"/disk1\"/>"
+                          "          </disk>"
+                          "          <disk id=\"large_disk2\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"30000B\"/>"
+                          "             <prop id=\"mount\" value=\"/disk2\"/>"
+                          "          </disk>"
+                          "          <disk id=\"large_disk3\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"30000B\"/>"
+                          "             <prop id=\"mount\" value=\"/disk2\"/>"
                           "          </disk>"
                           "          <disk id=\"scratch_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
                           "             <prop id=\"size\" value=\"100B\"/>"
@@ -115,7 +135,7 @@ protected:
                           "         <prop id=\"ram\" value=\"1024\" />"
                           "       </host> "
                           "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
-                          "       <route src=\"SingleHost\" dst=\"OneCoreHost\"> <link_ctn id=\"1\"/> </route>"
+                          "       <route src=\"TwoCoreHost\" dst=\"OneCoreHost\"> <link_ctn id=\"1\"/> </route>"
                           "       <route src=\"RAMHost\" dst=\"OneCoreHost\"> <link_ctn id=\"1\"/> </route>"
                           "   </zone> "
                           "</platform>";
@@ -345,25 +365,23 @@ void BareMetalComputeServiceOneTaskTest::do_Noop_test() {
 
     ASSERT_THROW(simulation->add((wrench::ComputeService *)nullptr), std::invalid_argument);
 
-    // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
-
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+            new wrench::BareMetalComputeService("TwoCoreHost",
+                                                {std::make_pair("TwoCoreHost", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
                                                 {"/scratch"},
                                                 {})));
 
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService("TwoCoreHost", {"/disk1"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::string  hostname = "TwoCoreHost";
     ASSERT_NO_THROW(wms = simulation->add(
             new NoopTestWMS(
                     this,
@@ -616,18 +634,18 @@ void BareMetalComputeServiceOneTaskTest::do_StandardJobConstructor_test() {
     simulation->instantiatePlatform(platform_file_path);
 
     // Get a hostname
-    std::string hostname1 = "SingleHost";
+    std::string hostname1 = "TwoCoreHost";
 
     // Create a Compute Service
     compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname1,
                                                 {std::make_pair(hostname1, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                "scratch",
+                                                "/scratch",
                                                 {}));
 
     // Create a Storage Service
     storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname1, {"/"}));
+            new wrench::SimpleStorageService(hostname1, {"/disk1"}));
 
     // Start a file registry service
     simulation->add(new wrench::FileRegistryService(hostname1));
@@ -679,14 +697,14 @@ private:
 
         double ram_capacity;
 
-        ram_capacity = wrench::Simulation::getHostMemoryCapacity("SingleHost");
+        ram_capacity = wrench::Simulation::getHostMemoryCapacity("TwoCoreHost");
         if (ram_capacity != wrench::S4U_Simulation::DEFAULT_RAM) {
-            throw std::runtime_error("RAM Capacity of SingleHost should be the default");
+            throw std::runtime_error("RAM Capacity of TwoCoreHost should be the default");
         }
 
         ram_capacity = wrench::Simulation::getMemoryCapacity();
         if (ram_capacity != wrench::S4U_Simulation::DEFAULT_RAM) {
-            throw std::runtime_error("RAM Capacity of SingleHost should be the default");
+            throw std::runtime_error("RAM Capacity of TwoCoreHost should be the default");
         }
 
 
@@ -722,7 +740,7 @@ void BareMetalComputeServiceOneTaskTest::do_HostMemory_test() {
     simulation->instantiatePlatform(platform_file_path);
 
     // Get a hostname
-    std::string hostname1 = "SingleHost";
+    std::string hostname1 = "TwoCoreHost";
     std::string hostname2 = "RAMHost";
 
     // Create a Compute Service
@@ -733,7 +751,7 @@ void BareMetalComputeServiceOneTaskTest::do_HostMemory_test() {
 
     // Create a Storage Service
     storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname1, {"/"}));
+            new wrench::SimpleStorageService(hostname1, {"/disk1"}));
 
     // Start a file registry service
     simulation->add(new wrench::FileRegistryService(hostname1));
@@ -785,8 +803,8 @@ private:
 
         // Create a job
         auto job = job_manager->createStandardJob(test->task,
-                                                  {{test->input_file,  wrench::FileLocation::LOCATION((test->storage_service1))},
-                                                   {test->output_file, wrench::FileLocation::LOCATION((test->storage_service1))}});
+                                                  {{test->input_file,  wrench::FileLocation::LOCATION(test->storage_service1, "/disk1")},
+                                                   {test->output_file, wrench::FileLocation::LOCATION(test->storage_service1, "/disk1")}});
 
         // Get the job type as a string
         std::string job_type_as_string = job->getTypeAsString();
@@ -876,7 +894,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithLocationMap_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService("OneCoreHost", {"/"})));
+            new wrench::SimpleStorageService("OneCoreHost", {"/disk1"})));
 
     // Create a File Registry Service
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
@@ -996,7 +1014,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithDefaultStorageService_t
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname, {"/disk1"})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -1136,7 +1154,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPrePostCopiesTaskCleanu
     ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
 
     // Get a hostname
-    std::string hostname ="SingleHost";
+    std::string hostname ="TwoCoreHost";
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
@@ -1281,15 +1299,15 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPrePostCopiesNoTaskNoCl
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname, {"/disk1"})));
 
     // Create another Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname, {"/disk2"})));
 
     // Create another Storage Service
     ASSERT_NO_THROW(storage_service3 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname, {"/disk3"})));
 
 
     // Create a Compute Service with default Storage Service #2
@@ -1404,11 +1422,11 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPreNoPostCopiesNoTaskCl
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname, {"/disk1"})));
 
     // Create another Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname, {"/disk2"})));
 
 
     // Create a Compute Service with default Storage Service #2
@@ -1529,11 +1547,11 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithMissingFile_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname, {"/disk1"})));
 
     // Create another Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname, {"/disk2"})));
 
 
     // Create a Compute Service with no default Storage Service
@@ -1652,11 +1670,11 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithNotEnoughCores_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname, {"/disk1"})));
 
     // Create another Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname, {"/disk3"})));
 
 
     // Create a Compute Service with no default Storage Service
@@ -1773,11 +1791,11 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithNotEnoughRAM_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname, {"/disk1"})));
 
     // Create another Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname, {"/disk2"})));
 
 
     // Create a Compute Service with no default Storage Service
@@ -1896,7 +1914,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithDownService_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname, {"/disk1"})));
 
     // Create a File Registry Service
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
@@ -2021,7 +2039,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithSuspendedService_test()
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname, {"/disk1"})));
 
     // Create a File Registry Service
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
