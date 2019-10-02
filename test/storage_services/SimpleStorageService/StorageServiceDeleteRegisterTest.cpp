@@ -120,7 +120,7 @@ TEST_F(SimpleStorageServiceDeleteRegisterTest, DeleteAndRegister) {
 
 void SimpleStorageServiceDeleteRegisterTest::do_DeleteRegisterTest() {
   // Create and initialize the simulation
-  wrench::Simulation *simulation = new wrench::Simulation();
+  auto simulation = new wrench::Simulation();
 
   // ??
   int argc = 1;

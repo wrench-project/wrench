@@ -306,7 +306,7 @@ TEST_F(DataMovementManagerCopyRegisterTest, CopyAndRegister) {
 
 void DataMovementManagerCopyRegisterTest::do_CopyRegister_test() {
     // Create and initialize the simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
 
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));

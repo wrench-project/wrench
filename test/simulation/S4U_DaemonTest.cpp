@@ -151,7 +151,7 @@ private:
         // Join and check that we get to the right time
         daemon->join();
 
-        double now = simulation->getCurrentSimulatedDate();
+        double now = wrench::Simulation::getCurrentSimulatedDate();
         if (std::abs(now - 120) > 1) {
             throw std::runtime_error("Joining at time " + std::to_string(now) + " instead of expected 120");
         }

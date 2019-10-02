@@ -531,7 +531,7 @@ TEST_F(SimpleStorageServiceFunctionalTest, BasicFunctionality) {
 void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
 
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -696,7 +696,7 @@ TEST_F(SimpleStorageServiceFunctionalTest, SynchronousFileCopy) {
 void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopy_test() {
 
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -836,7 +836,7 @@ TEST_F(SimpleStorageServiceFunctionalTest, AsynchronousFileCopy) {
 void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopy_test() {
 
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1031,7 +1031,7 @@ TEST_F(SimpleStorageServiceFunctionalTest, SynchronousFileCopyFailures) {
 void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopyFailures_test() {
 
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1254,7 +1254,7 @@ TEST_F(SimpleStorageServiceFunctionalTest, AsynchronousFileCopyFailures) {
 void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopyFailures_test() {
 
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1518,7 +1518,7 @@ TEST_F(SimpleStorageServiceFunctionalTest, Partitions) {
 void SimpleStorageServiceFunctionalTest::do_Partitions_test() {
 
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1631,7 +1631,7 @@ TEST_F(SimpleStorageServiceFunctionalTest, FileWrite) {
 void SimpleStorageServiceFunctionalTest::do_FileWrite_test() {
 
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("unit_test");

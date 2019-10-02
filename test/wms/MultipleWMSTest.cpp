@@ -221,7 +221,7 @@ void MultipleWMSTest::do_deferredWMSStartOneWMS_test() {
     ASSERT_NO_THROW(simulation->launch());
 
     // Simulation trace
-    ASSERT_GT(simulation->getCurrentSimulatedDate(), 100);
+    ASSERT_GT(wrench::Simulation::getCurrentSimulatedDate(), 100);
 
     delete simulation;
     free(argv[0]);
@@ -287,7 +287,7 @@ void MultipleWMSTest::do_deferredWMSStartTwoWMS_test() {
     ASSERT_NO_THROW(simulation->launch());
 
     // Simulation trace
-    ASSERT_GT(simulation->getCurrentSimulatedDate(), 1000);
+    ASSERT_GT(wrench::Simulation::getCurrentSimulatedDate(), 1000);
 
     delete simulation;
     free(argv[0]);
