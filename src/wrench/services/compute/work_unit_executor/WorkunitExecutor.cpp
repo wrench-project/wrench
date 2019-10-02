@@ -327,8 +327,9 @@ namespace wrench {
                     if (work->file_locations.find(f) != work->file_locations.end()) {
                         files_to_read[f] = work->file_locations[f];
                     } else {
-                        if (this->scratch_space == nullptr) {
-                            WRENCH_INFO("DUCK!!");
+                        if (this->scratch_space == nullptr) { // File should be in scratch, but there is no scratch
+                            throw WorkflowExecutionException(
+                                    std::make_shared<FileNotFound>(f, FileLocation::SCRATCH));
                         }
                         files_to_read[f] = FileLocation::LOCATION(this->scratch_space, job->getName());
                         this->files_stored_in_scratch.insert(f);
