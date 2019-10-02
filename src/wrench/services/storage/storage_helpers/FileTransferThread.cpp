@@ -30,6 +30,10 @@ namespace wrench {
      * @param file: the file corresponding to the connection
      * @param src_mailbox: the a source mailbox to receive data from
      * @param dst_location: a location to write data to
+     * @param answer_mailbox_if_read: the mailbox to send an answer to in case this was a file read ("" if none). This
+     *        will simply be reported to the parent service, who may use it as needed
+     * @param answer_mailbox_if_write: the mailbox to send an answer to in case this was a file write ("" if none). This
+     *        will simply be reported to the parent service, who may use it as needed
      * @param answer_mailbox_if_copy: the mailbox to send an answer to in case this was a file copy ("" if none). This
      *        will simply be reported to the parent service, who may use it as needed
      * @param buffer_size: the buffer size to use
@@ -40,12 +44,16 @@ namespace wrench {
                                            WorkflowFile *file,
                                            std::string src_mailbox,
                                            std::shared_ptr<FileLocation> dst_location,
+                                           std::string answer_mailbox_if_read,
+                                           std::string answer_mailbox_if_write,
                                            std::string answer_mailbox_if_copy,
                                            unsigned long buffer_size,
                                            SimulationTimestampFileCopyStart *start_timestamp) :
             Service(hostname, "file_transfer_thread", "file_transfer_thread"),
             parent(parent),
             file(file),
+            answer_mailbox_if_read(answer_mailbox_if_read),
+            answer_mailbox_if_write(answer_mailbox_if_write),
             answer_mailbox_if_copy(answer_mailbox_if_copy),
             buffer_size(buffer_size),
             start_timestamp(start_timestamp)
@@ -63,6 +71,10 @@ namespace wrench {
      * @param file: the file corresponding to the connection
      * @param src_location: a location to read data from
      * @param dst_mailbox: a mailbox to send data to
+     * @param answer_mailbox_if_read: the mailbox to send an answer to in case this was a file read ("" if none). This
+     *        will simply be reported to the parent service, who may use it as needed
+     * @param answer_mailbox_if_write: the mailbox to send an answer to in case this was a file write ("" if none). This
+     *        will simply be reported to the parent service, who may use it as needed
      * @param answer_mailbox_if_copy: the mailbox to send an answer to in case this was a file copy ("" if none). This
      *        will simply be reported to the parent service, who may use it as needed
      * @param buffer_size: the buffer size to use
@@ -73,12 +85,16 @@ namespace wrench {
                                            WorkflowFile *file,
                                            std::shared_ptr<FileLocation> src_location,
                                            std::string dst_mailbox,
+                                           std::string answer_mailbox_if_read,
+                                           std::string answer_mailbox_if_write,
                                            std::string answer_mailbox_if_copy,
                                            unsigned long buffer_size,
                                            SimulationTimestampFileCopyStart *start_timestamp) :
             Service(hostname, "file_transfer_thread", "file_transfer_thread"),
             parent(parent),
             file(file),
+            answer_mailbox_if_read(answer_mailbox_if_read),
+            answer_mailbox_if_write(answer_mailbox_if_write),
             answer_mailbox_if_copy(answer_mailbox_if_copy),
             buffer_size(buffer_size),
             start_timestamp(start_timestamp)
@@ -96,6 +112,10 @@ namespace wrench {
      * @param file: the file corresponding to the connection
      * @param src_location: a location to read data from
      * @param dst_location: a location to send data to
+     * @param answer_mailbox_if_read: the mailbox to send an answer to in case this was a file read ("" if none). This
+     *        will simply be reported to the parent service, who may use it as needed
+     * @param answer_mailbox_if_write: the mailbox to send an answer to in case this was a file write ("" if none). This
+     *        will simply be reported to the parent service, who may use it as needed
      * @param answer_mailbox_if_copy: the mailbox to send an answer to in case this was a file copy ("" if none). This
      *        will simply be reported to the parent service, who may use it as needed
      * @param buffer_size: the buffer size to use
@@ -106,12 +126,16 @@ namespace wrench {
                                            WorkflowFile *file,
                                            std::shared_ptr<FileLocation> src_location,
                                            std::shared_ptr<FileLocation> dst_location,
+                                           std::string answer_mailbox_if_read,
+                                           std::string answer_mailbox_if_write,
                                            std::string answer_mailbox_if_copy,
                                            unsigned long buffer_size,
                                            SimulationTimestampFileCopyStart *start_timestamp) :
             Service(hostname, "file_transfer_thread", "file_transfer_thread"),
             parent(parent),
             file(file),
+            answer_mailbox_if_read(answer_mailbox_if_read),
+            answer_mailbox_if_write(answer_mailbox_if_write),
             answer_mailbox_if_copy(answer_mailbox_if_copy),
             buffer_size(buffer_size),
             start_timestamp(start_timestamp)
@@ -141,13 +165,17 @@ namespace wrench {
         FileTransferThreadNotificationMessage *msg_to_send_back = nullptr;
         std::shared_ptr<NetworkError> failure_cause = nullptr;
 
-        WRENCH_INFO("New FileTransferThread (file=%s, src_mailbox=%s; src_location=%s; dst_mailbox=%s; dst_location=%s; answer_mailbox_if_copy=%s",
+        WRENCH_INFO("New FileTransferThread (file=%s, src_mailbox=%s; src_location=%s; dst_mailbox=%s; dst_location=%s; "
+                    "answer_mailbox_if_copy=%s; answer_mailbox_if_copy=%s; answer_mailbox_if_copy=%s",
                     file->getID().c_str(),
                     (src_mailbox.empty() ? "none" : src_mailbox.c_str()),
                     (src_location == nullptr ? "none" : src_location->toString().c_str()),
                     (dst_mailbox.empty() ? "none" : dst_mailbox.c_str()),
                     (dst_location == nullptr ? "none" : dst_location->toString().c_str()),
-                    (answer_mailbox_if_copy.empty() ? "none" : answer_mailbox_if_copy.c_str()));
+                    (answer_mailbox_if_read.empty() ? "none" : answer_mailbox_if_read.c_str()),
+                    (answer_mailbox_if_write.empty() ? "none" : answer_mailbox_if_write.c_str()),
+                    (answer_mailbox_if_copy.empty() ? "none" : answer_mailbox_if_copy.c_str())
+                    );
 
         // Create a message to send back (some field of which may be overwritten below)
         msg_to_send_back = new FileTransferThreadNotificationMessage(
@@ -157,6 +185,8 @@ namespace wrench {
                 this->src_location,
                 this->dst_mailbox,
                 this->dst_location,
+                this->answer_mailbox_if_read,
+                this->answer_mailbox_if_write,
                 this->answer_mailbox_if_copy,
                 true, nullptr,
                 this->start_timestamp);

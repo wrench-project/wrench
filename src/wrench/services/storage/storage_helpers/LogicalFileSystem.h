@@ -32,8 +32,8 @@ namespace wrench {
         double getTotalCapacity();
         bool hasEnoughFreeSpace(double bytes);
         double getFreeSpace();
-        void decreaseFreeSpace(double num_bytes);
-        void increaseFreeSpace(double num_bytes);
+        void reserveSpace(WorkflowFile *file, std::string absolute_path);
+        void unreserveSpace(WorkflowFile *file, std::string absolute_path);
 
         void createDirectory(std::string absolute_path);
         bool doesDirectoryExist(std::string absolute_path);
@@ -55,6 +55,7 @@ namespace wrench {
         std::string mount_point;
         double total_capacity;
         double occupied_space;
+        std::map<std::string, double> reserved_space;
 
         void assertDirectoryExist(std::string absolute_path) {
             if (not this->doesDirectoryExist(absolute_path)) {

@@ -114,7 +114,6 @@ namespace wrench {
         for (auto const &fs : this->file_systems) {
             message += "\n  - " + fs.first + ":" + std::to_string(fs.second->getTotalCapacity()/(1000*1000*1000)) + "GB";
         }
-        WRENCH_INFO("%s", message.c_str());
 
 
         /** Main loop **/
@@ -205,6 +204,7 @@ namespace wrench {
                                           msg->answer_mailbox, msg->start_timestamp);
 
         } else if (auto msg = std::dynamic_pointer_cast<FileTransferThreadNotificationMessage>(message)) {
+
             return processFileTransferThreadNotification(
                     msg->file_transfer_thread,
                     msg->file,
@@ -214,6 +214,8 @@ namespace wrench {
                     msg->dst_location,
                     msg->success,
                     msg->failure_cause,
+                    msg->answer_mailbox_if_read,
+                    msg->answer_mailbox_if_write,
                     msg->answer_mailbox_if_copy,
                     msg->start_time_stamp);
         } else {
@@ -266,6 +268,7 @@ namespace wrench {
         }
 
         if (failure_cause == nullptr) {
+
             auto fs = this->file_systems[location->getMountPoint()].get();
 
             if (not fs->doesDirectoryExist(location->getAbsolutePathAtMountPoint())) {
@@ -273,7 +276,7 @@ namespace wrench {
             }
 
             // Update occupied space, in advance (will have to be decreased later in case of failure)
-            fs->decreaseFreeSpace(file->getSize());
+            fs->reserveSpace(file, location->getAbsolutePathAtMountPoint());
 
             // Generate a mailbox_name name on which to receive the file
             std::string file_reception_mailbox = S4U_Mailbox::generateUniqueMailboxName("file_reception");
@@ -296,6 +299,8 @@ namespace wrench {
                                            file,
                                            file_reception_mailbox,
                                            location,
+                                           "",
+                                           answer_mailbox,
                                            "",
                                            buffer_size));
             ftt->simulation = this->simulation;
@@ -380,6 +385,8 @@ namespace wrench {
                                            file,
                                            location,
                                            mailbox_to_receive_the_file_content,
+                                           answer_mailbox,
+                                           "",
                                            "",
                                            buffer_size));
             ftt->simulation = this->simulation;
@@ -469,7 +476,7 @@ namespace wrench {
                 }
                 return true;
             }
-            fs->decreaseFreeSpace(file->getSize());
+            fs->reserveSpace(file, dst_location->getAbsolutePathAtMountPoint());
         }
 
 
@@ -484,6 +491,8 @@ namespace wrench {
                                        file,
                                        src_location,
                                        dst_location,
+                                       "",
+                                       "",
                                        answer_mailbox,
                                        this->buffer_size, start_timestamp));
         ftt->simulation = this->simulation;
@@ -517,6 +526,8 @@ namespace wrench {
  * @param dst_location: the transfer's destination location (or nullptr if destination was not a location)
  * @param success: whether the transfer succeeded or not
  * @param failure_cause: the failure cause (nullptr if success)
+ * @param answer_mailbox_if_read: the mailbox to send a read notification ("" if not a copy)
+ * @param answer_mailbox_if_write: the mailbox to send a write notification ("" if not a copy)
  * @param answer_mailbox_if_copy: the mailbox to send a copy notification ("" if not a copy)
  * @param start_timestamp: a start file copy time stamp
  * @return false if the daemon should terminate
@@ -529,6 +540,8 @@ namespace wrench {
                                                                      std::shared_ptr<FileLocation> dst_location,
                                                                      bool success,
                                                                      std::shared_ptr<FailureCause> failure_cause,
+                                                                     std::string answer_mailbox_if_read,
+                                                                     std::string answer_mailbox_if_write,
                                                                      std::string answer_mailbox_if_copy,
                                                                      SimulationTimestampFileCopyStart *start_timestamp) {
 
@@ -538,7 +551,6 @@ namespace wrench {
         } else {
             this->running_file_transfer_threads.erase(ftt);
         }
-
 
         // Was the destination me?
         if (dst_location and (dst_location->getStorageService().get() == this)) {
@@ -552,11 +564,23 @@ namespace wrench {
                 }
             } else {
                 // Process the failure, meaning, just un-decrease the free space
-                this->file_systems[dst_location->getAbsolutePathAtMountPoint()]->increaseFreeSpace(file->getSize());
+                this->file_systems[dst_location->getMountPoint()]->unreserveSpace(file, dst_location->getAbsolutePathAtMountPoint());
             }
         }
 
-        // Send back the corresponding ack if this was a copy
+        // Send back the relevant ack if this was a read
+        if (not answer_mailbox_if_read.empty()) {
+            WRENCH_INFO("Sending back an ack since this was a file read and some client is waiting for me to say something");
+            S4U_Mailbox::dputMessage(answer_mailbox_if_read, new StorageServiceAckMessage());
+        }
+
+        // Send back the relevant ack if this was a write
+        if (not answer_mailbox_if_write.empty()) {
+            WRENCH_INFO("Sending back an ack since this was a file write and some client is waiting for me to say something");
+            S4U_Mailbox::dputMessage(answer_mailbox_if_write, new StorageServiceAckMessage());
+        }
+
+        // Send back the relevant ack if this was a copy
         if (not answer_mailbox_if_copy.empty()) {
             WRENCH_INFO("Sending back an ack since this was a file copy and some client is waiting for me to say something");
             if ((src_location == nullptr) or (dst_location == nullptr)) {
@@ -575,7 +599,6 @@ namespace wrench {
                                                                                      SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
         }
 
-
         return true;
     }
 
@@ -592,7 +615,7 @@ namespace wrench {
                                                         std::string answer_mailbox) {
         std::shared_ptr<FailureCause> failure_cause = nullptr;
 
-        auto fs = this->file_systems[location->getAbsolutePathAtMountPoint()].get();
+        auto fs = this->file_systems[location->getMountPoint()].get();
 
         if ((not fs->doesDirectoryExist(location->getAbsolutePathAtMountPoint())) or
             (not fs->isFileInDirectory(file, location->getAbsolutePathAtMountPoint()))) {

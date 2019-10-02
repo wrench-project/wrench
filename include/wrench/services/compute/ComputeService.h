@@ -39,12 +39,12 @@ namespace wrench {
         /***********************/
 
         friend class StandardJobExecutorTest;
+        friend class Simulation;
 
         /***********************/
         /** \endcond          **/
         /***********************/
 
-        friend class Simulation;
 
     public:
 
@@ -98,7 +98,6 @@ namespace wrench {
 
         double getFreeScratchSpaceSize();
 
-        std::shared_ptr<StorageService> getScratch();
 
         /***********************/
         /** \endcond          **/
@@ -109,18 +108,18 @@ namespace wrench {
         /***********************/
 
 
-        /** 
+        /**
          * @brief Method to submit a standard job to the service
-         * 
+         *
          * @param job: The job being submitted
          * @param service_specific_arguments: the set of service-specific arguments
          */
         virtual void
         submitStandardJob(StandardJob *job, std::map<std::string, std::string> &service_specific_arguments) = 0;
 
-        /** 
+        /**
          * @brief Method to submit a pilot job to the service
-         * 
+         *
          * @param job: The job being submitted
          * @param service_specific_arguments: the set of service-specific arguments
          */
@@ -145,6 +144,8 @@ namespace wrench {
 
 
     protected:
+
+        std::shared_ptr<StorageService> getScratch();
 
         ComputeService(const std::string &hostname,
                        std::string service_name,

@@ -182,6 +182,8 @@ namespace wrench {
 
     };
 
+
+
     /**
     * @brief A message sent to a StorageService to write a file
     */
@@ -285,6 +287,16 @@ namespace wrench {
         /** @brief Whether this is the last file chunk */
         bool last_chunk;
     };
+
+
+    /**
+    * @brief A message sent by a StorageService as an ack
+    */
+    class StorageServiceAckMessage : public StorageServiceMessage {
+    public:
+        StorageServiceAckMessage() : StorageServiceMessage("ACK",0) {}
+    };
+
 
     /***********************/
     /** \endcond           */

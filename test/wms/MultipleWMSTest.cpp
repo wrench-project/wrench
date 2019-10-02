@@ -136,7 +136,7 @@ private:
             std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>> each_copy =
                     std::make_tuple(it.second,
                                     wrench::FileLocation::LOCATION(this->test->storage_service),
-                                    wrench::FileLocation::LOCATION(cs->getScratch()));
+                                    wrench::FileLocation::SCRATCH);
             pre_copies.insert(each_copy);
         }
 

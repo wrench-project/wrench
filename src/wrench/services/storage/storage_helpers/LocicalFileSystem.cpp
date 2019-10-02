@@ -23,15 +23,7 @@ namespace wrench {
      */
     LogicalFileSystem::LogicalFileSystem(std::string hostname, std::string mount_point) {
 
-        // Sanitize the mount_point
-        if (mount_point.at(0) != '/') {
-            mount_point = "/" + mount_point;
-        }
-        if (mount_point.at(mount_point.length()-1) != '/') {
-            mount_point += "/";
-        }
-
-        mount_point = FileLocation::sanitizePath(mount_point);
+        mount_point = FileLocation::sanitizePath("/" + mount_point + "/");
 
 //        WRENCH_INFO("NEW %s", mount_point.c_str());
         // Check uniqueness
@@ -40,7 +32,7 @@ namespace wrench {
                                         mount_point + " at host " + hostname + " already exists");
         }
 
-        if (mount_point != "/") { // "/" is obviously a prefix, but it's okstr(),
+        if (mount_point != "/") { // "/" is obviously a prefix, but it's ok
 
             // Check non-proper-prefixness
             for (auto const &mp : LogicalFileSystem::mount_points) {
@@ -60,8 +52,7 @@ namespace wrench {
         LogicalFileSystem::mount_points.insert(hostname+":"+mount_point);
 
         this->mount_point = mount_point;
-        this->content.insert(std::make_pair("/", (std::set<WorkflowFile*>){}));
-//        this->content["/"] = {};
+        this->content["/"] = {};
         this->total_capacity = S4U_Simulation::getDiskCapacity(hostname, mount_point);
         this->occupied_space = 0;
     }
@@ -115,14 +106,19 @@ namespace wrench {
 
 /**
  * @brief Store file in directory
- * @param absolute_path: the directory's absolute path
+ * @param absolute_path: the directory's absolute path (at the mount point)
  *
  * @throw std::invalid_argument
  */
     void LogicalFileSystem::storeFileInDirectory(WorkflowFile *file, std::string absolute_path) {
         assertDirectoryExist(absolute_path);
         this->content[absolute_path].insert(file);
-        this->occupied_space += file->getSize();
+        std::string key = FileLocation::sanitizePath(absolute_path) + file->getID();
+        if (this->reserved_space.find(key) == this->reserved_space.end()) {
+            this->occupied_space += file->getSize();
+        } else {
+            this->reserved_space.erase(key);
+        }
     }
 
 /**
@@ -202,27 +198,45 @@ namespace wrench {
     }
 
 /**
- * @brief Decrease the amount of free space the service "thinks" it has
- * @param num_bytes: the number of bytes by which to decrease
+ * @brief Reserve space for a file that will be stored
+ * @param file: the file
+ * @param absolute_path: the path where it will be written
  * @throw std::invalid_argument
  */
-    void LogicalFileSystem::decreaseFreeSpace(double num_bytes) {
-        if (this->total_capacity - this->occupied_space < num_bytes) {
-            throw std::invalid_argument("LogicalFileSystem::decrementFreeSpace(): Not enough free space");
+    void LogicalFileSystem::reserveSpace(WorkflowFile *file, std::string absolute_path) {
+        std::string key = FileLocation::sanitizePath(absolute_path) + file->getID();
+
+        if (this->total_capacity - this->occupied_space < file->getSize()) {
+            throw std::invalid_argument("LogicalFileSystem::reserveSpace(): Not enough free space");
         }
-        this->occupied_space += num_bytes;
+        if (this->reserved_space.find(key) != this->reserved_space.end()) {
+            throw std::runtime_error("LogicalFileSystem::reserveSpace(): Space was already being reserved for storing file " +
+                                     file->getID() + "at path " + absolute_path);
+        }
+        this->reserved_space[key] = file->getSize();
+        this->occupied_space += file->getSize();
     }
 
 /**
- * @brief Increase the amount of free space the service "thinks" it has
- * @param num_bytes: the number of bytes by which to increase
+ * @brief Unreserve space that was saved for a file (likely a failed transfer)
+ * @param file: the file
+ * @param absolute_path: the path where it would have been written
  * @throw std::invalid_argument
  */
-    void LogicalFileSystem::increaseFreeSpace(double num_bytes) {
-        if (this->occupied_space + num_bytes > this->total_capacity) {
-            throw std::invalid_argument("LogicalFileSystem::decrementFreeSpace(): No enough capacity");
+    void LogicalFileSystem::unreserveSpace(WorkflowFile *file, std::string absolute_path) {
+        std::string key = FileLocation::sanitizePath(absolute_path) + file->getID();
+
+        if (this->occupied_space + file->getSize() > this->total_capacity) {
+            throw std::invalid_argument("LogicalFileSystem::unreserveSpace(): No enough capacity");
         }
-        this->occupied_space -= num_bytes;
+
+        if (this->reserved_space.find(key) == this->reserved_space.end()) {
+            throw std::runtime_error("LogicalFileSystem::unreserveSpace(): Space was not being reserved for storing file " +
+                                     file->getID() + "at path " + absolute_path);
+        }
+
+        this->reserved_space.erase(key);
+        this->occupied_space -= file->getSize();
     }
 
 }
