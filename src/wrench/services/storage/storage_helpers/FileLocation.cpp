@@ -16,6 +16,8 @@
 
 namespace wrench {
 
+    std::shared_ptr<FileLocation> FileLocation::SCRATCH = std::shared_ptr<FileLocation>(new FileLocation(nullptr, "", ""));
+
 
     /**
      * @brief File location specifier for a storage service's (single) mount point root
@@ -29,6 +31,7 @@ namespace wrench {
         if (ss == nullptr) {
             throw std::invalid_argument("FileLocation::LOCATION(): Cannot pass nullptr storage service");
         }
+
         if (ss->hasMultipleMountPoints()) {
             throw std::invalid_argument("FileLocation::LOCATION(): Storage Service has multiple mount points. "
                                         "Call the version of this method that takes a mount point argument");
@@ -39,7 +42,7 @@ namespace wrench {
     /**
      * @brief File location specifier given an absolute path at a storage service
      *
-     * @param ss: a storage service
+     * @param ss: a storage service or ComputeService::SCRATCH
      * @param absolute_path: an absolute path at the storage service to a directory (that may contain files)
      * @return a file location specification
      *
@@ -47,16 +50,14 @@ namespace wrench {
      */
     std::shared_ptr<FileLocation> FileLocation::LOCATION(std::shared_ptr<StorageService> ss,
                                                          std::string absolute_path) {
-        if ((ss == nullptr) or (absolute_path.empty())) {
-            throw std::invalid_argument("FileLocation::LOCATION(): Invalid arguments");
+        if (ss == nullptr) {
+            throw std::invalid_argument("FileLocation::LOCATION(): Invalid storage service argument");
+        }
+        if (absolute_path.empty()) {
+            throw std::invalid_argument("FileLocation::LOCATION(): must specify a non-empty path");
         }
 
-        try {
-            absolute_path = FileLocation::sanitizePath(absolute_path);
-        } catch (std::invalid_argument &e) {
-            throw;
-        }
-
+        absolute_path = FileLocation::sanitizePath(absolute_path);
 
         std::string mount_point = "";
         for (auto const &mp : ss->getMountPoints()) {
@@ -71,20 +72,26 @@ namespace wrench {
                 mount_point = "/";
             } else {
                 throw std::invalid_argument("FileLocation::LOCATION(): Invalid path '" +
-                                            absolute_path +"' at storage service '" + ss->getName() + "'");
+                                            absolute_path + "' at storage service '" + ss->getName() + "'");
             }
         }
 
         absolute_path.replace(0, mount_point.length(), "/");
+        absolute_path = sanitizePath(absolute_path);
 
-        return std::shared_ptr<FileLocation>(new FileLocation(ss, mount_point, sanitizePath(absolute_path)));
+        return std::shared_ptr<FileLocation>(new FileLocation(ss, mount_point, absolute_path));
     }
 
     /**
      * @brief Give a <ss name>:<mount point>:<dir>" string for the location
      */
     std::string FileLocation::toString() {
-        return this->storage_service->getName() + ":" + sanitizePath(this->mount_point + this->absolute_path_at_mount_point);
+        if (this == FileLocation::SCRATCH.get()) {
+            return "scratch";
+        } else {
+            return this->storage_service->getName() + ":" +
+                   sanitizePath(this->mount_point + this->absolute_path_at_mount_point);
+        }
     }
 
     /**
@@ -92,6 +99,9 @@ namespace wrench {
      * @return a storage service
      */
     std::shared_ptr<StorageService> FileLocation::getStorageService() {
+        if (this == FileLocation::SCRATCH.get()) {
+            throw std::invalid_argument("FileLocation::getStorageService(): Method cannot be called on FileLocation::SCRATCH");
+        }
         return this->storage_service;
     }
 
@@ -100,15 +110,32 @@ namespace wrench {
      * @return a mount point
      */
     std::string FileLocation::getMountPoint() {
+        if (this == FileLocation::SCRATCH.get()) {
+            throw std::invalid_argument("FileLocation::getMountPoint(): Method cannot be called on FileLocation::SCRATCH");
+        }
         return this->mount_point;
     }
 
     /**
-     * @brief Get the location's storage service's mount point
+     * @brief Get the location's path at mount point
      * @return
      */
     std::string FileLocation::getAbsolutePathAtMountPoint() {
+        if (this == FileLocation::SCRATCH.get()) {
+            throw std::invalid_argument("FileLocation::getAbsolutePathAtMountPoint(): Method cannot be called on FileLocation::SCRATCH");
+        }
         return this->absolute_path_at_mount_point;
+    }
+
+    /**
+     * @brief Get the location's full absolute path
+     * @return
+     */
+    std::string FileLocation::getFullAbsolutePath() {
+        if (this == FileLocation::SCRATCH.get()) {
+            throw std::invalid_argument("FileLocation::getFullAbsolutePath(): Method cannot be called on FileLocation::SCRATCH");
+        }
+        return FileLocation::sanitizePath(this->mount_point + "/" + this->absolute_path_at_mount_point);
     }
 
 

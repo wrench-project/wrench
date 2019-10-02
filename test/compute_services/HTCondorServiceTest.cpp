@@ -140,7 +140,7 @@ private:
                 {},
                 {std::make_tuple(this->test->input_file,
                                  wrench::FileLocation::LOCATION(this->test->storage_service),
-                                 wrench::FileLocation::LOCATION(this->test->compute_service->getScratch()))},
+                                 wrench::FileLocation::SCRATCH)},
                 {}, {});
 
         // Submit the 2-task job for execution
@@ -261,7 +261,7 @@ private:
                 {this->test->task1}, {},
                 {std::make_tuple(this->test->input_file,
                                  wrench::FileLocation::LOCATION(htcondor_cs->getLocalStorageService()),
-                                 wrench::FileLocation::LOCATION(this->test->compute_service->getScratch()))},
+                                 wrench::FileLocation::SCRATCH)},
                 {}, {});
 
         // Submit the 2-task job for execution

@@ -111,6 +111,8 @@ namespace wrench {
                 std::shared_ptr<FileLocation> dst_location,
                 bool success,
                 std::shared_ptr<FailureCause> failure_cause,
+                std::string answer_mailbox_if_read,
+                std::string answer_mailbox_if_write,
                 std::string answer_mailbox_if_copy,
                 SimulationTimestampFileCopyStart *start_timestamp);
 

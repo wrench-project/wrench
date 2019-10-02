@@ -167,7 +167,7 @@ private:
                     {},
                     {std::make_tuple(this->getWorkflow()->getFileByID("input_file"),
                                      wrench::FileLocation::LOCATION(this->test->storage_service1),
-                                     wrench::FileLocation::LOCATION(this->test->compute_service->getScratch()))},
+                                     wrench::FileLocation::SCRATCH)},
                     {},
                     {});
 
@@ -304,7 +304,7 @@ private:
                     {},
                     {std::make_tuple(this->getWorkflow()->getFileByID("input_file1"),
                                      wrench::FileLocation::LOCATION(this->test->storage_service1),
-                                     wrench::FileLocation::LOCATION(this->test->compute_service->getScratch()))},
+                                     wrench::FileLocation::SCRATCH)},
                     {},
                     {});
 
@@ -315,7 +315,7 @@ private:
                     {},
                     {std::make_tuple(this->getWorkflow()->getFileByID("input_file2"),
                                      wrench::FileLocation::LOCATION(this->test->storage_service1),
-                                     wrench::FileLocation::LOCATION(this->test->compute_service->getScratch()))},
+                                     wrench::FileLocation::SCRATCH)},
                     {},
                     {});
 
@@ -557,7 +557,7 @@ private:
                 {},
                 {std::make_tuple(this->getWorkflow()->getFileByID("input_file1"),
                                  wrench::FileLocation::LOCATION(this->test->storage_service1),
-                                 wrench::FileLocation::LOCATION(this->test->compute_service->getScratch()))},
+                                 wrench::FileLocation::SCRATCH)},
                 {},
                 {});
 
@@ -567,7 +567,7 @@ private:
                 {},
                 {std::make_tuple(this->getWorkflow()->getFileByID("input_file2"),
                                  wrench::FileLocation::LOCATION(this->test->storage_service1),
-                                 wrench::FileLocation::LOCATION(this->test->compute_service->getScratch()))},
+                                 wrench::FileLocation::SCRATCH)},
                 {},
                 {});
 
@@ -577,7 +577,7 @@ private:
                 {},
                 {std::make_tuple(this->getWorkflow()->getFileByID("input_file3"),
                                  wrench::FileLocation::LOCATION(this->test->storage_service1),
-                                 wrench::FileLocation::LOCATION(this->test->compute_service->getScratch()))},
+                                 wrench::FileLocation::SCRATCH)},
                 {},
                 {});
 
@@ -753,7 +753,7 @@ private:
                 {task1, task2}, {},
                 {std::make_tuple(file,
                                  wrench::FileLocation::LOCATION(this->test->storage_service1),
-                                                                wrench::FileLocation::LOCATION(this->test->compute_service->getScratch()))},
+                                                                wrench::FileLocation::SCRATCH)},
                 {}, {});
 
         // Create a second job that:
@@ -763,7 +763,7 @@ private:
                 {task3}, {},
                 {std::make_tuple(file,
                                  wrench::FileLocation::LOCATION(this->test->storage_service1),
-                                                                wrench::FileLocation::LOCATION(this->test->compute_service->getScratch()))},
+                                                                wrench::FileLocation::SCRATCH)},
                 {}, {});
 
         // Submit both jobs
@@ -905,7 +905,7 @@ private:
                 {task1}, {},
                 {std::make_tuple(file1,
                                  wrench::FileLocation::LOCATION(this->test->storage_service1),
-                                 wrench::FileLocation::LOCATION(this->test->compute_service->getScratch()))},
+                                 wrench::FileLocation::SCRATCH)},
                 {}, {});
 
         // Submit job1

@@ -43,7 +43,6 @@ namespace wrench {
      * @brief Destructor
      */
     BareMetalComputeService::~BareMetalComputeService() {
-        WRENCH_INFO("IN DESTRUCTOR");
         this->default_property_values.clear();
     }
 

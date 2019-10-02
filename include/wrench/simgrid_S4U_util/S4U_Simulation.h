@@ -56,7 +56,7 @@ namespace wrench {
         static void readFromDisk(double num_bytes, std::string hostname, std::string absolute_path);
         static double getDiskCapacity(std::string hostname, std::string mount_point);
         std::set<std::string> getDisks(std::string hostname);
-        static bool hostHasDisk(std::string hostname, std::string mount_point);
+        static bool hostHasMountPoint(std::string hostname, std::string mount_point);
 
         static void yield();
         static std::string getHostProperty(std::string hostname, std::string property_name);

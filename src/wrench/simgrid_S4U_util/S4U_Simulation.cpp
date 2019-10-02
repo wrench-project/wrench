@@ -647,7 +647,7 @@ namespace wrench {
      * @param mount_point: the mount point
      * @return true if the host has a disk attached to the specified mount point, false otherwise
      */
-    bool S4U_Simulation::hostHasDisk(std::string hostname, std::string mount_point) {
+    bool S4U_Simulation::hostHasMountPoint(std::string hostname, std::string mount_point) {
 
         simgrid::s4u::Host *host;
         try {

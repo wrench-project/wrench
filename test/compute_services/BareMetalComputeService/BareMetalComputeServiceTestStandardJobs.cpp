@@ -293,7 +293,7 @@ private:
         auto two_core_task_job = job_manager->createStandardJob({this->test->task3}, {},
                                                                 {std::make_tuple(this->test->input_file,
                                                                                  wrench::FileLocation::LOCATION(this->test->storage_service),
-                                                                                 wrench::FileLocation::LOCATION(this->test->compute_service->getScratch()))},
+                                                                                 wrench::FileLocation::SCRATCH)},
                                                                 {}, {});
 
         // Submit the 1-task job for execution with too few cores
@@ -406,7 +406,7 @@ private:
                 {this->test->task1, this->test->task2}, {},
                 {std::make_tuple(this->test->input_file,
                                  wrench::FileLocation::LOCATION(this->test->storage_service),
-                                 wrench::FileLocation::LOCATION(this->test->compute_service->getScratch()))},
+                                 wrench::FileLocation::SCRATCH)},
                 {}, {});
 
         // Submit the 2-task job for execution
@@ -530,7 +530,7 @@ private:
         wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task3, this->test->task4}, {},
                                                                            {std::make_tuple(this->test->input_file,
                                                                                             wrench::FileLocation::LOCATION(this->test->storage_service),
-                                                                                            wrench::FileLocation::LOCATION(this->test->compute_service->getScratch()))},
+                                                                                            wrench::FileLocation::SCRATCH)},
                                                                            {}, {});
 
         // Submit the 2-task job for execution
@@ -654,7 +654,7 @@ private:
         wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task5, this->test->task6}, {},
                                                                            {std::make_tuple(this->test->input_file,
                                                                                             wrench::FileLocation::LOCATION(this->test->storage_service),
-                                                                                            wrench::FileLocation::LOCATION(this->test->compute_service->getScratch()))},
+                                                                                            wrench::FileLocation::SCRATCH)},
                                                                            {}, {});
 
         // Submit the 2-task job for execution
@@ -797,7 +797,7 @@ private:
                                                              {std::make_tuple(
                                                                      this->test->input_file,
                                                                      wrench::FileLocation::LOCATION(this->test->storage_service),
-                                                                     wrench::FileLocation::LOCATION(this->test->compute_service->getScratch()))},
+                                                                     wrench::FileLocation::SCRATCH)},
                                                              {}, {});
 
         // Submit the 2-task job for execution (WRONG CS-specific arguments)
@@ -888,7 +888,7 @@ private:
         wrench::StandardJob *two_task_job_2 = job_manager->createStandardJob({this->test->task7, this->test->task8}, {},
                                                                              {std::make_tuple(this->test->input_file,
                                                                                               wrench::FileLocation::LOCATION(this->test->storage_service),
-                                                                                              wrench::FileLocation::LOCATION(this->test->compute_service->getScratch()))},
+                                                                                              wrench::FileLocation::SCRATCH)},
                                                                              {}, {});
 
         job_manager->submitJob(two_task_job_2, this->test->compute_service,
@@ -1016,7 +1016,7 @@ private:
         wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {},
                                                                            {std::make_tuple(this->test->input_file,
                                                                                    wrench::FileLocation::LOCATION(this->test->storage_service),
-                                                                                   wrench::FileLocation::LOCATION(this->test->compute_service->getScratch()))},
+                                                                                   wrench::FileLocation::SCRATCH)},
                                                                            {}, {});
 
         // Submit the 2-task job for execution
@@ -1256,7 +1256,7 @@ private:
         wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {},
                                                                            {std::make_tuple(this->test->input_file,
                                                                                    wrench::FileLocation::LOCATION(this->test->storage_service),
-                                                                                   wrench::FileLocation::LOCATION(this->test->compute_service->getScratch()))},
+                                                                                   wrench::FileLocation::SCRATCH)},
                                                                            {}, {});
 
         // Submit the 2-task job for execution
@@ -1380,7 +1380,7 @@ private:
         wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {},
                                                                            {std::make_tuple(this->test->input_file,
                                                                                             wrench::FileLocation::LOCATION(this->test->storage_service),
-                                                                                            wrench::FileLocation::LOCATION(this->test->compute_service->getScratch()))},
+                                                                                            wrench::FileLocation::SCRATCH)},
                                                                            {}, {});
 
         // Submit the 2-task job for execution

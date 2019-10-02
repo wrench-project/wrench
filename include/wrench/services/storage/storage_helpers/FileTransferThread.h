@@ -34,6 +34,8 @@ namespace wrench {
                            WorkflowFile *file,
                            std::string src_mailbox,
                            std::shared_ptr<FileLocation> dst_location,
+                           std::string answer_mailbox_if_read,
+                           std::string answer_mailbox_if_write,
                            std::string answer_mailbox_if_copy,
                            unsigned long buffer_size,
                            SimulationTimestampFileCopyStart *start_timestamp = nullptr);
@@ -43,6 +45,8 @@ namespace wrench {
                            WorkflowFile *file,
                            std::shared_ptr<FileLocation> src_location,
                            std::string dst_mailbox,
+                           std::string answer_mailbox_if_read,
+                           std::string answer_mailbox_if_write,
                            std::string answer_mailbox_if_copy,
                            unsigned long buffer_size,
                            SimulationTimestampFileCopyStart *start_timestamp = nullptr);
@@ -52,6 +56,8 @@ namespace wrench {
                            WorkflowFile *file,
                            std::shared_ptr<FileLocation> src_location,
                            std::shared_ptr<FileLocation> dsg_location,
+                           std::string answer_mailbox_if_read,
+                           std::string answer_mailbox_if_write,
                            std::string answer_mailbox_if_copy,
                            unsigned long buffer_size,
                            SimulationTimestampFileCopyStart *start_timestamp = nullptr);
@@ -73,6 +79,8 @@ namespace wrench {
         std::string dst_mailbox;
         std::shared_ptr<FileLocation> dst_location;
 
+        std::string answer_mailbox_if_read;
+        std::string answer_mailbox_if_write;
         std::string answer_mailbox_if_copy;
         unsigned long buffer_size;
         SimulationTimestampFileCopyStart *start_timestamp;

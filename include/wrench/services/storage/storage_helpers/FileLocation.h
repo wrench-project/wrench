@@ -25,6 +25,7 @@ namespace wrench {
 
     public:
 
+        static std::shared_ptr<FileLocation> SCRATCH;
         static std::shared_ptr<FileLocation> LOCATION(std::shared_ptr<StorageService> ss);
 
         static std::shared_ptr<FileLocation> LOCATION(std::shared_ptr<StorageService> ss,
@@ -33,6 +34,7 @@ namespace wrench {
         std::shared_ptr<StorageService> getStorageService();
         std::string getMountPoint();
         std::string getAbsolutePathAtMountPoint();
+        std::string getFullAbsolutePath();
 
         std::string toString();
 

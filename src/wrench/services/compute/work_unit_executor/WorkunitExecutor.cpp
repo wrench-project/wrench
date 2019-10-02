@@ -327,6 +327,9 @@ namespace wrench {
                     if (work->file_locations.find(f) != work->file_locations.end()) {
                         files_to_read[f] = work->file_locations[f];
                     } else {
+                        if (this->scratch_space == nullptr) {
+                            WRENCH_INFO("DUCK!!");
+                        }
                         files_to_read[f] = FileLocation::LOCATION(this->scratch_space, job->getName());
                         this->files_stored_in_scratch.insert(f);
                     }
