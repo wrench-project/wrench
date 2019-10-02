@@ -1530,10 +1530,10 @@ private:
         }
         auto real_event = std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event);
         if (real_event) {
-            auto cause = std::dynamic_pointer_cast<wrench::NoStorageServiceForFile>(real_event->failure_cause);
+            auto cause = std::dynamic_pointer_cast<wrench::FileNotFound>(real_event->failure_cause);
             if (not cause) {
                 throw std::runtime_error("Got the expected job failure but unexpected failure cause: " +
-                                         real_event->failure_cause->toString() + " (expected: NoStorageServiceForFile)");
+                                         real_event->failure_cause->toString() + " (expected: FileNotFound)");
             }
             if (cause->getFile() != this->test->input_file) {
                 throw std::runtime_error(
