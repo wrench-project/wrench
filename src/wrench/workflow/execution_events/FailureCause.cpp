@@ -21,13 +21,6 @@ WRENCH_LOG_NEW_DEFAULT_CATEGORY(falure_cause, "Log category for FailureCause");
 
 namespace wrench {
 
-    /**
-     * @brief Constructor
-     * @param file: the file that could not be found on any storage service
-     */
-    NoStorageServiceForFile::NoStorageServiceForFile(WorkflowFile *file) {
-        this->file = file;
-    }
 
     /**
      * @brief Constructor
@@ -42,24 +35,8 @@ namespace wrench {
      * @return the message
      */
     std::string NoScratchSpace::toString() {
-        return error;
-    }
+        return error;}
 
-    /**
-     * @brief Getter
-     * @return the file
-     */
-    WorkflowFile *NoStorageServiceForFile::getFile() {
-        return this->file;
-    }
-
-    /**
-     * @brief Get the human-readable failure message
-     * @return the message
-     */
-    std::string NoStorageServiceForFile::toString() {
-        return "No Storage Service location is specified for file " + this->file->getID();
-    }
 
     /**
      * @brief Constructor

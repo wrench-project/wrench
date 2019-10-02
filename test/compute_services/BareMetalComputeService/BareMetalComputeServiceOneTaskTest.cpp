@@ -1266,10 +1266,12 @@ private:
         }
 
         // Test file locations
-        if (!this->test->storage_service2->lookupFile(this->test->input_file, nullptr)) {
+        if (not wrench::StorageService::lookupFile(this->test->input_file,
+                                                   wrench::FileLocation::LOCATION(this->test->storage_service2))) {
             throw std::runtime_error("Input file should be on Storage Service #2");
         }
-        if (!this->test->storage_service3->lookupFile(this->test->input_file, nullptr)) {
+        if (not wrench::StorageService::lookupFile(this->test->input_file,
+                                                   wrench::FileLocation::LOCATION(this->test->storage_service3))) {
             throw std::runtime_error("Input file should be on Storage Service #3");
         }
 
@@ -1392,7 +1394,8 @@ private:
         }
 
         // Test file locations
-        if (this->test->storage_service2->lookupFile(this->test->input_file, nullptr)) {
+        if (wrench::StorageService::lookupFile(this->test->input_file,
+                wrench::FileLocation::LOCATION(this->test->storage_service2))) {
             throw std::runtime_error("Input file should not be on Storage Service #2");
         }
 
@@ -1489,11 +1492,11 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        // Remove the staged file!
-        wrench::StorageService::deleteFile(test->input_file,
-                                           wrench::FileLocation::LOCATION(test->storage_service1));
+//        // Remove the staged file!
+//        wrench::StorageService::deleteFile(test->input_file,
+//                                           wrench::FileLocation::LOCATION(test->storage_service1));
 
-        // Create a job
+        // Create a job (that doesn't say where the file should come from!)
         wrench::StandardJob *job = job_manager->createStandardJob({test->task},
                                                                   {},
                                                                   {},
@@ -1506,11 +1509,11 @@ private:
         std::shared_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
         auto real_event = std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event);
         if (real_event) {
-            auto cause = std::dynamic_pointer_cast<wrench::NoStorageServiceForFile>(real_event->failure_cause);
+            auto cause = std::dynamic_pointer_cast<wrench::FileNotFound>(real_event->failure_cause);
             if (not cause) {
                 throw std::runtime_error(
                         "Got an Standard Job Failure as expected, but unexpected failure cause: " +
-                        real_event->failure_cause->toString() + " (expected: NoStorageServiceForFile");
+                        real_event->failure_cause->toString() + " (expected: FileNotFound");
             }
             std::string error_msg = cause->toString();
             if (cause->getFile() != test->input_file) {

@@ -61,28 +61,6 @@ namespace wrench {
 
 
     /**
-     * @brief A "file cannot be found anywhere" failure cause
-     */
-    class NoStorageServiceForFile : public FailureCause {
-
-    public:
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
-        NoStorageServiceForFile(WorkflowFile *file);
-        /***********************/
-        /** \endcond           */
-        /***********************/
-
-        WorkflowFile *getFile();
-        std::string toString();
-
-    private:
-        WorkflowFile *file;
-    };
-
-
-    /**
      * @brief A "no scratch space" failure cause
      */
     class NoScratchSpace : public FailureCause {
