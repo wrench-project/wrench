@@ -521,7 +521,7 @@ private:
                 //ignore (network error or something)
             }
 
-            double completion_time = this->simulation->getCurrentSimulatedDate();
+            double completion_time = wrench::Simulation::getCurrentSimulatedDate();
             double expected_completion_time;
             if (job == standard_job_2_nodes) {
                 expected_completion_time = 3600  + 1800;
