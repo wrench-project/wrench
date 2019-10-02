@@ -202,7 +202,7 @@ TEST_F(NetworkProximityTest, NetworkProximity) {
 void NetworkProximityTest::do_NetworkProximity_Test() {
 
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -403,7 +403,7 @@ TEST_F(NetworkProximityTest, CompareNetworkProximity) {
 void NetworkProximityTest::do_CompareNetworkProximity_Test() {
 
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -579,7 +579,7 @@ TEST_F(NetworkProximityTest, VivaldiConvergeTest) {
 
 void NetworkProximityTest::do_VivaldiConverge_Test() {
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -684,7 +684,7 @@ TEST_F(NetworkProximityTest, NetworkProximityValidatePropertiesTest) {
 
 void NetworkProximityTest::do_ValidateProperties_Test() {
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("unit_test");

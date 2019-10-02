@@ -427,7 +427,7 @@ TEST_F(FileRegistryTest, LookupEntry) {
 void FileRegistryTest::do_lookupEntry_Test() {
 
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("file_registry_lookup_entry_test");

@@ -119,7 +119,7 @@ private:
             for (auto reading : {true, false}) {
 
                 // Initiate 10 asynchronous file copies to/from storage_service_1 (unlimited)
-                double start = this->simulation->getCurrentSimulatedDate();
+                double start = wrench::Simulation::getCurrentSimulatedDate();
                 for (int i = 0; i < 10; i++) {
                     if (reading) {
                         data_movement_manager->initiateAsynchronousFileCopy(this->test->files[i],
@@ -138,7 +138,7 @@ private:
                     if (not std::dynamic_pointer_cast<wrench::FileCopyCompletedEvent>(event1)) {
                         throw std::runtime_error("Unexpected Workflow Execution Event: " + event1->toString());
                     }
-                    completion_dates[i] = this->simulation->getCurrentSimulatedDate();
+                    completion_dates[i] = wrench::Simulation::getCurrentSimulatedDate();
                 }
 
                 // Check results for the unlimited storage service
@@ -197,7 +197,7 @@ TEST_F(SimpleStorageServiceLimitedConnectionsTest, ConcurrencyFileCopies) {
 void SimpleStorageServiceLimitedConnectionsTest::do_ConcurrencyFileCopies_test() {
 
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("unit_test");

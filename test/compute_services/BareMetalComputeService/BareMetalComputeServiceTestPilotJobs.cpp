@@ -145,7 +145,7 @@ TEST_F(BareMetalComputeServiceTestPilotJobs, UnsupportedPilotJobs) {
 void BareMetalComputeServiceTestPilotJobs::do_UnsupportedPilotJobs_test() {
 
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("unit_test");

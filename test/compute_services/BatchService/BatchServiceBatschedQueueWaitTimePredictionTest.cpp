@@ -170,7 +170,7 @@ private:
                         "Got some exception"
                 );
             }
-            double first_job_running = this->simulation->getCurrentSimulatedDate();
+            double first_job_running = wrench::Simulation::getCurrentSimulatedDate();
 
             auto batch_service = (*this->getAvailableComputeServices<wrench::BatchComputeService>().begin());
             std::string job_id = "my_tentative_job";
@@ -355,7 +355,7 @@ private:
                         "Got some exception"
                 );
             }
-            auto first_job_running = this->simulation->getCurrentSimulatedDate();
+            auto first_job_running = wrench::Simulation::getCurrentSimulatedDate();
 
             auto batch_service = (*this->getAvailableComputeServices<wrench::BatchComputeService>().begin());
             std::string job_id = "my_tentative_job";
@@ -528,7 +528,7 @@ private:
                         "Got some exception"
                 );
             }
-            double first_job_running = this->simulation->getCurrentSimulatedDate();
+            double first_job_running = wrench::Simulation::getCurrentSimulatedDate();
 
 
             auto batch_service = (*this->getAvailableComputeServices<wrench::BatchComputeService>().begin());

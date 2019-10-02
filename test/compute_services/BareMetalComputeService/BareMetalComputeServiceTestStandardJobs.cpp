@@ -216,7 +216,7 @@ DO_TEST_WITH_FORK(do_UnsupportedStandardJobs_test);
 void BareMetalComputeServiceTestStandardJobs::do_UnsupportedStandardJobs_test() {
 
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -324,7 +324,7 @@ DO_TEST_WITH_FORK(do_BogusNumCores_test);
 void BareMetalComputeServiceTestStandardJobs::do_BogusNumCores_test() {
 
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -449,7 +449,7 @@ DO_TEST_WITH_FORK(do_TwoSingleCoreTasks_test);
 void BareMetalComputeServiceTestStandardJobs::do_TwoSingleCoreTasks_test() {
 
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -575,7 +575,7 @@ DO_TEST_WITH_FORK(do_TwoDualCoreTasksCase1_test);
 void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase1_test() {
 
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -713,7 +713,7 @@ DO_TEST_WITH_FORK(do_TwoDualCoreTasksCase2_test);
 void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase2_test() {
 
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -902,7 +902,7 @@ private:
             throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
         if (std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
-            two_task_job_2_completion_date = simulation->getCurrentSimulatedDate();
+            two_task_job_2_completion_date = wrench::Simulation::getCurrentSimulatedDate();
             // success, do nothing for now
         } else {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
@@ -936,7 +936,7 @@ DO_TEST_WITH_FORK(do_TwoDualCoreTasksCase3_test);
 void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase3_test() {
 
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("unit_test");

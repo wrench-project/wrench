@@ -699,7 +699,7 @@ private:
                 //ignore (network error or something)
             }
 
-            double completion_time = this->simulation->getCurrentSimulatedDate();
+            double completion_time = wrench::Simulation::getCurrentSimulatedDate();
             double expected_completion_time;
             if (job == standard_job_1) {
                 expected_completion_time = 1800;
@@ -1080,7 +1080,7 @@ TEST_F(BatchServiceTest, StandardPlusPilotJobSubmissionTest) {
 void BatchServiceTest::do_StandardPlusPilotJobTaskTest_test() {
 
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("batch_service_test");
@@ -1214,7 +1214,7 @@ TEST_F(BatchServiceTest, InsufficientCoresJobSubmissionTest) {
 void BatchServiceTest::do_InsufficientCoresTaskTest_test() {
 
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("batch_service_test");
@@ -1340,7 +1340,7 @@ TEST_F(BatchServiceTest, NoArgumentsJobSubmissionTest) {
 void BatchServiceTest::do_noArgumentsJobSubmissionTest_test() {
 
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("batch_service_test");
@@ -1493,7 +1493,7 @@ TEST_F(BatchServiceTest, StandardJobTimeOutTaskTest) {
 void BatchServiceTest::do_StandardJobTimeOutTaskTest_test() {
 
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("batch_service_test");
@@ -1846,7 +1846,7 @@ TEST_F(BatchServiceTest, BestFitStandardJobSubmissionTest)
 void BatchServiceTest::do_BestFitTaskTest_test() {
 
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("batch_service_test");
@@ -2010,7 +2010,7 @@ TEST_F(BatchServiceTest, FirstFitStandardJobSubmissionTest)
 void BatchServiceTest::do_FirstFitTaskTest_test() {
 
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("batch_service_test");
@@ -2192,7 +2192,7 @@ private:
 
             double EPSILON = 1.0;
             double not_expected_date = 60; //FIRSTFIT and BESTFIT would complete in ~60 seconds but ROUNDROBIN would finish, in this case, in ~90 seconds
-            if (std::abs(this->simulation->getCurrentSimulatedDate() - not_expected_date) <= EPSILON) {
+            if (std::abs(wrench::Simulation::getCurrentSimulatedDate() - not_expected_date) <= EPSILON) {
                 throw std::runtime_error(
                         "BatchServiceTest::ROUNDROBINTEST():: The tasks did not finish on time: Simulation Date > Expected Date"
                 );
@@ -2282,7 +2282,7 @@ TEST_F(BatchServiceTest, RoundRobinTaskTest)
 void BatchServiceTest::do_RoundRobinTask_test() {
 
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("batch_service_test");
@@ -2465,7 +2465,7 @@ TEST_F(BatchServiceTest, StandardJobInsidePilotJobTimeOutTaskTest) {
 void BatchServiceTest::do_StandardJobInsidePilotJobTimeOutTaskTest_test() {
 
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("batch_service_test");
@@ -2628,7 +2628,7 @@ TEST_F(BatchServiceTest, StandardJobInsidePilotJobSucessTaskTest) {
 void BatchServiceTest::do_StandardJobInsidePilotJobSucessTaskTest_test() {
 
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("batch_service_test");
@@ -2782,7 +2782,7 @@ TEST_F(BatchServiceTest, InsufficientCoresInsidePilotJobTaskTest) {
 void BatchServiceTest::do_InsufficientCoresInsidePilotJobTaskTest_test() {
 
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("batch_service_test");
@@ -2924,7 +2924,7 @@ TEST_F(BatchServiceTest, MultipleStandardJobSubmissionTest) {
 void BatchServiceTest::do_MultipleStandardTaskTest_test() {
 
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("batch_service_test");
@@ -3072,7 +3072,7 @@ TEST_F(BatchServiceTest, DISABLED_DifferentBatchAlgorithmsSubmissionTest)
 void BatchServiceTest::do_DifferentBatchAlgorithmsSubmissionTest_test() {
 
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("batch_service_test");
@@ -3230,7 +3230,7 @@ TEST_F(BatchServiceTest, ShutdownWithPendingRunningJobsTest)
 void BatchServiceTest::do_ShutdownWithPendingRunningJobsTest_test() {
 
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("batch_service_test");

@@ -166,7 +166,7 @@ private:
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
             if (std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
-                actual_completion_times[i] =  this->simulation->getCurrentSimulatedDate();
+                actual_completion_times[i] =  wrench::Simulation::getCurrentSimulatedDate();
             } else {
                 throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
