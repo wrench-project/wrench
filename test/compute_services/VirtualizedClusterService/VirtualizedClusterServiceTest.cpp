@@ -287,7 +287,7 @@ private:
         auto two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {},
                                                            {std::make_tuple(this->test->input_file,
                                                                             wrench::FileLocation::LOCATION(this->test->storage_service),
-                                                                            wrench::FileLocation::LOCATION(cs->getScratch()))},
+                                                                            wrench::FileLocation::SCRATCH)},
                                                            {}, {});
 
         // Try to submit the job directly to the CloudComputeService (which fails)
@@ -495,7 +495,7 @@ private:
         wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {},
                                                                            {std::make_tuple(this->test->input_file,
                                                                                             wrench::FileLocation::LOCATION(this->test->storage_service),
-                                                                                            wrench::FileLocation::LOCATION(vm_cs->getScratch()))},
+                                                                                            wrench::FileLocation::SCRATCH)},
                                                                            {}, {});
 
         // Submit the 2-task job for execution
@@ -606,7 +606,7 @@ private:
                 {this->test->task1, this->test->task2}, {},
                 {std::make_tuple(this->test->input_file,
                                  wrench::FileLocation::LOCATION(this->test->storage_service),
-                                 wrench::FileLocation::LOCATION(cs->getScratch()))},
+                                 wrench::FileLocation::SCRATCH)},
                 {}, {});
 
         // Submit the 2-task job for execution
@@ -1389,7 +1389,7 @@ private:
             wrench::StandardJob *job1 = job_manager->createStandardJob({this->test->task1}, {},
                                                                        {std::make_tuple(this->test->input_file,
                                                                                         wrench::FileLocation::LOCATION(this->test->storage_service),
-                                                                                        wrench::FileLocation::LOCATION(std::get<1>(vm_list[0])->getScratch()))},
+                                                                                        wrench::FileLocation::SCRATCH)},
                                                                        {}, {});
             // Trying to submit to a VM that has been shutdown
             job_manager->submitJob(job1, std::get<1>(vm_list[0]));
@@ -1412,7 +1412,7 @@ private:
         wrench::StandardJob *job1 = job_manager->createStandardJob({this->test->task1}, {},
                                                                    {std::make_tuple(this->test->input_file,
                                                                                     wrench::FileLocation::LOCATION(this->test->storage_service),
-                                                                                    wrench::FileLocation::LOCATION(std::get<1>(vm_list[1])->getScratch()))},
+                                                                                    wrench::FileLocation::SCRATCH)},
                                                                    {}, {});
 
         try {
@@ -1629,7 +1629,7 @@ private:
                 {std::make_tuple(
                         this->test->input_file,
                         wrench::FileLocation::LOCATION(this->test->storage_service),
-                        wrench::FileLocation::LOCATION(vm_cs->getScratch()))},
+                        wrench::FileLocation::SCRATCH)},
                 {}, {});
 
 
@@ -1762,7 +1762,7 @@ private:
                 {this->test->task1}, {},
                 {std::make_tuple(this->test->input_file,
                                  wrench::FileLocation::LOCATION(this->test->storage_service),
-                                 wrench::FileLocation::LOCATION(vm_cs->getScratch()))},
+                                 wrench::FileLocation::SCRATCH)},
                 {}, {});
 
         // Submit the job to the VM

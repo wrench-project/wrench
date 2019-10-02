@@ -287,6 +287,18 @@ namespace wrench {
                                                  file_content_message->getName() + "] message!");
                     }
                 }
+
+                //Waiting for the final ack
+                try {
+                    message = S4U_Mailbox::getMessage(answer_mailbox, storage_service->network_timeout);
+                } catch (std::shared_ptr<NetworkError> &cause) {
+                    throw WorkflowExecutionException(cause);
+                }
+                if (not std::dynamic_pointer_cast<StorageServiceAckMessage>(message)) {
+                    throw std::runtime_error("StorageService::writeFile(): Received an unexpected [" +
+                                             message->getName() + "] message!");
+                }
+
             }
 
         } else {
@@ -360,7 +372,20 @@ namespace wrench {
                 } catch (std::shared_ptr<NetworkError> &cause) {
                     throw WorkflowExecutionException(cause);
                 }
+
+                //Waiting for the final ack
+
+                try {
+                    message = S4U_Mailbox::getMessage(answer_mailbox, storage_service->network_timeout);
+                } catch (std::shared_ptr<NetworkError> &cause) {
+                    throw WorkflowExecutionException(cause);
+                }
+                if (not std::dynamic_pointer_cast<StorageServiceAckMessage>(message)) {
+                    throw std::runtime_error("StorageService::writeFile(): Received an unexpected [" +
+                                             message->getName() + "] message!");
+                }
             }
+
 
         } else {
             throw std::runtime_error("StorageService::writeFile(): Received an unexpected [" +

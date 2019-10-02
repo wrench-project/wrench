@@ -90,7 +90,7 @@ protected:
                           "          </disk>"
                           "          <disk id=\"large_disk3\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
                           "             <prop id=\"size\" value=\"30000B\"/>"
-                          "             <prop id=\"mount\" value=\"/disk2\"/>"
+                          "             <prop id=\"mount\" value=\"/disk3\"/>"
                           "          </disk>"
                           "          <disk id=\"scratch_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
                           "             <prop id=\"size\" value=\"100B\"/>"
@@ -108,7 +108,7 @@ protected:
                           "          </disk>"
                           "          <disk id=\"large_disk3\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
                           "             <prop id=\"size\" value=\"30000B\"/>"
-                          "             <prop id=\"mount\" value=\"/disk2\"/>"
+                          "             <prop id=\"mount\" value=\"/disk3\"/>"
                           "          </disk>"
                           "          <disk id=\"scratch_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
                           "             <prop id=\"size\" value=\"100B\"/>"
@@ -126,7 +126,7 @@ protected:
                           "          </disk>"
                           "          <disk id=\"large_disk3\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
                           "             <prop id=\"size\" value=\"30000B\"/>"
-                          "             <prop id=\"mount\" value=\"/disk2\"/>"
+                          "             <prop id=\"mount\" value=\"/disk3\"/>"
                           "          </disk>"
                           "          <disk id=\"scratch_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
                           "             <prop id=\"size\" value=\"100B\"/>"
@@ -1088,12 +1088,14 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create a job
-        wrench::StandardJob *job = job_manager->createStandardJob({test->task},
-                                                                  {{test->input_file,wrench::FileLocation::LOCATION((test->storage_service1))},{test->output_file,wrench::FileLocation::LOCATION(test->storage_service2)}}, //changed this since we don't have default storage now
-                                                                  {std::make_tuple(test->input_file, wrench::FileLocation::LOCATION((test->storage_service1)), wrench::FileLocation::LOCATION(test->storage_service2))},
-                                                                  {std::make_tuple(test->output_file, wrench::FileLocation::LOCATION(test->storage_service2), wrench::FileLocation::LOCATION((test->storage_service1)))},
-                                                                  {std::make_tuple(test->input_file, wrench::FileLocation::LOCATION(test->storage_service2)),
-                                                                   std::make_tuple(test->output_file, wrench::FileLocation::LOCATION(test->storage_service2))});
+        wrench::StandardJob *job = job_manager->createStandardJob(
+                {test->task},
+                {{test->input_file,wrench::FileLocation::LOCATION((test->storage_service1))},
+                 {test->output_file,wrench::FileLocation::LOCATION(test->storage_service2)}}, //changed this since we don't have default storage now
+                {std::make_tuple(test->input_file, wrench::FileLocation::LOCATION((test->storage_service1)), wrench::FileLocation::LOCATION(test->storage_service2))},
+                {std::make_tuple(test->output_file, wrench::FileLocation::LOCATION(test->storage_service2), wrench::FileLocation::LOCATION((test->storage_service1)))},
+                {std::make_tuple(test->input_file, wrench::FileLocation::LOCATION(test->storage_service2)),
+                 std::make_tuple(test->output_file, wrench::FileLocation::LOCATION(test->storage_service2))});
         // Submit the job
         job_manager->submitJob(job, test->compute_service);
 
@@ -1109,22 +1111,24 @@ private:
         }
 
         // Test file locations
-        if (!this->test->storage_service1->lookupFile(
-                this->test->input_file, nullptr)) {
+        if (not wrench::StorageService::lookupFile(
+                this->test->input_file,
+                wrench::FileLocation::LOCATION(this->test->storage_service1))) {
             throw std::runtime_error("Input file should be on Storage Service #1");
         }
-        if (!this->test->storage_service1->lookupFile(
-                this->test->output_file, nullptr)) {
+        if (not wrench::StorageService::lookupFile(
+                this->test->output_file,
+                wrench::FileLocation::LOCATION(this->test->storage_service1))) {
             throw std::runtime_error("Output file should be on Storage Service #1");
         }
-        if (this->test->storage_service2->lookupFile(
+        if (wrench::StorageService::lookupFile(
                 this->test->input_file,
-                wrench::FileLocation::LOCATION(this->test->storage_service2, "/" + job->getName()))) {
+                wrench::FileLocation::LOCATION(this->test->storage_service2))) {
             throw std::runtime_error("Input file should not be on Storage Service #2");
         }
-        if (this->test->storage_service2->lookupFile(
+        if (wrench::StorageService::lookupFile(
                 this->test->output_file,
-                wrench::FileLocation::LOCATION(this->test->storage_service2, "/" + job->getName()))) {
+                wrench::FileLocation::LOCATION(this->test->storage_service2))) {
             throw std::runtime_error("Output file should not be on Storage Service #2");
         }
 
@@ -1169,7 +1173,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPrePostCopiesTaskCleanu
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname,
                                                 {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                {})));
+                                                "", {})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -1487,7 +1491,7 @@ private:
 
         // Remove the staged file!
         wrench::StorageService::deleteFile(test->input_file,
-                wrench::FileLocation::LOCATION(test->storage_service1));
+                                           wrench::FileLocation::LOCATION(test->storage_service1));
 
         // Create a job
         wrench::StandardJob *job = job_manager->createStandardJob({test->task},

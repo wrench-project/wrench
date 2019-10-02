@@ -289,7 +289,9 @@ namespace wrench {
                                                                                std::string data_write_mailbox_name,
                                                                                double payload) : StorageServiceMessage(
             "FILE_WRITE_ANSWER", payload) {
-        if ((file == nullptr) || (location == nullptr) || (data_write_mailbox_name == "") ||
+        if ((file == nullptr) || (location == nullptr) ||
+            (success && (data_write_mailbox_name.empty())) ||
+            (!success && (!data_write_mailbox_name.empty())) ||
             (success && (failure_cause != nullptr)) || (!success && (failure_cause == nullptr))) {
             throw std::invalid_argument(
                     "StorageServiceFileWriteAnswerMessage::StorageServiceFileWriteAnswerMessage(): Invalid arguments");
