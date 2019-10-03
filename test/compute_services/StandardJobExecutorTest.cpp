@@ -2099,7 +2099,7 @@ void StandardJobExecutorTest::do_TwoMultiCoreTasksTest_test() {
 
     // Create another Storage Services
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname2, {"/"})));
+            new wrench::SimpleStorageService(hostname2, {"/disk2"})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -2364,7 +2364,7 @@ void StandardJobExecutorTest::do_MultiHostTest_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = "Host1";
 
     // Create a Compute Service (we don't use it)
     std::shared_ptr<wrench::ComputeService> compute_service;
@@ -2378,7 +2378,7 @@ void StandardJobExecutorTest::do_MultiHostTest_test() {
 
     // Create another Storage Services
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname, {"/disk2"})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;

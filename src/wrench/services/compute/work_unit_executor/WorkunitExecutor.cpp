@@ -331,7 +331,7 @@ namespace wrench {
                             throw WorkflowExecutionException(
                                     std::make_shared<FileNotFound>(f, FileLocation::SCRATCH));
                         }
-                        files_to_read[f] = FileLocation::LOCATION(this->scratch_space, job->getName());
+                        files_to_read[f] = FileLocation::LOCATION(this->scratch_space, this->scratch_space->getMountPoint()  + "/" + job->getName());
                         this->files_stored_in_scratch.insert(f);
                     }
                 }
@@ -369,7 +369,7 @@ namespace wrench {
                     if (work->file_locations.find(f) != work->file_locations.end()) {
                         files_to_write[f] = work->file_locations[f];
                     } else {
-                        files_to_write[f] = FileLocation::LOCATION(this->scratch_space, job->getName());
+                        files_to_write[f] = FileLocation::LOCATION(this->scratch_space, this->scratch_space->getMountPoint() + "/" + job->getName());
                     }
                 }
                 StorageService::writeFiles(files_to_write);
