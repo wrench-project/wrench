@@ -206,13 +206,13 @@ void BatchServiceOutputCSVFileTest::do_SimpleOutputCSVFile_test() {
 
   // Bogus output file
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchComputeService(hostname, {"Host1", "Host2", "Host3", "Host4"}, 0,
+          new wrench::BatchComputeService(hostname, {"Host1", "Host2", "Host3", "Host4"}, "",
                                    {{wrench::BatchComputeServiceProperty::OUTPUT_CSV_JOB_LOG, "/bogus"},
                                     {wrench::BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}})), std::invalid_argument);
 
   // OK output file
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchComputeService(hostname, {"Host1", "Host2", "Host3", "Host4"}, 0,
+          new wrench::BatchComputeService(hostname, {"Host1", "Host2", "Host3", "Host4"}, "",
                                    {{wrench::BatchComputeServiceProperty::OUTPUT_CSV_JOB_LOG, output_csv_file},
                                     {wrench::BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}})));
 
