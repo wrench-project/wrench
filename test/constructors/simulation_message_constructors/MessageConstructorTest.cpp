@@ -313,7 +313,7 @@ TEST_F(MessageConstructorTest, StorageServiceMessages) {
     ASSERT_THROW(new wrench::StorageServiceFileWriteRequestMessage("mailbox", file, nullptr, 10, 666), std::invalid_argument);
 
     ASSERT_NO_THROW(new wrench::StorageServiceFileWriteAnswerMessage(file, location, true, nullptr, "mailbox", 666));
-    ASSERT_NO_THROW(new wrench::StorageServiceFileWriteAnswerMessage(file, location, false, failure_cause, "mailbox", 666));
+    ASSERT_NO_THROW(new wrench::StorageServiceFileWriteAnswerMessage(file, location, false, failure_cause, "", 666));
     ASSERT_THROW(new wrench::StorageServiceFileWriteAnswerMessage(nullptr, location, true, nullptr, "mailbox", 666), std::invalid_argument);
     ASSERT_THROW(new wrench::StorageServiceFileWriteAnswerMessage(file, nullptr, true, nullptr, "mailbox", 666), std::invalid_argument);
     ASSERT_THROW(new wrench::StorageServiceFileWriteAnswerMessage(file, location, true, nullptr, "", 666), std::invalid_argument);
