@@ -63,7 +63,7 @@ protected:
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
-                          "       <host id=\"SingleHost\" speed=\"1f\""
+                          "       <host id=\"SingleHost\" speed=\"1f\">"
                           "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
                           "             <prop id=\"size\" value=\"100B\"/>"
                           "             <prop id=\"mount\" value=\"/disk100/\"/>"
@@ -1595,13 +1595,13 @@ private:
         auto file_registry_service = this->getAvailableFileRegistryService();
 
         try {
-            wrench::StorageService::writeFile(nullptr, wrench::FileLocation::LOCATION(this->test->storage_service_100, "/"));
+            wrench::StorageService::writeFile(nullptr, wrench::FileLocation::LOCATION(this->test->storage_service_100, "/disk100"));
             throw std::runtime_error("Should not be able to write a nullptr file to a service");
         } catch (std::invalid_argument &e) {
         }
 
         try {
-            wrench::StorageService::writeFile(this->test->file_500, wrench::FileLocation::LOCATION(this->test->storage_service_100, "/"));
+            wrench::StorageService::writeFile(this->test->file_500, wrench::FileLocation::LOCATION(this->test->storage_service_100));
             throw std::runtime_error("Should not be able to write to a storage service with not enough space");
         } catch (wrench::WorkflowExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::StorageServiceNotEnoughSpace>(e.getCause());
