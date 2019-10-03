@@ -256,12 +256,12 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobBrokenEstimateW
     // Create a Batch Service
     ASSERT_THROW(compute_service = simulation->add(
             new wrench::BatchComputeService(hostname,
-                                            {"Host1", "Host2", "Host3", "Host4"}, 0,  {
+                                            {"Host1", "Host2", "Host3", "Host4"}, "",  {
                                                     {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "BOGUS"}
                                             })), std::invalid_argument);
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BatchComputeService(hostname,
-                                            {"Host1", "Host2", "Host3", "Host4"}, 0, {
+                                            {"Host1", "Host2", "Host3", "Host4"}, "", {
                                                     {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "easy_bf"}
                                             })));
 
@@ -436,7 +436,7 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobBasicEstimateWa
     // Create a Batch Service
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BatchComputeService(hostname,
-                                            {"Host1", "Host2", "Host3", "Host4"}, 0, {
+                                            {"Host1", "Host2", "Host3", "Host4"}, "", {
                                                     {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"}
                                             })));
 
@@ -662,7 +662,7 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobEstimateWaiting
     // Create a Batch Service
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BatchComputeService(hostname,
-                                            {"Host1", "Host2", "Host3", "Host4"}, 0, {
+                                            {"Host1", "Host2", "Host3", "Host4"}, "", {
                                                     {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"},
                                                     {wrench::BatchComputeServiceProperty::BATCH_RJMS_DELAY, "0"}
                                             })));
@@ -934,7 +934,7 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobLittleComplexEs
     // Create a Batch Service
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BatchComputeService(hostname,
-                                            {"Host1", "Host2", "Host3", "Host4"}, 0, {
+                                            {"Host1", "Host2", "Host3", "Host4"}, "", {
                                                     {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"},
                                                     {wrench::BatchComputeServiceProperty::BATCH_RJMS_DELAY, "0"}
                                             })));
