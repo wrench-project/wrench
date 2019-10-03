@@ -231,8 +231,9 @@ namespace wrench {
         }
 
         if (this->reserved_space.find(key) == this->reserved_space.end()) {
-            throw std::runtime_error("LogicalFileSystem::unreserveSpace(): Space was not being reserved for storing file " +
-                                     file->getID() + "at path " + absolute_path);
+            return; // oh well
+//            throw std::runtime_error("LogicalFileSystem::unreserveSpace(): Space was not being reserved for storing file " +
+//                                     file->getID() + "at path " + absolute_path);
         }
 
         this->reserved_space.erase(key);

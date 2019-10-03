@@ -140,7 +140,7 @@ namespace wrench {
 
 
     /**
-     * @brief Method to sanitize an absolute path
+     * @brief Method to sanitize an absolute path (and make it absolute if it's not)
      * @param path
      * @return
      */
@@ -151,11 +151,6 @@ namespace wrench {
             throw std::invalid_argument("FileLocation::sanitizePath(): path cannot be empty");
         }
 
-        // Must terminate with a /
-        if (path.at(0) != '/') {
-            throw std::invalid_argument("FileLocation::sanitizePath(): An absolute path must start with '/' (" + path + ")");
-        }
-
         // Cannot have certain substring (why not)
         std::string unallowed_characters[] = {"\\", " ", "~", "`", "\"", "&", "*", "?"};
         for (auto const &c : unallowed_characters) {
@@ -164,9 +159,9 @@ namespace wrench {
             }
         }
 
-        // Make it /-terminated
+        // Make it /-started and /-terminated
         if (path.at(path.length()-1) != '/') {
-            path = path + "/";
+            path = "/" + path + "/";
         }
 
         // Deal with "", "." and ".."

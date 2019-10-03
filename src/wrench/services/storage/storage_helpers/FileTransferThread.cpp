@@ -440,13 +440,14 @@ namespace wrench {
         try {
             message = S4U_Mailbox::getMessage(request_answer_mailbox, this->network_timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw cause;
         }
+
 
         if (auto msg = std::dynamic_pointer_cast<StorageServiceFileReadAnswerMessage>(message)) {
             // If it's not a success, throw an exception
             if (not msg->success) {
-                throw WorkflowExecutionException(msg->failure_cause);
+                throw msg->failure_cause;
             }
         } else {
             throw std::runtime_error("FileTransferThread::downloadFileFromStorageService(): Received an unexpected [" +
@@ -499,7 +500,7 @@ namespace wrench {
                                             dst_location->getStorageService()->getHostname(),
                                             dst_location->getMountPoint());
             } catch (std::shared_ptr<NetworkError> &e) {
-                throw WorkflowExecutionException(e);
+                throw;
             }
         }
 
