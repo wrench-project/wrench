@@ -111,7 +111,11 @@ namespace wrench {
  * @throw std::invalid_argument
  */
     void LogicalFileSystem::storeFileInDirectory(WorkflowFile *file, std::string absolute_path) {
-        assertDirectoryExist(absolute_path);
+        // If directory does not exit, create it
+        if (not doesDirectoryExist(absolute_path)) {
+            createDirectory(absolute_path);
+        }
+
         this->content[absolute_path].insert(file);
         std::string key = FileLocation::sanitizePath(absolute_path) + file->getID();
         if (this->reserved_space.find(key) == this->reserved_space.end()) {
@@ -155,7 +159,10 @@ namespace wrench {
  * @throw std::invalid_argument
  */
     bool LogicalFileSystem::isFileInDirectory(WorkflowFile *file, std::string absolute_path) {
-        assertDirectoryExist(absolute_path);
+        // If directory does not exist, say "no"
+        if (not doesDirectoryExist(absolute_path)) {
+            return false;
+        }
         return (this->content[absolute_path].find(file) != this->content[absolute_path].end());
     }
 

@@ -415,9 +415,8 @@ namespace wrench {
                                                  SimulationTimestampFileCopyStart *start_timestamp) {
 
 
-        // File System  and path at the destination (me) exists?
-        if ((this->file_systems.find(dst_location->getMountPoint()) == this->file_systems.end()) or
-            (not this->file_systems[dst_location->getMountPoint()]->doesDirectoryExist(dst_location->getAbsolutePathAtMountPoint())))  {
+        // File System  and path at the destination exists?
+        if (this->file_systems.find(dst_location->getMountPoint()) == this->file_systems.end())  {
 
             this->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyFailure>(
                     new SimulationTimestampFileCopyFailure(start_timestamp));
@@ -446,7 +445,6 @@ namespace wrench {
         }
 
         auto fs = this->file_systems[dst_location->getMountPoint()].get();
-
 
         // File is not already here
         if (not fs->isFileInDirectory(file, dst_location->getAbsolutePathAtMountPoint())) {

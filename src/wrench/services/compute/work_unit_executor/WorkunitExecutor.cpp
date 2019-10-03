@@ -173,14 +173,14 @@ namespace wrench {
                 auto src = std::get<1>(pfc);
                 auto dst = std::get<2>(pfc);
 
-                if ((src->getStorageService()->isScratch()) ||
-                    (dst->getStorageService()->isScratch())) {
+                if ((src == FileLocation::SCRATCH) ||
+                    (dst == FileLocation::SCRATCH)) {
                     scratch_space_ok = false;
                     break;
                 }
             }
             for (auto const &fl : workunit->file_locations) {
-                if (fl.second->getStorageService()->isScratch()) {
+                if (fl.second == FileLocation::SCRATCH) {
                     scratch_space_ok = false;
                     break;
                 }
@@ -188,15 +188,15 @@ namespace wrench {
             for (auto const &pfc : workunit->post_file_copies) {
                 auto src = std::get<1>(pfc);
                 auto dst = std::get<2>(pfc);
-                if ((src->getStorageService()->isScratch()) ||
-                    (dst->getStorageService()->isScratch())) {
+                if ((src == FileLocation::SCRATCH) ||
+                    (dst == FileLocation::SCRATCH)) {
                     scratch_space_ok = false;
                     break;
                 }
             }
             for (auto const &cd : workunit->cleanup_file_deletions) {
                 auto location = std::get<1>(cd);
-                if (location->getStorageService()->isScratch()) {
+                if (location == FileLocation::SCRATCH) {
                     scratch_space_ok = false;
                     break;
                 }
@@ -290,9 +290,9 @@ namespace wrench {
                             dst_location->toString().c_str());
 
                 S4U_Simulation::sleep(this->thread_startup_overhead);
-                if (dst_location->getStorageService() == this->scratch_space) {
+                if (dst_location == FileLocation::SCRATCH) {
                     // Always use the job's name as directory if necessary
-                    auto augmented_dst_location = FileLocation::LOCATION(this->scratch_space, job->getName());
+                    auto augmented_dst_location = FileLocation::LOCATION(this->scratch_space, this->scratch_space->getMountPoint() + "/" + job->getName());
                     StorageService::copyFile(file, src_location, augmented_dst_location);
                     files_stored_in_scratch.insert(file);
                 } else {
@@ -410,13 +410,8 @@ namespace wrench {
             auto src_location = std::get<1>(fc);
             auto dst_location = std::get<2>(fc);
 
-            if ((dst_location->getStorageService()->isScratch()) and (dst_location->getStorageService() != this->scratch_space)) {
-                this->failure_timestamp_should_be_generated = true;
-                std::string error_msg = "Job " + job->getName() + " is trying to copy data to a remote compute service's scratch space";
-                throw NotAllowed(this->getSharedPtr<WorkunitExecutor>(), error_msg);
-            }
 
-            if (dst_location->getStorageService() == this->scratch_space) {
+            if (dst_location == FileLocation::SCRATCH) {
                 files_stored_in_scratch.insert(file);
                 WRENCH_WARN(
                         "WARNING: WorkunitExecutor::performWork(): Post copying files to the scratch space: Can cause implicit deletion afterwards"
