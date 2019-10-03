@@ -54,7 +54,7 @@ namespace wrench {
         std::map<std::string, std::string> default_property_values = {
                 {BatchComputeServiceProperty::SUPPORTS_PILOT_JOBS,                         "true"},
                 {BatchComputeServiceProperty::SUPPORTS_STANDARD_JOBS,                      "true"},
-                {BatchComputeServiceProperty::THREAD_STARTUP_OVERHEAD,                     "0"},
+                {BatchComputeServiceProperty::TASK_STARTUP_OVERHEAD,                     "0"},
                 {BatchComputeServiceProperty::HOST_SELECTION_ALGORITHM,                    "FIRSTFIT"},
                 {BatchComputeServiceProperty::TASK_SELECTION_ALGORITHM,                    "maximum_flops"},
         #ifdef ENABLE_BATSCHED
