@@ -48,45 +48,49 @@ protected:
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"Host1\" speed=\"1f\" core=\"10\"> "
-                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
-                          "             <prop id=\"size\" value=\"100\"/>"
-                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100GB\"/>"
+                          "             <prop id=\"mount\" value=\"/disk1/\"/>"
                           "          </disk>"
+                          "          <disk id=\"large_disk2\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100GB\"/>"
+                          "             <prop id=\"mount\" value=\"/disk2/\"/>"
+                          "          </disk>"
+
                           "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
-                          "             <prop id=\"size\" value=\"100\"/>"
+                          "             <prop id=\"size\" value=\"100B\"/>"
                           "             <prop id=\"mount\" value=\"/scratch\"/>"
                           "          </disk>"
                           "       </host>"
                           "       <host id=\"Host2\" speed=\"1f\" core=\"10\"> "
                           "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
-                          "             <prop id=\"size\" value=\"100\"/>"
+                          "             <prop id=\"size\" value=\"100GB\"/>"
                           "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
                           "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
-                          "             <prop id=\"size\" value=\"100\"/>"
+                          "             <prop id=\"size\" value=\"100B\"/>"
                           "             <prop id=\"mount\" value=\"/scratch\"/>"
                           "          </disk>"
                           "       </host>"
                           "       <host id=\"Host3\" speed=\"1f\" core=\"10\"> "
                           "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
-                          "             <prop id=\"size\" value=\"100\"/>"
+                          "             <prop id=\"size\" value=\"100GB\"/>"
                           "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
                           "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
-                          "             <prop id=\"size\" value=\"100\"/>"
+                          "             <prop id=\"size\" value=\"100B\"/>"
                           "             <prop id=\"mount\" value=\"/scratch\"/>"
                           "          </disk>"
                           "       </host>"
                           "       <host id=\"Host4\" speed=\"1f\" core=\"10\">  "
                           "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
-                          "             <prop id=\"size\" value=\"100\"/>"
+                          "             <prop id=\"size\" value=\"100GB\"/>"
                           "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
                           "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
-                          "             <prop id=\"size\" value=\"100\"/>"
+                          "             <prop id=\"size\" value=\"100B\"/>"
                           "             <prop id=\"mount\" value=\"/scratch\"/>"
                           "          </disk>"
-                          "       </host>"
                           "         <prop id=\"ram\" value=\"1024\"/> "
                           "       </host>  "
                           "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
@@ -417,7 +421,7 @@ void WorkunitExecutorTest::do_WorkunitExecutorConstructor_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = "Host1";
 
     // Create a Compute Service
     std::shared_ptr<wrench::ComputeService> compute_service;
@@ -428,11 +432,11 @@ void WorkunitExecutorTest::do_WorkunitExecutorConstructor_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
+            new wrench::SimpleStorageService(hostname, {"/disk1/"})));
 
     // Create another Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
+            new wrench::SimpleStorageService(hostname, {"/disk2/"})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
