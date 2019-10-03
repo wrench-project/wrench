@@ -26,8 +26,8 @@ namespace wrench {
 
     public:
 
-        /** @brief The number of seconds to start a thread (default = 0) **/
-        DECLARE_PROPERTY_NAME(THREAD_STARTUP_OVERHEAD);
+        /** @brief The number of seconds to start a task (default = 0) **/
+        DECLARE_PROPERTY_NAME(TASK_STARTUP_OVERHEAD);
 
         /** @brief The number of bytes in the control message sent by the executor to provide the set of files stored in the scratch **/
         DECLARE_PROPERTY_NAME(STANDARD_JOB_FILES_STORED_IN_SCRATCH);

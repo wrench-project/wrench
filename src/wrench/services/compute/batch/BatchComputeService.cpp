@@ -1602,9 +1602,9 @@ namespace wrench {
                                 this->getScratch(),
                                 false,
                                 nullptr,
-                                {{StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD,
+                                {{StandardJobExecutorProperty::TASK_STARTUP_OVERHEAD,
                                          this->getPropertyValueAsString(
-                                                 BatchComputeServiceProperty::THREAD_STARTUP_OVERHEAD)},
+                                                 BatchComputeServiceProperty::TASK_STARTUP_OVERHEAD)},
                                  {StandardJobExecutorProperty::SIMULATE_COMPUTATION_AS_SLEEP,
                                          this->getPropertyValueAsString(
                                                  BatchComputeServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP)},

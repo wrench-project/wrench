@@ -554,7 +554,7 @@ namespace wrench {
                                          this->scratch_space,
                                          job,
                                          this->getPropertyValueAsDouble(
-                                                 StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD),
+                                                 StandardJobExecutorProperty::TASK_STARTUP_OVERHEAD),
                                          this->getPropertyValueAsBoolean(
                                                  StandardJobExecutorProperty::SIMULATE_COMPUTATION_AS_SLEEP)
                     ));
