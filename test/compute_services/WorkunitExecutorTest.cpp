@@ -140,11 +140,11 @@ void WorkunitExecutorTest::do_WorkunitConstructor_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname, {"/disk1/"})));
 
     // Create another Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname, {"/disk2/"})));
 
     // Create workflow filess
     wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000000.0);
