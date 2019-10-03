@@ -58,12 +58,12 @@ public:
 
     void do_WorkUnit_test();
 
-    static bool isJustABitGreater(double base, double variable) {
-        return ((variable > base) && (variable < base + EPSILON));
+    static bool isJustABitGreater(double base, double variable,  double epsilon) {
+        return ((variable > base) && (variable < base + epsilon));
     }
 
-    static bool isJustABitGreaterThanOrEqual(double base, double variable) {
-        return ((variable >= base) && (variable < base + EPSILON));
+    static bool isJustABitGreaterThanOrEqual(double base, double variable, double epsilon) {
+        return ((variable >= base) && (variable < base + epsilon));
     }
 
 protected:
@@ -77,48 +77,56 @@ protected:
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"Host1\" speed=\"1f\" core=\"10\"> "
-                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
-                          "             <prop id=\"size\" value=\"10000000000000\"/>"
-                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"10000000000000B\"/>"
+                          "             <prop id=\"mount\" value=\"/disk1/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"large_disk2\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"10000000000000B\"/>"
+                          "             <prop id=\"mount\" value=\"/disk2/\"/>"
                           "          </disk>"
                           "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
-                          "             <prop id=\"size\" value=\"101\"/>"
+                          "             <prop id=\"size\" value=\"101B\"/>"
                           "             <prop id=\"mount\" value=\"/scratch\"/>"
                           "          </disk>"
                           "       </host>  "
                           "       <host id=\"Host2\" speed=\"1f\" core=\"10\"> "
                           "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
-                          "             <prop id=\"size\" value=\"10000000000000\"/>"
+                          "             <prop id=\"size\" value=\"10000000000000B\"/>"
                           "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
                           "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
-                          "             <prop id=\"size\" value=\"101\"/>"
+                          "             <prop id=\"size\" value=\"101b\"/>"
                           "             <prop id=\"mount\" value=\"/scratch\"/>"
                           "          </disk>"
                           "       </host>  "
                           "       <host id=\"Host3\" speed=\"1f\" core=\"10\"> "
                           "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
-                          "             <prop id=\"size\" value=\"10000000000000\"/>"
+                          "             <prop id=\"size\" value=\"10000000000000B\"/>"
                           "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
                           "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
-                          "             <prop id=\"size\" value=\"101\"/>"
+                          "             <prop id=\"size\" value=\"101B\"/>"
                           "             <prop id=\"mount\" value=\"/scratch\"/>"
                           "          </disk>"
                           "       </host>  "
                           "       <host id=\"Host4\" speed=\"1f\" core=\"10\">  "
-                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
-                          "             <prop id=\"size\" value=\"10000000000000\"/>"
-                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"10000000000000B\"/>"
+                          "             <prop id=\"mount\" value=\"/disk1/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"large_disk2\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"10000000000000B\"/>"
+                          "             <prop id=\"mount\" value=\"/disk2/\"/>"
                           "          </disk>"
                           "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
-                          "             <prop id=\"size\" value=\"101\"/>"
+                          "             <prop id=\"size\" value=\"101B\"/>"
                           "             <prop id=\"mount\" value=\"/scratch\"/>"
                           "          </disk>"
                           "         <prop id=\"ram\" value=\"1024\"/> "
                           "       </host>  "
                           "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
-                          "       <link id=\"2\" bandwidth=\"0.1MBps\" latency=\"10us\"/>"
+                          "       <link id=\"2\" bandwidth=\"0.1MBps\" latency=\"1us\"/>"
                           "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"1\"/> </route>"
                           "       <route src=\"Host3\" dst=\"Host4\"> <link_ctn id=\"2\"/> </route>"
                           "       <route src=\"Host1\" dst=\"Host4\"> <link_ctn id=\"2\"/> </route>"
@@ -200,7 +208,7 @@ private:
                             nullptr,
                             false,
                             nullptr,
-                            {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
+                            {{wrench::StandardJobExecutorProperty::TASK_STARTUP_OVERHEAD, std::to_string(
                                     thread_startup_overhead)}}, {}
                     ));
             throw std::runtime_error("Should not be able to create a standard job executor with a bogus host");
@@ -219,7 +227,7 @@ private:
                             nullptr,
                             false,
                             nullptr,
-                            {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
+                            {{wrench::StandardJobExecutorProperty::TASK_STARTUP_OVERHEAD, std::to_string(
                                     thread_startup_overhead)}}, {}
                     ));
             throw std::runtime_error("Should not be able to create a standard job executor with a nullptr job");
@@ -238,7 +246,7 @@ private:
                             nullptr,
                             false,
                             nullptr,
-                            {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
+                            {{wrench::StandardJobExecutorProperty::TASK_STARTUP_OVERHEAD, std::to_string(
                                     thread_startup_overhead)}}, {}
                     ));
             throw std::runtime_error("Should not be able to create a standard job executor with no compute resources");
@@ -257,7 +265,7 @@ private:
                             nullptr,
                             false,
                             nullptr,
-                            {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
+                            {{wrench::StandardJobExecutorProperty::TASK_STARTUP_OVERHEAD, std::to_string(
                                     thread_startup_overhead)}}, {}
                     ));
             throw std::runtime_error("Should not be able to create a standard job executor with zero cores on a resource");
@@ -276,7 +284,7 @@ private:
                             nullptr,
                             false,
                             nullptr,
-                            {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
+                            {{wrench::StandardJobExecutorProperty::TASK_STARTUP_OVERHEAD, std::to_string(
                                     thread_startup_overhead)}}, {}
                     ));
             throw std::runtime_error("Should not be able to create a standard job executor with more cores than available on a resource");
@@ -295,7 +303,7 @@ private:
                             nullptr,
                             false,
                             nullptr,
-                            {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
+                            {{wrench::StandardJobExecutorProperty::TASK_STARTUP_OVERHEAD, std::to_string(
                                     thread_startup_overhead)}}, {}
                     ));
             throw std::runtime_error("Should not be able to create a standard job executor with negative RAM on a resource");
@@ -314,7 +322,7 @@ private:
                             nullptr,
                             false,
                             nullptr,
-                            {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
+                            {{wrench::StandardJobExecutorProperty::TASK_STARTUP_OVERHEAD, std::to_string(
                                     thread_startup_overhead)}}, {}
                     ));
             throw std::runtime_error("Should not be able to create a standard job executor with more RAM than available on a resource");
@@ -355,7 +363,7 @@ private:
                             nullptr,
                             false,
                             nullptr,
-                            {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
+                            {{wrench::StandardJobExecutorProperty::TASK_STARTUP_OVERHEAD, std::to_string(
                                     thread_startup_overhead)}}, {}
                     ));
             throw std::runtime_error("Should not be able to create a standard job executor with insufficient RAM to run the job");
@@ -399,7 +407,7 @@ private:
                             nullptr,
                             false,
                             nullptr,
-                            {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
+                            {{wrench::StandardJobExecutorProperty::TASK_STARTUP_OVERHEAD, std::to_string(
                                     thread_startup_overhead)}}, {}
                     ));
             throw std::runtime_error("Should not be able to create a standard job executor with insufficient RAM to run the job");
@@ -441,7 +449,7 @@ private:
                             nullptr,
                             false,
                             nullptr,
-                            {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
+                            {{wrench::StandardJobExecutorProperty::TASK_STARTUP_OVERHEAD, std::to_string(
                                     thread_startup_overhead)}}, {}
                     ));
         } catch (std::invalid_argument &e) {
@@ -488,32 +496,33 @@ void StandardJobExecutorTest::do_StandardJobExecutorConstructorTest_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname1 = "Host1";
+    std::string hostname2 = "Host2";
 
     // Create a Compute Service (we don't use it)
     std::shared_ptr<wrench::ComputeService> compute_service;
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+            new wrench::BareMetalComputeService(hostname1,
+                                                {std::make_pair(hostname1, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
                                                 {})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname1, {"/disk1"})));
 
     // Create another Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname2, {"/"})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
             new StandardJobExecutorConstructorTestWMS(
-                    this,  {compute_service}, {storage_service1, storage_service2}, hostname)));
+                    this,  {compute_service}, {storage_service1, storage_service2}, hostname1)));
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-    simulation->add(new wrench::FileRegistryService(hostname));
+    simulation->add(new wrench::FileRegistryService(hostname1));
 
     // Create two workflow files
     wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000000.0);
@@ -592,13 +601,13 @@ private:
                     new wrench::StandardJobExecutor(
                             test->simulation,
                             my_mailbox,
-                            test->simulation->getHostnameList()[0],
+                            "Host1",
                             job,
                             {std::make_pair(test->simulation->getHostnameList()[0], std::make_tuple(2, wrench::ComputeService::ALL_RAM))},
                             nullptr,
                             false,
                             nullptr,
-                            {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
+                            {{wrench::StandardJobExecutorProperty::TASK_STARTUP_OVERHEAD, std::to_string(
                                     thread_startup_overhead)}}, {}
                     ));
             executor->start(executor, true, false); // Daemonized, no auto-restart
@@ -621,17 +630,17 @@ private:
 
             double observed_duration = after - before;
 
-            double expected_duration = task->getFlops() + 3 * thread_startup_overhead;
+            double expected_duration = task->getFlops() + 1 * thread_startup_overhead;
 
             // Does the job completion time make sense?
-            if (!StandardJobExecutorTest::isJustABitGreater(before + expected_duration, after)) {
+            if (!StandardJobExecutorTest::isJustABitGreater(before + expected_duration, after, 0.2)) {
                 throw std::runtime_error("Unexpected job completion time (should be around " +
                                          std::to_string(before + expected_duration) + " but is " +
                                          std::to_string(after) + ")");
             }
 
             // Doe the task-stored time information look good
-            if (!StandardJobExecutorTest::isJustABitGreaterThanOrEqual(before, task->getStartDate())) {
+            if (!StandardJobExecutorTest::isJustABitGreaterThanOrEqual(before, task->getStartDate(), EPSILON)) {
 //          std::cerr << "START: " << task->getStartDate() << std::endl;
                 throw std::runtime_error(
                         "Case 1: Unexpected task start date: " + std::to_string(task->getStartDate()) + "| " +
@@ -639,19 +648,21 @@ private:
             }
 
             // Note that we have to subtract the last thread startup overhead (for file deletions)
-            if (!StandardJobExecutorTest::isJustABitGreater(task->getEndDate(), after - 2 * thread_startup_overhead)) {
+            if (!StandardJobExecutorTest::isJustABitGreater(task->getEndDate(), after, EPSILON)) {
                 throw std::runtime_error(
                         "Case 1: Unexpected task end date: " + std::to_string(task->getEndDate()) +
-                        " (expected: " + std::to_string(after - 2 * thread_startup_overhead) + ")");
+                        " (expected: " + std::to_string(after) + ")");
             }
 
             // Has the output file been copied back to storage_service1?
-            if (!this->test->storage_service1->lookupFile(this->getWorkflow()->getFileByID("output_file"), nullptr)) {
+            if (not wrench::StorageService::lookupFile(this->getWorkflow()->getFileByID("output_file"),
+                                                       wrench::FileLocation::LOCATION(this->test->storage_service1))) {
                 throw std::runtime_error("The output file has not been copied back to the specified storage service");
             }
 
             // Has the output file been erased from storage_service2?
-            if (this->test->storage_service2->lookupFile(this->getWorkflow()->getFileByID("output_file"), nullptr)) {
+            if (wrench::StorageService::lookupFile(this->getWorkflow()->getFileByID("output_file"),
+                                                   wrench::FileLocation::LOCATION(this->test->storage_service2))) {
                 throw std::runtime_error("The output file has not been erased from the specified storage service");
             }
 
@@ -680,32 +691,33 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskTest_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname1 = "Host1";
+//    std::string hostname2 = "Host2";
 
     // Create a Compute Service (we don't use it)
     std::shared_ptr<wrench::ComputeService> compute_service;
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+            new wrench::BareMetalComputeService(hostname1,
+                                                {std::make_pair(hostname1, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
                                                 {})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname1, {"/disk1"})));
 
     // Create another Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname1, {"/disk2"})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new OneSingleCoreTaskTestWMS(
-                    this,  {compute_service}, {storage_service1, storage_service2}, hostname)));
+                    this,  {compute_service}, {storage_service1, storage_service2}, hostname1)));
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-    simulation->add(new wrench::FileRegistryService(hostname));
+    simulation->add(new wrench::FileRegistryService(hostname1));
 
     // Create two workflow files
     wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000000.0);
@@ -795,7 +807,7 @@ private:
                         nullptr,
                         false,
                         nullptr,
-                        {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
+                        {{wrench::StandardJobExecutorProperty::TASK_STARTUP_OVERHEAD, std::to_string(
                                 thread_startup_overhead)}}, {}
                 ));
             } catch (std::runtime_error &e) {
@@ -859,32 +871,33 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskBogusPreFileCopyTest_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname1 = "Host1";
+    std::string hostname2 = "Host2";
 
     // Create a Compute Service (we don't use it)
     std::shared_ptr<wrench::ComputeService> compute_service;
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+            new wrench::BareMetalComputeService(hostname1,
+                                                {std::make_pair(hostname1, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
                                                 {})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname1, {"/disk1"})));
 
     // Create another Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname2, {"/"})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new OneSingleCoreTaskBogusPreFileCopyTestWMS(
-                    this,  {compute_service}, {storage_service1, storage_service2}, hostname)));
+                    this,  {compute_service}, {storage_service1, storage_service2}, hostname1)));
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-    simulation->add(new wrench::FileRegistryService(hostname));
+    simulation->add(new wrench::FileRegistryService(hostname1));
 
     // Create two workflow files
     wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000000.0);
@@ -978,7 +991,7 @@ private:
                         nullptr,
                         false,
                         nullptr,
-                        {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
+                        {{wrench::StandardJobExecutorProperty::TASK_STARTUP_OVERHEAD, std::to_string(
                                 thread_startup_overhead)}}, {}
                 ));
             } catch (std::runtime_error &e) {
@@ -1042,31 +1055,32 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskMissingFileTest_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname1 = "Host1";
+    std::string hostname2 = "Host2";
 
     // Create a Compute Service (we don't use it)
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+            new wrench::BareMetalComputeService(hostname1,
+                                                {std::make_pair(hostname1, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
                                                 {})));
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname1, {"/disk1"})));
 
     // Create another Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname2, {"/"})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new OneSingleCoreTaskMissingFileTestWMS(
-                    this,  {compute_service}, {storage_service1, storage_service2}, hostname)));
+                    this,  {compute_service}, {storage_service1, storage_service2}, hostname1)));
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-    simulation->add(new wrench::FileRegistryService(hostname));
+    simulation->add(new wrench::FileRegistryService(hostname1));
 
     // Create two workflow files
     wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000000.0);
@@ -1178,7 +1192,7 @@ private:
                             //standard job executor is being created direclty (not by any Compute Service), we pass a dummy storage as a scratch space
                             false,
                             nullptr,
-                            {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
+                            {{wrench::StandardJobExecutorProperty::TASK_STARTUP_OVERHEAD, std::to_string(
                                     thread_startup_overhead)}}, {}
 
                     ));
@@ -1198,19 +1212,19 @@ private:
                 throw std::runtime_error("Unexpected '" + message->getName() + "' message");
             }
 
-            if (!StandardJobExecutorTest::isJustABitGreater(100, t1->getEndDate())) {
+            if (!StandardJobExecutorTest::isJustABitGreater(100, t1->getEndDate(), EPSILON)) {
                 throw std::runtime_error("Unexpected completion time for t1: " +
                                          std::to_string(t1->getEndDate()) + "(should be 100)");
             }
-            if (!StandardJobExecutorTest::isJustABitGreater(200, t2->getEndDate())) {
+            if (!StandardJobExecutorTest::isJustABitGreater(200, t2->getEndDate(), EPSILON)) {
                 throw std::runtime_error("Unexpected completion time for t2: " +
                                          std::to_string(t2->getEndDate()) + "(should be 200)");
             }
-            if (!StandardJobExecutorTest::isJustABitGreater(250, t3->getEndDate())) {
+            if (!StandardJobExecutorTest::isJustABitGreater(250, t3->getEndDate(), EPSILON)) {
                 throw std::runtime_error("Unexpected completion time for t3: " +
                                          std::to_string(t3->getEndDate()) + "(should be 250)");
             }
-            if (!StandardJobExecutorTest::isJustABitGreater(350, t4->getEndDate())) {
+            if (!StandardJobExecutorTest::isJustABitGreater(350, t4->getEndDate(), EPSILON)) {
                 throw std::runtime_error("Unexpected completion time for t4: " +
                                          std::to_string(t4->getEndDate()) + "(should be 350)");
             }
@@ -1254,7 +1268,7 @@ void StandardJobExecutorTest::do_DependentTasksTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname, {"/disk1"})));
 
     // Create a Compute Service
     std::shared_ptr<wrench::ComputeService> compute_service;
@@ -1334,7 +1348,7 @@ private:
                         nullptr,
                         false,
                         nullptr,
-                        {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}, {}
+                        {{wrench::StandardJobExecutorProperty::TASK_STARTUP_OVERHEAD, "0"}}, {}
                 ));
         executor->start(executor, true, false); // Daemonized, no auto-restart
 
@@ -1358,7 +1372,7 @@ private:
 
         double expected_duration = task->getFlops() / 6;
         // Does the task completion time make sense?
-        if (!StandardJobExecutorTest::isJustABitGreater(expected_duration, observed_duration)) {
+        if (!StandardJobExecutorTest::isJustABitGreater(expected_duration, observed_duration, EPSILON)) {
             throw std::runtime_error(
                     "Case 1: Unexpected task duration (should be around " + std::to_string(expected_duration) +
                     " but is " +
@@ -1400,7 +1414,7 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase1_test() {
                                                 {})));
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname, {"/disk1"})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -1486,7 +1500,7 @@ private:
                         nullptr,
                         false,
                         nullptr,
-                        {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}, {}
+                        {{wrench::StandardJobExecutorProperty::TASK_STARTUP_OVERHEAD, "0"}}, {}
                 ));
         executor->start(executor, true, false); // Daemonized, no auto-restart
 
@@ -1513,7 +1527,7 @@ private:
         double expected_duration = task->getFlops() / (10 * task->getParallelEfficiency());
 
         // Does the task completion time make sense?
-        if (!StandardJobExecutorTest::isJustABitGreater(expected_duration, observed_duration)) {
+        if (!StandardJobExecutorTest::isJustABitGreater(expected_duration, observed_duration, EPSILON)) {
             throw std::runtime_error(
                     "Case 2: Unexpected task duration (should be around " + std::to_string(expected_duration) +
                     " but is " +
@@ -1556,7 +1570,7 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase2_test() {
                                                 {})));
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname, {"/disk1"})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -1645,7 +1659,7 @@ private:
                         nullptr,
                         false,
                         nullptr,
-                        {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
+                        {{wrench::StandardJobExecutorProperty::TASK_STARTUP_OVERHEAD, std::to_string(
                                 thread_startup_overhead)}}, {}
                 ));
         executor->start(executor, true, false); // Daemonized, no auto-restart
@@ -1672,7 +1686,7 @@ private:
                 10 * thread_startup_overhead + task->getFlops() / (10 * task->getParallelEfficiency());
 
         // Does the task completion time make sense?
-        if (!StandardJobExecutorTest::isJustABitGreater(expected_duration, observed_duration)) {
+        if (!StandardJobExecutorTest::isJustABitGreater(expected_duration, observed_duration, EPSILON)) {
             throw std::runtime_error(
                     "Case 3: Unexpected job duration (should be around " + std::to_string(expected_duration) +
                     " but is " +
@@ -1715,7 +1729,7 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase3_test() {
                                                 {})));
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname, {"/disk1"})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -1813,7 +1827,7 @@ private:
                             nullptr,
                             false,
                             nullptr,
-                            {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}, {}
+                            {{wrench::StandardJobExecutorProperty::TASK_STARTUP_OVERHEAD, "0"}}, {}
                     ));
             executor->start(executor, true, false); // Daemonized, no auto-restart
 
@@ -1838,7 +1852,7 @@ private:
             double expected_duration = task1->getFlops() / 6 + task2->getFlops() / 6;
 
             // Does the task completion time make sense?
-            if (!StandardJobExecutorTest::isJustABitGreater(expected_duration, observed_duration)) {
+            if (!StandardJobExecutorTest::isJustABitGreater(expected_duration, observed_duration, EPSILON)) {
                 throw std::runtime_error(
                         "Case 1: Unexpected job duration (should be around " +
                         std::to_string(expected_duration) + " but is " +
@@ -1846,12 +1860,12 @@ private:
             }
 
             // Do individual task completion times make sense?
-            if (!StandardJobExecutorTest::isJustABitGreater(before + task1->getFlops() / 6, task1->getEndDate())) {
+            if (!StandardJobExecutorTest::isJustABitGreater(before + task1->getFlops() / 6, task1->getEndDate(), EPSILON)) {
                 throw std::runtime_error("Case 1: Unexpected task1 end date: " + std::to_string(task1->getEndDate()));
             }
 
             if (!StandardJobExecutorTest::isJustABitGreater(task1->getFlops() / 6 + task2->getFlops() / 6,
-                                                            task2->getEndDate())) {
+                                                            task2->getEndDate(), EPSILON)) {
                 throw std::runtime_error("Case 1: Unexpected task2 end date: " + std::to_string(task2->getEndDate()));
             }
 
@@ -1901,7 +1915,7 @@ private:
                             nullptr,
                             false,
                             nullptr,
-                            {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}, {}
+                            {{wrench::StandardJobExecutorProperty::TASK_STARTUP_OVERHEAD, "0"}}, {}
                     ));
             executor->start(executor, true, false); // Daemonized, no auto-restart
 
@@ -1926,7 +1940,7 @@ private:
             double expected_duration = std::max(task1->getFlops() / 6, task2->getFlops() / 4);
 
             // Does the overall completion time make sense?
-            if (!StandardJobExecutorTest::isJustABitGreater(expected_duration, observed_duration)) {
+            if (!StandardJobExecutorTest::isJustABitGreater(expected_duration, observed_duration, EPSILON)) {
                 throw std::runtime_error(
                         "Case 2: Unexpected job duration (should be around " +
                         std::to_string(expected_duration) + " but is " +
@@ -1934,11 +1948,11 @@ private:
             }
 
             // Do individual task completion times make sense?
-            if (!StandardJobExecutorTest::isJustABitGreater(before + task1->getFlops() / 6, task1->getEndDate())) {
+            if (!StandardJobExecutorTest::isJustABitGreater(before + task1->getFlops() / 6, task1->getEndDate(), EPSILON)) {
                 throw std::runtime_error("Case 2: Unexpected task1 end date: " + std::to_string(task1->getEndDate()));
             }
 
-            if (!StandardJobExecutorTest::isJustABitGreater(before + task2->getFlops() / 4, task2->getEndDate())) {
+            if (!StandardJobExecutorTest::isJustABitGreater(before + task2->getFlops() / 4, task2->getEndDate(), EPSILON)) {
                 throw std::runtime_error("Case 2: Unexpected task2 end date: " + std::to_string(task2->getEndDate()));
             }
 
@@ -1993,7 +2007,7 @@ private:
                             nullptr,
                             false,
                             nullptr,
-                            {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}, {}
+                            {{wrench::StandardJobExecutorProperty::TASK_STARTUP_OVERHEAD, "0"}}, {}
                     ));
             executor->start(executor, true, false); // Daemonized, no auto-restart
 
@@ -2019,7 +2033,7 @@ private:
                                        task3->getFlops() / (task3->getParallelEfficiency() * 10);
 
             // Does the job completion time make sense?
-            if (!StandardJobExecutorTest::isJustABitGreater(expected_duration, observed_duration)) {
+            if (!StandardJobExecutorTest::isJustABitGreater(expected_duration, observed_duration, EPSILON)) {
                 throw std::runtime_error(
                         "Case 3: Unexpected job duration (should be around " +
                         std::to_string(expected_duration) + " but is " +
@@ -2027,15 +2041,15 @@ private:
             }
 
             // Do the individual task completion times make sense
-            if (!StandardJobExecutorTest::isJustABitGreater(before + task1->getFlops() / 6.0, task1->getEndDate())) {
+            if (!StandardJobExecutorTest::isJustABitGreater(before + task1->getFlops() / 6.0, task1->getEndDate(), EPSILON)) {
                 throw std::runtime_error("Case 3: Unexpected task1 end date: " + std::to_string(task1->getEndDate()));
             }
-            if (!StandardJobExecutorTest::isJustABitGreater(before + task2->getFlops() / 4.0, task2->getEndDate())) {
+            if (!StandardJobExecutorTest::isJustABitGreater(before + task2->getFlops() / 4.0, task2->getEndDate(), EPSILON)) {
                 throw std::runtime_error("Case 3: Unexpected task1 end date: " + std::to_string(task2->getEndDate()));
             }
             if (!StandardJobExecutorTest::isJustABitGreater(
                     task1->getEndDate() + task3->getFlops() / (task3->getParallelEfficiency() * 10.0),
-                    task3->getEndDate())) {
+                    task3->getEndDate(), EPSILON)) {
                 throw std::runtime_error("Case 3: Unexpected task3 end date: " + std::to_string(task3->getEndDate()));
             }
 
@@ -2070,31 +2084,32 @@ void StandardJobExecutorTest::do_TwoMultiCoreTasksTest_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname1 = "Host1";
+    std::string hostname2 = "Host1";
 
     // Create a Compute Service (we don't use it)
     std::shared_ptr<wrench::ComputeService> compute_service;
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+            new wrench::BareMetalComputeService(hostname1,
+                                                {std::make_pair(hostname1, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
                                                 {})));
     // Create a Storage Services
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname1, {"/disk1"})));
 
     // Create another Storage Services
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname2, {"/"})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new TwoMultiCoreTasksTestWMS(
-                    this, {compute_service}, {storage_service1, storage_service2}, hostname)));
+                    this, {compute_service}, {storage_service1, storage_service2}, hostname1)));
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-    simulation->add(new wrench::FileRegistryService(hostname));
+    simulation->add(new wrench::FileRegistryService(hostname1));
 
     // Create two workflow files
     wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -2185,7 +2200,7 @@ public:
                             nullptr,
                             false,
                             nullptr,
-                            {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}, {}
+                            {{wrench::StandardJobExecutorProperty::TASK_STARTUP_OVERHEAD, "0"}}, {}
                     ));
             executor->start(executor, true, false); // Daemonized, no auto-restart
 
@@ -2210,7 +2225,7 @@ public:
             double expected_duration = std::max(task1->getFlops() / 6, task2->getFlops() / 6);
 
             // Does the task completion time make sense?
-            if (!StandardJobExecutorTest::isJustABitGreater(expected_duration, observed_duration)) {
+            if (!StandardJobExecutorTest::isJustABitGreater(expected_duration, observed_duration, EPSILON)) {
                 throw std::runtime_error(
                         "Case 1: Unexpected job duration (should be around " +
                         std::to_string(expected_duration) + " but is " +
@@ -2218,11 +2233,11 @@ public:
             }
 
             // Do individual task completion times make sense?
-            if (!StandardJobExecutorTest::isJustABitGreater(before + task1->getFlops() / 6, task1->getEndDate())) {
+            if (!StandardJobExecutorTest::isJustABitGreater(before + task1->getFlops() / 6, task1->getEndDate(), EPSILON)) {
                 throw std::runtime_error("Case 1: Unexpected task1 end date: " + std::to_string(task1->getEndDate()));
             }
 
-            if (!StandardJobExecutorTest::isJustABitGreater(task2->getFlops() / 6, task2->getEndDate())) {
+            if (!StandardJobExecutorTest::isJustABitGreater(task2->getFlops() / 6, task2->getEndDate(), EPSILON)) {
                 throw std::runtime_error("Case 1: Unexpected task2 end date: " + std::to_string(task2->getEndDate()));
             }
 
@@ -2275,7 +2290,7 @@ public:
                             nullptr,
                             false,
                             nullptr,
-                            {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}, {}
+                            {{wrench::StandardJobExecutorProperty::TASK_STARTUP_OVERHEAD, "0"}}, {}
                     ));
             executor->start(executor, true, false); // Daemonized, no auto-restart
 
@@ -2305,7 +2320,7 @@ public:
                                                 task3->getFlops() / 8);
 
             // Does the overall completion time make sense?
-            if (!StandardJobExecutorTest::isJustABitGreater(expected_duration, observed_duration)) {
+            if (!StandardJobExecutorTest::isJustABitGreater(expected_duration, observed_duration, EPSILON)) {
                 throw std::runtime_error(
                         "Case 2: Unexpected job duration (should be around " +
                         std::to_string(expected_duration) + " but is " +
@@ -2359,7 +2374,7 @@ void StandardJobExecutorTest::do_MultiHostTest_test() {
                                                 {})));
     // Create a Storage Services
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname, {"/disk1"})));
 
     // Create another Storage Services
     ASSERT_NO_THROW(storage_service2 = simulation->add(
@@ -2467,7 +2482,7 @@ private:
                             nullptr,
                             false,
                             nullptr,
-                            {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}, {}
+                            {{wrench::StandardJobExecutorProperty::TASK_STARTUP_OVERHEAD, "0"}}, {}
                     ));
             executor->start(executor, true, false); // Daemonized, no auto-restart
 
@@ -2515,11 +2530,11 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringAComputation_test() {
                                                 {})));
     // Create a Storage Services
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService("Host4", {"/"})));
+            new wrench::SimpleStorageService("Host4", {"/disk1"})));
 
     // Create another Storage Services
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService("Host4", {"/"})));
+            new wrench::SimpleStorageService("Host4", {"/disk2"})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -2622,7 +2637,7 @@ private:
                             nullptr,
                             false,
                             nullptr,
-                            {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}, {}
+                            {{wrench::StandardJobExecutorProperty::TASK_STARTUP_OVERHEAD, "0"}}, {}
                     ));
             executor->start(executor, true, false); // Daemonized, no auto-restart
 
@@ -2669,11 +2684,11 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringATransfer_test() {
                                                 {})));
     // Create a Storage Services
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService("Host4", {"/"})));
+            new wrench::SimpleStorageService("Host4", {"/disk1"})));
 
     // Create another Storage Services
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService("Host4", {"/"})));
+            new wrench::SimpleStorageService("Host4", {"/disk2"})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -2795,7 +2810,7 @@ private:
                                 nullptr,
                                 false,
                                 nullptr,
-                                {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}, {}
+                                {{wrench::StandardJobExecutorProperty::TASK_STARTUP_OVERHEAD, "0"}}, {}
                         ));
                 executor->start(executor, true, false); // Daemonized, no auto-restart
 
@@ -2845,11 +2860,11 @@ void StandardJobExecutorTest::do_JobTerminationTestAtRandomTimes_test() {
                                                 {})));
     // Create a Storage Services
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService("Host4", {"/"})));
+            new wrench::SimpleStorageService("Host4", {"/disk1"})));
 
     // Create another Storage Services
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService("Host4", {"/"})));
+            new wrench::SimpleStorageService("Host4", {"/disk2"})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -2990,7 +3005,7 @@ private:
                         nullptr,
                         false,
                         nullptr,
-                        {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}, {}
+                        {{wrench::StandardJobExecutorProperty::TASK_STARTUP_OVERHEAD, "0"}}, {}
                 ));
         executor->start(executor, true, false); // Daemonized, no auto-restart
 
@@ -3030,32 +3045,33 @@ void StandardJobExecutorTest::do_NoTaskTest_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname1 = "Host1";
+    std::string hostname2 = "Host2";
 
     // Create a Compute Service (we don't use it)
     std::shared_ptr<wrench::ComputeService> compute_service;
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(hostname,
+            new wrench::BareMetalComputeService(hostname1,
+                                                {std::make_pair(hostname1,
                                                                 std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
                                                 {})));
     // Create a Storage Services
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname1, {"/disk1"})));
 
     // Create another Storage Services
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname2, {"/"})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new NoTaskTestWMS(
-                    this, {compute_service}, {storage_service1, storage_service2}, hostname)));
+                    this, {compute_service}, {storage_service1, storage_service2}, hostname1)));
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-    simulation->add(new wrench::FileRegistryService(hostname));
+    simulation->add(new wrench::FileRegistryService(hostname1));
 
     // Create two workflow files
     wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);

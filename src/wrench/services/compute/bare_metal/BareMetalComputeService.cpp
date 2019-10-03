@@ -711,7 +711,7 @@ namespace wrench {
                                          this->getScratch(),
                                          job,
                                          this->getPropertyValueAsDouble(
-                                                 BareMetalComputeServiceProperty::THREAD_STARTUP_OVERHEAD),
+                                                 BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD),
                                          false
                     ));
 
@@ -1558,15 +1558,15 @@ namespace wrench {
         double thread_startup_overhead = 0;
         try {
             thread_startup_overhead = this->getPropertyValueAsDouble(
-                    BareMetalComputeServiceProperty::THREAD_STARTUP_OVERHEAD);
+                    BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD);
         } catch (std::invalid_argument &e) {
             success = false;
         }
 
         if ((!success) or (thread_startup_overhead < 0)) {
-            throw std::invalid_argument("Invalid THREAD_STARTUP_OVERHEAD property specification: " +
+            throw std::invalid_argument("Invalid TASK_STARTUP_OVERHEAD property specification: " +
                                         this->getPropertyValueAsString(
-                                                BareMetalComputeServiceProperty::THREAD_STARTUP_OVERHEAD));
+                                                BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD));
         }
 
         // Supporting Pilot jobs

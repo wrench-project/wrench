@@ -314,9 +314,11 @@ namespace wrench {
      *
      * @param num_bytes: number of bytes to write
      * @param hostname: name of host to which disk is attached
-     * @param absolute_path: absolute path
+     * @param mount_point: mount point
      */
-    void S4U_Simulation::writeToDisk(double num_bytes, std::string hostname, std::string absolute_path) {
+    void S4U_Simulation::writeToDisk(double num_bytes, std::string hostname, std::string mount_point) {
+        mount_point  = FileLocation::sanitizePath(mount_point);
+
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         if (not host) {
             throw std::invalid_argument("S4U_Simulation::writeToDisk(): unknown host " + hostname);
@@ -324,13 +326,15 @@ namespace wrench {
 
         auto disk_list = simgrid::s4u::Host::by_name(hostname)->get_disks();
         for (auto disk : disk_list) {
-            if (disk->get_property("mount") == absolute_path) {
+            std::string disk_mountpoint =
+                    FileLocation::sanitizePath(std::string(std::string(disk->get_property("mount"))));
+            if (disk_mountpoint == mount_point) {
                 disk->write(num_bytes);
                 return;
             }
         }
         throw std::invalid_argument("S4U_Simulation::writeToDisk(): unknown path " +
-                                    absolute_path + " at host " + hostname);
+                                    mount_point + " at host " + hostname);
     }
 
     /**
@@ -338,9 +342,11 @@ namespace wrench {
      *
      * @param num_bytes: number of bytes to read
      * @param hostname: name of host to which disk is attached
-     * @param absolute_path: absolute path
+     * @param mount_point: mount point
      */
-    void S4U_Simulation::readFromDisk(double num_bytes, std::string hostname, std::string absolute_path) {
+    void S4U_Simulation::readFromDisk(double num_bytes, std::string hostname, std::string mount_point) {
+        mount_point  = FileLocation::sanitizePath(mount_point);
+
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         if (not host) {
             throw std::invalid_argument("S4U_Simulation::readFromDisk(): unknown host " + hostname);
@@ -348,13 +354,16 @@ namespace wrench {
 
         auto disk_list = simgrid::s4u::Host::by_name(hostname)->get_disks();
         for (auto disk : disk_list) {
-            if (disk->get_property("mount") == absolute_path) {
+            std::string disk_mountpoint =
+                    FileLocation::sanitizePath(std::string(std::string(disk->get_property("mount"))));
+
+            if (disk_mountpoint == mount_point) {
                 disk->read(num_bytes);
                 return;
             }
         }
-        throw std::invalid_argument("S4U_Simulation::readFromDisk(): invalid path " +
-                                    absolute_path + " at host " + hostname);
+        throw std::invalid_argument("S4U_Simulation::readFromDisk(): invalid mount point " +
+                                    mount_point + " at host " + hostname);
     }
 
 
