@@ -67,7 +67,7 @@ public:
                    buffer_size / std::min<double>(bw_stage1, bw_stage2) +
                    (num_full_buffers - 2) * (buffer_size / bottleneck_bandwidth) +
                    std::max<double>(last_nonfull_buffer_size / bw_stage1,
-                   buffer_size / std::min<double>(bw_stage2, bw_stage3)) +
+                                    buffer_size / std::min<double>(bw_stage2, bw_stage3)) +
                    std::max<double>(last_nonfull_buffer_size / bw_stage2, buffer_size / bw_stage3) +
                    last_nonfull_buffer_size / bw_stage3;
         }
@@ -86,23 +86,25 @@ protected:
         file_2 = workflow->addFile("file_2", FILE_SIZE);
         file_3 = workflow->addFile("file_3", FILE_SIZE);
 
-        // Create a 3-host platform file (network bandwith == disk bandwidth)
+        // Create a 3-host platform file (network bandwidth == disk bandwidth)
         std::string xml = "<?xml version='1.0'?>"
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"SrcHost\" speed=\"1f\"> "
                           "          <disk id=\"large_disk\" read_bw=\"" + std::to_string(MBPS_BANDWIDTH) +
-                          "MBps\" write_bw=\"" + std::to_string(MBPS_BANDWIDTH) + "MBps\">"
-                                                                                  "             <prop id=\"size\" value=\"" + std::to_string(STORAGE_SIZE) +
+                          "MBps\" write_bw=\"" + std::to_string(MBPS_BANDWIDTH) +
+                          "MBps\">"
+                          "             <prop id=\"size\" value=\"" + std::to_string(STORAGE_SIZE) +
                           "B\"/>"
                           "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
                           "       </host>"
                           "       <host id=\"DstHost\" speed=\"1f\"> "
                           "          <disk id=\"large_disk\" read_bw=\"" + std::to_string(MBPS_BANDWIDTH) +
-                          "MBps\" write_bw=\"" + std::to_string(MBPS_BANDWIDTH) + "MBps\">"
-                                                                                  "             <prop id=\"size\" value=\"" + std::to_string(STORAGE_SIZE) +
+                          "MBps\" write_bw=\"" + std::to_string(MBPS_BANDWIDTH) +
+                          "MBps\">"
+                          "             <prop id=\"size\" value=\"" + std::to_string(STORAGE_SIZE) +
                           "B\"/>"
                           "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
