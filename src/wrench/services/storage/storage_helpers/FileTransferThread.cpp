@@ -217,14 +217,14 @@ namespace wrench {
         } else if ((this->src_location) and (this->src_location->getStorageService() == this->parent) and
                    (this->dst_location) and (this->dst_location->getStorageService() == this->parent)) {
             /** Copying a file local file */
-            copyFileLocally(this->file, this->src_location, this->dst_location);
+                copyFileLocally(this->file, this->src_location, this->dst_location);
 
         } else if (((this->src_location) and (this->dst_location) and
                     (this->dst_location->getStorageService() == this->parent))) {
             /** Downloading a file from another storage service */
             try {
                 downloadFileFromStorageService(this->file, this->src_location, this->dst_location);
-            } catch (std::shared_ptr<FailureCause> &failure_cause) {
+            } catch (std::shared_ptr<NetworkError> &failure_cause) {
                 msg_to_send_back->success = false;
                 msg_to_send_back->failure_cause = failure_cause;
             }
@@ -431,7 +431,7 @@ namespace wrench {
                                                                              src_location->getStorageService()->getMessagePayloadValue(
                                                                                      StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw;
         }
 
         // Wait for a reply to the request
@@ -440,7 +440,7 @@ namespace wrench {
         try {
             message = S4U_Mailbox::getMessage(request_answer_mailbox, this->network_timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw cause;
+            throw;
         }
 
 
