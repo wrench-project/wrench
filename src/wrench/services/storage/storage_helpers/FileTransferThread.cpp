@@ -407,7 +407,7 @@ namespace wrench {
             throw std::invalid_argument("StorageService::downloadFile(): Invalid arguments");
         }
 
-        WRENCH_INFO("Initiating a file read operation for file %s from location %s",
+        WRENCH_INFO("Downloading file  %s from location %s",
                     file->getID().c_str(), src_location->toString().c_str());
 
         // Check that the buffer size is compatible
@@ -453,7 +453,7 @@ namespace wrench {
                                      message->getName() + "] message!");
         }
 
-        WRENCH_INFO("File read request accepted (will receive file content on mailbox_name %s)",
+        WRENCH_INFO("Download request accepted (will receive file content on mailbox_name %s)",
                     mailbox_that_should_receive_file_content.c_str());
 
         if (this->buffer_size == 0) {
