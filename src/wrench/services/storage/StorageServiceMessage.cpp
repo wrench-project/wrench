@@ -289,6 +289,7 @@ namespace wrench {
                                                                                std::string data_write_mailbox_name,
                                                                                double payload) : StorageServiceMessage(
             "FILE_WRITE_ANSWER", payload) {
+
         if ((file == nullptr) || (location == nullptr) ||
             (success && (data_write_mailbox_name.empty())) ||
             (!success && (!data_write_mailbox_name.empty())) ||

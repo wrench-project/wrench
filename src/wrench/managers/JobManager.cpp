@@ -128,6 +128,10 @@ namespace wrench {
                 throw std::invalid_argument(
                         "JobManager::createStandardJob(): nullptr dst storage service in the pre_file_copies set");
             }
+            if ((std::get<1>(fc) == FileLocation::SCRATCH) and (std::get<2>(fc) == FileLocation::SCRATCH)) {
+                throw std::invalid_argument(
+                        "JobManager::createStandardJob(): cannot have FileLocation::SCRATCH as both source and destination in the pre_file_copies set");
+            }
         }
 
         for (auto fc : post_file_copies) {
@@ -142,6 +146,10 @@ namespace wrench {
             if (std::get<2>(fc) == nullptr) {
                 throw std::invalid_argument(
                         "JobManager::createStandardJob(): nullptr dst storage service in the post_file_copies set");
+            }
+            if ((std::get<1>(fc) == FileLocation::SCRATCH) and (std::get<2>(fc) == FileLocation::SCRATCH)) {
+                throw std::invalid_argument(
+                        "JobManager::createStandardJob(): cannot have FileLocation::SCRATCH as both source and destination in the pre_file_copies set");
             }
         }
 
