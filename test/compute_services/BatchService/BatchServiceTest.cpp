@@ -517,7 +517,6 @@ private:
             try {
                 job_manager->terminateJob(job);
             } catch (wrench::WorkflowExecutionException &e) {
-                WRENCH_INFO("---> %s", e.getCause()->toString().c_str());
                 if (not std::dynamic_pointer_cast<wrench::NotAllowed>(e.getCause())) {
                     throw std::runtime_error("Got an expected exception, but the failure cause is not NotAllowed");
                 }

@@ -392,7 +392,6 @@ private:
         }
 
         // Do an INVALID asynchronous file copy (file not there)
-        WRENCH_INFO("ASDAS");
         try {
             data_movement_manager->initiateAsynchronousFileCopy(this->test->file_500,
                                                                 wrench::FileLocation::LOCATION(this->test->storage_service_100),
@@ -418,7 +417,6 @@ private:
         } else {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
-        WRENCH_INFO("ASDAS");
 
         // Do a really bogus file removal
         try {
@@ -450,9 +448,10 @@ private:
             }
         }
 
+
         try {
             wrench::StorageService::lookupFile(this->test->file_1,
-                                               wrench::FileLocation::LOCATION(this->test->storage_service_100, "/"));
+                                               wrench::FileLocation::LOCATION(this->test->storage_service_100, "/disk100"));
             throw std::runtime_error("Should not be able to lookup a file from a DOWN service");
         } catch (wrench::WorkflowExecutionException &e) {
             // Check Exception
