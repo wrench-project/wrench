@@ -47,7 +47,6 @@ protected:
         FILE *trace_file = fopen(trace_file_path.c_str(), "w");
         fprintf(trace_file, "%s", trace_file_content.c_str());
         fclose(trace_file);
-        WRENCH_INFO("CREATED TRACE FILE %s", trace_file_path.c_str());
 
         // Create a platform file
         std::string xml = "<?xml version='1.0'?>"

@@ -276,7 +276,6 @@ private:
         job_manager->submitJob(job_that_will_fail, this->test->compute_service);
 
         // while large_input_file is being read, we delete small_input_file so that the one task job will fail
-        WRENCH_INFO("DELETING FILE!");
         wrench::StorageService::deleteFile(this->getWorkflow()->getFileByID("small_input_file"),
                                            wrench::FileLocation::LOCATION(this->test->storage_service),
                                            this->test->file_registry_service);

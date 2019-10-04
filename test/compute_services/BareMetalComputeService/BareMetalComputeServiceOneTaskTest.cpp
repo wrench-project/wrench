@@ -403,8 +403,6 @@ void BareMetalComputeServiceOneTaskTest::do_Noop_test() {
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-    WRENCH_INFO("LAUNCHING");
-
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
 
