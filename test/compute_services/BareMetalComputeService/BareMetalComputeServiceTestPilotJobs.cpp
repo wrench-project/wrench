@@ -187,8 +187,7 @@ void BareMetalComputeServiceTestPilotJobs::do_UnsupportedPilotJobs_test() {
 
 
     // Staging the input file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file,
-                                          wrench::FileLocation::LOCATION(storage_service)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());

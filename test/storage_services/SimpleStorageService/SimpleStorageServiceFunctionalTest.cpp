@@ -116,11 +116,11 @@ private:
 
         // Bogus staging (can only be done in maestro)
         try {
-            this->simulation->stageFile(this->test->file_1,
-                                        wrench::FileLocation::LOCATION(this->test->storage_service_100));
+            this->simulation->stageFile(this->test->file_1, this->test->storage_service_100);
             throw std::runtime_error("Should not be possible to call stageFile() from a non-maestro process");
         } catch (std::runtime_error &e) {
         }
+
 
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
@@ -133,7 +133,7 @@ private:
 
             if ((result.size() != 1) || ((*(result.begin()))->getStorageService() != this->test->storage_service_1000)) {
                 throw std::runtime_error(
-                        "File registry service should know that file " + f->getID() + " is on storage service " +
+                        "File registry service should know that file " + f->getID() + " is (only) on storage service " +
                         this->test->storage_service_1000->getName());
             }
 
@@ -148,9 +148,9 @@ private:
 
         // Do a few queries to storage services
         for (auto f : {this->test->file_1, this->test->file_10, this->test->file_100, this->test->file_500}) {
-            if ((!this->test->storage_service_1000->lookupFile(f, nullptr)) ||
-                (this->test->storage_service_100->lookupFile(f, nullptr)) ||
-                (this->test->storage_service_510->lookupFile(f, nullptr))) {
+            if ((not wrench::StorageService::lookupFile(f, wrench::FileLocation::LOCATION(this->test->storage_service_1000))) ||
+                (wrench::StorageService::lookupFile(f, wrench::FileLocation::LOCATION(this->test->storage_service_100))) ||
+                (wrench::StorageService::lookupFile(f, wrench::FileLocation::LOCATION(this->test->storage_service_510)))) {
                 throw std::runtime_error("Some storage services do/don't have the files that they shouldn't/should have");
             }
         }
@@ -192,7 +192,7 @@ private:
         }
 
         // Make sure the copy didn't happen
-        if (this->test->storage_service_100->lookupFile(this->test->file_500, nullptr)) {
+        if (wrench::StorageService::lookupFile(this->test->file_500, wrench::FileLocation::LOCATION(this->test->storage_service_100))) {
             throw std::runtime_error("File copy to a storage service without enough space shouldn't have succeeded");
         }
 
@@ -212,7 +212,7 @@ private:
         } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error("Should be able to get a storage's service free space");
         }
-        if ((free_space.size() != 1) or (free_space["/"] != 90.0)) {
+        if ((free_space.size() != 1) or (free_space["/disk100"] != 90.0)) {
             throw std::runtime_error(
                     "Free space on storage service is wrong (" + std::to_string(free_space["/"]) + ") instead of 90.0");
         }
@@ -259,10 +259,10 @@ private:
 
         }
 
-        // Delete a file in a bogus partition
+        // Delete a file in a bogus path
         try {
             wrench::StorageService::deleteFile(this->test->file_100,
-                                               wrench::FileLocation::LOCATION(this->test->storage_service_100, "bogys"));
+                                               wrench::FileLocation::LOCATION(this->test->storage_service_100, "/disk100/bogus"));
             throw std::runtime_error("Should not be able to delete a file unavailable a storage service");
         } catch (wrench::WorkflowExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::FileNotFound>(e.getCause());
@@ -295,9 +295,10 @@ private:
         } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error("Should be able to get a storage's service free space");
         }
-        if ((free_space.size() != 1) or (free_space["/"] != 100.0)) {
+
+        if ((free_space.size() != 1) or (free_space["/disk100"] != 100.0)) {
             throw std::runtime_error(
-                    "Free space on storage service is wrong (" + std::to_string(free_space["/"]) + ") instead of 100.0");
+                    "Free space on storage service is wrong (" + std::to_string(free_space["/disk100"]) + ") instead of 100.0");
         }
 
         // Do a bogus asynchronous file copy (file = nullptr);
@@ -359,7 +360,7 @@ private:
         } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error("Should be able to get a storage's service free space");
         }
-        if ((free_space.size() != 1) or (free_space["/"] != 99.0)) {
+        if ((free_space.size() != 1) or (free_space["/disk100"] != 99.0)) {
             throw std::runtime_error(
                     "Free space on storage service is wrong (" + std::to_string(free_space["/'"]) + ") instead of 99.0");
         }
@@ -391,6 +392,7 @@ private:
         }
 
         // Do an INVALID asynchronous file copy (file not there)
+        WRENCH_INFO("ASDAS");
         try {
             data_movement_manager->initiateAsynchronousFileCopy(this->test->file_500,
                                                                 wrench::FileLocation::LOCATION(this->test->storage_service_100),
@@ -416,6 +418,7 @@ private:
         } else {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
+        WRENCH_INFO("ASDAS");
 
         // Do a really bogus file removal
         try {
@@ -589,18 +592,16 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
     ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     // A bogus staging
-    ASSERT_THROW(simulation->stageFile(nullptr, wrench::FileLocation::LOCATION(storage_service_100)), std::invalid_argument);
+    ASSERT_THROW(simulation->stageFile(nullptr, storage_service_100), std::invalid_argument);
 
     // Another bogus staging
-    ASSERT_THROW(simulation->stageFile(file_500, wrench::FileLocation::LOCATION(storage_service_100)), std::runtime_error);
+    ASSERT_THROW(simulation->stageFile(file_500, storage_service_100), std::runtime_error);
 
     // Staging all files on the 1000 storage service
-    ASSERT_NO_THROW(simulation->stageFile(file_1, wrench::FileLocation::LOCATION(storage_service_1000)));
-    ASSERT_NO_THROW(simulation->stageFile(file_10, wrench::FileLocation::LOCATION(storage_service_1000)));
-
-    // Staging all files on the 1000 storage service
-    ASSERT_NO_THROW(simulation->stageFile(file_100, wrench::FileLocation::LOCATION(storage_service_1000)));
-    ASSERT_NO_THROW(simulation->stageFile(file_500, wrench::FileLocation::LOCATION(storage_service_1000)));
+    ASSERT_NO_THROW(simulation->stageFile(file_1, storage_service_1000));
+    ASSERT_NO_THROW(simulation->stageFile(file_10, storage_service_1000));
+    ASSERT_NO_THROW(simulation->stageFile(file_100, storage_service_1000));
+    ASSERT_NO_THROW(simulation->stageFile(file_500, storage_service_1000));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -736,10 +737,10 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopy_test() {
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Staging file_500 on the 1000-byte storage service
-    ASSERT_NO_THROW(simulation->stageFile(file_1, wrench::FileLocation::LOCATION(storage_service_1000)));
+    ASSERT_NO_THROW(simulation->stageFile(file_1, storage_service_1000));
 
     // Staging file_500 on the 1000-byte storage service
-    ASSERT_NO_THROW(simulation->stageFile(file_500, wrench::FileLocation::LOCATION(storage_service_1000)));
+    ASSERT_NO_THROW(simulation->stageFile(file_500, storage_service_1000));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -875,7 +876,7 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopy_test() {
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Staging file_500 on the 1000-byte storage service
-    ASSERT_NO_THROW(simulation->stageFile(file_500, wrench::FileLocation::LOCATION(storage_service_1000)));
+    ASSERT_NO_THROW(simulation->stageFile(file_500, storage_service_1000));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1077,7 +1078,7 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopyFailures_test() {
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Staging file_500 on the 1000-byte storage service
-    ASSERT_NO_THROW(simulation->stageFile(file_500, wrench::FileLocation::LOCATION(storage_service_1000)));
+    ASSERT_NO_THROW(simulation->stageFile(file_500, storage_service_1000));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1300,7 +1301,7 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopyFailures_test() 
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Staging file_500 on the 1000-byte storage service
-    ASSERT_NO_THROW(simulation->stageFile(file_500, wrench::FileLocation::LOCATION(storage_service_1000)));
+    ASSERT_NO_THROW(simulation->stageFile(file_500, storage_service_1000));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1553,7 +1554,7 @@ void SimpleStorageServiceFunctionalTest::do_Partitions_test() {
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Staging file_500 on the 1000-byte storage service
-    ASSERT_NO_THROW(simulation->stageFile(file_10, wrench::FileLocation::LOCATION(storage_service_1000)));
+    ASSERT_NO_THROW(simulation->stageFile(file_10, storage_service_1000));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());

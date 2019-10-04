@@ -175,7 +175,7 @@ namespace wrench {
                     (answer_mailbox_if_read.empty() ? "none" : answer_mailbox_if_read.c_str()),
                     (answer_mailbox_if_write.empty() ? "none" : answer_mailbox_if_write.c_str()),
                     (answer_mailbox_if_copy.empty() ? "none" : answer_mailbox_if_copy.c_str())
-                    );
+        );
 
         // Create a message to send back (some field of which may be overwritten below)
         msg_to_send_back = new FileTransferThreadNotificationMessage(
@@ -217,7 +217,7 @@ namespace wrench {
         } else if ((this->src_location) and (this->src_location->getStorageService() == this->parent) and
                    (this->dst_location) and (this->dst_location->getStorageService() == this->parent)) {
             /** Copying a file local file */
-                copyFileLocally(this->file, this->src_location, this->dst_location);
+            copyFileLocally(this->file, this->src_location, this->dst_location);
 
         } else if (((this->src_location) and (this->dst_location) and
                     (this->dst_location->getStorageService() == this->parent))) {
@@ -225,6 +225,9 @@ namespace wrench {
             try {
                 downloadFileFromStorageService(this->file, this->src_location, this->dst_location);
             } catch (std::shared_ptr<NetworkError> &failure_cause) {
+                msg_to_send_back->success = false;
+                msg_to_send_back->failure_cause = failure_cause;
+            } catch (std::shared_ptr<FailureCause> &failure_cause) {
                 msg_to_send_back->success = false;
                 msg_to_send_back->failure_cause = failure_cause;
             }

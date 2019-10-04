@@ -214,7 +214,7 @@ void MultipleWMSTest::do_deferredWMSStartOneWMS_test() {
 
     // Staging the input_file on the storage service
     for (auto const &f : workflow->getInputFiles()) {
-        ASSERT_NO_THROW(simulation->stageFile(f.second, wrench::FileLocation::LOCATION(storage_service)));
+        ASSERT_NO_THROW(simulation->stageFile(f.second, storage_service));
     }
 
     // Running a "run a single task" simulation
@@ -275,11 +275,11 @@ void MultipleWMSTest::do_deferredWMSStartTwoWMS_test() {
 
     // Staging the input_file on the storage service
     for (auto const &f : workflow->getInputFiles()) {
-        ASSERT_NO_THROW(simulation->stageFile(f.second, wrench::FileLocation::LOCATION(storage_service)));
+        ASSERT_NO_THROW(simulation->stageFile(f.second, storage_service));
 
     }
     for (auto const &f : workflow2->getInputFiles()) {
-        ASSERT_NO_THROW(simulation->stageFile(f.second, wrench::FileLocation::LOCATION(storage_service)));
+        ASSERT_NO_THROW(simulation->stageFile(f.second, storage_service));
 
     }
 

@@ -186,7 +186,7 @@ void StorageServiceReStartHostFailuresTest::do_StorageServiceRestartTest_test() 
 
     simulation->add(new wrench::FileRegistryService(stable_host));
 
-    simulation->stageFile(file, wrench::FileLocation::LOCATION(storage_service));
+    simulation->stageFile(file, storage_service);
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());

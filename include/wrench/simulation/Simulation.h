@@ -75,8 +75,6 @@ namespace wrench {
         }
 
 
-        void stageFile(WorkflowFile *file, std::shared_ptr<StorageService> storage_service, std::string absolute_path);
-
         SimulationOutput &getOutput();
 
         //start energy related calls
@@ -90,7 +88,8 @@ namespace wrench {
         static double getMaxPowerConsumption(const std::string &hostname);
         static std::vector<int> getListOfPstates(const std::string &hostname);
 
-        void stageFile(WorkflowFile *file, std::shared_ptr<FileLocation> location);
+        void stageFile(WorkflowFile *file, std::shared_ptr<StorageService> ss);
+        void stageFile(WorkflowFile *file, std::shared_ptr<StorageService> ss, std::string directory_absolute_path);
 
 
         /***********************/
@@ -132,6 +131,7 @@ namespace wrench {
         /***********************/
 
     private:
+
         SimulationOutput output;
 
         std::unique_ptr<S4U_Simulation> s4u_simulation;
@@ -145,6 +145,9 @@ namespace wrench {
         std::set<std::shared_ptr<ComputeService>> compute_services;
 
         std::set<std::shared_ptr<StorageService>> storage_services;
+
+        void stageFile(WorkflowFile *file, std::shared_ptr<FileLocation> location);
+
 
         void checkSimulationSetup();
         bool isRunning();

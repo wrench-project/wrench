@@ -359,13 +359,14 @@ namespace wrench {
 
             if (not fs->isFileInDirectory(file, location->getAbsolutePathAtMountPoint())) {
                 WRENCH_INFO(
-                        "Received a a read request for a file I don't have (%s)", location->toString().c_str());
+                        "Received a read request for a file I don't have (%s)", location->toString().c_str());
                 failure_cause = std::shared_ptr<FailureCause>(new FileNotFound(file, location));
             }
         }
 
         bool success = (failure_cause == nullptr);;
 
+        WRENCH_INFO("SENDING BACK MESSAGE");
         // Send back the corresponding ack, asynchronously and in a "fire and forget" fashion
         S4U_Mailbox::dputMessage(answer_mailbox,
                                  new StorageServiceFileReadAnswerMessage(
@@ -376,6 +377,7 @@ namespace wrench {
                                          this->getMessagePayloadValue(
                                                  SimpleStorageServiceMessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD)));
 
+        WRENCH_INFO("MESSAGE SENT");
         // If success, then follow up with sending the file (ASYNCHRONOUSLY!)
         if (success) {
             // Create a FileTransferThread
@@ -395,6 +397,7 @@ namespace wrench {
             this->pending_file_transfer_threads.push_front(ftt);
         }
 
+        WRENCH_INFO("DONEP ROCESSING");
         return true;
     }
 

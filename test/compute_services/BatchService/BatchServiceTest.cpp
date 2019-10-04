@@ -428,7 +428,7 @@ void BatchServiceTest::do_TerminateStandardJobsTest_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
     // Running a "run a single task" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -590,7 +590,7 @@ void BatchServiceTest::do_OneStandardJobTaskTest_test() {
     auto output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
     // Running a "run a single task" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -774,7 +774,7 @@ void BatchServiceTest::do_TwoStandardJobSubmissionTest_test() {
     auto output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
     // Running a "run a single task" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -948,7 +948,7 @@ void BatchServiceTest::do_PilotJobTaskTest_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
     // Running a "run a single task" simulation
@@ -1127,7 +1127,7 @@ void BatchServiceTest::do_StandardPlusPilotJobTaskTest_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
     // Running a "run a single task" simulation
@@ -1260,7 +1260,7 @@ void BatchServiceTest::do_InsufficientCoresTaskTest_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
     // Running a "run a single task" simulation
@@ -1386,7 +1386,7 @@ void BatchServiceTest::do_noArgumentsJobSubmissionTest_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
     // Running a "run a single task" simulation
@@ -1539,7 +1539,7 @@ void BatchServiceTest::do_StandardJobTimeOutTaskTest_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
     // Running a "run a single task" simulation
@@ -1670,7 +1670,7 @@ void BatchServiceTest::do_PilotJobTimeOutTaskTest_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
     // Running a "run a single task" simulation
@@ -1896,9 +1896,9 @@ void BatchServiceTest::do_BestFitTaskTest_test() {
     wrench::WorkflowFile *output_file_2 = this->workflow->addFile("output_file_2", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
-    ASSERT_NO_THROW(simulation->stageFile(input_file_1, wrench::FileLocation::LOCATION(storage_service1)));
-    ASSERT_NO_THROW(simulation->stageFile(input_file_2, wrench::FileLocation::LOCATION(storage_service1)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file_1, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file_2, storage_service1));
 
 
     // Running a "run a single task" simulation
@@ -2060,9 +2060,9 @@ void BatchServiceTest::do_FirstFitTaskTest_test() {
     wrench::WorkflowFile *output_file_2 = this->workflow->addFile("output_file_2", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
-    ASSERT_NO_THROW(simulation->stageFile(input_file_1, wrench::FileLocation::LOCATION(storage_service1)));
-    ASSERT_NO_THROW(simulation->stageFile(input_file_2, wrench::FileLocation::LOCATION(storage_service1)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file_1, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file_2, storage_service1));
 
 
     // Running a "run a single task" simulation
@@ -2332,9 +2332,9 @@ void BatchServiceTest::do_RoundRobinTask_test() {
     wrench::WorkflowFile *output_file_2 = this->workflow->addFile("output_file_2", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
-    ASSERT_NO_THROW(simulation->stageFile(input_file_1, wrench::FileLocation::LOCATION(storage_service1)));
-    ASSERT_NO_THROW(simulation->stageFile(input_file_2, wrench::FileLocation::LOCATION(storage_service1)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file_1, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file_2, storage_service1));
 
 
     // Running a "run a single task" simulation
@@ -2510,7 +2510,7 @@ void BatchServiceTest::do_StandardJobInsidePilotJobTimeOutTaskTest_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
     // Running a "run a single task" simulation
@@ -2674,7 +2674,7 @@ void BatchServiceTest::do_StandardJobInsidePilotJobSucessTaskTest_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
     // Running a "run a single task" simulation
@@ -2828,7 +2828,7 @@ void BatchServiceTest::do_InsufficientCoresInsidePilotJobTaskTest_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
     // Running a "run a single task" simulation
@@ -2970,7 +2970,7 @@ void BatchServiceTest::do_MultipleStandardTaskTest_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
     // Running a "run a single task" simulation
@@ -3121,7 +3121,7 @@ void BatchServiceTest::do_DifferentBatchAlgorithmsSubmissionTest_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
     // Running a "run a single task" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would

@@ -357,12 +357,9 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
 
     file_registry_service = simulation->add(new wrench::FileRegistryService(wms_host));
 
-    ASSERT_NO_THROW(simulation->stageFile(large_input_file,
-                                          wrench::FileLocation::LOCATION(storage_service)));
-    ASSERT_NO_THROW(simulation->stageFile(small_input_file,
-                                          wrench::FileLocation::LOCATION(storage_service)));
-    ASSERT_NO_THROW(simulation->stageFile(small_input_file,
-                                          wrench::FileLocation::LOCATION(backup_storage_service)));
+    ASSERT_NO_THROW(simulation->stageFile(large_input_file, storage_service));
+    ASSERT_NO_THROW(simulation->stageFile(small_input_file, storage_service));
+    ASSERT_NO_THROW(simulation->stageFile(small_input_file, backup_storage_service));
 
     ASSERT_NO_THROW(simulation->launch());
 
