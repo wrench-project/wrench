@@ -471,10 +471,10 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailurTest_test(std
         task->addInputFile(input_file);
         task->addOutputFile(output_file);
         if (this->storage_service1) {
-            simulation->stageFile(input_file, wrench::FileLocation::LOCATION(this->storage_service1));
+            simulation->stageFile(input_file, this->storage_service1);
         }
         if (this->storage_service2) {
-            simulation->stageFile(input_file, wrench::FileLocation::LOCATION(this->storage_service2));
+            simulation->stageFile(input_file, this->storage_service2);
         }
     }
 

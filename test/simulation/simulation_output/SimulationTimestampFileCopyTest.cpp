@@ -188,7 +188,7 @@ void SimulationTimestampFileCopyTest::do_SimulationTimestampFileCopyBasic_test()
     std::set<wrench::WorkflowFile *> files_to_stage = {file_1, file_2, file_3, xl_file, too_large_file};
 
     for (auto const &f  : files_to_stage) {
-        ASSERT_NO_THROW(simulation->stageFile(f, wrench::FileLocation::LOCATION(source_storage_service)));
+        ASSERT_NO_THROW(simulation->stageFile(f, source_storage_service));
     }
 
     ASSERT_NO_THROW(simulation->launch());

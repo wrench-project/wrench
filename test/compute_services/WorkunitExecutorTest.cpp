@@ -453,7 +453,7 @@ void WorkunitExecutorTest::do_WorkunitExecutorConstructor_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
     // Running a "run a single task" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would

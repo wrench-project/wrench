@@ -136,6 +136,7 @@ namespace wrench {
         assertDirectoryExist(absolute_path);
         assertFileIsInDirectory(file, absolute_path);
         this->content[absolute_path].erase(file);
+        this->occupied_space -= file->getSize();
     }
 
 /**

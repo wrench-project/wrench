@@ -226,7 +226,7 @@ void StandardJobExecutorHostFailuresTest::do_StandardJobExecutorOneFailureCausin
     // Staging the input_file on the storage service
     // Create a File Registry Service
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(stable_host)));
-    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
     // Running a "run a single task" simulation
 
@@ -358,7 +358,7 @@ void StandardJobExecutorHostFailuresTest::do_StandardJobExecutorOneFailureCausin
     // Staging the input_file on the storage service
     // Create a File Registry Service
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(stable_host)));
-    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -515,7 +515,7 @@ void StandardJobExecutorHostFailuresTest::do_StandardJobExecutorRandomFailures_t
     // Staging the input_file on the storage service
     // Create a File Registry Service
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(stable_host)));
-    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());

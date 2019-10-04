@@ -115,8 +115,7 @@ void SimpleStorageServiceZeroSizeFileTest::do_ReadZeroSizeFileTest() {
     wms->addWorkflow(this->workflow);
 
     // Stage the file on the StorageHost
-    ASSERT_NO_THROW(simulation->stageFile(file,
-                                          wrench::FileLocation::LOCATION(storage_service)));
+    ASSERT_NO_THROW(simulation->stageFile(file, storage_service));
 
     ASSERT_NO_THROW(simulation->launch());
 

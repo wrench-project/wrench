@@ -98,7 +98,7 @@ namespace wrench {
         auto fs = this->file_systems[mountpoint].get();
 
         if (not fs->hasEnoughFreeSpace(file->getSize())) {
-            throw std::invalid_argument("StorageService::stageFile(): Not enough storage space at location to stage file");
+            throw std::runtime_error("StorageService::stageFile(): Not enough storage space at location to stage file");
         }
 
         if (not fs->doesDirectoryExist(directory)) {
@@ -255,8 +255,10 @@ namespace wrench {
             throw WorkflowExecutionException(cause);
         }
 
+        WRENCH_INFO("GOT A REPLY");
         if (auto msg = std::dynamic_pointer_cast<StorageServiceFileReadAnswerMessage>(message)) {
             // If it's not a success, throw an exception
+           WRENCH_INFO("HERE");
             if (not msg->success) {
                 std::shared_ptr<FailureCause> &cause = msg->failure_cause;
                 throw WorkflowExecutionException(cause);
@@ -639,6 +641,7 @@ namespace wrench {
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw WorkflowExecutionException(cause);
         }
+        WRENCH_INFO("RETIRNING FROM INIIATE FILE COPY");
     }
 
 

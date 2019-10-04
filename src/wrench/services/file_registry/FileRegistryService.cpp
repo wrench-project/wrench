@@ -281,11 +281,6 @@ namespace wrench {
             return true;
         }
 
-//        if (message == nullptr) {
-//            WRENCH_INFO("Got a NULL message... Likely this means we're all done. Aborting!");
-//            return false;
-//        }
-
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
 
         if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
@@ -300,6 +295,7 @@ namespace wrench {
             return false;
 
         } else if (auto msg = std::dynamic_pointer_cast<FileRegistryFileLookupRequestMessage>(message)) {
+
             std::set<std::shared_ptr<FileLocation>> locations;
             if (this->entries.find(msg->file) != this->entries.end()) {
                 locations = this->entries[msg->file];
@@ -369,6 +365,7 @@ namespace wrench {
      * @param storage_service: a storage_service
      */
     void FileRegistryService::addEntryToDatabase(WorkflowFile *file, std::shared_ptr<FileLocation> location) {
+
         if (this->entries.find(file) != this->entries.end()) {
             this->entries[file].insert(location);
         } else {

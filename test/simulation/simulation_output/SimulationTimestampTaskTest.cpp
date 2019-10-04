@@ -176,8 +176,8 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test(){
     small_input_file = this->workflow->addFile("small_input_file", 10);
     large_input_file = this->workflow->addFile("large_input_file", 1000000);
 
-    ASSERT_NO_THROW(simulation->stageFile(large_input_file, wrench::FileLocation::LOCATION(storage_service)));
-    ASSERT_NO_THROW(simulation->stageFile(small_input_file, wrench::FileLocation::LOCATION(storage_service)));
+    ASSERT_NO_THROW(simulation->stageFile(large_input_file, storage_service));
+    ASSERT_NO_THROW(simulation->stageFile(small_input_file, storage_service));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -361,9 +361,9 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
     small_input_file = this->workflow->addFile("small_input_file", 10);
     large_input_file = this->workflow->addFile("large_input_file", 1000000);
 
-    ASSERT_NO_THROW(simulation->stageFile(large_input_file, wrench::FileLocation::LOCATION(storage_service)));
-    ASSERT_NO_THROW(simulation->stageFile(small_input_file, wrench::FileLocation::LOCATION(storage_service)));
-    ASSERT_NO_THROW(simulation->stageFile(small_input_file, wrench::FileLocation::LOCATION(backup_storage_service)));
+    ASSERT_NO_THROW(simulation->stageFile(large_input_file, storage_service));
+    ASSERT_NO_THROW(simulation->stageFile(small_input_file, storage_service));
+    ASSERT_NO_THROW(simulation->stageFile(small_input_file, backup_storage_service));
 
 
     ASSERT_NO_THROW(simulation->launch());
