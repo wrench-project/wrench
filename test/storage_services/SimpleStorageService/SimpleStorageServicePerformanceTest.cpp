@@ -303,9 +303,9 @@ void SimpleStorageServicePerformanceTest::do_ConcurrentFileCopies_test(double bu
     simulation->add(new wrench::FileRegistryService("WMSHost"));
 
     // Staging all files on the Src storage service
-    ASSERT_NO_THROW(simulation->stageFile(file_1, wrench::FileLocation::LOCATION(storage_service_1)));
-    ASSERT_NO_THROW(simulation->stageFile(file_2, wrench::FileLocation::LOCATION(storage_service_1)));
-    ASSERT_NO_THROW(simulation->stageFile(file_3, wrench::FileLocation::LOCATION(storage_service_1)));
+    ASSERT_NO_THROW(simulation->stageFile(file_1, storage_service_1));
+    ASSERT_NO_THROW(simulation->stageFile(file_2, storage_service_1));
+    ASSERT_NO_THROW(simulation->stageFile(file_3, storage_service_1));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -414,9 +414,9 @@ void SimpleStorageServicePerformanceTest::do_FileRead_test(double buffer_size) {
     simulation->add(new wrench::FileRegistryService("WMSHost"));
 
     // Staging all files on the  storage service
-    ASSERT_NO_THROW(simulation->stageFile(file_1, wrench::FileLocation::LOCATION(storage_service_1)));
-    ASSERT_NO_THROW(simulation->stageFile(file_2, wrench::FileLocation::LOCATION(storage_service_1)));
-    ASSERT_NO_THROW(simulation->stageFile(file_3, wrench::FileLocation::LOCATION(storage_service_1)));
+    ASSERT_NO_THROW(simulation->stageFile(file_1, storage_service_1));
+    ASSERT_NO_THROW(simulation->stageFile(file_2, storage_service_1));
+    ASSERT_NO_THROW(simulation->stageFile(file_3, storage_service_1));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());

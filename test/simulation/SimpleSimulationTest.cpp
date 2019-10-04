@@ -412,7 +412,7 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
 
 
     // Try to stage a file without a file registry
-    ASSERT_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service)), std::runtime_error);
+    ASSERT_THROW(simulation->stageFile(input_file, storage_service), std::runtime_error);
 
     // Create a file registry
     std::shared_ptr<wrench::FileRegistryService> file_registry_service;
@@ -423,10 +423,10 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     file_registry_service->getNetworkTimeoutValue();
 
     // Staging an invalid file on the storage service
-    ASSERT_THROW(simulation->stageFile(output_file1, wrench::FileLocation::LOCATION(storage_service)), std::runtime_error);
+    ASSERT_THROW(simulation->stageFile(output_file1, storage_service), std::runtime_error);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());

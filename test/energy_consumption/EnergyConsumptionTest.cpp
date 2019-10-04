@@ -321,7 +321,7 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionTests_test() {
     wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
 
     // Staging the input_file on the storage service
-    EXPECT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
+    EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
     // Running a "run a single task" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -476,7 +476,7 @@ void EnergyConsumptionTest::do_EnergyConsumption_test() {
     wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
 
     // Staging the input_file on the storage service
-    EXPECT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
+    EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
     // Running a "run a single task" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -629,7 +629,7 @@ void EnergyConsumptionTest::do_SimpleApiChecksEnergy_test() {
     wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
 
     // Staging the input_file on the storage service
-    EXPECT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
+    EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
     // Running a "run a single task" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -863,7 +863,7 @@ void EnergyConsumptionTest::do_EnergyConsumptionPStateChange_test() {
     wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
 
     // Staging the input_file on the storage service
-    EXPECT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
+    EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
     // Running a "run a single task" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would

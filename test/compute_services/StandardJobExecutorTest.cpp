@@ -529,7 +529,7 @@ void StandardJobExecutorTest::do_StandardJobExecutorConstructorTest_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
     // Running a "run a single task" simulation
@@ -724,7 +724,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskTest_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
     // Running a "run a single task" simulation
@@ -904,7 +904,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskBogusPreFileCopyTest_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
     // Running a "run a single task" simulation
@@ -1087,7 +1087,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskMissingFileTest_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
     // Running a "run a single task" simulation
@@ -1431,7 +1431,7 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase1_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
     // Running a "run a single task" simulation
@@ -1587,8 +1587,7 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase2_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file,
-                                          wrench::FileLocation::LOCATION(storage_service1)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
     // Running a "run a single task" simulation
@@ -1746,7 +1745,7 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase3_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
     // Running a "run a single task" simulation
@@ -2116,7 +2115,7 @@ void StandardJobExecutorTest::do_TwoMultiCoreTasksTest_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
     // Running a "run a single task" simulation
@@ -2395,7 +2394,7 @@ void StandardJobExecutorTest::do_MultiHostTest_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
     // Running a "run a single task" simulation
@@ -2552,7 +2551,7 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringAComputation_test() {
     wrench::WorkflowFile *output_file2 = this->workflow->addFile("output_file2", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
     // Running a "run a single task" simulation
@@ -2706,7 +2705,7 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringATransfer_test() {
     wrench::WorkflowFile *output_file2 = this->workflow->addFile("output_file2", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
     // Running a "run a single task" simulation
@@ -2881,7 +2880,7 @@ void StandardJobExecutorTest::do_JobTerminationTestAtRandomTimes_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
     // Running a "run a single task" simulation
@@ -3078,7 +3077,7 @@ void StandardJobExecutorTest::do_NoTaskTest_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service1)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
     // Running a "run a single task" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would

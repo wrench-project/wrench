@@ -478,10 +478,22 @@ namespace wrench {
 
 
 
+    /**
+    * @brief Stage a copy of a file at a storage service in the root of the (unique) mount point
+    *
+    * @param file: a file to stage on a storage service
+    * @param storage_service: a storage service
+    *
+    * @throw std::runtime_error
+    * @throw std::invalid_argument
+    */
+    void Simulation::stageFile(WorkflowFile *file, std::shared_ptr<StorageService> storage_service) {
+        Simulation::stageFile(file, FileLocation::LOCATION(storage_service));
+    }
+
 
     /**
-    * @brief Stage a copy of a file at the root of a mount point
-    *        of a disk of a storage service
+    * @brief Stage a copy of a file at a storage service in a particular directory
     *
     * @param file: a file to stage on a storage service
     * @param storage_service: a storage service
@@ -490,20 +502,24 @@ namespace wrench {
     * @throw std::runtime_error
     * @throw std::invalid_argument
     */
-    void Simulation::stageFile(WorkflowFile *file, std::shared_ptr<StorageService> storage_service, std::string absolute_path) {
-        Simulation::stageFile(file, FileLocation::LOCATION(storage_service, absolute_path));
+    void Simulation::stageFile(WorkflowFile *file, std::shared_ptr<StorageService> storage_service, std::string directory_absolute_path) {
+        Simulation::stageFile(file, FileLocation::LOCATION(storage_service, directory_absolute_path));
     }
 
 
     /**
-     * @brief State a copy of a file on a storage service (to the "/" partition)
-     * @param file
-     * @param location
+     * @brief State a copy of a file at a location
+     * @param file: the file
+     * @param location: the location
      */
     void Simulation::stageFile(WorkflowFile *file, std::shared_ptr<FileLocation> location) {
 
         if ((file == nullptr) or (location == nullptr)) {
             throw std::invalid_argument("Simulation::stageFile(): Invalid arguments");
+        }
+
+        if (this->is_running) {
+            throw  std::runtime_error(" Simulation::stageFile(): Cannot stage a file once the simulation has started");
         }
 
         // Check that a FileRegistryService has been set

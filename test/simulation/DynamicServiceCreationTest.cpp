@@ -287,7 +287,7 @@ void DynamicServiceCreationTest::do_getReadyTasksTest_test() {
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, wrench::FileLocation::LOCATION(storage_service)));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());

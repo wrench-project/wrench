@@ -341,7 +341,7 @@ void StorageServiceLinkFailuresTest::do_StorageServiceLinkFailureSimpleRandom_Te
     for (auto const &ss : storage_services) {
         for (auto const &f : files) {
             if (not dist_stage(rng)) {
-                simulation->stageFile(f, wrench::FileLocation::LOCATION(ss));
+                simulation->stageFile(f, ss);
             }
         }
     }
