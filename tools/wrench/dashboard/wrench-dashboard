@@ -1,3 +1,4 @@
+#!/bin/bash
 
 docker pull wrenchproject/wrench-dashboard
 docker images -q wrenchproject/wrench-dashboard > images.txt
