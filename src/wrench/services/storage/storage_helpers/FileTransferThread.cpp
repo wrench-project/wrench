@@ -367,6 +367,14 @@ namespace wrench {
         double remaining = file->getSize();
         double to_send = std::min<double>(this->buffer_size, remaining);
 
+        // if (src_location == dst_location) {  TODO: Why is the operator not working?
+        if ((src_location->getStorageService() == dst_location->getStorageService()) and
+                (src_location->getFullAbsolutePath() == dst_location->getFullAbsolutePath())) {
+            WRENCH_INFO("FileTransferThread::copyFileLocally(): Copying file %s onto itself at location %s... ignoring",
+                    file->getID().c_str(), src_location->toString().c_str());
+            return;
+        }
+
         /** Ideal Fluid model buffer size */
         if (this->buffer_size == 0) {
 
