@@ -951,13 +951,14 @@ private:
 
         // Do the file copy for a file that's not there
 
-        // First delete the file (we used to have an "already there" error)
+
+        // First delete the file on the 1000 storage service
         wrench::StorageService::deleteFile(this->test->file_500, wrench::FileLocation::LOCATION(this->test->storage_service_1000));
 
         try {
             data_movement_manager->doSynchronousFileCopy(this->test->file_500,
-                                                         wrench::FileLocation::LOCATION(this->test->storage_service_510),
-                                                         wrench::FileLocation::LOCATION(this->test->storage_service_1000));
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_1000),
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_510));
             throw std::runtime_error("Should have gotten a 'file not found' exception");
         } catch (wrench::WorkflowExecutionException &e) {
             // Check Exception
@@ -971,13 +972,13 @@ private:
                 throw std::runtime_error(
                         "Got the expected 'file not found' exception, but the failure cause does not point to the correct file");
             }
-            if (cause->getLocation()->getStorageService() != this->test->storage_service_510) {
+            if (cause->getLocation()->getStorageService() != this->test->storage_service_1000) {
                 throw std::runtime_error(
                         "Got the expected 'file not found' exception, but the failure cause does not point to the correct storage service");
             }
         }
 
-        // Do the file copy from a dst storage service that's down
+        // Do the file copy from a src storage service that's down
         this->test->storage_service_1000->stop();
 
         try {
@@ -1000,12 +1001,13 @@ private:
             }
         }
 
-        // Do the file copy from a src storage service that's down
+
+        // Do the file copy to a dst storage service that's down
         this->test->storage_service_510->stop();
 
         try {
-            data_movement_manager->doSynchronousFileCopy(this->test->file_500,
-                                                         wrench::FileLocation::LOCATION(this->test->storage_service_1000),
+            data_movement_manager->doSynchronousFileCopy(this->test->file_1,
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_100),
                                                          wrench::FileLocation::LOCATION(this->test->storage_service_510));
             throw std::runtime_error("Should have gotten a 'service is down' exception");
         } catch (wrench::WorkflowExecutionException &e) {
