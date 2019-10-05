@@ -593,7 +593,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Asynchronously ask the storage service to read a file from another storage service
+     * @brief Asynchronously ask for a file copy between two storage services
      *
      * @param answer_mailbox: the mailbox to which a notification message will be sent
      * @param file: the file
