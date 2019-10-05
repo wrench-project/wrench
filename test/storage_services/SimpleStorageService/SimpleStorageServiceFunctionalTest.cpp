@@ -663,7 +663,8 @@ private:
 
         // Do the file copy
         try {
-            data_movement_manager->doSynchronousFileCopy(this->test->file_500, wrench::FileLocation::LOCATION(this->test->storage_service_1000),
+            data_movement_manager->doSynchronousFileCopy(this->test->file_500,
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_1000),
                                                          wrench::FileLocation::LOCATION(this->test->storage_service_510));
         } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error("Got an exception while doing a synchronous file copy: " + std::string(e.what()));
@@ -671,16 +672,18 @@ private:
 
         // Do the file copy again, which should fail
         try {
-            data_movement_manager->doSynchronousFileCopy(this->test->file_500, wrench::FileLocation::LOCATION(this->test->storage_service_1000),
-                                                         wrench::FileLocation::LOCATION(this->test->storage_service_510));
+            data_movement_manager->doSynchronousFileCopy(this->test->file_500,
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_1000),
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510/foo/"));
             throw std::runtime_error("Should not be able to write a file beyond the storage capacity");
         } catch (wrench::WorkflowExecutionException &e) {
         }
 
         // Do another file copy with empty src dir and empty dst dir
         try {
-            data_movement_manager->doSynchronousFileCopy(this->test->file_1, wrench::FileLocation::LOCATION(this->test->storage_service_1000, ""),
-                                                         wrench::FileLocation::LOCATION(this->test->storage_service_510, ""));
+            data_movement_manager->doSynchronousFileCopy(this->test->file_1,
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_1000, "/disk1000"),
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510"));
         } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error("Got an exception while doing a synchronous file copy: " + std::string(e.what()));
         }
@@ -712,7 +715,7 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopy_test() {
     // Create a  Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(hostname, std::make_tuple(1, 0))},
+                                                {std::make_pair(hostname, std::make_tuple(1, 0))}, "",
                                                 {})));
 
     // Create 2 Storage Services
@@ -720,7 +723,7 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopy_test() {
             new wrench::SimpleStorageService(hostname, {"/disk1000"})));
 
     ASSERT_NO_THROW(storage_service_510 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/disk_510"})));
+            new wrench::SimpleStorageService(hostname, {"/disk510"})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
@@ -942,8 +945,8 @@ private:
             data_movement_manager->doSynchronousFileCopy(this->test->file_500,
                                                          wrench::FileLocation::LOCATION(this->test->storage_service_510),
                                                          wrench::FileLocation::LOCATION(this->test->storage_service_510));
-            throw std::runtime_error("Should have gotten a 'can't copy from myself' exception");
         } catch (std::invalid_argument &e) {
+            throw std::runtime_error("Copying a file onto itself shouldn't lead to an exception (just a printed warning)");
         }
 
         // Do the file copy for a file that's not there

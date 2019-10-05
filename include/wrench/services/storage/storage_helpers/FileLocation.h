@@ -19,6 +19,7 @@ namespace wrench {
     /** \cond DEVELOPER    */
     /***********************/
 
+
     class StorageService;
 
     class FileLocation {
@@ -40,8 +41,9 @@ namespace wrench {
 
 
         bool operator==(const std::shared_ptr<FileLocation> &rhs) {
+            std::cerr << "FOO\n";
             return ((this->getStorageService() == rhs->getStorageService()) and
-            (this->getAbsolutePathAtMountPoint() == rhs->getAbsolutePathAtMountPoint()));
+            (this->getFullAbsolutePath() == rhs->getFullAbsolutePath()));
         }
 
         /**
@@ -73,7 +75,6 @@ namespace wrench {
 
 
     };
-
 
     /***********************/
     /** \endcond           */
