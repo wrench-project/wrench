@@ -97,7 +97,7 @@ namespace wrench {
         try {
             this->pending_file_copies.push_front(std::unique_ptr<CopyRequestSpecs>(
                     new CopyRequestSpecs(file, src, dst, file_registry_service)));
-            dst->getStorageService()->initiateFileCopy(this->mailbox_name, file,
+            wrench::StorageService::initiateFileCopy(this->mailbox_name, file,
                                                        src, dst);
         } catch (WorkflowExecutionException &e) {
             throw;
