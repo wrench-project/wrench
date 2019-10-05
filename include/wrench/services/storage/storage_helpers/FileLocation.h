@@ -39,21 +39,12 @@ namespace wrench {
 
         std::string toString();
 
-
-        bool operator==(const std::shared_ptr<FileLocation> &rhs) {
-            std::cerr << "FOO\n";
-            return ((this->getStorageService() == rhs->getStorageService()) and
-            (this->getFullAbsolutePath() == rhs->getFullAbsolutePath()));
+        static bool equal(const std::shared_ptr<FileLocation> &lhs,
+            const std::shared_ptr<FileLocation> &rhs) {
+          return ((lhs->getStorageService() == rhs->getStorageService()) and
+                  (lhs->getFullAbsolutePath() == rhs->getFullAbsolutePath()));
         }
 
-        /**
-         * @brief Overloaded "not equal" operator
-         * @param rhs: right-hand side of the comparison
-         * @return true if different, false otherwise
-         */
-        bool operator!=(const std::shared_ptr<FileLocation> &rhs) {
-            return not FileLocation::operator==(rhs);
-        }
 
         static std::string sanitizePath(std::string path);
 
