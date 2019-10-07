@@ -503,7 +503,7 @@ namespace wrench {
  * @brief Start pending file transfer threads if any and if possible
  */
     void SimpleStorageService::startPendingFileTransferThread() {
-        while ((not this->pending_file_transfer_threads.empty()) and
+      while ((not this->pending_file_transfer_threads.empty()) and
                (this->running_file_transfer_threads.size() < this->num_concurrent_connections)) {
             // Start a communications!
             auto ftt = this->pending_file_transfer_threads.at(0);
