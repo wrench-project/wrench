@@ -127,7 +127,7 @@ protected:
                           "             <prop id=\"mount\" value=\"/scratch\"/>"
                           "          </disk>"
                           "       </host>  "
-                          "       <host id=\"TinyHost\" speed=\"1f\" core=\"1\"/> "
+                          "       <host id=\"TinyHost\" speed=\"1f\" core=\"1\" >"
                           "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
                           "             <prop id=\"size\" value=\"100\"/>"
                           "             <prop id=\"mount\" value=\"/\"/>"
