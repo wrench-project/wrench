@@ -51,65 +51,74 @@ protected:
 
         // Create a four-host 1-core platform file along with different pstates
         std::string xml = "<?xml version='1.0'?>"
-                          "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
-                          "<platform version=\"4.1\">"
-                          "<zone id=\"AS0\" routing=\"Full\">"
-                          "<host id=\"MyHost1\" speed=\"100.0Mf,50.0Mf,20.0Mf\" pstate=\"0\" core=\"1\" >"
-                          "<prop id=\"watt_per_state\" value=\"100.0:200.0, 93.0:170.0, 90.0:150.0\" />"
-                          "<prop id=\"watt_off\" value=\"10B\" />"
-                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
-                          "             <prop id=\"size\" value=\"10000000000000B\"/>"
-                          "             <prop id=\"mount\" value=\"/\"/>"
-                          "          </disk>"
-                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
-                          "             <prop id=\"size\" value=\"100B\"/>"
-                          "             <prop id=\"mount\" value=\"/scratch\"/>"
-                          "          </disk>"
-                          "       </host>"
-                          "</host>"
+                "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                "<platform version=\"4.1\">"
+                "<zone id=\"AS0\" routing=\"Full\">"
+                "<host id=\"MyHost1\" speed=\"100.0Mf,50.0Mf,20.0Mf\" pstate=\"0\" core=\"1\" >"
+                "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                "             <prop id=\"size\" value=\"10000000000000B\"/>"
+                "             <prop id=\"mount\" value=\"/disk1\"/>"
+                "          </disk>"
+                "          <disk id=\"large_disk2\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                "             <prop id=\"size\" value=\"10000000000000B\"/>"
+                "             <prop id=\"mount\" value=\"/disk2\"/>"
+                "          </disk>"
+                "          <disk id=\"large_disk3\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                "             <prop id=\"size\" value=\"100B\"/>"
+                "             <prop id=\"mount\" value=\"/scratch\"/>"
+                "          </disk>"
+                "          <prop id=\"watt_per_state\" value=\"100.0:200.0, 93.0:170.0, 90.0:150.0\" />"
+                "          <prop id=\"watt_off\" value=\"10B\" />"
+                "</host>"
 
-                          "<host id=\"MyHost2\" speed=\"100.0Mf,50.0Mf,20.0Mf\" pstate=\"0\" core=\"1\" >"
-                          "<prop id=\"watt_per_state\" value=\"100.0:200.0, 93.0:170.0, 90.0:150.0\" />"
-                          "<prop id=\"watt_off\" value=\"10B\" />"
-                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
-                          "             <prop id=\"size\" value=\"10000000000000B\"/>"
-                          "             <prop id=\"mount\" value=\"/\"/>"
-                          "          </disk>"
-                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
-                          "             <prop id=\"size\" value=\"100B\"/>"
-                          "             <prop id=\"mount\" value=\"/scratch\"/>"
-                          "          </disk>"
-                          "       </host>"
-                          "</host>"
+                "<host id=\"MyHost2\" speed=\"100.0Mf,50.0Mf,20.0Mf\" pstate=\"0\" core=\"1\" >"
+                "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                "             <prop id=\"size\" value=\"10000000000000B\"/>"
+                "             <prop id=\"mount\" value=\"/disk1\"/>"
+                "          </disk>"
+                "          <disk id=\"large_disk2\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                "             <prop id=\"size\" value=\"10000000000000B\"/>"
+                "             <prop id=\"mount\" value=\"/disk2\"/>"
+                "          </disk>"
+                "          <disk id=\"large_disk3\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                "             <prop id=\"size\" value=\"100B\"/>"
+                "             <prop id=\"mount\" value=\"/scratch\"/>"
+                "          </disk>"
+                "          <prop id=\"watt_per_state\" value=\"100.0:200.0, 93.0:170.0, 90.0:150.0\" />"
+                "          <prop id=\"watt_off\" value=\"10B\" />"
+                "</host>"
 
-                          "<host id=\"MyHost3\" speed=\"100.0Mf,50.0Mf,20.0Mf\" pstate=\"0\" core=\"1\" >"
-                          "<prop id=\"watt_per_state\" value=\"100.0:200.0, 93.0:170.0, 90.0:150.0\" />"
-                          "<prop id=\"watt_off\" value=\"10B\" />"
-                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
-                          "             <prop id=\"size\" value=\"10000000000000B\"/>"
-                          "             <prop id=\"mount\" value=\"/\"/>"
-                          "          </disk>"
-                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
-                          "             <prop id=\"size\" value=\"100B\"/>"
-                          "             <prop id=\"mount\" value=\"/scratch\"/>"
-                          "          </disk>"
-                          "       </host>"
-                          "</host>"
+                "<host id=\"MyHost3\" speed=\"100.0Mf,50.0Mf,20.0Mf\" pstate=\"0\" core=\"1\" >"
+                "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                "             <prop id=\"size\" value=\"10000000000000B\"/>"
+                "             <prop id=\"mount\" value=\"/disk2\"/>"
+                "          </disk>"
+                "          <disk id=\"large_disk2\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                "             <prop id=\"size\" value=\"10000000000000B\"/>"
+                "             <prop id=\"mount\" value=\"/disk2\"/>"
+                "          </disk>"
+                "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                "             <prop id=\"size\" value=\"100B\"/>"
+                "             <prop id=\"mount\" value=\"/scratch\"/>"
+                "          </disk>"
+                "          <prop id=\"watt_per_state\" value=\"100.0:200.0, 93.0:170.0, 90.0:150.0\" />"
+                "          <prop id=\"watt_off\" value=\"10B\" />"
+                "</host>"
 
-                          "<link id=\"bus\" bandwidth=\"100kBps\" latency=\"0\" sharing_policy=\"SHARED\">"
-                          "<prop id=\"watt_range\" value=\"1:3\" />"
-                          "</link>"
-                          "<route src=\"MyHost1\" dst=\"MyHost2\">"
-                          "<link_ctn id=\"bus\"/>"
-                          "</route>"
-                          "<route src=\"MyHost1\" dst=\"MyHost3\">"
-                          "<link_ctn id=\"bus\"/>"
-                          "</route>"
-                          "<route src=\"MyHost2\" dst=\"MyHost3\">"
-                          "<link_ctn id=\"bus\"/>"
-                          "</route>"
-                          "</zone>"
-                          "</platform>";
+                "<link id=\"bus\" bandwidth=\"100kBps\" latency=\"0\" sharing_policy=\"SHARED\">"
+                "<prop id=\"watt_range\" value=\"1:3\" />"
+                "</link>"
+                "<route src=\"MyHost1\" dst=\"MyHost2\">"
+                "<link_ctn id=\"bus\"/>"
+                "</route>"
+                "<route src=\"MyHost1\" dst=\"MyHost3\">"
+                "<link_ctn id=\"bus\"/>"
+                "</route>"
+                "<route src=\"MyHost2\" dst=\"MyHost3\">"
+                "<link_ctn id=\"bus\"/>"
+                "</route>"
+                "</zone>"
+                "</platform>";
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
@@ -293,11 +302,11 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionTests_test() {
 
     // Create a Storage Service
     EXPECT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname, {"/disk1"})));
 
     // Create a Storage Service
     EXPECT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname, {"/disk2"})));
 
 
     // Create a Compute Service
@@ -448,11 +457,11 @@ void EnergyConsumptionTest::do_EnergyConsumption_test() {
 
     // Create a Storage Service
     EXPECT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname, {"/disk1"})));
 
     // Create a Storage Service
     EXPECT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname, {"/disk2"})));
 
 
     // Create a Compute Service
@@ -601,11 +610,11 @@ void EnergyConsumptionTest::do_SimpleApiChecksEnergy_test() {
 
     // Create a Storage Service
     EXPECT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname, {"/disk1"})));
 
     // Create a Storage Service
     EXPECT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname, {"/disk2"})));
 
 
     // Create a Compute Service
@@ -835,11 +844,11 @@ void EnergyConsumptionTest::do_EnergyConsumptionPStateChange_test() {
 
     // Create a Storage Service
     EXPECT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname, {"/disk1"})));
 
     // Create a Storage Service
     EXPECT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname, {"/disk2"})));
 
 
     // Create a Compute Service
