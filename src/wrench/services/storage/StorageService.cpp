@@ -662,7 +662,7 @@ namespace wrench {
         if (this->hasMultipleMountPoints()) {
             throw std::invalid_argument("StorageService::getAbsolutePath(): The storage service has more than one mount point");
         }
-        return this->file_systems.begin()->first;
+        return wrench::FileLocation::sanitizePath(this->file_systems.begin()->first);
     }
 
 
