@@ -116,7 +116,7 @@ namespace wrench {
             createDirectory(absolute_path);
         }
 
-        this->content[absolute_path].insert(file);
+      this->content[absolute_path].insert(file);
         std::string key = FileLocation::sanitizePath(absolute_path) + file->getID();
         if (this->reserved_space.find(key) == this->reserved_space.end()) {
             this->occupied_space += file->getSize();

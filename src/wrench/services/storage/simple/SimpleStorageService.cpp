@@ -617,8 +617,11 @@ namespace wrench {
 
         if ((not fs->doesDirectoryExist(location->getAbsolutePathAtMountPoint())) or
             (not fs->isFileInDirectory(file, location->getAbsolutePathAtMountPoint()))) {
-            failure_cause = std::shared_ptr<FailureCause>(
-                    new FileNotFound(file, location));
+            // If this is scratch, we don't care, perhaps it was taken care of elsewhere...
+            if (not this->isScratch()) {
+               failure_cause = std::shared_ptr<FailureCause>(
+                       new FileNotFound(file, location));
+           }
         } else {
             fs->removeFileFromDirectory(file, location->getAbsolutePathAtMountPoint());
         }
