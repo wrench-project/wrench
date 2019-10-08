@@ -33,7 +33,7 @@ protected:
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"Host1\" speed=\"1f\" core=\"10\"> "
-                          "         <prop id=\"ram\" value=\"1024\"/> "
+                          "         <prop id=\"ram\" value=\"1024B\"/> "
                           "         <prop id=\"foo\" value=\"bar\"/> "
                           "       </host> "
                           "       <host id=\"Host2\" speed=\"1f\" core=\"10\"/> "
