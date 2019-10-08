@@ -82,7 +82,7 @@ protected:
                                        "             <prop id=\"size\" value=\"100B\"/>\n"
                                        "             <prop id=\"mount\" value=\"/scratch\"/>\n"
                                        "          </disk>\n"
-                                       "          <prop id=\"ram\" value=\"100\" /> \n"
+                                       "          <prop id=\"ram\" value=\"100B\" /> \n"
                                        "</host>\n";
         }
 

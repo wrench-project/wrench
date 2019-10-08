@@ -123,7 +123,7 @@ protected:
                           "             <prop id=\"size\" value=\"101B\"/>"
                           "             <prop id=\"mount\" value=\"/scratch\"/>"
                           "          </disk>"
-                          "         <prop id=\"ram\" value=\"1024\"/> "
+                          "         <prop id=\"ram\" value=\"1024B\"/> "
                           "       </host>  "
                           "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
                           "       <link id=\"2\" bandwidth=\"0.1MBps\" latency=\"1us\"/>"
