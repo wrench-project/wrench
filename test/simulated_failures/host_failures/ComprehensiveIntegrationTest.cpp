@@ -41,7 +41,7 @@ public:
     std::shared_ptr<wrench::CloudComputeService> cloud_service = nullptr;
     std::shared_ptr<wrench::BareMetalComputeService> baremetal_service = nullptr;
 
-    void do_IntegrationFailurTest_test(std::map<std::string, bool> args);
+    void do_IntegrationFailureTest_test(std::map<std::string, bool> args);
 
 
 protected:
@@ -73,15 +73,16 @@ protected:
                                               "BareMetalHead", "BareMetalHost1", "BareMetalHost2"};
 
         for (auto const &h : hostnames) {
-            xml += "<host id=\"" + h + "\"  speed=\"1f\" core=\"4\"> <prop id=\"ram\" value=\"100\"/> \n"
-                                       "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
-                                       "             <prop id=\"size\" value=\"10000000000000\"/>"
-                                       "             <prop id=\"mount\" value=\"/\"/>"
-                                       "          </disk>"
-                                       "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
-                                       "             <prop id=\"size\" value=\"100\"/>"
-                                       "             <prop id=\"mount\" value=\"/scratch\"/>"
-                                       "          </disk>"
+            xml += "<host id=\"" + h + "\"  speed=\"1f\" core=\"4\" > \n"
+                                       "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">\n"
+                                       "             <prop id=\"size\" value=\"10000000000000B\"/>\n"
+                                       "             <prop id=\"mount\" value=\"/\"/>\n"
+                                       "          </disk>\n"
+                                       "          <disk id=\"scratch_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">\n"
+                                       "             <prop id=\"size\" value=\"100B\"/>\n"
+                                       "             <prop id=\"mount\" value=\"/scratch\"/>\n"
+                                       "          </disk>\n"
+                                       "          <prop id=\"ram\" value=\"100\" /> \n"
                                        "</host>\n";
         }
 
@@ -119,6 +120,7 @@ protected:
 
         xml += "   </zone> \n"
                "</platform>\n";
+
 #if 0
 
         "       <host id=\"StorageHost1\"   speed=\"1f\" core=\"1\"/> "
@@ -142,6 +144,7 @@ protected:
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
+    WRENCH_INFO("%s", xml.c_str());
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
@@ -347,21 +350,21 @@ TEST_F(ComprehensiveIntegrationHostFailuresTest, OneNonFaultyStorageOneFaultyBar
     std::map<std::string, bool> args;
     args["storage1"] = false;
     args["baremetal"] = true;
-    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailurTest_test, args);
+    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTest_test, args);
 }
 
 TEST_F(ComprehensiveIntegrationHostFailuresTest, OneFaultyStorageOneNonFaultyBareMetal) {
     std::map<std::string, bool> args;
     args["storage1"] = true;
     args["baremetal"] = false;
-    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailurTest_test, args);
+    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTest_test, args);
 }
 
 TEST_F(ComprehensiveIntegrationHostFailuresTest, OneFaultyStorageOneFaultyBareMetal) {
     std::map<std::string, bool> args;
     args["storage1"] = true;
     args["baremetal"] = true;
-    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailurTest_test, args);
+    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTest_test, args);
 }
 
 TEST_F(ComprehensiveIntegrationHostFailuresTest, TwoFaultyStorageOneFaultyBareMetal) {
@@ -369,21 +372,21 @@ TEST_F(ComprehensiveIntegrationHostFailuresTest, TwoFaultyStorageOneFaultyBareMe
     args["storage1"] = true;
     args["storage2"] = true;
     args["baremetal"] = true;
-    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailurTest_test, args);
+    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTest_test, args);
 }
 
 TEST_F(ComprehensiveIntegrationHostFailuresTest, OneNonFaultyStorageOneFaultyCloud) {
     std::map<std::string, bool> args;
     args["storage1"] = false;
     args["cloud"] = true;
-    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailurTest_test, args);
+    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTest_test, args);
 }
 
 TEST_F(ComprehensiveIntegrationHostFailuresTest, OneFaultyStorageOneFaultyCloud) {
     std::map<std::string, bool> args;
     args["storage1"] = true;
     args["cloud"] = true;
-    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailurTest_test, args);
+    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTest_test, args);
 }
 
 TEST_F(ComprehensiveIntegrationHostFailuresTest, TwoFaultyStorageOneFaultyCloud) {
@@ -391,7 +394,7 @@ TEST_F(ComprehensiveIntegrationHostFailuresTest, TwoFaultyStorageOneFaultyCloud)
     args["storage1"] = true;
     args["storage2"] = true;
     args["cloud"] = true;
-    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailurTest_test, args);
+    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTest_test, args);
 }
 
 TEST_F(ComprehensiveIntegrationHostFailuresTest, WholeEnchilada) {
@@ -400,10 +403,10 @@ TEST_F(ComprehensiveIntegrationHostFailuresTest, WholeEnchilada) {
     args["storage2"] = true;
     args["baremetal"] = true;
     args["cloud"] = true;
-    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailurTest_test, args);
+    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTest_test, args);
 }
 
-void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailurTest_test(std::map<std::string, bool> args) {
+void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(std::map<std::string, bool> args) {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
@@ -416,7 +419,9 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailurTest_test(std
     simulation->init(&argc, argv);
 
     // Setting up the platform
+  WRENCH_INFO("HERE");
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  WRENCH_INFO("DONE!");
 
     // Create Storage Services
     if (args.find("storage1") != args.end()) {
