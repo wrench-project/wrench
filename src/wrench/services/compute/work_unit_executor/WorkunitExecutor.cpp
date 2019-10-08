@@ -370,6 +370,7 @@ namespace wrench {
                         files_to_write[f] = work->file_locations[f];
                     } else {
                         files_to_write[f] = FileLocation::LOCATION(this->scratch_space, this->scratch_space->getMountPoint() + "/" + job->getName());
+                        this->files_stored_in_scratch.insert(f);
                     }
                 }
                 StorageService::writeFiles(files_to_write);

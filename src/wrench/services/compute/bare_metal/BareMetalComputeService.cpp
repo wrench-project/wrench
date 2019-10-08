@@ -1147,7 +1147,7 @@ namespace wrench {
 
         this->releaseDaemonLock();
 
-        // If the job not done, just return
+        // If the job is not done, just return
         if (this->completed_workunits[job].size() != this->all_workunits[job].size()) {
             return;
         }
