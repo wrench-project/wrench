@@ -163,7 +163,8 @@ private:
         }
 
         // Paranoid check
-        if (!this->test->storage_service->lookupFile(this->test->output_file, nullptr)) {
+        if (not wrench::StorageService::lookupFile(this->test->output_file,
+                wrench::FileLocation::LOCATION(this->test->storage_service))) {
             throw std::runtime_error("Output file not written to storage service");
         }
 
@@ -277,7 +278,8 @@ private:
         }
 
         // Paranoid check
-        if (!this->test->storage_service->lookupFile(this->test->output_file, nullptr)) {
+        if (not wrench::StorageService::lookupFile(this->test->output_file,
+                                                   wrench::FileLocation::LOCATION(this->test->storage_service))) {
             throw std::runtime_error("Output file not written to storage service");
         }
 
