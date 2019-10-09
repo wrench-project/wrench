@@ -973,8 +973,7 @@ private:
             throw std::runtime_error("Unexpected workflow execution event!");
         }
 
-        if (!this->test->storage_service1->lookupFile(
-                this->test->output_file,
+        if (not wrench::StorageService::lookupFile(this->test->output_file,
                 wrench::FileLocation::LOCATION(this->test->storage_service1, "/scratch/" + job->getName()))) {
             throw std::runtime_error("Output file not written to storage service");
         }

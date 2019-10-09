@@ -87,21 +87,29 @@ protected:
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"DualCoreHost\" speed=\"1f\" core=\"2\" > "
-                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
                           "             <prop id=\"size\" value=\"100B\"/>"
-                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "             <prop id=\"mount\" value=\"/disk1\"/>"
                           "          </disk>"
-                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "          <disk id=\"large_disk2\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/disk2\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
                           "             <prop id=\"size\" value=\"100B\"/>"
                           "             <prop id=\"mount\" value=\"/scratch\"/>"
                           "          </disk>"
                           "       </host>"
                           "       <host id=\"QuadCoreHost\" speed=\"1f\" core=\"4\" > "
-                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
                           "             <prop id=\"size\" value=\"100B\"/>"
-                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "             <prop id=\"mount\" value=\"/disk1\"/>"
                           "          </disk>"
-                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "          <disk id=\"large_disk2\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/disk2\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
                           "             <prop id=\"size\" value=\"100B\"/>"
                           "             <prop id=\"mount\" value=\"/scratch\"/>"
                           "          </disk>"
@@ -154,7 +162,7 @@ private:
 
         // Dynamically create a Storage Service on this host
         auto dynamically_created_storage_service = simulation->startNewService(
-                new wrench::SimpleStorageService(hostname, {"/"},
+                new wrench::SimpleStorageService(hostname, {"/disk2"},
                                                  {},
                                                  {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 123}}));
 
@@ -169,7 +177,6 @@ private:
         // Create a VM
         auto vm_name = dynamically_created_compute_service->createVM(4, 10);
         auto vm_cs = dynamically_created_compute_service->startVM(vm_name);
-
 
         wrench::StandardJob *one_task_jobs[5];
         int job_index = 0;
@@ -210,17 +217,16 @@ private:
             }
         }
 
-        for (int i = 0; i < 5; i++) {
-            if (one_task_jobs[i]->getNumCompletedTasks() != 1) {
+        for (auto & j : one_task_jobs) {
+            if (j->getNumCompletedTasks() != 1) {
                 throw std::runtime_error("A job with one completed task should say it has one completed task");
             }
         }
 
-
         {
             // Try to forget the completed jobs
-            for (int i=0; i < 5; i++) {
-                job_manager->forgetJob(one_task_jobs[i]);
+            for (auto & j : one_task_jobs) {
+                job_manager->forgetJob(j);
             }
         }
 
@@ -263,17 +269,9 @@ void DynamicServiceCreationTest::do_getReadyTasksTest_test() {
 
     // Create a Storage Service
     storage_service = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"},
+            new wrench::SimpleStorageService(hostname, {"/disk1"},
                                              {},
                                              {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 123}}));
-
-
-
-//  // Create a Cloud Service
-//  std::vector<std::string> execution_hosts = {"QuadCoreHost"};
-//  compute_service = simulation->add(
-//          new wrench::CloudComputeService(hostname, execution_hosts, 100.0,
-//                                   { {wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}}));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;

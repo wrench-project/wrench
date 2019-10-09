@@ -25,7 +25,6 @@ namespace wrench {
 
         mount_point = FileLocation::sanitizePath("/" + mount_point + "/");
 
-//        WRENCH_INFO("NEW %s", mount_point.c_str());
         // Check uniqueness
         if (LogicalFileSystem::mount_points.find(hostname+":"+mount_point) != LogicalFileSystem::mount_points.end()) {
             throw std::invalid_argument("LogicalFileSystem::LogicalFileSystem(): A FileSystem with mount point " +
@@ -51,6 +50,7 @@ namespace wrench {
 
         LogicalFileSystem::mount_points.insert(hostname+":"+mount_point);
 
+        this->hostname = hostname;
         this->mount_point = mount_point;
         this->content["/"] = {};
         this->total_capacity = S4U_Simulation::getDiskCapacity(hostname, mount_point);
@@ -218,11 +218,12 @@ namespace wrench {
             throw std::invalid_argument("LogicalFileSystem::reserveSpace(): Not enough free space");
         }
         if (this->reserved_space.find(key) != this->reserved_space.end()) {
-            throw std::runtime_error("LogicalFileSystem::reserveSpace(): Space was already being reserved for storing file " +
-                                     file->getID() + "at path " + absolute_path);
+            WRENCH_WARN("LogicalFileSystem::reserveSpace(): Space was already being reserved for storing file %s at path %s:%s. This is likely a redundant copy",
+                                     file->getID().c_str(), this->hostname.c_str(), absolute_path.c_str());
+        } else {
+            this->reserved_space[key] = file->getSize();
+            this->occupied_space += file->getSize();
         }
-        this->reserved_space[key] = file->getSize();
-        this->occupied_space += file->getSize();
     }
 
 /**

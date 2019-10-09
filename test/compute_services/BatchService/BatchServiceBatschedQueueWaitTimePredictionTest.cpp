@@ -52,9 +52,13 @@ protected:
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"Host1\" speed=\"1f\" core=\"10\"> "
-                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
                           "             <prop id=\"size\" value=\"10000000000000B\"/>"
-                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "             <prop id=\"mount\" value=\"/disk1\"/>"
+                          "          </disk>"
+                          "          <disk id=\"large_disk2\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"10000000000000B\"/>"
+                          "             <prop id=\"mount\" value=\"/disk2\"/>"
                           "          </disk>"
                           "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
                           "             <prop id=\"size\" value=\"100B\"/>"
@@ -62,9 +66,13 @@ protected:
                           "          </disk>"
                           "       </host>"
                           "       <host id=\"Host2\" speed=\"1f\" core=\"10\"> "
-                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
                           "             <prop id=\"size\" value=\"10000000000000B\"/>"
-                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "             <prop id=\"mount\" value=\"/disk1\"/>"
+                          "          </disk>"
+                          "          <disk id=\"large_disk2\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"10000000000000B\"/>"
+                          "             <prop id=\"mount\" value=\"/disk2\"/>"
                           "          </disk>"
                           "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
                           "             <prop id=\"size\" value=\"100B\"/>"
@@ -72,9 +80,13 @@ protected:
                           "          </disk>"
                           "       </host>"
                           "       <host id=\"Host3\" speed=\"1f\" core=\"10\"> "
-                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
                           "             <prop id=\"size\" value=\"10000000000000B\"/>"
-                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "             <prop id=\"mount\" value=\"/disk1\"/>"
+                          "          </disk>"
+                          "          <disk id=\"large_disk2\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"10000000000000B\"/>"
+                          "             <prop id=\"mount\" value=\"/disk2\"/>"
                           "          </disk>"
                           "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
                           "             <prop id=\"size\" value=\"100B\"/>"
@@ -82,9 +94,13 @@ protected:
                           "          </disk>"
                           "       </host>"
                           "       <host id=\"Host4\" speed=\"1f\" core=\"10\"> "
-                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
                           "             <prop id=\"size\" value=\"10000000000000B\"/>"
-                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "             <prop id=\"mount\" value=\"/disk1\"/>"
+                          "          </disk>"
+                          "          <disk id=\"large_disk2\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"10000000000000B\"/>"
+                          "             <prop id=\"mount\" value=\"/disk2\"/>"
                           "          </disk>"
                           "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
                           "             <prop id=\"size\" value=\"100B\"/>"
@@ -247,11 +263,11 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobBrokenEstimateW
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
+            new wrench::SimpleStorageService(hostname, {"/disk1"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
+            new wrench::SimpleStorageService(hostname, {"/disk2"})));
 
     // Create a Batch Service
     ASSERT_THROW(compute_service = simulation->add(
@@ -427,11 +443,11 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobBasicEstimateWa
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
+            new wrench::SimpleStorageService(hostname, {"/disk1"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
+            new wrench::SimpleStorageService(hostname, {"/disk2"})));
 
     // Create a Batch Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -653,11 +669,11 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobEstimateWaiting
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
 
-            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
+            new wrench::SimpleStorageService(hostname, {"/disk1"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
+            new wrench::SimpleStorageService(hostname, {"/disk2"})));
 
     // Create a Batch Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -925,11 +941,11 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobLittleComplexEs
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
+            new wrench::SimpleStorageService(hostname, {"/disk1"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/large_disk"})));
+            new wrench::SimpleStorageService(hostname, {"/disk2"})));
 
     // Create a Batch Service
     ASSERT_NO_THROW(compute_service = simulation->add(
