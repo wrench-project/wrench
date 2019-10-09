@@ -1203,7 +1203,7 @@ private:
         // be generated for this host at time 0.0
         this->simulation->setPstate(this->getHostname(), 0);
 
-        const std::vector<std::string> hostnames = this->simulation->getHostnameList();
+        const std::vector<std::string> hostnames = wrench::Simulation::getHostnameList();
         const double TWO_SECOND_PERIOD = 2.0;
 
         auto em = this->createEnergyMeter(hostnames, TWO_SECOND_PERIOD);
@@ -1245,7 +1245,7 @@ void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
     EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path2));
 
     // get the single host
-    std::string host = simulation->getHostnameList()[0];
+    std::string host = wrench::Simulation::getHostnameList()[0];
 
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     EXPECT_NO_THROW(wms = simulation->add(

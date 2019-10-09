@@ -280,7 +280,7 @@ void FileRegistryTest::do_FileRegistry_Test() {
   ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
+  std::string hostname = wrench::Simulation::getHostnameList()[0];
 
   // Create a Compute Service
   ASSERT_NO_THROW(compute_service = simulation->add(
@@ -455,10 +455,10 @@ void FileRegistryTest::do_lookupEntry_Test() {
 
   simulation->instantiatePlatform(platform_file_path);
 
-  std::string host1 = simulation->getHostnameList()[0];
-  std::string host2 = simulation->getHostnameList()[1];
-  std::string host3 = simulation->getHostnameList()[2];
-  std::string host4 = simulation->getHostnameList()[3];
+  std::string host1 = wrench::Simulation::getHostnameList()[0];
+  std::string host2 = wrench::Simulation::getHostnameList()[1];
+  std::string host3 = wrench::Simulation::getHostnameList()[2];
+  std::string host4 = wrench::Simulation::getHostnameList()[3];
 
   auto network_proximity_service = simulation->add(new wrench::NetworkProximityService(host1, {host1, host3, host4}));
 
