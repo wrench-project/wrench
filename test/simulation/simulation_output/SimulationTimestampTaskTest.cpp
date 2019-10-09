@@ -152,8 +152,8 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test(){
 
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
-    std::string wms_host = simulation->getHostnameList()[1];
-    std::string execution_host = simulation->getHostnameList()[0];
+    std::string wms_host = wrench::Simulation::getHostnameList()[1];
+    std::string execution_host = wrench::Simulation::getHostnameList()[0];
 
     ASSERT_NO_THROW(compute_service = simulation->add(new wrench::BareMetalComputeService(wms_host,
                                                                                           {std::make_pair(
@@ -335,8 +335,8 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
 
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
-    std::string wms_host = simulation->getHostnameList()[1];
-    std::string execution_host = simulation->getHostnameList()[0];
+    std::string wms_host = wrench::Simulation::getHostnameList()[1];
+    std::string execution_host = wrench::Simulation::getHostnameList()[0];
 
     ASSERT_NO_THROW(compute_service = simulation->add(new wrench::BareMetalComputeService(wms_host,
                                                                                           {std::make_pair(
@@ -526,8 +526,8 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskTerminateAndFail_tes
 
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
-    std::string wms_host = simulation->getHostnameList()[1];
-    std::string execution_host = simulation->getHostnameList()[0];
+    std::string wms_host = wrench::Simulation::getHostnameList()[1];
+    std::string execution_host = wrench::Simulation::getHostnameList()[0];
 
     ASSERT_NO_THROW(compute_service = simulation->add(new wrench::BareMetalComputeService(execution_host,
                                                                                           {std::make_pair(

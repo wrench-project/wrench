@@ -126,7 +126,7 @@ void ScratchSpaceTest::do_BogusScratchSpace_test() {
   ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
+  std::string hostname = wrench::Simulation::getHostnameList()[0];
 
   // Create a Compute Service
   ASSERT_THROW(compute_service = simulation->add(
@@ -229,7 +229,7 @@ void ScratchSpaceTest::do_SimpleScratchSpace_test() {
   ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
+  std::string hostname = wrench::Simulation::getHostnameList()[0];
 
   // Create a Storage Service
   ASSERT_NO_THROW(storage_service1 = simulation->add(
@@ -438,7 +438,7 @@ void ScratchSpaceTest::do_ScratchSpaceFailure_test() {
   ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
+  std::string hostname = wrench::Simulation::getHostnameList()[0];
 
   // Create a Storage Service3
   ASSERT_NO_THROW(storage_service1 = simulation->add(
@@ -668,7 +668,7 @@ void ScratchSpaceTest::do_PilotJobScratchSpace_test() {
   ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
+  std::string hostname = wrench::Simulation::getHostnameList()[0];
 
   // Create a Storage Service
   ASSERT_NO_THROW(storage_service1 = simulation->add(
@@ -818,7 +818,7 @@ void ScratchSpaceTest::do_RaceConditionTest_test() {
   ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
+  std::string hostname = wrench::Simulation::getHostnameList()[0];
 
   // Create a Storage Service (note the BOGUS property, which is for testing puposes
   //  and doesn't matter because we do not stop the service)
@@ -1033,7 +1033,7 @@ void ScratchSpaceTest::do_PartitionsTest_test() {
   ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
+  std::string hostname = wrench::Simulation::getHostnameList()[0];
 
   // Create a Storage Service (note the BOGUS property, which is for testing puposes
   //  and doesn't matter because we do not stop the service)

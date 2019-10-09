@@ -202,7 +202,7 @@ private:
                     new wrench::StandardJobExecutor(
                             test->simulation,
                             my_mailbox,
-                            test->simulation->getHostnameList()[0],
+                            wrench::Simulation::getHostnameList()[0],
                             job,
                             {std::make_pair("bogus", std::make_tuple(2, wrench::ComputeService::ALL_RAM))},
                             nullptr,
@@ -221,9 +221,9 @@ private:
                     new wrench::StandardJobExecutor(
                             test->simulation,
                             my_mailbox,
-                            test->simulation->getHostnameList()[0],
+                            wrench::Simulation::getHostnameList()[0],
                             nullptr,
-                            {std::make_pair(test->simulation->getHostnameList()[0], std::make_tuple(2, wrench::ComputeService::ALL_RAM))},
+                            {std::make_pair(wrench::Simulation::getHostnameList()[0], std::make_tuple(2, wrench::ComputeService::ALL_RAM))},
                             nullptr,
                             false,
                             nullptr,
@@ -240,7 +240,7 @@ private:
                     new wrench::StandardJobExecutor(
                             test->simulation,
                             my_mailbox,
-                            test->simulation->getHostnameList()[0],
+                            wrench::Simulation::getHostnameList()[0],
                             job,
                             {},
                             nullptr,
@@ -259,9 +259,9 @@ private:
                     new wrench::StandardJobExecutor(
                             test->simulation,
                             my_mailbox,
-                            test->simulation->getHostnameList()[0],
+                            wrench::Simulation::getHostnameList()[0],
                             job,
-                            {std::make_pair(test->simulation->getHostnameList()[0], std::make_tuple(0, wrench::ComputeService::ALL_RAM))},
+                            {std::make_pair(wrench::Simulation::getHostnameList()[0], std::make_tuple(0, wrench::ComputeService::ALL_RAM))},
                             nullptr,
                             false,
                             nullptr,
@@ -278,9 +278,9 @@ private:
                     new wrench::StandardJobExecutor(
                             test->simulation,
                             my_mailbox,
-                            test->simulation->getHostnameList()[0],
+                            wrench::Simulation::getHostnameList()[0],
                             job,
-                            {std::make_pair(test->simulation->getHostnameList()[0], std::make_tuple(100, wrench::ComputeService::ALL_RAM))},
+                            {std::make_pair(wrench::Simulation::getHostnameList()[0], std::make_tuple(100, wrench::ComputeService::ALL_RAM))},
                             nullptr,
                             false,
                             nullptr,
@@ -297,9 +297,9 @@ private:
                     new wrench::StandardJobExecutor(
                             test->simulation,
                             my_mailbox,
-                            test->simulation->getHostnameList()[0],
+                            wrench::Simulation::getHostnameList()[0],
                             job,
-                            {std::make_pair(test->simulation->getHostnameList()[0], std::make_tuple(wrench::ComputeService::ALL_CORES, -1))},
+                            {std::make_pair(wrench::Simulation::getHostnameList()[0], std::make_tuple(wrench::ComputeService::ALL_CORES, -1))},
                             nullptr,
                             false,
                             nullptr,
@@ -316,7 +316,7 @@ private:
                     new wrench::StandardJobExecutor(
                             test->simulation,
                             my_mailbox,
-                            test->simulation->getHostnameList()[0],
+                            wrench::Simulation::getHostnameList()[0],
                             job,
                             {std::make_pair("Host4", std::make_tuple(wrench::ComputeService::ALL_CORES, 2048))},
                             nullptr,
@@ -357,7 +357,7 @@ private:
                     new wrench::StandardJobExecutor(
                             test->simulation,
                             my_mailbox,
-                            test->simulation->getHostnameList()[0],
+                            wrench::Simulation::getHostnameList()[0],
                             job,
                             {std::make_pair("Host4", std::make_tuple(wrench::ComputeService::ALL_CORES, 100.00))},
                             nullptr,
@@ -401,7 +401,7 @@ private:
                     new wrench::StandardJobExecutor(
                             test->simulation,
                             my_mailbox,
-                            test->simulation->getHostnameList()[0],
+                            wrench::Simulation::getHostnameList()[0],
                             job,
                             {std::make_pair("Host4", std::make_tuple(wrench::ComputeService::ALL_CORES, 100.00))},
                             nullptr,
@@ -443,7 +443,7 @@ private:
                     new wrench::StandardJobExecutor(
                             test->simulation,
                             my_mailbox,
-                            test->simulation->getHostnameList()[0],
+                            wrench::Simulation::getHostnameList()[0],
                             job,
                             {std::make_pair("Host1", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
                             nullptr,
@@ -603,7 +603,7 @@ private:
                             my_mailbox,
                             "Host1",
                             job,
-                            {std::make_pair(test->simulation->getHostnameList()[0], std::make_tuple(2, wrench::ComputeService::ALL_RAM))},
+                            {std::make_pair(wrench::Simulation::getHostnameList()[0], std::make_tuple(2, wrench::ComputeService::ALL_RAM))},
                             nullptr,
                             false,
                             nullptr,
@@ -801,9 +801,9 @@ private:
                 executor = std::shared_ptr<wrench::StandardJobExecutor>(new wrench::StandardJobExecutor(
                         test->simulation,
                         my_mailbox,
-                        test->simulation->getHostnameList()[0],
+                        wrench::Simulation::getHostnameList()[0],
                         job,
-                        {std::make_pair(test->simulation->getHostnameList()[0], std::make_tuple(2, wrench::ComputeService::ALL_RAM))},
+                        {std::make_pair(wrench::Simulation::getHostnameList()[0], std::make_tuple(2, wrench::ComputeService::ALL_RAM))},
                         nullptr,
                         false,
                         nullptr,
@@ -985,9 +985,9 @@ private:
                 executor = std::shared_ptr<wrench::StandardJobExecutor>(new wrench::StandardJobExecutor(
                         test->simulation,
                         my_mailbox,
-                        test->simulation->getHostnameList()[1],
+                        wrench::Simulation::getHostnameList()[1],
                         job,
-                        {std::make_pair(test->simulation->getHostnameList()[1], std::make_tuple(2, wrench::ComputeService::ALL_RAM))},
+                        {std::make_pair(wrench::Simulation::getHostnameList()[1], std::make_tuple(2, wrench::ComputeService::ALL_RAM))},
                         nullptr,
                         false,
                         nullptr,
@@ -1185,9 +1185,9 @@ private:
                     new wrench::StandardJobExecutor(
                             test->simulation,
                             my_mailbox,
-                            test->simulation->getHostnameList()[0],
+                            wrench::Simulation::getHostnameList()[0],
                             job,
-                            {std::make_pair(test->simulation->getHostnameList()[0], std::make_tuple(2, wrench::ComputeService::ALL_RAM))},
+                            {std::make_pair(wrench::Simulation::getHostnameList()[0], std::make_tuple(2, wrench::ComputeService::ALL_RAM))},
                             this->test->storage_service1 , // This should be a scratch space of a compute service, but since this
                             //standard job executor is being created direclty (not by any Compute Service), we pass a dummy storage as a scratch space
                             false,
@@ -1264,7 +1264,7 @@ void StandardJobExecutorTest::do_DependentTasksTest_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
@@ -1342,9 +1342,9 @@ private:
                 new wrench::StandardJobExecutor(
                         test->simulation,
                         my_mailbox,
-                        test->simulation->getHostnameList()[1],
+                        wrench::Simulation::getHostnameList()[1],
                         job,
-                        {std::make_pair(test->simulation->getHostnameList()[1], std::make_tuple(6, wrench::ComputeService::ALL_RAM))},
+                        {std::make_pair(wrench::Simulation::getHostnameList()[1], std::make_tuple(6, wrench::ComputeService::ALL_RAM))},
                         nullptr,
                         false,
                         nullptr,
@@ -1404,7 +1404,7 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase1_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a Compute Service (we don't use it)
     std::shared_ptr<wrench::ComputeService> compute_service;
@@ -1494,9 +1494,9 @@ private:
                 new wrench::StandardJobExecutor(
                         test->simulation,
                         my_mailbox,
-                        test->simulation->getHostnameList()[1],
+                        wrench::Simulation::getHostnameList()[1],
                         job,
-                        {std::make_pair(test->simulation->getHostnameList()[1], std::make_tuple(10, wrench::ComputeService::ALL_RAM))},
+                        {std::make_pair(wrench::Simulation::getHostnameList()[1], std::make_tuple(10, wrench::ComputeService::ALL_RAM))},
                         nullptr,
                         false,
                         nullptr,
@@ -1560,7 +1560,7 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase2_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a Compute Service (we don't use it)
     std::shared_ptr<wrench::ComputeService> compute_service;
@@ -1652,9 +1652,9 @@ private:
                 new wrench::StandardJobExecutor(
                         test->simulation,
                         my_mailbox,
-                        test->simulation->getHostnameList()[1],
+                        wrench::Simulation::getHostnameList()[1],
                         job,
-                        {std::make_pair(test->simulation->getHostnameList()[1], std::make_tuple(10, wrench::ComputeService::ALL_RAM))},
+                        {std::make_pair(wrench::Simulation::getHostnameList()[1], std::make_tuple(10, wrench::ComputeService::ALL_RAM))},
                         nullptr,
                         false,
                         nullptr,
@@ -1718,7 +1718,7 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase3_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a Compute Service (we don't use it)
     std::shared_ptr<wrench::ComputeService> compute_service;
@@ -1820,9 +1820,9 @@ private:
                     new wrench::StandardJobExecutor(
                             test->simulation,
                             my_mailbox,
-                            test->simulation->getHostnameList()[0],
+                            wrench::Simulation::getHostnameList()[0],
                             job,
-                            {std::make_pair(test->simulation->getHostnameList()[0], std::make_tuple(10, wrench::ComputeService::ALL_RAM))},
+                            {std::make_pair(wrench::Simulation::getHostnameList()[0], std::make_tuple(10, wrench::ComputeService::ALL_RAM))},
                             nullptr,
                             false,
                             nullptr,
@@ -1908,9 +1908,9 @@ private:
                     new wrench::StandardJobExecutor(
                             test->simulation,
                             my_mailbox,
-                            test->simulation->getHostnameList()[0],
+                            wrench::Simulation::getHostnameList()[0],
                             job,
-                            {std::make_pair(test->simulation->getHostnameList()[0], std::make_tuple(10, wrench::ComputeService::ALL_RAM))},
+                            {std::make_pair(wrench::Simulation::getHostnameList()[0], std::make_tuple(10, wrench::ComputeService::ALL_RAM))},
                             nullptr,
                             false,
                             nullptr,
@@ -2000,9 +2000,9 @@ private:
                     new wrench::StandardJobExecutor(
                             test->simulation,
                             my_mailbox,
-                            test->simulation->getHostnameList()[0],
+                            wrench::Simulation::getHostnameList()[0],
                             job,
-                            {std::make_pair(test->simulation->getHostnameList()[0], std::make_tuple(10, wrench::ComputeService::ALL_RAM))},
+                            {std::make_pair(wrench::Simulation::getHostnameList()[0], std::make_tuple(10, wrench::ComputeService::ALL_RAM))},
                             nullptr,
                             false,
                             nullptr,
@@ -2192,10 +2192,10 @@ public:
                     new wrench::StandardJobExecutor(
                             test->simulation,
                             my_mailbox,
-                            test->simulation->getHostnameList()[0],
+                            wrench::Simulation::getHostnameList()[0],
                             job,
-                            {std::make_pair(test->simulation->getHostnameList()[0], std::make_tuple(10, wrench::ComputeService::ALL_RAM)),
-                             std::make_pair(test->simulation->getHostnameList()[1], std::make_tuple(10, wrench::ComputeService::ALL_RAM))},
+                            {std::make_pair(wrench::Simulation::getHostnameList()[0], std::make_tuple(10, wrench::ComputeService::ALL_RAM)),
+                             std::make_pair(wrench::Simulation::getHostnameList()[1], std::make_tuple(10, wrench::ComputeService::ALL_RAM))},
                             nullptr,
                             false,
                             nullptr,
@@ -2282,10 +2282,10 @@ public:
                     new wrench::StandardJobExecutor(
                             test->simulation,
                             my_mailbox,
-                            test->simulation->getHostnameList()[0],
+                            wrench::Simulation::getHostnameList()[0],
                             job,
-                            {std::make_pair(test->simulation->getHostnameList()[0], std::make_tuple(10, wrench::ComputeService::ALL_RAM)),
-                             std::make_pair(test->simulation->getHostnameList()[1], std::make_tuple(10, wrench::ComputeService::ALL_RAM))},
+                            {std::make_pair(wrench::Simulation::getHostnameList()[0], std::make_tuple(10, wrench::ComputeService::ALL_RAM)),
+                             std::make_pair(wrench::Simulation::getHostnameList()[1], std::make_tuple(10, wrench::ComputeService::ALL_RAM))},
                             nullptr,
                             false,
                             nullptr,
@@ -2997,9 +2997,9 @@ private:
                 new wrench::StandardJobExecutor(
                         test->simulation,
                         my_mailbox,
-                        test->simulation->getHostnameList()[0],
+                        wrench::Simulation::getHostnameList()[0],
                         job,
-                        {std::make_pair(test->simulation->getHostnameList()[0],
+                        {std::make_pair(wrench::Simulation::getHostnameList()[0],
                                         std::make_tuple(10, wrench::ComputeService::ALL_RAM))},
                         nullptr,
                         false,

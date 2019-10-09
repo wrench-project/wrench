@@ -155,7 +155,7 @@ private:
 
         {
 
-            std::vector<std::string> simulation_hosts = simulation->getHostnameList();
+            std::vector<std::string> simulation_hosts = wrench::Simulation::getHostnameList();
 
             //Now based on this default speed, (100MF), execute a job requiring 10^10 flops and check the time
             wrench::WorkflowTask *task = this->getWorkflow()->addTask("task1", 10000000000, 1, 1, 1.0, 1.0);
@@ -176,9 +176,9 @@ private:
                     new wrench::StandardJobExecutor(
                             test->simulation,
                             my_mailbox,
-                            test->simulation->getHostnameList()[1],
+                            wrench::Simulation::getHostnameList()[1],
                             job,
-                            {std::make_pair(test->simulation->getHostnameList()[1], std::make_tuple(1, wrench::ComputeService::ALL_RAM))},
+                            {std::make_pair(wrench::Simulation::getHostnameList()[1], std::make_tuple(1, wrench::ComputeService::ALL_RAM))},
                             nullptr,
                             false,
                             nullptr,
@@ -298,7 +298,7 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionTests_test() {
     EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a Storage Service
     EXPECT_NO_THROW(storage_service1 = simulation->add(
@@ -389,9 +389,9 @@ private:
                     new wrench::StandardJobExecutor(
                             test->simulation,
                             my_mailbox,
-                            test->simulation->getHostnameList()[1],
+                            wrench::Simulation::getHostnameList()[1],
                             job,
-                            {std::make_pair(test->simulation->getHostnameList()[1],
+                            {std::make_pair(wrench::Simulation::getHostnameList()[1],
                                             std::make_tuple(1, wrench::ComputeService::ALL_RAM))},
                             nullptr,
                             false,
@@ -453,7 +453,7 @@ void EnergyConsumptionTest::do_EnergyConsumption_test() {
     EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a Storage Service
     EXPECT_NO_THROW(storage_service1 = simulation->add(
@@ -523,7 +523,7 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
         {
-            std::vector<std::string> simulation_hosts = test->simulation->getHostnameList();
+            std::vector<std::string> simulation_hosts = wrench::Simulation::getHostnameList();
 
             int cur_pstate = this->simulation->getCurrentPstate(simulation_hosts[1]);
             double cur_max_possible = this->simulation->getMaxPowerConsumption(simulation_hosts[1]);
@@ -606,7 +606,7 @@ void EnergyConsumptionTest::do_SimpleApiChecksEnergy_test() {
     EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a Storage Service
     EXPECT_NO_THROW(storage_service1 = simulation->add(
@@ -679,7 +679,7 @@ private:
         auto job_manager = this->createJobManager();
 
         {
-            std::vector<std::string> simulation_hosts = test->simulation->getHostnameList();
+            std::vector<std::string> simulation_hosts = wrench::Simulation::getHostnameList();
 
             //Now based on this default speed, (100MF), execute a job requiring 10^10 flops and check the time
             wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 10000000000, 1, 1, 1.0, 1.0);
@@ -711,9 +711,9 @@ private:
                     new wrench::StandardJobExecutor(
                             test->simulation,
                             my_mailbox,
-                            test->simulation->getHostnameList()[1],
+                            wrench::Simulation::getHostnameList()[1],
                             job1,
-                            {std::make_pair(test->simulation->getHostnameList()[1], std::make_tuple(1, wrench::ComputeService::ALL_RAM))},
+                            {std::make_pair(wrench::Simulation::getHostnameList()[1], std::make_tuple(1, wrench::ComputeService::ALL_RAM))},
                             nullptr,
                             false,
                             nullptr,
@@ -762,9 +762,9 @@ private:
                     new wrench::StandardJobExecutor(
                             test->simulation,
                             my_mailbox,
-                            test->simulation->getHostnameList()[1],
+                            wrench::Simulation::getHostnameList()[1],
                             job2,
-                            {std::make_pair(test->simulation->getHostnameList()[1], std::make_tuple(1, wrench::ComputeService::ALL_RAM))},
+                            {std::make_pair(wrench::Simulation::getHostnameList()[1], std::make_tuple(1, wrench::ComputeService::ALL_RAM))},
                             nullptr,
                             false,
                             nullptr,
@@ -840,7 +840,7 @@ void EnergyConsumptionTest::do_EnergyConsumptionPStateChange_test() {
     EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a Storage Service
     EXPECT_NO_THROW(storage_service1 = simulation->add(
@@ -914,7 +914,7 @@ private:
         auto job_manager = this->createJobManager();
 
         {
-            std::vector<std::string> simulation_hosts = test->simulation->getHostnameList();
+            std::vector<std::string> simulation_hosts = wrench::Simulation::getHostnameList();
 
             double after_current_energy_consumed_by_host1 = this->simulation->getEnergyConsumed(simulation_hosts[1]);
 
