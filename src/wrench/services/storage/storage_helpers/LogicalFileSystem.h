@@ -52,6 +52,7 @@ namespace wrench {
         static std::set<std::string> mount_points;
 
 
+        std::string hostname;
         std::string mount_point;
         double total_capacity;
         double occupied_space;

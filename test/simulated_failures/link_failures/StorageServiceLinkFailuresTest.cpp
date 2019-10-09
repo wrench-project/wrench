@@ -116,7 +116,7 @@ private:
 
         for (int trial = 0; trial < NUM_FILES; trial++) {
             auto potential_file = this->test->files.at(dist_files(rng));
-            if (ss->lookupFile(potential_file, wrench::FileLocation::LOCATION(ss))) {
+            if (wrench::StorageService::lookupFile(potential_file, wrench::FileLocation::LOCATION(ss))) {
                 return potential_file;
             }
         }
@@ -134,7 +134,8 @@ private:
             destination = wrench::FileLocation::LOCATION(this->test->storage_services.at(dist_storage(rng)));
 
         auto file = findRandomFileOnStorageService(source->getStorageService());
-        if ((file != nullptr) && (not destination->getStorageService()->lookupFile(file, destination))){
+        if ((file != nullptr) &&
+            (not wrench::StorageService::lookupFile(file, destination))) {
             this->data_movement_manager->doSynchronousFileCopy(
                     file, source, destination, this->test->file_registry_service);
         }
@@ -151,7 +152,8 @@ private:
             destination = wrench::FileLocation::LOCATION(this->test->storage_services.at(dist_storage(rng)));
 
         auto file = findRandomFileOnStorageService(source->getStorageService());
-        if ((file == nullptr) || (destination->getStorageService()->lookupFile(file, destination))) {
+        if ((file == nullptr) ||
+            (wrench::StorageService::lookupFile(file, destination))) {
             return;
         }
 
