@@ -544,7 +544,7 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -710,7 +710,7 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopy_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a  Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -850,7 +850,7 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopy_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -1047,7 +1047,7 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopyFailures_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -1258,7 +1258,7 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopyFailures_test() 
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -1520,7 +1520,7 @@ void SimpleStorageServiceFunctionalTest::do_Partitions_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create 2 Storage Services
     ASSERT_NO_THROW(storage_service_1000 = simulation->add(
@@ -1633,7 +1633,7 @@ void SimpleStorageServiceFunctionalTest::do_FileWrite_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create 2 Storage Services
     ASSERT_NO_THROW(storage_service_100 = simulation->add(

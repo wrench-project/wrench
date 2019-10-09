@@ -150,8 +150,8 @@ private:
     int main() {
 
         std::pair<std::string, std::string> hosts_to_compute_proximity;
-        hosts_to_compute_proximity = std::make_pair(this->simulation->getHostnameList()[2],
-                                                    this->simulation->getHostnameList()[1]);
+        hosts_to_compute_proximity = std::make_pair(wrench::Simulation::getHostnameList()[2],
+                                                    wrench::Simulation::getHostnameList()[1]);
         int count = 0, max_count = 100;
         auto network_proximity_services = this->getAvailableNetworkProximityServices();
         auto network_proximity_service = network_proximity_services.begin();
@@ -213,7 +213,7 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -233,13 +233,13 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
     // Get a host for network proximity host
-    std::string network_proximity_db_hostname = simulation->getHostnameList()[1];
+    std::string network_proximity_db_hostname = wrench::Simulation::getHostnameList()[1];
 
     //Get two hosts to communicate with each other for proximity value
-    std::string network_daemon1 = simulation->getHostnameList()[0];
-    std::string network_daemon2 = simulation->getHostnameList()[1];
-    std::string network_daemon3 = simulation->getHostnameList()[2];
-    std::string network_daemon4 = simulation->getHostnameList()[3];
+    std::string network_daemon1 = wrench::Simulation::getHostnameList()[0];
+    std::string network_daemon2 = wrench::Simulation::getHostnameList()[1];
+    std::string network_daemon3 = wrench::Simulation::getHostnameList()[2];
+    std::string network_daemon4 = wrench::Simulation::getHostnameList()[3];
     std::vector<std::string> hosts_in_network = {network_daemon1, network_daemon2, network_daemon3, network_daemon4};
 
     std::shared_ptr<wrench::NetworkProximityService> network_proximity_service = nullptr;
@@ -343,8 +343,8 @@ private:
 
 
         std::pair<std::string, std::string> first_pair_to_compute_proximity;
-        first_pair_to_compute_proximity = std::make_pair(this->simulation->getHostnameList()[0],
-                                                         this->simulation->getHostnameList()[1]);
+        first_pair_to_compute_proximity = std::make_pair(wrench::Simulation::getHostnameList()[0],
+                                                         wrench::Simulation::getHostnameList()[1]);
         int count = 0, max_count = 1000;
         double first_pair_proximity = (*(this->getAvailableNetworkProximityServices().begin()))->getHostPairDistance(
                 first_pair_to_compute_proximity).first;
@@ -366,8 +366,8 @@ private:
 
 
         std::pair<std::string, std::string> second_pair_to_compute_proximity;
-        second_pair_to_compute_proximity = std::make_pair(this->simulation->getHostnameList()[2],
-                                                          this->simulation->getHostnameList()[3]);
+        second_pair_to_compute_proximity = std::make_pair(wrench::Simulation::getHostnameList()[2],
+                                                          wrench::Simulation::getHostnameList()[3]);
         count = 0, max_count = 1000;
         double second_pair_proximity = (*(this->getAvailableNetworkProximityServices().begin()))->getHostPairDistance(
                 second_pair_to_compute_proximity).first;
@@ -414,7 +414,7 @@ void NetworkProximityTest::do_CompareNetworkProximity_Test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
 
 
@@ -437,13 +437,13 @@ void NetworkProximityTest::do_CompareNetworkProximity_Test() {
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
     // Get a host for network proximity host
-    std::string network_proximity_db_hostname = simulation->getHostnameList()[1];
+    std::string network_proximity_db_hostname = wrench::Simulation::getHostnameList()[1];
 
     //Get two hosts to communicate with each other for proximity value
-    std::string network_daemon1 = simulation->getHostnameList()[0];
-    std::string network_daemon2 = simulation->getHostnameList()[1];
-    std::string network_daemon3 = simulation->getHostnameList()[2];
-    std::string network_daemon4 = simulation->getHostnameList()[3];
+    std::string network_daemon1 = wrench::Simulation::getHostnameList()[0];
+    std::string network_daemon2 = wrench::Simulation::getHostnameList()[1];
+    std::string network_daemon3 = wrench::Simulation::getHostnameList()[2];
+    std::string network_daemon4 = wrench::Simulation::getHostnameList()[3];
     std::vector<std::string> hosts_in_network = {network_daemon1, network_daemon2, network_daemon3, network_daemon4};
 
     std::shared_ptr<wrench::NetworkProximityService> network_proximity_service;
@@ -589,7 +589,7 @@ void NetworkProximityTest::do_VivaldiConverge_Test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -610,13 +610,13 @@ void NetworkProximityTest::do_VivaldiConverge_Test() {
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
     // Get a host for network proximity host
-    std::string network_proximity_db_hostname = simulation->getHostnameList()[1];
+    std::string network_proximity_db_hostname = wrench::Simulation::getHostnameList()[1];
 
     //Get two hosts to communicate with each other for proximity value
-    std::string host1 = simulation->getHostnameList()[0];
-    std::string host2 = simulation->getHostnameList()[1];
-    std::string host3 = simulation->getHostnameList()[2];
-    std::string host4 = simulation->getHostnameList()[3];
+    std::string host1 = wrench::Simulation::getHostnameList()[0];
+    std::string host2 = wrench::Simulation::getHostnameList()[1];
+    std::string host3 = wrench::Simulation::getHostnameList()[2];
+    std::string host4 = wrench::Simulation::getHostnameList()[3];
     std::vector<std::string> hosts_in_network = {host1, host2, host3, host4};
 
     std::shared_ptr<wrench::NetworkProximityService> alltoall_network_service = nullptr;
@@ -694,7 +694,7 @@ void NetworkProximityTest::do_ValidateProperties_Test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -713,11 +713,11 @@ void NetworkProximityTest::do_ValidateProperties_Test() {
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
     // Get a host for network proximity host
-    std::string network_proximity_db_hostname = simulation->getHostnameList()[1];
+    std::string network_proximity_db_hostname = wrench::Simulation::getHostnameList()[1];
 
     //Get two hosts to communicate with each other for proximity value
-    std::string host1 = simulation->getHostnameList()[0];
-    std::string host2 = simulation->getHostnameList()[1];
+    std::string host1 = wrench::Simulation::getHostnameList()[0];
+    std::string host2 = wrench::Simulation::getHostnameList()[1];
     std::vector<std::string> hosts_in_network = {host1, host2};
 
     std::shared_ptr<wrench::NetworkProximityService> nps = nullptr;

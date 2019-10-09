@@ -188,14 +188,14 @@ void MultipleWMSTest::do_deferredWMSStartOneWMS_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
             new wrench::SimpleStorageService(hostname, {"/"})));
 
     // Create a Cloud Service
-    std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
+    std::vector<std::string> execution_hosts = {wrench::Simulation::getHostnameList()[1]};
     ASSERT_NO_THROW(compute_service = simulation->add(new wrench::CloudComputeService(
             hostname, execution_hosts, "/scratch",
             {{wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
@@ -241,14 +241,14 @@ void MultipleWMSTest::do_deferredWMSStartTwoWMS_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
             new wrench::SimpleStorageService(hostname, {"/"})));
 
     // Create a Cloud Service
-    std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
+    std::vector<std::string> execution_hosts = {wrench::Simulation::getHostnameList()[1]};
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::CloudComputeService(hostname, execution_hosts, "/scratch",
                                             {{wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
