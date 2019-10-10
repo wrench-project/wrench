@@ -313,9 +313,8 @@ namespace wrench {
             task->setExecutionHost(this->hostname);
             task->setNumCoresAllocated(this->num_cores);
 
-            this->simulation->getOutput().addTimestamp<SimulationTimestampTaskStart>(new
-                                                                                             SimulationTimestampTaskStart(
-                    task));
+            this->simulation->getOutput().addTimestamp<SimulationTimestampTaskStart>(
+                    new SimulationTimestampTaskStart(task));
             this->task_start_timestamp_has_been_inserted = true;
 
             // Read  all input files
@@ -336,6 +335,8 @@ namespace wrench {
                     }
                 }
                 StorageService::readFiles(files_to_read);
+                WRENCH_INFO("SETTING TASK %s's READ INPUT END DATE TO %lf",
+                        task->getID().c_str(), S4U_Simulation::getClock());
                 task->setReadInputEndDate(S4U_Simulation::getClock());
             } catch (WorkflowExecutionException &e) {
                 this->failure_timestamp_should_be_generated = true;
