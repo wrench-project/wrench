@@ -705,6 +705,15 @@ void VirtualizedClusterServiceTest::do_VMMigrationTest_test() {
 
     // Create a Virtualized Cluster Service
     std::vector<std::string> execution_hosts = wrench::Simulation::getHostnameList();
+    try {compute_service = simulation->add(
+            new wrench::VirtualizedClusterComputeService(hostname, execution_hosts, "/scratch",
+                                                         {{wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS,
+                                                                  "false"}}));
+    } catch (std::invalid_argument &e) {
+        WRENCH_INFO("---> %s", e.what());
+    }
+
+
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::VirtualizedClusterComputeService(hostname, execution_hosts, "/scratch",
                                                          {{wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS,
@@ -721,6 +730,7 @@ void VirtualizedClusterServiceTest::do_VMMigrationTest_test() {
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on the storage service
+    simulation->stageFile(input_file, storage_service);
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
     // Running a "run a single task" simulation

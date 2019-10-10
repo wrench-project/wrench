@@ -29,6 +29,8 @@ namespace wrench {
 
         explicit LogicalFileSystem(std::string hostname, std::string mount_point);
 
+        void init();
+
         double getTotalCapacity();
         bool hasEnoughFreeSpace(double bytes);
         double getFreeSpace();
@@ -49,6 +51,10 @@ namespace wrench {
         std::map<std::string, std::set<WorkflowFile*>> content;
     private:
 
+        friend class StorageService;
+
+        void stageFile(WorkflowFile *file, std::string absolute_path);
+
         static std::set<std::string> mount_points;
 
 
@@ -58,6 +64,13 @@ namespace wrench {
         double occupied_space;
         std::map<std::string, double> reserved_space;
 
+        bool initialized;
+
+        void assertInitHasBeenCalled() {
+            if (not this->initialized) {
+                throw std::runtime_error("LogicalFileSystem::assertInitHasBeenCalled(): A logical file system needs to be initialized before it's been called");
+            }
+        }
         void assertDirectoryExist(std::string absolute_path) {
             if (not this->doesDirectoryExist(absolute_path)) {
                 throw std::invalid_argument("LogicalFileSystem::assertDirectoryExists(): directory " + absolute_path + " does not exist");

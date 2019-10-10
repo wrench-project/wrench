@@ -97,14 +97,11 @@ namespace wrench {
 
         auto fs = this->file_systems[mountpoint].get();
 
-        if (not fs->hasEnoughFreeSpace(file->getSize())) {
-            throw std::runtime_error("StorageService::stageFile(): Not enough storage space at location to stage file");
+        try {
+            fs->stageFile(file, directory);
+        } catch (std::exception &e) {
+            throw;
         }
-
-        if (not fs->doesDirectoryExist(directory)) {
-            fs->createDirectory(directory);
-        }
-        fs->storeFileInDirectory(file, directory);
     }
 
     /**
