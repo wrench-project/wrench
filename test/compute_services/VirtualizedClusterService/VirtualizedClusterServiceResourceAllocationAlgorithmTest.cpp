@@ -47,9 +47,17 @@ protected:
                           "             <prop id=\"size\" value=\"100B\"/>"
                           "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
-                          "          <disk id=\"scratch_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "          <disk id=\"scratch_disk1\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
                           "             <prop id=\"size\" value=\"100B\"/>"
-                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch1\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch_disk2\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch2\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch_disk3\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch3\"/>"
                           "          </disk>"
                           "       </host> "
                           "       <host id=\"4Cores10RAM\" speed=\"1f\" core=\"4\"> "
@@ -57,11 +65,18 @@ protected:
                           "             <prop id=\"size\" value=\"100B\"/>"
                           "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
-                          "          <disk id=\"scratch_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "          <disk id=\"scratch_disk1\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
                           "             <prop id=\"size\" value=\"100B\"/>"
-                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch1\"/>"
                           "          </disk>"
-                          "       </host> "
+                          "          <disk id=\"scratch_disk2\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch2\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch_disk3\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch3\"/>"
+                          "          </disk>"
                           "         <prop id=\"ram\" value=\"10B\"/> "
                           "       </host> "
                           "       <host id=\"2Cores20RAM\" speed=\"1f\" core=\"2\"> "
@@ -69,11 +84,18 @@ protected:
                           "             <prop id=\"size\" value=\"100B\"/>"
                           "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
-                          "          <disk id=\"scratch_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "          <disk id=\"scratch_disk1\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
                           "             <prop id=\"size\" value=\"100B\"/>"
-                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch1\"/>"
                           "          </disk>"
-                          "       </host> "
+                          "          <disk id=\"scratch_disk2\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch2\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch_disk3\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch3\"/>"
+                          "          </disk>"
                           "         <prop id=\"ram\" value=\"20B\"/> "
                           "       </host> "
                           "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
@@ -211,19 +233,19 @@ void VirtualizedClusterServiceResourceAllocationTest::do_VMResourceAllocationAlg
     cloud_service_first_fit = simulation->add(
             new wrench::CloudComputeService(hostname,
                                             compute_hosts,
-                                            {"/scratch"},
+                                            {"/scratch1"},
                                             {{wrench::CloudComputeServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM, "first-fit"}}));
 
     cloud_service_best_fit_ram_first = simulation->add(
             new wrench::CloudComputeService(hostname,
                                             compute_hosts,
-                                            {"/scratch"},
+                                            {"/scratch2"},
                                             {{wrench::CloudComputeServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM, "best-fit-ram-first"}}));
 
     cloud_service_best_fit_cores_first = simulation->add(
             new wrench::CloudComputeService(hostname,
                                             compute_hosts,
-                                            {"/scratch"},
+                                            {"/scratch3"},
                                             {{wrench::CloudComputeServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM, "best-fit-cores-first"}}));
 
     // Create a WMS
