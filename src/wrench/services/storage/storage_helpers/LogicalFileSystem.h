@@ -27,7 +27,7 @@ namespace wrench {
 
     public:
 
-        explicit LogicalFileSystem(std::string hostname, std::string mount_point);
+        explicit LogicalFileSystem(std::string hostname, std::string ss_name, std::string mount_point);
 
         void init();
 
@@ -55,10 +55,11 @@ namespace wrench {
 
         void stageFile(WorkflowFile *file, std::string absolute_path);
 
-        static std::set<std::string> mount_points;
+        static std::map<std::string, std::string> mount_points;
 
 
         std::string hostname;
+        std::string ss_name;
         std::string mount_point;
         double total_capacity;
         double occupied_space;

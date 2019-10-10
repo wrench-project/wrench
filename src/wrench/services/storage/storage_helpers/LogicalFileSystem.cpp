@@ -15,13 +15,15 @@ WRENCH_LOG_NEW_DEFAULT_CATEGORY(logical_file_system, "Log category for Logical F
 
 namespace wrench {
 
-    std::set<std::string> LogicalFileSystem::mount_points;
+    std::map<std::string, std::string> LogicalFileSystem::mount_points;
 
     /**
      * @brief Constructor
+     * @param hostname: the host on which the file system is located
+     * @param ss_name: the storage service this file system is for
      * @param mount_point: the mount point
      */
-    LogicalFileSystem::LogicalFileSystem(std::string hostname, std::string mount_point) {
+    LogicalFileSystem::LogicalFileSystem(std::string hostname, std::string ss_name, std::string mount_point) {
 
         mount_point = FileLocation::sanitizePath("/" + mount_point + "/");
 
@@ -35,11 +37,11 @@ namespace wrench {
 
             // Check non-proper-prefixness
             for (auto const &mp : LogicalFileSystem::mount_points) {
-                if (mp == hostname+":"+"/") {
+                if (mp.first == hostname+":"+"/") {
                     continue;  // "/" is obviously a prefix, but it's ok
                 }
 //                WRENCH_INFO("COMPARING %s TO %s", (hostname + ":" + mount_point).c_str(), mp.c_str());
-                if ((mp.find(hostname + ":" + mount_point) == 0) or ((hostname + ":" + mount_point).find(mp) == 0)) {
+                if ((mp.first.find(hostname + ":" + mount_point) == 0) or ((hostname + ":" + mount_point).find(mp.first) == 0)) {
                     throw std::invalid_argument(
                             "LogicalFileSystem::LogicalFileSystem(): An existing mount point that has as prefix or is a prefix of '" +
                             mount_point + "' already exists at host " + hostname);
@@ -50,6 +52,7 @@ namespace wrench {
 
 
         this->hostname = hostname;
+        this->ss_name = ss_name;
         this->mount_point = mount_point;
         this->content["/"] = {};
         this->total_capacity = S4U_Simulation::getDiskCapacity(hostname, mount_point);
@@ -64,11 +67,15 @@ namespace wrench {
      */
     void LogicalFileSystem::init() {
         // Check uniqueness
-        if (LogicalFileSystem::mount_points.find(hostname+":"+mount_point) != LogicalFileSystem::mount_points.end()) {
-            throw std::invalid_argument("LogicalFileSystem::init(): A FileSystem with mount point " +
-                                        mount_point + " at host " + hostname + " already exists");
+
+        if (LogicalFileSystem::mount_points.find(this->hostname +  ":" + this->mount_point)
+            != LogicalFileSystem::mount_points.end()) {
+            if (LogicalFileSystem::mount_points[this->hostname +  ":" + this->mount_point] != this->ss_name) {
+                throw std::invalid_argument("LogicalFileSystem::init(): A FileSystem with mount point " +
+                                            this->mount_point + " at host " + this->hostname + " already exists");
+            }
         }
-        LogicalFileSystem::mount_points.insert(hostname+":"+mount_point);
+        LogicalFileSystem::mount_points[this->hostname + ":" + this->mount_point] = this->ss_name;
         this->initialized = true;
     }
 
