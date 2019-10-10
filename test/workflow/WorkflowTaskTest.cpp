@@ -383,6 +383,7 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
 
 // none of the values should be -1 except task_failure
     for (auto &value : t4_successful_execution_history_values) {
+        WRENCH_INFO("VALUE=%lf", value);
         ASSERT_NE(value, -1.0);
     }
 
