@@ -418,9 +418,7 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(st
     simulation->init(&argc, argv);
 
     // Setting up the platform
-  WRENCH_INFO("HERE");
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
-  WRENCH_INFO("DONE!");
 
     // Create Storage Services
     if (args.find("storage1") != args.end()) {

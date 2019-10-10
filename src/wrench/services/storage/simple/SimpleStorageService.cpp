@@ -115,10 +115,12 @@ namespace wrench {
         }
 
 
-        std::string message = "Simple Storage service %s starting on host %s:";
+        std::string message = "Simple Storage service " + this->getName() +
+                "  starting on host "  + this->getHostname();
         for (auto const &fs : this->file_systems) {
-            message += "\n\t- " + fs.first + ": " + std::to_string(fs.second->getFreeSpace()/(1000*1000*1000)) + "/" +
-                    std::to_string(fs.second->getTotalCapacity()/(1000*1000*1000)) + "GB";
+            message += "\n\t- " + fs.first + ": " +
+                    std::to_string(fs.second->getFreeSpace()) + "/" +
+                    std::to_string(fs.second->getTotalCapacity()) + " Bytes";
         }
         WRENCH_INFO("%s", message.c_str());
 
