@@ -675,7 +675,8 @@ namespace wrench {
             if (!p) {
                 p = "/";
             }
-            if (std::string(p) == mount_point) {
+
+            if (FileLocation::sanitizePath(std::string(p)) == FileLocation::sanitizePath(mount_point)) {
                 return true;
             }
         }

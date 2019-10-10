@@ -25,10 +25,10 @@ namespace wrench {
 
         mount_point = FileLocation::sanitizePath("/" + mount_point + "/");
 
-        // Check uniqueness
-        if (LogicalFileSystem::mount_points.find(hostname+":"+mount_point) != LogicalFileSystem::mount_points.end()) {
-            throw std::invalid_argument("LogicalFileSystem::LogicalFileSystem(): A FileSystem with mount point " +
-                                        mount_point + " at host " + hostname + " already exists");
+        // Check validity
+        if (not S4U_Simulation::hostHasMountPoint(hostname, mount_point)) {
+            throw std::invalid_argument("LogicalFileSystem::LogicalFileSystem(): Host " +
+                                        hostname + " does not have a disk mounted at " + mount_point);
         }
 
         if (mount_point != "/") { // "/" is obviously a prefix, but it's ok
@@ -40,23 +40,37 @@ namespace wrench {
                 }
 //                WRENCH_INFO("COMPARING %s TO %s", (hostname + ":" + mount_point).c_str(), mp.c_str());
                 if ((mp.find(hostname + ":" + mount_point) == 0) or ((hostname + ":" + mount_point).find(mp) == 0)) {
-                    throw std::invalid_argument("LogicalFileSystem::LogicalFileSystem(): An existing mount point that "
-                                                "has as prefix or is a prefix of '" + mount_point +
-                                                "' already exists at host " + hostname);
+                    throw std::invalid_argument(
+                            "LogicalFileSystem::LogicalFileSystem(): An existing mount point that has as prefix or is a prefix of '" +
+                            mount_point + "' already exists at host " + hostname);
                 }
             }
         }
 
 
-        LogicalFileSystem::mount_points.insert(hostname+":"+mount_point);
 
         this->hostname = hostname;
         this->mount_point = mount_point;
         this->content["/"] = {};
         this->total_capacity = S4U_Simulation::getDiskCapacity(hostname, mount_point);
         this->occupied_space = 0;
+        this->initialized = false;
     }
 
+
+
+    /**
+     * @brief Initializes the Logical File System (must be called before any other operation on this file system)
+     */
+    void LogicalFileSystem::init() {
+        // Check uniqueness
+        if (LogicalFileSystem::mount_points.find(hostname+":"+mount_point) != LogicalFileSystem::mount_points.end()) {
+            throw std::invalid_argument("LogicalFileSystem::init(): A FileSystem with mount point " +
+                                        mount_point + " at host " + hostname + " already exists");
+        }
+        LogicalFileSystem::mount_points.insert(hostname+":"+mount_point);
+        this->initialized = true;
+    }
 
 /**
  * @brief Create a new directory
@@ -66,6 +80,7 @@ namespace wrench {
  */
     void LogicalFileSystem::createDirectory(std::string absolute_path) {
 
+        assertInitHasBeenCalled();
         assertDirectoryDoesNotExist(absolute_path);
         this->content[absolute_path] = {};
     }
@@ -76,6 +91,7 @@ namespace wrench {
  * @return true if the directory exists
  */
     bool LogicalFileSystem::doesDirectoryExist(std::string absolute_path) {
+        assertInitHasBeenCalled();
         return (this->content.find(absolute_path) != this->content.end());
     }
 
@@ -88,6 +104,7 @@ namespace wrench {
  */
     bool LogicalFileSystem::isDirectoryEmpty(std::string absolute_path) {
 
+        assertInitHasBeenCalled();
         assertDirectoryExist(absolute_path);
         return (this->content[absolute_path].empty());
     }
@@ -99,6 +116,7 @@ namespace wrench {
  * @throw std::invalid_argument
  */
     void LogicalFileSystem::removeEmptyDirectory(std::string absolute_path) {
+        assertInitHasBeenCalled();
         assertDirectoryExist(absolute_path);
         assertDirectoryIsEmpty(absolute_path);
         this->content.erase(absolute_path);
@@ -111,12 +129,13 @@ namespace wrench {
  * @throw std::invalid_argument
  */
     void LogicalFileSystem::storeFileInDirectory(WorkflowFile *file, std::string absolute_path) {
+        assertInitHasBeenCalled();
         // If directory does not exit, create it
         if (not doesDirectoryExist(absolute_path)) {
             createDirectory(absolute_path);
         }
 
-      this->content[absolute_path].insert(file);
+        this->content[absolute_path].insert(file);
         std::string key = FileLocation::sanitizePath(absolute_path) + file->getID();
         if (this->reserved_space.find(key) == this->reserved_space.end()) {
             this->occupied_space += file->getSize();
@@ -133,6 +152,7 @@ namespace wrench {
  * @throw std::invalid_argument
  */
     void LogicalFileSystem::removeFileFromDirectory(WorkflowFile *file, std::string absolute_path) {
+        assertInitHasBeenCalled();
         assertDirectoryExist(absolute_path);
         assertFileIsInDirectory(file, absolute_path);
         this->content[absolute_path].erase(file);
@@ -146,6 +166,7 @@ namespace wrench {
  * @throw std::invalid_argument
  */
     void LogicalFileSystem::removeAllFilesInDirectory(std::string absolute_path) {
+        assertInitHasBeenCalled();
         assertDirectoryExist(absolute_path);
         this->content[absolute_path].clear();
     }
@@ -160,10 +181,12 @@ namespace wrench {
  * @throw std::invalid_argument
  */
     bool LogicalFileSystem::isFileInDirectory(WorkflowFile *file, std::string absolute_path) {
+        assertInitHasBeenCalled();
         // If directory does not exist, say "no"
         if (not doesDirectoryExist(absolute_path)) {
             return false;
         }
+
         return (this->content[absolute_path].find(file) != this->content[absolute_path].end());
     }
 
@@ -176,6 +199,7 @@ namespace wrench {
  * @throw std::invalid_argument
  */
     std::set<WorkflowFile *> LogicalFileSystem::listFilesInDirectory(std::string absolute_path) {
+        assertInitHasBeenCalled();
         assertDirectoryExist(absolute_path);
         return this->content[absolute_path];
     }
@@ -185,6 +209,7 @@ namespace wrench {
  * @return the total capacity
  */
     double LogicalFileSystem::getTotalCapacity() {
+        assertInitHasBeenCalled();
         return this->total_capacity;
     }
 
@@ -194,6 +219,7 @@ namespace wrench {
  * @return true if the number of bytes can fit
  */
     bool LogicalFileSystem::hasEnoughFreeSpace(double bytes) {
+        assertInitHasBeenCalled();
         return (this->total_capacity - this->occupied_space) >= bytes;
     }
 
@@ -202,6 +228,7 @@ namespace wrench {
  * @return the free space in bytes
  */
     double LogicalFileSystem::getFreeSpace() {
+        assertInitHasBeenCalled();
         return (this->total_capacity - this->occupied_space);
     }
 
@@ -212,6 +239,7 @@ namespace wrench {
  * @throw std::invalid_argument
  */
     void LogicalFileSystem::reserveSpace(WorkflowFile *file, std::string absolute_path) {
+        assertInitHasBeenCalled();
         std::string key = FileLocation::sanitizePath(absolute_path) + file->getID();
 
         if (this->total_capacity - this->occupied_space < file->getSize()) {
@@ -219,7 +247,7 @@ namespace wrench {
         }
         if (this->reserved_space.find(key) != this->reserved_space.end()) {
             WRENCH_WARN("LogicalFileSystem::reserveSpace(): Space was already being reserved for storing file %s at path %s:%s. This is likely a redundant copy",
-                                     file->getID().c_str(), this->hostname.c_str(), absolute_path.c_str());
+                        file->getID().c_str(), this->hostname.c_str(), absolute_path.c_str());
         } else {
             this->reserved_space[key] = file->getSize();
             this->occupied_space += file->getSize();
@@ -233,6 +261,7 @@ namespace wrench {
  * @throw std::invalid_argument
  */
     void LogicalFileSystem::unreserveSpace(WorkflowFile *file, std::string absolute_path) {
+        assertInitHasBeenCalled();
         std::string key = FileLocation::sanitizePath(absolute_path) + file->getID();
 
         if (this->reserved_space.find(key) == this->reserved_space.end()) {
@@ -250,4 +279,29 @@ namespace wrench {
         this->occupied_space -= file->getSize();
     }
 
+
+    /**
+     * @brief Stage file in directory
+     * @param absolute_path: the directory's absolute path (at the mount point)
+     *
+     * @throw std::invalid_argument
+     */
+    void LogicalFileSystem::stageFile(WorkflowFile *file, std::string absolute_path) {
+
+        // If Space is not sufficient, forget it
+        if (this->occupied_space + file->getSize() > this->total_capacity) {
+            throw std::invalid_argument("LogicalFileSystem::stageFile(): Insufficient space to store file " +
+                                        file->getID() + " at " + this->hostname + ":" + absolute_path);
+        }
+
+        absolute_path = wrench::FileLocation::sanitizePath(absolute_path);
+
+        // If directory does not exit, create it
+        if (this->content.find(absolute_path) == this->content.end()) {
+            this->content[absolute_path] = {};
+        }
+
+        this->content[absolute_path].insert(file);
+        this->occupied_space += file->getSize();
+    }
 }
