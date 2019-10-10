@@ -8,6 +8,9 @@
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
 
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(simulation_timestamp_file_copy_test, "Log category for SimulationTimestampFileCopyTest");
+
+
 class SimulationTimestampFileCopyTest : public ::testing::Test {
 
 public:
@@ -93,39 +96,39 @@ protected:
         auto dmm = this->createDataMovementManager();
 
         // regular copy with successful completion
+        WRENCH_INFO("DOING SYNCHRONOUS COPY");
         dmm->doSynchronousFileCopy(this->test->file_1,
                                    wrench::FileLocation::LOCATION(this->test->source_storage_service),
                                    wrench::FileLocation::LOCATION(this->test->destination_storage_service));
 
+        WRENCH_INFO("DOING ASYNCHRONOUS COPY");
         dmm->initiateAsynchronousFileCopy(this->test->xl_file,
                                           wrench::FileLocation::LOCATION(this->test->source_storage_service),
                                           wrench::FileLocation::LOCATION(this->test->destination_storage_service));
 
+        WRENCH_INFO("DOING SYNCHRONOUS COPY");
         dmm->doSynchronousFileCopy(this->test->file_2,
                                    wrench::FileLocation::LOCATION(this->test->source_storage_service),
                                    wrench::FileLocation::LOCATION(this->test->destination_storage_service));
 
+        WRENCH_INFO("DOING SYNCHRONOUS COPY");
         dmm->doSynchronousFileCopy(this->test->file_3,
                                    wrench::FileLocation::LOCATION(this->test->source_storage_service),
                                    wrench::FileLocation::LOCATION(this->test->destination_storage_service));
 
-        bool failed = false;
-
         // this should fail and a SimulationTimestampFileCopyFailure should be created
         try {
+        WRENCH_INFO("DOING SYNCHRONOUS COPY THAT WILL FAIL");
             dmm->doSynchronousFileCopy(this->test->too_large_file,
                                        wrench::FileLocation::LOCATION(this->test->source_storage_service),
                                        wrench::FileLocation::LOCATION(this->test->destination_storage_service));
 
-        } catch(wrench::WorkflowExecutionException &e) {
-            failed = true;
-        }
-        if (not failed) {
             throw std::runtime_error("file copy should have failed");
+        } catch(wrench::WorkflowExecutionException &e) {
         }
 
         // wait for xl_file file copy to complete
-        simulation->sleep(100);
+        wrench::Simulation::sleep(100);
 
         /*
          * expected outcome:

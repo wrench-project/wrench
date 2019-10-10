@@ -140,7 +140,6 @@ private:
             throw std::runtime_error("Synchronous file copy succeeded but file was not registered at DstHost");
         }
 
-        WRENCH_INFO("===========================================");
         // Do the same thing but kill the FileRegistryService first
 
         wrench::StorageService::deleteFile(this->test->src_file_1,
@@ -176,7 +175,6 @@ private:
             throw std::runtime_error("Got an exception while trying to instantiate a file copy: " + std::string(e.what()));
         }
 
-        WRENCH_INFO("===========================================");
         try {
             async_copy_event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {

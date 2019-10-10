@@ -335,8 +335,6 @@ namespace wrench {
                     }
                 }
                 StorageService::readFiles(files_to_read);
-                WRENCH_INFO("SETTING TASK %s's READ INPUT END DATE TO %lf",
-                        task->getID().c_str(), S4U_Simulation::getClock());
                 task->setReadInputEndDate(S4U_Simulation::getClock());
             } catch (WorkflowExecutionException &e) {
                 this->failure_timestamp_should_be_generated = true;
