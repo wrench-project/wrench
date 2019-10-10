@@ -254,3 +254,7 @@ td {
 #scale-input {
     width: 387px;
 }
+
+.error-text {
+    color: red;
+}
