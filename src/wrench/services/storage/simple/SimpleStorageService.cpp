@@ -118,7 +118,7 @@ namespace wrench {
         std::string message = "Simple Storage service " + this->getName() +
                 "  starting on host "  + this->getHostname();
         for (auto const &fs : this->file_systems) {
-            message += "\n\t- " + fs.first + ": " +
+            message += "\n\t- mount point " + fs.first + ": " +
                     std::to_string(fs.second->getFreeSpace()) + "/" +
                     std::to_string(fs.second->getTotalCapacity()) + " Bytes";
         }

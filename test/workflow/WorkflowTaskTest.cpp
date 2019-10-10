@@ -293,7 +293,7 @@ private:
 
         wrench::StandardJob *job_that_will_complete = job_manager->createStandardJob(this->test->t4,
                                                                                      {{this->test->small_input_file,
-                                                                                              wrench::FileLocation::LOCATION(this->test->storage_service)},
+                                                                                              wrench::FileLocation::LOCATION(this->test->backup_storage_service)},
                                                                                       {this->test->large_input_file,
                                                                                               wrench::FileLocation::LOCATION(this->test->storage_service)},
                                                                                       {this->test->t4_output_file,
@@ -383,7 +383,6 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
 
 // none of the values should be -1 except task_failure
     for (auto &value : t4_successful_execution_history_values) {
-        WRENCH_INFO("VALUE=%lf", value);
         ASSERT_NE(value, -1.0);
     }
 
