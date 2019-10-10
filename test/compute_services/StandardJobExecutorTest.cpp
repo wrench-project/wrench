@@ -2437,6 +2437,8 @@ private:
         auto job_manager = this->createJobManager();
 
 
+        wrench::StorageService::deleteFile(this->getWorkflow()->getFileByID("input_file"),
+                wrench::FileLocation::LOCATION(this->test->storage_service1));
         /**  Create a 4-task job and kill it **/
         {
             wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1.1", 3600, 6, 6, 1.0, 0);

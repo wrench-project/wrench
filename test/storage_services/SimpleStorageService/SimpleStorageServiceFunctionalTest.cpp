@@ -594,7 +594,7 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
     ASSERT_THROW(simulation->stageFile(nullptr, storage_service_100), std::invalid_argument);
 
     // Another bogus staging
-    ASSERT_THROW(simulation->stageFile(file_500, storage_service_100), std::runtime_error);
+    ASSERT_THROW(simulation->stageFile(file_500, storage_service_100), std::invalid_argument);
 
     // Staging all files on the 1000 storage service
     ASSERT_NO_THROW(simulation->stageFile(file_1, storage_service_1000));

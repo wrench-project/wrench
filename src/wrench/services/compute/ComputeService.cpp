@@ -82,7 +82,7 @@ namespace wrench {
      * @brief Terminate a previously-submitted job (which may or may not be running yet)
      *
      * @param job: the job to terminate
-     * 
+     *
      * @throw std::invalid_argument
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
