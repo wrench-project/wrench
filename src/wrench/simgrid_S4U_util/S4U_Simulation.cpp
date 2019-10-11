@@ -623,7 +623,7 @@ namespace wrench {
      * @param hostname: the host's name
      * @return a set of mount points
      *
-     * @htrow std::invalid_argument
+     * @throw std::invalid_argument
      */
     std::set<std::string> S4U_Simulation::getDisks(std::string hostname) {
 

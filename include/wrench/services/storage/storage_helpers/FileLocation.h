@@ -22,11 +22,18 @@ namespace wrench {
 
     class StorageService;
 
+    /**
+     * @brief  A class that encodes  a file location
+     */
     class FileLocation {
 
     public:
 
+        /**
+         * @brief Static location that denotes a compute service's scratch space
+         */
         static std::shared_ptr<FileLocation> SCRATCH;
+
         static std::shared_ptr<FileLocation> LOCATION(std::shared_ptr<StorageService> ss);
 
         static std::shared_ptr<FileLocation> LOCATION(std::shared_ptr<StorageService> ss,
@@ -39,6 +46,15 @@ namespace wrench {
 
         std::string toString();
 
+        /**
+         * @brief Method to compare two file locations
+         *
+         * @param lhs: a file location
+         * @param rhs: a file location
+         *
+         * @return true if both locations are equivalent
+         *
+         */
         static bool equal(const std::shared_ptr<FileLocation> &lhs,
             const std::shared_ptr<FileLocation> &rhs) {
           return ((lhs->getStorageService() == rhs->getStorageService()) and

@@ -23,6 +23,9 @@ namespace wrench {
     /***********************/
 
 
+    /**
+     * @brief  A class that implements a weak file system abstraction
+     */
     class LogicalFileSystem {
 
     public:
@@ -48,7 +51,6 @@ namespace wrench {
         std::set<WorkflowFile *> listFilesInDirectory(std::string absolute_path);
 
 
-        std::map<std::string, std::set<WorkflowFile*>> content;
     private:
 
         friend class StorageService;
@@ -57,6 +59,7 @@ namespace wrench {
 
         static std::map<std::string, std::string> mount_points;
 
+        std::map<std::string, std::set<WorkflowFile*>> content;
 
         std::string hostname;
         std::string ss_name;

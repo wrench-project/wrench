@@ -497,7 +497,7 @@ namespace wrench {
     *
     * @param file: a file to stage on a storage service
     * @param storage_service: a storage service
-    * @param absolute_path: the absolute path of the directory where the file should be stored
+    * @param directory_absolute_path: the absolute path of the directory where the file should be stored
     *
     * @throw std::runtime_error
     * @throw std::invalid_argument
