@@ -101,7 +101,7 @@ int main(int argc, char **argv) {
      * A batch service is an abstraction of a compute service that corresponds to
      * batch-scheduled platforms in which jobs are submitted to a queue and dispatched
      * to compute nodes according to various scheduling algorithms.
-     * In this example, this particular batch service has no scratch storage space (size = 0).
+     * In this example, this particular batch service has no scratch storage space (mount point = "").
      * The last argument to the constructor
      * shows how to configure particular simulated behaviors of the compute service via a property
      * list. In this example, one specifies that the message that will be send to the service to
@@ -113,7 +113,7 @@ int main(int argc, char **argv) {
     /* Add the batch service to the simulation, catching a possible exception */
     try {
         auto batch_service = simulation.add(new wrench::BatchComputeService(
-                batch_front_end_host, hostname_list, 0, {},
+                batch_front_end_host, hostname_list, "", {},
                 {{wrench::BatchComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 2048}}));
         compute_services.insert(batch_service);
     } catch (std::invalid_argument &e) {
