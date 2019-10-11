@@ -48,7 +48,7 @@ namespace wrench {
         bool getPropertyValueAsBoolean(std::string);
 
         void assertServiceIsUp();
-        static void assertServiceIsUp(std::shared_ptr<Service> s) { s->assertServiceIsUp(); };
+
 
         double getNetworkTimeoutValue();
         void setNetworkTimeoutValue(double value);
@@ -78,6 +78,12 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
+
+        /**
+         * @brief Assert for the service being up
+         * @param s: a service
+         */
+        static void assertServiceIsUp(std::shared_ptr<Service> s) { s->assertServiceIsUp(); };
 
         friend class Simulation;
 

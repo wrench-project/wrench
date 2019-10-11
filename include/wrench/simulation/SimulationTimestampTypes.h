@@ -136,11 +136,11 @@ namespace wrench {
      };
 
     class SimulationTimestampFileCopyStart;
+    class FileLocation;
 
     /**
      * @brief A base class for simulation timestamps regarding file copies
      */
-    class FileLocation;
     class SimulationTimestampFileCopy : public SimulationTimestampPair {
     public:
 

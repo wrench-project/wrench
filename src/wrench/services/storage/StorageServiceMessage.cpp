@@ -116,7 +116,7 @@ namespace wrench {
      * @brief Constructor
      * @param answer_mailbox: the mailbox to which to send the answer
      * @param file: the file
-     * @param dst_partition: the file partition from where the file will be deleted
+     * @param location: the file location
      * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
@@ -246,7 +246,7 @@ namespace wrench {
     * @brief Constructor
     * @param answer_mailbox: the mailbox to which to send the answer
     * @param file: the file
-    * @param dst_partition: the destination partition
+    * @param location: the file location
     * @param buffer_size: the buffer size
     * @param payload: the message size in bytes
     *
@@ -304,12 +304,12 @@ namespace wrench {
         this->data_write_mailbox_name = data_write_mailbox_name;
     }
 
-    /**
+  /**
    * @brief Constructor
    * @param answer_mailbox: the mailbox to which to send the answer
    * @param mailbox_to_receive_the_file_content: the mailbox to which to send the file content
    * @param file: the file
-   * @param src_partition: the partition where the file is stored
+   * @param location: the location where the file is stored
    * @param buffer_size: the requested buffer size
    * @param payload: the message size in bytes
    *
@@ -365,7 +365,9 @@ namespace wrench {
 
     /**
     * @brief Constructor
-    * @param file: the workflow data file
+    * @param file: the workflow data file to which this chunk belongs
+    * @param chunk_size: the chunk size
+    * @param last_chunk: whether this is the last chunk in the file
     */
     StorageServiceFileContentChunkMessage::StorageServiceFileContentChunkMessage(
             WorkflowFile *file, unsigned long chunk_size, bool last_chunk) : StorageServiceMessage(

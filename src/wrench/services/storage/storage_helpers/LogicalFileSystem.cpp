@@ -131,6 +131,8 @@ namespace wrench {
 
 /**
  * @brief Store file in directory
+ *
+ * @param file: the file to store
  * @param absolute_path: the directory's absolute path (at the mount point)
  *
  * @throw std::invalid_argument

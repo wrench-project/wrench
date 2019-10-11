@@ -155,7 +155,7 @@ namespace wrench {
     /**
      * @brief Add an entry
      * @param file: a file
-     * @param storage_service: a storage_service
+     * @param location: a file location
      *
      * @throw WorkflowExecutionException
      * @throw std::invalid_argument
@@ -198,7 +198,7 @@ namespace wrench {
     /**
      * @brief Remove an entry
      * @param file: a file
-     * @param storage_service: a storage service
+     * @param location: a file location
      *
      * @throw WorkflowExecutionException
      * @throw std::invalid_argument

@@ -84,6 +84,8 @@ namespace wrench {
 
     /**
      * @brief Give a <ss name>:<mount point>:<dir>" string for the location
+     *
+     * @return A string
      */
     std::string FileLocation::toString() {
         if (this == FileLocation::SCRATCH.get()) {
