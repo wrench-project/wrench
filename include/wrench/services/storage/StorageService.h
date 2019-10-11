@@ -19,7 +19,7 @@
 #include <wrench/workflow/execution_events/FailureCause.h>
 #include <wrench/services/file_registry/FileRegistryService.h>
 #include <wrench/workflow/job/StandardJob.h>
-#include <services/storage/storage_helpers/LogicalFileSystem.h>
+#include <wrench/services/storage/storage_helpers/LogicalFileSystem.h>
 #include <wrench/services/storage/storage_helpers/FileLocation.h>
 
 

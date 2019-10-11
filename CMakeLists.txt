@@ -182,7 +182,7 @@ set(SOURCE_FILES
         src/wrench/services/storage/StorageServiceMessage.h
         include/wrench/services/storage/storage_helpers/FileTransferThread.h
         src/wrench/services/storage/storage_helpers/LogicalFileSystem.cpp
-        src/wrench/services/storage/storage_helpers/LogicalFileSystem.h
+        include/wrench/services/storage/storage_helpers/LogicalFileSystem.h
         src/wrench/services/storage/storage_helpers/FileTransferThread.cpp
         src/wrench/services/storage/storage_helpers/FileTransferThreadMessage.h
         src/wrench/services/storage/storage_helpers/FileLocation.cpp
