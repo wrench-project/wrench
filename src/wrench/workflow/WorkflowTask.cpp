@@ -395,22 +395,6 @@ namespace wrench {
         this->cluster_id = id;
     }
 
-//    /**
-//     * @brief Get the workflow task type
-//     * @return a workflow task type
-//     */
-//    WorkflowTask::TaskType WorkflowTask::getTaskType() const {
-//        return this->task_type;
-//    }
-//
-//    /**
-//     * @brief Set the task type
-//     * @param task_type: task type
-//     */
-//    void WorkflowTask::setTaskType(wrench::WorkflowTask::TaskType task_type) {
-//        this->task_type = task_type;
-//    }
-
     /**
      * @brief Get the task priority. By default, priority is 0.
      * @return the task priority

@@ -178,10 +178,11 @@ namespace wrench {
     };
 
 
+    class FileLocation;
+
     /**
      * @brief A "file is already being copied" failure cause
      */
-    class FileLocation;
     class FileAlreadyBeingCopied : public FailureCause {
 
 

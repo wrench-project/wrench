@@ -163,6 +163,7 @@ namespace wrench {
      * @brief Synchronously asks the storage service whether it holds a file
      *
      * @param file: the file
+     * @param location: the file location
      *
      * @return true or false
      *
@@ -394,7 +395,6 @@ namespace wrench {
     /**
      * @brief Synchronously and sequentially read a set of files from storage services
      *
-     * @param files: the set of files to read
      * @param locations: a map of files to locations
      *
      * @throw std::runtime_error
@@ -407,7 +407,6 @@ namespace wrench {
     /**
      * @brief Synchronously and sequentially upload a set of files from storage services
      *
-     * @param files: the set of files to write
      * @param locations: a map of files to locations
      *
      * @throw std::runtime_error
@@ -531,7 +530,8 @@ namespace wrench {
      * @brief Synchronously ask the storage service to read a file from another storage service
      *
      * @param file: the file to copy
-     * @param src: the storage service from which to read the file
+     * @param src_location: the location where to read the file
+     * @param dst_location: the location where to write the file
      *
      * @throw WorkflowExecutionException
      * @throw std::invalid_argument
@@ -686,6 +686,8 @@ namespace wrench {
 
     /**
     * @brief Checked whether the storage service has a particular mount point
+    * @param mp: a mount point
+    *
     * @return true whether the service has that mount point
     */
     bool StorageService::hasMountPoint(std::string mp) {
