@@ -107,7 +107,7 @@ int main(int argc, char **argv) {
     /* Instantiate a cloud service, to be started on some host in the simulation platform.
      * A cloud service is an abstraction of a compute service that corresponds to a
      * Cloud platform that provides access to virtualized compute resources.
-     * In this example, this particular cloud service has no scratch storage space (size = 0).
+     * In this example, this particular cloud service has no scratch storage space (mount point = "").
      * The last argument to the constructor
      * shows how to configure particular simulated behaviors of the compute service via a property
      * list. In this example, one specified that the message that will be send to the service to
@@ -119,7 +119,7 @@ int main(int argc, char **argv) {
     /* Add the cloud service to the simulation, catching a possible exception */
     try {
         auto cloud_service = simulation.add(new wrench::CloudComputeService(
-                wms_host, execution_hosts, 0, {},
+                wms_host, execution_hosts, "", {},
                 {{wrench::CloudComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024}}));
         compute_services.insert(cloud_service);
     } catch (std::invalid_argument &e) {
