@@ -165,7 +165,6 @@ private:
 
         auto file_registry_service = this->getAvailableFileRegistryService();
 
-#if 1
         // Time the time it takes to transfer a file from Src to Dst
         double copy1_start = wrench::Simulation::getCurrentSimulatedDate();
         data_movement_manager->initiateAsynchronousFileCopy(this->test->file_1,
@@ -175,7 +174,6 @@ private:
         std::shared_ptr<wrench::WorkflowExecutionEvent> event1 = this->getWorkflow()->waitForNextExecutionEvent();
         double event1_arrival = wrench::Simulation::getCurrentSimulatedDate();
 
-#endif
         // Now do 2 of them in parallel
         double copy2_start = wrench::Simulation::getCurrentSimulatedDate();
         data_movement_manager->initiateAsynchronousFileCopy(this->test->file_2,
@@ -194,12 +192,9 @@ private:
         std::shared_ptr<wrench::WorkflowExecutionEvent> event3 = this->getWorkflow()->waitForNextExecutionEvent();
         double event3_arrival = wrench::Simulation::getCurrentSimulatedDate();
 
-#if 1
 
         double transfer_time_1 = event1_arrival - copy1_start;
-#endif
         double transfer_time_2 = event2_arrival - copy2_start;
-#if 1
         double transfer_time_3 = event3_arrival - copy3_start;
 
         // Do relative checks
@@ -216,10 +211,6 @@ private:
             throw std::runtime_error("Time between two asynchronous operation completions is too big");
         }
 
-#endif
-
-
-#if 1
         // Do absolute checksThree
         double expected_transfer_time_1 =
                 SimpleStorageServicePerformanceTest::computeExpectedThreeStagePipelineTime(
@@ -233,7 +224,6 @@ private:
             throw std::runtime_error("Unexpected transfer time #1 " + std::to_string(transfer_time_1) +
                                      " (should be around " + std::to_string(expected_transfer_time_1) + ")");
         }
-#endif
 
 
         double expected_transfer_time_2 =
