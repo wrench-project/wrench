@@ -25,8 +25,20 @@ namespace wrench {
     class S4U_PendingCommunication;
 
     /**
-     * @brief A storage service that provides direct
-     *        access to some storage resource (e.g., a disk)
+     * @brief A storage service that provides direct access to some storage resources (e.g., one or more disks).
+     *        An important (configurable) property of the storage service is
+     *        SimpleStorageServiceProperty::BUFFER_SIZE (see documentation thereof), which defines the
+     *        buffer size that the storage service uses. More specifically, when the storage service
+     *        receives / sends data from / to the network, it does so in a loop over data "chunks",
+     *        with pipelined network and disk I/O operations. The smaller the buffer size the more "fluid"
+     *        the model, but the more time-consuming the simulation. A large buffer size, however, may
+     *        lead to less realistic simulations. At the extreme, an infinite buffer size would correspond
+     *        to fully sequential executions (first a network receive/send, and then a disk write/read).
+     *        Setting the buffer size to "0" corresponds to a fully fluid model in which individual
+     *        data chunk operations are not simulated, thus achieving both accuracy (unless one specifically wishes
+     *        to study the effects of buffering) and quick simulation times. For now, setting the buffer
+     *        size to "0" is not implemented. The default buffer size is "infinity" (note that the user can
+     *        always declare a disk with arbitrary bandwidth in the platform description XML).
      */
     class SimpleStorageService : public StorageService {
 
