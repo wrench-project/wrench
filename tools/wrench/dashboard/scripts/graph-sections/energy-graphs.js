@@ -1,4 +1,9 @@
-function generateConsumedEnergyGraph() {
+/*
+    energyData: energyData to feed into the function
+    graphId: id of the <div> that will contain the graph
+    legendId: id of the <div> that will contain the graph
+*/
+function generateConsumedEnergyGraph(energyData, graphId, legendId) {
     eData = [];
     xAxisMarks = ["x"];
     // Iterate through data for each host
@@ -26,7 +31,7 @@ function generateConsumedEnergyGraph() {
     eData.push(xAxisMarks)
 
     bb.generate({
-        bindto: "#consumedEnergyGraph",
+        bindto: `#${graphId}`,
         data: {
             x : "x",
             columns: eData,
@@ -52,14 +57,19 @@ function generateConsumedEnergyGraph() {
             show: true,
             position: "right",
             contents: {
-                bindto: "#consumedEnergyGraphLegend",
+                bindto: `#${legendId}`,
                 template: "<span style='color:#fff;padding:10px;background-color:{=COLOR}'>{=TITLE}</span>"
             }
         }
     });
 }
 
-function generatePStateGraph() {
+/*
+    energyData: energyData to feed into the function
+    graphId: id of the HTML element that will contain the graph
+    legendId: id of the HTML element that will contain the graph
+*/
+function generatePStateGraph(energyData, graphId, legendId) {
     pStateData = [];
     xAxisMarks = ["x"];
     // Iterate through data for each host
@@ -88,7 +98,8 @@ function generatePStateGraph() {
     pStateData.push(xAxisMarks)
 
     bb.generate({
-        bindto: "#pStateGraph",
+        // bindto: "#pStateGraph",
+        bindto: `#${graphId}`,
         data: {
             x : "x",
             columns: pStateData,
@@ -114,7 +125,8 @@ function generatePStateGraph() {
             show: true,
             position: "right",
             contents: {
-                bindto: "#pStateGraphLegend",
+                // bindto: "#pStateGraphLegend",
+                bindto: `#${legendId}`,
                 template: "<span style='color:#fff;padding:10px;background-color:{=COLOR}'>{=TITLE}</span>"
             }
         }
