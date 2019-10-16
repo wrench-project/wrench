@@ -774,7 +774,8 @@ namespace wrench {
 
                 if (route_forward.empty() and route_backward.empty()) {
                     throw std::invalid_argument("Cannot generate platform graph because no route is found between hosts " +
-                                                (*source)->get_name() + " and " + (*target)->get_name());
+                                                std::string((*source)->get_cname()) + " and " +
+                                                std::string((*target)->get_cname()));
                 }
 
                 // check to see if the route from source to target is the same as from target to source
