@@ -41,8 +41,12 @@ function getOffset(el, position) {
     }
 }
 
-
-function generateGraph(data, containerId) {
+/*
+    data: simulation data,
+    containerId: id of <div> container of graph
+    currGraphState: pass in "hostView" to see the host view and "taskView" to see the task view
+*/
+function generateGraph(data, containerId, currGraphState) {
     document.getElementById(containerId).innerHTML = //reset graph
         `<div class="text-left" id="tooltip-container">
             <span id="tooltip-task-id"></span><br>
@@ -167,11 +171,11 @@ function generateGraph(data, containerId) {
                 .style('fill',write_color)
                 .attr('class','write')
         }
-        var tooltip = document.getElementById('tooltip-container')
-        var tooltip_task_id                 = d3.select('#tooltip-task-id')
-        var tooltip_host                    = d3.select('#tooltip-host')
-        var tooltip_task_operation          = d3.select('#tooltip-task-operation')
-        var tooltip_task_operation_duration = d3.select('#tooltip-task-operation-duration')
+        var tooltip = document.getElementById("tooltip-container")
+        var tooltip_task_id                 = d3.select("#tooltip-task-id")
+        var tooltip_host                    = d3.select("#tooltip-host")
+        var tooltip_task_operation          = d3.select("#tooltip-task-operation")
+        var tooltip_task_operation_duration = d3.select("#tooltip-task-operation-duration")
         group.selectAll('rect')
             .on('mouseover', function() {
                 tooltip.style.display = 'inline'
@@ -181,7 +185,7 @@ function generateGraph(data, containerId) {
                     .style('stroke-width', '1')
             })
             .on('mousemove', function() {
-                var offset = getOffset(document.getElementById("graph-container"), d3.mouse(this))
+                var offset = getOffset(document.getElementById(containerId), d3.mouse(this))
                 var x = window.scrollX + offset.left + 20
                 var y = window.scrollY + offset.top - 30 // 20 seems to account for the padding of the chart-block
                 

@@ -1,4 +1,9 @@
-function getOverallWorkflowMetrics(data) {
+/*
+    data: task data
+    tableContainer: id of the <table> which will contain the data
+    taskClass: class to apply to <td> elements
+*/
+function getOverallWorkflowMetrics(data, tableContainer, taskClass) {
     var hosts = new Set()
     var noFailed = 0
     var noTerminated = 0
@@ -105,7 +110,7 @@ function getOverallWorkflowMetrics(data) {
     }
 
     for (var key in metrics) {
-        var table = d3.select('#overall-metrics-table')
+        var table = d3.select(`#${tableContainer}`)
         var tr = table.append('tr')
 
         var currMetric = metrics[key]
@@ -118,9 +123,9 @@ function getOverallWorkflowMetrics(data) {
 
         tr.append('td')
             .html(display)
-            .attr('class', 'task-details-table-td')
+            .attr('class', taskClass)
         tr.append('td')
             .html(`${value} ${unit}`)
-            .attr('class', 'task-details-table-td')
+            .attr('class', taskClass)
     }
 }
