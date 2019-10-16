@@ -14,9 +14,13 @@ if (timeScalingFactor < 10) {
     timeScalingFactor = Math.round(timeScalingFactor / 10) * 10 // round to the nearest 10
 }
 var scale = maxTaskOverlap * 2
+var svg
+var cubesGroup
+var originXBox
+var originYBox
+var timeIntervalBox
+var scaleBox
 var key = function(d) { return d.task_id; }
-var svg    = d3.select('#three-d-graph-svg').call(d3.drag().on('drag', dragged).on('start', dragStart).on('end', dragEnd)).append('g')
-var cubesGroup = svg.append('g').attr('class', 'cubes')
 var color  = d3.scaleOrdinal(d3.schemeCategory20)
 var mx, my, mouseX, mouseY
 var threeDColourMap = {}
@@ -503,11 +507,36 @@ function processData(data, tt, populateLegend){
 
 }
 
-function generate3dGraph(data, populateLegend) {
-    var originXBox = document.getElementById('origin-x')
-    var originYBox = document.getElementById('origin-y')
-    var timeIntervalBox = document.getElementById('time-interval')
-    var scaleBox = document.getElementById('scale-input')
+/*
+    data: data to generate graph in json array
+    populateLegend: pass in true
+    svgId: id of the <svg> that will contain the graph
+    originXId: id of the <input> element that has the value for the X origin 
+    originyId: id of the <input> element that has the value for the Y origin
+    timeIntervalId: id of the <input> element that has the value for the time interval on the time axis of the graph
+    scaleInputId: id of the <input> element that has the value for the scale of the Z axis
+*/
+function generate3dGraph(data, populateLegend, svgId, originXId, originYId, timeIntervalId, scaleInputId) {
+    if (svgId) {
+        svg    = d3.select(`#${svgId}`).call(d3.drag().on('drag', dragged).on('start', dragStart).on('end', dragEnd)).append('g')
+        cubesGroup = svg.append('g').attr('class', 'cubes')
+    }
+
+    if (originXId) {
+        originXBox = document.getElementById(originXId)
+    }
+    
+    if (originYId) {
+        originYBox = document.getElementById(originYId)
+    }
+    
+    if (timeIntervalId) {
+        timeIntervalBox = document.getElementById(timeIntervalId)
+    }
+    
+    if (scaleInputId) {
+        scaleBox = document.getElementById(scaleInputId)
+    }
 
     originXBox.value = origin[0]
     originYBox.value = origin[1]

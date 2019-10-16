@@ -1,8 +1,14 @@
-function populateWorkflowTaskDataTable(data) {
-    d3.select("#task-details-table")
+/*
+    data: simulation data array
+    tableId: id of the <table> element
+    tableBodyId: id of the <tbody> element
+    tdClass: class name you want applied to each td
+*/
+function populateWorkflowTaskDataTable(data, tableId, tableBodyId, tdClass) {
+    d3.select(`#${tableId}`)
         .style('display', 'block')
 
-    let task_details_table_body = d3.select("#task-details-table-body")
+    let task_details_table_body = d3.select(`#${tableBodyId}`)
 
     const TASK_DATA = Object.assign([], data).sort(function(lhs, rhs) {
         return parseInt(lhs.task_id.slice(4)) - parseInt(rhs.task_id.slice(4))
@@ -33,36 +39,36 @@ function populateWorkflowTaskDataTable(data) {
 
         tr.append("td")
             .html(task_id)
-            .attr("class", "task-details-table-td")
+            .attr("class", tdClass)
         tr.append("td")
             .html(read_start)
-            .attr("class", "task-details-table-td")
+            .attr("class", tdClass)
         tr.append("td")
             .html(read_end)
-            .attr("class", "task-details-table-td")
+            .attr("class", tdClass)
         tr.append("td")
             .html(read_duration)
-            .attr("class", "task-details-table-td")
+            .attr("class", tdClass)
         tr.append("td")
             .html(compute_start)
-            .attr("class", "task-details-table-td")
+            .attr("class", tdClass)
         tr.append("td")
             .html(compute_end)
-            .attr("class", "task-details-table-td")
+            .attr("class", tdClass)
         tr.append("td")
             .html(compute_duration)
-            .attr("class", "task-details-table-td")
+            .attr("class", tdClass)
         tr.append("td")
             .html(write_start)
-            .attr("class", "task-details-table-td")
+            .attr("class", tdClass)
         tr.append("td")
             .html(write_end)
-            .attr("class", "task-details-table-td")
+            .attr("class", tdClass)
         tr.append("td")
             .html(write_duration)
-            .attr("class", "task-details-table-td")
+            .attr("class", tdClass)
         tr.append("td")
             .html(task_duration)
-            .attr("class", "task-details-table-td")
+            .attr("class", tdClass)
     })
 }
