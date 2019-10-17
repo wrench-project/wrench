@@ -1592,7 +1592,7 @@ private:
         }
 
         try {
-            wrench::StorageService::writeFile(this->test->file_500, wrench::FileLocation::LOCATION(this->test->storage_service_100));
+            wrench::StorageService::writeFile(this->test->file_500, wrench::FileLocation::LOCATION(this->test->storage_service_100, "/disk100"));
             throw std::runtime_error("Should not be able to write to a storage service with not enough space");
         } catch (wrench::WorkflowExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::StorageServiceNotEnoughSpace>(e.getCause());
@@ -1635,9 +1635,23 @@ void SimpleStorageServiceFunctionalTest::do_FileWrite_test() {
     // Get a hostname
     std::string hostname = wrench::Simulation::getHostnameList()[0];
 
-    // Create 2 Storage Services
+    // Create 1 Storage Services
     ASSERT_NO_THROW(storage_service_100 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/disk100"})));
+            new wrench::SimpleStorageService(hostname, {"/disk100", "/disk1000"})));
+
+    // FileLocation Testing
+    ASSERT_THROW(wrench::FileLocation::LOCATION(nullptr), std::invalid_argument);
+    ASSERT_THROW(wrench::FileLocation::LOCATION(nullptr, "/disk100"), std::invalid_argument);
+    ASSERT_THROW(wrench::FileLocation::LOCATION(storage_service_100, ""), std::invalid_argument);
+    ASSERT_THROW(wrench::FileLocation::LOCATION(storage_service_100, "/bogus"), std::invalid_argument);
+    ASSERT_THROW(wrench::FileLocation::LOCATION(storage_service_100), std::invalid_argument);
+    ASSERT_THROW(wrench::FileLocation::SCRATCH->getStorageService(), std::invalid_argument);
+    ASSERT_THROW(wrench::FileLocation::SCRATCH->getMountPoint(), std::invalid_argument);
+    ASSERT_THROW(wrench::FileLocation::SCRATCH->getAbsolutePathAtMountPoint(), std::invalid_argument);
+    ASSERT_THROW(wrench::FileLocation::SCRATCH->getFullAbsolutePath(), std::invalid_argument);
+    ASSERT_THROW(wrench::FileLocation::sanitizePath(""), std::invalid_argument);
+    ASSERT_THROW(wrench::FileLocation::sanitizePath(" "), std::invalid_argument);
+    ASSERT_THROW(wrench::FileLocation::sanitizePath("../.."), std::invalid_argument);
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
