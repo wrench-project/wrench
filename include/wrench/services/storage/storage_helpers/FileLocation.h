@@ -63,6 +63,7 @@ namespace wrench {
 
 
         static std::string sanitizePath(std::string path);
+        static bool properPathPrefix(std::string path1, std::string path2);
 
     private:
 
