@@ -149,6 +149,7 @@ namespace wrench {
         void stageFile(WorkflowFile *file, std::shared_ptr<FileLocation> location);
 
 
+        void platformSanityCheck();
         void checkSimulationSetup();
         bool isRunning();
 
