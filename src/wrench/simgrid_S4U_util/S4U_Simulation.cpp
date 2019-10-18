@@ -621,11 +621,11 @@ namespace wrench {
     /**
      * @brief Gets set of disks, i.e., mount points, available at a host
      * @param hostname: the host's name
-     * @return a set of mount points
+     * @return a vector of mount points
      *
      * @throw std::invalid_argument
      */
-    std::set<std::string> S4U_Simulation::getDisks(std::string hostname) {
+    std::vector<std::string> S4U_Simulation::getDisks(std::string hostname) {
 
         simgrid::s4u::Host *host;
         try {
@@ -634,7 +634,7 @@ namespace wrench {
             throw std::invalid_argument("S4U_Simulation::getDisks(): Unknown host " + hostname);
         }
 
-        std::set<std::string> mount_points;
+        std::vector<std::string> mount_points;
         for (auto const &d : host->get_disks()) {
             // Get the disk's mount point
             const char *p = d->get_property("mount");
@@ -642,12 +642,7 @@ namespace wrench {
                 p = "/";
             }
             std::string mount_point = std::string(p);
-            if (mount_points.find(mount_point) != mount_points.end()) {
-                throw std::invalid_argument("S4U_Simulation::getDisks(): At host " + hostname +
-                                            " it seems that several disks share the same mount point (or have the same default '/' mount point)."
-                                            "You likely need to fix your platform XML");
-            }
-            mount_points.insert(mount_point);
+            mount_points.push_back(mount_point);
         }
 
         return mount_points;

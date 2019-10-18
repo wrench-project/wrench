@@ -289,6 +289,7 @@ set(TEST_FILES
         test/network_proximity_services/NetworkProximityTest.cpp
         test/file_registry_services/FileRegistryTest.cpp
         test/wms/JobManagerTest.cpp
+        test/simulation/BadPlatformTest.cpp
         test/simulation/SimpleSimulationTest.cpp
         test/simulation/DynamicServiceCreationTest.cpp
         test/simulation/SimulationCommandLineArgumentsTest.cpp
