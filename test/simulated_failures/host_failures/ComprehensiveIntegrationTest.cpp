@@ -22,7 +22,7 @@
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(comprehensive_integration_host_failure_test, "Log category for ComprehensiveIntegrationHostFailuresTest");
 
-#define NUM_TASKS 50
+#define NUM_TASKS 100
 #define MAX_TASK_DURATION_WITH_ON_CORE 3600
 #define CHAOS_MONKEY_MIN_SLEEP_BEFORE_OFF 100
 #define CHAOS_MONKEY_MAX_SLEEP_BEFORE_OFF 3000  // The bigger this number the less flaky the platform
