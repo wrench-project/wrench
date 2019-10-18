@@ -205,6 +205,13 @@ namespace wrench {
             throw std::runtime_error("Simulation::instantiatePlatform(): Platform already setup");
         }
         this->s4u_simulation->setupPlatform(filename);
+
+        try {
+            this->platformSanityCheck();
+        } catch(std::exception &e) {
+            throw;
+        }
+
         already_setup = true;
     }
 
@@ -909,6 +916,58 @@ namespace wrench {
         shared_ptr->start(shared_ptr, true, false); // Daemonized, no auto-restart
 
         return shared_ptr;
+    }
+
+    /**
+     * @brief Checks that the platform is well defined
+     *
+     * @throw std::invalid_argument
+     */
+    void Simulation::platformSanityCheck() {
+        auto hostnames = wrench::Simulation::getHostnameList();
+
+        // Check RAM Capacities
+        for (auto const &h : hostnames) {
+            S4U_Simulation::getHostMemoryCapacity(h);
+        }
+
+        // Check Disk Capacities
+        for (auto const &h : hostnames) {
+            auto disks = S4U_Simulation::getDisks(h);
+            for (auto const &d : disks) {
+                S4U_Simulation::getDiskCapacity(h, d);
+            }
+        }
+
+        // Check Disk Capacities
+        for (auto const &h : hostnames) {
+            auto disks = S4U_Simulation::getDisks(h);
+            for (auto const &d : disks) {
+                S4U_Simulation::getDiskCapacity(h, d);
+            }
+        }
+
+        // Check Disk Prefixness
+        for (auto const &h : hostnames) {
+            auto disks = S4U_Simulation::getDisks(h);
+            for (int i=0; i < disks.size(); i++) {
+                for (int j=0; j < disks.size(); j++) {
+                    if (j == i) {
+                        continue;
+                    }
+                    if (disks[i] == disks[j]) {
+                        throw std::invalid_argument("Simulation::platformSanityCheck(): Host " + h +
+                                                    " has two disks with the same mount point '" + disks[i] + "'");
+                    }
+                    if ((disks[j] != "/") and (disks[i].find(disks[j]) == 0)) {
+                        throw std::invalid_argument("Simulation::platformSanityCheck(): Host " + h +
+                                                    " has two disks, with one of them having a mount point that "
+                                                    "is a prefix of the other (" + disks[j] + " and " + disks[i] + ")");
+                    }
+                }
+            }
+        }
+
     }
 
 
