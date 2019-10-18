@@ -959,7 +959,7 @@ namespace wrench {
                         throw std::invalid_argument("Simulation::platformSanityCheck(): Host " + h +
                                                     " has two disks with the same mount point '" + disks[i] + "'");
                     }
-                    if ((disks[j] != "/") and (disks[i].find(disks[j]) == 0)) {
+                    if ((disks[j] != "/") and  (disks[i] != "/") and (FileLocation::properPathPrefix(disks[i], disks[j]))) {
                         throw std::invalid_argument("Simulation::platformSanityCheck(): Host " + h +
                                                     " has two disks, with one of them having a mount point that "
                                                     "is a prefix of the other (" + disks[j] + " and " + disks[i] + ")");
