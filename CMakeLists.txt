@@ -259,6 +259,7 @@ set(TEST_FILES
         test/workflow/WorkflowLoadFromDAXTest.cpp
         test/workflow/WorkflowLoadFromJSONTest.cpp
         test/compute_services/BareMetalComputeService/BareMetalComputeServiceOneTaskTest.cpp
+        test/storage_services/LogicalFileSystem/LogicalFileSystemTest.cpp
         test/storage_services/SimpleStorageService/SimpleStorageServiceFunctionalTest.cpp
         test/storage_services/SimpleStorageService/SimpleStorageServicePerformanceTest.cpp
         test/storage_services/SimpleStorageService/SimpleStorageServiceLimitedConnectionsTest.cpp

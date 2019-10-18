@@ -829,6 +829,9 @@ private:
             bogus_batch_job_args["-t"] = "1"; //time in minutes
             bogus_batch_job_args["-c"] = "4"; //number of cores per node
 
+            // Coverage
+            ((wrench::WorkflowJob *) pilot_job)->getPriority();
+
             // Submit a pilot job with bogus batch jobs
             try {
                 job_manager->submitJob((wrench::WorkflowJob *) pilot_job, this->test->compute_service, bogus_batch_job_args);
