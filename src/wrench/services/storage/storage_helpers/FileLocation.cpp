@@ -13,6 +13,8 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 
+//WRENCH_LOG_NEW_DEFAULT_CATEGORY(file_location, "Log category for FileLocation");
+
 
 namespace wrench {
 
@@ -195,6 +197,38 @@ namespace wrench {
         sanitized += "/";
 
         return sanitized;
+    }
+
+    /**
+     * @brief Helper method to find if a path is a prefix of another path
+     * @return
+     */
+    bool FileLocation::properPathPrefix(std::string path1, std::string path2) {
+        // Sanitize paths
+        path1 = sanitizePath(path1);
+        path2 = sanitizePath(path2);
+
+        // Split into tokens
+        std::vector<std::string> tokens1, tokens2, shorter, longer;
+        boost::split(tokens1, path1, boost::is_any_of("/"));
+        boost::split(tokens2, path2, boost::is_any_of("/"));
+
+
+        if (tokens1.size() < tokens2.size()) {
+            shorter = tokens1;
+            longer = tokens2;
+        } else {
+            shorter = tokens2;
+            longer = tokens1;
+        }
+
+        for (int i=1; i < shorter.size()-1; i++) {
+            if (shorter.at(i) != longer.at(i)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
 
