@@ -72,7 +72,7 @@ namespace wrench {
             != LogicalFileSystem::mount_points.end()) {
             if (LogicalFileSystem::mount_points[this->hostname +  ":" + this->mount_point] != this->ss_name) {
                 throw std::invalid_argument("LogicalFileSystem::init(): A FileSystem with mount point " +
-                                            this->mount_point + " at host " + this->hostname + " already exists");
+                this->mount_point + " at host " + this->hostname + " already exists");
             }
         }
         LogicalFileSystem::mount_points[this->hostname + ":" + this->mount_point] = this->ss_name;

@@ -35,7 +35,6 @@ protected:
                           "             <prop id=\"size\" value=\"100MB\"/>"
                           "             <prop id=\"mount\" value=\"/home/users\"/>"
                           "          </disk>"
-
                           "       </host>"
                           "   </zone> "
                           "</platform>";
@@ -69,9 +68,14 @@ void LogicalFileSystemTest::do_BasicTests() {
     auto fs1 = new wrench::LogicalFileSystem("Host", "ss1", "/");
     fs1->init();
 
-//    WRENCH_INFO("SAME ONE");
-//    auto fs2 = new wrench::LogicalFileSystem("Host", "ss1", "/");
-//    ASSERT_THROW(fs2->init(), std::invalid_argument);
+    auto fs2 = new wrench::LogicalFileSystem("Host", "ss2", "/");
+    ASSERT_THROW(fs2->init(), std::invalid_argument);
+
+    fs1->createDirectory(("/foo"));
+    fs1->removeAllFilesInDirectory("/foo");
+    fs1->listFilesInDirectory("/foo");
+    fs1->removeEmptyDirectory("/foo");
+
 
 
     delete simulation;
