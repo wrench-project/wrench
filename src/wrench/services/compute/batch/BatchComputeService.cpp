@@ -88,7 +88,7 @@ namespace wrench {
      *                 - the hosts must be homogeneous (speed, number of cores, and RAM size)
      *                 - all cores are usable by the batch service on each host
      *                 - all RAM is usable by the batch service on each host
-     * @param scratch_space_mount_point: the mount point of the scratch storage space for the service (0 means "no scratch space")
+     * @param scratch_space_mount_point: the mount point of the scratch storage space for the service ("" means "no scratch space")
      * @param property_list: a property list that specifies BatchComputeServiceProperty values ({} means "use all defaults")
      * @param messagepayload_list: a message payload list that specifies BatchComputeServiceMessagePayload values ({} means "use all defaults")
      */
@@ -110,7 +110,7 @@ namespace wrench {
      *              - ComputeService::ALL_CORES to use all cores
      * @param ram_per_host: RAM per host (
      *              - ComputeService::ALL_RAM to use all RAM
-     * @param scratch_space_mount_point: the mount point og the scratch storage space for the service (0 means "no scratch space")
+     * @param scratch_space_mount_point: the mount point og the scratch storage space for the service ("" means "no scratch space")
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      * @param suffix: suffix to append to the service name and mailbox
