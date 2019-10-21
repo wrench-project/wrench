@@ -386,11 +386,16 @@ namespace wrench {
                                          src_location->getMountPoint());
             // start the pipeline
             while (remaining > this->buffer_size) {
-                // Write to disk. TODO: Make this asynchronous!
-                S4U_Simulation::writeToDisk(this->buffer_size, dst_location->getStorageService()->hostname,
-                                            dst_location->getMountPoint());
-                S4U_Simulation::readFromDisk(this->buffer_size, src_location->getStorageService()->hostname,
-                                             src_location->getMountPoint());
+
+                S4U_Simulation::readFromDiskAndWriteToDiskConcurrently(
+                        this->buffer_size, this->buffer_size, src_location->getStorageService()->hostname,
+                        src_location->getMountPoint(), dst_location->getMountPoint());
+
+//
+//                S4U_Simulation::writeToDisk(this->buffer_size, dst_location->getStorageService()->hostname,
+//                                            dst_location->getMountPoint());
+//                S4U_Simulation::readFromDisk(this->buffer_size, src_location->getStorageService()->hostname,
+//                                             src_location->getMountPoint());
 
                 remaining -= this->buffer_size;
             }

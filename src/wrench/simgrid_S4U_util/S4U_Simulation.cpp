@@ -338,6 +338,52 @@ namespace wrench {
                                     mount_point + " at host " + hostname);
     }
 
+
+    /**
+     * @brief Read from a local disk and write to a local disk concurrently
+     *
+     * @param num_bytes_to_read: number of bytes to read
+     * @param num_bytes_to_write: number of bytes to write
+     * @param hostname: the host at which the disks are located
+     * @param read_mount_point: the mountpoint to read from
+     * @param write_mount_point: the mountpoint to write to
+     */
+    void S4U_Simulation::readFromDiskAndWriteToDiskConcurrently(double num_bytes_to_read, double num_bytes_to_write,
+                                                                std::string hostname,
+                                                                std::string read_mount_point,
+                                                                std::string write_mount_point) {
+
+        auto host = simgrid::s4u::Host::by_name_or_null(hostname);
+        WRENCH_INFO("Reading %lf bytes from disk %s:%s and writing %lf bytes to disk %s:%s",
+                num_bytes_to_read, hostname.c_str(), read_mount_point.c_str(),
+                num_bytes_to_write, hostname.c_str(), write_mount_point.c_str());
+
+        simgrid::s4u::Disk *read_disk = nullptr;
+        simgrid::s4u::Disk *write_disk = nullptr;
+
+        auto disk_list = simgrid::s4u::Host::by_name(hostname)->get_disks();
+        for (auto disk : disk_list) {
+            std::string disk_mountpoint =
+                    FileLocation::sanitizePath(std::string(std::string(disk->get_property("mount"))));
+            if (disk_mountpoint == read_mount_point) {
+                read_disk = disk;
+            }
+            if (disk_mountpoint == write_mount_point) {
+                write_disk = disk;
+            }
+        }
+
+        // Start asynchronous read
+        simgrid::s4u::IoPtr read_activity = read_disk->io_init(num_bytes_to_read, simgrid::s4u::Io::OpType::READ);
+        read_activity->start();
+        // Do synchronous write
+        write_disk->write(num_bytes_to_write);
+        // Wait for asycnrhonous read to be done
+        read_activity->wait();
+
+    }
+
+
     /**
      * @brief Simulates a disk read
      *
