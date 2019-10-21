@@ -54,6 +54,11 @@ namespace wrench {
         static void computeZeroFlop();
         static void writeToDisk(double num_bytes, std::string hostname, std::string mount_point);
         static void readFromDisk(double num_bytes, std::string hostname, std::string mount_point);
+        static void readFromDiskAndWriteToDiskConcurrently(double num_bytes_to_read, double num_bytes_to_write,
+                                                                           std::string hostname,
+                                                                           std::string read_mount_point,
+                                                                           std::string write_mount_point);
+
         static double getDiskCapacity(std::string hostname, std::string mount_point);
         static std::vector<std::string> getDisks(std::string hostname);
         static bool hostHasMountPoint(std::string hostname, std::string mount_point);
