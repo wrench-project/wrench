@@ -36,7 +36,8 @@ public:
 
     void do_WorkloadTraceFileTestSWF_test();
     void do_WorkloadTraceFileTestSWFBatchServiceShutdown_test();
-    void do_WorkloadTraceFileRequestedTimesTestSWF_test();
+    void do_WorkloadTraceFileRequestedTimesSWF_test();
+    void do_WorkloadTraceFileDifferentTimeOriginSWF_test();
     void do_BatchTraceFileReplayTestWithFailedJob_test();
     void do_WorkloadTraceFileTestJSON_test();
 
@@ -782,13 +783,14 @@ private:
 #ifdef ENABLE_BATSCHED
 TEST_F(BatchServiceTest, WorkloadTraceFileSWFRequestedTimesTest) {
 #else
-TEST_F(BatchServiceTest, DISABLED_WorkloadTraceFileSWFRequestedTimesTest) {
+    TEST_F(BatchServiceTest, DISABLED_WorkloadTraceFileSWFRequestedTimesTest) {
 #endif
-    DO_TEST_WITH_FORK(do_WorkloadTraceFileRequestedTimesTestSWF_test);
+    DO_TEST_WITH_FORK(do_WorkloadTraceFileRequestedTimesSWF_test);
 }
 
 
-void BatchServiceTest::do_WorkloadTraceFileRequestedTimesTestSWF_test() {
+
+void BatchServiceTest::do_WorkloadTraceFileRequestedTimesSWF_test() {
 
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
@@ -822,7 +824,7 @@ void BatchServiceTest::do_WorkloadTraceFileRequestedTimesTestSWF_test() {
                                                     {wrench::BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path},
                                                     {wrench::BatchComputeServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP, "true"},
                                                     {wrench::BatchComputeServiceProperty::BATSCHED_LOGGING_MUTED, "true"},
-                                                    {wrench::BatchComputeServiceProperty::USE_REAL_RUNTIMES_AS_REQUESTED_RUNTIMES_IN_WORKLOAD_TRACE_FILE, "false"}
+                                                    {wrench::BatchComputeServiceProperty::USE_REAL_RUNTIMES_AS_REQUESTED_RUNTIMES_IN_WORKLOAD_TRACE_FILE, "false"},
                                             }
             )));
 
@@ -830,6 +832,172 @@ void BatchServiceTest::do_WorkloadTraceFileRequestedTimesTestSWF_test() {
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(new WorkloadTraceFileSWFRequestedTimesTestWMS(
+            this, {compute_service}, {}, hostname)));
+
+    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+
+    // Running a "run a single task" simulation
+    // Note that in these tests the WMS creates workflow tasks, which a user would
+    // of course not be likely to do
+    ASSERT_NO_THROW(simulation->launch());
+
+    delete simulation;
+
+    free(argv[0]);
+    free(argv);
+}
+
+
+
+
+/**********************************************************************/
+/**  SWF DIFFERENT TIME ORIGIN TEST               **/
+/**********************************************************************/
+
+class WorkloadTraceFileSWFDifferentTimeOriginTestWMS : public wrench::WMS {
+
+public:
+    WorkloadTraceFileSWFDifferentTimeOriginTestWMS(BatchServiceTest *test,
+                                              const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                              const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                                              std::string hostname) :
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
+                        hostname, "test") {
+        this->test = test;
+    }
+
+
+private:
+
+    BatchServiceTest *test;
+
+    int main() {
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+        wrench::Simulation::sleep(10);
+
+        std::vector<wrench::WorkflowTask *> tasks;
+        std::map<std::string, std::string> batch_job_args;
+
+        // Create and submit a job that needs 2 nodes and 10 minutes
+        for (size_t i = 0; i < 2; i++) {
+            double time_fudge = 1; // 1 second seems to make it all work!
+            double task_flops = 10 * (1 * (600 - time_fudge));
+            int num_cores = 10;
+            double parallel_efficiency = 1.0;
+            tasks.push_back(this->getWorkflow()->addTask("test_job_1_task_" + std::to_string(i),
+                                                         task_flops,
+                                                         num_cores, num_cores, parallel_efficiency,
+                                                         0.0));
+        }
+
+        // Create a Standard Job with only the tasks
+        wrench::StandardJob *standard_job_2_nodes;
+        standard_job_2_nodes = job_manager->createStandardJob(tasks, {});
+
+        // Create the batch-specific argument
+        batch_job_args["-N"] = std::to_string(2);     // Number of nodes/tasks
+        batch_job_args["-t"] = std::to_string(10);  // Time in minutes (at least 1 minute)
+        batch_job_args["-c"] = std::to_string(10);  //number of cores per task
+
+        // Submit this job to the batch service
+        job_manager->submitJob(standard_job_2_nodes, *(this->getAvailableComputeServices<wrench::ComputeService>().begin()), batch_job_args);
+
+
+        // Wait for the two execution events
+        for (auto job : {standard_job_2_nodes}) {
+            // Wait for the workflow execution event
+            WRENCH_INFO("Waiting for job completion of job %s", job->getName().c_str());
+            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+            try {
+                event = this->getWorkflow()->waitForNextExecutionEvent();
+                auto real_event = std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event);
+                if (real_event) {
+                    if (real_event->standard_job != job) {
+                        throw std::runtime_error("Wrong job completion order: got " +
+                                                 real_event->standard_job->getName() + " but expected " + job->getName());
+                    }
+                } else {
+                    throw std::runtime_error(
+                            "Unexpected workflow execution event: " + event->toString());
+                }
+            } catch (wrench::WorkflowExecutionException &e) {
+                //ignore (network error or something)
+            }
+
+            double completion_time = wrench::Simulation::getCurrentSimulatedDate();
+            double expected_completion_time;
+            if (job == standard_job_2_nodes) {
+                expected_completion_time = 100 + 600;
+            } else {
+                throw std::runtime_error("Phantom job completion!");
+            }
+            double delta = fabs(expected_completion_time - completion_time);
+            double tolerance = 5;
+            if (delta > tolerance) {
+                throw std::runtime_error("Unexpected job completion time for job " + job->getName() + ": " +
+                                         std::to_string(completion_time) + " (expected: " + std::to_string(expected_completion_time) + ")");
+            }
+
+        }
+        return 0;
+    }
+};
+
+#ifdef ENABLE_BATSCHED
+TEST_F(BatchServiceTest, WorkloadTraceFileSWFDifferentTimeOriginTest) {
+#else
+TEST_F(BatchServiceTest, DISABLED_WorkloadTraceFileSWFDifferentTimeOriginTest) {
+#endif
+    DO_TEST_WITH_FORK(do_WorkloadTraceFileDifferentTimeOriginSWF_test);
+}
+
+
+void BatchServiceTest::do_WorkloadTraceFileDifferentTimeOriginSWF_test() {
+
+    // Create and initialize a simulation
+    auto simulation = new wrench::Simulation();
+    int argc = 1;
+    auto argv = (char **) calloc(1, sizeof(char *));
+    argv[0] = strdup("batch_service_test");
+
+    ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+    // Setting up the platform
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    // Get a hostname
+    std::string hostname = "Host1";
+
+    // Create a Valid trace file
+    std::string trace_file_path = UNIQUE_TMP_PATH_PREFIX + "swf_trace.swf";
+    FILE *trace_file;
+    trace_file = fopen(trace_file_path.c_str(), "w");
+    fprintf(trace_file, "1 100 -1 100 -1 -1 -1 2 1800 -1\n");
+    fprintf(trace_file, "2 101 -1 1800 -1 -1 -1 2 1800 -1\n");
+    fprintf(trace_file, "3 102 -1 3600 -1 -1 -1 4 3600 -1\n");
+    fclose(trace_file);
+
+    // Create a Batch Service with a the valid trace file
+    ASSERT_NO_THROW(compute_service = simulation->add(
+            new wrench::BatchComputeService(hostname,
+                                            {"Host1", "Host2", "Host3", "Host4"}, "",
+                                            {
+                                                    {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "easy_bf"},
+                                                    {wrench::BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path},
+                                                    {wrench::BatchComputeServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP, "true"},
+                                                    {wrench::BatchComputeServiceProperty::BATSCHED_LOGGING_MUTED, "true"},
+                                                    {wrench::BatchComputeServiceProperty::USE_REAL_RUNTIMES_AS_REQUESTED_RUNTIMES_IN_WORKLOAD_TRACE_FILE, "false"},
+                                                    {wrench::BatchComputeServiceProperty::SUBMIT_TIME_OF_FIRST_JOB_IN_WORKLOAD_TRACE_FILE, "0"}
+
+                                            }
+            )));
+
+
+    // Create a WMS
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    ASSERT_NO_THROW(wms = simulation->add(new WorkloadTraceFileSWFDifferentTimeOriginTestWMS(
             this, {compute_service}, {}, hostname)));
 
     ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
