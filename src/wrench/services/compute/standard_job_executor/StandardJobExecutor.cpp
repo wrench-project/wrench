@@ -675,7 +675,6 @@ namespace wrench {
             std::shared_ptr<Workunit> workunit) {
 
         // Don't kill me while I am doing this
-        WRENCH_INFO("HERE1: QCQUIRING");
         this->acquireDaemonLock();
 
         // Update core availabilities

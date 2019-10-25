@@ -343,7 +343,9 @@ namespace wrench {
                     throw std::invalid_argument(
                             "TraceFileLoader::loadFromTraceFileJSON(): invalid job specification in JSON batch workload trace file");
                 }
-                subtime += (desired_submit_time_of_first_job - original_submit_time_of_first_job);
+                if (desired_submit_time_of_first_job >= 0) {
+                    subtime += (desired_submit_time_of_first_job - original_submit_time_of_first_job);
+                }
 
                 // It seems the Batsim JSON format does not include requested
                 // runtimes, and so we set the requested runtime to the walltime
