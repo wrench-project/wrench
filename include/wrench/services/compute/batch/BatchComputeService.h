@@ -57,18 +57,19 @@ namespace wrench {
                 {BatchComputeServiceProperty::TASK_STARTUP_OVERHEAD,                     "0"},
                 {BatchComputeServiceProperty::HOST_SELECTION_ALGORITHM,                    "FIRSTFIT"},
                 {BatchComputeServiceProperty::TASK_SELECTION_ALGORITHM,                    "maximum_flops"},
-        #ifdef ENABLE_BATSCHED
+#ifdef ENABLE_BATSCHED
                 {BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "conservative_bf"},
 //                {BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "easy_bf"},
 //                {BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "easy_bf_fast"},
                 {BatchComputeServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM,              "fcfs"},
-        #else
+#else
                 {BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM,            "FCFS"},
-        #endif
-                {BatchComputeServiceProperty::BATCH_RJMS_DELAY,                            "0"},
+#endif
+                {BatchComputeServiceProperty::BATCH_RJMS_DELAY,                             "0"},
                 {BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE,               ""},
                 {BatchComputeServiceProperty::USE_REAL_RUNTIMES_AS_REQUESTED_RUNTIMES_IN_WORKLOAD_TRACE_FILE,     "false"},
                 {BatchComputeServiceProperty::IGNORE_INVALID_JOBS_IN_WORLOAD_TRACE_FILE,     "false"},
+                {BatchComputeServiceProperty::SUBMIT_TIME_OF_FIRST_JOB_IN_WORKLOAD_TRACE_FILE,                          "-1"},
                 {BatchComputeServiceProperty::OUTPUT_CSV_JOB_LOG,                          ""},
                 {BatchComputeServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP,               "false"},
                 {BatchComputeServiceProperty::BATSCHED_LOGGING_MUTED,                      "true"},
@@ -96,10 +97,10 @@ namespace wrench {
 
     public:
         BatchComputeService(std::string &hostname,
-                     std::vector<std::string> compute_hosts,
-                     std::string scratch_space_mount_point,
-                     std::map<std::string, std::string> property_list = {},
-                     std::map<std::string, double> messagepayload_list = {}
+                            std::vector<std::string> compute_hosts,
+                            std::string scratch_space_mount_point,
+                            std::map<std::string, std::string> property_list = {},
+                            std::map<std::string, double> messagepayload_list = {}
         );
 
         /***********************/
@@ -126,13 +127,13 @@ namespace wrench {
         friend class WorkloadTraceFileReplayer;
 
         BatchComputeService(std::string hostname,
-                     std::vector<std::string> compute_hosts,
-                     unsigned long cores_per_host,
-                     double ram_per_host,
-                     std::string scratch_space_mount_point,
-                     std::map<std::string, std::string> property_list,
-                     std::map<std::string, double> messagepayload_list,
-                     std::string suffix
+                            std::vector<std::string> compute_hosts,
+                            unsigned long cores_per_host,
+                            double ram_per_host,
+                            std::string scratch_space_mount_point,
+                            std::map<std::string, std::string> property_list,
+                            std::map<std::string, double> messagepayload_list,
+                            std::string suffix
         );
 
         // helper function
