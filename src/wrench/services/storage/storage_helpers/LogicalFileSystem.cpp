@@ -33,24 +33,6 @@ namespace wrench {
                                         hostname + " does not have a disk mounted at " + mount_point);
         }
 
-        if (mount_point != "/") { // "/" is obviously a prefix, but it's ok
-
-            // Check non-proper-prefixness
-            for (auto const &mp : LogicalFileSystem::mount_points) {
-                if (mp.first == hostname+":"+"/") {
-                    continue;  // "/" is obviously a prefix, but it's ok
-                }
-//                WRENCH_INFO("COMPARING %s TO %s", (hostname + ":" + mount_point).c_str(), mp.c_str());
-                if ((mp.first.find(hostname + ":" + mount_point) == 0) or ((hostname + ":" + mount_point).find(mp.first) == 0)) {
-                    throw std::invalid_argument(
-                            "LogicalFileSystem::LogicalFileSystem(): An existing mount point that has as prefix or is a prefix of '" +
-                            mount_point + "' already exists at host " + hostname);
-                }
-            }
-        }
-
-
-
         this->hostname = hostname;
         this->ss_name = ss_name;
         this->mount_point = mount_point;
