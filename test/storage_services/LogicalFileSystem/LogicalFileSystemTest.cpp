@@ -31,7 +31,7 @@ protected:
                           "             <prop id=\"size\" value=\"100MB\"/>"
                           "             <prop id=\"mount\" value=\"/tmp\"/>"
                           "          </disk>"
-                          "          <disk id=\"large_disk2\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "          <disk id=\"large_disk4\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
                           "             <prop id=\"size\" value=\"100MB\"/>"
                           "             <prop id=\"mount\" value=\"/home/users\"/>"
                           "          </disk>"
@@ -68,8 +68,12 @@ void LogicalFileSystemTest::do_BasicTests() {
     auto fs1 = new wrench::LogicalFileSystem("Host", "ss1", "/");
     fs1->init();
 
+
     auto fs2 = new wrench::LogicalFileSystem("Host", "ss2", "/");
     ASSERT_THROW(fs2->init(), std::invalid_argument);
+
+    auto fs3 = new wrench::LogicalFileSystem("Host", "ss1", "/tmp"); // coverage
+    fs3->init();
 
     fs1->createDirectory(("/foo"));
     fs1->removeAllFilesInDirectory("/foo");
