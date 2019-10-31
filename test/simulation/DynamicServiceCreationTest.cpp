@@ -146,6 +146,26 @@ private:
     DynamicServiceCreationTest *test;
 
     int main() {
+
+        // Coverage
+        try {
+            wrench::Simulation::turnOnHost("bogus");
+            throw std::runtime_error("Should not be able to turn on bogus host");
+        } catch (std::invalid_argument &e) {}
+        try {
+            wrench::Simulation::turnOffHost("bogus");
+            throw std::runtime_error("Should not be able to turn off bogus host");
+        } catch (std::invalid_argument &e) {}
+        try {
+            wrench::Simulation::turnOnLink("bogus");
+            throw std::runtime_error("Should not be able to turn on bogus link");
+        } catch (std::invalid_argument &e) {}
+        try {
+            wrench::Simulation::turnOffLink("bogus");
+            throw std::runtime_error("Should not be able to turn off bogus link");
+        } catch (std::invalid_argument &e) {}
+
+        
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
 
