@@ -257,14 +257,12 @@ namespace wrench {
 
         if (this->reserved_space.find(key) == this->reserved_space.end()) {
             return; // oh well, the transfer was cancelled/terminated/whatever
-//            throw std::runtime_error("LogicalFileSystem::unreserveSpace(): Space was not being reserved for storing file " +
-//                                     file->getID() + "at path " + absolute_path);
         }
 
-        if (this->occupied_space <  file->getSize()) {
-            throw std::invalid_argument("LogicalFileSystem::unreserveSpace(): Occupied space is less than the file size... should not happen");
-        }
-
+//         This will never happen
+//        if (this->occupied_space <  file->getSize()) {
+//            throw std::invalid_argument("LogicalFileSystem::unreserveSpace(): Occupied space is less than the file size... should not happen");
+//        }
 
         this->reserved_space.erase(key);
         this->occupied_space -= file->getSize();
