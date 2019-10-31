@@ -165,12 +165,7 @@ namespace wrench {
             return true;
         }
 
-        if (message == nullptr) {
-            WRENCH_INFO("Got a NULL message... Likely this means we're all done. Aborting!");
-            return false;
-        }
-
-        WRENCH_INFO("Data Movement Manager got a %s message", message->getName().c_str());
+        WRENCH_INFO("Energy Meter got a %s message", message->getName().c_str());
 
         if (std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
             // There shouldn't be any need to clean any state up
