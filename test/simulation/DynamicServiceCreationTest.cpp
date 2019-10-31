@@ -165,7 +165,7 @@ private:
             throw std::runtime_error("Should not be able to turn off bogus link");
         } catch (std::invalid_argument &e) {}
 
-        
+
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
 
