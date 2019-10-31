@@ -602,6 +602,8 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
     ASSERT_NO_THROW(simulation->stageFile(file_100, storage_service_1000));
     ASSERT_NO_THROW(simulation->stageFile(file_500, storage_service_1000));
 
+
+
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
 
@@ -879,6 +881,8 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopy_test() {
 
     // Staging file_500 on the 1000-byte storage service
     ASSERT_NO_THROW(simulation->stageFile(file_500, storage_service_1000));
+    ASSERT_NO_THROW(simulation->stageFile(file_1, storage_service_1000, "/disk1000/some_files/")); // coverage
+
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
