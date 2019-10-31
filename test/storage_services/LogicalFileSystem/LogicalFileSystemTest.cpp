@@ -54,6 +54,7 @@ TEST_F(LogicalFileSystemTest, BasicTests) {
 void LogicalFileSystemTest::do_BasicTests() {
     // Create and initialize the simulation
     auto simulation = new wrench::Simulation();
+    auto workflow = new wrench::Workflow();
 
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
@@ -80,7 +81,9 @@ void LogicalFileSystemTest::do_BasicTests() {
     fs1->listFilesInDirectory("/foo");
     fs1->removeEmptyDirectory("/foo");
 
-
+    auto file = workflow->addFile("file", 10000000000);
+    auto file1 = workflow->addFile("file1", 10000);
+    ASSERT_THROW(fs1->reserveSpace(file, "/files/"), std::invalid_argument);
 
     delete simulation;
     free(argv[0]);
