@@ -1211,6 +1211,7 @@ private:
         const double MEGAFLOP = 1000.0 * 1000.0;
         wrench::S4U_Simulation::compute(6.0 * 100.0 * MEGAFLOP); // compute for 6 seconds
 
+
         return 0;
     }
 

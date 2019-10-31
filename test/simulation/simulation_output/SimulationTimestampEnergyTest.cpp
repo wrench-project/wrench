@@ -285,6 +285,18 @@ private:
             throw std::runtime_error("createEnergyMeter requires that measurement periods be 1.0 or greater");
         } catch(std::invalid_argument &e) { }
 
+        try {
+            std::map<std::string, double> mp = {{"bogus", 0.0}};
+            auto fail_em5 = this->createEnergyMeter(mp);
+            throw std::runtime_error("createEnergyMeter requires that hosts exist");
+        } catch(std::invalid_argument &e) { }
+
+        try {
+            std::vector<std::string> mp = {{"bogus"}};
+            auto fail_em6 = this->createEnergyMeter(mp, 1.0);
+            throw std::runtime_error("createEnergyMeter requires that hosts exist");
+        } catch(std::invalid_argument &e) { }
+
 
         // EnergyMeter functionality tests
         const std::vector<std::string> hostnames = wrench::Simulation::getHostnameList();
@@ -298,6 +310,9 @@ private:
         // Sleep 1 second to avoid having the power meters dying right when
         // The WMS is dying to, i.e., right when the simulation is terminating.
         wrench::Simulation::sleep(1.0);
+
+        em->stop();
+        
         return 0;
     }
 };
