@@ -544,11 +544,6 @@ namespace wrench {
             throw std::invalid_argument("StorageService::copyFile(): Invalid arguments");
         }
 
-        if (src_location == dst_location) {
-            throw std::invalid_argument(
-                    "StorageService::copyFile(): Cannot redundantly copy a file onto itself");
-        }
-
         assertServiceIsUp(src_location->getStorageService());
         assertServiceIsUp(dst_location->getStorageService());
 
@@ -611,10 +606,6 @@ namespace wrench {
             throw std::invalid_argument("StorageService::initiateFileCopy(): Invalid arguments");
         }
 
-        if (src_location == dst_location) {
-            throw std::invalid_argument(
-                    "StorageService::initiateFileCopy(): Cannot redundantly copy a file onto itself");
-        }
 
         assertServiceIsUp(src_location->getStorageService());
         assertServiceIsUp(dst_location->getStorageService());
