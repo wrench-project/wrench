@@ -1643,6 +1643,8 @@ void SimpleStorageServiceFunctionalTest::do_FileWrite_test() {
     ASSERT_NO_THROW(storage_service_100 = simulation->add(
             new wrench::SimpleStorageService(hostname, {"/disk100", "/disk1000"})));
 
+    ASSERT_THROW(storage_service_100->getMountPoint(), std::invalid_argument);
+
     // FileLocation Testing
     ASSERT_THROW(wrench::FileLocation::LOCATION(nullptr), std::invalid_argument);
     ASSERT_THROW(wrench::FileLocation::LOCATION(nullptr, "/disk100"), std::invalid_argument);
