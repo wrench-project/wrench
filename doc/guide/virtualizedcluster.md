@@ -38,8 +38,8 @@ virtualized cluster service requires the following parameters:
 
 - A hostname on which to start the service (this is the entry point to the service)
 - A list (`std::vector`) of hostnames (all cores and all RAM of each host is available to the virtualized cluster service) 
-- A scratch space size, i.e., the size in bytes of storage local to the virtualized cluster service (used to store
-  workflow files, as needed, during job executions) 
+- A mount point (corresponding to a disk attached to the host) for the scratch space, i.e., storage local to the virtualized cluster service (used to store
+  workflow files, as needed, during job executions)  
 - Maps (`std::map`) of configurable properties (`wrench::VirtualizedClusterComputeServiceProperty`) and configurable message
   payloads (`wrench::VirtualizedClusterComputeServiceMessagePayload`).
 
@@ -49,7 +49,8 @@ space of 1TiB:
 
 ~~~~~~~~~~~~~{.cpp}
 auto virtualized_cluster_cs = simulation.add(
-          new wrench::VirtualizedClusterComputeService("vc_gateway", {"host1", "host2", "host3", "host4"}, pow(2,40),
+          new wrench::VirtualizedClusterComputeService("vc_gateway", {"host1", "host2", "host3", "host4"}, 
+                                                "/scratch/",
                                                 {{wrench::VirtualizedClusterComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}}));
 ~~~~~~~~~~~~~
 

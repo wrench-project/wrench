@@ -34,7 +34,7 @@ service requires the following parameters:
 
 - A hostname on which to start the service (this is the entry point to the service)
 - A list (`std::vector`) of hostnames (all cores and all RAM of each host is available to the cloud service) 
-- A scratch space size, i.e., the size in bytes of storage local to the cloud service (used to store
+- A mount point (corresponding to a disk attached to the host) for the scratch space, i.e., storage local to the cloud service (used to store
   workflow files, as needed, during job executions) 
 - Maps (`std::map`) of configurable properties (`wrench::CloudServiceProperty`) and configurable message 
   payloads (`wrench::CloudComputeServiceMessagePayload`).
@@ -45,7 +45,7 @@ space of 1TiB:
 
 ~~~~~~~~~~~~~{.cpp}
 auto cloud_cs = simulation.add(
-          new wrench::CloudComputeService("cloud_gateway", {"host1", "host2", "host3", "host4"}, pow(2,40),
+          new wrench::CloudComputeService("cloud_gateway", {"host1", "host2", "host3", "host4"}, "/scratch/",
                                    {{wrench::CloudServiceProperty::SUPPORTS_PILOT_JOBS, "false"}}));
 ~~~~~~~~~~~~~
 
