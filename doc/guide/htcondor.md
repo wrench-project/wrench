@@ -43,7 +43,7 @@ with a pool of resources containing a [Bare-metal](@ref guide-baremetal) server:
 wrench::Simulation simulation;
 simulation.init(&argc, argv);
 
-// Create bare-metal server
+// Create bare-metal service
 std::set<wrench::ComputeService *> compute_services;
 compute_services.insert(new wrench::BareMetalComputeService(
           "execution_hostname",
@@ -51,7 +51,7 @@ compute_services.insert(new wrench::BareMetalComputeService(
                   "execution_hostname",
                   std::make_tuple(wrench::Simulation::getHostNumCores("execution_hostname"),
                                   wrench::Simulation::getHostMemoryCapacity("execution_hostname")))},
-          100000000000.0));
+          "/scratch/"));
 
 auto compute_service = simulation->add(
           new wrench::HTCondorComputeService(hostname, 
