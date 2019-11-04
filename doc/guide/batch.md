@@ -42,7 +42,7 @@ parameters:
 - A hostname on which to start the service (this is the entry point to the service)
 - A list (`std::vector`) of hostnames (all cores and all RAM of each host is available to
   the batch service)
-- A scratch space size, i.e., the size in bytes of storage local to the batch service (used to store
+- A mount point (corresponding to a disk attached to the host) for the scratch space, i.e., storage local to the batch service (used to store
   workflow files, as needed, during job executions) 
 - Maps (`std::map`) of configurable properties (`wrench::BatchComputeServiceProperty`) and configurable message
   payloads (`wrench::BatchComputeServiceMessagePayload`)
@@ -56,7 +56,7 @@ the FCFS (First-Come-First-Serve):
 auto batch_cs = simulation->add(
           new wrench::BatchComputeService("Gateway",
                                    {"Node1", "Node2", "Node3", "Node4"},
-                                   pow(2,40),
+                                   "/scratch/",
                                    {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}},
                                    {});
 ~~~~~~~~~~~~~

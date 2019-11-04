@@ -32,7 +32,7 @@ parameters:
 - The name of a host on which to start the service (this is the entry point to the service);
 - A set of compute hosts in a map (`std::map`), where each key is a hostname
   and each value is a tuple (`std::tuple`) with a number of cores and a RAM capacity. 
-- A scratch space size, i.e., the size in bytes of storage local to the bare-metal service (used to store
+- A mount point (corresponding to a disk attached to the host) for the scratch space, i.e., storage local to the bare-metal service (used to store
   workflow files, as needed, during job executions) 
 - Maps (`std::map`) of configurable properties (`wrench::BareMetalComputeServiceProperty`) and configurable message 
   payloads (`wrench::BareMetalComputeServiceMessagePayload`).
@@ -46,7 +46,7 @@ configured to be one hundredth of a second:
 auto baremetal_cs = simulation->add(
           new wrench::BareMetalComputeService("Gateway", 
                                        {{"Node1", std::make_tuple(4, pow(2,30))}, {"Node2", std::make_tuple(8, pow(2,32)}},
-                                       pow(2,40),
+                                       "/scratch/",
                                        {{wrench::BareMetalComputeServiceProperty::THREAD_STARTUP_OVERHEAD, "0.01"}}, 
                                        {});
 ~~~~~~~~~~~~~
