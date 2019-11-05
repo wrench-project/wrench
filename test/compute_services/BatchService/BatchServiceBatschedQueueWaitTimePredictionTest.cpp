@@ -211,7 +211,7 @@ private:
                     throw std::runtime_error(
                             "Got the expected exception, but the failure cause does not point to the right service");
                 }
-                cause->toString();
+
                 WRENCH_INFO("toString: %s", cause->toString().c_str());  // for coverage
             }
 
