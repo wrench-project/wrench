@@ -663,6 +663,25 @@ private:
         } catch (std::invalid_argument &e) {
         }
 
+        // Do the file copy with a bogus path
+        try {
+            data_movement_manager->doSynchronousFileCopy(this->test->file_500,
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_1000, "/disk1000/whatever/"),
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_510));
+            throw std::runtime_error("Should not be able to do a file copy with a bogus path");
+        } catch (wrench::WorkflowExecutionException &e) {
+            auto cause = e.getCause();
+            if (auto real_cause = std::dynamic_pointer_cast<wrench::InvalidDirectoryPath>(e.getCause())) {
+                real_cause->toString();         // Coverage
+                real_cause->getInvalidPath();   // Coverage
+                real_cause->getStorageService();// Coverage
+            } else {
+                throw std::runtime_error("Got the expected execption, but the failure cause is not InvalidDirectoryPath (it's " + cause->toString() + ")");
+            }
+
+
+        }
+
         // Do the file copy
         try {
             data_movement_manager->doSynchronousFileCopy(this->test->file_500,
@@ -812,6 +831,7 @@ private:
             if (cause->getDestinationLocation()->getAbsolutePathAtMountPoint() != "/") {
                 throw std::runtime_error("Got expected failure cause, but failure cause does not point to the right path");
             }
+            cause->getSourceLocation(); // for coverage
             cause->toString(); // for coverage
         }
 
