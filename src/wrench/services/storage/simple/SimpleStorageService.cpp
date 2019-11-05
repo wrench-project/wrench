@@ -247,16 +247,16 @@ namespace wrench {
         // Figure out whether this succeeds or not
         std::shared_ptr<FailureCause> failure_cause = nullptr;
 
-        // Invalid mount point
-        if ((this->file_systems.find(location->getMountPoint()) == this->file_systems.end())) {
-
-            failure_cause = std::shared_ptr<FailureCause>(
-                    new InvalidDirectoryPath(
-                            this->getSharedPtr<SimpleStorageService>(),
-                            location->getMountPoint()
-                            + "/" +
-                            location->getAbsolutePathAtMountPoint()));
-        } else {
+//        // Invalid mount point
+//        if ((this->file_systems.find(location->getMountPoint()) == this->file_systems.end())) {
+//
+//            failure_cause = std::shared_ptr<FailureCause>(
+//                    new InvalidDirectoryPath(
+//                            this->getSharedPtr<SimpleStorageService>(),
+//                            location->getMountPoint()
+//                            + "/" +
+//                            location->getAbsolutePathAtMountPoint()));
+//        } else {
 
             auto fs = this->file_systems[location->getMountPoint()].get();
 
@@ -274,7 +274,7 @@ namespace wrench {
                                     this->getSharedPtr<SimpleStorageService>()));
                 }
             }
-        }
+//        }
 
         if (failure_cause == nullptr) {
 
@@ -353,8 +353,8 @@ namespace wrench {
         // Figure out whether this succeeds or not
         std::shared_ptr<FailureCause> failure_cause = nullptr;
 
-        if ((this->file_systems.find(location->getMountPoint()) == this->file_systems.end()) or
-            (not this->file_systems[location->getMountPoint()]->doesDirectoryExist(location->getAbsolutePathAtMountPoint()))) {
+//        if ((this->file_systems.find(location->getMountPoint()) == this->file_systems.end()) or
+           if (not this->file_systems[location->getMountPoint()]->doesDirectoryExist(location->getAbsolutePathAtMountPoint())) {
 
             failure_cause = std::shared_ptr<FailureCause>(
                     new InvalidDirectoryPath(
@@ -424,34 +424,34 @@ namespace wrench {
                                                  SimulationTimestampFileCopyStart *start_timestamp) {
 
 
-        // File System  and path at the destination exists?
-        if (this->file_systems.find(dst_location->getMountPoint()) == this->file_systems.end())  {
-
-            this->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyFailure>(
-                    new SimulationTimestampFileCopyFailure(start_timestamp));
-
-            try {
-                S4U_Mailbox::putMessage(answer_mailbox,
-                                        new StorageServiceFileCopyAnswerMessage(
-                                                file,
-                                                src_location,
-                                                dst_location,
-                                                nullptr, false,
-                                                false,
-                                                std::shared_ptr<FailureCause>(
-                                                        new InvalidDirectoryPath(
-                                                                this->getSharedPtr<SimpleStorageService>(),
-                                                                dst_location->getMountPoint()
-                                                                + "/" +
-                                                                dst_location->getAbsolutePathAtMountPoint())),
-                                                this->getMessagePayloadValue(
-                                                        SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
-
-            } catch (std::shared_ptr<NetworkError> &cause) {
-                return true;
-            }
-            return true;
-        }
+//        // File System  and path at the destination exists?
+//        if (this->file_systems.find(dst_location->getMountPoint()) == this->file_systems.end())  {
+//
+//            this->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyFailure>(
+//                    new SimulationTimestampFileCopyFailure(start_timestamp));
+//
+//            try {
+//                S4U_Mailbox::putMessage(answer_mailbox,
+//                                        new StorageServiceFileCopyAnswerMessage(
+//                                                file,
+//                                                src_location,
+//                                                dst_location,
+//                                                nullptr, false,
+//                                                false,
+//                                                std::shared_ptr<FailureCause>(
+//                                                        new InvalidDirectoryPath(
+//                                                                this->getSharedPtr<SimpleStorageService>(),
+//                                                                dst_location->getMountPoint()
+//                                                                + "/" +
+//                                                                dst_location->getAbsolutePathAtMountPoint())),
+//                                                this->getMessagePayloadValue(
+//                                                        SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
+//
+//            } catch (std::shared_ptr<NetworkError> &cause) {
+//                return true;
+//            }
+//            return true;
+//        }
 
         auto fs = this->file_systems[dst_location->getMountPoint()].get();
 
