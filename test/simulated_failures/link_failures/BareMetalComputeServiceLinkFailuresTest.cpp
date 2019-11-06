@@ -124,7 +124,7 @@ private:
             try {
 
                 wrench::Simulation::sleep(25);
-                switch (i % 8) {
+                switch (i % 9) {
                     case 0:
                         this->test->cs->getNumHosts();
                         break;
@@ -141,12 +141,15 @@ private:
                         this->test->cs->getPerHostNumIdleCores();
                         break;
                     case 5:
-                        this->test->cs->getMemoryCapacity();
+                        this->test->cs->getTotalNumIdleCores();
                         break;
                     case 6:
-                        this->test->cs->getPerHostAvailableMemoryCapacity();
+                        this->test->cs->getMemoryCapacity();
                         break;
                     case 7:
+                        this->test->cs->getPerHostAvailableMemoryCapacity();
+                        break;
+                    case 8:
                         this->test->cs->getTTL();
                         break;
                 }
