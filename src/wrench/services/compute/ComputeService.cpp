@@ -193,8 +193,6 @@ namespace wrench {
             dict = this->getServiceResourceInformation();
         } catch (WorkflowExecutionException &e) {
             throw;
-        } catch (std::runtime_error &e) {
-            throw;
         }
 
         if (dict.find("num_hosts") != dict.end()) {
@@ -218,8 +216,6 @@ namespace wrench {
         try {
             dict = this->getServiceResourceInformation();
         } catch (WorkflowExecutionException &e) {
-            throw;
-        } catch (std::runtime_error &e) {
             throw;
         }
 
@@ -247,8 +243,6 @@ namespace wrench {
         try {
             dict = this->getServiceResourceInformation();
         } catch (WorkflowExecutionException &e) {
-            throw;
-        } catch (std::runtime_error &e) {
             throw;
         }
 
@@ -278,8 +272,6 @@ namespace wrench {
             dict = this->getServiceResourceInformation();
         } catch (WorkflowExecutionException &e) {
             throw;
-        } catch (std::runtime_error &e) {
-            throw;
         }
 
         std::map<std::string, unsigned long> to_return;
@@ -306,8 +298,6 @@ namespace wrench {
         try {
             dict = this->getServiceResourceInformation();
         } catch (WorkflowExecutionException &e) {
-            throw;
-        } catch (std::runtime_error &e) {
             throw;
         }
 
@@ -336,8 +326,6 @@ namespace wrench {
             dict = this->getServiceResourceInformation();
         } catch (WorkflowExecutionException &e) {
             throw;
-        } catch (std::runtime_error &e) {
-            throw;
         }
 
 
@@ -365,8 +353,6 @@ namespace wrench {
             dict = this->getServiceResourceInformation();
         } catch (WorkflowExecutionException &e) {
             throw;
-        } catch (std::runtime_error &e) {
-            throw;
         }
 
         std::map<std::string, double> to_return;
@@ -391,8 +377,6 @@ namespace wrench {
         try {
             dict = this->getServiceResourceInformation();
         } catch (WorkflowExecutionException &e) {
-            throw;
-        } catch (std::runtime_error &e) {
             throw;
         }
 
@@ -419,8 +403,6 @@ namespace wrench {
         try {
             dict = this->getServiceResourceInformation();
         } catch (WorkflowExecutionException &e) {
-            throw;
-        } catch (std::runtime_error &e) {
             throw;
         }
 
