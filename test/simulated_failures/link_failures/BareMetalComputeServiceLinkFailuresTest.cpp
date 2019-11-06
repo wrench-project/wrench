@@ -119,14 +119,38 @@ private:
 
         // Do a bunch of resource requests
         unsigned long num_failures = 0;
-        unsigned long num_trials = 1000;
+        unsigned long num_trials = 2000;
         for (unsigned int i=0; i < num_trials; i++) {
             try {
-//                WRENCH_INFO("Sleeping for 25 seconds..");
+
                 wrench::Simulation::sleep(25);
-                WRENCH_INFO("Requesting resource information..");
-                this->test->cs->getPerHostNumCores();
-//                WRENCH_INFO("Got it!");
+                switch (i % 8) {
+                    case 0:
+                        this->test->cs->getNumHosts();
+                        break;
+                    case 1:
+                        this->test->cs->getCoreFlopRate();
+                        break;
+                    case 2:
+                        this->test->cs->getTotalNumCores();
+                        break;
+                    case 3:
+                        this->test->cs->getPerHostNumCores();
+                        break;
+                    case 4:
+                        this->test->cs->getPerHostNumIdleCores();
+                        break;
+                    case 5:
+                        this->test->cs->getMemoryCapacity();
+                        break;
+                    case 6:
+                        this->test->cs->getPerHostAvailableMemoryCapacity();
+                        break;
+                    case 7:
+                        this->test->cs->getTTL();
+                        break;
+                }
+
             } catch (wrench::WorkflowExecutionException &e) {
 //                WRENCH_INFO("Got an exception");
                 num_failures++;
