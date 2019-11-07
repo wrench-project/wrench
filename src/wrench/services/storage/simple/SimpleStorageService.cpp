@@ -318,7 +318,7 @@ namespace wrench {
             this->pending_file_transfer_threads.push_back(ftt);
         } else {
 
-            // Reply with a "go ahead, send me the file" message
+            // Reply with a "failure" message
             S4U_Mailbox::dputMessage(answer_mailbox,
                                      new StorageServiceFileWriteAnswerMessage(
                                              file,
