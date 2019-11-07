@@ -1,3 +1,4 @@
+
 /**
  * Copyright (c) 2017. The WRENCH Team.
  *
@@ -56,7 +57,7 @@ protected:
                         "             <prop id=\"size\" value=\"" + std::to_string(STORAGE_SERVICE_CAPACITY) +
                         "B\"/>"
                         "             <prop id=\"mount\" value=\"/disk" + std::to_string(i) + "/\"/>"
-                        "          </disk>";
+                                                                                              "          </disk>";
             }
 
             xml +=
@@ -198,6 +199,20 @@ private:
         }
     }
 
+    void doRandomFileRead() {
+
+        std::uniform_int_distribution<unsigned long> dist_storage(
+                0, this->test->storage_services.size()-1);
+
+        auto source = wrench::FileLocation::LOCATION(this->test->storage_services.at(dist_storage(rng)));
+        auto file = findRandomFileOnStorageService(source->getStorageService());
+        if (file == nullptr) {
+            return;
+        }
+
+        wrench::StorageService::readFile(file, source);
+    }
+
     int main() {
 
         // Create a link switcher on/off er for link1
@@ -218,10 +233,11 @@ private:
         this->data_movement_manager = this->createDataMovementManager();
 
 
-        unsigned long network_failure_1 = 0, network_failure_2 = 0, network_failure_3 = 0;
+        unsigned long network_failure_1 = 0, network_failure_2 = 0;
+        unsigned long network_failure_3 = 0, network_failure_4 = 0;
 
         // Do a bunch of operations
-        unsigned long NUM_TRIALS = 200;
+        unsigned long NUM_TRIALS = 5000;
         for (unsigned long i=0; i < NUM_TRIALS; i++) {
 
             // Do a random synchronous file copy
@@ -257,11 +273,22 @@ private:
 
             wrench::Simulation::sleep(5);
 
+            // Do a random file read
+            try {
+                this->doRandomFileRead();
+            } catch (wrench::WorkflowExecutionException &e) {
+                if (std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause())) {
+                    network_failure_4++;
+                }
+            }
+
+            wrench::Simulation::sleep(5);
         }
 
         WRENCH_INFO("NETWORK FAILURES Sync   %lu", network_failure_1);
         WRENCH_INFO("NETWORK FAILURES Async  %lu", network_failure_2);
         WRENCH_INFO("NETWORK FAILURES Delete %lu", network_failure_3);
+        WRENCH_INFO("NETWORK FAILURES Read   %lu", network_failure_4);
 
         return 0;
     }

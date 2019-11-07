@@ -285,6 +285,22 @@ private:
         } catch (std::invalid_argument &e) {
         }
 
+        // Create a job with SCRATCH as both src and dst
+        try {
+            std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation> > > pre_file_copies;
+            pre_file_copies.insert(std::make_tuple(f, wrench::FileLocation::SCRATCH, wrench::FileLocation::SCRATCH));
+            job_manager->createStandardJob({}, {}, pre_file_copies, {}, {});
+            throw std::runtime_error("Should not be able to create a standard job with a pre file copy that has SCRATCH has both dst and src");
+        } catch (std::invalid_argument &e) {
+        }
+        // Create a job with SCRATCH as both src and dst
+        try {
+            std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation> > > post_file_copies;
+            post_file_copies.insert(std::make_tuple(f, wrench::FileLocation::SCRATCH, wrench::FileLocation::SCRATCH));
+            job_manager->createStandardJob({}, {}, {}, post_file_copies, {});
+            throw std::runtime_error("Should not be able to create a standard job with a post file copy that has SCRATCH has both dst and src");
+        } catch (std::invalid_argument &e) {
+        }
         
         // Create a job with not ok task dependencies
         try {
