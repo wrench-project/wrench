@@ -222,7 +222,7 @@ namespace wrench {
             longer = tokens1;
         }
 
-        for (int i=1; i < shorter.size()-1; i++) {
+        for (unsigned int i=1; i < shorter.size()-1; i++) {
             if (shorter.at(i) != longer.at(i)) {
                 return false;
             }
