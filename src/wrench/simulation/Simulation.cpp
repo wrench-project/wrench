@@ -950,8 +950,8 @@ namespace wrench {
         // Check Disk Prefixness
         for (auto const &h : hostnames) {
             auto disks = S4U_Simulation::getDisks(h);
-            for (int i=0; i < disks.size(); i++) {
-                for (int j=0; j < disks.size(); j++) {
+            for (unsigned int i=0; i < disks.size(); i++) {
+                for (unsigned int j=0; j < disks.size(); j++) {
                     if (j == i) {
                         continue;
                     }
