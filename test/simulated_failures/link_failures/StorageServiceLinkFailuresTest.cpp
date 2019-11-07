@@ -213,6 +213,20 @@ private:
         wrench::StorageService::readFile(file, source);
     }
 
+    void doRandomFileWrite() {
+        static unsigned int count=0;
+
+        std::uniform_int_distribution<unsigned long> dist_storage(
+                0, this->test->storage_services.size()-1);
+
+        auto dest = wrench::FileLocation::LOCATION(this->test->storage_services.at(dist_storage(rng)));
+        auto file = this->getWorkflow()->addFile("written_file_" + std::to_string(count++), FILE_SIZE);
+        wrench::StorageService::writeFile(file, dest);
+        wrench::StorageService::deleteFile(file, dest);
+    }
+
+    
+
     int main() {
 
         // Create a link switcher on/off er for link1
@@ -235,6 +249,7 @@ private:
 
         unsigned long network_failure_1 = 0, network_failure_2 = 0;
         unsigned long network_failure_3 = 0, network_failure_4 = 0;
+        unsigned long network_failure_5 = 0;
 
         // Do a bunch of operations
         unsigned long NUM_TRIALS = 5000;
@@ -283,12 +298,24 @@ private:
             }
 
             wrench::Simulation::sleep(5);
+
+            // Do a random file write
+            try {
+                this->doRandomFileWrite();
+            } catch (wrench::WorkflowExecutionException &e) {
+                if (std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause())) {
+                    network_failure_5++;
+                }
+            }
+
+            wrench::Simulation::sleep(5);
         }
 
         WRENCH_INFO("NETWORK FAILURES Sync   %lu", network_failure_1);
         WRENCH_INFO("NETWORK FAILURES Async  %lu", network_failure_2);
         WRENCH_INFO("NETWORK FAILURES Delete %lu", network_failure_3);
         WRENCH_INFO("NETWORK FAILURES Read   %lu", network_failure_4);
+        WRENCH_INFO("NETWORK FAILURES Write   %lu", network_failure_5);
 
         return 0;
     }
