@@ -154,7 +154,7 @@ namespace wrench {
         if (auto msg = std::dynamic_pointer_cast<StorageServiceFreeSpaceAnswerMessage>(message)) {
             return msg->free_space;
         } else {
-            throw std::runtime_error("StorageService::howMuchFreeSpace(): Unexpected [" + msg->getName() + "] message");
+            throw std::runtime_error("StorageService::getFreeSpace(): Unexpected [" + msg->getName() + "] message");
         }
     }
 
@@ -263,7 +263,7 @@ namespace wrench {
 
             if (storage_service->buffer_size == 0) {
 
-                throw std::runtime_error("StorageService::writeFile(): Zero buffer size not implemented yet");
+                throw std::runtime_error("StorageService::readFile(): Zero buffer size not implemented yet");
 
             } else {
 
@@ -294,7 +294,7 @@ namespace wrench {
                     throw WorkflowExecutionException(cause);
                 }
                 if (not std::dynamic_pointer_cast<StorageServiceAckMessage>(message)) {
-                    throw std::runtime_error("StorageService::writeFile(): Received an unexpected [" +
+                    throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
                                              message->getName() + "] message!");
                 }
 
@@ -648,7 +648,7 @@ namespace wrench {
      */
     std::string StorageService::getMountPoint() {
         if (this->hasMultipleMountPoints()) {
-            throw std::invalid_argument("StorageService::getAbsolutePath(): The storage service has more than one mount point");
+            throw std::invalid_argument("StorageService::getMountPoint(): The storage service has more than one mount point");
         }
         return wrench::FileLocation::sanitizePath(this->file_systems.begin()->first);
     }
