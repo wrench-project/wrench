@@ -254,11 +254,11 @@ namespace wrench {
         if (it != args.end()) {
             if (sscanf((*it).second.c_str(), "%lu", &value) != 1) {
                 throw std::invalid_argument(
-                        "BatchComputeService::submitStandardJob(): Invalid " + key + " value '" + (*it).second + "'");
+                        "BatchComputeService::parseUnsignedLongServiceSpecificArgument(): Invalid " + key + " value '" + (*it).second + "'");
             }
         } else {
             throw std::invalid_argument(
-                    "BatchComputeService::submitStandardJob(): Batch Service requires -N argument to be specified for job submission"
+                    "BatchComputeService::parseUnsignedLongServiceSpecificArgument(): Batch Service requires " + key + " argument to be specified for job submission"
             );
         }
         return value;
