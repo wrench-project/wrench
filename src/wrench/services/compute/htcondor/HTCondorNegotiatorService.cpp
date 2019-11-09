@@ -39,14 +39,14 @@ namespace wrench {
             : Service(hostname, "htcondor_negotiator", "htcondor_negotiator"), reply_mailbox(reply_mailbox),
               compute_resources(&compute_resources), running_jobs(&running_jobs), pending_jobs(pending_jobs) {
 
-      this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
+        this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
     }
 
     /**
      * @brief Destructor
      */
     HTCondorNegotiatorService::~HTCondorNegotiatorService() {
-      this->pending_jobs.clear();
+        this->pending_jobs.clear();
     }
 
     /**
@@ -58,7 +58,7 @@ namespace wrench {
      * @return whether the priority of the left-hand-side workflow job is higher
      */
     bool HTCondorNegotiatorService::JobPriorityComparator::operator()(WorkflowJob *&lhs, WorkflowJob *&rhs) {
-      return lhs->getPriority() > rhs->getPriority();
+        return lhs->getPriority() > rhs->getPriority();
     }
 
     /**
@@ -68,69 +68,80 @@ namespace wrench {
      */
     int HTCondorNegotiatorService::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_BLUE);
-      WRENCH_INFO("HTCondor Negotiator Service starting on host %s listening on mailbox_name %s",
-                  this->hostname.c_str(), this->mailbox_name.c_str());
+        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_BLUE);
+        WRENCH_INFO("HTCondor Negotiator Service starting on host %s listening on mailbox_name %s",
+                    this->hostname.c_str(), this->mailbox_name.c_str());
 
-      // TODO: check how to pass the service specific arguments
-      std::map<std::string, std::string> specific_args;
-      std::vector<WorkflowJob *> scheduled_jobs;
+        std::vector<WorkflowJob *> scheduled_jobs;
 
-      // sort tasks by priority
-      std::sort(this->pending_jobs.begin(), this->pending_jobs.end(), JobPriorityComparator());
+        // sort tasks by priority
+        std::sort(this->pending_jobs.begin(), this->pending_jobs.end(), JobPriorityComparator());
 
-      for (auto job : this->pending_jobs) {
-        if (auto standard_job = dynamic_cast<StandardJob *>(job)) {
-          for (auto &item : *this->compute_resources) {
-            if (item.second >= standard_job->getMinimumRequiredNumCores()) {
-              WRENCH_INFO("Dispatching job %s with %ld tasks", standard_job->getName().c_str(),
-                          standard_job->getTasks().size());
-              for (auto task : standard_job->getTasks()) {
-                WRENCH_INFO("    Task ID: %s", task->getID().c_str());
-              }
+        for (auto job : this->pending_jobs) {
 
-              standard_job->pushCallbackMailbox(this->reply_mailbox);
-              item.first->submitStandardJob(standard_job, specific_args);
-              this->running_jobs->insert(std::make_pair(job, item.first));
-              scheduled_jobs.push_back(job);
-              item.second -= standard_job->getMinimumRequiredNumCores();
-              WRENCH_INFO("Dispatched job %s with %ld tasks", standard_job->getName().c_str(),
-                          standard_job->getTasks().size());
-              break;
+            // STANDARD JOB
+            if (auto standard_job = dynamic_cast<StandardJob *>(job)) {
+                for (auto &item : *this->compute_resources) {
+
+                    if (not item.first->supportsStandardJobs()) {
+                        continue;
+                    }
+
+                    if (item.second >= standard_job->getMinimumRequiredNumCores()) {
+                        WRENCH_INFO("Dispatching job %s with %ld tasks", standard_job->getName().c_str(),
+                                    standard_job->getTasks().size());
+                        for (auto task : standard_job->getTasks()) {
+                            WRENCH_INFO("    Task ID: %s", task->getID().c_str());
+                        }
+
+                        auto service_specific_arguments = standard_job->getServiceSpecificArguments();
+                        WRENCH_INFO("---> %lu", service_specific_arguments.size());
+
+                        standard_job->pushCallbackMailbox(this->reply_mailbox);
+                        item.first->submitStandardJob(standard_job, service_specific_arguments);
+                        this->running_jobs->insert(std::make_pair(job, item.first));
+                        scheduled_jobs.push_back(job);
+                        item.second -= standard_job->getMinimumRequiredNumCores();
+                        WRENCH_INFO("Dispatched job %s with %ld tasks", standard_job->getName().c_str(),
+                                    standard_job->getTasks().size());
+                        break;
+                    }
+                }
+
+                // PILOT JOB
+            } else if (auto pilot_job = dynamic_cast<PilotJob *>(job)) {
+
+
+                auto service_specific_arguments = pilot_job->getServiceSpecificArguments();
+
+                for (auto &item : *this->compute_resources) {
+                    if (not item.first->supportsPilotJobs()) {
+                        continue;
+                    }
+
+                    pilot_job->pushCallbackMailbox(this->reply_mailbox);
+                    item.first->submitPilotJob(pilot_job, service_specific_arguments);
+                    this->running_jobs->insert(std::make_pair(job, item.first));
+                    scheduled_jobs.push_back(job);
+                    WRENCH_INFO("Dispatched pilot job %s", pilot_job->getName().c_str());
+                    break;
+                }
             }
-          }
-
-        } else if (auto pilot_job = dynamic_cast<PilotJob *>(job)) {
-
-          // TODO: fix specific args
-          specific_args["-N"] = "1";
-          specific_args["-t"] = "1000"; //time in minutes
-          specific_args["-c"] = "1"; //number of cores per node
-
-          for (auto &item : *this->compute_resources) {
-            pilot_job->pushCallbackMailbox(this->reply_mailbox);
-            item.first->submitPilotJob(pilot_job, specific_args);
-            this->running_jobs->insert(std::make_pair(job, item.first));
-            scheduled_jobs.push_back(job);
-            WRENCH_INFO("Dispatched pilot job %s", pilot_job->getName().c_str());
-            break;
-          }
         }
-      }
 
-      // Send the callback to the originator
-      try {
-        S4U_Mailbox::putMessage(
-                this->reply_mailbox, new NegotiatorCompletionMessage(
-                        scheduled_jobs, this->getMessagePayloadValue(
-                                HTCondorCentralManagerServiceMessagePayload::HTCONDOR_NEGOTIATOR_DONE_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        return 1;
-      }
+        // Send the callback to the originator
+        try {
+            S4U_Mailbox::putMessage(
+                    this->reply_mailbox, new NegotiatorCompletionMessage(
+                            scheduled_jobs, this->getMessagePayloadValue(
+                                    HTCondorCentralManagerServiceMessagePayload::HTCONDOR_NEGOTIATOR_DONE_MESSAGE_PAYLOAD)));
+        } catch (std::shared_ptr<NetworkError> &cause) {
+            return 1;
+        }
 
-      WRENCH_INFO("HTCondorNegotiator Service on host %s cleanly terminating!",
-                  S4U_Simulation::getHostName().c_str());
-      return 0;
+        WRENCH_INFO("HTCondorNegotiator Service on host %s cleanly terminating!",
+                    S4U_Simulation::getHostName().c_str());
+        return 0;
     }
 
 }
