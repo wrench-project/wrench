@@ -188,7 +188,7 @@ namespace wrench {
             try {
 
                 this->workload_trace = TraceFileLoader::loadFromTraceFile(workload_file,
-                        this->getPropertyValueAsBoolean(BatchComputeServiceProperty::IGNORE_INVALID_JOBS_IN_WORLOAD_TRACE_FILE),
+                        this->getPropertyValueAsBoolean(BatchComputeServiceProperty::IGNORE_INVALID_JOBS_IN_WORKLOAD_TRACE_FILE),
                         this->getPropertyValueAsDouble(BatchComputeServiceProperty::SUBMIT_TIME_OF_FIRST_JOB_IN_WORKLOAD_TRACE_FILE));
             } catch (std::exception &e) {
                 throw;

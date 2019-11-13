@@ -97,12 +97,12 @@ namespace wrench {
          *      - "true": merely print a warning whenever there is an invalid job
          *      - "false": abort whenever there is an invalid job
          */
-        DECLARE_PROPERTY_NAME(IGNORE_INVALID_JOBS_IN_WORLOAD_TRACE_FILE);
+        DECLARE_PROPERTY_NAME(IGNORE_INVALID_JOBS_IN_WORKLOAD_TRACE_FILE);
 
         /**
          * @brief A specification of the submit time of the first job in a provided trace file.
          *          - A positive number: the submit time of the first job
-         *          - A negative number (say "-1"): use whatever submit time is in the trace file
+         *          - A strictly negative number: use whatever submit time is in the trace file
          */
         DECLARE_PROPERTY_NAME(SUBMIT_TIME_OF_FIRST_JOB_IN_WORKLOAD_TRACE_FILE);
 
