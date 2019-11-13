@@ -198,7 +198,7 @@ namespace wrench {
                             case 17: // Think time
                                 break;
                             default:
-                                throw std::runtime_error(
+                                throw std::invalid_argument(
                                         "TraceFileLoader::loadFromTraceFileSWF(): Unknown batch workload trace file column, maybe there are more than 18 columns?"
                                 );
                         }
