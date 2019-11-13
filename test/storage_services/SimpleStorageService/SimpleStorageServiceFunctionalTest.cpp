@@ -1449,7 +1449,7 @@ private:
         // Copy storage_service_510:foo:file_10 to storage_service_510:bar
         try {
             data_movement_manager->initiateAsynchronousFileCopy(this->test->file_10,
-                                                                wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510/foo"),
+                                                                wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510/foo/../foo"),
                                                                 wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510/bar"));
         } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error("Got an unexpected exception");
