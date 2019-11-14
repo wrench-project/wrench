@@ -1518,6 +1518,7 @@ private:
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
+
         return 0;
     }
 };
@@ -1578,6 +1579,11 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithMissingFile_test() {
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
+
+    ASSERT_EQ(this->task->getFailureCount(), 1);
+    ASSERT_GT(this->task->getFailureDate(), 0.0);
+    ASSERT_LT(this->task->getFailureDate(), wrench::Simulation::getCurrentSimulatedDate());
+
 
     delete simulation;
 
