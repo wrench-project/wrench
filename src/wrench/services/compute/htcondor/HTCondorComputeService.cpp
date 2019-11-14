@@ -85,7 +85,6 @@ namespace wrench {
                     break;
                 }
             }
-            WRENCH_INFO("FOUND CLOUD = %d", found_cloud);
             if (not found_cloud) {
                 throw std::invalid_argument("HTCondorComputeService::HTCondorComputeService(): if this service is to support standard jobs, then at least one of its compute resources should support pilot jobs");
             }
