@@ -576,6 +576,8 @@ namespace wrench {
         std::string new_host_to_avoid = "";
         double new_host_to_avoid_ram_capacity = 0;
         for (auto const &r : this->compute_resources) {
+
+
             // If there is a required host, then don't even look at others
             if (not required_host.empty() and (r.first != required_host)) {
                 continue;
@@ -667,7 +669,7 @@ namespace wrench {
         // able to run on that host due to RAM, and because we don't
         // allow non-zero-ram tasks to jump ahead of other tasks
 
-//        WRENCH_INFO("THERE ARE %lu READY WUs", this->ready_workunits.size());
+        WRENCH_INFO("THERE ARE %lu READY WUs", this->ready_workunits.size());
         for (auto const &wu : this->ready_workunits) {
 
             std::string picked_host;
@@ -679,7 +681,7 @@ namespace wrench {
             if (wu->task == nullptr) {
                 // Always run on the first host
                 std::tuple<std::string, unsigned long> allocation =
-                        pickAllocation(nullptr, "", 1, 0.0, no_longer_considered_hosts);
+                        pickAllocation(nullptr, "", 0, 0.0, no_longer_considered_hosts);
                 required_ram = 0.0;
                 target_host = std::get<0>(allocation);
                 target_num_cores = std::get<1>(allocation);
@@ -697,6 +699,7 @@ namespace wrench {
 
             // If we didn't find a host, forget it
             if (target_host.empty()) {
+                WRENCH_INFO("NO DICE");
                 continue;
             }
 

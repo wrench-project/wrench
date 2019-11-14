@@ -46,9 +46,17 @@ namespace wrench {
                                     double memory_requirement) {
 
 
-        if ((flops < 0.0) || (min_num_cores < 1) || (min_num_cores > max_num_cores) ||
+        if ((flops < 0.0) || (min_num_cores > max_num_cores) ||
             (parallel_efficiency <= 0.0) || (parallel_efficiency > 1.0) || (memory_requirement < 0)) {
             throw std::invalid_argument("WorkflowTask::addTask(): Invalid argument");
+        }
+
+        if ((min_num_cores == 0) and (max_num_cores != 0)) {
+            throw std::invalid_argument("WorkflowTask::addTask(): A task with a minimum number of cores set to 0 must also have a maximum number of cores set to 0");
+        }
+
+        if ((min_num_cores == 0) and (flops > 0)) {
+            throw std::invalid_argument("WorkflowTask::addTask(): A task with a minimum number of cores set to 0 must have 0 flops");
         }
 
         // Check that the task doesn't really exist
