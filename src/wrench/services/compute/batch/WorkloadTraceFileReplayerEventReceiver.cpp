@@ -49,7 +49,7 @@ namespace wrench {
                 }
             } catch (wrench::WorkflowExecutionException &e) {
                 //ignore (network error or something)
-                break;
+                continue;
 
             }
 
@@ -60,7 +60,6 @@ namespace wrench {
 
             this->job_manager->forgetJob(job);
         }
-        return 0;
 
     }
 };
