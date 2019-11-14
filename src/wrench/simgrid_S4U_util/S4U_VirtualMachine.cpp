@@ -81,7 +81,7 @@ namespace wrench {
 
         simgrid::s4u::Host *physical_host = simgrid::s4u::Host::by_name_or_null(pm_name);
         if (physical_host == nullptr) {
-            throw std::runtime_error("S4U_VirtualMachine::start(): unknown physical host '" + pm_name + "'");
+            throw std::invalid_argument("S4U_VirtualMachine::start(): unknown physical host '" + pm_name + "'");
         }
         this->vm = new simgrid::s4u::VirtualMachine(this->vm_name,
                                                     physical_host,

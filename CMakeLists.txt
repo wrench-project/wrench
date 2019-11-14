@@ -302,6 +302,7 @@ set(TEST_FILES
         test/simulation/InvalidXMLTest.cpp
         test/compute_services/ScratchSpaceTest.cpp
         test/simulation/S4U_DaemonTest.cpp
+        test/simulation/S4U_VirtualMachineTest.cpp
         test/simulation/S4U_SimulationTest.cpp
         test/pilot_job/CriticalPathSchedulerTest.cpp
         test/misc/PointerUtilTest.cpp
