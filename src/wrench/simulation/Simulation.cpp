@@ -110,9 +110,9 @@ namespace wrench {
         std::vector<std::string> cleanedup_args;
 
         for (i = 0; i < *argc; i++) {
-            if (not strcmp(argv[i], "--wrench-no-color")) {
+            if ((not strcmp(argv[i], "--wrench-no-color")) or (not strcmp(argv[i], "--wrench-no-colors"))) {
                 TerminalOutput::disableColor();
-            } else if (not strcmp(argv[i], "--wrench-no-log")) {
+            } else if ((not strcmp(argv[i], "--wrench-no-log")) or (not strcmp(argv[i], "--wrench-no-logs"))) {
                 TerminalOutput::disableColor();
                 TerminalOutput::disableLog();
                 wrench_no_log = true;
