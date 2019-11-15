@@ -681,7 +681,7 @@ namespace wrench {
             if (wu->task == nullptr) {
                 // Always run on the first host
                 std::tuple<std::string, unsigned long> allocation =
-                        pickAllocation(nullptr, "", 0, 0.0, no_longer_considered_hosts);
+                        pickAllocation(nullptr, "", 1, 0.0, no_longer_considered_hosts);
                 required_ram = 0.0;
                 target_host = std::get<0>(allocation);
                 target_num_cores = std::get<1>(allocation);
