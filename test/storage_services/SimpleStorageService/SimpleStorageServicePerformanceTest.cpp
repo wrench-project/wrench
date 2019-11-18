@@ -244,14 +244,13 @@ private:
 };
 
 TEST_F(SimpleStorageServicePerformanceTest, ConcurrentFileCopies) {
-    DO_TEST_WITH_FORK_ONE_ARG(do_ConcurrentFileCopies_test, DBL_MAX);
+    DO_TEST_WITH_FORK_ONE_ARG(do_ConcurrentFileCopies_test, DBL_MAX)
     DO_TEST_WITH_FORK_ONE_ARG(do_ConcurrentFileCopies_test, FILE_SIZE/2);
     DO_TEST_WITH_FORK_ONE_ARG(do_ConcurrentFileCopies_test, FILE_SIZE/10);
     DO_TEST_WITH_FORK_ONE_ARG(do_ConcurrentFileCopies_test, FILE_SIZE/10 + FILE_SIZE / 3);
     DO_TEST_WITH_FORK_ONE_ARG(do_ConcurrentFileCopies_test, FILE_SIZE/20);
     DO_TEST_WITH_FORK_ONE_ARG(do_ConcurrentFileCopies_test, FILE_SIZE/50);
     DO_TEST_WITH_FORK_ONE_ARG(do_ConcurrentFileCopies_test, FILE_SIZE/100);
-    DO_TEST_WITH_FORK_ONE_ARG(do_ConcurrentFileCopies_test, FILE_SIZE/200);
 }
 
 void SimpleStorageServicePerformanceTest::do_ConcurrentFileCopies_test(double buffer_size) {

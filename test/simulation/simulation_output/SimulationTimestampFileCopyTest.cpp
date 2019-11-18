@@ -173,8 +173,10 @@ void SimulationTimestampFileCopyTest::do_SimulationTimestampFileCopyBasic_test()
                                                                                                                   wrench::ComputeService::ALL_RAM))},
                                                                                           {})));
 
-    ASSERT_NO_THROW(source_storage_service = simulation->add(new wrench::SimpleStorageService(host1, {"/"})));
-    ASSERT_NO_THROW(destination_storage_service = simulation->add(new wrench::SimpleStorageService(host2, {"/"})));
+    ASSERT_NO_THROW(source_storage_service = simulation->add(new wrench::SimpleStorageService(host1, {"/"},
+                                                                                              {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "infinity"}})));
+    ASSERT_NO_THROW(destination_storage_service = simulation->add(new wrench::SimpleStorageService(host2, {"/"},
+                                                                                                   {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "infinity"}})));
 
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
     ASSERT_NO_THROW(file_registry_service = simulation->add(new wrench::FileRegistryService(host1)));
