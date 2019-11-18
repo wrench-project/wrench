@@ -24,10 +24,12 @@ namespace wrench {
     public:
 
         /** @brief Buffer size used when copying/communicating data:
-         *   - "infinity" (default): full buffering (read/write and forward model)
+         *   - "infinity": full buffering (read/write and forward model)
          *   - "0": an ideal fluid model
          *   - any integral value in between: an actual buffer size (the smaller the buffer size, the
          *     slower the simulation)
+         *
+         *  - Default value: "1048576" (1 MiB)
          **/
         DECLARE_PROPERTY_NAME(BUFFER_SIZE);
     };
