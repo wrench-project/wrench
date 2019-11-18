@@ -20,10 +20,20 @@ class BadPlatformTest : public ::testing::Test {
 
 public:
 
+    void do_badPlatformFileTest_test();
     void do_badPlatformTest_test(std::string xml);
 
 protected:
 
+
+    std::string bad_format_xml = "<?xml version='1.0'?>"
+                               "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                               "<platform version=\"4.1\"> "
+                               " < "
+                               "   <zone id=\"AS0\" routing=\"Full\"> "
+                               "       <host id=\"Host\" speed=\"1f\" core=\"2\" /> "
+                               "   </zone> "
+                               "</platform>";
 
     std::string bad_ram1_xml = "<?xml version='1.0'?>"
                                "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
@@ -101,12 +111,40 @@ protected:
 };
 
 /**********************************************************************/
+/**                   BAD PLATFORM FILE TEST                         **/
+/**********************************************************************/
+
+
+TEST_F(BadPlatformTest, BadPlatformFile) {
+        DO_TEST_WITH_FORK(do_badPlatformFileTest_test);
+}
+
+void BadPlatformTest::do_badPlatformFileTest_test() {
+
+    // Create and initialize a simulation
+    auto *simulation = new wrench::Simulation();
+    int argc = 1;
+    auto argv = (char **) calloc(1, sizeof(char *));
+    argv[0] = strdup("unit_test");
+
+    ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+    ASSERT_THROW(simulation->instantiatePlatform("/bogus"), std::invalid_argument);
+
+    delete simulation;
+    free(argv[0]);
+    free(argv);
+}
+
+
+/**********************************************************************/
 /**                        BAD PLATFORM TEST                         **/
 /**********************************************************************/
 
 
 TEST_F(BadPlatformTest, BadPlatform) {
     auto bad_xmls = {
+            this->bad_format_xml,
             this->bad_ram1_xml,
             this->bad_ram2_xml,
             this->bad_disk1_xml,
