@@ -204,6 +204,7 @@ namespace wrench {
         if (already_setup) {
             throw std::runtime_error("Simulation::instantiatePlatform(): Platform already setup");
         }
+
         this->s4u_simulation->setupPlatform(filename);
 
         try {
