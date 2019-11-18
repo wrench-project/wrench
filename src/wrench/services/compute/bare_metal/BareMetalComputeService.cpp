@@ -669,7 +669,6 @@ namespace wrench {
         // able to run on that host due to RAM, and because we don't
         // allow non-zero-ram tasks to jump ahead of other tasks
 
-        WRENCH_INFO("THERE ARE %lu READY WUs", this->ready_workunits.size());
         for (auto const &wu : this->ready_workunits) {
 
             std::string picked_host;
