@@ -110,9 +110,9 @@ namespace wrench {
         std::vector<std::string> cleanedup_args;
 
         for (i = 0; i < *argc; i++) {
-            if (not strcmp(argv[i], "--wrench-no-color")) {
+            if ((not strcmp(argv[i], "--wrench-no-color")) or (not strcmp(argv[i], "--wrench-no-colors"))) {
                 TerminalOutput::disableColor();
-            } else if (not strcmp(argv[i], "--wrench-no-log")) {
+            } else if ((not strcmp(argv[i], "--wrench-no-log")) or (not strcmp(argv[i], "--wrench-no-logs"))) {
                 TerminalOutput::disableColor();
                 TerminalOutput::disableLog();
                 wrench_no_log = true;
@@ -204,7 +204,15 @@ namespace wrench {
         if (already_setup) {
             throw std::runtime_error("Simulation::instantiatePlatform(): Platform already setup");
         }
+
         this->s4u_simulation->setupPlatform(filename);
+
+        try {
+            this->platformSanityCheck();
+        } catch(std::exception &e) {
+            throw;
+        }
+
         already_setup = true;
     }
 
@@ -477,39 +485,49 @@ namespace wrench {
     }
 
 
-    /**
-        * @brief Stage a copy of a file on a storage service (to the "/" partition)
-        *
-        * @param file: a file to stage on a storage service
-        * @param storage_service: the storage service
-        *
-        * @throw std::runtime_error
-        * @throw std::invalid_argument
-        */
-    void Simulation::stageFile(WorkflowFile *file, std::shared_ptr<StorageService> storage_service) {
-        try {
-            this->stageFile(file, storage_service, "/");
-        } catch (std::runtime_error &e) {
-            throw;
-        } catch (std::invalid_argument &e) {
-            throw;
-        }
-    }
 
     /**
-     * @brief Stage a copy of a file on a storage service
-     *
-     * @param file: a file to stage on a storage service
-     * @param storage_service: the storage service
-     * @param partition: the partition on which to store the files
-     *
-     * @throw std::runtime_error
-     * @throw std::invalid_argument
+    * @brief Stage a copy of a file at a storage service in the root of the (unique) mount point
+    *
+    * @param file: a file to stage on a storage service
+    * @param storage_service: a storage service
+    *
+    * @throw std::runtime_error
+    * @throw std::invalid_argument
+    */
+    void Simulation::stageFile(WorkflowFile *file, std::shared_ptr<StorageService> storage_service) {
+        Simulation::stageFile(file, FileLocation::LOCATION(storage_service));
+    }
+
+
+    /**
+    * @brief Stage a copy of a file at a storage service in a particular directory
+    *
+    * @param file: a file to stage on a storage service
+    * @param storage_service: a storage service
+    * @param directory_absolute_path: the absolute path of the directory where the file should be stored
+    *
+    * @throw std::runtime_error
+    * @throw std::invalid_argument
+    */
+    void Simulation::stageFile(WorkflowFile *file, std::shared_ptr<StorageService> storage_service, std::string directory_absolute_path) {
+        Simulation::stageFile(file, FileLocation::LOCATION(storage_service, directory_absolute_path));
+    }
+
+
+    /**
+     * @brief State a copy of a file at a location
+     * @param file: the file
+     * @param location: the location
      */
-    void
-    Simulation::stageFile(WorkflowFile *file, std::shared_ptr<StorageService> storage_service, std::string partition) {
-        if ((file == nullptr) || (storage_service == nullptr)) {
+    void Simulation::stageFile(WorkflowFile *file, std::shared_ptr<FileLocation> location) {
+
+        if ((file == nullptr) or (location == nullptr)) {
             throw std::invalid_argument("Simulation::stageFile(): Invalid arguments");
+        }
+
+        if (this->is_running) {
+            throw  std::runtime_error(" Simulation::stageFile(): Cannot stage a file once the simulation has started");
         }
 
         // Check that a FileRegistryService has been set
@@ -524,82 +542,19 @@ namespace wrench {
                     "Simulation::stageFile(): Cannot stage a file that's the output of task that hasn't executed yet");
         }
 
-        if (partition.empty()) {
-            partition = "/";
-        }
-
-//        XBT_INFO("Staging file %s (%lf)", file->getID().c_str(), file->getSize());
         // Put the file on the storage service (not via the service daemon)
         try {
-            storage_service->stageFile(file);
-        } catch (std::runtime_error &e) {
+            StorageService::stageFile(file, location);
+        } catch (std::invalid_argument &e) {
             throw;
         }
 
         // Update all file registry services
         for (auto frs : this->file_registry_services) {
-            frs->addEntryToDatabase(file, storage_service);
+            frs->addEntryToDatabase(file, location);
         }
     }
 
-    /**
-   * @brief Stage file copies on a storage service (to the "/" partition)
-   *
-   * @param files: a map of files (indexed by file ids) to stage on a storage service
-   * @param storage_service: the storage service
-   *
-   * @throw std::runtime_error
-   * @throw std::invalid_argument
-   */
-    void Simulation::stageFiles(std::map<std::string, WorkflowFile *> files,
-                                std::shared_ptr<StorageService> storage_service) {
-        try {
-            this->stageFiles(files, storage_service, "/");
-        } catch (std::runtime_error &e) {
-            throw e;
-        } catch (std::invalid_argument &e) {
-            throw e;
-        }
-    }
-
-/**
-  * @brief Stage file copies on a storage service
-  *
-  * @param files: a map of files (indexed by file ids) to stage on a storage service
-  * @param storage_service: the storage service
-  * @param partition: the partition on which to store the files
-  *
-  * @throw std::runtime_error
-  * @throw std::invalid_argument
-  */
-    void
-    Simulation::stageFiles(std::map<std::string, WorkflowFile *> files, std::shared_ptr<StorageService> storage_service,
-                           std::string partition) {
-
-        if (storage_service == nullptr) {
-            throw std::invalid_argument("Simulation::stageFiles(): Invalid arguments");
-        }
-
-        // Check that at least one  FileRegistryService has been set
-        if (this->file_registry_services.empty()) {
-            throw std::runtime_error(
-                    "Simulation::stageFiles(): A FileRegistryService must be instantiated and passed to Simulation.add() before files can be staged on storage services");
-        }
-
-        if (partition.empty()) {
-            partition = "/";
-        }
-
-        try {
-            for (auto const &f : files) {
-                this->stageFile(f.second, storage_service, partition);
-            }
-        } catch (std::runtime_error &e) {
-            throw;
-        } catch (std::invalid_argument &e) {
-            throw;
-        }
-    }
 
     /**
      * @brief Get the current simulated date
@@ -962,6 +917,58 @@ namespace wrench {
         shared_ptr->start(shared_ptr, true, false); // Daemonized, no auto-restart
 
         return shared_ptr;
+    }
+
+    /**
+     * @brief Checks that the platform is well defined
+     *
+     * @throw std::invalid_argument
+     */
+    void Simulation::platformSanityCheck() {
+        auto hostnames = wrench::Simulation::getHostnameList();
+
+        // Check RAM Capacities
+        for (auto const &h : hostnames) {
+            S4U_Simulation::getHostMemoryCapacity(h);
+        }
+
+        // Check Disk Capacities
+        for (auto const &h : hostnames) {
+            auto disks = S4U_Simulation::getDisks(h);
+            for (auto const &d : disks) {
+                S4U_Simulation::getDiskCapacity(h, d);
+            }
+        }
+
+        // Check Disk Capacities
+        for (auto const &h : hostnames) {
+            auto disks = S4U_Simulation::getDisks(h);
+            for (auto const &d : disks) {
+                S4U_Simulation::getDiskCapacity(h, d);
+            }
+        }
+
+        // Check Disk Prefixness
+        for (auto const &h : hostnames) {
+            auto disks = S4U_Simulation::getDisks(h);
+            for (unsigned int i=0; i < disks.size(); i++) {
+                for (unsigned int j=0; j < disks.size(); j++) {
+                    if (j == i) {
+                        continue;
+                    }
+                    if (disks[i] == disks[j]) {
+                        throw std::invalid_argument("Simulation::platformSanityCheck(): Host " + h +
+                                                    " has two disks with the same mount point '" + disks[i] + "'");
+                    }
+                    if ((disks[j] != "/") and  (disks[i] != "/") and (FileLocation::properPathPrefix(disks[i], disks[j]))) {
+                        throw std::invalid_argument("Simulation::platformSanityCheck(): Host " + h +
+                                                    " has two disks, with one of them having a mount point that "
+                                                    "is a prefix of the other (" + disks[j] + " and " + disks[i] + ")");
+                    }
+                }
+            }
+        }
+
     }
 
 

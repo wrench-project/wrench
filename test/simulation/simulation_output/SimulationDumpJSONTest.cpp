@@ -48,10 +48,10 @@ protected:
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"host1\" speed=\"1f\" core=\"10\"> "
-                          "         <prop id=\"ram\" value=\"10\"/>"
+                          "         <prop id=\"ram\" value=\"10B\"/>"
                           "       </host>"
                           "       <host id=\"host2\" speed=\"1f\" core=\"20\"> "
-                          "          <prop id=\"ram\" value=\"20\"/> "
+                          "          <prop id=\"ram\" value=\"20B\"/> "
                           "       </host> "
                           "       <link id=\"1\" bandwidth=\"1Gbps\" latency=\"1us\"/>"
                           "       <route src=\"host1\" dst=\"host2\"> <link_ctn id=\"1\"/> </route>"
@@ -90,13 +90,13 @@ protected:
                            "<platform version=\"4.1\"> "
                            "   <zone id=\"AS0\" routing=\"Full\"> "
                            "       <host id=\"host1\" speed=\"1f\" core=\"10\"> "
-                           "         <prop id=\"ram\" value=\"10\"/>"
+                           "         <prop id=\"ram\" value=\"10B\"/>"
                            "       </host>"
                            "       <host id=\"host2\" speed=\"1f\" core=\"20\"> "
-                           "          <prop id=\"ram\" value=\"20\"/> "
+                           "          <prop id=\"ram\" value=\"20B\"/> "
                            "       </host> "
                            "       <host id=\"host3\" speed=\"1f\" core=\"20\"> "
-                           "          <prop id=\"ram\" value=\"20\"/> "
+                           "          <prop id=\"ram\" value=\"20B\"/> "
                            "       </host> "
                            "       <link id=\"1\" bandwidth=\"1Gbps\" latency=\"1us\"/>"
                            "       <link id=\"2\" bandwidth=\"1Gbps\" latency=\"1us\"/>"
@@ -117,13 +117,13 @@ protected:
                            "<platform version=\"4.1\"> "
                            "   <zone id=\"AS0\" routing=\"Full\"> "
                            "       <host id=\"host1\" speed=\"1f\" core=\"10\"> "
-                           "         <prop id=\"ram\" value=\"10\"/>"
+                           "         <prop id=\"ram\" value=\"10B\"/>"
                            "       </host>"
                            "       <host id=\"host2\" speed=\"1f\" core=\"20\"> "
-                           "          <prop id=\"ram\" value=\"20\"/> "
+                           "          <prop id=\"ram\" value=\"20B\"/> "
                            "       </host> "
                            "       <host id=\"host3\" speed=\"1f\" core=\"20\"> "
-                           "          <prop id=\"ram\" value=\"20\"/> "
+                           "          <prop id=\"ram\" value=\"20B\"/> "
                            "       </host> "
                            "       <link id=\"1\" bandwidth=\"1Gbps\" latency=\"1us\"/>"
                            "       <link id=\"2\" bandwidth=\"1Gbps\" latency=\"1us\"/>"
@@ -145,7 +145,7 @@ protected:
                            "     <!-- effective bandwidth = 1250 MBps -->"
                            "     <cluster id=\"hpc.edu\" prefix=\"hpc.edu/node_\" suffix=\"\" radical=\"0-3"
                            "\" core=\"1\" speed=\"1000Gf\" bw=\"1288.6597MBps\" lat=\"10us\" router_id=\"hpc_gateway\">"
-                           "         <prop id=\"ram\" value=\"80000000000\"/>"
+                           "         <prop id=\"ram\" value=\"80000000000B\"/>"
                            "        </cluster>"
                            "      <zone id=\"AS2\" routing=\"Full\">"
                            "          <host id=\"storage_db.edu\" speed=\"1000Gf\"/>"
@@ -1203,13 +1203,14 @@ private:
         // be generated for this host at time 0.0
         this->simulation->setPstate(this->getHostname(), 0);
 
-        const std::vector<std::string> hostnames = this->simulation->getHostnameList();
+        const std::vector<std::string> hostnames = wrench::Simulation::getHostnameList();
         const double TWO_SECOND_PERIOD = 2.0;
 
         auto em = this->createEnergyMeter(hostnames, TWO_SECOND_PERIOD);
 
         const double MEGAFLOP = 1000.0 * 1000.0;
         wrench::S4U_Simulation::compute(6.0 * 100.0 * MEGAFLOP); // compute for 6 seconds
+
 
         return 0;
     }
@@ -1245,7 +1246,7 @@ void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
     EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path2));
 
     // get the single host
-    std::string host = simulation->getHostnameList()[0];
+    std::string host = wrench::Simulation::getHostnameList()[0];
 
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     EXPECT_NO_THROW(wms = simulation->add(

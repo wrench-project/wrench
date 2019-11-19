@@ -87,8 +87,30 @@ protected:
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
-                          "       <host id=\"DualCoreHost\" speed=\"1f\" core=\"2\"/> "
-                          "       <host id=\"QuadCoreHost\" speed=\"1f\" core=\"4\"/> "
+                          "       <host id=\"DualCoreHost\" speed=\"1f\" core=\"2\" > "
+                          "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/disk1\"/>"
+                          "          </disk>"
+                          "          <disk id=\"large_disk2\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/disk2\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"101B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>  "
+                          "       <host id=\"QuadCoreHost\" speed=\"1f\" core=\"4\" > "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"101B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>  "
                           "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
                           "       <route src=\"DualCoreHost\" dst=\"QuadCoreHost\"> <link_ctn id=\"1\"/> </route>"
                           "   </zone> "
@@ -192,7 +214,8 @@ private:
         int job_index = 0;
         for (auto task : tasks) {
             try {
-                one_task_jobs[job_index] = job_manager->createStandardJob({task}, {{this->test->input_file, this->test->storage_service}},
+                one_task_jobs[job_index] = job_manager->createStandardJob({task}, {{this->test->input_file,
+                                                                                    wrench::FileLocation::LOCATION(this->test->storage_service)}},
                                                                           {}, {}, {});
 
                 if (one_task_jobs[job_index]->getNumTasks() != 1) {
@@ -319,9 +342,9 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     // Adding services to an uninitialized simulation
     std::vector<std::string> hosts = {"DualCoreHost", "QuadCoreHost"};
     ASSERT_THROW(simulation->add(
-            new wrench::CloudComputeService("DualCoreHost", hosts, 100.0)), std::runtime_error);
+            new wrench::CloudComputeService("DualCoreHost", hosts, "/scratch")), std::runtime_error);
     ASSERT_THROW(simulation->add(
-            new wrench::SimpleStorageService("DualCoreHost", 100.0)), std::runtime_error);
+            new wrench::SimpleStorageService("DualCoreHost", {"/"})), std::runtime_error);
     ASSERT_THROW(simulation->add(
             new wrench::NetworkProximityService("DualCoreHost", hosts)), std::runtime_error);
     ASSERT_THROW(simulation->add(
@@ -337,10 +360,10 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
 
     // Create a Storage Service
     ASSERT_THROW(storage_service = simulation->add(
-            new wrench::SimpleStorageService(hostname, 100.0, {},
+            new wrench::SimpleStorageService(hostname, {"/disk1"}, {},
                                              {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, -1}})), std::invalid_argument);
     storage_service = simulation->add(
-            new wrench::SimpleStorageService(hostname, 100.0, {},
+            new wrench::SimpleStorageService(hostname, {"/disk2"}, {},
                                              {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 123}}));
 
 
@@ -357,15 +380,15 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     // Create a Cloud Service
     std::vector<std::string> execution_hosts = {"QuadCoreHost"};
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::CloudComputeService(hostname, execution_hosts, 100.0,
+            new wrench::CloudComputeService(hostname, execution_hosts, "/scratch",
                                             { {wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"},
-                                              {wrench::BareMetalComputeServiceProperty::THREAD_STARTUP_OVERHEAD, "0"}
+                                              {wrench::BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD, "0"}
                                               })));
 
     // Try to get the property in bogus ways, for coverage
     ASSERT_THROW(compute_service->getPropertyValueAsDouble(wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS), std::invalid_argument);
     ASSERT_THROW(compute_service->getPropertyValueAsUnsignedLong(wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS), std::invalid_argument);
-    ASSERT_THROW(compute_service->getPropertyValueAsBoolean(wrench::BareMetalComputeServiceProperty::THREAD_STARTUP_OVERHEAD), std::invalid_argument);
+    ASSERT_THROW(compute_service->getPropertyValueAsBoolean(wrench::BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD), std::invalid_argument);
 
     // Try to get a message payload value, just for kicks
     ASSERT_NO_THROW(compute_service->getMessagePayloadValue(wrench::ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD));

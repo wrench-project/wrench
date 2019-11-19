@@ -19,106 +19,108 @@
 namespace wrench {
 
     class WMS;
-		class Workflow;
-		class WorkflowTask;
-		class WorkflowFile;
-		class WorkflowJob;
-		class PilotJob;
-		class StandardJob;
-		class ComputeService;
-		class StorageService;
+    class Workflow;
+    class WorkflowTask;
+    class WorkflowFile;
+    class WorkflowJob;
+    class PilotJob;
+    class StandardJob;
+    class ComputeService;
+    class StorageService;
 
-		/***********************/
-		/** \cond DEVELOPER    */
-		/***********************/
-
-
-		/**
-     * @brief A helper daemon (co-located with and explicitly started by a WMS), which is used to
-     *        handle all job executions
-     */
-		class JobManager : public Service {
-
-		public:
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
 
 
-				void stop() override;
+    /**
+ * @brief A helper daemon (co-located with and explicitly started by a WMS), which is used to
+ *        handle all job executions
+ */
+    class JobManager : public Service {
 
-				void kill();
-
-				StandardJob *createStandardJob(std::vector<WorkflowTask *> tasks,
-				                               std::map<WorkflowFile *, std::shared_ptr<StorageService>  > file_locations,
-				                               std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>  , std::shared_ptr<StorageService>  >> pre_file_copies,
-				                               std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>  , std::shared_ptr<StorageService>  >> post_file_copies,
-				                               std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>  >> cleanup_file_deletions);
-
-				StandardJob *createStandardJob(std::vector<WorkflowTask *> tasks,
-				                               std::map<WorkflowFile *,
-								                               std::shared_ptr<StorageService>  > file_locations);
-
-				StandardJob *createStandardJob(WorkflowTask *task,
-				                               std::map<WorkflowFile *,
-								                               std::shared_ptr<StorageService>  > file_locations);
-
-				PilotJob *createPilotJob();
-
-				void submitJob(WorkflowJob *job, std::shared_ptr<ComputeService> compute_service, std::map<std::string, std::string> service_specific_args = {});
-
-				void terminateJob(WorkflowJob *);
-
-				void forgetJob(WorkflowJob *job);
-
-				std::set<PilotJob *> getPendingPilotJobs();
-
-				std::set<PilotJob *> getRunningPilotJobs();
-				/***********************/
-				/** \cond INTERNAL    */
-				/***********************/
-
-				~JobManager() override;
-
-		protected:
-
-				friend class WMS;
-
-				explicit JobManager(std::shared_ptr<WMS> wms);
-
-				/***********************/
-				/** \endcond           */
-				/***********************/
-
-		private:
-
-				int main() override;
-                bool processNextMessage();
-                void processStandardJobCompletion(StandardJob *job, std::shared_ptr<ComputeService> compute_service);
-                void processStandardJobFailure(StandardJob *job, std::shared_ptr<ComputeService> compute_service, std::shared_ptr<FailureCause> cause);
-                void processPilotJobStart(PilotJob *job, std::shared_ptr<ComputeService> compute_service);
-                void processPilotJobExpiration(PilotJob *job, std::shared_ptr<ComputeService> compute_service);
+    public:
 
 
+        void stop() override;
 
-            // Relevant WMS
-				std::shared_ptr<WMS> wms;
+        void kill();
 
-				// Job map
-				std::map<WorkflowJob*, std::unique_ptr<WorkflowJob>> jobs;
 
-				// Job lists
-				std::set<StandardJob *> pending_standard_jobs;
-				std::set<StandardJob *> running_standard_jobs;
-				std::set<StandardJob *> completed_standard_jobs;
-				std::set<StandardJob *> failed_standard_jobs;
+        StandardJob *createStandardJob(std::vector<WorkflowTask *> tasks,
+                                       std::map<WorkflowFile *, std::shared_ptr<FileLocation>  > file_locations,
+                                       std::set<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  , std::shared_ptr<FileLocation>  >> pre_file_copies,
+                                       std::set<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  , std::shared_ptr<FileLocation>  >> post_file_copies,
+                                       std::set<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  >> cleanup_file_deletions);
 
-				std::set<PilotJob *> pending_pilot_jobs;
-				std::set<PilotJob *> running_pilot_jobs;
-				std::set<PilotJob *> completed_pilot_jobs;
 
-		};
+        StandardJob *createStandardJob(std::vector<WorkflowTask *> tasks,
+                                       std::map<WorkflowFile *,
+                                               std::shared_ptr<FileLocation>  > file_locations);
 
-		/***********************/
-		/** \endcond            */
-		/***********************/
+        StandardJob *createStandardJob(WorkflowTask *task,
+                                       std::map<WorkflowFile *,
+                                               std::shared_ptr<FileLocation>  > file_locations);
+
+        PilotJob *createPilotJob();
+
+        void submitJob(WorkflowJob *job, std::shared_ptr<ComputeService> compute_service, std::map<std::string, std::string> service_specific_args = {});
+
+        void terminateJob(WorkflowJob *);
+
+        void forgetJob(WorkflowJob *job);
+
+        std::set<PilotJob *> getPendingPilotJobs();
+
+        std::set<PilotJob *> getRunningPilotJobs();
+        /***********************/
+        /** \cond INTERNAL    */
+        /***********************/
+
+        ~JobManager() override;
+
+    protected:
+
+        friend class WMS;
+
+        explicit JobManager(std::shared_ptr<WMS> wms);
+
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
+    private:
+
+        int main() override;
+        bool processNextMessage();
+        void processStandardJobCompletion(StandardJob *job, std::shared_ptr<ComputeService> compute_service);
+        void processStandardJobFailure(StandardJob *job, std::shared_ptr<ComputeService> compute_service, std::shared_ptr<FailureCause> cause);
+        void processPilotJobStart(PilotJob *job, std::shared_ptr<ComputeService> compute_service);
+        void processPilotJobExpiration(PilotJob *job, std::shared_ptr<ComputeService> compute_service);
+
+
+
+        // Relevant WMS
+        std::shared_ptr<WMS> wms;
+
+        // Job map
+        std::map<WorkflowJob*, std::unique_ptr<WorkflowJob>> jobs;
+
+        // Job lists
+        std::set<StandardJob *> pending_standard_jobs;
+        std::set<StandardJob *> running_standard_jobs;
+        std::set<StandardJob *> completed_standard_jobs;
+        std::set<StandardJob *> failed_standard_jobs;
+
+        std::set<PilotJob *> pending_pilot_jobs;
+        std::set<PilotJob *> running_pilot_jobs;
+        std::set<PilotJob *> completed_pilot_jobs;
+
+    };
+
+    /***********************/
+    /** \endcond            */
+    /***********************/
 
 };
 

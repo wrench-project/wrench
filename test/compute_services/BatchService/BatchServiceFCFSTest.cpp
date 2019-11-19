@@ -166,7 +166,7 @@ private:
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
             if (std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
-                actual_completion_times[i] =  this->simulation->getCurrentSimulatedDate();
+                actual_completion_times[i] =  wrench::Simulation::getCurrentSimulatedDate();
             } else {
                 throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
@@ -219,7 +219,7 @@ void BatchServiceFCFSTest::do_SimpleFCFS_test() {
 
     // Create a Batch Service with a FCFS scheduling algorithm
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BatchComputeService(hostname, {"Host1", "Host2", "Host3", "Host4"}, 0,
+            new wrench::BatchComputeService(hostname, {"Host1", "Host2", "Host3", "Host4"}, "",
                                             {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}})));
 
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -404,7 +404,7 @@ void BatchServiceFCFSTest::do_SimpleFCFSQueueWaitTimePrediction_test() {
 
     // Create a Batch Service with a FCFS scheduling algorithm
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BatchComputeService(hostname, {"Host1", "Host2", "Host3", "Host4"}, 0,
+            new wrench::BatchComputeService(hostname, {"Host1", "Host2", "Host3", "Host4"}, "",
                                             {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}})));
 
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -510,7 +510,7 @@ void BatchServiceFCFSTest::do_BrokenQueueWaitTimePrediction_test() {
 
     // Create a Batch Service with a FCFS scheduling algorithm
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BatchComputeService(hostname, {"Host1", "Host2", "Host3", "Host4"}, 0,
+            new wrench::BatchComputeService(hostname, {"Host1", "Host2", "Host3", "Host4"}, "",
                                             {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"},
                                              {wrench::BatchComputeServiceProperty::HOST_SELECTION_ALGORITHM, "BESTFIT"}})));
 

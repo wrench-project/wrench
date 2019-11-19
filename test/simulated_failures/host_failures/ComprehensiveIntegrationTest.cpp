@@ -41,7 +41,7 @@ public:
     std::shared_ptr<wrench::CloudComputeService> cloud_service = nullptr;
     std::shared_ptr<wrench::BareMetalComputeService> baremetal_service = nullptr;
 
-    void do_IntegrationFailurTest_test(std::map<std::string, bool> args);
+    void do_IntegrationFailureTest_test(std::map<std::string, bool> args);
 
 
 protected:
@@ -73,7 +73,17 @@ protected:
                                               "BareMetalHead", "BareMetalHost1", "BareMetalHost2"};
 
         for (auto const &h : hostnames) {
-            xml += "<host id=\"" + h + "\"  speed=\"1f\" core=\"4\"> <prop id=\"ram\" value=\"100\"/> </host>\n";
+            xml += "<host id=\"" + h + "\"  speed=\"1f\" core=\"4\" > \n"
+                                       "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">\n"
+                                       "             <prop id=\"size\" value=\"10000000000000B\"/>\n"
+                                       "             <prop id=\"mount\" value=\"/\"/>\n"
+                                       "          </disk>\n"
+                                       "          <disk id=\"scratch_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">\n"
+                                       "             <prop id=\"size\" value=\"100B\"/>\n"
+                                       "             <prop id=\"mount\" value=\"/scratch\"/>\n"
+                                       "          </disk>\n"
+                                       "          <prop id=\"ram\" value=\"100B\" /> \n"
+                                       "</host>\n";
         }
 
         xml += "<link id=\"link\" bandwidth=\"1kBps\" latency=\"0\"/>\n";
@@ -110,6 +120,7 @@ protected:
 
         xml += "   </zone> \n"
                "</platform>\n";
+
 #if 0
 
         "       <host id=\"StorageHost1\"   speed=\"1f\" core=\"1\"/> "
@@ -170,9 +181,9 @@ private:
         seed = seed * 17 + 37;
         auto switcher = std::shared_ptr<wrench::ResourceRandomRepeatSwitcher>(
                 new wrench::ResourceRandomRepeatSwitcher("WMSHost", seed,
-                                                     CHAOS_MONKEY_MIN_SLEEP_BEFORE_OFF, CHAOS_MONKEY_MAX_SLEEP_BEFORE_OFF,
-                                                     CHAOS_MONKEY_MIN_SLEEP_BEFORE_ON, CHAOS_MONKEY_MAX_SLEEP_BEFORE_ON,
-                                                     victimhost, wrench::ResourceRandomRepeatSwitcher::ResourceType::HOST));
+                                                         CHAOS_MONKEY_MIN_SLEEP_BEFORE_OFF, CHAOS_MONKEY_MAX_SLEEP_BEFORE_OFF,
+                                                         CHAOS_MONKEY_MIN_SLEEP_BEFORE_ON, CHAOS_MONKEY_MAX_SLEEP_BEFORE_ON,
+                                                         victimhost, wrench::ResourceRandomRepeatSwitcher::ResourceType::HOST));
         switcher->simulation = this->simulation;
         switcher->start(switcher, true, false); // Daemonized, no auto-restart
     }
@@ -292,8 +303,8 @@ private:
 
         // Create/submit a standard job
         auto job = this->job_manager->createStandardJob(task, {
-                {*(task->getInputFiles().begin()), target_storage_service},
-                {*(task->getOutputFiles().begin()), target_storage_service},
+                {*(task->getInputFiles().begin()), wrench::FileLocation::LOCATION(target_storage_service)},
+                {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(target_storage_service)},
         });
         this->job_manager->submitJob(job, target_cs);
 
@@ -338,21 +349,21 @@ TEST_F(ComprehensiveIntegrationHostFailuresTest, OneNonFaultyStorageOneFaultyBar
     std::map<std::string, bool> args;
     args["storage1"] = false;
     args["baremetal"] = true;
-    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailurTest_test, args);
+    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTest_test, args);
 }
 
 TEST_F(ComprehensiveIntegrationHostFailuresTest, OneFaultyStorageOneNonFaultyBareMetal) {
     std::map<std::string, bool> args;
     args["storage1"] = true;
     args["baremetal"] = false;
-    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailurTest_test, args);
+    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTest_test, args);
 }
 
 TEST_F(ComprehensiveIntegrationHostFailuresTest, OneFaultyStorageOneFaultyBareMetal) {
     std::map<std::string, bool> args;
     args["storage1"] = true;
     args["baremetal"] = true;
-    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailurTest_test, args);
+    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTest_test, args);
 }
 
 TEST_F(ComprehensiveIntegrationHostFailuresTest, TwoFaultyStorageOneFaultyBareMetal) {
@@ -360,21 +371,21 @@ TEST_F(ComprehensiveIntegrationHostFailuresTest, TwoFaultyStorageOneFaultyBareMe
     args["storage1"] = true;
     args["storage2"] = true;
     args["baremetal"] = true;
-    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailurTest_test, args);
+    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTest_test, args);
 }
 
 TEST_F(ComprehensiveIntegrationHostFailuresTest, OneNonFaultyStorageOneFaultyCloud) {
     std::map<std::string, bool> args;
     args["storage1"] = false;
     args["cloud"] = true;
-    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailurTest_test, args);
+    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTest_test, args);
 }
 
 TEST_F(ComprehensiveIntegrationHostFailuresTest, OneFaultyStorageOneFaultyCloud) {
     std::map<std::string, bool> args;
     args["storage1"] = true;
     args["cloud"] = true;
-    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailurTest_test, args);
+    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTest_test, args);
 }
 
 TEST_F(ComprehensiveIntegrationHostFailuresTest, TwoFaultyStorageOneFaultyCloud) {
@@ -382,7 +393,7 @@ TEST_F(ComprehensiveIntegrationHostFailuresTest, TwoFaultyStorageOneFaultyCloud)
     args["storage1"] = true;
     args["storage2"] = true;
     args["cloud"] = true;
-    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailurTest_test, args);
+    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTest_test, args);
 }
 
 TEST_F(ComprehensiveIntegrationHostFailuresTest, WholeEnchilada) {
@@ -391,10 +402,10 @@ TEST_F(ComprehensiveIntegrationHostFailuresTest, WholeEnchilada) {
     args["storage2"] = true;
     args["baremetal"] = true;
     args["cloud"] = true;
-    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailurTest_test, args);
+    DO_TEST_WITH_FORK_ONE_ARG(do_IntegrationFailureTest_test, args);
 }
 
-void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailurTest_test(std::map<std::string, bool> args) {
+void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(std::map<std::string, bool> args) {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
@@ -411,10 +422,10 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailurTest_test(std
 
     // Create Storage Services
     if (args.find("storage1") != args.end()) {
-        this->storage_service1 = simulation->add(new wrench::SimpleStorageService("StorageHost1", 10000000000000.0));
+        this->storage_service1 = simulation->add(new wrench::SimpleStorageService("StorageHost1", {"/"}));
     }
     if (args.find("storage2") != args.end()) {
-        this->storage_service2 = simulation->add(new wrench::SimpleStorageService("StorageHost2", 10000000000000.0));
+        this->storage_service2 = simulation->add(new wrench::SimpleStorageService("StorageHost2", {"/"}));
     }
 
     ASSERT_TRUE((this->storage_service1 != nullptr) or (this->storage_service2 != nullptr));
@@ -430,7 +441,7 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailurTest_test(std
                                 std::make_pair("BareMetalHost2", std::make_tuple(wrench::ComputeService::ALL_CORES,
                                                                                  wrench::ComputeService::ALL_RAM)),
                         },
-                        100.0,
+                        "/scratch",
                         {}, {})));
     }
 
@@ -441,11 +452,12 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailurTest_test(std
         cloudhosts.push_back("CloudHost1");
         cloudhosts.push_back("CloudHost2");
         cloudhosts.push_back("CloudHost3");
-        this->cloud_service = std::dynamic_pointer_cast<wrench::CloudComputeService>(simulation->add(new wrench::CloudComputeService(
-                cloudhead,
-                cloudhosts,
-                1000000.0,
-                {}, {})));
+        this->cloud_service = std::dynamic_pointer_cast<wrench::CloudComputeService>(
+                simulation->add(new wrench::CloudComputeService(
+                        cloudhead,
+                        cloudhosts,
+                        {"/scratch"},
+                        {}, {})));
     }
 
     // Create a FileRegistryService
@@ -461,10 +473,10 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailurTest_test(std
         task->addInputFile(input_file);
         task->addOutputFile(output_file);
         if (this->storage_service1) {
-            simulation->stageFiles({{input_file->getID(), input_file}}, this->storage_service1);
+            simulation->stageFile(input_file, this->storage_service1);
         }
         if (this->storage_service2) {
-            simulation->stageFiles({{input_file->getID(), input_file}}, this->storage_service2);
+            simulation->stageFile(input_file, this->storage_service2);
         }
     }
 

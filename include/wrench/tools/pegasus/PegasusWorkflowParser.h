@@ -16,6 +16,10 @@ namespace wrench {
 
     class Workflow;
 
+    /**
+     * @brief A class that implement methods to read workflow files 
+     *        provided by the Pegasus project
+     */
     class PegasusWorkflowParser {
 
     public:

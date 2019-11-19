@@ -96,12 +96,12 @@ namespace wrench {
             WRENCH_INFO("Submitting task '%s' for execution on a VM", task->getID().c_str());
 
             // Submitting the task
-            std::map<WorkflowFile *, std::shared_ptr<StorageService>> file_locations;
+            std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations;
             for (auto f : task->getInputFiles()) {
-                file_locations.insert(std::make_pair(f, default_storage_service));
+                file_locations[f] = (FileLocation::LOCATION(default_storage_service));
             }
             for (auto f : task->getOutputFiles()) {
-                file_locations.insert(std::make_pair(f, default_storage_service));
+                file_locations[f] = (FileLocation::LOCATION(default_storage_service));
             }
             auto job = this->getJobManager()->createStandardJob(task, file_locations);
             this->getJobManager()->submitJob(job, picked_vm_cs);

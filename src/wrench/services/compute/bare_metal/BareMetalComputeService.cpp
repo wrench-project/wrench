@@ -43,7 +43,6 @@ namespace wrench {
      * @brief Destructor
      */
     BareMetalComputeService::~BareMetalComputeService() {
-        WRENCH_INFO("IN DESTRUCTOR");
         this->default_property_values.clear();
     }
 
@@ -296,21 +295,22 @@ namespace wrench {
      *        the compute resources available to this service.
      *          - use num_cores = ComputeService::ALL_CORES to use all cores available on the host
      *          - use memory = ComputeService::ALL_RAM to use all RAM available on the host
-     * @param scratch_space_size: size (in bytes) of the compute service's scratch storage paste
+     * @param scratch_space_mount_point: the compute service's scratch space's mount point ("" means none)
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      */
     BareMetalComputeService::BareMetalComputeService(
             const std::string &hostname,
             const std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
-            double scratch_space_size,
+            std::string scratch_space_mount_point,
             std::map<std::string, std::string> property_list,
             std::map<std::string, double> messagepayload_list
     ) :
             ComputeService(hostname,
                            "bare_metal",
                            "bare_metal",
-                           scratch_space_size) {
+                           scratch_space_mount_point) {
+
 
         initiateInstance(hostname,
                          std::move(compute_resources),
@@ -323,20 +323,20 @@ namespace wrench {
      * @param hostname: the name of the host on which the service should be started
      * @param compute_hosts:: the names of the hosts available as compute resources (the service
      *        will use all the cores and all the RAM of each host)
-     * @param scratch_space_size: size (in bytes) of the compute service's scratch storage paste
+     * @param scratch_space_mount_point: the compute service's scratch space's mount point ("" means none)
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      */
     BareMetalComputeService::BareMetalComputeService(const std::string &hostname,
                                                      const std::set<std::string> compute_hosts,
-                                                     double scratch_space_size,
+                                                     std::string scratch_space_mount_point,
                                                      std::map<std::string, std::string> property_list,
                                                      std::map<std::string, double> messagepayload_list
     ) :
             ComputeService(hostname,
                            "bare_metal",
                            "bare_metal",
-                           scratch_space_size) {
+                           scratch_space_mount_point) {
 
         std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
         for (auto h : compute_hosts) {
@@ -576,6 +576,8 @@ namespace wrench {
         std::string new_host_to_avoid = "";
         double new_host_to_avoid_ram_capacity = 0;
         for (auto const &r : this->compute_resources) {
+
+
             // If there is a required host, then don't even look at others
             if (not required_host.empty() and (r.first != required_host)) {
                 continue;
@@ -667,7 +669,6 @@ namespace wrench {
         // able to run on that host due to RAM, and because we don't
         // allow non-zero-ram tasks to jump ahead of other tasks
 
-//        WRENCH_INFO("THERE ARE %lu READY WUs", this->ready_workunits.size());
         for (auto const &wu : this->ready_workunits) {
 
             std::string picked_host;
@@ -697,6 +698,7 @@ namespace wrench {
 
             // If we didn't find a host, forget it
             if (target_host.empty()) {
+                WRENCH_INFO("NO DICE");
                 continue;
             }
 
@@ -711,7 +713,7 @@ namespace wrench {
                                          this->getScratch(),
                                          job,
                                          this->getPropertyValueAsDouble(
-                                                 BareMetalComputeServiceProperty::THREAD_STARTUP_OVERHEAD),
+                                                 BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD),
                                          false
                     ));
 
@@ -975,7 +977,11 @@ namespace wrench {
         if (this->containing_pilot_job == nullptr) {
             for (auto const &f : this->files_in_scratch[job]) {
                 try {
-                    this->getScratch()->deleteFile(f, job, nullptr);
+                    StorageService::deleteFile(f,
+                                               FileLocation::LOCATION(this->getScratch(),
+                                                                      this->getScratch()->getMountPoint() +
+                                                                      "/" + job->getName()),
+                                               nullptr);
                 } catch (WorkflowExecutionException &e) {
                     // ignore (perhaps it was never written)
                 }
@@ -1143,7 +1149,7 @@ namespace wrench {
 
         this->releaseDaemonLock();
 
-        // If the job not done, just return
+        // If the job is not done, just return
         if (this->completed_workunits[job].size() != this->all_workunits[job].size()) {
             return;
         }
@@ -1160,7 +1166,10 @@ namespace wrench {
         // If not in a pilot job, remove all files in scratch
         if (this->containing_pilot_job == nullptr) {
             for (auto const &f : this->files_in_scratch[job]) {
-                this->getScratch()->deleteFile(f, job, nullptr);
+                StorageService::deleteFile(f,
+                                           FileLocation::LOCATION(this->getScratch(),
+                                                                  this->getScratch()->getMountPoint() + job->getName()),
+                                           nullptr);
             }
             this->files_in_scratch[job].clear();
             this->files_in_scratch.erase(job);
@@ -1515,11 +1524,7 @@ namespace wrench {
                 dict,
                 this->getMessagePayloadValue(
                         ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD));
-//        try {
         S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
-//        } catch (std::shared_ptr<NetworkError> &cause) {
-//            return;
-//        }
     }
 
 /**
@@ -1531,7 +1536,10 @@ namespace wrench {
         for (auto const &j : this->files_in_scratch) {
             for (auto const &f : j.second) {
                 try {
-                    getScratch()->deleteFile(f, j.first, nullptr);
+                    StorageService::deleteFile(f,
+                                               FileLocation::LOCATION(this->getScratch(),
+                                                                      this->getScratch()->getMountPoint() +
+                                                                      j.first->getName()));
                 } catch (WorkflowExecutionException &e) {
                     throw;
                 }
@@ -1552,15 +1560,15 @@ namespace wrench {
         double thread_startup_overhead = 0;
         try {
             thread_startup_overhead = this->getPropertyValueAsDouble(
-                    BareMetalComputeServiceProperty::THREAD_STARTUP_OVERHEAD);
+                    BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD);
         } catch (std::invalid_argument &e) {
             success = false;
         }
 
         if ((!success) or (thread_startup_overhead < 0)) {
-            throw std::invalid_argument("Invalid THREAD_STARTUP_OVERHEAD property specification: " +
+            throw std::invalid_argument("Invalid TASK_STARTUP_OVERHEAD property specification: " +
                                         this->getPropertyValueAsString(
-                                                BareMetalComputeServiceProperty::THREAD_STARTUP_OVERHEAD));
+                                                BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD));
         }
 
         // Supporting Pilot jobs

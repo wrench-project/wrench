@@ -76,7 +76,7 @@ namespace wrench {
      *
      * @param tasks: a list of tasks (which must be either READY, or children of COMPLETED tasks or
      *                                   of tasks also included in the standard job)
-     * @param file_locations: a map that specifies on which storage services input/output files should be read/written.
+     * @param file_locations: a map that specifies locations where input/output files should be read/written.
      *         When unspecified, it is assumed that the ComputeService's scratch storage space will be used.
      * @param pre_file_copies: a set of tuples that specify which file copy operations should be completed
      *                         before task executions begin. The ComputeService::SCRATCH constant can be
@@ -92,10 +92,10 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     StandardJob *JobManager::createStandardJob(std::vector<WorkflowTask *> tasks,
-                                               std::map<WorkflowFile *, std::shared_ptr<StorageService> > file_locations,
-                                               std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>, std::shared_ptr<StorageService>  >> pre_file_copies,
-                                               std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>, std::shared_ptr<StorageService>  >> post_file_copies,
-                                               std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>  >> cleanup_file_deletions) {
+                                               std::map<WorkflowFile *, std::shared_ptr<FileLocation> > file_locations,
+                                               std::set<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> pre_file_copies,
+                                               std::set<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> post_file_copies,
+                                               std::set<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  >> cleanup_file_deletions) {
 
         // Do a sanity check of everything (looking for nullptr)
         for (auto t : tasks) {
@@ -128,6 +128,10 @@ namespace wrench {
                 throw std::invalid_argument(
                         "JobManager::createStandardJob(): nullptr dst storage service in the pre_file_copies set");
             }
+            if ((std::get<1>(fc) == FileLocation::SCRATCH) and (std::get<2>(fc) == FileLocation::SCRATCH)) {
+                throw std::invalid_argument(
+                        "JobManager::createStandardJob(): cannot have FileLocation::SCRATCH as both source and destination in the pre_file_copies set");
+            }
         }
 
         for (auto fc : post_file_copies) {
@@ -142,6 +146,10 @@ namespace wrench {
             if (std::get<2>(fc) == nullptr) {
                 throw std::invalid_argument(
                         "JobManager::createStandardJob(): nullptr dst storage service in the post_file_copies set");
+            }
+            if ((std::get<1>(fc) == FileLocation::SCRATCH) and (std::get<2>(fc) == FileLocation::SCRATCH)) {
+                throw std::invalid_argument(
+                        "JobManager::createStandardJob(): cannot have FileLocation::SCRATCH as both source and destination in the pre_file_copies set");
             }
         }
 
@@ -170,7 +178,7 @@ namespace wrench {
      *
      * @param tasks: a list of tasks  (which must be either READY, or children of COMPLETED tasks or
      *                                   of tasks also included in the list)
-     * @param file_locations: a map that specifies on which storage services input/output files should be read/written.
+     * @param file_locations: a map that specifies locations where files should be read/written.
      *                        When unspecified, it is assumed that the ComputeService's scratch storage space will be used.
      *
      * @return the standard job
@@ -178,7 +186,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     StandardJob *JobManager::createStandardJob(std::vector<WorkflowTask *> tasks,
-                                               std::map<WorkflowFile *, std::shared_ptr<StorageService> > file_locations) {
+                                               std::map<WorkflowFile *, std::shared_ptr<FileLocation> > file_locations) {
         if (tasks.empty()) {
             throw std::invalid_argument("JobManager::createStandardJob(): Invalid arguments");
         }
@@ -190,7 +198,7 @@ namespace wrench {
      * @brief Create a standard job
      *
      * @param task: a task (which must be ready)
-     * @param file_locations: a map that specifies on which storage services input/output files should be read/written.
+     * @param file_locations: a map that specifies locations where input/output files should be read/written.
      *                When unspecified, it is assumed that the ComputeService's scratch storage space will be used.
      *
      * @return the standard job
@@ -199,7 +207,7 @@ namespace wrench {
      */
     StandardJob *
     JobManager::createStandardJob(WorkflowTask *task,
-                                  std::map<WorkflowFile *, std::shared_ptr<StorageService> > file_locations) {
+                                  std::map<WorkflowFile *, std::shared_ptr<FileLocation> > file_locations) {
 
         if (task == nullptr) {
             throw std::invalid_argument("JobManager::createStandardJob(): Invalid arguments");

@@ -20,50 +20,75 @@ namespace wrench {
     class WorkflowFile;
     class SimulationTimestampFileCopyStart;
 
-    /** @brief A help class that implements the concept of a communication
+    /** @brief A helper class that implements the concept of a communication
      *  thread that performs a file transfer
      */
     class FileTransferThread : public Service {
 
     public:
 
-        /** @brief An enumerated type that denotes whether a src/dst
-         * is local partition or a (remote) mailbox or an actual storage service
-         */
-        enum LocationType {
-            LOCAL_PARTITION,
-            MAILBOX,
-            STORAGE_SERVICE
-        };
 
 
         FileTransferThread(std::string hostname,
-                                std::shared_ptr<StorageService> parent,
-                                WorkflowFile *file,
-                                std::pair<LocationType, std::string> src,
-                                std::pair<LocationType, std::string> dst,
-                                std::string answer_mailbox_if_copy,
-                                unsigned long buffer_size,
-                                SimulationTimestampFileCopyStart *start_timestamp = nullptr);
+                           std::shared_ptr<StorageService> parent,
+                           WorkflowFile *file,
+                           std::string src_mailbox,
+                           std::shared_ptr<FileLocation> dst_location,
+                           std::string answer_mailbox_if_read,
+                           std::string answer_mailbox_if_write,
+                           std::string answer_mailbox_if_copy,
+                           unsigned long buffer_size,
+                           SimulationTimestampFileCopyStart *start_timestamp = nullptr);
+
+        FileTransferThread(std::string hostname,
+                           std::shared_ptr<StorageService> parent,
+                           WorkflowFile *file,
+                           std::shared_ptr<FileLocation> src_location,
+                           std::string dst_mailbox,
+                           std::string answer_mailbox_if_read,
+                           std::string answer_mailbox_if_write,
+                           std::string answer_mailbox_if_copy,
+                           unsigned long buffer_size,
+                           SimulationTimestampFileCopyStart *start_timestamp = nullptr);
+
+        FileTransferThread(std::string hostname,
+                           std::shared_ptr<StorageService> parent,
+                           WorkflowFile *file,
+                           std::shared_ptr<FileLocation> src_location,
+                           std::shared_ptr<FileLocation> dsg_location,
+                           std::string answer_mailbox_if_read,
+                           std::string answer_mailbox_if_write,
+                           std::string answer_mailbox_if_copy,
+                           unsigned long buffer_size,
+                           SimulationTimestampFileCopyStart *start_timestamp = nullptr);
 
         int main() override;
         void cleanup(bool has_returned_from_main, int return_value) override;
 
 
     private:
+
         std::shared_ptr<StorageService> parent;
         WorkflowFile *file;
-        std::pair<LocationType, std::string> src;
-        std::pair<LocationType, std::string> dst;
+
+        // Only one of these two is valid
+        std::string src_mailbox;
+        std::shared_ptr<FileLocation> src_location;
+
+        // Only one of these two is valid
+        std::string dst_mailbox;
+        std::shared_ptr<FileLocation> dst_location;
+
+        std::string answer_mailbox_if_read;
+        std::string answer_mailbox_if_write;
         std::string answer_mailbox_if_copy;
         unsigned long buffer_size;
         SimulationTimestampFileCopyStart *start_timestamp;
 
-        void receiveFileFromNetwork(WorkflowFile *file, std::string partition, std::string mailbox);
-        void sendLocalFileToNetwork(WorkflowFile *file, std::string partition, std::string mailbox);
-        void downloadFileFromStorageService(WorkflowFile *file, std::string partition, std::string storage_service_and_partition);
-        void copyFileLocally(WorkflowFile *file, std::string src_partition, std::string dst_partition);
-
+        void receiveFileFromNetwork(WorkflowFile *file, std::string mailbox, std::shared_ptr<FileLocation> location);
+        void sendLocalFileToNetwork(WorkflowFile *file, std::shared_ptr<FileLocation> location, std::string mailbox);
+        void downloadFileFromStorageService(WorkflowFile *file, std::shared_ptr<FileLocation> src_location, std::shared_ptr<FileLocation> dst_location);
+        void copyFileLocally(WorkflowFile *file, std::shared_ptr<FileLocation> src_location, std::shared_ptr<FileLocation> dst_location);
 
     };
 

@@ -15,6 +15,9 @@
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
 
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(file_registry_service_test, "Log category for File Registry Service test");
+
+
 class FileRegistryTest : public ::testing::Test {
 
 public:
@@ -37,10 +40,50 @@ protected:
               "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
               "<platform version=\"4.1\"> "
               "   <zone id=\"AS0\" routing=\"Full\"> "
-              "       <host id=\"Host1\" speed=\"1f\" core=\"10\"/> "
-              "       <host id=\"Host2\" speed=\"1f\" core=\"10\"/> "
-              "       <host id=\"Host3\" speed=\"1f\" core=\"10\"/> "
-              "       <host id=\"Host4\" speed=\"1f\" core=\"10\"/> "
+              "       <host id=\"Host1\" speed=\"1f\" core=\"10\" > "
+              "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+              "             <prop id=\"size\" value=\"10000000000000B\"/>"
+              "             <prop id=\"mount\" value=\"/\"/>"
+              "          </disk>"
+              "          <disk id=\"other_large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+              "             <prop id=\"size\" value=\"10000000000000B\"/>"
+              "             <prop id=\"mount\" value=\"/otherdisk\"/>"
+              "          </disk>"
+              "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+              "             <prop id=\"size\" value=\"100B\"/>"
+              "             <prop id=\"mount\" value=\"/scratch\"/>"
+              "          </disk>"
+              "       </host>"
+              "       <host id=\"Host2\" speed=\"1f\" core=\"10\" > "
+              "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+              "             <prop id=\"size\" value=\"10000000000000B\"/>"
+              "             <prop id=\"mount\" value=\"/\"/>"
+              "          </disk>"
+              "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+              "             <prop id=\"size\" value=\"100B\"/>"
+              "             <prop id=\"mount\" value=\"/scratch\"/>"
+              "          </disk>"
+              "       </host>"
+              "       <host id=\"Host3\" speed=\"1f\" core=\"10\" > "
+              "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+              "             <prop id=\"size\" value=\"10000000000000B\"/>"
+              "             <prop id=\"mount\" value=\"/\"/>"
+              "          </disk>"
+              "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+              "             <prop id=\"size\" value=\"100B\"/>"
+              "             <prop id=\"mount\" value=\"/scratch\"/>"
+              "          </disk>"
+              "       </host>"
+              "       <host id=\"Host4\" speed=\"1f\" core=\"10\" > "
+              "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+              "             <prop id=\"size\" value=\"100B\"/>"
+              "             <prop id=\"mount\" value=\"/\"/>"
+              "          </disk>"
+              "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+              "             <prop id=\"size\" value=\"100B\"/>"
+              "             <prop id=\"mount\" value=\"/scratch\"/>"
+              "          </disk>"
+              "       </host>"
               "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
               "       <link id=\"2\" bandwidth=\"1000GBps\" latency=\"1000us\"/>"
               "       <link id=\"3\" bandwidth=\"2000GBps\" latency=\"1500us\"/>"
@@ -95,15 +138,14 @@ private:
 
     int main() {
 
-
       auto file1 = this->getWorkflow()->addFile("file1", 100.0);
       auto file2 = this->getWorkflow()->addFile("file2", 100.0);
       auto frs = this->getAvailableFileRegistryService();
 
-      std::set<std::shared_ptr<wrench::StorageService>> locations;
+      std::set<std::shared_ptr<wrench::FileLocation>> locations;
 
       try {
-        frs->addEntry(nullptr, this->test->storage_service1);
+        frs->addEntry(nullptr, wrench::FileLocation::LOCATION(this->test->storage_service1));
         throw std::runtime_error("Should not be able to add an entry with a nullptr file");
       } catch (std::invalid_argument &e) {
       }
@@ -121,8 +163,8 @@ private:
       }
 
       // Adding twice file1
-      frs->addEntry(file1, this->test->storage_service1);
-      frs->addEntry(file1, this->test->storage_service1);
+      frs->addEntry(file1, wrench::FileLocation::LOCATION(this->test->storage_service1));
+      frs->addEntry(file1, wrench::FileLocation::LOCATION(this->test->storage_service1));
 
       // Getting file1
       try {
@@ -134,12 +176,14 @@ private:
       if (locations.size() != 1) {
         throw std::runtime_error("Got a wrong number of locations for file1");
       }
-      if ((*locations.begin()) != this->test->storage_service1) {
+
+
+      if ((*locations.begin())->getStorageService() != this->test->storage_service1) {
         throw std::runtime_error("Got the wrong location for file 1");
       }
 
       // Adding another location for file1
-      frs->addEntry(file1, this->test->storage_service2);
+      frs->addEntry(file1, wrench::FileLocation::LOCATION(this->test->storage_service2));
 
       // Getting file1
       locations = frs->lookupEntry(file1);
@@ -147,13 +191,24 @@ private:
       if (locations.size() != 2) {
         throw std::runtime_error("Got a wrong number of locations for file1");
       }
-      if ((locations.find(this->test->storage_service1) == locations.end()) ||
-          (locations.find(this->test->storage_service2) == locations.end())) {
+
+      bool found_ss1 = false;
+      bool found_ss2 = false;
+
+      for (auto const &l : locations) {
+        if (l->getStorageService() == this->test->storage_service1) {
+          found_ss1 = true;
+        }
+        if (l->getStorageService() == this->test->storage_service2) {
+          found_ss2 = true;
+        }
+      }
+      if ((not found_ss1) || (not found_ss2)) {
         throw std::runtime_error("Got the wrong locations for file 1");
       }
 
       try {
-        frs->removeEntry(nullptr, this->test->storage_service1);
+        frs->removeEntry(nullptr, wrench::FileLocation::LOCATION(this->test->storage_service1));
         throw std::runtime_error("Should not be able to remove an entry with a nullptr file");
       } catch (std::invalid_argument &e) {
       }
@@ -164,10 +219,10 @@ private:
       } catch (std::invalid_argument &e) {
       }
 
-      frs->removeEntry(file1, this->test->storage_service1);
+      frs->removeEntry(file1, wrench::FileLocation::LOCATION(this->test->storage_service1));
 
       // Doing it again, which does nothing (coverage)
-      frs->removeEntry(file1, this->test->storage_service1);
+      frs->removeEntry(file1, wrench::FileLocation::LOCATION(this->test->storage_service1));
 
       // Getting file1
       locations = frs->lookupEntry(file1);
@@ -175,23 +230,23 @@ private:
       if (locations.size() != 1) {
         throw std::runtime_error("Got a wrong number of locations for file1");
       }
-      if (locations.find(this->test->storage_service2) == locations.end()) {
+      if ((*(locations.begin()))->getStorageService() != this->test->storage_service2) {
         throw std::runtime_error("Got the wrong locations for file 1");
       }
 
       // Remove an already removed entry
-      frs->removeEntry(file1, this->test->storage_service1);
+      frs->removeEntry(file1, wrench::FileLocation::LOCATION(this->test->storage_service1));
 
       // Shutting down the service
       frs->stop();
 
       // Trying a removeEntry
       try {
-        frs->removeEntry(file1, this->test->storage_service1);
+        frs->removeEntry(file1, wrench::FileLocation::LOCATION(this->test->storage_service1));
         throw std::runtime_error("Should not be able to remove an entry from a service that is down");
       } catch (wrench::WorkflowExecutionException &e) {
         // Check Exception
-          auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(e.getCause());
+        auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(e.getCause());
         if (not cause) {
           throw std::runtime_error("Got an exception, as expected, but of the unexpected failure cause: " +
                                    e.getCause()->toString() + " (expected: ServiceIsDown)");
@@ -225,20 +280,20 @@ void FileRegistryTest::do_FileRegistry_Test() {
   ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
+  std::string hostname = wrench::Simulation::getHostnameList()[0];
 
   // Create a Compute Service
   ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::BareMetalComputeService(hostname,
-                                                       {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                       {})));
+                                              {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                              {})));
   // Create a Storage Service
   ASSERT_NO_THROW(storage_service1 = simulation->add(
-          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, {"/"})));
 
   // Create a Storage Service
   ASSERT_NO_THROW(storage_service2 = simulation->add(
-          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, {"/otherdisk"})));
 
   // Create a file registry service
   std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
@@ -291,16 +346,16 @@ private:
       auto frs = this->getAvailableFileRegistryService();
       auto nps = *(this->getAvailableNetworkProximityServices().begin());
 
-      frs->addEntry(file1, this->test->storage_service1);
-      frs->addEntry(file1, this->test->storage_service2);
-      frs->addEntry(file1, this->test->storage_service3);
+      frs->addEntry(file1, wrench::FileLocation::LOCATION(this->test->storage_service1));
+      frs->addEntry(file1, wrench::FileLocation::LOCATION(this->test->storage_service2));
+      frs->addEntry(file1, wrench::FileLocation::LOCATION(this->test->storage_service3));
 
       wrench::S4U_Simulation::sleep(600.0);
 
 
       std::vector<std::string> file1_expected_locations = {"Host4", "Host1", "Host2"};
       std::vector<std::string> file1_locations(3);
-      std::map<double, std::shared_ptr<wrench::StorageService>> file1_locations_by_proximity;
+      std::map<double, std::shared_ptr<wrench::FileLocation>> file1_locations_by_proximity;
 
       try {
         frs->lookupEntry(nullptr_file, "Host3", nps);
@@ -316,7 +371,7 @@ private:
 
       int count=0;
       for (auto &storage_service : file1_locations_by_proximity) {
-        file1_locations[count++] = storage_service.second->getHostname();
+        file1_locations[count++] = storage_service.second->getStorageService()->getHostname();
       }
 
       bool is_equal = std::equal(file1_expected_locations.begin(), file1_expected_locations.end(),
@@ -327,7 +382,7 @@ private:
       }
 
       auto last_location = file1_locations_by_proximity.rbegin();
-      if (last_location->second->getHostname() != "Host2") {
+      if (last_location->second->getStorageService()->getHostname() != "Host2") {
         throw std::runtime_error(
                 "lookupEntry using NetworkProximityService did not return the correct unmonitored Storage Service");
       } else if (last_location->first != DBL_MAX) {
@@ -351,7 +406,7 @@ private:
         throw std::runtime_error("Should not be able to lookup a file when the service is down");
       } catch (wrench::WorkflowExecutionException &e) {
         // Check Exception
-          auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(e.getCause());
+        auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(e.getCause());
         if (not cause) {
           throw std::runtime_error("Got an exception, as expected, but of the unexpected failure cause: " +
                                    e.getCause()->toString() + " (expected: ServiceIsDown)");
@@ -368,7 +423,7 @@ private:
         throw std::runtime_error("Should not be able to lookup a file when the service is down");
       } catch (wrench::WorkflowExecutionException &e) {
         // Check Exception
-          auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(e.getCause());
+        auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(e.getCause());
         if (not cause) {
           throw std::runtime_error("Got an exception, as expected, but of the unexpected failure cause: " +
                                    e.getCause()->toString() + " (expected: ServiceIsDown)");
@@ -391,7 +446,7 @@ TEST_F(FileRegistryTest, LookupEntry) {
 void FileRegistryTest::do_lookupEntry_Test() {
 
   // Create and initialize a simulation
-  wrench::Simulation *simulation = new wrench::Simulation();
+  auto simulation = new wrench::Simulation();
   int argc = 1;
   char **argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("file_registry_lookup_entry_test");
@@ -400,24 +455,24 @@ void FileRegistryTest::do_lookupEntry_Test() {
 
   simulation->instantiatePlatform(platform_file_path);
 
-  std::string host1 = simulation->getHostnameList()[0];
-  std::string host2 = simulation->getHostnameList()[1];
-  std::string host3 = simulation->getHostnameList()[2];
-  std::string host4 = simulation->getHostnameList()[3];
+  std::string host1 = wrench::Simulation::getHostnameList()[0];
+  std::string host2 = wrench::Simulation::getHostnameList()[1];
+  std::string host3 = wrench::Simulation::getHostnameList()[2];
+  std::string host4 = wrench::Simulation::getHostnameList()[3];
 
   auto network_proximity_service = simulation->add(new wrench::NetworkProximityService(host1, {host1, host3, host4}));
 
   storage_service1 = simulation->add(
-          new wrench::SimpleStorageService(host1, 10000000000000.0));
+          new wrench::SimpleStorageService(host1, {"/"}));
 
   storage_service2 = simulation->add(
-          new wrench::SimpleStorageService(host2, 10000000000000.0));
+          new wrench::SimpleStorageService(host2, {"/"}));
 
   storage_service3 = simulation->add(
-          new wrench::SimpleStorageService(host4, 10000000000000.0));
+          new wrench::SimpleStorageService(host4, {"/"}));
 
 
- auto file_registry_service = simulation->add(new wrench::FileRegistryService(host1));
+  auto file_registry_service = simulation->add(new wrench::FileRegistryService(host1));
 
   std::shared_ptr<wrench::WMS> wms = nullptr;;
   wms = simulation->add(

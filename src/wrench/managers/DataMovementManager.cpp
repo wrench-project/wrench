@@ -65,55 +65,28 @@ namespace wrench {
     /**
      * @brief Ask the data manager to initiate an asynchronous file copy
      * @param file: the file to copy
-     * @param src: the source storage service (using the "/" partition)
-     * @param dst: the destination storage service (using the "/" partition)
+     * @param src: the source location
+     * @param dst: the destination location
      * @param file_registry_service: a file registry service to update once the file copy has (successfully) completed (none if nullptr)
      *
      * @throw std::invalid_argument
      * @throw WorkflowExecutionException
      */
     void DataMovementManager::initiateAsynchronousFileCopy(WorkflowFile *file,
-                                                           std::shared_ptr<StorageService> src,
-                                                           std::shared_ptr<StorageService> dst,
-                                                           std::shared_ptr<FileRegistryService> file_registry_service) {
-        initiateAsynchronousFileCopy(file, src, "/", dst, "/", file_registry_service);
-    }
-
-    /**
-     * @brief Ask the data manager to initiate an asynchronous file copy
-     * @param file: the file to copy
-     * @param src: the source storage service
-     * @param src_partition: the source partition
-     * @param dst: the destination storage service
-     * @param dst_partition: the destination partition
-     * @param file_registry_service: a file registry service to update once the file copy has (successfully) completed (none if nullptr)
-     *
-     * @throw std::invalid_argument
-     * @throw WorkflowExecutionException
-     */
-    void DataMovementManager::initiateAsynchronousFileCopy(WorkflowFile *file,
-                                                           std::shared_ptr<StorageService> src,
-                                                           std::string src_partition,
-                                                           std::shared_ptr<StorageService> dst,
-                                                           std::string dst_partition,
+                                                           std::shared_ptr<FileLocation> src,
+                                                           std::shared_ptr<FileLocation> dst,
                                                            std::shared_ptr<FileRegistryService> file_registry_service) {
         if ((file == nullptr) || (src == nullptr) || (dst == nullptr)) {
             throw std::invalid_argument("DataMovementManager::initiateFileCopy(): Invalid arguments");
         }
-        if (src_partition.empty()) {
-            src_partition = "/";
-        }
-        if (dst_partition.empty()) {
-            dst_partition = "/";
-        }
 
-        DataMovementManager::CopyRequestSpecs request(file, dst, dst_partition, file_registry_service);
+        DataMovementManager::CopyRequestSpecs request(file, src, dst, file_registry_service);
 
         try {
             for (auto const &p : this->pending_file_copies) {
                 if (*p == request) {
                     throw WorkflowExecutionException(
-                            std::shared_ptr<FailureCause>(new FileAlreadyBeingCopied(file, dst, dst_partition)));
+                            std::shared_ptr<FailureCause>(new FileAlreadyBeingCopied(file, src, dst)));
                 }
             }
         } catch (WorkflowExecutionException &e) {
@@ -123,8 +96,9 @@ namespace wrench {
 
         try {
             this->pending_file_copies.push_front(std::unique_ptr<CopyRequestSpecs>(
-                    new CopyRequestSpecs(file, dst, dst_partition, file_registry_service)));
-            dst->initiateFileCopy(this->mailbox_name, file, src, src_partition, dst_partition);
+                    new CopyRequestSpecs(file, src, dst, file_registry_service)));
+            wrench::StorageService::initiateFileCopy(this->mailbox_name, file,
+                                                       src, dst);
         } catch (WorkflowExecutionException &e) {
             throw;
         }
@@ -133,59 +107,32 @@ namespace wrench {
     /**
      * @brief Ask the data manager to perform a synchronous file copy
      * @param file: the file to copy
-     * @param src: the source storage service (using the "/" partition)
-     * @param dst: the destination storage service (using the "/" partition)
+     * @param src: the source location
+     * @param dst: the destination location
      * @param file_registry_service: a file registry service to update once the file copy has (successfully) completed (none if nullptr)
      *
      * @throw std::invalid_argument
      * @throw WorkflowExecutionException
      */
     void DataMovementManager::doSynchronousFileCopy(WorkflowFile *file,
-                                                    std::shared_ptr<StorageService> src,
-                                                    std::shared_ptr<StorageService> dst,
-                                                    std::shared_ptr<FileRegistryService> file_registry_service) {
-        doSynchronousFileCopy(file, src, "/", dst, "/", file_registry_service);
-    }
-
-    /**
-     * @brief Ask the data manager to perform a synchronous file copy
-     * @param file: the file to copy
-     * @param src: the source storage service
-     * @param src_partition: the partition on the source storage service
-     * @param dst: the destination storage service
-     * @param dst_partition: the partition on the destination storage service
-     * @param file_registry_service: a file registry service to update once the file copy has (successfully) completed (none if nullptr)
-     *
-     * @throw std::invalid_argument
-     * @throw WorkflowExecutionException
-     */
-    void DataMovementManager::doSynchronousFileCopy(WorkflowFile *file,
-                                                    std::shared_ptr<StorageService> src,
-                                                    std::string src_partition,
-                                                    std::shared_ptr<StorageService> dst,
-                                                    std::string dst_partition,
+                                                    std::shared_ptr<FileLocation> src,
+                                                    std::shared_ptr<FileLocation> dst,
                                                     std::shared_ptr<FileRegistryService> file_registry_service) {
         if ((file == nullptr) || (src == nullptr) || (dst == nullptr)) {
             throw std::invalid_argument("DataMovementManager::initiateFileCopy(): Invalid arguments");
         }
-        if (src_partition.empty()) {
-            src_partition = "/";
-        }
-        if (dst_partition.empty()) {
-            dst_partition = "/";
-        }
 
-        DataMovementManager::CopyRequestSpecs request(file, dst, dst_partition, file_registry_service);
+        DataMovementManager::CopyRequestSpecs request(file, src, dst, file_registry_service);
 
         try {
             for (auto const &p : this->pending_file_copies) {
                 if (*p == request) {
                     throw WorkflowExecutionException(
-                            std::shared_ptr<FailureCause>(new FileAlreadyBeingCopied(file, dst, dst_partition)));
+                            std::shared_ptr<FailureCause>(new FileAlreadyBeingCopied(file, src, dst)));
                 }
             }
 
-            dst->copyFile(file, src);
+            StorageService::copyFile(file, src, dst);
         } catch (WorkflowExecutionException &e) {
             throw;
         }
@@ -246,7 +193,7 @@ namespace wrench {
         } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFileCopyAnswerMessage>(message)) {
 
             // Remove the record and find the File Registry Service, if any
-            DataMovementManager::CopyRequestSpecs request(msg->file, msg->storage_service, msg->dst_partition, nullptr);
+            DataMovementManager::CopyRequestSpecs request(msg->file, msg->src, msg->dst, nullptr);
             for (auto it = this->pending_file_copies.begin();
                  it != this->pending_file_copies.end();
                  ++it) {
@@ -273,8 +220,8 @@ namespace wrench {
             // Forward it back
             S4U_Mailbox::dputMessage(msg->file->getWorkflow()->getCallbackMailbox(),
                                      new StorageServiceFileCopyAnswerMessage(msg->file,
-                                                                             msg->storage_service,
-                                                                             msg->dst_partition,
+                                                                             msg->src,
+                                                                             msg->dst,
                                                                              request.file_registry_service,
                                                                              file_registry_service_updated,
                                                                              msg->success,

@@ -23,6 +23,7 @@ namespace wrench {
     class Service;
     class WorkflowFile;
     class WorkflowJob;
+    class FileLocation;
 
     /***********************/
     /** \cond DEVELOPER    */
@@ -38,56 +39,6 @@ namespace wrench {
 
     public:
 
-#if 0
-        /** @brief Types of failure causes */
-        enum CauseType {
-            /** @brief Unknown cause */
-                    FATAL_FAILURE,
-            /** @brief The file cannot be found anywhere */
-                    NO_STORAGE_SERVICE_FOR_FILE,
-            /** @brief No Scratch Space is available */
-                    NO_SCRATCH_SPACE,
-            /** @brief The file was not found where it was supposed to be found */
-                    FILE_NOT_FOUND,
-            /** @brief The file to be written is already there */
-                    FILE_ALREADY_THERE,
-            /** @brief The file is already being copied there */
-                    FILE_ALREADY_BEING_COPIED,
-            /** @brief The storage service does not have enough space to support the requested operation */
-                    STORAGE_NOT_ENOUGH_SPACE,
-            /** @brief The service cannot be used because it is down (likely it was terminated) */
-                    SERVICE_DOWN,
-            /** @brief The service cannot be used because it is suspended (likely it was terminated) */
-                    SERVICE_SUSPENDED,
-            /** @brief The compute service does not support this job type */
-                    JOB_TYPE_NOT_SUPPORTED,
-            /** @brief The compute service cannot run the job (ever) due to insufficient resources (cores and/or ram) */
-                    NOT_ENOUGH_RESOURCES,
-            /** @brief There was a network error, or an endpoint was down */
-                    NETWORK_ERROR,
-            /** @brief There was a network timeout (for a "with timeout" network operation) */
-                    NETWORK_TIMEOUT,
-            /** @brief A Job has been killed (likely because the service performing it was terminated  or killed) */
-                    JOB_KILLED,
-            /** @brief The job cannot be terminated because it is neither pending nor running */
-                    JOB_CANNOT_BE_TERMINATED,
-            /** @brief The job cannot be forgotten because it is not completed */
-                    JOB_CANNOT_BE_FORGOTTEN,
-            /** @brief A compute thread has died */
-                    COMPUTE_THREAD_HAS_DIED,
-            /** @brief A functionality is not available */
-                    FUNCTIONALITY_NOT_AVAILABLE,
-            /** @brief A job was terminated due to a timeout */
-                    JOB_TIMEOUT,
-            /** @brief The host went down (while computing, while sleeping) **/
-                    HOST_ERROR,
-            /** @brief Operation is not allowed **/
-                    NOT_ALLOWED
-
-        };
-#endif
-
-//        explicit FailureCause(CauseType cause);
         FailureCause() = default;
 
         /***********************/
@@ -106,32 +57,6 @@ namespace wrench {
          */
         virtual std::string toString() = 0;
 
-//        CauseType getCauseType();
-
-//    private:
-//        CauseType cause;
-    };
-
-
-    /**
-     * @brief A "file cannot be found anywhere" failure cause
-     */
-    class NoStorageServiceForFile : public FailureCause {
-
-    public:
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
-        NoStorageServiceForFile(WorkflowFile *file);
-        /***********************/
-        /** \endcond           */
-        /***********************/
-
-        WorkflowFile *getFile();
-        std::string toString();
-
-    private:
-        WorkflowFile *file;
     };
 
 
@@ -163,19 +88,19 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        FileNotFound(WorkflowFile *file, std::shared_ptr<StorageService>  storage_service);
+        FileNotFound(WorkflowFile *file, std::shared_ptr<FileLocation>  location);
         /***********************/
         /** \endcond           */
         /***********************/
 
         WorkflowFile *getFile();
-        std::shared_ptr<StorageService>  getStorageService();
+        std::shared_ptr<FileLocation>  getLocation();
         std::string toString();
 
 
     private:
         WorkflowFile *file;
-        std::shared_ptr<StorageService>  storage_service;
+        std::shared_ptr<FileLocation> location;
     };
 
     /**
@@ -227,28 +152,60 @@ namespace wrench {
 //    };
 
     /**
-     * @brief A "file is already being copied" failure cause
-     */
-    class FileAlreadyBeingCopied : public FailureCause {
+        * @brief A "unknown mount point storage service" failure cause
+        */
+    class InvalidDirectoryPath : public FailureCause {
 
     public:
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        FileAlreadyBeingCopied(WorkflowFile *file, std::shared_ptr<StorageService> dst, std::string dst_partition);
+        InvalidDirectoryPath(
+                std::shared_ptr<StorageService> storage_service,
+                std::string invalid_path);
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
+        std::shared_ptr<StorageService>  getStorageService();
+        std::string  getInvalidPath();
+        std::string toString();
+
+
+    private:
+        std::shared_ptr<StorageService>  storage_service;
+        std::string  invalid_path;
+    };
+
+
+    class FileLocation;
+
+    /**
+     * @brief A "file is already being copied" failure cause
+     */
+    class FileAlreadyBeingCopied : public FailureCause {
+
+
+    public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        FileAlreadyBeingCopied(WorkflowFile *file,
+                               std::shared_ptr<FileLocation> src,
+                               std::shared_ptr<FileLocation> dst);
         /***********************/
         /** \endcond           */
         /***********************/
 
         WorkflowFile *getFile();
-        std::shared_ptr<StorageService> getStorageService();
-        std::string getPartition();
+        std::shared_ptr<FileLocation> getSourceLocation();
+        std::shared_ptr<FileLocation> getDestinationLocation();
         std::string toString();
 
     private:
         WorkflowFile *file;
-        std::shared_ptr<StorageService> storage_service;
-        std::string dst_partition;
+        std::shared_ptr<FileLocation> src_location;
+        std::shared_ptr<FileLocation> dst_location;
     };
 
     /**

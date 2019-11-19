@@ -72,7 +72,7 @@ namespace wrench {
     public:
         CloudComputeService(const std::string &hostname,
                      std::vector<std::string> &execution_hosts,
-                     double scratch_space_size,
+                     std::string scratch_space_mount_point,
                      std::map<std::string, std::string> property_list = {},
                      std::map<std::string, double> messagepayload_list = {});
 
