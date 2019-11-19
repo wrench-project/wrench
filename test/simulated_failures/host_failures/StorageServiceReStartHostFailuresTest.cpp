@@ -47,17 +47,30 @@ protected:
         FILE *trace_file = fopen(trace_file_path.c_str(), "w");
         fprintf(trace_file, "%s", trace_file_content.c_str());
         fclose(trace_file);
-        WRENCH_INFO("CREATED TRACE FILE %s", trace_file_path.c_str());
 
         // Create a platform file
         std::string xml = "<?xml version='1.0'?>"
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
-                          "       <host id=\"FailedHost\" speed=\"1f\" core=\"1\"/> "
-                          "       <host id=\"FailedHostTrace\" speed=\"1f\" state_file=\"" + trace_file_name +
-                          "\"  core=\"1\"/> "
-                          "       <host id=\"StableHost\" speed=\"1f\" core=\"1\"/> "
+                          "       <host id=\"FailedHost\" speed=\"1f\" core=\"1\" > "
+                          "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"10000000B\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "       </host>"
+                          "       <host id=\"FailedHostTrace\" speed=\"1f\" state_file=\"" + trace_file_name + "\"  core=\"1\" > "
+                          "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"10000000B\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "       </host>"
+                          "       <host id=\"StableHost\" speed=\"1f\" core=\"1\" > "
+                          "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"10000000B\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "       </host>"
                           "       <link id=\"link1\" bandwidth=\"1kBps\" latency=\"0\"/>"
                           "       <route src=\"FailedHost\" dst=\"StableHost\">"
                           "           <link_ctn id=\"link1\"/>"
@@ -112,14 +125,14 @@ private:
         auto file = this->getWorkflow()->getFileByID("file");
         auto storage_service = *(this->getAvailableStorageServices().begin());
         try {
-            storage_service->readFile(file);
+            wrench::StorageService::readFile(file, wrench::FileLocation::LOCATION(storage_service));
             throw std::runtime_error("Should not have been able to read the file (first attempt)");
         } catch (wrench::WorkflowExecutionException &e) {
             // Expected
         }
         wrench::Simulation::sleep(1000);
         try {
-            storage_service->readFile(file);
+            wrench::StorageService::readFile(file, wrench::FileLocation::LOCATION(storage_service));
         } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error("Should  have been able to read the file (second attempt)");
         }
@@ -137,14 +150,14 @@ private:
         resurector->start(murderer, true, false); // Daemonized, no auto-restart
 
         try {
-            storage_service->readFile(file);
+            wrench::StorageService::readFile(file, wrench::FileLocation::LOCATION(storage_service));
             throw std::runtime_error("Should not have been able to read the file (first attempt)");
         } catch (wrench::WorkflowExecutionException &e) {
             // Expected
         }
         wrench::Simulation::sleep(1000);
         try {
-            storage_service->readFile(file);
+            wrench::StorageService::readFile(file, wrench::FileLocation::LOCATION(storage_service));
         } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error("Should  have been able to read the file (second attempt)");
         }
@@ -172,7 +185,7 @@ void StorageServiceReStartHostFailuresTest::do_StorageServiceRestartTest_test() 
 
     // Get a hostname
     std::string failed_host = "FailedHost";
-    auto storage_service = simulation->add(new wrench::SimpleStorageService(failed_host, 10000000000000.0));
+    auto storage_service = simulation->add(new wrench::SimpleStorageService(failed_host, {"/"}));
 
     // Create a WMS
     std::string stable_host = "StableHost";
@@ -186,7 +199,7 @@ void StorageServiceReStartHostFailuresTest::do_StorageServiceRestartTest_test() 
 
     simulation->add(new wrench::FileRegistryService(stable_host));
 
-    simulation->stageFiles({{"file", file}}, storage_service);
+    simulation->stageFile(file, storage_service);
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());

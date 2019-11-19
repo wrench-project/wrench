@@ -4,6 +4,7 @@ message(STATUS "Cmake version ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CM
 project(wrench CXX)
 
 add_definitions("-Wall -Wno-unused-variable -Wno-unused-private-field")
+add_definitions("-Wall -Wno-unused-variable -Wno-unused-private-field")
 if (ENABLE_BATSCHED)
     add_definitions(-DENABLE_BATSCHED)
 endif ()
@@ -96,6 +97,7 @@ set(HEADER_FILES
         include/wrench/services/storage/simple/SimpleStorageService.h
         include/wrench/services/storage/simple/SimpleStorageServiceProperty.h
         include/wrench/services/storage/simple/SimpleStorageServiceMessagePayload.h
+        include/wrench/services/storage/storage_helpers/FileLocation.h
         include/wrench/services/file_registry/FileRegistryService.h
         include/wrench/services/file_registry/FileRegistryServiceProperty.h
         include/wrench/services/file_registry/FileRegistryServiceMessagePayload.h
@@ -161,31 +163,35 @@ set(SOURCE_FILES
         src/wrench/simulation/SimulationTrace.cpp
         src/wrench/simulation/SimulationOutput.cpp
         src/wrench/services/file_registry/FileRegistryService.cpp
-        src/wrench/services/storage/StorageService.cpp
-        src/wrench/services/storage/simple/SimpleStorageService.cpp
-        src/wrench/services/storage/storage_helpers/FileTransferThread.cpp
-        include/wrench/services/storage/storage_helpers/FileTransferThread.h
         src/wrench/services/Service.cpp
         src/wrench/services/ServiceProperty.cpp
         src/wrench/services/ServiceMessagePayload.cpp
         src/wrench/services/compute/ComputeServiceProperty.cpp
         src/wrench/services/compute/ComputeServiceMessagePayload.cpp
-        src/wrench/services/storage/StorageServiceProperty.cpp
-        src/wrench/services/storage/StorageServiceMessagePayload.cpp
         src/wrench/services/file_registry/FileRegistryServiceProperty.cpp
         src/wrench/services/file_registry/FileRegistryServiceMessagePayload.cpp
         src/wrench/services/compute/bare_metal/BareMetalComputeServiceProperty.cpp
         src/wrench/services/compute/bare_metal/BareMetalComputeServiceMessagePayload.cpp
+        src/wrench/services/storage/StorageServiceProperty.cpp
+        src/wrench/services/storage/StorageServiceMessagePayload.cpp
         src/wrench/services/storage/simple/SimpleStorageServiceProperty.cpp
         src/wrench/services/storage/simple/SimpleStorageServiceMessagePayload.cpp
+        src/wrench/services/storage/StorageService.cpp
+        src/wrench/services/storage/simple/SimpleStorageService.cpp
+        src/wrench/services/storage/StorageServiceMessage.cpp
+        src/wrench/services/storage/StorageServiceMessage.h
+        include/wrench/services/storage/storage_helpers/FileTransferThread.h
+        src/wrench/services/storage/storage_helpers/LogicalFileSystem.cpp
+        include/wrench/services/storage/storage_helpers/LogicalFileSystem.h
+        src/wrench/services/storage/storage_helpers/FileTransferThread.cpp
+        src/wrench/services/storage/storage_helpers/FileTransferThreadMessage.h
+        src/wrench/services/storage/storage_helpers/FileLocation.cpp
         src/wrench/workflow/execution_events/FailureCause.cpp
         src/wrench/managers/JobManagerMessage.cpp
         src/wrench/managers/JobManagerMessage.h
         src/wrench/services/ServiceMessage.cpp
         src/wrench/managers/EnergyMeter.cpp
         src/wrench/services/compute/ComputeServiceMessage.cpp
-        src/wrench/services/storage/StorageServiceMessage.cpp
-        src/wrench/services/storage/StorageServiceMessage.h
         src/wrench/services/file_registry/FileRegistryMessage.cpp
         src/wrench/services/file_registry/FileRegistryMessage.h
         src/wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.cpp
@@ -253,6 +259,7 @@ set(TEST_FILES
         test/workflow/WorkflowLoadFromDAXTest.cpp
         test/workflow/WorkflowLoadFromJSONTest.cpp
         test/compute_services/BareMetalComputeService/BareMetalComputeServiceOneTaskTest.cpp
+        test/storage_services/LogicalFileSystem/LogicalFileSystemTest.cpp
         test/storage_services/SimpleStorageService/SimpleStorageServiceFunctionalTest.cpp
         test/storage_services/SimpleStorageService/SimpleStorageServicePerformanceTest.cpp
         test/storage_services/SimpleStorageService/SimpleStorageServiceLimitedConnectionsTest.cpp
@@ -283,6 +290,7 @@ set(TEST_FILES
         test/network_proximity_services/NetworkProximityTest.cpp
         test/file_registry_services/FileRegistryTest.cpp
         test/wms/JobManagerTest.cpp
+        test/simulation/BadPlatformTest.cpp
         test/simulation/SimpleSimulationTest.cpp
         test/simulation/DynamicServiceCreationTest.cpp
         test/simulation/SimulationCommandLineArgumentsTest.cpp
@@ -294,6 +302,7 @@ set(TEST_FILES
         test/simulation/InvalidXMLTest.cpp
         test/compute_services/ScratchSpaceTest.cpp
         test/simulation/S4U_DaemonTest.cpp
+        test/simulation/S4U_VirtualMachineTest.cpp
         test/simulation/S4U_SimulationTest.cpp
         test/pilot_job/CriticalPathSchedulerTest.cpp
         test/misc/PointerUtilTest.cpp
@@ -327,9 +336,6 @@ set(TEST_FILES
         test/simulated_failures/failure_test_util/ComputerVictim.h
         test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.cpp
         test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.h
-        src/wrench/services/storage/storage_helpers/FileTransferThread.cpp
-        include/wrench/services/storage/storage_helpers/FileTransferThread.h
-        src/wrench/services/storage/storage_helpers/FileTransferThreadMessage.h
         test/simulation/S4U_MailboxTest.cpp)
 
 # sigmgrid library

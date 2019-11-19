@@ -24,7 +24,7 @@ class. An instantiation of a Simple storage service requires the following
 parameters:
 
 - The name of a host on which to start the service (this is the entry point to the service);
-- A capacity in bytes;
+- A list of mount points (corresponding to disks attached to the host)
 - Maps (`std::map`) of configurable properties (`wrench::BatchComputeServiceProperty`) and configurable message
   payloads (`wrench::BatchComputeServiceMessagePayload`).
   
@@ -36,7 +36,7 @@ the service is configured to be 8:
 ~~~~~~~~~~~~~{.cpp}
 auto storage_service = simulation->add(
           new wrench::SimpleStorageService("Gateway", 
-                                  pow(2,46),
+                                  {"/data/", "/home/"},
                                        {{wrench::SimpleStorageProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "8"}}
                                       );
 ~~~~~~~~~~~~~
@@ -54,14 +54,16 @@ wrench::WorkflowFile *some_file;
 
 [...]
 
-if (storage_service->lookupFile(some_file)) {
+if (wrench::StorageService::lookupFile(wrench::FileLocation::LOCATION(storage_service, "/data/")) {
   std::cerr << "File is there! Let's delete it...\n";
   storage_service->deleteFile(some_file);
 }
 ~~~~~~~~~~~~~
 
 While there are few other direct interactions are possible 
-(see the documentation of the `wrench::StorageService` and `wrench::SimpleStorageService` classes), many interactions are via a data movement manager (an instance of the `wrench::DataMovementManager` class).  This is a helper process that makes it possible interact asynchronously and transparently with storage services.
+(see the documentation of the `wrench::StorageService` and `wrench::SimpleStorageService` classes),
+many interactions are via a data movement manager (an instance of the `wrench::DataMovementManager` class). 
+ This is a helper process that makes it possible interact asynchronously and transparently with storage services.
 For instance, here is an example of a synchronous file copy:
 
 ~~~~~~~~~~~~~{.cpp}
@@ -70,10 +72,12 @@ wrench::StorageService *src, *dst;
 
 [...]
 
-// Create a job manager
-auto job_manager = this->createJobManager();
+// Create a data movement manager
+auto data_movement_manager = this->createDataMovementManager();
 
-job_manager->doSynchronousFileCopy(some_file, src, dst);
+data_movement_manager->doSynchronousFileCopy(some_file, 
+                                             wrench::FileLocation::LOCATION(src), 
+                                             wrench::FileLocation::LOCATION(dst));
 ~~~~~~~~~~~~~
 
 The above call blocks until the file copy has completed. An asynchronous file copy would work as follows:
@@ -87,7 +91,9 @@ wrench::StorageService *src, *dst;
 // Create a job manager
 auto job_manager = this->createJobManager();
 
-job_manager->initiateAsynchronousFileCopy(some_file, src, dst);
+job_manager->initiateAsynchronousFileCopy(some_file, 
+                                          wrench::FileLocation::LOCATION(src), 
+                                          wrench::FileLocation::LOCATION(dst));
 
 [...]
 

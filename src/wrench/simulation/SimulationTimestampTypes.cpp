@@ -173,19 +173,16 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param file: the WorkflowFile associated with this file copy
-     * @param src: the source StorageService from which this file is being copied
-     * @param src_partition: the partition in the source StorageService from which this file is being copied
-     * @param dst: the destination StorageService where this file will be copied
-     * @param dst_partition: the partition in the destination StorageService where this file will be copied
+     * @param src_location: the source location
+     * @param dst_location: the destination location
      * @param start_timestamp: the timestamp for the file copy start
      */
-    SimulationTimestampFileCopy::SimulationTimestampFileCopy(WorkflowFile *file, std::shared_ptr<StorageService> src,
-                                                             std::string src_partition,
-                                                             std::shared_ptr<StorageService> dst,
-                                                             std::string dst_partition,
+    SimulationTimestampFileCopy::SimulationTimestampFileCopy(WorkflowFile *file,
+                                                             std::shared_ptr<FileLocation> src_location,
+                                                             std::shared_ptr<FileLocation> dst_location,
                                                              SimulationTimestampFileCopyStart *start_timestamp) :
-            SimulationTimestampPair(start_timestamp), file(file), source(FileLocation(src, src_partition)),
-            destination(FileLocation(dst, dst_partition)) {
+            SimulationTimestampPair(start_timestamp), file(file), source(src_location),
+            destination(dst_location) {
     }
 
     /**
@@ -198,17 +195,17 @@ namespace wrench {
 
     /**
      * @brief retrieves the location from which the WorkflowFile is being copied
-     * @return a FileLocation object containing the source StorageService and source partition from which the file is being copied
+     * @return the copy's source location
      */
-    SimulationTimestampFileCopy::FileLocation SimulationTimestampFileCopy::getSource() {
+    std::shared_ptr<FileLocation> SimulationTimestampFileCopy::getSource() {
         return this->source;
     }
 
     /**
      * @brief retrieves the location where the WorkflowFile will be copied
-     * @return a FileLocation object containing the destination StorageService and destination partition into which the file is being copied
+     * @return the copy's destination location
      */
-    SimulationTimestampFileCopy::FileLocation SimulationTimestampFileCopy::getDestination() {
+    std::shared_ptr<FileLocation> SimulationTimestampFileCopy::getDestination() {
         return this->destination;
     }
 
@@ -223,28 +220,22 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param file: the WorkflowFile associated with this file copy
-     * @param src: the source StorageService from which this file is being copied
-     * @param src_partition: the partition in the source StorageService from which this file is being copied
-     * @param dst: the destination StorageService where this file will be copied
-     * @param dst_partition: the partition in the destination StorageService where this file will be copied
+     * @param src: the source location
+     * @param dst: the destination location
      * @throw std::invalid_argument
      */
     SimulationTimestampFileCopyStart::SimulationTimestampFileCopyStart(WorkflowFile *file,
-                                                                       std::shared_ptr<StorageService> src,
-                                                                       std::string src_partition,
-                                                                       std::shared_ptr<StorageService> dst,
-                                                                       std::string dst_partition) :
-            SimulationTimestampFileCopy(file, src, src_partition, dst, dst_partition) {
+                                                                       std::shared_ptr<FileLocation> src,
+                                                                       std::shared_ptr<FileLocation> dst) :
+            SimulationTimestampFileCopy(file, src, dst) {
 
         // all information about a file copy should be passed
         if ((this->file == nullptr)
-            || (this->source.storage_service == nullptr)
-            || (this->source.partition.empty())
-            || (this->destination.storage_service == nullptr)
-            || (this->destination.partition.empty())) {
+            || (this->source == nullptr)
+            || (this->destination == nullptr)) {
 
             throw std::invalid_argument(
-                    "SimulationTimestampFileCopyStart::SimulationTimestampFileCopyStart() cannot take nullptr or empty strings");
+                    "SimulationTimestampFileCopyStart::SimulationTimestampFileCopyStart() cannot take nullptr arguments");
         }
     }
 
@@ -256,7 +247,7 @@ namespace wrench {
      */
     SimulationTimestampFileCopyFailure::SimulationTimestampFileCopyFailure(
             SimulationTimestampFileCopyStart *start_timestamp) :
-            SimulationTimestampFileCopy(nullptr, nullptr, "", nullptr, "", start_timestamp) {
+            SimulationTimestampFileCopy(nullptr, nullptr, nullptr, start_timestamp) {
 
         // a corresponding start timestamp must be passed
         if (start_timestamp == nullptr) {
@@ -277,18 +268,16 @@ namespace wrench {
      */
     SimulationTimestampFileCopyCompletion::SimulationTimestampFileCopyCompletion(
             SimulationTimestampFileCopyStart *start_timestamp) :
-            SimulationTimestampFileCopy(nullptr, nullptr, "", nullptr, "", start_timestamp) {
+            SimulationTimestampFileCopy(nullptr, nullptr, nullptr, start_timestamp) {
 
         // a corresponding start timestamp must be passed
         if (start_timestamp == nullptr) {
             throw std::invalid_argument(
                     "SimulationTimestampFileCopyCompletion::SimulationTimestampFileCopyCompletion() start_timestamp cannot be nullptr");
         } else {
-            this->file = start_timestamp->file;
-            this->source = SimulationTimestampFileCopy::FileLocation(start_timestamp->source.storage_service,
-                                                                     start_timestamp->source.partition);
-            this->destination = SimulationTimestampFileCopy::FileLocation(start_timestamp->destination.storage_service,
-                                                                          start_timestamp->destination.partition);
+            this->file = start_timestamp->getFile();
+            this->source = start_timestamp->getSource();
+            this->destination = start_timestamp->getDestination();
             start_timestamp->endpoint = this;
         }
     }

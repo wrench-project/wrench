@@ -23,6 +23,7 @@ namespace wrench {
     class WorkflowFile;
     class StorageService;
     class WorkflowTask;
+    class FileLocation;
 
     /***********************/
     /** \cond INTERNAL     */
@@ -35,13 +36,13 @@ namespace wrench {
 
     public:
 
-        Workunit(StandardJob *job,
-                 std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>,
-                         std::shared_ptr<StorageService>>> pre_file_copies,
-                 WorkflowTask * task,
-                 std::map<WorkflowFile *, std::shared_ptr<StorageService>> file_locations,
-                 std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>, std::shared_ptr<StorageService>>> post_file_copies,
-                 std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>>> cleanup_file_deletions);
+        Workunit(
+                StandardJob *job,
+                std::set<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> pre_file_copies,
+                WorkflowTask *task,
+                std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations,
+                std::set<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> post_file_copies,
+                std::set<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>>> cleanup_file_deletions);
 
         static void addDependency(std::shared_ptr<Workunit> parent, std::shared_ptr<Workunit> child);
 
@@ -58,15 +59,15 @@ namespace wrench {
         unsigned long num_pending_parents;
 
         /** @brief File copies to perform before computational tasks begin */
-        std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>, std::shared_ptr<StorageService>>> pre_file_copies;
+        std::set<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> pre_file_copies;
         /** @brief Computational task to perform */
         WorkflowTask *task = nullptr;
         /** @brief Locations where computational tasks should read/write files */
-        std::map<WorkflowFile *, std::shared_ptr<StorageService>> file_locations;
+        std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations;
         /** @brief File copies to perform after computational tasks completes */
-        std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>, std::shared_ptr<StorageService>>> post_file_copies;
+        std::set<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> post_file_copies;
         /** @brief File deletions to perform last */
-        std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>>> cleanup_file_deletions;
+        std::set<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>>> cleanup_file_deletions;
 
 
         ~Workunit();

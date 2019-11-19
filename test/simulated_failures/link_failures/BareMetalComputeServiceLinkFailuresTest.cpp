@@ -40,9 +40,36 @@ protected:
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
-                          "       <host id=\"Host1\" speed=\"1f\" core=\"10\"/> "
-                          "       <host id=\"Host2\" speed=\"1f\" core=\"10\"/> "
-                          "       <host id=\"Host3\" speed=\"1f\" core=\"10\"/> "
+                          "       <host id=\"Host1\" speed=\"1f\" core=\"10\"> "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"10000000000000B\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"101B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>  "
+                          "       <host id=\"Host2\" speed=\"1f\" core=\"10\"> "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"10000000000000B\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"101B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>  "
+                          "       <host id=\"Host3\" speed=\"1f\" core=\"10\"> "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"10000000000000B\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"101B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>  "
                           "       <link id=\"link1\" bandwidth=\"1Bps\" latency=\"0us\"/>"
                           "       <link id=\"link2\" bandwidth=\"1Bps\" latency=\"0us\"/>"
                           "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"link1\""
@@ -92,14 +119,41 @@ private:
 
         // Do a bunch of resource requests
         unsigned long num_failures = 0;
-        unsigned long num_trials = 1000;
+        unsigned long num_trials = 2000;
         for (unsigned int i=0; i < num_trials; i++) {
             try {
-//                WRENCH_INFO("Sleeping for 25 seconds..");
+
                 wrench::Simulation::sleep(25);
-                WRENCH_INFO("Requesting resource information..");
-                this->test->cs->getPerHostNumCores();
-//                WRENCH_INFO("Got it!");
+                switch (i % 9) {
+                    case 0:
+                        this->test->cs->getNumHosts();
+                        break;
+                    case 1:
+                        this->test->cs->getCoreFlopRate();
+                        break;
+                    case 2:
+                        this->test->cs->getTotalNumCores();
+                        break;
+                    case 3:
+                        this->test->cs->getPerHostNumCores();
+                        break;
+                    case 4:
+                        this->test->cs->getPerHostNumIdleCores();
+                        break;
+                    case 5:
+                        this->test->cs->getTotalNumIdleCores();
+                        break;
+                    case 6:
+                        this->test->cs->getMemoryCapacity();
+                        break;
+                    case 7:
+                        this->test->cs->getPerHostAvailableMemoryCapacity();
+                        break;
+                    case 8:
+                        this->test->cs->getTTL();
+                        break;
+                }
+
             } catch (wrench::WorkflowExecutionException &e) {
 //                WRENCH_INFO("Got an exception");
                 num_failures++;
@@ -138,7 +192,7 @@ void BareMetalComputeServiceLinkFailuresTest::do_ResourceInformationLinkFailure_
             (std::map<std::string, std::tuple<unsigned long, double>>){
                     std::make_pair("Host2", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)),
             },
-            100.0,
+            "/scratch",
             {},
             {
                     {wrench::BareMetalComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD, 1},

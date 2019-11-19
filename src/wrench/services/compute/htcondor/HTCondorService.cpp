@@ -82,7 +82,7 @@ namespace wrench {
                     this->mailbox_name,
                     new ComputeServiceSubmitStandardJobRequestMessage(
                             answer_mailbox, job, service_specific_args,
-                            this->getMessagePayloadValue(
+                            this->SgetMessagePayloadValue(
                                     HTCondorServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw WorkflowExecutionException(cause);
@@ -199,10 +199,6 @@ namespace wrench {
             return true;
         }
 
-        if (message == nullptr) {
-            WRENCH_INFO("Got a NULL message... Likely this means we're all done. Aborting");
-            return false;
-        }
 
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
 

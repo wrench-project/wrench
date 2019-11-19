@@ -36,8 +36,34 @@ protected:
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
-                          "       <host id=\"WMSHost\" speed=\"1f\" core=\"1\"/> "
-                          "       <host id=\"ExecutionHost\" speed=\"1f\" core=\"1\"/> "
+                          "       <host id=\"WMSHost\" speed=\"1f\" core=\"1\" > "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100000000000000B\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"large_disk_backup\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100000000000000B\"/>"
+                          "             <prop id=\"mount\" value=\"/backup\"/>"
+                          "          </disk>"
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>"
+                          "       <host id=\"ExecutionHost\" speed=\"1f\" core=\"1\" > "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100000000000000B\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"large_disk_backup\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100000000000000B\"/>"
+                          "             <prop id=\"mount\" value=\"/backup\"/>"
+                          "          </disk>"
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>"
                           "       <link id=\"1\" bandwidth=\"1Gbps\" latency=\"1us\"/>"
                           "       <route src=\"ExecutionHost\" dst=\"WMSHost\"> <link_ctn id=\"1\"/> </route>"
                           "   </zone> "
@@ -95,10 +121,15 @@ private:
         this->test->failed_task->addInputFile(this->test->large_input_file);
         this->test->failed_task->addInputFile(this->test->small_input_file);
 
-        wrench::StandardJob *failed_job = job_manager->createStandardJob(this->test->failed_task, {{this->test->small_input_file, this->test->storage_service},
-                                                                                                   {this->test->large_input_file, this->test->storage_service}});
+        wrench::StandardJob *failed_job = job_manager->createStandardJob(
+                this->test->failed_task,
+                {{this->test->small_input_file, wrench::FileLocation::LOCATION(this->test->storage_service)},
+                 {this->test->large_input_file, wrench::FileLocation::LOCATION(this->test->storage_service)}});
         job_manager->submitJob(failed_job, this->test->compute_service);
-        this->test->storage_service->deleteFile(this->getWorkflow()->getFileByID("small_input_file"), this->test->file_registry_service);
+
+        wrench::StorageService::deleteFile(this->getWorkflow()->getFileByID("small_input_file"),
+                                           wrench::FileLocation::LOCATION(this->test->storage_service),
+                                           this->test->file_registry_service);
 
         std::shared_ptr<wrench::WorkflowExecutionEvent> workflow_execution_event;
         try {
@@ -129,8 +160,8 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test(){
 
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
-    std::string wms_host = simulation->getHostnameList()[1];
-    std::string execution_host = simulation->getHostnameList()[0];
+    std::string wms_host = wrench::Simulation::getHostnameList()[1];
+    std::string execution_host = wrench::Simulation::getHostnameList()[0];
 
     ASSERT_NO_THROW(compute_service = simulation->add(new wrench::BareMetalComputeService(wms_host,
                                                                                           {std::make_pair(
@@ -139,7 +170,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test(){
                                                                                                                   wrench::ComputeService::ALL_RAM))},
                                                                                           {})));
 
-    ASSERT_NO_THROW(storage_service = simulation->add(new wrench::SimpleStorageService(wms_host, 100000000000000.0)));
+    ASSERT_NO_THROW(storage_service = simulation->add(new wrench::SimpleStorageService(wms_host, {"/"})));
 
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(new SimulationTimestampTaskBasicTestWMS(
@@ -153,9 +184,8 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test(){
     small_input_file = this->workflow->addFile("small_input_file", 10);
     large_input_file = this->workflow->addFile("large_input_file", 1000000);
 
-    ASSERT_NO_THROW(simulation->stageFiles({{large_input_file->getID(), large_input_file},
-                                            {small_input_file->getID(), small_input_file}},
-                                           storage_service));
+    ASSERT_NO_THROW(simulation->stageFile(large_input_file, storage_service));
+    ASSERT_NO_THROW(simulation->stageFile(small_input_file, storage_service));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -277,15 +307,20 @@ private:
         this->test->failed_task->addInputFile(this->test->large_input_file);
         this->test->failed_task->addInputFile(this->test->small_input_file);
 
-        wrench::StandardJob *failed_job = job_manager->createStandardJob(this->test->failed_task, {{this->test->small_input_file, this->test->storage_service},
-                                                                                                   {this->test->large_input_file, this->test->storage_service}});
+        wrench::StandardJob *failed_job = job_manager->createStandardJob(
+                this->test->failed_task,
+                {{this->test->small_input_file, wrench::FileLocation::LOCATION(this->test->storage_service)},
+                 {this->test->large_input_file, wrench::FileLocation::LOCATION(this->test->storage_service)}});
 
         job_manager->submitJob(failed_job, this->test->compute_service);
-        this->test->storage_service->deleteFile(this->getWorkflow()->getFileByID("small_input_file"), this->test->file_registry_service);
+        wrench::StorageService::deleteFile(this->getWorkflow()->getFileByID("small_input_file"),
+                                           wrench::FileLocation::LOCATION(this->test->storage_service));
         this->waitForAndProcessNextEvent();
 
-        wrench::StandardJob *passing_job = job_manager->createStandardJob(this->test->failed_task, {{this->test->small_input_file, this->test->backup_storage_service},
-                                                                                                    {this->test->large_input_file, this->test->storage_service}});
+        wrench::StandardJob *passing_job = job_manager->createStandardJob(
+                this->test->failed_task,
+                {{this->test->small_input_file, wrench::FileLocation::LOCATION(this->test->backup_storage_service)},
+                 {this->test->large_input_file, wrench::FileLocation::LOCATION(this->test->storage_service)}});
         job_manager->submitJob(passing_job, this->test->compute_service);
         this->waitForAndProcessNextEvent();
 
@@ -308,8 +343,8 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
 
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
-    std::string wms_host = simulation->getHostnameList()[1];
-    std::string execution_host = simulation->getHostnameList()[0];
+    std::string wms_host = wrench::Simulation::getHostnameList()[1];
+    std::string execution_host = wrench::Simulation::getHostnameList()[0];
 
     ASSERT_NO_THROW(compute_service = simulation->add(new wrench::BareMetalComputeService(wms_host,
                                                                                           {std::make_pair(
@@ -318,8 +353,8 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
                                                                                                                   wrench::ComputeService::ALL_RAM))},
                                                                                           {})));
 
-    ASSERT_NO_THROW(storage_service = simulation->add(new wrench::SimpleStorageService(wms_host, 100000000000000.0)));
-    ASSERT_NO_THROW(backup_storage_service = simulation->add(new wrench::SimpleStorageService(wms_host, 100000000000000.0)));
+    ASSERT_NO_THROW(storage_service = simulation->add(new wrench::SimpleStorageService(wms_host, {"/"})));
+    ASSERT_NO_THROW(backup_storage_service = simulation->add(new wrench::SimpleStorageService(wms_host, {"/backup"})));
 
 
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -334,11 +369,9 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
     small_input_file = this->workflow->addFile("small_input_file", 10);
     large_input_file = this->workflow->addFile("large_input_file", 1000000);
 
-    ASSERT_NO_THROW(simulation->stageFiles({{large_input_file->getID(), large_input_file},
-                                            {small_input_file->getID(), small_input_file}},
-                                           storage_service));
-
-    ASSERT_NO_THROW(simulation->stageFiles({{small_input_file->getID(), small_input_file}}, backup_storage_service));
+    ASSERT_NO_THROW(simulation->stageFile(large_input_file, storage_service));
+    ASSERT_NO_THROW(simulation->stageFile(small_input_file, storage_service));
+    ASSERT_NO_THROW(simulation->stageFile(small_input_file, backup_storage_service));
 
 
     ASSERT_NO_THROW(simulation->launch());
@@ -501,8 +534,8 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskTerminateAndFail_tes
 
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
-    std::string wms_host = simulation->getHostnameList()[1];
-    std::string execution_host = simulation->getHostnameList()[0];
+    std::string wms_host = wrench::Simulation::getHostnameList()[1];
+    std::string execution_host = wrench::Simulation::getHostnameList()[0];
 
     ASSERT_NO_THROW(compute_service = simulation->add(new wrench::BareMetalComputeService(execution_host,
                                                                                           {std::make_pair(
@@ -511,7 +544,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskTerminateAndFail_tes
                                                                                                                   wrench::ComputeService::ALL_RAM))},
                                                                                           {})));
 
-    ASSERT_NO_THROW(storage_service = simulation->add(new wrench::SimpleStorageService(wms_host, 100000000000000.0)));
+    ASSERT_NO_THROW(storage_service = simulation->add(new wrench::SimpleStorageService(wms_host, {"/"})));
 
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(new SimulationTimestampTaskTerminateAndFailTestWMS(

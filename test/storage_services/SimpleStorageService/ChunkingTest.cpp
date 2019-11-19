@@ -32,7 +32,16 @@ protected:
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
-                          "       <host id=\"StorageHost\" speed=\"1f\"/> "
+                          "       <host id=\"StorageHost\" speed=\"1f\"> "
+                          "          <disk id=\"disk1\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"1000B\"/>"
+                          "             <prop id=\"mount\" value=\"/disk1\"/>"
+                          "          </disk>"
+                          "          <disk id=\"disk2\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"1000B\"/>"
+                          "             <prop id=\"mount\" value=\"/disk2\"/>"
+                          "          </disk>"
+                          "       </host>"
                           "       <host id=\"WMSHost\" speed=\"1f\"/> "
                           "       <link id=\"link\" bandwidth=\"100Bps\" latency=\"100us\"/>"
                           "       <route src=\"WMSHost\" dst=\"StorageHost\">"
@@ -71,18 +80,28 @@ private:
         auto data_movement_manager = this->createDataMovementManager();
 
         if (mode == "reading") {
-            this->test->storage_service_1->readFile(this->test->file_size_0);
-            this->test->storage_service_1->readFile(this->test->file_size_100);
+            wrench::StorageService::readFile(
+                    this->test->file_size_0,
+                    wrench::FileLocation::LOCATION(this->test->storage_service_1));
+            wrench::StorageService::readFile(
+                    this->test->file_size_100,
+                    wrench::FileLocation::LOCATION(this->test->storage_service_1));
+
         } else if (mode == "writing") {
-            this->test->storage_service_2->writeFile(this->test->file_size_0);
-            this->test->storage_service_2->writeFile(this->test->file_size_100);
+            wrench::StorageService::writeFile(
+                    this->test->file_size_0,
+                    wrench::FileLocation::LOCATION(this->test->storage_service_2));
+            wrench::StorageService::writeFile(
+                    this->test->file_size_100,
+                    wrench::FileLocation::LOCATION(this->test->storage_service_2));
+
         } else if (mode == "copying") {
             data_movement_manager->doSynchronousFileCopy(this->test->file_size_0,
-                                                         this->test->storage_service_1,
-                                                         this->test->storage_service_2);
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_1),
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_2));
             data_movement_manager->doSynchronousFileCopy(this->test->file_size_100,
-                                                         this->test->storage_service_1,
-                                                         this->test->storage_service_2);
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_1),
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service_2));
 
         }
 
@@ -118,14 +137,14 @@ void SimpleStorageServiceChunkingTest::do_ChunkingTest(std::string mode) {
 
     // Create One Storage Service
     ASSERT_NO_THROW(storage_service_1 = simulation->add(
-            new wrench::SimpleStorageService("StorageHost", 1000,
+            new wrench::SimpleStorageService("StorageHost", {"/disk1"},
                                              {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "5"},
                                               {wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "10"}}
             )));
 
     // Create Another Storage Service
     ASSERT_NO_THROW(storage_service_2 = simulation->add(
-            new wrench::SimpleStorageService("StorageHost", 1000,
+            new wrench::SimpleStorageService("StorageHost", {"/disk2"},
                                              {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10"},
                                               {wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "10"}}
             )));
@@ -142,11 +161,8 @@ void SimpleStorageServiceChunkingTest::do_ChunkingTest(std::string mode) {
     wms->addWorkflow(this->workflow);
 
     // Stage the file on the StorageHost
-    ASSERT_NO_THROW(simulation->stageFiles({
-                                                   {file_size_0->getID(), file_size_0},
-                                                   {file_size_100->getID(), file_size_100},
-                                           },
-                                           storage_service_1));
+    ASSERT_NO_THROW(simulation->stageFile(file_size_0, storage_service_1));
+    ASSERT_NO_THROW(simulation->stageFile(file_size_100, storage_service_1));
 
     ASSERT_NO_THROW(simulation->launch());
 

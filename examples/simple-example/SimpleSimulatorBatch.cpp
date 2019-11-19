@@ -81,19 +81,18 @@ int main(int argc, char **argv) {
 
     /* Instantiate a storage service, to be stated on some host in the simulated platform,
      * and adding it to the simulation.  A wrench::StorageService is an abstraction of a service on
-     * which files can be written and read.  This particular storage service  has a capacity
-     * of 10,000,000,000,000 bytes, and is a SimpleStorageService instance. The SimpleStorageService
+     * which files can be written and read.  This particular storage service, which is an instance
+     * of wrench::SimpleStorageService, is started on Host3 in the
+     * platform (platform/batch_platform.xml), which has an attached disk called large_disk. The SimpleStorageService
      * is a barebone storage service implementation provided by WRENCH.
      * Throughout the simulation execution, input/output files of workflow tasks will be located
      * in this storage service.
      */
-    std::string storage_host = hostname_list[(hostname_list.size() > 2) ? 2 : 1];
+    std::string storage_host = "Host3";
     std::cerr << "Instantiating a SimpleStorageService on " << storage_host << "..." << std::endl;
-    auto storage_service = simulation.add(
-            new wrench::SimpleStorageService(storage_host, 10000000000000.0));
+    auto storage_service = simulation.add(new wrench::SimpleStorageService(storage_host, {"/"}));
     storage_services.insert(storage_service);
 
-    std::string wms_host = hostname_list[0];
 
     /* Create a list of compute services that will be used by the WMS */
     std::set<std::shared_ptr<wrench::ComputeService>> compute_services;
@@ -102,24 +101,24 @@ int main(int argc, char **argv) {
      * A batch service is an abstraction of a compute service that corresponds to
      * batch-scheduled platforms in which jobs are submitted to a queue and dispatched
      * to compute nodes according to various scheduling algorithms.
-     * In this example, this particular batch service has no scratch storage space (size = 0).
+     * In this example, this particular batch service has no scratch storage space (mount point = "").
      * The last argument to the constructor
      * shows how to configure particular simulated behaviors of the compute service via a property
      * list. In this example, one specifies that the message that will be send to the service to
      * terminate it will be 2048 bytes. See the documentation to find out all available
      * configurable properties for each kind of service.
      */
+    std::string batch_front_end_host = "Host2";
 
     /* Add the batch service to the simulation, catching a possible exception */
     try {
         auto batch_service = simulation.add(new wrench::BatchComputeService(
-                wms_host, hostname_list, 0, {},
+                batch_front_end_host, hostname_list, "", {},
                 {{wrench::BatchComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 2048}}));
         compute_services.insert(batch_service);
     } catch (std::invalid_argument &e) {
         std::cerr << "Error: " << e.what() << std::endl;
         std::exit(1);}
-
 
 
     /* Instantiate a WMS, to be stated on some host (wms_host), which is responsible
@@ -129,6 +128,7 @@ int main(int argc, char **argv) {
      *
      * The WMS implementation is in SimpleWMS.[cpp|h].
      */
+    std::string wms_host = "Host1";
     std::cerr << "Instantiating a WMS on " << wms_host << "..." << std::endl;
     auto wms = simulation.add(
             new wrench::SimpleWMS(std::unique_ptr<wrench::BatchStandardJobScheduler>(
@@ -152,15 +152,13 @@ int main(int argc, char **argv) {
      * These files are then staged on the storage service.
      */
     std::cerr << "Staging input files..." << std::endl;
-    auto input_files = workflow->getInputFiles();
-    for (auto f : input_files) {
-        std::cerr << "---> " << f.second->getID() << "\n";
-    }
-    try {
-        simulation.stageFiles(input_files, storage_service);
-    } catch (std::runtime_error &e) {
-        std::cerr << "Exception: " << e.what() << std::endl;
-        return 0;
+    for (auto const &f : workflow->getInputFiles()) {
+        try {
+            simulation.stageFile(f.second, storage_service);
+        } catch (std::runtime_error &e) {
+            std::cerr << "Exception: " << e.what() << std::endl;
+            return 0;
+        }
     }
 
     /* Launch the simulation. This call only returns when the simulation is complete. */

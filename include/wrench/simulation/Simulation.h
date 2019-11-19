@@ -34,6 +34,7 @@ namespace wrench {
     class WorkflowFile;
     class SimulationOutput;
     class S4U_Simulation;
+    class FileLocation;
 
 
     /**
@@ -57,16 +58,8 @@ namespace wrench {
         static double getHostMemoryCapacity(std::string hostname);
         static unsigned long getHostNumCores(std::string hostname);
         static double getHostFlopRate(std::string hostname);
-        static bool isHostOn(std::string hostname);
-        static void turnOnHost(std::string hostname);
-        static void turnOffHost(std::string hostname);
-        static bool isLinkOn(std::string linkname);
-        static void turnOnLink(std::string linkname);
-        static void turnOffLink(std::string linkname);
 
         void launch();
-        bool isRunning();
-
 
         /**
          * @brief Method to add a service to the simulation
@@ -81,17 +74,6 @@ namespace wrench {
             return s;
         }
 
-        void addService(std::shared_ptr<ComputeService> service);
-        void addService(std::shared_ptr<StorageService> service);
-        void addService(std::shared_ptr<NetworkProximityService> service);
-        void addService(std::shared_ptr<WMS> service);
-        void addService(std::shared_ptr<FileRegistryService> service);
-
-        void stageFile(WorkflowFile *file, std::shared_ptr<StorageService> storage_service);
-        void stageFile(WorkflowFile *file, std::shared_ptr<StorageService> storage_service, std::string partition);
-
-        void stageFiles(std::map<std::string, WorkflowFile *> files, std::shared_ptr<StorageService>storage_service);
-        void stageFiles(std::map<std::string, WorkflowFile *> files, std::shared_ptr<StorageService>storage_service, std::string partition);
 
         SimulationOutput &getOutput();
 
@@ -101,18 +83,29 @@ namespace wrench {
 //        double getEnergyTimestamp(const std::string &hostname, bool can_record = false);
 
         // pstate related calls
-        void setPstate(const std::string &hostname, int pstate);
         static int getNumberofPstates(const std::string &hostname);
-        static int getCurrentPstate(const std::string &hostname);
         static double getMinPowerConsumption(const std::string &hostname);
         static double getMaxPowerConsumption(const std::string &hostname);
         static std::vector<int> getListOfPstates(const std::string &hostname);
 
+        void stageFile(WorkflowFile *file, std::shared_ptr<StorageService> ss);
+        void stageFile(WorkflowFile *file, std::shared_ptr<StorageService> ss, std::string directory_absolute_path);
 
 
         /***********************/
         /** \cond DEVELOPER    */
         /***********************/
+
+        static bool isHostOn(std::string hostname);
+        static void turnOnHost(std::string hostname);
+        static void turnOffHost(std::string hostname);
+        static bool isLinkOn(std::string linkname);
+        static void turnOnLink(std::string linkname);
+        static void turnOffLink(std::string linkname);
+
+        // pstate related calls
+        void setPstate(const std::string &hostname, int pstate);
+        static int getCurrentPstate(const std::string &hostname);
 
 
         std::shared_ptr<ComputeService> startNewService(ComputeService *service);
@@ -138,6 +131,7 @@ namespace wrench {
         /***********************/
 
     private:
+
         SimulationOutput output;
 
         std::unique_ptr<S4U_Simulation> s4u_simulation;
@@ -152,9 +146,19 @@ namespace wrench {
 
         std::set<std::shared_ptr<StorageService>> storage_services;
 
+        void stageFile(WorkflowFile *file, std::shared_ptr<FileLocation> location);
+
+
+        void platformSanityCheck();
         void checkSimulationSetup();
+        bool isRunning();
 
         void startAllProcesses();
+        void addService(std::shared_ptr<ComputeService> service);
+        void addService(std::shared_ptr<StorageService> service);
+        void addService(std::shared_ptr<NetworkProximityService> service);
+        void addService(std::shared_ptr<WMS> service);
+        void addService(std::shared_ptr<FileRegistryService> service);
 
         std::string getWRENCHVersionString() { return WRENCH_VERSION_STRING; }
 
@@ -163,7 +167,7 @@ namespace wrench {
         unsigned int on_state_change_callback_id;
 
 
-        };
+    };
 
 };
 

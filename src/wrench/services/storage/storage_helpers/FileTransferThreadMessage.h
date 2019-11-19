@@ -53,34 +53,58 @@ namespace wrench {
          *
          * @param file_transfer_thread: the FileTransferThread that sent this message
          * @param file: the file that was being transfered
-         * @param src: the source of the transfer
-         * @param dst: the destination of the transfer
+         * @param src_mailbox: the source mailbox of the transfer (or "" if source wasn't a mailbox)
+         * @param src_location: the source location of the transfer (or nullptr if source wasn't a location)
+         * @param dst_mailbox: the destination mailbox of the transfer (or "" if source wasn't a mailbox)
+         * @param dst_location: the destination location of the transfer (or nullptr if source wasn't a location)
+         * @param answer_mailbox_if_read: the mailbox that a "read is done" may be sent to if necessary
+         * @param answer_mailbox_if_write: the mailbox that a "write is done" may be sent to if necessary
          * @param answer_mailbox_if_copy: the mailbox that a "copy is done/failed" may be sent if necessary
          * @param success: whether the transfer succeeded
          * @param failure_cause: the failure cause (nullptr if success)
          * @param start_time_stamp: the start time stamp
          */
         FileTransferThreadNotificationMessage(std::shared_ptr<FileTransferThread> file_transfer_thread,
-                                                   WorkflowFile *file,
-                                                   std::pair<FileTransferThread::LocationType, std::string> src,
-                                                   std::pair<FileTransferThread::LocationType, std::string> dst,
-                                                   std::string answer_mailbox_if_copy,
-                                                   bool success, std::shared_ptr<FailureCause> failure_cause,
-                                                   SimulationTimestampFileCopyStart *start_time_stamp) :
+                                              WorkflowFile *file,
+                                              std::string src_mailbox,
+                                              std::shared_ptr<FileLocation> src_location,
+                                              std::string dst_mailbox,
+                                              std::shared_ptr<FileLocation> dst_location,
+                                              std::string answer_mailbox_if_read,
+                                              std::string answer_mailbox_if_write,
+                                              std::string answer_mailbox_if_copy,
+                                              bool success, std::shared_ptr<FailureCause> failure_cause,
+                                              SimulationTimestampFileCopyStart *start_time_stamp) :
                 FileTransferThreadMessage("FileTransferThreadNotificationMessage", 0),
                 file_transfer_thread(file_transfer_thread),
-                file(file), src(src), dst(dst),
-                answer_mailbox_if_copy(answer_mailbox_if_copy), success(success),
+                file(file),
+                src_mailbox(src_mailbox), src_location(src_location),
+                dst_mailbox(dst_mailbox), dst_location(dst_location),
+                answer_mailbox_if_read(answer_mailbox_if_read),
+                answer_mailbox_if_write(answer_mailbox_if_write),
+                answer_mailbox_if_copy(answer_mailbox_if_copy),
+                success(success),
                 failure_cause(failure_cause), start_time_stamp(start_time_stamp) {}
 
         /** @brief File transfer thread that sent this message */
         std::shared_ptr<FileTransferThread> file_transfer_thread;
         /** @brief File that was being communicated */
         WorkflowFile *file;
-        /** @brief Source */
-        std::pair<FileTransferThread::LocationType, std::string> src;
-        /** @brief Destination */
-        std::pair<FileTransferThread::LocationType, std::string> dst;
+
+        /** @brief Source mailbox (or "" if source wasn't a mailbox) */
+        std::string src_mailbox;
+        /** @brief Source location (or nullptr if source wasn't a location) */
+        std::shared_ptr<FileLocation> src_location;
+
+        /** @brief Destination mailbox (or "" if destination wasn't a mailbox) */
+        std::string dst_mailbox;
+        /** @brief Destination location (or nullptr if source wasn't a location) */
+        std::shared_ptr<FileLocation> dst_location;
+
+        /** @brief If this was a file read, the mailbox to which an answer should be send */
+        std::string answer_mailbox_if_read;
+        /** @brief If this was a file write, the mailbox to which an answer should be send */
+        std::string answer_mailbox_if_write;
         /** @brief If this was a file copy, the mailbox to which an answer should be send */
         std::string answer_mailbox_if_copy;
         /** @brief Whether the transfer succeeded or not */

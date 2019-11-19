@@ -32,10 +32,12 @@ namespace wrench {
         }
         this->job = job;
         if (jobid <= 0 || num_nodes == 0 || cores_per_node == 0) {
-            std::cout << "Info: " << jobid << " " << time_in_minutes << " " << num_nodes << " " << cores_per_node
-                      << "\n";
             throw std::invalid_argument(
-                    "BatchJob::BatchJob(): either jobid, time_in_minutes, num_nodes, cores_per_node is less than or equal to zero"
+                    "BatchJob::BatchJob(): either jobid (" + std::to_string(jobid) +
+                    "), time_in_minutes (" + std::to_string(time_in_minutes) +
+                    "), num_nodes (" + std::to_string(num_nodes) +
+                    "), cores_per_node (" + std::to_string(cores_per_node) +
+                    ") is less than or equal to zero"
             );
         }
         this->jobid = jobid;

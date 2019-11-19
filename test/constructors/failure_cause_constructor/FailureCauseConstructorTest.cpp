@@ -52,8 +52,23 @@ TEST_F(FailureCauseConstructorTest, NetworkError) {
   ASSERT_EQ(cause->whileReceiving(), true);
   ASSERT_EQ(cause->whileSending(), false);
 
-
 }
+
+TEST_F(FailureCauseConstructorTest, ComputeThreadHasDied) {
+
+    wrench::ComputeThreadHasDied *cause = nullptr;
+    ASSERT_NO_THROW(cause = new wrench::ComputeThreadHasDied());
+    cause->toString(); // Coverage
+}
+
+
+TEST_F(FailureCauseConstructorTest, FatalFailure) {
+
+    wrench::FatalFailure *cause = nullptr;
+    ASSERT_NO_THROW(cause = new wrench::FatalFailure());
+    cause->toString(); // Coverage
+}
+
 
 TEST_F(FailureCauseConstructorTest, HostError) {
   wrench::HostError *cause;

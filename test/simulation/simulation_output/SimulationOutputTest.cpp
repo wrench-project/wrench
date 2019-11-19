@@ -140,7 +140,7 @@ void SimulationOutputTest::do_emptyTrace_test() {
   ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
+  std::string hostname = wrench::Simulation::getHostnameList()[0];
 
 
   // Create a WMS

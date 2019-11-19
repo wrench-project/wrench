@@ -110,7 +110,7 @@ namespace wrench {
         std::map<std::string, std::string> property_list;
 
         std::map<std::string, std::string> default_property_values = {
-                {StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"},
+                {StandardJobExecutorProperty::TASK_STARTUP_OVERHEAD, "0"},
                 {StandardJobExecutorProperty::CORE_ALLOCATION_ALGORITHM, "maximum"},
                 {StandardJobExecutorProperty::TASK_SELECTION_ALGORITHM, "maximum_flops"},
                 {StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM, "best_fit"},

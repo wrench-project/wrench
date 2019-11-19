@@ -42,13 +42,33 @@ protected:
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
-                          "       <host id=\"Host1\" speed=\"1f\" core=\"10\"/> "
-                          "       <host id=\"Host2\" speed=\"1f\" core=\"10\"/> "
-                          "       <link id=\"link1\" bandwidth=\"1Bps\" latency=\"0us\"/>"
-                          "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"link1\""
-                          "       /> </route>"
-                          "   </zone> "
-                          "</platform>";
+                          "       <host id=\"Host1\" speed=\"1f\" core=\"10\"> ";
+        for (int i = 0; i < NUM_STORAGE_SERVICES; i++) {
+            xml += "          <disk id=\"large_disk_" + std::to_string(i) + "\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                                                                            "             <prop id=\"size\" value=\"100B\"/>"
+                                                                            "             <prop id=\"mount\" value=\"/disk_" + std::to_string(i) + "\"/>"
+                                                                                                                                                   "          </disk>";
+        }
+        xml += "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+               "             <prop id=\"size\" value=\"101B\"/>"
+               "             <prop id=\"mount\" value=\"/scratch\"/>"
+               "          </disk>"
+               "       </host>  "
+               "       <host id=\"Host2\" speed=\"1f\" core=\"10\"> "
+               "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+               "             <prop id=\"size\" value=\"100B\"/>"
+               "             <prop id=\"mount\" value=\"/\"/>"
+               "          </disk>"
+               "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+               "             <prop id=\"size\" value=\"101B\"/>"
+               "             <prop id=\"mount\" value=\"/scratch\"/>"
+               "          </disk>"
+               "       </host>  "
+               "       <link id=\"link1\" bandwidth=\"1Bps\" latency=\"0us\"/>"
+               "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"link1\""
+               "       /> </route>"
+               "   </zone> "
+               "</platform>";
 
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
@@ -69,7 +89,7 @@ class FileRegistryLinkFailuresTestWMS : public wrench::WMS {
 
 public:
     FileRegistryLinkFailuresTestWMS(FileRegistryLinkFailuresTest *test,
-                                   std::string hostname) :
+                                    std::string hostname) :
             wrench::WMS(nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -93,8 +113,7 @@ private:
         switcher->simulation = this->simulation;
         switcher->start(switcher, true, false); // Daemonized, no auto-restart
 
-        std::mt19937 rng;
-        rng.seed(666);
+        std::mt19937 rng(666);
         std::uniform_int_distribution<unsigned long> dist_files(0, files.size() - 1);
         std::uniform_int_distribution<unsigned long> dist_storage(0, this->test->storage_services.size() - 1);
 
@@ -104,12 +123,12 @@ private:
                 // Do a random add
                 wrench::Simulation::sleep(1.0);
                 this->test->file_registry_service->addEntry(files.at(dist_files(rng)),
-                                                            this->test->storage_services.at(dist_storage(rng)));
+                                                            wrench::FileLocation::LOCATION(this->test->storage_services.at(dist_storage(rng))));
 
                 // Do a random delete
                 wrench::Simulation::sleep(1.0);
                 this->test->file_registry_service->removeEntry(files.at(dist_files(rng)),
-                                                               this->test->storage_services.at(dist_storage(rng)));
+                                                               wrench::FileLocation::LOCATION(this->test->storage_services.at(dist_storage(rng))));
 
                 // Do a random lookup
                 wrench::Simulation::sleep(1.0);
@@ -142,12 +161,12 @@ void FileRegistryLinkFailuresTest::do_FileRegistryLinkFailureSimpleRandom_Test()
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a bunch of storage services
     for (unsigned int i = 0; i < NUM_STORAGE_SERVICES; i++) {
         storage_services.push_back(simulation->add(
-                new wrench::SimpleStorageService(hostname, 100000000.0)));
+                new wrench::SimpleStorageService(hostname, {"/disk_" + std::to_string(i)})));
     }
 
     // Create a file registry service

@@ -17,18 +17,23 @@
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
 
+XBT_LOG_NEW_DEFAULT_CATEGORY(simple_storage_service_limited_connection_test, "Log category for SimpleStorageServiceLimitedConnectionTest");
 
+
+#define NUM_PARALLEL_TRANSFERS 7 // Changing this number  to a non n*3+ 1 number will ikely
+// require changing the test code
 #define FILE_SIZE 10000000000.00
 #define STORAGE_SIZE (100.0 * FILE_SIZE)
 
 class SimpleStorageServiceLimitedConnectionsTest : public ::testing::Test {
 
 public:
-    wrench::WorkflowFile *files[10];
+    wrench::WorkflowFile *files[NUM_PARALLEL_TRANSFERS];
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
-    std::shared_ptr<wrench::StorageService> storage_service_wms = nullptr;
-    std::shared_ptr<wrench::StorageService> storage_service_1 = nullptr;
-    std::shared_ptr<wrench::StorageService> storage_service_2 = nullptr;
+    std::shared_ptr<wrench::StorageService> storage_service_wms_unlimited = nullptr;
+    std::shared_ptr<wrench::StorageService> storage_service_wms_limited = nullptr;
+    std::shared_ptr<wrench::StorageService> storage_service_unlimited = nullptr;
+    std::shared_ptr<wrench::StorageService> storage_service_limited = nullptr;
 
     void do_ConcurrencyFileCopies_test();
 
@@ -40,28 +45,57 @@ protected:
       workflow = new wrench::Workflow();
 
       // Create the files
-      for (size_t i=0; i < 10; i++) {
+      for (size_t i=0; i < NUM_PARALLEL_TRANSFERS; i++) {
         files[i] = workflow->addFile("file_"+std::to_string(i), FILE_SIZE);
       }
 
       // Create a 3-host platform file
       std::string xml = "<?xml version='1.0'?>"
-              "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
-              "<platform version=\"4.1\"> "
-              "   <zone id=\"AS0\" routing=\"Full\"> "
-              "       <host id=\"Host1\" speed=\"1f\"/> "
-              "       <host id=\"Host2\" speed=\"1f\"/> "
-              "       <host id=\"WMSHost\" speed=\"1f\"/> "
-              "       <link id=\"link1\" bandwidth=\"10MBps\" latency=\"100us\"/>"
-              "       <link id=\"link2\" bandwidth=\"10MBps\" latency=\"100us\"/>"
-              "       <route src=\"WMSHost\" dst=\"Host1\">"
-              "         <link_ctn id=\"link1\"/>"
-              "       </route>"
-              "       <route src=\"WMSHost\" dst=\"Host2\">"
-              "         <link_ctn id=\"link2\"/>"
-              "       </route>"
-              "   </zone> "
-              "</platform>";
+                                "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                                "<platform version=\"4.1\"> "
+                                "   <zone id=\"AS0\" routing=\"Full\"> "
+                                "       <host id=\"Host1\" speed=\"1Gf\" > "
+                                "          <disk id=\"large_disk\" read_bw=\"50MBps\" write_bw=\"50MBps\">"
+                                "             <prop id=\"size\" value=\"" + std::to_string(STORAGE_SIZE) + "B\"/>"
+                                "             <prop id=\"mount\" value=\"/\"/>"
+                                "          </disk>"
+                                "       </host>"
+                                "       <host id=\"Host2\" speed=\"1Gf\" > "
+                                "          <disk id=\"large_disk\" read_bw=\"50MBps\" write_bw=\"50MBps\">"
+                                "             <prop id=\"size\" value=\"" + std::to_string(STORAGE_SIZE) + "B\"/>"
+                                "             <prop id=\"mount\" value=\"/\"/>"
+                                "          </disk>"
+                                "       </host>"
+                                "       <host id=\"WMSHost\" speed=\"1Gf\" > "
+                                "          <disk id=\"large_disk1\" read_bw=\"50MBps\" write_bw=\"50MBps\">"
+                                "             <prop id=\"size\" value=\"" + std::to_string(STORAGE_SIZE) + "B\"/>"
+                                "             <prop id=\"mount\" value=\"/disk1\"/>"
+                                "          </disk>"
+                                "          <disk id=\"large_disk2\" read_bw=\"50MBps\" write_bw=\"50MBps\">"
+                                "             <prop id=\"size\" value=\"" + std::to_string(STORAGE_SIZE) + "B\"/>"
+                                "             <prop id=\"mount\" value=\"/disk2\"/>"
+                                "          </disk>"
+                                "       </host>"
+                                "       <link id=\"loop\" bandwidth=\"1000000GBps\" latency=\"0us\"/>"
+                                "       <link id=\"link1\" bandwidth=\"54MBps\" latency=\"0us\"/>"
+                                "       <link id=\"link2\" bandwidth=\"54MBps\" latency=\"0us\"/>"
+                                "       <route src=\"WMSHost\" dst=\"Host1\">"
+                                "         <link_ctn id=\"link1\"/>"
+                                "       </route>"
+                                "       <route src=\"WMSHost\" dst=\"Host2\">"
+                                "         <link_ctn id=\"link2\"/>"
+                                "       </route>"
+                                "       <route src=\"WMSHost\" dst=\"WMSHost\">"
+                                "         <link_ctn id=\"loop\"/>"
+                                "       </route>"
+                                "       <route src=\"Host1\" dst=\"Host1\">"
+                                "         <link_ctn id=\"loop\"/>"
+                                "       </route>"
+                                "       <route src=\"Host2\" dst=\"Host2\">"
+                                "         <link_ctn id=\"loop\"/>"
+                                "       </route>"
+                                "   </zone> "
+                                "</platform>";
       FILE *platform_file = fopen(platform_file_path.c_str(), "w");
       fprintf(platform_file, "%s", xml.c_str());
       fclose(platform_file);
@@ -80,10 +114,11 @@ protected:
 class SimpleStorageServiceConcurrencyFileCopiesLimitedConnectionsTestWMS : public wrench::WMS {
 
 public:
-    SimpleStorageServiceConcurrencyFileCopiesLimitedConnectionsTestWMS(SimpleStorageServiceLimitedConnectionsTest *test,
-                                                                       const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                                                       const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                                                                       const std::string &hostname) :
+    SimpleStorageServiceConcurrencyFileCopiesLimitedConnectionsTestWMS(
+            SimpleStorageServiceLimitedConnectionsTest *test,
+            const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+            const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+            const std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
     }
@@ -102,77 +137,75 @@ private:
       auto file_registry_service = this->getAvailableFileRegistryService();
 
       // Reading
-      for (auto dst_storage_service : {this->test->storage_service_1, this->test->storage_service_2}) {
+      for (auto dst_storage_service : {this->test->storage_service_unlimited, this->test->storage_service_limited}) {
 
-        for (auto reading : {true, false}) {
+        std::shared_ptr<wrench::StorageService> src_storage_service;
+        if (dst_storage_service == this->test->storage_service_unlimited) {
+          src_storage_service = this->test->storage_service_wms_unlimited;
+        }
+        if (dst_storage_service == this->test->storage_service_limited) {
+          src_storage_service = this->test->storage_service_wms_limited;
+        }
 
-          // Initiate 10 asynchronous file copies to/from storage_service_1 (unlimited)
-          double start = this->simulation->getCurrentSimulatedDate();
-          for (int i = 0; i < 10; i++) {
-            if (reading) {
-              data_movement_manager->initiateAsynchronousFileCopy(this->test->files[i],
-                                                                  this->test->storage_service_wms,
-                                                                  dst_storage_service);
-            } else {
-              data_movement_manager->initiateAsynchronousFileCopy(this->test->files[i],
-                                                                  dst_storage_service,
-                                                                  this->test->storage_service_wms);
-            }
+        double start = wrench::Simulation::getCurrentSimulatedDate();
+
+        // Initiate asynchronous file copies to/from storage_service
+        for (int i = 0; i < NUM_PARALLEL_TRANSFERS; i++) {
+          data_movement_manager->initiateAsynchronousFileCopy(this->test->files[i],
+                                                              wrench::FileLocation::LOCATION(src_storage_service),
+                                                              wrench::FileLocation::LOCATION(dst_storage_service));
+        }
+
+        double elapsed[NUM_PARALLEL_TRANSFERS];
+        for (int i = 0; i < NUM_PARALLEL_TRANSFERS; i++) {
+          std::shared_ptr<wrench::WorkflowExecutionEvent> event1 = this->getWorkflow()->waitForNextExecutionEvent();
+          if (not std::dynamic_pointer_cast<wrench::FileCopyCompletedEvent>(event1)) {
+            throw std::runtime_error("Unexpected Workflow Execution Event: " + event1->toString());
           }
+          elapsed[i] = wrench::Simulation::getCurrentSimulatedDate() - start;
+        }
 
-          double completion_dates[10];
-          for (int i = 0; i < 10; i++) {
-            std::shared_ptr<wrench::WorkflowExecutionEvent> event1 = this->getWorkflow()->waitForNextExecutionEvent();
-            if (not std::dynamic_pointer_cast<wrench::FileCopyCompletedEvent>(event1)) {
-              throw std::runtime_error("Unexpected Workflow Execution Event: " + event1->toString());
-            }
-            completion_dates[i] = this->simulation->getCurrentSimulatedDate();
-          }
+//          WRENCH_INFO("START = %lf", start);
+//          for (int i = 0; i < NUM_PARALLEL_TRANSFERS; i++) {
+//            WRENCH_INFO("--> elapsed : %lf", elapsed[i]);
+//          }
 
-          // Check results for the unlimited storage service
-          if (dst_storage_service == this->test->storage_service_1) {
-            double baseline_elapsed = completion_dates[0] - start;
-            for (int i=1; i < 10; i++) {
-              if (std::abs(baseline_elapsed - (completion_dates[i] - start)) > 1) {
-                throw std::runtime_error("Incoherent transfer elapsed times for the unlimited storage service");
-              }
-            }
-          }
-
-          // Check results for the limited storage service
-          if (dst_storage_service == this->test->storage_service_2) {
-            bool success = true;
-
-            if ((std::abs(completion_dates[0] - completion_dates[1]) > 1) ||
-                (std::abs(completion_dates[2] - completion_dates[1]) > 1) ||
-                (std::abs(completion_dates[4] - completion_dates[3]) > 1) ||
-                (std::abs(completion_dates[5] - completion_dates[4]) > 1) ||
-                (std::abs(completion_dates[7] - completion_dates[6]) > 1) ||
-                (std::abs(completion_dates[8] - completion_dates[7]) > 1)) {
-              success = false;
-            }
-
-            double elapsed_1 = completion_dates[0] - start;
-            double elapsed_2 = completion_dates[3] - completion_dates[0];
-            double elapsed_3 = completion_dates[6] - completion_dates[3];
-            double elapsed_4 = completion_dates[9] - completion_dates[8];
-
-            if ((std::abs(elapsed_2 - elapsed_1) > 1) ||
-                (std::abs(elapsed_3 - elapsed_2) > 1)) {
-              success = false;
-            }
-
-            if (std::abs(3.0 * elapsed_4 - elapsed_3) > 1) {
-              success = false;
-            }
-
-            if (not success) {
-              throw std::runtime_error("Incoherent transfer elapsed times for the limited storage service");
+        // Check results for the unlimited storage service
+        if (dst_storage_service == this->test->storage_service_unlimited) {
+          double baseline_elapsed = elapsed[0];
+          for (int i=1; i < NUM_PARALLEL_TRANSFERS; i++) {
+            if (std::abs(baseline_elapsed - elapsed[i]) > 1) {
+              throw std::runtime_error("Incoherent transfer elapsed times for the unlimited storage service");
             }
           }
         }
-      }
 
+        // Check results for the limited storage service
+        if (dst_storage_service == this->test->storage_service_limited) {
+          bool success = true;
+
+          for (int i=0; i < NUM_PARALLEL_TRANSFERS; i+=3) {
+            if (std::abs<double>(elapsed[i] - elapsed[i+1] > 1) > 1) {
+              success = false;
+            }
+            if (std::abs<double>(elapsed[i+1] - elapsed[i+2] > 1) > 1) {
+              success = false;
+            }
+            if ((i > 0) and (i < NUM_PARALLEL_TRANSFERS-1)) {
+              if (std::abs<double>(elapsed[i] - 2.0 * elapsed[i/3-1]) > 1) {
+                success = false;
+              }
+            }
+          }
+          if (std::abs<double>(elapsed[NUM_PARALLEL_TRANSFERS-1] - elapsed[NUM_PARALLEL_TRANSFERS-2] - (elapsed[0] / 3.0)) > 1) {
+            success = false;
+          }
+
+          if (not success) {
+            throw std::runtime_error("Incoherent transfer elapsed times for the limited storage service");
+          }
+        }
+      }
 
       return 0;
     }
@@ -185,7 +218,7 @@ TEST_F(SimpleStorageServiceLimitedConnectionsTest, ConcurrencyFileCopies) {
 void SimpleStorageServiceLimitedConnectionsTest::do_ConcurrencyFileCopies_test() {
 
   // Create and initialize a simulation
-  wrench::Simulation *simulation = new wrench::Simulation();
+  auto simulation = new wrench::Simulation();
   int argc = 1;
   char **argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("unit_test");
@@ -197,29 +230,35 @@ void SimpleStorageServiceLimitedConnectionsTest::do_ConcurrencyFileCopies_test()
 
   // Create a (unused) Compute Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-                  new wrench::BareMetalComputeService("WMSHost",
-                                                               {std::make_pair("WMSHost",
-                                                                               std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                               0,
-                                                               {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}, {wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
+          new wrench::BareMetalComputeService("WMSHost",
+                                              {std::make_pair("WMSHost",
+                                                              std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                              "",
+                                              {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}, {wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
 
   // Create a Local storage service with unlimited connections
-  ASSERT_NO_THROW(storage_service_wms = simulation->add(
-                  new wrench::SimpleStorageService("WMSHost", STORAGE_SIZE)));
+  ASSERT_NO_THROW(storage_service_wms_unlimited = simulation->add(
+          new wrench::SimpleStorageService("WMSHost", {"/disk1"})));
+
+  // Create a Local storage service with limited connections
+  ASSERT_NO_THROW(storage_service_wms_limited = simulation->add(
+          new wrench::SimpleStorageService("WMSHost", {"/disk2"},
+                                           {{"MAX_NUM_CONCURRENT_DATA_CONNECTIONS", "3"}})));
 
   // Create a Storage service with unlimited connections
-  ASSERT_NO_THROW(storage_service_1 = simulation->add(
-                  new wrench::SimpleStorageService("Host1", STORAGE_SIZE)));
+  ASSERT_NO_THROW(storage_service_unlimited = simulation->add(
+          new wrench::SimpleStorageService("Host1", {"/"})));
 
   // Create a Storage Service limited to 3 connections
-  ASSERT_NO_THROW(storage_service_2 = simulation->add(
-                  new wrench::SimpleStorageService("Host2", STORAGE_SIZE, {{"MAX_NUM_CONCURRENT_DATA_CONNECTIONS", "3"}})));
+  ASSERT_NO_THROW(storage_service_limited = simulation->add(
+          new wrench::SimpleStorageService("Host2", {"/"},
+                                           {{"MAX_NUM_CONCURRENT_DATA_CONNECTIONS", "3"}})));
 
   // Create a WMS
   std::shared_ptr<wrench::WMS> wms = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(
           new SimpleStorageServiceConcurrencyFileCopiesLimitedConnectionsTestWMS(
-                  this, {compute_service}, {storage_service_wms, storage_service_1, storage_service_2},
+                  this, {compute_service}, {storage_service_wms_unlimited, storage_service_wms_limited, storage_service_unlimited, storage_service_limited},
                   "WMSHost")));
 
   ASSERT_NO_THROW(wms->addWorkflow(workflow));
@@ -228,8 +267,9 @@ void SimpleStorageServiceLimitedConnectionsTest::do_ConcurrencyFileCopies_test()
   simulation->add(new wrench::FileRegistryService("WMSHost"));
 
   // Staging all files on the WMS storage service
-  for (int i=0; i < 10; i++) {
-    ASSERT_NO_THROW(simulation->stageFile(files[i], storage_service_wms));
+  for (int i=0; i < NUM_PARALLEL_TRANSFERS; i++) {
+    ASSERT_NO_THROW(simulation->stageFile(files[i], storage_service_wms_unlimited));
+    ASSERT_NO_THROW(simulation->stageFile(files[i], storage_service_wms_limited));
   }
 
   // Running a "run a single task" simulation

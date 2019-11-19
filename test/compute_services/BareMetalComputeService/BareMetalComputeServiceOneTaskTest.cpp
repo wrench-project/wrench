@@ -53,7 +53,7 @@ public:
     void do_ExecutionWithNotEnoughRAM_test();
 
     void do_ExecutionWithDownService_test();
-    
+
     void do_ExecutionWithSuspendedService_test();
 
 
@@ -79,13 +79,63 @@ protected:
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
-                          "       <host id=\"SingleHost\" speed=\"1f\" core=\"2\"/> "
-                          "       <host id=\"OneCoreHost\" speed=\"1f\" core=\"1\"/> "
+                          "       <host id=\"TwoCoreHost\" speed=\"1f\" core=\"2\"> "
+                          "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"30000B\"/>"
+                          "             <prop id=\"mount\" value=\"/disk1\"/>"
+                          "          </disk>"
+                          "          <disk id=\"large_disk2\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"30000B\"/>"
+                          "             <prop id=\"mount\" value=\"/disk2\"/>"
+                          "          </disk>"
+                          "          <disk id=\"large_disk3\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"30000B\"/>"
+                          "             <prop id=\"mount\" value=\"/disk3\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host> "
+                          "       <host id=\"OneCoreHost\" speed=\"1f\" core=\"1\"> "
+                          "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"30000B\"/>"
+                          "             <prop id=\"mount\" value=\"/disk1\"/>"
+                          "          </disk>"
+                          "          <disk id=\"large_disk2\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"30000B\"/>"
+                          "             <prop id=\"mount\" value=\"/disk2\"/>"
+                          "          </disk>"
+                          "          <disk id=\"large_disk3\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"30000B\"/>"
+                          "             <prop id=\"mount\" value=\"/disk3\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host> "
                           "       <host id=\"RAMHost\" speed=\"1f\" core=\"1\" > "
-                          "         <prop id=\"ram\" value=\"1024\" />"
+                          "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"30000B\"/>"
+                          "             <prop id=\"mount\" value=\"/disk1\"/>"
+                          "          </disk>"
+                          "          <disk id=\"large_disk2\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"30000B\"/>"
+                          "             <prop id=\"mount\" value=\"/disk2\"/>"
+                          "          </disk>"
+                          "          <disk id=\"large_disk3\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"30000B\"/>"
+                          "             <prop id=\"mount\" value=\"/disk3\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "         <prop id=\"ram\" value=\"1024B\" />"
                           "       </host> "
                           "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
-                          "       <route src=\"SingleHost\" dst=\"OneCoreHost\"> <link_ctn id=\"1\"/> </route>"
+                          "       <route src=\"TwoCoreHost\" dst=\"OneCoreHost\"> <link_ctn id=\"1\"/> </route>"
                           "       <route src=\"RAMHost\" dst=\"OneCoreHost\"> <link_ctn id=\"1\"/> </route>"
                           "   </zone> "
                           "</platform>";
@@ -170,14 +220,14 @@ void BareMetalComputeServiceOneTaskTest::do_BadSetup_test() {
                                                 {})), std::invalid_argument);
 
     // Get a hostname
-    auto hostname = simulation->getHostnameList()[0];
+    auto hostname = wrench::Simulation::getHostnameList()[0];
 
     // Bad resource hostname
     ASSERT_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname,
                                                 {std::make_pair("bogus",
                                                                 std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                wrench::ComputeService::ALL_RAM))},
+                                                                                wrench::ComputeService::ALL_RAM))}, "",
                                                 {})), std::invalid_argument);
 
     // Bad number of cores
@@ -185,7 +235,7 @@ void BareMetalComputeServiceOneTaskTest::do_BadSetup_test() {
             new wrench::BareMetalComputeService(hostname,
                                                 {std::make_pair(hostname,
                                                                 std::make_tuple(0,
-                                                                                wrench::ComputeService::ALL_RAM))},
+                                                                                wrench::ComputeService::ALL_RAM))}, "",
                                                 {})), std::invalid_argument);
 
     // Bad number of cores
@@ -195,6 +245,7 @@ void BareMetalComputeServiceOneTaskTest::do_BadSetup_test() {
                                                                 std::make_tuple(100,
                                                                                 wrench::ComputeService::ALL_RAM))},
                                                 {})), std::invalid_argument);
+
 
     // Bad RAM
     ASSERT_THROW(compute_service = simulation->add(
@@ -212,16 +263,15 @@ void BareMetalComputeServiceOneTaskTest::do_BadSetup_test() {
                                                                                 100000.0))},
                                                 {})), std::invalid_argument);
 
-
     // Bad PROPERTIES
     ASSERT_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname,
                                                 {std::make_pair("RAMHost",
                                                                 std::make_tuple(wrench::ComputeService::ALL_CORES,
                                                                                 100000.0))},
-                                                0,
+                                                "",
                                                 {
-                                                        std::make_pair(wrench::BareMetalComputeServiceProperty::THREAD_STARTUP_OVERHEAD, "-1.0")
+                                                        std::make_pair(wrench::BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD, "-1.0")
                                                 },
                                                 {})), std::invalid_argument);
 
@@ -315,24 +365,23 @@ void BareMetalComputeServiceOneTaskTest::do_Noop_test() {
 
     ASSERT_THROW(simulation->add((wrench::ComputeService *)nullptr), std::invalid_argument);
 
-    // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
-
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},100.0,
+            new wrench::BareMetalComputeService("TwoCoreHost",
+                                                {std::make_pair("TwoCoreHost", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                {"/scratch"},
                                                 {})));
 
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService("TwoCoreHost", {"/disk1"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::string  hostname = "TwoCoreHost";
     ASSERT_NO_THROW(wms = simulation->add(
             new NoopTestWMS(
                     this,
@@ -344,15 +393,15 @@ void BareMetalComputeServiceOneTaskTest::do_Noop_test() {
 
     // Without a file registry service this should fail
     ASSERT_THROW(simulation->launch(), std::runtime_error);
-    ASSERT_THROW(simulation->stageFiles({{input_file->getID(),input_file}}, storage_service1), std::runtime_error);
+    ASSERT_THROW(simulation->stageFile(input_file, storage_service1), std::runtime_error);
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
-    ASSERT_THROW(simulation->stageFiles({{input_file->getID(), input_file}}, nullptr), std::invalid_argument);
-    ASSERT_THROW(simulation->stageFiles({{"foo", nullptr}}, storage_service1), std::invalid_argument);
+    ASSERT_THROW(simulation->stageFile(input_file, (std::shared_ptr<wrench::StorageService>)nullptr), std::invalid_argument);
+    ASSERT_THROW(simulation->stageFile(nullptr, storage_service1), std::invalid_argument);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFiles({{input_file->getID(), input_file}}, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -398,8 +447,8 @@ private:
         // Create a job with nullptr task (and no file copies)
         try {
             job = job_manager->createStandardJob(nullptr,
-                                                 {{test->input_file,  test->storage_service1},
-                                                  {test->output_file, test->storage_service1}});
+                                                 {{test->input_file,  wrench::FileLocation::LOCATION((test->storage_service1))},
+                                                  {test->output_file, wrench::FileLocation::LOCATION((test->storage_service1))}});
             throw std::runtime_error("Should not be able to create a job with an empty task");
         } catch (std::invalid_argument &e) {
         }
@@ -407,8 +456,8 @@ private:
         // Create a job with an empty vector of tasks (and no file copies)
         try {
             job = job_manager->createStandardJob({},
-                                                 {{test->input_file,  test->storage_service1},
-                                                  {test->output_file, test->storage_service1}});
+                                                 {{test->input_file,  wrench::FileLocation::LOCATION((test->storage_service1))},
+                                                  {test->output_file, wrench::FileLocation::LOCATION((test->storage_service1))}});
             throw std::runtime_error("Should not be able to create a job with an empty task vector");
         } catch (std::invalid_argument &e) {
         }
@@ -416,8 +465,8 @@ private:
         // Create a job with a vector of empty tasks (and no file copies)
         try {
             job = job_manager->createStandardJob({nullptr, nullptr},
-                                                 {{test->input_file,  test->storage_service1},
-                                                  {test->output_file, test->storage_service1}});
+                                                 {{test->input_file,  wrench::FileLocation::LOCATION((test->storage_service1))},
+                                                  {test->output_file, wrench::FileLocation::LOCATION((test->storage_service1))}});
             throw std::runtime_error("Should not be able to create a job with a vector of empty tasks");
         } catch (std::invalid_argument &e) {
         }
@@ -429,8 +478,8 @@ private:
         try {
 
             job = job_manager->createStandardJob({test->task, task_big},
-                                                 {{nullptr,  test->storage_service1},
-                                                  {test->output_file, test->storage_service1}});
+                                                 {{nullptr,  wrench::FileLocation::LOCATION((test->storage_service1))},
+                                                  {test->output_file, wrench::FileLocation::LOCATION((test->storage_service1))}});
             throw std::runtime_error("Should not be able to create a job with an nullptr file in file locations");
         } catch (std::invalid_argument &e) {
         }
@@ -439,7 +488,7 @@ private:
         try {
             job = job_manager->createStandardJob({test->task, task_big},
                                                  {{test->input_file,  nullptr},
-                                                  {test->output_file, test->storage_service1}});
+                                                  {test->output_file, wrench::FileLocation::LOCATION((test->storage_service1))}});
             throw std::runtime_error("Should not be able to create a job with an nullptr storage service in file locations");
         } catch (std::invalid_argument &e) {
         }
@@ -447,10 +496,9 @@ private:
         // Create a job with nullptrs in pre file copies
         try {
             job = job_manager->createStandardJob({test->task},
-                                                 {{test->input_file,  test->storage_service1},
-                                                  {test->output_file, test->storage_service1}},
-                                                 {std::make_tuple(nullptr, test->storage_service1, test->storage_service2)
-                                                 },
+                                                 {{test->input_file,  wrench::FileLocation::LOCATION((test->storage_service1))},
+                                                  {test->output_file, wrench::FileLocation::LOCATION((test->storage_service1))}},
+                                                 {std::make_tuple(nullptr, wrench::FileLocation::LOCATION((test->storage_service1)), wrench::FileLocation::LOCATION(test->storage_service2))},
                                                  {},
                                                  {}
             );
@@ -461,10 +509,9 @@ private:
         // Create a job with nullptrs in pre file copies
         try {
             job = job_manager->createStandardJob({test->task},
-                                                 {{test->input_file,  test->storage_service1},
-                                                  {test->output_file, test->storage_service1}},
-                                                 {std::make_tuple(test->output_file, nullptr, test->storage_service2)
-                                                 },
+                                                 {{test->input_file,  wrench::FileLocation::LOCATION(test->storage_service1)},
+                                                  {test->output_file, wrench::FileLocation::LOCATION((test->storage_service1))}},
+                                                 {std::make_tuple(test->output_file, nullptr, wrench::FileLocation::LOCATION(test->storage_service2))},
                                                  {},
                                                  {}
             );
@@ -475,9 +522,9 @@ private:
         // Create a job with nullptrs in pre file copies
         try {
             job = job_manager->createStandardJob({test->task},
-                                                 {{test->input_file,  test->storage_service1},
-                                                  {test->output_file, test->storage_service1}},
-                                                 {std::make_tuple(test->output_file, test->storage_service1, nullptr)},
+                                                 {{test->input_file,  wrench::FileLocation::LOCATION((test->storage_service1))},
+                                                  {test->output_file, wrench::FileLocation::LOCATION((test->storage_service1))}},
+                                                 {std::make_tuple(test->output_file, wrench::FileLocation::LOCATION((test->storage_service1)), nullptr)},
                                                  {},
                                                  {}
             );
@@ -488,10 +535,10 @@ private:
         // Create a job with nullptrs in post file copies
         try {
             job = job_manager->createStandardJob({test->task},
-                                                 {{test->input_file,  test->storage_service1},
-                                                  {test->output_file, test->storage_service1}},
+                                                 {{test->input_file,  wrench::FileLocation::LOCATION((test->storage_service1))},
+                                                  {test->output_file, wrench::FileLocation::LOCATION((test->storage_service1))}},
                                                  {},
-                                                 {std::make_tuple(nullptr, test->storage_service1, test->storage_service2)},
+                                                 {std::make_tuple(nullptr, wrench::FileLocation::LOCATION(test->storage_service1), wrench::FileLocation::LOCATION(test->storage_service2))},
                                                  {}
             );
             throw std::runtime_error("Should not be able to create a job with a nullptr file in post file copies");
@@ -501,10 +548,10 @@ private:
         // Create a job with nullptrs in post file copies
         try {
             job = job_manager->createStandardJob({test->task},
-                                                 {{test->input_file,  test->storage_service1},
-                                                  {test->output_file, test->storage_service1}},
+                                                 {{test->input_file,  wrench::FileLocation::LOCATION((test->storage_service1))},
+                                                  {test->output_file, wrench::FileLocation::LOCATION((test->storage_service1))}},
                                                  {},
-                                                 {std::make_tuple(test->output_file, nullptr, test->storage_service2)},
+                                                 {std::make_tuple(test->output_file, nullptr, wrench::FileLocation::LOCATION(test->storage_service2))},
                                                  {}
             );
             throw std::runtime_error("Should not be able to create a job with a nullptr src storage service in post file copies");
@@ -514,10 +561,10 @@ private:
         // Create a job with nullptrs in post file copies
         try {
             job = job_manager->createStandardJob({test->task},
-                                                 {{test->input_file,  test->storage_service1},
-                                                  {test->output_file, test->storage_service1}},
+                                                 {{test->input_file,  wrench::FileLocation::LOCATION((test->storage_service1))},
+                                                  {test->output_file, wrench::FileLocation::LOCATION((test->storage_service1))}},
                                                  {},
-                                                 {std::make_tuple(test->output_file, test->storage_service1, nullptr)
+                                                 {std::make_tuple(test->output_file, wrench::FileLocation::LOCATION((test->storage_service1)), nullptr)
                                                  },
                                                  {}
             );
@@ -528,11 +575,11 @@ private:
         // Create a job with nullptrs in post file deletions
         try {
             job = job_manager->createStandardJob({test->task},
-                                                 {{test->input_file,  test->storage_service1},
-                                                  {test->output_file, test->storage_service1}},
+                                                 {{test->input_file,  wrench::FileLocation::LOCATION((test->storage_service1))},
+                                                  {test->output_file, wrench::FileLocation::LOCATION((test->storage_service1))}},
                                                  {},
                                                  {},
-                                                 {std::make_tuple(nullptr, test->storage_service1)}
+                                                 {std::make_tuple(nullptr, wrench::FileLocation::LOCATION((test->storage_service1)))}
             );
             throw std::runtime_error("Should not be able to create a job with a nullptr file in file deletions");
         } catch (std::invalid_argument &e) {
@@ -542,8 +589,8 @@ private:
         // Create a job with nullptrs in post file deletions
         try {
             job = job_manager->createStandardJob({test->task},
-                                                 {{test->input_file,  test->storage_service1},
-                                                  {test->output_file, test->storage_service1}},
+                                                 {{test->input_file,  wrench::FileLocation::LOCATION((test->storage_service1))},
+                                                  {test->output_file, wrench::FileLocation::LOCATION((test->storage_service1))}},
                                                  {},
                                                  {},
                                                  {std::make_tuple(test->input_file, nullptr)}
@@ -582,17 +629,18 @@ void BareMetalComputeServiceOneTaskTest::do_StandardJobConstructor_test() {
     simulation->instantiatePlatform(platform_file_path);
 
     // Get a hostname
-    std::string hostname1 = "SingleHost";
+    std::string hostname1 = "TwoCoreHost";
 
     // Create a Compute Service
     compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname1,
-                                                {std::make_pair(hostname1, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},100.0,
+                                                {std::make_pair(hostname1, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                "/scratch",
                                                 {}));
 
     // Create a Storage Service
     storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname1, 10000000000000.0));
+            new wrench::SimpleStorageService(hostname1, {"/disk1"}));
 
     // Start a file registry service
     simulation->add(new wrench::FileRegistryService(hostname1));
@@ -605,7 +653,7 @@ void BareMetalComputeServiceOneTaskTest::do_StandardJobConstructor_test() {
     wms->addWorkflow(workflow);
 
     // Staging the input_file on the storage service
-    simulation->stageFiles({{input_file->getID(), input_file}}, storage_service1);
+    simulation->stageFile(input_file, storage_service1);
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -644,14 +692,14 @@ private:
 
         double ram_capacity;
 
-        ram_capacity = wrench::Simulation::getHostMemoryCapacity("SingleHost");
+        ram_capacity = wrench::Simulation::getHostMemoryCapacity("TwoCoreHost");
         if (ram_capacity != wrench::S4U_Simulation::DEFAULT_RAM) {
-            throw std::runtime_error("RAM Capacity of SingleHost should be the default");
+            throw std::runtime_error("RAM Capacity of TwoCoreHost should be the default");
         }
 
         ram_capacity = wrench::Simulation::getMemoryCapacity();
         if (ram_capacity != wrench::S4U_Simulation::DEFAULT_RAM) {
-            throw std::runtime_error("RAM Capacity of SingleHost should be the default");
+            throw std::runtime_error("RAM Capacity of TwoCoreHost should be the default");
         }
 
 
@@ -687,18 +735,18 @@ void BareMetalComputeServiceOneTaskTest::do_HostMemory_test() {
     simulation->instantiatePlatform(platform_file_path);
 
     // Get a hostname
-    std::string hostname1 = "SingleHost";
+    std::string hostname1 = "TwoCoreHost";
     std::string hostname2 = "RAMHost";
 
     // Create a Compute Service
     compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname1,
-                                                {std::make_pair(hostname1, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},100.0,
+                                                {std::make_pair(hostname1, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))}, "/scratch",
                                                 {}));
 
     // Create a Storage Service
     storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname1, 10000000000000.0));
+            new wrench::SimpleStorageService(hostname1, {"/disk1"}));
 
     // Start a file registry service
     simulation->add(new wrench::FileRegistryService(hostname1));
@@ -711,7 +759,7 @@ void BareMetalComputeServiceOneTaskTest::do_HostMemory_test() {
     wms->addWorkflow(workflow);
 
     // Staging the input_file on the storage service
-    simulation->stageFiles({{input_file->getID(), input_file}}, storage_service1);
+    simulation->stageFile(input_file, storage_service1);
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -750,8 +798,8 @@ private:
 
         // Create a job
         auto job = job_manager->createStandardJob(test->task,
-                                                  {{test->input_file,  test->storage_service1},
-                                                   {test->output_file, test->storage_service1}});
+                                                  {{test->input_file,  wrench::FileLocation::LOCATION(test->storage_service1, "/disk1")},
+                                                   {test->output_file, wrench::FileLocation::LOCATION(test->storage_service1, "/disk1")}});
 
         // Get the job type as a string
         std::string job_type_as_string = job->getTypeAsString();
@@ -765,10 +813,25 @@ private:
         // Wait for the workflow execution event
         std::shared_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
         if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
-            throw std::runtime_error("Unexpected workflow execution event!");
+            throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
-        if (!this->test->storage_service1->lookupFile(this->test->output_file, nullptr)) {
+        // bogus lookup #1
+        try {
+            wrench::StorageService::lookupFile(nullptr, wrench::FileLocation::LOCATION(this->test->storage_service1));
+            throw std::runtime_error("Should not have been able to lookup a nullptr file");
+        } catch (std::invalid_argument &e) {
+        }
+
+        // bogus lookup #2
+        try {
+            wrench::StorageService::lookupFile(this->test->output_file, nullptr);
+            throw std::runtime_error("Should not have been able to lookup a nullptr location");
+        } catch (std::invalid_argument &e) {
+        }
+
+
+        if (!wrench::StorageService::lookupFile(this->test->output_file, wrench::FileLocation::LOCATION(this->test->storage_service1))) {
             throw std::runtime_error("Output file not written to storage service");
         }
 
@@ -816,17 +879,17 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithLocationMap_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname,
                                                 {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                {})));
+                                                "")));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService("OneCoreHost", {"/disk1"})));
 
     // Create a File Registry Service
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
@@ -844,7 +907,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithLocationMap_test() {
     ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFiles({{input_file->getID(), input_file}}, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -910,7 +973,8 @@ private:
             throw std::runtime_error("Unexpected workflow execution event!");
         }
 
-        if (!this->test->storage_service1->lookupFile(this->test->output_file, job)) {
+        if (not wrench::StorageService::lookupFile(this->test->output_file,
+                wrench::FileLocation::LOCATION(this->test->storage_service1, "/scratch/" + job->getName()))) {
             throw std::runtime_error("Output file not written to storage service");
         }
 
@@ -925,7 +989,7 @@ TEST_F(BareMetalComputeServiceOneTaskTest, DISABLED_ExecutionWithDefaultStorageS
 
 void BareMetalComputeServiceOneTaskTest::do_ExecutionWithDefaultStorageService_test() {
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("one_task_test");
@@ -940,11 +1004,11 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithDefaultStorageService_t
     ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/disk1"})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -965,7 +1029,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithDefaultStorageService_t
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFiles({{input_file->getID(), input_file}}, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
     // Running a "run a single task" simulation
@@ -1018,12 +1082,14 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create a job
-        wrench::StandardJob *job = job_manager->createStandardJob({test->task},
-                                                                  {{test->input_file,test->storage_service1},{test->output_file,test->storage_service2}}, //changed this since we don't have default storage now
-                                                                  {std::make_tuple(test->input_file, test->storage_service1, test->storage_service2)},
-                                                                  {std::make_tuple(test->output_file, test->storage_service2, test->storage_service1)},
-                                                                  {std::make_tuple(test->input_file, test->storage_service2),
-                                                                   std::make_tuple(test->output_file, test->storage_service2)});
+        wrench::StandardJob *job = job_manager->createStandardJob(
+                {test->task},
+                {{test->input_file,wrench::FileLocation::LOCATION((test->storage_service1))},
+                 {test->output_file,wrench::FileLocation::LOCATION(test->storage_service2)}}, //changed this since we don't have default storage now
+                {std::make_tuple(test->input_file, wrench::FileLocation::LOCATION((test->storage_service1)), wrench::FileLocation::LOCATION(test->storage_service2))},
+                {std::make_tuple(test->output_file, wrench::FileLocation::LOCATION(test->storage_service2), wrench::FileLocation::LOCATION((test->storage_service1)))},
+                {std::make_tuple(test->input_file, wrench::FileLocation::LOCATION(test->storage_service2)),
+                 std::make_tuple(test->output_file, wrench::FileLocation::LOCATION(test->storage_service2))});
         // Submit the job
         job_manager->submitJob(job, test->compute_service);
 
@@ -1039,16 +1105,24 @@ private:
         }
 
         // Test file locations
-        if (!this->test->storage_service1->lookupFile(this->test->input_file, nullptr)) {
+        if (not wrench::StorageService::lookupFile(
+                this->test->input_file,
+                wrench::FileLocation::LOCATION(this->test->storage_service1))) {
             throw std::runtime_error("Input file should be on Storage Service #1");
         }
-        if (!this->test->storage_service1->lookupFile(this->test->output_file, nullptr)) {
+        if (not wrench::StorageService::lookupFile(
+                this->test->output_file,
+                wrench::FileLocation::LOCATION(this->test->storage_service1))) {
             throw std::runtime_error("Output file should be on Storage Service #1");
         }
-        if (this->test->storage_service2->lookupFile(this->test->input_file,job)) {
+        if (wrench::StorageService::lookupFile(
+                this->test->input_file,
+                wrench::FileLocation::LOCATION(this->test->storage_service2))) {
             throw std::runtime_error("Input file should not be on Storage Service #2");
         }
-        if (this->test->storage_service2->lookupFile(this->test->input_file,job)) {
+        if (wrench::StorageService::lookupFile(
+                this->test->output_file,
+                wrench::FileLocation::LOCATION(this->test->storage_service2))) {
             throw std::runtime_error("Output file should not be on Storage Service #2");
         }
 
@@ -1063,7 +1137,7 @@ TEST_F(BareMetalComputeServiceOneTaskTest, ExecutionWithPrePostCopiesTaskCleanup
 void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPrePostCopiesTaskCleanup_test() {
 
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("one_task_test");
@@ -1078,22 +1152,22 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPrePostCopiesTaskCleanu
     ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname ="TwoCoreHost";
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/disk1"})));
 
     // Create another Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/disk2"})));
 
 
     // Create a Compute Service with default Storage Service #2
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname,
                                                 {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                {})));
+                                                "", {})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -1144,9 +1218,9 @@ class ExecutionWithPrePostCopiesNoTaskNoCleanupTestWMS : public wrench::WMS {
 
 public:
     ExecutionWithPrePostCopiesNoTaskNoCleanupTestWMS(BareMetalComputeServiceOneTaskTest *test,
-                                                const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                                const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                                                std::string &hostname) :
+                                                     const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                                     const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                                                     std::string &hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -1164,8 +1238,12 @@ private:
         // Create a job
         wrench::StandardJob *job = job_manager->createStandardJob({},
                                                                   {}, //changed this since we don't have default storage now
-                                                                  {std::make_tuple(test->input_file, test->storage_service1, test->storage_service2)},
-                                                                  {std::make_tuple(test->input_file, test->storage_service2, test->storage_service3)},
+                                                                  {std::make_tuple(test->input_file,
+                                                                                   wrench::FileLocation::LOCATION(test->storage_service1),
+                                                                                   wrench::FileLocation::LOCATION(test->storage_service2))},
+                                                                  {std::make_tuple(test->input_file,
+                                                                                   wrench::FileLocation::LOCATION(test->storage_service2),
+                                                                                   wrench::FileLocation::LOCATION(test->storage_service3))},
                                                                   {});
         // Submit the job
         job_manager->submitJob(job, test->compute_service);
@@ -1182,10 +1260,12 @@ private:
         }
 
         // Test file locations
-        if (!this->test->storage_service2->lookupFile(this->test->input_file, nullptr)) {
+        if (not wrench::StorageService::lookupFile(this->test->input_file,
+                                                   wrench::FileLocation::LOCATION(this->test->storage_service2))) {
             throw std::runtime_error("Input file should be on Storage Service #2");
         }
-        if (!this->test->storage_service3->lookupFile(this->test->input_file, nullptr)) {
+        if (not wrench::StorageService::lookupFile(this->test->input_file,
+                                                   wrench::FileLocation::LOCATION(this->test->storage_service3))) {
             throw std::runtime_error("Input file should be on Storage Service #3");
         }
 
@@ -1200,7 +1280,7 @@ TEST_F(BareMetalComputeServiceOneTaskTest, ExecutionWithPrePostCopiesNoTaskNoCle
 void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPrePostCopiesNoTaskNoCleanup_test() {
 
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("one_task_test");
@@ -1215,19 +1295,19 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPrePostCopiesNoTaskNoCl
     ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/disk1"})));
 
     // Create another Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/disk2"})));
 
     // Create another Storage Service
     ASSERT_NO_THROW(storage_service3 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/disk3"})));
 
 
     // Create a Compute Service with default Storage Service #2
@@ -1240,9 +1320,9 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPrePostCopiesNoTaskNoCl
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new ExecutionWithPrePostCopiesNoTaskNoCleanupTestWMS(this,
-                                                            { compute_service }, {
-                                                                    storage_service1, storage_service2
-                                                            }, hostname)));
+                                                                 { compute_service }, {
+                                                                         storage_service1, storage_service2
+                                                                 }, hostname)));
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
@@ -1290,9 +1370,9 @@ private:
         // Create a job
         wrench::StandardJob *job = job_manager->createStandardJob({},
                                                                   {}, //changed this since we don't have default storage now
-                                                                  {std::make_tuple(test->input_file, test->storage_service1, test->storage_service2)},
+                                                                  {std::make_tuple(test->input_file, wrench::FileLocation::LOCATION(test->storage_service1), wrench::FileLocation::LOCATION(test->storage_service2))},
                                                                   {},
-                                                                  {std::make_tuple(test->input_file, test->storage_service2)});
+                                                                  {std::make_tuple(test->input_file, wrench::FileLocation::LOCATION(test->storage_service2))});
         // Submit the job
         job_manager->submitJob(job, test->compute_service);
 
@@ -1308,7 +1388,8 @@ private:
         }
 
         // Test file locations
-        if (this->test->storage_service2->lookupFile(this->test->input_file, nullptr)) {
+        if (wrench::StorageService::lookupFile(this->test->input_file,
+                wrench::FileLocation::LOCATION(this->test->storage_service2))) {
             throw std::runtime_error("Input file should not be on Storage Service #2");
         }
 
@@ -1323,7 +1404,7 @@ TEST_F(BareMetalComputeServiceOneTaskTest, ExecutionWithPreNoPostCopiesNoTaskCle
 void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPreNoPostCopiesNoTaskCleanup_test() {
 
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("one_task_test");
@@ -1338,15 +1419,15 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPreNoPostCopiesNoTaskCl
     ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/disk1"})));
 
     // Create another Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/disk2"})));
 
 
     // Create a Compute Service with default Storage Service #2
@@ -1359,9 +1440,9 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPreNoPostCopiesNoTaskCl
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new ExecutionWithPreNoPostCopiesNoTaskCleanupTestWMS(this,
-                                                            { compute_service }, {
-                                                                    storage_service1, storage_service2
-                                                            }, hostname)));
+                                                                 { compute_service }, {
+                                                                         storage_service1, storage_service2
+                                                                 }, hostname)));
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
@@ -1405,10 +1486,11 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        // Remove the staged file!
-        this->test->storage_service1->deleteFile(test->input_file);
+//        // Remove the staged file!
+//        wrench::StorageService::deleteFile(test->input_file,
+//                                           wrench::FileLocation::LOCATION(test->storage_service1));
 
-        // Create a job
+        // Create a job (that doesn't say where the file should come from!)
         wrench::StandardJob *job = job_manager->createStandardJob({test->task},
                                                                   {},
                                                                   {},
@@ -1421,11 +1503,11 @@ private:
         std::shared_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
         auto real_event = std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event);
         if (real_event) {
-            auto cause = std::dynamic_pointer_cast<wrench::NoStorageServiceForFile>(real_event->failure_cause);
+            auto cause = std::dynamic_pointer_cast<wrench::FileNotFound>(real_event->failure_cause);
             if (not cause) {
                 throw std::runtime_error(
                         "Got an Standard Job Failure as expected, but unexpected failure cause: " +
-                        real_event->failure_cause->toString() + " (expected: NoStorageServiceForFile");
+                        real_event->failure_cause->toString() + " (expected: FileNotFound");
             }
             std::string error_msg = cause->toString();
             if (cause->getFile() != test->input_file) {
@@ -1435,6 +1517,7 @@ private:
         } else {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
+
 
         return 0;
     }
@@ -1447,7 +1530,7 @@ TEST_F(BareMetalComputeServiceOneTaskTest, ExecutionWithMissingFile) {
 void BareMetalComputeServiceOneTaskTest::do_ExecutionWithMissingFile_test() {
 
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("one_task_test");
@@ -1462,15 +1545,15 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithMissingFile_test() {
     ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/disk1"})));
 
     // Create another Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/disk2"})));
 
 
     // Create a Compute Service with no default Storage Service
@@ -1496,6 +1579,11 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithMissingFile_test() {
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
+
+    ASSERT_EQ(this->task->getFailureCount(), 1);
+    ASSERT_GT(this->task->getFailureDate(), 0.0);
+    ASSERT_LT(this->task->getFailureDate(), wrench::Simulation::getCurrentSimulatedDate());
+
 
     delete simulation;
 
@@ -1570,7 +1658,7 @@ TEST_F(BareMetalComputeServiceOneTaskTest, ExecutionWithNotEnoughCores) {
 void BareMetalComputeServiceOneTaskTest::do_ExecutionWithNotEnoughCores_test() {
 
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("one_task_test");
@@ -1585,15 +1673,15 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithNotEnoughCores_test() {
     ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/disk1"})));
 
     // Create another Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/disk3"})));
 
 
     // Create a Compute Service with no default Storage Service
@@ -1691,7 +1779,7 @@ TEST_F(BareMetalComputeServiceOneTaskTest, ExecutionWithNotEnoughRAM) {
 void BareMetalComputeServiceOneTaskTest::do_ExecutionWithNotEnoughRAM_test() {
 
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("one_task_test");
@@ -1706,15 +1794,15 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithNotEnoughRAM_test() {
     ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/disk1"})));
 
     // Create another Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/disk2"})));
 
 
     // Create a Compute Service with no default Storage Service
@@ -1781,8 +1869,8 @@ private:
 
         // Create a job
         job = job_manager->createStandardJob(test->task,
-                                             {{test->input_file,  test->storage_service1},
-                                              {test->output_file, test->storage_service1}});
+                                             {{test->input_file,  wrench::FileLocation::LOCATION(test->storage_service1)},
+                                              {test->output_file, wrench::FileLocation::LOCATION(test->storage_service1)}});
 
         // Submit the job
         try {
@@ -1823,7 +1911,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithDownService_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -1833,7 +1921,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithDownService_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/disk1"})));
 
     // Create a File Registry Service
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
@@ -1851,7 +1939,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithDownService_test() {
     ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFiles({{input_file->getID(), input_file}}, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1872,9 +1960,9 @@ class ExecutionWithSuspendedServiceTestWMS : public wrench::WMS {
 
 public:
     ExecutionWithSuspendedServiceTestWMS(BareMetalComputeServiceOneTaskTest *test,
-                                    const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                    const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                                    std::string &hostname) :
+                                         const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                         const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                                         std::string &hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -1896,8 +1984,8 @@ private:
 
         // Create a job
         job = job_manager->createStandardJob(test->task,
-                                             {{test->input_file,  test->storage_service1},
-                                              {test->output_file, test->storage_service1}});
+                                             {{test->input_file,  wrench::FileLocation::LOCATION(test->storage_service1)},
+                                              {test->output_file, wrench::FileLocation::LOCATION(test->storage_service1)}});
 
         // Submit the job
         try {
@@ -1948,7 +2036,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithSuspendedService_test()
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -1958,7 +2046,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithSuspendedService_test()
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/disk1"})));
 
     // Create a File Registry Service
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
@@ -1976,7 +2064,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithSuspendedService_test()
     ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFiles({{input_file->getID(), input_file}}, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());

@@ -1,3 +1,4 @@
+
 /**
  * Copyright (c) 2017-2018. The WRENCH Team.
  *
@@ -58,9 +59,36 @@ protected:
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
-                          "       <host id=\"FailedHost1\" speed=\"1f\" core=\"1\"/> "
-                          "       <host id=\"FailedHost2\" speed=\"1f\" core=\"1\"/> "
-                          "       <host id=\"StableHost\" speed=\"1f\" core=\"1\"/> "
+                          "       <host id=\"FailedHost1\" speed=\"1f\" core=\"1\"> "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"10000000000000B\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"101B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>  "
+                          "       <host id=\"FailedHost2\" speed=\"1f\" core=\"1\"> "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"10000000000000B\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"101B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>  "
+                          "       <host id=\"StableHost\" speed=\"1f\" core=\"1\"> "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"10000000000000B\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"101B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>  "
                           "       <link id=\"link1\" bandwidth=\"100kBps\" latency=\"0\"/>"
                           "       <route src=\"FailedHost1\" dst=\"StableHost\">"
                           "           <link_ctn id=\"link1\"/>"
@@ -105,7 +133,7 @@ private:
 
         // Starting a FailedHost1 murderer!!
         auto murderer = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 100, "FailedHost1",
-                wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
+                                                                                               wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
         murderer->simulation = this->simulation;
         murderer->start(murderer, true, false); // Daemonized, no auto-restart
 
@@ -120,8 +148,8 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create a standard job
-        auto job = job_manager->createStandardJob(this->test->task, {{this->test->input_file, this->test->storage_service},
-                                                                     {this->test->output_file, this->test->storage_service}});
+        auto job = job_manager->createStandardJob(this->test->task, {{this->test->input_file, wrench::FileLocation::LOCATION(this->test->storage_service)},
+                                                                     {this->test->output_file, wrench::FileLocation::LOCATION(this->test->storage_service)}});
 
         // Submit the standard job to the compute service, making it sure it runs on FailedHost1
         job_manager->submitJob(job, vm_cs);
@@ -186,12 +214,12 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJob_tes
     // Create a Compute Service that has access to two hosts
     compute_service = simulation->add(
             new wrench::CloudComputeService(stable_host,
-                                     compute_hosts,
-                                     100.0,
-                                     {}));
+                                            compute_hosts,
+                                            "/scratch",
+                                            {}));
 
     // Create a Storage Service
-    storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, 10000000000000.0));
+    storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, {"/"}));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -202,7 +230,7 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJob_tes
     // Staging the input_file on the storage service
     // Create a File Registry Service
     simulation->add(new wrench::FileRegistryService(stable_host));
-    simulation->stageFiles({{input_file->getID(), input_file}}, storage_service);
+    simulation->stageFile(this->input_file, storage_service);
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -238,13 +266,13 @@ private:
 
         // Starting a FailedHost1 murderer!!
         auto murderer = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 100, "FailedHost1",
-                wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
+                                                                                               wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
         murderer->simulation = this->simulation;
         murderer->start(murderer, true, false); // Daemonized, no auto-restart
 
         // Starting a FailedHost1 resurector!!
         auto resurector = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 1000, "FailedHost1",
-                wrench::ResourceSwitcher::Action::TURN_ON, wrench::ResourceSwitcher::ResourceType::HOST));
+                                                                                                 wrench::ResourceSwitcher::Action::TURN_ON, wrench::ResourceSwitcher::ResourceType::HOST));
         resurector->simulation = this->simulation;
         resurector->start(resurector, true, false); // Daemonized, no auto-restart
 
@@ -259,8 +287,9 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create a standard job
-        auto job = job_manager->createStandardJob(this->test->task, {{this->test->input_file, this->test->storage_service},
-                                                                     {this->test->output_file, this->test->storage_service}});
+        auto job = job_manager->createStandardJob(this->test->task,
+                                                  {{this->test->input_file, wrench::FileLocation::LOCATION(this->test->storage_service)},
+                                                   {this->test->output_file, wrench::FileLocation::LOCATION(this->test->storage_service)}});
 
         // Submit the standard job to the compute service, making it sure it runs on FailedHost1
         job_manager->submitJob(job, vm_cs);
@@ -340,12 +369,12 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJobFoll
     // Create a Compute Service that has access to two hosts
     compute_service = simulation->add(
             new wrench::CloudComputeService(stable_host,
-                                     compute_hosts,
-                                     100.0,
-                                     {}));
+                                            compute_hosts,
+                                            "/scratch",
+                                            {}));
 
     // Create a Storage Service
-    storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, 10000000000000.0));
+    storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, {"/"}));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -356,7 +385,7 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJobFoll
     // Staging the input_file on the storage service
     // Create a File Registry Service
     simulation->add(new wrench::FileRegistryService(stable_host));
-    simulation->stageFiles({{input_file->getID(), input_file}}, storage_service);
+    simulation->stageFile(input_file, storage_service);
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -406,7 +435,7 @@ private:
             unsigned long seed1 = trial * 2 + 37;
             auto switch1 = std::shared_ptr<wrench::ResourceRandomRepeatSwitcher>(
                     new wrench::ResourceRandomRepeatSwitcher("StableHost", seed1, 10, 100, 10, 100,
-                            "FailedHost1", wrench::ResourceRandomRepeatSwitcher::ResourceType::HOST));
+                                                             "FailedHost1", wrench::ResourceRandomRepeatSwitcher::ResourceType::HOST));
             switch1->simulation = this->simulation;
             switch1->start(switch1, true, false); // Daemonized, no auto-restart
 
@@ -414,7 +443,7 @@ private:
             unsigned long seed2 = trial * 17 + 42;
             auto switch2 = std::shared_ptr<wrench::ResourceRandomRepeatSwitcher>(
                     new wrench::ResourceRandomRepeatSwitcher("StableHost", seed1, 10, 100, 10, 100,
-                            "FailedHost2", wrench::ResourceRandomRepeatSwitcher::ResourceType::HOST));
+                                                             "FailedHost2", wrench::ResourceRandomRepeatSwitcher::ResourceType::HOST));
             switch2->simulation = this->simulation;
             switch2->start(switch1, true, false); // Daemonized, no auto-restart
 
@@ -426,8 +455,9 @@ private:
             task->addOutputFile(output_file);
 
             // Create a standard job
-            auto job = job_manager->createStandardJob(task, {{this->test->input_file,  this->test->storage_service},
-                                                             {output_file, this->test->storage_service}});
+            auto job = job_manager->createStandardJob(task, {{this->test->input_file,
+                                                                           wrench::FileLocation::LOCATION(this->test->storage_service)},
+                                                             {output_file, wrench::FileLocation::LOCATION(this->test->storage_service)}});
 
             // Create a VM
             auto vm_name = cloud_service->createVM(task->getMinNumCores(), task->getMemoryRequirement());
@@ -502,12 +532,12 @@ void CloudServiceHostFailuresTest::do_CloudServiceRandomFailures_test() {
     // Create a Compute Service that has access to two hosts
     compute_service = simulation->add(
             new wrench::CloudComputeService(stable_host,
-                                     compute_hosts,
-                                     100.0,
-                                     {}));
+                                            compute_hosts,
+                                            "/scratch",
+                                            {}));
 
     // Create a Storage Service
-    storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, 10000000000000.0));
+    storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, {"/"}));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -518,7 +548,7 @@ void CloudServiceHostFailuresTest::do_CloudServiceRandomFailures_test() {
     // Staging the input_file on the storage service
     // Create a File Registry Service
     simulation->add(new wrench::FileRegistryService(stable_host));
-    simulation->stageFiles({{input_file->getID(), input_file}}, storage_service);
+    simulation->stageFile(input_file, storage_service);
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());

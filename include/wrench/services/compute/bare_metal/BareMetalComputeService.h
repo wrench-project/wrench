@@ -55,7 +55,7 @@ namespace wrench {
         std::map<std::string, std::string> default_property_values = {
                 {BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS,                         "true"},
                 {BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS,                            "false"},
-                {BareMetalComputeServiceProperty::THREAD_STARTUP_OVERHEAD,                        "0.0"},
+                {BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD,                          "0.0"},
                 {BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN,      "false"},
         };
 
@@ -86,7 +86,7 @@ namespace wrench {
         // Public Constructor
         BareMetalComputeService(const std::string &hostname,
                                 const std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
-                                double scratch_space_size,
+                                std::string scratch_space_mount_point,
                                 std::map<std::string, std::string> property_list = {},
                                 std::map<std::string, double> messagepayload_list = {}
         );
@@ -94,7 +94,7 @@ namespace wrench {
         // Public Constructor
         BareMetalComputeService(const std::string &hostname,
                                 const std::set<std::string> compute_hosts,
-                                double scratch_space_size,
+                                std::string scratch_space_mount_point,
                                 std::map<std::string, std::string> property_list = {},
                                 std::map<std::string, double> messagepayload_list = {}
         );

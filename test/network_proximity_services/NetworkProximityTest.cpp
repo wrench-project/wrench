@@ -55,10 +55,46 @@ protected:
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
-                          "       <host id=\"Host1\" speed=\"1f\" core=\"10\"/> "
-                          "       <host id=\"Host2\" speed=\"1f\" core=\"10\"/> "
-                          "       <host id=\"Host3\" speed=\"1f\" core=\"10\"/> "
-                          "       <host id=\"Host4\" speed=\"1f\" core=\"10\"/> "
+                          "       <host id=\"Host1\" speed=\"1f\" core=\"10\" > "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"10000000000000B\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"101B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>  "
+                          "       <host id=\"Host2\" speed=\"1f\" core=\"10\" > "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"10000000000000B\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"101B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>  "
+                          "       <host id=\"Host3\" speed=\"1f\" core=\"10\" > "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"10000000000000B\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"101B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>  "
+                          "       <host id=\"Host4\" speed=\"1f\" core=\"10\" > "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"10000000000000B\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"101B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>  "
                           "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
                           "       <link id=\"2\" bandwidth=\"1000GBps\" latency=\"1000us\"/>"
                           "       <link id=\"3\" bandwidth=\"2000GBps\" latency=\"0us\"/>"
@@ -114,8 +150,8 @@ private:
     int main() {
 
         std::pair<std::string, std::string> hosts_to_compute_proximity;
-        hosts_to_compute_proximity = std::make_pair(this->simulation->getHostnameList()[2],
-                                                    this->simulation->getHostnameList()[1]);
+        hosts_to_compute_proximity = std::make_pair(wrench::Simulation::getHostnameList()[2],
+                                                    wrench::Simulation::getHostnameList()[1]);
         int count = 0, max_count = 100;
         auto network_proximity_services = this->getAvailableNetworkProximityServices();
         auto network_proximity_service = network_proximity_services.begin();
@@ -166,7 +202,7 @@ TEST_F(NetworkProximityTest, NetworkProximity) {
 void NetworkProximityTest::do_NetworkProximity_Test() {
 
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -177,7 +213,7 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -187,7 +223,7 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
                                                 {})));
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/"})));
 
 
     // Create a file registry service
@@ -197,13 +233,13 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
     // Get a host for network proximity host
-    std::string network_proximity_db_hostname = simulation->getHostnameList()[1];
+    std::string network_proximity_db_hostname = wrench::Simulation::getHostnameList()[1];
 
     //Get two hosts to communicate with each other for proximity value
-    std::string network_daemon1 = simulation->getHostnameList()[0];
-    std::string network_daemon2 = simulation->getHostnameList()[1];
-    std::string network_daemon3 = simulation->getHostnameList()[2];
-    std::string network_daemon4 = simulation->getHostnameList()[3];
+    std::string network_daemon1 = wrench::Simulation::getHostnameList()[0];
+    std::string network_daemon2 = wrench::Simulation::getHostnameList()[1];
+    std::string network_daemon3 = wrench::Simulation::getHostnameList()[2];
+    std::string network_daemon4 = wrench::Simulation::getHostnameList()[3];
     std::vector<std::string> hosts_in_network = {network_daemon1, network_daemon2, network_daemon3, network_daemon4};
 
     std::shared_ptr<wrench::NetworkProximityService> network_proximity_service = nullptr;
@@ -307,8 +343,8 @@ private:
 
 
         std::pair<std::string, std::string> first_pair_to_compute_proximity;
-        first_pair_to_compute_proximity = std::make_pair(this->simulation->getHostnameList()[0],
-                                                         this->simulation->getHostnameList()[1]);
+        first_pair_to_compute_proximity = std::make_pair(wrench::Simulation::getHostnameList()[0],
+                                                         wrench::Simulation::getHostnameList()[1]);
         int count = 0, max_count = 1000;
         double first_pair_proximity = (*(this->getAvailableNetworkProximityServices().begin()))->getHostPairDistance(
                 first_pair_to_compute_proximity).first;
@@ -330,8 +366,8 @@ private:
 
 
         std::pair<std::string, std::string> second_pair_to_compute_proximity;
-        second_pair_to_compute_proximity = std::make_pair(this->simulation->getHostnameList()[2],
-                                                          this->simulation->getHostnameList()[3]);
+        second_pair_to_compute_proximity = std::make_pair(wrench::Simulation::getHostnameList()[2],
+                                                          wrench::Simulation::getHostnameList()[3]);
         count = 0, max_count = 1000;
         double second_pair_proximity = (*(this->getAvailableNetworkProximityServices().begin()))->getHostPairDistance(
                 second_pair_to_compute_proximity).first;
@@ -367,7 +403,7 @@ TEST_F(NetworkProximityTest, CompareNetworkProximity) {
 void NetworkProximityTest::do_CompareNetworkProximity_Test() {
 
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -378,7 +414,7 @@ void NetworkProximityTest::do_CompareNetworkProximity_Test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
 
 
@@ -391,23 +427,23 @@ void NetworkProximityTest::do_CompareNetworkProximity_Test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/"})));
 
 
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFiles({std::make_pair(input_file->getID(), input_file)}, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
     // Get a host for network proximity host
-    std::string network_proximity_db_hostname = simulation->getHostnameList()[1];
+    std::string network_proximity_db_hostname = wrench::Simulation::getHostnameList()[1];
 
     //Get two hosts to communicate with each other for proximity value
-    std::string network_daemon1 = simulation->getHostnameList()[0];
-    std::string network_daemon2 = simulation->getHostnameList()[1];
-    std::string network_daemon3 = simulation->getHostnameList()[2];
-    std::string network_daemon4 = simulation->getHostnameList()[3];
+    std::string network_daemon1 = wrench::Simulation::getHostnameList()[0];
+    std::string network_daemon2 = wrench::Simulation::getHostnameList()[1];
+    std::string network_daemon3 = wrench::Simulation::getHostnameList()[2];
+    std::string network_daemon4 = wrench::Simulation::getHostnameList()[3];
     std::vector<std::string> hosts_in_network = {network_daemon1, network_daemon2, network_daemon3, network_daemon4};
 
     std::shared_ptr<wrench::NetworkProximityService> network_proximity_service;
@@ -542,7 +578,7 @@ TEST_F(NetworkProximityTest, VivaldiConvergeTest) {
 
 void NetworkProximityTest::do_VivaldiConverge_Test() {
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -553,7 +589,7 @@ void NetworkProximityTest::do_VivaldiConverge_Test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -563,7 +599,7 @@ void NetworkProximityTest::do_VivaldiConverge_Test() {
                                                 {})));
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/"})));
 
 
 
@@ -574,13 +610,13 @@ void NetworkProximityTest::do_VivaldiConverge_Test() {
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
     // Get a host for network proximity host
-    std::string network_proximity_db_hostname = simulation->getHostnameList()[1];
+    std::string network_proximity_db_hostname = wrench::Simulation::getHostnameList()[1];
 
     //Get two hosts to communicate with each other for proximity value
-    std::string host1 = simulation->getHostnameList()[0];
-    std::string host2 = simulation->getHostnameList()[1];
-    std::string host3 = simulation->getHostnameList()[2];
-    std::string host4 = simulation->getHostnameList()[3];
+    std::string host1 = wrench::Simulation::getHostnameList()[0];
+    std::string host2 = wrench::Simulation::getHostnameList()[1];
+    std::string host3 = wrench::Simulation::getHostnameList()[2];
+    std::string host4 = wrench::Simulation::getHostnameList()[3];
     std::vector<std::string> hosts_in_network = {host1, host2, host3, host4};
 
     std::shared_ptr<wrench::NetworkProximityService> alltoall_network_service = nullptr;
@@ -647,7 +683,7 @@ TEST_F(NetworkProximityTest, NetworkProximityValidatePropertiesTest) {
 
 void NetworkProximityTest::do_ValidateProperties_Test() {
     // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -658,7 +694,7 @@ void NetworkProximityTest::do_ValidateProperties_Test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -668,7 +704,7 @@ void NetworkProximityTest::do_ValidateProperties_Test() {
                                                 {})));
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+            new wrench::SimpleStorageService(hostname, {"/"})));
 
     // Create a file registry service
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -677,11 +713,11 @@ void NetworkProximityTest::do_ValidateProperties_Test() {
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
     // Get a host for network proximity host
-    std::string network_proximity_db_hostname = simulation->getHostnameList()[1];
+    std::string network_proximity_db_hostname = wrench::Simulation::getHostnameList()[1];
 
     //Get two hosts to communicate with each other for proximity value
-    std::string host1 = simulation->getHostnameList()[0];
-    std::string host2 = simulation->getHostnameList()[1];
+    std::string host1 = wrench::Simulation::getHostnameList()[0];
+    std::string host2 = wrench::Simulation::getHostnameList()[1];
     std::vector<std::string> hosts_in_network = {host1, host2};
 
     std::shared_ptr<wrench::NetworkProximityService> nps = nullptr;

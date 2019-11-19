@@ -21,13 +21,6 @@ WRENCH_LOG_NEW_DEFAULT_CATEGORY(falure_cause, "Log category for FailureCause");
 
 namespace wrench {
 
-    /**
-     * @brief Constructor
-     * @param file: the file that could not be found on any storage service
-     */
-    NoStorageServiceForFile::NoStorageServiceForFile(WorkflowFile *file) {
-        this->file = file;
-    }
 
     /**
      * @brief Constructor
@@ -42,33 +35,17 @@ namespace wrench {
      * @return the message
      */
     std::string NoScratchSpace::toString() {
-        return error;
-    }
+        return error;}
 
-    /**
-     * @brief Getter
-     * @return the file
-     */
-    WorkflowFile *NoStorageServiceForFile::getFile() {
-        return this->file;
-    }
-
-    /**
-     * @brief Get the human-readable failure message
-     * @return the message
-     */
-    std::string NoStorageServiceForFile::toString() {
-        return "No Storage Service location is specified for file " + this->file->getID();
-    }
 
     /**
      * @brief Constructor
      * @param file: the file that could not be found
-     * @param storage_service: the storage service on which it was not found
+     * @param location: the location at which it could not be found
      */
-    FileNotFound::FileNotFound(WorkflowFile *file, std::shared_ptr<StorageService> storage_service) {
+    FileNotFound::FileNotFound(WorkflowFile *file, std::shared_ptr<FileLocation> location) {
         this->file = file;
-        this->storage_service = storage_service;
+        this->location = location;
     }
 
     /**
@@ -83,8 +60,8 @@ namespace wrench {
      * @brief Getter
      * @return the storage service
      */
-    std::shared_ptr<StorageService> FileNotFound::getStorageService() {
-        return this->storage_service;
+    std::shared_ptr<FileLocation> FileNotFound::getLocation() {
+        return this->location;
     }
 
     /**
@@ -92,7 +69,7 @@ namespace wrench {
      * @return the message
      */
     std::string FileNotFound::toString() {
-        return "Couldn't find file " + this->file->getID() + " at Storage Service " + this->storage_service->getName();
+        return "Couldn't find file " + this->file->getID() + " at location " + this->location->toString();
     }
 
     /**
@@ -360,55 +337,59 @@ namespace wrench {
     };
 
 
+#if 0
 
-//    /**
-//     * @brief Constructor
-//     * @param file: the file that is already there
-//     * @param storage_service:  the storage service on which it is
-//     */
-//    StorageServiceFileAlreadyThere::StorageServiceFileAlreadyThere(WorkflowFile *file, std::shared_ptr<StorageService>  storage_service)
-//            : FailureCause(FILE_ALREADY_THERE) {
-//      this->file = file;
-//      this->storage_service = storage_service;
-//    }
-//
-//    /**
-//     * @brief Getter
-//     * @return the file
-//     */
-//    WorkflowFile *StorageServiceFileAlreadyThere::getFile() {
-//      return this->file;
-//    }
-//
-//    /**
-//     * @brief Getter
-//     * @return the storage service
-//     */
-//    std::shared_ptr<StorageService>  StorageServiceFileAlreadyThere::getStorageService() {
-//      return this->storage_service;
-//    }
-//
-//    /**
-//     * @brief Get the human-readable failure message
-//     * @return the message
-//     */
-//    std::string StorageServiceFileAlreadyThere::toString() {
-//      return "Cannot write file " + this->file->getID() + " to Storage Service " +
-//             this->storage_service->getName() + " because it's already stored there";
-//    }
+    /**
+     * @brief Constructor
+     * @param file: the file that is already there
+     * @param storage_service:  the storage service on which it is
+     */
+    StorageServiceFileAlreadyThere::StorageServiceFileAlreadyThere(WorkflowFile *file, std::shared_ptr<StorageService>  storage_service)
+            : FailureCause(FILE_ALREADY_THERE) {
+      this->file = file;
+      this->storage_service = storage_service;
+    }
 
+    /**
+     * @brief Getter
+     * @return the file
+     */
+    WorkflowFile *StorageServiceFileAlreadyThere::getFile() {
+      return this->file;
+    }
+
+    /**
+     * @brief Getter
+     * @return the storage service
+     */
+    std::shared_ptr<StorageService>  StorageServiceFileAlreadyThere::getStorageService() {
+      return this->storage_service;
+    }
+
+    /**
+     * @brief Get the human-readable failure message
+     * @return the message
+     */
+    std::string StorageServiceFileAlreadyThere::toString() {
+      return "Cannot write file " + this->file->getID() + " to Storage Service " +
+             this->storage_service->getName() + " because it's already stored there";
+    }
+
+
+#endif
 
     /**
      * @brief Constructor
      * @param file: the file that is already being copied
-     * @param storage_service:  the storage service to which is is being copied
-     * @param dst_partition: the destination partition
+     * @param src: the source location
+     * @param dst: the destination location
      */
-    FileAlreadyBeingCopied::FileAlreadyBeingCopied(WorkflowFile *file, std::shared_ptr<StorageService> storage_service,
-                                                   std::string dst_partition) {
+    FileAlreadyBeingCopied::FileAlreadyBeingCopied(WorkflowFile *file,
+                                                   std::shared_ptr<FileLocation> src,
+                                                   std::shared_ptr<FileLocation> dst) {
         this->file = file;
-        this->storage_service = storage_service;
-        this->dst_partition = dst_partition;
+        this->src_location = src;
+        this->dst_location = dst;
     }
 
     /**
@@ -421,28 +402,28 @@ namespace wrench {
 
     /**
      * @brief Getter
-     * @return the storage service
+     * @return the source location
      */
-    std::shared_ptr<StorageService> FileAlreadyBeingCopied::getStorageService() {
-        return this->storage_service;
+    std::shared_ptr<FileLocation> FileAlreadyBeingCopied::getSourceLocation() {
+        return this->src_location;
     }
 
     /**
     * @brief Getter
-    * @return the destination partition
+    * @return the source location
     */
-    std::string FileAlreadyBeingCopied::getPartition() {
-        return this->dst_partition;
+    std::shared_ptr<FileLocation> FileAlreadyBeingCopied::getDestinationLocation() {
+        return this->dst_location;
     }
-
 
     /**
      * @brief Get the human-readable failure message
      * @return the message
      */
     std::string FileAlreadyBeingCopied::toString() {
-        return "File " + this->file->getID() + " is already being copied to  Storage Service " +
-               this->storage_service->getName();
+        return "File " + this->file->getID() + " is already being copied ("+
+               "src = " + this->src_location->toString() + "; " +
+               "dst = " + this->dst_location->toString() + ")";
     }
 
 
@@ -584,6 +565,42 @@ namespace wrench {
         } else {
             return "Operation not allowed (" + this->error_message + ")";
         }
+    }
+
+    /**
+     * @brief Constructor
+     * @param storage_service: the storage service at which the mount point was unknown
+     * @param invalid_path: the invalid path
+     */
+    InvalidDirectoryPath::InvalidDirectoryPath(std::shared_ptr<StorageService> storage_service,
+                                               std::string invalid_path) {
+        this->storage_service = storage_service;
+        this->invalid_path = invalid_path;
+    }
+
+    /**
+     * @brief Get the storage service at which the path was invalid
+     * @return a storage service
+     */
+    std::shared_ptr<StorageService> InvalidDirectoryPath::getStorageService() {
+        return this->storage_service;
+    }
+
+    /**
+     * @brief Get the invalid path
+     * @return a path
+     */
+    std::string InvalidDirectoryPath::getInvalidPath() {
+        return this->invalid_path;
+    }
+
+    /**
+     * @brief Get the human-readable failure message
+     * @return the message
+     */
+    std::string InvalidDirectoryPath::toString() {
+        return "Storage service " + this->storage_service->getName() + " doesn't have a " +
+               this->getInvalidPath() + " path";
     }
 
 };

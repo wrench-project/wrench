@@ -41,15 +41,15 @@ protected:
                         "<platform version=\"4.1\"> "
                         "   <zone id=\"AS0\" routing=\"Full\"> "
                         "       <host id=\"Host1\" speed=\"1f\" core=\"4\"> "
-                        "         <prop id=\"ram\" value=\"2048\"/> "
+                        "         <prop id=\"ram\" value=\"2048B\"/> "
                         "       </host>  "
                         "       <host id=\"Host2\" speed=\"10Gf\" core=\"4\"> "
-                        "         <prop id=\"ram\" value=\"1024\"/> "
+                        "         <prop id=\"ram\" value=\"1024B\"/> "
                         "       </host>  "
                         "       <host id=\"Host3\" speed=\"1f\" core=\"10\"> "
                         "       </host>  "
                         "       <host id=\"Host4\" speed=\"1f\" core=\"10\">  "
-                        "         <prop id=\"ram\" value=\"1024\"/> "
+                        "         <prop id=\"ram\" value=\"1024B\"/> "
                         "       </host>  "
                         "        <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
                         "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"1\"/> </route>"
@@ -235,7 +235,7 @@ void BareMetalComputeServiceTestResourceInformation::do_ResourceInformation_test
                                               {{std::make_pair("Host1",
                                                                std::make_tuple(4, wrench::ComputeService::ALL_RAM))},
                                                {std::make_pair("Host2",
-                                                               std::make_tuple(4, wrench::ComputeService::ALL_RAM))}}, 0
+                                                               std::make_tuple(4, wrench::ComputeService::ALL_RAM))}}, ""
           )));
 
   // Create 1 Compute Service that manages Host3 and Host4
@@ -244,7 +244,7 @@ void BareMetalComputeServiceTestResourceInformation::do_ResourceInformation_test
                                               {{std::make_pair("Host3",
                                                                std::make_tuple(8, wrench::ComputeService::ALL_RAM))},
                                                {std::make_pair("Host4",
-                                                               std::make_tuple(8, wrench::ComputeService::ALL_RAM))}}, 0
+                                                               std::make_tuple(8, wrench::ComputeService::ALL_RAM))}}, ""
           )));
   std::set<std::shared_ptr<wrench::ComputeService>> compute_services;
   compute_services.insert(compute_service1);
