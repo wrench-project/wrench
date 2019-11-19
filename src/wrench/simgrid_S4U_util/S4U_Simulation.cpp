@@ -86,18 +86,14 @@ namespace wrench {
      */
     void S4U_Simulation::setupPlatform(std::string &filename) {
 
-        // Check the file is valid (one day SimGrid will throw for this
-        FILE *platform_file = fopen(filename.c_str(), "r");
-        if (not platform_file) {
-            throw std::invalid_argument("Cannot open file " + filename);
-        }
-        fclose(platform_file);
-
         try {
             this->engine->load_platform(filename);
         } catch (simgrid::ParseError &e) {
             throw std::invalid_argument("XML Platform description file error: " + std::string(e.what()));
+        } catch (std::invalid_argument &e) {
+            throw;
         }
+
         this->platform_setup = true;
     }
 
