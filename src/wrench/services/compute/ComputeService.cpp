@@ -25,10 +25,6 @@ namespace wrench {
     constexpr unsigned long ComputeService::ALL_CORES;
     constexpr double ComputeService::ALL_RAM;
 
-    // Create SCRATCH as share_ptr to a boogus ptr, with a noop destructor!
-    std::shared_ptr<StorageService> ComputeService::SCRATCH =
-            std::shared_ptr<StorageService>((StorageService *) 666, [](void *ptr) {});
-
     /**
      * @brief Stop the compute service - must be called by the stop()
      *        method of derived classes
@@ -36,7 +32,6 @@ namespace wrench {
     void ComputeService::stop() {
         Service::stop();
     }
-
 
     /**
      * @brief Submit a job to the compute service
@@ -78,8 +73,6 @@ namespace wrench {
             }
         } catch (WorkflowExecutionException &e) {
             throw;
-        } catch (std::runtime_error &e) {
-            throw;
         }
     }
 
@@ -87,7 +80,7 @@ namespace wrench {
      * @brief Terminate a previously-submitted job (which may or may not be running yet)
      *
      * @param job: the job to terminate
-     * 
+     *
      * @throw std::invalid_argument
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
@@ -113,8 +106,6 @@ namespace wrench {
             }
         } catch (WorkflowExecutionException &e) {
             throw;
-        } catch (std::runtime_error &e) {
-            throw;
         }
     }
 
@@ -124,20 +115,22 @@ namespace wrench {
      * @param hostname: the name of the host on which the compute service runs
      * @param service_name: the name of the compute service
      * @param mailbox_name_prefix: the mailbox name prefix
-     * @param scratch_space_size: the size for the scratch storage space of the compute service (0 if none)
+     * @param scratch_space_mount_point: the service's scratch space's mount point ("" if none)
      */
     ComputeService::ComputeService(const std::string &hostname,
                                    const std::string service_name,
                                    const std::string mailbox_name_prefix,
-                                   double scratch_space_size) :
+                                   std::string scratch_space_mount_point) :
             Service(hostname, service_name, mailbox_name_prefix) {
 
         this->state = ComputeService::UP;
 
-        if (scratch_space_size > 0) {
+        if (not scratch_space_mount_point.empty()) {
+
             try {
                 this->scratch_space_storage_service =
-                        std::shared_ptr<StorageService>(new SimpleStorageService(hostname, scratch_space_size));
+                        std::shared_ptr<StorageService>(new SimpleStorageService(hostname, {scratch_space_mount_point}));
+                this->scratch_space_storage_service->setScratch();
                 this->scratch_space_storage_service_shared_ptr = std::shared_ptr<StorageService>(
                         this->scratch_space_storage_service);
             } catch (std::runtime_error &e) {
@@ -196,15 +189,13 @@ namespace wrench {
             dict = this->getServiceResourceInformation();
         } catch (WorkflowExecutionException &e) {
             throw;
-        } catch (std::runtime_error &e) {
-            throw;
         }
 
+        unsigned long count = 0;
         if (dict.find("num_hosts") != dict.end()) {
-            return (unsigned long) (*(dict["num_hosts"].begin())).second;
-        } else {
-            return 0;
+            count += (unsigned long) (*(dict["num_hosts"].begin())).second;
         }
+        return count;
     }
 
 
@@ -221,8 +212,6 @@ namespace wrench {
         try {
             dict = this->getServiceResourceInformation();
         } catch (WorkflowExecutionException &e) {
-            throw;
-        } catch (std::runtime_error &e) {
             throw;
         }
 
@@ -251,19 +240,15 @@ namespace wrench {
             dict = this->getServiceResourceInformation();
         } catch (WorkflowExecutionException &e) {
             throw;
-        } catch (std::runtime_error &e) {
-            throw;
         }
 
+        unsigned long count = 0;
         if (dict.find("num_cores") != dict.end()) {
-            unsigned long count = 0;
             for (auto x : dict["num_cores"]) {
                 count += (unsigned long) x.second;
             }
-            return count;
-        } else {
-            return 0;
         }
+        return count;
     }
 
 
@@ -280,8 +265,6 @@ namespace wrench {
         try {
             dict = this->getServiceResourceInformation();
         } catch (WorkflowExecutionException &e) {
-            throw;
-        } catch (std::runtime_error &e) {
             throw;
         }
 
@@ -310,8 +293,6 @@ namespace wrench {
             dict = this->getServiceResourceInformation();
         } catch (WorkflowExecutionException &e) {
             throw;
-        } catch (std::runtime_error &e) {
-            throw;
         }
 
         std::map<std::string, double> to_return;
@@ -339,27 +320,23 @@ namespace wrench {
             dict = this->getServiceResourceInformation();
         } catch (WorkflowExecutionException &e) {
             throw;
-        } catch (std::runtime_error &e) {
-            throw;
         }
 
 
+        unsigned long count = 0;
         if (dict.find("num_cores") != dict.end()) {
-            unsigned long count = 0;
             for (auto x : dict["num_idle_cores"]) {
                 count += (unsigned long) x.second;
             }
-            return count;
-        } else {
-            return 0;
         }
+        return count;
     }
 
     /**
     * @brief Get the per-core flop rate of the compute service's hosts
     * @return a list of flop rates in flop/sec
     *
-    * @throw std::runtime_error
+    * @throw WorkflowExecutionException
     */
     std::map<std::string, double> ComputeService::getCoreFlopRate() {
 
@@ -367,8 +344,6 @@ namespace wrench {
         try {
             dict = this->getServiceResourceInformation();
         } catch (WorkflowExecutionException &e) {
-            throw;
-        } catch (std::runtime_error &e) {
             throw;
         }
 
@@ -386,7 +361,7 @@ namespace wrench {
     * @brief Get the RAM capacities for each of the compute service's hosts
     * @return a map of RAM capacities, indexed by hostname
     *
-    * @throw std::runtime_error
+    * @throw WorkflowExecutionException
     */
     std::map<std::string, double> ComputeService::getMemoryCapacity() {
 
@@ -394,8 +369,6 @@ namespace wrench {
         try {
             dict = this->getServiceResourceInformation();
         } catch (WorkflowExecutionException &e) {
-            throw;
-        } catch (std::runtime_error &e) {
             throw;
         }
 
@@ -414,7 +387,7 @@ namespace wrench {
      * @brief Get the time-to-live of the compute service
      * @return the ttl in seconds
      *
-     * @throw std::runtime_error
+     * @throw WorkflowExecutionException
      */
     double ComputeService::getTTL() {
 
@@ -422,8 +395,6 @@ namespace wrench {
         try {
             dict = this->getServiceResourceInformation();
         } catch (WorkflowExecutionException &e) {
-            throw;
-        } catch (std::runtime_error &e) {
             throw;
         }
 
@@ -433,6 +404,9 @@ namespace wrench {
     /**
      * @brief Get information about the compute service as a dictionary of vectors
      * @return service information
+     *
+     * @throw WorkflowExecutionException
+     * @throw std::runtime_error
      */
     std::map<std::string, std::map<std::string, double>> ComputeService::getServiceResourceInformation() {
 
@@ -473,7 +447,8 @@ namespace wrench {
      * @return a size (in bytes)
      */
     double ComputeService::getTotalScratchSpaceSize() {
-        return this->scratch_space_storage_service ? this->scratch_space_storage_service->getTotalSpace() : 0.0;
+        // A scratch space SS is always created with a single mount point
+        return this->scratch_space_storage_service ? this->scratch_space_storage_service->getTotalSpace().begin()->second : 0.0;
     }
 
     /**
@@ -481,7 +456,8 @@ namespace wrench {
      * @return a size (in bytes)
      */
     double ComputeService::getFreeScratchSpaceSize() {
-        return this->scratch_space_storage_service ? this->scratch_space_storage_service->getFreeSpace() : 0.0;
+        // A scratch space SS is always created with a single mount point
+        return this->scratch_space_storage_service ? this->scratch_space_storage_service->getFreeSpace().begin()->second : 0.0;
     }
 
     /**

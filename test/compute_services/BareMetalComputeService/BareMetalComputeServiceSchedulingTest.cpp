@@ -60,13 +60,13 @@ protected:
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"Host1\" speed=\"1f\" core=\"4\"> "
-                          "            <prop id=\"ram\" value=\"1000\"/> "
+                          "            <prop id=\"ram\" value=\"1000B\"/> "
                           "       </host> "
                           "       <host id=\"Host2\" speed=\"1f\" core=\"4\"> "
-                          "            <prop id=\"ram\" value=\"1000\"/> "
+                          "            <prop id=\"ram\" value=\"1000B\"/> "
                           "       </host> "
                           "       <host id=\"Host3\" speed=\"3f\" core=\"4\"> "
-                          "            <prop id=\"ram\" value=\"1000\"/> "
+                          "            <prop id=\"ram\" value=\"1000B\"/> "
                           "       </host> "
                           "        <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
                           "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"1\"/> </route>"
@@ -215,7 +215,7 @@ void BareMetalComputeServiceTestScheduling::do_RAMPressure_test() {
     // Create a Compute Service
     ASSERT_NO_THROW(cs = simulation->add(
             new wrench::BareMetalComputeService("Host1",
-                                                (std::set<std::string>){"Host1", "Host2"}, 0.0,
+                                                (std::set<std::string>){"Host1", "Host2"}, {},
                                                 {}, {})));
     std::set<std::shared_ptr<wrench::ComputeService>> compute_services;
     compute_services.insert(cs);
@@ -349,7 +349,7 @@ void BareMetalComputeServiceTestScheduling::do_LoadBalancing1_test() {
     // Create a Compute Service
     ASSERT_NO_THROW(cs = simulation->add(
             new wrench::BareMetalComputeService("Host1",
-                                                (std::set<std::string>){"Host1", "Host2"}, 0.0,
+                                                (std::set<std::string>){"Host1", "Host2"}, "",
                                                 {}, {})));
     std::set<std::shared_ptr<wrench::ComputeService>> compute_services;
     compute_services.insert(cs);
@@ -483,7 +483,7 @@ void BareMetalComputeServiceTestScheduling::do_LoadBalancing2_test() {
     // Create a Compute Service
     ASSERT_NO_THROW(cs = simulation->add(
             new wrench::BareMetalComputeService("Host1",
-                                                (std::set<std::string>){"Host1", "Host3"}, 0.0,
+                                                (std::set<std::string>){"Host1", "Host3"}, "",
                                                 {}, {})));
     std::set<std::shared_ptr<wrench::ComputeService>> compute_services;
     compute_services.insert(cs);

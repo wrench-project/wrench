@@ -29,7 +29,12 @@ protected:
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
-                          "       <host id=\"StorageHost\" speed=\"1f\"/> "
+                          "       <host id=\"StorageHost\" speed=\"1f\"> "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"10B\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "       </host>"
                           "       <host id=\"WMSHost\" speed=\"1f\"/> "
                           "       <link id=\"link\" bandwidth=\"10MBps\" latency=\"100us\"/>"
                           "       <route src=\"WMSHost\" dst=\"StorageHost\">"
@@ -49,9 +54,9 @@ protected:
 class SimpleStorageServiceZeroSizeFileTestWMS : public wrench::WMS {
 public:
     SimpleStorageServiceZeroSizeFileTestWMS(SimpleStorageServiceZeroSizeFileTest *test,
-                                              const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                                            const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                             std::shared_ptr<wrench::FileRegistryService> file_registry_service,
-                                              std::string hostname) :
+                                            std::string hostname) :
             wrench::WMS(nullptr, nullptr, {}, storage_services, {}, file_registry_service,
                         hostname, "test") {
         this->test = test;
@@ -69,7 +74,8 @@ private:
         auto storage_service = *(this->getAvailableStorageServices().begin());
 
         // read the file
-        storage_service->readFile(this->test->file);
+        wrench::StorageService::readFile(this->test->file,
+                                         wrench::FileLocation::LOCATION(storage_service));
 
 
         return 0;
@@ -82,7 +88,7 @@ TEST_F(SimpleStorageServiceZeroSizeFileTest, ReadZeroSizeFile) {
 
 void SimpleStorageServiceZeroSizeFileTest::do_ReadZeroSizeFileTest() {
     // Create and initialize the simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
+    auto simulation = new wrench::Simulation();
 
     int argc = 1;
     char **argv = (char **) calloc(1, sizeof(char *));
@@ -95,7 +101,7 @@ void SimpleStorageServiceZeroSizeFileTest::do_ReadZeroSizeFileTest() {
 
     // Create One Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
-            new wrench::SimpleStorageService("StorageHost", 10)));
+            new wrench::SimpleStorageService("StorageHost", {"/"})));
 
     // Create a file registry
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
@@ -109,7 +115,7 @@ void SimpleStorageServiceZeroSizeFileTest::do_ReadZeroSizeFileTest() {
     wms->addWorkflow(this->workflow);
 
     // Stage the file on the StorageHost
-    ASSERT_NO_THROW(simulation->stageFiles({{file->getID(), file}}, storage_service));
+    ASSERT_NO_THROW(simulation->stageFile(file, storage_service));
 
     ASSERT_NO_THROW(simulation->launch());
 

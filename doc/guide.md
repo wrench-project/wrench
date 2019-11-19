@@ -6,13 +6,12 @@ Guide                        {#guide}
 @WRENCHInternalDoc  <div class="doc-type">Internal Documentation</div><div class="doc-link">Other: <a href="../user/guide.html">User</a> -  <a href="../developer/guide.html">Developer</a></div> @endWRENCHDoc
 
 
-WRENCH simulations typically comprise a number of __Cyberinfrastructure Services__ that are deployed on hosts
-in the simulated platform. The set of currently available services, which is constantly evolving, is
-described below, categorized by service types.
+
+WRENCH currently provide the following (simulated) CyberInfrastructure Service implementations:
 
 
 1. Compute Services
-    1. [Bare-metal Servers](@ref guide-baremetal)
+    1. [Bare-metal Servers](@ref guide-baremetal)s
     2. [Cloud Platforms](@ref guide-cloud)
     3. [Virtualized Cluster Platforms](@ref guide-virtualizedcluster)
     4. [Batch-scheduled Clusters](@ref guide-batch)
@@ -27,3 +26,4 @@ described below, categorized by service types.
 4. Network Proximity Services
     1. [Network Proximity Service](@ref guide-networkproximity)
 
+---

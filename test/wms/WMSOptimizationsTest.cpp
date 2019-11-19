@@ -31,8 +31,26 @@ protected:
                         "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
                         "<platform version=\"4.1\"> "
                         "   <zone id=\"AS0\" routing=\"Full\"> "
-                        "       <host id=\"DualCoreHost\" speed=\"1f\" core=\"2\"/> "
-                        "       <host id=\"QuadCoreHost\" speed=\"1f\" core=\"4\"/> "
+                        "       <host id=\"DualCoreHost\" speed=\"1f\" core=\"2\"> "
+                        "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                        "             <prop id=\"size\" value=\"10000000000000B\"/>"
+                        "             <prop id=\"mount\" value=\"/\"/>"
+                        "          </disk>"
+                        "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                        "             <prop id=\"size\" value=\"101B\"/>"
+                        "             <prop id=\"mount\" value=\"/scratch\"/>"
+                        "          </disk>"
+                        "       </host>  "
+                        "       <host id=\"QuadCoreHost\" speed=\"1f\" core=\"4\"> "
+                        "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                        "             <prop id=\"size\" value=\"10000000000000B\"/>"
+                        "             <prop id=\"mount\" value=\"/\"/>"
+                        "          </disk>"
+                        "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                        "             <prop id=\"size\" value=\"101B\"/>"
+                        "             <prop id=\"mount\" value=\"/scratch\"/>"
+                        "          </disk>"
+                        "       </host>  "
                         "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
                         "       <route src=\"DualCoreHost\" dst=\"QuadCoreHost\"> <link_ctn id=\"1\"/> </route>"
                         "   </zone> "
@@ -162,17 +180,17 @@ void WMSOptimizationsTest::do_staticOptimization_test() {
   ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
+  std::string hostname = wrench::Simulation::getHostnameList()[0];
 
   // Create a Storage Service
   ASSERT_NO_THROW(storage_service = simulation->add(
-          new wrench::SimpleStorageService(hostname, 100.0)));
+          new wrench::SimpleStorageService(hostname, {"/"})));
 
   // Create a MHMC Service
-  std::set<std::string> execution_hosts = {simulation->getHostnameList()[1]};
+  std::set<std::string> execution_hosts = {wrench::Simulation::getHostnameList()[1]};
   ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::BareMetalComputeService(
-                  hostname, execution_hosts, 100.0,
+                  hostname, execution_hosts, "/scratch",
                   {{wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
 
   // Create a WMS
@@ -188,7 +206,9 @@ void WMSOptimizationsTest::do_staticOptimization_test() {
   ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
   // Staging the input_file on the storage service
-  ASSERT_NO_THROW(simulation->stageFiles(workflow->getInputFiles(), storage_service));
+  for (auto const &f : workflow->getInputFiles()) {
+      ASSERT_NO_THROW(simulation->stageFile(f.second, storage_service));
+  }
 
   // Running a "run a single task" simulation
   ASSERT_NO_THROW(simulation->launch());
@@ -297,17 +317,17 @@ void WMSOptimizationsTest::do_dynamicOptimization_test() {
   ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
+  std::string hostname = wrench::Simulation::getHostnameList()[0];
 
   // Create a Storage Service
   ASSERT_NO_THROW(storage_service = simulation->add(
-          new wrench::SimpleStorageService(hostname, 100.0)));
+          new wrench::SimpleStorageService(hostname, {"/"})));
 
   // Create a MHMC Service
-  std::set<std::string> execution_hosts = {simulation->getHostnameList()[1]};
+  std::set<std::string> execution_hosts = {wrench::Simulation::getHostnameList()[1]};
   ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::BareMetalComputeService(
-                  hostname, execution_hosts, 100.0,
+                  hostname, execution_hosts, "/scratch",
                   {{wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
 
   // Create a WMS
@@ -323,7 +343,10 @@ void WMSOptimizationsTest::do_dynamicOptimization_test() {
   ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
   // Staging the input_file on the storage service
-  ASSERT_NO_THROW(simulation->stageFiles(workflow->getInputFiles(), storage_service));
+    // Staging the input_file on the storage service
+    for (auto const &f : workflow->getInputFiles()) {
+        ASSERT_NO_THROW(simulation->stageFile(f.second, storage_service));
+    }
 
   // Running a "run a single task" simulation
   ASSERT_NO_THROW(simulation->launch());

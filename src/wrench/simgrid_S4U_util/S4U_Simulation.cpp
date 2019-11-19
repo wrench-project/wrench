@@ -14,12 +14,14 @@
 #include <wrench/services/compute/ComputeService.h>
 #include <wrench/util/UnitParser.h>
 #include <simgrid/plugins/energy.h>
+#include <simgrid/plugins/file_system.h>
 #include <wrench/workflow/execution_events/FailureCause.h>
 #include "wrench/logging/TerminalOutput.h"
 
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 
 WRENCH_LOG_NEW_DEFAULT_CATEGORY(s4u_simulation, "Log category for S4U_Simulation");
+
 
 
 namespace wrench {
@@ -33,6 +35,7 @@ namespace wrench {
     void S4U_Simulation::initialize(int *argc, char **argv) {
         this->engine = new simgrid::s4u::Engine(argc, argv);
         this->initialized = true;
+        sg_storage_file_system_init();
     }
 
     /**
@@ -75,17 +78,22 @@ namespace wrench {
     }
 
     /**
-     * @brief Initialize the simulated platform. Must only be called once. Due to
-     *        the current SimGrid implementation, if the file is not readable or
-     *        not correctly formatted, this method will call exit() instead of throwing
-     *        an exception.
+     * @brief Initialize the simulated platform. Must only be called once.
      *
      * @param filename: the path to an XML platform description file
+     *
+     * @throw std::invalid_argument
      */
     void S4U_Simulation::setupPlatform(std::string &filename) {
 
-        // TODO: One day, perhaps SimGrid will throw an exception here...
-        this->engine->load_platform(filename);
+        try {
+            this->engine->load_platform(filename);
+        } catch (simgrid::ParseError &e) {
+            throw std::invalid_argument("XML Platform description file error: " + std::string(e.what()));
+        } catch (std::invalid_argument &e) {
+            throw;
+        }
+
         this->platform_setup = true;
     }
 
@@ -211,6 +219,7 @@ namespace wrench {
      */
     void S4U_Simulation::turnOffHost(std::string hostname) {
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
+        WRENCH_INFO("ASDADASDAS");
         if (host == nullptr) {
             throw std::invalid_argument("Unknown hostname " + hostname);
         }
@@ -308,24 +317,108 @@ namespace wrench {
 
     /**
      * @brief Simulates a disk write
-     * @param num_bytes: bumber of written bytes
-     * @param partition_name: partition name
+     *
+     * @param num_bytes: number of bytes to write
+     * @param hostname: name of host to which disk is attached
+     * @param mount_point: mount point
      */
-    void S4U_Simulation::writeToDisk(double num_bytes, std::string partition_name) {
-        // TODO: Change this once I/O in SimGrid is better: the data transfer rate
-        // should be based on the I/O device associated to the partition
-        // Right now, this takes ZERO time!!!
+    void S4U_Simulation::writeToDisk(double num_bytes, std::string hostname, std::string mount_point) {
+        mount_point  = FileLocation::sanitizePath(mount_point);
+
+        WRENCH_INFO("Writing %lf bytes to disk %s:%s", num_bytes, hostname.c_str(), mount_point.c_str());
+        auto host = simgrid::s4u::Host::by_name_or_null(hostname);
+        if (not host) {
+            throw std::invalid_argument("S4U_Simulation::writeToDisk(): unknown host " + hostname);
+        }
+
+        auto disk_list = simgrid::s4u::Host::by_name(hostname)->get_disks();
+        for (auto disk : disk_list) {
+            std::string disk_mountpoint =
+                    FileLocation::sanitizePath(std::string(std::string(disk->get_property("mount"))));
+            if (disk_mountpoint == mount_point) {
+                disk->write(num_bytes);
+                return;
+            }
+        }
+        throw std::invalid_argument("S4U_Simulation::writeToDisk(): unknown path " +
+                                    mount_point + " at host " + hostname);
     }
+
+
+    /**
+     * @brief Read from a local disk and write to a local disk concurrently
+     *
+     * @param num_bytes_to_read: number of bytes to read
+     * @param num_bytes_to_write: number of bytes to write
+     * @param hostname: the host at which the disks are located
+     * @param read_mount_point: the mountpoint to read from
+     * @param write_mount_point: the mountpoint to write to
+     */
+    void S4U_Simulation::readFromDiskAndWriteToDiskConcurrently(double num_bytes_to_read, double num_bytes_to_write,
+                                                                std::string hostname,
+                                                                std::string read_mount_point,
+                                                                std::string write_mount_point) {
+
+        auto host = simgrid::s4u::Host::by_name_or_null(hostname);
+        WRENCH_INFO("Reading %lf bytes from disk %s:%s and writing %lf bytes to disk %s:%s",
+                num_bytes_to_read, hostname.c_str(), read_mount_point.c_str(),
+                num_bytes_to_write, hostname.c_str(), write_mount_point.c_str());
+
+        simgrid::s4u::Disk *read_disk = nullptr;
+        simgrid::s4u::Disk *write_disk = nullptr;
+
+        auto disk_list = simgrid::s4u::Host::by_name(hostname)->get_disks();
+        for (auto disk : disk_list) {
+            std::string disk_mountpoint =
+                    FileLocation::sanitizePath(std::string(std::string(disk->get_property("mount"))));
+            if (disk_mountpoint == read_mount_point) {
+                read_disk = disk;
+            }
+            if (disk_mountpoint == write_mount_point) {
+                write_disk = disk;
+            }
+        }
+
+        // Start asynchronous read
+        auto read_activity = read_disk->io_init(num_bytes_to_read, simgrid::s4u::Io::OpType::READ);
+        read_activity->start();
+        // Do synchronous write
+        write_disk->write(num_bytes_to_write);
+        // Wait for asycnrhonous read to be done
+        read_activity->wait();
+
+    }
+
 
     /**
      * @brief Simulates a disk read
-     * @param num_bytes: bumber of read bytes
-     * @param partition_name: partition name
+     *
+     * @param num_bytes: number of bytes to read
+     * @param hostname: name of host to which disk is attached
+     * @param mount_point: mount point
      */
-    void S4U_Simulation::readFromDisk(double num_bytes, std::string partition_name) {
-        // TODO: Change this once I/O in SimGrid is better: the data transfer rate
-        // should be based on the I/O device associated to the partition
-        // Right now, this takes ZERO time!!!
+    void S4U_Simulation::readFromDisk(double num_bytes, std::string hostname, std::string mount_point) {
+        mount_point  = FileLocation::sanitizePath(mount_point);
+
+        WRENCH_INFO("Reading %lf bytes from disk %s:%s", num_bytes, hostname.c_str(), mount_point.c_str());
+
+        auto host = simgrid::s4u::Host::by_name_or_null(hostname);
+        if (not host) {
+            throw std::invalid_argument("S4U_Simulation::readFromDisk(): unknown host " + hostname);
+        }
+
+        auto disk_list = simgrid::s4u::Host::by_name(hostname)->get_disks();
+        for (auto disk : disk_list) {
+            std::string disk_mountpoint =
+                    FileLocation::sanitizePath(std::string(std::string(disk->get_property("mount"))));
+
+            if (disk_mountpoint == mount_point) {
+                disk->read(num_bytes);
+                return;
+            }
+        }
+        throw std::invalid_argument("S4U_Simulation::readFromDisk(): invalid mount point " +
+                                    mount_point + " at host " + hostname);
     }
 
 
@@ -417,16 +510,21 @@ namespace wrench {
      * @brief Get the energy consumed by the host up to now
      * @param hostname: the host name
      * @return the energy consumed by the host in Joules
+     * @throw std::invalid_argument
      * @throw std::runtime_error
      */
     double S4U_Simulation::getEnergyConsumedByHost(const std::string &hostname) {
         double energy_consumed = 0;
+        auto host = simgrid::s4u::Host::by_name_or_null(hostname);
+        if (host == nullptr) {
+            throw std::invalid_argument("Unknown hostname " + hostname);
+        }
         try {
-            energy_consumed = sg_host_get_consumed_energy(simgrid::s4u::Host::by_name(hostname));
+            energy_consumed = sg_host_get_consumed_energy(host);
         } catch (std::exception &e) {
             throw std::runtime_error(
-                    "S4U_Simulation::getEnergyConsumedByHost(): Was not able to get the energy consumed by the host. Make sure energy plugin is enabled and "
-                    "the host name is correct"
+                    "S4U_Simulation::getEnergyConsumedByHost(): Was not able to get the "
+                    "energy consumed by the host. Make sure the energy plugin is enabled (--activate-energy)"
             );
         }
         return energy_consumed;
@@ -460,15 +558,21 @@ namespace wrench {
      *
      * @param hostname: the host name
      * @param pstate: the power state index (the power state index is specified in the platform xml description file)
+     * @throw std::invalid_argument
      * @throw std::runtime_error
      */
     void S4U_Simulation::setPstate(const std::string &hostname, int pstate) {
+        auto host = simgrid::s4u::Host::by_name_or_null(hostname);
+        if (host == nullptr) {
+            throw std::invalid_argument("Unknown hostname " + hostname);
+        }
         try {
-            simgrid::s4u::Host::by_name(hostname)->set_pstate(pstate);
+            host->set_pstate(pstate);
         } catch (std::exception &e) {
             throw std::runtime_error(
-                    "S4U_Simulation::setPstate(): Was not able to set the pstate of the host. Make sure energy is plugin is enabled and "
-                    "the host name is correct and the pstate is within range of pstates available to the host"
+                    "S4U_Simulation::setPstate(): Was not able to set the pstate of the host. "
+                    "Make sure the energy is plugin is enabled (--activate-energy) and "
+                    "the pstate is within range of pstates available to the host"
             );
         }
     }
@@ -477,15 +581,20 @@ namespace wrench {
      * @brief Get the total number of power states of a host
      * @param hostname: the host name
      * @return The number of power states available for the host (as specified in the platform xml description file)
+     * @throw std::invalid_argument
      * @throw std::runtime_error
      */
     int S4U_Simulation::getNumberofPstates(const std::string &hostname) {
+        auto host = simgrid::s4u::Host::by_name_or_null(hostname);
+        if (host == nullptr) {
+            throw std::invalid_argument("Unknown hostname " + hostname);
+        }
         try {
-            return simgrid::s4u::Host::by_name(hostname)->get_pstate_count();
+            return host->get_pstate_count();
         } catch (std::exception &e) {
             throw std::runtime_error(
-                    "S4U_Simulation::getNumberofPstates():: Was not able to get the energy consumed by the host. Make sure energy plugin is enabled and "
-                    "the host name is correct"
+                    "S4U_Simulation::getNumberofPstates():: Was not able to get the energy consumed by the host. "
+                    "Make sure the energy plugin is enabled (--activate-energy) "
             );
         }
     }
@@ -497,12 +606,16 @@ namespace wrench {
      * @throw std::runtime_error
      */
     int S4U_Simulation::getCurrentPstate(const std::string &hostname) {
+        auto host = simgrid::s4u::Host::by_name_or_null(hostname);
+        if (host == nullptr) {
+            throw std::invalid_argument("Unknown hostname " + hostname);
+        }
         try {
-            return simgrid::s4u::Host::by_name(hostname)->get_pstate();
+            return host->get_pstate();
         } catch (std::exception &e) {
             throw std::runtime_error(
-                    "S4U_Simulation::getNumberofPstates(): Was not able to get the number of pstates of the host. Make sure energy plugin is enabled and "
-                    "the host name is correct"
+                    "S4U_Simulation::getNumberofPstates():: Was not able to get the energy consumed by the host. "
+                    "Make sure the energy plugin is enabled (--activate-energy) "
             );
         }
     }
@@ -511,16 +624,20 @@ namespace wrench {
      * @brief Get the minimum power consumption (i.e., idling) for a host at its current pstate
      * @param hostname: the host name
      * @return The power consumption for this host if idle (as specified in the platform xml description file)
+     * @throw std::invalid_argument
      * @throw std::runtime_error
      */
     double S4U_Simulation::getMinPowerConsumption(const std::string &hostname) {
+        auto host = simgrid::s4u::Host::by_name_or_null(hostname);
+        if (host == nullptr) {
+            throw std::invalid_argument("Unknown hostname " + hostname);
+        }
         try {
-            return sg_host_get_wattmin_at(simgrid::s4u::Host::by_name(hostname),
-                                          (simgrid::s4u::Host::by_name(hostname))->get_pstate());
+            return sg_host_get_wattmin_at(host, host->get_pstate());
         } catch (std::exception &e) {
             throw std::runtime_error(
-                    "S4U_Simulation::getMinPowerAvailable(): Was not able to get the min power available to the host. Make sure energy plugin is enabled and "
-                    "the host name is correct"
+                    "S4U_Simulation::getMinPowerConsumption(): Was not able to get the min power available to the host. "
+                    "Make sure the energy plugin is enabled (--activate-energy) "
             );
         }
     }
@@ -529,16 +646,22 @@ namespace wrench {
      * @brief Get the maximum power consumption (i.e., 100% load) for a host at its current pstate
      * @param hostname: the host name
      * @return The power consumption for this host if 100% used (as specified in the platform xml description file)
+     * @throw std::invalid_argument
      * @throw std::runtime_error
      */
     double S4U_Simulation::getMaxPowerConsumption(const std::string &hostname) {
+        auto host = simgrid::s4u::Host::by_name_or_null(hostname);
+        if (host == nullptr) {
+            throw std::invalid_argument("Unknown hostname " + hostname);
+        }
         try {
             return sg_host_get_wattmax_at(simgrid::s4u::Host::by_name(hostname),
                                           (simgrid::s4u::Host::by_name(hostname))->get_pstate());
         } catch (std::exception &e) {
             throw std::runtime_error(
-                    "S4U_Simulation::getMaxPowerPossible():: Was not able to get the max power possible for the host. Make sure energy is plugin is enabled and "
-                    "the host name is correct"
+                    "S4U_Simulation::getMaxPowerConsumption():: Was not able to get the max power possible for the host. "
+                    "Make sure the energy plugin is enabled (--activate-energy)"
+
             );
         }
     }
@@ -547,9 +670,16 @@ namespace wrench {
      * @brief Get the list of power states available for a host
      * @param hostname: the host name
      * @return a list of power states available for the host (as specified in the platform xml description file)
+     * @throw std::invalid_argument
      * @throw std::runtime_error
      */
     std::vector<int> S4U_Simulation::getListOfPstates(const std::string &hostname) {
+
+        auto host = simgrid::s4u::Host::by_name_or_null(hostname);
+        if (host == nullptr) {
+            throw std::invalid_argument("Unknown hostname " + hostname);
+        }
+
         std::vector<int> list = {};
         try {
             int num_pstates = getNumberofPstates(hostname);
@@ -558,8 +688,8 @@ namespace wrench {
             }
         } catch (std::exception &e) {
             throw std::runtime_error(
-                    "S4U_Simulation::getListOfPstates(): Was not able to get the list of pstates for the host. Make sure energy plugin is enabled and "
-                    "the host name is correct"
+                    "S4U_Simulation::getListOfPstates(): Was not able to get the list of pstates for the host. "
+                    "Make sure the energy plugin is enabled (--activate-energy) "
             );
         }
         return list;
@@ -575,6 +705,127 @@ namespace wrench {
             S4U_Simulation::compute(0);
         }
     }
+
+
+    /**
+     * @brief Gets set of disks, i.e., mount points, available at a host
+     * @param hostname: the host's name
+     * @return a vector of mount points
+     *
+     * @throw std::invalid_argument
+     */
+    std::vector<std::string> S4U_Simulation::getDisks(std::string hostname) {
+
+        simgrid::s4u::Host *host;
+        try {
+            host = simgrid::s4u::Host::by_name(hostname);
+        } catch (std::exception &e) {
+            throw std::invalid_argument("S4U_Simulation::getDisks(): Unknown host " + hostname);
+        }
+
+        std::vector<std::string> mount_points;
+        for (auto const &d : host->get_disks()) {
+            // Get the disk's mount point
+            const char *p = d->get_property("mount");
+            if (!p) {
+                p = "/";
+            }
+            std::string mount_point = std::string(p);
+            mount_points.push_back(mount_point);
+        }
+
+        return mount_points;
+    }
+
+    /**
+     * @brief Determines whether a mount point is defined at a host
+     * @param hostname: the host's name
+     * @param mount_point: the mount point
+     * @return true if the host has a disk attached to the specified mount point, false otherwise
+     */
+    bool S4U_Simulation::hostHasMountPoint(std::string hostname, std::string mount_point) {
+
+        simgrid::s4u::Host *host;
+        try {
+            host = simgrid::s4u::Host::by_name(hostname);
+        } catch (std::exception &e) {
+            throw std::invalid_argument("S4U_Simulation::getDisks(): Unknown host " + hostname);
+        }
+
+        std::set<std::string> mount_points;
+        for (auto const &d : host->get_disks()) {
+            // Get the disk's mount point
+            const char *p = d->get_property("mount");
+            if (!p) {
+                p = "/";
+            }
+
+            if (FileLocation::sanitizePath(std::string(p)) == FileLocation::sanitizePath(mount_point)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    /**
+     * @brief Gets the capacity of a disk attached to some host for a given mount point
+     * @param hostname: the host's name
+     * @param mount_point: the mount point (e.g.,  "/home")
+     * @return the capacity of the disk / mount point
+     *
+     * @throw std::invalid_argument
+     */
+    double S4U_Simulation::getDiskCapacity(std::string hostname, std::string mount_point) {
+
+//        WRENCH_INFO("==== %s %s ==== ", hostname.c_str(), mount_point.c_str());
+        simgrid::s4u::Host *host;
+        try {
+            host = simgrid::s4u::Host::by_name(hostname);
+        } catch (std::exception &e) {
+            throw std::invalid_argument("S4U_Simulation::getDiskCapacity(): Unknown host " + hostname);
+        }
+
+        mount_point = FileLocation::sanitizePath(mount_point + "/");
+
+        for (auto const &d : host->get_disks()) {
+
+
+            // Get the disk's mount point
+            const char *mp = d->get_property("mount");
+            if (!mp) {
+                mp = "/";
+            }
+
+            std::string dmp = FileLocation::sanitizePath(std::string(mp) + "/");
+
+            // This is not the mount point you're looking for
+            if (dmp != mount_point) {
+                continue;
+            }
+
+            double capacity;
+            const char *capacity_str = d->get_property("size");
+
+            if (capacity_str) {
+                try {
+                    capacity = UnitParser::parse_size(capacity_str);
+                } catch (std::invalid_argument &e) {
+                    throw std::invalid_argument("S4U_Simulation::getDiskCapacity(): Disk " + d->get_name() +
+                                                " at host " + hostname + " has invalid size");
+                }
+            } else {
+                capacity = DBL_MAX; // Default size if no size property specified
+            }
+
+            return capacity;
+        }
+
+        throw std::invalid_argument("S4U_Simulation::getDiskCapacity(): Unknown mount point " +
+                                    mount_point + " at host " + hostname);
+    }
+
 
 
 };

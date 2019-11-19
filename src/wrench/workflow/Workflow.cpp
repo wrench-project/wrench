@@ -51,6 +51,14 @@ namespace wrench {
             throw std::invalid_argument("WorkflowTask::addTask(): Invalid argument");
         }
 
+//        if ((min_num_cores == 0) and (max_num_cores != 0)) {
+//            throw std::invalid_argument("WorkflowTask::addTask(): A task with a minimum number of cores set to 0 must also have a maximum number of cores set to 0");
+//        }
+//
+//        if ((min_num_cores == 0) and (flops > 0)) {
+//            throw std::invalid_argument("WorkflowTask::addTask(): A task with a minimum number of cores set to 0 must have 0 flops");
+//        }
+
         // Check that the task doesn't really exist
         if (tasks.find(id) != tasks.end()) {
             throw std::invalid_argument("Workflow::addTask(): Task ID '" + id + "' already exists");

@@ -182,7 +182,8 @@
                             Y: <input type='number' id='origin-y'>
                         </div>
                         <div id='time-interval-container' class='three-d-graph-config'>
-                            Time interval: <br><input type='number' step='10' id='time-interval'>
+                            Time interval: <br>
+                            <input type='number' id='time-interval' step='10'> <br>
                         </div>
                         <div id='scale-input-container' class='three-d-graph-config'>
                             Scale: <br><input type='number' id='scale-input'>
@@ -200,12 +201,13 @@
             </div>
         </div>
     </body>
-    <script src="public/scripts.js"></script>
-    <script>
-        if (energyData != []) {
-            generateConsumedEnergyGraph()
-            generatePStateGraph()
-        }
-        initialise()
-    </script>
+    <script src="scripts/data.js" ></script>
+    <script src="scripts/util.js" ></script>
+    <script src="scripts/button-clicks.js"></script>
+    <script src="scripts/graph-sections/3d-visualization.js"></script>
+    <script src="scripts/graph-sections/energy-graphs.js"></script>
+    <script src="scripts/graph-sections/simulation-details.js"></script>
+    <script src="scripts/graph-sections/simulation-graph.js"></script>
+    <script src="scripts/graph-sections/workflow-summary.js"></script>
+    <script src="scripts/initialise.js"></script>
 </html>

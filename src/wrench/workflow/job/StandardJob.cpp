@@ -24,23 +24,21 @@ namespace wrench {
      *
      * @param tasks: the tasks in the job (which must be either READY, or children of COMPLETED tasks or
      *                                   of tasks also included in the standard job)
-     * @param file_locations: a map that specifies on which storage service input/output files should be read/written
-     *         (default storage is used otherwise, provided that the job is submitted to a compute service
-     *          for which that default was specified)
+     * @param file_locations: a map that specifies locations where input/output files should be read/written
      * @param pre_file_copies: a set of tuples that specify which file copy operations should be completed
      *                         before task executions begin
      * @param post_file_copies: a set of tuples that specify which file copy operations should be completed
      *                         after task executions end
      * @param cleanup_file_deletions: a set of tuples that specify which file copies should be removed from which
-     *                         storage service. This will happen regardless of whether the job succeeds or fails
+     *                         locations. This will happen regardless of whether the job succeeds or fails
      *
      * @throw std::invalid_argument
      */
     StandardJob::StandardJob(Workflow *workflow, std::vector<WorkflowTask *> tasks,
-                             std::map<WorkflowFile *, std::shared_ptr<StorageService> > &file_locations,
-                             std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>, std::shared_ptr<StorageService>  >> &pre_file_copies,
-                             std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>, std::shared_ptr<StorageService>  >> &post_file_copies,
-                             std::set<std::tuple<WorkflowFile *, std::shared_ptr<StorageService>  >> &cleanup_file_deletions)
+                             std::map<WorkflowFile *, std::shared_ptr<FileLocation> > &file_locations,
+                             std::set<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> &pre_file_copies,
+                             std::set<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> &post_file_copies,
+                             std::set<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  >> &cleanup_file_deletions)
             :
             WorkflowJob(WorkflowJob::STANDARD),
             num_completed_tasks(0),
@@ -128,7 +126,7 @@ namespace wrench {
      *
      * @return a map of files to storage services
      */
-    std::map<WorkflowFile *, std::shared_ptr<StorageService> > StandardJob::getFileLocations() {
+    std::map<WorkflowFile *, std::shared_ptr<FileLocation> > StandardJob::getFileLocations() {
       return this->file_locations;
     }
 

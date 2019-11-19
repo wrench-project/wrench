@@ -267,6 +267,7 @@ namespace wrench {
 
         this->acquireDaemonLock();
 
+
         // Kill all Workunit executors
         for (auto const &wue : this->running_workunit_executors) {
             wue->kill(job_termination);
@@ -554,7 +555,7 @@ namespace wrench {
                                          this->scratch_space,
                                          job,
                                          this->getPropertyValueAsDouble(
-                                                 StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD),
+                                                 StandardJobExecutorProperty::TASK_STARTUP_OVERHEAD),
                                          this->getPropertyValueAsBoolean(
                                                  StandardJobExecutorProperty::SIMULATE_COMPUTATION_AS_SLEEP)
                     ));
@@ -564,6 +565,7 @@ namespace wrench {
                 workunit_executor->start(workunit_executor, true, false); // Daemonized, no auto-restart
                 // This is an error on the target host!!
             } catch (std::shared_ptr<HostError> &e) {
+                this->releaseDaemonLock();
                 throw std::runtime_error(
                         "BareMetalComputeService::dispatchReadyWorkunits(): got a host error on the target host - this shouldn't happen");
             }
@@ -784,6 +786,7 @@ namespace wrench {
 
 
         // Don't kill me while I am doing this
+
         this->acquireDaemonLock();
 
         WRENCH_INFO("A workunit executor has failed to complete a workunit on behalf of job '%s'",
@@ -813,6 +816,7 @@ namespace wrench {
             }
         }
         if (!found_it) {
+            this->releaseDaemonLock();
             throw std::runtime_error(
                     "StandardJobExecutor::processWorkunitExecutorFailure(): couldn't find a recently failed workunit in the running workunit list");
         }
@@ -821,6 +825,7 @@ namespace wrench {
         // Deal with running work units!
         for (auto const &wu : this->running_workunits) {
             if ((not wu->post_file_copies.empty()) || (not wu->pre_file_copies.empty())) {
+                this->releaseDaemonLock();
                 throw std::runtime_error(
                         "StandardJobExecutor::processWorkunitExecutorFailure(): trying to cancel a running workunit that's doing some file copy operations - not supported (for now)");
             }
@@ -832,6 +837,8 @@ namespace wrench {
                 }
             }
         }
+
+        this->releaseDaemonLock();
 
         // Send the notification back
         try {
@@ -845,7 +852,6 @@ namespace wrench {
             // do nothing
         }
 
-        this->releaseDaemonLock();
     }
 
 
@@ -970,9 +976,9 @@ namespace wrench {
     void StandardJobExecutor::cleanUpScratch() {
         if (this->scratch_space != nullptr) {
             /** Perform scratch cleanup */
-            for (auto scratch_cleanup_file : files_stored_in_scratch) {
+            for (auto f : files_stored_in_scratch) {
                 try {
-                    this->scratch_space->deleteFile(scratch_cleanup_file, job, nullptr);
+                    StorageService::deleteFile(f, FileLocation::LOCATION(this->scratch_space, job->getName()));
                 } catch (WorkflowExecutionException &e) {
                     throw;
                 }

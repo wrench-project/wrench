@@ -12,9 +12,12 @@
 #define WRENCH_FILEREGISTRYSERVICE_H
 
 #include <set>
-#include <wrench/services/network_proximity/NetworkProximityService.h>
 
-#include "wrench/services/Service.h"
+#include <wrench/services/Service.h>
+#include <wrench/services/network_proximity/NetworkProximityService.h>
+#include <wrench/services/storage/StorageService.h>
+#include <wrench/services/storage/storage_helpers/FileLocation.h>
+
 #include "FileRegistryServiceProperty.h"
 #include "FileRegistryServiceMessagePayload.h"
 
@@ -38,41 +41,41 @@ namespace wrench {
     private:
 
         std::map<std::string, std::string> default_property_values = {
-                 {FileRegistryServiceProperty::LOOKUP_COMPUTE_COST,                      "0.0"},
-                };
+                {FileRegistryServiceProperty::LOOKUP_COMPUTE_COST,                      "0.0"},
+        };
 
         std::map<std::string, double> default_messagepayload_values = {
-                 {FileRegistryServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,          1024},
-                 {FileRegistryServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,       1024},
-                 {FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD,  1024},
-                 {FileRegistryServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD,   1024},
-                 {FileRegistryServiceMessagePayload::REMOVE_ENTRY_REQUEST_MESSAGE_PAYLOAD, 1024},
-                 {FileRegistryServiceMessagePayload::REMOVE_ENTRY_ANSWER_MESSAGE_PAYLOAD,  1024},
-                 {FileRegistryServiceMessagePayload::ADD_ENTRY_REQUEST_MESSAGE_PAYLOAD,    1024},
-                 {FileRegistryServiceMessagePayload::ADD_ENTRY_ANSWER_MESSAGE_PAYLOAD,     1024},
-                };
+                {FileRegistryServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,          1024},
+                {FileRegistryServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,       1024},
+                {FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD,  1024},
+                {FileRegistryServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD,   1024},
+                {FileRegistryServiceMessagePayload::REMOVE_ENTRY_REQUEST_MESSAGE_PAYLOAD, 1024},
+                {FileRegistryServiceMessagePayload::REMOVE_ENTRY_ANSWER_MESSAGE_PAYLOAD,  1024},
+                {FileRegistryServiceMessagePayload::ADD_ENTRY_REQUEST_MESSAGE_PAYLOAD,    1024},
+                {FileRegistryServiceMessagePayload::ADD_ENTRY_ANSWER_MESSAGE_PAYLOAD,     1024},
+        };
 
     public:
 
 
         // Public Constructor
         explicit FileRegistryService(std::string hostname,
-                            std::map<std::string, std::string> property_list = {},
-                            std::map<std::string, double> messagepayload_list = {}
+                                     std::map<std::string, std::string> property_list = {},
+                                     std::map<std::string, double> messagepayload_list = {}
         );
 
         /****************************/
         /** \cond DEVELOPER         */
         /****************************/
 
-        std::set<std::shared_ptr<StorageService>> lookupEntry(WorkflowFile *file);
+        std::set<std::shared_ptr<FileLocation>> lookupEntry(WorkflowFile *file);
 
-        std::map<double, std::shared_ptr<StorageService>> lookupEntry(WorkflowFile *file, std::string reference_host,
-                                                       std::shared_ptr<NetworkProximityService> network_proximity_service);
+        std::map<double, std::shared_ptr<FileLocation>> lookupEntry(WorkflowFile *file, std::string reference_host,
+                                                                    std::shared_ptr<NetworkProximityService> network_proximity_service);
 
-        void addEntry(WorkflowFile *file, std::shared_ptr<StorageService> storage_service);
+        void addEntry(WorkflowFile *file, std::shared_ptr<FileLocation> location);
 
-        void removeEntry(WorkflowFile *file, std::shared_ptr<StorageService> storage_service);
+        void removeEntry(WorkflowFile *file, std::shared_ptr<FileLocation> location);
 
         /****************************/
         /** \endcond                */
@@ -92,15 +95,15 @@ namespace wrench {
 
         friend class Simulation;
 
-        void addEntryToDatabase(WorkflowFile *file, std::shared_ptr<StorageService> storage_service);
+        void addEntryToDatabase(WorkflowFile *file, std::shared_ptr<FileLocation> location);
 
-        bool removeEntryFromDatabase(WorkflowFile *file, std::shared_ptr<StorageService> storage_service);
+        bool removeEntryFromDatabase(WorkflowFile *file, std::shared_ptr<FileLocation> location);
 
         int main() override;
 
         bool processNextMessage();
 
-        std::map<WorkflowFile *, std::set<std::shared_ptr<StorageService>>> entries;
+        std::map<WorkflowFile *, std::set<std::shared_ptr<FileLocation>>> entries;
     };
 
 

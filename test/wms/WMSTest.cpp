@@ -34,8 +34,26 @@ protected:
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
-                          "       <host id=\"Host1\" speed=\"1f\" core=\"4\"/> "
-                          "       <host id=\"Host2\" speed=\"1f\" core=\"4\"/> "
+                          "       <host id=\"Host1\" speed=\"1f\" core=\"4\"> "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>"
+                          "       <host id=\"Host2\" speed=\"1f\" core=\"4\"> "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>"
                           "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
                           "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"1\"/> </route>"
                           "   </zone> "
@@ -135,12 +153,16 @@ private:
 
         // Get a "FILE COPY COMPLETION" event (default handler)
         data_movement_manager->initiateAsynchronousFileCopy(this->test->small_file,
-                                                            this->test->storage_service1, this->test->storage_service2, nullptr);
+                                                            wrench::FileLocation::LOCATION(this->test->storage_service1),
+                                                            wrench::FileLocation::LOCATION(this->test->storage_service2),
+                                                            nullptr);
         this->waitForAndProcessNextEvent();
 
         // Get a "FILE COPY FAILURE" event (default handler)
         data_movement_manager->initiateAsynchronousFileCopy(this->test->big_file,
-                                                            this->test->storage_service1, this->test->storage_service2, nullptr);
+                                                            wrench::FileLocation::LOCATION(this->test->storage_service1),
+                                                            wrench::FileLocation::LOCATION(this->test->storage_service2),
+                                                            nullptr);
         this->waitForAndProcessNextEvent();
 
         // Set a timer
@@ -179,23 +201,23 @@ void WMSTest::do_DefaultHandlerWMS_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname1, 100.0)));
+            new wrench::SimpleStorageService(hostname1, {"/"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname2, 100.0)));
+            new wrench::SimpleStorageService(hostname2, {"/"})));
 
     // Create a Cloud Service
     std::vector<std::string> cloud_hosts;
     cloud_hosts.push_back(hostname1);
     ASSERT_NO_THROW(cs_cloud = simulation->add(
-            new wrench::CloudComputeService(hostname1, cloud_hosts, 100.0, {}, {})));
+            new wrench::CloudComputeService(hostname1, cloud_hosts, "/scratch", {}, {})));
 
     // Create a Batch Service
     std::vector<std::string> batch_hosts;
     batch_hosts.push_back(hostname2);
     ASSERT_NO_THROW(cs_batch = simulation->add(
-            new wrench::BatchComputeService(hostname2, batch_hosts, 100.0,
+            new wrench::BatchComputeService(hostname2, batch_hosts, "/scratch",
                     {},
 //                    {{wrench::BatchComputeServiceProperty::BATSCHED_LOGGING_MUTED, "false"}},
                     {})));
@@ -218,8 +240,7 @@ void WMSTest::do_DefaultHandlerWMS_test() {
     this->big_file = workflow->addFile("big", 1000);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFiles({std::make_pair(this->small_file->getID(), this->small_file)},
-                                           storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(this->small_file, storage_service1));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -302,7 +323,8 @@ private:
 
         // Get a "FILE COPY COMPLETION" event (default handler)
         data_movement_manager->initiateAsynchronousFileCopy(this->test->small_file,
-                                                            this->test->storage_service1, this->test->storage_service2, nullptr);
+                                                            wrench::FileLocation::LOCATION(this->test->storage_service1),
+                                                            wrench::FileLocation::LOCATION(this->test->storage_service2), nullptr);
         this->waitForAndProcessNextEvent();
         if (this->counter != 5) {
             throw std::runtime_error("Did not get expected FileCoompletedEvent");
@@ -310,7 +332,8 @@ private:
 
         // Get a "FILE COPY FAILURE" event (default handler)
         data_movement_manager->initiateAsynchronousFileCopy(this->test->big_file,
-                                                            this->test->storage_service1, this->test->storage_service2, nullptr);
+                                                            wrench::FileLocation::LOCATION(this->test->storage_service1),
+                                                            wrench::FileLocation::LOCATION(this->test->storage_service2), nullptr);
         this->waitForAndProcessNextEvent();
         if (this->counter != 6) {
             throw std::runtime_error("Did not get expected FileCopyFailureEvent");
@@ -386,23 +409,23 @@ void WMSTest::do_CustomHandlerWMS_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname1, 100.0)));
+            new wrench::SimpleStorageService(hostname1, {"/"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname2, 100.0)));
+            new wrench::SimpleStorageService(hostname2, {"/"})));
 
     // Create a Cloud Service
     std::vector<std::string> cloud_hosts;
     cloud_hosts.push_back(hostname1);
     ASSERT_NO_THROW(cs_cloud = simulation->add(
-            new wrench::CloudComputeService(hostname1, cloud_hosts, 100.0, {}, {})));
+            new wrench::CloudComputeService(hostname1, cloud_hosts, "/scratch", {}, {})));
 
     // Create a Batch Service
     std::vector<std::string> batch_hosts;
     batch_hosts.push_back(hostname1);
     ASSERT_NO_THROW(cs_batch = simulation->add(
-            new wrench::BatchComputeService(hostname2, batch_hosts, 100.0, {}, {})));
+            new wrench::BatchComputeService(hostname2, batch_hosts, "/scratch", {}, {})));
 
 
     // Create a WMS
@@ -422,8 +445,7 @@ void WMSTest::do_CustomHandlerWMS_test() {
     this->big_file = workflow->addFile("big", 1000);
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFiles({std::make_pair(this->small_file->getID(), this->small_file)},
-                                           storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(this->small_file, storage_service1));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());

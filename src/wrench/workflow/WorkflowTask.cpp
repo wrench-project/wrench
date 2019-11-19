@@ -89,13 +89,15 @@ namespace wrench {
 
         // If the file is already input, complain
         if (this->input_files.find(file->getID()) != this->input_files.end()) {
-            throw std::invalid_argument("WorkflowTask::addOutputFile(): File ID '" + file->getID() + "' is already an input file of task '" + this->getID() + "'");
+            throw std::invalid_argument("WorkflowTask::addOutputFile(): File ID '" + file->getID() +
+                                        "' is already an input file of task '" + this->getID() + "'");
         }
 
         // If the file is already output of another task, complain
         if (file->getOutputOf() != nullptr) {
-            throw std::invalid_argument("WorkflowTask::addOutputFile(): File ID '" + file->getID() + "' is already an output file of another task (task '" +
-            file->getOutputOf()->getID() + "')");
+            throw std::invalid_argument("WorkflowTask::addOutputFile(): File ID '" + file->getID() +
+                                        "' is already an output file of another task (task '" +
+                                        file->getOutputOf()->getID() + "')");
         }
 
         // Otherwise proceeed
@@ -392,22 +394,6 @@ namespace wrench {
     void WorkflowTask::setClusterID(std::string id) {
         this->cluster_id = id;
     }
-
-//    /**
-//     * @brief Get the workflow task type
-//     * @return a workflow task type
-//     */
-//    WorkflowTask::TaskType WorkflowTask::getTaskType() const {
-//        return this->task_type;
-//    }
-//
-//    /**
-//     * @brief Set the task type
-//     * @param task_type: task type
-//     */
-//    void WorkflowTask::setTaskType(wrench::WorkflowTask::TaskType task_type) {
-//        this->task_type = task_type;
-//    }
 
     /**
      * @brief Get the task priority. By default, priority is 0.

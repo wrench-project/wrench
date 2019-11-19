@@ -25,15 +25,27 @@ namespace wrench {
     class S4U_PendingCommunication;
 
     /**
-     * @brief A storage service that provides direct
-     *        access to some storage resource (e.g., a disk)
+     * @brief A storage service that provides direct access to some storage resources (e.g., one or more disks).
+     *        An important (configurable) property of the storage service is
+     *        SimpleStorageServiceProperty::BUFFER_SIZE (see documentation thereof), which defines the
+     *        buffer size that the storage service uses. More specifically, when the storage service
+     *        receives / sends data from / to the network, it does so in a loop over data "chunks",
+     *        with pipelined network and disk I/O operations. The smaller the buffer size the more "fluid"
+     *        the model, but the more time-consuming the simulation. A large buffer size, however, may
+     *        lead to less realistic simulations. At the extreme, an infinite buffer size would correspond
+     *        to fully sequential executions (first a network receive/send, and then a disk write/read).
+     *        Setting the buffer size to "0" corresponds to a fully fluid model in which individual
+     *        data chunk operations are not simulated, thus achieving both accuracy (unless one specifically wishes
+     *        to study the effects of buffering) and quick simulation times. For now, setting the buffer
+     *        size to "0" is not implemented. The default buffer size is 1 MiB (note that the user can
+     *        always declare a disk with arbitrary bandwidth in the platform description XML).
      */
     class SimpleStorageService : public StorageService {
 
     private:
         std::map<std::string, std::string> default_property_values = {
                  {SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS,  "infinity"},
-                 {SimpleStorageServiceProperty::BUFFER_SIZE,  "infinity"},
+                 {SimpleStorageServiceProperty::BUFFER_SIZE,  "1048576"}, // 1 MEGA BYTE
                 };
 
         std::map<std::string, double> default_messagepayload_values = {
@@ -57,7 +69,7 @@ namespace wrench {
 
         // Public Constructor
         SimpleStorageService(std::string hostname,
-                             double capacity,
+                             std::set<std::string> mount_points,
                              std::map<std::string, std::string> property_list = {},
                              std::map<std::string, double> messagepayload_list = {});
 
@@ -79,7 +91,7 @@ namespace wrench {
 
         // Low-level Constructor
         SimpleStorageService(std::string hostname,
-                             double capacity,
+                             std::set<std::string> mount_points,
                              std::map<std::string, std::string> property_list,
                              std::map<std::string, double> messagepayload_list,
                              std::string suffix);
@@ -90,24 +102,29 @@ namespace wrench {
 
         unsigned long getNewUniqueNumber();
 
-        bool processFileDeleteRequest(WorkflowFile *file, std::string dst_partition, std::string answer_mailbox);
+        bool processFileDeleteRequest(WorkflowFile *file, std::shared_ptr<FileLocation> location, std::string answer_mailbox);
 
-        bool processFileWriteRequest(WorkflowFile *file, std::string dst_dir, std::string answer_mailbox, unsigned long buffer_size);
+        bool processFileWriteRequest(WorkflowFile *file, std::shared_ptr<FileLocation>, std::string answer_mailbox, unsigned long buffer_size);
 
-        bool processFileReadRequest(WorkflowFile *file, std::string src_dir, std::string answer_mailbox,
+        bool processFileReadRequest(WorkflowFile *file, std::shared_ptr<FileLocation> location, std::string answer_mailbox,
                                     std::string mailbox_to_receive_the_file_content, unsigned long buffer_size);
 
-        bool processFileCopyRequest(WorkflowFile *file, std::shared_ptr<StorageService> src,
-                std::string src_dir, std::string dst_dir,
+        bool processFileCopyRequest(WorkflowFile *file,
+                std::shared_ptr<FileLocation> src,
+                std::shared_ptr<FileLocation> dst,
                 std::string answer_mailbox, SimulationTimestampFileCopyStart *start_timestamp);
 
         bool processFileTransferThreadNotification(
                 std::shared_ptr<FileTransferThread> ftt,
                 WorkflowFile *file,
-                std::pair<FileTransferThread::LocationType, std::string> src,
-                std::pair<FileTransferThread::LocationType, std::string> dst,
+                std::string src_mailbox,
+                std::shared_ptr<FileLocation> src_location,
+                std::string dst_mailbox,
+                std::shared_ptr<FileLocation> dst_location,
                 bool success,
                 std::shared_ptr<FailureCause> failure_cause,
+                std::string answer_mailbox_if_read,
+                std::string answer_mailbox_if_write,
                 std::string answer_mailbox_if_copy,
                 SimulationTimestampFileCopyStart *start_timestamp);
 

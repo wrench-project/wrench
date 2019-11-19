@@ -136,6 +136,7 @@ namespace wrench {
      };
 
     class SimulationTimestampFileCopyStart;
+    class FileLocation;
 
     /**
      * @brief A base class for simulation timestamps regarding file copies
@@ -146,53 +147,18 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        SimulationTimestampFileCopy(WorkflowFile *file, std::shared_ptr<StorageService>  src, std::string src_partition, std::shared_ptr<StorageService>  dst, std::string dst_partition, SimulationTimestampFileCopyStart *start_timestamp = nullptr);
+        SimulationTimestampFileCopy(WorkflowFile *file, std::shared_ptr<FileLocation>  src, std::shared_ptr<FileLocation> dst, SimulationTimestampFileCopyStart *start_timestamp = nullptr);
         /***********************/
         /** \endcond           */
         /***********************/
-
-        /**
-         * @brief A file location struct that contains the storage service and partition where a file is located
-         */
-        struct FileLocation {
-            /** @brief The StorageService where the file is located **/
-            std::shared_ptr<StorageService>  storage_service;
-            /** @brief The StorageService's partition at which file is located **/
-            std::string partition;
-
-            /** @brief Constructor 
-             * @param storage_service: the StorageService where the file is located    
-             * @param partition: the StorageService's partition where the file is stored    
-             */
-            FileLocation(std::shared_ptr<StorageService> storage_service, std::string partition) : storage_service(storage_service), partition(partition) {
-            }
-
-            /**
-             * @brief Overloaded "equal" operator
-             * @param rhs: right-hand side of the comparison
-             * @return true if equal, false otherwise
-             */
-            bool operator==(const FileLocation &rhs) {
-                return (this->storage_service == rhs.storage_service) && (this->partition == rhs.partition);
-            }
-
-            /**
-             * @brief Overloaded "not equal" operator
-             * @param rhs: right-hand side of the comparison
-             * @return true if different, false otherwise
-             */
-            bool operator!=(const FileLocation &rhs) {
-                return !FileLocation::operator==(rhs);
-            }
-        };
 
         /**
          * @brief Retrieve the matching endpoint, if any
          */
         SimulationTimestampFileCopy *getEndpoint() override;
         WorkflowFile *getFile();
-        FileLocation getSource();
-        FileLocation getDestination();
+        std::shared_ptr<FileLocation> getSource();
+        std::shared_ptr<FileLocation> getDestination();
 
     protected:
         /** 
@@ -203,12 +169,12 @@ namespace wrench {
         /**
          * @brief The location where the WorkflowFile was being copied from
          */
-        FileLocation source;
+        std::shared_ptr<FileLocation> source;
 
         /**
-         * @brief The intended location where the WorkflowFile was being copied to
+         * @brief The location where the WorkflowFile was being copied to
          */
-        FileLocation destination;
+        std::shared_ptr<FileLocation> destination;
     };
 
     class SimulationTimestampFileCopyFailure;
@@ -222,7 +188,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        SimulationTimestampFileCopyStart(WorkflowFile *file, std::shared_ptr<StorageService> src, std::string src_partition, std::shared_ptr<StorageService> dst, std::string dst_partition);
+        SimulationTimestampFileCopyStart(WorkflowFile *file, std::shared_ptr<FileLocation> src, std::shared_ptr<FileLocation> dst);
         /***********************/
         /** \endcond           */
         /***********************/

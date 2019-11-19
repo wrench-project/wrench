@@ -88,18 +88,18 @@ namespace wrench {
      *                 - the hosts must be homogeneous (speed, number of cores, and RAM size)
      *                 - all cores are usable by the batch service on each host
      *                 - all RAM is usable by the batch service on each host
-     * @param scratch_space_size: the size for the scratch storage space for the service (0 means "no scratch space")
+     * @param scratch_space_mount_point: the mount point of the scratch storage space for the service ("" means "no scratch space")
      * @param property_list: a property list that specifies BatchComputeServiceProperty values ({} means "use all defaults")
      * @param messagepayload_list: a message payload list that specifies BatchComputeServiceMessagePayload values ({} means "use all defaults")
      */
     BatchComputeService::BatchComputeService(std::string &hostname,
                                              std::vector<std::string> compute_hosts,
-                                             double scratch_space_size,
+                                             std::string scratch_space_mount_point,
                                              std::map<std::string, std::string> property_list,
                                              std::map<std::string, double> messagepayload_list
     ) :
             BatchComputeService(hostname, std::move(compute_hosts), ComputeService::ALL_CORES,
-                                ComputeService::ALL_RAM, scratch_space_size, std::move(property_list),
+                                ComputeService::ALL_RAM, scratch_space_mount_point, std::move(property_list),
                                 std::move(messagepayload_list), "") {}
 
     /**
@@ -110,7 +110,7 @@ namespace wrench {
      *              - ComputeService::ALL_CORES to use all cores
      * @param ram_per_host: RAM per host (
      *              - ComputeService::ALL_RAM to use all RAM
-     * @param scratch_space_size: the size for the scratch storage space for the service (0 means "no scratch space")
+     * @param scratch_space_mount_point: the mount point og the scratch storage space for the service ("" means "no scratch space")
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      * @param suffix: suffix to append to the service name and mailbox
@@ -121,14 +121,14 @@ namespace wrench {
                                              std::vector<std::string> compute_hosts,
                                              unsigned long cores_per_host,
                                              double ram_per_host,
-                                             double scratch_space_size,
+                                             std::string scratch_space_mount_point,
                                              std::map<std::string, std::string> property_list,
                                              std::map<std::string, double> messagepayload_list,
                                              std::string suffix) :
             ComputeService(hostname,
                            "batch" + suffix,
                            "batch" + suffix,
-                           scratch_space_size) {
+                           scratch_space_mount_point) {
 
 
         // Set default and specified properties
@@ -186,7 +186,10 @@ namespace wrench {
                 BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE);
         if (not workload_file.empty()) {
             try {
-                this->workload_trace = TraceFileLoader::loadFromTraceFile(workload_file, this->getPropertyValueAsBoolean(BatchComputeServiceProperty::IGNORE_INVALID_JOBS_IN_WORLOAD_TRACE_FILE), 0);
+
+                this->workload_trace = TraceFileLoader::loadFromTraceFile(workload_file,
+                        this->getPropertyValueAsBoolean(BatchComputeServiceProperty::IGNORE_INVALID_JOBS_IN_WORKLOAD_TRACE_FILE),
+                        this->getPropertyValueAsDouble(BatchComputeServiceProperty::SUBMIT_TIME_OF_FIRST_JOB_IN_WORKLOAD_TRACE_FILE));
             } catch (std::exception &e) {
                 throw;
             }
@@ -251,11 +254,11 @@ namespace wrench {
         if (it != args.end()) {
             if (sscanf((*it).second.c_str(), "%lu", &value) != 1) {
                 throw std::invalid_argument(
-                        "BatchComputeService::submitStandardJob(): Invalid " + key + " value '" + (*it).second + "'");
+                        "BatchComputeService::parseUnsignedLongServiceSpecificArgument(): Invalid " + key + " value '" + (*it).second + "'");
             }
         } else {
             throw std::invalid_argument(
-                    "BatchComputeService::submitStandardJob(): Batch Service requires -N argument to be specified for job submission"
+                    "BatchComputeService::parseUnsignedLongServiceSpecificArgument(): Batch Service requires " + key + " argument to be specified for job submission"
             );
         }
         return value;
@@ -1602,9 +1605,9 @@ namespace wrench {
                                 this->getScratch(),
                                 false,
                                 nullptr,
-                                {{StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD,
+                                {{StandardJobExecutorProperty::TASK_STARTUP_OVERHEAD,
                                          this->getPropertyValueAsString(
-                                                 BatchComputeServiceProperty::THREAD_STARTUP_OVERHEAD)},
+                                                 BatchComputeServiceProperty::TASK_STARTUP_OVERHEAD)},
                                  {StandardJobExecutorProperty::SIMULATE_COMPUTATION_AS_SLEEP,
                                          this->getPropertyValueAsString(
                                                  BatchComputeServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP)},

@@ -12,7 +12,7 @@
 
 namespace wrench {
 
-    SET_PROPERTY_NAME(StandardJobExecutorProperty, THREAD_STARTUP_OVERHEAD);
+    SET_PROPERTY_NAME(StandardJobExecutorProperty, TASK_STARTUP_OVERHEAD);
     SET_PROPERTY_NAME(StandardJobExecutorProperty, STANDARD_JOB_FILES_STORED_IN_SCRATCH);
 
     SET_PROPERTY_NAME(StandardJobExecutorProperty, CORE_ALLOCATION_ALGORITHM);

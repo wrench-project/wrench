@@ -38,7 +38,7 @@ namespace wrench {
             std::set<ComputeService *> compute_resources,
             std::map<std::string, std::string> property_list,
             std::map<std::string, double> messagepayload_list)
-            : ComputeService(hostname, "htcondor_central_manager", "htcondor_central_manager", nullptr) {
+            : ComputeService(hostname, "htcondor_central_manager", "htcondor_central_manager", "") {
 
         // Check compute_resource viability
         if (compute_resources.empty()) {

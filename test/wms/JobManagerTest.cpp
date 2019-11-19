@@ -50,10 +50,36 @@ protected:
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
-                          "       <host id=\"Host1\" speed=\"1f\" core=\"10\"/> "
-                          "       <host id=\"Host2\" speed=\"1f\" core=\"10\"/> "
+                          "       <host id=\"Host1\" speed=\"1f\" core=\"10\"> "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"101B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>  "
+                          "       <host id=\"Host2\" speed=\"1f\" core=\"10\"> "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"101B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>  "
                           "       <host id=\"Host3\" speed=\"1f\" core=\"10\"> "
-                          "          <prop id=\"ram\" value=\"100\" />"
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"101B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "          <prop id=\"ram\" value=\"100B\" />"
                           "       </host> "
                           "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"1us\"/>"
                           "       <link id=\"2\" bandwidth=\"5000GBps\" latency=\"1us\"/>"
@@ -139,7 +165,7 @@ void JobManagerTest::do_JobManagerConstructorTest_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -189,12 +215,15 @@ private:
         }
 
 
+        // Create a job with a nullptr task in it
         try {
             job_manager->createStandardJob((std::vector<wrench::WorkflowTask *>) {nullptr}, {});
             throw std::runtime_error("Should not be able to create a standard job with a nullptr task in it");
         } catch (std::invalid_argument &e) {
         }
 
+
+        // Create a job  with nothing in it
         try {
             std::vector<wrench::WorkflowTask *> tasks; // empty
             job_manager->createStandardJob(tasks, {});
@@ -202,11 +231,84 @@ private:
         } catch (std::invalid_argument &e) {
         }
 
+
         wrench::WorkflowTask *t1 = this->getWorkflow()->addTask("t1", 1.0, 1, 1, 1.0, 0.0);
         wrench::WorkflowTask *t2 = this->getWorkflow()->addTask("t2", 1.0, 1, 1, 1.0, 0.0);
         wrench::WorkflowFile *f = this->getWorkflow()->addFile("f", 100);
         t1->addOutputFile(f);
         t2->addInputFile(f);
+
+        // Create a job with a null stuff in pre file copy
+        try {
+            std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation> > > pre_file_copies;
+            pre_file_copies.insert(std::make_tuple((wrench::WorkflowFile *)nullptr, wrench::FileLocation::SCRATCH, wrench::FileLocation::SCRATCH));
+            job_manager->createStandardJob({}, {}, pre_file_copies, {}, {});
+            throw std::runtime_error("Should not be able to create a standard job with a (nullptr, *, *) pre file copy");
+        } catch (std::invalid_argument &e) {
+        }
+        try {
+            std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation> > > pre_file_copies;
+            pre_file_copies.insert(std::make_tuple(f, nullptr, wrench::FileLocation::SCRATCH));
+            job_manager->createStandardJob({}, {}, pre_file_copies, {}, {});
+            throw std::runtime_error("Should not be able to create a standard job with a (*, nullptr, *) pre file copy");
+        } catch (std::invalid_argument &e) {
+        }
+        try {
+            std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation> > > pre_file_copies;
+            pre_file_copies.insert(std::make_tuple(f, wrench::FileLocation::SCRATCH, nullptr));
+            job_manager->createStandardJob({}, {}, pre_file_copies, {}, {});
+            throw std::runtime_error("Should not be able to create a standard job with a (*, *, nullptr) pre file copy");
+        } catch (std::invalid_argument &e) {
+        }
+
+
+        // Create a job with a null stuff in post file copy
+        try {
+            std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation> > > post_file_copies;
+            post_file_copies.insert(std::make_tuple((wrench::WorkflowFile *)nullptr, wrench::FileLocation::SCRATCH, wrench::FileLocation::SCRATCH));
+            job_manager->createStandardJob({}, {}, {}, post_file_copies, {});
+            throw std::runtime_error("Should not be able to create a standard job with a (nullptr, *, *) post file copy");
+        } catch (std::invalid_argument &e) {
+        }
+        try {
+            std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation> > > post_file_copies;
+            post_file_copies.insert(std::make_tuple(f, nullptr, wrench::FileLocation::SCRATCH));
+            job_manager->createStandardJob({}, {}, {}, post_file_copies, {});
+            throw std::runtime_error("Should not be able to create a standard job with a (*, nullptr, *) post file copy");
+        } catch (std::invalid_argument &e) {
+        }
+        try {
+            std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation> > > post_file_copies;
+            post_file_copies.insert(std::make_tuple(f, wrench::FileLocation::SCRATCH, nullptr));
+            job_manager->createStandardJob({}, {}, {}, post_file_copies, {});
+            throw std::runtime_error("Should not be able to create a standard job with a (*, *, nullptr) post file copy");
+        } catch (std::invalid_argument &e) {
+        }
+
+        // Create a job with SCRATCH as both src and dst
+        try {
+            std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation> > > pre_file_copies;
+            pre_file_copies.insert(std::make_tuple(f, wrench::FileLocation::SCRATCH, wrench::FileLocation::SCRATCH));
+            job_manager->createStandardJob({}, {}, pre_file_copies, {}, {});
+            throw std::runtime_error("Should not be able to create a standard job with a pre file copy that has SCRATCH has both dst and src");
+        } catch (std::invalid_argument &e) {
+        }
+        // Create a job with SCRATCH as both src and dst
+        try {
+            std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation> > > post_file_copies;
+            post_file_copies.insert(std::make_tuple(f, wrench::FileLocation::SCRATCH, wrench::FileLocation::SCRATCH));
+            job_manager->createStandardJob({}, {}, {}, post_file_copies, {});
+            throw std::runtime_error("Should not be able to create a standard job with a post file copy that has SCRATCH has both dst and src");
+        } catch (std::invalid_argument &e) {
+        }
+        
+        // Create a job with not ok task dependencies
+        try {
+            job_manager->createStandardJob((std::vector<wrench::WorkflowTask *>) {t2}, {});
+            throw std::runtime_error("Should not be able to create a standard job with a not-self-contained task");
+        } catch (std::invalid_argument &e) {
+        }
+
 
         // Create an "ok" job
         try {
@@ -215,12 +317,8 @@ private:
             throw std::runtime_error("Should be able to create a standard job with two dependent tasks");
         }
 
-        // Create a "not ok" job
-        try {
-            job_manager->createStandardJob((std::vector<wrench::WorkflowTask *>) {t2}, {});
-            throw std::runtime_error("Should not be able to create a standard job with a not-self-contained task");
-        } catch (std::invalid_argument &e) {
-        }
+
+
 
         return 0;
     }
@@ -244,7 +342,7 @@ void JobManagerTest::do_JobManagerCreateJobTest_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -333,7 +431,7 @@ void JobManagerTest::do_JobManagerSubmitJobTest_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -470,13 +568,15 @@ void JobManagerTest::do_JobManagerResubmitJobTest_test() {
 
     ASSERT_NO_THROW(cs1 = simulation->add(
             new wrench::BareMetalComputeService("Host2",
-                                                {std::make_pair("Host2", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},100.0,
+                                                {std::make_pair("Host2", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                "/scratch",
                                                 {{wrench::ComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}})));
 
     // Create a ComputeService that does support standard jobs
     ASSERT_NO_THROW(cs2 = simulation->add(
             new wrench::BareMetalComputeService("Host3",
-                                                {std::make_pair("Host3", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},100.0,
+                                                {std::make_pair("Host3", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                "/scratch",
                                                 {{wrench::ComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}})));
 
     // Create a WMS
@@ -619,7 +719,8 @@ void JobManagerTest::do_JobManagerTerminateJobTest_test() {
     std::shared_ptr<wrench::ComputeService> cs = nullptr;
     ASSERT_NO_THROW(cs = simulation->add(
             new wrench::BareMetalComputeService("Host3",
-                                                {std::make_pair("Host3", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},100.0,
+                                                {std::make_pair("Host3", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                "/scratch",
                                                 {{wrench::ComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}})));
 
     // Create a WMS

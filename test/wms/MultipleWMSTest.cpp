@@ -31,8 +31,26 @@ protected:
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
-                          "       <host id=\"DualCoreHost\" speed=\"1f\" core=\"2\"/> "
-                          "       <host id=\"QuadCoreHost\" speed=\"1f\" core=\"4\"/> "
+                          "       <host id=\"DualCoreHost\" speed=\"1f\" core=\"2\"> "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>"
+                          "       <host id=\"QuadCoreHost\" speed=\"1f\" core=\"4\"> "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>"
                           "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
                           "       <route src=\"DualCoreHost\" dst=\"QuadCoreHost\"> <link_ctn id=\"1\"/> </route>"
                           "   </zone> "
@@ -110,10 +128,15 @@ private:
         // Get the file registry service
         auto file_registry_service = this->getAvailableFileRegistryService();
 
-        std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>>> pre_copies = {};
+        // Get the cloud service
+        auto cs = *this->getAvailableComputeServices<wrench::CloudComputeService>().begin();
+
+        std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>> pre_copies = {};
         for (auto it : this->getWorkflow()->getInputFiles()) {
-            std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::StorageService>, std::shared_ptr<wrench::StorageService>> each_copy =
-                    std::make_tuple(it.second, this->test->storage_service, wrench::ComputeService::SCRATCH);
+            std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>> each_copy =
+                    std::make_tuple(it.second,
+                                    wrench::FileLocation::LOCATION(this->test->storage_service),
+                                    wrench::FileLocation::SCRATCH);
             pre_copies.insert(each_copy);
         }
 
@@ -165,16 +188,16 @@ void MultipleWMSTest::do_deferredWMSStartOneWMS_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
-            new wrench::SimpleStorageService(hostname, 100.0)));
+            new wrench::SimpleStorageService(hostname, {"/"})));
 
     // Create a Cloud Service
-    std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
+    std::vector<std::string> execution_hosts = {wrench::Simulation::getHostnameList()[1]};
     ASSERT_NO_THROW(compute_service = simulation->add(new wrench::CloudComputeService(
-            hostname, execution_hosts, 100.0,
+            hostname, execution_hosts, "/scratch",
             {{wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
 
     // Create a WMS
@@ -190,13 +213,15 @@ void MultipleWMSTest::do_deferredWMSStartOneWMS_test() {
             new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFiles(workflow->getInputFiles(), storage_service));
+    for (auto const &f : workflow->getInputFiles()) {
+        ASSERT_NO_THROW(simulation->stageFile(f.second, storage_service));
+    }
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     // Simulation trace
-    ASSERT_GT(simulation->getCurrentSimulatedDate(), 100);
+    ASSERT_GT(wrench::Simulation::getCurrentSimulatedDate(), 100);
 
     delete simulation;
     free(argv[0]);
@@ -216,16 +241,16 @@ void MultipleWMSTest::do_deferredWMSStartTwoWMS_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
-            new wrench::SimpleStorageService(hostname, 100.0)));
+            new wrench::SimpleStorageService(hostname, {"/"})));
 
     // Create a Cloud Service
-    std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
+    std::vector<std::string> execution_hosts = {wrench::Simulation::getHostnameList()[1]};
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::CloudComputeService(hostname, execution_hosts, 100.0,
+            new wrench::CloudComputeService(hostname, execution_hosts, "/scratch",
                                             {{wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
 
     // Create a WMS
@@ -249,14 +274,20 @@ void MultipleWMSTest::do_deferredWMSStartTwoWMS_test() {
             new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFiles(workflow->getInputFiles(), storage_service));
-    ASSERT_NO_THROW(simulation->stageFiles(workflow2->getInputFiles(), storage_service));
+    for (auto const &f : workflow->getInputFiles()) {
+        ASSERT_NO_THROW(simulation->stageFile(f.second, storage_service));
+
+    }
+    for (auto const &f : workflow2->getInputFiles()) {
+        ASSERT_NO_THROW(simulation->stageFile(f.second, storage_service));
+
+    }
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     // Simulation trace
-    ASSERT_GT(simulation->getCurrentSimulatedDate(), 1000);
+    ASSERT_GT(wrench::Simulation::getCurrentSimulatedDate(), 1000);
 
     delete simulation;
     free(argv[0]);

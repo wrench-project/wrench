@@ -111,7 +111,7 @@ private:
             wrench::WorkflowTask *task4 = this->getWorkflow()->addTask(cs->getName() + "task4", 59, 1, 1, 1.0, 0);
             wrench::StandardJob *job;
 
-            double start_time = this->simulation->getCurrentSimulatedDate();
+            double start_time = wrench::Simulation::getCurrentSimulatedDate();
 
             // Submit a sequential task that lasts one min and requires 1 host
             job = job_manager->createStandardJob(task1, {});
@@ -178,7 +178,7 @@ private:
                 if (real_event) {
                     wrench::WorkflowTask *task = *(real_event->standard_job->getTasks().begin());
                     if (task == task4) {
-                        double now = simulation->getCurrentSimulatedDate();
+                        double now = wrench::Simulation::getCurrentSimulatedDate();
                         contiguous = (now >= start_time + 120);
                     }
                 } else {
@@ -233,7 +233,7 @@ void BatchServiceBatschedContiguityTest::do_BatchJobContiguousAllocationTest_tes
     // Create a Batch Service
     batch_service_conservative_bf_contiguous = simulation->add(
             new wrench::BatchComputeService(hostname,
-                                            {"Host1", "Host2", "Host3", "Host4"}, 0, {
+                                            {"Host1", "Host2", "Host3", "Host4"}, "", {
                                                     {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"},
                                                     {wrench::BatchComputeServiceProperty::BATCH_RJMS_DELAY, "0"},
                                                     {wrench::BatchComputeServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION,"true"}
@@ -241,7 +241,7 @@ void BatchServiceBatschedContiguityTest::do_BatchJobContiguousAllocationTest_tes
 
     batch_service_conservative_bf_non_contiguous = simulation->add(
             new wrench::BatchComputeService(hostname,
-                                            {"Host1", "Host2", "Host3", "Host4"}, 0, {
+                                            {"Host1", "Host2", "Host3", "Host4"}, "", {
                                                     {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"},
                                                     {wrench::BatchComputeServiceProperty::BATCH_RJMS_DELAY, "0"},
                                                     {wrench::BatchComputeServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION,"false"}
@@ -249,7 +249,7 @@ void BatchServiceBatschedContiguityTest::do_BatchJobContiguousAllocationTest_tes
 
     batch_service_easy_bf_contiguous = simulation->add(
             new wrench::BatchComputeService(hostname,
-                                            {"Host1", "Host2", "Host3", "Host4"}, 0, {
+                                            {"Host1", "Host2", "Host3", "Host4"}, "", {
                                                     {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "easy_bf"},
                                                     {wrench::BatchComputeServiceProperty::BATCH_RJMS_DELAY, "0"},
                                                     {wrench::BatchComputeServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION,"true"}
@@ -257,7 +257,7 @@ void BatchServiceBatschedContiguityTest::do_BatchJobContiguousAllocationTest_tes
 
     batch_service_easy_bf_non_contiguous = simulation->add(
             new wrench::BatchComputeService(hostname,
-                                            {"Host1", "Host2", "Host3", "Host4"}, 0, {
+                                            {"Host1", "Host2", "Host3", "Host4"}, "", {
                                                     {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "easy_bf"},
                                                     {wrench::BatchComputeServiceProperty::BATCH_RJMS_DELAY, "0"},
                                                     {wrench::BatchComputeServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION,"false"}
