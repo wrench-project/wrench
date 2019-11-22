@@ -188,7 +188,7 @@ namespace wrench {
     StandardJob *JobManager::createStandardJob(std::vector<WorkflowTask *> tasks,
                                                std::map<WorkflowFile *, std::shared_ptr<FileLocation> > file_locations) {
         if (tasks.empty()) {
-            throw std::invalid_argument("JobManager::createStandardJob(): Invalid arguments");
+            throw std::invalid_argument("JobManager::createStandardJob(): Invalid arguments (empty tasks argument!)");
         }
 
         return this->createStandardJob(tasks, file_locations, {}, {}, {});
