@@ -375,7 +375,9 @@ void StorageServiceLinkFailuresTest::do_StorageServiceLinkFailureSimpleRandom_Te
     file_registry_service = simulation->add(
             new wrench::FileRegistryService("Host1",
                                             {
-                                                    {wrench::FileRegistryServiceProperty::LOOKUP_COMPUTE_COST, "0"}
+                                                    {wrench::FileRegistryServiceProperty::LOOKUP_COMPUTE_COST, "0"},
+                                                    {wrench::FileRegistryServiceProperty::ADD_ENTRY_COMPUTE_COST, "0"},
+                                                    {wrench::FileRegistryServiceProperty::REMOVE_ENTRY_COMPUTE_COST, "0"}
                                             },
                                             {
                                                     {wrench::FileRegistryServiceMessagePayload::ADD_ENTRY_REQUEST_MESSAGE_PAYLOAD, message_payload},
