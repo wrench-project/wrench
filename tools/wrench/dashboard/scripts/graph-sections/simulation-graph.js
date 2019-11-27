@@ -46,7 +46,7 @@ function getOffset(el, position) {
     containerId: id of <div> container of graph
     currGraphState: pass in "hostView" to see the host view and "taskView" to see the task view
 */
-function generateGraph(data, containerId, currGraphState) {
+function generateGraph(data, containerId, currGraphState, CONTAINER_WIDTH, CONTAINER_HEIGHT) {
     document.getElementById(containerId).innerHTML = //reset graph
         `<div class="text-left" id="tooltip-container">
             <span id="tooltip-task-id"></span><br>
@@ -59,8 +59,6 @@ function generateGraph(data, containerId, currGraphState) {
     var compute_color = '#f7daad'
     var write_color   = '#abdcf4'
     var container = d3.select(`#${containerId}`)
-    const CONTAINER_WIDTH = 1000
-    const CONTAINER_HEIGHT = 1000
     const PADDING = 60
     var svg = container
         .append("svg")
