@@ -258,3 +258,24 @@ td {
 .error-text {
     color: red;
 }
+
+#host-utilization-chart-tooltip {
+    position: absolute;
+    width: auto;
+    padding: 10px;
+    background-color: #f2f2f2;
+    border-radius: 2px;
+    border: 0px solid #000;
+    display: none;
+    pointer-events: none;
+    font-family: sans-serif;
+    font-size: 12px;
+}
+
+#host-utilization-chart-legend-compute-time {
+    border-left: 15px solid #f7daad;
+}
+
+#host-utilization-chart-legend-idle-time {
+    border-left: 15px solid #ffd8f8;
+}
