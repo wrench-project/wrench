@@ -15,11 +15,12 @@ function initialise() {
     } else {
         noFileDiv.style.display = "none"
         mainBodyDiv.style.display = "block"
-        generateGraph(data.contents, "graph-container", currGraphState)
+        generateGraph(data.contents, "graph-container", currGraphState, 1000, 1000)
         populateLegend("taskView")
         populateWorkflowTaskDataTable(data.contents, "task-details-table", "task-details-table-body", "task-details-table-td")
         getOverallWorkflowMetrics(data.contents, "overall-metrics-table", "task-details-table-td")
         generate3dGraph(data.contents, true, "three-d-graph-svg", "origin-x", "origin-y", "time-interval", "scale-input")
+        generateHostUtilizationGraph(data.contents, "host-utilization-chart", "host-utilization-chart-tooltip", "host-utilization-chart-tooltip-task-id", "host-utilization-chart-tooltip-compute-time", 1000, 1000)
     }
 }
 
