@@ -13,7 +13,7 @@
 #include <wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h>
 #include <wrench/services/compute/cloud/CloudComputeService.h>
 #include <wrench/wms/WMS.h>
-#include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
+#include "helper_services/standard_job_executor/StandardJobExecutorMessage.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/compute/batch/BatchComputeService.h"
