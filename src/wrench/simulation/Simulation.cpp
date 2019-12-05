@@ -968,6 +968,17 @@ namespace wrench {
             }
         }
 
+//        // Check Disk Bandwidth (TODO: Remove this check once SimGrid has a more decent I/O model)
+//        for (auto const &h : hostnames) {
+//            WRENCH_INFO("---> %s", h.c_str());
+//            for (auto const &d : simgrid::s4u::Host::by_name(h)->get_disks()) {
+//                auto props = d->get_properties();
+//                for (auto it = props->begin(); it != props->end(); it++) {
+//                    WRENCH_INFO("===> %s %s", (*it).first.c_str(), (*it).second.c_str());
+//                }
+//            }
+//        }
+
     }
 
 
