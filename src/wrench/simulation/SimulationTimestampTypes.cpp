@@ -284,6 +284,102 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     * @param file: the WorkflowFile associated with this file read
+     * @param src_location: the source location
+     * @param start_timestamp: the timestamp for the file read start
+     */
+    SimulationTimestampFileRead::SimulationTimestampFileRead(WorkflowFile *file,
+                                                             std::shared_ptr<FileLocation> src_location,
+                                                             SimulationTimestampFileReadStart *start_timestamp) :
+            SimulationTimestampPair(start_timestamp), file(file), source(src_location){
+    }
+
+    /**
+     * @brief retrieves the WorkflowFile being read
+     * @return a pointer to the WorkflowFile associated with this read
+     */
+    WorkflowFile *SimulationTimestampFileRead::getFile() {
+        return this->file;
+    }
+
+    /**
+     * @brief retrieves the location from which the WorkflowFile is being copied
+     * @return the read's source location
+     */
+    std::shared_ptr<FileLocation> SimulationTimestampFileRead::getSource() {
+        return this->source;
+    }
+
+    /**
+     * @brief retrieves the corresponding SimulationTimestampFileRead object
+     * @return a pointer to the start or end SimulationTimestampFileRead object
+     */
+    SimulationTimestampFileRead *SimulationTimestampFileRead::getEndpoint() {
+        return dynamic_cast<SimulationTimestampFileRead *>(this->endpoint);
+    }
+
+    /**
+     * @brief Constructor
+     * @param file: the WorkflowFile associated with this file read
+     * @param src: the source location
+     * @throw std::invalid_argument
+     */
+    SimulationTimestampFileReadStart::SimulationTimestampFileReadStart(WorkflowFile *file,
+                                                                       std::shared_ptr<FileLocation> src) :
+            SimulationTimestampFileRead(file, src) {
+
+        // all information about a file read should be passed
+        if ((this->file == nullptr)
+            || (this->source == nullptr)) {
+
+            throw std::invalid_argument(
+                    "SimulationTimestampFileReadStart::SimulationTimestampFileReadStart() cannot take nullptr arguments");
+        }
+    }
+
+
+    /**
+     * @brief Constructor
+     * @param start_timestamp: a pointer to the SimulationTimestampFileReadStart associated with this timestamp
+     * @throw std::invalid_argument
+     */
+    SimulationTimestampFileReadFailure::SimulationTimestampFileReadFailure(
+            SimulationTimestampFileReadStart *start_timestamp) :
+            SimulationTimestampFileRead(nullptr, nullptr, start_timestamp) {
+
+        // a corresponding start timestamp must be passed
+        if (start_timestamp == nullptr) {
+            throw std::invalid_argument(
+                    "SimulationTimestampFileReadFailure::SimulationTimestampFileReadFailure() start_timestamp cannot be nullptr");
+        } else {
+            this->file = start_timestamp->file;
+            this->source = start_timestamp->source;
+            start_timestamp->endpoint = this;
+        }
+    }
+
+    /**
+     * @brief Constructor
+     * @param start_timestamp: a pointer to the SimulationTimestampFileReadStart associated with this timestamp
+     * @throw std::invalid_argument
+     */
+    SimulationTimestampFileReadCompletion::SimulationTimestampFileReadCompletion(
+            SimulationTimestampFileReadStart *start_timestamp) :
+            SimulationTimestampFileRead(nullptr, nullptr, start_timestamp) {
+
+        // a corresponding start timestamp must be passed
+        if (start_timestamp == nullptr) {
+            throw std::invalid_argument(
+                    "SimulationTimestampFileReadCompletion::SimulationTimestampFileReadCompletion() start_timestamp cannot be nullptr");
+        } else {
+            this->file = start_timestamp->getFile();
+            this->source = start_timestamp->getSource();
+            start_timestamp->endpoint = this;
+        }
+    }
+
+    /**
+     * @brief Constructor
      * @param hostname: the host on which a pstate is being set
      * @param pstate: the pstate that is being set on this host
      */

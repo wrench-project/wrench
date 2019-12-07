@@ -335,6 +335,12 @@ namespace wrench {
                     }
                 }
                 StorageService::readFiles(files_to_read);
+                //TODO add timestamps to readFile and loop through files_to_read
+                for (auto const &f : files_to_read){
+
+                    StorageService::readFile(f.first, f.second);
+
+                }
                 task->setReadInputEndDate(S4U_Simulation::getClock());
             } catch (WorkflowExecutionException &e) {
                 this->failure_timestamp_should_be_generated = true;
