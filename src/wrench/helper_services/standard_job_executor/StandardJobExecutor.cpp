@@ -172,7 +172,8 @@ namespace wrench {
 
         if (!enough_ram) {
             throw std::invalid_argument(
-                    "StandardJobExecutor::StandardJobExecutor(): insufficient memory resources to run the job");
+                    "StandardJobExecutor::StandardJobExecutor(): insufficient memory resources to run the job "
+                    "(max_required_ram = " + std::to_string(max_required_ram) + ")");
         }
 
         // Set instance variables

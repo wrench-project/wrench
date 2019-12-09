@@ -32,7 +32,6 @@ namespace wrench {
      * @param scratch_space_mount_point: the mount of of the scratch space of the cloud service ("" means none)
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
-     * @param messagepayload_list: a message payload list ({} means "use all defaults")
      *
      * @throw std::runtime_error
      */
