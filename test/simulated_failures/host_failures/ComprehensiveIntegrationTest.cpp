@@ -74,11 +74,11 @@ protected:
 
         for (auto const &h : hostnames) {
             xml += "<host id=\"" + h + "\"  speed=\"1f\" core=\"4\" > \n"
-                                       "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">\n"
+                                       "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">\n"
                                        "             <prop id=\"size\" value=\"10000000000000B\"/>\n"
                                        "             <prop id=\"mount\" value=\"/\"/>\n"
                                        "          </disk>\n"
-                                       "          <disk id=\"scratch_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">\n"
+                                       "          <disk id=\"scratch_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">\n"
                                        "             <prop id=\"size\" value=\"100B\"/>\n"
                                        "             <prop id=\"mount\" value=\"/scratch\"/>\n"
                                        "          </disk>\n"

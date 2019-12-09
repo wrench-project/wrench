@@ -53,7 +53,7 @@ protected:
             for (int i = 0; i < NUM_STORAGE_SERVICES; i++) {
                 xml +=
                         "          <disk id=\"large_disk" + std::to_string(i) +
-                        "\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                        "\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                         "             <prop id=\"size\" value=\"" + std::to_string(STORAGE_SERVICE_CAPACITY) +
                         "B\"/>"
                         "             <prop id=\"mount\" value=\"/disk" + std::to_string(i) + "/\"/>"
@@ -61,7 +61,7 @@ protected:
             }
 
             xml +=
-                    "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                    "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                     "             <prop id=\"size\" value=\"101B\"/>"
                     "             <prop id=\"mount\" value=\"/scratch\"/>"
                     "          </disk>"
