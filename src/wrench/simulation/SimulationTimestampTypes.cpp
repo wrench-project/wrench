@@ -76,6 +76,8 @@ namespace wrench {
      */
     std::map<std::string, SimulationTimestampTask *> SimulationTimestampTask::pending_task_timestamps;
 
+
+
     /**
      * @brief Sets the endpoint of the calling object (SimulationTimestampTaskFailure, SimulationTimestampTaskTerminated, SimulationTimestampTaskStart) with a SimulationTimestampTaskStart object
      */
@@ -116,6 +118,7 @@ namespace wrench {
          * be set when a SimulationTimestampTaskFailure, SimulationTimestampTaskTerminated, or SimulationTimestampTaskCompletion is created
          */
         pending_task_timestamps.insert(std::make_pair(task->getID(), this));
+
     }
 
 
@@ -319,6 +322,11 @@ namespace wrench {
     }
 
     /**
+     * @brief A static unordered multimap of SimulationTimestampFileReadStart objects that have yet to be matched with Failure, Terminated or Completion timestamps
+     */
+    std::unordered_multimap<File, std::pair<SimulationTimestampFileRead *, double>, decltype(&file_hash)> SimulationTimestampFileRead::pending_file_reads;
+
+    /**
      * @brief Constructor
      * @param file: the WorkflowFile associated with this file read
      * @param src: the source location
@@ -335,6 +343,7 @@ namespace wrench {
             throw std::invalid_argument(
                     "SimulationTimestampFileReadStart::SimulationTimestampFileReadStart() cannot take nullptr arguments");
         }
+        pending_file_reads.insert(std::make_tuple(this->file, this->source, this->whoami), std::make_pair(this, this->getDate()));
     }
 
 
@@ -345,9 +354,9 @@ namespace wrench {
      */
     SimulationTimestampFileReadFailure::SimulationTimestampFileReadFailure(
             SimulationTimestampFileReadStart *start_timestamp) :
-            SimulationTimestampFileRead(nullptr, nullptr, start_timestamp) {
+            SimulationTimestampFileRead(nullptr, nullptr) {
 
-        // a corresponding start timestamp must be passed
+        //TODO retrieve corresponding timestamp from unordered multimap
         if (start_timestamp == nullptr) {
             throw std::invalid_argument(
                     "SimulationTimestampFileReadFailure::SimulationTimestampFileReadFailure() start_timestamp cannot be nullptr");
@@ -365,9 +374,9 @@ namespace wrench {
      */
     SimulationTimestampFileReadCompletion::SimulationTimestampFileReadCompletion(
             SimulationTimestampFileReadStart *start_timestamp) :
-            SimulationTimestampFileRead(nullptr, nullptr, start_timestamp) {
+            SimulationTimestampFileRead(nullptr, nullptr) {
 
-        // a corresponding start timestamp must be passed
+        //TODO retrieve corresponding timestamp from unordered multimap
         if (start_timestamp == nullptr) {
             throw std::invalid_argument(
                     "SimulationTimestampFileReadCompletion::SimulationTimestampFileReadCompletion() start_timestamp cannot be nullptr");
