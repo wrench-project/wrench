@@ -18,6 +18,21 @@ namespace wrench {
     class StorageService;
 
     /**
+     * @brief File, Source, Whoami used to be hashed as key for unordered multimap for ongoing file operations.
+     */
+    typedef std::tuple<std::string, std::string, std::string> File;
+
+    /**
+     *
+     * @param file - tuple of three strings relating to File, Source and Whoami
+     * @return XOR of hashes of file
+     */
+    size_t file_hash( const File & file )
+    {
+        return std::hash<std::string>()(std::get<0>(file)) ^ std::hash<std::string>()(std::get<1>(file)) ^ std::hash<std::string>()(std::get<2>(file));
+    }
+
+    /**
      * @brief A top-level base class for simulation timestamps
      */
     class SimulationTimestampType {
@@ -134,6 +149,95 @@ namespace wrench {
          /** \endcond           */
          /***********************/
      };
+
+    class SimulationTimestampFileReadStart;
+    class FileLocation;
+
+    /**
+     * @brief A base class for simulation timestamps regarding file copies
+     */
+    class SimulationTimestampFileRead : public SimulationTimestampPair {
+    public:
+
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        SimulationTimestampFileRead(WorkflowFile *file, std::shared_ptr<FileLocation> src);
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
+        /**
+         * @brief Retrieve the matching endpoint, if any
+         */
+        SimulationTimestampFileRead *getEndpoint() override;
+        WorkflowFile *getFile();
+        std::shared_ptr<FileLocation> getSource();
+
+    protected:
+        /**
+         * @brief The WorkflowFile that was being read
+         */
+        WorkflowFile *file;
+
+        /**
+         * @brief The location where the WorkflowFile was being read from
+         */
+        std::shared_ptr<FileLocation> source;
+
+        /**
+         * @brief the data structure that holds the ongoing file reads.
+         */
+         static std::unordered_multimap<File, std::pair<SimulationTimestampFileRead *, double>, decltype(&file_hash)> pending_file_reads;
+    };
+
+    class SimulationTimestampFileReadFailure;
+    class SimulationTimestampFileReadCompletion;
+
+    /**
+     * @brief A simulation timestamp class for file read start times
+     */
+    class SimulationTimestampFileReadStart : public SimulationTimestampFileRead {
+    public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        SimulationTimestampFileReadStart(WorkflowFile *file, std::shared_ptr<FileLocation> src);
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
+        friend class SimulationTimestampFileReadFailure;
+        friend class SimulationTimestampFileReadCompletion;
+    };
+
+    /**
+     * @brief A simulation timestamp class for file read failure times
+     */
+    class SimulationTimestampFileReadFailure : public SimulationTimestampFileRead {
+    public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        SimulationTimestampFileReadFailure(WorkflowFile *file, std::shared_ptr<FileLocation> src);
+        /***********************/
+        /** \endcond           */
+        /***********************/
+    };
+
+    /**
+     * @brief A simulation timestamp class for file read completions
+     */
+    class SimulationTimestampFileReadCompletion : public SimulationTimestampFileRead {
+    public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        SimulationTimestampFileReadCompletion(WorkflowFile *file, std::shared_ptr<FileLocation> src);
+        /***********************/
+        /** \endcond           */
+        /***********************/
+    };
 
     class SimulationTimestampFileCopyStart;
     class FileLocation;
