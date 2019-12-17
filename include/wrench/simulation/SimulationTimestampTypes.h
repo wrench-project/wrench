@@ -10,6 +10,8 @@
 #ifndef WRENCH_SIMULATIONTIMESTAMPTYPES_H
 #define WRENCH_SIMULATIONTIMESTAMPTYPES_H
 
+#include <wrench/services/Service.h>
+#include <wrench/services/storage/storage_helpers/FileLocation.h>
 #include "wrench/workflow/WorkflowTask.h"
 
 namespace wrench {
@@ -20,7 +22,7 @@ namespace wrench {
     /**
      * @brief File, Source, Whoami used to be hashed as key for unordered multimap for ongoing file operations.
      */
-    typedef std::tuple<std::string, std::string, std::string> File;
+    typedef std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, Service *> File;
 
     /**
      *
@@ -29,7 +31,7 @@ namespace wrench {
      */
     size_t file_hash( const File & file )
     {
-        return std::hash<std::string>()(std::get<0>(file)) ^ std::hash<std::string>()(std::get<1>(file)) ^ std::hash<std::string>()(std::get<2>(file));
+        return std::hash<void *>()(std::get<0>(file)) ^ std::hash<std::shared_ptr<FileLocation>>()(std::get<1>(file)) ^ std::hash<void *>()(std::get<2>(file));
     }
 
     /**
@@ -162,7 +164,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        SimulationTimestampFileRead(WorkflowFile *file, std::shared_ptr<FileLocation> src);
+        SimulationTimestampFileRead(WorkflowFile *file, std::shared_ptr<FileLocation> src, Service *service);
         /***********************/
         /** \endcond           */
         /***********************/
@@ -173,6 +175,7 @@ namespace wrench {
         SimulationTimestampFileRead *getEndpoint() override;
         WorkflowFile *getFile();
         std::shared_ptr<FileLocation> getSource();
+        Service *getService();
 
     protected:
         /**
@@ -186,9 +189,16 @@ namespace wrench {
         std::shared_ptr<FileLocation> source;
 
         /**
+         * @brief Service that initiated the read
+         */
+        Service *service;
+
+        /**
          * @brief the data structure that holds the ongoing file reads.
          */
          static std::unordered_multimap<File, std::pair<SimulationTimestampFileRead *, double>, decltype(&file_hash)> pending_file_reads;
+
+        void setEndpoints();
     };
 
     class SimulationTimestampFileReadFailure;
@@ -202,7 +212,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        SimulationTimestampFileReadStart(WorkflowFile *file, std::shared_ptr<FileLocation> src);
+        SimulationTimestampFileReadStart(WorkflowFile *file, std::shared_ptr<FileLocation> src, Service *service);
         /***********************/
         /** \endcond           */
         /***********************/
@@ -219,7 +229,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        SimulationTimestampFileReadFailure(WorkflowFile *file, std::shared_ptr<FileLocation> src);
+        SimulationTimestampFileReadFailure(WorkflowFile *file, std::shared_ptr<FileLocation> src, Service *service);
         /***********************/
         /** \endcond           */
         /***********************/
@@ -233,7 +243,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        SimulationTimestampFileReadCompletion(WorkflowFile *file, std::shared_ptr<FileLocation> src);
+        SimulationTimestampFileReadCompletion(WorkflowFile *file, std::shared_ptr<FileLocation> src, Service *service);
         /***********************/
         /** \endcond           */
         /***********************/
