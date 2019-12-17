@@ -289,17 +289,17 @@ namespace wrench {
      * @brief Constructor
      * @param file: the WorkflowFile associated with this file read
      * @param src_location: the source location
-     * @param start_timestamp: the timestamp for the file read start
+     * @param service: service requesting file read
      */
     SimulationTimestampFileRead::SimulationTimestampFileRead(WorkflowFile *file,
                                                              std::shared_ptr<FileLocation> src_location,
-                                                             SimulationTimestampFileReadStart *start_timestamp) :
-            SimulationTimestampPair(start_timestamp), file(file), source(src_location){
+                                                             Service *service) :
+            service(service), file(file), source(src_location){
     }
 
     /**
      * @brief retrieves the WorkflowFile being read
-     * @return a pointer to the WorkflowFile associated with this read
+     * @return a pointer to the WorkflowFile associated with this reads
      */
     WorkflowFile *SimulationTimestampFileRead::getFile() {
         return this->file;
@@ -312,6 +312,16 @@ namespace wrench {
     std::shared_ptr<FileLocation> SimulationTimestampFileRead::getSource() {
         return this->source;
     }
+
+    /**
+     * @brief retrieves the Service that ordered file read
+     * @return point to the service associated with this read
+     */
+    Service *SimulationTimestampFileRead::getService() {
+        return this->service;
+    }
+
+
 
     /**
      * @brief retrieves the corresponding SimulationTimestampFileRead object
@@ -327,64 +337,101 @@ namespace wrench {
     std::unordered_multimap<File, std::pair<SimulationTimestampFileRead *, double>, decltype(&file_hash)> SimulationTimestampFileRead::pending_file_reads;
 
     /**
+     * @brief Sets the endpoint of the calling object (SimulationTimestampFileReadFailure, SimulationTimestampFileReadTerminated, SimulationTimestampFileReadStart) with a SimulationTimestampFileReadStart object
+     */
+    void SimulationTimestampFileRead::setEndpoints() {
+        // find the SimulationTimestampTaskStart object containing the same task
+        auto pending_reads_itr = pending_file_reads.find(File(this->file, this->source, this->service));
+        if (pending_reads_itr != pending_file_reads.end()) {
+            // set my endpoint to the SimulationTimestampFileReadStart
+            this->endpoint = (*pending_reads_itr).second.first;
+
+            // set the SimulationTimestampFileReadStart's endpoint to me
+            (*pending_reads_itr).second.first->endpoint = this;
+
+            // the SimulationTimestampFileReadStart is no longer waiting to be matched with an end timestamp, remove it from the map
+            pending_file_reads.erase(pending_reads_itr);
+        } else {
+            throw std::runtime_error(
+                    "SimulationTimestampFileRead::setEndpoints() could not find a SimulationTimestampFileReadStart object.");
+        }
+    }
+
+
+
+    /**
      * @brief Constructor
      * @param file: the WorkflowFile associated with this file read
      * @param src: the source location
+     * @param service: service requesting file read
      * @throw std::invalid_argument
      */
     SimulationTimestampFileReadStart::SimulationTimestampFileReadStart(WorkflowFile *file,
-                                                                       std::shared_ptr<FileLocation> src) :
-            SimulationTimestampFileRead(file, src) {
+                                                                       std::shared_ptr<FileLocation> src,
+                                                                       Service *service) :
+            SimulationTimestampFileRead(file, src, service) {
 
         // all information about a file read should be passed
         if ((this->file == nullptr)
-            || (this->source == nullptr)) {
+            || (this->source == nullptr)
+            || (this->service == nullptr)) {
 
             throw std::invalid_argument(
                     "SimulationTimestampFileReadStart::SimulationTimestampFileReadStart() cannot take nullptr arguments");
         }
-        pending_file_reads.insert(std::make_tuple(this->file, this->source, this->whoami), std::make_pair(this, this->getDate()));
+
+
+
+        pending_file_reads.insert(std::make_pair(File(this->file, this->source, this->service), std::make_pair(this, this->getDate())));
     }
 
 
     /**
      * @brief Constructor
-     * @param start_timestamp: a pointer to the SimulationTimestampFileReadStart associated with this timestamp
+     * @param file: the WorkflowFile associated with this file read
+     * @param src: the source location
+     * @param service: service requesting file read
      * @throw std::invalid_argument
      */
-    SimulationTimestampFileReadFailure::SimulationTimestampFileReadFailure(
-            SimulationTimestampFileReadStart *start_timestamp) :
-            SimulationTimestampFileRead(nullptr, nullptr) {
+    SimulationTimestampFileReadFailure::SimulationTimestampFileReadFailure(WorkflowFile *file,
+                                                                           std::shared_ptr<FileLocation> src,
+                                                                           Service *service) :
+            SimulationTimestampFileRead(file, src, service) {
+        WRENCH_DEBUG("Inserting a TaskFailure timestamp for file read");
 
-        //TODO retrieve corresponding timestamp from unordered multimap
-        if (start_timestamp == nullptr) {
+        if (file == nullptr
+            || src == nullptr
+            || service == nullptr) {
             throw std::invalid_argument(
-                    "SimulationTimestampFileReadFailure::SimulationTimestampFileReadFailure() start_timestamp cannot be nullptr");
-        } else {
-            this->file = start_timestamp->file;
-            this->source = start_timestamp->source;
-            start_timestamp->endpoint = this;
+                    "SimulationTimestampFileReadFailure::SimulationTimestampFileReadFailure() requires a valid pointer to file, source and service objects");
         }
+
+        // match this timestamp with a SimulationTimestampFileReadStart
+        setEndpoints();
     }
 
     /**
      * @brief Constructor
-     * @param start_timestamp: a pointer to the SimulationTimestampFileReadStart associated with this timestamp
+     * @param file: the WorkflowFile associated with this file read
+     * @param src: the source location
+     * @param service: service requesting file read
      * @throw std::invalid_argument
      */
-    SimulationTimestampFileReadCompletion::SimulationTimestampFileReadCompletion(
-            SimulationTimestampFileReadStart *start_timestamp) :
-            SimulationTimestampFileRead(nullptr, nullptr) {
+    SimulationTimestampFileReadCompletion::SimulationTimestampFileReadCompletion(WorkflowFile *file,
+                                                                                 std::shared_ptr<FileLocation> src,
+                                                                                 Service *service) :
+            SimulationTimestampFileRead(file, src, service)  {
+        WRENCH_DEBUG("Inserting a TaskFailure timestamp for file read");
 
-        //TODO retrieve corresponding timestamp from unordered multimap
-        if (start_timestamp == nullptr) {
+        if (file == nullptr
+            || src == nullptr
+            || service == nullptr) {
             throw std::invalid_argument(
-                    "SimulationTimestampFileReadCompletion::SimulationTimestampFileReadCompletion() start_timestamp cannot be nullptr");
-        } else {
-            this->file = start_timestamp->getFile();
-            this->source = start_timestamp->getSource();
-            start_timestamp->endpoint = this;
+                    "SimulationTimestampFileReadFailure::SimulationTimestampFileReadFailure() requires a valid pointer to file, source and service objects");
         }
+
+        // match this timestamp with a SimulationTimestampFileReadStart
+        setEndpoints();
     }
 
     /**
