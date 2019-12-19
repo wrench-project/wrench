@@ -139,6 +139,8 @@ set(HEADER_FILES
         include/wrench/services/compute/hadoop/hadoop_subsystem/HdfsService.h
         include/wrench/services/compute/hadoop/hadoop_subsystem/ReducerService.h
         include/wrench/services/compute/hadoop/hadoop_subsystem/MapperService.h
+        include/wrench/services/compute/hadoop/HadoopComputeServiceProperty.h
+        include/wrench/services/compute/hadoop/HadoopComputeServiceMessagePayload.h
         )
 
 # source files
@@ -255,11 +257,9 @@ set(SOURCE_FILES
         src/wrench/services/compute/hadoop/HadoopComputeService.cpp
         include/wrench/services/compute/hadoop/HadoopComputeService.h
         src/wrench/services/compute/hadoop/HadoopComputeServiceProperty.cpp
-        include/wrench/services/compute/hadoop/HadoopComputeServiceProperty.h
         src/wrench/services/compute/hadoop/HadoopComputeServiceMessage.cpp
         src/wrench/services/compute/hadoop/HadoopComputeServiceMessage.h
         src/wrench/services/compute/hadoop/HadoopComputeServiceMessagePayload.cpp
-        include/wrench/services/compute/hadoop/HadoopComputeServiceMessagePayload.h
         src/wrench/services/compute/hadoop/DeterministicMRJob.cpp
         src/wrench/services/compute/hadoop/hadoop_subsystem/MRJobExecutor.cpp
         src/wrench/services/compute/hadoop/hadoop_subsystem/MRJobExecutorMessagePayload.cpp

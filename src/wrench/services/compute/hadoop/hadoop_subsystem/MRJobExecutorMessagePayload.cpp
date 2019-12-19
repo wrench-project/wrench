@@ -14,4 +14,3 @@ namespace wrench {
     SET_MESSAGEPAYLOAD_NAME(MRJobExecutorMessagePayload, NOTIFY_EXECUTOR_STATUS_MESSAGE_PAYLOAD);
 
 }
-
