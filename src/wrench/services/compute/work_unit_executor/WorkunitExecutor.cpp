@@ -334,12 +334,14 @@ namespace wrench {
                         this->files_stored_in_scratch.insert(f);
                     }
                 }
-                StorageService::readFiles(files_to_read);
-                //TODO add timestamps to readFile and loop through files_to_read
                 for (auto const &f : files_to_read){
-
-                    StorageService::readFile(f.first, f.second);
-
+                    try{
+                        StorageService::readFile(f.first, f.second);
+                    } catch (WorkflowExecutionException &e) {
+                        this->simulation->getOutput().addTimestamp<SimulationTimestampFileReadFailure>(
+                                new SimulationTimestampFileReadFailure(f.first, f.second, f.second->getStorageService().get()));
+                        throw;
+                    }
                 }
                 task->setReadInputEndDate(S4U_Simulation::getClock());
             } catch (WorkflowExecutionException &e) {
