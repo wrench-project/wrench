@@ -10,29 +10,27 @@
 #ifndef WRENCH_SIMULATIONTIMESTAMPTYPES_H
 #define WRENCH_SIMULATIONTIMESTAMPTYPES_H
 
-#include <wrench/services/Service.h>
-#include <wrench/services/storage/storage_helpers/FileLocation.h>
+
 #include "wrench/workflow/WorkflowTask.h"
+#include <unordered_map>
 
 namespace wrench {
 
     class WorkflowTask;
     class StorageService;
+    class FileLocation;
 
     /**
      * @brief File, Source, Whoami used to be hashed as key for unordered multimap for ongoing file operations.
      */
-    typedef std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, Service *> File;
+    typedef std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, StorageService *> File;
 
     /**
      *
      * @param file - tuple of three strings relating to File, Source and Whoami
      * @return XOR of hashes of file
      */
-    size_t file_hash( const File & file )
-    {
-        return std::hash<void *>()(std::get<0>(file)) ^ std::hash<std::shared_ptr<FileLocation>>()(std::get<1>(file)) ^ std::hash<void *>()(std::get<2>(file));
-    }
+    size_t file_hash( const File & file );
 
     /**
      * @brief A top-level base class for simulation timestamps
@@ -153,7 +151,7 @@ namespace wrench {
      };
 
     class SimulationTimestampFileReadStart;
-    class FileLocation;
+
 
     /**
      * @brief A base class for simulation timestamps regarding file copies
@@ -164,7 +162,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        SimulationTimestampFileRead(WorkflowFile *file, std::shared_ptr<FileLocation> src, Service *service);
+        SimulationTimestampFileRead(WorkflowFile *file, std::shared_ptr<FileLocation> src, StorageService *service);
         /***********************/
         /** \endcond           */
         /***********************/
@@ -175,7 +173,7 @@ namespace wrench {
         SimulationTimestampFileRead *getEndpoint() override;
         WorkflowFile *getFile();
         std::shared_ptr<FileLocation> getSource();
-        Service *getService();
+        StorageService *getService();
 
     protected:
         /**
@@ -191,12 +189,12 @@ namespace wrench {
         /**
          * @brief Service that initiated the read
          */
-        Service *service;
+        StorageService *service;
 
         /**
          * @brief the data structure that holds the ongoing file reads.
          */
-         static std::unordered_multimap<File, std::pair<SimulationTimestampFileRead *, double>, decltype(&file_hash)> pending_file_reads;
+        static std::unordered_multimap<File, std::pair<SimulationTimestampFileRead *, double>, decltype(&file_hash)> pending_file_reads;
 
         void setEndpoints();
     };
@@ -212,7 +210,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        SimulationTimestampFileReadStart(WorkflowFile *file, std::shared_ptr<FileLocation> src, Service *service);
+        SimulationTimestampFileReadStart(WorkflowFile *file, std::shared_ptr<FileLocation> src, StorageService *service);
         /***********************/
         /** \endcond           */
         /***********************/
@@ -229,7 +227,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        SimulationTimestampFileReadFailure(WorkflowFile *file, std::shared_ptr<FileLocation> src, Service *service);
+        SimulationTimestampFileReadFailure(WorkflowFile *file, std::shared_ptr<FileLocation> src, StorageService *service);
         /***********************/
         /** \endcond           */
         /***********************/
@@ -243,7 +241,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        SimulationTimestampFileReadCompletion(WorkflowFile *file, std::shared_ptr<FileLocation> src, Service *service);
+        SimulationTimestampFileReadCompletion(WorkflowFile *file, std::shared_ptr<FileLocation> src, StorageService *service);
         /***********************/
         /** \endcond           */
         /***********************/
