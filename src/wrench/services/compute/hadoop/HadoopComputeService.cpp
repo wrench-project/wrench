@@ -7,8 +7,12 @@
  * (at your option) any later version.
  */
 
-#include "HadoopComputeService.h"
+#include "wrench/services/compute/hadoop/HadoopComputeService.h"
+#include "HadoopComputeServiceMessage.h"
 
+#include "wrench/simgrid_S4U_util/S4U_Simulation.h"
+
+#include "wrench/services/compute/ComputeService.h"
 
 #include "wrench/logging/TerminalOutput.h"
 #include "HadoopComputeServiceMessage.h"
@@ -26,7 +30,7 @@ namespace wrench {
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      */
-    HadoopComputeService::HadoopComputeService(
+    HadoopComputeService::HadoopComputeService (
             const std::string &hostname,
             const std::set<std::string> compute_resources,
             std::map<std::string, std::string> property_list,
@@ -67,10 +71,10 @@ namespace wrench {
         //  send a "run a MR job" message to the daemon's mailbox_name
         try {
             S4U_Mailbox::putMessage(this->mailbox_name,
-                                    new HadoopComputeServiceRunStandardJobRequestMessage(
+                                    new HadoopComputeServiceRunMRJobRequestMessage(
                                             answer_mailbox,
                                             this->getMessagePayloadValue(
-                                                    HaddopComputeServiceMessagePayload::RUN_MR_JOB_REQUEST_MESSAGE_PAYLOAD)));
+                                                    HadoopComputeServiceMessagePayload::RUN_MR_JOB_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw std::runtime_error("HadoopComputeService::runMRJob(): UNEXPECTED NETWORK ERROR");
         }
@@ -83,7 +87,7 @@ namespace wrench {
             throw std::runtime_error("HadoopComputeService::runMRJob(): UNEXPECTED NETWORK ERROR");
         }
 
-        if (auto msg = std::dynamic_pointer_cast<HadoopComputeServiceRunStandardJobAnswerMessage>(message)) {
+        if (auto msg = std::dynamic_pointer_cast<HadoopComputeServiceRunMRJobAnswerMessage>(message)) {
             // If no success, throw an exception
             if (not msg->success) {
                 throw std::runtime_error("HadoopComputeService::runMRJob(): UNEXPECTED JOB FAILURE");
@@ -114,7 +118,7 @@ namespace wrench {
         }
 
         WRENCH_INFO("HadoopComputeService on host %s terminating cleanly!", S4U_Simulation::getHostName().c_str());
-        return this->exit_code;
+        return 0;
     }
 
 
@@ -153,7 +157,20 @@ namespace wrench {
 
         } else if (auto msg = std::dynamic_pointer_cast<HadoopComputeServiceRunMRJobRequestMessage>(message)) {
 
-            WRENCH_INFO("I SHOULD DO SOME WORK!");
+            WRENCH_INFO("I SHOULD DO SOME WORK, BUT I AM JUST REPLYING 'SUCCESS' FOR NOW!");
+            try {
+                S4U_Mailbox::putMessage(msg->answer_mailbox,
+                                        new HadoopComputeServiceRunMRJobAnswerMessage(true, this->getMessagePayloadValue(
+                                                HadoopComputeServiceMessagePayload::RUN_MR_JOB_ANSWER_MESSAGE_PAYLOAD)));
+            } catch (std::shared_ptr<NetworkError> &cause) {
+                return true;
+            }
+            return true;
+
+        } else {
+
+            throw std::runtime_error(
+                    "HadoopComputeService::processNextMessage(): Received an unexpected [" + message->getName() + "] message!");
         }
     }
 

@@ -302,6 +302,14 @@ set(SOURCE_FILES
         src/wrench/workflow/job/PilotJob.cpp
         src/wrench/workflow/job/StandardJob.cpp
         src/wrench/workflow/job/WorkflowJob.cpp
+        src/wrench/services/compute/hadoop/HadoopComputeService.cpp
+        include/wrench/services/compute/hadoop/HadoopComputeService.h
+        src/wrench/services/compute/hadoop/HadoopComputeServiceProperty.cpp
+        include/wrench/services/compute/hadoop/HadoopComputeServiceProperty.h
+        src/wrench/services/compute/hadoop/HadoopComputeServiceMessage.cpp
+        src/wrench/services/compute/hadoop/HadoopComputeServiceMessage.h
+        src/wrench/services/compute/hadoop/HadoopComputeServiceMessagePayload.cpp
+        include/wrench/services/compute/hadoop/HadoopComputeServiceMessagePayload.h
         )
 
 # test files

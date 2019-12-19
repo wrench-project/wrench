@@ -9,7 +9,7 @@
 #
 
 path=/usr/local/wrench/dashboard/index.html
-git add
+
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
     xdg-open "$path"
 elif [[ "$OSTYPE" == "darwin"* ]]; then

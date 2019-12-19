@@ -7,11 +7,11 @@
  * (at your option) any later version.
  */
 
-#include "wrench/services/compute/hadoop/HadoopComputeServiceProperty.h"
-
+#include "wrench/services/compute/hadoop/HadoopComputeServiceMessagePayload.h"
 
 namespace wrench {
 
-    SET_PROPERTY_NAME(HadoopComputeServiceProperty, MAP_STARTUP_OVERHEAD);
+    SET_MESSAGEPAYLOAD_NAME(HadoopComputeServiceMessagePayload, RUN_MR_JOB_REQUEST_MESSAGE_PAYLOAD);
+    SET_MESSAGEPAYLOAD_NAME(HadoopComputeServiceMessagePayload, RUN_MR_JOB_ANSWER_MESSAGE_PAYLOAD);
 
 }

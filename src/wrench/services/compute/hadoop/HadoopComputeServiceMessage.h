@@ -13,7 +13,7 @@
 
 #include "wrench/services/compute/ComputeServiceMessage.h"
 
-namespace wrench{
+namespace wrench {
 
 /***********************/
 /** \cond INTERNAL     */
@@ -36,7 +36,7 @@ namespace wrench{
 
         /** @brief The mailbox to answer to */
         std::string answer_mailbox;
-    }
+    };
 
     /**
      * @brief A message sent by a HadoopComputeService after running a MR job
@@ -46,13 +46,13 @@ namespace wrench{
         HadoopComputeServiceRunMRJobAnswerMessage(bool success, double payload);
 
         bool success;
-    }
+    };
 
 /***********************/
 /** \endcond          **/
 /***********************/
 
-};
+}
 
 
 #endif //WRENCH_HADOOPCOMPUTESERVICEMESSAGE_H
