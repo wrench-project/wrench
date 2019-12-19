@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include "HadoopComputeServiceMessagePayload.h"
+#include "wrench/services/compute/hadoop/HadoopComputeServiceMessagePayload.h"
 
 namespace wrench {
 

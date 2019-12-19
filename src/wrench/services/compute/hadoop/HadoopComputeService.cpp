@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include "HadoopComputeService.h"
+#include "wrench/services/compute/hadoop/HadoopComputeService.h"
 #include "HadoopComputeServiceMessage.h"
 
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
@@ -157,9 +157,16 @@ namespace wrench {
 
         } else if (auto msg = std::dynamic_pointer_cast<HadoopComputeServiceRunMRJobRequestMessage>(message)) {
 
-            WRENCH_INFO("I SHOULD DO SOME WORK!");
+            WRENCH_INFO("I SHOULD DO SOME WORK, BUT I AM JUST REPLYING 'SUCCESS' FOR NOW!");
+            try {
+                S4U_Mailbox::putMessage(msg->answer_mailbox,
+                                        new HadoopComputeServiceRunMRJobAnswerMessage(true, this->getMessagePayloadValue(
+                                                HadoopComputeServiceMessagePayload::RUN_MR_JOB_ANSWER_MESSAGE_PAYLOAD)));
+            } catch (std::shared_ptr<NetworkError> &cause) {
+                return true;
+            }
             return true;
-            
+
         } else {
 
             throw std::runtime_error(

@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include "HadoopComputeServiceProperty.h"
+#include "wrench/services/compute/hadoop/HadoopComputeServiceProperty.h"
 
 
 namespace wrench {

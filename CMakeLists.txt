@@ -245,13 +245,13 @@ set(SOURCE_FILES
         src/wrench/util/UnitParser.cpp
         src/wrench/simulation/SimulationTimestampTypes.cpp
         src/wrench/services/compute/hadoop/HadoopComputeService.cpp
-        src/wrench/services/compute/hadoop/HadoopComputeService.h
+        include/wrench/services/compute/hadoop/HadoopComputeService.h
         src/wrench/services/compute/hadoop/HadoopComputeServiceProperty.cpp
-        src/wrench/services/compute/hadoop/HadoopComputeServiceProperty.h
+        include/wrench/services/compute/hadoop/HadoopComputeServiceProperty.h
         src/wrench/services/compute/hadoop/HadoopComputeServiceMessage.cpp
         src/wrench/services/compute/hadoop/HadoopComputeServiceMessage.h
         src/wrench/services/compute/hadoop/HadoopComputeServiceMessagePayload.cpp
-        src/wrench/services/compute/hadoop/HadoopComputeServiceMessagePayload.h
+        include/wrench/services/compute/hadoop/HadoopComputeServiceMessagePayload.h
         )
 
 # test files
