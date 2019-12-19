@@ -23,11 +23,20 @@ namespace wrench {
     public:
 
         /** 
-         * @brief The computational cost, in flops, of looking up, adding, and
-         * removing entries for a file
+         * @brief The computational cost, in flops, of looking entries for a file
          */
         DECLARE_PROPERTY_NAME(LOOKUP_COMPUTE_COST);
+
+        /**
+         * @brief The computational cost, in flops, of adding, an
+         * entry for a file
+         */
         DECLARE_PROPERTY_NAME(ADD_ENTRY_COMPUTE_COST);
+
+        /**
+         * @brief The computational cost, in flops, of
+         * removing an entry for a file
+         */
         DECLARE_PROPERTY_NAME(REMOVE_ENTRY_COMPUTE_COST);
         
     };
