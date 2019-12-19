@@ -11,8 +11,6 @@
 #define WRENCH_HADOOPCOMPUTESERVICEPROPERTY_H
 
 
-class HadoopComputeServiceProperty {
-
 #include "wrench/services/compute/ComputeServiceProperty.h"
 
 namespace wrench {
@@ -28,9 +26,9 @@ namespace wrench {
          */
         DECLARE_PROPERTY_NAME(MAP_STARTUP_OVERHEAD);
 
-    }
+    };
 
-};
+}
 
 
 #endif //WRENCH_HADOOPCOMPUTESERVICEPROPERTY_H

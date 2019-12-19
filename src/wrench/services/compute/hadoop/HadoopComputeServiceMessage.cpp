@@ -18,9 +18,9 @@ namespace wrench {
      * @param name: the message name
      * @param payload: the message size in bytes
      */
-    HadoopComputeServiceMessage::HadoopCompuetServiceMessage(std::string name, double payload) :
-    ComputeServiceMessage("HadoopComputeServiceMessage::" + name, payload) {
-}
+    HadoopComputeServiceMessage::HadoopComputeServiceMessage(std::string name, double payload) :
+            ComputeServiceMessage("HadoopComputeServiceMessage::" + name, payload) {
+    }
 
 /**
  * @brief Constructor
@@ -30,15 +30,15 @@ namespace wrench {
  *
  * @throw std::invalid_argument
  */
-HadoopComputeServiceRunMRJobRequestMessage::HadoopComputeServiceRunMRJobRequestMessage(std::string answer_mailbox,
-                                                                                       double payload)
-        : HadoopComputeServiceMessage("HadoopComputeServiceRunMRJobRequestMessage", payload) {
-    if (answer_mailbox.empty()) {
-        throw std::invalid_argument(
-                "HadoopComputeServiceRunMRJobRequestMessage::HadoopComputeServiceRunMRJobRequestMessage(): Empty answer mailbox");
+    HadoopComputeServiceRunMRJobRequestMessage::HadoopComputeServiceRunMRJobRequestMessage(std::string answer_mailbox,
+                                                                                           double payload)
+            : HadoopComputeServiceMessage("HadoopComputeServiceRunMRJobRequestMessage", payload) {
+        if (answer_mailbox.empty()) {
+            throw std::invalid_argument(
+                    "HadoopComputeServiceRunMRJobRequestMessage::HadoopComputeServiceRunMRJobRequestMessage(): Empty answer mailbox");
+        }
+        this->answer_mailbox = answer_mailbox;
     }
-    this->answer_mailbox = answer_mailbox;
-}
 
 
 /**
@@ -47,12 +47,12 @@ HadoopComputeServiceRunMRJobRequestMessage::HadoopComputeServiceRunMRJobRequestM
  *
  * @throw std::invalid_argument
  */
-HadoopComputeServiceRunMRJobAnswerMessage::HadoopComputeServiceRunMRJobAnswerMessage(bool success,
-                                                                                     double payload)
-        : HadoopComputeServiceMessage("HadoopComputeServiceRunMRJobAnswerMessage", payload) {
+    HadoopComputeServiceRunMRJobAnswerMessage::HadoopComputeServiceRunMRJobAnswerMessage(bool success,
+                                                                                         double payload)
+            : HadoopComputeServiceMessage("HadoopComputeServiceRunMRJobAnswerMessage", payload) {
 
-    this->success = success;
-}
+        this->success = success;
+    }
 
 
 };
