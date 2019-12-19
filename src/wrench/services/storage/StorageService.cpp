@@ -225,12 +225,20 @@ namespace wrench {
             throw std::invalid_argument("StorageService::readFile(): Invalid arguments");
         }
 
+
         auto storage_service = location->getStorageService();
+        StorageService *service = storage_service.get();
+
 
         assertServiceIsUp(storage_service);
 
         // Send a message to the daemon
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("read_file");
+
+        //adding timestamp for file read start.
+        location->getStorageService()->simulation->getOutput().addTimestamp<SimulationTimestampFileReadStart>(
+                new SimulationTimestampFileReadStart(file, location, service));
+
         try {
             S4U_Mailbox::putMessage(storage_service->mailbox_name,
                                     new StorageServiceFileReadRequestMessage(
@@ -304,6 +312,9 @@ namespace wrench {
             throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
                                      message->getName() + "] message!");
         }
+
+        location->getStorageService()->simulation->getOutput().addTimestamp<SimulationTimestampFileReadCompletion>(
+                new SimulationTimestampFileReadCompletion(file, location, service));
     }
 
     /**

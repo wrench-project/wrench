@@ -7,6 +7,16 @@ WRENCH_LOG_NEW_DEFAULT_CATEGORY(simulation_timestamps, "Log category for Simulat
 
 namespace wrench {
 
+    /**
+     *
+     * @param file - tuple of three strings relating to File, Source and Whoami
+     * @return XOR of hashes of file
+     */
+    size_t file_hash( const File & file )
+    {
+        return std::hash<void *>()(std::get<0>(file)) ^ std::hash<std::shared_ptr<FileLocation>>()(std::get<1>(file)) ^ std::hash<void *>()(std::get<2>(file));
+    }
+
     SimulationTimestampType::SimulationTimestampType() {
         this->date = S4U_Simulation::getClock();
     }
@@ -293,7 +303,7 @@ namespace wrench {
      */
     SimulationTimestampFileRead::SimulationTimestampFileRead(WorkflowFile *file,
                                                              std::shared_ptr<FileLocation> src_location,
-                                                             Service *service) :
+                                                             StorageService *service) :
             service(service), file(file), source(src_location){
     }
 
@@ -317,7 +327,7 @@ namespace wrench {
      * @brief retrieves the Service that ordered file read
      * @return point to the service associated with this read
      */
-    Service *SimulationTimestampFileRead::getService() {
+    StorageService *SimulationTimestampFileRead::getService() {
         return this->service;
     }
 
@@ -368,8 +378,9 @@ namespace wrench {
      */
     SimulationTimestampFileReadStart::SimulationTimestampFileReadStart(WorkflowFile *file,
                                                                        std::shared_ptr<FileLocation> src,
-                                                                       Service *service) :
+                                                                       StorageService *service) :
             SimulationTimestampFileRead(file, src, service) {
+        WRENCH_DEBUG("Inserting a FileReadStart timestamp for file read");
 
         // all information about a file read should be passed
         if ((this->file == nullptr)
@@ -395,9 +406,9 @@ namespace wrench {
      */
     SimulationTimestampFileReadFailure::SimulationTimestampFileReadFailure(WorkflowFile *file,
                                                                            std::shared_ptr<FileLocation> src,
-                                                                           Service *service) :
+                                                                           StorageService *service) :
             SimulationTimestampFileRead(file, src, service) {
-        WRENCH_DEBUG("Inserting a TaskFailure timestamp for file read");
+        WRENCH_DEBUG("Inserting a FileReadFailure timestamp for file read");
 
         if (file == nullptr
             || src == nullptr
@@ -419,9 +430,9 @@ namespace wrench {
      */
     SimulationTimestampFileReadCompletion::SimulationTimestampFileReadCompletion(WorkflowFile *file,
                                                                                  std::shared_ptr<FileLocation> src,
-                                                                                 Service *service) :
+                                                                                 StorageService *service) :
             SimulationTimestampFileRead(file, src, service)  {
-        WRENCH_DEBUG("Inserting a TaskFailure timestamp for file read");
+        WRENCH_DEBUG("Inserting a FileReadCompletion timestamp for file read");
 
         if (file == nullptr
             || src == nullptr
