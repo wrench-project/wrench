@@ -14,6 +14,21 @@
 #include "wrench/workflow/WorkflowTask.h"
 #include <unordered_map>
 
+using namespace std;
+
+typedef std::tuple<void *, void *, void *> File;
+
+namespace std {
+    template <>
+    class hash<File>{
+    public :
+        size_t operator()(const File &file ) const
+        {
+            return std::hash<void *>()(std::get<0>(file)) ^ std::hash<void *>()(std::get<1>(file)) ^ std::hash<void *>()(std::get<2>(file));
+        }
+    };
+};
+
 namespace wrench {
 
     class WorkflowTask;
@@ -23,14 +38,14 @@ namespace wrench {
     /**
      * @brief File, Source, Whoami used to be hashed as key for unordered multimap for ongoing file operations.
      */
-    typedef std::tuple<WorkflowFile *, FileLocation *, StorageService *> File;
+    ///typedef std::tuple<WorkflowFile *, FileLocation *, StorageService *> File;
 
     /**
      *
      * @param file - tuple of three strings relating to File, Source and Whoami
      * @return XOR of hashes of file
      */
-    size_t file_hash( const File & file );
+    ///size_t file_hash( const File & file );
 
     /**
      * @brief A top-level base class for simulation timestamps
@@ -194,7 +209,8 @@ namespace wrench {
         /**
          * @brief the data structure that holds the ongoing file reads.
          */
-        static std::unordered_multimap<File, std::pair<SimulationTimestampFileRead *, double>, decltype(&file_hash)> pending_file_reads;
+        ///static std::unordered_multimap<File, std::pair<SimulationTimestampFileRead *, double>, decltype(&file_hash)> pending_file_reads;
+        static std::unordered_multimap<File, std::pair<SimulationTimestampFileRead *, double>> pending_file_reads;
 
         void setEndpoints();
     };

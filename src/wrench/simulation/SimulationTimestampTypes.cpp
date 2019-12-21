@@ -12,10 +12,10 @@ namespace wrench {
      * @param file - tuple of three strings relating to File, Source and Whoami
      * @return XOR of hashes of file
      */
-    size_t file_hash( const File & file )
-    {
-        return std::hash<void *>()(std::get<0>(file)) ^ std::hash<void *>()(std::get<1>(file)) ^ std::hash<void *>()(std::get<2>(file));
-    }
+    ///size_t file_hash( const File & file )
+    ///{
+    ///    return std::hash<void *>()(std::get<0>(file)) ^ std::hash<void *>()(std::get<1>(file)) ^ std::hash<void *>()(std::get<2>(file));
+    ///}
 
     SimulationTimestampType::SimulationTimestampType() {
         this->date = S4U_Simulation::getClock();
@@ -344,7 +344,7 @@ namespace wrench {
     /**
      * @brief A static unordered multimap of SimulationTimestampFileReadStart objects that have yet to be matched with Failure, Terminated or Completion timestamps
      */
-    std::unordered_multimap<File, std::pair<SimulationTimestampFileRead *, double>, decltype(&file_hash)> SimulationTimestampFileRead::pending_file_reads;
+    std::unordered_multimap<File, std::pair<SimulationTimestampFileRead *, double>> SimulationTimestampFileRead::pending_file_reads;
 
     /**
      * @brief Sets the endpoint of the calling object (SimulationTimestampFileReadFailure, SimulationTimestampFileReadTerminated, SimulationTimestampFileReadStart) with a SimulationTimestampFileReadStart object
