@@ -234,10 +234,10 @@ namespace wrench {
 
         // Send a message to the daemon
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("read_file");
-
+        WRENCH_INFO("Storage service about to insert Timestamp for file read");
         //adding timestamp for file read start.
         location->getStorageService()->simulation->getOutput().addTimestamp<SimulationTimestampFileReadStart>(
-                new SimulationTimestampFileReadStart(file, location, service));
+                new SimulationTimestampFileReadStart(file, location.get(), service));
 
         try {
             S4U_Mailbox::putMessage(storage_service->mailbox_name,
@@ -314,7 +314,7 @@ namespace wrench {
         }
 
         location->getStorageService()->simulation->getOutput().addTimestamp<SimulationTimestampFileReadCompletion>(
-                new SimulationTimestampFileReadCompletion(file, location, service));
+                new SimulationTimestampFileReadCompletion(file, location.get(), service));
     }
 
     /**

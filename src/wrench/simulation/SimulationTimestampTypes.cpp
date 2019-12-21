@@ -14,7 +14,7 @@ namespace wrench {
      */
     size_t file_hash( const File & file )
     {
-        return std::hash<void *>()(std::get<0>(file)) ^ std::hash<std::shared_ptr<FileLocation>>()(std::get<1>(file)) ^ std::hash<void *>()(std::get<2>(file));
+        return std::hash<void *>()(std::get<0>(file)) ^ std::hash<void *>()(std::get<1>(file)) ^ std::hash<void *>()(std::get<2>(file));
     }
 
     SimulationTimestampType::SimulationTimestampType() {
@@ -302,7 +302,7 @@ namespace wrench {
      * @param service: service requesting file read
      */
     SimulationTimestampFileRead::SimulationTimestampFileRead(WorkflowFile *file,
-                                                             std::shared_ptr<FileLocation> src_location,
+                                                             FileLocation *src_location,
                                                              StorageService *service) :
             service(service), file(file), source(src_location){
     }
@@ -319,7 +319,7 @@ namespace wrench {
      * @brief retrieves the location from which the WorkflowFile is being copied
      * @return the read's source location
      */
-    std::shared_ptr<FileLocation> SimulationTimestampFileRead::getSource() {
+    FileLocation *SimulationTimestampFileRead::getSource() {
         return this->source;
     }
 
@@ -377,7 +377,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     SimulationTimestampFileReadStart::SimulationTimestampFileReadStart(WorkflowFile *file,
-                                                                       std::shared_ptr<FileLocation> src,
+                                                                       FileLocation *src,
                                                                        StorageService *service) :
             SimulationTimestampFileRead(file, src, service) {
         WRENCH_DEBUG("Inserting a FileReadStart timestamp for file read");
@@ -392,8 +392,11 @@ namespace wrench {
         }
 
 
+        WRENCH_INFO("Inserting file read into pending_file_reads");
 
+        //TODO problem is with this line specifically causing a segfault.
         pending_file_reads.insert(std::make_pair(File(this->file, this->source, this->service), std::make_pair(this, this->getDate())));
+        WRENCH_INFO("File insert completed.");
     }
 
 
@@ -405,7 +408,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     SimulationTimestampFileReadFailure::SimulationTimestampFileReadFailure(WorkflowFile *file,
-                                                                           std::shared_ptr<FileLocation> src,
+                                                                           FileLocation *src,
                                                                            StorageService *service) :
             SimulationTimestampFileRead(file, src, service) {
         WRENCH_DEBUG("Inserting a FileReadFailure timestamp for file read");
@@ -429,7 +432,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     SimulationTimestampFileReadCompletion::SimulationTimestampFileReadCompletion(WorkflowFile *file,
-                                                                                 std::shared_ptr<FileLocation> src,
+                                                                                 FileLocation *src,
                                                                                  StorageService *service) :
             SimulationTimestampFileRead(file, src, service)  {
         WRENCH_DEBUG("Inserting a FileReadCompletion timestamp for file read");
