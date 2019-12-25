@@ -1,0 +1,31 @@
+[
+    {
+        "compute": {
+            "end": 1000.0003924198195,
+            "start": 0.00019726981948412205
+        },
+        "execution_host": {
+            "cores": 4,
+            "flop_rate": 100.0,
+            "hostname": "Host1",
+            "memory": 1.125899906842624e+15
+        },
+        "failed": -1.0,
+        "num_cores_allocated": 1,
+        "read": {
+            "end": 0.00019726981948412205,
+            "start": 0.00019726981948412205
+        },
+        "task_id": "t",
+        "terminated": -1.0,
+        "vertical_position": 0,
+        "whole_task": {
+            "end": 1000.0003924198195,
+            "start": 0.00019726981948412205
+        },
+        "write": {
+            "end": 1000.0003924198195,
+            "start": 1000.0003924198195
+        }
+    }
+]
