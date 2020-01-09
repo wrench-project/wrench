@@ -17,7 +17,6 @@ class SimulationTimestampFileReadTest : public ::testing::Test {
 public:
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service = nullptr;
-    std::shared_ptr<wrench::StorageService> backup_storage_service = nullptr;
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
 
     wrench::WorkflowTask *task1 = nullptr;
@@ -80,6 +79,13 @@ protected:
         fclose(platform_file);
 
         workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+
+        file_1 = workflow->addFile("file_1", 100.0);
+        file_2 = workflow->addFile("file_2", 100.0);
+        file_3 = workflow->addFile("file_3", 100.0);
+
+        xl_file = workflow->addFile("xl_file", 1000000000.0);
+        too_large_file = workflow->addFile("too_large_file", 10000000000000000000.0);
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
@@ -102,8 +108,9 @@ public:
     SimulationTimestampFileReadBasicTestWMS(SimulationTimestampFileReadTest *test,
                                         const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                         const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                                        std::shared_ptr<wrench::FileRegistryService> file_registry_service,
                                         std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, file_registry_service, hostname, "test") {
         this->test = test;
     }
 
@@ -113,6 +120,28 @@ private:
     int main() {
 
         auto job_manager = this->createJobManager();
+
+        ///StorageService::readFile(file*, location)
+
+        wrench::StorageService::readFile(this->test->file_1, wrench::FileLocation::LOCATION(this->test->storage_service));
+
+        wrench::StorageService::readFile(this->test->file_2, wrench::FileLocation::LOCATION(this->test->storage_service));
+
+        wrench::StorageService::readFile(this->test->file_3, wrench::FileLocation::LOCATION(this->test->storage_service));
+
+        wrench::StorageService::readFile(this->test->xl_file, wrench::FileLocation::LOCATION(this->test->storage_service));
+
+        wrench::StorageService::readFile(this->test->too_large_file, wrench::FileLocation::LOCATION(this->test->storage_service));
+/*
+ *  This is where it should have tests for reading several files.
+ */
+
+
+
+
+
+
+
 
         this->test->task1 = this->getWorkflow()->addTask("task1", 10.0, 1, 1, 1.0, 0);
         wrench::StandardJob *job1 = job_manager->createStandardJob(this->test->task1, {});
