@@ -322,7 +322,6 @@ namespace wrench {
             try {
                 task->setReadInputStartDate(S4U_Simulation::getClock());
                 std::map<WorkflowFile *, std::shared_ptr<FileLocation>> files_to_read;
-                WRENCH_INFO("About to create files_to_read map");
                 for (auto const &f : task->getInputFiles()) {
                     if (work->file_locations.find(f) != work->file_locations.end()) {
                         files_to_read[f] = work->file_locations[f];
@@ -337,12 +336,9 @@ namespace wrench {
                         this->files_stored_in_scratch.insert(f);
                     }
                 }
-                WRENCH_INFO("About to loop through files_to_read to read them");
                 for (auto const &f : files_to_read) {
                     try{
-                        WRENCH_INFO("Trying to call readFile");
                         StorageService::readFile(f.first, f.second);
-                        WRENCH_INFO("Successfully called readFile");
                     } catch (WorkflowExecutionException &e) {
                         this->simulation->getOutput().addTimestamp<SimulationTimestampFileReadFailure>(
                                 new SimulationTimestampFileReadFailure(f.first, f.second.get(), f.second->getStorageService().get()));
