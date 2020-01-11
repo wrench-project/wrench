@@ -19,6 +19,7 @@ public:
     std::shared_ptr<wrench::StorageService> storage_service = nullptr;
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
 
+
     wrench::WorkflowTask *task1 = nullptr;
     wrench::WorkflowTask *task2 = nullptr;
 
@@ -119,66 +120,48 @@ private:
 
     int main() {
 
-        auto job_manager = this->createJobManager();
 
         ///StorageService::readFile(file*, location)
 
         wrench::StorageService::readFile(this->test->file_1, wrench::FileLocation::LOCATION(this->test->storage_service));
 
+        wrench::StorageService::readFile(this->test->xl_file, wrench::FileLocation::LOCATION(this->test->storage_service));
+
         wrench::StorageService::readFile(this->test->file_2, wrench::FileLocation::LOCATION(this->test->storage_service));
 
         wrench::StorageService::readFile(this->test->file_3, wrench::FileLocation::LOCATION(this->test->storage_service));
 
-        wrench::StorageService::readFile(this->test->xl_file, wrench::FileLocation::LOCATION(this->test->storage_service));
+        wrench::StorageService::readFile(this->test->file_3, wrench::FileLocation::LOCATION(this->test->storage_service));
 
-        wrench::StorageService::readFile(this->test->too_large_file, wrench::FileLocation::LOCATION(this->test->storage_service));
-/*
- *  This is where it should have tests for reading several files.
- */
-
-
-
-
-
-
-
-
-        this->test->task1 = this->getWorkflow()->addTask("task1", 10.0, 1, 1, 1.0, 0);
-        wrench::StandardJob *job1 = job_manager->createStandardJob(this->test->task1, {});
-        job_manager->submitJob(job1, this->test->compute_service);
-        this->waitForAndProcessNextEvent();
-
-        this->test->task2 = this->getWorkflow()->addTask("task2", 10.0, 1, 1, 1.0, 0);
-        wrench::StandardJob *job2 = job_manager->createStandardJob(this->test->task2, {});
-        job_manager->submitJob(job2, this->test->compute_service);
-        this->waitForAndProcessNextEvent();
-
-        this->test->failed_task = this->getWorkflow()->addTask("failed_task", 100000.0, 1, 1, 1.0, 0);
-        this->test->failed_task->addInputFile(this->test->large_input_file);
-        this->test->failed_task->addInputFile(this->test->small_input_file);
-
-        wrench::StandardJob *failed_job = job_manager->createStandardJob(
-                this->test->failed_task,
-                {{this->test->small_input_file, wrench::FileLocation::LOCATION(this->test->storage_service)},
-                 {this->test->large_input_file, wrench::FileLocation::LOCATION(this->test->storage_service)}});
-        job_manager->submitJob(failed_job, this->test->compute_service);
-
-        wrench::StorageService::deleteFile(this->getWorkflow()->getFileByID("small_input_file"),
-                                           wrench::FileLocation::LOCATION(this->test->storage_service),
-                                           this->test->file_registry_service);
-
-        std::shared_ptr<wrench::WorkflowExecutionEvent> workflow_execution_event;
         try {
-            workflow_execution_event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
-            throw std::runtime_error("Error getting the execution event: " + e.getCause()->toString());
+            wrench::StorageService::readFile(this->test->too_large_file, wrench::FileLocation::LOCATION(this->test->storage_service));
+            throw std::runtime_error("file read should have failed");
+        } catch(wrench::WorkflowExecutionException &e) {
         }
 
-        if (not std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(workflow_execution_event)) {
-            throw std::runtime_error("Job should have failed");
-        }
+
+        wrench::Simulation::sleep(100); ///to allow for xl_file to finish reading.
+        /*
+         *  This is where it should have tests for reading several files.
+         */
+        /*
+         * expected outcome:
+         * file_1 start
+         * file_1 end
+         * xl_file start
+         * file_2 start
+         * file_2 end
+         * file_3 start
+         * file_3 end
+         * file_3 start
+         * file_3_end
+         * too_large_file start
+         * too_large_file failure
+         * xl_file end
+         */
 
         return 0;
+
     }
 };
 
@@ -206,94 +189,149 @@ void SimulationTimestampFileReadTest::do_SimulationTimestampFileReadBasic_test()
                                                                                                                   wrench::ComputeService::ALL_RAM))},
                                                                                           {})));
 
-    ASSERT_NO_THROW(storage_service = simulation->add(new wrench::SimpleStorageService(wms_host, {"/"})));
+    ASSERT_NO_THROW(storage_service = simulation->add(new wrench::SimpleStorageService(wms_host, {"/"},
+            {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "infinity"}})));
+
+    std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
+    ASSERT_NO_THROW(file_registry_service = simulation->add(new wrench::FileRegistryService(execution_host)));
+
 
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(new SimulationTimestampFileReadBasicTestWMS(
-            this, {compute_service}, {storage_service}, wms_host
+            this, {compute_service}, {storage_service}, file_registry_service, wms_host
     )));
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-    file_registry_service = simulation->add(new wrench::FileRegistryService(wms_host));
 
-    small_input_file = this->workflow->addFile("small_input_file", 10);
-    large_input_file = this->workflow->addFile("large_input_file", 1000000);
+    //stage files
+    std::set<wrench::WorkflowFile *> files_to_stage = {file_1, file_2, file_3, xl_file, too_large_file};
 
-    ASSERT_NO_THROW(simulation->stageFile(large_input_file, storage_service));
-    ASSERT_NO_THROW(simulation->stageFile(small_input_file, storage_service));
+    for (auto const &f  : files_to_stage) {
+        ASSERT_NO_THROW(simulation->stageFile(f, storage_service));
+    }
 
     ASSERT_NO_THROW(simulation->launch());
 
-    /*
-     * expected timeline: task1_start...task1_end...task2_start...task2_end
-     * WorkflowTask member variables start_date and end_date should equal SimulationTimestamp<SimulationTimestampFileReadStart>::getContent()->getDate()
-     * and SimulationTimestamp<SimulationTimestampFileReadCompletion>::getContent()->getDate() respectively
-     */
-    auto timestamp_start_trace = simulation->getOutput().getTrace<wrench::SimulationTimestampFileReadStart>();
-    double task1_start_date = this->task1->getStartDate();
-    double task1_start_timestamp = timestamp_start_trace[0]->getContent()->getDate();
+    <--- done to here --->
 
-    ASSERT_DOUBLE_EQ(task1_start_date, task1_start_timestamp);
+    int expected_start_timestamps = 6;
+    int expected_failure_timestamps = 1;
+    int expected_completion_timestamps = 5;
 
-    auto timestamp_completion_trace = simulation->getOutput().getTrace<wrench::SimulationTimestampFileReadCompletion>();
-    double task1_completion_date = this->task1->getEndDate();
-    double task1_completion_timestamp = timestamp_completion_trace[0]->getContent()->getDate();
+    auto start_timestamps = simulation->getOutput().getTrace<wrench::SimulationTimestampFileReadStart>();
+    auto failure_timestamps = simulation->getOutput().getTrace<wrench::SimulationTimestampFileReadFailure>();
+    auto completion_timestamps = simulation->getOutput().getTrace<wrench::SimulationTimestampFileReadCompletion>();
 
-    ASSERT_DOUBLE_EQ(task1_completion_date, task1_completion_timestamp);
+    // check number of SimulationTimestampFileRead
+    ASSERT_EQ(expected_start_timestamps, start_timestamps.size());
+    ASSERT_EQ(expected_failure_timestamps, failure_timestamps.size());
+    ASSERT_EQ(expected_completion_timestamps, completion_timestamps.size());
 
-    double task2_start_timestamp = timestamp_start_trace[1]->getContent()->getDate();
-    double task2_completion_timestamp = timestamp_completion_trace[1]->getContent()->getDate();
+    wrench::SimulationTimestampFileRead *file_1_start = start_timestamps[0]->getContent();
+    wrench::SimulationTimestampFileRead *file_1_end = completion_timestamps[0]->getContent();
 
-    ASSERT_GT(task2_start_timestamp, task1_start_timestamp);
-    ASSERT_GT(task2_completion_timestamp, task1_completion_timestamp);
+    wrench::SimulationTimestampFileRead *xl_file_start = start_timestamps[1]->getContent();
+    wrench::SimulationTimestampFileRead *xl_file_end = completion_timestamps.back()->getContent();
 
-    // expected timeline: task2_end...failed_task_start...failed_task_failed
-    auto timestamp_failure_trace = simulation->getOutput().getTrace<wrench::SimulationTimestampFileReadFailure>();
-    double failed_task_start_timestamp = timestamp_start_trace[2]->getContent()->getDate();
-    double failed_task_end_date = this->failed_task->getEndDate();
-    double failed_task_failure_timestamp = timestamp_failure_trace[0]->getContent()->getDate();
+    wrench::SimulationTimestampFileRead *file_2_start = start_timestamps[2]->getContent();
+    wrench::SimulationTimestampFileRead *file_2_end = completion_timestamps[1]->getContent();
 
-    ASSERT_GT(failed_task_start_timestamp, task2_completion_timestamp);
-    ASSERT_GT(failed_task_failure_timestamp, failed_task_start_timestamp);
+    wrench::SimulationTimestampFileRead *file_3_1_start = start_timestamps[3]->getContent();
+    wrench::SimulationTimestampFileRead *file_3_1_end = completion_timestamps[2]->getContent();
 
-    /*
-     * the failed_task should not have its 'end_date' updated
-     */
-    ASSERT_DOUBLE_EQ(failed_task_end_date, -1.0);
+    wrench::SimulationTimestampFileRead *file_3_2_start = start_timestamps[4]->getContent();
+    wrench::SimulationTimestampFileRead *file_3_2_end = completion_timestamps[3]->getContent();
 
-    /*
-     * check that there is no completion timestamp for the failed task
-     */
-    for (auto &ts : timestamp_completion_trace) {
-        if (ts->getContent()->getTask()->getID() == "failed_task") {
-            throw std::runtime_error("timestamp_completion_trace should not have the 'failed_task'");
-        }
+    wrench::SimulationTimestampFileRead *too_large_file_start = start_timestamps[5]->getContent();
+    wrench::SimulationTimestampFileRead *too_large_file_end = failure_timestamps.front()->getContent();
+
+    // list of expected matching start and end timestamps
+    std::vector<std::pair<wrench::SimulationTimestampFileRead *, wrench::SimulationTimestampFileRead *>> file_read_timestamps = {
+            std::make_pair(file_1_start, file_1_end),
+            std::make_pair(xl_file_start, xl_file_end),
+            std::make_pair(file_2_start, file_2_end),
+            std::make_pair(file_3_1_start, file_3_1_end),
+            std::make_pair(file_3_2_start, file_3_2_end),
+            std::make_pair(too_large_file_start, too_large_file_end)
+    };
+
+    wrench::StorageService *service = storage_service.get();
+
+
+    for (auto &fc : file_read_timestamps) {
+
+        // endpoints should be set correctly
+        ASSERT_EQ(fc.first->getEndpoint(), fc.second);
+        ASSERT_EQ(fc.second->getEndpoint(), fc.first);
+
+        // completion/failure timestamp times should be greater than start timestamp times
+        ASSERT_GT(fc.second->getDate(), fc.first->getDate());
+
+        // source should be set
+        ASSERT_EQ(this->storage_service, fc.first->getSource()->getStorageService());
+        ASSERT_EQ("/", fc.first->getSource()->getAbsolutePathAtMountPoint());
+
+        ASSERT_EQ(this->storage_service, fc.second->getSource()->getStorageService());
+        ASSERT_EQ("/", fc.second->getSource()->getAbsolutePathAtMountPoint());
+
+        //service should be set
+        ASSERT_EQ(fc.first->getService(), fc.second->getService());
+
+        // file should be set
+        ASSERT_EQ(fc.first->getFile(), fc.second->getFile());
     }
 
-    // check that endpoints match up correctly
-    wrench::SimulationTimestampTask *task_1_start = timestamp_start_trace[0]->getContent();
-    wrench::SimulationTimestampTask *task_1_end = timestamp_completion_trace[0]->getContent();
-    ASSERT_EQ(task_1_start->getEndpoint(), task_1_end);
-    ASSERT_EQ(task_1_end->getEndpoint(), task_1_start);
-    ASSERT_EQ(task_1_start->getTask(), task_1_end->getTask());
 
-    wrench::SimulationTimestampTask *task_2_start = timestamp_start_trace[1]->getContent();
-    wrench::SimulationTimestampTask *task_2_end = timestamp_completion_trace[1]->getContent();
-    ASSERT_EQ(task_2_start->getEndpoint(), task_2_end);
-    ASSERT_EQ(task_2_end->getEndpoint(), task_2_start);
-    ASSERT_EQ(task_2_start->getTask(), task_2_end->getTask());
 
-    wrench::SimulationTimestampTask *failed_task_start = timestamp_start_trace[2]->getContent();
-    wrench::SimulationTimestampTask *failed_task_failed = timestamp_failure_trace[0]->getContent();
-    ASSERT_EQ(failed_task_start->getEndpoint(), failed_task_failed);
-    ASSERT_EQ(failed_task_failed->getEndpoint(), failed_task_start);
-    ASSERT_EQ(failed_task_start->getTask(), failed_task_failed->getTask());
+    // test constructors for invalid arguments
+    ASSERT_THROW(wrench::SimulationTimestampFileReadStart(
+                         nullptr,
+                                 wrench::FileLocation::LOCATION(this->storage_service).get(),
+                                 service), std::invalid_argument);
 
-    // test constructors
-    ASSERT_THROW(wrench::SimulationTimestampFileReadStart(nullptr), std::invalid_argument);
-    ASSERT_THROW(wrench::SimulationTimestampFileReadFailure(nullptr), std::invalid_argument);
-    ASSERT_THROW(wrench::SimulationTimestampFileReadCompletion(nullptr), std::invalid_argument);
+    ASSERT_THROW(wrench::SimulationTimestampFileReadStart(
+                         this->file_1,
+                                 nullptr,
+                                 service), std::invalid_argument);
+
+    ASSERT_THROW(wrench::SimulationTimestampFileReadStart(
+                         this->file_1,
+                                 wrench::FileLocation::LOCATION(this->storage_service).get(),
+                                 nullptr), std::invalid_argument);
+
+
+    ASSERT_THROW(wrench::SimulationTimestampFileReadFailure(
+                         nullptr,
+                                 wrench::FileLocation::LOCATION(this->storage_service).get(),
+                                 service), std::invalid_argument);
+
+    ASSERT_THROW(wrench::SimulationTimestampFileReadFailure(
+                         this->file_1,
+                                 nullptr,
+                                 service), std::invalid_argument);
+
+    ASSERT_THROW(wrench::SimulationTimestampFileReadFailure(
+                         this->file_1,
+                                 wrench::FileLocation::LOCATION(this->storage_service).get(),
+                                 nullptr), std::invalid_argument);
+
+
+    ASSERT_THROW(wrench::SimulationTimestampFileReadCompletion(
+                         nullptr,
+                                 wrench::FileLocation::LOCATION(this->storage_service).get(),
+                                 service), std::invalid_argument);
+
+    ASSERT_THROW(wrench::SimulationTimestampFileReadCompletion(
+                         this->file_1,
+                                 nullptr,
+                                 service), std::invalid_argument);
+
+    ASSERT_THROW(wrench::SimulationTimestampFileReadCompletion(
+                         this->file_1,
+                                 wrench::FileLocation::LOCATION(this->storage_service).get(),
+                                 nullptr), std::invalid_argument);
+
 
     delete simulation;
     free(argv[0]);
