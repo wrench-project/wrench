@@ -169,7 +169,7 @@ namespace wrench {
 
 
     /**
-     * @brief A base class for simulation timestamps regarding file copies
+     * @brief A base class for simulation timestamps regarding file reads
      */
     class SimulationTimestampFileRead : public SimulationTimestampPair {
     public:
@@ -258,6 +258,104 @@ namespace wrench {
         /** \cond INTERNAL     */
         /***********************/
         SimulationTimestampFileReadCompletion(WorkflowFile *file, FileLocation *src, StorageService *service);
+        /***********************/
+        /** \endcond           */
+        /***********************/
+    };
+
+    class SimulationTimestampFileWriteStart;
+
+
+    /**
+     * @brief A base class for simulation timestamps regarding file writes
+     */
+    class SimulationTimestampFileWrite : public SimulationTimestampPair {
+    public:
+
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        SimulationTimestampFileWrite(WorkflowFile *file, FileLocation *dst, StorageService *service);
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
+        /**
+         * @brief Retrieve the matching endpoint, if any
+         */
+        SimulationTimestampFileWrite *getEndpoint() override;
+        WorkflowFile *getFile();
+        FileLocation *getDestination();
+        StorageService *getService();
+
+    protected:
+        /**
+         * @brief The WorkflowFile that was being write
+         */
+        WorkflowFile *file;
+
+        /**
+         * @brief The location where the WorkflowFile was being write from
+         */
+        FileLocation *destination;
+
+        /**
+         * @brief Service that initiated the write
+         */
+        StorageService *service;
+
+        /**
+         * @brief the data structure that holds the ongoing file writes.
+         */
+        ///static std::unordered_multimap<File, std::pair<SimulationTimestampFileWrite *, double>, decltype(&file_hash)> pending_file_writes;
+        static std::unordered_multimap<File, std::pair<SimulationTimestampFileWrite *, double>> pending_file_writes;
+
+        void setEndpoints();
+    };
+
+    class SimulationTimestampFileWriteFailure;
+    class SimulationTimestampFileWriteCompletion;
+
+    /**
+     * @brief A simulation timestamp class for file write start times
+     */
+    class SimulationTimestampFileWriteStart : public SimulationTimestampFileWrite {
+    public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        SimulationTimestampFileWriteStart(WorkflowFile *file, FileLocation *dst, StorageService *service);
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
+        friend class SimulationTimestampFileWriteFailure;
+        friend class SimulationTimestampFileWriteCompletion;
+    };
+
+    /**
+     * @brief A simulation timestamp class for file write failure times
+     */
+    class SimulationTimestampFileWriteFailure : public SimulationTimestampFileWrite {
+    public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        SimulationTimestampFileWriteFailure(WorkflowFile *file, FileLocation *dst, StorageService *service);
+        /***********************/
+        /** \endcond           */
+        /***********************/
+    };
+
+    /**
+     * @brief A simulation timestamp class for file write completions
+     */
+    class SimulationTimestampFileWriteCompletion : public SimulationTimestampFileWrite {
+    public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        SimulationTimestampFileWriteCompletion(WorkflowFile *file, FileLocation *dst, StorageService *service);
         /***********************/
         /** \endcond           */
         /***********************/
