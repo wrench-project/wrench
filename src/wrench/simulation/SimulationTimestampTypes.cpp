@@ -450,6 +450,162 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     * @param file: the WorkflowFile associated with this file write
+     * @param dst_location: the destination location
+     * @param service: service requesting file write
+     */
+    SimulationTimestampFileWrite::SimulationTimestampFileWrite(WorkflowFile *file,
+                                                               FileLocation *dst_location,
+                                                               StorageService *service) :
+            service(service), file(file), destination(dst_location){
+    }
+
+    /**
+     * @brief retrieves the WorkflowFile being written
+     * @return a pointer to the WorkflowFile associated with this writes
+     */
+    WorkflowFile *SimulationTimestampFileWrite::getFile() {
+        return this->file;
+    }
+
+    /**
+     * @brief retrieves the location from which the WorkflowFile is being copied
+     * @return the write's destination location
+     */
+    FileLocation *SimulationTimestampFileWrite::getDestination() {
+        return this->destination;
+    }
+
+    /**
+     * @brief retrieves the Service that ordered file write
+     * @return point to the service associated with this write
+     */
+    StorageService *SimulationTimestampFileWrite::getService() {
+        return this->service;
+    }
+
+
+
+    /**
+     * @brief retrieves the corresponding SimulationTimestampFileWrite object
+     * @return a pointer to the start or end SimulationTimestampFileWrite object
+     */
+    SimulationTimestampFileWrite *SimulationTimestampFileWrite::getEndpoint() {
+        return dynamic_cast<SimulationTimestampFileWrite *>(this->endpoint);
+    }
+
+    /**
+     * @brief A static unordered multimap of SimulationTimestampFileWriteStart objects that have yet to be matched with Failure, Terminated or Completion timestamps
+     */
+    std::unordered_multimap<File, std::pair<SimulationTimestampFileWrite *, double>> SimulationTimestampFileWrite::pending_file_writes;
+
+    /**
+     * @brief Sets the endpoint of the calling object (SimulationTimestampFileWriteFailure, SimulationTimestampFileWriteTerminated, SimulationTimestampFileWriteStart) with a SimulationTimestampFileWriteStart object
+     */
+    void SimulationTimestampFileWrite::setEndpoints() {
+        // find the SimulationTimestampTaskStart object containing the same task
+        auto pending_writes_itr = pending_file_writes.find(File(this->file, this->destination, this->service));
+        if (pending_writes_itr != pending_file_writes.end()) {
+            // set my endpoint to the SimulationTimestampFileWriteStart
+            this->endpoint = (*pending_writes_itr).second.first;
+
+            // set the SimulationTimestampFileWriteStart's endpoint to me
+            (*pending_writes_itr).second.first->endpoint = this;
+
+            // the SimulationTimestampFileWriteStart is no longer waiting to be matched with an end timestamp, remove it from the map
+            pending_file_writes.erase(pending_writes_itr);
+        } else {
+            throw std::runtime_error(
+                    "SimulationTimestampFileWrite::setEndpoints() could not find a SimulationTimestampFileWriteStart object.");
+        }
+    }
+
+
+
+    /**
+     * @brief Constructor
+     * @param file: the WorkflowFile associated with this file write
+     * @param dst: the destination location
+     * @param service: service requesting file write
+     * @throw std::invalid_argument
+     */
+    SimulationTimestampFileWriteStart::SimulationTimestampFileWriteStart(WorkflowFile *file,
+                                                                         FileLocation *dst,
+                                                                         StorageService *service) :
+            SimulationTimestampFileWrite(file, dst, service) {
+        WRENCH_DEBUG("Inserting a FileWriteStart timestamp for file write");
+
+        // all information about a file write should be passed
+        if ((this->file == nullptr)
+            || (this->destination == nullptr)
+            || (this->service == nullptr)) {
+
+            throw std::invalid_argument(
+                    "SimulationTimestampFileWriteStart::SimulationTimestampFileWriteStart() cannot take nullptr arguments");
+        }
+
+
+        WRENCH_INFO("Inserting file write into pending_file_writes");
+
+        //TODO problem is with this line specifically causing a segfault.
+        pending_file_writes.insert(std::make_pair(File(this->file, this->destination, this->service), std::make_pair(this, this->getDate())));
+        WRENCH_INFO("File insert completed.");
+    }
+
+
+    /**
+     * @brief Constructor
+     * @param file: the WorkflowFile associated with this file write
+     * @param dst: the destination location
+     * @param service: service requesting file write
+     * @throw std::invalid_argument
+     */
+    SimulationTimestampFileWriteFailure::SimulationTimestampFileWriteFailure(WorkflowFile *file,
+                                                                             FileLocation *dst,
+                                                                             StorageService *service) :
+            SimulationTimestampFileWrite(file, dst, service) {
+        WRENCH_DEBUG("Inserting a FileWriteFailure timestamp for file write");
+
+        if (file == nullptr
+            || dst == nullptr
+            || service == nullptr) {
+            throw std::invalid_argument(
+                    "SimulationTimestampFileWriteFailure::SimulationTimestampFileWriteFailure() requires a valid pointer to file, destination and service objects");
+        }
+
+        // match this timestamp with a SimulationTimestampFileWriteStart
+        setEndpoints();
+    }
+
+    /**
+     * @brief Constructor
+     * @param file: the WorkflowFile associated with this file write
+     * @param dst: the destination location
+     * @param service: service requesting file write
+     * @throw std::invalid_argument
+     */
+    SimulationTimestampFileWriteCompletion::SimulationTimestampFileWriteCompletion(WorkflowFile *file,
+                                                                                   FileLocation *dst,
+                                                                                   StorageService *service) :
+            SimulationTimestampFileWrite(file, dst, service)  {
+        WRENCH_DEBUG("Inserting a FileWriteCompletion timestamp for file write");
+
+        if (file == nullptr
+            || dst == nullptr
+            || service == nullptr) {
+            throw std::invalid_argument(
+                    "SimulationTimestampFileWriteFailure::SimulationTimestampFileWriteFailure() requires a valid pointer to file, destination and service objects");
+        }
+
+        // match this timestamp with a SimulationTimestampFileWriteStart
+        setEndpoints();
+    }
+
+
+
+
+    /**
+     * @brief Constructor
      * @param hostname: the host on which a pstate is being set
      * @param pstate: the pstate that is being set on this host
      */
