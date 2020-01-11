@@ -18,7 +18,7 @@ public:
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service = nullptr;
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
-    
+
 
     wrench::WorkflowFile *file_1;
     wrench::WorkflowFile *file_2;
