@@ -18,14 +18,7 @@ public:
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service = nullptr;
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
-
-
-    wrench::WorkflowTask *task1 = nullptr;
-    wrench::WorkflowTask *task2 = nullptr;
-
-    wrench::WorkflowTask *failed_task = nullptr;
-    wrench::WorkflowFile *small_input_file = nullptr;
-    wrench::WorkflowFile *large_input_file = nullptr;
+    
 
     wrench::WorkflowFile *file_1;
     wrench::WorkflowFile *file_2;
