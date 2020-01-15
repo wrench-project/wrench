@@ -392,11 +392,7 @@ namespace wrench {
         }
 
 
-        WRENCH_INFO("Inserting file read into pending_file_reads");
-
-        //TODO problem is with this line specifically causing a segfault.
         pending_file_reads.insert(std::make_pair(File(this->file, this->source, this->service), std::make_pair(this, this->getDate())));
-        WRENCH_INFO("File insert completed.");
     }
 
 
@@ -545,11 +541,8 @@ namespace wrench {
         }
 
 
-        WRENCH_INFO("Inserting file write into pending_file_writes");
-
-        //TODO problem is with this line specifically causing a segfault.
         pending_file_writes.insert(std::make_pair(File(this->file, this->destination, this->service), std::make_pair(this, this->getDate())));
-        WRENCH_INFO("File insert completed.");
+
     }
 
 
