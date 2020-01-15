@@ -234,7 +234,7 @@ namespace wrench {
 
         // Send a message to the daemon
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("read_file");
-        WRENCH_INFO("Storage service about to insert Timestamp for file read");
+
         //adding timestamp for file read start.
         location->getStorageService()->simulation->getOutput().addTimestamp<SimulationTimestampFileReadStart>(
                 new SimulationTimestampFileReadStart(file, location.get(), service));
@@ -332,11 +332,17 @@ namespace wrench {
         }
 
         auto storage_service = location->getStorageService();
+        StorageService *service = storage_service.get();
 
         assertServiceIsUp(storage_service);
 
         // Send a  message to the daemon
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("write_file");
+
+        //adding timestamp for file write start.
+        location->getStorageService()->simulation->getOutput().addTimestamp<SimulationTimestampFileWriteStart>(
+                new SimulationTimestampFileWriteStart(file, location.get(), service));
+
         try {
             S4U_Mailbox::putMessage(storage_service->mailbox_name,
                                     new StorageServiceFileWriteRequestMessage(
@@ -400,6 +406,9 @@ namespace wrench {
             throw std::runtime_error("StorageService::writeFile(): Received an unexpected [" +
                                      message->getName() + "] message!");
         }
+
+        location->getStorageService()->simulation->getOutput().addTimestamp<SimulationTimestampFileWriteCompletion>(
+                new SimulationTimestampFileWriteCompletion(file, location.get(), service));
     }
 
     /**

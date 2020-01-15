@@ -382,7 +382,16 @@ namespace wrench {
                         this->files_stored_in_scratch.insert(f);
                     }
                 }
-                StorageService::writeFiles(files_to_write);
+
+                for (auto const &f : files_to_write) {
+                    try{
+                        StorageService::writeFile(f.first, f.second);
+                    } catch (WorkflowExecutionException &e) {
+                        this->simulation->getOutput().addTimestamp<SimulationTimestampFileWriteFailure>(
+                                new SimulationTimestampFileWriteFailure(f.first, f.second.get(), f.second->getStorageService().get()));
+                        throw;
+                    }
+                }
                 task->setWriteOutputEndDate(S4U_Simulation::getClock());
             } catch (WorkflowExecutionException &e) {
                 this->failure_timestamp_should_be_generated = true;
