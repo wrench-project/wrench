@@ -338,6 +338,15 @@ namespace wrench {
 
         auto tasks = workflow->getTasks();
 
+
+        ///TODO need to actually parse all timestamps, but for now just testing.
+        auto start_timestamps = this->getTrace<SimulationTimestampFileReadStart>();
+        auto completion_timestamps = this->getTrace<wrench::SimulationTimestampFileReadCompletion>();
+
+        wrench::SimulationTimestampFileRead *file_1_start = start_timestamps[0]->getContent();
+        wrench::SimulationTimestampFileRead *file_1_end = completion_timestamps[0]->getContent();
+
+
         std::vector<WorkflowTaskExecutionInstance> data;
 
         // For each attempted execution of a task, add a WorkflowTaskExecutionInstance to the list.
@@ -378,6 +387,8 @@ namespace wrench {
                 execution_history.pop();
             }
         }
+
+
 
         // Set the "vertical position" of each WorkflowExecutionInstance so we know where to plot each rectangle
         if (generate_host_utilization_layout) {
