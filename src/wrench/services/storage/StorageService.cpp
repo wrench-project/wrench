@@ -239,78 +239,85 @@ namespace wrench {
         location->getStorageService()->simulation->getOutput().addTimestamp<SimulationTimestampFileReadStart>(
                 new SimulationTimestampFileReadStart(file, location.get(), service));
 
-        try {
-            S4U_Mailbox::putMessage(storage_service->mailbox_name,
-                                    new StorageServiceFileReadRequestMessage(
-                                            answer_mailbox,
-                                            answer_mailbox,
-                                            file,
-                                            location,
-                                            storage_service->buffer_size,
-                                            storage_service->getMessagePayloadValue(
-                                                    StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
-        }
 
-        // Wait for a reply
-        std::shared_ptr<SimulationMessage> message = nullptr;
-
-        try {
-            message = S4U_Mailbox::getMessage(answer_mailbox, storage_service->network_timeout);
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
-        }
-
-        if (auto msg = std::dynamic_pointer_cast<StorageServiceFileReadAnswerMessage>(message)) {
-            // If it's not a success, throw an exception
-            if (not msg->success) {
-                std::shared_ptr<FailureCause> &cause = msg->failure_cause;
+        try{
+            try {
+                S4U_Mailbox::putMessage(storage_service->mailbox_name,
+                                        new StorageServiceFileReadRequestMessage(
+                                                answer_mailbox,
+                                                answer_mailbox,
+                                                file,
+                                                location,
+                                                storage_service->buffer_size,
+                                                storage_service->getMessagePayloadValue(
+                                                        StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
+            } catch (std::shared_ptr<NetworkError> &cause) {
                 throw WorkflowExecutionException(cause);
             }
 
-            if (storage_service->buffer_size == 0) {
+            // Wait for a reply
+            std::shared_ptr<SimulationMessage> message = nullptr;
 
-                throw std::runtime_error("StorageService::readFile(): Zero buffer size not implemented yet");
+            try {
+                message = S4U_Mailbox::getMessage(answer_mailbox, storage_service->network_timeout);
+            } catch (std::shared_ptr<NetworkError> &cause) {
+                throw WorkflowExecutionException(cause);
+            }
 
-            } else {
+            if (auto msg = std::dynamic_pointer_cast<StorageServiceFileReadAnswerMessage>(message)) {
+                // If it's not a success, throw an exception
+                if (not msg->success) {
+                    std::shared_ptr<FailureCause> &cause = msg->failure_cause;
+                    throw WorkflowExecutionException(cause);
+                }
 
-                // Otherwise, retrieve the file chunks until the last one is received
-                while (true) {
-                    std::shared_ptr<SimulationMessage> file_content_message = nullptr;
+                if (storage_service->buffer_size == 0) {
+
+                    throw std::runtime_error("StorageService::readFile(): Zero buffer size not implemented yet");
+
+                } else {
+
+                    // Otherwise, retrieve the file chunks until the last one is received
+                    while (true) {
+                        std::shared_ptr<SimulationMessage> file_content_message = nullptr;
+                        try {
+                            file_content_message = S4U_Mailbox::getMessage(answer_mailbox);
+                        } catch (std::shared_ptr<NetworkError> &cause) {
+                            throw WorkflowExecutionException(cause);
+                        }
+
+                        if (auto file_content_chunk_msg = std::dynamic_pointer_cast<StorageServiceFileContentChunkMessage>(
+                                file_content_message)) {
+                            if (file_content_chunk_msg->last_chunk) {
+                                break;
+                            }
+                        } else {
+                            throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
+                                                     file_content_message->getName() + "] message!");
+                        }
+                    }
+
+                    //Waiting for the final ack
                     try {
-                        file_content_message = S4U_Mailbox::getMessage(answer_mailbox);
+                        message = S4U_Mailbox::getMessage(answer_mailbox, storage_service->network_timeout);
                     } catch (std::shared_ptr<NetworkError> &cause) {
                         throw WorkflowExecutionException(cause);
                     }
-
-                    if (auto file_content_chunk_msg = std::dynamic_pointer_cast<StorageServiceFileContentChunkMessage>(
-                            file_content_message)) {
-                        if (file_content_chunk_msg->last_chunk) {
-                            break;
-                        }
-                    } else {
+                    if (not std::dynamic_pointer_cast<StorageServiceAckMessage>(message)) {
                         throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
-                                                 file_content_message->getName() + "] message!");
+                                                 message->getName() + "] message!");
                     }
+
                 }
 
-                //Waiting for the final ack
-                try {
-                    message = S4U_Mailbox::getMessage(answer_mailbox, storage_service->network_timeout);
-                } catch (std::shared_ptr<NetworkError> &cause) {
-                    throw WorkflowExecutionException(cause);
-                }
-                if (not std::dynamic_pointer_cast<StorageServiceAckMessage>(message)) {
-                    throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
-                                             message->getName() + "] message!");
-                }
-
+            } else {
+                throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
+                                         message->getName() + "] message!");
             }
-
-        } else {
-            throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
-                                     message->getName() + "] message!");
+        } catch (WorkflowExecutionException &e){
+            location->getStorageService()->simulation->getOutput().addTimestamp<SimulationTimestampFileReadFailure>(
+                    new SimulationTimestampFileReadFailure(file, location.get(), service));
+            throw;
         }
 
         location->getStorageService()->simulation->getOutput().addTimestamp<SimulationTimestampFileReadCompletion>(
@@ -344,67 +351,74 @@ namespace wrench {
                 new SimulationTimestampFileWriteStart(file, location.get(), service));
 
         try {
-            S4U_Mailbox::putMessage(storage_service->mailbox_name,
-                                    new StorageServiceFileWriteRequestMessage(
-                                            answer_mailbox,
-                                            file,
-                                            location,
-                                            storage_service->buffer_size,
-                                            storage_service->getMessagePayloadValue(
-                                                    StorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
-        }
-
-        // Wait for a reply
-        std::shared_ptr<SimulationMessage> message;
-
-        try {
-            message = S4U_Mailbox::getMessage(answer_mailbox, storage_service->network_timeout);
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
-        }
-
-        if (auto msg = std::dynamic_pointer_cast<StorageServiceFileWriteAnswerMessage>(message)) {
-            // If not a success, throw an exception
-            if (not msg->success) {
-                throw WorkflowExecutionException(msg->failure_cause);
+            try {
+                S4U_Mailbox::putMessage(storage_service->mailbox_name,
+                                        new StorageServiceFileWriteRequestMessage(
+                                                answer_mailbox,
+                                                file,
+                                                location,
+                                                storage_service->buffer_size,
+                                                storage_service->getMessagePayloadValue(
+                                                        StorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD)));
+            } catch (std::shared_ptr<NetworkError> &cause) {
+                throw WorkflowExecutionException(cause);
             }
 
-            if (storage_service->buffer_size == 0) {
-                throw std::runtime_error("StorageService::writeFile(): Zero buffer size not implemented yet");
-            } else {
-                try {
-                    double remaining = file->getSize();
-                    while (remaining > storage_service->buffer_size) {
+            // Wait for a reply
+            std::shared_ptr<SimulationMessage> message;
+
+            try {
+                message = S4U_Mailbox::getMessage(answer_mailbox, storage_service->network_timeout);
+            } catch (std::shared_ptr<NetworkError> &cause) {
+                throw WorkflowExecutionException(cause);
+            }
+
+            if (auto msg = std::dynamic_pointer_cast<StorageServiceFileWriteAnswerMessage>(message)) {
+                // If not a success, throw an exception
+                if (not msg->success) {
+                    throw WorkflowExecutionException(msg->failure_cause);
+                }
+
+                if (storage_service->buffer_size == 0) {
+                    throw std::runtime_error("StorageService::writeFile(): Zero buffer size not implemented yet");
+                } else {
+                    try {
+                        double remaining = file->getSize();
+                        while (remaining > storage_service->buffer_size) {
+                            S4U_Mailbox::putMessage(msg->data_write_mailbox_name,
+                                                    new StorageServiceFileContentChunkMessage(
+                                                            file, storage_service->buffer_size, false));
+                            remaining -= storage_service->buffer_size;
+                        }
                         S4U_Mailbox::putMessage(msg->data_write_mailbox_name, new StorageServiceFileContentChunkMessage(
-                                file, storage_service->buffer_size, false));
-                        remaining -= storage_service->buffer_size;
+                                file, remaining, true));
+
+                    } catch (std::shared_ptr<NetworkError> &cause) {
+                        throw WorkflowExecutionException(cause);
                     }
-                    S4U_Mailbox::putMessage(msg->data_write_mailbox_name, new StorageServiceFileContentChunkMessage(
-                            file, remaining, true));
 
-                } catch (std::shared_ptr<NetworkError> &cause) {
-                    throw WorkflowExecutionException(cause);
+                    //Waiting for the final ack
+
+                    try {
+                        message = S4U_Mailbox::getMessage(answer_mailbox, storage_service->network_timeout);
+                    } catch (std::shared_ptr<NetworkError> &cause) {
+                        throw WorkflowExecutionException(cause);
+                    }
+                    if (not std::dynamic_pointer_cast<StorageServiceAckMessage>(message)) {
+                        throw std::runtime_error("StorageService::writeFile(): Received an unexpected [" +
+                                                 message->getName() + "] message!");
+                    }
                 }
 
-                //Waiting for the final ack
 
-                try {
-                    message = S4U_Mailbox::getMessage(answer_mailbox, storage_service->network_timeout);
-                } catch (std::shared_ptr<NetworkError> &cause) {
-                    throw WorkflowExecutionException(cause);
-                }
-                if (not std::dynamic_pointer_cast<StorageServiceAckMessage>(message)) {
-                    throw std::runtime_error("StorageService::writeFile(): Received an unexpected [" +
-                                             message->getName() + "] message!");
-                }
+            } else {
+                throw std::runtime_error("StorageService::writeFile(): Received an unexpected [" +
+                                         message->getName() + "] message!");
             }
-
-
-        } else {
-            throw std::runtime_error("StorageService::writeFile(): Received an unexpected [" +
-                                     message->getName() + "] message!");
+        } catch (WorkflowExecutionException &e){
+            location->getStorageService()->simulation->getOutput().addTimestamp<SimulationTimestampFileWriteFailure>(
+                    new SimulationTimestampFileWriteFailure(file, location.get(), service));
+            throw;
         }
 
         location->getStorageService()->simulation->getOutput().addTimestamp<SimulationTimestampFileWriteCompletion>(

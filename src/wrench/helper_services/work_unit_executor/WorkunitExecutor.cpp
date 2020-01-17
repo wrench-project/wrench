@@ -340,8 +340,6 @@ namespace wrench {
                     try{
                         StorageService::readFile(f.first, f.second);
                     } catch (WorkflowExecutionException &e) {
-                        this->simulation->getOutput().addTimestamp<SimulationTimestampFileReadFailure>(
-                                new SimulationTimestampFileReadFailure(f.first, f.second.get(), f.second->getStorageService().get()));
                         throw;
                     }
                 }
@@ -387,8 +385,6 @@ namespace wrench {
                     try{
                         StorageService::writeFile(f.first, f.second);
                     } catch (WorkflowExecutionException &e) {
-                        this->simulation->getOutput().addTimestamp<SimulationTimestampFileWriteFailure>(
-                                new SimulationTimestampFileWriteFailure(f.first, f.second.get(), f.second->getStorageService().get()));
                         throw;
                     }
                 }
