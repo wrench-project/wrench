@@ -324,7 +324,7 @@ namespace wrench {
     }
 
     /**
-     * @brief retrieves the Service that ordered file read
+     * @brief retrieves the storage service for file read
      * @return point to the service associated with this read
      */
     StorageService *SimulationTimestampFileRead::getService() {
