@@ -328,7 +328,7 @@ namespace wrench {
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      */
     BareMetalComputeService::BareMetalComputeService(const std::string &hostname,
-                                                     const std::set<std::string> compute_hosts,
+                                                     const std::vector<std::string> compute_hosts,
                                                      std::string scratch_space_mount_point,
                                                      std::map<std::string, std::string> property_list,
                                                      std::map<std::string, double> messagepayload_list
@@ -338,14 +338,14 @@ namespace wrench {
                            "bare_metal",
                            scratch_space_mount_point) {
 
-        std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
+        std::map<std::string, std::tuple<unsigned long, double>> specified_compute_resources;
         for (auto h : compute_hosts) {
-            compute_resources.insert(
+            specified_compute_resources.insert(
                     std::make_pair(h, std::make_tuple(ComputeService::ALL_CORES, ComputeService::ALL_RAM)));
         }
 
         initiateInstance(hostname,
-                         compute_resources,
+                         specified_compute_resources,
                          std::move(property_list), std::move(messagepayload_list), DBL_MAX, nullptr);
     }
 
