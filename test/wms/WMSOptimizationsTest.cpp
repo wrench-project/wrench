@@ -187,7 +187,7 @@ void WMSOptimizationsTest::do_staticOptimization_test() {
           new wrench::SimpleStorageService(hostname, {"/"})));
 
   // Create a MHMC Service
-  std::set<std::string> execution_hosts = {wrench::Simulation::getHostnameList()[1]};
+  std::vector<std::string> execution_hosts = {wrench::Simulation::getHostnameList()[1]};
   ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::BareMetalComputeService(
                   hostname, execution_hosts, "/scratch",
@@ -324,7 +324,7 @@ void WMSOptimizationsTest::do_dynamicOptimization_test() {
           new wrench::SimpleStorageService(hostname, {"/"})));
 
   // Create a MHMC Service
-  std::set<std::string> execution_hosts = {wrench::Simulation::getHostnameList()[1]};
+  std::vector<std::string> execution_hosts = {wrench::Simulation::getHostnameList()[1]};
   ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::BareMetalComputeService(
                   hostname, execution_hosts, "/scratch",
