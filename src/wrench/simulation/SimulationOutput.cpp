@@ -340,11 +340,11 @@ namespace wrench {
 
 
         ///TODO need to actually parse all timestamps, but for now just testing.
-        auto start_timestamps = this->getTrace<SimulationTimestampFileReadStart>();
-        auto completion_timestamps = this->getTrace<wrench::SimulationTimestampFileReadCompletion>();
+        //auto start_timestamps = this->getTrace<SimulationTimestampFileReadStart>();
+        //auto completion_timestamps = this->getTrace<wrench::SimulationTimestampFileReadCompletion>();
 
-        wrench::SimulationTimestampFileRead *file_1_start = start_timestamps[0]->getContent();
-        wrench::SimulationTimestampFileRead *file_1_end = completion_timestamps[0]->getContent();
+        //wrench::SimulationTimestampFileRead *file_1_start = start_timestamps[0]->getContent();
+       // wrench::SimulationTimestampFileRead *file_1_end = completion_timestamps[0]->getContent();
 
 
         std::vector<WorkflowTaskExecutionInstance> data;

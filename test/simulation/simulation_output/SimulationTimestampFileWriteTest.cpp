@@ -24,7 +24,6 @@ public:
     wrench::WorkflowFile *file_2;
     wrench::WorkflowFile *file_3;
     wrench::WorkflowFile *xl_file;
-    wrench::WorkflowFile *too_large_file;
 
 
     void do_SimulationTimestampFileWriteBasic_test();
@@ -36,36 +35,28 @@ protected:
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
-                          "       <host id=\"WMSHost\" speed=\"1f\" core=\"1\" > "
-                          "          <disk id=\"large_disk\" write_bw=\"100MBps\" write_bw=\"40MBps\">"
-                          "             <prop id=\"size\" value=\"100000000000000B\"/>"
+                          "       <host id=\"Host1\" speed=\"1f\" core=\"1\" > "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "             <prop id=\"size\" value=\"10000000000000B\"/>"
                           "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
-                          "          <disk id=\"large_disk_backup\" write_bw=\"100MBps\" write_bw=\"40MBps\">"
-                          "             <prop id=\"size\" value=\"100000000000000B\"/>"
-                          "             <prop id=\"mount\" value=\"/backup\"/>"
-                          "          </disk>"
-                          "          <disk id=\"large_disk\" write_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                           "             <prop id=\"size\" value=\"100B\"/>"
                           "             <prop id=\"mount\" value=\"/scratch\"/>"
                           "          </disk>"
                           "       </host>"
-                          "       <host id=\"ExecutionHost\" speed=\"1f\" core=\"1\" > "
-                          "          <disk id=\"large_disk\" write_bw=\"100MBps\" write_bw=\"40MBps\">"
-                          "             <prop id=\"size\" value=\"100000000000000B\"/>"
+                          "       <host id=\"Host2\" speed=\"1f\" core=\"1\" > "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "             <prop id=\"size\" value=\"10000000000B\"/>"
                           "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
-                          "          <disk id=\"large_disk_backup\" write_bw=\"100MBps\" write_bw=\"40MBps\">"
-                          "             <prop id=\"size\" value=\"100000000000000B\"/>"
-                          "             <prop id=\"mount\" value=\"/backup\"/>"
-                          "          </disk>"
-                          "          <disk id=\"large_disk\" write_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                           "             <prop id=\"size\" value=\"100B\"/>"
                           "             <prop id=\"mount\" value=\"/scratch\"/>"
                           "          </disk>"
                           "       </host>"
-                          "       <link id=\"1\" bandwidth=\"1Gbps\" latency=\"1us\"/>"
-                          "       <route src=\"ExecutionHost\" dst=\"WMSHost\"> <link_ctn id=\"1\"/> </route>"
+                          "       <link id=\"1\" bandwidth=\"1Gbps\" latency=\"10000us\"/>"
+                          "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"1\"/> </route>"
                           "   </zone> "
                           "</platform>";
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
@@ -79,7 +70,7 @@ protected:
         file_3 = workflow->addFile("file_3", 100.0);
 
         xl_file = workflow->addFile("xl_file", 1000000000.0);
-        too_large_file = workflow->addFile("too_large_file", 10000000000000000000.0);
+
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
@@ -126,17 +117,10 @@ private:
 
         wrench::StorageService::writeFile(this->test->file_3, wrench::FileLocation::LOCATION(this->test->storage_service));
 
-        try {
-            wrench::StorageService::writeFile(this->test->too_large_file, wrench::FileLocation::LOCATION(this->test->storage_service));
-            throw std::runtime_error("file write should have failed");
-        } catch(wrench::WorkflowExecutionException &e) {
-        }
 
 
-        wrench::Simulation::sleep(100); ///to allow for xl_file to finish writeing.
-        /*
-         *  This is where it should have tests for writeing several files.
-         */
+        wrench::Simulation::sleep(100); ///to allow for xl_file to finish writing.
+
         /*
          * expected outcome:
          * file_1 start
@@ -148,8 +132,6 @@ private:
          * file_3 end
          * file_3 start
          * file_3_end
-         * too_large_file start
-         * too_large_file failure
          * xl_file end
          */
 
@@ -172,33 +154,33 @@ void SimulationTimestampFileWriteTest::do_SimulationTimestampFileWriteBasic_test
 
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
-    std::string wms_host = wrench::Simulation::getHostnameList()[1];
-    std::string execution_host = wrench::Simulation::getHostnameList()[0];
+    std::string host1 = "Host1";
+    std::string host2 = "Host2";
 
-    ASSERT_NO_THROW(compute_service = simulation->add(new wrench::BareMetalComputeService(wms_host,
+    ASSERT_NO_THROW(compute_service = simulation->add(new wrench::BareMetalComputeService(host1,
                                                                                           {std::make_pair(
-                                                                                                  execution_host,
+                                                                                                  host1,
                                                                                                   std::make_tuple(wrench::ComputeService::ALL_CORES,
                                                                                                                   wrench::ComputeService::ALL_RAM))},
                                                                                           {})));
 
-    ASSERT_NO_THROW(storage_service = simulation->add(new wrench::SimpleStorageService(wms_host, {"/"},
+    ASSERT_NO_THROW(storage_service = simulation->add(new wrench::SimpleStorageService(host1, {"/"},
                                                                                        {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "infinity"}})));
 
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
-    ASSERT_NO_THROW(file_registry_service = simulation->add(new wrench::FileRegistryService(execution_host)));
+    ASSERT_NO_THROW(file_registry_service = simulation->add(new wrench::FileRegistryService(host1)));
 
 
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(new SimulationTimestampFileWriteBasicTestWMS(
-            this, {compute_service}, {storage_service}, file_registry_service, wms_host
+            this, {compute_service}, {storage_service}, file_registry_service, host1
     )));
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
 
     //stage files
-    std::set<wrench::WorkflowFile *> files_to_stage = {file_1, file_2, file_3, xl_file, too_large_file};
+    std::set<wrench::WorkflowFile *> files_to_stage = {file_1, file_2, file_3, xl_file};
 
     for (auto const &f  : files_to_stage) {
         ASSERT_NO_THROW(simulation->stageFile(f, storage_service));
@@ -207,8 +189,8 @@ void SimulationTimestampFileWriteTest::do_SimulationTimestampFileWriteBasic_test
     ASSERT_NO_THROW(simulation->launch());
 
 
-    int expected_start_timestamps = 6;
-    int expected_failure_timestamps = 1;
+    int expected_start_timestamps = 5;
+    int expected_failure_timestamps = 0;
     int expected_completion_timestamps = 5;
 
     auto start_timestamps = simulation->getOutput().getTrace<wrench::SimulationTimestampFileWriteStart>();
@@ -224,19 +206,17 @@ void SimulationTimestampFileWriteTest::do_SimulationTimestampFileWriteBasic_test
     wrench::SimulationTimestampFileWrite *file_1_end = completion_timestamps[0]->getContent();
 
     wrench::SimulationTimestampFileWrite *xl_file_start = start_timestamps[1]->getContent();
-    wrench::SimulationTimestampFileWrite *xl_file_end = completion_timestamps.back()->getContent();
+    wrench::SimulationTimestampFileWrite *xl_file_end = completion_timestamps[1]->getContent();
 
     wrench::SimulationTimestampFileWrite *file_2_start = start_timestamps[2]->getContent();
-    wrench::SimulationTimestampFileWrite *file_2_end = completion_timestamps[1]->getContent();
+    wrench::SimulationTimestampFileWrite *file_2_end = completion_timestamps[2]->getContent();
 
     wrench::SimulationTimestampFileWrite *file_3_1_start = start_timestamps[3]->getContent();
-    wrench::SimulationTimestampFileWrite *file_3_1_end = completion_timestamps[2]->getContent();
+    wrench::SimulationTimestampFileWrite *file_3_1_end = completion_timestamps[3]->getContent();
 
     wrench::SimulationTimestampFileWrite *file_3_2_start = start_timestamps[4]->getContent();
-    wrench::SimulationTimestampFileWrite *file_3_2_end = completion_timestamps[3]->getContent();
+    wrench::SimulationTimestampFileWrite *file_3_2_end = completion_timestamps[4]->getContent();
 
-    wrench::SimulationTimestampFileWrite *too_large_file_start = start_timestamps[5]->getContent();
-    wrench::SimulationTimestampFileWrite *too_large_file_end = failure_timestamps.front()->getContent();
 
     // list of expected matching start and end timestamps
     std::vector<std::pair<wrench::SimulationTimestampFileWrite *, wrench::SimulationTimestampFileWrite *>> file_write_timestamps = {
@@ -245,7 +225,6 @@ void SimulationTimestampFileWriteTest::do_SimulationTimestampFileWriteBasic_test
             std::make_pair(file_2_start, file_2_end),
             std::make_pair(file_3_1_start, file_3_1_end),
             std::make_pair(file_3_2_start, file_3_2_end),
-            std::make_pair(too_large_file_start, too_large_file_end)
     };
 
     wrench::StorageService *service = storage_service.get();
