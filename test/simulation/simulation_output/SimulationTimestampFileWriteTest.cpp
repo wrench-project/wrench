@@ -25,6 +25,8 @@ public:
     wrench::WorkflowFile *file_3;
     wrench::WorkflowFile *xl_file;
 
+    wrench::WorkflowTask *task = nullptr;
+
 
     void do_SimulationTimestampFileWriteBasic_test();
 
@@ -105,21 +107,21 @@ private:
     int main() {
 
 
+        auto job_manager = this->createJobManager();
 
+        this->test->task = this->getWorkflow()->addTask("task1", 10.0, 1, 1, 1.0, 0);
+        this->test->task->addOutputFile(this->test->file_1);
+        this->test->task->addOutputFile(this->test->file_2);
+        this->test->task->addOutputFile(this->test->file_3);
+        this->test->task->addOutputFile(this->test->xl_file);
+        wrench::StandardJob *job1 = job_manager->createStandardJob(this->test->task,
+                                                                   {{this->test->file_1, wrench::FileLocation::LOCATION(this->test->storage_service)},
+                                                                    {this->test->file_2, wrench::FileLocation::LOCATION(this->test->storage_service)},
+                                                                    {this->test->file_3, wrench::FileLocation::LOCATION(this->test->storage_service)},
+                                                                    {this->test->xl_file, wrench::FileLocation::LOCATION(this->test->storage_service)}});
+        job_manager->submitJob(job1, this->test->compute_service);
 
-        wrench::StorageService::writeFile(this->test->file_1, wrench::FileLocation::LOCATION(this->test->storage_service));
-
-        wrench::StorageService::writeFile(this->test->xl_file, wrench::FileLocation::LOCATION(this->test->storage_service));
-
-        wrench::StorageService::writeFile(this->test->file_2, wrench::FileLocation::LOCATION(this->test->storage_service));
-
-        wrench::StorageService::writeFile(this->test->file_3, wrench::FileLocation::LOCATION(this->test->storage_service));
-
-        wrench::StorageService::writeFile(this->test->file_3, wrench::FileLocation::LOCATION(this->test->storage_service));
-
-
-
-        wrench::Simulation::sleep(100); ///to allow for xl_file to finish writing.
+        this->waitForAndProcessNextEvent();
 
         /*
          * expected outcome:
@@ -155,7 +157,7 @@ void SimulationTimestampFileWriteTest::do_SimulationTimestampFileWriteBasic_test
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     std::string host1 = "Host1";
-    std::string host2 = "Host2";
+
 
     ASSERT_NO_THROW(compute_service = simulation->add(new wrench::BareMetalComputeService(host1,
                                                                                           {std::make_pair(
@@ -189,9 +191,9 @@ void SimulationTimestampFileWriteTest::do_SimulationTimestampFileWriteBasic_test
     ASSERT_NO_THROW(simulation->launch());
 
 
-    int expected_start_timestamps = 5;
+    int expected_start_timestamps = 4;
     int expected_failure_timestamps = 0;
-    int expected_completion_timestamps = 5;
+    int expected_completion_timestamps = 4;
 
     auto start_timestamps = simulation->getOutput().getTrace<wrench::SimulationTimestampFileWriteStart>();
     auto failure_timestamps = simulation->getOutput().getTrace<wrench::SimulationTimestampFileWriteFailure>();
@@ -205,26 +207,22 @@ void SimulationTimestampFileWriteTest::do_SimulationTimestampFileWriteBasic_test
     wrench::SimulationTimestampFileWrite *file_1_start = start_timestamps[0]->getContent();
     wrench::SimulationTimestampFileWrite *file_1_end = completion_timestamps[0]->getContent();
 
-    wrench::SimulationTimestampFileWrite *xl_file_start = start_timestamps[1]->getContent();
-    wrench::SimulationTimestampFileWrite *xl_file_end = completion_timestamps[1]->getContent();
+    wrench::SimulationTimestampFileWrite *file_2_start = start_timestamps[1]->getContent();
+    wrench::SimulationTimestampFileWrite *file_2_end = completion_timestamps[1]->getContent();
 
-    wrench::SimulationTimestampFileWrite *file_2_start = start_timestamps[2]->getContent();
-    wrench::SimulationTimestampFileWrite *file_2_end = completion_timestamps[2]->getContent();
+    wrench::SimulationTimestampFileWrite *file_3_1_start = start_timestamps[2]->getContent();
+    wrench::SimulationTimestampFileWrite *file_3_1_end = completion_timestamps[2]->getContent();
 
-    wrench::SimulationTimestampFileWrite *file_3_1_start = start_timestamps[3]->getContent();
-    wrench::SimulationTimestampFileWrite *file_3_1_end = completion_timestamps[3]->getContent();
-
-    wrench::SimulationTimestampFileWrite *file_3_2_start = start_timestamps[4]->getContent();
-    wrench::SimulationTimestampFileWrite *file_3_2_end = completion_timestamps[4]->getContent();
+    wrench::SimulationTimestampFileWrite *xl_file_start = start_timestamps[3]->getContent();
+    wrench::SimulationTimestampFileWrite *xl_file_end = completion_timestamps[3]->getContent();
 
 
     // list of expected matching start and end timestamps
     std::vector<std::pair<wrench::SimulationTimestampFileWrite *, wrench::SimulationTimestampFileWrite *>> file_write_timestamps = {
             std::make_pair(file_1_start, file_1_end),
-            std::make_pair(xl_file_start, xl_file_end),
             std::make_pair(file_2_start, file_2_end),
             std::make_pair(file_3_1_start, file_3_1_end),
-            std::make_pair(file_3_2_start, file_3_2_end),
+            std::make_pair(xl_file_start, xl_file_end),
     };
 
     wrench::StorageService *service = storage_service.get();
@@ -251,59 +249,85 @@ void SimulationTimestampFileWriteTest::do_SimulationTimestampFileWriteBasic_test
 
         // file should be set
         ASSERT_EQ(fc.first->getFile(), fc.second->getFile());
-    }
 
+        //task should be set
+        ASSERT_EQ(fc.first->getTask(), fc.second->getTask());
+    }
 
 
     // test constructors for invalid arguments
     ASSERT_THROW(wrench::SimulationTimestampFileWriteStart(
                          nullptr,
                                  wrench::FileLocation::LOCATION(this->storage_service).get(),
-                                 service), std::invalid_argument);
+                                 service,
+                                 task), std::invalid_argument);
 
     ASSERT_THROW(wrench::SimulationTimestampFileWriteStart(
                          this->file_1,
                                  nullptr,
-                                 service), std::invalid_argument);
+                                 service,
+                                 task), std::invalid_argument);
 
     ASSERT_THROW(wrench::SimulationTimestampFileWriteStart(
                          this->file_1,
                                  wrench::FileLocation::LOCATION(this->storage_service).get(),
-                                 nullptr), std::invalid_argument);
+                                 nullptr,
+                                 task), std::invalid_argument);
 
+    ASSERT_THROW(wrench::SimulationTimestampFileWriteStart(
+                         this->file_1,
+                                 wrench::FileLocation::LOCATION(this->storage_service).get(),
+                                 service,
+                                 nullptr), std::invalid_argument);
 
     ASSERT_THROW(wrench::SimulationTimestampFileWriteFailure(
                          nullptr,
                                  wrench::FileLocation::LOCATION(this->storage_service).get(),
-                                 service), std::invalid_argument);
+                                 service,
+                                 task), std::invalid_argument);
 
     ASSERT_THROW(wrench::SimulationTimestampFileWriteFailure(
                          this->file_1,
                                  nullptr,
-                                 service), std::invalid_argument);
+                                 service,
+                                 task), std::invalid_argument);
 
     ASSERT_THROW(wrench::SimulationTimestampFileWriteFailure(
                          this->file_1,
                                  wrench::FileLocation::LOCATION(this->storage_service).get(),
+                                 nullptr,
+                                 task), std::invalid_argument);
+
+    ASSERT_THROW(wrench::SimulationTimestampFileWriteFailure(
+                         this->file_1,
+                                 wrench::FileLocation::LOCATION(this->storage_service).get(),
+                                 service,
                                  nullptr), std::invalid_argument);
 
 
     ASSERT_THROW(wrench::SimulationTimestampFileWriteCompletion(
                          nullptr,
                                  wrench::FileLocation::LOCATION(this->storage_service).get(),
-                                 service), std::invalid_argument);
+                                 service,
+                                 task), std::invalid_argument);
 
     ASSERT_THROW(wrench::SimulationTimestampFileWriteCompletion(
                          this->file_1,
                                  nullptr,
-                                 service), std::invalid_argument);
+                                 service,
+                                 task), std::invalid_argument);
 
     ASSERT_THROW(wrench::SimulationTimestampFileWriteCompletion(
                          this->file_1,
                                  wrench::FileLocation::LOCATION(this->storage_service).get(),
+                                 nullptr,
+                                 task), std::invalid_argument);
+
+    ASSERT_THROW(wrench::SimulationTimestampFileWriteCompletion(
+                         this->file_1,
+                                 wrench::FileLocation::LOCATION(this->storage_service).get(),
+                                 service,
                                  nullptr), std::invalid_argument);
-
-
     delete simulation;
     free(argv[0]);
     free(argv);

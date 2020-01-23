@@ -303,8 +303,9 @@ namespace wrench {
      */
     SimulationTimestampFileRead::SimulationTimestampFileRead(WorkflowFile *file,
                                                              FileLocation *src_location,
-                                                             StorageService *service) :
-            service(service), file(file), source(src_location){
+                                                             StorageService *service,
+                                                             WorkflowTask *task) :
+            service(service), file(file), source(src_location), task(task){
     }
 
     /**
@@ -331,7 +332,13 @@ namespace wrench {
         return this->service;
     }
 
-
+    /**
+     * @brief retrieves task associated w/ file read
+     * @return a pointer to the WorkflowTask associated with this timestamp
+     */
+    WorkflowTask *SimulationTimestampFileRead::getTask() {
+        return this->task;
+    }
 
     /**
      * @brief retrieves the corresponding SimulationTimestampFileRead object
@@ -344,7 +351,7 @@ namespace wrench {
     /**
      * @brief A static unordered multimap of SimulationTimestampFileReadStart objects that have yet to be matched with Failure, Terminated or Completion timestamps
      */
-    std::unordered_multimap<File, std::pair<SimulationTimestampFileRead *, double>> SimulationTimestampFileRead::pending_file_reads;
+    std::unordered_multimap<File, std::pair<SimulationTimestampFileRead *, WorkflowTask *>> SimulationTimestampFileRead::pending_file_reads;
 
     /**
      * @brief Sets the endpoint of the calling object (SimulationTimestampFileReadFailure, SimulationTimestampFileReadTerminated, SimulationTimestampFileReadStart) with a SimulationTimestampFileReadStart object
@@ -378,21 +385,23 @@ namespace wrench {
      */
     SimulationTimestampFileReadStart::SimulationTimestampFileReadStart(WorkflowFile *file,
                                                                        FileLocation *src,
-                                                                       StorageService *service) :
-            SimulationTimestampFileRead(file, src, service) {
+                                                                       StorageService *service,
+                                                                       WorkflowTask *task) :
+            SimulationTimestampFileRead(file, src, service, task) {
         WRENCH_DEBUG("Inserting a FileReadStart timestamp for file read");
 
         // all information about a file read should be passed
         if ((this->file == nullptr)
             || (this->source == nullptr)
-            || (this->service == nullptr)) {
+            || (this->service == nullptr)
+            || (this->task == nullptr)) {
 
             throw std::invalid_argument(
                     "SimulationTimestampFileReadStart::SimulationTimestampFileReadStart() cannot take nullptr arguments");
         }
 
 
-        pending_file_reads.insert(std::make_pair(File(this->file, this->source, this->service), std::make_pair(this, this->getDate())));
+        pending_file_reads.insert(std::make_pair(File(this->file, this->source, this->service), std::make_pair(this, this->task)));
     }
 
 
@@ -405,13 +414,15 @@ namespace wrench {
      */
     SimulationTimestampFileReadFailure::SimulationTimestampFileReadFailure(WorkflowFile *file,
                                                                            FileLocation *src,
-                                                                           StorageService *service) :
-            SimulationTimestampFileRead(file, src, service) {
+                                                                           StorageService *service,
+                                                                           WorkflowTask *task) :
+            SimulationTimestampFileRead(file, src, service, task) {
         WRENCH_DEBUG("Inserting a FileReadFailure timestamp for file read");
 
         if (file == nullptr
             || src == nullptr
-            || service == nullptr) {
+            || (service == nullptr)
+            || (task == nullptr)) {
             throw std::invalid_argument(
                     "SimulationTimestampFileReadFailure::SimulationTimestampFileReadFailure() requires a valid pointer to file, source and service objects");
         }
@@ -429,13 +440,15 @@ namespace wrench {
      */
     SimulationTimestampFileReadCompletion::SimulationTimestampFileReadCompletion(WorkflowFile *file,
                                                                                  FileLocation *src,
-                                                                                 StorageService *service) :
-            SimulationTimestampFileRead(file, src, service)  {
+                                                                                 StorageService *service,
+                                                                                 WorkflowTask *task) :
+            SimulationTimestampFileRead(file, src, service, task)  {
         WRENCH_DEBUG("Inserting a FileReadCompletion timestamp for file read");
 
         if (file == nullptr
             || src == nullptr
-            || service == nullptr) {
+            || service == nullptr
+            || task == nullptr) {
             throw std::invalid_argument(
                     "SimulationTimestampFileReadFailure::SimulationTimestampFileReadFailure() requires a valid pointer to file, source and service objects");
         }
@@ -452,8 +465,9 @@ namespace wrench {
      */
     SimulationTimestampFileWrite::SimulationTimestampFileWrite(WorkflowFile *file,
                                                                FileLocation *dst_location,
-                                                               StorageService *service) :
-            service(service), file(file), destination(dst_location){
+                                                               StorageService *service,
+                                                               WorkflowTask *task) :
+            service(service), file(file), destination(dst_location), task(task){
     }
 
     /**
@@ -480,7 +494,13 @@ namespace wrench {
         return this->service;
     }
 
-
+    /**
+     * @brief retrieves task associated w/ file write
+     * @return a pointer to the WorkflowTask associated with this timestamp
+     */
+    WorkflowTask *SimulationTimestampFileWrite::getTask() {
+        return this->task;
+    }
 
     /**
      * @brief retrieves the corresponding SimulationTimestampFileWrite object
@@ -493,7 +513,7 @@ namespace wrench {
     /**
      * @brief A static unordered multimap of SimulationTimestampFileWriteStart objects that have yet to be matched with Failure, Terminated or Completion timestamps
      */
-    std::unordered_multimap<File, std::pair<SimulationTimestampFileWrite *, double>> SimulationTimestampFileWrite::pending_file_writes;
+    std::unordered_multimap<File, std::pair<SimulationTimestampFileWrite *, WorkflowTask *>> SimulationTimestampFileWrite::pending_file_writes;
 
     /**
      * @brief Sets the endpoint of the calling object (SimulationTimestampFileWriteFailure, SimulationTimestampFileWriteTerminated, SimulationTimestampFileWriteStart) with a SimulationTimestampFileWriteStart object
@@ -527,21 +547,23 @@ namespace wrench {
      */
     SimulationTimestampFileWriteStart::SimulationTimestampFileWriteStart(WorkflowFile *file,
                                                                          FileLocation *dst,
-                                                                         StorageService *service) :
-            SimulationTimestampFileWrite(file, dst, service) {
+                                                                         StorageService *service,
+                                                                         WorkflowTask *task) :
+            SimulationTimestampFileWrite(file, dst, service, task) {
         WRENCH_DEBUG("Inserting a FileWriteStart timestamp for file write");
 
         // all information about a file write should be passed
         if ((this->file == nullptr)
             || (this->destination == nullptr)
-            || (this->service == nullptr)) {
+            || (this->service == nullptr)
+            || (this->task == nullptr)) {
 
             throw std::invalid_argument(
                     "SimulationTimestampFileWriteStart::SimulationTimestampFileWriteStart() cannot take nullptr arguments");
         }
 
 
-        pending_file_writes.insert(std::make_pair(File(this->file, this->destination, this->service), std::make_pair(this, this->getDate())));
+        pending_file_writes.insert(std::make_pair(File(this->file, this->destination, this->service), std::make_pair(this, this->task)));
 
     }
 
@@ -555,13 +577,15 @@ namespace wrench {
      */
     SimulationTimestampFileWriteFailure::SimulationTimestampFileWriteFailure(WorkflowFile *file,
                                                                              FileLocation *dst,
-                                                                             StorageService *service) :
-            SimulationTimestampFileWrite(file, dst, service) {
+                                                                             StorageService *service,
+                                                                             WorkflowTask *task) :
+            SimulationTimestampFileWrite(file, dst, service, task) {
         WRENCH_DEBUG("Inserting a FileWriteFailure timestamp for file write");
 
         if (file == nullptr
             || dst == nullptr
-            || service == nullptr) {
+            || service == nullptr
+            || task == nullptr) {
             throw std::invalid_argument(
                     "SimulationTimestampFileWriteFailure::SimulationTimestampFileWriteFailure() requires a valid pointer to file, destination and service objects");
         }
@@ -579,13 +603,15 @@ namespace wrench {
      */
     SimulationTimestampFileWriteCompletion::SimulationTimestampFileWriteCompletion(WorkflowFile *file,
                                                                                    FileLocation *dst,
-                                                                                   StorageService *service) :
-            SimulationTimestampFileWrite(file, dst, service)  {
+                                                                                   StorageService *service,
+                                                                                   WorkflowTask *task) :
+            SimulationTimestampFileWrite(file, dst, service, task)  {
         WRENCH_DEBUG("Inserting a FileWriteCompletion timestamp for file write");
 
         if (file == nullptr
             || dst == nullptr
-            || service == nullptr) {
+            || service == nullptr
+            || task == nullptr) {
             throw std::invalid_argument(
                     "SimulationTimestampFileWriteFailure::SimulationTimestampFileWriteFailure() requires a valid pointer to file, destination and service objects");
         }
