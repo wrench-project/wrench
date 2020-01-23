@@ -338,10 +338,16 @@ namespace wrench {
                 }
                 for (auto const &f : files_to_read) {
                     try{
+                        this->simulation->getOutput().addTimestamp<SimulationTimestampFileReadStart>(
+                                new SimulationTimestampFileReadStart(f.first, f.second.get(), f.second->getStorageService().get(), task));
                         StorageService::readFile(f.first, f.second);
                     } catch (WorkflowExecutionException &e) {
+                        this->simulation->getOutput().addTimestamp<SimulationTimestampFileReadFailure>(
+                                new SimulationTimestampFileReadFailure(f.first, f.second.get(), f.second->getStorageService().get(), task));
                         throw;
                     }
+                        this->simulation->getOutput().addTimestamp<SimulationTimestampFileReadCompletion>(
+                            new SimulationTimestampFileReadCompletion(f.first, f.second.get(), f.second->getStorageService().get(), task));
                 }
                 task->setReadInputEndDate(S4U_Simulation::getClock());
             } catch (WorkflowExecutionException &e) {
@@ -383,10 +389,16 @@ namespace wrench {
 
                 for (auto const &f : files_to_write) {
                     try{
+                        this->simulation->getOutput().addTimestamp<SimulationTimestampFileWriteStart>(
+                                new SimulationTimestampFileWriteStart(f.first, f.second.get(), f.second->getStorageService().get(), task));
                         StorageService::writeFile(f.first, f.second);
                     } catch (WorkflowExecutionException &e) {
+                        this->simulation->getOutput().addTimestamp<SimulationTimestampFileWriteFailure>(
+                                new SimulationTimestampFileWriteFailure(f.first, f.second.get(), f.second->getStorageService().get(), task));
                         throw;
                     }
+                    this->simulation->getOutput().addTimestamp<SimulationTimestampFileWriteCompletion>(
+                            new SimulationTimestampFileWriteCompletion(f.first, f.second.get(), f.second->getStorageService().get(), task));
                 }
                 task->setWriteOutputEndDate(S4U_Simulation::getClock());
             } catch (WorkflowExecutionException &e) {

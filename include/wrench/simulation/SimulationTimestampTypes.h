@@ -177,7 +177,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        SimulationTimestampFileRead(WorkflowFile *file, FileLocation *src, StorageService *service);
+        SimulationTimestampFileRead(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task);
         /***********************/
         /** \endcond           */
         /***********************/
@@ -189,6 +189,7 @@ namespace wrench {
         WorkflowFile *getFile();
         FileLocation *getSource();
         StorageService *getService();
+        WorkflowTask *getTask();
 
     protected:
         /**
@@ -207,10 +208,15 @@ namespace wrench {
         StorageService *service;
 
         /**
+         * @brief Task tied to read
+         */
+         WorkflowTask *task;
+
+        /**
          * @brief the data structure that holds the ongoing file reads.
          */
         ///static std::unordered_multimap<File, std::pair<SimulationTimestampFileRead *, double>, decltype(&file_hash)> pending_file_reads;
-        static std::unordered_multimap<File, std::pair<SimulationTimestampFileRead *, double>> pending_file_reads;
+        static std::unordered_multimap<File, std::pair<SimulationTimestampFileRead *, WorkflowTask *>> pending_file_reads;
 
         void setEndpoints();
     };
@@ -226,7 +232,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        SimulationTimestampFileReadStart(WorkflowFile *file, FileLocation *src, StorageService *service);
+        SimulationTimestampFileReadStart(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task);
         /***********************/
         /** \endcond           */
         /***********************/
@@ -243,7 +249,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        SimulationTimestampFileReadFailure(WorkflowFile *file, FileLocation *src, StorageService *service);
+        SimulationTimestampFileReadFailure(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task);
         /***********************/
         /** \endcond           */
         /***********************/
@@ -257,7 +263,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        SimulationTimestampFileReadCompletion(WorkflowFile *file, FileLocation *src, StorageService *service);
+        SimulationTimestampFileReadCompletion(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task);
         /***********************/
         /** \endcond           */
         /***********************/
@@ -275,7 +281,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        SimulationTimestampFileWrite(WorkflowFile *file, FileLocation *dst, StorageService *service);
+        SimulationTimestampFileWrite(WorkflowFile *file, FileLocation *dst, StorageService *service, WorkflowTask *task);
         /***********************/
         /** \endcond           */
         /***********************/
@@ -287,6 +293,7 @@ namespace wrench {
         WorkflowFile *getFile();
         FileLocation *getDestination();
         StorageService *getService();
+        WorkflowTask *getTask();
 
     protected:
         /**
@@ -305,10 +312,15 @@ namespace wrench {
         StorageService *service;
 
         /**
+         * @brief Task associated with write
+         */
+         WorkflowTask *task;
+
+        /**
          * @brief the data structure that holds the ongoing file writes.
          */
         ///static std::unordered_multimap<File, std::pair<SimulationTimestampFileWrite *, double>, decltype(&file_hash)> pending_file_writes;
-        static std::unordered_multimap<File, std::pair<SimulationTimestampFileWrite *, double>> pending_file_writes;
+        static std::unordered_multimap<File, std::pair<SimulationTimestampFileWrite *, WorkflowTask *>> pending_file_writes;
 
         void setEndpoints();
     };
@@ -324,7 +336,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        SimulationTimestampFileWriteStart(WorkflowFile *file, FileLocation *dst, StorageService *service);
+        SimulationTimestampFileWriteStart(WorkflowFile *file, FileLocation *dst, StorageService *service, WorkflowTask *task);
         /***********************/
         /** \endcond           */
         /***********************/
@@ -341,7 +353,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        SimulationTimestampFileWriteFailure(WorkflowFile *file, FileLocation *dst, StorageService *service);
+        SimulationTimestampFileWriteFailure(WorkflowFile *file, FileLocation *dst, StorageService *service, WorkflowTask *task);
         /***********************/
         /** \endcond           */
         /***********************/
@@ -355,7 +367,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        SimulationTimestampFileWriteCompletion(WorkflowFile *file, FileLocation *dst, StorageService *service);
+        SimulationTimestampFileWriteCompletion(WorkflowFile *file, FileLocation *dst, StorageService *service, WorkflowTask *task);
         /***********************/
         /** \endcond           */
         /***********************/
