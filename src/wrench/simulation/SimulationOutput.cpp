@@ -49,6 +49,9 @@ namespace wrench {
         std::pair<double, double> compute;
         std::pair<double, double> write;
 
+        std::vector<std::pair<double, double>> reads;
+        std::vector<std::pair<double, double>> writes;
+
         double failed;
         double terminated;
 
@@ -66,6 +69,32 @@ namespace wrench {
         }
     } WorkflowTaskExecutionInstance;
 
+
+
+    /**
+     * @brief Function that generates a unified JSON file containing the information specified by boolean arguments.
+     *
+     * @param workflow: a pointer to the Workflow
+     * @param file_path: path for generated JSON
+     * @param include_platform: boolean whether to include platform in JSON
+     * @param include_workflow_exec: boolean whether to include workflow execution in JSON
+     * @param include_workflow_graph: boolean whether to include workflow graph in JSON
+     * @param include_energy: boolean whether to include energy consumption in JSON
+     * @param generate_host_utilization_layout: boolean specifying whether or not you would like a possible host utilization
+      *     layout to be generated
+     */
+    void SimulationOutput::dumpUnifiedJSON(Workflow *workflow, std::string file_path,
+                                                     bool include_platform,
+                                                     bool include_workflow_exec,
+                                                     bool include_workflow_graph,
+                                                     bool include_energy,
+                                                     bool generate_host_utilization_layout) {
+
+
+
+
+    }
+
     /**
      * @brief Function called by the nlohmann::json constructor when a WorkflowTaskExecutionInstance is passed in as
      *      a parameter. This returns the JSON representation of a WorkflowTaskExecutionInstance. The name of this function
@@ -74,36 +103,54 @@ namespace wrench {
      * @param w: reference to a WorkflowTaskExecutionInstance
      */
     void to_json(nlohmann::json &j, const WorkflowTaskExecutionInstance &w) {
-        j = nlohmann::json{
-                {"task_id",             w.task_id},
-                {"execution_host",      {
-                                                {"hostname", w.hostname},
-                                                {"flop_rate", w.host_flop_rate},
-                                                {"memory", w.host_memory},
-                                                {"cores", w.host_num_cores}
 
-                                        }},
-                {"num_cores_allocated", w.num_cores_allocated},
-                {"vertical_position",   w.vertical_position},
-                {"whole_task",          {
-                                                {"start",    w.whole_task.first},
-                                                {"end",       w.whole_task.second}
-                                        }},
-                {"read",                {
-                                                {"start",    w.read.first},
-                                                {"end",       w.read.second}
-                                        }},
-                {"compute",             {
-                                                {"start",    w.compute.first},
-                                                {"end",       w.compute.second}
-                                        }},
-                {"write",               {
-                                                {"start",    w.write.first},
-                                                {"end",       w.write.second}
-                                        }},
-                {"failed",              w.failed},
-                {"terminated",          w.terminated}
+        j["task_id"] = w.task_id;
+
+        j["execution_host"] = {
+                {"hostname", w.hostname},
+                {"flop_rate", w.host_flop_rate},
+                {"memory", w.host_memory},
+                {"cores", w.host_num_cores}
         };
+
+        j["num_cores_allocated"] = w.num_cores_allocated;
+
+        j["vertical_position"] = w.vertical_position;
+
+        j["whole_task"] = {
+                {"start",    w.whole_task.first},
+                {"end",       w.whole_task.second}
+        };
+
+        nlohmann::json file_reads;
+        for (auto const &r : w.reads) {
+            nlohmann::json file_read = nlohmann::json::object({{"end", r.second},
+                                                              {"start", r.first}});
+            file_reads.push_back(file_read);
+        }
+
+        j["read"] = file_reads;
+
+        j["compute"] = {
+                {"start",    w.compute.first},
+                {"end",       w.compute.second}
+        };
+
+
+        nlohmann::json file_writes;
+        for (auto const &r : w.writes) {
+            nlohmann::json file_write = nlohmann::json::object({{"end", r.second},
+                                                               {"start", r.first}});
+            file_writes.push_back(file_write);
+        }
+
+        j["write"] = file_writes;
+
+        j["failed"] = w.failed;
+
+        j["terminated"] = w.terminated;
+
+
     }
 
     /**
@@ -339,12 +386,13 @@ namespace wrench {
         auto tasks = workflow->getTasks();
 
 
-        ///TODO need to actually parse all timestamps, but for now just testing.
-        //auto start_timestamps = this->getTrace<SimulationTimestampFileReadStart>();
-        //auto completion_timestamps = this->getTrace<wrench::SimulationTimestampFileReadCompletion>();
+        auto read_start_timestamps = this->getTrace<SimulationTimestampFileReadStart>();
+        auto read_completion_timestamps = this->getTrace<wrench::SimulationTimestampFileReadCompletion>();
+        auto read_failure_timestamps = this->getTrace<wrench::SimulationTimestampFileReadFailure>();
 
-        //wrench::SimulationTimestampFileRead *file_1_start = start_timestamps[0]->getContent();
-       // wrench::SimulationTimestampFileRead *file_1_end = completion_timestamps[0]->getContent();
+        auto write_start_timestamps = this->getTrace<SimulationTimestampFileWriteStart>();
+        auto write_completion_timestamps = this->getTrace<wrench::SimulationTimestampFileWriteCompletion>();
+        auto write_failure_timestamps = this->getTrace<wrench::SimulationTimestampFileWriteFailure>();
 
 
         std::vector<WorkflowTaskExecutionInstance> data;
@@ -360,6 +408,24 @@ namespace wrench {
 
                 current_execution_instance.task_id = task->getID();
 
+                if (!read_start_timestamps.empty()) {
+                    for (auto & read_start_timestamp : read_start_timestamps){
+                        if (read_start_timestamp->getContent()->getTask()->getID() == current_execution_instance.task_id) {
+                            current_execution_instance.reads.emplace_back(read_start_timestamp->getContent()->getDate(),
+                                                                                      read_start_timestamp->getContent()->getEndpoint()->getDate());
+                        }
+                    }
+                }
+
+                if (!write_start_timestamps.empty()) {
+                    for (auto & write_start_timestamp : write_start_timestamps){
+                        if (write_start_timestamp->getContent()->getTask()->getID() == current_execution_instance.task_id) {
+                        current_execution_instance.writes.emplace_back(write_start_timestamp->getContent()->getDate(),
+                                                                                  write_start_timestamp->getContent()->getEndpoint()->getDate());
+                        }
+                    }
+                }
+
                 current_execution_instance.hostname = current_task_execution.execution_host;
                 current_execution_instance.host_flop_rate = Simulation::getHostFlopRate(
                         current_task_execution.execution_host);
@@ -373,12 +439,8 @@ namespace wrench {
 
                 current_execution_instance.whole_task = std::make_pair(current_task_execution.task_start,
                                                                        current_task_execution.task_end);
-                current_execution_instance.read = std::make_pair(current_task_execution.read_input_start,
-                                                                 current_task_execution.read_input_end);
                 current_execution_instance.compute = std::make_pair(current_task_execution.computation_start,
                                                                     current_task_execution.computation_end);
-                current_execution_instance.write = std::make_pair(current_task_execution.write_output_start,
-                                                                  current_task_execution.write_output_end);
 
                 current_execution_instance.failed = current_task_execution.task_failed;
                 current_execution_instance.terminated = current_task_execution.task_terminated;
