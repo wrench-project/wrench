@@ -55,6 +55,8 @@ namespace wrench {
         void dumpWorkflowGraphJSON(wrench::Workflow *workflow, std::string file_path);
         void dumpHostEnergyConsumptionJSON(std::string file_path);
         void dumpPlatformGraphJSON(std::string file_path);
+        void dumpUnifiedJSON(Workflow *workflow, std::string file_path, bool include_platform = false, bool include_workflow_exec = true,
+                             bool include_workflow_graph = false, bool include_energy = false, bool generate_host_utilization_layout = false);
 
         /***********************/
         /** \cond DEVELOPER    */
@@ -94,6 +96,8 @@ namespace wrench {
 
     private:
         std::map<std::type_index, GenericSimulationTrace*> traces;
+
+
     };
 
 };
