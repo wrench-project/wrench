@@ -90,9 +90,21 @@ namespace wrench {
                                                      bool include_energy,
                                                      bool generate_host_utilization_layout) {
 
+        if(include_platform) {
+            dumpPlatformGraphJSON(file_path);
+        }
 
+        if(include_workflow_exec){
+            dumpWorkflowExecutionJSON(workflow, file_path, generate_host_utilization_layout);
+        }
 
+        if(include_workflow_graph){
+            dumpWorkflowGraphJSON(workflow, file_path);
+        }
 
+        if(include_energy){
+            dumpHostEnergyConsumptionJSON(file_path);
+        }
     }
 
     /**
@@ -457,7 +469,7 @@ namespace wrench {
             generateHostUtilizationGraphLayout(data);
         }
 
-        std::ofstream output(file_path);
+        std::ofstream output(file_path, std::ofstream::app);
         output << std::setw(4) << nlohmann::json(data) << std::endl;
         output.close();
     }
@@ -568,8 +580,8 @@ namespace wrench {
         workflow_task_graph["edges"] = edges;
 
 
-        std::ofstream output(file_path);
-        output << std::setw(4) << workflow_task_graph << std::endl;
+        std::ofstream output(file_path, std::ofstream::app);
+        output << std::setw(4) << nlohmann::json(workflow_task_graph) << std::endl;
         output.close();
     }
 
@@ -696,8 +708,8 @@ namespace wrench {
 
             // std::cerr << hosts_energy_consumption_information.dump(4);
 
-            std::ofstream output(file_path);
-            output << std::setw(4) << hosts_energy_consumption_information << std::endl;
+            std::ofstream output(file_path, std::ofstream::app);
+            output << std::setw(4) << nlohmann::json(hosts_energy_consumption_information) << std::endl;
             output.close();
 
         } catch (std::runtime_error &e) {
@@ -1001,8 +1013,8 @@ namespace wrench {
         //std::cerr << platform_graph_json.dump(4) << std::endl;
 
 
-        std::ofstream output(file_path);
-        output << std::setw(4) << platform_graph_json << std::endl;
+        std::ofstream output(file_path, std::ofstream::app);
+        output << std::setw(4) << nlohmann::json(platform_graph_json) << std::endl;
         output.close();
     }
 };

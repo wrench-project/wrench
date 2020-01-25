@@ -20,7 +20,7 @@ typedef std::tuple<void *, void *, void *> File;
 
 namespace std {
     template <>
-    class hash<File>{
+    struct hash<File>{
     public :
         size_t operator()(const File &file ) const
         {
