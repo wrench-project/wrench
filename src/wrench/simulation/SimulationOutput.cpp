@@ -90,6 +90,9 @@ namespace wrench {
                                                      bool include_energy,
                                                      bool generate_host_utilization_layout) {
 
+        std::ofstream output(file_path);
+        output.close();
+
         if(include_platform) {
             dumpPlatformGraphJSON(file_path);
         }
@@ -396,7 +399,7 @@ namespace wrench {
         }
 
         auto tasks = workflow->getTasks();
-
+        nlohmann::json task_json;
 
         auto read_start_timestamps = this->getTrace<SimulationTimestampFileReadStart>();
         auto read_completion_timestamps = this->getTrace<wrench::SimulationTimestampFileReadCompletion>();
@@ -408,6 +411,77 @@ namespace wrench {
 
 
         std::vector<WorkflowTaskExecutionInstance> data;
+
+        for (auto const &task : tasks) {
+            auto execution_history = task->getExecutionHistory();
+            while(not execution_history.empty()){
+                auto current_task_execution = execution_history.top();
+                WorkflowTaskExecutionInstance current_execution_instance;
+
+                current_execution_instance.task_id = task->getID();
+
+                if (!read_start_timestamps.empty()) {
+                    for (auto & read_start_timestamp : read_start_timestamps){
+                        if (read_start_timestamp->getContent()->getTask()->getID() == current_execution_instance.task_id) {
+                            current_execution_instance.reads.emplace_back(read_start_timestamp->getContent()->getDate(),
+                                                                          read_start_timestamp->getContent()->getEndpoint()->getDate());
+                        }
+                    }
+                }
+
+                if (!write_start_timestamps.empty()) {
+                    for (auto & write_start_timestamp : write_start_timestamps){
+                        if (write_start_timestamp->getContent()->getTask()->getID() == current_execution_instance.task_id) {
+                            current_execution_instance.writes.emplace_back(write_start_timestamp->getContent()->getDate(),
+                                                                           write_start_timestamp->getContent()->getEndpoint()->getDate());
+                        }
+                    }
+                }
+
+                nlohmann::json file_reads;
+                for (auto const &r : current_execution_instance.reads) {
+                    nlohmann::json file_read = nlohmann::json::object({{"end", r.second},
+                                                                       {"start", r.first}});
+                    file_reads.push_back(file_read);
+                }
+
+                nlohmann::json file_writes;
+                for (auto const &r : current_execution_instance.writes) {
+                    nlohmann::json file_write = nlohmann::json::object({{"end", r.second},
+                                                                        {"start", r.first}});
+                    file_writes.push_back(file_write);
+                }
+                task_json.push_back({
+                                            {"id",                  task->getID()},
+                                            {"execution host", {
+                                                                     {"hostname", current_task_execution.execution_host},
+                                                                     {"flop_rate", Simulation::getHostFlopRate(
+                                                                                    current_task_execution.execution_host)},
+                                                                     {"memory", Simulation::getHostMemoryCapacity(
+                                                                                    current_task_execution.execution_host)},
+                                                                     {"cores", Simulation::getHostNumCores(
+                                                                                    current_task_execution.execution_host)}
+                                                                    }},
+                                            {"num_cores_allocated",           current_task_execution.num_cores_allocated},
+                                            {"vertical_position",           0},
+                                            {"whole_task", {
+                                                                   {"start",    current_task_execution.task_start},
+                                                                   {"end",       current_task_execution.task_end}
+                                                           }},
+                                            {"read",              file_reads},
+                                            {"compute",       {
+                                                                      {"start",    current_task_execution.computation_start},
+                                                                      {"end",       current_task_execution.computation_end}
+                                                              }},
+                                            {"write",            file_writes},
+                                            {"failed", current_task_execution.task_failed},
+                                            {"terminated", current_task_execution.task_terminated}
+                                    });
+                execution_history.pop();
+            }
+
+        }
+
 
         // For each attempted execution of a task, add a WorkflowTaskExecutionInstance to the list.
         for (auto const &task : tasks) {
@@ -470,7 +544,7 @@ namespace wrench {
         }
 
         std::ofstream output(file_path, std::ofstream::app);
-        output << std::setw(4) << nlohmann::json(data) << std::endl;
+        output << std::setw(4) << task_json << std::endl;
         output.close();
     }
 
