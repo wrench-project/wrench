@@ -90,24 +90,33 @@ namespace wrench {
                                                      bool include_energy,
                                                      bool generate_host_utilization_layout) {
 
-        std::ofstream output(file_path);
-        output.close();
+        nlohmann::json unified_json;
 
         if(include_platform) {
-            dumpPlatformGraphJSON(file_path);
+            dumpPlatformGraphJSON(file_path, false);
+            unified_json["platform"] = platform_json_part;
         }
 
         if(include_workflow_exec){
-            dumpWorkflowExecutionJSON(workflow, file_path, generate_host_utilization_layout);
+            dumpWorkflowExecutionJSON(workflow, file_path, generate_host_utilization_layout, false);
+            unified_json["workflow_execution"] = workflow_exec_json_part;
         }
 
         if(include_workflow_graph){
-            dumpWorkflowGraphJSON(workflow, file_path);
+            dumpWorkflowGraphJSON(workflow, file_path, false);
+            unified_json["workflow_graph"] = workflow_graph_json_part;
         }
 
         if(include_energy){
-            dumpHostEnergyConsumptionJSON(file_path);
+            dumpHostEnergyConsumptionJSON(file_path, false);
+            unified_json["energy_consumption"] = energy_json_part;
         }
+
+
+
+        std::ofstream output(file_path);
+        output << std::setw(4) << unified_json << std::endl;
+        output.close();
     }
 
     /**
@@ -389,11 +398,13 @@ namespace wrench {
       * @param file_path: the path to write the file
       * @param generate_host_utilization_layout: boolean specifying whether or not you would like a possible host utilization
       *     layout to be generated
+      * @param writing_file: whether or not the file is written, true by default but will be false when utilized as part
+      * of dumpUnifiedJSON
       *
       * @throws std::invalid_argument
       */
     void SimulationOutput::dumpWorkflowExecutionJSON(Workflow *workflow, std::string file_path,
-                                                     bool generate_host_utilization_layout) {
+                                                     bool generate_host_utilization_layout, bool writing_file) {
         if (workflow == nullptr || file_path.empty()) {
             throw std::invalid_argument("SimulationOutput::dumpTaskDataJSON() requires a valid workflow and file_path");
         }
@@ -452,7 +463,7 @@ namespace wrench {
                     file_writes.push_back(file_write);
                 }
                 task_json.push_back({
-                                            {"id",                  task->getID()},
+                                            {"task_id",                  task->getID()},
                                             {"execution host", {
                                                                      {"hostname", current_task_execution.execution_host},
                                                                      {"flop_rate", Simulation::getHostFlopRate(
@@ -482,7 +493,7 @@ namespace wrench {
 
         }
 
-
+        /*
         // For each attempted execution of a task, add a WorkflowTaskExecutionInstance to the list.
         for (auto const &task : tasks) {
             auto execution_history = task->getExecutionHistory();
@@ -536,16 +547,22 @@ namespace wrench {
             }
         }
 
-
+        */
 
         // Set the "vertical position" of each WorkflowExecutionInstance so we know where to plot each rectangle
         if (generate_host_utilization_layout) {
             generateHostUtilizationGraphLayout(data);
         }
 
-        std::ofstream output(file_path, std::ofstream::app);
-        output << std::setw(4) << task_json << std::endl;
-        output.close();
+        nlohmann::json workflow_execution_json;
+        workflow_execution_json["tasks"] = task_json;
+        workflow_exec_json_part = workflow_execution_json;
+
+        if(writing_file) {
+            std::ofstream output(file_path);
+            output << std::setw(4) << workflow_execution_json << std::endl;
+            output.close();
+        }
     }
 
     /**
@@ -583,10 +600,12 @@ namespace wrench {
      *
      * @param workflow: a pointer to the workflow
      * @param file_path: the path to write the file
+     * @param writing_file: whether or not the file is written, true by default but will be false when utilized as part
+     * of dumpUnifiedJSON
      *
      * @throws std::invalid_argument
      */
-    void SimulationOutput::dumpWorkflowGraphJSON(wrench::Workflow *workflow, std::string file_path) {
+    void SimulationOutput::dumpWorkflowGraphJSON(wrench::Workflow *workflow, std::string file_path, bool writing_file) {
         if (workflow == nullptr || file_path.empty()) {
             throw std::invalid_argument("SimulationOutput::dumpTaskDataJSON() requires a valid workflow and file_path");
         }
@@ -653,10 +672,13 @@ namespace wrench {
         workflow_task_graph["vertices"] = vertices;
         workflow_task_graph["edges"] = edges;
 
+        workflow_graph_json_part = workflow_task_graph;
 
-        std::ofstream output(file_path, std::ofstream::app);
-        output << std::setw(4) << nlohmann::json(workflow_task_graph) << std::endl;
-        output.close();
+        if(writing_file) {
+            std::ofstream output(file_path);
+            output << std::setw(4) << nlohmann::json(workflow_task_graph) << std::endl;
+            output.close();
+        }
     }
 
 
@@ -702,11 +724,12 @@ namespace wrench {
      * </pre>
      *
      * @param file_path: the path to write the file
-     *
+     * @param writing_file: whether or not the file is written, true by default but will be false when utilized as part
+     * of dumpUnifiedJSON
      * @throws std::invalid_argument
      * @throws std::runtime_error
      */
-    void SimulationOutput::dumpHostEnergyConsumptionJSON(std::string file_path) {
+    void SimulationOutput::dumpHostEnergyConsumptionJSON(std::string file_path, bool writing_file) {
 
         if (file_path.empty()) {
             throw std::invalid_argument("SimulationOutput::dumpHostEnergyConsumptionJSON() requires a valid file_path");
@@ -782,9 +805,13 @@ namespace wrench {
 
             // std::cerr << hosts_energy_consumption_information.dump(4);
 
-            std::ofstream output(file_path, std::ofstream::app);
-            output << std::setw(4) << nlohmann::json(hosts_energy_consumption_information) << std::endl;
-            output.close();
+            energy_json_part = hosts_energy_consumption_information;
+
+            if(writing_file) {
+                std::ofstream output(file_path);
+                output << std::setw(4) << nlohmann::json(hosts_energy_consumption_information) << std::endl;
+                output.close();
+            }
 
         } catch (std::runtime_error &e) {
             // the functions that get energy information catch any exceptions then throw runtime_errors
@@ -840,10 +867,12 @@ namespace wrench {
      * </pre>
      *
      * @param file_path: the path to write the file
+     * @param writing_file: whether or not the file is written, true by default but will be false when utilized as part
+     * of dumpUnifiedJSON
      *
      * @throws std::invalid_argument
      */
-    void SimulationOutput::dumpPlatformGraphJSON(std::string file_path) {
+    void SimulationOutput::dumpPlatformGraphJSON(std::string file_path, bool writing_file) {
         if (file_path.empty()) {
             throw std::invalid_argument("SimulationOutput::dumpPlatformGraphJSON() requires a valid file_path");
         }
@@ -1086,9 +1115,12 @@ namespace wrench {
 
         //std::cerr << platform_graph_json.dump(4) << std::endl;
 
+        platform_json_part = platform_graph_json;
 
-        std::ofstream output(file_path, std::ofstream::app);
-        output << std::setw(4) << nlohmann::json(platform_graph_json) << std::endl;
-        output.close();
+        if(writing_file){
+            std::ofstream output(file_path);
+            output << std::setw(4) << nlohmann::json(platform_graph_json) << std::endl;
+            output.close();
+        }
     }
 };
