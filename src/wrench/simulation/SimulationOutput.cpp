@@ -474,7 +474,7 @@ namespace wrench {
                                                                                     current_task_execution.execution_host)}
                                                                     }},
                                             {"num_cores_allocated",           current_task_execution.num_cores_allocated},
-                                            {"vertical_position",           0},
+                                            {"vertical_position",            },
                                             {"whole_task", {
                                                                    {"start",    current_task_execution.task_start},
                                                                    {"end",       current_task_execution.task_end}
@@ -493,10 +493,11 @@ namespace wrench {
 
         }
 
-        /*
+
         // For each attempted execution of a task, add a WorkflowTaskExecutionInstance to the list.
         for (auto const &task : tasks) {
             auto execution_history = task->getExecutionHistory();
+            auto count = 0;
 
             while (not execution_history.empty()) {
                 auto current_task_execution = execution_history.top();
@@ -532,7 +533,7 @@ namespace wrench {
                         current_task_execution.execution_host);
 
                 current_execution_instance.num_cores_allocated = current_task_execution.num_cores_allocated;
-                current_execution_instance.vertical_position = 0;
+                current_execution_instance.vertical_position = count;
 
                 current_execution_instance.whole_task = std::make_pair(current_task_execution.task_start,
                                                                        current_task_execution.task_end);
@@ -545,9 +546,10 @@ namespace wrench {
                 data.push_back(current_execution_instance);
                 execution_history.pop();
             }
+            count+=1;
         }
 
-        */
+
 
         // Set the "vertical position" of each WorkflowExecutionInstance so we know where to plot each rectangle
         if (generate_host_utilization_layout) {

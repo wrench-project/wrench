@@ -255,109 +255,79 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowExecutionJSON_test() {
     t2->setNumCoresAllocated(20);
 
     nlohmann::json expected_json = R"(
-        {
-            "tasks": [
-                {
-                    "compute": {
-                        "end": -1.0,
-                        "start": -1.0
-                    },
-                    "execution_host": {
-                        "cores": 20,
-                        "flop_rate": 1.0,
-                        "hostname": "host2",
-                        "memory": 20.0
-                    },
-                    "failed": -1.0,
-                    "num_cores_allocated": 10,
-                    "read": [
-                        {
-                            "end": -1.0,
-                            "start": -1.0
-                        }
-                    ],
-                    "task_id": "task1",
-                    "terminated": -1.0,
-                    "vertical_position": 0,
-                    "whole_task": {
-                        "end": 3.0,
-                        "start": 2.0
-                    },
-                    "write": [
-                        {
-                            "end": -1.0,
-                            "start": -1.0
-                        }
-                    ]
+    {
+        "tasks": [
+            {
+                "compute": {
+                    "end": -1.0,
+                    "start": -1.0
                 },
-                {
-                    "compute": {
-                        "end": -1.0,
-                        "start": -1.0
-                    },
-                    "execution_host": {
-                        "cores": 10,
-                        "flop_rate": 1.0,
-                        "hostname": "host1",
-                        "memory": 10.0
-                    },
-                    "failed": -1.0,
-                    "num_cores_allocated": 8,
-                    "read": [
-                        {
-                            "end": -1.0,
-                            "start": -1.0
-                        }
-                    ],
-                    "task_id": "task1",
-                    "terminated": -1.0,
-                    "vertical_position": 0,
-                    "whole_task": {
-                        "end": 2.0,
-                        "start": 1.0
-                    },
-                    "write": [
-                        {
-                            "end": -1.0,
-                            "start": -1.0
-                        }
-                    ]
+                "execution_host": {
+                    "cores": 20,
+                    "flop_rate": 1.0,
+                    "hostname": "host2",
+                    "memory": 20.0
                 },
-                {
-                    "compute": {
-                        "end": -1.0,
-                        "start": -1.0
-                    },
-                    "execution_host": {
-                        "cores": 20,
-                        "flop_rate": 1.0,
-                        "hostname": "host2",
-                        "memory": 20.0
-                    },
-                    "failed": -1.0,
-                    "num_cores_allocated": 20,
-                    "read": [
-                        {
-                            "end": -1.0,
-                            "start": -1.0
-                        }
-                    ],
-                    "task_id": "task2",
-                    "terminated": -1.0,
-                    "vertical_position": 0,
-                    "whole_task": {
-                        "end": 4.0,
-                        "start": 3.0
-                    },
-                    "write": [
-                        {
-                            "end": -1.0,
-                            "start": -1.0
-                        }
-                    ]
-                }
-            ]
-        }
+                "failed": -1.0,
+                "num_cores_allocated": 10,
+                "read": null,
+                "task_id": "task1",
+                "terminated": -1.0,
+                "vertical_position": 0,
+                "whole_task": {
+                    "end": 3.0,
+                    "start": 2.0
+                },
+                "write": null
+            },
+            {
+                "compute": {
+                    "end": -1.0,
+                    "start": -1.0
+                },
+                "execution_host": {
+                    "cores": 10,
+                    "flop_rate": 1.0,
+                    "hostname": "host1",
+                    "memory": 10.0
+                },
+                "failed": -1.0,
+                "num_cores_allocated": 8,
+                "read": null,
+                "task_id": "task1",
+                "terminated": -1.0,
+                "vertical_position": 0,
+                "whole_task": {
+                    "end": 2.0,
+                    "start": 1.0
+                },
+                "write": null
+            },
+            {
+                "compute": {
+                    "end": -1.0,
+                    "start": -1.0
+                },
+                "execution_host": {
+                    "cores": 20,
+                    "flop_rate": 1.0,
+                    "hostname": "host2",
+                    "memory": 20.0
+                },
+                "failed": -1.0,
+                "num_cores_allocated": 20,
+                "read": null,
+                "task_id": "task2",
+                "terminated": -1.0,
+                "vertical_position": 0,
+                "whole_task": {
+                    "end": 4.0,
+                    "start": 3.0
+                },
+                "write": null
+            }
+        ]
+    }
     )"_json;
 
     EXPECT_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(nullptr, execution_data_json_file_path), std::invalid_argument);
@@ -424,7 +394,8 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
     t2->setNumCoresAllocated(5);
 
     nlohmann::json expected_json1 = R"(
-        [
+    {
+        "tasks": [
             {
                 "compute": {
                     "end": -1.0,
@@ -438,12 +409,7 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 5,
-                "read": [
-                    {
-                        "end": -1.0,
-                        "start": -1.0
-                    }
-                ],
+                "read": null,
                 "task_id": "task1",
                 "terminated": -1.0,
                 "vertical_position": 0,
@@ -451,12 +417,7 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
                     "end": 2.0,
                     "start": 1.0
                 },
-                "write": [
-                    {
-                        "end": -1.0,
-                        "start": -1.0
-                    }
-                ]
+                "write": null
             },
             {
                 "compute": {
@@ -471,12 +432,7 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 5,
-                "read": [
-                    {
-                        "end": -1.0,
-                        "start": -1.0
-                    }
-                ],
+                "read": null,
                 "task_id": "task2",
                 "terminated": -1.0,
                 "vertical_position": 5,
@@ -484,18 +440,14 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
                     "end": 2.0,
                     "start": 1.0
                 },
-                "write": [
-                    {
-                        "end": -1.0,
-                        "start": -1.0
-                    }
-                ]
+                "write": null
             }
         ]
+    }
     )"_json;
 
 
-    EXPECT_NO_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(workflow.get(), execution_data_json_file_path, true));
+    EXPECT_NO_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(workflow.get(), execution_data_json_file_path, false));
 
     json_file = std::ifstream(execution_data_json_file_path);
     nlohmann::json result_json1;
@@ -530,7 +482,8 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
     t2->setNumCoresAllocated(5);
 
     nlohmann::json expected_json2 = R"(
-        [
+    {
+        "tasks": [
             {
                 "compute": {
                     "end": -1.0,
@@ -544,12 +497,7 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 5,
-                "read": [
-                    {
-                        "end": -1.0,
-                        "start": -1.0
-                    }
-                ],
+                "read": null,
                 "task_id": "task1",
                 "terminated": -1.0,
                 "vertical_position": 0,
@@ -557,12 +505,7 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
                     "end": 2.0,
                     "start": 1.0
                 },
-                "write": [
-                    {
-                        "end": -1.0,
-                        "start": -1.0
-                    }
-                ]
+                "write": null
             },
             {
                 "compute": {
@@ -577,12 +520,7 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 5,
-                "read": [
-                    {
-                        "end": -1.0,
-                        "start": -1.0
-                    }
-                ],
+                "read": null,
                 "task_id": "task2",
                 "terminated": -1.0,
                 "vertical_position": 0,
@@ -590,18 +528,14 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
                     "end": 3.0,
                     "start": 2.0
                 },
-                "write": [
-                    {
-                        "end": -1.0,
-                        "start": -1.0
-                    }
-                ]
+                "write": null
             }
         ]
+    }
     )"_json;
 
 
-    EXPECT_NO_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(workflow.get(), execution_data_json_file_path, true));
+    EXPECT_NO_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(workflow.get(), execution_data_json_file_path, false));
 
     json_file = std::ifstream(execution_data_json_file_path);
     nlohmann::json result_json2;
@@ -651,7 +585,8 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
     t4->setNumCoresAllocated(1);
 
     nlohmann::json expected_json3 = R"(
-        [
+    {
+        "tasks": [
             {
                 "compute": {
                     "end": -1.0,
@@ -665,12 +600,7 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 5,
-                "read": [
-                    {
-                        "end": -1.0,
-                        "start": -1.0
-                    }
-                ],
+                "read": null,
                 "task_id": "task1",
                 "terminated": -1.0,
                 "vertical_position": 0,
@@ -678,12 +608,7 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
                     "end": 2.0,
                     "start": 1.0
                 },
-                "write": [
-                    {
-                        "end": -1.0,
-                        "start": -1.0
-                    }
-                ]
+                "write": null
             },
             {
                 "compute": {
@@ -698,12 +623,7 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 5,
-                "read": [
-                    {
-                        "end": -1.0,
-                        "start": -1.0
-                    }
-                ],
+                "read": null,
                 "task_id": "task2",
                 "terminated": -1.0,
                 "vertical_position": 5,
@@ -711,12 +631,7 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
                     "end": 2.0,
                     "start": 1.0
                 },
-                "write": [
-                    {
-                        "end": -1.0,
-                        "start": -1.0
-                    }
-                ]
+                "write": null
             },
             {
                 "compute": {
@@ -731,12 +646,7 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
-                "read": [
-                    {
-                        "end": -1.0,
-                        "start": -1.0
-                    }
-                ],
+                "read": null,
                 "task_id": "task3",
                 "terminated": -1.0,
                 "vertical_position": 0,
@@ -744,12 +654,7 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
                     "end": 2.0,
                     "start": 1.0
                 },
-                "write": [
-                    {
-                        "end": -1.0,
-                        "start": -1.0
-                    }
-                ]
+                "write": null
             },
             {
                 "compute": {
@@ -764,12 +669,7 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
-                "read": [
-                    {
-                        "end": -1.0,
-                        "start": -1.0
-                    }
-                ],
+                "read": null,
                 "task_id": "task4",
                 "terminated": -1.0,
                 "vertical_position": 1,
@@ -777,14 +677,10 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
                     "end": 2.0,
                     "start": 1.0
                 },
-                "write": [
-                    {
-                        "end": -1.0,
-                        "start": -1.0
-                    }
-                ]
+                "write": null
             }
         ]
+    }
     )"_json;
 
     EXPECT_NO_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(workflow.get(), execution_data_json_file_path, false));
