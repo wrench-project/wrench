@@ -32,6 +32,8 @@ WRENCH_LOG_NEW_DEFAULT_CATEGORY(simulation_output, "Log category for Simulation 
 
 namespace wrench {
 
+    nlohmann::json host_utilization_layout;
+
     /**
      * \cond
      */
@@ -280,6 +282,13 @@ namespace wrench {
             // Set the vertical positions as we go so the entire graph layout is set when the function returns
             current_execution_instance.vertical_position = vertical_position;
 
+            nlohmann::json task_vert;
+
+            task_vert[current_execution_instance.task_id] = vertical_position;
+
+
+
+
             auto current_rect_y_range = std::pair<unsigned long long, unsigned long long>(
                     vertical_position,
                     vertical_position + num_cores_allocated
@@ -320,12 +329,15 @@ namespace wrench {
                 }
             }
 
+
             if (not has_overlap and index >= data.size() - 1) {
+                host_utilization_layout.push_back(task_vert);
                 return true;
             } else if (not has_overlap) {
                 bool found_layout = searchForLayout(data, index + 1);
 
                 if (found_layout) {
+                    host_utilization_layout.push_back(task_vert);
                     return true;
                 }
             }
@@ -474,7 +486,6 @@ namespace wrench {
                                                                                     current_task_execution.execution_host)}
                                                                     }},
                                             {"num_cores_allocated",           current_task_execution.num_cores_allocated},
-                                            {"vertical_position",            },
                                             {"whole_task", {
                                                                    {"start",    current_task_execution.task_start},
                                                                    {"end",       current_task_execution.task_end}
@@ -497,7 +508,7 @@ namespace wrench {
         // For each attempted execution of a task, add a WorkflowTaskExecutionInstance to the list.
         for (auto const &task : tasks) {
             auto execution_history = task->getExecutionHistory();
-            auto count = 0;
+
 
             while (not execution_history.empty()) {
                 auto current_task_execution = execution_history.top();
@@ -533,7 +544,7 @@ namespace wrench {
                         current_task_execution.execution_host);
 
                 current_execution_instance.num_cores_allocated = current_task_execution.num_cores_allocated;
-                current_execution_instance.vertical_position = count;
+                current_execution_instance.vertical_position = 0;
 
                 current_execution_instance.whole_task = std::make_pair(current_task_execution.task_start,
                                                                        current_task_execution.task_end);
@@ -546,14 +557,20 @@ namespace wrench {
                 data.push_back(current_execution_instance);
                 execution_history.pop();
             }
-            count+=1;
         }
 
 
 
         // Set the "vertical position" of each WorkflowExecutionInstance so we know where to plot each rectangle
         if (generate_host_utilization_layout) {
-            generateHostUtilizationGraphLayout(data);
+            try {
+                generateHostUtilizationGraphLayout(data);
+                std::ofstream output("host_utilization_layout.json");
+                output << std::setw(4) << host_utilization_layout << std::endl;
+                output.close();
+            } catch(std::runtime_error &e) {
+                throw;
+            }
         }
 
         nlohmann::json workflow_execution_json;
