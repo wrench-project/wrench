@@ -24,6 +24,8 @@
 
 namespace wrench {
 
+
+
     /**
      * @brief A class that contains post-mortem simulation-generated data
      */
@@ -103,6 +105,7 @@ namespace wrench {
         nlohmann::json workflow_exec_json_part;
         nlohmann::json workflow_graph_json_part;
         nlohmann::json energy_json_part;
+
 
     };
 
