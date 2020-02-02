@@ -36,7 +36,7 @@ protected:
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"StorageHost\" speed=\"1f\"> "
-                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                           "             <prop id=\"size\" value=\"" + std::to_string(STORAGE_SIZE) + "B\"/>"
                                                                                                      "             <prop id=\"mount\" value=\"/\"/>"
                                                                                                      "          </disk>"
