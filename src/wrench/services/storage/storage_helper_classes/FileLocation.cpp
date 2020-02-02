@@ -200,8 +200,10 @@ namespace wrench {
     }
 
     /**
-     * @brief Helper method to find if a path is a prefix of another path
-     * @return
+     * @brief Helper method to find if a path is a proper prefix of another path
+     * @param a path
+     * @param another path 
+     * @return true if one of the two paths is a proper prefix of the other
      */
     bool FileLocation::properPathPrefix(std::string path1, std::string path2) {
         // Sanitize paths
