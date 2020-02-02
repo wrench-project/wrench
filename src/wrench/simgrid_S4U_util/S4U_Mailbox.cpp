@@ -42,7 +42,7 @@ namespace wrench {
      */
     std::shared_ptr<SimulationMessage> S4U_Mailbox::getMessage(std::string mailbox_name) {
         WRENCH_DEBUG("Getting a message from mailbox_name '%s'", mailbox_name.c_str());
-        simgrid::s4u::Mailbox *mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
+        auto mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
         SimulationMessage *msg = nullptr;
         try {
             msg = static_cast<SimulationMessage *>(mailbox->get());
@@ -75,7 +75,7 @@ namespace wrench {
         }
 
         WRENCH_DEBUG("Getting a message from mailbox_name '%s' with timeout %lf sec", mailbox_name.c_str(), timeout);
-        simgrid::s4u::Mailbox *mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
+        auto mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
         void *data = nullptr;
 
         try {
@@ -142,7 +142,7 @@ namespace wrench {
 
         simgrid::s4u::CommPtr comm = nullptr;
 
-        simgrid::s4u::Mailbox *mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
+        auto mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
 
 //        try {
 #ifdef MESSAGE_MANAGER
@@ -177,7 +177,7 @@ namespace wrench {
 
         simgrid::s4u::CommPtr comm_ptr = nullptr;
 
-        simgrid::s4u::Mailbox *mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
+        auto mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
 
         try {
 #ifdef MESSAGE_MANAGER
@@ -189,7 +189,7 @@ namespace wrench {
                     new NetworkError(NetworkError::SENDING, NetworkError::FAILURE, mailbox_name));
         }
 
-        std::shared_ptr<S4U_PendingCommunication> pending_communication = std::shared_ptr<S4U_PendingCommunication>(
+        auto pending_communication = std::shared_ptr<S4U_PendingCommunication>(
                 new S4U_PendingCommunication(mailbox_name, S4U_PendingCommunication::OperationType::SENDING));
         pending_communication->comm_ptr = comm_ptr;
         return pending_communication;
@@ -213,7 +213,7 @@ namespace wrench {
         std::shared_ptr<S4U_PendingCommunication> pending_communication = std::shared_ptr<S4U_PendingCommunication>(
                 new S4U_PendingCommunication(mailbox_name, S4U_PendingCommunication::OperationType::RECEIVING));
 
-        simgrid::s4u::Mailbox *mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
+        auto mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
         try {
             comm_ptr = mailbox->get_async((void **) (&(pending_communication->simulation_message)));
         } catch (simgrid::NetworkFailureException &e) {

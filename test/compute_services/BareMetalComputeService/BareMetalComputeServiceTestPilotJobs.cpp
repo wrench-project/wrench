@@ -71,7 +71,7 @@ protected:
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"DualCoreHost\" speed=\"1f\" core=\"2\"> "
-                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                           "             <prop id=\"size\" value=\"100B\"/>"
                           "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"

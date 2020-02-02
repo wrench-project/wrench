@@ -204,6 +204,7 @@ namespace wrench {
         if (already_setup) {
             throw std::runtime_error("Simulation::instantiatePlatform(): Platform already setup");
         }
+
         this->s4u_simulation->setupPlatform(filename);
 
         try {
@@ -968,17 +969,19 @@ namespace wrench {
             }
         }
 
-//        // Check Disk Bandwidth (TODO: Remove this check once SimGrid has a more decent I/O model)
-//        for (auto const &h : hostnames) {
+        // Check Disk Bandwidth (TODO: Remove this check once SimGrid has a more decent I/O model)
+        for (auto const &h : hostnames) {
 //            WRENCH_INFO("---> %s", h.c_str());
-//            for (auto const &d : simgrid::s4u::Host::by_name(h)->get_disks()) {
-//                auto props = d->get_properties();
-//                for (auto it = props->begin(); it != props->end(); it++) {
-//                    WRENCH_INFO("===> %s %s", (*it).first.c_str(), (*it).second.c_str());
-//                }
-//            }
-//        }
-
+            for (auto const &d : simgrid::s4u::Host::by_name(h)->get_disks()) {
+                double read_bw = d->get_read_bandwidth();
+                double write_bw = d->get_write_bandwidth();
+                if(std::abs<double>(read_bw - write_bw) > DBL_EPSILON) {
+                    throw  std::invalid_argument("Simulation::platformSanityCheck(): For now, disks must have equal "
+                                                 "read and write bandwidth (offending disk: " +
+                                                 h + ":" + d->get_property("mount"));
+                }
+            }
+        }
     }
 
 
