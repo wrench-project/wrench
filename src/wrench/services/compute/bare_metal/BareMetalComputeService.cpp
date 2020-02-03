@@ -522,6 +522,15 @@ namespace wrench {
 
         WRENCH_INFO("New BareMetal Compute Service starting (%s) on %ld hosts with a total of %ld cores",
                     this->mailbox_name.c_str(), this->compute_resources.size(), this->total_num_cores);
+        std::string msg = "";
+        //         std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
+        for (auto cr : this->compute_resources) {
+            auto host = cr.first;
+            auto num_cores = std::get<0>(cr.second);
+            auto ram = std::get<1>(cr.second);
+            msg += "  - " + host + ": " + std::to_string(num_cores) + " cores; " + std::to_string(ram/1000000000)  + " GB of RAM\n";
+        }
+        WRENCH_INFO("%s", msg.c_str());
 
         {
             // Create the host state monitor
