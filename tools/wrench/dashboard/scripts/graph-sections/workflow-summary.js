@@ -4,6 +4,18 @@
     taskClass: class to apply to <td> elements
 */
 function getOverallWorkflowMetrics(data, tableContainer, taskClass) {
+    document.getElementById(tableContainer).innerHTML = `
+        <colgroup>
+            <col span="1" class='overall-metrics-table-col read-col'></col>
+            <col span="1" class='overall-metrics-table-col write-col'></col>
+        </colgroup>
+        <thead>
+            <tr>
+                <th class='task-details-table-td'>Metric</th>
+                <th class='task-details-table-td'>Value</th>
+            </tr>
+        </thead>
+    `
     var hosts = new Set()
     var noFailed = 0
     var noTerminated = 0
