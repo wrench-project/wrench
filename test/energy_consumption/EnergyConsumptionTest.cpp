@@ -36,6 +36,8 @@ public:
 
     void do_AccessEnergyApiExceptionTests_test();
 
+    void do_AccessEnergyApiExceptionPluginNotActiveTests_test();
+
     void do_EnergyConsumption_test();
 
     void do_EnergyConsumptionPStateChange_test();
@@ -55,15 +57,15 @@ protected:
                 "<platform version=\"4.1\">"
                 "<zone id=\"AS0\" routing=\"Full\">"
                 "<host id=\"MyHost1\" speed=\"100.0Mf,50.0Mf,20.0Mf\" pstate=\"0\" core=\"1\" >"
-                "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                 "             <prop id=\"size\" value=\"10000000000000B\"/>"
                 "             <prop id=\"mount\" value=\"/disk1\"/>"
                 "          </disk>"
-                "          <disk id=\"large_disk2\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                "          <disk id=\"large_disk2\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                 "             <prop id=\"size\" value=\"10000000000000B\"/>"
                 "             <prop id=\"mount\" value=\"/disk2\"/>"
                 "          </disk>"
-                "          <disk id=\"large_disk3\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                "          <disk id=\"large_disk3\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                 "             <prop id=\"size\" value=\"100B\"/>"
                 "             <prop id=\"mount\" value=\"/scratch\"/>"
                 "          </disk>"
@@ -72,15 +74,15 @@ protected:
                 "</host>"
 
                 "<host id=\"MyHost2\" speed=\"100.0Mf,50.0Mf,20.0Mf\" pstate=\"0\" core=\"1\" >"
-                "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                 "             <prop id=\"size\" value=\"10000000000000B\"/>"
                 "             <prop id=\"mount\" value=\"/disk1\"/>"
                 "          </disk>"
-                "          <disk id=\"large_disk2\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                "          <disk id=\"large_disk2\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                 "             <prop id=\"size\" value=\"10000000000000B\"/>"
                 "             <prop id=\"mount\" value=\"/disk2\"/>"
                 "          </disk>"
-                "          <disk id=\"large_disk3\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                "          <disk id=\"large_disk3\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                 "             <prop id=\"size\" value=\"100B\"/>"
                 "             <prop id=\"mount\" value=\"/scratch\"/>"
                 "          </disk>"
@@ -89,15 +91,15 @@ protected:
                 "</host>"
 
                 "<host id=\"MyHost3\" speed=\"100.0Mf,50.0Mf,20.0Mf\" pstate=\"0\" core=\"1\" >"
-                "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                 "             <prop id=\"size\" value=\"10000000000000B\"/>"
                 "             <prop id=\"mount\" value=\"/disk1\"/>"
                 "          </disk>"
-                "          <disk id=\"large_disk2\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                "          <disk id=\"large_disk2\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                 "             <prop id=\"size\" value=\"10000000000000B\"/>"
                 "             <prop id=\"mount\" value=\"/disk2\"/>"
                 "          </disk>"
-                "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                 "             <prop id=\"size\" value=\"100B\"/>"
                 "             <prop id=\"mount\" value=\"/scratch\"/>"
                 "          </disk>"
@@ -131,7 +133,7 @@ protected:
 
 
 /**********************************************************************/
-/**         ENERGY API TEST WITHOUT ENABLING ENERGY PLUGIN           **/
+/**         ENERGY API TEST WITH BOGUS HOST NAMES                    **/
 /**********************************************************************/
 
 class EnergyApiAccessExceptionsTestWMS : public wrench::WMS {
@@ -204,8 +206,7 @@ private:
             try {
                 double value = this->simulation->getEnergyConsumed("dummy_unavailable_host");
                 throw std::runtime_error("Should not have been able to read the energy for dummy hosts");
-            } catch (std::exception &e) {
-                WRENCH_INFO("Expected exception as we were trying to measure the energy for a dummy host that is not available");
+            } catch (std::invalid_argument &e) {
             }
 
             try {
@@ -213,8 +214,7 @@ private:
                 throw std::runtime_error(
                         "Should not have been able to read the energy for dummy hosts"
                 );
-            } catch (std::exception &e) {
-                WRENCH_INFO("Expected exception as we were trying to measure the energy for a dummy host that is not available");
+            } catch (std::invalid_argument &e) {
             }
 
             try {
@@ -222,8 +222,7 @@ private:
                 throw std::runtime_error(
                         "Should not have been able to read the energy for dummy hosts"
                 );
-            } catch (std::exception &e) {
-                WRENCH_INFO("Expected exception as we were trying to measure the energy for a dummy host that is not available");
+            } catch (std::invalid_argument &e) {
             }
 
             try {
@@ -231,17 +230,16 @@ private:
                 throw std::runtime_error(
                         "Should not have been able to read the energy for dummy hosts"
                 );
-            } catch (std::exception &e) {
-                WRENCH_INFO("Expected exception as we were trying to measure the energy for a dummy host that is not available");
+            } catch (std::invalid_argument &e) {
             }
+
 
             try {
                 double value = this->simulation->getMinPowerConsumption("dummy_unavailable_host");
                 throw std::runtime_error(
                         "Should not have been able to read the energy for dummy hosts"
                 );
-            } catch (std::exception &e) {
-                WRENCH_INFO("Expected exception as we were trying to measure the energy for a dummy host that is not available");
+            } catch (std::invalid_argument &e) {
             }
 
             try {
@@ -249,8 +247,7 @@ private:
                 throw std::runtime_error(
                         "Should not have been able to read the energy for dummy hosts"
                 );
-            } catch (std::exception &e) {
-                WRENCH_INFO("Expected exception as we were trying to access energy plugin for a dummy host that is not available");
+            } catch (std::invalid_argument &e) {
             }
 
             try {
@@ -258,17 +255,15 @@ private:
                 throw std::runtime_error(
                         "Should not have been able to read the energy for dummy hosts"
                 );
-            } catch (std::exception &e) {
-                WRENCH_INFO("Expected exception as we were trying to access energy plugin for a dummy host that is not available");
+            } catch (std::invalid_argument &e) {
             }
 
             try {
-                this->simulation->setPstate(simulation_hosts[1],2);
+                this->simulation->setPstate("dummy_unavailable_host",2);
                 throw std::runtime_error(
                         "Should not have been able to read the energy for dummy hosts"
                 );
-            } catch (std::exception &e) {
-                WRENCH_INFO("Unexpected exception as we were trying to access energy plugin for a correct host that is available");
+            } catch (std::invalid_argument &e) {
             }
 
         }
@@ -321,6 +316,205 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionTests_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     EXPECT_NO_THROW(wms = simulation->add(
             new EnergyApiAccessExceptionsTestWMS(
+                    this,  {compute_service}, hostname)));
+
+    EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+
+
+    // Create two workflow files
+    wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
+
+    // Staging the input_file on the storage service
+    EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+
+    // Running a "run a single task" simulation
+    // Note that in these tests the WMS creates workflow tasks, which a user would
+    // of course not be likely to do
+    EXPECT_NO_THROW(simulation->launch());
+
+    delete simulation;
+
+    free(argv[0]);
+    free(argv[1]);
+    free(argv);
+}
+
+
+/**********************************************************************/
+/**         ENERGY API TEST WITHOUT ENABLING ENERGY PLUGIN           **/
+/**********************************************************************/
+
+class EnergyApiAccessExceptionsPluginNotActiveTestWMS : public wrench::WMS {
+
+public:
+    EnergyApiAccessExceptionsPluginNotActiveTestWMS(EnergyConsumptionTest *test,
+                                     const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                     std::string& hostname) :
+            wrench::WMS(nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
+                        "test") {
+        this->test = test;
+    }
+
+private:
+
+    EnergyConsumptionTest *test;
+
+    int main() {
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+        {
+
+            std::vector<std::string> simulation_hosts = wrench::Simulation::getHostnameList();
+
+            //Now based on this default speed, (100MF), execute a job requiring 10^10 flops and check the time
+            wrench::WorkflowTask *task = this->getWorkflow()->addTask("task1", 10000000000, 1, 1, 1.0, 1.0);
+
+            // Create a StandardJob
+            wrench::StandardJob *job = job_manager->createStandardJob(
+                    task,
+                    {
+                    });
+            //sleep for 10 seconds
+            wrench::S4U_Simulation::sleep(10);
+            //let's execute the job, this should take ~100 sec based on the 100MF speed
+            std::string my_mailbox = "test_callback_mailbox";
+
+
+            // Create a StandardJobExecutor that will run stuff on one host and 6 core
+            std::shared_ptr<wrench::StandardJobExecutor> executor = std::unique_ptr<wrench::StandardJobExecutor>(
+                    new wrench::StandardJobExecutor(
+                            test->simulation,
+                            my_mailbox,
+                            wrench::Simulation::getHostnameList()[1],
+                            job,
+                            {std::make_pair(wrench::Simulation::getHostnameList()[1], std::make_tuple(1, wrench::ComputeService::ALL_RAM))},
+                            nullptr,
+                            false,
+                            nullptr,
+                            {},
+                            {}
+                    ));
+            executor->start(executor, true, false); // Daemonized, no auto-restart
+
+            // Wait for a message on my mailbox_name
+            std::shared_ptr<wrench::SimulationMessage> message;
+            try {
+                message = wrench::S4U_Mailbox::getMessage(my_mailbox);
+            } catch (std::shared_ptr<wrench::NetworkError> &cause) {
+                throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
+            }
+
+            // Did we get the expected message?
+            auto msg = std::dynamic_pointer_cast<wrench::StandardJobExecutorDoneMessage>(message);
+            if (!msg) {
+                throw std::runtime_error("Unexpected '" + message->getName() + "' message");
+            }
+
+            try {
+                double value = this->simulation->getEnergyConsumed("MyHost1");
+                throw std::runtime_error("Should not have been able to read the energy without activating energy plugin");
+            } catch (std::runtime_error &e) {
+            }
+
+            try {
+                std::map<std::string, double> value = this->simulation->getEnergyConsumed(std::vector<std::string>({"MyHost1"}));
+                throw std::runtime_error(
+                        "Should not have been able to read the energy without activating energy plugin"
+                );
+            } catch (std::runtime_error &e) {
+            }
+
+            try {
+                double value = this->simulation->getNumberofPstates("MyHost1");
+                throw std::runtime_error(
+                        "Should not have been able to read the energy without activating energy plugin"
+                );
+            } catch (std::runtime_error &e) {
+            }
+
+            try {
+                double value = this->simulation->getCurrentPstate("MyHost1");
+                throw std::runtime_error(
+                        "Should not have been able to read the energy without activating energy plugin"
+                );
+            } catch (std::runtime_error &e) {
+            }
+
+            try {
+                double value = this->simulation->getMinPowerConsumption("MyHost1");
+                throw std::runtime_error(
+                        "Should not have been able to read the energy without activating energy plugin"
+                );
+            } catch (std::runtime_error &e) {
+            }
+
+            try {
+                double value = this->simulation->getMaxPowerConsumption("MyHost1");
+                throw std::runtime_error(
+                        "Should not have been able to read the energy without activating energy plugin"
+                );
+            } catch (std::runtime_error &e) {
+            }
+
+            try {
+                this->simulation->setPstate("MyHost1",1);
+                throw std::runtime_error(
+                        "Should not have been able to read the energy without activating energy plugin"
+                );
+            } catch (std::runtime_error &e) {
+            }
+
+        }
+
+        return 0;
+    }
+};
+
+TEST_F(EnergyConsumptionTest, EnergyApiAccessExceptionsPluginNotActiveTest) {
+    DO_TEST_WITH_FORK(do_AccessEnergyApiExceptionPluginNotActiveTests_test);
+}
+
+
+void EnergyConsumptionTest::do_AccessEnergyApiExceptionPluginNotActiveTests_test() {
+
+
+    // Create and initialize a simulation
+    simulation = new wrench::Simulation();
+    int argc = 1;
+    auto argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
+//    argv[1] = strdup("--activate-energy");
+
+    EXPECT_NO_THROW(simulation->init(&argc, argv));
+
+    // Setting up the platform
+    EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    // Get a hostname
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
+
+    // Create a Storage Service
+    EXPECT_NO_THROW(storage_service1 = simulation->add(
+            new wrench::SimpleStorageService(hostname, {"/disk1"})));
+
+    // Create a Storage Service
+    EXPECT_NO_THROW(storage_service2 = simulation->add(
+            new wrench::SimpleStorageService(hostname, {"/disk2"})));
+
+
+    // Create a Compute Service
+    EXPECT_NO_THROW(compute_service = simulation->add(
+            new wrench::BareMetalComputeService(hostname,
+                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                "/scratch", {})));
+
+    simulation->add(new wrench::FileRegistryService(hostname));
+
+    // Create a WMS
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    EXPECT_NO_THROW(wms = simulation->add(
+            new EnergyApiAccessExceptionsPluginNotActiveTestWMS(
                     this,  {compute_service}, hostname)));
 
     EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
