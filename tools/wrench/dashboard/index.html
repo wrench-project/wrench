@@ -18,14 +18,27 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/billboard.js/dist/billboard.min.css">
     </head>
     <body>
-        
         <div id='info-container'>
-            <img src='public/logo-vertical.png' id=logo>
-            <h3>WRENCH Dashboard</h3>
-            <p id='updated'></p>
+            <div id='nav-bar-top-half'>
+                <div id='logo-and-title'>
+                    <img src='public/logo-vertical.png' id=logo>
+                    <h3>WRENCH Dashboard</h3>
+                </div>
+                <div id='file-upload'>
+                    <h5 id='file-upload-title'>Upload files here:</h5>
+                    <div class='file-upload-container'>
+                        <p class='file-upload-subtitle'>Workflow Data: </p>
+                        <input type='file' accept='application/json' onchange='processFile(this.files, "taskData");'>
+                    </div>
+                    <div class='file-upload-container'>
+                        <p class='file-upload-subtitle'>Energy Data: </p>
+                        <input type='file' accept='application/json' onchange='processFile(this.files, "energy");'>
+                    </div>
+                </div>
+            </div>
         </div>
         <div id="no-file">
-            <h6>Please provide a JSON file to read. Refer to this <a href="https://github.com/wrench-project/wrench/tree/master/tools/wrench/dashboard" target="blank">README</a> for more information</h6>
+            <h6>Please upload your JSON files in the file upload above</h6>
         </div>
         <div id="main-body">
             <div class='element-and-title-container'>
