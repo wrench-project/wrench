@@ -723,9 +723,12 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
 
 }
 
-TEST_F(SimulationDumpJSONTest, SimulationSearchForHostUtilizationGraphLayoutTest) {
+/*
+ * TEST_F(SimulationDumpJSONTest, SimulationSearchForHostUtilizationGraphLayoutTest) {
     DO_TEST_WITH_FORK(do_SimulationSearchForHostUtilizationGraphLayout_test);
 }
+ */
+
 
 /**********************************************************************/
 /**         SimulationDumpWorkflowGraphJSONTest                      **/
