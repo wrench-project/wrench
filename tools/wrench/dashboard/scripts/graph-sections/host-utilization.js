@@ -33,6 +33,17 @@ function getComputeTime(d) {
 function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskId, tooltipComputeTime, CONTAINER_WIDTH, CONTAINER_HEIGHT) {
     var num_cores = determineNumCores(data);
     var container = d3.select(`#${containerId}`);
+    document.getElementById(containerId).innerHTML = `
+        <div class="container legend" id="host-utilization-chart-legend">
+            <small class="inline-block" id="host-utilization-chart-legend-compute-time">Compute Time</small>
+            <small class="inline-block" id="host-utilization-chart-legend-idle-time">Idle Time</small>
+        </div>
+
+        <div class="text-left" id="host-utilization-chart-tooltip">
+            <span id="host-utilization-chart-tooltip-task-id"></span><br>
+            <span id="host-utilization-chart-tooltip-compute-time"></span><br>
+        </div>
+    `
     var chart = document.getElementById(containerId);
     const PADDING = 60;
 
@@ -52,7 +63,7 @@ function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskI
 
     var x_scale = d3.scaleLinear()
         .domain([0, d3.max(data, function(d) {
-            return d.whole_task.end;
+            return d3.max([d.whole_task.end, d.terminated, d.failed]);
         })])
         .range([PADDING, CONTAINER_WIDTH - PADDING]);
 
@@ -107,13 +118,23 @@ function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskI
         .enter()
         .append("rect")
         .attr("x", function(d) {
+            if (d.compute.start === -1) {
+                return 0
+            }
             return x_scale(d.compute.start);
         })
         .attr("y", function(d) {
             var y_scale = y_cores_per_host.get(d.execution_host.hostname);
-            return y_scale(d.vertical_position + d.num_cores_allocated);
+            var vertical_position = searchOverlap(d.task_id, determineTaskOverlap(data))
+            return y_scale(vertical_position + d.num_cores_allocated);
         })
         .attr("width", function(d) {
+            if (d.compute.start === -1) {
+                return 0
+            }
+            if (d.compute.end === -1) {
+                return x_scale(determineTaskEnd(d)) - x_scale(d.compute.start)
+            }
             return x_scale(d.compute.end) - x_scale(d.compute.start);
         })
         .attr("height", function(d) {
