@@ -125,11 +125,11 @@ private:
                 this->test->failed_task,
                 {{this->test->small_input_file, wrench::FileLocation::LOCATION(this->test->storage_service)},
                  {this->test->large_input_file, wrench::FileLocation::LOCATION(this->test->storage_service)}});
-        job_manager->submitJob(failed_job, this->test->compute_service);
-
         wrench::StorageService::deleteFile(this->getWorkflow()->getFileByID("small_input_file"),
                                            wrench::FileLocation::LOCATION(this->test->storage_service),
                                            this->test->file_registry_service);
+        job_manager->submitJob(failed_job, this->test->compute_service);
+
 
         std::shared_ptr<wrench::WorkflowExecutionEvent> workflow_execution_event;
         try {
@@ -312,9 +312,10 @@ private:
                 {{this->test->small_input_file, wrench::FileLocation::LOCATION(this->test->storage_service)},
                  {this->test->large_input_file, wrench::FileLocation::LOCATION(this->test->storage_service)}});
 
-        job_manager->submitJob(failed_job, this->test->compute_service);
+
         wrench::StorageService::deleteFile(this->getWorkflow()->getFileByID("small_input_file"),
                                            wrench::FileLocation::LOCATION(this->test->storage_service));
+        job_manager->submitJob(failed_job, this->test->compute_service);
         this->waitForAndProcessNextEvent();
 
         wrench::StandardJob *passing_job = job_manager->createStandardJob(
