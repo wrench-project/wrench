@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <script type='text/javascript' src='public/jquery-3.3.1.min.js'></script>
         <meta charset="utf-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>WRENCH Dashboard</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <script src="public/bootstrap.min.css"></script>
-        <link rel="stylesheet" href="public/bootstrap.min.css">
-        <link rel="stylesheet" href="public/styles.css">
-        <link rel="icon" href="public/favicon.ico" />
-        <script src="public/d3.min.js" type="text/javascript"></script>
-        <script src="public/jQueryRotate.js" type="text/javascript"></script>
-        <script src="public/d3-3d.js" type="text/javascript"></script>
+
+        <title>WRENCH Dashboard</title>
+
+        <link rel="stylesheet" href="public/css/bootstrap.min.css">
+        <link rel="stylesheet" href="public/css/styles.css">
+        <link rel="icon" href="public/img/favicon.ico" />
+
+        <script type='text/javascript' src='public/js/jquery-3.3.1.min.js'></script>
+        <script src="public/js/d3.min.js" type="text/javascript"></script>
+        <script src="public/js/jQueryRotate.js" type="text/javascript"></script>
+        <script src="public/js/d3-3d.js" type="text/javascript"></script>
+
         <!-- billboard.js scripts -->
         <script src="https://cdn.jsdelivr.net/npm/billboard.js/dist/billboard.min.js"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/billboard.js/dist/billboard.min.css">
@@ -21,7 +24,7 @@
         <div id='info-container'>
             <div id='nav-bar-top-half'>
                 <div id='logo-and-title'>
-                    <img src='public/logo-vertical.png' id=logo>
+                    <img src='public/img/logo-vertical.png' id=logo>
                     <h3>WRENCH Dashboard</h3>
                 </div>
                 <div id='file-upload'>
@@ -46,7 +49,7 @@
                     <h6 class='title-text'>Summary of Simulation Metrics</h6>
                     <div class='arrow-div'>
                         <span class='arrow-helper'></span>
-                        <img id='overall-metrics-arrow' class='arrow-img' src='public/expand-arrow.png'/>
+                        <img id='overall-metrics-arrow' class='arrow-img' src='public/img/expand-arrow.png'/>
                     </div>
                 </div>
                 
@@ -71,18 +74,18 @@
                     <h6 class='title-text'>Simulation Graph</h6>
                     <div class='arrow-div'>
                         <span class='arrow-helper'></span>
-                        <img id='simulation-graph-arrow' class='arrow-img' src='public/expand-arrow.png'/>
+                        <img id='simulation-graph-arrow' class='arrow-img' src='public/img/expand-arrow.png'/>
                     </div>
                 </div>
                 
                 <div class='hidden' id='overall-graph-container'>
                     <div id='button-and-information-container'>
                         <button id='toggle-view-button' onclick="toggleView()">Switch to Host View</button>
-                        <img id='information-img' class='information-img' src='public/information.png' onclick='showInstructions("host-instructions", "information-img")'/>
+                        <img id='information-img' class='information-img' src='public/img/information.png' onclick='showInstructions("host-instructions", "information-img")'/>
                     </div>
                     <div id='host-instructions' class='instructions-container'>
                         <div id='host-instructions-close-button-container' class='instructions-close-button-container'>
-                            <img id='host-instructions-close-button' class='instructions-close-button' src='public/close-button.png' onclick='hideInstructions("host-instructions", "information-img")'/>
+                            <img id='host-instructions-close-button' class='instructions-close-button' src='public/img/close-button.png' onclick='hideInstructions("host-instructions", "information-img")'/>
                         </div>
                         <p id='host-instructions-text'>Hover over or click on a host on the legend to isolate that host on the graph. Click on a selected host to deselect it. or just select a different host on the legend</p>
                     </div>
@@ -95,7 +98,7 @@
                     <h6 class='title-text'>Simulation Details</h6>
                     <div class='arrow-div'>
                         <span class='arrow-helper'></span>
-                        <img id='simulation-details-arrow' class='arrow-img' src='public/expand-arrow.png'/>
+                        <img id='simulation-details-arrow' class='arrow-img' src='public/img/expand-arrow.png'/>
                     </div>
                 </div>
 
@@ -144,7 +147,7 @@
                     <h6 class='title-text'>Energy Graphs</h6>
                     <div class='arrow-div'>
                         <span class='arrow-helper'></span>
-                        <img id='energy-graph-arrow' class='arrow-img' src='public/expand-arrow.png'/>
+                        <img id='energy-graph-arrow' class='arrow-img' src='public/img/expand-arrow.png'/>
                     </div>
                 </div>
 
@@ -167,14 +170,14 @@
                     <h6 class='title-text'>3D Visualisation</h6>
                     <div class='arrow-div'>
                         <span class='arrow-helper'></span>
-                        <img id='three-d-graph-arrow' class='arrow-img' src='public/expand-arrow.png'/>
+                        <img id='three-d-graph-arrow' class='arrow-img' src='public/img/expand-arrow.png'/>
                     </div>
                 </div>
                 <div id='three-d-graph-container' class='hidden'>
-                    <img id='three-d-information-img' class='information-img' src='public/information.png' onclick='showInstructions("three-d-instructions", "three-d-information-img")'/>
+                    <img id='three-d-information-img' class='information-img' src='public/img/information.png' onclick='showInstructions("three-d-instructions", "three-d-information-img")'/>
                     <div id='three-d-instructions' class='instructions-container' style='text-align: left'>
                         <div id='three-d-instructions-close-button-container' class='instructions-close-button-container'>
-                            <img id='three-d-instructions-close-button' class='instructions-close-button' src='public/close-button.png' onclick='hideInstructions("three-d-instructions", "three-d-information-img")'/>
+                            <img id='three-d-instructions-close-button' class='instructions-close-button' src='public/img/close-button.png' onclick='hideInstructions("three-d-instructions", "three-d-information-img")'/>
                         </div>
                         <p id='three-d-instructions-text'>
                             Each cube in this 3D graph represents a task. The color to task ID mapping can be found in the legend below. Hover over or click a task in the legend to view more details about the task and highlight it in the graph. You can click and drag the graph to adjust the angle. 
@@ -218,7 +221,7 @@
                     <h6 class='title-text'>Host Utilization Graph</h6>
                     <div class='arrow-div'>
                         <span class='arrow-helper'></span>
-                        <img id='host-utilization-arrow' class='arrow-img' src='public/expand-arrow.png'/>
+                        <img id='host-utilization-arrow' class='arrow-img' src='public/img/expand-arrow.png'/>
                     </div>
                 </div>
 
