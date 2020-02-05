@@ -282,9 +282,7 @@ namespace wrench {
             // Set the vertical positions as we go so the entire graph layout is set when the function returns
             current_execution_instance.vertical_position = vertical_position;
 
-            nlohmann::json task_vert;
 
-            task_vert[current_execution_instance.task_id] = vertical_position;
 
 
 
@@ -331,13 +329,13 @@ namespace wrench {
 
 
             if (not has_overlap and index >= data.size() - 1) {
-                host_utilization_layout.push_back(task_vert);
+                host_utilization_layout[current_execution_instance.task_id] = vertical_position;
                 return true;
             } else if (not has_overlap) {
                 bool found_layout = searchForLayout(data, index + 1);
 
                 if (found_layout) {
-                    host_utilization_layout.push_back(task_vert);
+                    host_utilization_layout[current_execution_instance.task_id] = vertical_position;
                     return true;
                 }
             }
@@ -476,7 +474,7 @@ namespace wrench {
                 }
                 task_json.push_back({
                                             {"task_id",                  task->getID()},
-                                            {"execution host", {
+                                            {"execution_host", {
                                                                      {"hostname", current_task_execution.execution_host},
                                                                      {"flop_rate", Simulation::getHostFlopRate(
                                                                                     current_task_execution.execution_host)},
@@ -592,28 +590,30 @@ namespace wrench {
      *
      * <pre>
      * {
-     *      vertices: [
-     *          {
-     *              type: <"task">,
-     *              id: <string>,
-     *              flops: <double>,
-     *              min_cores: <unsigned_long>,
-     *              max_cores: <unsigned_long>,
-     *              parallel_efficiency: <double>,
-     *              memory: <double>,
-     *          },
-     *          {
-     *              type: <"file">,
-     *              id: <string>,
-     *              size: <double>
-     *          }, . . .
-     *      ],
-     *      edges: [
-     *          {
-     *              source: <string>,
-     *              target: <string>
-     *          }, . . .
-     *      ]
+     *      "workflow_graph": {
+     *          vertices: [
+     *              {
+     *                  type: <"task">,
+     *                  id: <string>,
+     *                  flops: <double>,
+     *                  min_cores: <unsigned_long>,
+     *                  max_cores: <unsigned_long>,
+     *                  parallel_efficiency: <double>,
+     *                  memory: <double>,
+     *              },
+     *              {
+     *                  type: <"file">,
+     *                  id: <string>,
+     *                  size: <double>
+     *              }, . . .
+     *          ],
+     *          edges: [
+     *              {
+     *                  source: <string>,
+     *                  target: <string>
+     *              }, . . .
+     *          ]
+     *      }
      *  }
      *  </pre>
      *
@@ -690,12 +690,13 @@ namespace wrench {
         nlohmann::json workflow_task_graph;
         workflow_task_graph["vertices"] = vertices;
         workflow_task_graph["edges"] = edges;
-
+        nlohmann::json workflow_graph;
+        workflow_graph["workflow_graph"] = workflow_task_graph;
         workflow_graph_json_part = workflow_task_graph;
 
         if(writing_file) {
             std::ofstream output(file_path);
-            output << std::setw(4) << nlohmann::json(workflow_task_graph) << std::endl;
+            output << std::setw(4) << nlohmann::json(workflow_graph) << std::endl;
             output.close();
         }
     }
@@ -707,7 +708,8 @@ namespace wrench {
      * The JSON array has the following format:
      *
      * <pre>
-     * [
+     * {
+     *      "energy_consumption": {
      *      {
      *          hostname: <string>,
      *          pstates: [                 <-- if this host is a single core host, items in this list will be formatted as
@@ -739,7 +741,7 @@ namespace wrench {
      *              }, ...
      *          ]
      *      }, ...
-     * ]
+     * }
      * </pre>
      *
      * @param file_path: the path to write the file
@@ -824,11 +826,14 @@ namespace wrench {
 
             // std::cerr << hosts_energy_consumption_information.dump(4);
 
+
+            nlohmann::json energy_consumption;
+            energy_consumption["energy_consumption"] = hosts_energy_consumption_information;
             energy_json_part = hosts_energy_consumption_information;
 
             if(writing_file) {
                 std::ofstream output(file_path);
-                output << std::setw(4) << nlohmann::json(hosts_energy_consumption_information) << std::endl;
+                output << std::setw(4) << nlohmann::json(energy_consumption) << std::endl;
                 output.close();
             }
 
@@ -845,43 +850,45 @@ namespace wrench {
      *
      * <pre>
      * {
-     *    vertices: [
-     *        {
-     *            type: <"host">,
-     *            id: <string>,
-     *            flop_rate: <double (flops per second)>,
-     *            memory: <double (bytes)>,
-     *            cores: <unsigned_long>
-     *        },
-     *        {
-     *            type: <"link">,
-     *            id: <string>,
-     *            bandwidth: <double (bytes per second)>,
-     *            latency: <double (in seconds)>
-     *        }, . . .
-     *    ],
-     *    edges: [
-     *        {
-     *            source: {
-     *                type: <string>,
-     *                id: <string>
+     *     "platform":{
+     *       vertices: [
+     *            {
+     *                type: <"host">,
+     *                id: <string>,
+     *              flop_rate: <double (flops per second)>,
+     *              memory: <double (bytes)>,
+     *              cores: <unsigned_long>
+     *           },
+     *           {
+     *                type: <"link">,
+     *                id: <string>,
+     *               bandwidth: <double (bytes per second)>,
+     *             latency: <double (in seconds)>
+     *            }, . . .
+     *       ],
+     *        edges: [
+     *            {
+     *                source: {
+     *                    type: <string>,
+     *                    id: <string>
+     *              }
+     *                target: {
+     *                    type: <string>,
+     *                    id: <string>
      *            }
-     *            target: {
-     *                type: <string>,
-     *                id: <string>
-     *           }
-     *        }, . . .
+     *            }, . . .
+     *      ],
+     *    routes: [
+     *           {
+     *               source: <string>,
+     *               target: <string>,
+     *               latency: <double (in seconds)>
+     *               route: [
+     *                  link_id, ...
+     *              ]
+     *        }
      *    ],
-     *   routes: [
-     *       {
-     *           source: <string>,
-     *           target: <string>,
-     *           latency: <double (in seconds)>
-     *           route: [
-     *               link_id, ...
-     *           ]
-     *       }
-     *   ],
+     *   }
      * }
      * </pre>
      *
@@ -1133,12 +1140,13 @@ namespace wrench {
         }
 
         //std::cerr << platform_graph_json.dump(4) << std::endl;
-
+        nlohmann::json platform;
+        platform["platform"] = platform_graph_json;
         platform_json_part = platform_graph_json;
 
         if(writing_file){
             std::ofstream output(file_path);
-            output << std::setw(4) << nlohmann::json(platform_graph_json) << std::endl;
+            output << std::setw(4) << nlohmann::json(platform) << std::endl;
             output.close();
         }
     }
