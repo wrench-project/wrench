@@ -1,10 +1,8 @@
 function initialise() {
-    if (energyData != []) {
-        generateConsumedEnergyGraph(energyData, "consumedEnergyGraph", "consumedEnergyGraphLegend")
-        generatePStateGraph(energyData, "pStateGraph", "pStateGraphLegend")
-    }
-    var noFileDiv = document.getElementById("no-file")
-    var mainBodyDiv = document.getElementById("main-body")
+    const noFileDiv = document.getElementById("no-file")
+    const mainBodyDiv = document.getElementById("main-body")
+    const energyTitles = document.getElementsByClassName("energy-title")
+    const noEnergyFileDiv = document.getElementById("no-energy-file")
     if (localStorage.getItem("firstVisit") === "null") {
         localStorage.setItem("firstVisit", true)
         firstVisit = true
@@ -15,6 +13,19 @@ function initialise() {
     } else {
         noFileDiv.style.display = "none"
         mainBodyDiv.style.display = "block"
+        if (Object.keys(energyData).length !== 0) {
+            Array.from(energyTitles).forEach(function(et) {
+                et.style.display = "block"
+            })
+            noEnergyFileDiv.style.display = "none"
+            generateConsumedEnergyGraph(energyData, "consumedEnergyGraph", "consumedEnergyGraphLegend")
+            generatePStateGraph(energyData, "pStateGraph", "pStateGraphLegend")
+        } else {
+            Array.from(energyTitles).forEach(function(et) {
+                et.style.display = "none"
+            })
+            noEnergyFileDiv.style.display = "block"
+        }
         if (data.file !== undefined) {
             generateGraph(data.contents, "graph-container", currGraphState, 1000, 1000)
             populateLegend("taskView")
