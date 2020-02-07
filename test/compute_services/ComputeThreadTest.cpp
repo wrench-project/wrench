@@ -11,7 +11,7 @@
 #include <random>
 #include <wrench-dev.h>
 
-#include "../../src/wrench/services/compute/work_unit_executor/ComputeThread.h"
+#include "../../src/wrench/helper_services/work_unit_executor/ComputeThread.h"
 
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"

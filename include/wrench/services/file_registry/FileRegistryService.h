@@ -42,6 +42,8 @@ namespace wrench {
 
         std::map<std::string, std::string> default_property_values = {
                 {FileRegistryServiceProperty::LOOKUP_COMPUTE_COST,                      "0.0"},
+                {FileRegistryServiceProperty::ADD_ENTRY_COMPUTE_COST,                   "0.0"},
+                {FileRegistryServiceProperty::REMOVE_ENTRY_COMPUTE_COST,                "0.0"},
         };
 
         std::map<std::string, double> default_messagepayload_values = {

@@ -8,7 +8,7 @@
  */
 
 #include <climits>
-#include <services/storage/storage_helpers/FileTransferThreadMessage.h>
+#include <services/storage/storage_helper_classes/FileTransferThreadMessage.h>
 
 #include "wrench/services/storage/simple/SimpleStorageService.h"
 #include "wrench/services/ServiceMessage.h"

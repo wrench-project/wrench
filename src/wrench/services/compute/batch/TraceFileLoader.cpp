@@ -225,14 +225,15 @@ namespace wrench {
                     if (requested_ram < 0) {
                         requested_ram = 0;
                     }
+
                     if (sub_time < 0) {
                         throw std::invalid_argument(
                                 "TraceFileLoader::loadFromTraceFileSWF(): invalid job with negative submission time in batch workload trace file");
                     }
-                    if (requested_num_nodes < 0) {
+                    if (requested_num_nodes <= 0) {
                         requested_num_nodes = num_nodes;
                     }
-                    if (requested_num_nodes < 0) {
+                    if (requested_num_nodes <= 0) {
                         throw std::invalid_argument(
                                 "TraceFileLoader::loadFromTraceFileSWF(): invalid job with negative (requested) number of node in batch workload trace file");
                     }

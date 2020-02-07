@@ -53,7 +53,7 @@ protected:
             for (int i = 0; i < NUM_STORAGE_SERVICES; i++) {
                 xml +=
                         "          <disk id=\"large_disk" + std::to_string(i) +
-                        "\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                        "\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                         "             <prop id=\"size\" value=\"" + std::to_string(STORAGE_SERVICE_CAPACITY) +
                         "B\"/>"
                         "             <prop id=\"mount\" value=\"/disk" + std::to_string(i) + "/\"/>"
@@ -61,7 +61,7 @@ protected:
             }
 
             xml +=
-                    "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                    "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                     "             <prop id=\"size\" value=\"101B\"/>"
                     "             <prop id=\"mount\" value=\"/scratch\"/>"
                     "          </disk>"
@@ -375,7 +375,9 @@ void StorageServiceLinkFailuresTest::do_StorageServiceLinkFailureSimpleRandom_Te
     file_registry_service = simulation->add(
             new wrench::FileRegistryService("Host1",
                                             {
-                                                    {wrench::FileRegistryServiceProperty::LOOKUP_COMPUTE_COST, "0"}
+                                                    {wrench::FileRegistryServiceProperty::LOOKUP_COMPUTE_COST, "0"},
+                                                    {wrench::FileRegistryServiceProperty::ADD_ENTRY_COMPUTE_COST, "0"},
+                                                    {wrench::FileRegistryServiceProperty::REMOVE_ENTRY_COMPUTE_COST, "0"}
                                             },
                                             {
                                                     {wrench::FileRegistryServiceMessagePayload::ADD_ENTRY_REQUEST_MESSAGE_PAYLOAD, message_payload},

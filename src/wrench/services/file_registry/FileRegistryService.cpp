@@ -339,6 +339,10 @@ namespace wrench {
 
       } else if (auto msg = std::dynamic_pointer_cast<FileRegistryAddEntryRequestMessage>(message)) {
         addEntryToDatabase(msg->file, msg->location);
+
+        // Simulate an add overhead
+        S4U_Simulation::compute(getPropertyValueAsDouble(FileRegistryServiceProperty::ADD_ENTRY_COMPUTE_COST));
+
         S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                  new FileRegistryAddEntryAnswerMessage(this->getMessagePayloadValue(
                                          FileRegistryServiceMessagePayload::ADD_ENTRY_ANSWER_MESSAGE_PAYLOAD)));
@@ -347,6 +351,10 @@ namespace wrench {
       } else if (auto msg = std::dynamic_pointer_cast<FileRegistryRemoveEntryRequestMessage>(message)) {
 
         bool success = removeEntryFromDatabase(msg->file, msg->location);
+
+        // Simulate a removal overhead
+        S4U_Simulation::compute(getPropertyValueAsDouble(FileRegistryServiceProperty::REMOVE_ENTRY_COMPUTE_COST));
+
         S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                  new FileRegistryRemoveEntryAnswerMessage(success,
                                                                           this->getMessagePayloadValue(

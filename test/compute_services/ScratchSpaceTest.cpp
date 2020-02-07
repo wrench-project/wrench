@@ -10,7 +10,7 @@
 #include <wrench-dev.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/simulation/SimulationMessage.h>
-#include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
+#include "helper_services/standard_job_executor/StandardJobExecutorMessage.h"
 #include <gtest/gtest.h>
 #include <wrench/services/compute/batch/BatchComputeService.h>
 #include <wrench/services/compute/batch/BatchComputeServiceMessage.h>
@@ -59,23 +59,23 @@ protected:
               "   <zone id=\"AS0\" routing=\"Full\"> ";
       for (int i=1; i <= 4; i++) {
         xml +=  "       <host id=\"Host" + std::to_string(i) + "\" speed=\"1f\" core=\"10\" > "
-                "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                 "             <prop id=\"size\" value=\"10000000000000B\"/>"
                 "             <prop id=\"mount\" value=\"/disk1\"/>"
                 "          </disk>"
-                "          <disk id=\"large_disk2\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                "          <disk id=\"large_disk2\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                 "             <prop id=\"size\" value=\"1000000000000B\"/>"
                 "             <prop id=\"mount\" value=\"/disk2\"/>"
                 "          </disk>"
-                "          <disk id=\"disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                "          <disk id=\"disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                 "             <prop id=\"size\" value=\"3000B\"/>"
                 "             <prop id=\"mount\" value=\"/scratch3000\"/>"
                 "          </disk>"
-                "          <disk id=\"disk1\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                "          <disk id=\"disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                 "             <prop id=\"size\" value=\"10000B\"/>"
                 "             <prop id=\"mount\" value=\"/scratch10000\"/>"
                 "          </disk>"
-                "          <disk id=\"disk2\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                "          <disk id=\"disk2\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                 "             <prop id=\"size\" value=\"100B\"/>"
                 "             <prop id=\"mount\" value=\"/scratch100\"/>"
                 "          </disk>"

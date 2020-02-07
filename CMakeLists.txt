@@ -181,11 +181,11 @@ set(SOURCE_FILES
         src/wrench/services/storage/StorageServiceMessage.cpp
         src/wrench/services/storage/StorageServiceMessage.h
         include/wrench/services/storage/storage_helpers/FileTransferThread.h
-        src/wrench/services/storage/storage_helpers/LogicalFileSystem.cpp
+        src/wrench/services/storage/storage_helper_classes/LogicalFileSystem.cpp
         include/wrench/services/storage/storage_helpers/LogicalFileSystem.h
-        src/wrench/services/storage/storage_helpers/FileTransferThread.cpp
-        src/wrench/services/storage/storage_helpers/FileTransferThreadMessage.h
-        src/wrench/services/storage/storage_helpers/FileLocation.cpp
+        src/wrench/services/storage/storage_helper_classes/FileTransferThread.cpp
+        src/wrench/services/storage/storage_helper_classes/FileTransferThreadMessage.h
+        src/wrench/services/storage/storage_helper_classes/FileLocation.cpp
         src/wrench/workflow/execution_events/FailureCause.cpp
         src/wrench/managers/JobManagerMessage.cpp
         src/wrench/managers/JobManagerMessage.h
@@ -204,15 +204,15 @@ set(SOURCE_FILES
         src/wrench/services/compute/cloud/CloudComputeServiceMessagePayload.cpp
         src/wrench/services/compute/cloud/CloudComputeServiceMessage.h
         src/wrench/services/compute/cloud/CloudComputeServiceMessage.cpp
-        src/wrench/services/compute/work_unit_executor/ComputeThread.h
-        src/wrench/services/compute/work_unit_executor/ComputeThread.cpp
-        src/wrench/services/compute/work_unit_executor/Workunit.cpp
-        src/wrench/services/compute/work_unit_executor/WorkunitExecutor.cpp
-        src/wrench/services/compute/standard_job_executor/StandardJobExecutorMessage.h
-        src/wrench/services/compute/standard_job_executor/StandardJobExecutorMessage.cpp
-        src/wrench/services/compute/standard_job_executor/StandardJobExecutor.cpp
-        src/wrench/services/compute/standard_job_executor/StandardJobExecutorProperty.cpp
-        src/wrench/services/compute/standard_job_executor/StandardJobExecutorMessagePayload.cpp
+        src/wrench/helper_services/work_unit_executor/ComputeThread.h
+        src/wrench/helper_services/work_unit_executor/ComputeThread.cpp
+        src/wrench/helper_services/work_unit_executor/Workunit.cpp
+        src/wrench/helper_services/work_unit_executor/WorkunitExecutor.cpp
+        src/wrench/helper_services/standard_job_executor/StandardJobExecutorMessage.h
+        src/wrench/helper_services/standard_job_executor/StandardJobExecutorMessage.cpp
+        src/wrench/helper_services/standard_job_executor/StandardJobExecutor.cpp
+        src/wrench/helper_services/standard_job_executor/StandardJobExecutorProperty.cpp
+        src/wrench/helper_services/standard_job_executor/StandardJobExecutorMessagePayload.cpp
         src/wrench/services/network_proximity/NetworkProximityService.cpp
         src/wrench/services/network_proximity/NetworkProximityServiceProperty.cpp
         src/wrench/services/network_proximity/NetworkProximityServiceMessagePayload.cpp
@@ -232,12 +232,12 @@ set(SOURCE_FILES
         src/wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessage.cpp
         src/wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessagePayload.cpp
         src/wrench/services/compute/htcondor/HTCondorNegotiatorService.cpp
-        src/wrench/services/helpers/alarm/Alarm.cpp
-        src/wrench/services/helpers/service_termination_detector/ServiceTerminationDetector.cpp
-        src/wrench/services/helpers/service_termination_detector/ServiceTerminationDetectorMessage.cpp
-        src/wrench/services/helpers/host_state_change_detector/HostStateChangeDetector.cpp
-        src/wrench/services/helpers/host_state_change_detector/HostStateChangeDetectorProperty.cpp
-        src/wrench/services/helpers/host_state_change_detector/HostStateChangeDetectorMessage.cpp
+        src/wrench/helper_services/alarm/Alarm.cpp
+        src/wrench/helper_services/service_termination_detector/ServiceTerminationDetector.cpp
+        src/wrench/helper_services/service_termination_detector/ServiceTerminationDetectorMessage.cpp
+        src/wrench/helper_services/host_state_change_detector/HostStateChangeDetector.cpp
+        src/wrench/helper_services/host_state_change_detector/HostStateChangeDetectorProperty.cpp
+        src/wrench/helper_services/host_state_change_detector/HostStateChangeDetectorMessage.cpp
         src/wrench/util/PointerUtil.cpp
         src/wrench/util/PointerUtil.cpp
         src/wrench/util/MessageManager.cpp
