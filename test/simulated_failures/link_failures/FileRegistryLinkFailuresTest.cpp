@@ -44,22 +44,22 @@ protected:
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"Host1\" speed=\"1f\" core=\"10\"> ";
         for (int i = 0; i < NUM_STORAGE_SERVICES; i++) {
-            xml += "          <disk id=\"large_disk_" + std::to_string(i) + "\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+            xml += "          <disk id=\"large_disk_" + std::to_string(i) + "\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                                                                             "             <prop id=\"size\" value=\"100B\"/>"
                                                                             "             <prop id=\"mount\" value=\"/disk_" + std::to_string(i) + "\"/>"
                                                                                                                                                    "          </disk>";
         }
-        xml += "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+        xml += "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                "             <prop id=\"size\" value=\"101B\"/>"
                "             <prop id=\"mount\" value=\"/scratch\"/>"
                "          </disk>"
                "       </host>  "
                "       <host id=\"Host2\" speed=\"1f\" core=\"10\"> "
-               "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+               "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                "             <prop id=\"size\" value=\"100B\"/>"
                "             <prop id=\"mount\" value=\"/\"/>"
                "          </disk>"
-               "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+               "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                "             <prop id=\"size\" value=\"101B\"/>"
                "             <prop id=\"mount\" value=\"/scratch\"/>"
                "          </disk>"

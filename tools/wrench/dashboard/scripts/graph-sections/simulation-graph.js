@@ -46,7 +46,7 @@ function getOffset(el, position) {
     containerId: id of <div> container of graph
     currGraphState: pass in "hostView" to see the host view and "taskView" to see the task view
 */
-function generateGraph(data, containerId, currGraphState) {
+function generateGraph(data, containerId, currGraphState, CONTAINER_WIDTH, CONTAINER_HEIGHT) {
     document.getElementById(containerId).innerHTML = //reset graph
         `<div class="text-left" id="tooltip-container">
             <span id="tooltip-task-id"></span><br>
@@ -59,9 +59,8 @@ function generateGraph(data, containerId, currGraphState) {
     var compute_color = '#f7daad'
     var write_color   = '#abdcf4'
     var container = d3.select(`#${containerId}`)
-    const CONTAINER_WIDTH = 1000
-    const CONTAINER_HEIGHT = 1000
     const PADDING = 60
+    const RANGE_END = 30
     var svg = container
         .append("svg")
         .attr('width', CONTAINER_WIDTH)
@@ -84,7 +83,7 @@ function generateGraph(data, containerId, currGraphState) {
 
     var yscale = d3.scaleBand()
         .domain(task_ids)
-        .range([CONTAINER_HEIGHT - PADDING, 30])
+        .range([CONTAINER_HEIGHT - PADDING, RANGE_END])
         .padding(0.1)
 
     var x_axis = d3.axisBottom()
@@ -126,6 +125,8 @@ function generateGraph(data, containerId, currGraphState) {
         .text(yAxisText)
 
     data.forEach(function(d) {
+        var height = data.length > 1 ? yscale(data[0].task_id)-yscale(data[1].task_id) : CONTAINER_HEIGHT - PADDING - RANGE_END;
+        var yScaleNumber = data.length > 1 ? yscale(d.task_id) : RANGE_END
         var group = svg.append('g')
            .attr('id', d.task_id)
         var readTime = getBoxWidth(d, "read", xscale)
@@ -134,30 +135,28 @@ function generateGraph(data, containerId, currGraphState) {
         var ft_point = determineFailedOrTerminatedPoint(d)
         if (ft_point != "none") {
             var x_ft = xscale(d.terminated == -1 ? d.failed : d.terminated)
-            var height_ft = yscale(data[0].task_id)-yscale(data[1].task_id)
-            var y_ft = yscale(d.task_id)
             var colour_ft = d.terminated == -1 ? 'orange' : 'red'
             var class_ft = d.terminated == -1 ? 'failed' : 'terminated'
             group.append('rect')
                 .attr('x', x_ft)
-                .attr('y', y_ft)
-                .attr('height', height_ft)
+                .attr('y', yScaleNumber)
+                .attr('height', height)
                 .attr('width', '5px')
                 .style('fill', colour_ft)
                 .attr('class', class_ft)
         }
         group.append('rect')
             .attr('x', xscale(d.read.start))
-            .attr('y', yscale(d.task_id))
-            .attr('height', yscale(data[0].task_id)-yscale(data[1].task_id))
+            .attr('y', yScaleNumber)
+            .attr('height', height)
             .attr('width', readTime)
             .style('fill',read_color)
             .attr('class','read')
         if (ft_point != "read" || ft_point == "none") {
             group.append('rect')
                 .attr('x', xscale(d.compute.start))
-                .attr('y', yscale(d.task_id))
-                .attr('height', yscale(data[0].task_id)-yscale(data[1].task_id))
+                .attr('y', yScaleNumber)
+                .attr('height', height)
                 .attr('width', computeTime)
                 .style('fill',compute_color)
                 .attr('class','compute')
@@ -165,8 +164,8 @@ function generateGraph(data, containerId, currGraphState) {
         if ((ft_point != "read" && ft_point != "compute" )|| ft_point == "none") {
             group.append('rect')
                 .attr('x', xscale(d.write.start))
-                .attr('y', yscale(d.task_id))
-                .attr('height', yscale(data[0].task_id)-yscale(data[1].task_id))
+                .attr('y', yScaleNumber)
+                .attr('height', height)
                 .attr('width', writeTime)
                 .style('fill',write_color)
                 .attr('class','write')

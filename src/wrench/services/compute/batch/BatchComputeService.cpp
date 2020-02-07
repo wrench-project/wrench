@@ -13,7 +13,7 @@
 #include <wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h>
 #include <wrench/services/compute/cloud/CloudComputeService.h>
 #include <wrench/wms/WMS.h>
-#include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
+#include "helper_services/standard_job_executor/StandardJobExecutorMessage.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/compute/batch/BatchComputeService.h"
@@ -2544,9 +2544,10 @@ namespace wrench {
             std::map<std::string, unsigned long>::iterator it;
 
             for (auto node:node_resources) {
+                double ram_capacity = S4U_Simulation::getHostMemoryCapacity(this->host_id_to_names[node]); // Use the whole RAM
                 this->available_nodes_to_cores[this->host_id_to_names[node]] -= cores_per_node_asked_for;
                 resources.insert(std::make_pair(this->host_id_to_names[node],std::make_tuple( cores_per_node_asked_for,
-                                                                                              0))); // TODO: Is setting RAM to 0 ok here?
+                                                                                              ram_capacity)));
             }
 
             startJob(resources, workflow_job, batch_job, num_nodes_allocated, time_in_seconds,

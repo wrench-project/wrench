@@ -168,7 +168,7 @@ namespace wrench {
         sg_vm_migrate(this->vm, dest_pm);
         double mig_end = simgrid::s4u::Engine::get_clock();
         this->pm_name = dest_pm_name;
-        WRENCH_INFO("%s migrated: %s to %g s", src_pm_hostname.c_str(), dest_pm_name.c_str(), mig_end - mig_sta);
+        WRENCH_INFO("%s migrated to %s in %g s", src_pm_hostname.c_str(), dest_pm_name.c_str(), mig_end - mig_sta);
     }
 
     /**

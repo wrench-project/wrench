@@ -32,21 +32,21 @@ protected:
                         "<platform version=\"4.1\"> "
                         "   <zone id=\"AS0\" routing=\"Full\"> "
                         "       <host id=\"DualCoreHost\" speed=\"1f\" core=\"2\"> "
-                        "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                        "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                         "             <prop id=\"size\" value=\"10000000000000B\"/>"
                         "             <prop id=\"mount\" value=\"/\"/>"
                         "          </disk>"
-                        "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                        "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                         "             <prop id=\"size\" value=\"101B\"/>"
                         "             <prop id=\"mount\" value=\"/scratch\"/>"
                         "          </disk>"
                         "       </host>  "
                         "       <host id=\"QuadCoreHost\" speed=\"1f\" core=\"4\"> "
-                        "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                        "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                         "             <prop id=\"size\" value=\"10000000000000B\"/>"
                         "             <prop id=\"mount\" value=\"/\"/>"
                         "          </disk>"
-                        "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"40MBps\">"
+                        "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                         "             <prop id=\"size\" value=\"101B\"/>"
                         "             <prop id=\"mount\" value=\"/scratch\"/>"
                         "          </disk>"
@@ -187,7 +187,7 @@ void WMSOptimizationsTest::do_staticOptimization_test() {
           new wrench::SimpleStorageService(hostname, {"/"})));
 
   // Create a MHMC Service
-  std::set<std::string> execution_hosts = {wrench::Simulation::getHostnameList()[1]};
+  std::vector<std::string> execution_hosts = {wrench::Simulation::getHostnameList()[1]};
   ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::BareMetalComputeService(
                   hostname, execution_hosts, "/scratch",
@@ -324,7 +324,7 @@ void WMSOptimizationsTest::do_dynamicOptimization_test() {
           new wrench::SimpleStorageService(hostname, {"/"})));
 
   // Create a MHMC Service
-  std::set<std::string> execution_hosts = {wrench::Simulation::getHostnameList()[1]};
+  std::vector<std::string> execution_hosts = {wrench::Simulation::getHostnameList()[1]};
   ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::BareMetalComputeService(
                   hostname, execution_hosts, "/scratch",

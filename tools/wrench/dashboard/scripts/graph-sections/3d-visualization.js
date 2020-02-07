@@ -126,55 +126,6 @@ function searchOverlap(taskId, taskOverlap) {
     }
 }
 
-function determineTaskEnd(d) {
-    var taskEnd
-    if (d.terminated !== -1) {
-        taskEnd = d.terminated
-    } else if (d.failed !== -1) {
-        taskEnd = d.failed
-    } else {
-        taskEnd = d.whole_task.end
-    }
-    return taskEnd
-}
-
-function determineTaskOverlap(data) {
-    var taskOverlap = {}
-    data.forEach(function(d) {
-        var taskStart = d.whole_task.start
-        var taskEnd = determineTaskEnd(d)
-        if (Object.keys(taskOverlap).length === 0) {
-            taskOverlap[0] = []
-            taskOverlap[0].push(d)
-        } else {
-            var i = 0
-            var placed = false
-            while (!placed) {
-                if (taskOverlap[i] === undefined) {
-                    taskOverlap[i] = []
-                }
-                var overlap = false
-                for (var j = 0; j < taskOverlap[i].length; j++) {
-                    var t = taskOverlap[i][j]
-                    var currTaskStart = t.whole_task.start
-                    var currTaskEnd = determineTaskEnd(t)
-                    if ((taskStart >= currTaskStart && taskStart <= currTaskEnd) || (taskEnd >= currTaskStart && taskEnd <= currTaskEnd)) {
-                        i++
-                        overlap = true
-                        break
-                    }
-                }
-                if (!overlap) {
-                    taskOverlap[i].push(d)
-                    placed = true
-                }
-            }
-        }
-    })
-    return taskOverlap
-}
-
-
 function makeCube(h, x, z, duration, colour, taskId){
     return [
         {x: x    , y: h, z: z + duration}, // FRONT TOP LEFT
