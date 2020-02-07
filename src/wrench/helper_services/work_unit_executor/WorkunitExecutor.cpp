@@ -18,7 +18,7 @@
 #include <wrench/exceptions/WorkflowExecutionException.h>
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <wrench/services/compute/workunit_executor/WorkunitExecutor.h>
-#include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
+#include "helper_services/standard_job_executor/StandardJobExecutorMessage.h"
 #include <wrench/workflow/WorkflowTask.h>
 #include <wrench/workflow/job/StandardJob.h>
 #include <wrench/simulation/SimulationTimestampTypes.h>
