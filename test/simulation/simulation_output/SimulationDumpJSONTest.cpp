@@ -38,6 +38,7 @@ public:
     void do_SimulationDumpHostEnergyConsumptionJSON_test();
     void do_SimulationDumpPlatformGraphJSON_test();
     void do_SimulationDumpPlatformGraphJSONBrokenRouting_test();
+    void do_SimulationDumpUnifiedJSON_test();
 
 protected:
     SimulationDumpJSONTest() {
@@ -183,6 +184,7 @@ protected:
     std::string workflow_graph_json_file_path = UNIQUE_TMP_PATH_PREFIX + "workflow_graph_data.json";
     std::string energy_consumption_data_file_path = UNIQUE_TMP_PATH_PREFIX + "energy_consumption.json";
     std::string platform_graph_json_file_path = UNIQUE_TMP_PATH_PREFIX + "platform_graph.json";
+    std::string unified_json_file_path = UNIQUE_TMP_PATH_PREFIX + "unified_output.json";
     std::unique_ptr<wrench::Workflow> workflow;
 
 };
@@ -267,74 +269,76 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowExecutionJSON_test() {
 
     nlohmann::json expected_json = R"(
     {
-        "tasks": [
-            {
-                "compute": {
-                    "end": -1.0,
-                    "start": -1.0
+        "workflow_execution": {
+            "tasks": [
+                {
+                    "compute": {
+                        "end": -1.0,
+                        "start": -1.0
+                    },
+                    "execution_host": {
+                        "cores": 20,
+                        "flop_rate": 1.0,
+                        "hostname": "host2",
+                        "memory": 20.0
+                    },
+                    "failed": -1.0,
+                    "num_cores_allocated": 10,
+                    "read": null,
+                    "task_id": "task1",
+                    "terminated": -1.0,
+                    "whole_task": {
+                        "end": 3.0,
+                        "start": 2.0
+                    },
+                    "write": null
                 },
-                "execution_host": {
-                    "cores": 20,
-                    "flop_rate": 1.0,
-                    "hostname": "host2",
-                    "memory": 20.0
+                {
+                    "compute": {
+                        "end": -1.0,
+                        "start": -1.0
+                    },
+                    "execution_host": {
+                        "cores": 10,
+                        "flop_rate": 1.0,
+                        "hostname": "host1",
+                        "memory": 10.0
+                    },
+                    "failed": -1.0,
+                    "num_cores_allocated": 8,
+                    "read": null,
+                    "task_id": "task1",
+                    "terminated": -1.0,
+                    "whole_task": {
+                        "end": 2.0,
+                        "start": 1.0
+                    },
+                    "write": null
                 },
-                "failed": -1.0,
-                "num_cores_allocated": 10,
-                "read": null,
-                "task_id": "task1",
-                "terminated": -1.0,
-                "whole_task": {
-                    "end": 3.0,
-                    "start": 2.0
-                },
-                "write": null
-            },
-            {
-                "compute": {
-                    "end": -1.0,
-                    "start": -1.0
-                },
-                "execution_host": {
-                    "cores": 10,
-                    "flop_rate": 1.0,
-                    "hostname": "host1",
-                    "memory": 10.0
-                },
-                "failed": -1.0,
-                "num_cores_allocated": 8,
-                "read": null,
-                "task_id": "task1",
-                "terminated": -1.0,
-                "whole_task": {
-                    "end": 2.0,
-                    "start": 1.0
-                },
-                "write": null
-            },
-            {
-                "compute": {
-                    "end": -1.0,
-                    "start": -1.0
-                },
-                "execution_host": {
-                    "cores": 20,
-                    "flop_rate": 1.0,
-                    "hostname": "host2",
-                    "memory": 20.0
-                },
-                "failed": -1.0,
-                "num_cores_allocated": 20,
-                "read": null,
-                "task_id": "task2",
-                "terminated": -1.0,
-                "whole_task": {
-                    "end": 4.0,
-                    "start": 3.0
-                },
-                "write": null
-            }
-        ]
+                {
+                    "compute": {
+                        "end": -1.0,
+                        "start": -1.0
+                    },
+                    "execution_host": {
+                        "cores": 20,
+                        "flop_rate": 1.0,
+                        "hostname": "host2",
+                        "memory": 20.0
+                    },
+                    "failed": -1.0,
+                    "num_cores_allocated": 20,
+                    "read": null,
+                    "task_id": "task2",
+                    "terminated": -1.0,
+                    "whole_task": {
+                        "end": 4.0,
+                        "start": 3.0
+                    },
+                    "write": null
+                }
+            ]
+        }
     }
     )"_json;
 
@@ -353,8 +357,8 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowExecutionJSON_test() {
      * comparing results with expected values, we sort the json lists so the test is deterministic.
      */
 
-    std::sort(result_json["tasks"].begin(), result_json["tasks"].end(), compareStartTimes);
-    std::sort(expected_json["tasks"].begin(), expected_json["tasks"].end(), compareStartTimes);
+    std::sort(result_json["workflow_execution"]["tasks"].begin(), result_json["workflow_execution"]["tasks"].end(), compareStartTimes);
+    std::sort(expected_json["workflow_execution"]["tasks"].begin(), expected_json["workflow_execution"]["tasks"].end(), compareStartTimes);
 
     EXPECT_TRUE(result_json == expected_json);
 
@@ -1025,6 +1029,7 @@ void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
     EXPECT_THROW(simulation->getOutput().dumpHostEnergyConsumptionJSON(""), std::invalid_argument);
 
     EXPECT_NO_THROW(simulation->getOutput().dumpHostEnergyConsumptionJSON(this->energy_consumption_data_file_path));
+    //simulation->getOutput().dumpUnifiedJSON(workflow.get(), "energy_unified.json", false, true, true, true, false);
 
     nlohmann::json expected_json = R"(
     {
@@ -1381,4 +1386,372 @@ void SimulationDumpJSONTest::do_SimulationDumpPlatformGraphJSONBrokenRouting_tes
     EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path3_broken));
 
     EXPECT_THROW(simulation->getOutput().dumpPlatformGraphJSON(this->platform_graph_json_file_path), std::invalid_argument);
+}
+
+
+/**********************************************************************/
+/**         SimulationDumpUnifiedJSONTest                            **/
+/**********************************************************************/
+
+TEST_F(SimulationDumpJSONTest, SimulationDumpUnifiedJSONTest) {
+    DO_TEST_WITH_FORK(do_SimulationDumpUnifiedJSON_test);
+}
+
+void SimulationDumpJSONTest::do_SimulationDumpUnifiedJSON_test() {
+    auto simulation = new wrench::Simulation();
+    int argc = 2;
+    auto argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
+    argv[1] = strdup("--activate-energy");
+
+    simulation->init(&argc, argv);
+
+    simulation->instantiatePlatform(platform_file_path);
+
+    workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+
+    t1 = workflow->addTask("task1", 1, 1, 1, 1.0, 0);
+    t2 = workflow->addTask("task2", 1, 1, 1, 1.0, 0);
+
+    t1->setStartDate(1.0);
+    t1->setEndDate(2.0);
+    t1->setExecutionHost("host1");
+    t1->setNumCoresAllocated(8);
+
+    t1->setStartDate(2.0);
+    t1->setEndDate(3.0);
+    t1->setExecutionHost("host2");
+    t1->setNumCoresAllocated(10);
+
+    t2->setStartDate(3.0);
+    t2->setEndDate(4.0);
+    t2->setExecutionHost("host2");
+    t2->setNumCoresAllocated(20);
+
+    nlohmann::json expected_json5 = R"(
+    {
+        "platform": {
+            "edges": [
+                {
+                    "source": {
+                        "id": "host1",
+                        "type": "host"
+                    },
+                    "target": {
+                        "id": "1",
+                        "type": "link"
+                    }
+                },
+                {
+                    "source": {
+                        "id": "1",
+                        "type": "link"
+                    },
+                    "target": {
+                        "id": "host2",
+                        "type": "host"
+                    }
+                }
+            ],
+            "routes": [
+                {
+                    "latency": 1e-06,
+                    "route": [
+                        "1"
+                    ],
+                    "source": "host1",
+                    "target": "host2"
+                }
+            ],
+            "vertices": [
+                {
+                    "cluster_id": "host1",
+                    "cores": 10,
+                    "flop_rate": 1.0,
+                    "id": "host1",
+                    "memory": 10.0,
+                    "type": "host"
+                },
+                {
+                    "cluster_id": "host2",
+                    "cores": 20,
+                    "flop_rate": 1.0,
+                    "id": "host2",
+                    "memory": 20.0,
+                    "type": "host"
+                },
+                {
+                    "bandwidth": 125000000.0,
+                    "id": "1",
+                    "latency": 1e-06,
+                    "type": "link"
+                }
+            ]
+        },
+        "workflow_execution": {
+            "tasks": [
+                {
+                    "compute": {
+                        "end": -1.0,
+                        "start": -1.0
+                    },
+                    "execution_host": {
+                        "cores": 20,
+                        "flop_rate": 1.0,
+                        "hostname": "host2",
+                        "memory": 20.0
+                    },
+                    "failed": -1.0,
+                    "num_cores_allocated": 10,
+                    "read": null,
+                    "task_id": "task1",
+                    "terminated": -1.0,
+                    "whole_task": {
+                        "end": 3.0,
+                        "start": 2.0
+                    },
+                    "write": null
+                },
+                {
+                    "compute": {
+                        "end": -1.0,
+                        "start": -1.0
+                    },
+                    "execution_host": {
+                        "cores": 10,
+                        "flop_rate": 1.0,
+                        "hostname": "host1",
+                        "memory": 10.0
+                    },
+                    "failed": -1.0,
+                    "num_cores_allocated": 8,
+                    "read": null,
+                    "task_id": "task1",
+                    "terminated": -1.0,
+                    "whole_task": {
+                        "end": 2.0,
+                        "start": 1.0
+                    },
+                    "write": null
+                },
+                {
+                    "compute": {
+                        "end": -1.0,
+                        "start": -1.0
+                    },
+                    "execution_host": {
+                        "cores": 20,
+                        "flop_rate": 1.0,
+                        "hostname": "host2",
+                        "memory": 20.0
+                    },
+                    "failed": -1.0,
+                    "num_cores_allocated": 20,
+                    "read": null,
+                    "task_id": "task2",
+                    "terminated": -1.0,
+                    "whole_task": {
+                        "end": 4.0,
+                        "start": 3.0
+                    },
+                    "write": null
+                }
+            ]
+        },
+        "workflow_graph": {
+            "edges": null,
+            "vertices": [
+                {
+                    "flops": 1.0,
+                    "id": "task1",
+                    "max_cores": 1,
+                    "memory": 0.0,
+                    "min_cores": 1,
+                    "parallel_efficiency": 1.0,
+                    "type": "task"
+                },
+                {
+                    "flops": 1.0,
+                    "id": "task2",
+                    "max_cores": 1,
+                    "memory": 0.0,
+                    "min_cores": 1,
+                    "parallel_efficiency": 1.0,
+                    "type": "task"
+                }
+            ]
+        }
+    }
+    )"_json;
+
+    EXPECT_NO_THROW(simulation->getOutput().dumpUnifiedJSON(workflow.get(), unified_json_file_path, true, true, true, false, false));
+
+    std::ifstream json_file = std::ifstream("workflow_data.json");
+    nlohmann::json result_json;
+    json_file >> result_json;
+
+    std::sort(result_json["platform"]["edges"].begin(), result_json["platform"]["edges"].end(), compareEdges);
+    std::sort(expected_json5["platform"]["edges"].begin(), expected_json5["platform"]["edges"].end(), compareEdges);
+
+    std::sort(result_json["platform"]["vertices"].begin(), result_json["platform"]["vertices"].end(), compareNodes);
+    std::sort(expected_json5["platform"]["vertices"].begin(), expected_json5["platform"]["vertices"].end(), compareNodes);
+
+    std::sort(result_json["platform"]["routes"].begin(), result_json["platform"]["routes"].end(), compareRoutes);
+    std::sort(expected_json5["platform"]["routes"].begin(), expected_json5["platform"]["routes"].end(), compareRoutes);
+
+    std::sort(result_json["workflow_execution"]["tasks"].begin(), result_json["workflow_execution"]["tasks"].end(), compareStartTimes);
+    std::sort(expected_json5["workflow_execution"]["tasks"].begin(), expected_json5["workflow_execution"]["tasks"].end(), compareStartTimes);
+
+    std::sort(result_json["workflow_graph"]["edges"].begin(), result_json["workflow_graph"]["edges"].end(), compareLinks);
+    std::sort(result_json["workflow_graph"]["vertices"].begin(), result_json["workflow_graph"]["vertices"].end(), compareNodes);
+
+    std::sort(expected_json5["workflow_graph"]["edges"].begin(), expected_json5["workflow_graph"]["edges"].end(), compareLinks);
+    std::sort(expected_json5["workflow_graph"]["vertices"].begin(), expected_json5["workflow_graph"]["vertices"].end(), compareNodes);
+
+    EXPECT_TRUE(result_json == expected_json5);
+
+
+    /*
+    workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+
+
+    std::string host = wrench::Simulation::getHostnameList()[0];
+
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    EXPECT_NO_THROW(wms = simulation->add(
+            new SimulationOutputDumpEnergyConsumptionTestWMS(
+                    this, host
+            )
+    ));
+
+    EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
+
+    EXPECT_NO_THROW(simulation->launch());
+
+    EXPECT_NO_THROW(simulation->getOutput().dumpUnifiedJSON(workflow.get(), unified_json_file_path, false, false, false, true, false));
+
+    nlohmann::json expected_json6 = R"(
+    {
+        "energy_consumption": [
+            {
+                "consumed_energy_trace": [
+                    {
+                        "time": 0.0,
+                        "joules": 0.0
+                    },
+                    {
+                        "time": 2.0,
+                        "joules": 400.0
+                    },
+                    {
+                        "time": 4.0,
+                        "joules": 800.0
+                    },
+                    {
+                        "time": 6.0,
+                        "joules": 1200.0
+                    }
+                ],
+                "hostname": "host1",
+                "pstate_trace": [
+                    {
+                        "pstate": 0,
+                        "time": 0.0
+                    }
+                ],
+                "pstates": [
+                    {
+                        "idle": "100.0",
+                        "pstate": 0,
+                        "running": "200.0",
+                        "speed": 100000000.0
+                    },
+                    {
+                        "idle": " 93.0",
+                        "pstate": 1,
+                        "running": "170.0",
+                        "speed": 50000000.0
+                    },
+                    {
+                        "idle": " 90.0",
+                        "pstate": 2,
+                        "running": "150.0",
+                        "speed": 20000000.0
+                    }
+                ],
+                "watt_off": "10"
+            },
+            {
+                "consumed_energy_trace": [
+                    {
+                        "time": 0.0,
+                        "joules": 0.0
+                    },
+                    {
+                        "time": 2.0,
+                        "joules": 200.0
+                    },
+                    {
+                        "time": 4.0,
+                        "joules": 400.0
+                    }
+                ],
+                "hostname": "host2",
+                "pstate_trace": [
+                    {
+                        "pstate": 0,
+                        "time": 0.0
+                    }
+                ],
+                "pstates": [
+                    {
+                        "idle": "100.0",
+                        "pstate": 0,
+                        "running": "200.0",
+                        "speed": 100000000.0
+                    },
+                    {
+                        "idle": " 93.0",
+                        "pstate": 1,
+                        "running": "170.0",
+                        "speed": 50000000.0
+                    },
+                    {
+                        "idle": " 90.0",
+                        "pstate": 2,
+                        "running": "150.0",
+                        "speed": 20000000.0
+                    }
+                ],
+                "watt_off": "10"
+            }
+        ]
+    })"_json;
+
+    std::sort(expected_json6["energy_consumption"].begin(), expected_json6["energy_consumption"].end(), compareHostname);
+    for (size_t i = 0; i < expected_json6["energy_consumption"].size(); ++i) {
+        std::sort(expected_json6["energy_consumption"][i]["consumed_energy_trace"].begin(), expected_json6["energy_consumption"][i]["consumed_energy_trace"].end(), compareTime);
+        std::sort(expected_json6["energy_consumption"][i]["pstates"].begin(), expected_json6["energy_consumption"][i]["pstates"].end(), comparePstate);
+        std::sort(expected_json6["energy_consumption"][i]["pstate_trace"].begin(), expected_json6["energy_consumption"][i]["pstate_trace"].end(), comparePstate);
+    }
+
+    std::ifstream json1_file(unified_json_file_path);
+    nlohmann::json result_json2;
+    json1_file >> result_json2;
+
+
+    std::sort(result_json2["energy_consumption"].begin(), result_json2["energy_consumption"].end(), compareHostname);
+    for (size_t i = 0; i < expected_json6["energy_consumption"].size(); ++i) {
+        std::sort(result_json2["energy_consumption"][i]["consumed_energy_trace"].begin(), result_json2["energy_consumption"][i]["consumed_energy_trace"].end(), compareTime);
+        std::sort(result_json2["energy_consumption"][i]["pstates"].begin(), result_json2["energy_consumption"][i]["pstates"].end(), comparePstate);
+        std::sort(result_json2["energy_consumption"][i]["pstate_trace"].begin(), result_json2["energy_consumption"][i]["pstate_trace"].end(), comparePstate);
+    }
+
+    EXPECT_TRUE(expected_json6 == result_json2);
+    */
+
+    delete simulation;
+    free(argv[0]);
+    free(argv[1]);
+    free(argv);
 }
