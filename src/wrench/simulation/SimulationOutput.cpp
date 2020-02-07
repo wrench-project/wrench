@@ -372,7 +372,10 @@ namespace wrench {
       * The JSON array has the following format:
       *
       * <pre>
-      *    [
+      *    {
+      *      "workflow_execution": {
+      *         "tasks": [
+      *
       *      {
       *          task_id: <string>,
       *          execution_host: {
@@ -391,6 +394,8 @@ namespace wrench {
       *          terminated: <double>
       *      }, . . .
       *    ]
+      *    }
+      *    }
       * </pre>
       *
       *   If generate_host_utilization_layout is set to true, a recursive function searches for a possible host
@@ -572,12 +577,14 @@ namespace wrench {
         }
 
         nlohmann::json workflow_execution_json;
+        nlohmann::json workflow_execution_json_single;
         workflow_execution_json["tasks"] = task_json;
+        workflow_execution_json_single["workflow_execution"] = workflow_execution_json;
         workflow_exec_json_part = workflow_execution_json;
 
         if(writing_file) {
             std::ofstream output(file_path);
-            output << std::setw(4) << workflow_execution_json << std::endl;
+            output << std::setw(4) << workflow_execution_json_single << std::endl;
             output.close();
         }
     }
