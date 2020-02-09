@@ -24,7 +24,7 @@ WRENCH is fully developed in C++. The code follows the C++11 standard, and thus 
 compilers tend to fail the compilation process. Therefore, we strongly recommend
 users to satisfy the following requirements:
 
-- **CMake** - version 3.2.3 or higher
+- **CMake** - version 3.5 or higher
   
 And, one of the following:
 - **g++** - version 5.0 or higher
