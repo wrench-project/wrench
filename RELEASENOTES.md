@@ -1,6 +1,23 @@
 WRENCH Release Notes
 ------
 
+### WRENCH 1.5
+
+(Feb 07, 2020) This release includes a series of new features and bug fixes, including:
+
+- Simulation of failures
+- WRENCH Dashboard
+- Enabled Pilot Job Submission for HTCondor compute service
+- Improved exception handling
+- Added a `BatchComputeServiceProperty` to make it possible to ignore bogus job specifications in workload trace files
+- Allow users to define `SIMGRID_INSTALL_PATH` for non-standard SimGrid installations
+- Code performance improvements
+- Bug fixes: [#104](https://github.com/wrench-project/wrench/issues/104), [#116](https://github.com/wrench-project/wrench/issues/116), [#118](https://github.com/wrench-project/wrench/pull/118)
+
+**Note**: WRENCH 1.5 requires [SimGrid 3.25](https://simgrid.org).
+
+---
+
 ### WRENCH 1.4
 
 (Apr 22, 2019) This release includes a series of new features and bug fixes, including:
@@ -14,6 +31,8 @@ WRENCH Release Notes
 
 **Note**: WRENCH 1.4 requires [SimGrid 3.21](https://simgrid.org).
 
+---
+
 ### WRENCH 1.3
 
 (_Jan 3, 2019_) This release includes a series of new features and bug fixes, including:
@@ -26,6 +45,8 @@ WRENCH Release Notes
 
 **Note**: WRENCH 1.3 requires [SimGrid 3.21](https://simgrid.org).
 
+---
+
 ### WRENCH 1.2
 
 (_Nov 6, 2018_) This release includes a series of new features and bug fixes, including:
@@ -37,6 +58,8 @@ WRENCH Release Notes
 - Bug fixes: #67, #69, #79, #80
 
 **Note**: WRENCH 1.2 requires [SimGrid 3.21](https://simgrid.org).
+
+---
 
 ### WRENCH 1.1
 
@@ -51,6 +74,8 @@ WRENCH Release Notes
 
 **Note**: WRENCH 1.1 requires [SimGrid 3.20](https://simgrid.org)
 
+---
+
 ### WRENCH 1.0.1
 
 (_Aug 14, 2018_) On this minor bug fix and small improvements release, we provide:
@@ -60,6 +85,8 @@ WRENCH Release Notes
 - Bug fixes: #51, #53, #54, #56, and #57
 
 **Note**: WRENCH 1.0.1 requires [SimGrid 3.20](https://simgrid.org)
+
+---
 
 ### WRENCH 1.0
 
