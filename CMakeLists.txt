@@ -297,6 +297,8 @@ set(TEST_FILES
         test/simulation/SimulationLoggingTest.cpp
         test/simulation/simulation_output/SimulationOutputTest.cpp
         test/simulation/simulation_output/SimulationTimestampTaskTest.cpp
+        test/simulation/simulation_output/SimulationTimestampFileReadTest.cpp
+        test/simulation/simulation_output/SimulationTimestampFileWriteTest.cpp
         test/simulation/simulation_output/SimulationTimestampFileCopyTest.cpp
         test/simulation/simulation_output/SimulationTimestampEnergyTest.cpp
         test/simulation/InvalidXMLTest.cpp

@@ -26,7 +26,7 @@ namespace wrench {
 
 		/**
 		 * @brief An generic exception that is thrown whenever something
-		 * unexpected (but simulation-valid) occurrs during the simulated
+		 * unexpected (but simulation-valid) occurs during the simulated
 		 * execution of a WMS
 		 */
 		class WorkflowExecutionException: public std::exception {
