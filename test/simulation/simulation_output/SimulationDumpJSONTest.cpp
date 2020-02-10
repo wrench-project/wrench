@@ -1586,7 +1586,7 @@ void SimulationDumpJSONTest::do_SimulationDumpUnifiedJSON_test() {
 
     EXPECT_NO_THROW(simulation->getOutput().dumpUnifiedJSON(workflow.get(), unified_json_file_path, true, true, true, false, false));
 
-    std::ifstream json_file = std::ifstream("workflow_data.json");
+    std::ifstream json_file = std::ifstream(unified_json_file_path);
     nlohmann::json result_json;
     json_file >> result_json;
 

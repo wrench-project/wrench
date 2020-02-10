@@ -45,3 +45,6 @@ docs
 # Examples
 wrench-simple-example-cloud
 wrench-simple-example-batch
+
+#JSON
+host_utilization_layout.json
