@@ -225,12 +225,18 @@ namespace wrench {
             throw std::invalid_argument("StorageService::readFile(): Invalid arguments");
         }
 
+
         auto storage_service = location->getStorageService();
+        StorageService *service = storage_service.get();
+
 
         assertServiceIsUp(storage_service);
 
         // Send a message to the daemon
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("read_file");
+
+
+
         try {
             S4U_Mailbox::putMessage(storage_service->mailbox_name,
                                     new StorageServiceFileReadRequestMessage(
@@ -304,6 +310,8 @@ namespace wrench {
             throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
                                      message->getName() + "] message!");
         }
+
+
     }
 
     /**
@@ -321,11 +329,14 @@ namespace wrench {
         }
 
         auto storage_service = location->getStorageService();
+        StorageService *service = storage_service.get();
 
         assertServiceIsUp(storage_service);
 
         // Send a  message to the daemon
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("write_file");
+
+
         try {
             S4U_Mailbox::putMessage(storage_service->mailbox_name,
                                     new StorageServiceFileWriteRequestMessage(
@@ -360,8 +371,9 @@ namespace wrench {
                 try {
                     double remaining = file->getSize();
                     while (remaining > storage_service->buffer_size) {
-                        S4U_Mailbox::putMessage(msg->data_write_mailbox_name, new StorageServiceFileContentChunkMessage(
-                                file, storage_service->buffer_size, false));
+                        S4U_Mailbox::putMessage(msg->data_write_mailbox_name,
+                                                new StorageServiceFileContentChunkMessage(
+                                                        file, storage_service->buffer_size, false));
                         remaining -= storage_service->buffer_size;
                     }
                     S4U_Mailbox::putMessage(msg->data_write_mailbox_name, new StorageServiceFileContentChunkMessage(
@@ -389,6 +401,9 @@ namespace wrench {
             throw std::runtime_error("StorageService::writeFile(): Received an unexpected [" +
                                      message->getName() + "] message!");
         }
+
+
+
     }
 
     /**
