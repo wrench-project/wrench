@@ -19,7 +19,12 @@
 #include "wrench/simulation/SimulationTimestamp.h"
 #include "wrench/simulation/SimulationTrace.h"
 
+
+
+
 namespace wrench {
+
+
 
     /**
      * @brief A class that contains post-mortem simulation-generated data
@@ -51,10 +56,12 @@ namespace wrench {
           return non_generic_vector;
         }
 
-        void dumpWorkflowExecutionJSON(Workflow *workflow, std::string file_path, bool generate_host_utilization_layout = false);
-        void dumpWorkflowGraphJSON(wrench::Workflow *workflow, std::string file_path);
-        void dumpHostEnergyConsumptionJSON(std::string file_path);
-        void dumpPlatformGraphJSON(std::string file_path);
+        void dumpWorkflowExecutionJSON(Workflow *workflow, std::string file_path, bool generate_host_utilization_layout = false, bool writing_file = true);
+        void dumpWorkflowGraphJSON(wrench::Workflow *workflow, std::string file_path, bool writing_file = true);
+        void dumpHostEnergyConsumptionJSON(std::string file_path, bool writing_file = true);
+        void dumpPlatformGraphJSON(std::string file_path, bool writing_file = true);
+        void dumpUnifiedJSON(Workflow *workflow, std::string file_path, bool include_platform = false, bool include_workflow_exec = true,
+                             bool include_workflow_graph = false, bool include_energy = false, bool generate_host_utilization_layout = false);
 
         /***********************/
         /** \cond DEVELOPER    */
@@ -94,6 +101,12 @@ namespace wrench {
 
     private:
         std::map<std::type_index, GenericSimulationTrace*> traces;
+        nlohmann::json platform_json_part;
+        nlohmann::json workflow_exec_json_part;
+        nlohmann::json workflow_graph_json_part;
+        nlohmann::json energy_json_part;
+
+
     };
 
 };

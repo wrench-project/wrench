@@ -32,6 +32,8 @@ WRENCH_LOG_NEW_DEFAULT_CATEGORY(simulation_output, "Log category for Simulation 
 
 namespace wrench {
 
+    nlohmann::json host_utilization_layout;
+
     /**
      * \cond
      */
@@ -48,6 +50,9 @@ namespace wrench {
         std::pair<double, double> read;
         std::pair<double, double> compute;
         std::pair<double, double> write;
+
+        std::vector<std::pair<double, double>> reads;
+        std::vector<std::pair<double, double>> writes;
 
         double failed;
         double terminated;
@@ -66,6 +71,56 @@ namespace wrench {
         }
     } WorkflowTaskExecutionInstance;
 
+
+
+    /**
+     * @brief Function that generates a unified JSON file containing the information specified by boolean arguments.
+     *
+     * @param workflow: a pointer to the Workflow
+     * @param file_path: path for generated JSON
+     * @param include_platform: boolean whether to include platform in JSON
+     * @param include_workflow_exec: boolean whether to include workflow execution in JSON
+     * @param include_workflow_graph: boolean whether to include workflow graph in JSON
+     * @param include_energy: boolean whether to include energy consumption in JSON
+     * @param generate_host_utilization_layout: boolean specifying whether or not you would like a possible host utilization
+      *     layout to be generated
+     */
+    void SimulationOutput::dumpUnifiedJSON(Workflow *workflow, std::string file_path,
+                                                     bool include_platform,
+                                                     bool include_workflow_exec,
+                                                     bool include_workflow_graph,
+                                                     bool include_energy,
+                                                     bool generate_host_utilization_layout) {
+
+        nlohmann::json unified_json;
+
+        if(include_platform) {
+            dumpPlatformGraphJSON(file_path, false);
+            unified_json["platform"] = platform_json_part;
+        }
+
+        if(include_workflow_exec){
+            dumpWorkflowExecutionJSON(workflow, file_path, generate_host_utilization_layout, false);
+            unified_json["workflow_execution"] = workflow_exec_json_part;
+        }
+
+        if(include_workflow_graph){
+            dumpWorkflowGraphJSON(workflow, file_path, false);
+            unified_json["workflow_graph"] = workflow_graph_json_part;
+        }
+
+        if(include_energy){
+            dumpHostEnergyConsumptionJSON(file_path, false);
+            unified_json["energy_consumption"] = energy_json_part;
+        }
+
+
+
+        std::ofstream output(file_path);
+        output << std::setw(4) << unified_json << std::endl;
+        output.close();
+    }
+
     /**
      * @brief Function called by the nlohmann::json constructor when a WorkflowTaskExecutionInstance is passed in as
      *      a parameter. This returns the JSON representation of a WorkflowTaskExecutionInstance. The name of this function
@@ -74,36 +129,54 @@ namespace wrench {
      * @param w: reference to a WorkflowTaskExecutionInstance
      */
     void to_json(nlohmann::json &j, const WorkflowTaskExecutionInstance &w) {
-        j = nlohmann::json{
-                {"task_id",             w.task_id},
-                {"execution_host",      {
-                                                {"hostname", w.hostname},
-                                                {"flop_rate", w.host_flop_rate},
-                                                {"memory", w.host_memory},
-                                                {"cores", w.host_num_cores}
 
-                                        }},
-                {"num_cores_allocated", w.num_cores_allocated},
-                {"vertical_position",   w.vertical_position},
-                {"whole_task",          {
-                                                {"start",    w.whole_task.first},
-                                                {"end",       w.whole_task.second}
-                                        }},
-                {"read",                {
-                                                {"start",    w.read.first},
-                                                {"end",       w.read.second}
-                                        }},
-                {"compute",             {
-                                                {"start",    w.compute.first},
-                                                {"end",       w.compute.second}
-                                        }},
-                {"write",               {
-                                                {"start",    w.write.first},
-                                                {"end",       w.write.second}
-                                        }},
-                {"failed",              w.failed},
-                {"terminated",          w.terminated}
+        j["task_id"] = w.task_id;
+
+        j["execution_host"] = {
+                {"hostname", w.hostname},
+                {"flop_rate", w.host_flop_rate},
+                {"memory", w.host_memory},
+                {"cores", w.host_num_cores}
         };
+
+        j["num_cores_allocated"] = w.num_cores_allocated;
+
+        j["vertical_position"] = w.vertical_position;
+
+        j["whole_task"] = {
+                {"start",    w.whole_task.first},
+                {"end",       w.whole_task.second}
+        };
+
+        nlohmann::json file_reads;
+        for (auto const &r : w.reads) {
+            nlohmann::json file_read = nlohmann::json::object({{"end", r.second},
+                                                              {"start", r.first}});
+            file_reads.push_back(file_read);
+        }
+
+        j["read"] = file_reads;
+
+        j["compute"] = {
+                {"start",    w.compute.first},
+                {"end",       w.compute.second}
+        };
+
+
+        nlohmann::json file_writes;
+        for (auto const &r : w.writes) {
+            nlohmann::json file_write = nlohmann::json::object({{"end", r.second},
+                                                               {"start", r.first}});
+            file_writes.push_back(file_write);
+        }
+
+        j["write"] = file_writes;
+
+        j["failed"] = w.failed;
+
+        j["terminated"] = w.terminated;
+
+
     }
 
     /**
@@ -209,6 +282,11 @@ namespace wrench {
             // Set the vertical positions as we go so the entire graph layout is set when the function returns
             current_execution_instance.vertical_position = vertical_position;
 
+
+
+
+
+
             auto current_rect_y_range = std::pair<unsigned long long, unsigned long long>(
                     vertical_position,
                     vertical_position + num_cores_allocated
@@ -249,12 +327,15 @@ namespace wrench {
                 }
             }
 
+
             if (not has_overlap and index >= data.size() - 1) {
+                host_utilization_layout[current_execution_instance.task_id] = vertical_position;
                 return true;
             } else if (not has_overlap) {
                 bool found_layout = searchForLayout(data, index + 1);
 
                 if (found_layout) {
+                    host_utilization_layout[current_execution_instance.task_id] = vertical_position;
                     return true;
                 }
             }
@@ -291,7 +372,10 @@ namespace wrench {
       * The JSON array has the following format:
       *
       * <pre>
-      *    [
+      *    {
+      *      "workflow_execution": {
+      *         "tasks": [
+      *
       *      {
       *          task_id: <string>,
       *          execution_host: {
@@ -310,6 +394,8 @@ namespace wrench {
       *          terminated: <double>
       *      }, . . .
       *    ]
+      *    }
+      *    }
       * </pre>
       *
       *   If generate_host_utilization_layout is set to true, a recursive function searches for a possible host
@@ -327,22 +413,105 @@ namespace wrench {
       * @param file_path: the path to write the file
       * @param generate_host_utilization_layout: boolean specifying whether or not you would like a possible host utilization
       *     layout to be generated
+      * @param writing_file: whether or not the file is written, true by default but will be false when utilized as part
+      * of dumpUnifiedJSON
       *
       * @throws std::invalid_argument
       */
     void SimulationOutput::dumpWorkflowExecutionJSON(Workflow *workflow, std::string file_path,
-                                                     bool generate_host_utilization_layout) {
+                                                     bool generate_host_utilization_layout, bool writing_file) {
         if (workflow == nullptr || file_path.empty()) {
             throw std::invalid_argument("SimulationOutput::dumpTaskDataJSON() requires a valid workflow and file_path");
         }
 
         auto tasks = workflow->getTasks();
+        nlohmann::json task_json;
+
+        auto read_start_timestamps = this->getTrace<SimulationTimestampFileReadStart>();
+        auto read_completion_timestamps = this->getTrace<wrench::SimulationTimestampFileReadCompletion>();
+        auto read_failure_timestamps = this->getTrace<wrench::SimulationTimestampFileReadFailure>();
+
+        auto write_start_timestamps = this->getTrace<SimulationTimestampFileWriteStart>();
+        auto write_completion_timestamps = this->getTrace<wrench::SimulationTimestampFileWriteCompletion>();
+        auto write_failure_timestamps = this->getTrace<wrench::SimulationTimestampFileWriteFailure>();
+
 
         std::vector<WorkflowTaskExecutionInstance> data;
+
+        for (auto const &task : tasks) {
+            auto execution_history = task->getExecutionHistory();
+            while(not execution_history.empty()){
+                auto current_task_execution = execution_history.top();
+                WorkflowTaskExecutionInstance current_execution_instance;
+
+                current_execution_instance.task_id = task->getID();
+
+                if (!read_start_timestamps.empty()) {
+                    for (auto & read_start_timestamp : read_start_timestamps){
+                        if (read_start_timestamp->getContent()->getTask()->getID() == current_execution_instance.task_id) {
+                            current_execution_instance.reads.emplace_back(read_start_timestamp->getContent()->getDate(),
+                                                                          read_start_timestamp->getContent()->getEndpoint()->getDate());
+                        }
+                    }
+                }
+
+                if (!write_start_timestamps.empty()) {
+                    for (auto & write_start_timestamp : write_start_timestamps){
+                        if (write_start_timestamp->getContent()->getTask()->getID() == current_execution_instance.task_id) {
+                            current_execution_instance.writes.emplace_back(write_start_timestamp->getContent()->getDate(),
+                                                                           write_start_timestamp->getContent()->getEndpoint()->getDate());
+                        }
+                    }
+                }
+
+                nlohmann::json file_reads;
+                for (auto const &r : current_execution_instance.reads) {
+                    nlohmann::json file_read = nlohmann::json::object({{"end", r.second},
+                                                                       {"start", r.first}});
+                    file_reads.push_back(file_read);
+                }
+
+                nlohmann::json file_writes;
+                for (auto const &r : current_execution_instance.writes) {
+                    nlohmann::json file_write = nlohmann::json::object({{"end", r.second},
+                                                                        {"start", r.first}});
+                    file_writes.push_back(file_write);
+                }
+                task_json.push_back({
+                                            {"task_id",                  task->getID()},
+                                            {"execution_host", {
+                                                                     {"hostname", current_task_execution.execution_host},
+                                                                     {"flop_rate", Simulation::getHostFlopRate(
+                                                                                    current_task_execution.execution_host)},
+                                                                     {"memory", Simulation::getHostMemoryCapacity(
+                                                                                    current_task_execution.execution_host)},
+                                                                     {"cores", Simulation::getHostNumCores(
+                                                                                    current_task_execution.execution_host)}
+                                                                    }},
+                                            {"num_cores_allocated",           current_task_execution.num_cores_allocated},
+                                            {"whole_task", {
+                                                                   {"start",    current_task_execution.task_start},
+                                                                   {"end",       current_task_execution.task_end}
+                                                           }},
+                                            {"read",              file_reads},
+                                            {"compute",       {
+                                                                      {"start",    current_task_execution.computation_start},
+                                                                      {"end",       current_task_execution.computation_end}
+                                                              }},
+                                            {"write",            file_writes},
+                                            {"failed", current_task_execution.task_failed},
+                                            {"terminated", current_task_execution.task_terminated}
+                                    });
+                execution_history.pop();
+            }
+
+        }
+
 
         // For each attempted execution of a task, add a WorkflowTaskExecutionInstance to the list.
         for (auto const &task : tasks) {
             auto execution_history = task->getExecutionHistory();
+
 
             while (not execution_history.empty()) {
                 auto current_task_execution = execution_history.top();
@@ -350,6 +519,24 @@ namespace wrench {
                 WorkflowTaskExecutionInstance current_execution_instance;
 
                 current_execution_instance.task_id = task->getID();
+
+                if (!read_start_timestamps.empty()) {
+                    for (auto & read_start_timestamp : read_start_timestamps){
+                        if (read_start_timestamp->getContent()->getTask()->getID() == current_execution_instance.task_id) {
+                            current_execution_instance.reads.emplace_back(read_start_timestamp->getContent()->getDate(),
+                                                                                      read_start_timestamp->getContent()->getEndpoint()->getDate());
+                        }
+                    }
+                }
+
+                if (!write_start_timestamps.empty()) {
+                    for (auto & write_start_timestamp : write_start_timestamps){
+                        if (write_start_timestamp->getContent()->getTask()->getID() == current_execution_instance.task_id) {
+                        current_execution_instance.writes.emplace_back(write_start_timestamp->getContent()->getDate(),
+                                                                                  write_start_timestamp->getContent()->getEndpoint()->getDate());
+                        }
+                    }
+                }
 
                 current_execution_instance.hostname = current_task_execution.execution_host;
                 current_execution_instance.host_flop_rate = Simulation::getHostFlopRate(
@@ -364,12 +551,8 @@ namespace wrench {
 
                 current_execution_instance.whole_task = std::make_pair(current_task_execution.task_start,
                                                                        current_task_execution.task_end);
-                current_execution_instance.read = std::make_pair(current_task_execution.read_input_start,
-                                                                 current_task_execution.read_input_end);
                 current_execution_instance.compute = std::make_pair(current_task_execution.computation_start,
                                                                     current_task_execution.computation_end);
-                current_execution_instance.write = std::make_pair(current_task_execution.write_output_start,
-                                                                  current_task_execution.write_output_end);
 
                 current_execution_instance.failed = current_task_execution.task_failed;
                 current_execution_instance.terminated = current_task_execution.task_terminated;
@@ -379,14 +562,31 @@ namespace wrench {
             }
         }
 
+
+
         // Set the "vertical position" of each WorkflowExecutionInstance so we know where to plot each rectangle
         if (generate_host_utilization_layout) {
-            generateHostUtilizationGraphLayout(data);
+            try {
+                generateHostUtilizationGraphLayout(data);
+                std::ofstream output("host_utilization_layout.json");
+                output << std::setw(4) << host_utilization_layout << std::endl;
+                output.close();
+            } catch(std::runtime_error &e) {
+                throw;
+            }
         }
 
-        std::ofstream output(file_path);
-        output << std::setw(4) << nlohmann::json(data) << std::endl;
-        output.close();
+        nlohmann::json workflow_execution_json;
+        nlohmann::json workflow_execution_json_single;
+        workflow_execution_json["tasks"] = task_json;
+        workflow_execution_json_single["workflow_execution"] = workflow_execution_json;
+        workflow_exec_json_part = workflow_execution_json;
+
+        if(writing_file) {
+            std::ofstream output(file_path);
+            output << std::setw(4) << workflow_execution_json_single << std::endl;
+            output.close();
+        }
     }
 
     /**
@@ -397,37 +597,41 @@ namespace wrench {
      *
      * <pre>
      * {
-     *      vertices: [
-     *          {
-     *              type: <"task">,
-     *              id: <string>,
-     *              flops: <double>,
-     *              min_cores: <unsigned_long>,
-     *              max_cores: <unsigned_long>,
-     *              parallel_efficiency: <double>,
-     *              memory: <double>,
-     *          },
-     *          {
-     *              type: <"file">,
-     *              id: <string>,
-     *              size: <double>
-     *          }, . . .
-     *      ],
-     *      edges: [
-     *          {
-     *              source: <string>,
-     *              target: <string>
-     *          }, . . .
-     *      ]
+     *      "workflow_graph": {
+     *          vertices: [
+     *              {
+     *                  type: <"task">,
+     *                  id: <string>,
+     *                  flops: <double>,
+     *                  min_cores: <unsigned_long>,
+     *                  max_cores: <unsigned_long>,
+     *                  parallel_efficiency: <double>,
+     *                  memory: <double>,
+     *              },
+     *              {
+     *                  type: <"file">,
+     *                  id: <string>,
+     *                  size: <double>
+     *              }, . . .
+     *          ],
+     *          edges: [
+     *              {
+     *                  source: <string>,
+     *                  target: <string>
+     *              }, . . .
+     *          ]
+     *      }
      *  }
      *  </pre>
      *
      * @param workflow: a pointer to the workflow
      * @param file_path: the path to write the file
+     * @param writing_file: whether or not the file is written, true by default but will be false when utilized as part
+     * of dumpUnifiedJSON
      *
      * @throws std::invalid_argument
      */
-    void SimulationOutput::dumpWorkflowGraphJSON(wrench::Workflow *workflow, std::string file_path) {
+    void SimulationOutput::dumpWorkflowGraphJSON(wrench::Workflow *workflow, std::string file_path, bool writing_file) {
         if (workflow == nullptr || file_path.empty()) {
             throw std::invalid_argument("SimulationOutput::dumpTaskDataJSON() requires a valid workflow and file_path");
         }
@@ -493,11 +697,15 @@ namespace wrench {
         nlohmann::json workflow_task_graph;
         workflow_task_graph["vertices"] = vertices;
         workflow_task_graph["edges"] = edges;
+        nlohmann::json workflow_graph;
+        workflow_graph["workflow_graph"] = workflow_task_graph;
+        workflow_graph_json_part = workflow_task_graph;
 
-
-        std::ofstream output(file_path);
-        output << std::setw(4) << workflow_task_graph << std::endl;
-        output.close();
+        if(writing_file) {
+            std::ofstream output(file_path);
+            output << std::setw(4) << nlohmann::json(workflow_graph) << std::endl;
+            output.close();
+        }
     }
 
 
@@ -507,7 +715,8 @@ namespace wrench {
      * The JSON array has the following format:
      *
      * <pre>
-     * [
+     * {
+     *      "energy_consumption": {
      *      {
      *          hostname: <string>,
      *          pstates: [                 <-- if this host is a single core host, items in this list will be formatted as
@@ -539,15 +748,16 @@ namespace wrench {
      *              }, ...
      *          ]
      *      }, ...
-     * ]
+     * }
      * </pre>
      *
      * @param file_path: the path to write the file
-     *
+     * @param writing_file: whether or not the file is written, true by default but will be false when utilized as part
+     * of dumpUnifiedJSON
      * @throws std::invalid_argument
      * @throws std::runtime_error
      */
-    void SimulationOutput::dumpHostEnergyConsumptionJSON(std::string file_path) {
+    void SimulationOutput::dumpHostEnergyConsumptionJSON(std::string file_path, bool writing_file) {
 
         if (file_path.empty()) {
             throw std::invalid_argument("SimulationOutput::dumpHostEnergyConsumptionJSON() requires a valid file_path");
@@ -623,9 +833,16 @@ namespace wrench {
 
             // std::cerr << hosts_energy_consumption_information.dump(4);
 
-            std::ofstream output(file_path);
-            output << std::setw(4) << hosts_energy_consumption_information << std::endl;
-            output.close();
+
+            nlohmann::json energy_consumption;
+            energy_consumption["energy_consumption"] = hosts_energy_consumption_information;
+            energy_json_part = hosts_energy_consumption_information;
+
+            if(writing_file) {
+                std::ofstream output(file_path);
+                output << std::setw(4) << nlohmann::json(energy_consumption) << std::endl;
+                output.close();
+            }
 
         } catch (std::runtime_error &e) {
             // the functions that get energy information catch any exceptions then throw runtime_errors
@@ -640,51 +857,55 @@ namespace wrench {
      *
      * <pre>
      * {
-     *    vertices: [
-     *        {
-     *            type: <"host">,
-     *            id: <string>,
-     *            flop_rate: <double (flops per second)>,
-     *            memory: <double (bytes)>,
-     *            cores: <unsigned_long>
-     *        },
-     *        {
-     *            type: <"link">,
-     *            id: <string>,
-     *            bandwidth: <double (bytes per second)>,
-     *            latency: <double (in seconds)>
-     *        }, . . .
-     *    ],
-     *    edges: [
-     *        {
-     *            source: {
-     *                type: <string>,
-     *                id: <string>
+     *     "platform":{
+     *       vertices: [
+     *            {
+     *                type: <"host">,
+     *                id: <string>,
+     *              flop_rate: <double (flops per second)>,
+     *              memory: <double (bytes)>,
+     *              cores: <unsigned_long>
+     *           },
+     *           {
+     *                type: <"link">,
+     *                id: <string>,
+     *               bandwidth: <double (bytes per second)>,
+     *             latency: <double (in seconds)>
+     *            }, . . .
+     *       ],
+     *        edges: [
+     *            {
+     *                source: {
+     *                    type: <string>,
+     *                    id: <string>
+     *              }
+     *                target: {
+     *                    type: <string>,
+     *                    id: <string>
      *            }
-     *            target: {
-     *                type: <string>,
-     *                id: <string>
-     *           }
-     *        }, . . .
+     *            }, . . .
+     *      ],
+     *    routes: [
+     *           {
+     *               source: <string>,
+     *               target: <string>,
+     *               latency: <double (in seconds)>
+     *               route: [
+     *                  link_id, ...
+     *              ]
+     *        }
      *    ],
-     *   routes: [
-     *       {
-     *           source: <string>,
-     *           target: <string>,
-     *           latency: <double (in seconds)>
-     *           route: [
-     *               link_id, ...
-     *           ]
-     *       }
-     *   ],
+     *   }
      * }
      * </pre>
      *
      * @param file_path: the path to write the file
+     * @param writing_file: whether or not the file is written, true by default but will be false when utilized as part
+     * of dumpUnifiedJSON
      *
      * @throws std::invalid_argument
      */
-    void SimulationOutput::dumpPlatformGraphJSON(std::string file_path) {
+    void SimulationOutput::dumpPlatformGraphJSON(std::string file_path, bool writing_file) {
         if (file_path.empty()) {
             throw std::invalid_argument("SimulationOutput::dumpPlatformGraphJSON() requires a valid file_path");
         }
@@ -926,10 +1147,14 @@ namespace wrench {
         }
 
         //std::cerr << platform_graph_json.dump(4) << std::endl;
+        nlohmann::json platform;
+        platform["platform"] = platform_graph_json;
+        platform_json_part = platform_graph_json;
 
-
-        std::ofstream output(file_path);
-        output << std::setw(4) << platform_graph_json << std::endl;
-        output.close();
+        if(writing_file){
+            std::ofstream output(file_path);
+            output << std::setw(4) << nlohmann::json(platform) << std::endl;
+            output.close();
+        }
     }
 };

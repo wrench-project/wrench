@@ -330,11 +330,25 @@ namespace wrench {
                             throw WorkflowExecutionException(
                                     std::make_shared<FileNotFound>(f, FileLocation::SCRATCH));
                         }
-                        files_to_read[f] = FileLocation::LOCATION(this->scratch_space, this->scratch_space->getMountPoint()  + "/" + job->getName());
+                        files_to_read[f] = FileLocation::LOCATION(this->scratch_space,
+                                                                  this->scratch_space->getMountPoint() + "/" +
+                                                                  job->getName());
                         this->files_stored_in_scratch.insert(f);
                     }
                 }
-                StorageService::readFiles(files_to_read);
+                for (auto const &f : files_to_read) {
+                    try{
+                        this->simulation->getOutput().addTimestamp<SimulationTimestampFileReadStart>(
+                                new SimulationTimestampFileReadStart(f.first, f.second.get(), f.second->getStorageService().get(), task));
+                        StorageService::readFile(f.first, f.second);
+                    } catch (WorkflowExecutionException &e) {
+                        this->simulation->getOutput().addTimestamp<SimulationTimestampFileReadFailure>(
+                                new SimulationTimestampFileReadFailure(f.first, f.second.get(), f.second->getStorageService().get(), task));
+                        throw;
+                    }
+                        this->simulation->getOutput().addTimestamp<SimulationTimestampFileReadCompletion>(
+                            new SimulationTimestampFileReadCompletion(f.first, f.second.get(), f.second->getStorageService().get(), task));
+                }
                 task->setReadInputEndDate(S4U_Simulation::getClock());
             } catch (WorkflowExecutionException &e) {
                 this->failure_timestamp_should_be_generated = true;
@@ -372,7 +386,20 @@ namespace wrench {
                         this->files_stored_in_scratch.insert(f);
                     }
                 }
-                StorageService::writeFiles(files_to_write);
+
+                for (auto const &f : files_to_write) {
+                    try{
+                        this->simulation->getOutput().addTimestamp<SimulationTimestampFileWriteStart>(
+                                new SimulationTimestampFileWriteStart(f.first, f.second.get(), f.second->getStorageService().get(), task));
+                        StorageService::writeFile(f.first, f.second);
+                    } catch (WorkflowExecutionException &e) {
+                        this->simulation->getOutput().addTimestamp<SimulationTimestampFileWriteFailure>(
+                                new SimulationTimestampFileWriteFailure(f.first, f.second.get(), f.second->getStorageService().get(), task));
+                        throw;
+                    }
+                    this->simulation->getOutput().addTimestamp<SimulationTimestampFileWriteCompletion>(
+                            new SimulationTimestampFileWriteCompletion(f.first, f.second.get(), f.second->getStorageService().get(), task));
+                }
                 task->setWriteOutputEndDate(S4U_Simulation::getClock());
             } catch (WorkflowExecutionException &e) {
                 this->failure_timestamp_should_be_generated = true;
