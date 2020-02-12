@@ -22,19 +22,19 @@ namespace wrench {
     /**
     * @brief Constructor
     * @param job: the job this workunit belongs to
-    * @param pre_file_copies: a set of file copy actions to perform in sequence first
+    * @param pre_file_copies: a vector of file copy actions to perform in sequence first
     * @param task: a WorkflowTask
     * @param file_locations: locations where tasks should read/write files
-    * @param post_file_copies: a set of file copy actions to perform in sequence after all tasks
-    * @param cleanup_file_deletions: a set of file deletion actions to perform last
+    * @param post_file_copies: a vector of file copy actions to perform in sequence after all tasks
+    * @param cleanup_file_deletions: a vector of file deletion actions to perform last
     */
     Workunit::Workunit(
             StandardJob *job,
-            std::set<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> pre_file_copies,
+            std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> pre_file_copies,
             WorkflowTask *task,
             std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations,
-            std::set<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> post_file_copies,
-            std::set<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>>> cleanup_file_deletions) {
+            std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> post_file_copies,
+            std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>>> cleanup_file_deletions) {
 
         this->num_pending_parents = 0;
 
@@ -126,10 +126,10 @@ namespace wrench {
         // Create the cleanup workunit, if any
         if (not job->cleanup_file_deletions.empty()) {
             cleanup_workunit = std::make_shared<Workunit>(job,
-                                                          (std::set<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation> >>) {},
+                                                          (std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation> >>) {},
                                                           nullptr,
                                                           (std::map<WorkflowFile *, std::shared_ptr<FileLocation> >) {},
-                                                          (std::set<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation> >>) {},
+                                                          (std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation> >>) {},
                                                           job->cleanup_file_deletions);
         }
 
@@ -139,28 +139,28 @@ namespace wrench {
                                                                    job->pre_file_copies,
                                                                    nullptr,
                                                                    (std::map<WorkflowFile *, std::shared_ptr<FileLocation> >) {},
-                                                                   (std::set<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation> >>) {},
-                                                                   (std::set<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation> >>) {});
+                                                                   (std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation> >>) {},
+                                                                   (std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation> >>) {});
         }
 
         // Create the post_file_copies work unit, if any
         if (not job->post_file_copies.empty()) {
             post_file_copies_work_unit = std::make_shared<Workunit>(job,
-                                                                    (std::set<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation> >>) {},
+                                                                    (std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation> >>) {},
                                                                     nullptr,
                                                                     (std::map<WorkflowFile *, std::shared_ptr<FileLocation> >) {},
                                                                     job->post_file_copies,
-                                                                    (std::set<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation> >>) {});
+                                                                    (std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation> >>) {});
         }
 
         // Create the task work units, if any
         for (auto const &task : job->tasks) {
             task_work_units.push_back(std::make_shared<Workunit>(job,
-                                                                 (std::set<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation> >>) {},
+                                                                 (std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation> >>) {},
                                                                  task,
                                                                  job->file_locations,
-                                                                 (std::set<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation> >>) {},
-                                                                 (std::set<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation> >>) {}));
+                                                                 (std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation> >>) {},
+                                                                 (std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation> >>) {}));
         }
 
         // Add dependencies between task work units, if any
