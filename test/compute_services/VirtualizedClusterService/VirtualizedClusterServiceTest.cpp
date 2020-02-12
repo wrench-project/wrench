@@ -639,6 +639,7 @@ private:
 
 
             // migrating the VM
+            wrench::Simulation::sleep(0.01); // TODO Without this sleep, the test hangs! This is being investigated...
 
             try { // try a bogus one for coverage
                 cs->migrateVM("NON-EXISTENT", "DualCoreHost");
