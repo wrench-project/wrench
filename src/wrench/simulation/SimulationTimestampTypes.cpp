@@ -305,7 +305,7 @@ namespace wrench {
                                                              FileLocation *src_location,
                                                              StorageService *service,
                                                              WorkflowTask *task) :
-            service(service), file(file), source(src_location), task(task){
+            file(file), source(src_location), service(service), task(task){
     }
 
     /**
@@ -467,7 +467,7 @@ namespace wrench {
                                                                FileLocation *dst_location,
                                                                StorageService *service,
                                                                WorkflowTask *task) :
-            service(service), file(file), destination(dst_location), task(task){
+            file(file), destination(dst_location), service(service), task(task){
     }
 
     /**
