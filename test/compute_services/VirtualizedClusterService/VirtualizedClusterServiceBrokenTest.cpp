@@ -233,7 +233,7 @@ private:
     }
 };
 
-TEST_F(VirtualizedClusterServiceBrokenTest, Broken) {
+TEST_F(VirtualizedClusterServiceBrokenTest, DISABLED_Broken) {
     DO_TEST_WITH_FORK(do_VMMigrationTest_test);
 }
 
