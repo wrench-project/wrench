@@ -49,8 +49,8 @@ protected:
         small_input_file = workflow->addFile("small_input_file", 10);
         t4_output_file = workflow->addFile("t4_output_file", 1000);
 
-        t4->addInputFile(large_input_file);
         t4->addInputFile(small_input_file);
+        t4->addInputFile(large_input_file);
         t4->addOutputFile(t4_output_file);
         t4->setBytesRead(1000010);
         t4->setBytesWritten(1000);
@@ -267,10 +267,10 @@ private:
         auto job_manager = this->createJobManager();
 
         wrench::StandardJob *job_that_will_fail = job_manager->createStandardJob(this->test->t4,
-                                                                                 {{this->test->large_input_file,
-                                                                                          wrench::FileLocation::LOCATION(this->test->storage_service),
-                                                                                          {this->test->small_input_file,
-                                                                                                  wrench::FileLocation::LOCATION(this->test->storage_service)}},
+                                                                                 {{this->test->small_input_file,
+                                                                                          wrench::FileLocation::LOCATION(this->test->storage_service)},
+                                                                                  {this->test->large_input_file,
+                                                                                          wrench::FileLocation::LOCATION(this->test->storage_service)},
                                                                                   {this->test->t4_output_file,
                                                                                           wrench::FileLocation::LOCATION(this->test->storage_service)}});
         job_manager->submitJob(job_that_will_fail, this->test->compute_service);
