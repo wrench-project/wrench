@@ -267,10 +267,10 @@ private:
         auto job_manager = this->createJobManager();
 
         wrench::StandardJob *job_that_will_fail = job_manager->createStandardJob(this->test->t4,
-                                                                                 {{this->test->small_input_file,
-                                                                                          wrench::FileLocation::LOCATION(this->test->storage_service)},
-                                                                                  {this->test->large_input_file,
-                                                                                          wrench::FileLocation::LOCATION(this->test->storage_service)},
+                                                                                 {{this->test->large_input_file,
+                                                                                          wrench::FileLocation::LOCATION(this->test->storage_service),
+                                                                                          {this->test->small_input_file,
+                                                                                                  wrench::FileLocation::LOCATION(this->test->storage_service)}},
                                                                                   {this->test->t4_output_file,
                                                                                           wrench::FileLocation::LOCATION(this->test->storage_service)}});
         job_manager->submitJob(job_that_will_fail, this->test->compute_service);
