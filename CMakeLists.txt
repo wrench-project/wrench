@@ -286,6 +286,7 @@ set(TEST_FILES
         test/wms/MultipleWMSTest.cpp
         test/wms/WMSOptimizationsTest.cpp
         test/compute_services/VirtualizedClusterService/VirtualizedClusterServiceTest.cpp
+        test/compute_services/VirtualizedClusterService/VirtualizedClusterServiceBrokenTest.cpp
         test/compute_services/VirtualizedClusterService/VirtualizedClusterServiceResourceAllocationAlgorithmTest.cpp
         test/network_proximity_services/NetworkProximityTest.cpp
         test/file_registry_services/FileRegistryTest.cpp
