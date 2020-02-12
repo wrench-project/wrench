@@ -46,7 +46,7 @@ protected:
 
 
         large_input_file = workflow->addFile("large_input_file", 1000000);
-        small_input_file = workflow->addFile("aa_small_input_file", 10);
+        small_input_file = workflow->addFile("zz_small_input_file", 10);
         t4_output_file = workflow->addFile("t4_output_file", 1000);
 
         t4->addInputFile(small_input_file);
@@ -276,7 +276,7 @@ private:
         job_manager->submitJob(job_that_will_fail, this->test->compute_service);
 
         // while large_input_file is being read, we delete small_input_file so that the one task job will fail
-        wrench::StorageService::deleteFile(this->getWorkflow()->getFileByID("aa_small_input_file"),
+        wrench::StorageService::deleteFile(this->getWorkflow()->getFileByID("zz_small_input_file"),
                                            wrench::FileLocation::LOCATION(this->test->storage_service),
                                            this->test->file_registry_service);
 
