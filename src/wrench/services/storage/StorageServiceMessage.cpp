@@ -173,7 +173,6 @@ namespace wrench {
     * @param src: the source location
     * @param dst: the destination location
     * @param file_registry_service: the file registry service to update (nullptr if none)
-    * @param start_timestamp: the file copy start timestamp
     * @param payload: the message size in bytes
     *
     * @throw std::invalid_argument
@@ -183,11 +182,10 @@ namespace wrench {
                                                                                std::shared_ptr<FileLocation> src,
                                                                                std::shared_ptr<FileLocation> dst,
                                                                                std::shared_ptr<FileRegistryService> file_registry_service,
-                                                                               SimulationTimestampFileCopyStart *start_timestamp,
                                                                                double payload) : StorageServiceMessage(
             "FILE_COPY_REQUEST", payload) {
         if ((answer_mailbox == "") || (file == nullptr) || (src == nullptr)
-            || (dst == nullptr) || (start_timestamp == nullptr)) {
+            || (dst == nullptr)) {
             throw std::invalid_argument(
                     "StorageServiceFileCopyRequestMessage::StorageServiceFileCopyRequestMessage(): Invalid arguments");
         }
@@ -196,7 +194,7 @@ namespace wrench {
         this->src = src;
         this->dst = dst;
         this->file_registry_service = file_registry_service;
-        this->start_timestamp = start_timestamp;
+
 
         /**
          *

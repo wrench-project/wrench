@@ -37,8 +37,7 @@ namespace wrench {
                            std::string answer_mailbox_if_read,
                            std::string answer_mailbox_if_write,
                            std::string answer_mailbox_if_copy,
-                           unsigned long buffer_size,
-                           SimulationTimestampFileCopyStart *start_timestamp = nullptr);
+                           unsigned long buffer_size);
 
         FileTransferThread(std::string hostname,
                            std::shared_ptr<StorageService> parent,
@@ -48,8 +47,7 @@ namespace wrench {
                            std::string answer_mailbox_if_read,
                            std::string answer_mailbox_if_write,
                            std::string answer_mailbox_if_copy,
-                           unsigned long buffer_size,
-                           SimulationTimestampFileCopyStart *start_timestamp = nullptr);
+                           unsigned long buffer_size);
 
         FileTransferThread(std::string hostname,
                            std::shared_ptr<StorageService> parent,
@@ -59,8 +57,7 @@ namespace wrench {
                            std::string answer_mailbox_if_read,
                            std::string answer_mailbox_if_write,
                            std::string answer_mailbox_if_copy,
-                           unsigned long buffer_size,
-                           SimulationTimestampFileCopyStart *start_timestamp = nullptr);
+                           unsigned long buffer_size);
 
         int main() override;
         void cleanup(bool has_returned_from_main, int return_value) override;
@@ -83,7 +80,6 @@ namespace wrench {
         std::string answer_mailbox_if_write;
         std::string answer_mailbox_if_copy;
         unsigned long buffer_size;
-        SimulationTimestampFileCopyStart *start_timestamp;
 
         void receiveFileFromNetwork(WorkflowFile *file, std::string mailbox, std::shared_ptr<FileLocation> location);
         void sendLocalFileToNetwork(WorkflowFile *file, std::shared_ptr<FileLocation> location, std::string mailbox);

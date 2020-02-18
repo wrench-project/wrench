@@ -41,13 +41,7 @@ protected:
         standard_job = (wrench::StandardJob *)(1234);
         batch_job = (wrench::BatchJob *)(1234);
         pilot_job = (wrench::PilotJob *)(1234);
-        file_copy_start_time_stamp = new wrench::SimulationTimestampFileCopyStart(file,
-                                                                                  location,
-                                                                                  location);
         failure_cause = std::shared_ptr<wrench::FileNotFound>(new wrench::FileNotFound(file, location), [](void *ptr){});
-        file_copy_start_time_stamp = new wrench::SimulationTimestampFileCopyStart(file,
-                                                                                  location,
-                                                                                  location);
     }
 
 
@@ -65,7 +59,6 @@ protected:
     wrench::StandardJob *standard_job;
     wrench::BatchJob *batch_job;
     wrench::PilotJob *pilot_job;
-    wrench::SimulationTimestampFileCopyStart *file_copy_start_time_stamp;
     std::shared_ptr<wrench::FileNotFound> failure_cause;
 };
 
@@ -292,12 +285,11 @@ TEST_F(MessageConstructorTest, StorageServiceMessages) {
     ASSERT_THROW(new wrench::StorageServiceFileDeleteAnswerMessage(file, storage_service, true, failure_cause, 666),
                  std::invalid_argument);
 
-    ASSERT_NO_THROW(new wrench::StorageServiceFileCopyRequestMessage("mailbox", file, location, location, nullptr, file_copy_start_time_stamp, 666));
-    ASSERT_THROW(new wrench::StorageServiceFileCopyRequestMessage("", file, location, location, nullptr, file_copy_start_time_stamp, 666), std::invalid_argument);
-    ASSERT_THROW(new wrench::StorageServiceFileCopyRequestMessage("mailbox", nullptr, location, location, nullptr, file_copy_start_time_stamp, 666), std::invalid_argument);
-    ASSERT_THROW(new wrench::StorageServiceFileCopyRequestMessage("mailbox", file, nullptr, location, nullptr, file_copy_start_time_stamp, 666), std::invalid_argument);
-    ASSERT_THROW(new wrench::StorageServiceFileCopyRequestMessage("mailbox", file, location, nullptr, nullptr, file_copy_start_time_stamp, 666), std::invalid_argument);
-    ASSERT_THROW(new wrench::StorageServiceFileCopyRequestMessage("mailbox", file, location, location, nullptr, nullptr, 666), std::invalid_argument);
+    ASSERT_NO_THROW(new wrench::StorageServiceFileCopyRequestMessage("mailbox", file, location, location, nullptr, 666));
+    ASSERT_THROW(new wrench::StorageServiceFileCopyRequestMessage("", file, location, location, nullptr, 666), std::invalid_argument);
+    ASSERT_THROW(new wrench::StorageServiceFileCopyRequestMessage("mailbox", nullptr, location, location, nullptr, 666), std::invalid_argument);
+    ASSERT_THROW(new wrench::StorageServiceFileCopyRequestMessage("mailbox", file, nullptr, location, nullptr, 666), std::invalid_argument);
+    ASSERT_THROW(new wrench::StorageServiceFileCopyRequestMessage("mailbox", file, location, nullptr, nullptr, 666), std::invalid_argument);
 
     ASSERT_THROW(new wrench::StorageServiceFileCopyAnswerMessage(nullptr, location, location, nullptr, false, true, nullptr, 666), std::invalid_argument);
     ASSERT_NO_THROW(new wrench::StorageServiceFileCopyAnswerMessage(file, location, location, nullptr, false, true, nullptr, 666));

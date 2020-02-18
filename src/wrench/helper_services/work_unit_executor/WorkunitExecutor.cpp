@@ -455,11 +455,7 @@ namespace wrench {
                 );
             }
 
-            try {
-                StorageService::copyFile(file, src_location, dst_location);
-            } catch (WorkflowExecutionException &e) {
-                throw;
-            }
+            StorageService::copyFile(file, src_location, dst_location);
         }
 
         /** Perform all cleanup file deletions */
