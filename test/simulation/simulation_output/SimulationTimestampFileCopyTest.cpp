@@ -278,8 +278,42 @@ void SimulationTimestampFileCopyTest::do_SimulationTimestampFileCopyBasic_test()
                                  wrench::FileLocation::LOCATION(this->source_storage_service),
                                  nullptr), std::invalid_argument);
 
-    ASSERT_THROW(wrench::SimulationTimestampFileCopyFailure(nullptr), std::invalid_argument);
-    ASSERT_THROW(wrench::SimulationTimestampFileCopyCompletion(nullptr), std::invalid_argument);
+
+
+    ASSERT_THROW(wrench::SimulationTimestampFileCopyFailure(
+                         nullptr,
+                                 wrench::FileLocation::LOCATION(this->source_storage_service),
+                                 wrench::FileLocation::LOCATION(this->destination_storage_service)), std::invalid_argument);
+
+    ASSERT_THROW(wrench::SimulationTimestampFileCopyFailure(
+                         this->file_1,
+                                 nullptr,
+                                 wrench::FileLocation::LOCATION(this->destination_storage_service, "/")), std::invalid_argument);
+
+    ASSERT_THROW(wrench::SimulationTimestampFileCopyFailure(
+                         this->file_1,
+                                 wrench::FileLocation::LOCATION(this->source_storage_service),
+                                 nullptr), std::invalid_argument);
+
+
+
+    ASSERT_THROW(wrench::SimulationTimestampFileCopyCompletion(
+                         nullptr,
+                                 wrench::FileLocation::LOCATION(this->source_storage_service),
+                                 wrench::FileLocation::LOCATION(this->destination_storage_service)), std::invalid_argument);
+
+    ASSERT_THROW(wrench::SimulationTimestampFileCopyCompletion(
+                         this->file_1,
+                                 nullptr,
+                                 wrench::FileLocation::LOCATION(this->destination_storage_service, "/")), std::invalid_argument);
+
+    ASSERT_THROW(wrench::SimulationTimestampFileCopyCompletion(
+                         this->file_1,
+                                 wrench::FileLocation::LOCATION(this->source_storage_service),
+                                 nullptr), std::invalid_argument);
+
+
+
 
     delete simulation;
     free(argv[0]);

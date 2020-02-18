@@ -210,7 +210,7 @@ namespace wrench {
         } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFileCopyRequestMessage>(message)) {
 
             return processFileCopyRequest(msg->file, msg->src, msg->dst,
-                                          msg->answer_mailbox, msg->start_timestamp);
+                                          msg->answer_mailbox);
 
         } else if (auto msg = std::dynamic_pointer_cast<FileTransferThreadNotificationMessage>(message)) {
 
@@ -225,8 +225,7 @@ namespace wrench {
                     msg->failure_cause,
                     msg->answer_mailbox_if_read,
                     msg->answer_mailbox_if_write,
-                    msg->answer_mailbox_if_copy,
-                    msg->start_time_stamp);
+                    msg->answer_mailbox_if_copy);
         } else {
             throw std::runtime_error("SimpleStorageService::processNextMessage(): Unexpected [" + message->getName() + "] message");
         }
@@ -413,15 +412,13 @@ namespace wrench {
  * @param src_location: the source location
  * @param dst_location: the destination location
  * @param answer_mailbox: the mailbox to which the answer should be sent
- * @param start_timestamp: an optional star time stamp
  * @return
  */
     bool
     SimpleStorageService::processFileCopyRequest(WorkflowFile *file,
                                                  std::shared_ptr<FileLocation> src_location,
                                                  std::shared_ptr<FileLocation> dst_location,
-                                                 std::string answer_mailbox,
-                                                 SimulationTimestampFileCopyStart *start_timestamp) {
+                                                 std::string answer_mailbox) {
 
 
 //        // File System  and path at the destination exists?
@@ -461,7 +458,7 @@ namespace wrench {
             if (not fs->hasEnoughFreeSpace(file->getSize())) {
 
                 this->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyFailure>(
-                        new SimulationTimestampFileCopyFailure(start_timestamp));
+                        new SimulationTimestampFileCopyFailure(file, src_location, dst_location));
 
                 try {
                     S4U_Mailbox::putMessage(answer_mailbox,
@@ -501,7 +498,7 @@ namespace wrench {
                                        "",
                                        "",
                                        answer_mailbox,
-                                       this->buffer_size, start_timestamp));
+                                       this->buffer_size));
         ftt->simulation = this->simulation;
         this->pending_file_transfer_threads.push_back(ftt);
 
@@ -536,7 +533,6 @@ namespace wrench {
  * @param answer_mailbox_if_read: the mailbox to send a read notification ("" if not a copy)
  * @param answer_mailbox_if_write: the mailbox to send a write notification ("" if not a copy)
  * @param answer_mailbox_if_copy: the mailbox to send a copy notification ("" if not a copy)
- * @param start_timestamp: a start file copy time stamp
  * @return false if the daemon should terminate
  */
     bool SimpleStorageService::processFileTransferThreadNotification(std::shared_ptr<FileTransferThread> ftt,
@@ -549,8 +545,7 @@ namespace wrench {
                                                                      std::shared_ptr<FailureCause> failure_cause,
                                                                      std::string answer_mailbox_if_read,
                                                                      std::string answer_mailbox_if_write,
-                                                                     std::string answer_mailbox_if_copy,
-                                                                     SimulationTimestampFileCopyStart *start_timestamp) {
+                                                                     std::string answer_mailbox_if_copy) {
 
         // Remove the ftt from the list of running ftt
         if (this->running_file_transfer_threads.find(ftt) == this->running_file_transfer_threads.end()) {
@@ -564,11 +559,14 @@ namespace wrench {
             if (success) {
                 this->file_systems[dst_location->getMountPoint()]->storeFileInDirectory(
                         file, dst_location->getAbsolutePathAtMountPoint());
-                // Deal with time stamps
-                if (start_timestamp != nullptr) {
+                // Deal with time stamps, previously we could test whether a real timestamp was passed, now this. May be no corresponding timestamp.
+                try{
                     this->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyCompletion>(
-                            new SimulationTimestampFileCopyCompletion(start_timestamp));
+                            new SimulationTimestampFileCopyCompletion(file, src_location, dst_location));
+                } catch(invalid_argument &e){
                 }
+
+
             } else {
                 // Process the failure, meaning, just un-decrease the free space
                 this->file_systems[dst_location->getMountPoint()]->unreserveSpace(file, dst_location->getAbsolutePathAtMountPoint());
