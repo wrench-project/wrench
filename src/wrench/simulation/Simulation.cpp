@@ -127,9 +127,12 @@ namespace wrench {
             } else if (not strcmp(argv[i], "--version")) {
                 version_requested = true;
             } else {
-                cleanedup_args.push_back(std::string(argv[i]));
+                cleanedup_args.emplace_back(argv[i]);
             }
         }
+
+        // Add the precision-setting argument
+        cleanedup_args.emplace_back("--cfg=surf/precision:1e-9");
 
         // Always activate VM migration plugin
         sg_vm_live_migration_plugin_init();
