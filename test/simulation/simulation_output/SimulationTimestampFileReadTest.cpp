@@ -273,11 +273,6 @@ void SimulationTimestampFileReadTest::do_SimulationTimestampFileReadBasic_test()
                                  nullptr,
                                  task), std::invalid_argument);
 
-    ASSERT_THROW(wrench::SimulationTimestampFileReadStart(
-                         this->file_1,
-                                 wrench::FileLocation::LOCATION(this->storage_service).get(),
-                                 service,
-                                 nullptr), std::invalid_argument);
 
     ASSERT_THROW(wrench::SimulationTimestampFileReadFailure(
                          nullptr,
@@ -297,11 +292,7 @@ void SimulationTimestampFileReadTest::do_SimulationTimestampFileReadBasic_test()
                                  nullptr,
                                  task), std::invalid_argument);
 
-    ASSERT_THROW(wrench::SimulationTimestampFileReadFailure(
-                         this->file_1,
-                                 wrench::FileLocation::LOCATION(this->storage_service).get(),
-                                 service,
-                                 nullptr), std::invalid_argument);
+
 
 
     ASSERT_THROW(wrench::SimulationTimestampFileReadCompletion(
@@ -322,11 +313,7 @@ void SimulationTimestampFileReadTest::do_SimulationTimestampFileReadBasic_test()
                                  nullptr,
                                  task), std::invalid_argument);
 
-    ASSERT_THROW(wrench::SimulationTimestampFileReadCompletion(
-                         this->file_1,
-                                 wrench::FileLocation::LOCATION(this->storage_service).get(),
-                                 service,
-                                 nullptr), std::invalid_argument);
+
 
 
 

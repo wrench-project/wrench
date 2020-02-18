@@ -561,6 +561,7 @@ namespace wrench {
         assertServiceIsUp(src_location->getStorageService());
         assertServiceIsUp(dst_location->getStorageService());
 
+
         // Send a message to the daemon of the dst service
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("copy_file");
         auto start_timestamp = new SimulationTimestampFileCopyStart(file, src_location, dst_location);
@@ -575,7 +576,6 @@ namespace wrench {
                             src_location,
                             dst_location,
                             nullptr,
-                            start_timestamp,
                             dst_location->getStorageService()->getMessagePayloadValue(StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw WorkflowExecutionException(cause);
@@ -637,7 +637,6 @@ namespace wrench {
                             src_location,
                             dst_location,
                             nullptr,
-                            start_timestamp,
                             dst_location->getStorageService()->getMessagePayloadValue(StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw WorkflowExecutionException(cause);

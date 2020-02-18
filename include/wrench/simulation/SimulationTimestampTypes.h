@@ -177,7 +177,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        SimulationTimestampFileRead(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task);
+        SimulationTimestampFileRead(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task = nullptr);
         /***********************/
         /** \endcond           */
         /***********************/
@@ -232,7 +232,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        SimulationTimestampFileReadStart(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task);
+        SimulationTimestampFileReadStart(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task = nullptr);
         /***********************/
         /** \endcond           */
         /***********************/
@@ -249,7 +249,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        SimulationTimestampFileReadFailure(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task);
+        SimulationTimestampFileReadFailure(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task = nullptr);
         /***********************/
         /** \endcond           */
         /***********************/
@@ -263,7 +263,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        SimulationTimestampFileReadCompletion(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task);
+        SimulationTimestampFileReadCompletion(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task = nullptr);
         /***********************/
         /** \endcond           */
         /***********************/
@@ -281,7 +281,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        SimulationTimestampFileWrite(WorkflowFile *file, FileLocation *dst, StorageService *service, WorkflowTask *task);
+        SimulationTimestampFileWrite(WorkflowFile *file, FileLocation *dst, StorageService *service, WorkflowTask *task = nullptr);
         /***********************/
         /** \endcond           */
         /***********************/
@@ -336,7 +336,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        SimulationTimestampFileWriteStart(WorkflowFile *file, FileLocation *dst, StorageService *service, WorkflowTask *task);
+        SimulationTimestampFileWriteStart(WorkflowFile *file, FileLocation *dst, StorageService *service, WorkflowTask *task = nullptr);
         /***********************/
         /** \endcond           */
         /***********************/
@@ -353,7 +353,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        SimulationTimestampFileWriteFailure(WorkflowFile *file, FileLocation *dst, StorageService *service, WorkflowTask *task);
+        SimulationTimestampFileWriteFailure(WorkflowFile *file, FileLocation *dst, StorageService *service, WorkflowTask *task = nullptr);
         /***********************/
         /** \endcond           */
         /***********************/
@@ -367,7 +367,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        SimulationTimestampFileWriteCompletion(WorkflowFile *file, FileLocation *dst, StorageService *service, WorkflowTask *task);
+        SimulationTimestampFileWriteCompletion(WorkflowFile *file, FileLocation *dst, StorageService *service, WorkflowTask *task = nullptr);
         /***********************/
         /** \endcond           */
         /***********************/
@@ -385,7 +385,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        SimulationTimestampFileCopy(WorkflowFile *file, std::shared_ptr<FileLocation>  src, std::shared_ptr<FileLocation> dst, SimulationTimestampFileCopyStart *start_timestamp = nullptr);
+        SimulationTimestampFileCopy(WorkflowFile *file, std::shared_ptr<FileLocation>  src, std::shared_ptr<FileLocation> dst);
         /***********************/
         /** \endcond           */
         /***********************/
@@ -413,6 +413,15 @@ namespace wrench {
          * @brief The location where the WorkflowFile was being copied to
          */
         std::shared_ptr<FileLocation> destination;
+
+
+
+        /**
+         * @brief the data structure that holds the ongoing file writes.
+         */
+         static std::unordered_multimap<File, SimulationTimestampFileCopy *> pending_file_copies;
+
+        void setEndpoints();
     };
 
     class SimulationTimestampFileCopyFailure;
@@ -443,7 +452,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        SimulationTimestampFileCopyFailure(SimulationTimestampFileCopyStart *start_timestamp);
+        SimulationTimestampFileCopyFailure(WorkflowFile *file, std::shared_ptr<FileLocation>  src, std::shared_ptr<FileLocation> dst);
         /***********************/
         /** \endcond           */
         /***********************/
@@ -457,7 +466,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        SimulationTimestampFileCopyCompletion(SimulationTimestampFileCopyStart *start_timestamp);
+        SimulationTimestampFileCopyCompletion(WorkflowFile *file, std::shared_ptr<FileLocation>  src, std::shared_ptr<FileLocation> dst);
         /***********************/
         /** \endcond           */
         /***********************/

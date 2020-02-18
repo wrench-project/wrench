@@ -192,10 +192,8 @@ namespace wrench {
      */
     SimulationTimestampFileCopy::SimulationTimestampFileCopy(WorkflowFile *file,
                                                              std::shared_ptr<FileLocation> src_location,
-                                                             std::shared_ptr<FileLocation> dst_location,
-                                                             SimulationTimestampFileCopyStart *start_timestamp) :
-            SimulationTimestampPair(start_timestamp), file(file), source(src_location),
-            destination(dst_location) {
+                                                             std::shared_ptr<FileLocation> dst_location) :
+             file(file), source(src_location), destination(dst_location) {
     }
 
     /**
@@ -222,12 +220,39 @@ namespace wrench {
         return this->destination;
     }
 
+
     /**
      * @brief retrieves the corresponding SimulationTimestampFileCopy object
      * @return a pointer to the start or end SimulationTimestampFileCopy object
      */
     SimulationTimestampFileCopy *SimulationTimestampFileCopy::getEndpoint() {
         return dynamic_cast<SimulationTimestampFileCopy *>(this->endpoint);
+    }
+
+    /**
+    * @brief A static unordered multimap of SimulationTimestampFileCopyStart objects that have yet to be matched with Failure, Terminated or Completion timestamps
+    */
+    std::unordered_multimap<File, SimulationTimestampFileCopy *> SimulationTimestampFileCopy::pending_file_copies;
+
+
+    /**
+     * @brief Sets the endpoint of the calling object (SimulationTimestampFileCopyFailure, SimulationTimestampFileCopyCompletion, SimulationTimestampFileCopyStart) with a SimulationTimestampFileCopyStart object
+     */
+    void SimulationTimestampFileCopy::setEndpoints() {
+        auto pending_copies_itr = pending_file_copies.find(File(this->file, this->source.get(), this->destination.get()));
+        if (pending_copies_itr != pending_file_copies.end()) {
+            // set my endpoint to the SimulationTimestampFileCopyStart
+            this->endpoint = (*pending_copies_itr).second;
+
+            // set the SimulationTimestampFileCopyStart's endpoint to me
+            (*pending_copies_itr).second->endpoint = this;
+
+            // the SimulationTimestampFileCopyStart is no longer waiting to be matched with an end timestamp, remove it from the map
+            pending_file_copies.erase(pending_copies_itr);
+        } else {
+            throw std::runtime_error(
+                    "SimulationTimestampFileCopy::setEndpoints() could not find a SimulationTimestampFileCopyStart object.");
+        }
     }
 
     /**
@@ -241,6 +266,7 @@ namespace wrench {
                                                                        std::shared_ptr<FileLocation> src,
                                                                        std::shared_ptr<FileLocation> dst) :
             SimulationTimestampFileCopy(file, src, dst) {
+        WRENCH_DEBUG("Inserting a FileCopyStart timestamp for file copy");
 
         // all information about a file copy should be passed
         if ((this->file == nullptr)
@@ -250,6 +276,8 @@ namespace wrench {
             throw std::invalid_argument(
                     "SimulationTimestampFileCopyStart::SimulationTimestampFileCopyStart() cannot take nullptr arguments");
         }
+
+        pending_file_copies.insert(std::make_pair(File(this->file, this->source.get(), this->destination.get()), this));
     }
 
 
@@ -258,20 +286,22 @@ namespace wrench {
      * @param start_timestamp: a pointer to the SimulationTimestampFileCopyStart associated with this timestamp
      * @throw std::invalid_argument
      */
-    SimulationTimestampFileCopyFailure::SimulationTimestampFileCopyFailure(
-            SimulationTimestampFileCopyStart *start_timestamp) :
-            SimulationTimestampFileCopy(nullptr, nullptr, nullptr, start_timestamp) {
+    SimulationTimestampFileCopyFailure::SimulationTimestampFileCopyFailure(WorkflowFile *file,
+                                                                           std::shared_ptr<FileLocation> src,
+                                                                           std::shared_ptr<FileLocation> dst) :
+            SimulationTimestampFileCopy(file, src, dst) {
+        WRENCH_DEBUG("Inserting a FileCopyFailure timestamp for file copy");
 
-        // a corresponding start timestamp must be passed
-        if (start_timestamp == nullptr) {
+        // all information about a file copy should be passed
+        if ((this->file == nullptr)
+            || (this->source == nullptr)
+            || (this->destination == nullptr)) {
+
             throw std::invalid_argument(
-                    "SimulationTimestampFileCopyFailure::SimulationTimestampFileCopyFailure() start_timestamp cannot be nullptr");
-        } else {
-            this->file = start_timestamp->file;
-            this->source = start_timestamp->source;
-            this->destination = start_timestamp->destination;
-            start_timestamp->endpoint = this;
+                    "SimulationTimestampFileCopyFailure::SimulationTimestampFileCopyFailure() cannot take nullptr arguments");
         }
+
+        setEndpoints();
     }
 
     /**
@@ -279,21 +309,26 @@ namespace wrench {
      * @param start_timestamp: a pointer to the SimulationTimestampFileCopyStart associated with this timestamp
      * @throw std::invalid_argument
      */
-    SimulationTimestampFileCopyCompletion::SimulationTimestampFileCopyCompletion(
-            SimulationTimestampFileCopyStart *start_timestamp) :
-            SimulationTimestampFileCopy(nullptr, nullptr, nullptr, start_timestamp) {
+    SimulationTimestampFileCopyCompletion::SimulationTimestampFileCopyCompletion(WorkflowFile *file,
+                                                                                 std::shared_ptr<FileLocation> src,
+                                                                                 std::shared_ptr<FileLocation> dst) :
+            SimulationTimestampFileCopy(file, src, dst) {
+        WRENCH_DEBUG("Inserting a FileCopyCompletion timestamp for file copy");
 
-        // a corresponding start timestamp must be passed
-        if (start_timestamp == nullptr) {
+
+        // all information about a file copy should be passed
+        if ((this->file == nullptr)
+            || (this->source == nullptr)
+            || (this->destination == nullptr)) {
+
             throw std::invalid_argument(
-                    "SimulationTimestampFileCopyCompletion::SimulationTimestampFileCopyCompletion() start_timestamp cannot be nullptr");
-        } else {
-            this->file = start_timestamp->getFile();
-            this->source = start_timestamp->getSource();
-            this->destination = start_timestamp->getDestination();
-            start_timestamp->endpoint = this;
+                    "SimulationTimestampFileCopyCompletion::SimulationTimestampFileCopyCompletion() cannot take nullptr arguments");
         }
+
+        setEndpoints();
     }
+
+
 
     /**
      * @brief Constructor
@@ -357,7 +392,7 @@ namespace wrench {
      * @brief Sets the endpoint of the calling object (SimulationTimestampFileReadFailure, SimulationTimestampFileReadTerminated, SimulationTimestampFileReadStart) with a SimulationTimestampFileReadStart object
      */
     void SimulationTimestampFileRead::setEndpoints() {
-        // find the SimulationTimestampTaskStart object containing the same task
+        // find the SimulationTimestampFileRead object containing the same task
         auto pending_reads_itr = pending_file_reads.find(File(this->file, this->source, this->service));
         if (pending_reads_itr != pending_file_reads.end()) {
             // set my endpoint to the SimulationTimestampFileReadStart
@@ -393,8 +428,7 @@ namespace wrench {
         // all information about a file read should be passed
         if ((this->file == nullptr)
             || (this->source == nullptr)
-            || (this->service == nullptr)
-            || (this->task == nullptr)) {
+            || (this->service == nullptr)) {
 
             throw std::invalid_argument(
                     "SimulationTimestampFileReadStart::SimulationTimestampFileReadStart() cannot take nullptr arguments");
@@ -421,8 +455,7 @@ namespace wrench {
 
         if (file == nullptr
             || src == nullptr
-            || (service == nullptr)
-            || (task == nullptr)) {
+            || (service == nullptr)) {
             throw std::invalid_argument(
                     "SimulationTimestampFileReadFailure::SimulationTimestampFileReadFailure() requires a valid pointer to file, source and service objects");
         }
@@ -447,8 +480,7 @@ namespace wrench {
 
         if (file == nullptr
             || src == nullptr
-            || service == nullptr
-            || task == nullptr) {
+            || service == nullptr) {
             throw std::invalid_argument(
                     "SimulationTimestampFileReadFailure::SimulationTimestampFileReadFailure() requires a valid pointer to file, source and service objects");
         }
@@ -519,7 +551,7 @@ namespace wrench {
      * @brief Sets the endpoint of the calling object (SimulationTimestampFileWriteFailure, SimulationTimestampFileWriteTerminated, SimulationTimestampFileWriteStart) with a SimulationTimestampFileWriteStart object
      */
     void SimulationTimestampFileWrite::setEndpoints() {
-        // find the SimulationTimestampTaskStart object containing the same task
+        // find the SimulationTimestampFileWrite object containing the same task
         auto pending_writes_itr = pending_file_writes.find(File(this->file, this->destination, this->service));
         if (pending_writes_itr != pending_file_writes.end()) {
             // set my endpoint to the SimulationTimestampFileWriteStart
@@ -555,8 +587,7 @@ namespace wrench {
         // all information about a file write should be passed
         if ((this->file == nullptr)
             || (this->destination == nullptr)
-            || (this->service == nullptr)
-            || (this->task == nullptr)) {
+            || (this->service == nullptr)) {
 
             throw std::invalid_argument(
                     "SimulationTimestampFileWriteStart::SimulationTimestampFileWriteStart() cannot take nullptr arguments");
@@ -584,8 +615,7 @@ namespace wrench {
 
         if (file == nullptr
             || dst == nullptr
-            || service == nullptr
-            || task == nullptr) {
+            || service == nullptr) {
             throw std::invalid_argument(
                     "SimulationTimestampFileWriteFailure::SimulationTimestampFileWriteFailure() requires a valid pointer to file, destination and service objects");
         }
@@ -610,8 +640,7 @@ namespace wrench {
 
         if (file == nullptr
             || dst == nullptr
-            || service == nullptr
-            || task == nullptr) {
+            || service == nullptr) {
             throw std::invalid_argument(
                     "SimulationTimestampFileWriteFailure::SimulationTimestampFileWriteFailure() requires a valid pointer to file, destination and service objects");
         }
