@@ -19,7 +19,7 @@ cp -Rf $HOME/gh-pages-to-deploy/* .
 
 #add, commit and push files
 git add -f .
-git commit -m "Travis build $TRAVIS_BUILD_NUMBER"
+git diff-index --quiet HEAD || git commit -m "Travis build $TRAVIS_BUILD_NUMBER"
 git push -fq origin gh-pages > /dev/null
 
 echo "Done updating gh-pages."
