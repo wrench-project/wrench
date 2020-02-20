@@ -59,8 +59,8 @@ after_success:
       sonar-scanner -Dsonar.host.url=https://sonarqube.com -Dsonar.login=$SONAR_TOKEN;
     fi
   - docker cp wrench:/home/wrench/wrench/docs .;
-  - pwd
-  - ls -lh
+  - cp -R ./docs/gh-pages $HOME/gh-pages-to-deploy
+  - ls -lh $HOME
   - docker stop wrench;
   - docker rm wrench;
   - docker rmi wrenchproject/wrench-build:${DIST}-${COMPILER};

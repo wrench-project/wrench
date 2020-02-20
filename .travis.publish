@@ -8,8 +8,7 @@ if [[ $TRAVIS_BRANCH == "master" && $TRAVIS_PULL_REQUEST == "false" && "$TRAVIS_
 
 #copy data we're interested in to other place
 pwd
-ls -lh
-cp -R ./docs/gh-pages $HOME/gh-pages-to-deploy
+ls -lh $HOME
 
 git config --global user.email "travis@travis-ci.org"
 git config --global user.name "Travis"
