@@ -2,9 +2,12 @@
 
 set -e # exit with nonzero exit code if anything fails
 
-echo "Starting to update gh-pages\n"
+echo "Starting to update gh-pages"
 
-if [[ $TRAVIS_BRANCH == "master" && $TRAVIS_PULL_REQUEST == "false" && "$TRAVIS_OS_NAME" == "linux" && $DIST == "ubuntu-bionic" && $COMPILER == "gcc7" && $BATSCHED == "off" ]] || [[ $TRAVIS_BRANCH == "master" && $TRAVIS_PULL_REQUEST == "false" && "$TRAVIS_OS_NAME" == "linux" && $DIST == "ubuntu-bionic" && $COMPILER == "gcc7" && $BATSCHED == "on" ]]; then
+if [[ $TRAVIS_BRANCH == "master" && $TRAVIS_PULL_REQUEST == "false" && "$TRAVIS_OS_NAME" == "linux" && $DIST == "ubuntu-bionic" && $COMPILER == "gcc7" && $BATSCHED == "off" ]] || [[ $TRAVIS_BRANCH == "master" && $TRAVIS_PULL_REQUEST == "false" && "$TRAVIS_OS_NAME" == "linux" && $DIST == "ubuntu-bionic" && $COMPILER == "gcc7-batsched" && $BATSCHED == "on" ]]; then
+
+#copy data we're interested in to other place
+cp -R ./docs/gh-pages $HOME/gh-pages-to-deploy
 
 git config --global user.email "travis@travis-ci.org"
 git config --global user.name "Travis"
@@ -14,14 +17,14 @@ git clone --quiet --branch=gh-pages https://${GITHUB_TOKEN}@github.com/wrench-pr
 
 #go into directory and copy data we're interested in to that directory
 cd gh-pages
-cp -Rf ../docs/gh-pages/* .
+cp -Rf $HOME/gh-pages-to-deploy/* .
 
 #add, commit and push files
 git add -f .
 git commit -m "Travis build $TRAVIS_BUILD_NUMBER"
 git push -fq origin gh-pages > /dev/null
 
-echo "Done updating gh-pages\n"
+echo "Done updating gh-pages."
 
 else
  echo "Skipped updating gh-pages."
