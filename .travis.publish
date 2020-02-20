@@ -7,9 +7,6 @@ echo "Starting to update gh-pages"
 if [[ $TRAVIS_BRANCH == "master" && $TRAVIS_PULL_REQUEST == "false" && "$TRAVIS_OS_NAME" == "linux" && $DIST == "ubuntu-bionic" && $COMPILER == "gcc7" && $BATSCHED == "off" ]] || [[ $TRAVIS_BRANCH == "master" && $TRAVIS_PULL_REQUEST == "false" && "$TRAVIS_OS_NAME" == "linux" && $DIST == "ubuntu-bionic" && $COMPILER == "gcc7-batsched" && $BATSCHED == "on" ]]; then
 
 #copy data we're interested in to other place
-pwd
-ls -lh $HOME
-
 git config --global user.email "travis@travis-ci.org"
 git config --global user.name "Travis"
 
