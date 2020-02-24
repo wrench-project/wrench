@@ -26,7 +26,7 @@ function getOverallWorkflowMetrics(data, tableContainer, taskClass) {
     var averageComputeDuration
     var averageWriteDuration
     data.forEach(function(d) {
-        var currHost = d.execution_host
+        var currHost = d['execution host']
         hosts.add(currHost)
 
         if (d.failed != -1) {
