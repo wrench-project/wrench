@@ -33,17 +33,7 @@ function getComputeTime(d) {
 function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskId, tooltipComputeTime, CONTAINER_WIDTH, CONTAINER_HEIGHT) {
     var num_cores = determineNumCores(data);
     var container = d3.select(`#${containerId}`);
-    document.getElementById(containerId).innerHTML = `
-        <div class="container legend" id="host-utilization-chart-legend">
-            <small class="inline-block" id="host-utilization-chart-legend-compute-time">Compute Time</small>
-            <small class="inline-block" id="host-utilization-chart-legend-idle-time">Idle Time</small>
-        </div>
-
-        <div class="text-left" id="host-utilization-chart-tooltip">
-            <span id="host-utilization-chart-tooltip-task-id"></span><br>
-            <span id="host-utilization-chart-tooltip-compute-time"></span><br>
-        </div>
-    `
+    document.getElementById(containerId).innerHTML = hostUtilizationHtml
     var chart = document.getElementById(containerId);
     const PADDING = 60;
 
@@ -68,7 +58,7 @@ function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskI
         .range([PADDING, CONTAINER_WIDTH - PADDING]);
 
     var tasks_by_hostname = d3.nest()
-        .key(function(d) { return d.execution_host.hostname; })
+        .key(function(d) { return d['execution host'].hostname; })
         .sortKeys(d3.ascending)
         .entries(data);
 
@@ -85,7 +75,7 @@ function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskI
         tasks_by_hostname.forEach(function (d) {
             y_cores_per_host.set(d.key,
                 d3.scaleLinear()
-                    .domain([0, d.values[0].execution_host.cores])
+                    .domain([0, d.values[0]['execution host'].cores])
                     .range([y_hosts(d.key) + y_hosts.bandwidth(), y_hosts(d.key)])
             );
         });
@@ -124,9 +114,9 @@ function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskI
             return x_scale(d.compute.start);
         })
         .attr("y", function(d) {
-            var y_scale = y_cores_per_host.get(d.execution_host.hostname);
+            var y_scale = y_cores_per_host.get(d['execution host'].hostname);
             var vertical_position = searchOverlap(d.task_id, determineTaskOverlap(data))
-            return y_scale(vertical_position + d.num_cores_allocated);
+            return y_scale(vertical_position);
         })
         .attr("width", function(d) {
             if (d.compute.start === -1) {
@@ -138,7 +128,7 @@ function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskI
             return x_scale(d.compute.end) - x_scale(d.compute.start);
         })
         .attr("height", function(d) {
-            var y_scale = y_cores_per_host.get(d.execution_host.hostname);
+            var y_scale = y_cores_per_host.get(d['execution host'].hostname);
             return y_scale(0) - y_scale(d.num_cores_allocated);
         })
         .attr("fill", "#f7daad")

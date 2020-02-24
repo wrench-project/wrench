@@ -1,3 +1,22 @@
+function prepareData(data) {
+    const nullReplacement = {
+        start: 0,
+        end: 0
+    }
+    data.forEach(function(d) {
+        if (d.read === null) {
+            d.read = nullReplacement
+        }
+        if (d.compute === null) {
+            d.compute = nullReplacement
+        }
+        if (d.write === null) {
+            d.write = nullReplacement
+        }
+    })
+    return data
+}
+
 function initialise() {
     const noFileDiv = document.getElementById("no-file")
     const mainBodyDiv = document.getElementById("main-body")
@@ -27,6 +46,7 @@ function initialise() {
             noEnergyFileDiv.style.display = "block"
         }
         if (data.file !== undefined) {
+            data.contents = prepareData(data.contents)
             generateGraph(data.contents, "graph-container", currGraphState, 1000, 1000)
             populateLegend("taskView")
             populateWorkflowTaskDataTable(data.contents, "task-details-table", "task-details-table-body", "task-details-table-td")
