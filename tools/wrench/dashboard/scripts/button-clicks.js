@@ -15,7 +15,7 @@ function getHostNames(data) {
     var hostNames = new Set();
 
     data.forEach(function(task) {
-        var hostName = task.execution_host.hostname
+        var hostName = task['execution host'].hostname
         hostNames.add(hostName)
     })
 
@@ -45,10 +45,11 @@ function switchToHostView(data, selectedHost) {
     
 
     data.forEach(function(task) {
-        var hostName = task.execution_host.hostname
-        var taskRead = d3.select(`#${task.task_id} .read`)
-        var taskCompute = d3.select(`#${task.task_id} .compute`)
-        var taskWrite = d3.select(`#${task.task_id} .write`)
+        var hostName = task['execution host'].hostname
+        var sanitizedId = sanitizeId(task.task_id)
+        var taskRead = d3.select(`#${sanitizedId} .read`)
+        var taskCompute = d3.select(`#${sanitizedId} .compute`)
+        var taskWrite = d3.select(`#${sanitizedId} .write`)
 
         taskRead.style("fill", hostColours[hostName])
         taskRead.style("opacity", 1)
