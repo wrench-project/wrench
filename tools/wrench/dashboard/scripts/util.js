@@ -169,12 +169,16 @@ function processFile(files, fileType) {
         return
     }
     extractFileContent(files[0])
-        .then(function(rawData) {
+        .then(function(rawDataString) {
             switch (fileType) {
                 case "taskData":
+                    const rawData = JSON.parse(rawDataString)
+                    if (!rawData.workflow_execution || !rawData.workflow_execution.tasks) {
+                        break
+                    }
                     data = {
                         file: files[0].name,
-                        contents: JSON.parse(rawData)
+                        contents: rawData.workflow_execution.tasks
                     }
                     break
                 case "energy":
@@ -186,4 +190,10 @@ function processFile(files, fileType) {
         .catch(function() {
             return
         })
+}
+
+function sanitizeId(id) {
+    id = id.replace('#', '')
+    id = id.replace(' ', '')
+    return id
 }
