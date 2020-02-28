@@ -133,6 +133,7 @@ set(HEADER_FILES
         include/wrench/util/UnitParser.h
         include/wrench/services/compute/hadoop/DeterministicMRJob.h
         include/wrench/services/compute/hadoop/MRJob.h
+        include/wrench/services/compute/hadoop/hadoop_subsystem/MRJobExecutor.h
         include/wrench/services/compute/hadoop/hadoop_subsystem/Spill.h
         include/wrench/services/compute/hadoop/hadoop_subsystem/Shuffle.h
         include/wrench/services/compute/hadoop/hadoop_subsystem/ReduceSideMerge.h
@@ -262,6 +263,7 @@ set(SOURCE_FILES
         src/wrench/services/compute/hadoop/HadoopComputeServiceMessagePayload.cpp
         include/wrench/services/compute/hadoop/HadoopComputeServiceMessagePayload.h
         src/wrench/services/compute/hadoop/DeterministicMRJob.cpp
+        src/wrench/services/compute/hadoop/hadoop_subsystem/MRJobExecutor.cpp
         src/wrench/services/compute/hadoop/hadoop_subsystem/MapperService.cpp
         src/wrench/services/compute/hadoop/hadoop_subsystem/ReducerService.cpp
         src/wrench/services/compute/hadoop/hadoop_subsystem/HdfsService.cpp

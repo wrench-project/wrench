@@ -7,6 +7,7 @@
  * (at your option) any later version.
  */
 
+#include <wrench/services/compute/hadoop/MRJob.h>
 #include "wrench/services/compute/hadoop/HadoopComputeService.h"
 #include "HadoopComputeServiceMessage.h"
 
@@ -36,10 +37,9 @@ namespace wrench {
             std::map<std::string, std::string> property_list,
             std::map<std::string, double> messagepayload_list
     ) :
-            ComputeService(hostname,
-                           "hadoop",
-                           "hadoop",
-                           "") {
+            Service(hostname,
+                    "hadoop",
+                    "hadoop") {
 
         // Set default and specified properties
         this->setProperties(this->default_property_values, std::move(property_list));
@@ -62,7 +62,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void HadoopComputeService::runMRJob() {
+    void HadoopComputeService::runMRJob(MRJob *job) {
 
         assertServiceIsUp();
 
@@ -73,6 +73,7 @@ namespace wrench {
             S4U_Mailbox::putMessage(this->mailbox_name,
                                     new HadoopComputeServiceRunMRJobRequestMessage(
                                             answer_mailbox,
+                                            job,
                                             this->getMessagePayloadValue(
                                                     HadoopComputeServiceMessagePayload::RUN_MR_JOB_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
@@ -145,6 +146,8 @@ namespace wrench {
         WRENCH_INFO("Got a [%s] message", message->getName().c_str());
         if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
 
+            // TODO: Forward the stop request to the executor
+
             // This is Synchronous
             try {
                 S4U_Mailbox::putMessage(msg->ack_mailbox,
@@ -157,15 +160,61 @@ namespace wrench {
 
         } else if (auto msg = std::dynamic_pointer_cast<HadoopComputeServiceRunMRJobRequestMessage>(message)) {
 
-            WRENCH_INFO("I SHOULD DO SOME WORK, BUT I AM JUST REPLYING 'SUCCESS' FOR NOW!");
+            // If an executor is already running, reject the request
+            bool success;
+
+            if (not this->pending_jobs.empty()) {
+                success = false;
+
+            } else {
+
+                // TODO: Double check that the job can run (e.g., do we have enough compute resources?)
+
+                // Start a MRJobExecutor service
+                this->executor = std::shared_ptr<MRJobExecutor>(new MRJobExecutor(this->hostname,
+                                                                                  msg->job,
+                                                                                  this->compute_resources,  // Right now, run the job on all resources
+                                                                                  this->mailbox_name,
+                                                                                  {},
+                                                                                  {}));
+                this->executor->simulation = this->simulation;
+                this->executor->start(this->hostname, true, false);
+
+                this->pending_jobs[msg->job] =
+                        std::unique_ptr<PendingJob>(new PendingJob(job, executor, msg->answer_mailbox)));
+            }
+
+
+            if (not success) {
+                try {
+                    S4U_Mailbox::putMessage(msg->answer_mailbox,
+                                            new HadoopComputeServiceRunMRJobAnswerMessage(success,
+                                                                                          this->getMessagePayloadValue(
+                                                                                                  HadoopComputeServiceMessagePayload::RUN_MR_JOB_ANSWER_MESSAGE_PAYLOAD)));
+                } catch (std::shared_ptr<NetworkError> &cause) {
+                    return true;
+                }
+            }
+
+            return true;
+
+        } else if (auto msg = std::dynamic_pointer_cast<MRJobExecutorNotificationMessage>(message)) {
+
+            if (this->pending_jobs.find(msg->job) == this->pending_jobs.end()) {
+                throw std::runtime_error("Couldn't find MR Job in pending job list!");
+            }
+
+            this->pending_jobs.erase(msg->job);
+
             try {
                 S4U_Mailbox::putMessage(msg->answer_mailbox,
-                                        new HadoopComputeServiceRunMRJobAnswerMessage(true, this->getMessagePayloadValue(
-                                                HadoopComputeServiceMessagePayload::RUN_MR_JOB_ANSWER_MESSAGE_PAYLOAD)));
+                                        new HadoopComputeServiceRunMRJobAnswerMessage(msg->success,
+                                                                                      this->getMessagePayloadValue(
+                                                                                              MRJobExecutorMessagePayload::XXX)));
             } catch (std::shared_ptr<NetworkError> &cause) {
                 return true;
             }
-            return true;
+
 
         } else {
 

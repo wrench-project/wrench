@@ -7,14 +7,15 @@
  * (at your option) any later version.
  */
 
-#ifndef WRENCH_HADOOPCOMPUTESERVICE_H
-#define WRENCH_HADOOPCOMPUTESERVICE_H
+#ifndef WRENCH_MRJOBNEXECUTOR_H
+#define WRENCH_MRJOBNEXECUTOR_H
 
 #include  <string>
 #include  <set>
 #include  <map>
 
-#include "wrench/services/compute/ComputeService.h"
+#include "wrench/services/Service.h"
+#include "wrench/services/compute/hadoop/hadoop_subsystem/MRJobExecutor"
 #include "HadoopComputeServiceProperty.h"
 #include "HadoopComputeServiceMessagePayload.h"
 #include "wrench/services/compute/hadoop/MRJob.h"
@@ -22,38 +23,25 @@
 namespace wrench {
 
 
-    class HadoopComputeService : public Service {
-
+    class MRJobExecutor : public Service {
 
     public:
 
-        HadoopComputeService(
+        MRJobExecutor(
                 const std::string &hostname,
+                MRJob *job,
                 const std::set<std::string> compute_resources,
+                std::string notify_mailbox,
                 std::map<std::string, std::string> property_list,
                 std::map<std::string, double> messagepayload_list
         );
 
         void stop();
 
-        void runMRJob(MRJob *job);
-
     private:
 
-        class PendingJob {
-        public:
-
-            MRJob *job;
-            std::shared_ptr<MRJobExecutor> executor;
-            std::string answer_mailbox;
-
-            PendingJob(job, executor, answer_mailbox) {
-                this->job = job;
-                this->executor = executor;
-                this->answer_mailbox = answer_mailbox;
-            }
-
-        };
+        MRJob *job;
+        std::string notify_mailbox;
 
         std::map<std::string, std::string> default_property_values = {
                 {HadoopComputeServiceProperty::MAP_STARTUP_OVERHEAD,                         "0.0"},
@@ -67,12 +55,9 @@ namespace wrench {
 
         std::set<std::string> compute_resources;
 
-        std::map<MRJob *, std::unique_ptr<PendingJob>> pending_jobs;
-
         int main();
 
         bool processNextMessage();
-
 
 
     };
