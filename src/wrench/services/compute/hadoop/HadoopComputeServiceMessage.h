@@ -24,7 +24,8 @@ namespace wrench {
      */
     class HadoopComputeServiceMessage : public ComputeServiceMessage {
     protected:
-        HadoopComputeServiceMessage(std::string name, double payload);
+        HadoopComputeServiceMessage(std::string name, double payload) :
+          ComputeServiceMessage("HadoopComputeServiceMessage:"  + name, payload) {}
     };
 
     /**
@@ -32,10 +33,16 @@ namespace wrench {
      */
     class HadoopComputeServiceRunMRJobRequestMessage : public HadoopComputeServiceMessage {
     public:
-        HadoopComputeServiceRunMRJobRequestMessage(std::string answer_mailbox, double payload);
+        HadoopComputeServiceRunMRJobRequestMessage(std::string answer_mailbox, MRJob *job, double payload) :
+        HadoopComputeServiceMessage("HadoopComputeServiceRunMRJobRequestMessage", payload) {
+            this->answer_mailbox = answer_mailbox;
+            this->job = job;
+        }
 
         /** @brief The mailbox to answer to */
         std::string answer_mailbox;
+        /** @brief The MR job */
+        MRJob *job;
     };
 
     /**
@@ -43,7 +50,10 @@ namespace wrench {
      */
     class HadoopComputeServiceRunMRJobAnswerMessage : public HadoopComputeServiceMessage {
     public:
-        HadoopComputeServiceRunMRJobAnswerMessage(bool success, double payload);
+        HadoopComputeServiceRunMRJobAnswerMessage(bool success, double payload) :
+                HadoopComputeServiceMessage("HadoopComputeServiceRunMRJobAnswerMessage", payload) {
+            this->success = success;
+        }
 
         bool success;
     };
