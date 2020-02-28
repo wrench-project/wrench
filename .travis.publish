@@ -16,6 +16,7 @@ git clone --quiet --branch=gh-pages https://${GITHUB_TOKEN}@github.com/wrench-pr
 #go into directory and copy data we're interested in to that directory
 cd gh-pages
 cp -Rf $HOME/gh-pages-to-deploy/* .
+touch .nojekyll
 
 #add, commit and push files
 git add -f .
