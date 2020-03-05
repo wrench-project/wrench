@@ -54,7 +54,7 @@ wrench::WorkflowFile *some_file;
 
 [...]
 
-if (wrench::StorageService::lookupFile(wrench::FileLocation::LOCATION(storage_service, "/data/")) {
+if (wrench::StorageService::lookupFile(some_file, wrench::FileLocation::LOCATION(storage_service, "/data/")) {
   std::cerr << "File is there! Let's delete it...\n";
   storage_service->deleteFile(some_file);
 }
