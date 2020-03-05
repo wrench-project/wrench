@@ -11,7 +11,7 @@ WRENCH currently provide the following (simulated) CyberInfrastructure Service i
 
 
 1. Compute Services
-    1. [Bare-metal Servers](@ref guide-baremetal)s
+    1. [Bare-metal Servers](@ref guide-baremetal)
     2. [Cloud Platforms](@ref guide-cloud)
     3. [Virtualized Cluster Platforms](@ref guide-virtualizedcluster)
     4. [Batch-scheduled Clusters](@ref guide-batch)
