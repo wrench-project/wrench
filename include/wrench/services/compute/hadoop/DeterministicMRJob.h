@@ -16,16 +16,17 @@ namespace wrench {
 
     class DeterministicMRJob : public MRJob {
     public:
-        DeterministicMRJob(int num_mappers, int num_reducers, double data_size, bool use_combiner, int sort_factor,
-                           double spill_percent, int key_value_width);
+
+        DeterministicMRJob(
+                int num_mappers, int num_reducers, double data_size,
+                bool use_combiner, int sort_factor,
+                double spill_percent, int key_value_width
+        );
 
         DeterministicMRJob();
 
         ~DeterministicMRJob();
 
-        std::pair<double, double> getMapCost(double map_function_cost) override;
-
-        std::pair<double, double> getReduceCost(double reduce_function_cost) override;
     };
 }
 

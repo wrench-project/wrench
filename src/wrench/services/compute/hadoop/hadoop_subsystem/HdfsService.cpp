@@ -9,44 +9,69 @@
 
 #include "wrench/services/compute/hadoop/hadoop_subsystem/HdfsService.h"
 #include "wrench/services/compute/hadoop/HadoopComputeService.h"
-
-#include "wrench/simgrid_S4U_util/S4U_Simulation.h"
-#include "wrench/services/compute/ComputeService.h"
-#include "wrench/logging/TerminalOutput.h"
-#include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/services/ServiceMessage.h"
+#include "wrench/simgrid_S4U_util/S4U_Simulation.h"
+#include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
+#include "wrench/logging/TerminalOutput.h"
 #include "wrench/workflow/execution_events/FailureCause.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(hadoop_compute_servivce, "Log category for HDFS Actor");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(hdfs_servivce, "Log category for HDFS Actor");
 
 namespace wrench {
-    HdfsService::HdfsService(const std::string &hostname,
-            MRJob &MRJob, double read_cost, double write_cost
-    ) : ComputeService(hostname, "hadoop", "hadoop", ""), job(MRJob) {
-        this->setReadCost(read_cost);
-        this->setWriteCost(write_cost);
+
+    /**
+     * @brief: HdfsService constructor
+     *
+     * @param hostname: the name of the host on which the service should be started
+     * @param job: the MR job
+     * @param compute_resources: a set of hostnames
+     * @param property_list: a property list ({} means "use all defaults")
+     * @param messagepayload_list: a message payload list ({} means "use all defaults")
+     */
+    HdfsService::HdfsService(
+            const std::string &hostname,
+            MRJob *job,
+            const std::set<std::string> compute_resources,
+            std::map<std::string, std::string> property_list,
+            std::map<std::string, double> messagepayload_list
+    ) :
+            Service(hostname,
+                    "hdfs_service",
+                    "hdfs_service"), job(job) {
+
+        this->compute_resources = compute_resources;
+
+        // Set default and specified properties
+        this->setProperties(this->default_property_values, std::move(property_list));
+
+        // Set default and specified message payloads
+        this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
+
     }
 
-    HdfsService::~HdfsService() = default;
-
-    double HdfsService::deterministicReadIOCost() {
-        double read_cost = this->getReadCost() * (this->getJob().getDataSize() / this->getJob().getNumMappers());
-        return  read_cost;
+    /**
+     * @brief Stop the compute service - must be called by the stop()
+     *        method of derived classes
+     */
+    void HdfsService::stop() {
+        Service::stop();
     }
 
-    double HdfsService::deterministicReadCPUCost() {
-        // TODO
-        return 0.0;
-    }
+    /**
+     * @brief Main method of the HdfsMergeService daemon
+     *
+     * @return 0 on termination
+     */
+    int HdfsService::main() {
+        this->state = Service::UP;
 
-    double HdfsService::deterministicWriteIOCost() {
-        // TODO
-        return 0.0;
-    }
+        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
+        while (this->processNextMessage()) {
 
-    double HdfsService::deterministicWriteCPUCost() {
-        // TODO
-        return 0.0;
+        }
+
+        WRENCH_INFO("HdfsService on host %s terminating cleanly!", S4U_Simulation::getHostName().c_str());
+        return 0;
     }
 
     /**
@@ -57,6 +82,8 @@ namespace wrench {
     * @throw std::runtime_error
     */
     bool HdfsService::processNextMessage() {
+
+        // TODO: DEFINE THE SET OF MESSAGES AN HDFSSERVICE CAN SEND AND RECEIVE
 
         S4U_Simulation::computeZeroFlop();
 
@@ -86,17 +113,5 @@ namespace wrench {
             throw std::runtime_error(
                     "HdfsService::processNextMessage(): Received an unexpected [" + message->getName() + "] message!");
         }
-    }
-
-    int HdfsService::main() {
-        this->state = Service::UP;
-
-        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
-        while (this->processNextMessage()) {
-
-        }
-
-        WRENCH_INFO("HdfsService on host %s terminating cleanly!", S4U_Simulation::getHostName().c_str());
-        return 0;
     }
 }

@@ -162,13 +162,13 @@ set(HEADER_FILES
         include/wrench/services/compute/hadoop/DeterministicMRJob.h
         include/wrench/services/compute/hadoop/MRJob.h
         include/wrench/services/compute/hadoop/hadoop_subsystem/MRJobExecutor.h
-        include/wrench/services/compute/hadoop/hadoop_subsystem/Spill.h
-        include/wrench/services/compute/hadoop/hadoop_subsystem/Shuffle.h
-        include/wrench/services/compute/hadoop/hadoop_subsystem/ReduceSideMerge.h
-        include/wrench/services/compute/hadoop/hadoop_subsystem/MapSideMerge.h
+        include/wrench/services/compute/hadoop/hadoop_subsystem/MRJobExecutorMessagePayload.h
+        include/wrench/services/compute/hadoop/hadoop_subsystem/ShuffleService.h
         include/wrench/services/compute/hadoop/hadoop_subsystem/HdfsService.h
         include/wrench/services/compute/hadoop/hadoop_subsystem/ReducerService.h
         include/wrench/services/compute/hadoop/hadoop_subsystem/MapperService.h
+        include/wrench/services/compute/hadoop/HadoopComputeServiceProperty.h
+        include/wrench/services/compute/hadoop/HadoopComputeServiceMessagePayload.h
         )
 
 # source files
@@ -315,20 +315,16 @@ set(SOURCE_FILES
         src/wrench/services/compute/hadoop/HadoopComputeService.cpp
         include/wrench/services/compute/hadoop/HadoopComputeService.h
         src/wrench/services/compute/hadoop/HadoopComputeServiceProperty.cpp
-        include/wrench/services/compute/hadoop/HadoopComputeServiceProperty.h
         src/wrench/services/compute/hadoop/HadoopComputeServiceMessage.cpp
         src/wrench/services/compute/hadoop/HadoopComputeServiceMessage.h
         src/wrench/services/compute/hadoop/HadoopComputeServiceMessagePayload.cpp
-        include/wrench/services/compute/hadoop/HadoopComputeServiceMessagePayload.h
         src/wrench/services/compute/hadoop/DeterministicMRJob.cpp
         src/wrench/services/compute/hadoop/hadoop_subsystem/MRJobExecutor.cpp
+        src/wrench/services/compute/hadoop/hadoop_subsystem/MRJobExecutorMessagePayload.cpp
         src/wrench/services/compute/hadoop/hadoop_subsystem/MapperService.cpp
         src/wrench/services/compute/hadoop/hadoop_subsystem/ReducerService.cpp
         src/wrench/services/compute/hadoop/hadoop_subsystem/HdfsService.cpp
-        src/wrench/services/compute/hadoop/hadoop_subsystem/MapSideMerge.cpp
-        src/wrench/services/compute/hadoop/hadoop_subsystem/ReduceSideMerge.cpp
-        src/wrench/services/compute/hadoop/hadoop_subsystem/Shuffle.cpp
-        src/wrench/services/compute/hadoop/hadoop_subsystem/Spill.cpp
+        src/wrench/services/compute/hadoop/hadoop_subsystem/ShuffleService.cpp
         )
 
 # test files

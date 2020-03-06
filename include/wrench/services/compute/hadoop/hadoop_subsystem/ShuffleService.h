@@ -7,23 +7,18 @@
  * (at your option) any later version.
  */
 
-#ifndef WRENCH_REDUCER_H
-#define WRENCH_REDUCER_H
-
-#include <string>
-#include <set>
-#include <map>
+#ifndef WRENCH_SHUFFLE_H
+#define WRENCH_SHUFFLE_H
 
 #include "wrench/services/compute/hadoop/MRJob.h"
-#include "wrench/services/compute/ComputeService.h"
-#include "wrench/simgrid_S4U_util/S4U_Simulation.h"
+#include "wrench/services/compute/hadoop/HadoopComputeService.h"
 
 namespace wrench {
 
-    class ReducerService : public Service {
+    class ShuffleService : public Service {
     public:
 
-        ReducerService(
+        ShuffleService(
                 const std::string &hostname,
                 MRJob *job,
                 const std::set<std::string> compute_resources,
@@ -52,4 +47,4 @@ namespace wrench {
     };
 }
 
-#endif //WRENCH_REDUCER_H
+#endif //WRENCH_SHUFFLE_H

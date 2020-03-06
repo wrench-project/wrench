@@ -8,15 +8,14 @@
  */
 
 #include <wrench/services/compute/hadoop/MRJob.h>
+#include <wrench/services/compute/hadoop/hadoop_subsystem/MapperService.h>
+#include <wrench/services/compute/hadoop/hadoop_subsystem/ReducerService.h>
+#include <wrench/services/compute/hadoop/hadoop_subsystem/ShuffleService.h>
 #include "wrench/services/compute/hadoop/HadoopComputeService.h"
-#include "HadoopComputeServiceMessage.h"
-
+#include "../HadoopComputeServiceMessage.h"
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
-
 #include "wrench/services/compute/ComputeService.h"
-
 #include "wrench/logging/TerminalOutput.h"
-#include "HadoopComputeServiceMessage.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 
 WRENCH_LOG_NEW_DEFAULT_CATEGORY(mr_job_executor_servivce, "Log category for MR Job Executor Service");
@@ -33,7 +32,7 @@ namespace wrench {
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      */
-    MRJobExecutor::MRJobExecutor (
+    MRJobExecutor::MRJobExecutor(
             const std::string &hostname,
             MRJob *job,
             const std::set<std::string> compute_resources,
@@ -42,11 +41,11 @@ namespace wrench {
             std::map<std::string, double> messagepayload_list
     ) :
             Service(hostname,
-                           "mr_job_executor",
-                           "mr_job_executor") {
+                    "mr_job_executor",
+                    "mr_job_executor") {
 
         this->compute_resources = compute_resources;
-        this->notify_mailbox = notify_mailbox;
+        this->notify_mailbox = std::move(notify_mailbox);
 
         // Set default and specified properties
         this->setProperties(this->default_property_values, std::move(property_list));
@@ -64,8 +63,6 @@ namespace wrench {
         Service::stop();
     }
 
-
-
     /**
      * @brief Main method of the daemon
      *
@@ -79,14 +76,52 @@ namespace wrench {
         WRENCH_INFO("New MRJobExecutor starting (%s) on %ld hosts",
                     this->mailbox_name.c_str(), this->compute_resources.size());
 
-        // TODO: START STUFF TO MAKE THE JOB HAPPEN!
+        this->success = true;
+
+        std::shared_ptr<HdfsService> hdfs = std::shared_ptr<HdfsService>(
+                new HdfsService(this->hostname, this->job, this->compute_resources,
+                                  {},
+                                  {}));
+        hdfs->simulation = this->simulation;
+
+        std::shared_ptr<MapperService> mapper = std::shared_ptr<MapperService>(
+                new MapperService(this->hostname, this->job, this->compute_resources,
+                                  {},
+                                  {}));
+        mapper->simulation = this->simulation;
+
+        std::shared_ptr<ReducerService> reducer = std::shared_ptr<ReducerService>(
+                new ReducerService(this->hostname, this->job, this->compute_resources,
+                                  {},
+                                  {}));
+        reducer->simulation = this->simulation;
+
+        std::shared_ptr<ShuffleService> shuffle = std::shared_ptr<ShuffleService>(
+                new ShuffleService(this->hostname, this->job, this->compute_resources,
+                                   {},
+                                   {}));
+        shuffle->simulation = this->simulation;
+
+        hdfs->start(hdfs, true, false);
+        mapper->start(mapper, true, false);
+        reducer->start(reducer, true, false);
+        shuffle->start(shuffle, true, false);
 
         /** Main loop **/
         while (this->processNextMessage()) {
 
         }
 
-        // TODO: Reply to my creator with job status
+        // Reply to my creator with job status
+        try {
+            S4U_Mailbox::putMessage(this->notify_mailbox,
+                                    new MRJobExecutorNotificationMessage(this->success, this->job,
+                                                                         this->getMessagePayloadValue(
+                                                                                 MRJobExecutorMessagePayload::NOTIFY_EXECUTOR_STATUS_MESSAGE_PAYLOAD)));
+        } catch (std::shared_ptr<NetworkError> &cause) { WRENCH_INFO(
+                    "Failed to notify the MRJobExecutor's creator...");
+            // TODO: deal with this failure mode.
+        }
 
         WRENCH_INFO("MRJobExecutor on host %s terminating cleanly!", S4U_Simulation::getHostName().c_str());
         return 0;
@@ -100,7 +135,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    bool HadoopComputeService::processNextMessage() {
+    bool MRJobExecutor::processNextMessage() {
 
         S4U_Simulation::computeZeroFlop();
 
@@ -116,10 +151,12 @@ namespace wrench {
         WRENCH_INFO("Got a [%s] message", message->getName().c_str());
         if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
 
-            // TODO: Kill all the subordinate services (mappers, reducers, whatever0
+            // TODO: Kill all the subordinate services (mappers, reducers, whatever)
             // TODO: Or reject the stop request because a job  is running?
             // TODO: Or terminate brutally a running job?
 
+            // Right now, assume the job fails.
+            this->success = false;
             // This is Synchronous
             try {
                 S4U_Mailbox::putMessage(msg->ack_mailbox,
@@ -131,12 +168,9 @@ namespace wrench {
             return false;
 
         } else {
-
             throw std::runtime_error(
-                    "MRJobExecutor::processNextMessage(): Received an unexpected [" + message->getName() + "] message!");
+                    "MRJobExecutor::processNextMessage(): Received an unexpected [" + message->getName() +
+                    "] message!");
         }
     }
-
-
-
 };

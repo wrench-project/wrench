@@ -15,7 +15,8 @@
 namespace wrench {
 
     class MRJob {
-    protected:
+    private:
+
         int num_mappers;
         int num_reducers;
         int sort_factor;
@@ -24,10 +25,8 @@ namespace wrench {
         bool use_combiner;
         double data_size;
         std::string job_type;
-    public:
-        virtual std::pair<double, double> getMapCost(double map_function_cost) = 0;
 
-        virtual std::pair<double, double> getReduceCost(double reduce_function_cost) = 0;
+    public:
 
         // Mutators
         void setNumMappers(int num_mappers) {

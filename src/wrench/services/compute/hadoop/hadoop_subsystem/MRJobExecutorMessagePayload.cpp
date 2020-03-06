@@ -7,18 +7,10 @@
  * (at your option) any later version.
  */
 
-#include "wrench/services/compute/hadoop/hadoop_subsystem/Shuffle.h"
+#include "wrench/services/compute/hadoop/hadoop_subsystem/MRJobExecutorMessagePayload.h"
 
 namespace wrench {
 
-    Shuffle::Shuffle(MRJob &MRJob) {
-        this->setJobType(MRJob.getJobType());
-    }
+    SET_MESSAGEPAYLOAD_NAME(MRJobExecutorMessagePayload, NOTIFY_EXECUTOR_STATUS_MESSAGE_PAYLOAD);
 
-    double Shuffle::calculateShuffleCost() {
-        if (this->getJobType() == std::string("deterministic")) {
-            // TODO
-        }
-        return 0.0;
-    }
 }

@@ -7,19 +7,27 @@
  * (at your option) any later version.
  */
 
-#include "wrench/services/compute/hadoop/hadoop_subsystem/ReducerService.h"
-#include "wrench/services/compute/hadoop/HadoopComputeService.h"
-#include "wrench/services/compute/ComputeService.h"
+#include "wrench/services/compute/hadoop/hadoop_subsystem/ShuffleService.h"
+#include "wrench/services/ServiceMessage.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
-#include "wrench/services/ServiceMessage.h"
+#include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 #include "wrench/workflow/execution_events/FailureCause.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(reducer_servivce, "Log category for Reducer Actor");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(shuffle_servivce, "Log category for Shuffle Actor");
 
 namespace wrench {
 
-    ReducerService::ReducerService(
+/**
+     * @brief Constructor
+     *
+     * @param hostname: the name of the host on which the service should be started
+     * @param job: the job to execute
+     * @param compute_resources: a set of hostnames
+     * @param property_list: a property list ({} means "use all defaults")
+     * @param messagepayload_list: a message payload list ({} means "use all defaults")
+     */
+    ShuffleService::ShuffleService(
             const std::string &hostname,
             MRJob *job,
             const std::set<std::string> compute_resources,
@@ -27,8 +35,8 @@ namespace wrench {
             std::map<std::string, double> messagepayload_list
     ) :
             Service(hostname,
-                    "reducer_service",
-                    "reducer_service"), job(job) {
+                    "shuffle_service",
+                    "shuffle_service") {
 
         this->compute_resources = compute_resources;
 
@@ -40,26 +48,45 @@ namespace wrench {
 
     }
 
-    void ReducerService::stop() {
+    /**
+     * @brief Stop the compute service - must be called by the stop()
+     *        method of derived classes
+     */
+    void ShuffleService::stop() {
         Service::stop();
     }
 
-    /** Main loop */
-    int ReducerService::main() {
+    /**
+     * @brief Main method of the daemon
+     *
+     * @return 0 on termination
+     */
+    int ShuffleService::main() {
         this->state = Service::UP;
 
-        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
+        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
+
+        WRENCH_INFO("New ShuffleService starting (%s) on %ld hosts",
+                    this->mailbox_name.c_str(), this->compute_resources.size());
+
+        /** Main loop **/
         while (this->processNextMessage()) {
 
         }
 
-        WRENCH_INFO("ReducerService on host %s terminating cleanly!", S4U_Simulation::getHostName().c_str());
+        WRENCH_INFO("ShuffleService on host %s terminating cleanly!", S4U_Simulation::getHostName().c_str());
         return 0;
     }
 
-    bool ReducerService::processNextMessage() {
 
-        //TODO: DEFINE SET OF MESSAGES THAT REDUCER SERVICE CAN SEND AND RECEIVE
+    /**
+     * @brief Wait for and react to any incoming message
+     *
+     * @return false if the daemon should terminate, true otherwise
+     *
+     * @throw std::runtime_error
+     */
+    bool ShuffleService::processNextMessage() {
 
         S4U_Simulation::computeZeroFlop();
 
@@ -87,7 +114,8 @@ namespace wrench {
 
         } else {
             throw std::runtime_error(
-                    "ReducerService::processNextMessage(): Received an unexpected [" + message->getName() + "] message!");
+                    "MRJobExecutor::processNextMessage(): Received an unexpected [" + message->getName() +
+                    "] message!");
         }
     }
 }

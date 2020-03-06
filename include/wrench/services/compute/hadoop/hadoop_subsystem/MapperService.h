@@ -10,45 +10,49 @@
 #ifndef WRENCH_MAPPER_H
 #define WRENCH_MAPPER_H
 
+#include <wrench/services/compute/hadoop/HadoopComputeService.h>
 #include "wrench/services/compute/hadoop/MRJob.h"
 #include "wrench/services/compute/hadoop/hadoop_subsystem/HdfsService.h"
-#include "wrench/services/compute/hadoop/hadoop_subsystem/Spill.h"
-#include "wrench/services/compute/hadoop/hadoop_subsystem/MapSideMerge.h"
 #include "wrench/services/compute/ComputeService.h"
 
 namespace wrench {
 
-    class MapperService : ComputeService {
+    class MapperService : public Service {
+    public:
+
+        MapperService(
+                const std::string &hostname,
+                MRJob *job,
+                const std::set<std::string> compute_resources,
+                std::map<std::string, std::string> property_list,
+                std::map<std::string, double> messagepayload_list
+        );
+
+        void stop() override;
+
     private:
-        int main();
+
+        MRJob *job;
+
+        // TODO: Define these:
+        std::map<std::string, std::string> default_property_values = {
+                {HadoopComputeServiceProperty::MAP_SIDE_SPILL_PHASE, "0.0"},
+                {HadoopComputeServiceProperty::MAP_SIDE_MERGE_PHASE, "0.0"}
+        };
+
+        // TODO: And define these:
+        std::map<std::string, double> default_messagepayload_values = {
+                {MRJobExecutorMessagePayload::MAP_SIDE_HDFS_DATA_DELIVERY_PAYLOAD, 1024},
+                {MRJobExecutorMessagePayload::MAP_SIDE_HDFS_DATA_REQUEST_PAYLOAD,  1024},
+                {MRJobExecutorMessagePayload::MAP_SIDE_SHUFFLE_REQUEST_PAYLOAD,    1024},
+        };
+
+        std::set<std::string> compute_resources;
+
+        int main() override;
 
         bool processNextMessage();
 
-    protected:
-        MRJob &job;
-        double map_function_cost;
-    public:
-        MapperService(const std::string &hostname, MRJob &MRJob, double map_function_cost);
-
-        ~MapperService();
-
-        std::pair<double, double> calculateMapperCost();
-
-        void setJob(MRJob &job) {
-            this->job = job;
-        }
-
-        void setMapFunctionCost(double map_function_cost) {
-            this->map_function_cost = map_function_cost;
-        }
-
-        MRJob &getJob() {
-            return job;
-        }
-
-        double getMapFunctionCost() {
-            return map_function_cost;
-        }
     };
 }
 

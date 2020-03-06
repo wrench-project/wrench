@@ -25,7 +25,11 @@ namespace wrench {
          * @brief The overhead to start a map task (placeholder example property to be changed later)
          */
         DECLARE_PROPERTY_NAME(MAP_STARTUP_OVERHEAD);
-
+        DECLARE_PROPERTY_NAME(REDUCER_STARTUP_OVERHEAD);
+        DECLARE_PROPERTY_NAME(MAP_SIDE_SPILL_PHASE);
+        DECLARE_PROPERTY_NAME(MAP_SIDE_MERGE_PHASE);
+        DECLARE_PROPERTY_NAME(HDFS_READ);
+        DECLARE_PROPERTY_NAME(HDFS_WRITE);
     };
 
 }
