@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2019. The WRENCH Team.
+ * Copyright (c) 2017-2020. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -96,7 +96,7 @@ namespace wrench {
         /** set of compute resources **/
         std::set<ComputeService *> compute_resources;
         /** queue of pending jobs **/
-        std::vector<WorkflowJob *> pending_jobs;
+        std::vector<std::tuple<WorkflowJob *, std::map<std::string, std::string>>> pending_jobs;
         /** whether a negotiator is dispatching jobs **/
         bool dispatching_jobs = false;
         /** whether a negotiator could not dispatch jobs **/
