@@ -9,45 +9,72 @@
 
 #include "wrench/services/compute/hadoop/hadoop_subsystem/MapperService.h"
 #include "wrench/services/compute/hadoop/HadoopComputeService.h"
-
+#include "wrench/services/ServiceMessage.h"
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
-#include "wrench/services/compute/ComputeService.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
-#include "wrench/services/ServiceMessage.h"
 #include "wrench/workflow/execution_events/FailureCause.h"
 
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(hadoop_compute_servivce, "Log category for Mapper Actor");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(mapper_service, "Log category for Mapper Actor");
 
 namespace wrench {
 
-    MapperService::MapperService(const std::string &hostname,
-            MRJob &MRJob, double map_function_cost
-    ) : ComputeService(hostname, "hadooop", "hadoop", ""), job(MRJob) {
-        this->setMapFunctionCost(map_function_cost);
+    /**
+     * @brief: MapperService constructor
+     *
+     * @param hostname: the name of the host on which the service should be started
+     * @param job: the job to execute
+     * @param compute_resources: a set of hostnames
+     * @param property_list: a property list ({} means "use all defaults")
+     * @param messagepayload_list: a message payload list ({} means "use all defaults")
+     */
+    MapperService::MapperService(
+            const std::string &hostname,
+            MRJob *job,
+            const std::set<std::string> compute_resources,
+            std::map<std::string, std::string> property_list,
+            std::map<std::string, double> messagepayload_list
+    ) :
+            Service(hostname,
+                    "mapper_service",
+                    "mapper_service"), job(job) {
+
+        this->compute_resources = compute_resources;
+
+        // Set default and specified properties
+        this->setProperties(this->default_property_values, std::move(property_list));
+
+        // Set default and specified message payloads
+        this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
+
     }
 
-    MapperService::~MapperService() = default;
+    /**
+     * @brief Stop the compute service - must be called by the stop()
+     *        method of derived classes
+     */
+    void MapperService::stop() {
+        Service::stop();
+    }
 
-    std::pair<double, double> MapperService::calculateMapperCost() {
-        /**
-         * TODO: pass the HDFS reaed and write costs as Mapper
-         * parameters that a Job instance can specify.
-         */
-        auto *spill = new Spill(this->job);
-        auto *merge = new MapSideMerge(this->job);
+    /**
+     * @brief Main method of the MapperService daemon
+     *
+     * @return 0 on termination
+     */
+    int MapperService::main() {
+        this->state = Service::UP;
 
-        double total_map_cpu_cost = this->getMapFunctionCost();
-        double total_map_io_cost = 0.0;
+        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
 
-        if (this->job.getJobType() == std::string("deterministic")) {
-            total_map_io_cost += (spill->deterministicSpillIOCost() +
-                                  merge->deterministicMapSideMergeIOCost());
-            total_map_cpu_cost += (spill->deterministicSpillCPUCost() +
-                                  merge->deterministicMapSideMergCPUCost());
+        /** Main loop */
+        while (this->processNextMessage()) {
+
         }
-        return std::make_pair(total_map_cpu_cost, total_map_io_cost);
+
+        WRENCH_INFO("MapperService on host %s terminating cleanly!", S4U_Simulation::getHostName().c_str());
+        return 0;
     }
 
     /**
@@ -58,6 +85,8 @@ namespace wrench {
      * @throw std::runtime_error
      */
     bool MapperService::processNextMessage() {
+
+        //TODO: DEFINE SET OF MESSAGES THAT MAPPER SERVICE CAN SEND AND RECEIVE
 
         S4U_Simulation::computeZeroFlop();
 
@@ -85,19 +114,8 @@ namespace wrench {
 
         } else {
             throw std::runtime_error(
-                    "MapperService::processNextMessage(): Received an unexpected [" + message->getName() + "] message!");
+                    "MapperService::processNextMessage(): Received an unexpected [" + message->getName() +
+                    "] message!");
         }
-    }
-
-    int MapperService::main() {
-        this->state = Service::UP;
-
-        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
-        while (this->processNextMessage()) {
-
-        }
-
-        WRENCH_INFO("MapperService on host %s terminating cleanly!", S4U_Simulation::getHostName().c_str());
-        return 0;
     }
 }

@@ -15,9 +15,11 @@ WRENCH_LOG_NEW_DEFAULT_CATEGORY(hadoop_compute_servivce, "Log category for Deter
 
 namespace wrench {
 
-    DeterministicMRJob::DeterministicMRJob(int num_mappers, int num_reducers, double data_size,
-                                           bool use_combiner, int sort_factor, double spill_percent,
-                                           int key_value_width) : MRJob() {
+    DeterministicMRJob::DeterministicMRJob(
+            int num_mappers, int num_reducers, double data_size,
+            bool use_combiner, int sort_factor, double spill_percent,
+            int key_value_width
+    ) {
         this->setNumMappers(num_mappers);
         this->setNumReducers(num_reducers);
         this->setUseCombiner(use_combiner);
@@ -42,32 +44,4 @@ namespace wrench {
 
     DeterministicMRJob::~DeterministicMRJob() = default;
 
-    std::pair<double, double> DeterministicMRJob::getMapCost(double map_function_cost) {
-        /** TODO:
-         * Using the deterministic model, the map cost is as simple
-         * as:
-         *    num_mappers * total_map_cost
-         * A Mapper object will have the following
-         * sub-costs:
-         *  - Read: Via an `HDFS` object
-         *  - User map function cost: Unsure
-         *  - Collection and spill: Via a `Spill` object
-         *  - Merge: Via a `MapSideMerge` object
-         */
-
-        auto mapper = new MapperService(*this, map_function_cost);
-        // returns <map_cpu_cost, map_io_cost>
-        return mapper->calculateMapperCost();
-    }
-
-    std::pair<double, double> DeterministicMRJob::getReduceCost(double reduce_function_cost) {
-        /** TODO:
-         * Similary, the same idea can be used on the reduce side:
-         *  - Shuffle: Via a `Shuffle` object
-         *  - Merge: Via a `ReduceSideMerge` object
-         *  - Reduce: Unsure
-         *  - Write: Via an `HDFS` object
-         */
-        return std::make_pair(0.0, 0.0);
-    }
 }

@@ -18,6 +18,7 @@
 #include "HadoopComputeServiceProperty.h"
 #include "HadoopComputeServiceMessagePayload.h"
 #include "wrench/services/compute/hadoop/MRJob.h"
+#include "wrench/services/compute/hadoop/hadoop_subsystem/MRJobExecutor.h"
 
 namespace wrench {
 
@@ -34,7 +35,7 @@ namespace wrench {
                 std::map<std::string, double> messagepayload_list
         );
 
-        void stop();
+        void stop() override;
 
         void runMRJob(MRJob *job);
 
@@ -47,33 +48,29 @@ namespace wrench {
             std::shared_ptr<MRJobExecutor> executor;
             std::string answer_mailbox;
 
-            PendingJob(job, executor, answer_mailbox) {
+            PendingJob(MRJob *job, std::shared_ptr<MRJobExecutor> executor, std::string answer_mailbox) {
                 this->job = job;
-                this->executor = executor;
-                this->answer_mailbox = answer_mailbox;
+                this->executor = std::move(executor);
+                this->answer_mailbox = std::move(answer_mailbox);
             }
 
         };
 
-        std::map<std::string, std::string> default_property_values = {
-                {HadoopComputeServiceProperty::MAP_STARTUP_OVERHEAD,                         "0.0"},
-        };
+        std::map<std::string, std::string> default_property_values = {};
 
         std::map<std::string, double> default_messagepayload_values = {
-                {HadoopComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024},
+                {HadoopComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,        1024},
                 {HadoopComputeServiceMessagePayload::RUN_MR_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {HadoopComputeServiceMessagePayload::RUN_MR_JOB_ANSWER_MESSAGE_PAYLOAD, 1024},
+                {HadoopComputeServiceMessagePayload::RUN_MR_JOB_ANSWER_MESSAGE_PAYLOAD,  1024},
         };
 
         std::set<std::string> compute_resources;
 
         std::map<MRJob *, std::unique_ptr<PendingJob>> pending_jobs;
 
-        int main();
+        int main() override;
 
         bool processNextMessage();
-
-
 
     };
 }

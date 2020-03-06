@@ -12,6 +12,7 @@
 
 
 #include "wrench/services/compute/ComputeServiceMessage.h"
+#include "wrench/services/compute/hadoop/MRJob.h"
 
 namespace wrench {
 
@@ -24,8 +25,7 @@ namespace wrench {
      */
     class HadoopComputeServiceMessage : public ComputeServiceMessage {
     protected:
-        HadoopComputeServiceMessage(std::string name, double payload) :
-          ComputeServiceMessage("HadoopComputeServiceMessage:"  + name, payload) {}
+        HadoopComputeServiceMessage(std::string name, double payload);
     };
 
     /**
@@ -33,11 +33,7 @@ namespace wrench {
      */
     class HadoopComputeServiceRunMRJobRequestMessage : public HadoopComputeServiceMessage {
     public:
-        HadoopComputeServiceRunMRJobRequestMessage(std::string answer_mailbox, MRJob *job, double payload) :
-        HadoopComputeServiceMessage("HadoopComputeServiceRunMRJobRequestMessage", payload) {
-            this->answer_mailbox = answer_mailbox;
-            this->job = job;
-        }
+        HadoopComputeServiceRunMRJobRequestMessage(std::string answer_mailbox, MRJob *job, double payload);
 
         /** @brief The mailbox to answer to */
         std::string answer_mailbox;
@@ -50,12 +46,17 @@ namespace wrench {
      */
     class HadoopComputeServiceRunMRJobAnswerMessage : public HadoopComputeServiceMessage {
     public:
-        HadoopComputeServiceRunMRJobAnswerMessage(bool success, double payload) :
-                HadoopComputeServiceMessage("HadoopComputeServiceRunMRJobAnswerMessage", payload) {
-            this->success = success;
-        }
+        HadoopComputeServiceRunMRJobAnswerMessage(bool success, double payload);
 
         bool success;
+    };
+
+    class MRJobExecutorNotificationMessage : public HadoopComputeServiceMessage {
+    public:
+        MRJobExecutorNotificationMessage(bool success, MRJob *job, double payload);
+
+        bool success;
+        MRJob *job;
     };
 
 /***********************/

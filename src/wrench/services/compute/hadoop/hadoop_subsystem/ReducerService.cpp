@@ -9,26 +9,57 @@
 
 #include "wrench/services/compute/hadoop/hadoop_subsystem/ReducerService.h"
 #include "wrench/services/compute/hadoop/HadoopComputeService.h"
-
-
-#include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 #include "wrench/services/compute/ComputeService.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/services/ServiceMessage.h"
 #include "wrench/workflow/execution_events/FailureCause.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(hadoop_compute_servivce, "Log category for Reducer Actor");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(reducer_servivce, "Log category for Reducer Actor");
 
 namespace wrench {
 
-    ReducerService::ReducerService(const std::string &hostname,
-            MRJob &MRJob
-    ) : ComputeService(hostname, "hadooop", "hadoop", ""), job(MRJob) {
+    ReducerService::ReducerService(
+            const std::string &hostname,
+            MRJob *job,
+            const std::set<std::string> compute_resources,
+            std::map<std::string, std::string> property_list,
+            std::map<std::string, double> messagepayload_list
+    ) :
+            Service(hostname,
+                    "reducer_service",
+                    "reducer_service"), job(job) {
+
+        this->compute_resources = compute_resources;
+
+        // Set default and specified properties
+        this->setProperties(this->default_property_values, std::move(property_list));
+
+        // Set default and specified message payloads
+        this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
 
     }
 
+    void ReducerService::stop() {
+        Service::stop();
+    }
+
+    /** Main loop */
+    int ReducerService::main() {
+        this->state = Service::UP;
+
+        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
+        while (this->processNextMessage()) {
+
+        }
+
+        WRENCH_INFO("ReducerService on host %s terminating cleanly!", S4U_Simulation::getHostName().c_str());
+        return 0;
+    }
+
     bool ReducerService::processNextMessage() {
+
+        //TODO: DEFINE SET OF MESSAGES THAT REDUCER SERVICE CAN SEND AND RECEIVE
 
         S4U_Simulation::computeZeroFlop();
 
@@ -58,17 +89,5 @@ namespace wrench {
             throw std::runtime_error(
                     "ReducerService::processNextMessage(): Received an unexpected [" + message->getName() + "] message!");
         }
-    }
-
-    int ReducerService::main() {
-        this->state = Service::UP;
-
-        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
-        while (this->processNextMessage()) {
-
-        }
-
-        WRENCH_INFO("ReducerService on host %s terminating cleanly!", S4U_Simulation::getHostName().c_str());
-        return 0;
     }
 }

@@ -10,56 +10,43 @@
 #ifndef WRENCH_HDFS_H
 #define WRENCH_HDFS_H
 
+#include <wrench/services/compute/hadoop/HadoopComputeServiceProperty.h>
 #include "wrench/services/compute/hadoop/MRJob.h"
 #include "wrench/services/compute/ComputeService.h"
 
 namespace wrench {
 
-    class HdfsService : ComputeService {
-    private:
-        bool processNextMessage();
-        int main();
-    protected:
-        MRJob &job;
-        double read_cost;
-        double write_cost;
+    class HdfsService : public Service {
     public:
-        HdfsService(const std::string &hostname, MRJob &MRJob,
-                double read_cost, double write_cost);
 
-        ~HdfsService();
+        HdfsService(
+                const std::string &hostname,
+                MRJob *job,
+                const std::set<std::string> compute_resources,
+                std::map<std::string, std::string> property_list,
+                std::map<std::string, double> messagepayload_list
+        );
 
-        double deterministicReadIOCost();
+        void stop() override;
 
-        double deterministicReadCPUCost();
+    private:
 
-        double deterministicWriteIOCost();
+        MRJob *job;
 
-        double deterministicWriteCPUCost();
+        // TODO: Define these:
+        std::map<std::string, std::string> default_property_values = {
+                {HadoopComputeServiceProperty::HDFS_READ, "0.0"},
+                {HadoopComputeServiceProperty::HDFS_WRITE, "0.0"}
+        };
 
-        void setJob(MRJob &job) {
-            this->job = job;
-        }
+        // TODO: And define these:
+        std::map<std::string, double> default_messagepayload_values = {};
 
-        void setReadCost(double cost) {
-            this->read_cost = cost;
-        }
+        std::set<std::string> compute_resources;
 
-        void setWriteCost(double cost) {
-            this->write_cost = cost;
-        }
+        int main() override;
 
-        double getReadCost() {
-            return read_cost;
-        }
-
-        double getWriteCost() {
-            return write_cost;
-        }
-
-        MRJob &getJob() {
-            return job;
-        }
+        bool processNextMessage();
     };
 }
 
