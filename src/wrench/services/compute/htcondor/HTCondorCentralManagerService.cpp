@@ -193,9 +193,10 @@ namespace wrench {
      */
     int HTCondorCentralManagerService::main() {
 
-        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);WRENCH_INFO(
-                "HTCondor Service starting on host %s listening on mailbox_name %s",
-                this->hostname.c_str(), this->mailbox_name.c_str());
+        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
+
+        WRENCH_INFO("HTCondor Service starting on host %s listening on mailbox_name %s",
+                    this->hostname.c_str(), this->mailbox_name.c_str());
 
         // start the compute resource services
         try {
@@ -274,7 +275,9 @@ namespace wrench {
             return true;
         }
 
-        if (message == nullptr) { WRENCH_INFO("Got a NULL message... Likely this means we're all done. Aborting");
+        if (message == nullptr) {
+
+            WRENCH_INFO("Got a NULL message... Likely this means we're all done. Aborting");
             return false;
         }
 
@@ -413,8 +416,10 @@ namespace wrench {
     void HTCondorCentralManagerService::processStandardJobCompletion(StandardJob *job) {
         WRENCH_INFO("A standard job has completed: %s", job->getName().c_str());
         std::string callback_mailbox = job->popCallbackMailbox();
-        for (auto task : job->getTasks()) { WRENCH_INFO("    Task completed: %s (%s)", task->getID().c_str(),
-                                                        callback_mailbox.c_str());
+
+        for (auto task : job->getTasks()) {
+
+            WRENCH_INFO("    Task completed: %s (%s)", task->getID().c_str(), callback_mailbox.c_str());
         }
 
         // Send the callback to the originator
