@@ -20,6 +20,7 @@
 #include "wrench/services/helpers/Alarm.h"
 #include "wrench/workflow/job/StandardJob.h"
 #include "wrench/workflow/job/WorkflowJob.h"
+#include "wrench/services/compute/batch/batch_schedulers/BatchScheduler.h"
 #include <deque>
 #include <queue>
 #include <set>
@@ -123,8 +124,9 @@ namespace wrench {
     private:
 
 
-
         friend class WorkloadTraceFileReplayer;
+        friend class FCFSBatchScheduler;
+        friend class CONSERVATIVE_BFBatchScheduler;
 
         BatchComputeService(std::string hostname,
                             std::vector<std::string> compute_hosts,
@@ -172,7 +174,7 @@ namespace wrench {
         std::map<std::string,std::shared_ptr<Alarm>> pilot_job_alarms;
 
 
-        /* Resources information in Batchservice */
+        /* Resources information in BatchService */
         unsigned long total_num_of_nodes;
         unsigned long num_cores_per_node;
         std::map<std::string, unsigned long> nodes_to_cores_map;
@@ -180,7 +182,7 @@ namespace wrench {
         std::map<std::string, unsigned long> available_nodes_to_cores;
         std::map<unsigned long, std::string> host_id_to_names;
         std::vector<std::string> compute_hosts;
-        /*End Resources information in Batchservice */
+        /* End Resources information in BatchService */
 
         // Vector of standard job executors
         std::set<std::shared_ptr<StandardJobExecutor>> running_standard_job_executors;
@@ -191,17 +193,19 @@ namespace wrench {
         // Master List of batch jobs
         std::set<std::unique_ptr<BatchJob>>  all_jobs;
 
-        //Queue of pending batch jobs
-        std::deque<BatchJob *> pending_jobs;
-
         //A set of running batch jobs
         std::set<BatchJob *> running_jobs;
 
-        // A set of waiting jobs that have been submitted to batsched, but not scheduled
-        std::set<BatchJob *> waiting_jobs;
+        // Scheduler
+        std::unique_ptr<BatchScheduler> scheduler;
 
+        std::deque<BatchJob *> batch_queue;
 
 #ifdef ENABLE_BATSCHED
+        // A set of waiting jobs that have been submitted to batsched, but not scheduled
+
+        //A set of pending batch jobs
+        std::set<BatchJob *> waiting_jobs;
 
         std::set<std::string> scheduling_algorithms = {"conservative_bf", "crasher", "easy_bf", "easy_bf_fast",
                                                        "easy_bf_plot_liquid_load_horizon",
@@ -218,7 +222,7 @@ namespace wrench {
 
         };
 #else
-        std::set<std::string> scheduling_algorithms = {"FCFS"
+        std::set<std::string> scheduling_algorithms = {"FCFS", "CONSERVATIVE_BF",
         };
 
         //Batch queue ordering options
@@ -231,6 +235,8 @@ namespace wrench {
         unsigned long generateUniqueJobID();
 
         void removeJobFromRunningList(BatchJob *job);
+
+        void removeJobFromBatchQueue(BatchJob *job);
 
         void freeJobFromJobsList(BatchJob* job);
 
@@ -250,10 +256,6 @@ namespace wrench {
 
         void terminateRunningStandardJob(StandardJob *job);
 
-        std::map<std::string, std::tuple<unsigned long, double>> scheduleOnHosts(std::string host_selection_algorithm,
-                                                                                 unsigned long, unsigned long, double);
-
-        BatchJob *pickJobForScheduling(std::string);
 
         //Terminate the batch service (this is usually for pilot jobs when they act as a batch service)
         void cleanup(bool has_returned_from_main, int return_value) override;
@@ -303,10 +305,6 @@ namespace wrench {
                       BatchJob *, unsigned long, unsigned long, unsigned long);
 
 
-
-        //vector of network listeners (only useful when ENABLE_BATSCHED == on)
-
-        std::map<std::string,double> getStartTimeEstimatesForFCFS(std::set<std::tuple<std::string,unsigned int,unsigned int, double>>);
 
 
         /** BATSCHED-related fields **/

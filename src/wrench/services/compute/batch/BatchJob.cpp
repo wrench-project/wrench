@@ -41,9 +41,9 @@ namespace wrench {
             );
         }
         this->jobid = jobid;
-        this->allocated_time = time_in_minutes * 60;
-        this->num_nodes = num_nodes;
-        this->cores_per_node = cores_per_node;
+        this->requested_time = time_in_minutes * 60;
+        this->requested_num_nodes = num_nodes;
+        this->requested_cores_per_node = cores_per_node;
         this->ending_time_stamp = ending_time_stamp;
         this->arrival_time_stamp = arrival_time_stamp;
 
@@ -51,27 +51,27 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the number of cores per node
+     * @brief Get the requested number of cores per node
      * @return a number of cores
      */
-    unsigned long BatchJob::getAllocatedCoresPerNode() {
-        return this->cores_per_node;
+    unsigned long BatchJob::getRequestedCoresPerNode() {
+        return this->requested_cores_per_node;
     }
 
     /**
-     * @brief Get the allocated time
+     * @brief Get the requested time
      * @return a time in seconds
      */
-    unsigned long BatchJob::getAllocatedTime() {
-        return this->allocated_time;
+    unsigned long BatchJob::getRequestedTime() {
+        return this->requested_time;
     }
 
     /**
-     * @brief Set the allocated time
+     * @brief Set the requested time
      * @param time: a time in seconds
      */
-    void BatchJob::setAllocatedTime(unsigned long time) {
-        this->allocated_time = time;
+    void BatchJob::setRequestedTime(unsigned long time) {
+        this->requested_time = time;
     }
 
     /**
@@ -117,11 +117,11 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the number of allocated compute nodes (or hosts)
+     * @brief Get the number of requested compute nodes (or hosts)
      * @return a number of nodes
      */
-    unsigned long BatchJob::getNumNodes() {
-        return this->num_nodes;
+    unsigned long BatchJob::getRequestedNumNodes() {
+        return this->requested_num_nodes;
     }
 
 
