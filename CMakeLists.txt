@@ -222,11 +222,19 @@ set(SOURCE_FILES
         src/wrench/services/compute/batch/BatchJob.cpp
         src/wrench/services/compute/batch/BatchComputeServiceMessage.cpp
         src/wrench/services/compute/batch/BatchComputeService.cpp
-        src/wrench/services/compute/batch/WorkloadTraceFileReplayer.cpp
-        src/wrench/services/compute/batch/WorkloadTraceFileReplayerEventReceiver.cpp
+        src/wrench/services/compute/batch/workload_helper_classes/WorkloadTraceFileReplayer.cpp
+        src/wrench/services/compute/batch/workload_helper_classes/WorkloadTraceFileReplayerEventReceiver.cpp
         src/wrench/services/compute/batch/BatchComputeServiceProperty.cpp
         src/wrench/services/compute/batch/BatchComputeServiceMessagePayload.cpp
         src/wrench/services/compute/batch/BatschedNetworkListener.cpp
+        src/wrench/services/compute/batch/batch_schedulers/BatchScheduler.cpp
+        include/wrench/services/compute/batch/batch_schedulers/BatchScheduler.h
+        src/wrench/services/compute/batch/batch_schedulers/FCFS/FCFSBatchScheduler.cpp
+        src/wrench/services/compute/batch/batch_schedulers/FCFS/FCFSBatchScheduler.h
+        src/wrench/services/compute/batch/batch_schedulers/CONSERVATIVE_BF/conservative_backfilling_helper_classes/NodeAvailabilityTimeLine.cpp
+        src/wrench/services/compute/batch/batch_schedulers/CONSERVATIVE_BF/conservative_backfilling_helper_classes/NodeAvailabilityTimeLine.h
+        src/wrench/services/compute/batch/batch_schedulers/CONSERVATIVE_BF/conservative_backfilling_helper_classes/ConservativeBackfillingScheduler.cpp
+        src/wrench/services/compute/batch/batch_schedulers/CONSERVATIVE_BF/conservative_backfilling_helper_classes/ConservativeBackfillingScheduler.h
         src/wrench/services/compute/htcondor/HTCondorComputeService.cpp
         src/wrench/services/compute/htcondor/HTCondorCentralManagerService.cpp
         src/wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessage.cpp
@@ -241,7 +249,7 @@ set(SOURCE_FILES
         src/wrench/util/PointerUtil.cpp
         src/wrench/util/PointerUtil.cpp
         src/wrench/util/MessageManager.cpp
-        src/wrench/services/compute/batch/TraceFileLoader.cpp
+        src/wrench/services/compute/batch/workload_helper_classes/TraceFileLoader.cpp
         src/wrench/util/UnitParser.cpp
         src/wrench/simulation/SimulationTimestampTypes.cpp
         )
