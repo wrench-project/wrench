@@ -29,8 +29,8 @@ namespace wrench {
         /**
          * @brief The batch scheduling algorithm. Can be:
          *    - If ENABLE_BATSCHED is set to off / not set:
-         *      - "FCFS": First Come First Serve
-         *      - "CONSERVATIVE_BF": a home-grown implementation of FCFS with conservative backfilling, which only  allocates resources at the node level
+         *      - "fcfs": First Come First Serve
+         *      - "conservative_bf": a home-grown implementation of FCFS with conservative backfilling, which only  allocates resources at the node level
          *    - If ENABLE_BATSCHED is set to on:
          *      - whatever scheduling algorithm is supported by Batsched
          *        (by default: "conservative_bf", other options include
@@ -50,8 +50,8 @@ namespace wrench {
 
         /**
          * @brief The host selection algorithm. Can be:
-         *      - If ENABLE_BATSCHED is set to on or if the BATCH_SCHEDULING_ALGORITHM is not FCFS: ignored
-         *      - If ENABLE_BATSCHED is set to off or not set, and if the BATCH_SCHEDULING_ALGORITHM is FCFS:
+         *      - If ENABLE_BATSCHED is set to on or if the BATCH_SCHEDULING_ALGORITHM is not fcfs: ignored
+         *      - If ENABLE_BATSCHED is set to off or not set, and if the BATCH_SCHEDULING_ALGORITHM is fcfs:
          *          - FIRSTFIT  (default)
          *          - BESTFIT
          *          - ROUNDROBIN

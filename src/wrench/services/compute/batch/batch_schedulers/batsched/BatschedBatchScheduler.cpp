@@ -41,9 +41,9 @@ namespace wrench {
 
         // The "mod by 1500" below is totally ad-hoc, but not modding seemed
         // to lead to weird zmq "address already in use" errors...
-        this->cs->batsched_port = 28000 + (getpid() % 1500) +
+        this->batsched_port = 28000 + (getpid() % 1500) +
                                   S4U_Mailbox::generateUniqueSequenceNumber();
-        this->cs->pid = getpid();
+        this->pid = getpid();
 
         int top_pid = fork();
 
@@ -64,7 +64,7 @@ namespace wrench {
             }
 
             std::string rjms_delay = this->cs->getPropertyValueAsString(BatchComputeServiceProperty::BATCH_RJMS_DELAY);
-            std::string socket_endpoint = "tcp://*:" + std::to_string(this->cs->batsched_port);
+            std::string socket_endpoint = "tcp://*:" + std::to_string(this->batsched_port);
 
             char **args = NULL;
             unsigned int num_args = 0;
@@ -223,7 +223,7 @@ namespace wrench {
         std::shared_ptr<BatschedNetworkListener> network_listener =
                 std::shared_ptr<BatschedNetworkListener>(
                         new BatschedNetworkListener(this->cs->hostname, this->cs->getSharedPtr<BatchComputeService>(), batchsched_query_mailbox,
-                                                    std::to_string(this->cs->batsched_port),
+                                                    std::to_string(this->batsched_port),
                                                     data));
         network_listener->simulation = this->cs->simulation;
         network_listener->start(network_listener, true, false); // Daemonized, no auto-restart
@@ -265,7 +265,7 @@ namespace wrench {
         // Stop Batsched
         zmq::context_t context(1);
         zmq::socket_t socket(context, ZMQ_REQ);
-        socket.connect("tcp://localhost:" + std::to_string(this->cs->batsched_port));
+        socket.connect("tcp://localhost:" + std::to_string(this->batsched_port));
 
         nlohmann::json simulation_ends_msg;
         simulation_ends_msg["now"] = S4U_Simulation::getClock();
@@ -347,7 +347,7 @@ namespace wrench {
         std::shared_ptr<BatschedNetworkListener> network_listener =
                 std::shared_ptr<BatschedNetworkListener>(
                         new BatschedNetworkListener(this->cs->hostname, this->cs->getSharedPtr<BatchComputeService>(), this->cs->mailbox_name,
-                                                    std::to_string(this->cs->batsched_port),
+                                                    std::to_string(this->batsched_port),
                                                     data));
         network_listener->simulation = this->cs->simulation;
         network_listener->start(network_listener, true, false); // Daemonized, no auto-restart
@@ -427,7 +427,7 @@ namespace wrench {
                 std::shared_ptr<BatschedNetworkListener>(
                         new BatschedNetworkListener(this->cs->hostname, this->cs->getSharedPtr<BatchComputeService>(),
                                                     this->cs->mailbox_name,
-                                                    std::to_string(this->cs->batsched_port),
+                                                    std::to_string(this->batsched_port),
                                                     data));
         network_listener->simulation = this->cs->simulation;
         network_listener->start(network_listener, true, false); // Daemonized, no auto-restart
@@ -539,7 +539,7 @@ namespace wrench {
             std::shared_ptr<BatschedNetworkListener> network_listener =
                     std::shared_ptr<BatschedNetworkListener>(
                             new BatschedNetworkListener(this->cs->hostname, this->cs->getSharedPtr<BatchComputeService>(), this->cs->mailbox_name,
-                                                        std::to_string(this->cs->batsched_port),
+                                                        std::to_string(this->batsched_port),
                                                         data));
             network_listener->simulation = this->cs->simulation;
             network_listener->start(network_listener, true, false); // Daemonized, no auto-restart
