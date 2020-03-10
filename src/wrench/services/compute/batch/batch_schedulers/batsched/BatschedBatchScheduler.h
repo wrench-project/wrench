@@ -42,6 +42,12 @@ namespace wrench {
 
         void startBatschedNetworkListener();
 
+
+        pid_t pid;
+
+        unsigned long batsched_port;
+
+
 #endif
 
     };

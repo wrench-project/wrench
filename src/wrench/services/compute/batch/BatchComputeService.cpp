@@ -31,17 +31,17 @@
 #include "batch_schedulers/homegrown/conservative_bf/CONSERVATIVE_BFBatchScheduler.h"
 #include "batch_schedulers/batsched/BatschedBatchScheduler.h"
 
-#ifdef ENABLE_BATSCHED
-
-#include <zmq.hpp>
-#include <zmq.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <signal.h>
-#include <iostream>
-#include <fstream>
-
-#endif
+//#ifdef ENABLE_BATSCHED
+//
+//#include <zmq.hpp>
+//#include <zmq.h>
+//#include <sys/types.h>
+//#include <sys/wait.h>
+//#include <signal.h>
+//#include <iostream>
+//#include <fstream>
+//
+//#endif
 
 WRENCH_LOG_NEW_DEFAULT_CATEGORY(batch_service, "Log category for Batch Service");
 
@@ -689,54 +689,6 @@ namespace wrench {
     }
 
 
-///**
-// * @brief Schedule one queued job
-// * @return true if a job was scheduled, false otherwise
-// */
-//    bool BatchComputeService::scheduleOneQueuedJob() {
-//
-//        // Invoke the scheduler to pick a job to schedule
-//        BatchJob *batch_job = this->scheduler->pickNextJobToSchedule();
-//        if (batch_job == nullptr) {
-//            WRENCH_INFO("No pending jobs to schedule");
-//            return false;
-//        }
-//
-//        // Get the workflow job associated to the picked batch job
-//        WorkflowJob *workflow_job = batch_job->getWorkflowJob();
-//
-//        // Find on which resources to actually run the job
-//        unsigned long cores_per_node_asked_for = batch_job->getRequestedCoresPerNode();
-//        unsigned long num_nodes_asked_for = batch_job->getRequestedNumNodes();
-//        unsigned long requested_time = batch_job->getRequestedTime();
-//
-////      WRENCH_INFO("Trying to see if I can run job (batch_job = %ld)(%s)",
-////                  (unsigned long)batch_job,
-////                  workflow_job->getName().c_str());
-////        std::map<std::string, std::tuple<unsigned long, double>> resources;
-//
-//        auto resources = this->scheduler->scheduleOnHosts(num_nodes_asked_for, cores_per_node_asked_for, ComputeService::ALL_RAM);
-//        if (resources.empty()) {
-//            WRENCH_INFO("Can't run job %s right now", workflow_job->getName().c_str());
-//            return false;
-//        }
-//
-//        WRENCH_INFO("Starting job %s", workflow_job->getName().c_str());
-//
-//        // Remove the job from the batch queue
-//        this->removeJobFromBatchQueue(batch_job);
-//
-//        // Add it to the running list
-//        this->running_jobs.insert(batch_job);
-//
-//        // Start it!
-//        startJob(resources, workflow_job, batch_job, num_nodes_asked_for, requested_time,
-//                 cores_per_node_asked_for);
-//
-//        return true;
-//
-//    }
-
 /**
 * @brief Declare all current jobs as failed (likely because the daemon is being terminated
 * or has timed out (because it's in fact a pilot job))
@@ -791,7 +743,6 @@ namespace wrench {
             to_erase.clear();
         }
 
-#ifdef ENABLE_BATSCHED
         {
             std::vector<BatchJob *> to_erase;
 
@@ -812,7 +763,6 @@ namespace wrench {
             }
             to_erase.clear();
         }
-#endif
 
         // UNLOCK
         this->releaseDaemonLock();
@@ -946,13 +896,9 @@ namespace wrench {
         } else if (auto msg = std::dynamic_pointer_cast<AlarmJobTimeOutMessage>(message)) {
             processAlarmJobTimeout(msg->job);
             return true;
-
-
-#ifdef ENABLE_BATSCHED
         } else if (auto msg = std::dynamic_pointer_cast<BatchExecuteJobFromBatSchedMessage>(message)) {
             processExecuteJobFromBatSched(msg->batsched_decision_reply);
             return true;
-#endif
         } else {
             throw std::runtime_error(
                     "BatchComputeService::processNextMessage(): Unexpected [" + message->getName() + "] message");
@@ -1165,7 +1111,6 @@ namespace wrench {
             }
         }
 
-#ifdef ENABLE_BATSCHED
         for (auto it2 = this->waiting_jobs.begin(); it2 != this->waiting_jobs.end(); it2++) {
             if ((*it2)->getWorkflowJob() == job) {
                 job_id = std::to_string((*it2)->getJobID());
@@ -1182,7 +1127,6 @@ namespace wrench {
                 return;
             }
         }
-#endif
 
         for (auto it1 = this->running_jobs.begin(); it1 != this->running_jobs.end();) {
             if ((*it1)->getWorkflowJob() == job) {
@@ -1646,8 +1590,6 @@ namespace wrench {
 
         bool is_waiting = false;
 
-#ifdef ENABLE_BATSCHED
-
         if (batch_job == nullptr && batch_pending_it == this->batch_queue.end()) {
             // Is it waiting?
             for (auto const &j : this->waiting_jobs) {
@@ -1659,7 +1601,6 @@ namespace wrench {
                 }
             }
         }
-#endif
 
         if (!is_pending && !is_running && !is_waiting) {
             std::string msg = "Job cannot be terminated because it is neither pending, not running, not waiting";
@@ -1689,12 +1630,10 @@ namespace wrench {
             this->batch_queue.erase(batch_pending_it);
             this->freeJobFromJobsList(to_free);
         }
-#ifdef ENABLE_BATSCHED
         if (is_waiting) {
             this->waiting_jobs.erase(batch_job);
             this->freeJobFromJobsList(batch_job);
         }
-#endif
         ComputeServiceTerminateStandardJobAnswerMessage *answer_message =
                 new ComputeServiceTerminateStandardJobAnswerMessage(
                         job, this->getSharedPtr<BatchComputeService>(), true, nullptr,
@@ -1745,13 +1684,6 @@ namespace wrench {
             );
         }
     }
-
-
-/********************************************************************************************/
-/** BATSCHED INTERFACE METHODS BELOW                                                        */
-/********************************************************************************************/
-
-#ifdef ENABLE_BATSCHED
 
     /**
      * @brief Method to hand incoming batsched message
@@ -1825,6 +1757,5 @@ namespace wrench {
     }
 
 
-#endif  // ENABLE_BATSCHED
 
 };

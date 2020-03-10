@@ -123,7 +123,6 @@ namespace wrench {
 
     private:
 
-
         friend class WorkloadTraceFileReplayer;
         friend class FCFSBatchScheduler;
         friend class CONSERVATIVE_BFBatchScheduler;
@@ -174,7 +173,6 @@ namespace wrench {
         //alarms for pilot jobs (only one pilot job alarm)
         std::map<std::string,std::shared_ptr<Alarm>> pilot_job_alarms;
 
-
         /* Resources information in BatchService */
         unsigned long total_num_of_nodes;
         unsigned long num_cores_per_node;
@@ -200,13 +198,14 @@ namespace wrench {
         // Scheduler
         std::unique_ptr<BatchScheduler> scheduler;
 
+        // The batch queue
         std::deque<BatchJob *> batch_queue;
 
-#ifdef ENABLE_BATSCHED
-        // A set of waiting jobs that have been submitted to batsched, but not scheduled
-
-        //A set of pending batch jobs
+        // A set of "waiting" batch jobs, i.e., jobs that are waiting to be sent to
+        //  the  scheduler (useful for batsched only)
         std::set<BatchJob *> waiting_jobs;
+
+#ifdef ENABLE_BATSCHED
 
         std::set<std::string> scheduling_algorithms = {"conservative_bf", "crasher", "easy_bf", "easy_bf_fast",
                                                        "easy_bf_plot_liquid_load_horizon",
@@ -231,7 +230,6 @@ namespace wrench {
         };
 
 #endif
-
 
         unsigned long generateUniqueJobID();
 
@@ -294,48 +292,15 @@ namespace wrench {
         //send call back to the standard job submitters
         void sendStandardJobFailureNotification(StandardJob *job, std::string job_id, std::shared_ptr<FailureCause> cause);
 
-//        // Try to schedule a job
-//        bool scheduleOneQueuedJob();
-
         // process a job submission
         void processJobSubmission(BatchJob *job, std::string answer_mailbox);
-
 
         //start a job
         void startJob(std::map<std::string, std::tuple<unsigned long, double>>, WorkflowJob *,
                       BatchJob *, unsigned long, unsigned long, unsigned long);
 
 
-
-
-        /** BATSCHED-related fields **/
-        std::set<std::shared_ptr<BatschedNetworkListener>> network_listeners;
-        pid_t pid;
-        unsigned long batsched_port;
-
-
-#ifdef ENABLE_BATSCHED
-        friend class BatschedNetworkListener;
-
-//        void startBatsched();
-//        void stopBatsched();
-
-//        std::map<std::string,double> getStartTimeEstimatesFromBatsched(std::set<std::tuple<std::string,unsigned int,unsigned int,double>>);
-//
-//        void startBatschedNetworkListener();
-
-//        void notifyJobEventsToBatSched(std::string job_id, std::string status, std::string job_state,
-//                                       std::string kill_reason, std::string even_type);
-
-//        void appendJobInfoToCSVOutputFile(BatchJob *batch_job, std::string status);
-
-//        void sendAllQueuedJobsToBatsched();
-
-        //process execute events from batsched
-
         void processExecuteJobFromBatSched(std::string bat_sched_reply);
-
-#endif // ENABLE_BATSCHED
 
     };
 }
