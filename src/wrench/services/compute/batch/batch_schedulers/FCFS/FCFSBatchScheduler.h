@@ -23,7 +23,13 @@ namespace wrench {
 
     public:
 
-        FCFSBatchScheduler(BatchComputeService *cs) : BatchScheduler(cs) {}
+        explicit FCFSBatchScheduler(BatchComputeService *cs) : BatchScheduler(cs) {}
+
+        void init() override;
+
+        void launch() override;
+
+        void shutdown() override;
 
         BatchJob *pickNextJobToSchedule() override;
 

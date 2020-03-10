@@ -127,6 +127,7 @@ namespace wrench {
         friend class WorkloadTraceFileReplayer;
         friend class FCFSBatchScheduler;
         friend class CONSERVATIVE_BFBatchScheduler;
+        friend class BatschedBatchScheduler;
 
         BatchComputeService(std::string hostname,
                             std::vector<std::string> compute_hosts,
