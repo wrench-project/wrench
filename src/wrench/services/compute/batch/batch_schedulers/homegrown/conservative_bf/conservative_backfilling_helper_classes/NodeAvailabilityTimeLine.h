@@ -17,29 +17,40 @@
 /** \cond INTERNAL     */
 /***********************/
 
-class NodeAvailabilityTimeLine {
-
-public:
-    explicit NodeAvailabilityTimeLine(u_int16_t max_num_nodes);
-    void resetTimeOrigin(u_int32_t t);
-    void add(u_int32_t start, u_int32_t end, u_int16_t num_nodes) { update(true, start, end, num_nodes);}
-    void remove(u_int32_t start, u_int32_t end, u_int16_t num_nodes) { update(false, start, end, num_nodes);}
-    void print();
-    bool canStartAtOrigin(uint32_t duration, u_int16_t num_nodes);
-    u_int32_t findEarliestStartTime(uint32_t duration, u_int16_t num_nodes);
+namespace wrench {
 
 
+    class BatchJob;
 
-private:
+    class NodeAvailabilityTimeLine {
 
-    unsigned int max_num_nodes;
-    boost::icl::interval_map<u_int32_t, u_int16_t,  boost::icl::partial_enricher> availability_timeslots;
+    public:
+        explicit NodeAvailabilityTimeLine(unsigned long max_num_nodes);
+        void setTimeOrigin(u_int32_t t);
+        u_int32_t getTimeOrigin();
+        void add(u_int32_t start, u_int32_t end, BatchJob *job) { update(true, start, end, job);}
+        void remove(u_int32_t start, u_int32_t end, BatchJob *job) { update(false, start, end, job);}
+        void clear();
+        void print();
+        bool canStartNow(BatchJob *job);
+        std::set<BatchJob *> getJobsInFirstSlot();
+        u_int32_t findEarliestStartTime(uint32_t duration, unsigned long num_nodes);
 
-    void update(bool add, u_int32_t start, u_int32_t end, u_int16_t num_nodes);
-    u_int32_t findEarliestStartTimeHelper(bool at_origin, uint32_t duration, u_int16_t num_nodes);
 
-};
 
+    private:
+
+        unsigned long max_num_nodes;
+        boost::icl::interval_map<u_int32_t, std::set<BatchJob *>,  boost::icl::partial_enricher> availability_timeslots;
+
+        void update(bool add, u_int32_t start, u_int32_t end, BatchJob *job);
+        u_int32_t findEarliestStartTimeHelper(bool at_origin, uint32_t duration, unsigned long num_nodes);
+
+        static unsigned  long sumNodes(const std::set<BatchJob *>& job_set);
+
+    };
+
+}
 
 /***********************/
 /** \endcond           */

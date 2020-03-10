@@ -7,8 +7,8 @@
  * (at your option) any later version.
  */
 
-#ifndef WRENCH_CONSERVATIVE_BFBATCHSCHEDULER_H
-#define WRENCH_CONSERVATIVE_BFBATCHSCHEDULER_H
+#ifndef WRENCH_CONSERVATIVEBFBATCHSCHEDULER_H
+#define WRENCH_CONSERVATIVEBFBATCHSCHEDULER_H
 
 /***********************/
 /** \cond INTERNAL     */
@@ -20,24 +20,23 @@
 
 namespace wrench {
 
-    class CONSERVATIVE_BFBatchScheduler : public HomegrownBatchScheduler {
+    class CONSERVATIVEBFBatchScheduler : public HomegrownBatchScheduler {
 
     public:
 
-
-        explicit CONSERVATIVE_BFBatchScheduler(BatchComputeService *cs);
+        explicit CONSERVATIVEBFBatchScheduler(BatchComputeService *cs);
 
         // TODO: IMPLEMENT EVERYTHING
-        void processQueuedJobs() override {}
+        void processQueuedJobs() override;
 
-        void processJobSubmission(BatchJob *batch_job) override {};
-        void processJobFailure(BatchJob *batch_job) override {};
-        void processJobCompletion(BatchJob *batch_job) override {};
-        void processJobTermination(BatchJob *batch_job) override {};
+        void processJobSubmission(BatchJob *batch_job) override;
+        void processJobFailure(BatchJob *batch_job) override;
+        void processJobCompletion(BatchJob *batch_job) override;
+        void processJobTermination(BatchJob *batch_job) override;
 
-        BatchJob *pickNextJobToSchedule() override {};
+        void compactSchedule();
 
-        std::map <std::string, std::tuple<unsigned long, double>> scheduleOnHosts(unsigned long, unsigned long, double) override {};
+        std::map <std::string, std::tuple<unsigned long, double>> scheduleOnHosts(unsigned long, unsigned long, double) override;
 
         std::map<std::string, double>
         getStartTimeEstimates(std::set <std::tuple<std::string, unsigned int, unsigned int, double>> set_of_jobs) override {};
@@ -55,4 +54,4 @@ namespace wrench {
 
 
 
-#endif //WRENCH_CONSERVATIVE_BFBATCHSCHEDULER_H
+#endif //WRENCH_CONSERVATIVEBFBATCHSCHEDULER_H
