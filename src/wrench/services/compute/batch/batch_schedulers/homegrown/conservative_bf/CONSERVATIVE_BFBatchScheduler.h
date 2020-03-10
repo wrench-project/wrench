@@ -14,24 +14,24 @@
 /** \cond INTERNAL     */
 /***********************/
 
-#include "wrench/services/compute/batch/batch_schedulers/BatchScheduler.h"
 #include <wrench/services/compute/batch/BatchComputeService.h>
+#include <wrench/services/compute/batch/batch_schedulers/homegrown/HomegrownBatchScheduler.h>
 
 namespace wrench {
 
-    class CONSERVATIVE_BFBatchScheduler : public BatchScheduler {
+    class CONSERVATIVE_BFBatchScheduler : public HomegrownBatchScheduler {
 
     public:
 
         // TODO: IMPLEMENT EVERYTHING
 
-        CONSERVATIVE_BFBatchScheduler(BatchComputeService *cs) : BatchScheduler(cs) {}
+        explicit CONSERVATIVE_BFBatchScheduler(BatchComputeService *cs) : HomegrownBatchScheduler(cs) {}
 
-        void init() override {};
+        void processQueuedJobs() override {}
 
-        void launch() override {};
-
-        void shutdown() override {};
+        void processJobFailure(BatchJob *batch_job, std::string job_id) override {};
+        void processJobCompletion(BatchJob *batch_job, std::string job_id) override {};
+        void processJobTermination(BatchJob *batch_job, std::string job_id) override {};
 
         BatchJob *pickNextJobToSchedule() override {};
 
