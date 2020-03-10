@@ -374,16 +374,19 @@ namespace wrench {
         }
     }
 
-
-    void FCFSBatchScheduler::processJobFailure(BatchJob *batch_job, std::string job_id) {
+    void FCFSBatchScheduler::processJobSubmission(BatchJob *batch_job) {
         // Do nothing
     }
 
-    void FCFSBatchScheduler::processJobCompletion(BatchJob *batch_job, std::string job_id) {
+    void FCFSBatchScheduler::processJobFailure(BatchJob *batch_job) {
         // Do nothing
     }
 
-    void FCFSBatchScheduler::processJobTermination(BatchJob *batch_job, std::string job_id) {
+    void FCFSBatchScheduler::processJobCompletion(BatchJob *batch_job) {
+        // Do nothing
+    }
+
+    void FCFSBatchScheduler::processJobTermination(BatchJob *batch_job) {
         // Do nothing
     }
 

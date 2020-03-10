@@ -28,9 +28,10 @@ namespace wrench {
         void processQueuedJobs() override;
 
         // TODO: is't the second arg just inside the first->id field?
-        void processJobFailure(BatchJob *batch_job, std::string job_id) override;
-        void processJobCompletion(BatchJob *batch_job, std::string job_id) override;
-        void processJobTermination(BatchJob *batch_job, std::string job_id) override;
+        void processJobSubmission(BatchJob *batch_job) override;
+        void processJobFailure(BatchJob *batch_job) override;
+        void processJobCompletion(BatchJob *batch_job) override;
+        void processJobTermination(BatchJob *batch_job) override;
 
         BatchJob *pickNextJobToSchedule() override;
 

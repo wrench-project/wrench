@@ -16,6 +16,7 @@
 
 #include <wrench/services/compute/batch/BatchComputeService.h>
 #include <wrench/services/compute/batch/batch_schedulers/homegrown/HomegrownBatchScheduler.h>
+#include <services/compute/batch/batch_schedulers/homegrown/conservative_bf/conservative_backfilling_helper_classes/NodeAvailabilityTimeLine.h>
 
 namespace wrench {
 
@@ -23,15 +24,16 @@ namespace wrench {
 
     public:
 
+
+        explicit CONSERVATIVE_BFBatchScheduler(BatchComputeService *cs);
+
         // TODO: IMPLEMENT EVERYTHING
-
-        explicit CONSERVATIVE_BFBatchScheduler(BatchComputeService *cs) : HomegrownBatchScheduler(cs) {}
-
         void processQueuedJobs() override {}
 
-        void processJobFailure(BatchJob *batch_job, std::string job_id) override {};
-        void processJobCompletion(BatchJob *batch_job, std::string job_id) override {};
-        void processJobTermination(BatchJob *batch_job, std::string job_id) override {};
+        void processJobSubmission(BatchJob *batch_job) override {};
+        void processJobFailure(BatchJob *batch_job) override {};
+        void processJobCompletion(BatchJob *batch_job) override {};
+        void processJobTermination(BatchJob *batch_job) override {};
 
         BatchJob *pickNextJobToSchedule() override {};
 
@@ -40,6 +42,9 @@ namespace wrench {
         std::map<std::string, double>
         getStartTimeEstimates(std::set <std::tuple<std::string, unsigned int, unsigned int, double>> set_of_jobs) override {};
 
+    private:
+
+        std::unique_ptr<NodeAvailabilityTimeLine> schedule;
     };
 
 }
