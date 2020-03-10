@@ -8,8 +8,7 @@
  */
 
 
-#include "ConservativeBackfillingScheduler.h"
 
-ConservativeBackfillingScheduler::ConservativeBackfillingScheduler(u_int16_t max_num_nodes) {
-    this->schedule = std::unique_ptr<NodeAvailabilityTimeLine>(new NodeAvailabilityTimeLine(max_num_nodes));
-}
+//ConservativeBackfillingScheduler::ConservativeBackfillingScheduler(u_int16_t max_num_nodes) {
+//    this->schedule = std::unique_ptr<NodeAvailabilityTimeLine>(new NodeAvailabilityTimeLine(max_num_nodes));
+//}

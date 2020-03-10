@@ -29,11 +29,22 @@ namespace wrench {
 
         BatchScheduler(BatchComputeService *cs) : cs(cs) {};
 
-        virtual std::map<std::string, double> getStartTimeEstimates(std::set<std::tuple<std::string, unsigned int, unsigned int, double>> set_of_jobs) = 0;
+        /**
+         * Virtual methods to override
+         */
+
+        virtual void init() = 0;
+
+        virtual void launch() = 0;
+
+        virtual void shutdown() = 0;
 
         virtual BatchJob *pickNextJobToSchedule() = 0;
 
         virtual std::map<std::string, std::tuple<unsigned long, double>> scheduleOnHosts(unsigned long, unsigned long, double) = 0;
+
+        virtual std::map<std::string, double> getStartTimeEstimates(std::set<std::tuple<std::string, unsigned int, unsigned int, double>> set_of_jobs) = 0;
+
 
 
     protected:

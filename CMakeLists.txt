@@ -229,12 +229,14 @@ set(SOURCE_FILES
         src/wrench/services/compute/batch/BatschedNetworkListener.cpp
         src/wrench/services/compute/batch/batch_schedulers/BatchScheduler.cpp
         include/wrench/services/compute/batch/batch_schedulers/BatchScheduler.h
+        src/wrench/services/compute/batch/batch_schedulers/BATSCHED/BatschedBatchScheduler.cpp
+        src/wrench/services/compute/batch/batch_schedulers/BATSCHED/BatschedBatchScheduler.h
         src/wrench/services/compute/batch/batch_schedulers/FCFS/FCFSBatchScheduler.cpp
         src/wrench/services/compute/batch/batch_schedulers/FCFS/FCFSBatchScheduler.h
+        src/wrench/services/compute/batch/batch_schedulers/CONSERVATIVE_BF/CONSERVATIVE_BFBatchScheduler.cpp
+        src/wrench/services/compute/batch/batch_schedulers/CONSERVATIVE_BF/CONSERVATIVE_BFBatchScheduler.h
         src/wrench/services/compute/batch/batch_schedulers/CONSERVATIVE_BF/conservative_backfilling_helper_classes/NodeAvailabilityTimeLine.cpp
         src/wrench/services/compute/batch/batch_schedulers/CONSERVATIVE_BF/conservative_backfilling_helper_classes/NodeAvailabilityTimeLine.h
-        src/wrench/services/compute/batch/batch_schedulers/CONSERVATIVE_BF/conservative_backfilling_helper_classes/ConservativeBackfillingScheduler.cpp
-        src/wrench/services/compute/batch/batch_schedulers/CONSERVATIVE_BF/conservative_backfilling_helper_classes/ConservativeBackfillingScheduler.h
         src/wrench/services/compute/htcondor/HTCondorComputeService.cpp
         src/wrench/services/compute/htcondor/HTCondorCentralManagerService.cpp
         src/wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessage.cpp

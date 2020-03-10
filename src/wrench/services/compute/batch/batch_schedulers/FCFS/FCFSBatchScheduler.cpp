@@ -325,6 +325,28 @@ namespace wrench {
 
         }
 
-        return predictions;    }
+        return predictions;
+    }
+
+    /**
+     * @brief Overriden init fucntion
+     */
+    void FCFSBatchScheduler::init() {
+        // Nothing to do
+    }
+
+    /**
+    * @brief Overriden init function
+    */
+    void FCFSBatchScheduler::launch() {
+        // Nothing to do
+    }
+
+    /**
+    * @brief Overriden shutdown function
+    */
+    void FCFSBatchScheduler::shutdown() {
+        // Nothing to do
+    }
 
 }
