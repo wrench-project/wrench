@@ -162,7 +162,7 @@ namespace wrench {
             std::set<std::tuple<std::string, unsigned int, unsigned int, double>> set_of_jobs) {
 
         if (cs->getPropertyValueAsString(BatchComputeServiceProperty::HOST_SELECTION_ALGORITHM) != "FIRSTFIT") {
-            throw std::runtime_error("FCFSBatchScheduler::getStartTimeEstimates(): The FCFS sceduling algorithm can only provide start time estimates "
+            throw std::runtime_error("FCFSBatchScheduler::getStartTimeEstimates(): The fcfs sceduling algorithm can only provide start time estimates "
                                      "when the HOST_SELECTION_ALGORITHM property is set to FIRSTFIT");
         }
 
@@ -250,7 +250,7 @@ namespace wrench {
             }
 
             // Go through all hosts and make sure that no core is available before earliest_job_start_time
-            // since this is a simple FCFS algorithm with no "jumping ahead" of any kind
+            // since this is a simple fcfs algorithm with no "jumping ahead" of any kind
             for (auto h : cs->nodes_to_cores_map) {
                 std::string hostname = h.first;
                 unsigned long num_cores = h.second;
@@ -328,25 +328,64 @@ namespace wrench {
         return predictions;
     }
 
-    /**
-     * @brief Overriden init fucntion
-     */
-    void FCFSBatchScheduler::init() {
-        // Nothing to do
+    void FCFSBatchScheduler::processQueuedJobs() {
+
+        while (true) {
+
+            // Invoke the scheduler to pick a job to schedule
+            BatchJob *batch_job = this->pickNextJobToSchedule();
+            if (batch_job == nullptr) {
+                WRENCH_INFO("No pending jobs to schedule");
+                break;
+            }
+
+            // Get the workflow job associated to the picked batch job
+            WorkflowJob *workflow_job = batch_job->getWorkflowJob();
+
+            // Find on which resources to actually run the job
+            unsigned long cores_per_node_asked_for = batch_job->getRequestedCoresPerNode();
+            unsigned long num_nodes_asked_for = batch_job->getRequestedNumNodes();
+            unsigned long requested_time = batch_job->getRequestedTime();
+
+//      WRENCH_INFO("Trying to see if I can run job (batch_job = %ld)(%s)",
+//                  (unsigned long)batch_job,
+//                  workflow_job->getName().c_str());
+//        std::map<std::string, std::tuple<unsigned long, double>> resources;
+
+            auto resources = this->scheduleOnHosts(num_nodes_asked_for, cores_per_node_asked_for, ComputeService::ALL_RAM);
+            if (resources.empty()) {
+                WRENCH_INFO("Can't run job %s right now", workflow_job->getName().c_str());
+                break;
+            }
+
+            WRENCH_INFO("Starting job %s", workflow_job->getName().c_str());
+
+            // Remove the job from the batch queue
+            this->cs->removeJobFromBatchQueue(batch_job);
+
+            // Add it to the running list
+            this->cs->running_jobs.insert(batch_job);
+
+            // Start it!
+            this->cs->startJob(resources, workflow_job, batch_job, num_nodes_asked_for, requested_time,
+                     cores_per_node_asked_for);
+
+
+        }
     }
 
-    /**
-    * @brief Overriden init function
-    */
-    void FCFSBatchScheduler::launch() {
-        // Nothing to do
+
+    void FCFSBatchScheduler::processJobFailure(BatchJob *batch_job, std::string job_id) {
+        // Do nothing
     }
 
-    /**
-    * @brief Overriden shutdown function
-    */
-    void FCFSBatchScheduler::shutdown() {
-        // Nothing to do
+    void FCFSBatchScheduler::processJobCompletion(BatchJob *batch_job, std::string job_id) {
+        // Do nothing
     }
+
+    void FCFSBatchScheduler::processJobTermination(BatchJob *batch_job, std::string job_id) {
+        // Do nothing
+    }
+
 
 }

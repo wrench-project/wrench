@@ -215,26 +215,26 @@ void BatchServiceTest::do_BogusSetupTest_test() {
     // Create a Batch Service with a bogus host list
     ASSERT_THROW(compute_service = simulation->add(
             new wrench::BatchComputeService(hostname, {}, "",
-                                            {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}})),
+                                            {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "fcfs"}})),
                  std::invalid_argument);
 
     // Create a Batch Service with a non-homogeneous (speed) host list
     ASSERT_THROW(compute_service = simulation->add(
             new wrench::BatchComputeService(hostname, {"Host1", "HostFast"}, "",
-                                            {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}})),
+                                            {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "fcfs"}})),
                  std::invalid_argument);
 
 
     // Create a Batch Service with a non-homogeneous (#cores) host list
     ASSERT_THROW(compute_service = simulation->add(
             new wrench::BatchComputeService(hostname, {"Host1", "HostManyCores"}, "",
-                                            {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}})),
+                                            {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "fcfs"}})),
                  std::invalid_argument);
 
     // Create a Batch Service with a non-homogeneous (RAM) host list
     ASSERT_THROW(compute_service = simulation->add(
             new wrench::BatchComputeService(hostname, {"Host1", "RAMHost"}, "",
-                                            {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}})),
+                                            {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "fcfs"}})),
                  std::invalid_argument);
 
 
