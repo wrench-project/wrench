@@ -23,7 +23,15 @@ namespace wrench {
 
     public:
 
+        // TODO: IMPLEMENT EVERYTHING
+
         CONSERVATIVE_BFBatchScheduler(BatchComputeService *cs) : BatchScheduler(cs) {}
+
+        void init() override {};
+
+        void launch() override {};
+
+        void shutdown() override {};
 
         BatchJob *pickNextJobToSchedule() override {};
 
