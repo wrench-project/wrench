@@ -39,9 +39,12 @@ namespace wrench {
 
         virtual void shutdown() = 0;
 
-        virtual BatchJob *pickNextJobToSchedule() = 0;
+        virtual void processQueuedJobs() = 0;
 
-        virtual std::map<std::string, std::tuple<unsigned long, double>> scheduleOnHosts(unsigned long, unsigned long, double) = 0;
+        virtual void processJobFailure(BatchJob *batch_job, std::string job_id) = 0;
+        virtual void processJobCompletion(BatchJob *batch_job, std::string job_id) = 0;
+        virtual void processJobTermination(BatchJob *batch_job, std::string job_id) = 0;
+
 
         virtual std::map<std::string, double> getStartTimeEstimates(std::set<std::tuple<std::string, unsigned int, unsigned int, double>> set_of_jobs) = 0;
 

@@ -42,7 +42,7 @@ namespace wrench {
         // The "mod by 1500" below is totally ad-hoc, but not modding seemed
         // to lead to weird zmq "address already in use" errors...
         this->cs->batsched_port = 28000 + (getpid() % 1500) +
-                              S4U_Mailbox::generateUniqueSequenceNumber();
+                                  S4U_Mailbox::generateUniqueSequenceNumber();
         this->cs->pid = getpid();
 
         int top_pid = fork();
@@ -178,7 +178,7 @@ namespace wrench {
 #ifdef ENABLE_BATSCHED
         // Start the Batsched Network Listener
         try {
-            this->cs->startBatschedNetworkListener();
+            this->startBatschedNetworkListener();
         } catch (std::runtime_error &e) {
             throw;
         }
@@ -200,7 +200,7 @@ namespace wrench {
         nlohmann::json batch_submission_data;
         batch_submission_data["now"] = S4U_Simulation::getClock();
 
-        // IMPORTANT: THIS IGNORES THE NUMBER OF CORES (THIS IS A LIMITATION OF BATSCHED!)
+        // IMPORTANT: THIS IGNORES THE NUMBER OF CORES (THIS IS A LIMITATION OF batsched!)
 
         int idx = 0;
         batch_submission_data["events"] = nlohmann::json::array();
@@ -258,17 +258,6 @@ namespace wrench {
     }
 
 
-    // TODO
-    BatchJob *BatschedBatchScheduler::pickNextJobToSchedule() {
-        return nullptr;
-    }
-
-    // TODO
-    std::map<std::string, std::tuple<unsigned long, double>>
-    BatschedBatchScheduler::scheduleOnHosts(unsigned long, unsigned long, double) {
-        return std::map<std::string, std::tuple<unsigned long, double>>();
-    }
-
     void BatschedBatchScheduler::shutdown() {
 
 #ifdef ENABLE_BATSCHED
@@ -303,7 +292,7 @@ namespace wrench {
         decision_events = reply_decisions["events"];
         if (decision_events.size() > 0) {
             throw std::runtime_error(
-                    "BatschedBatchScheduler::shutdown(): Upon termination BATSCHED returned a non-empty event set, which is unexpected");
+                    "BatschedBatchScheduler::shutdown(): Upon termination batsched returned a non-empty event set, which is unexpected");
         }
 
 #else
@@ -313,6 +302,255 @@ namespace wrench {
     }
 
 
+
+    void BatschedBatchScheduler::processQueuedJobs() {
+#if ENABLE_BATSCHED
+        if (this->cs->batch_queue.empty()) {
+            return;
+        }
+
+        // IMPORTANT: We always as for more time, so that when the alarm goes
+        // of at the right time, we can respond to it before the Batsched
+        // time slice has expired!
+        double BATSCHED_JOB_EXTRA_TIME = 1.0;
+
+        // Send ALL Queued jobs to batsched, and move them all to the WAITING queue
+        // The WAITING queue is: those jobs that I need to hear from Batsched about
+
+        nlohmann::json batch_submission_data;
+        batch_submission_data["now"] = S4U_Simulation::getClock();
+        batch_submission_data["events"] = nlohmann::json::array();
+        size_t i;
+        std::deque<BatchJob *>::iterator it;
+        for (i = 0, it = this->cs->batch_queue.begin(); i < this->cs->batch_queue.size(); i++, it++) {
+
+            BatchJob *batch_job = *it;
+
+            /* Get the nodes and cores per nodes asked for */
+            unsigned long cores_per_node_asked_for = batch_job->getRequestedCoresPerNode();
+            unsigned long num_nodes_asked_for = batch_job->getRequestedNumNodes();
+            unsigned long allocated_time = batch_job->getRequestedTime();
+
+            batch_submission_data["events"][i]["timestamp"] = batch_job->getArrivalTimeStamp();
+            batch_submission_data["events"][i]["type"] = "JOB_SUBMITTED";
+            batch_submission_data["events"][i]["data"]["job_id"] = std::to_string(batch_job->getJobID());
+            batch_submission_data["events"][i]["data"]["job"]["id"] = std::to_string(batch_job->getJobID());
+            batch_submission_data["events"][i]["data"]["job"]["res"] = num_nodes_asked_for;
+            batch_submission_data["events"][i]["data"]["job"]["core"] = cores_per_node_asked_for;
+            batch_submission_data["events"][i]["data"]["job"]["walltime"] = allocated_time + BATSCHED_JOB_EXTRA_TIME;
+
+            this->cs->batch_queue.erase(it);
+            this->cs->waiting_jobs.insert(batch_job);
+
+        }
+        std::string data = batch_submission_data.dump();
+        std::shared_ptr<BatschedNetworkListener> network_listener =
+                std::shared_ptr<BatschedNetworkListener>(
+                        new BatschedNetworkListener(this->cs->hostname, this->cs->getSharedPtr<BatchComputeService>(), this->cs->mailbox_name,
+                                                    std::to_string(this->cs->batsched_port),
+                                                    data));
+        network_listener->simulation = this->cs->simulation;
+        network_listener->start(network_listener, true, false); // Daemonized, no auto-restart
+        network_listener = nullptr; // detached mode
+#else
+        throw std::runtime_error("BatschedBatchScheduler::processQueuesJobs(): BATSCHED_ENABLE should be set to 'on'");
+#endif
+    }
+
+
+    void BatschedBatchScheduler::processJobFailure(BatchJob *batch_job, std::string job_id) {
+
+#ifdef ENABLE_BATSCHED
+
+        this->notifyJobEventsToBatSched(job_id, "TIMEOUT", "COMPLETED_FAILED", "", "JOB_COMPLETED");
+        this->appendJobInfoToCSVOutputFile(batch_job, "FAILED");
+#else
+        throw std::runtime_error("BatschedBatchScheduler::processQueuesJobs(): BATSCHED_ENABLE should be set to 'on'");
+#endif
+    }
+
+    void BatschedBatchScheduler::processJobCompletion(BatchJob *batch_job, std::string job_id) {
+
+#ifdef ENABLE_BATSCHED
+        this->notifyJobEventsToBatSched(std::to_string(batch_job->getJobID()), "SUCCESS", "COMPLETED_SUCCESSFULLY", "", "JOB_COMPLETED");
+        this->appendJobInfoToCSVOutputFile(batch_job, "success");
+#else
+        throw std::runtime_error("BatschedBatchScheduler::processQueuesJobs(): BATSCHED_ENABLE should be set to 'on'");
+#endif
+    }
+
+
+    void BatschedBatchScheduler::processJobTermination(BatchJob *batch_job, std::string job_id) {
+
+#ifdef ENABLE_BATSCHED
+        this->notifyJobEventsToBatSched(job_id, "TIMEOUT", "NOT_SUBMITTED", "", "JOB_COMPLETED");
+        this->appendJobInfoToCSVOutputFile(batch_job, "TERMINATED");
+#else
+        throw std::runtime_error("BatschedBatchScheduler::processQueuesJobs(): BATSCHED_ENABLE should be set to 'on'");
+#endif
+    }
+
+
+    /**
+     * HELPER METHODS
+     */
+
+#ifdef ENABLE_BATSCHED
+
+    /**
+    * @brief Notify a job even to batsched (batsched ONLY)
+    * @param job_id the id of the job to be processed
+    * @param status the status of the job
+    * @param job_state current state of the job
+    * @param kill_reason the reason to be killed ("" if not being killed)
+    * @param event_type the type of event (JOB_COMPLETED/JOB_KILLED..)
+    */
+    void BatschedBatchScheduler::notifyJobEventsToBatSched(std::string job_id, std::string status, std::string job_state,
+                                                           std::string kill_reason, std::string event_type) {
+
+        //      if (not this->isBatschedReady()) {
+        //        throw std::runtime_error("BatchComputeService::notifyJobEventsToBatSched(): "
+        //                                         "batsched is not ready, which should not happen");
+        //      }
+
+        nlohmann::json batch_submission_data;
+        batch_submission_data["now"] = S4U_Simulation::getClock();
+        batch_submission_data["events"][0]["timestamp"] = S4U_Simulation::getClock();
+        batch_submission_data["events"][0]["type"] = event_type;
+        batch_submission_data["events"][0]["data"]["job_id"] = job_id;
+        batch_submission_data["events"][0]["data"]["status"] = status;
+        batch_submission_data["events"][0]["data"]["job_state"] = job_state;
+        batch_submission_data["events"][0]["data"]["kill_reason"] = kill_reason;
+
+        std::string data = batch_submission_data.dump();
+        std::shared_ptr<BatschedNetworkListener> network_listener =
+                std::shared_ptr<BatschedNetworkListener>(
+                        new BatschedNetworkListener(this->cs->hostname, this->cs->getSharedPtr<BatchComputeService>(),
+                                                    this->cs->mailbox_name,
+                                                    std::to_string(this->cs->batsched_port),
+                                                    data));
+        network_listener->simulation = this->cs->simulation;
+        network_listener->start(network_listener, true, false); // Daemonized, no auto-restart
+        network_listener = nullptr; // detached mode
+        //      this->network_listeners.insert(network_listener);
+    }
+
+
+    /**
+     * @brief Appends a job to the CSV Output file
+     *
+     * @param batch_job: the batch job
+     * @param status: "COMPLETED", "TERMINATED" (by user), "FAILED" (timeout)
+     */
+    void BatschedBatchScheduler::appendJobInfoToCSVOutputFile(BatchJob *batch_job, std::string status) {
+        std::string csv_file_path;
+        static unsigned long job_id = 0;
+
+        csv_file_path = this->cs->getPropertyValueAsString(BatchComputeServiceProperty::OUTPUT_CSV_JOB_LOG);
+        if (csv_file_path.empty()) {
+            return;
+        }
+        std::ofstream file;
+        file.open(csv_file_path, std::ios_base::app);
+        if (not file) {
+            throw std::runtime_error("BatchComputeService::appendJobInfoToCSVOutputFile(): Unable to append to CSV output file " +
+                                     csv_file_path + " (as specified by the BatchComputeServiceProperty::OUTPUT_CSV_JOB_LOG property)");
+        }
+        std::string csv_line = "";
+
+        // Allocated Processors
+        csv_line += batch_job->csv_allocated_processors + ",";
+        // Consumed Energy
+        csv_line += "0,";
+        // Execution Time
+        double execution_time = batch_job->getEndingTimeStamp() - batch_job->getBeginTimeStamp();
+        csv_line += std::to_string(execution_time) + ",";
+        // Finish time
+        double finish_time = batch_job->getEndingTimeStamp();
+        csv_line += std::to_string(finish_time) + ",";
+        // Job ID
+        csv_line += std::to_string(job_id++) + ",";
+        // MetaData
+        csv_line += std::string("\"") + batch_job->csv_metadata + "\",";
+        // Requested number of processors
+        csv_line += std::to_string(batch_job->getRequestedNumNodes()) + ",";
+        // Requested time
+        csv_line += std::to_string(batch_job->getRequestedTime()) + ",";
+        // Starting time
+        double starting_time = batch_job->getBeginTimeStamp();
+        csv_line += std::to_string(starting_time) + ",";
+        // Stretch
+        double stretch = (batch_job->getEndingTimeStamp() - batch_job->getArrivalTimeStamp()) /
+                         (batch_job->getEndingTimeStamp() - batch_job->getBeginTimeStamp());
+        csv_line += std::to_string(stretch) + ",";
+        // Submission time
+        double submission_time = batch_job->getArrivalTimeStamp();
+        csv_line += std::to_string(submission_time) + ",";
+        // Success
+        unsigned char success = 1;
+        if (status == "COMPLETED") {
+            success = 1;
+        } else if (status == "FAILED") {
+            success = 0;
+        } else if (status == "TERMINATED") {
+            success = 2;
+        }
+        csv_line += std::to_string(success) + ",";
+        // Turnaround time
+        double turnaround_time = (batch_job->getEndingTimeStamp() - batch_job->getArrivalTimeStamp());
+        csv_line += std::to_string(turnaround_time) + ",";
+        // Waiting time
+        double waiting_time = (batch_job->getBeginTimeStamp() - batch_job->getArrivalTimeStamp());
+        csv_line += std::to_string(waiting_time) + ",";
+        // Workload name
+        csv_line += "wrench";
+
+        file << csv_line << std::endl;
+        file.close();
+    }
+
+
+    /**
+    * @brief Start a network listener process (for batsched only)
+    */
+    void BatschedBatchScheduler::startBatschedNetworkListener() {
+
+        nlohmann::json compute_resources_map;
+        compute_resources_map["now"] = S4U_Simulation::getClock();
+        compute_resources_map["events"][0]["timestamp"] = S4U_Simulation::getClock();
+        compute_resources_map["events"][0]["type"] = "SIMULATION_BEGINS";
+        compute_resources_map["events"][0]["data"]["nb_resources"] = this->cs->nodes_to_cores_map.size();
+        compute_resources_map["events"][0]["data"]["allow_time_sharing"] = false;
+        //    This was the "old" batsched up until commit 39a30d83
+        //      compute_resources_map["events"][0]["data"]["config"]["redis"]["enabled"] = false;
+        compute_resources_map["events"][0]["data"]["config"]["redis-enabled"] = false;
+        std::map<std::string, unsigned long>::iterator it;
+        int count = 0;
+        for (it = this->cs->nodes_to_cores_map.begin(); it != this->cs->nodes_to_cores_map.end(); it++) {
+            compute_resources_map["events"][0]["data"]["resources_data"][count]["id"] = std::to_string(count);
+            compute_resources_map["events"][0]["data"]["resources_data"][count]["name"] = it->first;
+            compute_resources_map["events"][0]["data"]["resources_data"][count]["core"] = it->second;
+            compute_resources_map["events"][0]["data"]["resources_data"][count++]["state"] = "idle";
+        }
+        std::string data = compute_resources_map.dump();
+
+
+        try {
+            std::shared_ptr<BatschedNetworkListener> network_listener =
+                    std::shared_ptr<BatschedNetworkListener>(
+                            new BatschedNetworkListener(this->cs->hostname, this->cs->getSharedPtr<BatchComputeService>(), this->cs->mailbox_name,
+                                                        std::to_string(this->cs->batsched_port),
+                                                        data));
+            network_listener->simulation = this->cs->simulation;
+            network_listener->start(network_listener, true, false); // Daemonized, no auto-restart
+            network_listener = nullptr; // detached mode
+            //        this->network_listeners.insert(std::move(network_listener));
+        } catch (std::runtime_error &e) {
+            throw;
+        }
+
+    }
+#endif
 
 }
 

@@ -64,7 +64,7 @@ namespace wrench {
 //                {BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "easy_bf_fast"},
                 {BatchComputeServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM,              "fcfs"},
 #else
-                {BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM,            "FCFS"},
+                {BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM,            "fcfs"},
 #endif
                 {BatchComputeServiceProperty::BATCH_RJMS_DELAY,                             "0"},
                 {BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE,               ""},
@@ -223,7 +223,7 @@ namespace wrench {
 
         };
 #else
-        std::set<std::string> scheduling_algorithms = {"FCFS", "CONSERVATIVE_BF",
+        std::set<std::string> scheduling_algorithms = {"fcfs", "conservative_bf",
         };
 
         //Batch queue ordering options
@@ -294,8 +294,8 @@ namespace wrench {
         //send call back to the standard job submitters
         void sendStandardJobFailureNotification(StandardJob *job, std::string job_id, std::shared_ptr<FailureCause> cause);
 
-        // Try to schedule a job
-        bool scheduleOneQueuedJob();
+//        // Try to schedule a job
+//        bool scheduleOneQueuedJob();
 
         // process a job submission
         void processJobSubmission(BatchJob *job, std::string answer_mailbox);
@@ -317,25 +317,25 @@ namespace wrench {
 #ifdef ENABLE_BATSCHED
         friend class BatschedNetworkListener;
 
-        void startBatsched();
-        void stopBatsched();
+//        void startBatsched();
+//        void stopBatsched();
 
-        std::map<std::string,double> getStartTimeEstimatesFromBatsched(std::set<std::tuple<std::string,unsigned int,unsigned int,double>>);
+//        std::map<std::string,double> getStartTimeEstimatesFromBatsched(std::set<std::tuple<std::string,unsigned int,unsigned int,double>>);
+//
+//        void startBatschedNetworkListener();
 
-        void startBatschedNetworkListener();
+//        void notifyJobEventsToBatSched(std::string job_id, std::string status, std::string job_state,
+//                                       std::string kill_reason, std::string even_type);
 
-        void notifyJobEventsToBatSched(std::string job_id, std::string status, std::string job_state,
-                                       std::string kill_reason, std::string even_type);
+//        void appendJobInfoToCSVOutputFile(BatchJob *batch_job, std::string status);
 
-        void appendJobInfoToCSVOutputFile(BatchJob *batch_job, std::string status);
-
-        void sendAllQueuedJobsToBatsched();
+//        void sendAllQueuedJobsToBatsched();
 
         //process execute events from batsched
+
         void processExecuteJobFromBatSched(std::string bat_sched_reply);
 
 #endif // ENABLE_BATSCHED
-
 
     };
 }

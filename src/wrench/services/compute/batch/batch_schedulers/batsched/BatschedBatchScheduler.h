@@ -24,12 +24,25 @@ namespace wrench {
         void launch() override;
         void shutdown() override;
 
-        BatchJob *pickNextJobToSchedule() override;
+        void processQueuedJobs() override;
 
-        std::map<std::string, std::tuple<unsigned long, double>> scheduleOnHosts(unsigned long, unsigned long, double) override ;
+        void processJobFailure(BatchJob *batch_job, std::string job_id) override;
+        void processJobCompletion(BatchJob *batch_job, std::string job_id) override;
+        void processJobTermination(BatchJob *batch_job, std::string job_id) override;
 
         std::map<std::string, double> getStartTimeEstimates(std::set<std::tuple<std::string, unsigned int, unsigned int, double>> set_of_jobs) override;
 
+    private:
+#ifdef ENABLE_BATSCHED
+
+        void notifyJobEventsToBatSched(std::string job_id, std::string status, std::string job_state,
+                                       std::string kill_reason, std::string event_type);
+
+        void appendJobInfoToCSVOutputFile(BatchJob *batch_job, std::string status);
+
+        void startBatschedNetworkListener();
+
+#endif
 
     };
 

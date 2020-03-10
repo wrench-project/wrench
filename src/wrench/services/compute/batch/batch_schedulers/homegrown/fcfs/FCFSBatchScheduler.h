@@ -14,22 +14,23 @@
 /** \cond INTERNAL     */
 /***********************/
 
-#include "wrench/services/compute/batch/batch_schedulers/BatchScheduler.h"
+#include <wrench/services/compute/batch/batch_schedulers/homegrown/HomegrownBatchScheduler.h>
 #include <wrench/services/compute/batch/BatchComputeService.h>
 
 namespace wrench {
 
-    class FCFSBatchScheduler : public BatchScheduler {
+    class FCFSBatchScheduler : public HomegrownBatchScheduler {
 
     public:
 
-        explicit FCFSBatchScheduler(BatchComputeService *cs) : BatchScheduler(cs) {}
+        explicit FCFSBatchScheduler(BatchComputeService *cs) : HomegrownBatchScheduler(cs) {}
 
-        void init() override;
+        void processQueuedJobs() override;
 
-        void launch() override;
-
-        void shutdown() override;
+        // TODO: is't the second arg just inside the first->id field?
+        void processJobFailure(BatchJob *batch_job, std::string job_id) override;
+        void processJobCompletion(BatchJob *batch_job, std::string job_id) override;
+        void processJobTermination(BatchJob *batch_job, std::string job_id) override;
 
         BatchJob *pickNextJobToSchedule() override;
 

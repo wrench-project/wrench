@@ -217,10 +217,10 @@ void BatchServiceFCFSTest::do_SimpleFCFS_test() {
     // Get a hostname
     std::string hostname = "Host1";
 
-    // Create a Batch Service with a FCFS scheduling algorithm
+    // Create a Batch Service with a fcfs scheduling algorithm
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BatchComputeService(hostname, {"Host1", "Host2", "Host3", "Host4"}, "",
-                                            {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}})));
+                                            {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "fcfs"}})));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -402,10 +402,10 @@ void BatchServiceFCFSTest::do_SimpleFCFSQueueWaitTimePrediction_test() {
     // Get a hostname
     std::string hostname = "Host1";
 
-    // Create a Batch Service with a FCFS scheduling algorithm
+    // Create a Batch Service with a fcfs scheduling algorithm
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BatchComputeService(hostname, {"Host1", "Host2", "Host3", "Host4"}, "",
-                                            {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}})));
+                                            {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "fcfs"}})));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -508,10 +508,10 @@ void BatchServiceFCFSTest::do_BrokenQueueWaitTimePrediction_test() {
     // Get a hostname
     std::string hostname = "Host1";
 
-    // Create a Batch Service with a FCFS scheduling algorithm
+    // Create a Batch Service with a fcfs scheduling algorithm
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BatchComputeService(hostname, {"Host1", "Host2", "Host3", "Host4"}, "",
-                                            {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"},
+                                            {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "fcfs"},
                                              {wrench::BatchComputeServiceProperty::HOST_SELECTION_ALGORITHM, "BESTFIT"}})));
 
     simulation->add(new wrench::FileRegistryService(hostname));
