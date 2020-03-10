@@ -235,8 +235,8 @@ set(SOURCE_FILES
         include/wrench/services/compute/batch/batch_schedulers/homegrown/HomegrownBatchScheduler.h
         src/wrench/services/compute/batch/batch_schedulers/homegrown/fcfs/FCFSBatchScheduler.cpp
         src/wrench/services/compute/batch/batch_schedulers/homegrown/fcfs/FCFSBatchScheduler.h
-        src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/CONSERVATIVE_BFBatchScheduler.cpp
-        src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/CONSERVATIVE_BFBatchScheduler.h
+        src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/CONSERVATIVEBFBatchScheduler.cpp
+        src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/CONSERVATIVEBFBatchScheduler.h
         src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/conservative_backfilling_helper_classes/NodeAvailabilityTimeLine.cpp
         src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/conservative_backfilling_helper_classes/NodeAvailabilityTimeLine.h
         src/wrench/services/compute/htcondor/HTCondorComputeService.cpp
@@ -288,6 +288,7 @@ set(TEST_FILES
         test/compute_services/BareMetalComputeService/BareMetalComputeServiceResourceInformationTest.cpp
         test/compute_services/BatchService/BatchServiceTest.cpp
         test/compute_services/BatchService/BatchServiceFCFSTest.cpp
+        test/compute_services/BatchService/BatchServiceCONSERVATIVEBFTest.cpp
         test/compute_services/BatchService/BatchServiceTraceFileTest.cpp
         test/compute_services/BatchService/BatchServiceOutputCSVFileTest.cpp
         test/compute_services/BatchService/BatchServiceBatschedQueueWaitTimePredictionTest.cpp

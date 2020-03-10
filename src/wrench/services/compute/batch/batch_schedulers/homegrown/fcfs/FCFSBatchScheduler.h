@@ -33,7 +33,7 @@ namespace wrench {
         void processJobCompletion(BatchJob *batch_job) override;
         void processJobTermination(BatchJob *batch_job) override;
 
-        BatchJob *pickNextJobToSchedule() override;
+        BatchJob *pickNextJobToSchedule();
 
         std::map <std::string, std::tuple<unsigned long, double>> scheduleOnHosts(unsigned long, unsigned long, double) override;
 
