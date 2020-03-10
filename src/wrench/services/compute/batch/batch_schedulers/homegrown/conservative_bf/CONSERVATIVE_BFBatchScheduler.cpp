@@ -7,8 +7,13 @@
  * (at your option) any later version.
  */
 
+#include "CONSERVATIVE_BFBatchScheduler.h"
+
+namespace wrench {
+
+    CONSERVATIVE_BFBatchScheduler::CONSERVATIVE_BFBatchScheduler(BatchComputeService *cs) : HomegrownBatchScheduler(cs) {
+        this->schedule = std::unique_ptr<NodeAvailabilityTimeLine>(new NodeAvailabilityTimeLine(cs->total_num_of_nodes));
+    }
 
 
-//ConservativeBackfillingScheduler::ConservativeBackfillingScheduler(u_int16_t max_num_nodes) {
-//    this->schedule = std::unique_ptr<NodeAvailabilityTimeLine>(new NodeAvailabilityTimeLine(max_num_nodes));
-//}
+}

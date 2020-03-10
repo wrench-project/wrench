@@ -228,8 +228,6 @@ namespace wrench {
         network_listener->simulation = this->cs->simulation;
         network_listener->start(network_listener, true, false); // Daemonized, no auto-restart
         network_listener = nullptr; // detached mode
-//      this->cs->network_listeners.insert(std::move(network_listener));
-
 
         std::map<std::string, double> job_estimated_start_times = {};
         for (auto job : set_of_jobs) {
@@ -358,18 +356,18 @@ namespace wrench {
     }
 
 
-    void BatschedBatchScheduler::processJobFailure(BatchJob *batch_job, std::string job_id) {
+    void BatschedBatchScheduler::processJobFailure(BatchJob *batch_job) {
 
 #ifdef ENABLE_BATSCHED
 
-        this->notifyJobEventsToBatSched(job_id, "TIMEOUT", "COMPLETED_FAILED", "", "JOB_COMPLETED");
+        this->notifyJobEventsToBatSched(std::to_string(batch_job->getJobID()), "TIMEOUT", "COMPLETED_FAILED", "", "JOB_COMPLETED");
         this->appendJobInfoToCSVOutputFile(batch_job, "FAILED");
 #else
         throw std::runtime_error("BatschedBatchScheduler::processQueuesJobs(): BATSCHED_ENABLE should be set to 'on'");
 #endif
     }
 
-    void BatschedBatchScheduler::processJobCompletion(BatchJob *batch_job, std::string job_id) {
+    void BatschedBatchScheduler::processJobCompletion(BatchJob *batch_job) {
 
 #ifdef ENABLE_BATSCHED
         this->notifyJobEventsToBatSched(std::to_string(batch_job->getJobID()), "SUCCESS", "COMPLETED_SUCCESSFULLY", "", "JOB_COMPLETED");
@@ -380,14 +378,18 @@ namespace wrench {
     }
 
 
-    void BatschedBatchScheduler::processJobTermination(BatchJob *batch_job, std::string job_id) {
+    void BatschedBatchScheduler::processJobTermination(BatchJob *batch_job) {
 
 #ifdef ENABLE_BATSCHED
-        this->notifyJobEventsToBatSched(job_id, "TIMEOUT", "NOT_SUBMITTED", "", "JOB_COMPLETED");
+        this->notifyJobEventsToBatSched(std::to_string(batch_job->getJobID()), "TIMEOUT", "NOT_SUBMITTED", "", "JOB_COMPLETED");
         this->appendJobInfoToCSVOutputFile(batch_job, "TERMINATED");
 #else
         throw std::runtime_error("BatschedBatchScheduler::processQueuesJobs(): BATSCHED_ENABLE should be set to 'on'");
 #endif
+    }
+
+    void BatschedBatchScheduler::processJobSubmission(BatchJob *batch_job) {
+        // Do nothing
     }
 
 
@@ -408,11 +410,6 @@ namespace wrench {
     void BatschedBatchScheduler::notifyJobEventsToBatSched(std::string job_id, std::string status, std::string job_state,
                                                            std::string kill_reason, std::string event_type) {
 
-        //      if (not this->isBatschedReady()) {
-        //        throw std::runtime_error("BatchComputeService::notifyJobEventsToBatSched(): "
-        //                                         "batsched is not ready, which should not happen");
-        //      }
-
         nlohmann::json batch_submission_data;
         batch_submission_data["now"] = S4U_Simulation::getClock();
         batch_submission_data["events"][0]["timestamp"] = S4U_Simulation::getClock();
@@ -432,7 +429,6 @@ namespace wrench {
         network_listener->simulation = this->cs->simulation;
         network_listener->start(network_listener, true, false); // Daemonized, no auto-restart
         network_listener = nullptr; // detached mode
-        //      this->network_listeners.insert(network_listener);
     }
 
 
@@ -544,7 +540,6 @@ namespace wrench {
             network_listener->simulation = this->cs->simulation;
             network_listener->start(network_listener, true, false); // Daemonized, no auto-restart
             network_listener = nullptr; // detached mode
-            //        this->network_listeners.insert(std::move(network_listener));
         } catch (std::runtime_error &e) {
             throw;
         }

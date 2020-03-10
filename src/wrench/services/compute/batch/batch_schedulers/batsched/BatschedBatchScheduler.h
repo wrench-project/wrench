@@ -26,9 +26,10 @@ namespace wrench {
 
         void processQueuedJobs() override;
 
-        void processJobFailure(BatchJob *batch_job, std::string job_id) override;
-        void processJobCompletion(BatchJob *batch_job, std::string job_id) override;
-        void processJobTermination(BatchJob *batch_job, std::string job_id) override;
+        void processJobSubmission(BatchJob *batch_job) override;
+        void processJobFailure(BatchJob *batch_job) override;
+        void processJobCompletion(BatchJob *batch_job) override;
+        void processJobTermination(BatchJob *batch_job) override;
 
         std::map<std::string, double> getStartTimeEstimates(std::set<std::tuple<std::string, unsigned int, unsigned int, double>> set_of_jobs) override;
 
