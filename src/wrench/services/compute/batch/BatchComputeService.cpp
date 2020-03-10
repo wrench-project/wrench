@@ -28,20 +28,8 @@
 #include "services/compute/batch/workload_helper_classes/WorkloadTraceFileReplayer.h"
 
 #include "batch_schedulers/homegrown/fcfs/FCFSBatchScheduler.h"
-#include "batch_schedulers/homegrown/conservative_bf/CONSERVATIVE_BFBatchScheduler.h"
+#include "services/compute/batch/batch_schedulers/homegrown/conservative_bf/CONSERVATIVEBFBatchScheduler.h"
 #include "batch_schedulers/batsched/BatschedBatchScheduler.h"
-
-//#ifdef ENABLE_BATSCHED
-//
-//#include <zmq.hpp>
-//#include <zmq.h>
-//#include <sys/types.h>
-//#include <sys/wait.h>
-//#include <signal.h>
-//#include <iostream>
-//#include <fstream>
-//
-//#endif
 
 WRENCH_LOG_NEW_DEFAULT_CATEGORY(batch_service, "Log category for Batch Service");
 
@@ -196,7 +184,7 @@ namespace wrench {
         if (batch_scheduling_alg == "fcfs") {
             this->scheduler = std::unique_ptr<BatchScheduler>(new FCFSBatchScheduler(this));
         } else if (batch_scheduling_alg == "conservative_bf") {
-            this->scheduler = std::unique_ptr<BatchScheduler>(new CONSERVATIVE_BFBatchScheduler(this));
+            this->scheduler = std::unique_ptr<BatchScheduler>(new CONSERVATIVEBFBatchScheduler(this));
         }
 #endif
 
@@ -1548,14 +1536,12 @@ namespace wrench {
                                                                    std::string answer_mailbox) {
 
         BatchJob *batch_job = nullptr;
-        std::string job_id = "";
         // Is it running?
         bool is_running = false;
         for (auto const &j : this->running_jobs) {
             auto workflow_job = j->getWorkflowJob();
             if ((workflow_job->getType() == WorkflowJob::STANDARD) and ((StandardJob *) workflow_job == job)) {
                 batch_job = j;
-//                job_id = std::to_string(j->getJobID());
                 is_running = true;
             }
         }
@@ -1568,7 +1554,6 @@ namespace wrench {
                 WorkflowJob *workflow_job = (*it1)->getWorkflowJob();
                 if ((workflow_job->getType() == WorkflowJob::STANDARD) and ((StandardJob *) workflow_job == job)) {
                     batch_pending_it = it1;
-//                    job_id = std::to_string((*it1)->getJobID());
                     is_pending = true;
                 }
             }
@@ -1582,7 +1567,6 @@ namespace wrench {
                 WorkflowJob *workflow_job = j->getWorkflowJob();
                 if ((workflow_job->getType() == WorkflowJob::STANDARD) and ((StandardJob *) workflow_job == job)) {
                     batch_job = j;
-//                    job_id = std::to_string(j->getJobID());
                     is_waiting = true;
                 }
             }

@@ -36,6 +36,11 @@ namespace wrench {
         void setAllocatedResources(std::map<std::string, std::tuple<unsigned long, double>> resources);
 
     private:
+
+        friend class CONSERVATIVEBFBatchScheduler;
+        u_int32_t conservative_bf_start_date;           // Field used by CONSERVATIVE_BF
+        u_int32_t conservative_bf_expected_end_date;    // Field used by CONSERVATIVE_BF
+
         unsigned long jobid;
         unsigned long  requested_time;
         WorkflowJob* job;

@@ -26,8 +26,6 @@ namespace wrench {
 
         void shutdown() override {};
 
-        virtual BatchJob *pickNextJobToSchedule() = 0;
-
         virtual std::map<std::string, std::tuple<unsigned long, double>> scheduleOnHosts(unsigned long, unsigned long, double) = 0;
 
     };

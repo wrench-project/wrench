@@ -106,6 +106,7 @@ namespace wrench {
                 task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
                 if (not this->terminated_due_job_being_forcefully_terminated) {
                     task->setFailureDate(S4U_Simulation::getClock());
+                    WRENCH_INFO("EGAD! %d", this->task_start_timestamp_has_been_inserted);
                     this->simulation->getOutput().addTimestamp<SimulationTimestampTaskFailure>(
                             new SimulationTimestampTaskFailure(task));
                 } else {
@@ -313,9 +314,12 @@ namespace wrench {
             task->setExecutionHost(this->hostname);
             task->setNumCoresAllocated(this->num_cores);
 
+            WRENCH_INFO("ADDIN TIME STAMP HERE  : %s", task->getID().c_str());
             this->simulation->getOutput().addTimestamp<SimulationTimestampTaskStart>(
                     new SimulationTimestampTaskStart(task));
             this->task_start_timestamp_has_been_inserted = true;
+            WRENCH_INFO("SET THE BOOLEAN: %s", task->getID().c_str());
+
 
             // Read  all input files
             WRENCH_INFO("Reading the %ld input files for task %s", task->getInputFiles().size(), task->getID().c_str());
