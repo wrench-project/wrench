@@ -38,21 +38,33 @@ namespace wrench {
         this->schedule->add(est, est + batch_job->getRequestedTime(), batch_job);
         batch_job->conservative_bf_start_date = est;
         batch_job->conservative_bf_expected_end_date = est + batch_job->getRequestedTime();
+        WRENCH_INFO("JUST SET BATCH JOB %lu  DATES: %u %u", batch_job->getJobID(), batch_job->conservative_bf_start_date, batch_job->conservative_bf_expected_end_date);
 //        this->schedule->print();
     }
 
 
 
     void CONSERVATIVEBFBatchScheduler::processQueuedJobs() {
+
+        if (this->cs->batch_queue.empty()){
+            return;
+        }
+
         WRENCH_INFO("CONSERVATIVE: Asked to process queued jobs");
         // Update the time origin
         WRENCH_INFO("CONSERVATIVE: Reset time origin");
         this->schedule->setTimeOrigin((u_int32_t)Simulation::getCurrentSimulatedDate());
-
 //        this->schedule->print();
+
 
         // Start  all non-started the jobs in the next slot!
         auto next_jobs = this->schedule->getJobsInFirstSlot();
+
+
+        if (next_jobs.empty()){
+            throw  std::runtime_error("CONSERVATIVEBFBatchScheduler::processQueuedJobs(): next_jobs is empty. This shouldn't happen");
+        }
+
         for (auto const &batch_job : next_jobs)  {
 
             WRENCH_INFO("LOOKING AT  BATCH JOB %lu", batch_job->getJobID());
@@ -100,6 +112,76 @@ namespace wrench {
 
 
 
+
+    void CONSERVATIVEBFBatchScheduler::processJobCompletion(BatchJob *batch_job) {
+        WRENCH_INFO("CONSERVATIVE: Notified of a JOB COMPLETION!:  %s", std::to_string(batch_job->getJobID()).c_str());
+        // Update the time origin
+        WRENCH_INFO("CONSERVATIVE: Reset time origin");
+        auto now = (u_int32_t)Simulation::getCurrentSimulatedDate();
+        this->schedule->setTimeOrigin(now);
+//        this->schedule->print();
+
+        WRENCH_INFO("CONSERVATIVE: Remove job from schedule entirely");
+        // TODO: Is the UINT32_MAX making things slow?
+        this->schedule->remove(this->schedule->getTimeOrigin(), UINT32_MAX, batch_job);
+//        this->schedule->print();
+
+
+
+        if (now < batch_job->conservative_bf_expected_end_date) {
+            WRENCH_INFO("CONSERVATIVE: Batch job %s completed now (%u) but was supposed to complete at time %u... Schedule must be compacted",
+                        std::to_string(batch_job->getJobID()).c_str(), now, batch_job->conservative_bf_expected_end_date);
+            compactSchedule();
+        }
+
+    }
+
+    void CONSERVATIVEBFBatchScheduler::compactSchedule() {
+
+        WRENCH_INFO("CONSERVATIVE_BF: COMPACTING SCHEDULE");
+        // Clear the schedule
+        this->schedule->clear();
+
+        // Reset the time origin
+        auto now = (u_int32_t)Simulation::getCurrentSimulatedDate();
+        this->schedule->setTimeOrigin(now);
+
+        // Add the running job time slots
+        WRENCH_INFO("THERE ARE  %lu RUNNING JOBS", this->cs->running_jobs.size());
+        for (auto  const &batch_job : this->cs->running_jobs) {
+            WRENCH_INFO("    --> %lu   (%u %u)", batch_job->getJobID(), batch_job->conservative_bf_start_date, batch_job->conservative_bf_expected_end_date);
+            this->schedule->add(now, batch_job->conservative_bf_expected_end_date, batch_job);
+        }
+
+//        this->schedule->print();
+
+        WRENCH_INFO("NOW PUTTING ALL JOBS BACK");
+
+        // Add in all other jobs as early as possible in batch queue order
+        for (auto const &batch_job : this->cs->batch_queue) {
+            auto est = this->schedule->findEarliestStartTime(batch_job->getRequestedTime(), batch_job->getRequestedNumNodes());
+            // Insert it in the schedule
+            this->schedule->add(est, est + batch_job->getRequestedTime(), batch_job);
+            batch_job->conservative_bf_start_date = est;
+            batch_job->conservative_bf_expected_end_date = est + batch_job->getRequestedTime();
+        }
+
+//        this->schedule->print();
+    }
+
+    void CONSERVATIVEBFBatchScheduler::processJobTermination(BatchJob *batch_job) {
+        // Just like a job Completion to me!
+        this->processJobCompletion(batch_job);
+
+    }
+
+    void CONSERVATIVEBFBatchScheduler::processJobFailure(BatchJob *batch_job) {
+        // Just like a job Completion to me!
+        this->processJobCompletion(batch_job);
+    }
+
+
+
     std::map<std::string, std::tuple<unsigned long, double>>
     CONSERVATIVEBFBatchScheduler::scheduleOnHosts(unsigned long num_nodes, unsigned long cores_per_node, double ram_per_node) {
 
@@ -130,6 +212,7 @@ namespace wrench {
         unsigned long host_count = 0;
         for (auto map_it = cs->available_nodes_to_cores.begin();
              map_it != cs->available_nodes_to_cores.end(); map_it++) {
+            WRENCH_INFO("-   Host  %s: %lu cores", (*map_it).first.c_str(), (*map_it).second);
             if ((*map_it).second >= cores_per_node) {
                 //Remove that many cores from the available_nodes_to_core
                 (*map_it).second -= cores_per_node;
@@ -151,65 +234,5 @@ namespace wrench {
 
         return resources;
     }
-
-    void CONSERVATIVEBFBatchScheduler::processJobCompletion(BatchJob *batch_job) {
-        WRENCH_INFO("CONSERVATIVE: Notified of a JOB COMPLETION!");
-        // Update the time origin
-        WRENCH_INFO("CONSERVATIVE: Reset time origin");
-        auto now = (u_int32_t)Simulation::getCurrentSimulatedDate();
-        this->schedule->setTimeOrigin(now);
-//        this->schedule->print();
-
-        WRENCH_INFO("CONSERVATIVE: Remove job from schedule entirely");
-        // TODO: Is the UINT32_MAX making things slow?
-        this->schedule->remove(this->schedule->getTimeOrigin(), UINT32_MAX, batch_job);
-
-
-        if (now < batch_job->conservative_bf_expected_end_date) {
-            WRENCH_INFO("CONSERVATIVE: Batch job %s completed now (%u) but was supposed to complete at time %u... Schedule must be compacted",
-                        std::to_string(batch_job->getJobID()).c_str(), now, batch_job->conservative_bf_expected_end_date);
-            compactSchedule();
-        }
-
-    }
-
-    void CONSERVATIVEBFBatchScheduler::compactSchedule() {
-
-        WRENCH_INFO("CONSERVATIVE_BF: COMPACTING SCHEDULE");
-        // Clear the schedule
-        this->schedule->clear();
-
-        // Reset the time origin
-        auto now = (u_int32_t)Simulation::getCurrentSimulatedDate();
-        this->schedule->setTimeOrigin(now);
-
-        // Add the running job time slots
-        for (auto  const &batch_job : this->cs->running_jobs) {
-            this->schedule->add(now, batch_job->conservative_bf_expected_end_date, batch_job);
-        }
-
-        // Add in all other jobs as early as possible in batch queue order
-        for (auto const &batch_job : this->cs->batch_queue) {
-            auto est = this->schedule->findEarliestStartTime(batch_job->getRequestedTime(), batch_job->getRequestedNumNodes());
-            // Insert it in the schedule
-            this->schedule->add(est, est + batch_job->getRequestedTime(), batch_job);
-            batch_job->conservative_bf_start_date = est;
-            batch_job->conservative_bf_start_date = est + batch_job->getRequestedTime();
-        }
-
-//        this->schedule->print();
-    }
-
-    void CONSERVATIVEBFBatchScheduler::processJobTermination(BatchJob *batch_job) {
-        // Just like a job Completion to me!
-        this->processJobCompletion(batch_job);
-
-    }
-
-    void CONSERVATIVEBFBatchScheduler::processJobFailure(BatchJob *batch_job) {
-        // Just like a job Completion to me!
-        this->processJobCompletion(batch_job);
-    }
-
 
 }
