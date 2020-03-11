@@ -238,11 +238,11 @@ void BatchServiceCONSERVATIVE_BFTest::do_SimpleCONSERVATIVE_BF_test() {
 
 /**********************************************************************/
 /**  LARGE CONSERVATIVE_BF TEST                                     **/
-/**********************************************************************/
+/******************************************************************s****/
 
-#define NUM_JOBS 70
+#define NUM_JOBS 10
 
-#define SEED 37
+#define SEED 1
 
 class LargeCONSERVATIVE_BFTestWMS : public wrench::WMS {
 
@@ -285,7 +285,7 @@ private:
             for (int i=0; i < NUM_JOBS; i++) {
                 std::map<std::string, std::string> job_specific_args;
                 job_specific_args["-N"] = std::to_string(1 + rand() % 4);
-                job_specific_args["-t"] = std::to_string(2 + rand() % 100);  // TODO: CHANGE the 2 to a 1, NUM_JOBS=200, SEED 37
+                job_specific_args["-t"] = std::to_string(2 + rand() % 100);  // TODO: CHANGE the 2 to a 1, NUM_JOBS=200, SEED 128
                 job_specific_args["-c"] = "10";
                 job_manager->submitJob(jobs[i], this->test->compute_service, job_specific_args);
             }
