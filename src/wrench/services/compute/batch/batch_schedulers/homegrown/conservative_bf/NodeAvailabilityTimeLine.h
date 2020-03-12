@@ -36,17 +36,10 @@ namespace wrench {
         std::set<BatchJob *> getJobsInFirstSlot();
         u_int32_t findEarliestStartTime(uint32_t duration, unsigned long num_nodes);
 
-
-
     private:
-
         unsigned long max_num_nodes;
-//        boost::icl::interval_map<u_int32_t, std::set<BatchJob *>,  boost::icl::partial_enricher> availability_timeslots;
         boost::icl::interval_map<u_int32_t, BatchJobSet, boost::icl::partial_enricher> availability_timeslots;
-
         void update(bool add, u_int32_t start, u_int32_t end, BatchJob *job);
-
-        static unsigned  long sumNodes(const std::set<BatchJob *>& job_set);
 
     };
 
