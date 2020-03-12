@@ -78,8 +78,8 @@ class SimpleCONSERVATIVE_BFTestWMS : public wrench::WMS {
 
 public:
     SimpleCONSERVATIVE_BFTestWMS(BatchServiceCONSERVATIVE_BFTest *test,
-                      const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                      std::string hostname) :
+                                 const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                 std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
                         "test") {
         this->test = test;
@@ -248,8 +248,8 @@ class LargeCONSERVATIVE_BFTestWMS : public wrench::WMS {
 
 public:
     LargeCONSERVATIVE_BFTestWMS(BatchServiceCONSERVATIVE_BFTest *test,
-                                 const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                 std::string hostname) :
+                                const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
                         "test") {
         this->test = test;
@@ -262,8 +262,6 @@ private:
     int main() {
         // Create a job manager
         auto job_manager = this->createJobManager();
-
-//        srand(SEED);
 
         // Create 4 1-min tasks and submit them as various shaped jobs
 
@@ -325,28 +323,16 @@ private:
         }
 
         // Print Completion times:
-        std::cerr << "----------\n";
-        std::cerr  << "EACH JOB ACTUALLY TAKES 1 min\n";
+        WRENCH_INFO("----------");
         for (auto const &i : actual_completion_times) {
             wrench::StandardJob *job = i.second.first;
             double completion_time = i.second.second;
-
-            std::cerr << "COMPLETION TIME " << i.first << " (" << job->getServiceSpecificArguments()["-N"] << " nodes, " <<  job->getServiceSpecificArguments()["-t"]<< " min)  : " << completion_time << "\n";
+            WRENCH_INFO("COMPLETION TIME %s (%s nodes, %s minutes): %lf",
+                        i.first.c_str(),
+                        job->getServiceSpecificArguments()["-N"].c_str(),
+                        job->getServiceSpecificArguments()["-t"].c_str(),
+                        completion_time);
         }
-
-//        // Check
-//        for (int i=0; i < NUM_JOBS; i++) {
-//            double delta = std::abs(actual_completion_times[i] - expected_completion_times[i]);
-//            if (delta > EPSILON) {
-//                throw std::runtime_error("Unexpected job completion time for the job containing task " +
-//                                         tasks[i]->getID() +
-//                                         ": " +
-//                                         std::to_string(actual_completion_times[i]) +
-//                                         "(expected: " +
-//                                         std::to_string(expected_completion_times[i]) +
-//                                         ")");
-//            }
-//        }
 
         return 0;
     }
@@ -413,8 +399,8 @@ class SimpleCONSERVATIVE_BFQueueWaitTimePredictionWMS : public wrench::WMS {
 
 public:
     SimpleCONSERVATIVE_BFQueueWaitTimePredictionWMS(BatchServiceCONSERVATIVE_BFTest *test,
-                                         const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                         std::string hostname) :
+                                                    const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                                    std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
                         "test") {
         this->test = test;
