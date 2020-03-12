@@ -159,7 +159,7 @@ namespace wrench {
     }
 
     std::map<std::string, double> FCFSBatchScheduler::getStartTimeEstimates(
-            std::set<std::tuple<std::string, unsigned int, unsigned int, double>> set_of_jobs) {
+            std::set<std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs) {
 
         if (cs->getPropertyValueAsString(BatchComputeServiceProperty::HOST_SELECTION_ALGORITHM) != "FIRSTFIT") {
             throw std::runtime_error("FCFSBatchScheduler::getStartTimeEstimates(): The fcfs sceduling algorithm can only provide start time estimates "

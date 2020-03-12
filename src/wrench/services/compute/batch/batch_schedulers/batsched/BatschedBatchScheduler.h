@@ -31,7 +31,7 @@ namespace wrench {
         void processJobCompletion(BatchJob *batch_job) override;
         void processJobTermination(BatchJob *batch_job) override;
 
-        std::map<std::string, double> getStartTimeEstimates(std::set<std::tuple<std::string, unsigned int, unsigned int, double>> set_of_jobs) override;
+        std::map<std::string, double> getStartTimeEstimates(std::set<std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs) override;
 
     private:
 #ifdef ENABLE_BATSCHED

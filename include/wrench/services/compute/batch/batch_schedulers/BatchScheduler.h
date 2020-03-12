@@ -47,7 +47,7 @@ namespace wrench {
         virtual void processJobTermination(BatchJob *batch_job) = 0;
 
 
-        virtual std::map<std::string, double> getStartTimeEstimates(std::set<std::tuple<std::string, unsigned int, unsigned int, double>> set_of_jobs) = 0;
+        virtual std::map<std::string, double> getStartTimeEstimates(std::set<std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs) = 0;
 
 
 

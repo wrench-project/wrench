@@ -330,17 +330,17 @@ private:
         wrench::Simulation::sleep(10);
 
         // Get Predictions
-        std::set<std::tuple<std::string,unsigned int,unsigned int, double>> set_of_jobs = {
-                (std::tuple<std::string,unsigned int,unsigned int, double>){"job1", 1, 1, 400},
-                (std::tuple<std::string,unsigned int,unsigned int, double>){"job2", 5, 1, 400},
-                (std::tuple<std::string,unsigned int,unsigned int, double>){"job3", 4, 10, 400},
-                (std::tuple<std::string,unsigned int,unsigned int, double>){"job4", 1, 6, 400},
-                (std::tuple<std::string,unsigned int,unsigned int, double>){"job5", 2, 6, 400},
-                (std::tuple<std::string,unsigned int,unsigned int, double>){"job6", 2, 7, 400},
-                (std::tuple<std::string,unsigned int,unsigned int, double>){"job7", 3, 7, 400},
-                (std::tuple<std::string,unsigned int,unsigned int, double>){"job8", 4, 4, 400},
-                (std::tuple<std::string,unsigned int,unsigned int, double>){"job9", 1, 1, 400},
-                (std::tuple<std::string,unsigned int,unsigned int, double>){"job10", 1, 2, 400},
+        std::set<std::tuple<std::string,unsigned long,unsigned long, double>> set_of_jobs = {
+                (std::tuple<std::string,unsigned long,unsigned long, double>){"job1", 1, 1, 400},
+                (std::tuple<std::string,unsigned long,unsigned long, double>){"job2", 5, 1, 400},
+                (std::tuple<std::string,unsigned long,unsigned long, double>){"job3", 4, 10, 400},
+                (std::tuple<std::string,unsigned long,unsigned long, double>){"job4", 1, 6, 400},
+                (std::tuple<std::string,unsigned long,unsigned long, double>){"job5", 2, 6, 400},
+                (std::tuple<std::string,unsigned long,unsigned long, double>){"job6", 2, 7, 400},
+                (std::tuple<std::string,unsigned long,unsigned long, double>){"job7", 3, 7, 400},
+                (std::tuple<std::string,unsigned long,unsigned long, double>){"job8", 4, 4, 400},
+                (std::tuple<std::string,unsigned long,unsigned long, double>){"job9", 1, 1, 400},
+                (std::tuple<std::string,unsigned long,unsigned long, double>){"job10", 1, 2, 400},
         };
 
         // Expectations
@@ -451,8 +451,8 @@ private:
         wrench::Simulation::sleep(10);
 
         // Get Predictions
-        std::set<std::tuple<std::string,unsigned int,unsigned int, double>> set_of_jobs = {
-                (std::tuple<std::string,unsigned int,unsigned int, double>){"job1", 1, 1, 400}
+        std::set<std::tuple<std::string,unsigned long,unsigned long, double>> set_of_jobs = {
+                (std::tuple<std::string,unsigned long,unsigned long, double>){"job1", 1, 1, 400}
         };
 
 

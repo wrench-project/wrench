@@ -62,6 +62,7 @@ namespace wrench {
                 {BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "conservative_bf"},
 //                {BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "easy_bf"},
 //                {BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "easy_bf_fast"},
+
                 {BatchComputeServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM,              "fcfs"},
 #else
                 {BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM,            "fcfs"},
@@ -107,7 +108,7 @@ namespace wrench {
         /***********************/
         /** \cond DEVELOPER   **/
         /***********************/
-        std::map<std::string,double> getStartTimeEstimates(std::set<std::tuple<std::string,unsigned int,unsigned int, double>> resources);
+        std::map<std::string,double> getStartTimeEstimates(std::set<std::tuple<std::string,unsigned long,unsigned long, double>> resources);
 
         /***********************/
         /** \endcond          **/

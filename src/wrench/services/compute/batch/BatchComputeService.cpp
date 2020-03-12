@@ -198,8 +198,8 @@ namespace wrench {
      * @param set_of_jobs: the set of job configurations, each of them with an id. Each configuration
      *         is a tuple as follows:
      *             - a configuration id (std::string)
-     *             - a number of hosts (unsigned int)
-     *             - a number of cores per host (unsigned int)
+     *             - a number of hosts (unsigned long)
+     *             - a number of cores per host (unsigned long)
      *             - a duration in seconds (double)
      * @return start date predictions in seconds (as a map of ids). A prediction that's negative
      *         means that the job configuration can not run on the service (e.g., not enough hosts,
@@ -207,7 +207,7 @@ namespace wrench {
      */
     std::map<std::string, double>
     BatchComputeService::getStartTimeEstimates(
-            std::set<std::tuple<std::string, unsigned int, unsigned int, double>> set_of_jobs) {
+            std::set<std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs) {
 
         try {
             auto estimates = this->scheduler->getStartTimeEstimates(set_of_jobs);
