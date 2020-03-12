@@ -28,7 +28,6 @@ namespace wrench {
     public:
         explicit NodeAvailabilityTimeLine(unsigned long max_num_nodes);
         void setTimeOrigin(u_int32_t t);
-        u_int32_t getTimeOrigin();
         void add(u_int32_t start, u_int32_t end, BatchJob *job) { update(true, start, end, job);}
         void remove(u_int32_t start, u_int32_t end, BatchJob *job) { update(false, start, end, job);}
         void clear();
