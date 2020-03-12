@@ -70,6 +70,10 @@ namespace wrench {
         auto next_jobs = this->schedule->getJobsInFirstSlot();
 
         if (next_jobs.empty()){
+            std::cerr <<  "this-.cs->batch_queue has " << this->cs->batch_queue.size() << "jobs\n";
+            for (auto const &j : this->cs->batch_queue) {
+                std::cerr << "    - " << j->getJobID() << "\n";
+            }
             throw  std::runtime_error("CONSERVATIVEBFBatchScheduler::processQueuedJobs(): next_jobs is empty. This shouldn't happen");
         }
 

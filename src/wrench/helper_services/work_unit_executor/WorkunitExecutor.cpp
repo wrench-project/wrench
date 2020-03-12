@@ -99,6 +99,8 @@ namespace wrench {
                 "In on_exit.cleanup(): WorkunitExecutor: %s has_returned_from_main = %d (return_value = %d, job forcefully terminated = %d)",
                 this->getName().c_str(), has_returned_from_main, return_value,
                 this->terminated_due_job_being_forcefully_terminated);
+
+        // Check if it's a failure!
         if ((not has_returned_from_main) and (this->task_start_timestamp_has_been_inserted) and
             (not this->task_failure_time_stamp_has_already_been_generated)) {
             if (this->workunit->task != nullptr) {
@@ -106,7 +108,6 @@ namespace wrench {
                 task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
                 if (not this->terminated_due_job_being_forcefully_terminated) {
                     task->setFailureDate(S4U_Simulation::getClock());
-                    WRENCH_INFO("EGAD! %d", this->task_start_timestamp_has_been_inserted);
                     this->simulation->getOutput().addTimestamp<SimulationTimestampTaskFailure>(
                             new SimulationTimestampTaskFailure(task));
                 } else {
@@ -115,7 +116,11 @@ namespace wrench {
                             new SimulationTimestampTaskTermination(task));
                 }
             }
+        } else if ((this->workunit->task != nullptr) and this->task_completion_timestamp_should_be_generated){
+            this->simulation->getOutput().addTimestamp<SimulationTimestampTaskCompletion>(
+                    new SimulationTimestampTaskCompletion(this->workunit->task));
         }
+
     }
 
     /**
@@ -238,13 +243,21 @@ namespace wrench {
         }
 
         WRENCH_INFO("Work unit executor on host %s terminating!", S4U_Simulation::getHostName().c_str());
-        if (this->failure_timestamp_should_be_generated) {
+        if ((not this->task_failure_time_stamp_has_already_been_generated) and this->failure_timestamp_should_be_generated) {
             if (this->workunit->task != nullptr) {
+                std::cerr << "XXXX1\n";
                 WorkflowTask *task = this->workunit->task;
+                std::cerr << "XXXX1\n";
                 task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
+                std::cerr << "XXXX1\n";
                 task->setFailureDate(S4U_Simulation::getClock());
+                std::cerr << "XXXX1\n";
                 auto ts = new SimulationTimestampTaskFailure(task);
+                std::cerr << "XXXX1\n";
+                WRENCH_INFO("ADDING FAILRE TIME STAMP");
+                std::cerr << "XXXX1\n";
                 this->simulation->getOutput().addTimestamp<SimulationTimestampTaskFailure>(ts);
+                std::cerr << "XXXX1\n";
                 this->task_failure_time_stamp_has_already_been_generated = true;
             }
         }
@@ -264,6 +277,7 @@ namespace wrench {
             WRENCH_INFO("Work unit executor on can't report back due to network error.. oh well!");
         }
 
+        WRENCH_INFO("RETURNING CLEANLY");
         return 0;
 
     }
@@ -422,8 +436,10 @@ namespace wrench {
 
             WRENCH_DEBUG("Setting the internal state of %s to TASK_COMPLETED", task->getID().c_str());
             task->setInternalState(WorkflowTask::InternalState::TASK_COMPLETED);
-            this->simulation->getOutput().addTimestamp<SimulationTimestampTaskCompletion>(
-                    new SimulationTimestampTaskCompletion(task));
+
+            this->task_completion_timestamp_should_be_generated = true;
+//            this->simulation->getOutput().addTimestamp<SimulationTimestampTaskCompletion>(
+//                    new SimulationTimestampTaskCompletion(task));
             task->setEndDate(S4U_Simulation::getClock());
 
             // Deal with Children

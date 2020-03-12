@@ -266,6 +266,11 @@ namespace wrench {
             throw;
         }
 
+        // Sanity check
+        if ((num_hosts == 0) or (num_cores_per_host == 0) or  (time_asked_for_in_minutes == 0)) {
+            throw std::invalid_argument("BatchComputeService::submitWorkflowJob(): service-specific arguments should have non-zero values");
+        }
+
         // Create a Batch Job
         unsigned long jobid = this->generateUniqueJobID();
         auto *batch_job = new BatchJob(job, jobid, time_asked_for_in_minutes,

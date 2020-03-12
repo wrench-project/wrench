@@ -240,9 +240,9 @@ void BatchServiceCONSERVATIVE_BFTest::do_SimpleCONSERVATIVE_BF_test() {
 /**  LARGE CONSERVATIVE_BF TEST                                     **/
 /******************************************************************s****/
 
-#define NUM_JOBS 1000
 
-#define SEED 4
+#define NUM_JOBS 500
+#define SEED 43
 
 class LargeCONSERVATIVE_BFTestWMS : public wrench::WMS {
 
@@ -273,15 +273,18 @@ private:
         }
 
         unsigned int random = SEED;
+        srand(SEED);
 
         // Submit jobs
         try {
             for (int i=0; i < NUM_JOBS; i++) {
                 std::map<std::string, std::string> job_specific_args;
-                random = random  * 17 + 4123451;
-                job_specific_args["-N"] = std::to_string(1 + random % 4);
-                random = random  * 17 + 4123451;
-                job_specific_args["-t"] = std::to_string(2 + random % 100);  // TODO: CHANGE the 2 to a 1, NUM_JOBS=200, SEED 128
+                job_specific_args["-N"] = std::to_string(1 + rand() % 4);
+//                random = random  * 17 + 4123451;
+//                job_specific_args["-N"] = std::to_string(1 + random % 4);
+                job_specific_args["-t"] = std::to_string(2 + rand() % 100);  // TODO: CHANGE the 2 to a 1, NUM_JOBS=200, SEED 43
+//                random = random  * 17 + 4123451;
+//                job_specific_args["-t"] = std::to_string(1 + random % 100);  // TODO: CHANGE the 2 to a 1, NUM_JOBS=200, SEED 43
                 job_specific_args["-c"] = "10";
                 job_manager->submitJob(jobs[i], this->test->compute_service, job_specific_args);
             }

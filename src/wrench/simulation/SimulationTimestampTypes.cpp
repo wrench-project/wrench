@@ -94,6 +94,7 @@ namespace wrench {
     void SimulationTimestampTask::setEndpoints() {
         // find the SimulationTimestampTaskStart object containing the same task
         auto pending_tasks_itr = pending_task_timestamps.find(this->task->getID());
+
         if (pending_tasks_itr != pending_task_timestamps.end()) {
             // set my endpoint to the SimulationTimestampTaskStart
             this->endpoint = (*pending_tasks_itr).second;
