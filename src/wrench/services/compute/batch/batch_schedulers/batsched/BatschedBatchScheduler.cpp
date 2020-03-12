@@ -189,7 +189,7 @@ namespace wrench {
 
 
     std::map<std::string, double> BatschedBatchScheduler::getStartTimeEstimates(
-            std::set<std::tuple<std::string, unsigned int, unsigned int, double>> set_of_jobs) {
+            std::set<std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs) {
 
 #ifdef ENABLE_BATSCHED
 

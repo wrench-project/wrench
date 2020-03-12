@@ -12,6 +12,7 @@
 
 #include <vector>
 #include <boost/icl/interval_map.hpp>
+#include "BatchJobSet.h"
 
 /***********************/
 /** \cond INTERNAL     */
@@ -32,7 +33,6 @@ namespace wrench {
         void remove(u_int32_t start, u_int32_t end, BatchJob *job) { update(false, start, end, job);}
         void clear();
         void print();
-        bool canStartNow(BatchJob *job);
         std::set<BatchJob *> getJobsInFirstSlot();
         u_int32_t findEarliestStartTime(uint32_t duration, unsigned long num_nodes);
 
@@ -41,10 +41,10 @@ namespace wrench {
     private:
 
         unsigned long max_num_nodes;
-        boost::icl::interval_map<u_int32_t, std::set<BatchJob *>,  boost::icl::partial_enricher> availability_timeslots;
+//        boost::icl::interval_map<u_int32_t, std::set<BatchJob *>,  boost::icl::partial_enricher> availability_timeslots;
+        boost::icl::interval_map<u_int32_t, BatchJobSet, boost::icl::partial_enricher> availability_timeslots;
 
         void update(bool add, u_int32_t start, u_int32_t end, BatchJob *job);
-        u_int32_t findEarliestStartTimeHelper(bool at_origin, uint32_t duration, unsigned long num_nodes);
 
         static unsigned  long sumNodes(const std::set<BatchJob *>& job_set);
 
