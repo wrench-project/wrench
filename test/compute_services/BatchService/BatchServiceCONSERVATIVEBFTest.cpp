@@ -240,7 +240,7 @@ void BatchServiceCONSERVATIVE_BFTest::do_SimpleCONSERVATIVE_BF_test() {
 /**  LARGE CONSERVATIVE_BF TEST                                     **/
 /******************************************************************s****/
 
-#define NUM_JOBS 500
+#define NUM_JOBS 1000
 
 #define SEED 4
 

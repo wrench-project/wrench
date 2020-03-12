@@ -18,55 +18,56 @@ WRENCH_LOG_NEW_DEFAULT_CATEGORY(conservative_bf_batch_scheduler, "Log category f
 
 namespace wrench {
 
+    /**
+     * @brief Constructor
+     * @param cs: The BatchComputeService for which this scheduler is working
+     */
     CONSERVATIVEBFBatchScheduler::CONSERVATIVEBFBatchScheduler(BatchComputeService *cs) : HomegrownBatchScheduler(cs) {
         this->schedule = std::unique_ptr<NodeAvailabilityTimeLine>(new NodeAvailabilityTimeLine(cs->total_num_of_nodes));
     }
 
-
-
+    /**
+     * @brief Method to process a job submission
+     * @param batch_job: the newly submitted batch job
+     */
     void CONSERVATIVEBFBatchScheduler::processJobSubmission(BatchJob *batch_job) {
-        WRENCH_INFO("CONSERVATIVE: A new job shows up (needs %lu nodes)", batch_job->getRequestedNumNodes());
+
+        WRENCH_INFO("Scheduling a new batch job, %lu, that needs %lu nodes",
+                batch_job->getJobID(),  batch_job->getRequestedNumNodes());
 
         // Update the time origin
-        WRENCH_INFO("CONSERVATIVE: Reset time origin");
         this->schedule->setTimeOrigin((u_int32_t)Simulation::getCurrentSimulatedDate());
-#ifdef PRINT_SCHEDULE
-        this->schedule->print();
-#endif
 
-        // Find its earliest start time
+        // Find its earliest possible start time
         auto est = this->schedule->findEarliestStartTime(batch_job->getRequestedTime(), batch_job->getRequestedNumNodes());
-        WRENCH_INFO("CONSERVATIVE: Earliest start time is: %u", est);
+//        WRENCH_INFO("The Earliest start time is: %u", est);
 
         // Insert it in the schedule
         this->schedule->add(est, est + batch_job->getRequestedTime(), batch_job);
         batch_job->conservative_bf_start_date = est;
         batch_job->conservative_bf_expected_end_date = est + batch_job->getRequestedTime();
-        WRENCH_INFO("JUST SET BATCH JOB %lu  DATES: %u %u", batch_job->getJobID(), batch_job->conservative_bf_start_date, batch_job->conservative_bf_expected_end_date);
+        WRENCH_INFO("Scheduled batch job %lu on %lu from time %u to %u",
+                batch_job->getJobID(), batch_job->getRequestedNumNodes(),
+                batch_job->conservative_bf_start_date, batch_job->conservative_bf_expected_end_date);
 #ifdef PRINT_SCHEDULE
         this->schedule->print();
 #endif
     }
 
-
-
+    /**
+     * @brief Method to schedule (possibly) the next jobs to be scheduled
+     */
     void CONSERVATIVEBFBatchScheduler::processQueuedJobs() {
 
         if (this->cs->batch_queue.empty()){
             return;
         }
 
-        WRENCH_INFO("CONSERVATIVE: Asked to process queued jobs");
         // Update the time origin
-        WRENCH_INFO("CONSERVATIVE: Reset time origin");
         this->schedule->setTimeOrigin((u_int32_t)Simulation::getCurrentSimulatedDate());
-#ifdef PRINT_SCHEDULE
-        this->schedule->print();
-#endif
 
         // Start  all non-started the jobs in the next slot!
         auto next_jobs = this->schedule->getJobsInFirstSlot();
-
 
         if (next_jobs.empty()){
             throw  std::runtime_error("CONSERVATIVEBFBatchScheduler::processQueuedJobs(): next_jobs is empty. This shouldn't happen");
@@ -74,11 +75,8 @@ namespace wrench {
 
         for (auto const &batch_job : next_jobs)  {
 
-            WRENCH_INFO("LOOKING AT  BATCH JOB %lu", batch_job->getJobID());
-
             // If the job has already been allocated resources, it's already running anyway
             if (not batch_job->resources_allocated.empty()) {
-                WRENCH_INFO("  Nope, it's already running!");
                 continue;
             }
 
@@ -90,18 +88,12 @@ namespace wrench {
             unsigned long num_nodes_asked_for = batch_job->getRequestedNumNodes();
             unsigned long requested_time = batch_job->getRequestedTime();
 
-            WRENCH_INFO("Trying to see if I can run job (batch_job = %lu)(%s)",
-                        batch_job->getJobID(),
-                        workflow_job->getName().c_str());
-
-//        std::map<std::string, std::tuple<unsigned long, double>> resources;
-
             auto resources = this->scheduleOnHosts(num_nodes_asked_for, cores_per_node_asked_for, ComputeService::ALL_RAM);
             if (resources.empty()) {
                 throw std::runtime_error("Can't run batch job " + std::to_string(batch_job->getJobID()) +  " right now, this shouldn't happen!");
             }
 
-            WRENCH_INFO("Starting job %s (batch job %s)", workflow_job->getName().c_str(), std::to_string(batch_job->getJobID()).c_str());
+            WRENCH_INFO("Starting batch job %lu ", batch_job->getJobID());
 
             // Remove the job from the batch queue
             this->cs->removeJobFromBatchQueue(batch_job);
@@ -113,41 +105,14 @@ namespace wrench {
             this->cs->startJob(resources, workflow_job, batch_job, num_nodes_asked_for, requested_time,
                                cores_per_node_asked_for);
         }
-
-        return;
     }
 
-
-
-
-    void CONSERVATIVEBFBatchScheduler::processJobCompletion(BatchJob *batch_job) {
-        WRENCH_INFO("CONSERVATIVE: Notified of a JOB COMPLETION!:  %s", std::to_string(batch_job->getJobID()).c_str());
-        // Update the time origin
-        WRENCH_INFO("CONSERVATIVE: Reset time origin");
-        auto now = (u_int32_t)Simulation::getCurrentSimulatedDate();
-        this->schedule->setTimeOrigin(now);
-#ifdef PRINT_SCHEDULE
-        this->schedule->print();
-#endif
-        WRENCH_INFO("CONSERVATIVE: Remove job from schedule entirely");
-        // TODO: Is the UINT32_MAX making things slow?
-        this->schedule->remove(this->schedule->getTimeOrigin(), UINT32_MAX, batch_job);
-#ifdef PRINT_SCHEDULE
-        this->schedule->print();
-#endif
-
-
-        if (now < batch_job->conservative_bf_expected_end_date) {
-            WRENCH_INFO("CONSERVATIVE: Batch job %s completed now (%u) but was supposed to complete at time %u... Schedule must be compacted",
-                        std::to_string(batch_job->getJobID()).c_str(), now, batch_job->conservative_bf_expected_end_date);
-            compactSchedule();
-        }
-
-    }
-
+    /**
+     * @brief Method to compact the schedule
+     */
     void CONSERVATIVEBFBatchScheduler::compactSchedule() {
 
-        WRENCH_INFO("CONSERVATIVE_BF: COMPACTING SCHEDULE");
+        WRENCH_INFO("Compacting schedule...");
         // Clear the schedule
         this->schedule->clear();
 
@@ -156,16 +121,9 @@ namespace wrench {
         this->schedule->setTimeOrigin(now);
 
         // Add the running job time slots
-        WRENCH_INFO("THERE ARE  %lu RUNNING JOBS", this->cs->running_jobs.size());
         for (auto  const &batch_job : this->cs->running_jobs) {
-            WRENCH_INFO("    --> %lu   (%u %u)", batch_job->getJobID(), batch_job->conservative_bf_start_date, batch_job->conservative_bf_expected_end_date);
             this->schedule->add(now, batch_job->conservative_bf_expected_end_date, batch_job);
         }
-
-#ifdef PRINT_SCHEDULE
-        this->schedule->print();
-#endif
-        WRENCH_INFO("NOW PUTTING ALL JOBS BACK");
 
         // Add in all other jobs as early as possible in batch queue order
         for (auto const &batch_job : this->cs->batch_queue) {
@@ -181,20 +139,51 @@ namespace wrench {
 #endif
     }
 
+    /**
+     * @brief Method to process a job completion
+     * @param batch_job: the job that completed
+     */
+    void CONSERVATIVEBFBatchScheduler::processJobCompletion(BatchJob *batch_job) {
+        WRENCH_INFO("Notified of completion of batch job, %lu", batch_job->getJobID());
 
+        auto now = (u_int32_t)Simulation::getCurrentSimulatedDate();
+        this->schedule->setTimeOrigin(now);
+        this->schedule->remove(now, batch_job->conservative_bf_expected_end_date + 100, batch_job);
+
+#ifdef PRINT_SCHEDULE
+        this->schedule->print();
+#endif
+
+        if (now < batch_job->conservative_bf_expected_end_date) {
+            compactSchedule();
+        }
+    }
+
+    /**
+    * @brief Method to process a job termination
+    * @param batch_job: the job that was terminated
+    */
     void CONSERVATIVEBFBatchScheduler::processJobTermination(BatchJob *batch_job) {
         // Just like a job Completion to me!
         this->processJobCompletion(batch_job);
-
     }
 
+    /**
+    * @brief Method to process a job failure
+    * @param batch_job: the job that failed
+    */
     void CONSERVATIVEBFBatchScheduler::processJobFailure(BatchJob *batch_job) {
         // Just like a job Completion to me!
         this->processJobCompletion(batch_job);
     }
 
-
-
+    /**
+     * @brief Method to figure out on which actual resources a job could be scheduled right now
+     * @param num_nodes: number of nodes
+     * @param cores_per_node: number of cores per node
+     * @param ram_per_node: amount of RAM
+     * @return
+     */
     std::map<std::string, std::tuple<unsigned long, double>>
     CONSERVATIVEBFBatchScheduler::scheduleOnHosts(unsigned long num_nodes, unsigned long cores_per_node, double ram_per_node) {
 
@@ -215,7 +204,6 @@ namespace wrench {
             throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::findNextJobToSchedule(): Asking for too many cores per host");
         }
 
-
         // IMPORTANT: We always give all cores to a job on a node!
         cores_per_node = Simulation::getHostNumCores(cs->available_nodes_to_cores.begin()->first);
 
@@ -223,14 +211,12 @@ namespace wrench {
         std::vector<std::string> hosts_assigned = {};
 
         unsigned long host_count = 0;
-        for (auto map_it = cs->available_nodes_to_cores.begin();
-             map_it != cs->available_nodes_to_cores.end(); map_it++) {
-            WRENCH_INFO("-   Host  %s: %lu cores", (*map_it).first.c_str(), (*map_it).second);
-            if ((*map_it).second >= cores_per_node) {
+        for (auto & available_nodes_to_core : cs->available_nodes_to_cores) {
+            if (available_nodes_to_core.second >= cores_per_node) {
                 //Remove that many cores from the available_nodes_to_core
-                (*map_it).second -= cores_per_node;
-                hosts_assigned.push_back((*map_it).first);
-                resources.insert(std::make_pair((*map_it).first, std::make_tuple(cores_per_node, ram_per_node)));
+                available_nodes_to_core.second -= cores_per_node;
+                hosts_assigned.push_back(available_nodes_to_core.first);
+                resources.insert(std::make_pair(available_nodes_to_core.first, std::make_tuple(cores_per_node, ram_per_node)));
                 if (++host_count >= num_nodes) {
                     break;
                 }
@@ -248,18 +234,23 @@ namespace wrench {
         return resources;
     }
 
+    /**
+     * @brief Method to obtain start time estimates
+     * @param set_of_jobs: a set of job specs
+     * @return map of estimates
+     */
     std::map<std::string, double> CONSERVATIVEBFBatchScheduler::getStartTimeEstimates(
             std::set<std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs) {
         std::map<std::string, double> to_return;
 
         for (auto const &j : set_of_jobs) {
-            std::string id = std::get<0>(j);
+            const std::string& id = std::get<0>(j);
             u_int64_t num_nodes = std::get<1>(j);
             u_int64_t num_cores_per_host = this->cs->num_cores_per_node;  // Ignore this one. Assume all  cores!
             if (std::get<3>(j) > UINT32_MAX) {
-                throw std::runtime_error("CONSERVATIVEBFBatchScheduler::getStartTimeEstimates(): job  duration too large");
+                throw std::runtime_error("CONSERVATIVEBFBatchScheduler::getStartTimeEstimates(): job duration too large");
             }
-            u_int32_t duration = (u_int32_t)(std::get<3>(j));
+            auto duration = (u_int32_t)(std::get<3>(j));
 
             auto est = this->schedule->findEarliestStartTime(duration, num_nodes);
             if (est <  UINT32_MAX) {
