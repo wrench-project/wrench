@@ -239,6 +239,7 @@ set(SOURCE_FILES
         src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/CONSERVATIVEBFBatchScheduler.h
         src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/conservative_backfilling_helper_classes/NodeAvailabilityTimeLine.cpp
         src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/conservative_backfilling_helper_classes/NodeAvailabilityTimeLine.h
+        src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/conservative_backfilling_helper_classes/BatchJobSet.h
         src/wrench/services/compute/htcondor/HTCondorComputeService.cpp
         src/wrench/services/compute/htcondor/HTCondorCentralManagerService.cpp
         src/wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessage.cpp

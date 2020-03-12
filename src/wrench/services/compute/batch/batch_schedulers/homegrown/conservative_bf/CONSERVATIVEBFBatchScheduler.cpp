@@ -12,6 +12,8 @@
 
 #include "CONSERVATIVEBFBatchScheduler.h"
 
+//#define  PRINT_SCHEDULE 1
+
 WRENCH_LOG_NEW_DEFAULT_CATEGORY(conservative_bf_batch_scheduler, "Log category for CONSERVATIVEBFBatchScheduler");
 
 namespace wrench {
@@ -23,12 +25,14 @@ namespace wrench {
 
 
     void CONSERVATIVEBFBatchScheduler::processJobSubmission(BatchJob *batch_job) {
-        WRENCH_INFO("CONSERVATIVE: A new job shows up");
+        WRENCH_INFO("CONSERVATIVE: A new job shows up (needs %lu nodes)", batch_job->getRequestedNumNodes());
 
         // Update the time origin
         WRENCH_INFO("CONSERVATIVE: Reset time origin");
         this->schedule->setTimeOrigin((u_int32_t)Simulation::getCurrentSimulatedDate());
-//        this->schedule->print();
+#ifdef PRINT_SCHEDULE
+        this->schedule->print();
+#endif
 
         // Find its earliest start time
         auto est = this->schedule->findEarliestStartTime(batch_job->getRequestedTime(), batch_job->getRequestedNumNodes());
@@ -39,7 +43,9 @@ namespace wrench {
         batch_job->conservative_bf_start_date = est;
         batch_job->conservative_bf_expected_end_date = est + batch_job->getRequestedTime();
         WRENCH_INFO("JUST SET BATCH JOB %lu  DATES: %u %u", batch_job->getJobID(), batch_job->conservative_bf_start_date, batch_job->conservative_bf_expected_end_date);
-//        this->schedule->print();
+#ifdef PRINT_SCHEDULE
+        this->schedule->print();
+#endif
     }
 
 
@@ -54,8 +60,9 @@ namespace wrench {
         // Update the time origin
         WRENCH_INFO("CONSERVATIVE: Reset time origin");
         this->schedule->setTimeOrigin((u_int32_t)Simulation::getCurrentSimulatedDate());
-//        this->schedule->print();
-
+#ifdef PRINT_SCHEDULE
+        this->schedule->print();
+#endif
 
         // Start  all non-started the jobs in the next slot!
         auto next_jobs = this->schedule->getJobsInFirstSlot();
@@ -119,13 +126,15 @@ namespace wrench {
         WRENCH_INFO("CONSERVATIVE: Reset time origin");
         auto now = (u_int32_t)Simulation::getCurrentSimulatedDate();
         this->schedule->setTimeOrigin(now);
-//        this->schedule->print();
-
+#ifdef PRINT_SCHEDULE
+        this->schedule->print();
+#endif
         WRENCH_INFO("CONSERVATIVE: Remove job from schedule entirely");
         // TODO: Is the UINT32_MAX making things slow?
         this->schedule->remove(this->schedule->getTimeOrigin(), UINT32_MAX, batch_job);
-//        this->schedule->print();
-
+#ifdef PRINT_SCHEDULE
+        this->schedule->print();
+#endif
 
 
         if (now < batch_job->conservative_bf_expected_end_date) {
@@ -153,8 +162,9 @@ namespace wrench {
             this->schedule->add(now, batch_job->conservative_bf_expected_end_date, batch_job);
         }
 
-//        this->schedule->print();
-
+#ifdef PRINT_SCHEDULE
+        this->schedule->print();
+#endif
         WRENCH_INFO("NOW PUTTING ALL JOBS BACK");
 
         // Add in all other jobs as early as possible in batch queue order
@@ -166,8 +176,11 @@ namespace wrench {
             batch_job->conservative_bf_expected_end_date = est + batch_job->getRequestedTime();
         }
 
-//        this->schedule->print();
+#ifdef PRINT_SCHEDULE
+        this->schedule->print();
+#endif
     }
+
 
     void CONSERVATIVEBFBatchScheduler::processJobTermination(BatchJob *batch_job) {
         // Just like a job Completion to me!
@@ -233,6 +246,29 @@ namespace wrench {
         }
 
         return resources;
+    }
+
+    std::map<std::string, double> CONSERVATIVEBFBatchScheduler::getStartTimeEstimates(
+            std::set<std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs) {
+        std::map<std::string, double> to_return;
+
+        for (auto const &j : set_of_jobs) {
+            std::string id = std::get<0>(j);
+            u_int64_t num_nodes = std::get<1>(j);
+            u_int64_t num_cores_per_host = this->cs->num_cores_per_node;  // Ignore this one. Assume all  cores!
+            if (std::get<3>(j) > UINT32_MAX) {
+                throw std::runtime_error("CONSERVATIVEBFBatchScheduler::getStartTimeEstimates(): job  duration too large");
+            }
+            u_int32_t duration = (u_int32_t)(std::get<3>(j));
+
+            auto est = this->schedule->findEarliestStartTime(duration, num_nodes);
+            if (est <  UINT32_MAX) {
+                to_return[id] = (double) est;
+            } else {
+                to_return[id] = -1.0;
+            }
+        }
+        return  to_return;
     }
 
 }
