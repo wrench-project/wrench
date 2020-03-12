@@ -14,9 +14,6 @@
 
 namespace wrench {
 
-
-    class BatchJob;
-
     class BatchJobSet {
 
     public:
@@ -26,43 +23,54 @@ namespace wrench {
         std::set<BatchJob *> jobs;
         unsigned long num_nodes_utilized = 0;
 
+        /**
+         * @brief Overloaded += operator
+         * @param right: right-hand side
+         * @return
+         */
         BatchJobSet& operator += (const BatchJobSet& right)
-        { jobs.insert(right.jobs.begin(), right.jobs.end());
-          num_nodes_utilized += right.num_nodes_utilized;
-          return *this;
+        {
+            jobs.insert(right.jobs.begin(), right.jobs.end());
+            num_nodes_utilized += right.num_nodes_utilized;
+            return *this;
         }
 
+        /**
+         * @brief Overloaded -= operator
+         * @param right: right-hand side
+         * @return
+         */
         BatchJobSet& operator -= (const BatchJobSet& right)
         {
             for (const auto &j : right.jobs) {
                 if (jobs.find(j) != jobs.end()) {
-                    num_nodes_utilized -=  j->getRequestedNumNodes();
+                    num_nodes_utilized -= j->getRequestedNumNodes();
                     jobs.erase(j);
                 }
             }
-//            if (jobs.find())
-//            jobs.erase(right.jobs.begin(), right.jobs.end());
-//            num_nodes_utilized -= right.num_nodes_utilized;
             return *this;
         }
 
-
+        /**
+         * @brief Add a batch job to the set
+         * @param job: the batch job
+         */
         void add(BatchJob *job) {
             num_nodes_utilized += job->getRequestedNumNodes();
             this->jobs.insert(job);
         }
 
+        /**
+         * @brief Remove a batch job from the set
+         * @param job: the batch job
+         */
         void remove(BatchJob *job) {
             num_nodes_utilized -= job->getRequestedNumNodes();
             this->jobs.erase(job);
         }
 
-
     };
 
-
-
 }
-
 
 #endif //WRENCH_BATCHJOBSET_H

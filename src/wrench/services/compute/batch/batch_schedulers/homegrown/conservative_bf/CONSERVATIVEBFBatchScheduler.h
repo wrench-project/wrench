@@ -16,7 +16,7 @@
 
 #include <wrench/services/compute/batch/BatchComputeService.h>
 #include <wrench/services/compute/batch/batch_schedulers/homegrown/HomegrownBatchScheduler.h>
-#include <services/compute/batch/batch_schedulers/homegrown/conservative_bf/conservative_backfilling_helper_classes/NodeAvailabilityTimeLine.h>
+#include <services/compute/batch/batch_schedulers/homegrown/conservative_bf/NodeAvailabilityTimeLine.h>
 
 namespace wrench {
 
