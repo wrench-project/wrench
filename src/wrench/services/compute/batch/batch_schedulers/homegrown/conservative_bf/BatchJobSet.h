@@ -30,8 +30,12 @@ namespace wrench {
          */
         BatchJobSet& operator += (const BatchJobSet& right)
         {
-            jobs.insert(right.jobs.begin(), right.jobs.end());
-            num_nodes_utilized += right.num_nodes_utilized;
+            for (const auto &j : right.jobs) {
+                if (jobs.find(j) == jobs.end()) {
+                    num_nodes_utilized += j->getRequestedNumNodes();
+                    jobs.insert(j);
+                }
+            }
             return *this;
         }
 

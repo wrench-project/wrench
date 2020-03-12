@@ -15,10 +15,20 @@
 
 namespace wrench {
 
+    /**
+     * @brief Overloaded operator
+     * @param left: left-hand side
+     * @param right: right-hand side
+     * @return
+     */
     bool operator == (const BatchJobSet& left, const BatchJobSet& right) {
         return left.jobs==right.jobs;
     }
 
+    /**
+     * @brief Constructor
+     * @param max_num_nodes: number of nodes on the platform
+     */
     NodeAvailabilityTimeLine::NodeAvailabilityTimeLine(unsigned long max_num_nodes) : max_num_nodes(max_num_nodes) {
 
         std::set<BatchJob *> empty_set;
@@ -26,12 +36,19 @@ namespace wrench {
         this->availability_timeslots += make_pair(boost::icl::interval<u_int32_t>::right_open(0, UINT32_MAX), BatchJobSet());
     }
 
+    /**
+     * @brief Method to clear the node availaibility timeline
+     */
     void NodeAvailabilityTimeLine::clear() {
         this->availability_timeslots.clear();
         std::set<BatchJob *> empty_set;
         this->availability_timeslots += make_pair(boost::icl::interval<u_int32_t>::right_open(0, UINT32_MAX), BatchJobSet());
     }
 
+    /**
+     * @brief Method to set the node availaibility timeline's time origin
+     * @param t: a date
+     */
     void NodeAvailabilityTimeLine::setTimeOrigin(u_int32_t t) {
 
         while (true) {
@@ -54,6 +71,9 @@ namespace wrench {
 
     }
 
+    /**
+     * @brief Method to print the node availaibility timeline
+     */
     void NodeAvailabilityTimeLine::print() {
         std::cerr  << "------ SCHEDULE -----\n";
         for (auto & availability_timeslot : this->availability_timeslots) {
@@ -67,7 +87,13 @@ namespace wrench {
     }
 
 
-
+    /**
+     * @brief Method to update the node availaibility timeline
+     * @param add: true if we're adding, false otherwise
+     * @param start: the start date
+     * @param end: the end date
+     * @param job: the batch job
+     */
     void NodeAvailabilityTimeLine::update(bool add, u_int32_t start, u_int32_t end, BatchJob *job) {
         auto job_set = new BatchJobSet();
         job_set->add(job);
@@ -81,37 +107,47 @@ namespace wrench {
         }
     }
 
+    /**
+     * @brief Method to find the earliest start time for a job spec
+     * @param duration: the job's duration
+     * @param num_nodes: the job's number of nodes
+     * @return a date
+     */
     u_int32_t NodeAvailabilityTimeLine::findEarliestStartTime(uint32_t duration, unsigned long num_nodes) {
 
         uint32_t start_time = UINT32_MAX;
         uint32_t remaining_duration = duration;
 
 
-        for (auto it = this->availability_timeslots.begin(); it != this->availability_timeslots.end(); it++) {
-            unsigned long available_nodes = this->max_num_nodes  - (*it).second.num_nodes_utilized;
+        for (auto & availability_timeslot : this->availability_timeslots) {
+            unsigned long available_nodes = this->max_num_nodes  - availability_timeslot.second.num_nodes_utilized;
 
             // Nope!
             if (available_nodes < num_nodes) {
                 start_time = UINT32_MAX;
                 continue;
             }
-            u_int32_t interval_length = (*it).first.upper() - (*it).first.lower();
+            u_int32_t interval_length = availability_timeslot.first.upper() - availability_timeslot.first.lower();
             // Yes!
             if (interval_length >= remaining_duration) {
                 if (start_time == UINT32_MAX) {
-                    start_time = (*it).first.lower();
+                    start_time = availability_timeslot.first.lower();
                 }
                 break;
             }
             // Maybe!
             remaining_duration -= interval_length;
             if (start_time == UINT32_MAX) {
-                start_time = (*it).first.lower();
+                start_time = availability_timeslot.first.lower();
             }
         }
         return start_time;
     }
 
+    /**
+     * @brief Get the batch jobs in the first slot in the  node availaibility timeline
+     * @return a set of batch jobs
+     */
     std::set<BatchJob *> NodeAvailabilityTimeLine::getJobsInFirstSlot() {
         std::set<BatchJob *> to_return;
         for (auto const &j : (*(this->availability_timeslots.begin())).second.jobs) {
@@ -120,10 +156,5 @@ namespace wrench {
 
         return to_return;
     }
-
-    u_int32_t NodeAvailabilityTimeLine::getTimeOrigin() {
-        return (*(this->availability_timeslots.begin())).first.lower();
-    }
-
 
 }
