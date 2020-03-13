@@ -69,7 +69,7 @@ namespace wrench {
      * @brief A debug function to print the content of the message manager
      */
     void MessageManager::print() {
-        WRENCH_INFO("MESSAGE_MANAGER DB:");
+        WRENCH_INFO("MessageManager DB:");
         for (auto const &x : mailbox_messages) {
             WRENCH_INFO("   ==> [%s]:%lu", x.first.c_str(), x.second.size());
         }

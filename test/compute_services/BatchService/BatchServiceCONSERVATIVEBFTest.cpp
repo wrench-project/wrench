@@ -30,9 +30,10 @@ public:
 //    wrench::Simulation *simulation;
 
     void do_SimpleCONSERVATIVE_BF_test();
-    void do_LargeCONSERVATIVE_BF_test();
+    void do_LargeCONSERVATIVE_BF_test(int seed);
     void do_SimpleCONSERVATIVE_BFQueueWaitTimePrediction_test();
-    void do_BrokenQueueWaitTimePrediction_test();
+    void do_BatschedBroken_test();
+    int seed;
 
 protected:
     BatchServiceCONSERVATIVE_BFTest() {
@@ -195,7 +196,6 @@ TEST_F(BatchServiceCONSERVATIVE_BFTest, SimpleCONSERVATIVE_BFTest)
     DO_TEST_WITH_FORK(do_SimpleCONSERVATIVE_BF_test);
 }
 
-
 void BatchServiceCONSERVATIVE_BFTest::do_SimpleCONSERVATIVE_BF_test() {
 
     // Create and initialize a simulation
@@ -235,14 +235,12 @@ void BatchServiceCONSERVATIVE_BFTest::do_SimpleCONSERVATIVE_BF_test() {
     free(argv);
 }
 
-
 /**********************************************************************/
 /**  LARGE CONSERVATIVE_BF TEST                                     **/
-/******************************************************************s****/
+/**********************************************************************/
 
 
-#define NUM_JOBS 500
-#define SEED 43
+#define NUM_JOBS 100
 
 class LargeCONSERVATIVE_BFTestWMS : public wrench::WMS {
 
@@ -268,12 +266,12 @@ private:
         wrench::WorkflowTask *tasks[NUM_JOBS];
         wrench::StandardJob *jobs[NUM_JOBS];
         for (int i=0; i < NUM_JOBS; i++) {
-            tasks[i] = this->getWorkflow()->addTask("task" + std::to_string(i), 60, 1, 1, 1.0, 0);
+            tasks[i] = this->getWorkflow()->addTask("task" + std::to_string(i), 60*(rand() % 10), 1, 1, 1.0, 0);
             jobs[i] = job_manager->createStandardJob(tasks[i], {});
         }
 
-        unsigned int random = SEED;
-        srand(SEED);
+//        unsigned int random = 4;
+        srand(this->test->seed);
 
         // Submit jobs
         try {
@@ -282,11 +280,13 @@ private:
                 job_specific_args["-N"] = std::to_string(1 + rand() % 4);
 //                random = random  * 17 + 4123451;
 //                job_specific_args["-N"] = std::to_string(1 + random % 4);
-                job_specific_args["-t"] = std::to_string(2 + rand() % 100);  // TODO: CHANGE the 2 to a 1, NUM_JOBS=200, SEED 43
+                job_specific_args["-t"] = std::to_string(1 + rand() % 100);
 //                random = random  * 17 + 4123451;
-//                job_specific_args["-t"] = std::to_string(1 + random % 100);  // TODO: CHANGE the 2 to a 1, NUM_JOBS=200, SEED 43
+//                job_specific_args["-t"] = std::to_string(1 + random % 100);
                 job_specific_args["-c"] = "10";
                 job_manager->submitJob(jobs[i], this->test->compute_service, job_specific_args);
+                std::cerr << "-N:" << job_specific_args["-N"];
+                std::cerr << "-t:" << job_specific_args["-t"] <<  "\n";
             }
         } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error(
@@ -305,7 +305,10 @@ private:
             }
             if (auto real_event = std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
                 actual_completion_times[real_event->standard_job->getName()] =  std::make_pair(real_event->standard_job,  wrench::Simulation::getCurrentSimulatedDate());
-            } else {
+            } else if (auto real_event = std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event)) {
+                actual_completion_times[real_event->standard_job->getName()] = std::make_pair(real_event->standard_job,
+                                                                                              wrench::Simulation::getCurrentSimulatedDate());
+            }  else {
                 throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
 
@@ -326,39 +329,44 @@ private:
         }
 
         // Print Completion times:
-        WRENCH_INFO("----------");
-        for (auto const &i : actual_completion_times) {
-            wrench::StandardJob *job = i.second.first;
-            double completion_time = i.second.second;
-            WRENCH_INFO("COMPLETION TIME %s (%s nodes, %s minutes): %lf",
-                        i.first.c_str(),
-                        job->getServiceSpecificArguments()["-N"].c_str(),
-                        job->getServiceSpecificArguments()["-t"].c_str(),
-                        completion_time);
-        }
+//        WRENCH_INFO("----------");
+//        for (auto const &i : actual_completion_times) {
+//            wrench::StandardJob *job = i.second.first;
+//            double completion_time = i.second.second;
+//            WRENCH_INFO("COMPLETION TIME %s (%s nodes, %s minutes): %lf",
+//                        i.first.c_str(),
+//                        job->getServiceSpecificArguments()["-N"].c_str(),
+//                        job->getServiceSpecificArguments()["-t"].c_str(),
+//                        completion_time);
+//        }
 
         return 0;
     }
 };
 
 #ifdef ENABLE_BATSCHED
-//TEST_F(BatchServiceCONSERVATIVE_BFTest, DISABLED_LargeCONSERVATIVE_BFTest)
 TEST_F(BatchServiceCONSERVATIVE_BFTest, LargeCONSERVATIVE_BFTest)
 #else
 TEST_F(BatchServiceCONSERVATIVE_BFTest, LargeCONSERVATIVE_BFTest)
 #endif
 {
-    DO_TEST_WITH_FORK(do_LargeCONSERVATIVE_BF_test);
+//    DO_TEST_WITH_FORK(do_LargeCONSERVATIVE_BF_test);
+    for  (int seed = 1; seed < 2; seed++) {
+//        std::cerr <<  "SEED = " << seed << "\n";
+        DO_TEST_WITH_FORK_ONE_ARG(do_LargeCONSERVATIVE_BF_test, seed);
+    }
 }
 
 
-void BatchServiceCONSERVATIVE_BFTest::do_LargeCONSERVATIVE_BF_test() {
+void BatchServiceCONSERVATIVE_BFTest::do_LargeCONSERVATIVE_BF_test(int seed) {
 
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("batch_service_test");
+
+    this->seed = seed;
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -562,3 +570,171 @@ void BatchServiceCONSERVATIVE_BFTest::do_SimpleCONSERVATIVE_BFQueueWaitTimePredi
     free(argv);
 }
 
+
+/**********************************************************************/
+/**  BATSCHED BROKEN TEST                                            **/
+/**********************************************************************/
+
+class BatschedBrokenTestWMS : public wrench::WMS {
+
+public:
+    BatschedBrokenTestWMS(BatchServiceCONSERVATIVE_BFTest *test,
+                          const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                          std::string hostname) :
+            wrench::WMS(nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
+                        "test") {
+        this->test = test;
+    }
+
+private:
+
+    BatchServiceCONSERVATIVE_BFTest *test;
+
+    int main() {
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+        wrench::WorkflowTask *tasks[5];
+        wrench::StandardJob *jobs[5];
+        for (int i=0; i < 5; i++) {
+            tasks[i] = this->getWorkflow()->addTask("task" + std::to_string(i), 60, 1, 1, 1.0, 0);
+            jobs[i] = job_manager->createStandardJob(tasks[i], {});
+        }
+
+        std::map<std::string, std::string>
+                job1,
+                job2,
+                job3,
+                job4,
+                job5;
+
+        job1["-N"] = "4";
+        job1["-t"] = "75";
+        job1["-c"] = "10";
+
+        job2["-N"] = "2";
+        job2["-t"] = "25";
+        job2["-c"] = "10";
+
+        job3["-N"] = "4";
+        job3["-t"] = "67";
+        job3["-c"] = "10";
+
+        job4["-N"] = "2";
+        job4["-t"] = "25";
+        job4["-c"] = "10";
+
+        job5["-N"] = "4";
+        job5["-t"] = "59";
+        job5["-c"] = "10";
+
+        int num_jobs_submitted = 0;
+
+        // Submit jobs
+        try {
+            job_manager->submitJob(jobs[0], this->test->compute_service, job1); num_jobs_submitted++;
+            job_manager->submitJob(jobs[1], this->test->compute_service, job2); num_jobs_submitted++;
+            job_manager->submitJob(jobs[2], this->test->compute_service, job3); num_jobs_submitted++;
+            job_manager->submitJob(jobs[3], this->test->compute_service, job4); num_jobs_submitted++;
+            job_manager->submitJob(jobs[4], this->test->compute_service, job5); num_jobs_submitted++;
+        } catch (wrench::WorkflowExecutionException &e) {
+            throw std::runtime_error("Unexpected exception while submitting job");
+        }
+
+        std::map<std::string, std::pair<wrench::StandardJob *, double>>  actual_completion_times;
+        for (int i=0; i < num_jobs_submitted; i++) {
+            // Wait for a workflow execution event
+            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+            try {
+                event = this->getWorkflow()->waitForNextExecutionEvent();
+            } catch (wrench::WorkflowExecutionException &e) {
+                throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+            }
+            if (auto real_event = std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
+                actual_completion_times[real_event->standard_job->getName()] =
+                        std::make_pair(real_event->standard_job,  wrench::Simulation::getCurrentSimulatedDate());
+            } else {
+                throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
+            }
+        }
+
+        // Print Completion times:
+        WRENCH_INFO("----------");
+        for (auto const &i : actual_completion_times) {
+            wrench::StandardJob *job = i.second.first;
+            double completion_time = i.second.second;
+            WRENCH_INFO("COMPLETION TIME %s (%s nodes, %s minutes): %lf",
+                        i.first.c_str(),
+                        job->getServiceSpecificArguments()["-N"].c_str(),
+                        job->getServiceSpecificArguments()["-t"].c_str(),
+                        completion_time);
+        }
+
+//        // Check
+//        for (int i=0; i < 5; i++) {
+//            double delta = std::abs(actual_completion_times[i] - expected_completion_times[i]);
+//            if (delta > EPSILON) {
+//                throw std::runtime_error("Unexpected job completion time for the job containing task " +
+//                                         tasks[i]->getID() +
+//                                         ": " +
+//                                         std::to_string(actual_completion_times[i]) +
+//                                         "(expected: " +
+//                                         std::to_string(expected_completion_times[i]) +
+//                                         ")");
+//            }
+//        }
+
+        return 0;
+    }
+};
+
+
+#ifdef ENABLE_BATSCHED
+TEST_F(BatchServiceCONSERVATIVE_BFTest, DISABLED_BatschedBrokenTest)
+#else
+TEST_F(BatchServiceCONSERVATIVE_BFTest, BatschedBrokenTest)
+#endif
+{
+    DO_TEST_WITH_FORK(do_BatschedBroken_test);
+}
+
+
+void BatchServiceCONSERVATIVE_BFTest::do_BatschedBroken_test() {
+
+    // Create and initialize a simulation
+    auto simulation = new wrench::Simulation();
+    int argc = 1;
+    auto argv = (char **) calloc(1, sizeof(char *));
+    argv[0] = strdup("batch_service_test");
+
+    ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+    // Setting up the platform
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    // Get a hostname
+    std::string hostname = "Host1";
+
+    // Create a Batch Service with a fcfs scheduling algorithm
+    ASSERT_NO_THROW(compute_service = simulation->add(
+            new wrench::BatchComputeService(hostname, {"Host1", "Host2", "Host3", "Host4"}, "",
+                                            {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"},
+                                             {wrench::BatchComputeServiceProperty::BATSCHED_LOGGING_MUTED, "false"}})));
+
+    simulation->add(new wrench::FileRegistryService(hostname));
+
+    // Create a WMS
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    ASSERT_NO_THROW(wms = simulation->add(
+            new BatschedBrokenTestWMS(
+                    this,  {compute_service}, hostname)));
+
+    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+
+    ASSERT_NO_THROW(simulation->launch());
+
+    delete simulation;
+
+    free(argv[0]);
+    free(argv);
+}

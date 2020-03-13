@@ -1174,8 +1174,10 @@ namespace wrench {
 
 
         if (not executor_on_the_list) {
-            throw std::runtime_error(
-                    "BatchComputeService::processStandardJobCompletion(): Received a standard job completion, but the executor is not in the executor list");
+            WRENCH_WARN("BatchComputeService::processStandardJobCompletion(): Received a standard job completion, but the executor is not in the executor list - Likely getting wires crossed due to concurrent completion and time-outs.. ignoring")
+            return;
+//            throw std::runtime_error(
+//                    "BatchComputeService::processStandardJobCompletion(): Received a standard job completion, but the executor is not in the executor list");
         }
 
         // Look for the corresponding batch job
@@ -1192,6 +1194,13 @@ namespace wrench {
                     "BatchComputeService::processStandardJobCompletion(): Received a standard job completion, but the job is not in the running job list");
         }
 
+        WRENCH_INFO("A standard job executor has completed job %s", job->getName().c_str());
+
+//        std::cerr << "BEFORE FREEING UP RES\n";
+//        for (auto r : this->compute_hosts) {
+//            std::cerr << "-----> " << this->available_nodes_to_cores[r]  << "\n";
+//        }
+
         // Free up resources (by finding the corresponding BatchJob)
         this->freeUpResources(batch_job->getResourcesAllocated());
 
@@ -1199,8 +1208,11 @@ namespace wrench {
         this->removeJobFromRunningList(batch_job);
 
 
-        WRENCH_INFO("A standard job executor has completed job %s", job->getName().c_str());
 
+//        std::cerr << "AFTER FREEING UP RES\n";
+//        for (auto r : this->compute_hosts) {
+//            std::cerr << "-----> " << this->available_nodes_to_cores[r]  << "\n";
+//        }
         // notify the scheduled of the job completion
         this->scheduler->processJobCompletion(batch_job);
 
