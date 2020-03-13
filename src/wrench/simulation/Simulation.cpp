@@ -151,14 +151,15 @@ namespace wrench {
 
         *argc = 0;
         for (auto a : cleanedup_args) {
-            argv[(*argc)-1] = strdup(a.c_str());
+            std::cerr << "*argc = " << *argc  << "    " << a << "\n";
+            argv[(*argc)] = strdup(a.c_str());
             (*argc)++;
         }
 
         // If version requested, put back the "--version" argument
         if (version_requested) {
             std::cout << "WRENCH version " << getWRENCHVersionString() << "\n";
-            argv[(*argc)-1] = strdup("--version");
+            argv[(*argc)] = strdup("--version");
             (*argc)++;
         }
 
@@ -166,14 +167,14 @@ namespace wrench {
 
         // If SimGrid help is requested, put back in a "--help" argument
         if (simgrid_help_requested) {
-            argv[(*argc)-1] = strdup("--help");
+            argv[(*argc)] = strdup("--help");
             (*argc)++;
             std::cout << "\nSimgrid command-line arguments:\n\n";
         }
 
         // If WRENCH no logging is requested, put back and convert it to a SimGrid argument
         if (wrench_no_log) {
-            argv[(*argc)-1] = strdup("--log=root.threshold:critical");
+            argv[(*argc)] = strdup("--log=root.threshold:critical");
             (*argc)++;
         }
 
