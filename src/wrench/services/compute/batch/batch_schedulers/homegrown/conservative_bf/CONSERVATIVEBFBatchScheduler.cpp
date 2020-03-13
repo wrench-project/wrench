@@ -94,7 +94,9 @@ namespace wrench {
 
             auto resources = this->scheduleOnHosts(num_nodes_asked_for, cores_per_node_asked_for, ComputeService::ALL_RAM);
             if (resources.empty()) {
-                throw std::runtime_error("Can't run batch job " + std::to_string(batch_job->getJobID()) +  " right now, this shouldn't happen!");
+                // Hmmm... we don't have the resources right now... we should get an update soon....
+                return;
+//                throw std::runtime_error("Can't run batch job " + std::to_string(batch_job->getJobID()) +  " right now, this shouldn't happen!");
             }
 
             WRENCH_INFO("Starting batch job %lu ", batch_job->getJobID());

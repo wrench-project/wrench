@@ -245,19 +245,11 @@ namespace wrench {
         WRENCH_INFO("Work unit executor on host %s terminating!", S4U_Simulation::getHostName().c_str());
         if ((not this->task_failure_time_stamp_has_already_been_generated) and this->failure_timestamp_should_be_generated) {
             if (this->workunit->task != nullptr) {
-                std::cerr << "XXXX1\n";
                 WorkflowTask *task = this->workunit->task;
-                std::cerr << "XXXX1\n";
                 task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
-                std::cerr << "XXXX1\n";
                 task->setFailureDate(S4U_Simulation::getClock());
-                std::cerr << "XXXX1\n";
                 auto ts = new SimulationTimestampTaskFailure(task);
-                std::cerr << "XXXX1\n";
-                WRENCH_INFO("ADDING FAILRE TIME STAMP");
-                std::cerr << "XXXX1\n";
                 this->simulation->getOutput().addTimestamp<SimulationTimestampTaskFailure>(ts);
-                std::cerr << "XXXX1\n";
                 this->task_failure_time_stamp_has_already_been_generated = true;
             }
         }
@@ -277,7 +269,6 @@ namespace wrench {
             WRENCH_INFO("Work unit executor on can't report back due to network error.. oh well!");
         }
 
-        WRENCH_INFO("RETURNING CLEANLY");
         return 0;
 
     }
@@ -328,11 +319,9 @@ namespace wrench {
             task->setExecutionHost(this->hostname);
             task->setNumCoresAllocated(this->num_cores);
 
-            WRENCH_INFO("ADDIN TIME STAMP HERE  : %s", task->getID().c_str());
             this->simulation->getOutput().addTimestamp<SimulationTimestampTaskStart>(
                     new SimulationTimestampTaskStart(task));
             this->task_start_timestamp_has_been_inserted = true;
-            WRENCH_INFO("SET THE BOOLEAN: %s", task->getID().c_str());
 
 
             // Read  all input files

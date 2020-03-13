@@ -219,7 +219,6 @@ namespace wrench {
      */
     void S4U_Simulation::turnOffHost(std::string hostname) {
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
-        WRENCH_INFO("ASDADASDAS");
         if (host == nullptr) {
             throw std::invalid_argument("Unknown hostname " + hostname);
         }
