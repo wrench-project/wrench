@@ -31,10 +31,7 @@ namespace wrench {
         BatchJobSet& operator += (const BatchJobSet& right)
         {
             for (const auto &j : right.jobs) {
-                if (jobs.find(j) == jobs.end()) {
-                    num_nodes_utilized += j->getRequestedNumNodes();
-                    jobs.insert(j);
-                }
+                add(j);
             }
             return *this;
         }
@@ -47,10 +44,7 @@ namespace wrench {
         BatchJobSet& operator -= (const BatchJobSet& right)
         {
             for (const auto &j : right.jobs) {
-                if (jobs.find(j) != jobs.end()) {
-                    num_nodes_utilized -= j->getRequestedNumNodes();
-                    jobs.erase(j);
-                }
+                remove(j);
             }
             return *this;
         }
@@ -59,18 +53,22 @@ namespace wrench {
          * @brief Add a batch job to the set
          * @param job: the batch job
          */
-        void add(BatchJob *job) {
-            num_nodes_utilized += job->getRequestedNumNodes();
-            this->jobs.insert(job);
+        void inline add(BatchJob *job) {
+            if (this->jobs.find(job) == this->jobs.end()) {
+                num_nodes_utilized += job->getRequestedNumNodes();
+                this->jobs.insert(job);
+            }
         }
 
         /**
          * @brief Remove a batch job from the set
          * @param job: the batch job
          */
-        void remove(BatchJob *job) {
-            num_nodes_utilized -= job->getRequestedNumNodes();
-            this->jobs.erase(job);
+        void inline remove(BatchJob *job) {
+            if  (this->jobs.find(job) != this->jobs.end()) {
+                num_nodes_utilized -= job->getRequestedNumNodes();
+                this->jobs.erase(job);
+            }
         }
 
     };

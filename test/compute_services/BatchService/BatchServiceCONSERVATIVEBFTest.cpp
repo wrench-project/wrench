@@ -240,7 +240,7 @@ void BatchServiceCONSERVATIVE_BFTest::do_SimpleCONSERVATIVE_BF_test() {
 /**********************************************************************/
 
 
-#define NUM_JOBS 100
+#define NUM_JOBS 600
 
 class LargeCONSERVATIVE_BFTestWMS : public wrench::WMS {
 
@@ -285,8 +285,8 @@ private:
 //                job_specific_args["-t"] = std::to_string(1 + random % 100);
                 job_specific_args["-c"] = "10";
                 job_manager->submitJob(jobs[i], this->test->compute_service, job_specific_args);
-                std::cerr << "-N:" << job_specific_args["-N"];
-                std::cerr << "-t:" << job_specific_args["-t"] <<  "\n";
+//                std::cerr << "-N:" << job_specific_args["-N"];
+//                std::cerr << "-t:" << job_specific_args["-t"] <<  "\n";
             }
         } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error(
