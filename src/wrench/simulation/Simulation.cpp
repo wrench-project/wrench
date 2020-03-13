@@ -166,14 +166,14 @@ namespace wrench {
 
         // If SimGrid help is requested, put back in a "--help" argument
         if (simgrid_help_requested) {
-            argv[*argc] = strdup("--help");
+            argv[(*argc)-1] = strdup("--help");
             (*argc)++;
             std::cout << "\nSimgrid command-line arguments:\n\n";
         }
 
         // If WRENCH no logging is requested, put back and convert it to a SimGrid argument
         if (wrench_no_log) {
-            argv[*argc] = strdup("--log=root.threshold:critical");
+            argv[(*argc)-1] = strdup("--log=root.threshold:critical");
             (*argc)++;
         }
 
