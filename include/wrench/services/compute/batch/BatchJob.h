@@ -42,9 +42,9 @@ namespace wrench {
         u_int32_t conservative_bf_expected_end_date;    // Field used by CONSERVATIVE_BF
 
         unsigned long jobid;
+        unsigned long requested_num_nodes;
         unsigned long  requested_time;
         WorkflowJob* job;
-        unsigned long requested_num_nodes;
         unsigned long requested_cores_per_node;
         double begin_time_stamp;
         double ending_time_stamp;
