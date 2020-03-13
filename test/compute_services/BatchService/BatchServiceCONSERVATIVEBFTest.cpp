@@ -719,7 +719,7 @@ void BatchServiceCONSERVATIVE_BFTest::do_BatschedBroken_test() {
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BatchComputeService(hostname, {"Host1", "Host2", "Host3", "Host4"}, "",
                                             {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"},
-                                             {wrench::BatchComputeServiceProperty::BATSCHED_LOGGING_MUTED, "false"}})));
+                                             {wrench::BatchComputeServiceProperty::BATSCHED_LOGGING_MUTED, "true"}})));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
