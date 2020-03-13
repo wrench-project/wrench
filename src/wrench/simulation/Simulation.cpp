@@ -98,7 +98,6 @@ namespace wrench {
             throw std::invalid_argument("Simulation::init(): Invalid argument argv (nullptr)");
         }
 
-
         // Extract WRENCH-specific argument
         int i;
         bool simgrid_help_requested = false;
@@ -132,7 +131,8 @@ namespace wrench {
         }
 
         // Add the precision-setting argument
-        cleanedup_args.emplace_back("--cfg=surf/precision:1e-9");
+//        cleanedup_args.emplace_back("--cfg=surf/precision:1e-9");
+        simgrid::s4u::Engine::get_instance()->set_config("surf/precision:1e-9");
 
         // Always activate VM migration plugin
         sg_vm_live_migration_plugin_init();
@@ -151,7 +151,7 @@ namespace wrench {
 
         *argc = 0;
         for (auto a : cleanedup_args) {
-            std::cerr << "*argc = " << *argc  << "    " << a << "\n";
+            std::cerr << "Writing to element argv[" << *argc  << "]    " << a << "\n";
             argv[(*argc)] = strdup(a.c_str());
             (*argc)++;
         }
