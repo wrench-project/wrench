@@ -147,7 +147,7 @@ namespace wrench {
 
         *argc = 0;
         for (auto a : cleanedup_args) {
-            std::cerr << "Writing to element argv[" << *argc  << "]    " << a << "\n";
+//            std::cerr << "Writing to element argv[" << *argc  << "]    " << a << "\n";
             argv[(*argc)] = strdup(a.c_str());
             (*argc)++;
         }
