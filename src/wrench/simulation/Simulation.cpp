@@ -130,10 +130,6 @@ namespace wrench {
             }
         }
 
-        // Add the precision-setting argument
-//        cleanedup_args.emplace_back("--cfg=surf/precision:1e-9");
-        simgrid::s4u::Engine::get_instance()->set_config("surf/precision:1e-9");
-
         // Always activate VM migration plugin
         sg_vm_live_migration_plugin_init();
 
