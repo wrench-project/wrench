@@ -151,14 +151,14 @@ namespace wrench {
 
         *argc = 0;
         for (auto a : cleanedup_args) {
-            argv[*argc] = strdup(a.c_str());
+            argv[(*argc)-1] = strdup(a.c_str());
             (*argc)++;
         }
 
         // If version requested, put back the "--version" argument
         if (version_requested) {
             std::cout << "WRENCH version " << getWRENCHVersionString() << "\n";
-            argv[*argc] = strdup("--version");
+            argv[(*argc)-1] = strdup("--version");
             (*argc)++;
         }
 
