@@ -33,7 +33,7 @@ namespace wrench {
     void CONSERVATIVEBFBatchScheduler::processJobSubmission(BatchJob *batch_job) {
 
         WRENCH_INFO("Scheduling a new batch job, %lu, that needs %lu nodes",
-                batch_job->getJobID(),  batch_job->getRequestedNumNodes());
+                    batch_job->getJobID(),  batch_job->getRequestedNumNodes());
 
         // Update the time origin
         this->schedule->setTimeOrigin((u_int32_t)Simulation::getCurrentSimulatedDate());
@@ -47,8 +47,8 @@ namespace wrench {
         batch_job->conservative_bf_start_date = est;
         batch_job->conservative_bf_expected_end_date = est + batch_job->getRequestedTime();
         WRENCH_INFO("Scheduled batch job %lu on %lu from time %u to %u",
-                batch_job->getJobID(), batch_job->getRequestedNumNodes(),
-                batch_job->conservative_bf_start_date, batch_job->conservative_bf_expected_end_date);
+                    batch_job->getJobID(), batch_job->getRequestedNumNodes(),
+                    batch_job->conservative_bf_start_date, batch_job->conservative_bf_expected_end_date);
 #ifdef PRINT_SCHEDULE
         this->schedule->print();
 #endif
@@ -207,7 +207,9 @@ namespace wrench {
             throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::findNextJobToSchedule(): Asking for too many hosts");
         }
         if (cores_per_node > Simulation::getHostNumCores(cs->available_nodes_to_cores.begin()->first)) {
-            throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::findNextJobToSchedule(): Asking for too many cores per host");
+            throw std::runtime_error("CONSERVATIVE_BFBatchScheduler::findNextJobToSchedule(): Asking for too many cores per host (asking  for " +
+                                     std::to_string(cores_per_node) + " but hosts have " +
+                                     std::to_string(Simulation::getHostNumCores(cs->available_nodes_to_cores.begin()->first)) + "cores)");
         }
 
         // IMPORTANT: We always give all cores to a job on a node!
