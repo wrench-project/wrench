@@ -21,6 +21,7 @@
 #include "wrench/workflow/job/StandardJob.h"
 #include "wrench/workflow/job/WorkflowJob.h"
 #include "wrench/services/compute/batch/batch_schedulers/BatchScheduler.h"
+
 #include <deque>
 #include <queue>
 #include <set>
@@ -36,7 +37,7 @@ namespace wrench {
      *
      *        In the current implementation of
      *        this service, like for many of its real-world counterparts, memory
-     *        partitioning among jobs on the same host is not handled.  When multiple jobs share hosts,
+     *        partitioning among jobs onq the same host is not handled.  When multiple jobs share hosts,
      *        which can happen when jobs require only a few cores per host and can thus
      *        be co-located on the same hosts in a non-exclusive fashion,
      *        each job simply runs as if it had access to the
