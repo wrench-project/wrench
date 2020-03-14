@@ -27,7 +27,7 @@ namespace wrench {
 
         virtual ~BatchScheduler() = default;
 
-        BatchScheduler(BatchComputeService *cs) : cs(cs) {};
+        explicit BatchScheduler(BatchComputeService *cs) : cs(cs) {};
 
         /**
          * Virtual methods to override
