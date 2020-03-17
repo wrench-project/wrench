@@ -4,7 +4,6 @@ message(STATUS "Cmake version ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CM
 project(wrench CXX)
 
 add_definitions("-Wall -Wno-unused-variable -Wno-unused-private-field")
-add_definitions("-Wall -Wno-unused-variable -Wno-unused-private-field")
 if (ENABLE_BATSCHED)
     add_definitions(-DENABLE_BATSCHED)
 endif ()
@@ -12,7 +11,8 @@ if (ENABLE_MESSAGE_MANAGER)
     add_definitions(-DMESSAGE_MANAGER)
 endif ()
 
-set(SIMGRID_INSTALL_PATH "/usr/local/" CACHE PATH "The path to SimGrid's installation directory")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CmakeModules/")
+find_package(SimGrid REQUIRED)
 
 set(CMAKE_CXX_STANDARD 11)
 
@@ -34,7 +34,7 @@ endif ()
 
 message(STATUS "Building WRENCH Version: ${WRENCH_RELEASE_VERSION}")
 
-include_directories(src/wrench/ include/ ${SIMGRID_INSTALL_PATH}/include /usr/include  /usr/local/include /opt/local/include)
+include_directories(src/wrench/ include/ ${SimGrid_INCLUDE_DIR}/include /usr/include  /usr/local/include /opt/local/include)
 
 
 # library header files
@@ -354,19 +354,14 @@ set(TEST_FILES
         test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.h
         test/simulation/S4U_MailboxTest.cpp)
 
-# sigmgrid library
-find_library(SIMGRID_LIBRARY NAMES simgrid HINTS ${SIMGRID_INSTALL_PATH}/lib NO_DEFAULT_PATH)
-if (NOT SIMGRID_LIBRARY)
-    message(FATAL_ERROR "SimGrid library not found. Perhaps an invalid SIMGRID_INSTALL_PATH specification (${SIMGRID_INSTALL_PATH}?")
-endif()
-
 find_library(PUGIXML_LIBRARY NAMES pugixml)
 find_library(LEMON_LIBRARY NAMES emon lemon)
 find_library(GTEST_LIBRARY NAMES gtest)
 
 add_library(wrench STATIC ${SOURCE_FILES})
 set_target_properties(wrench PROPERTIES VERSION ${WRENCH_RELEASE_VERSION})
-target_link_libraries(wrench ${SIMGRID_LIBRARY} ${PUGIXML_LIBRARY} ${LEMON_LIBRARY})
+#target_link_libraries(wrench ${SIMGRID_LIBRARY} ${PUGIXML_LIBRARY} ${LEMON_LIBRARY})
+target_link_libraries(wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY} ${LEMON_LIBRARY})
 
 # wrench version
 add_custom_command(TARGET wrench PRE_LINK COMMAND ${CMAKE_COMMAND} -DPROJECT_SOURCE_DIR=${PROJECT_SOURCE_DIR} -DWRENCH_RELEASE_VERSION=${WRENCH_RELEASE_VERSION} -P ${CMAKE_HOME_DIRECTORY}/conf/cmake/Version.cmake)
