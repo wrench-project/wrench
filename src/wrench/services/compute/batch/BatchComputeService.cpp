@@ -1016,7 +1016,7 @@ namespace wrench {
 
         // Add the RJMS delay to the job's requested time
         job->setRequestedTime(job->getRequestedTime() +
-                              this->getPropertyValueAsUnsignedLong(BatchComputeServiceProperty::BATCH_RJMS_DELAY));
+                              this->getPropertyValueAsUnsignedLong(BatchComputeServiceProperty::BATCH_RJMS_PADDING_DELAY));
         this->all_jobs.insert(job);
         this->batch_queue.push_back(job);
 
