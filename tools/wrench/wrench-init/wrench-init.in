@@ -40,7 +40,7 @@ def _create_subdirectories(project_dir):
     :param project_dir: project directory
     """
     logger.debug('Creating subdirectories structure')
-    sub_dirs = ['src', 'test', 'doc', 'build', 'data', 'data/platform-files']
+    sub_dirs = ['CMakeModules', 'src', 'test', 'doc', 'build', 'data', 'data/platform-files']
     for sub_dir in sub_dirs:
         if not os.path.isdir(project_dir + '/' + sub_dir):
             os.mkdir(project_dir + '/' + sub_dir)
@@ -62,7 +62,7 @@ def _add_header():
     return [
         '/**',
         ' * Copyright (c) 2019. <ADD YOUR HEADER INFORMATION>.',
-        ' * Generated with the wrench-init tool.',
+        ' * Generated with the wrench-init.in tool.',
         ' *',
         ' * This program is free software: you can redistribute it and/or modify',
         ' * it under the terms of the GNU General Public License as published by',
@@ -89,10 +89,12 @@ def _write_cmakelists(project_dir):
         '',
         'set(CMAKE_CXX_STANDARD 11)',
         '',
-        'set(SIMGRID_INSTALL_PATH "/usr/local/" CACHE PATH "The path to SimGrid\'s installation directory")',
+        'set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CmakeModules/")',
+        '',
+        'find_package(SimGrid REQUIRED)',
         '',
         '# include directories for dependencies and WRENCH libraries',
-        'include_directories(src/ ${SIMGRID_INSTALL_PATH}/include /usr/local/include /opt/local/include /usr/local/include/wrench)',
+        'include_directories(src/ ${SimGrid_INCLUDE_DIR}/include /usr/local/include /opt/local/include /usr/local/include/wrench)',
         '',
         '# source files',
         'set(SOURCE_FILES',
@@ -110,10 +112,6 @@ def _write_cmakelists(project_dir):
         '# wrench library and dependencies',
         'find_library(WRENCH_LIBRARY NAMES wrench)',
         'find_library(WRENCH_PEGASUS_WORKFLOW_PARSER_LIBRARY NAMES wrenchpegasusworkflowparser)',
-        'find_library(SIMGRID_LIBRARY NAMES simgrid HINTS ${SIMGRID_INSTALL_PATH}/lib/ NO_DEFAULT_PATH)',
-        'if (NOT SIMGRID_LIBRARY)',
-        '  message(FATAL_ERROR "SimGrid library not found. Perhaps an invalid SIMGRID_INSTALL_PATH specification (${SIMGRID_INSTALL_PATH})?")',
-        'endif()',
         'find_library(PUGIXML_LIBRARY NAMES pugixml)',
         'find_library(LEMON_LIBRARY NAMES emon lemon)',
         'find_library(GTEST_LIBRARY NAMES gtest)',
@@ -125,7 +123,7 @@ def _write_cmakelists(project_dir):
         'target_link_libraries(my-executable',
         '                       ${WRENCH_LIBRARY}',
         '                       ${WRENCH_PEGASUS_WORKFLOW_PARSER_LIBRARY}',
-        '                       ${SIMGRID_LIBRARY}',
+        '                       ${SimGrid_LIBRARY}',
         '                       ${PUGIXML_LIBRARY}',
         '                       ${LEMON_LIBRARY}',
         '                      -lzmq )',
@@ -133,7 +131,7 @@ def _write_cmakelists(project_dir):
         'target_link_libraries(my-executable',
         '                       ${WRENCH_LIBRARY}',
         '                       ${WRENCH_PEGASUS_WORKFLOW_PARSER_LIBRARY}',
-        '                       ${SIMGRID_LIBRARY}',
+        '                       ${SimGrid_LIBRARY}',
         '                       ${PUGIXML_LIBRARY}',
         '                       ${LEMON_LIBRARY}',
         '                      )',
@@ -150,6 +148,30 @@ def _write_cmakelists(project_dir):
         '                       ${GTEST_LIBRARY} wrench -lpthread -lm',
         '                      )'
     ])
+
+def _write_findsimgridcmake(project_sub_dir):
+    """
+    Write the FindSimGrid.cmake file
+    :param project_sub_dir: target project sub-directory
+    """
+    logger.debug('Writing FindSimGrid.cmake file')
+    """
+    The file below is just a cut-and-paste of the FindSimGrid.cmake
+    file (which is at the root of the SimGrid distribution, but also included into the
+    WRENCH distribution). This is thus an awful
+    cut and paste of that file, but it's not clear how to do this better. One option
+    is to download the file from the simgrid master, but then, that may be a different version/.
+    Another option is to copy the file from the wrench local distribution, but it's not clear
+    where that is and/or if it's anywhere locally (e.g., the source could have been deleted
+    after a make install).  Yet another option is to, during the WRENCH install, to copy that
+    file somewhere, so that we know where it is. That seems a bit strange  (but perhaps to some
+    place like /var/lib/wrench/?)
+    """
+    _write_contents(project_sub_dir + '/FindSimGrid.cmake',
+"""
+TO_REPLACE_FIND_SIMGRID_CMAKE_END_TO_REPLACE
+""".split('\n')
+    )
 
 
 def _write_main(project_dir, compute_service):
@@ -724,6 +746,9 @@ def main():
 
     # write CMakeLists.txt
     _write_cmakelists(args.project_dir)
+
+    # write CMakeModules/FindSimGrid.cmake
+    _write_findsimgridcmake(args.project_dir + "/CMakeModules/")
 
     # create SimpleWMS
     _write_simple_wms(args.project_dir)

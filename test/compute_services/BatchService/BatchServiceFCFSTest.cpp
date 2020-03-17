@@ -217,10 +217,10 @@ void BatchServiceFCFSTest::do_SimpleFCFS_test() {
     // Get a hostname
     std::string hostname = "Host1";
 
-    // Create a Batch Service with a FCFS scheduling algorithm
+    // Create a Batch Service with a fcfs scheduling algorithm
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BatchComputeService(hostname, {"Host1", "Host2", "Host3", "Host4"}, "",
-                                            {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}})));
+                                            {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "fcfs"}})));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -330,17 +330,17 @@ private:
         wrench::Simulation::sleep(10);
 
         // Get Predictions
-        std::set<std::tuple<std::string,unsigned int,unsigned int, double>> set_of_jobs = {
-                (std::tuple<std::string,unsigned int,unsigned int, double>){"job1", 1, 1, 400},
-                (std::tuple<std::string,unsigned int,unsigned int, double>){"job2", 5, 1, 400},
-                (std::tuple<std::string,unsigned int,unsigned int, double>){"job3", 4, 10, 400},
-                (std::tuple<std::string,unsigned int,unsigned int, double>){"job4", 1, 6, 400},
-                (std::tuple<std::string,unsigned int,unsigned int, double>){"job5", 2, 6, 400},
-                (std::tuple<std::string,unsigned int,unsigned int, double>){"job6", 2, 7, 400},
-                (std::tuple<std::string,unsigned int,unsigned int, double>){"job7", 3, 7, 400},
-                (std::tuple<std::string,unsigned int,unsigned int, double>){"job8", 4, 4, 400},
-                (std::tuple<std::string,unsigned int,unsigned int, double>){"job9", 1, 1, 400},
-                (std::tuple<std::string,unsigned int,unsigned int, double>){"job10", 1, 2, 400},
+        std::set<std::tuple<std::string,unsigned long,unsigned long, double>> set_of_jobs = {
+                (std::tuple<std::string,unsigned long,unsigned long, double>){"job1", 1, 1, 400},
+                (std::tuple<std::string,unsigned long,unsigned long, double>){"job2", 5, 1, 400},
+                (std::tuple<std::string,unsigned long,unsigned long, double>){"job3", 4, 10, 400},
+                (std::tuple<std::string,unsigned long,unsigned long, double>){"job4", 1, 6, 400},
+                (std::tuple<std::string,unsigned long,unsigned long, double>){"job5", 2, 6, 400},
+                (std::tuple<std::string,unsigned long,unsigned long, double>){"job6", 2, 7, 400},
+                (std::tuple<std::string,unsigned long,unsigned long, double>){"job7", 3, 7, 400},
+                (std::tuple<std::string,unsigned long,unsigned long, double>){"job8", 4, 4, 400},
+                (std::tuple<std::string,unsigned long,unsigned long, double>){"job9", 1, 1, 400},
+                (std::tuple<std::string,unsigned long,unsigned long, double>){"job10", 1, 2, 400},
         };
 
         // Expectations
@@ -402,10 +402,11 @@ void BatchServiceFCFSTest::do_SimpleFCFSQueueWaitTimePrediction_test() {
     // Get a hostname
     std::string hostname = "Host1";
 
-    // Create a Batch Service with a FCFS scheduling algorithm
+    // Create a Batch Service with a fcfs scheduling algorithm
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BatchComputeService(hostname, {"Host1", "Host2", "Host3", "Host4"}, "",
-                                            {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}})));
+                                            {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "fcfs"},
+                                             {wrench::BatchComputeServiceProperty::BATCH_RJMS_PADDING_DELAY,   "0"}})));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -451,8 +452,8 @@ private:
         wrench::Simulation::sleep(10);
 
         // Get Predictions
-        std::set<std::tuple<std::string,unsigned int,unsigned int, double>> set_of_jobs = {
-                (std::tuple<std::string,unsigned int,unsigned int, double>){"job1", 1, 1, 400}
+        std::set<std::tuple<std::string,unsigned long,unsigned long, double>> set_of_jobs = {
+                (std::tuple<std::string,unsigned long,unsigned long, double>){"job1", 1, 1, 400}
         };
 
 
@@ -508,10 +509,10 @@ void BatchServiceFCFSTest::do_BrokenQueueWaitTimePrediction_test() {
     // Get a hostname
     std::string hostname = "Host1";
 
-    // Create a Batch Service with a FCFS scheduling algorithm
+    // Create a Batch Service with a fcfs scheduling algorithm
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BatchComputeService(hostname, {"Host1", "Host2", "Host3", "Host4"}, "",
-                                            {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"},
+                                            {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "fcfs"},
                                              {wrench::BatchComputeServiceProperty::HOST_SELECTION_ALGORITHM, "BESTFIT"}})));
 
     simulation->add(new wrench::FileRegistryService(hostname));

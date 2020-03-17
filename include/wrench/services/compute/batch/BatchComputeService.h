@@ -20,6 +20,8 @@
 #include "wrench/services/helpers/Alarm.h"
 #include "wrench/workflow/job/StandardJob.h"
 #include "wrench/workflow/job/WorkflowJob.h"
+#include "wrench/services/compute/batch/batch_schedulers/BatchScheduler.h"
+
 #include <deque>
 #include <queue>
 #include <set>
@@ -35,7 +37,7 @@ namespace wrench {
      *
      *        In the current implementation of
      *        this service, like for many of its real-world counterparts, memory
-     *        partitioning among jobs on the same host is not handled.  When multiple jobs share hosts,
+     *        partitioning among jobs onq the same host is not handled.  When multiple jobs share hosts,
      *        which can happen when jobs require only a few cores per host and can thus
      *        be co-located on the same hosts in a non-exclusive fashion,
      *        each job simply runs as if it had access to the
@@ -61,11 +63,12 @@ namespace wrench {
                 {BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "conservative_bf"},
 //                {BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "easy_bf"},
 //                {BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "easy_bf_fast"},
+
                 {BatchComputeServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM,              "fcfs"},
 #else
-                {BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM,            "FCFS"},
+                {BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM,            "fcfs"},
 #endif
-                {BatchComputeServiceProperty::BATCH_RJMS_DELAY,                             "0"},
+                {BatchComputeServiceProperty::BATCH_RJMS_PADDING_DELAY, "5"},
                 {BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE,               ""},
                 {BatchComputeServiceProperty::USE_REAL_RUNTIMES_AS_REQUESTED_RUNTIMES_IN_WORKLOAD_TRACE_FILE,     "false"},
                 {BatchComputeServiceProperty::IGNORE_INVALID_JOBS_IN_WORKLOAD_TRACE_FILE,     "false"},
@@ -106,7 +109,7 @@ namespace wrench {
         /***********************/
         /** \cond DEVELOPER   **/
         /***********************/
-        std::map<std::string,double> getStartTimeEstimates(std::set<std::tuple<std::string,unsigned int,unsigned int, double>> resources);
+        std::map<std::string,double> getStartTimeEstimates(std::set<std::tuple<std::string,unsigned long,unsigned long, double>> resources);
 
         /***********************/
         /** \endcond          **/
@@ -122,9 +125,10 @@ namespace wrench {
 
     private:
 
-
-
         friend class WorkloadTraceFileReplayer;
+        friend class FCFSBatchScheduler;
+        friend class CONSERVATIVEBFBatchScheduler;
+        friend class BatschedBatchScheduler;
 
         BatchComputeService(std::string hostname,
                             std::vector<std::string> compute_hosts,
@@ -171,8 +175,7 @@ namespace wrench {
         //alarms for pilot jobs (only one pilot job alarm)
         std::map<std::string,std::shared_ptr<Alarm>> pilot_job_alarms;
 
-
-        /* Resources information in Batchservice */
+        /* Resources information in BatchService */
         unsigned long total_num_of_nodes;
         unsigned long num_cores_per_node;
         std::map<std::string, unsigned long> nodes_to_cores_map;
@@ -180,7 +183,7 @@ namespace wrench {
         std::map<std::string, unsigned long> available_nodes_to_cores;
         std::map<unsigned long, std::string> host_id_to_names;
         std::vector<std::string> compute_hosts;
-        /*End Resources information in Batchservice */
+        /* End Resources information in BatchService */
 
         // Vector of standard job executors
         std::set<std::shared_ptr<StandardJobExecutor>> running_standard_job_executors;
@@ -189,16 +192,20 @@ namespace wrench {
         std::set<std::shared_ptr<StandardJobExecutor>> finished_standard_job_executors;
 
         // Master List of batch jobs
-        std::set<std::unique_ptr<BatchJob>>  all_jobs;
-
-        //Queue of pending batch jobs
-        std::deque<BatchJob *> pending_jobs;
+        std::set<std::shared_ptr<BatchJob>>  all_jobs;
 
         //A set of running batch jobs
-        std::set<BatchJob *> running_jobs;
+        std::set<std::shared_ptr<BatchJob>> running_jobs;
 
-        // A set of waiting jobs that have been submitted to batsched, but not scheduled
-        std::set<BatchJob *> waiting_jobs;
+        // The batch queue
+        std::deque<std::shared_ptr<BatchJob>> batch_queue;
+
+        // A set of "waiting" batch jobs, i.e., jobs that are waiting to be sent to
+        //  the  scheduler (useful for batsched only)
+        std::set<std::shared_ptr<BatchJob>> waiting_jobs;
+
+        // Scheduler
+        std::unique_ptr<BatchScheduler> scheduler;
 
 
 #ifdef ENABLE_BATSCHED
@@ -218,7 +225,7 @@ namespace wrench {
 
         };
 #else
-        std::set<std::string> scheduling_algorithms = {"FCFS"
+        std::set<std::string> scheduling_algorithms = {"fcfs", "conservative_bf",
         };
 
         //Batch queue ordering options
@@ -227,12 +234,13 @@ namespace wrench {
 
 #endif
 
-
         unsigned long generateUniqueJobID();
 
-        void removeJobFromRunningList(BatchJob *job);
+        void removeJobFromRunningList(std::shared_ptr<BatchJob> job);
 
-        void freeJobFromJobsList(BatchJob* job);
+        void removeJobFromBatchQueue(std::shared_ptr<BatchJob> job);
+
+        void removeBatchJobFromJobsList(std::shared_ptr<BatchJob> job);
 
         int main() override;
 
@@ -250,10 +258,6 @@ namespace wrench {
 
         void terminateRunningStandardJob(StandardJob *job);
 
-        std::map<std::string, std::tuple<unsigned long, double>> scheduleOnHosts(std::string host_selection_algorithm,
-                                                                                 unsigned long, unsigned long, double);
-
-        BatchJob *pickJobForScheduling(std::string);
 
         //Terminate the batch service (this is usually for pilot jobs when they act as a batch service)
         void cleanup(bool has_returned_from_main, int return_value) override;
@@ -277,7 +281,7 @@ namespace wrench {
         void processPilotJobTerminationRequest(PilotJob *job, std::string answer_mailbox);
 
         // process a batch job tiemout event
-        void processAlarmJobTimeout(BatchJob *job);
+        void processAlarmJobTimeout(std::shared_ptr<BatchJob>job);
 
         //Process pilot job timeout
         void processPilotJobTimeout(PilotJob *job);
@@ -291,52 +295,15 @@ namespace wrench {
         //send call back to the standard job submitters
         void sendStandardJobFailureNotification(StandardJob *job, std::string job_id, std::shared_ptr<FailureCause> cause);
 
-        // Try to schedule a job
-        bool scheduleOneQueuedJob();
-
         // process a job submission
-        void processJobSubmission(BatchJob *job, std::string answer_mailbox);
-
+        void processJobSubmission(std::shared_ptr<BatchJob>job, std::string answer_mailbox);
 
         //start a job
         void startJob(std::map<std::string, std::tuple<unsigned long, double>>, WorkflowJob *,
-                      BatchJob *, unsigned long, unsigned long, unsigned long);
+                      std::shared_ptr<BatchJob>, unsigned long, unsigned long, unsigned long);
 
 
-
-        //vector of network listeners (only useful when ENABLE_BATSCHED == on)
-
-        std::map<std::string,double> getStartTimeEstimatesForFCFS(std::set<std::tuple<std::string,unsigned int,unsigned int, double>>);
-
-
-        /** BATSCHED-related fields **/
-        std::set<std::shared_ptr<BatschedNetworkListener>> network_listeners;
-        pid_t pid;
-        unsigned long batsched_port;
-
-
-#ifdef ENABLE_BATSCHED
-        friend class BatschedNetworkListener;
-
-        void startBatsched();
-        void stopBatsched();
-
-        std::map<std::string,double> getStartTimeEstimatesFromBatsched(std::set<std::tuple<std::string,unsigned int,unsigned int,double>>);
-
-        void startBatschedNetworkListener();
-
-        void notifyJobEventsToBatSched(std::string job_id, std::string status, std::string job_state,
-                                       std::string kill_reason, std::string even_type);
-
-        void appendJobInfoToCSVOutputFile(BatchJob *batch_job, std::string status);
-
-        void sendAllQueuedJobsToBatsched();
-
-        //process execute events from batsched
         void processExecuteJobFromBatSched(std::string bat_sched_reply);
-
-#endif // ENABLE_BATSCHED
-
 
     };
 }

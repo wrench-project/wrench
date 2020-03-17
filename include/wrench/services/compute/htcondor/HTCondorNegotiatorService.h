@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2019. The WRENCH Team.
+ * Copyright (c) 2017-2020. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ namespace wrench {
         HTCondorNegotiatorService(std::string &hostname,
                                   std::map<std::shared_ptr<ComputeService>, unsigned long> &compute_resources,
                                   std::map<WorkflowJob *, std::shared_ptr<ComputeService>> &running_jobs,
-                                  std::vector<WorkflowJob *> &pending_jobs,
+                                  std::vector<std::tuple<WorkflowJob *, std::map<std::string, std::string>>> &pending_jobs,
                                   std::string &reply_mailbox);
 
         ~HTCondorNegotiatorService();
@@ -45,7 +45,8 @@ namespace wrench {
         int main() override;
 
         struct JobPriorityComparator {
-            bool operator()(WorkflowJob *&lhs, WorkflowJob *&rhs);
+            bool operator()(std::tuple<WorkflowJob *, std::map<std::string, std::string>> &lhs,
+                            std::tuple<WorkflowJob *, std::map<std::string, std::string>> &rhs);
         };
 
         /** mailbox to reply **/
@@ -54,7 +55,7 @@ namespace wrench {
         std::map<std::shared_ptr<ComputeService>, unsigned long> *compute_resources;
         std::map<WorkflowJob *, std::shared_ptr<ComputeService>> *running_jobs;
         /** queue of pending jobs **/
-        std::vector<WorkflowJob *> pending_jobs;
+        std::vector<std::tuple<WorkflowJob *, std::map<std::string, std::string>>> pending_jobs;
     };
 
     /***********************/

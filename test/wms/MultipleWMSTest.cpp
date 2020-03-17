@@ -131,13 +131,13 @@ private:
         // Get the cloud service
         auto cs = *this->getAvailableComputeServices<wrench::CloudComputeService>().begin();
 
-        std::set<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>> pre_copies = {};
+        std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>> pre_copies = {};
         for (auto it : this->getWorkflow()->getInputFiles()) {
             std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>> each_copy =
                     std::make_tuple(it.second,
                                     wrench::FileLocation::LOCATION(this->test->storage_service),
                                     wrench::FileLocation::SCRATCH);
-            pre_copies.insert(each_copy);
+            pre_copies.push_back(each_copy);
         }
 
         // Create a 2-task job

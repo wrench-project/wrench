@@ -25,20 +25,20 @@ namespace wrench {
      * @param tasks: the tasks in the job (which must be either READY, or children of COMPLETED tasks or
      *                                   of tasks also included in the standard job)
      * @param file_locations: a map that specifies locations where input/output files should be read/written
-     * @param pre_file_copies: a set of tuples that specify which file copy operations should be completed
+     * @param pre_file_copies: a vector of tuples that specify which file copy operations should be completed
      *                         before task executions begin
-     * @param post_file_copies: a set of tuples that specify which file copy operations should be completed
+     * @param post_file_copies: a vector of tuples that specify which file copy operations should be completed
      *                         after task executions end
-     * @param cleanup_file_deletions: a set of tuples that specify which file copies should be removed from which
+     * @param cleanup_file_deletions: a vector of tuples that specify which file copies should be removed from which
      *                         locations. This will happen regardless of whether the job succeeds or fails
      *
      * @throw std::invalid_argument
      */
     StandardJob::StandardJob(Workflow *workflow, std::vector<WorkflowTask *> tasks,
                              std::map<WorkflowFile *, std::shared_ptr<FileLocation> > &file_locations,
-                             std::set<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> &pre_file_copies,
-                             std::set<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> &post_file_copies,
-                             std::set<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  >> &cleanup_file_deletions)
+                             std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> &pre_file_copies,
+                             std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> &post_file_copies,
+                             std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  >> &cleanup_file_deletions)
             :
             WorkflowJob(WorkflowJob::STANDARD),
             num_completed_tasks(0),

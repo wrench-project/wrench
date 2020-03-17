@@ -20,6 +20,7 @@
 #include "services/compute/virtualized_cluster/VirtualizedClusterComputeServiceMessage.h"
 #include "services/network_proximity/NetworkProximityMessage.h"
 #include "wrench/workflow/execution_events/FailureCause.h"
+#include "wrench/services/compute/batch/BatchJob.h"
 
 class MessageConstructorTest : public ::testing::Test {
 protected:
@@ -40,14 +41,9 @@ protected:
         workflow_job = (wrench::WorkflowJob *)(1234);
         standard_job = (wrench::StandardJob *)(1234);
         batch_job = (wrench::BatchJob *)(1234);
+        batch_job_shared_ptr = std::shared_ptr<wrench::BatchJob>(new wrench::BatchJob(workflow_job,1,1,1,1,1,1));
         pilot_job = (wrench::PilotJob *)(1234);
-        file_copy_start_time_stamp = new wrench::SimulationTimestampFileCopyStart(file,
-                                                                                  location,
-                                                                                  location);
         failure_cause = std::shared_ptr<wrench::FileNotFound>(new wrench::FileNotFound(file, location), [](void *ptr){});
-        file_copy_start_time_stamp = new wrench::SimulationTimestampFileCopyStart(file,
-                                                                                  location,
-                                                                                  location);
     }
 
 
@@ -64,8 +60,8 @@ protected:
     wrench::WorkflowJob *workflow_job;
     wrench::StandardJob *standard_job;
     wrench::BatchJob *batch_job;
+    std::shared_ptr<wrench::BatchJob> batch_job_shared_ptr;
     wrench::PilotJob *pilot_job;
-    wrench::SimulationTimestampFileCopyStart *file_copy_start_time_stamp;
     std::shared_ptr<wrench::FileNotFound> failure_cause;
 };
 
@@ -292,12 +288,11 @@ TEST_F(MessageConstructorTest, StorageServiceMessages) {
     ASSERT_THROW(new wrench::StorageServiceFileDeleteAnswerMessage(file, storage_service, true, failure_cause, 666),
                  std::invalid_argument);
 
-    ASSERT_NO_THROW(new wrench::StorageServiceFileCopyRequestMessage("mailbox", file, location, location, nullptr, file_copy_start_time_stamp, 666));
-    ASSERT_THROW(new wrench::StorageServiceFileCopyRequestMessage("", file, location, location, nullptr, file_copy_start_time_stamp, 666), std::invalid_argument);
-    ASSERT_THROW(new wrench::StorageServiceFileCopyRequestMessage("mailbox", nullptr, location, location, nullptr, file_copy_start_time_stamp, 666), std::invalid_argument);
-    ASSERT_THROW(new wrench::StorageServiceFileCopyRequestMessage("mailbox", file, nullptr, location, nullptr, file_copy_start_time_stamp, 666), std::invalid_argument);
-    ASSERT_THROW(new wrench::StorageServiceFileCopyRequestMessage("mailbox", file, location, nullptr, nullptr, file_copy_start_time_stamp, 666), std::invalid_argument);
-    ASSERT_THROW(new wrench::StorageServiceFileCopyRequestMessage("mailbox", file, location, location, nullptr, nullptr, 666), std::invalid_argument);
+    ASSERT_NO_THROW(new wrench::StorageServiceFileCopyRequestMessage("mailbox", file, location, location, nullptr, 666));
+    ASSERT_THROW(new wrench::StorageServiceFileCopyRequestMessage("", file, location, location, nullptr, 666), std::invalid_argument);
+    ASSERT_THROW(new wrench::StorageServiceFileCopyRequestMessage("mailbox", nullptr, location, location, nullptr, 666), std::invalid_argument);
+    ASSERT_THROW(new wrench::StorageServiceFileCopyRequestMessage("mailbox", file, nullptr, location, nullptr, 666), std::invalid_argument);
+    ASSERT_THROW(new wrench::StorageServiceFileCopyRequestMessage("mailbox", file, location, nullptr, nullptr, 666), std::invalid_argument);
 
     ASSERT_THROW(new wrench::StorageServiceFileCopyAnswerMessage(nullptr, location, location, nullptr, false, true, nullptr, 666), std::invalid_argument);
     ASSERT_NO_THROW(new wrench::StorageServiceFileCopyAnswerMessage(file, location, location, nullptr, false, true, nullptr, 666));
@@ -386,10 +381,10 @@ TEST_F(MessageConstructorTest, BatchComputeServiceMessages) {
 
     ASSERT_NO_THROW(new wrench::BatchQueryAnswerMessage(1.0, 666));
 
-    ASSERT_NO_THROW(new wrench::BatchComputeServiceJobRequestMessage("mailbox", batch_job, 666));
+    ASSERT_NO_THROW(new wrench::BatchComputeServiceJobRequestMessage("mailbox", batch_job_shared_ptr, 666));
     ASSERT_THROW(new wrench::BatchComputeServiceJobRequestMessage("mailbox", nullptr, 666), std::invalid_argument);
-    ASSERT_THROW(new wrench::BatchComputeServiceJobRequestMessage("", batch_job, 666), std::invalid_argument);
-    ASSERT_NO_THROW(new wrench::AlarmJobTimeOutMessage(batch_job, 666));
+    ASSERT_THROW(new wrench::BatchComputeServiceJobRequestMessage("", batch_job_shared_ptr, 666), std::invalid_argument);
+    ASSERT_NO_THROW(new wrench::AlarmJobTimeOutMessage(batch_job_shared_ptr, 666));
     ASSERT_THROW(new wrench::AlarmJobTimeOutMessage(nullptr, 666), std::invalid_argument);
 
 

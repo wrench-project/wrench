@@ -250,11 +250,7 @@ requires host **pstate** definitions (levels of performance, CPU frequency) in t
 [XML platform description file](https://simgrid.org/doc/latest/platform.html). The following is a 
 list of current available information provided by the plugin: 
 
-- `wrench::Simulation::getEnergyConsumedByHost()`
-- `wrench::Simulation::getTotalEnergyConsumed()`
-- `wrench::Simulation::setPstate()`
 - `wrench::Simulation::getNumberofPstates()`
-- `wrench::Simulation::getCurrentPstate()`
 - `wrench::Simulation::getMinPowerConsumption()`
 - `wrench::Simulation::getMaxPowerConsumption()`
 - `wrench::Simulation::getListOfPstates()`

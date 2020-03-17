@@ -707,7 +707,6 @@ namespace wrench {
 
             // If we didn't find a host, forget it
             if (target_host.empty()) {
-                WRENCH_INFO("NO DICE");
                 continue;
             }
 
