@@ -5,7 +5,7 @@
         <host id="Tremblay" speed="1000Gf" core="4"/>
         <host id="Jupiter" speed="1000Gf" core="2"/>
         <host id="Fafard" speed="1000Gf" core="1">
-            <disk id="large_disk" read_bw="100MBps" write_bw="40MBps">
+            <disk id="large_disk" read_bw="40MBps" write_bw="40MBps">
                 <prop id="size" value="5000GiB"/>
                 <prop id="mount" value="/"/>
             </disk>
