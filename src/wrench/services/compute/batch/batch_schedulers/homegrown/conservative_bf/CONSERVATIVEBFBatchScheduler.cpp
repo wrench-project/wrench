@@ -30,7 +30,7 @@ namespace wrench {
      * @brief Method to process a job submission
      * @param batch_job: the newly submitted batch job
      */
-    void CONSERVATIVEBFBatchScheduler::processJobSubmission(BatchJob *batch_job) {
+    void CONSERVATIVEBFBatchScheduler::processJobSubmission(std::shared_ptr<BatchJob> batch_job) {
 
         WRENCH_INFO("Scheduling a new batch job, %lu, that needs %lu nodes",
                     batch_job->getJobID(),  batch_job->getRequestedNumNodes());
@@ -69,7 +69,7 @@ namespace wrench {
         // Start  all non-started the jobs in the next slot!
         auto next_jobs = this->schedule->getJobsInFirstSlot();
 
-        if (next_jobs.empty()){
+        if (next_jobs.empty()) {
             std::cerr <<  "this-.cs->batch_queue has " << this->cs->batch_queue.size() << "jobs\n";
             for (auto const &j : this->cs->batch_queue) {
                 std::cerr << "    - " << j->getJobID() << "\n";
@@ -149,7 +149,7 @@ namespace wrench {
      * @brief Method to process a job completion
      * @param batch_job: the job that completed
      */
-    void CONSERVATIVEBFBatchScheduler::processJobCompletion(BatchJob *batch_job) {
+    void CONSERVATIVEBFBatchScheduler::processJobCompletion(std::shared_ptr<BatchJob> batch_job) {
         WRENCH_INFO("Notified of completion of batch job, %lu", batch_job->getJobID());
 
         auto now = (u_int32_t)Simulation::getCurrentSimulatedDate();
@@ -169,7 +169,7 @@ namespace wrench {
     * @brief Method to process a job termination
     * @param batch_job: the job that was terminated
     */
-    void CONSERVATIVEBFBatchScheduler::processJobTermination(BatchJob *batch_job) {
+    void CONSERVATIVEBFBatchScheduler::processJobTermination(std::shared_ptr<BatchJob> batch_job) {
         // Just like a job Completion to me!
         this->processJobCompletion(batch_job);
     }
@@ -178,7 +178,7 @@ namespace wrench {
     * @brief Method to process a job failure
     * @param batch_job: the job that failed
     */
-    void CONSERVATIVEBFBatchScheduler::processJobFailure(BatchJob *batch_job) {
+    void CONSERVATIVEBFBatchScheduler::processJobFailure(std::shared_ptr<BatchJob> batch_job) {
         // Just like a job Completion to me!
         this->processJobCompletion(batch_job);
     }

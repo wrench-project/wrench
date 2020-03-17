@@ -32,12 +32,12 @@ namespace wrench{
      */
     class BatchComputeServiceJobRequestMessage : public BatchComputeServiceMessage {
     public:
-        BatchComputeServiceJobRequestMessage(std::string answer_mailbox, BatchJob* job , double payload);
+        BatchComputeServiceJobRequestMessage(std::string answer_mailbox, std::shared_ptr<BatchJob> job , double payload);
 
         /** @brief The mailbox to answer to */
         std::string answer_mailbox;
         /** @brief The batch job */
-        BatchJob* job;
+        std::shared_ptr<BatchJob> job;
     };
 
     /**
@@ -46,9 +46,9 @@ namespace wrench{
      */
     class AlarmJobTimeOutMessage : public ServiceMessage {
     public:
-        AlarmJobTimeOutMessage(BatchJob* job,double payload);
+        AlarmJobTimeOutMessage(std::shared_ptr<BatchJob> job,double payload);
         /** @brief The batch job */
-        BatchJob* job;
+        std::shared_ptr<BatchJob> job;
     };
 
     #if 0

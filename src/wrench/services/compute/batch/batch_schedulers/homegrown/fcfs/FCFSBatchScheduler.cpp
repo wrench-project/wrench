@@ -20,7 +20,7 @@ namespace wrench {
     * @brief Overriden Method to pick the next job to schedule
     * @return A batch job, or nullptr is none is found
     */
-    BatchJob *FCFSBatchScheduler::pickNextJobToSchedule() {
+    std::shared_ptr<BatchJob> FCFSBatchScheduler::pickNextJobToSchedule() {
         if (this->cs->batch_queue.empty()) {
             return nullptr;
         } else {
@@ -333,7 +333,7 @@ namespace wrench {
         while (true) {
 
             // Invoke the scheduler to pick a job to schedule
-            BatchJob *batch_job = this->pickNextJobToSchedule();
+            auto batch_job = this->pickNextJobToSchedule();
             if (batch_job == nullptr) {
                 WRENCH_INFO("No pending jobs to schedule");
                 break;
@@ -374,19 +374,19 @@ namespace wrench {
         }
     }
 
-    void FCFSBatchScheduler::processJobSubmission(BatchJob *batch_job) {
+    void FCFSBatchScheduler::processJobSubmission(std::shared_ptr<BatchJob> batch_job) {
         // Do nothing
     }
 
-    void FCFSBatchScheduler::processJobFailure(BatchJob *batch_job) {
+    void FCFSBatchScheduler::processJobFailure(std::shared_ptr<BatchJob> batch_job) {
         // Do nothing
     }
 
-    void FCFSBatchScheduler::processJobCompletion(BatchJob *batch_job) {
+    void FCFSBatchScheduler::processJobCompletion(std::shared_ptr<BatchJob> batch_job) {
         // Do nothing
     }
 
-    void FCFSBatchScheduler::processJobTermination(BatchJob *batch_job) {
+    void FCFSBatchScheduler::processJobTermination(std::shared_ptr<BatchJob> batch_job) {
         // Do nothing
     }
 

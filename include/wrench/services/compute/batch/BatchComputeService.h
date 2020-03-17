@@ -192,20 +192,21 @@ namespace wrench {
         std::set<std::shared_ptr<StandardJobExecutor>> finished_standard_job_executors;
 
         // Master List of batch jobs
-        std::set<std::unique_ptr<BatchJob>>  all_jobs;
+        std::set<std::shared_ptr<BatchJob>>  all_jobs;
 
         //A set of running batch jobs
-        std::set<BatchJob *> running_jobs;
+        std::set<std::shared_ptr<BatchJob>> running_jobs;
+
+        // The batch queue
+        std::deque<std::shared_ptr<BatchJob>> batch_queue;
+
+        // A set of "waiting" batch jobs, i.e., jobs that are waiting to be sent to
+        //  the  scheduler (useful for batsched only)
+        std::set<std::shared_ptr<BatchJob>> waiting_jobs;
 
         // Scheduler
         std::unique_ptr<BatchScheduler> scheduler;
 
-        // The batch queue
-        std::deque<BatchJob *> batch_queue;
-
-        // A set of "waiting" batch jobs, i.e., jobs that are waiting to be sent to
-        //  the  scheduler (useful for batsched only)
-        std::set<BatchJob *> waiting_jobs;
 
 #ifdef ENABLE_BATSCHED
 
@@ -235,11 +236,11 @@ namespace wrench {
 
         unsigned long generateUniqueJobID();
 
-        void removeJobFromRunningList(BatchJob *job);
+        void removeJobFromRunningList(std::shared_ptr<BatchJob> job);
 
-        void removeJobFromBatchQueue(BatchJob *job);
+        void removeJobFromBatchQueue(std::shared_ptr<BatchJob> job);
 
-        void freeJobFromJobsList(BatchJob* job);
+        void removeBatchJobFromJobsList(std::shared_ptr<BatchJob> job);
 
         int main() override;
 
@@ -280,7 +281,7 @@ namespace wrench {
         void processPilotJobTerminationRequest(PilotJob *job, std::string answer_mailbox);
 
         // process a batch job tiemout event
-        void processAlarmJobTimeout(BatchJob *job);
+        void processAlarmJobTimeout(std::shared_ptr<BatchJob>job);
 
         //Process pilot job timeout
         void processPilotJobTimeout(PilotJob *job);
@@ -295,11 +296,11 @@ namespace wrench {
         void sendStandardJobFailureNotification(StandardJob *job, std::string job_id, std::shared_ptr<FailureCause> cause);
 
         // process a job submission
-        void processJobSubmission(BatchJob *job, std::string answer_mailbox);
+        void processJobSubmission(std::shared_ptr<BatchJob>job, std::string answer_mailbox);
 
         //start a job
         void startJob(std::map<std::string, std::tuple<unsigned long, double>>, WorkflowJob *,
-                      BatchJob *, unsigned long, unsigned long, unsigned long);
+                      std::shared_ptr<BatchJob>, unsigned long, unsigned long, unsigned long);
 
 
         void processExecuteJobFromBatSched(std::string bat_sched_reply);
