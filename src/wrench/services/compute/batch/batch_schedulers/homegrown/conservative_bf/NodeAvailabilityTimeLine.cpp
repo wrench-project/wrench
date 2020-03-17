@@ -92,7 +92,7 @@ namespace wrench {
      * @param end: the end date
      * @param job: the batch job
      */
-    void NodeAvailabilityTimeLine::update(bool add, u_int32_t start, u_int32_t end, BatchJob *job) {
+    void NodeAvailabilityTimeLine::update(bool add, u_int32_t start, u_int32_t end, std::shared_ptr<BatchJob> job) {
         auto job_set = new BatchJobSet();
         job_set->add(job);
 
@@ -148,8 +148,8 @@ namespace wrench {
      * @brief Get the batch jobs in the first slot in the node availability timeline
      * @return a set of batch jobs
      */
-    std::set<BatchJob *> NodeAvailabilityTimeLine::getJobsInFirstSlot() {
-        std::set<BatchJob *> to_return;
+    std::set<std::shared_ptr<BatchJob>> NodeAvailabilityTimeLine::getJobsInFirstSlot() {
+        std::set<std::shared_ptr<BatchJob>> to_return;
         for (auto const &j : (*(this->availability_timeslots.begin())).second.jobs) {
             to_return.insert(j);
         }

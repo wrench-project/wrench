@@ -319,10 +319,10 @@ namespace wrench {
         batch_submission_data["now"] = S4U_Simulation::getClock();
         batch_submission_data["events"] = nlohmann::json::array();
         size_t i;
-        std::deque<BatchJob *>::iterator it;
+        std::deque<std::shared_ptr<BatchJob>>::iterator it;
         for (i = 0, it = this->cs->batch_queue.begin(); i < this->cs->batch_queue.size(); i++, it++) {
 
-            BatchJob *batch_job = *it;
+            auto batch_job = *it;
 
             /* Get the nodes and cores per nodes asked for */
             unsigned long cores_per_node_asked_for = batch_job->getRequestedCoresPerNode();
@@ -356,39 +356,39 @@ namespace wrench {
     }
 
 
-    void BatschedBatchScheduler::processJobFailure(BatchJob *batch_job) {
+    void BatschedBatchScheduler::processJobFailure(std::shared_ptr<BatchJob> batch_job) {
 
 #ifdef ENABLE_BATSCHED
 
         this->notifyJobEventsToBatSched(std::to_string(batch_job->getJobID()), "TIMEOUT", "COMPLETED_FAILED", "", "JOB_COMPLETED");
-        this->appendJobInfoToCSVOutputFile(batch_job, "FAILED");
+        this->appendJobInfoToCSVOutputFile(batch_job.get(), "FAILED");
 #else
         throw std::runtime_error("BatschedBatchScheduler::processQueuesJobs(): BATSCHED_ENABLE should be set to 'on'");
 #endif
     }
 
-    void BatschedBatchScheduler::processJobCompletion(BatchJob *batch_job) {
+    void BatschedBatchScheduler::processJobCompletion(std::shared_ptr<BatchJob>batch_job) {
 
 #ifdef ENABLE_BATSCHED
         this->notifyJobEventsToBatSched(std::to_string(batch_job->getJobID()), "SUCCESS", "COMPLETED_SUCCESSFULLY", "", "JOB_COMPLETED");
-        this->appendJobInfoToCSVOutputFile(batch_job, "success");
+        this->appendJobInfoToCSVOutputFile(batch_job.get(), "success");
 #else
         throw std::runtime_error("BatschedBatchScheduler::processQueuesJobs(): BATSCHED_ENABLE should be set to 'on'");
 #endif
     }
 
 
-    void BatschedBatchScheduler::processJobTermination(BatchJob *batch_job) {
+    void BatschedBatchScheduler::processJobTermination(std::shared_ptr<BatchJob>batch_job) {
 
 #ifdef ENABLE_BATSCHED
         this->notifyJobEventsToBatSched(std::to_string(batch_job->getJobID()), "TIMEOUT", "NOT_SUBMITTED", "", "JOB_COMPLETED");
-        this->appendJobInfoToCSVOutputFile(batch_job, "TERMINATED");
+        this->appendJobInfoToCSVOutputFile(batch_job.get(), "TERMINATED");
 #else
         throw std::runtime_error("BatschedBatchScheduler::processQueuesJobs(): BATSCHED_ENABLE should be set to 'on'");
 #endif
     }
 
-    void BatschedBatchScheduler::processJobSubmission(BatchJob *batch_job) {
+    void BatschedBatchScheduler::processJobSubmission(std::shared_ptr<BatchJob>batch_job) {
         // Do nothing
     }
 
