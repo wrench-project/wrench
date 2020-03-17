@@ -273,8 +273,8 @@ namespace wrench {
 
         // Create a Batch Job
         unsigned long jobid = this->generateUniqueJobID();
-        auto *batch_job = new BatchJob(job, jobid, time_asked_for_in_minutes,
-                                       num_hosts, num_cores_per_host, -1, S4U_Simulation::getClock());
+        auto batch_job = std::shared_ptr<BatchJob>(new BatchJob(job, jobid, time_asked_for_in_minutes,
+                                       num_hosts, num_cores_per_host, -1, S4U_Simulation::getClock()));
 
         // Set job display color for csv output
         auto it = batch_job_args.find("-color");
@@ -534,10 +534,10 @@ namespace wrench {
                                                                  std::shared_ptr<FailureCause> cause) {
         WRENCH_INFO("A standard job executor has failed because of timeout %s", job->getName().c_str());
 
-        BatchJob *batch_job = nullptr;
+        std::shared_ptr<BatchJob> batch_job = nullptr;
         for (auto const &j : this->all_jobs) {
             if (j->getWorkflowJob() == job) {
-                batch_job = j.get();
+                batch_job = j;
                 break;
             }
         }
@@ -572,7 +572,7 @@ namespace wrench {
      * @brief ...
      * @param job
      */
-    void BatchComputeService::removeJobFromRunningList(BatchJob *job) {
+    void BatchComputeService::removeJobFromRunningList(std::shared_ptr<BatchJob> job) {
         if (this->running_jobs.find(job) == this->running_jobs.end()) {
             throw std::runtime_error("BatchComputeService::removeJobFromRunningList(): Cannot find job!");
         }
@@ -583,7 +583,7 @@ namespace wrench {
      *
      * @param job
      */
-    void BatchComputeService::freeJobFromJobsList(BatchJob *job) {
+    void BatchComputeService::removeBatchJobFromJobsList(std::shared_ptr<BatchJob> job) {
         if (job == nullptr) {
             return;
         }
@@ -694,7 +694,7 @@ namespace wrench {
         WRENCH_INFO("Failing current standard jobs");
 
         {
-            std::vector<BatchJob *> to_erase;
+            std::vector<std::shared_ptr<BatchJob>> to_erase;
             for (auto const &j : this->running_jobs) {
                 WorkflowJob *workflow_job = j->getWorkflowJob();
                 if (workflow_job->getType() == WorkflowJob::STANDARD) {
@@ -709,14 +709,14 @@ namespace wrench {
 
             for (auto const &j : to_erase) {
                 this->running_jobs.erase(j);
-                this->freeJobFromJobsList(j);
+                this->removeBatchJobFromJobsList(j);
             }
             to_erase.clear();
         }
 
 
         {
-            std::vector<std::deque<BatchJob *>::iterator> to_erase;
+            std::vector<std::deque<std::shared_ptr<BatchJob>>::iterator> to_erase;
 
             for (auto it1 = this->batch_queue.begin(); it1 != this->batch_queue.end(); it1++) {
                 WorkflowJob *workflow_job = (*it1)->getWorkflowJob();
@@ -731,13 +731,13 @@ namespace wrench {
 
             for (auto const &j : to_erase) {
                 this->batch_queue.erase(j);
-                this->freeJobFromJobsList(*j);
+                this->removeBatchJobFromJobsList(*j);
             }
             to_erase.clear();
         }
 
         {
-            std::vector<BatchJob *> to_erase;
+            std::vector<std::shared_ptr<BatchJob>> to_erase;
 
             for (auto const &wj : this->waiting_jobs) {
                 WorkflowJob *workflow_job = wj->getWorkflowJob();
@@ -752,7 +752,7 @@ namespace wrench {
 
             for (auto const &j : to_erase) {
                 this->waiting_jobs.erase(j);
-                this->freeJobFromJobsList(j);
+                this->removeBatchJobFromJobsList(j);
             }
             to_erase.clear();
         }
@@ -782,7 +782,7 @@ namespace wrench {
     void BatchComputeService::terminateRunningPilotJobs() {
         if (getPropertyValueAsBoolean(BatchComputeServiceProperty::SUPPORTS_PILOT_JOBS)) {
             WRENCH_INFO("Failing running pilot jobs");
-            std::vector<BatchJob *> to_erase;
+            std::vector<std::shared_ptr<BatchJob>> to_erase;
 
             // LOCK
             this->acquireDaemonLock();
@@ -808,7 +808,7 @@ namespace wrench {
             // Cleaning up data structures
             for (auto &job : to_erase) {
                 this->running_jobs.erase(job);
-                this->freeJobFromJobsList(job);
+                this->removeBatchJobFromJobsList(job);
             }
 
             // UNLOCK
@@ -905,11 +905,9 @@ namespace wrench {
      * @param job: the batch job object
      * @param answer_mailbox: the mailbox to which answer messages should be sent
      */
-    void BatchComputeService::processJobSubmission(BatchJob *job, std::string answer_mailbox) {
+    void BatchComputeService::processJobSubmission(std::shared_ptr<BatchJob> job, std::string answer_mailbox) {
 
         WRENCH_INFO("Asked to run a batch job with id %ld", job->getJobID());
-
-        auto unique_ref_to_batch_job = std::unique_ptr<BatchJob>(job); // for freeing upon return
 
         // Check whether the job type is supported
         if ((job->getWorkflowJob()->getType() == WorkflowJob::STANDARD) and
@@ -1019,7 +1017,7 @@ namespace wrench {
         // Add the RJMS delay to the job's requested time
         job->setRequestedTime(job->getRequestedTime() +
                               this->getPropertyValueAsUnsignedLong(BatchComputeServiceProperty::BATCH_RJMS_DELAY));
-        this->all_jobs.insert(std::move(unique_ref_to_batch_job));
+        this->all_jobs.insert(job);
         this->batch_queue.push_back(job);
 
         this->scheduler->processJobSubmission(job);
@@ -1033,7 +1031,7 @@ namespace wrench {
     void BatchComputeService::processPilotJobCompletion(PilotJob *job) {
 
         // Remove the job from the running job list
-        BatchJob *batch_job = nullptr;
+        std::shared_ptr<BatchJob> batch_job = nullptr;
         for (auto const &rj : this->running_jobs) {
             if (rj->getWorkflowJob() == job) {
                 batch_job = rj;
@@ -1086,25 +1084,25 @@ namespace wrench {
                 // notify scheduler of job termination
                 this->scheduler->processJobTermination(*it);
 
-                BatchJob *to_erase = *it;
+                std::shared_ptr<BatchJob> to_erase = *it;
                 this->batch_queue.erase(it);
-                this->freeJobFromJobsList(to_erase);
+                this->removeBatchJobFromJobsList(to_erase);
                 return;
             }
         }
 
         for (auto it2 = this->waiting_jobs.begin(); it2 != this->waiting_jobs.end(); it2++) {
             if ((*it2)->getWorkflowJob() == job) {
-                ComputeServiceTerminatePilotJobAnswerMessage *answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
+                auto answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
                         job, this->getSharedPtr<BatchComputeService>(), true, nullptr,
                         this->getMessagePayloadValue(
                                 BatchComputeServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
                 S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
                 // forward this notification to batsched
                 this->scheduler->processJobTermination(*it2);
-                BatchJob *to_erase = *it2;
+                auto to_erase = *it2;
                 this->waiting_jobs.erase(it2);
-                this->freeJobFromJobsList(to_erase);
+                this->removeBatchJobFromJobsList(to_erase);
                 return;
             }
         }
@@ -1117,7 +1115,7 @@ namespace wrench {
                 for (auto r : resources) {
                     this->available_nodes_to_cores[r.first] += std::get<0>(r.second);
                 }
-                ComputeServiceTerminatePilotJobAnswerMessage *answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
+                auto answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
                         job, this->getSharedPtr<BatchComputeService>(), true, nullptr,
                         this->getMessagePayloadValue(
                                 BatchComputeServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
@@ -1127,9 +1125,9 @@ namespace wrench {
                 this->scheduler->processJobTermination(*it1);
 
                 //this is the list of unique pointers
-                BatchJob *to_erase = *it1;
+                auto to_erase = *it1;
                 this->running_jobs.erase(it1);
-                this->freeJobFromJobsList(to_erase);
+                this->removeBatchJobFromJobsList(to_erase);
                 return;
             } else {
                 ++it1;
@@ -1139,7 +1137,7 @@ namespace wrench {
         // If we got here, we're in trouble
         WRENCH_INFO("Trying to terminate a pilot job that's neither pending nor running!");
         std::string msg = "Job cannot be terminated because it's neither pending nor running";
-        ComputeServiceTerminatePilotJobAnswerMessage *answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
+        auto answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
                 job, this->getSharedPtr<BatchComputeService>(), false,
                 std::shared_ptr<FailureCause>(new NotAllowed(this->getSharedPtr<BatchComputeService>(), msg)),
                 this->getMessagePayloadValue(
@@ -1181,7 +1179,7 @@ namespace wrench {
         }
 
         // Look for the corresponding batch job
-        BatchJob *batch_job = nullptr;
+        std::shared_ptr<BatchJob> batch_job = nullptr;
         for (auto const &rj : this->running_jobs) {
             if (rj->getWorkflowJob() == job) {
                 batch_job = rj;
@@ -1225,7 +1223,7 @@ namespace wrench {
 
         //Free the job from the global (pending, running, waiting) job list, (doing this at the end of this method to make sure
         // this job is not used anymore anywhere)
-        this->freeJobFromJobsList(batch_job);
+        this->removeBatchJobFromJobsList(batch_job);
 
         return;
     }
@@ -1235,7 +1233,7 @@ namespace wrench {
      * @brief Helper function to remove a job from the batch queue
      * @param job: the job to remove
      */
-    void BatchComputeService::removeJobFromBatchQueue(BatchJob *job) {
+    void BatchComputeService::removeJobFromBatchQueue(std::shared_ptr<BatchJob> job) {
         for (auto it = this->batch_queue.begin(); it != this->batch_queue.end(); it++) {
             if ((*it) == job) {
                 this->batch_queue.erase(it);
@@ -1275,7 +1273,7 @@ namespace wrench {
         }
 
         // Free up resources (by finding the corresponding BatchJob)
-        BatchJob *batch_job = nullptr;
+        std::shared_ptr<BatchJob> batch_job = nullptr;
         for (auto const &rj : this->running_jobs) {
             if (rj->getWorkflowJob() == job) {
                 batch_job = rj;
@@ -1298,7 +1296,7 @@ namespace wrench {
         this->sendStandardJobFailureNotification(job, std::to_string((batch_job->getJobID())), cause);
         //Free the job from the global (pending, running, waiting) job list, (doing this at the end of this method to make sure
         // this job is not used anymore anywhere)
-        this->freeJobFromJobsList(batch_job);
+        this->removeBatchJobFromJobsList(batch_job);
 
     }
 
@@ -1323,7 +1321,7 @@ namespace wrench {
     void
     BatchComputeService::startJob(std::map<std::string, std::tuple<unsigned long, double>> resources,
                                   WorkflowJob *workflow_job,
-                                  BatchJob *batch_job, unsigned long num_nodes_allocated,
+                                  std::shared_ptr<BatchJob> batch_job, unsigned long num_nodes_allocated,
                                   unsigned long allocated_time,
                                   unsigned long cores_per_node_asked_for) {
 
@@ -1552,7 +1550,7 @@ namespace wrench {
     void BatchComputeService::processStandardJobTerminationRequest(StandardJob *job,
                                                                    std::string answer_mailbox) {
 
-        BatchJob *batch_job = nullptr;
+        std::shared_ptr<BatchJob> batch_job = nullptr;
         // Is it running?
         bool is_running = false;
         for (auto const &j : this->running_jobs) {
@@ -1610,18 +1608,18 @@ namespace wrench {
         if (is_running) {
             terminateRunningStandardJob(job);
             this->running_jobs.erase(batch_job);
-            this->freeJobFromJobsList(batch_job);
+            this->removeBatchJobFromJobsList(batch_job);
         }
         if (is_pending) {
-            BatchJob *to_free = *batch_pending_it;
+            auto to_free = *batch_pending_it;
             this->batch_queue.erase(batch_pending_it);
-            this->freeJobFromJobsList(to_free);
+            this->removeBatchJobFromJobsList(to_free);
         }
         if (is_waiting) {
             this->waiting_jobs.erase(batch_job);
-            this->freeJobFromJobsList(batch_job);
+            this->removeBatchJobFromJobsList(batch_job);
         }
-        ComputeServiceTerminateStandardJobAnswerMessage *answer_message =
+        auto answer_message =
                 new ComputeServiceTerminateStandardJobAnswerMessage(
                         job, this->getSharedPtr<BatchComputeService>(), true, nullptr,
                         this->getMessagePayloadValue(
@@ -1635,11 +1633,11 @@ namespace wrench {
      * @brief Process a Batch job timeout
      * @param job: the batch job
      */
-    void BatchComputeService::processAlarmJobTimeout(BatchJob *job) {
+    void BatchComputeService::processAlarmJobTimeout(std::shared_ptr<BatchJob> job) {
 
         if (this->running_jobs.find(job) == this->running_jobs.end()) {
             WRENCH_INFO("BatchComputeService::processAlarmJobTimeout(): Received a time out message for an unknown batch job (%ld)... ignoring",
-                        (unsigned long) job);
+                        (unsigned long) job.get());
             return;
         }
         if (job->getWorkflowJob()->getType() == WorkflowJob::STANDARD) {
@@ -1680,7 +1678,7 @@ namespace wrench {
     void BatchComputeService::processExecuteJobFromBatSched(std::string bat_sched_reply) {
         nlohmann::json execute_events = nlohmann::json::parse(bat_sched_reply);
         WorkflowJob *workflow_job = nullptr;
-        BatchJob *batch_job = nullptr;
+        std::shared_ptr<BatchJob> batch_job = nullptr;
         for (auto it1 = this->waiting_jobs.begin(); it1 != this->waiting_jobs.end(); it1++) {
             if (std::to_string((*it1)->getJobID()) == execute_events["job_id"]) {
                 batch_job = (*it1);
@@ -1741,6 +1739,5 @@ namespace wrench {
         startJob(resources, workflow_job, batch_job, num_nodes_allocated, time_in_seconds,
                  cores_per_node_asked_for);
     }
-
 
 };

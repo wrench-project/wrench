@@ -28,18 +28,18 @@ namespace wrench {
     public:
         explicit NodeAvailabilityTimeLine(unsigned long max_num_nodes);
         void setTimeOrigin(u_int32_t t);
-        void add(u_int32_t start, u_int32_t end, BatchJob *job) { update(true, start, end, job);}
-        void remove(u_int32_t start, u_int32_t end, BatchJob *job) { update(false, start, end, job);}
+        void add(u_int32_t start, u_int32_t end, std::shared_ptr<BatchJob>job) { update(true, start, end, job);}
+        void remove(u_int32_t start, u_int32_t end, std::shared_ptr<BatchJob> job) { update(false, start, end, job);}
         void clear();
         void print();
-        std::set<BatchJob *> getJobsInFirstSlot();
+        std::set<std::shared_ptr<BatchJob>> getJobsInFirstSlot();
         u_int32_t findEarliestStartTime(uint32_t duration, unsigned long num_nodes);
 
     private:
         unsigned long max_num_nodes;
         boost::icl::interval_map<u_int32_t, BatchJobSet, boost::icl::partial_enricher> availability_timeslots;
 
-        void update(bool add, u_int32_t start, u_int32_t end, BatchJob *job);
+        void update(bool add, u_int32_t start, u_int32_t end, std::shared_ptr<BatchJob>job);
 
     };
 

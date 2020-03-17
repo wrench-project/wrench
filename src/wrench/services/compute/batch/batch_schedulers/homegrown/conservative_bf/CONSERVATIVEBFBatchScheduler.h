@@ -29,10 +29,10 @@ namespace wrench {
         // TODO: IMPLEMENT EVERYTHING
         void processQueuedJobs() override;
 
-        void processJobSubmission(BatchJob *batch_job) override;
-        void processJobFailure(BatchJob *batch_job) override;
-        void processJobCompletion(BatchJob *batch_job) override;
-        void processJobTermination(BatchJob *batch_job) override;
+        void processJobSubmission(std::shared_ptr<BatchJob> batch_job) override;
+        void processJobFailure(std::shared_ptr<BatchJob> batch_job) override;
+        void processJobCompletion(std::shared_ptr<BatchJob> batch_job) override;
+        void processJobTermination(std::shared_ptr<BatchJob> batch_job) override;
 
         void compactSchedule();
 

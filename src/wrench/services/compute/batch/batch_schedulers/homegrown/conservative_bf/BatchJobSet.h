@@ -20,7 +20,7 @@ namespace wrench {
 
         BatchJobSet() = default;
 
-        std::set<BatchJob *> jobs;
+        std::set<std::shared_ptr<BatchJob>> jobs;
         unsigned long num_nodes_utilized = 0;
 
         /**
@@ -53,7 +53,7 @@ namespace wrench {
          * @brief Add a batch job to the set
          * @param job: the batch job
          */
-        void inline add(BatchJob *job) {
+        void inline add(std::shared_ptr<BatchJob> job) {
             if (this->jobs.find(job) == this->jobs.end()) {
                 num_nodes_utilized += job->getRequestedNumNodes();
                 this->jobs.insert(job);
@@ -64,7 +64,7 @@ namespace wrench {
          * @brief Remove a batch job from the set
          * @param job: the batch job
          */
-        void inline remove(BatchJob *job) {
+        void inline remove(std::shared_ptr<BatchJob> job) {
             if  (this->jobs.find(job) != this->jobs.end()) {
                 num_nodes_utilized -= job->getRequestedNumNodes();
                 this->jobs.erase(job);

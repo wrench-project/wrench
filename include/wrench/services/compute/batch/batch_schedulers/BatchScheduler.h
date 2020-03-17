@@ -41,10 +41,10 @@ namespace wrench {
 
         virtual void processQueuedJobs() = 0;
 
-        virtual void processJobSubmission(BatchJob *batch_job) = 0;
-        virtual void processJobFailure(BatchJob *batch_job) = 0;
-        virtual void processJobCompletion(BatchJob *batch_job) = 0;
-        virtual void processJobTermination(BatchJob *batch_job) = 0;
+        virtual void processJobSubmission(std::shared_ptr<BatchJob> batch_job) = 0;
+        virtual void processJobFailure(std::shared_ptr<BatchJob> batch_job) = 0;
+        virtual void processJobCompletion(std::shared_ptr<BatchJob> batch_job) = 0;
+        virtual void processJobTermination(std::shared_ptr<BatchJob> batch_job) = 0;
 
 
         virtual std::map<std::string, double> getStartTimeEstimates(std::set<std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs) = 0;
