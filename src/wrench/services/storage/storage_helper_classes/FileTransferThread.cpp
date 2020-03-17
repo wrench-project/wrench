@@ -153,6 +153,8 @@ namespace wrench {
      */
     int FileTransferThread::main() {
 
+        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_CYAN);
+
         FileTransferThreadNotificationMessage *msg_to_send_back = nullptr;
         std::shared_ptr<NetworkError> failure_cause = nullptr;
 
@@ -325,6 +327,7 @@ namespace wrench {
 
                 while (remaining > 0) {
                     double chunk_size = std::min<double>(this->buffer_size, remaining);
+                    WRENCH_INFO("Reading %s bytes from disk", std::to_string(chunk_size).c_str());
                     S4U_Simulation::readFromDisk(chunk_size, location->getStorageService()->hostname,
                                                  location->getMountPoint());
                     remaining -= this->buffer_size;
