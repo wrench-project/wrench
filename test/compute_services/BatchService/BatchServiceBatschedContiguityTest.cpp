@@ -234,33 +234,33 @@ void BatchServiceBatschedContiguityTest::do_BatchJobContiguousAllocationTest_tes
     batch_service_conservative_bf_contiguous = simulation->add(
             new wrench::BatchComputeService(hostname,
                                             {"Host1", "Host2", "Host3", "Host4"}, "", {
-                                                    {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"},
-                                                    {wrench::BatchComputeServiceProperty::BATCH_RJMS_DELAY, "0"},
-                                                    {wrench::BatchComputeServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION,"true"}
+                                                    {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM,     "conservative_bf"},
+                                                    {wrench::BatchComputeServiceProperty::BATCH_RJMS_PADDING_DELAY,       "0"},
+                                                    {wrench::BatchComputeServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION, "true"}
                                             }));
 
     batch_service_conservative_bf_non_contiguous = simulation->add(
             new wrench::BatchComputeService(hostname,
                                             {"Host1", "Host2", "Host3", "Host4"}, "", {
-                                                    {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"},
-                                                    {wrench::BatchComputeServiceProperty::BATCH_RJMS_DELAY, "0"},
-                                                    {wrench::BatchComputeServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION,"false"}
+                                                    {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM,     "conservative_bf"},
+                                                    {wrench::BatchComputeServiceProperty::BATCH_RJMS_PADDING_DELAY,       "0"},
+                                                    {wrench::BatchComputeServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION, "false"}
                                             }));
 
     batch_service_easy_bf_contiguous = simulation->add(
             new wrench::BatchComputeService(hostname,
                                             {"Host1", "Host2", "Host3", "Host4"}, "", {
-                                                    {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "easy_bf"},
-                                                    {wrench::BatchComputeServiceProperty::BATCH_RJMS_DELAY, "0"},
-                                                    {wrench::BatchComputeServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION,"true"}
+                                                    {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM,     "easy_bf"},
+                                                    {wrench::BatchComputeServiceProperty::BATCH_RJMS_PADDING_DELAY,       "0"},
+                                                    {wrench::BatchComputeServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION, "true"}
                                             }));
 
     batch_service_easy_bf_non_contiguous = simulation->add(
             new wrench::BatchComputeService(hostname,
                                             {"Host1", "Host2", "Host3", "Host4"}, "", {
-                                                    {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "easy_bf"},
-                                                    {wrench::BatchComputeServiceProperty::BATCH_RJMS_DELAY, "0"},
-                                                    {wrench::BatchComputeServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION,"false"}
+                                                    {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM,     "easy_bf"},
+                                                    {wrench::BatchComputeServiceProperty::BATCH_RJMS_PADDING_DELAY,       "0"},
+                                                    {wrench::BatchComputeServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION, "false"}
                                             }));
 
 

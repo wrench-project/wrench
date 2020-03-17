@@ -454,7 +454,7 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobBasicEstimateWa
             new wrench::BatchComputeService(hostname,
                                             {"Host1", "Host2", "Host3", "Host4"}, "", {
                                                     {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"},
-                                                    {wrench::BatchComputeServiceProperty::BATCH_RJMS_DELAY, "0"}
+                                                    {wrench::BatchComputeServiceProperty::BATCH_RJMS_PADDING_DELAY, "0"}
                                             })));
 
     // Create a WMS
@@ -681,7 +681,7 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobEstimateWaiting
             new wrench::BatchComputeService(hostname,
                                             {"Host1", "Host2", "Host3", "Host4"}, "", {
                                                     {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"},
-                                                    {wrench::BatchComputeServiceProperty::BATCH_RJMS_DELAY, "0"}
+                                                    {wrench::BatchComputeServiceProperty::BATCH_RJMS_PADDING_DELAY, "0"}
                                             })));
 
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -953,7 +953,7 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobLittleComplexEs
             new wrench::BatchComputeService(hostname,
                                             {"Host1", "Host2", "Host3", "Host4"}, "", {
                                                     {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"},
-                                                    {wrench::BatchComputeServiceProperty::BATCH_RJMS_DELAY, "0"}
+                                                    {wrench::BatchComputeServiceProperty::BATCH_RJMS_PADDING_DELAY, "0"}
                                             })));
 
     // Create a WMS
