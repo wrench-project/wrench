@@ -222,11 +222,24 @@ set(SOURCE_FILES
         src/wrench/services/compute/batch/BatchJob.cpp
         src/wrench/services/compute/batch/BatchComputeServiceMessage.cpp
         src/wrench/services/compute/batch/BatchComputeService.cpp
-        src/wrench/services/compute/batch/WorkloadTraceFileReplayer.cpp
-        src/wrench/services/compute/batch/WorkloadTraceFileReplayerEventReceiver.cpp
+        src/wrench/services/compute/batch/workload_helper_classes/WorkloadTraceFileReplayer.cpp
+        src/wrench/services/compute/batch/workload_helper_classes/WorkloadTraceFileReplayerEventReceiver.cpp
         src/wrench/services/compute/batch/BatchComputeServiceProperty.cpp
         src/wrench/services/compute/batch/BatchComputeServiceMessagePayload.cpp
         src/wrench/services/compute/batch/BatschedNetworkListener.cpp
+        src/wrench/services/compute/batch/batch_schedulers/BatchScheduler.cpp
+        include/wrench/services/compute/batch/batch_schedulers/BatchScheduler.h
+        src/wrench/services/compute/batch/batch_schedulers/batsched/BatschedBatchScheduler.cpp
+        src/wrench/services/compute/batch/batch_schedulers/batsched/BatschedBatchScheduler.h
+        src/wrench/services/compute/batch/batch_schedulers/homegrown/HomegrownBatchScheduler.cpp
+        include/wrench/services/compute/batch/batch_schedulers/homegrown/HomegrownBatchScheduler.h
+        src/wrench/services/compute/batch/batch_schedulers/homegrown/fcfs/FCFSBatchScheduler.cpp
+        src/wrench/services/compute/batch/batch_schedulers/homegrown/fcfs/FCFSBatchScheduler.h
+        src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/CONSERVATIVEBFBatchScheduler.cpp
+        src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/CONSERVATIVEBFBatchScheduler.h
+        src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/NodeAvailabilityTimeLine.cpp
+        src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/NodeAvailabilityTimeLine.h
+        src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/BatchJobSet.h
         src/wrench/services/compute/htcondor/HTCondorComputeService.cpp
         src/wrench/services/compute/htcondor/HTCondorCentralManagerService.cpp
         src/wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessage.cpp
@@ -241,7 +254,7 @@ set(SOURCE_FILES
         src/wrench/util/PointerUtil.cpp
         src/wrench/util/PointerUtil.cpp
         src/wrench/util/MessageManager.cpp
-        src/wrench/services/compute/batch/TraceFileLoader.cpp
+        src/wrench/services/compute/batch/workload_helper_classes/TraceFileLoader.cpp
         src/wrench/util/UnitParser.cpp
         src/wrench/simulation/SimulationTimestampTypes.cpp
         )
@@ -276,6 +289,7 @@ set(TEST_FILES
         test/compute_services/BareMetalComputeService/BareMetalComputeServiceResourceInformationTest.cpp
         test/compute_services/BatchService/BatchServiceTest.cpp
         test/compute_services/BatchService/BatchServiceFCFSTest.cpp
+        test/compute_services/BatchService/BatchServiceCONSERVATIVEBFTest.cpp
         test/compute_services/BatchService/BatchServiceTraceFileTest.cpp
         test/compute_services/BatchService/BatchServiceOutputCSVFileTest.cpp
         test/compute_services/BatchService/BatchServiceBatschedQueueWaitTimePredictionTest.cpp

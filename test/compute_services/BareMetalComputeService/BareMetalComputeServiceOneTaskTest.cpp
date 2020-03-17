@@ -918,13 +918,13 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithLocationMap_test() {
     ASSERT_GT(task->getStartDate(), 0.0);
     ASSERT_GT(task->getEndDate(), 0.0);
     ASSERT_GT(task->getEndDate(), task->getStartDate());
-    ASSERT_EQ(workflow->getCompletionDate(), task->getEndDate());
+    ASSERT_LT(std::abs(workflow->getCompletionDate() - task->getEndDate()), 0.01);
 
     std::vector<wrench::SimulationTimestamp<wrench::SimulationTimestampTaskCompletion> *> task_completion_trace =
             simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>();
     ASSERT_EQ(simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>().size(), 1);
-    ASSERT_EQ(simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>()[0]->getContent()->getDate(),
-              task->getEndDate());
+    ASSERT_LT(std::abs(simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>()[0]->getContent()->getDate() -
+              task->getEndDate()), 0.01);
     ASSERT_EQ(simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>()[0]->getContent()->getTask(),
               task);
 
@@ -1198,8 +1198,8 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPrePostCopiesTaskCleanu
     std::vector<wrench::SimulationTimestamp<wrench::SimulationTimestampTaskCompletion> *> task_completion_trace =
             simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>();
     ASSERT_EQ(simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>().size(), 1);
-    ASSERT_EQ(simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>()[0]->getContent()->getDate(),
-              task->getEndDate());
+    ASSERT_LT(std::abs(simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>()[0]->getContent()->getDate()-
+              task->getEndDate()), 0.01);
     ASSERT_EQ(simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>()[0]->getContent()->getTask(),
               task);
 

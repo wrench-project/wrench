@@ -193,8 +193,8 @@ private:
             unsigned int nodes = 2;
             double walltime_seconds = 1000;
             //std::tuple<std::string,unsigned int,double> my_job = {job_id,nodes,walltime_seconds};
-            std::tuple<std::string,unsigned int,unsigned int, double> my_job = std::make_tuple(job_id,nodes,1, walltime_seconds);
-            std::set<std::tuple<std::string,unsigned int,unsigned int, double>> set_of_jobs = {my_job};
+            std::tuple<std::string,unsigned long,unsigned long, double> my_job = std::make_tuple(job_id,nodes,1, walltime_seconds);
+            std::set<std::tuple<std::string,unsigned long,unsigned long, double>> set_of_jobs = {my_job};
 
             std::map<std::string,double> jobs_estimated_start_times;
 
@@ -377,9 +377,9 @@ private:
             std::string job_id = "my_tentative_job";
             unsigned int nodes = 2;
             double walltime_seconds = 1000;
-            //std::tuple<std::string,unsigned int,double> my_job = {job_id,nodes,walltime_seconds};
-            std::tuple<std::string,unsigned int,unsigned int,double> my_job = std::make_tuple(job_id,nodes,1,walltime_seconds);
-            std::set<std::tuple<std::string,unsigned int,unsigned int, double>> set_of_jobs = {my_job};
+            //std::tuple<std::string,unsigned long,double> my_job = {job_id,nodes,walltime_seconds};
+            std::tuple<std::string,unsigned long,unsigned long,double> my_job = std::make_tuple(job_id,nodes,1,walltime_seconds);
+            std::set<std::tuple<std::string,unsigned long,unsigned long, double>> set_of_jobs = {my_job};
 
             std::map<std::string,double> jobs_estimated_start_times;
             try {
@@ -453,7 +453,8 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobBasicEstimateWa
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BatchComputeService(hostname,
                                             {"Host1", "Host2", "Host3", "Host4"}, "", {
-                                                    {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"}
+                                                    {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"},
+                                                    {wrench::BatchComputeServiceProperty::BATCH_RJMS_PADDING_DELAY, "0"}
                                             })));
 
     // Create a WMS
@@ -551,8 +552,8 @@ private:
             std::string job_id = "my_job1";
             unsigned int nodes = 2;
             double walltime_seconds = 1000;
-            std::tuple<std::string,unsigned int,unsigned int,double> my_job = std::make_tuple(job_id,nodes,1,walltime_seconds);
-            std::set<std::tuple<std::string,unsigned int,unsigned int,double>> set_of_jobs = {my_job};
+            std::tuple<std::string,unsigned long,unsigned long,double> my_job = std::make_tuple(job_id,nodes,1,walltime_seconds);
+            std::set<std::tuple<std::string,unsigned long,unsigned long,double>> set_of_jobs = {my_job};
             std::map<std::string,double> jobs_estimated_start_times = batch_service->getStartTimeEstimates(set_of_jobs);
             double expected_start_time = 300 - first_job_running; // in seconds
             double delta = std::abs(expected_start_time - (jobs_estimated_start_times[job_id] - 1));
@@ -611,12 +612,12 @@ private:
             }
 
             auto batch_service = (*this->getAvailableComputeServices<wrench::BatchComputeService>().begin());
-            std::set<std::tuple<std::string, unsigned int, unsigned int, double>> set_of_jobs = {};
+            std::set<std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs = {};
             for (int i=0; i<10; i++) {
                 std::string job_id = "new_job"+std::to_string(i);
                 unsigned int nodes = rand() % 4 + 1;
                 double walltime_seconds = nodes * (rand() % 10 + 1);
-                std::tuple<std::string, unsigned int, unsigned int, double> my_job = std::make_tuple(job_id, nodes,1, walltime_seconds);
+                std::tuple<std::string, unsigned long, unsigned long, double> my_job = std::make_tuple(job_id, nodes,1, walltime_seconds);
                 set_of_jobs.insert(my_job);
             }
             std::map<std::string, double> jobs_estimated_start_times = batch_service->getStartTimeEstimates(
@@ -680,7 +681,7 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobEstimateWaiting
             new wrench::BatchComputeService(hostname,
                                             {"Host1", "Host2", "Host3", "Host4"}, "", {
                                                     {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"},
-                                                    {wrench::BatchComputeServiceProperty::BATCH_RJMS_DELAY, "0"}
+                                                    {wrench::BatchComputeServiceProperty::BATCH_RJMS_PADDING_DELAY, "0"}
                                             })));
 
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -847,8 +848,8 @@ private:
             std::string job_id = "my_job1";
             unsigned int nodes = 1;
             double walltime_seconds = 400;
-            std::tuple<std::string,unsigned int,unsigned int,double> my_job = std::make_tuple(job_id,nodes,1,walltime_seconds);
-            std::set<std::tuple<std::string,unsigned int,unsigned int, double>> set_of_jobs = {my_job};
+            std::tuple<std::string,unsigned long,unsigned long,double> my_job = std::make_tuple(job_id,nodes,1,walltime_seconds);
+            std::set<std::tuple<std::string,unsigned long,unsigned long, double>> set_of_jobs = {my_job};
             std::map<std::string,double> jobs_estimated_start_times = batch_service->getStartTimeEstimates(set_of_jobs);
 
             if ((jobs_estimated_start_times[job_id] - 903) > 1) {
@@ -952,7 +953,7 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobLittleComplexEs
             new wrench::BatchComputeService(hostname,
                                             {"Host1", "Host2", "Host3", "Host4"}, "", {
                                                     {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"},
-                                                    {wrench::BatchComputeServiceProperty::BATCH_RJMS_DELAY, "0"}
+                                                    {wrench::BatchComputeServiceProperty::BATCH_RJMS_PADDING_DELAY, "0"}
                                             })));
 
     // Create a WMS

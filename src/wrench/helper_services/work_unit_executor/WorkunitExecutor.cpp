@@ -99,6 +99,8 @@ namespace wrench {
                 "In on_exit.cleanup(): WorkunitExecutor: %s has_returned_from_main = %d (return_value = %d, job forcefully terminated = %d)",
                 this->getName().c_str(), has_returned_from_main, return_value,
                 this->terminated_due_job_being_forcefully_terminated);
+
+        // Check if it's a failure!
         if ((not has_returned_from_main) and (this->task_start_timestamp_has_been_inserted) and
             (not this->task_failure_time_stamp_has_already_been_generated)) {
             if (this->workunit->task != nullptr) {
@@ -114,7 +116,11 @@ namespace wrench {
                             new SimulationTimestampTaskTermination(task));
                 }
             }
+        } else if ((this->workunit->task != nullptr) and this->task_completion_timestamp_should_be_generated){
+            this->simulation->getOutput().addTimestamp<SimulationTimestampTaskCompletion>(
+                    new SimulationTimestampTaskCompletion(this->workunit->task));
         }
+
     }
 
     /**
@@ -237,7 +243,7 @@ namespace wrench {
         }
 
         WRENCH_INFO("Work unit executor on host %s terminating!", S4U_Simulation::getHostName().c_str());
-        if (this->failure_timestamp_should_be_generated) {
+        if ((not this->task_failure_time_stamp_has_already_been_generated) and this->failure_timestamp_should_be_generated) {
             if (this->workunit->task != nullptr) {
                 WorkflowTask *task = this->workunit->task;
                 task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
@@ -316,6 +322,7 @@ namespace wrench {
             this->simulation->getOutput().addTimestamp<SimulationTimestampTaskStart>(
                     new SimulationTimestampTaskStart(task));
             this->task_start_timestamp_has_been_inserted = true;
+
 
             // Read  all input files
             WRENCH_INFO("Reading the %ld input files for task %s", task->getInputFiles().size(), task->getID().c_str());
@@ -418,8 +425,10 @@ namespace wrench {
 
             WRENCH_DEBUG("Setting the internal state of %s to TASK_COMPLETED", task->getID().c_str());
             task->setInternalState(WorkflowTask::InternalState::TASK_COMPLETED);
-            this->simulation->getOutput().addTimestamp<SimulationTimestampTaskCompletion>(
-                    new SimulationTimestampTaskCompletion(task));
+
+            this->task_completion_timestamp_should_be_generated = true;
+//            this->simulation->getOutput().addTimestamp<SimulationTimestampTaskCompletion>(
+//                    new SimulationTimestampTaskCompletion(task));
             task->setEndDate(S4U_Simulation::getClock());
 
             // Deal with Children

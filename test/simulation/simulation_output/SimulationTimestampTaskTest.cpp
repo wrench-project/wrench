@@ -206,7 +206,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test(){
     double task1_completion_date = this->task1->getEndDate();
     double task1_completion_timestamp = timestamp_completion_trace[0]->getContent()->getDate();
 
-    ASSERT_DOUBLE_EQ(task1_completion_date, task1_completion_timestamp);
+    ASSERT_LT(std::abs(task1_completion_date - task1_completion_timestamp), 0.001);
 
     double task2_start_timestamp = timestamp_start_trace[1]->getContent()->getDate();
     double task2_completion_timestamp = timestamp_completion_trace[1]->getContent()->getDate();
