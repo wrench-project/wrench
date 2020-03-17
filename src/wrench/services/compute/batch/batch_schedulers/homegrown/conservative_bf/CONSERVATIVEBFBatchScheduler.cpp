@@ -119,6 +119,33 @@ namespace wrench {
     void CONSERVATIVEBFBatchScheduler::compactSchedule() {
 
         WRENCH_INFO("Compacting schedule...");
+
+        // For each job in the order of the batch queue:
+        //   - remove the job from the schedule
+        //   - re-insert it as early as possible
+
+        // Reset the time origin
+        auto now = (u_int32_t)Simulation::getCurrentSimulatedDate();
+        this->schedule->setTimeOrigin(now);
+
+        // Go through the batch queue
+        for (auto const &batch_job : this->cs->batch_queue) {
+
+            // Remove the job from the schedule
+            this->schedule->remove(batch_job->conservative_bf_start_date, batch_job->conservative_bf_expected_end_date + 100, batch_job);
+
+            // Find the earliest start time
+            auto est = this->schedule->findEarliestStartTime(batch_job->getRequestedTime(), batch_job->getRequestedNumNodes());
+
+            // Insert it in the schedule
+            this->schedule->add(est, est + batch_job->getRequestedTime(), batch_job);
+
+            batch_job->conservative_bf_start_date = est;
+            batch_job->conservative_bf_expected_end_date = est + batch_job->getRequestedTime();
+        }
+
+
+#if 0 // OLD IMPLEMENTATION THAT RECONSTRUCTS THE SCHEDULE FROM SCRATCH
         // Clear the schedule
         this->schedule->clear();
 
@@ -139,6 +166,7 @@ namespace wrench {
             batch_job->conservative_bf_start_date = est;
             batch_job->conservative_bf_expected_end_date = est + batch_job->getRequestedTime();
         }
+#endif
 
 #ifdef PRINT_SCHEDULE
         this->schedule->print();
