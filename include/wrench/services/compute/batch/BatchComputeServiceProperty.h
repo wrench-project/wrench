@@ -126,7 +126,7 @@ namespace wrench {
          *        if a job says it wants to run for (at most) 60 seconds, the system
          *        will actually assume the job wants to run for (at most) 60 + 5 seconds.
          */
-        DECLARE_PROPERTY_NAME(BATCH_RJMS_DELAY);
+        DECLARE_PROPERTY_NAME(BATCH_RJMS_PADDING_DELAY);
 
         /** @brief Simulate computation as just a sleep instead of an actual compute thread. This is for scalability reason,
          *        and only simulation-valid

@@ -63,7 +63,7 @@ namespace wrench {
                 exit(2);
             }
 
-            std::string rjms_delay = this->cs->getPropertyValueAsString(BatchComputeServiceProperty::BATCH_RJMS_DELAY);
+            std::string rjms_delay = this->cs->getPropertyValueAsString(BatchComputeServiceProperty::BATCH_RJMS_PADDING_DELAY);
             std::string socket_endpoint = "tcp://*:" + std::to_string(this->batsched_port);
 
             char **args = NULL;
