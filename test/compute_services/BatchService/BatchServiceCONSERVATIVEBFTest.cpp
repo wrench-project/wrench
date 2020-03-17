@@ -240,7 +240,7 @@ void BatchServiceCONSERVATIVE_BFTest::do_SimpleCONSERVATIVE_BF_test() {
 /**********************************************************************/
 
 
-#define NUM_JOBS 500
+#define NUM_JOBS 300
 
 class LargeCONSERVATIVE_BFTestWMS : public wrench::WMS {
 
@@ -261,32 +261,27 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        // Create 4 1-min tasks and submit them as various shaped jobs
+        unsigned int random = this->test->seed;
 
         wrench::WorkflowTask *tasks[NUM_JOBS];
         wrench::StandardJob *jobs[NUM_JOBS];
+        // Create 4 1-min tasks and submit them as various shaped jobs
         for (int i=0; i < NUM_JOBS; i++) {
-            tasks[i] = this->getWorkflow()->addTask("task" + std::to_string(i), 60*(rand() % 10), 1, 1, 1.0, 0);
+            random = random  * 17 + 4123451;
+            tasks[i] = this->getWorkflow()->addTask("task" + std::to_string(i), 60 + 60*(random % 30), 1, 1, 1.0, 0);
             jobs[i] = job_manager->createStandardJob(tasks[i], {});
         }
-
-//        unsigned int random = 4;
-        srand(this->test->seed);
 
         // Submit jobs
         try {
             for (int i=0; i < NUM_JOBS; i++) {
                 std::map<std::string, std::string> job_specific_args;
-                job_specific_args["-N"] = std::to_string(1 + rand() % 4);
-//                random = random  * 17 + 4123451;
-//                job_specific_args["-N"] = std::to_string(1 + random % 4);
-                job_specific_args["-t"] = std::to_string(1 + rand() % 100);
-//                random = random  * 17 + 4123451;
-//                job_specific_args["-t"] = std::to_string(1 + random % 100);
+                random = random  * 17 + 4123451;
+                job_specific_args["-N"] = std::to_string(1 + random % 4);
+                random = random  * 17 + 4123451;
+                job_specific_args["-t"] = std::to_string(1 + random % 100);
                 job_specific_args["-c"] = "10";
                 job_manager->submitJob(jobs[i], this->test->compute_service, job_specific_args);
-//                std::cerr << "-N:" << job_specific_args["-N"];
-//                std::cerr << "-t:" << job_specific_args["-t"] <<  "\n";
             }
         } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error(
@@ -329,29 +324,43 @@ private:
         }
 
         // Print Completion times:
-//        WRENCH_INFO("----------");
-//        for (auto const &i : actual_completion_times) {
-//            wrench::StandardJob *job = i.second.first;
-//            double completion_time = i.second.second;
+#if 0
+        std::cerr << "--------------\n";
+        for (auto const &i : actual_completion_times) {
+            wrench::StandardJob *job = i.second.first;
+            double completion_time = i.second.second;
+            std::cerr << "- " << i.first.c_str()  <<  ":" << "\t-N:" <<
+                    job->getServiceSpecificArguments()["-N"].c_str() << " -t:"<<
+                    job->getServiceSpecificArguments()["-t"].c_str() << " (real=" <<
+                    job->getTasks().at(0)->getFlops()/60 << ")   \tCT="<<
+                    completion_time/60.0 << "\n";
 //            WRENCH_INFO("COMPLETION TIME %s (%s nodes, %s minutes): %lf",
 //                        i.first.c_str(),
 //                        job->getServiceSpecificArguments()["-N"].c_str(),
 //                        job->getServiceSpecificArguments()["-t"].c_str(),
 //                        completion_time);
-//        }
+        }
+#endif
 
         return 0;
     }
 };
 
+//  Discrepancy with BATSCHED
+//discrepancy: 6 jobs    seed=3!!
+//discrepancy: 5 jobs    seed=6!!
+//discrepancy: 4 jobs    seed=25!!
+//discrepancy: 3 jobs    seed=25
+
+
 #ifdef ENABLE_BATSCHED
-TEST_F(BatchServiceCONSERVATIVE_BFTest, DISABLED_LargeCONSERVATIVE_BFTest)
+TEST_F(BatchServiceCONSERVATIVE_BFTest, LargeCONSERVATIVE_BFTest)
 #else
 TEST_F(BatchServiceCONSERVATIVE_BFTest, LargeCONSERVATIVE_BFTest)
 #endif
 {
 //    DO_TEST_WITH_FORK(do_LargeCONSERVATIVE_BF_test);
-    for  (int seed = 1; seed < 2; seed++) {
+    for  (int seed =1; seed < 2; seed++) {
 //        std::cerr <<  "SEED = " << seed << "\n";
         DO_TEST_WITH_FORK_ONE_ARG(do_LargeCONSERVATIVE_BF_test, seed);
     }
@@ -379,7 +388,9 @@ void BatchServiceCONSERVATIVE_BFTest::do_LargeCONSERVATIVE_BF_test(int seed) {
     // Create a Batch Service with a fcfs scheduling algorithm
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BatchComputeService(hostname, {"Host1", "Host2", "Host3", "Host4"}, "",
-                                            {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"}})));
+                                            {
+                    {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"},
+                                             })));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 

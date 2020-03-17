@@ -67,18 +67,14 @@ namespace wrench {
         this->schedule->setTimeOrigin((u_int32_t)Simulation::getCurrentSimulatedDate());
 
         // Start  all non-started the jobs in the next slot!
-        auto next_jobs = this->schedule->getJobsInFirstSlot();
 
+        std::set<std::shared_ptr<BatchJob>> next_jobs = this->schedule->getJobsInFirstSlot();
         if (next_jobs.empty()) {
-            std::cerr <<  "this-.cs->batch_queue has " << this->cs->batch_queue.size() << "jobs\n";
-            for (auto const &j : this->cs->batch_queue) {
-                std::cerr << "    - " << j->getJobID() << "\n";
-            }
-            throw  std::runtime_error("CONSERVATIVEBFBatchScheduler::processQueuedJobs(): next_jobs is empty. This shouldn't happen");
+            this->compactSchedule();
+            next_jobs = this->schedule->getJobsInFirstSlot();
         }
 
         for (auto const &batch_job : next_jobs)  {
-
             // If the job has already been allocated resources, it's already running anyway
             if (not batch_job->resources_allocated.empty()) {
                 continue;
@@ -120,6 +116,11 @@ namespace wrench {
 
         WRENCH_INFO("Compacting schedule...");
 
+#ifdef PRINT_SCHEDULE
+        WRENCH_INFO("BEFORE COMPACTING");
+        this->schedule->print();
+#endif
+
         // For each job in the order of the batch queue:
         //   - remove the job from the schedule
         //   - re-insert it as early as possible
@@ -130,15 +131,21 @@ namespace wrench {
 
         // Go through the batch queue
         for (auto const &batch_job : this->cs->batch_queue) {
+//            WRENCH_INFO("DEALING WITH JOB %lu", batch_job->getJobID());
 
             // Remove the job from the schedule
+//            WRENCH_INFO("REMOVING IT FROM SCHEDULE");
             this->schedule->remove(batch_job->conservative_bf_start_date, batch_job->conservative_bf_expected_end_date + 100, batch_job);
+//            this->schedule->print();
 
             // Find the earliest start time
+//            WRENCH_INFO("FINDING EARLIEST START TIME");
             auto est = this->schedule->findEarliestStartTime(batch_job->getRequestedTime(), batch_job->getRequestedNumNodes());
-
+//            WRENCH_INFO("EARLIEST START TIME FOR IT: %u", est);
             // Insert it in the schedule
             this->schedule->add(est, est + batch_job->getRequestedTime(), batch_job);
+//            WRENCH_INFO("RE-INSERTED THERE!");
+//            this->schedule->print();
 
             batch_job->conservative_bf_start_date = est;
             batch_job->conservative_bf_expected_end_date = est + batch_job->getRequestedTime();
@@ -169,6 +176,7 @@ namespace wrench {
 #endif
 
 #ifdef PRINT_SCHEDULE
+        WRENCH_INFO("AFTER COMPACTING");
         this->schedule->print();
 #endif
     }
