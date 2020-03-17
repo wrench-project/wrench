@@ -155,7 +155,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     BatchComputeServiceJobRequestMessage::BatchComputeServiceJobRequestMessage(std::string answer_mailbox,
-                                                                               BatchJob *job, double payload)
+                                                                               std::shared_ptr<BatchJob> job, double payload)
             : BatchComputeServiceMessage("BatchComputeServiceJobRequestMessage", payload) {
         if (job == nullptr) {
             throw std::invalid_argument(
@@ -176,7 +176,7 @@ namespace wrench {
      *
      * @throw std::invalid_arguments
      */
-    AlarmJobTimeOutMessage::AlarmJobTimeOutMessage(BatchJob *job, double payload)
+    AlarmJobTimeOutMessage::AlarmJobTimeOutMessage(std::shared_ptr<BatchJob> job, double payload)
             : ServiceMessage("AlarmJobTimeOutMessage", payload) {
         if (job == nullptr) {
             throw std::invalid_argument(

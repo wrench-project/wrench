@@ -4,7 +4,6 @@ message(STATUS "Cmake version ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CM
 project(wrench CXX)
 
 add_definitions("-Wall -Wno-unused-variable -Wno-unused-private-field")
-add_definitions("-Wall -Wno-unused-variable -Wno-unused-private-field")
 if (ENABLE_BATSCHED)
     add_definitions(-DENABLE_BATSCHED)
 endif ()
@@ -12,13 +11,14 @@ if (ENABLE_MESSAGE_MANAGER)
     add_definitions(-DMESSAGE_MANAGER)
 endif ()
 
-set(SIMGRID_INSTALL_PATH "/usr/local/" CACHE PATH "The path to SimGrid's installation directory")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/conf/cmake/")
+find_package(SimGrid REQUIRED)
 
 set(CMAKE_CXX_STANDARD 11)
 
 # build the version number
 set(WRENCH_VERSION_MAJOR "1")
-set(WRENCH_VERSION_MINOR "5")
+set(WRENCH_VERSION_MINOR "6")
 set(WRENCH_VERSION_PATCH "0")
 set(WRENCH_VERSION_EXTRA "dev")
 
@@ -34,7 +34,7 @@ endif ()
 
 message(STATUS "Building WRENCH Version: ${WRENCH_RELEASE_VERSION}")
 
-include_directories(src/wrench/ include/ ${SIMGRID_INSTALL_PATH}/include /usr/include  /usr/local/include /opt/local/include)
+include_directories(src/wrench/ include/ ${SimGrid_INCLUDE_DIR}/include /usr/include  /usr/local/include /opt/local/include)
 
 
 # library header files
@@ -222,11 +222,24 @@ set(SOURCE_FILES
         src/wrench/services/compute/batch/BatchJob.cpp
         src/wrench/services/compute/batch/BatchComputeServiceMessage.cpp
         src/wrench/services/compute/batch/BatchComputeService.cpp
-        src/wrench/services/compute/batch/WorkloadTraceFileReplayer.cpp
-        src/wrench/services/compute/batch/WorkloadTraceFileReplayerEventReceiver.cpp
+        src/wrench/services/compute/batch/workload_helper_classes/WorkloadTraceFileReplayer.cpp
+        src/wrench/services/compute/batch/workload_helper_classes/WorkloadTraceFileReplayerEventReceiver.cpp
         src/wrench/services/compute/batch/BatchComputeServiceProperty.cpp
         src/wrench/services/compute/batch/BatchComputeServiceMessagePayload.cpp
         src/wrench/services/compute/batch/BatschedNetworkListener.cpp
+        src/wrench/services/compute/batch/batch_schedulers/BatchScheduler.cpp
+        include/wrench/services/compute/batch/batch_schedulers/BatchScheduler.h
+        src/wrench/services/compute/batch/batch_schedulers/batsched/BatschedBatchScheduler.cpp
+        src/wrench/services/compute/batch/batch_schedulers/batsched/BatschedBatchScheduler.h
+        src/wrench/services/compute/batch/batch_schedulers/homegrown/HomegrownBatchScheduler.cpp
+        include/wrench/services/compute/batch/batch_schedulers/homegrown/HomegrownBatchScheduler.h
+        src/wrench/services/compute/batch/batch_schedulers/homegrown/fcfs/FCFSBatchScheduler.cpp
+        src/wrench/services/compute/batch/batch_schedulers/homegrown/fcfs/FCFSBatchScheduler.h
+        src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/CONSERVATIVEBFBatchScheduler.cpp
+        src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/CONSERVATIVEBFBatchScheduler.h
+        src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/NodeAvailabilityTimeLine.cpp
+        src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/NodeAvailabilityTimeLine.h
+        src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/BatchJobSet.h
         src/wrench/services/compute/htcondor/HTCondorComputeService.cpp
         src/wrench/services/compute/htcondor/HTCondorCentralManagerService.cpp
         src/wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessage.cpp
@@ -241,7 +254,7 @@ set(SOURCE_FILES
         src/wrench/util/PointerUtil.cpp
         src/wrench/util/PointerUtil.cpp
         src/wrench/util/MessageManager.cpp
-        src/wrench/services/compute/batch/TraceFileLoader.cpp
+        src/wrench/services/compute/batch/workload_helper_classes/TraceFileLoader.cpp
         src/wrench/util/UnitParser.cpp
         src/wrench/simulation/SimulationTimestampTypes.cpp
         )
@@ -276,6 +289,7 @@ set(TEST_FILES
         test/compute_services/BareMetalComputeService/BareMetalComputeServiceResourceInformationTest.cpp
         test/compute_services/BatchService/BatchServiceTest.cpp
         test/compute_services/BatchService/BatchServiceFCFSTest.cpp
+        test/compute_services/BatchService/BatchServiceCONSERVATIVEBFTest.cpp
         test/compute_services/BatchService/BatchServiceTraceFileTest.cpp
         test/compute_services/BatchService/BatchServiceOutputCSVFileTest.cpp
         test/compute_services/BatchService/BatchServiceBatschedQueueWaitTimePredictionTest.cpp
@@ -297,6 +311,8 @@ set(TEST_FILES
         test/simulation/SimulationLoggingTest.cpp
         test/simulation/simulation_output/SimulationOutputTest.cpp
         test/simulation/simulation_output/SimulationTimestampTaskTest.cpp
+        test/simulation/simulation_output/SimulationTimestampFileReadTest.cpp
+        test/simulation/simulation_output/SimulationTimestampFileWriteTest.cpp
         test/simulation/simulation_output/SimulationTimestampFileCopyTest.cpp
         test/simulation/simulation_output/SimulationTimestampEnergyTest.cpp
         test/simulation/InvalidXMLTest.cpp
@@ -338,19 +354,13 @@ set(TEST_FILES
         test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.h
         test/simulation/S4U_MailboxTest.cpp)
 
-# sigmgrid library
-find_library(SIMGRID_LIBRARY NAMES simgrid HINTS ${SIMGRID_INSTALL_PATH}/lib NO_DEFAULT_PATH)
-if (NOT SIMGRID_LIBRARY)
-    message(FATAL_ERROR "SimGrid library not found. Perhaps an invalid SIMGRID_INSTALL_PATH specification (${SIMGRID_INSTALL_PATH})?")
-endif()
-
 find_library(PUGIXML_LIBRARY NAMES pugixml)
 find_library(LEMON_LIBRARY NAMES emon lemon)
 find_library(GTEST_LIBRARY NAMES gtest)
 
 add_library(wrench STATIC ${SOURCE_FILES})
 set_target_properties(wrench PROPERTIES VERSION ${WRENCH_RELEASE_VERSION})
-target_link_libraries(wrench ${SIMGRID_LIBRARY} ${PUGIXML_LIBRARY} ${LEMON_LIBRARY})
+target_link_libraries(wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY} ${LEMON_LIBRARY})
 
 # wrench version
 add_custom_command(TARGET wrench PRE_LINK COMMAND ${CMAKE_COMMAND} -DPROJECT_SOURCE_DIR=${PROJECT_SOURCE_DIR} -DWRENCH_RELEASE_VERSION=${WRENCH_RELEASE_VERSION} -P ${CMAKE_HOME_DIRECTORY}/conf/cmake/Version.cmake)

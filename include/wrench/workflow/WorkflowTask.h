@@ -105,9 +105,9 @@ namespace wrench {
 
         unsigned long getBytesWritten() const;
 
-        std::set<WorkflowFile *> getInputFiles();
+        std::vector<WorkflowFile *> getInputFiles();
 
-        std::set<WorkflowFile *> getOutputFiles();
+        std::vector<WorkflowFile *> getOutputFiles();
 
         unsigned long getTopLevel();
 

@@ -136,3 +136,64 @@ function determineTaskOverlap(data) {
     })
     return taskOverlap
 }
+
+function searchOverlap(taskId, taskOverlap) {
+    for (var key in taskOverlap) {
+        if (taskOverlap.hasOwnProperty(key)) {
+            var currOverlap = taskOverlap[key]
+            for (var i = 0; i < currOverlap.length; i++) {
+                if (currOverlap[i].task_id === taskId) {
+                    return key
+                }
+            }
+        }
+    }
+}
+
+function extractFileContent(file) {
+    return new Promise(function(resolve, reject) {
+        let reader = new FileReader()
+        reader.onload = function(event) {
+            resolve(event.target.result);
+            // document.getElementById('fileContent').textContent = event.target.result;
+        }
+        reader.readAsText(file);
+        setTimeout(function() {
+            reject()
+        }, 5000)
+    })
+}
+
+function processFile(files, fileType) {
+    if (files.length === 0) {
+        return
+    }
+    extractFileContent(files[0])
+        .then(function(rawDataString) {
+            switch (fileType) {
+                case "taskData":
+                    const rawData = JSON.parse(rawDataString)
+                    if (!rawData.workflow_execution || !rawData.workflow_execution.tasks) {
+                        break
+                    }
+                    data = {
+                        file: files[0].name,
+                        contents: rawData.workflow_execution.tasks
+                    }
+                    break
+                case "energy":
+                    energyData = JSON.parse(rawData)
+                    break
+            }
+            initialise()
+        })
+        .catch(function() {
+            return
+        })
+}
+
+function sanitizeId(id) {
+    id = id.replace('#', '')
+    id = id.replace(' ', '')
+    return id
+}

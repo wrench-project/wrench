@@ -626,27 +626,27 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the set of input WorkflowFile objects for the task
-     * @return a set workflow files
+     * @brief Get the list of input WorkflowFile objects for the task
+     * @return a list workflow files
      */
-    std::set<WorkflowFile *> WorkflowTask::getInputFiles() {
-        std::set<WorkflowFile *> input;
+    std::vector<WorkflowFile *> WorkflowTask::getInputFiles() {
+        std::vector<WorkflowFile *> input;
 
         for (auto f: this->input_files) {
-            input.insert(f.second);
+            input.push_back(f.second);
         }
         return input;
     }
 
     /**
-     * @brief Get the set of output WorkflowFile objects for the task
-     * @return a set of workflow files
+     * @brief Get the list of output WorkflowFile objects for the task
+     * @return a list of workflow files
      */
-    std::set<WorkflowFile *> WorkflowTask::getOutputFiles() {
-        std::set<WorkflowFile *> output;
+    std::vector<WorkflowFile *> WorkflowTask::getOutputFiles() {
+        std::vector<WorkflowFile *> output;
 
         for (auto f: this->output_files) {
-            output.insert(f.second);
+            output.push_back(f.second);
         }
         return output;
     }

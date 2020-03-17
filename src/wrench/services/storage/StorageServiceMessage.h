@@ -135,7 +135,6 @@ namespace wrench {
                                              std::shared_ptr<FileLocation> src,
                                              std::shared_ptr<FileLocation> dst,
                                              std::shared_ptr<FileRegistryService> file_registry_service,
-                                             SimulationTimestampFileCopyStart *start_timestamp,
                                              double payload);
 
         /** @brief Mailbox to which the answer message should be sent */
@@ -148,8 +147,6 @@ namespace wrench {
         std::shared_ptr<FileLocation> dst;
         /** @brief The file registry service to update, or none if nullptr */
         std::shared_ptr<FileRegistryService> file_registry_service;
-        /** @brief The SimulationTimestampFileCopyStart associated with this file copy request */
-        SimulationTimestampFileCopyStart *start_timestamp;
     };
 
     /**

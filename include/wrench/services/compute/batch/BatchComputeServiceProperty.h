@@ -29,7 +29,8 @@ namespace wrench {
         /**
          * @brief The batch scheduling algorithm. Can be:
          *    - If ENABLE_BATSCHED is set to off / not set:
-         *      - "FCFS": First Come First Serve
+         *      - "fcfs": First Come First Serve
+         *      - "conservative_bf": a home-grown implementation of FCFS with conservative backfilling, which only  allocates resources at the node level
          *    - If ENABLE_BATSCHED is set to on:
          *      - whatever scheduling algorithm is supported by Batsched
          *        (by default: "conservative_bf", other options include
@@ -49,8 +50,8 @@ namespace wrench {
 
         /**
          * @brief The host selection algorithm. Can be:
-         *      - If ENABLE_BATSCHED is set to off or not set: ignored
-         *      - If ENABLE_BATSCHED is set to on:
+         *      - If ENABLE_BATSCHED is set to on or if the BATCH_SCHEDULING_ALGORITHM is not fcfs: ignored
+         *      - If ENABLE_BATSCHED is set to off or not set, and if the BATCH_SCHEDULING_ALGORITHM is fcfs:
          *          - FIRSTFIT  (default)
          *          - BESTFIT
          *          - ROUNDROBIN
@@ -125,7 +126,7 @@ namespace wrench {
          *        if a job says it wants to run for (at most) 60 seconds, the system
          *        will actually assume the job wants to run for (at most) 60 + 5 seconds.
          */
-        DECLARE_PROPERTY_NAME(BATCH_RJMS_DELAY);
+        DECLARE_PROPERTY_NAME(BATCH_RJMS_PADDING_DELAY);
 
         /** @brief Simulate computation as just a sleep instead of an actual compute thread. This is for scalability reason,
          *        and only simulation-valid

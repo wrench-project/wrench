@@ -17,7 +17,7 @@ int main(int argc, char **argv) {
     xbt_log_control_set("root.thresh:critical");
 
 //   Example selective log enabling
-//   xbt_log_control_set("simulation_timestamps.thresh:debug");
+//    xbt_log_control_set("simulation_timestamps.thresh:debug");
 //   xbt_log_control_set("mailbox.thresh:debug");
 //   xbt_log_control_set("comprehensive_failure_integration_test.thresh:info");
 //   xbt_log_control_set("s4u_daemon.thresh:info");

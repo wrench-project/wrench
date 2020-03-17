@@ -442,7 +442,7 @@ private:
         auto job_manager = this->createJobManager();
 
         wrench::Simulation::sleep(10);
-        // At this point, using the FCFS algorithm, a 2-node 30-min job should complete around t=1.5 hours
+        // At this point, using the fcfs algorithm, a 2-node 30-min job should complete around t=1.5 hours
         // and 4-node 30-min job should complete around t=2.5 hours
 
         std::vector<wrench::WorkflowTask *> tasks;
@@ -1170,7 +1170,7 @@ private:
         auto job_manager = this->createJobManager();
 
         wrench::Simulation::sleep(10);
-        // At this point, using the FCFS algorithm, a 2-node 30-min job should complete around t=1.5 hours
+        // At this point, using the fcfs algorithm, a 2-node 30-min job should complete around t=1.5 hours
         // and 4-node 30-min job should complete around t=2.5 hours
 
         std::vector<wrench::WorkflowTask *> tasks;
