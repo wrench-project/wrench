@@ -37,7 +37,6 @@ namespace wrench {
      * @param answer_mailbox_if_copy: the mailbox to send an answer to in case this was a file copy ("" if none). This
      *        will simply be reported to the parent service, who may use it as needed
      * @param buffer_size: the buffer size to use
-     * @param start_timestamp: if this is a file copy, a start timestamp associated with it
      */
     FileTransferThread::FileTransferThread(std::string hostname,
                                            std::shared_ptr<StorageService> parent,
@@ -47,16 +46,14 @@ namespace wrench {
                                            std::string answer_mailbox_if_read,
                                            std::string answer_mailbox_if_write,
                                            std::string answer_mailbox_if_copy,
-                                           unsigned long buffer_size,
-                                           SimulationTimestampFileCopyStart *start_timestamp) :
+                                           unsigned long buffer_size) :
             Service(hostname, "file_transfer_thread", "file_transfer_thread"),
             parent(parent),
             file(file),
             answer_mailbox_if_read(answer_mailbox_if_read),
             answer_mailbox_if_write(answer_mailbox_if_write),
             answer_mailbox_if_copy(answer_mailbox_if_copy),
-            buffer_size(buffer_size),
-            start_timestamp(start_timestamp)
+            buffer_size(buffer_size)
     {
         this->src_mailbox = src_mailbox;
         this->src_location = nullptr;
@@ -78,7 +75,6 @@ namespace wrench {
      * @param answer_mailbox_if_copy: the mailbox to send an answer to in case this was a file copy ("" if none). This
      *        will simply be reported to the parent service, who may use it as needed
      * @param buffer_size: the buffer size to use
-     * @param start_timestamp: if this is a file copy, a start timestamp associated with it
      */
     FileTransferThread::FileTransferThread(std::string hostname,
                                            std::shared_ptr<StorageService> parent,
@@ -88,16 +84,14 @@ namespace wrench {
                                            std::string answer_mailbox_if_read,
                                            std::string answer_mailbox_if_write,
                                            std::string answer_mailbox_if_copy,
-                                           unsigned long buffer_size,
-                                           SimulationTimestampFileCopyStart *start_timestamp) :
+                                           unsigned long buffer_size) :
             Service(hostname, "file_transfer_thread", "file_transfer_thread"),
             parent(parent),
             file(file),
             answer_mailbox_if_read(answer_mailbox_if_read),
             answer_mailbox_if_write(answer_mailbox_if_write),
             answer_mailbox_if_copy(answer_mailbox_if_copy),
-            buffer_size(buffer_size),
-            start_timestamp(start_timestamp)
+            buffer_size(buffer_size)
     {
         this->src_mailbox = "";
         this->src_location = src_location;
@@ -119,7 +113,6 @@ namespace wrench {
      * @param answer_mailbox_if_copy: the mailbox to send an answer to in case this was a file copy ("" if none). This
      *        will simply be reported to the parent service, who may use it as needed
      * @param buffer_size: the buffer size to use
-     * @param start_timestamp: if this is a file copy, a start timestamp associated with it
      */
     FileTransferThread::FileTransferThread(std::string hostname,
                                            std::shared_ptr<StorageService> parent,
@@ -129,16 +122,14 @@ namespace wrench {
                                            std::string answer_mailbox_if_read,
                                            std::string answer_mailbox_if_write,
                                            std::string answer_mailbox_if_copy,
-                                           unsigned long buffer_size,
-                                           SimulationTimestampFileCopyStart *start_timestamp) :
+                                           unsigned long buffer_size) :
             Service(hostname, "file_transfer_thread", "file_transfer_thread"),
             parent(parent),
             file(file),
             answer_mailbox_if_read(answer_mailbox_if_read),
             answer_mailbox_if_write(answer_mailbox_if_write),
             answer_mailbox_if_copy(answer_mailbox_if_copy),
-            buffer_size(buffer_size),
-            start_timestamp(start_timestamp)
+            buffer_size(buffer_size)
     {
         this->src_mailbox = "";
         this->src_location = src_location;
@@ -161,6 +152,8 @@ namespace wrench {
      * @return 0 on success, non-zero otherwise
      */
     int FileTransferThread::main() {
+
+        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_CYAN);
 
         FileTransferThreadNotificationMessage *msg_to_send_back = nullptr;
         std::shared_ptr<NetworkError> failure_cause = nullptr;
@@ -188,8 +181,7 @@ namespace wrench {
                 this->answer_mailbox_if_read,
                 this->answer_mailbox_if_write,
                 this->answer_mailbox_if_copy,
-                true, nullptr,
-                this->start_timestamp);
+                true, nullptr);
 
 
         if ((this->src_location) and (this->src_location->getStorageService() == this->parent) and
@@ -335,6 +327,7 @@ namespace wrench {
 
                 while (remaining > 0) {
                     double chunk_size = std::min<double>(this->buffer_size, remaining);
+                    WRENCH_INFO("Reading %s bytes from disk", std::to_string(chunk_size).c_str());
                     S4U_Simulation::readFromDisk(chunk_size, location->getStorageService()->hostname,
                                                  location->getMountPoint());
                     remaining -= this->buffer_size;

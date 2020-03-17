@@ -1,6 +1,3 @@
-body {
-    padding: 20px;
-}
 #tooltip-container {
     position: absolute;
     width: auto;
@@ -26,12 +23,28 @@ body {
     font-size: 12px;
 }
 #logo {
-    width: 150px;
-    margin-bottom: 20px;
+    width: 7rem;
 }
+
 #overall-graph-container {
     width: 1000px;
     margin: auto;
+}
+
+#nav-bar-top-half {
+    display: flex;
+}
+
+#file-upload {
+    margin-left: auto;
+}
+
+.file-upload-container {
+    display: flex;
+}
+
+.file-upload-subtitle {
+    margin-right: 1rem;
 }
 
 #host-graph-container {
@@ -41,8 +54,17 @@ body {
 }
 
 #info-container {
-    text-align: center;
+    background-color: #DCDCDC;
+    margin-bottom: 20px;
+    padding-top: 20px;
+    padding-bottom: 20px;
 }
+
+#logo-and-title {
+    display: flex;
+    align-items: center;
+}
+
 #workflow-execution-chart-legend {
     overflow-wrap: break-word;
 }

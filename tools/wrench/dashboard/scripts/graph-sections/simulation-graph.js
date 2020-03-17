@@ -128,7 +128,7 @@ function generateGraph(data, containerId, currGraphState, CONTAINER_WIDTH, CONTA
         var height = data.length > 1 ? yscale(data[0].task_id)-yscale(data[1].task_id) : CONTAINER_HEIGHT - PADDING - RANGE_END;
         var yScaleNumber = data.length > 1 ? yscale(d.task_id) : RANGE_END
         var group = svg.append('g')
-           .attr('id', d.task_id)
+           .attr('id', sanitizeId(d.task_id))
         var readTime = getBoxWidth(d, "read", xscale)
         var computeTime = getBoxWidth(d, "compute", xscale)
         var writeTime = getBoxWidth(d, "write", xscale)
@@ -193,7 +193,7 @@ function generateGraph(data, containerId, currGraphState, CONTAINER_WIDTH, CONTA
 
                 tooltip_task_id.text('TaskID: ' + d.task_id)
 
-                tooltip_host.text('Host Name: ' + d.execution_host.hostname)
+                tooltip_host.text('Host Name: ' + d['execution host'].hostname)
 
                 var parent_group = d3.select(this).attr('class')
 

@@ -12,7 +12,6 @@
 #define WRENCH_MULTITASKJOB_H
 
 
-#include <vector>
 #include <map>
 #include <set>
 #include <vector>
@@ -70,19 +69,21 @@ namespace wrench {
 
         /** @brief The job's computational tasks */
         std::vector<WorkflowTask *> tasks;
+
         /** @brief The job's total computational cost (in flops) */
         double total_flops;
         /** @brief The number of computational tasks that have completed */
         unsigned long num_completed_tasks;
+
         /** @brief The file locations that tasks should read/write files from/to */
         std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations;
-        /** @brief The file copy operations to perform before computational tasks */
-        std::set<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  , std::shared_ptr<FileLocation>  >> pre_file_copies;
 
-        /** @brief The file copy operations to perform after computational tasks */
-        std::set<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  , std::shared_ptr<FileLocation>  >> post_file_copies;
-        /** @brief The file deletion operations to perform at the end */
-        std::set<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  >> cleanup_file_deletions;
+        /** @brief The ordered file copy operations to perform before computational tasks */
+        std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  , std::shared_ptr<FileLocation>  >> pre_file_copies;
+        /** @brief The ordered file copy operations to perform after computational tasks */
+        std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  , std::shared_ptr<FileLocation>  >> post_file_copies;
+        /** @brief The ordered file deletion operations to perform at the end */
+        std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  >> cleanup_file_deletions;
 
     private:
 
@@ -95,9 +96,9 @@ namespace wrench {
 
         StandardJob(Workflow *workflow,
                     std::vector<WorkflowTask *> tasks, std::map<WorkflowFile *, std::shared_ptr<FileLocation>  > &file_locations,
-                    std::set<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  , std::shared_ptr<FileLocation>  >> &pre_file_copies,
-                    std::set<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  , std::shared_ptr<FileLocation>  >> &post_file_copies,
-                    std::set<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  >> &cleanup_file_deletions);
+                    std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  , std::shared_ptr<FileLocation>  >> &pre_file_copies,
+                    std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  , std::shared_ptr<FileLocation>  >> &post_file_copies,
+                    std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  >> &cleanup_file_deletions);
 
         State state;
 

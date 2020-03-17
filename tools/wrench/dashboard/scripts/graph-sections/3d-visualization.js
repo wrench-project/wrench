@@ -1,57 +1,57 @@
-var origin = [0, 200]
-var startAngle = Math.PI/4
-var yAngle = startAngle
-var xAngle = -startAngle
-var taskOverlap = determineTaskOverlap(data.contents)
-var maxTaskOverlap = Object.keys(taskOverlap).length + 1
-var maxTime = d3.max(data.contents, function(d) {
-    return Math.max(d['whole_task'].end, d['failed'], d['terminated'])
-})
-var timeScalingFactor = maxTime / 32 // 32 is the ideal number of columns for the width of the space
-if (timeScalingFactor < 10) {
-    timeScalingFactor = 10
-} else {
-    timeScalingFactor = Math.round(timeScalingFactor / 10) * 10 // round to the nearest 10
-}
-var scale = maxTaskOverlap * 2
+var origin, startAngle, xAngle, yAngle
+var taskOverlap, maxTaskOverlap
+var maxTime, timeScalingFactor
+var scale
 var svg
 var cubesGroup
-var originXBox
-var originYBox
-var timeIntervalBox
-var scaleBox
+var originXBox, originYBox, timeIntervalBox, scaleBox
 var key = function(d) { return d.task_id; }
 var color  = d3.scaleOrdinal(d3.schemeCategory20)
 var mx, my, mouseX, mouseY
 var threeDColourMap = {}
 var currentlySelectedCube
 var cubeIsClicked = false
-var grid3d = d3._3d()
-    .shape('GRID', maxTaskOverlap)
-    .origin(origin)
-    .rotateY( startAngle)
-    .rotateX(-startAngle)
-    .scale(scale)
+var grid3d, scale3d, cubes3d
 
-var scale3d = d3._3d()
-    .shape('LINE_STRIP')
-    .origin(origin)
-    .rotateY( startAngle)
-    .rotateX(-startAngle)
-    .scale(scale)
-
-var cubes3d = d3._3d()
-    .shape('CUBE')
-    .x(function(d){ return d.x; })
-    .y(function(d){ return d.y; })
-    .z(function(d){ return d.z; })
-    .rotateY( startAngle)
-    .rotateX(-startAngle)
-    .origin(origin)
-    .scale(scale)
-
-
-
+function initialise3dGraph() {
+    origin = [0, 200]
+    startAngle = Math.PI/4
+    yAngle = startAngle
+    xAngle = -startAngle
+    taskOverlap = determineTaskOverlap(data.contents)
+    maxTaskOverlap = Object.keys(taskOverlap).length + 1
+    maxTime = d3.max(data.contents, function(d) {
+        return Math.max(d['whole_task'].end, d['failed'], d['terminated'])
+    })
+    timeScalingFactor = maxTime / 32 // 32 is the ideal number of columns for the width of the space
+    if (timeScalingFactor < 10) {
+        timeScalingFactor = 10
+    } else {
+        timeScalingFactor = Math.round(timeScalingFactor / 10) * 10 // round to the nearest 10
+    }
+    scale = maxTaskOverlap * 2
+    grid3d = d3._3d()
+        .shape('GRID', maxTaskOverlap)
+        .origin(origin)
+        .rotateY( startAngle)
+        .rotateX(-startAngle)
+        .scale(scale)
+    scale3d = d3._3d()
+        .shape('LINE_STRIP')
+        .origin(origin)
+        .rotateY( startAngle)
+        .rotateX(-startAngle)
+        .scale(scale)
+    cubes3d = d3._3d()
+        .shape('CUBE')
+        .x(function(d){ return d.x; })
+        .y(function(d){ return d.y; })
+        .z(function(d){ return d.z; })
+        .rotateY( startAngle)
+        .rotateX(-startAngle)
+        .origin(origin)
+        .scale(scale)
+}
 
 function changeOriginOrScale(newOrigin, newScale) {
     origin = newOrigin
@@ -93,7 +93,7 @@ function changeOriginOrScale(newOrigin, newScale) {
 
 function changeTimeScalingFactor(factor) {
     timeScalingFactor = factor
-    generate3dGraph(data.contents, false)
+    generate3dGraph(data.contents, false, false)
 }
 
 function showInstructions(instructions, img) {
@@ -111,19 +111,6 @@ function determineMaxNumCoresAllocated(data) {
         }
     })
     return max
-}
-
-function searchOverlap(taskId, taskOverlap) {
-    for (var key in taskOverlap) {
-        if (taskOverlap.hasOwnProperty(key)) {
-            var currOverlap = taskOverlap[key]
-            for (var i = 0; i < currOverlap.length; i++) {
-                if (currOverlap[i].task_id === taskId) {
-                    return key
-                }
-            }
-        }
-    }
 }
 
 function makeCube(h, x, z, duration, colour, taskId){
@@ -199,7 +186,7 @@ function showAndPopulateTooltip(d) {
 
     tooltipTaskId.text('TaskID: ' + d.task_id)
 
-    tooltipHost.text('Host Name: ' + d.execution_host.hostname)
+    tooltipHost.text('Host Name: ' + d['execution host'].hostname)
 
     var durationFull = findDuration(data.contents, d.task_id, "whole_task")
     tooltipDuration.text('Duration: ' + toFiveDecimalPlaces(durationFull) + 's')
@@ -460,14 +447,19 @@ function processData(data, tt, populateLegend){
 
 /*
     data: data to generate graph in json array
-    populateLegend: pass in true
+    populateLegend: pass in true, this is for initial dashboard
+    needToInitialse: whether you want to reset all of the parameters for the 3d graph
     svgId: id of the <svg> that will contain the graph
     originXId: id of the <input> element that has the value for the X origin 
     originyId: id of the <input> element that has the value for the Y origin
     timeIntervalId: id of the <input> element that has the value for the time interval on the time axis of the graph
     scaleInputId: id of the <input> element that has the value for the scale of the Z axis
 */
-function generate3dGraph(data, populateLegend, svgId, originXId, originYId, timeIntervalId, scaleInputId) {
+function generate3dGraph(data, populateLegend, needToInitialise, svgId, originXId, originYId, timeIntervalId, scaleInputId) {
+    if (needToInitialise) {
+        initialise3dGraph()
+    }
+
     if (svgId) {
         svg    = d3.select(`#${svgId}`).call(d3.drag().on('drag', dragged).on('start', dragStart).on('end', dragEnd)).append('g')
         cubesGroup = svg.append('g').attr('class', 'cubes')
@@ -476,15 +468,15 @@ function generate3dGraph(data, populateLegend, svgId, originXId, originYId, time
     if (originXId) {
         originXBox = document.getElementById(originXId)
     }
-    
+
     if (originYId) {
         originYBox = document.getElementById(originYId)
     }
-    
+
     if (timeIntervalId) {
         timeIntervalBox = document.getElementById(timeIntervalId)
     }
-    
+
     if (scaleInputId) {
         scaleBox = document.getElementById(scaleInputId)
     }
@@ -557,5 +549,4 @@ function generate3dGraph(data, populateLegend, svgId, originXId, originYId, time
         cubes3d(ftCubesData)
     ];
     processData(threeDdata, 1000, populateLegend);
-
 }

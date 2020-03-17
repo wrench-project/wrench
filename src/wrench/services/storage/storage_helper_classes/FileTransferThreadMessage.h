@@ -62,7 +62,6 @@ namespace wrench {
          * @param answer_mailbox_if_copy: the mailbox that a "copy is done/failed" may be sent if necessary
          * @param success: whether the transfer succeeded
          * @param failure_cause: the failure cause (nullptr if success)
-         * @param start_time_stamp: the start time stamp
          */
         FileTransferThreadNotificationMessage(std::shared_ptr<FileTransferThread> file_transfer_thread,
                                               WorkflowFile *file,
@@ -73,8 +72,7 @@ namespace wrench {
                                               std::string answer_mailbox_if_read,
                                               std::string answer_mailbox_if_write,
                                               std::string answer_mailbox_if_copy,
-                                              bool success, std::shared_ptr<FailureCause> failure_cause,
-                                              SimulationTimestampFileCopyStart *start_time_stamp) :
+                                              bool success, std::shared_ptr<FailureCause> failure_cause) :
                 FileTransferThreadMessage("FileTransferThreadNotificationMessage", 0),
                 file_transfer_thread(file_transfer_thread),
                 file(file),
@@ -84,7 +82,7 @@ namespace wrench {
                 answer_mailbox_if_write(answer_mailbox_if_write),
                 answer_mailbox_if_copy(answer_mailbox_if_copy),
                 success(success),
-                failure_cause(failure_cause), start_time_stamp(start_time_stamp) {}
+                failure_cause(failure_cause) {}
 
         /** @brief File transfer thread that sent this message */
         std::shared_ptr<FileTransferThread> file_transfer_thread;
@@ -111,8 +109,6 @@ namespace wrench {
         bool success;
         /** @brief The failure cause is case of a failure */
         std::shared_ptr<FailureCause> failure_cause;
-        /** @brief A start time stamp */
-        SimulationTimestampFileCopyStart *start_time_stamp;
     };
 
 

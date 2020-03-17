@@ -5,6 +5,7 @@
     tdClass: class name you want applied to each td
 */
 function populateWorkflowTaskDataTable(data, tableId, tableBodyId, tdClass) {
+    document.getElementById(tableId).innerHTML = simulationDetailsHtml
     d3.select(`#${tableId}`)
         .style('display', 'block')
 

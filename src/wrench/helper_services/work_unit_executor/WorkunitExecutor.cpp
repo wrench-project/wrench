@@ -99,6 +99,8 @@ namespace wrench {
                 "In on_exit.cleanup(): WorkunitExecutor: %s has_returned_from_main = %d (return_value = %d, job forcefully terminated = %d)",
                 this->getName().c_str(), has_returned_from_main, return_value,
                 this->terminated_due_job_being_forcefully_terminated);
+
+        // Check if it's a failure!
         if ((not has_returned_from_main) and (this->task_start_timestamp_has_been_inserted) and
             (not this->task_failure_time_stamp_has_already_been_generated)) {
             if (this->workunit->task != nullptr) {
@@ -114,7 +116,11 @@ namespace wrench {
                             new SimulationTimestampTaskTermination(task));
                 }
             }
+        } else if ((this->workunit->task != nullptr) and this->task_completion_timestamp_should_be_generated){
+            this->simulation->getOutput().addTimestamp<SimulationTimestampTaskCompletion>(
+                    new SimulationTimestampTaskCompletion(this->workunit->task));
         }
+
     }
 
     /**
@@ -237,7 +243,7 @@ namespace wrench {
         }
 
         WRENCH_INFO("Work unit executor on host %s terminating!", S4U_Simulation::getHostName().c_str());
-        if (this->failure_timestamp_should_be_generated) {
+        if ((not this->task_failure_time_stamp_has_already_been_generated) and this->failure_timestamp_should_be_generated) {
             if (this->workunit->task != nullptr) {
                 WorkflowTask *task = this->workunit->task;
                 task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
@@ -317,24 +323,45 @@ namespace wrench {
                     new SimulationTimestampTaskStart(task));
             this->task_start_timestamp_has_been_inserted = true;
 
+
             // Read  all input files
             WRENCH_INFO("Reading the %ld input files for task %s", task->getInputFiles().size(), task->getID().c_str());
             try {
                 task->setReadInputStartDate(S4U_Simulation::getClock());
-                std::map<WorkflowFile *, std::shared_ptr<FileLocation>> files_to_read;
+//                std::map<WorkflowFile *, std::shared_ptr<FileLocation>> files_to_read;
+                std::vector<std::pair<WorkflowFile *, std::shared_ptr<FileLocation>>> files_to_read;
                 for (auto const &f : task->getInputFiles()) {
                     if (work->file_locations.find(f) != work->file_locations.end()) {
-                        files_to_read[f] = work->file_locations[f];
+                        files_to_read.push_back(std::make_pair(f, work->file_locations[f]));
                     } else {
                         if (this->scratch_space == nullptr) { // File should be in scratch, but there is no scratch
                             throw WorkflowExecutionException(
                                     std::make_shared<FileNotFound>(f, FileLocation::SCRATCH));
                         }
-                        files_to_read[f] = FileLocation::LOCATION(this->scratch_space, this->scratch_space->getMountPoint()  + "/" + job->getName());
+                        files_to_read.push_back(std::make_pair(
+                                f,
+                                FileLocation::LOCATION(this->scratch_space,
+                                                       this->scratch_space->getMountPoint() + "/" +
+                                                       job->getName())));
                         this->files_stored_in_scratch.insert(f);
                     }
                 }
-                StorageService::readFiles(files_to_read);
+                for (auto const &p : files_to_read) {
+                    WorkflowFile *f = p.first;
+                    std::shared_ptr<FileLocation> l = p.second;
+
+                    try{
+                        this->simulation->getOutput().addTimestamp<SimulationTimestampFileReadStart>(
+                                new SimulationTimestampFileReadStart(f, l.get(), l->getStorageService().get(), task));
+                        StorageService::readFile(f, l);
+                    } catch (WorkflowExecutionException &e) {
+                        this->simulation->getOutput().addTimestamp<SimulationTimestampFileReadFailure>(
+                                new SimulationTimestampFileReadFailure(f, l.get(), l->getStorageService().get(), task));
+                        throw;
+                    }
+                    this->simulation->getOutput().addTimestamp<SimulationTimestampFileReadCompletion>(
+                            new SimulationTimestampFileReadCompletion(f, l.get(), l->getStorageService().get(), task));
+                }
                 task->setReadInputEndDate(S4U_Simulation::getClock());
             } catch (WorkflowExecutionException &e) {
                 this->failure_timestamp_should_be_generated = true;
@@ -363,16 +390,33 @@ namespace wrench {
             // Write all output files
             try {
                 task->setWriteOutputStartDate(S4U_Simulation::getClock());
-                std::map<WorkflowFile *, std::shared_ptr<FileLocation>> files_to_write;
+//                std::map<WorkflowFile *, std::shared_ptr<FileLocation>> files_to_write;
+                std::vector<std::pair<WorkflowFile *, std::shared_ptr<FileLocation>>> files_to_write;
                 for (auto const &f : task->getOutputFiles()) {
                     if (work->file_locations.find(f) != work->file_locations.end()) {
-                        files_to_write[f] = work->file_locations[f];
+                        files_to_write.push_back(std::make_pair(f, work->file_locations[f]));
                     } else {
-                        files_to_write[f] = FileLocation::LOCATION(this->scratch_space, this->scratch_space->getMountPoint() + "/" + job->getName());
+                        files_to_write.push_back(std::make_pair(f, FileLocation::LOCATION(this->scratch_space, this->scratch_space->getMountPoint() + "/" + job->getName())));
                         this->files_stored_in_scratch.insert(f);
                     }
                 }
-                StorageService::writeFiles(files_to_write);
+
+                for (auto const &p : files_to_write) {
+                    WorkflowFile *f = p.first;
+                    std::shared_ptr<FileLocation> l = p.second;
+
+                    try{
+                        this->simulation->getOutput().addTimestamp<SimulationTimestampFileWriteStart>(
+                                new SimulationTimestampFileWriteStart(f, l.get(), l->getStorageService().get(), task));
+                        StorageService::writeFile(f, l);
+                    } catch (WorkflowExecutionException &e) {
+                        this->simulation->getOutput().addTimestamp<SimulationTimestampFileWriteFailure>(
+                                new SimulationTimestampFileWriteFailure(f, l.get(), l->getStorageService().get(), task));
+                        throw;
+                    }
+                    this->simulation->getOutput().addTimestamp<SimulationTimestampFileWriteCompletion>(
+                            new SimulationTimestampFileWriteCompletion(f, l.get(), l->getStorageService().get(), task));
+                }
                 task->setWriteOutputEndDate(S4U_Simulation::getClock());
             } catch (WorkflowExecutionException &e) {
                 this->failure_timestamp_should_be_generated = true;
@@ -381,8 +425,10 @@ namespace wrench {
 
             WRENCH_DEBUG("Setting the internal state of %s to TASK_COMPLETED", task->getID().c_str());
             task->setInternalState(WorkflowTask::InternalState::TASK_COMPLETED);
-            this->simulation->getOutput().addTimestamp<SimulationTimestampTaskCompletion>(
-                    new SimulationTimestampTaskCompletion(task));
+
+            this->task_completion_timestamp_should_be_generated = true;
+//            this->simulation->getOutput().addTimestamp<SimulationTimestampTaskCompletion>(
+//                    new SimulationTimestampTaskCompletion(task));
             task->setEndDate(S4U_Simulation::getClock());
 
             // Deal with Children
@@ -418,11 +464,7 @@ namespace wrench {
                 );
             }
 
-            try {
-                StorageService::copyFile(file, src_location, dst_location);
-            } catch (WorkflowExecutionException &e) {
-                throw;
-            }
+            StorageService::copyFile(file, src_location, dst_location);
         }
 
         /** Perform all cleanup file deletions */

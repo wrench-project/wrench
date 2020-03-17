@@ -11,14 +11,15 @@ addons:
       secure: "a3gk/Phr7yPccMhzBp6LRwEkIXWwSMbeC20sm0N5O/eZ63gN+4sp371pQcUugoPIXBa1jLMeJLL0we950EY9/kFPMVTdscHJ1OOwrM98R65dTtayxLOhDf1D8GTnrOIdpuH9vMatIulRoW0TYUhD1Ay2wIJWToXAJRM4W3bgzAOfsaM45PYeR21tlIuplazZtNys7XFVBO/4F4dHvG1tC5DqiaAM6GBHWqFivdr6vOVzZRZ1+ZvNWv0qk0zy4uxF6W4C+kdBEqhX6Ad2/AuFxIEe5zwdgqMGIu3pSySLVmcrIAGUjBqkR84iQQjlbniSEUyv89jpTvyJ9D95UVlbJ9PB38SYLtfyboDgXb2Sm/M3v0gqPcF6ZX8RP9MaIBEN6HfB4XpPYN4CI6Pwkzkz+7gdFPIl6o5lqbjrvXkeccBH2pWIHrL33pBkIB/wQEKA552jZbB9DbU+A2lobJcFREO5PO5EPWh2WUFB9/C0cOTHPY2k8W92mvsjXlWNqmUTqKwQsldOLrX45sPTkFFCAMU0hOVrjL4qtVO8l/jJitRvtKqXe3ZK1dbZmJU1Rh2G7KDS6+m4t2kIgoxtYDOPdHft38s6NTo/639TPEisn2kLO4sjx/sk2KXh7ja6vKa/eNKMxUBLTbv0x28xMiKN/WEtSTzQKsLWpYLlMUNGUTM="
 
 env:
-  - DIST=ubuntu-xenial COMPILER=clang BATSCHED=off
-  - DIST=ubuntu-xenial COMPILER=clang-6 BATSCHED=off
-  - DIST=ubuntu-xenial COMPILER=gcc5 BATSCHED=off
-  - DIST=ubuntu-xenial COMPILER=gcc6 BATSCHED=off
-  - DIST=ubuntu-bionic COMPILER=gcc7 BATSCHED=off
-  - DIST=ubuntu-bionic COMPILER=gcc7-batsched BATSCHED=on
-  - DIST=ubuntu-bionic COMPILER=clang BATSCHED=off
-  - DIST=debian-stretch COMPILER=gcc6 BATSCHED=off
+  - DIST=ubuntu-xenial COMPILER=clang batsched=off
+  - DIST=ubuntu-xenial COMPILER=clang-6 batsched=off
+  - DIST=ubuntu-xenial COMPILER=gcc5 batsched=off
+  - DIST=ubuntu-xenial COMPILER=gcc6 batsched=off
+  - DIST=ubuntu-bionic COMPILER=gcc7 batsched=off
+  - DIST=ubuntu-bionic COMPILER=gcc7-batsched batsched=on
+  - DIST=ubuntu-bionic COMPILER=clang batsched=off
+  - DIST=debian-stretch COMPILER=gcc6 batsched=off
+  - DIST=debian-buster COMPILER=gcc8 batsched=off
 
 services:
   - docker
@@ -41,14 +42,14 @@ before_install:
 script:
   # building wrench
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-      docker exec -w /home/wrench/wrench/build -it wrench cmake -DENABLE_BATSCHED=${BATSCHED} -DCMAKE_VERBOSE_MAKEFILE=ON -DCOVERAGE=1 ..;
-      docker exec -w /home/wrench/wrench/build -it wrench make all unit_tests;
+      docker exec -w /home/wrench/wrench/build -it wrench cmake -DENABLE_BATSCHED=${batsched} -DCMAKE_VERBOSE_MAKEFILE=ON -DCOVERAGE=1 ..;
+      docker exec -w /home/wrench/wrench/build -it wrench make all unit_tests doc-gh;
       travis_wait sleep infinity & docker exec -w /home/wrench/wrench/build -it wrench ./unit_tests;
     fi
 
 after_success:
   # coverage analysis and sonarcloud
-  - if [[ "$TRAVIS_OS_NAME" == "linux" && $DIST == "ubuntu-bionic" && $COMPILER == "gcc7" && $BATSCHED == "off" ]] || [[ "$TRAVIS_OS_NAME" == "linux" && $DIST == "ubuntu-bionic" && $COMPILER == "gcc7" && $BATSCHED == "on" ]]; then
+  - if [[ "$TRAVIS_OS_NAME" == "linux" && $DIST == "ubuntu-bionic" && $COMPILER == "gcc7" && $batsched == "off" ]] || [[ "$TRAVIS_OS_NAME" == "linux" && $DIST == "ubuntu-bionic" && $COMPILER == "gcc7-batsched" && $batsched == "on" ]]; then
       docker exec -w /home/wrench/wrench/build -it wrench lcov --directory . --capture --output-file coverage.info;
       docker exec -w /home/wrench/wrench/build -it wrench lcov --remove coverage.info '*/test/*' '*/examples/*' '*/include/*' --output-file coverage.info;
       docker exec -w /home/wrench/wrench/build -it wrench coveralls-lcov --repo-token ${COVERALLS_TOKEN} coverage.info;
@@ -59,18 +60,16 @@ after_success:
       sonar-scanner -Dsonar.host.url=https://sonarqube.com -Dsonar.login=$SONAR_TOKEN;
     fi
   - docker cp wrench:/home/wrench/wrench/docs .;
+  - cp -R ./docs/gh-pages $HOME/gh-pages-to-deploy
   - docker stop wrench;
   - docker rm wrench;
   - docker rmi wrenchproject/wrench-build:${DIST}-${COMPILER};
 
-#deploy:
-#  provider: pages
-#  skip_cleanup: true
-#  keep-history: true
-#  github_token: $GITHUB_TOKEN
-#  local_dir: ./docs/gh-pages
-#  on:
-#    branch: master
+deploy:
+  provider: script
+  script: bash .travis.publish
+  on:
+    branch: master
 
 notifications:
   email:

@@ -125,11 +125,13 @@ private:
                 this->test->failed_task,
                 {{this->test->small_input_file, wrench::FileLocation::LOCATION(this->test->storage_service)},
                  {this->test->large_input_file, wrench::FileLocation::LOCATION(this->test->storage_service)}});
+
         job_manager->submitJob(failed_job, this->test->compute_service);
 
         wrench::StorageService::deleteFile(this->getWorkflow()->getFileByID("small_input_file"),
                                            wrench::FileLocation::LOCATION(this->test->storage_service),
                                            this->test->file_registry_service);
+
 
         std::shared_ptr<wrench::WorkflowExecutionEvent> workflow_execution_event;
         try {
@@ -204,7 +206,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test(){
     double task1_completion_date = this->task1->getEndDate();
     double task1_completion_timestamp = timestamp_completion_trace[0]->getContent()->getDate();
 
-    ASSERT_DOUBLE_EQ(task1_completion_date, task1_completion_timestamp);
+    ASSERT_LT(std::abs(task1_completion_date - task1_completion_timestamp), 0.001);
 
     double task2_start_timestamp = timestamp_start_trace[1]->getContent()->getDate();
     double task2_completion_timestamp = timestamp_completion_trace[1]->getContent()->getDate();
@@ -312,9 +314,12 @@ private:
                 {{this->test->small_input_file, wrench::FileLocation::LOCATION(this->test->storage_service)},
                  {this->test->large_input_file, wrench::FileLocation::LOCATION(this->test->storage_service)}});
 
+
+
         job_manager->submitJob(failed_job, this->test->compute_service);
         wrench::StorageService::deleteFile(this->getWorkflow()->getFileByID("small_input_file"),
                                            wrench::FileLocation::LOCATION(this->test->storage_service));
+
         this->waitForAndProcessNextEvent();
 
         wrench::StandardJob *passing_job = job_manager->createStandardJob(

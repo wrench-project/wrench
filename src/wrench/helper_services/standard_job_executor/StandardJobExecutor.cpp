@@ -307,7 +307,6 @@ namespace wrench {
         this->host_state_monitor->simulation = this->simulation;
         this->host_state_monitor->start(this->host_state_monitor, true, false); // Daemonized, no auto-restart
 
-
         /** Create all Workunits **/
         std::set<std::shared_ptr<Workunit>> all_work_units = Workunit::createWorkunits(this->job);
 
@@ -356,7 +355,6 @@ namespace wrench {
 
         this->host_state_monitor->kill();
         this->host_state_monitor = nullptr; // Which will release the pointer to this service!
-
 
         WRENCH_INFO("Standard Job Executor on host %s cleanly terminating!", S4U_Simulation::getHostName().c_str());
         return 0;
@@ -723,6 +721,7 @@ namespace wrench {
             (this->ready_workunits.empty()) &&
             (this->running_workunits.empty())) {
 
+//            WRENCH_INFO("NOTIFYING BACK SAYING  'COMPLETED' for job %s:", this->job->getName().c_str());
             try {
                 S4U_Mailbox::putMessage(this->callback_mailbox,
                                         new StandardJobExecutorDoneMessage(this->job,

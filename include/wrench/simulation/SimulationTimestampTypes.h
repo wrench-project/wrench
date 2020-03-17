@@ -10,12 +10,42 @@
 #ifndef WRENCH_SIMULATIONTIMESTAMPTYPES_H
 #define WRENCH_SIMULATIONTIMESTAMPTYPES_H
 
+
 #include "wrench/workflow/WorkflowTask.h"
+#include <unordered_map>
+
+using namespace std;
+
+typedef std::tuple<void *, void *, void *> File;
+
+namespace std {
+    template <>
+    struct hash<File>{
+    public :
+        size_t operator()(const File &file ) const
+        {
+            return std::hash<void *>()(std::get<0>(file)) ^ std::hash<void *>()(std::get<1>(file)) ^ std::hash<void *>()(std::get<2>(file));
+        }
+    };
+};
 
 namespace wrench {
 
     class WorkflowTask;
     class StorageService;
+    class FileLocation;
+
+    /**
+     * @brief File, Source, Whoami used to be hashed as key for unordered multimap for ongoing file operations.
+     */
+    ///typedef std::tuple<WorkflowFile *, FileLocation *, StorageService *> File;
+
+    /**
+     *
+     * @param file - tuple of three strings relating to File, Source and Whoami
+     * @return XOR of hashes of file
+     */
+    ///size_t file_hash( const File & file );
 
     /**
      * @brief A top-level base class for simulation timestamps
@@ -135,6 +165,214 @@ namespace wrench {
          /***********************/
      };
 
+    class SimulationTimestampFileReadStart;
+
+
+    /**
+     * @brief A base class for simulation timestamps regarding file reads
+     */
+    class SimulationTimestampFileRead : public SimulationTimestampPair {
+    public:
+
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        SimulationTimestampFileRead(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task = nullptr);
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
+        /**
+         * @brief Retrieve the matching endpoint, if any
+         */
+        SimulationTimestampFileRead *getEndpoint() override;
+        WorkflowFile *getFile();
+        FileLocation *getSource();
+        StorageService *getService();
+        WorkflowTask *getTask();
+
+    protected:
+        /**
+         * @brief The WorkflowFile that was being read
+         */
+        WorkflowFile *file;
+
+        /**
+         * @brief The location where the WorkflowFile was being read from
+         */
+        FileLocation *source;
+
+        /**
+         * @brief Service that initiated the read
+         */
+        StorageService *service;
+
+        /**
+         * @brief Task tied to read
+         */
+         WorkflowTask *task;
+
+        /**
+         * @brief the data structure that holds the ongoing file reads.
+         */
+        ///static std::unordered_multimap<File, std::pair<SimulationTimestampFileRead *, double>, decltype(&file_hash)> pending_file_reads;
+        static std::unordered_multimap<File, std::pair<SimulationTimestampFileRead *, WorkflowTask *>> pending_file_reads;
+
+        void setEndpoints();
+    };
+
+    class SimulationTimestampFileReadFailure;
+    class SimulationTimestampFileReadCompletion;
+
+    /**
+     * @brief A simulation timestamp class for file read start times
+     */
+    class SimulationTimestampFileReadStart : public SimulationTimestampFileRead {
+    public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        SimulationTimestampFileReadStart(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task = nullptr);
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
+        friend class SimulationTimestampFileReadFailure;
+        friend class SimulationTimestampFileReadCompletion;
+    };
+
+    /**
+     * @brief A simulation timestamp class for file read failure times
+     */
+    class SimulationTimestampFileReadFailure : public SimulationTimestampFileRead {
+    public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        SimulationTimestampFileReadFailure(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task = nullptr);
+        /***********************/
+        /** \endcond           */
+        /***********************/
+    };
+
+    /**
+     * @brief A simulation timestamp class for file read completions
+     */
+    class SimulationTimestampFileReadCompletion : public SimulationTimestampFileRead {
+    public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        SimulationTimestampFileReadCompletion(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task = nullptr);
+        /***********************/
+        /** \endcond           */
+        /***********************/
+    };
+
+    class SimulationTimestampFileWriteStart;
+
+
+    /**
+     * @brief A base class for simulation timestamps regarding file writes
+     */
+    class SimulationTimestampFileWrite : public SimulationTimestampPair {
+    public:
+
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        SimulationTimestampFileWrite(WorkflowFile *file, FileLocation *dst, StorageService *service, WorkflowTask *task = nullptr);
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
+        /**
+         * @brief Retrieve the matching endpoint, if any
+         */
+        SimulationTimestampFileWrite *getEndpoint() override;
+        WorkflowFile *getFile();
+        FileLocation *getDestination();
+        StorageService *getService();
+        WorkflowTask *getTask();
+
+    protected:
+        /**
+         * @brief The WorkflowFile that was being write
+         */
+        WorkflowFile *file;
+
+        /**
+         * @brief The location where the WorkflowFile was being write from
+         */
+        FileLocation *destination;
+
+        /**
+         * @brief Service that initiated the write
+         */
+        StorageService *service;
+
+        /**
+         * @brief Task associated with write
+         */
+         WorkflowTask *task;
+
+        /**
+         * @brief the data structure that holds the ongoing file writes.
+         */
+        ///static std::unordered_multimap<File, std::pair<SimulationTimestampFileWrite *, double>, decltype(&file_hash)> pending_file_writes;
+        static std::unordered_multimap<File, std::pair<SimulationTimestampFileWrite *, WorkflowTask *>> pending_file_writes;
+
+        void setEndpoints();
+    };
+
+    class SimulationTimestampFileWriteFailure;
+    class SimulationTimestampFileWriteCompletion;
+
+    /**
+     * @brief A simulation timestamp class for file write start times
+     */
+    class SimulationTimestampFileWriteStart : public SimulationTimestampFileWrite {
+    public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        SimulationTimestampFileWriteStart(WorkflowFile *file, FileLocation *dst, StorageService *service, WorkflowTask *task = nullptr);
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
+        friend class SimulationTimestampFileWriteFailure;
+        friend class SimulationTimestampFileWriteCompletion;
+    };
+
+    /**
+     * @brief A simulation timestamp class for file write failure times
+     */
+    class SimulationTimestampFileWriteFailure : public SimulationTimestampFileWrite {
+    public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        SimulationTimestampFileWriteFailure(WorkflowFile *file, FileLocation *dst, StorageService *service, WorkflowTask *task = nullptr);
+        /***********************/
+        /** \endcond           */
+        /***********************/
+    };
+
+    /**
+     * @brief A simulation timestamp class for file write completions
+     */
+    class SimulationTimestampFileWriteCompletion : public SimulationTimestampFileWrite {
+    public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        SimulationTimestampFileWriteCompletion(WorkflowFile *file, FileLocation *dst, StorageService *service, WorkflowTask *task = nullptr);
+        /***********************/
+        /** \endcond           */
+        /***********************/
+    };
+
     class SimulationTimestampFileCopyStart;
     class FileLocation;
 
@@ -147,7 +385,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        SimulationTimestampFileCopy(WorkflowFile *file, std::shared_ptr<FileLocation>  src, std::shared_ptr<FileLocation> dst, SimulationTimestampFileCopyStart *start_timestamp = nullptr);
+        SimulationTimestampFileCopy(WorkflowFile *file, std::shared_ptr<FileLocation>  src, std::shared_ptr<FileLocation> dst);
         /***********************/
         /** \endcond           */
         /***********************/
@@ -175,6 +413,15 @@ namespace wrench {
          * @brief The location where the WorkflowFile was being copied to
          */
         std::shared_ptr<FileLocation> destination;
+
+
+
+        /**
+         * @brief the data structure that holds the ongoing file writes.
+         */
+         static std::unordered_multimap<File, SimulationTimestampFileCopy *> pending_file_copies;
+
+        void setEndpoints();
     };
 
     class SimulationTimestampFileCopyFailure;
@@ -205,7 +452,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        SimulationTimestampFileCopyFailure(SimulationTimestampFileCopyStart *start_timestamp);
+        SimulationTimestampFileCopyFailure(WorkflowFile *file, std::shared_ptr<FileLocation>  src, std::shared_ptr<FileLocation> dst);
         /***********************/
         /** \endcond           */
         /***********************/
@@ -219,7 +466,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        SimulationTimestampFileCopyCompletion(SimulationTimestampFileCopyStart *start_timestamp);
+        SimulationTimestampFileCopyCompletion(WorkflowFile *file, std::shared_ptr<FileLocation>  src, std::shared_ptr<FileLocation> dst);
         /***********************/
         /** \endcond           */
         /***********************/

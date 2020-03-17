@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2020. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -115,7 +115,8 @@ namespace wrench {
             }
         } else {
             throw std::runtime_error(
-                    "ComputeService::submitStandardJob(): Received an unexpected [" + message->getName() + "] message!");
+                    "ComputeService::submitStandardJob(): Received an unexpected [" + message->getName() +
+                    "] message!");
         }
     }
 
@@ -193,6 +194,7 @@ namespace wrench {
     int HTCondorCentralManagerService::main() {
 
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
+
         WRENCH_INFO("HTCondor Service starting on host %s listening on mailbox_name %s",
                     this->hostname.c_str(), this->mailbox_name.c_str());
 
@@ -274,6 +276,7 @@ namespace wrench {
         }
 
         if (message == nullptr) {
+
             WRENCH_INFO("Got a NULL message... Likely this means we're all done. Aborting");
             return false;
         }
@@ -336,7 +339,7 @@ namespace wrench {
             const std::string &answer_mailbox, StandardJob *job,
             std::map<std::string, std::string> &service_specific_args) {
 
-        this->pending_jobs.push_back(job);
+        this->pending_jobs.push_back(std::make_tuple(job, service_specific_args));
         this->resources_unavailable = false;
 
         S4U_Mailbox::dputMessage(
@@ -360,7 +363,7 @@ namespace wrench {
             const std::string &answer_mailbox, PilotJob *job,
             std::map<std::string, std::string> &service_specific_args) {
 
-        this->pending_jobs.push_back(job);
+        this->pending_jobs.push_back(std::make_tuple(job, service_specific_args));
         this->resources_unavailable = false;
 
         S4U_Mailbox::dputMessage(
@@ -413,7 +416,9 @@ namespace wrench {
     void HTCondorCentralManagerService::processStandardJobCompletion(StandardJob *job) {
         WRENCH_INFO("A standard job has completed: %s", job->getName().c_str());
         std::string callback_mailbox = job->popCallbackMailbox();
+
         for (auto task : job->getTasks()) {
+
             WRENCH_INFO("    Task completed: %s (%s)", task->getID().c_str(), callback_mailbox.c_str());
         }
 
@@ -446,7 +451,7 @@ namespace wrench {
 
         for (auto sjob : scheduled_jobs) {
             for (auto it = this->pending_jobs.begin(); it != this->pending_jobs.end(); ++it) {
-                auto pjob = *it;
+                auto pjob = std::get<0>(*it);
                 if (sjob == pjob) {
                     this->pending_jobs.erase(it);
                     break;

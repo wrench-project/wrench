@@ -78,13 +78,13 @@ namespace wrench {
      *                                   of tasks also included in the standard job)
      * @param file_locations: a map that specifies locations where input/output files should be read/written.
      *         When unspecified, it is assumed that the ComputeService's scratch storage space will be used.
-     * @param pre_file_copies: a set of tuples that specify which file copy operations should be completed
+     * @param pre_file_copies: a vector of tuples that specify which file copy operations should be completed
      *                         before task executions begin. The ComputeService::SCRATCH constant can be
      *                         used to mean "the scratch storage space of the ComputeService".
-     * @param post_file_copies: a set of tuples that specify which file copy operations should be completed
+     * @param post_file_copies: a vector of tuples that specify which file copy operations should be completed
      *                         after task executions end. The ComputeService::SCRATCH constant can be
      *                         used to mean "the scratch storage space of the ComputeService".
-     * @param cleanup_file_deletions: a set of file tuples that specify file deletion operations that should be completed
+     * @param cleanup_file_deletions: a vector of file tuples that specify file deletion operations that should be completed
      *                                at the end of the job. The ComputeService::SCRATCH constant can be
      *                         used to mean "the scratch storage space of the ComputeService".
      * @return the standard job
@@ -93,9 +93,9 @@ namespace wrench {
      */
     StandardJob *JobManager::createStandardJob(std::vector<WorkflowTask *> tasks,
                                                std::map<WorkflowFile *, std::shared_ptr<FileLocation> > file_locations,
-                                               std::set<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> pre_file_copies,
-                                               std::set<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> post_file_copies,
-                                               std::set<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  >> cleanup_file_deletions) {
+                                               std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> pre_file_copies,
+                                               std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> post_file_copies,
+                                               std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  >> cleanup_file_deletions) {
 
         // Do a sanity check of everything (looking for nullptr)
         for (auto t : tasks) {
