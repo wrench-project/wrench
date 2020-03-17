@@ -8,8 +8,8 @@
  *
  */
 
-#ifndef WRENCH_BATCHSCHEDULER_H
-#define WRENCH_BATCHSCHEDULER_H
+#ifndef WRENCH_BATCHSTANDARDJOBSCHEDULER_H
+#define WRENCH_BATCHSTANDARDJOBSCHEDULER_H
 
 #include <wrench-dev.h>
 
@@ -22,7 +22,7 @@ namespace wrench {
 
     public:
 
-        BatchStandardJobScheduler(std::shared_ptr<StorageService> default_storage_service) :
+        explicit BatchStandardJobScheduler(std::shared_ptr<StorageService> default_storage_service) :
                 default_storage_service(default_storage_service) {}
 
         /***********************/
@@ -30,7 +30,7 @@ namespace wrench {
         /***********************/
 
         void scheduleTasks(const std::set<std::shared_ptr<ComputeService>> &compute_services,
-                           const std::vector<WorkflowTask *> &tasks);
+                           const std::vector<WorkflowTask *> &tasks) override;
 
         /***********************/
         /** \endcond           */
@@ -42,4 +42,4 @@ namespace wrench {
     };
 }
 
-#endif //WRENCH_BATCHSCHEDULER_H
+#endif //WRENCH_BATCHSTANDARDJOBSCHEDULER_H
