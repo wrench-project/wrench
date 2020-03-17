@@ -65,6 +65,7 @@ namespace wrench {
     private:
 
         bool failure_timestamp_should_be_generated = false;
+        bool task_completion_timestamp_should_be_generated = false;
         bool terminated_due_job_being_forcefully_terminated = false;
         bool task_start_timestamp_has_been_inserted = false;
         bool task_failure_time_stamp_has_already_been_generated = false;

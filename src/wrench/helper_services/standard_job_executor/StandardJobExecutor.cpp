@@ -721,6 +721,7 @@ namespace wrench {
             (this->ready_workunits.empty()) &&
             (this->running_workunits.empty())) {
 
+//            WRENCH_INFO("NOTIFYING BACK SAYING  'COMPLETED' for job %s:", this->job->getName().c_str());
             try {
                 S4U_Mailbox::putMessage(this->callback_mailbox,
                                         new StandardJobExecutorDoneMessage(this->job,
