@@ -68,7 +68,7 @@ namespace wrench {
 #else
                 {BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM,            "fcfs"},
 #endif
-                {BatchComputeServiceProperty::BATCH_RJMS_DELAY,                             "0"},
+                {BatchComputeServiceProperty::BATCH_RJMS_DELAY,                             "5"},
                 {BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE,               ""},
                 {BatchComputeServiceProperty::USE_REAL_RUNTIMES_AS_REQUESTED_RUNTIMES_IN_WORKLOAD_TRACE_FILE,     "false"},
                 {BatchComputeServiceProperty::IGNORE_INVALID_JOBS_IN_WORKLOAD_TRACE_FILE,     "false"},
