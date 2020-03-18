@@ -1,9 +1,0 @@
-{
-  "name": "wrench-dashboard",
-  "description": "WRENCH Dashboard",
-  "dependencies": {
-    "ejs": "^2.6.1",
-    "express": "^4.16.3",
-    "opn": "^5.4.0"
-  }
-}
