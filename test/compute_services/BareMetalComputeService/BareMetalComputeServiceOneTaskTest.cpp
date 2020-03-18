@@ -211,6 +211,12 @@ void BareMetalComputeServiceOneTaskTest::do_BadSetup_test() {
     // Setting up the platform
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
+    // Empty resource list
+    ASSERT_THROW(compute_service = simulation->add(
+            new wrench::BareMetalComputeService("bogus",
+                                                (std::map<std::string, std::tuple<unsigned long, double>>){},
+                                                {})), std::invalid_argument);
+
     // Bad hostname
     ASSERT_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService("bogus",
