@@ -446,7 +446,12 @@ namespace wrench {
         // Set default and specified message payloads
         this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
 
+
         // Check that there is at least one core per host and that hosts have enough cores
+        if (compute_resources.empty()) {
+            throw std::invalid_argument(
+                    "BareMetalComputeService::initiateInstance(): the resource list is empty");
+        }
         for (auto host : compute_resources) {
 
             std::string hname = host.first;
