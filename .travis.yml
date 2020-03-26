@@ -29,11 +29,10 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
       docker pull wrenchproject/wrench-build:${DIST}-${COMPILER};
       docker run -m 1g -d -t --name=wrench wrenchproject/wrench-build:${DIST}-${COMPILER} bash;
-      export BRANCH=`git rev-parse --abbrev-ref HEAD`;
       docker exec -it wrench git clone https://github.com/wrench-project/wrench;
     fi
-  - if [[ "$BRANCH" != "HEAD" ]]; then
-      docker exec -w /home/wrench/wrench -it wrench git checkout ${BRANCH};
+  - if [[ "$TRAVIS_BRANCH" != "HEAD" ]]; then
+      docker exec -w /home/wrench/wrench -it wrench git checkout ${TRAVIS_BRANCH};
     fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
       docker exec -it wrench mkdir wrench/build;
@@ -70,7 +69,7 @@ deploy:
   provider: script
   script: bash .travis.publish
   on:
-    branch: master
+    branch: ${TRAVIS_BRANCH}
 
 notifications:
   email:
