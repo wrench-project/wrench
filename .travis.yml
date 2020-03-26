@@ -52,6 +52,7 @@ after_success:
   - if [[ "$TRAVIS_OS_NAME" == "linux" && $DIST == "ubuntu-bionic" && $COMPILER == "gcc7" && $batsched == "off" ]] || [[ "$TRAVIS_OS_NAME" == "linux" && $DIST == "ubuntu-bionic" && $COMPILER == "gcc7-batsched" && $batsched == "on" ]]; then
       docker exec -w /home/wrench/wrench/build -it wrench lcov --directory . --capture --output-file coverage.info;
       docker exec -w /home/wrench/wrench/build -it wrench lcov --remove coverage.info '*/test/*' '*/examples/*' '*/include/*' --output-file coverage.info;
+      docker exec -w /home/wrench/wrench/build -it wrench bash <(curl -s https://codecov.io/bash) -f coverage.info -t ${CODECOV_TOKEN};
       docker exec -w /home/wrench/wrench/build -it wrench coveralls-lcov --repo-token ${COVERALLS_TOKEN} coverage.info;
 
       docker cp wrench:/home/wrench/wrench/build .;
