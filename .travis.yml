@@ -55,7 +55,7 @@ after_success:
       docker cp wrench:/home/wrench/wrench/build .;
       bash <(curl -s https://codecov.io/bash) -f build/coverage.info -t ${CODECOV_TOKEN};
       build-wrapper-linux-x86-64 --out-dir bw-output make all;
-      sonar-scanner -Dsonar.host.url=https://sonarqube.com -Dsonar.login=$SONAR_TOKEN;
+      sonar-scanner -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_TOKEN;
     fi
   - docker cp wrench:/home/wrench/wrench/docs .;
   - cp -R ./docs/gh-pages $HOME/gh-pages-to-deploy
