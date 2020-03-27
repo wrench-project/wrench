@@ -1,7 +1,7 @@
 [![Build Status][travis-badge]][travis-link]
 [![GitHub Release][release-badge]][release-link]
 [![License: LGPL v3][license-badge]](LICENSE.md)
-[![Coverage Status][coveralls-badge]][coveralls-link]
+[![Coverage Status][codecov-badge]][codecov-link]
 [![Codacy Badge][codacy-badge]][codacy-link]
 [![SonarCloud Badge][sonarcloud-badge]][sonarcloud-link]
 [![CII Best Practices][cii-badge]][cii-link]
@@ -108,6 +108,8 @@ WRENCH has been funded by the National Science Foundation (NSF), and the Nationa
 [travis-badge]:             https://travis-ci.org/wrench-project/wrench.svg?branch=master
 [travis-link]:              https://travis-ci.org/wrench-project/wrench
 [license-badge]:            https://img.shields.io/badge/License-LGPL%20v3-blue.svg
+[codecov-badge]:            https://codecov.io/gh/wrench-project/wrench/branch/master/graph/badge.svg
+[codecov-link]:             https://codecov.io/gh/wrench-project/wrench
 [coveralls-badge]:          https://coveralls.io/repos/github/wrench-project/wrench/badge.svg?branch=master
 [coveralls-link]:           https://coveralls.io/github/wrench-project/wrench?branch=master
 [release-badge]:            https://img.shields.io/github/release/wrench-project/wrench/all.svg
