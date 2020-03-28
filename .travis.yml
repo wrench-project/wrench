@@ -41,7 +41,7 @@ before_install:
 script:
   # building wrench
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-      docker exec -w /home/wrench/wrench/build -it wrench cmake -DENABLE_BATSCHED=${batsched} -DCMAKE_VERBOSE_MAKEFILE=ON -DCOVERAGE=1 ..;
+      docker exec -w /home/wrench/wrench/build -it wrench cmake -DENABLE_BATSCHED=${batsched} -DCMAKE_VERBOSE_MAKEFILE=ON ..;
       docker exec -w /home/wrench/wrench/build -it wrench make all unit_tests doc-gh;
       travis_wait sleep infinity & docker exec -w /home/wrench/wrench/build -it wrench ./unit_tests;
     fi
@@ -49,14 +49,20 @@ script:
 after_success:
   # coverage analysis and sonarcloud
   - if [[ "$TRAVIS_OS_NAME" == "linux" && $DIST == "ubuntu-bionic" && $COMPILER == "gcc7" && $batsched == "off" ]] || [[ "$TRAVIS_OS_NAME" == "linux" && $DIST == "ubuntu-bionic" && $COMPILER == "gcc7-batsched" && $batsched == "on" ]]; then
+      docker exec -it wrench mkdir wrench/sonar;
+      SONARPATH=$(dirname "`which build-wrapper-linux-x86-64`")
+      docker cp $SONARPATH wrench:/home/wrench/wrench/sonar;
+      docker exec -w /home/wrench/wrench/sonar -it wrench cmake -DENABLE_BATSCHED=${batsched} -DCMAKE_VERBOSE_MAKEFILE=ON ..;
+      docker exec -w /home/wrench/wrench/sonar -it wrench ./build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir bw-output make clean all;
+
+      docker cp /home/travis/.sonarscanner/sonar-scanner.zip wrench:/home/wrench/wrench;
+      docker exec -w /home/wrench/wrench -it wrench unzip sonar-scanner.zip;
+      docker exec -w /home/wrench/wrench -it wrench ./sonar-scanner-3.0.3.778/bin/sonar-scanner -Dsonar.cfamily.build-wrapper-output=sonar/bw-output -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${SONAR_TOKEN};
+
       docker exec -w /home/wrench/wrench/build -it wrench lcov --directory . --capture --output-file coverage.info;
       docker exec -w /home/wrench/wrench/build -it wrench lcov --remove coverage.info '*/test/*' '*/examples/*' '*/include/*' --output-file coverage.info;
-      docker cp wrench:/home/wrench/wrench .;
-      cd wrench/build;
+      docker cp wrench:/home/wrench/wrench/build/coverage.info .;
       bash <(curl -s https://codecov.io/bash) -f coverage.info -t ${CODECOV_TOKEN};
-      build-wrapper-linux-x86-64 --out-dir bw-output make all;
-      sonar-scanner -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_TOKEN;
-      cd ../..;
     fi
   - docker cp wrench:/home/wrench/wrench/docs .;
   - cp -R ./docs/gh-pages $HOME/gh-pages-to-deploy
