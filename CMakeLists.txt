@@ -394,4 +394,3 @@ include(${CMAKE_HOME_DIRECTORY}/conf/cmake/Examples.cmake)
 
 # build documentation
 include(${CMAKE_HOME_DIRECTORY}/conf/cmake/Documentation.cmake)
-
