@@ -17,8 +17,6 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/tools/wrench/wrench-init/wrench-init
         PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
         )
 
-
-
 # install dashboard
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tools/wrench/dashboard
         DESTINATION wrench
@@ -26,6 +24,14 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tools/wrench/dashboard
         PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
         )
 
+configure_file (
+        "${CMAKE_CURRENT_SOURCE_DIR}/tools/wrench/wrench-dashboard.in"
+        "${CMAKE_CURRENT_SOURCE_DIR}/tools/wrench/wrench-dashboard"
+)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/tools/wrench/wrench-dashboard
+        DESTINATION bin
+        PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+        )
 
 # compile/install the pegasus workflow parser
 set(PEGASUS_WORKFLOW_PARSER_SOURCE_FILES

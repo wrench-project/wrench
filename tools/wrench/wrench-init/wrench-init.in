@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2019. The WRENCH Team.
+# Copyright (c) 2019-2020. The WRENCH Team.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -11,8 +11,6 @@
 import argparse
 import logging
 import os
-
-__author__ = "Rafael Ferreira da Silva"
 
 logger = logging.getLogger(__name__)
 
