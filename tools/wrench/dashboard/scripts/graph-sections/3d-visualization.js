@@ -84,7 +84,7 @@ function changeOriginOrScale(newOrigin, newScale) {
         grid3d(xGrid),
         scale3d([yLine]),
         cubes3d(cubesData),
-        scale3d([xLine]), 
+        scale3d([xLine]),
         data.contents,
         cubes3d(ftCubesData)
     ]
@@ -131,8 +131,8 @@ function makeCube(h, x, z, duration, colour, taskId){
 function dragged(){
     mouseX = mouseX || 0;
     mouseY = mouseY || 0;
-    beta   = (d3.event.x - mx + mouseX) * Math.PI / 230 ;
-    alpha  = (d3.event.y - my + mouseY) * Math.PI / 230  * (-1);
+    var beta   = (d3.event.x - mx + mouseX) * Math.PI / 230 ;
+    var alpha  = (d3.event.y - my + mouseY) * Math.PI / 230  * (-1);
     yAngle = beta + startAngle
     xAngle = alpha - startAngle
     var rotatedData = [
@@ -409,7 +409,7 @@ function processData(data, tt, populateLegend){
         .classed('_3d', true)
         .merge(faces)
         .transition().duration(tt)
-        .attr('d', cubes3d.draw)        
+        .attr('d', cubes3d.draw)
 
     faces.exit().remove();
 
@@ -429,7 +429,7 @@ function processData(data, tt, populateLegend){
         })
         .attr('stroke', function(d){ return d3.color(color(d.id)); })
         .merge(cubes)
-    
+
     /* --------- FT FACES ---------*/
 
     var ftFaces = ftCubes.merge(ftCE).selectAll('path.face').data(function(d){ return d.faces; }, function(d){ return d.face; });
@@ -441,7 +441,7 @@ function processData(data, tt, populateLegend){
         .classed('_3d', true)
         .merge(ftFaces)
         .transition().duration(tt)
-        .attr('d', cubes3d.draw)    
+        .attr('d', cubes3d.draw)
 
 }
 
@@ -506,7 +506,7 @@ function generate3dGraph(data, populateLegend, needToInitialise, svgId, originXI
         showInstructions("three-d-instructions", "three-d-information-img")
     }
 
-    xGrid = [], scatter = [], yLine = [], xLine = []
+    var xGrid = [], scatter = [], yLine = [], xLine = []
     for(var z = 0; z <= maxTime + timeScalingFactor; z+=timeScalingFactor){
         for(var x = 0; x < maxTaskOverlap; x++) {
             xGrid.push([x, 1, z/timeScalingFactor])
@@ -519,8 +519,8 @@ function generate3dGraph(data, populateLegend, needToInitialise, svgId, originXI
     d3.range(0, maxTime, timeScalingFactor).forEach(function(d) { xLine.push([0, 1, d / timeScalingFactor, d]) })
     xLine.push([0,1,(maxTime / timeScalingFactor) + 1, "Time (seconds)"]) // for axis label
 
-    cubesData = []
-    ftCubesData = []
+    var cubesData = []
+    var ftCubesData = []
     data.forEach(function(d) {
         var h = d.num_cores_allocated
         var z = d.whole_task.start / timeScalingFactor

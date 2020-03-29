@@ -33,7 +33,7 @@ function getComputeTime(d) {
 function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskId, tooltipComputeTime, CONTAINER_WIDTH, CONTAINER_HEIGHT) {
     var num_cores = determineNumCores(data);
     var container = d3.select(`#${containerId}`);
-    document.getElementById(containerId).innerHTML = hostUtilizationHtml
+    document.getElementById(containerId).innerHTML = hostUtilizationHtml;
     var chart = document.getElementById(containerId);
     const PADDING = 60;
 
@@ -45,7 +45,7 @@ function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskI
 
     var tooltip                         = d3.select(`#${tooltipId}`);
     var tooltip_task_id                 = d3.select(`#${tooltipTaskId}`);
-    var tooltip_compute_time            = d3.select(`#${tooltipComputeTime}`)
+    var tooltip_compute_time            = d3.select(`#${tooltipComputeTime}`);
 
     svg = container.append("svg")
         .attr("width", CONTAINER_WIDTH)
