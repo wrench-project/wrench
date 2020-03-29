@@ -4,13 +4,13 @@
     legendId: id of the <div> that will contain the graph
 */
 function generateConsumedEnergyGraph(energyData, graphId, legendId) {
-    eData = [];
-    xAxisMarks = ["x"];
+    var eData = [];
+    var xAxisMarks = ["x"];
     // Iterate through data for each host
     for(var i = 0; i < energyData.length; i++) {
         var hostData = energyData[i]["consumed_energy_trace"];
 
-        consumedEnergyData = []
+        var consumedEnergyData = []
 
         // Iterate through each energy trace for a host
         for(var j = 0; j < hostData.length; j++) {
@@ -70,13 +70,13 @@ function generateConsumedEnergyGraph(energyData, graphId, legendId) {
     legendId: id of the HTML element that will contain the graph
 */
 function generatePStateGraph(energyData, graphId, legendId) {
-    pStateData = [];
-    xAxisMarks = ["x"];
+    var pStateData = [];
+    var xAxisMarks = ["x"];
     // Iterate through data for each host
     for(var i = 0; i < energyData.length; i++) {
         var hostData = energyData[i]["pstate_trace"];
 
-        consumedEnergyData = []
+        var consumedEnergyData = []
 
         // Iterate through each energy trace for a host
         for(var j = 0; j < hostData.length; j++) {
