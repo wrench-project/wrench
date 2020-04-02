@@ -244,10 +244,10 @@ are all classes named `wrench::SimulationTimestampSomething`, where `Something` 
 
 # Measuring Energy Consumption #                 {#wrench-101-energy}
 
-WRENCH leverages [SimGrid's energy plugin](http://simgrid.gforge.inria.fr/simgrid/latest/doc/group__plugin__energy.html),
+WRENCH leverages [SimGrid's energy plugin](https://simgrid.org/doc/latest/Plugins.html#host-energy),
 which provides accounting for computing time and dissipated energy in the simulated platform. SimGrid's energy plugin 
 requires host **pstate** definitions (levels of performance, CPU frequency) in the
-[XML platform description file](http://simgrid.gforge.inria.fr/simgrid/latest/doc/platform.html). The following is a 
+[XML platform description file](https://simgrid.org/doc/latest/platform.html). The following is a 
 list of current available information provided by the plugin: 
 
 - `wrench::Simulation::getNumberofPstates()`
