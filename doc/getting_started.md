@@ -40,16 +40,16 @@ wrench-simple-example-batch \
 ## Understanding the Simple Example      {#getting-started-example-simple}
 
 Both versions of the example (cloud of batch) require two command-line arguments: (1) a [SimGrid virtual platform 
-description file](http://simgrid.gforge.inria.fr/simgrid/3.19/doc/platform.html); and
+description file](https://simgrid.org/doc/latest/platform.html); and
 (2) a WRENCH workflow file.
 
   - **SimGrid simulated platform description file:** 
-A [SimGrid](http://simgrid.gforge.inria.fr) simulation must be provided with the description 
+A [SimGrid](https://simgrid.org) simulation must be provided with the description 
 of the platform on which an application execution is to be simulated. This is done via
 a platform description file, in XML, that includes definitions of compute hosts, clusters of hosts, 
 storage resources, network links, routes between hosts, etc.
 A detailed description on how to create a platform description file can be found
-[here](http://simgrid.gforge.inria.fr/simgrid/3.19/doc/platform.html).
+[here](https://simgrid.org/doc/latest/platform.html).
 
   - **WRENCH workflow file:**
 WRENCH provides native parsers for [DAX](http://workflowarchive.org) (DAG in XML) 
