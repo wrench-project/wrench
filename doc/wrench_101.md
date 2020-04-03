@@ -59,15 +59,15 @@ Here are the steps that a WRENCH-based simulator typically follows:
 
 -# **Create and initialize a simulation** -- In WRENCH, a user simulation is defined via the `wrench::Simulation` class. 
  An instance of this class must be created, and the `wrench::Simulation::init()` method is called to initialize the 
- simulation (and parse WRENCH-specific and [SimGrid-specific](http://simgrid.gforge.inria.fr/simgrid/3.19/doc/options.html) 
+ simulation (and parse WRENCH-specific and [SimGrid-specific](https://simgrid.org/doc/latest/Configuring_SimGrid.html) 
  command-line arguments).  Two useful such arguments are `--help-wrench`, which displays help messages about 
  optional WRENCH-specific command-line arguments, and `--help-simgrid`, which displays help messages about optional
  Simgrid-specific command-line arguments. 
 
 -# **Instantiate a simulated platform** --  This is done with the `wrench::Simulation::instantiatePlatform()`
  method which takes as argument a 
- [SimGrid virtual platform description file](http://simgrid.gforge.inria.fr/simgrid/3.17/doc/platform.html).
- Any [SimGrid](http://simgrid.gforge.inria.fr) simulation must be provided with the description 
+ [SimGrid virtual platform description file](https://simgrid.org/doc/latest/platform.html).
+ Any [SimGrid](https://simgrid.org) simulation must be provided with the description 
  of the platform on which an application/system execution is to be simulated (compute hosts, clusters of hosts, 
  storage resources, network links, routers, routes between hosts, etc.)
 
@@ -224,7 +224,7 @@ while other messages are disabled as follows:
 ~~~~~~~~~~~~~
 
 Use the `--help-logs` option displays information on the way SimGrid logging works. See the 
-[full SimGrid logging documentation](http://simgrid.gforge.inria.fr/simgrid/latest/doc/outcomes_logs.html) for 
+[full SimGrid logging documentation](https://simgrid.org/doc/latest/outcomes.html) for 
 all details.
 
 
@@ -453,7 +453,7 @@ in the simple example provided in the `examples/simple-example` directory.
 It is often desirable for the WMS to print log output to the terminal. This is easily accomplished using the 
 `wrench::WRENCH_INFO`, `wrench::WRENCH_DEBUG`, and `wrench::WRENCH_WARN` macros, which are used just like `printf`. Each of these
 macros corresponds to a different logging level in SimGrid. See the 
-[SimGrid logging documentation](http://simgrid.gforge.inria.fr/simgrid/latest/doc/outcomes_logs.html) for 
+[SimGrid logging documentation](https://simgrid.org/doc/latest/outcomes.html) for 
 all details. 
 
 Furthermore, one can change the color of the log messages with the
