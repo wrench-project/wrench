@@ -336,7 +336,9 @@ namespace wrench {
             std::string disk_mountpoint =
                     FileLocation::sanitizePath(std::string(std::string(disk->get_property("mount"))));
             if (disk_mountpoint == mount_point) {
+                // TODO: WRITE START TIME STAMP
                 disk->write(num_bytes);
+                // TODO: WRITE END TIME STAMP
                 return;
             }
         }
@@ -381,11 +383,15 @@ namespace wrench {
 
         // Start asynchronous read
         auto read_activity = read_disk->io_init(num_bytes_to_read, simgrid::s4u::Io::OpType::READ);
+        // TODO: READ START TIME STAMP
         read_activity->start();
         // Do synchronous write
         write_disk->write(num_bytes_to_write);
-        // Wait for asycnrhonous read to be done
+        // TODO: WRITE END TIME STAMP
+        // Wait for asychronous read to be done
         read_activity->wait();
+        // TODO: READ END TIME STAMP
+
 
     }
 
@@ -413,7 +419,9 @@ namespace wrench {
                     FileLocation::sanitizePath(std::string(std::string(disk->get_property("mount"))));
 
             if (disk_mountpoint == mount_point) {
+                // TODO: READ START TIME STAMP
                 disk->read(num_bytes);
+                // TODO: READ END TIME STAMP
                 return;
             }
         }
