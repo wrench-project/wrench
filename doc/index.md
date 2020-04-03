@@ -15,7 +15,7 @@ Overview                        {#mainpage}
 research, development, and education.
 WRENCH capitalizes on recent and critical advances in the state of the art of distributed 
 platform/application simulation. WRENCH builds on top
-of the open-source [SimGrid](http://simgrid.gforge.inria.fr) simulation framework. 
+of the open-source [SimGrid](https://simgrid.org) simulation framework. 
 SimGrid enables the simulation of large-scale
 distributed applications in a way that is accurate (via validated simulation models), scalable 
 (low ratio of simulation time to simulated time, ability to run large simulations 
@@ -42,7 +42,7 @@ abstractions to provide high-level **building blocks** for developing custom sim
 
 WRENCH comprises four distinct layers:
 
-- **Simulation Core:**  All necessary simulation models and base abstractions (computing, communicating, storing), provided by [SimGrid](http://simgrid.gforge.inria.fr).
+- **Simulation Core:**  All necessary simulation models and base abstractions (computing, communicating, storing), provided by [SimGrid](https://simgrid.org).
 - **Simulated Core CI Services:** abstractions for simulated cyberinfrastructure (CI) components that can be used by a WMS to execute workflows (compute services, storage services, network proximity services, data location services, etc.).
 - **Simulated WMS:** simulated WMS implementations (e.g., simulated existing production WMSs, simulated WMS research prototypes).
 - **Top-Level Simulation:** a top-level set of abstractions to instantiate and simulate the execution of arbitrary workflows on arbitrary platforms using a particular WMS implementation.
