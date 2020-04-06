@@ -51,8 +51,8 @@ namespace wrench {
         std::pair<double, double> compute;
         std::pair<double, double> write;
 
-        std::vector<std::pair<double, double>> reads;
-        std::vector<std::pair<double, double>> writes;
+        std::vector<std::tuple<double, double, string>> reads;
+        std::vector<std::tuple<double, double, string>> writes;
 
         double failed;
         double terminated;
@@ -150,8 +150,8 @@ namespace wrench {
 
         nlohmann::json file_reads;
         for (auto const &r : w.reads) {
-            nlohmann::json file_read = nlohmann::json::object({{"end", r.second},
-                                                              {"start", r.first}});
+            nlohmann::json file_read = nlohmann::json::object({{"end", std::get<1>(r)},
+                                                               {"start", std::get<0>(r)}, {"id", std::get<2>(r)}});
             file_reads.push_back(file_read);
         }
 
@@ -165,8 +165,8 @@ namespace wrench {
 
         nlohmann::json file_writes;
         for (auto const &r : w.writes) {
-            nlohmann::json file_write = nlohmann::json::object({{"end", r.second},
-                                                               {"start", r.first}});
+            nlohmann::json file_write = nlohmann::json::object({{"end", std::get<1>(r)},
+                                                                {"start", std::get<0>(r)}, {"id", std::get<2>(r)}});
             file_writes.push_back(file_write);
         }
 
@@ -450,7 +450,7 @@ namespace wrench {
                     for (auto & read_start_timestamp : read_start_timestamps){
                         if (read_start_timestamp->getContent()->getTask()->getID() == current_execution_instance.task_id) {
                             current_execution_instance.reads.emplace_back(read_start_timestamp->getContent()->getDate(),
-                                                                          read_start_timestamp->getContent()->getEndpoint()->getDate());
+                                                                          read_start_timestamp->getContent()->getEndpoint()->getDate(), read_start_timestamp->getContent()->getFile()->getID());
                         }
                     }
                 }
@@ -459,22 +459,22 @@ namespace wrench {
                     for (auto & write_start_timestamp : write_start_timestamps){
                         if (write_start_timestamp->getContent()->getTask()->getID() == current_execution_instance.task_id) {
                             current_execution_instance.writes.emplace_back(write_start_timestamp->getContent()->getDate(),
-                                                                           write_start_timestamp->getContent()->getEndpoint()->getDate());
+                                                                           write_start_timestamp->getContent()->getEndpoint()->getDate(), write_start_timestamp->getContent()->getFile()->getID());
                         }
                     }
                 }
 
                 nlohmann::json file_reads;
                 for (auto const &r : current_execution_instance.reads) {
-                    nlohmann::json file_read = nlohmann::json::object({{"end", r.second},
-                                                                       {"start", r.first}});
+                    nlohmann::json file_read = nlohmann::json::object({{"end", std::get<1>(r)},
+                                                                       {"start", std::get<0>(r)}, {"id", std::get<2>(r)}});
                     file_reads.push_back(file_read);
                 }
 
                 nlohmann::json file_writes;
                 for (auto const &r : current_execution_instance.writes) {
-                    nlohmann::json file_write = nlohmann::json::object({{"end", r.second},
-                                                                        {"start", r.first}});
+                    nlohmann::json file_write = nlohmann::json::object({{"end", std::get<1>(r)},
+                                                                        {"start", std::get<0>(r)}, {"id", std::get<2>(r)}});
                     file_writes.push_back(file_write);
                 }
                 task_json.push_back({
@@ -524,7 +524,7 @@ namespace wrench {
                     for (auto & read_start_timestamp : read_start_timestamps){
                         if (read_start_timestamp->getContent()->getTask()->getID() == current_execution_instance.task_id) {
                             current_execution_instance.reads.emplace_back(read_start_timestamp->getContent()->getDate(),
-                                                                                      read_start_timestamp->getContent()->getEndpoint()->getDate());
+                                                                                      read_start_timestamp->getContent()->getEndpoint()->getDate(), read_start_timestamp->getContent()->getFile()->getID());
                         }
                     }
                 }
@@ -533,7 +533,7 @@ namespace wrench {
                     for (auto & write_start_timestamp : write_start_timestamps){
                         if (write_start_timestamp->getContent()->getTask()->getID() == current_execution_instance.task_id) {
                         current_execution_instance.writes.emplace_back(write_start_timestamp->getContent()->getDate(),
-                                                                                  write_start_timestamp->getContent()->getEndpoint()->getDate());
+                                                                                  write_start_timestamp->getContent()->getEndpoint()->getDate(), write_start_timestamp->getContent()->getFile()->getID());
                         }
                     }
                 }
