@@ -49,7 +49,6 @@ namespace wrench {
 
         void assertServiceIsUp();
 
-
         double getNetworkTimeoutValue();
         void setNetworkTimeoutValue(double value);
 

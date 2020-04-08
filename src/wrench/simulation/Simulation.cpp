@@ -256,9 +256,7 @@ namespace wrench {
         // Even if the energy-plugin is not activated, getCurrentPstate(hostname) can
         // still be called.
         for (const auto &hostname: this->getHostnameList()) {
-            this->getOutput().addTimestamp<SimulationTimestampPstateSet>(
-                    new SimulationTimestampPstateSet(hostname, getCurrentPstate(hostname))
-            );
+            this->getOutput().addTimestampPstateSet(hostname, getCurrentPstate(hostname));
         }
 
         // Start all services (and the WMS)
@@ -717,8 +715,7 @@ namespace wrench {
         double consumption = S4U_Simulation::getEnergyConsumedByHost(hostname);
 
         if (record_as_time_stamp) {
-            this->getOutput().addTimestamp<SimulationTimestampEnergyConsumption>(
-                    new SimulationTimestampEnergyConsumption(hostname, consumption));
+            this->getOutput().addTimestampEnergyConsumption(hostname, consumption);
         }
 
         return consumption;
@@ -752,8 +749,7 @@ namespace wrench {
      */
     void Simulation::setPstate(const std::string &hostname, int pstate) {
         S4U_Simulation::setPstate(hostname, pstate);
-        this->getOutput().addTimestamp<SimulationTimestampPstateSet>(
-                new SimulationTimestampPstateSet(hostname, pstate));
+        this->getOutput().addTimestampPstateSet(hostname, pstate);
     }
 
     /**

@@ -329,7 +329,7 @@ namespace wrench {
             unsigned long num_nodes_asked_for = batch_job->getRequestedNumNodes();
             unsigned long allocated_time = batch_job->getRequestedTime();
 
-            batch_submission_data["events"][i]["timestamp"] = batch_job->getArrivalTimeStamp();
+            batch_submission_data["events"][i]["timestamp"] = batch_job->getArrivalTimestamp();
             batch_submission_data["events"][i]["type"] = "JOB_SUBMITTED";
             batch_submission_data["events"][i]["data"]["job_id"] = std::to_string(batch_job->getJobID());
             batch_submission_data["events"][i]["data"]["job"]["id"] = std::to_string(batch_job->getJobID());
@@ -459,10 +459,10 @@ namespace wrench {
         // Consumed Energy
         csv_line += "0,";
         // Execution Time
-        double execution_time = batch_job->getEndingTimeStamp() - batch_job->getBeginTimeStamp();
+        double execution_time = batch_job->getEndingTimestamp() - batch_job->getBeginTimestamp();
         csv_line += std::to_string(execution_time) + ",";
         // Finish time
-        double finish_time = batch_job->getEndingTimeStamp();
+        double finish_time = batch_job->getEndingTimestamp();
         csv_line += std::to_string(finish_time) + ",";
         // Job ID
         csv_line += std::to_string(job_id++) + ",";
@@ -473,14 +473,14 @@ namespace wrench {
         // Requested time
         csv_line += std::to_string(batch_job->getRequestedTime()) + ",";
         // Starting time
-        double starting_time = batch_job->getBeginTimeStamp();
+        double starting_time = batch_job->getBeginTimestamp();
         csv_line += std::to_string(starting_time) + ",";
         // Stretch
-        double stretch = (batch_job->getEndingTimeStamp() - batch_job->getArrivalTimeStamp()) /
-                         (batch_job->getEndingTimeStamp() - batch_job->getBeginTimeStamp());
+        double stretch = (batch_job->getEndingTimestamp() - batch_job->getArrivalTimestamp()) /
+                         (batch_job->getEndingTimestamp() - batch_job->getBeginTimestamp());
         csv_line += std::to_string(stretch) + ",";
         // Submission time
-        double submission_time = batch_job->getArrivalTimeStamp();
+        double submission_time = batch_job->getArrivalTimestamp();
         csv_line += std::to_string(submission_time) + ",";
         // Success
         unsigned char success = 1;
@@ -493,10 +493,10 @@ namespace wrench {
         }
         csv_line += std::to_string(success) + ",";
         // Turnaround time
-        double turnaround_time = (batch_job->getEndingTimeStamp() - batch_job->getArrivalTimeStamp());
+        double turnaround_time = (batch_job->getEndingTimestamp() - batch_job->getArrivalTimestamp());
         csv_line += std::to_string(turnaround_time) + ",";
         // Waiting time
-        double waiting_time = (batch_job->getBeginTimeStamp() - batch_job->getArrivalTimeStamp());
+        double waiting_time = (batch_job->getBeginTimestamp() - batch_job->getArrivalTimestamp());
         csv_line += std::to_string(waiting_time) + ",";
         // Workload name
         csv_line += "wrench";

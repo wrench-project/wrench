@@ -122,7 +122,7 @@ void SimulationTimestampEnergyTest::do_SimulationTimestampPstateSet_test() {
     EXPECT_NO_THROW(simulation->launch());
 
     // Check constructor for SimulationTimestampPstateSet timestamps
-    EXPECT_THROW(new wrench::SimulationTimestampPstateSet("", 0), std::invalid_argument);
+    EXPECT_THROW(simulation->getOutput().addTimestampPstateSet("", 0), std::invalid_argument);
 
     // Check that the expected SimulationTimestampPstateSet timestamps have been added to simulation output
     auto set_pstate_timestamps = simulation->getOutput().getTrace<wrench::SimulationTimestampPstateSet>();
@@ -217,7 +217,7 @@ void SimulationTimestampEnergyTest::do_SimulationTimestampEnergyConsumption_test
     EXPECT_NO_THROW(simulation->launch());
 
     // Check constructor for SimulationTimestampEnergyConsumption timestamp
-    EXPECT_THROW(new wrench::SimulationTimestampEnergyConsumption("", 1.0), std::invalid_argument);
+    EXPECT_THROW(simulation->getOutput().addTimestampEnergyConsumption("", 1.0), std::invalid_argument);
 
     // Check that the expected SimulationTimestampEnergyConsumption timestamps have been added to simulation output
     auto energy_consumption_timestamps = simulation->getOutput().getTrace<wrench::SimulationTimestampEnergyConsumption>();

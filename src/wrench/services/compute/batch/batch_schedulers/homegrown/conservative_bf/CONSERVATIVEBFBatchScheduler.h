@@ -10,16 +10,19 @@
 #ifndef WRENCH_CONSERVATIVEBFBATCHSCHEDULER_H
 #define WRENCH_CONSERVATIVEBFBATCHSCHEDULER_H
 
-/***********************/
-/** \cond INTERNAL     */
-/***********************/
-
 #include <wrench/services/compute/batch/BatchComputeService.h>
 #include <wrench/services/compute/batch/batch_schedulers/homegrown/HomegrownBatchScheduler.h>
 #include <services/compute/batch/batch_schedulers/homegrown/conservative_bf/NodeAvailabilityTimeLine.h>
 
 namespace wrench {
 
+/***********************/
+/** \cond INTERNAL     */
+/***********************/
+
+    /**
+     * @brief A class that defines a conservative backfilling batch scheduler
+     */
     class CONSERVATIVEBFBatchScheduler : public HomegrownBatchScheduler {
 
     public:
@@ -46,11 +49,11 @@ namespace wrench {
         std::unique_ptr<NodeAvailabilityTimeLine> schedule;
     };
 
-}
 
 /***********************/
 /** \endcond           */
 /***********************/
+}
 
 
 

@@ -564,8 +564,7 @@ namespace wrench {
 
         // Send a message to the daemon of the dst service
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("copy_file");
-        auto start_timestamp = new SimulationTimestampFileCopyStart(file, src_location, dst_location);
-        src_location->getStorageService()->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyStart>(start_timestamp);
+        src_location->getStorageService()->simulation->getOutput().addTimestampFileCopyStart(file, src_location, dst_location);
 
         try {
             S4U_Mailbox::putMessage(
@@ -624,8 +623,7 @@ namespace wrench {
         assertServiceIsUp(src_location->getStorageService());
         assertServiceIsUp(dst_location->getStorageService());
 
-        auto start_timestamp = new SimulationTimestampFileCopyStart(file, src_location, dst_location);
-        src_location->getStorageService()->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyStart>(start_timestamp);
+        src_location->getStorageService()->simulation->getOutput().addTimestampFileCopyStart(file, src_location, dst_location);
 
         // Send a message to the daemon on the dst location
         try {

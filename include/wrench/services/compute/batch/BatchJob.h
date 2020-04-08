@@ -25,13 +25,13 @@ namespace wrench {
         void setRequestedTime(unsigned long time);
         unsigned long getRequestedCoresPerNode();
         double getMemoryRequirement();
-        double getBeginTimeStamp();
-        void setBeginTimeStamp(double time_stamp);
-        double getEndingTimeStamp();
-        double getArrivalTimeStamp();
+        double getBeginTimestamp();
+        void setBeginTimestamp(double time_stamp);
+        double getEndingTimestamp();
+        double getArrivalTimestamp();
         unsigned long getRequestedNumNodes();
         WorkflowJob* getWorkflowJob();
-        void setEndingTimeStamp(double time_stamp);
+        void setEndingTimestamp(double time_stamp);
         std::map<std::string, std::tuple<unsigned long, double>> getResourcesAllocated();
         void setAllocatedResources(std::map<std::string, std::tuple<unsigned long, double>> resources);
 

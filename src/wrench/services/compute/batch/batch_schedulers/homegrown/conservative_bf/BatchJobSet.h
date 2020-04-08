@@ -14,13 +14,22 @@
 
 namespace wrench {
 
+    /***********************/
+    /** \cond              */
+    /***********************/
+
+    /**
+     * @brief A class that implements a batch job set abstrsaction
+     */
     class BatchJobSet {
 
     public:
 
         BatchJobSet() = default;
 
+        /** @brief The job set **/
         std::set<std::shared_ptr<BatchJob>> jobs;
+        /** @brief number of utilized nodes **/
         unsigned long num_nodes_utilized = 0;
 
         /**
@@ -72,6 +81,10 @@ namespace wrench {
         }
 
     };
+
+    /***********************/
+    /** \endcond           */
+    /***********************/
 
 }
 

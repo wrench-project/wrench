@@ -22,22 +22,24 @@ namespace wrench {
      */
     void FailureDynamicClustering::process(Workflow *workflow) {
 
-      int count = 0;
+        int count = 0;
 
-      for (auto task_map : workflow->getReadyClusters()) {
-        if (task_map.second.size() > 1) {
-          for (auto task : task_map.second) {
-            if (not task->getClusterID().empty() && task->getFailureCount() > 0) {
-              WRENCH_INFO("Ungrouping task %s due to failure", task->getID().c_str());
-              task->setClusterID(task->getID());
-              ++count;
+        for (auto task_map : workflow->getReadyClusters()) {
+
+            if  (task_map.second.size() <= 1) continue;
+
+            for (auto task : task_map.second) {
+
+                if (task->getClusterID().empty() && task->getFailureCount() > 0) continue;
+
+                WRENCH_INFO("Ungrouping task %s due to failure", task->getID().c_str());
+                task->setClusterID(task->getID());
+                ++count;
             }
-          }
         }
-      }
 
-      if (count > 0) {
-        WRENCH_INFO("Ungrouped %d tasks", count);
-      }
+        if (count > 0) {
+            WRENCH_INFO("Ungrouped %d tasks", count);
+        }
     }
 }

@@ -24,8 +24,19 @@ namespace wrench {
 
     public:
 
+        /**
+         * @brief Method to import a Pegasus workflow in DAX format
+         */
         static Workflow *createWorkflowFromDAX(const std::string &filename, const std::string &reference_flop_rate, bool redundant_dependencies = false);
+
+        /**
+         * @brief Method to import a Pegasus workflow in JSON format
+         */
         static Workflow *createWorkflowFromJSON(const std::string &filename, const std::string &reference_flop_rate, bool redundant_dependencies = false);
+
+        /**
+         * @brief Method to import an executable Pegasus workflow in JSON format
+         */
         static Workflow *createExecutableWorkflowFromJSON(const std::string &filename, const std::string &reference_flop_rate, bool redundant_dependencies = false);
 
     };

@@ -22,7 +22,7 @@ namespace wrench {
 
 
     public:
-        CloudStandardJobScheduler(std::shared_ptr<StorageService> default_storage_service) :
+        explicit CloudStandardJobScheduler(std::shared_ptr<StorageService> default_storage_service) :
                 default_storage_service(default_storage_service) {}
 
         /***********************/

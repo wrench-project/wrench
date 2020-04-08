@@ -263,51 +263,51 @@ void SimulationTimestampFileCopyTest::do_SimulationTimestampFileCopyBasic_test()
     }
 
     // test constructors for invalid arguments
-    ASSERT_THROW(wrench::SimulationTimestampFileCopyStart(
+    ASSERT_THROW(simulation->getOutput().addTimestampFileCopyStart(
                          nullptr,
                                  wrench::FileLocation::LOCATION(this->source_storage_service),
                                  wrench::FileLocation::LOCATION(this->destination_storage_service)), std::invalid_argument);
 
-    ASSERT_THROW(wrench::SimulationTimestampFileCopyStart(
+    ASSERT_THROW(simulation->getOutput().addTimestampFileCopyStart(
                          this->file_1,
                                  nullptr,
                                  wrench::FileLocation::LOCATION(this->destination_storage_service, "/")), std::invalid_argument);
 
-    ASSERT_THROW(wrench::SimulationTimestampFileCopyStart(
+    ASSERT_THROW(simulation->getOutput().addTimestampFileCopyStart(
                          this->file_1,
                                  wrench::FileLocation::LOCATION(this->source_storage_service),
                                  nullptr), std::invalid_argument);
 
 
 
-    ASSERT_THROW(wrench::SimulationTimestampFileCopyFailure(
+    ASSERT_THROW(simulation->getOutput().addTimestampFileCopyFailure(
                          nullptr,
                                  wrench::FileLocation::LOCATION(this->source_storage_service),
                                  wrench::FileLocation::LOCATION(this->destination_storage_service)), std::invalid_argument);
 
-    ASSERT_THROW(wrench::SimulationTimestampFileCopyFailure(
+    ASSERT_THROW(simulation->getOutput().addTimestampFileCopyFailure(
                          this->file_1,
                                  nullptr,
                                  wrench::FileLocation::LOCATION(this->destination_storage_service, "/")), std::invalid_argument);
 
-    ASSERT_THROW(wrench::SimulationTimestampFileCopyFailure(
+    ASSERT_THROW(simulation->getOutput().addTimestampFileCopyFailure(
                          this->file_1,
                                  wrench::FileLocation::LOCATION(this->source_storage_service),
                                  nullptr), std::invalid_argument);
 
 
 
-    ASSERT_THROW(wrench::SimulationTimestampFileCopyCompletion(
+    ASSERT_THROW(simulation->getOutput().addTimestampFileCopyCompletion(
                          nullptr,
                                  wrench::FileLocation::LOCATION(this->source_storage_service),
                                  wrench::FileLocation::LOCATION(this->destination_storage_service)), std::invalid_argument);
 
-    ASSERT_THROW(wrench::SimulationTimestampFileCopyCompletion(
+    ASSERT_THROW(simulation->getOutput().addTimestampFileCopyCompletion(
                          this->file_1,
                                  nullptr,
                                  wrench::FileLocation::LOCATION(this->destination_storage_service, "/")), std::invalid_argument);
 
-    ASSERT_THROW(wrench::SimulationTimestampFileCopyCompletion(
+    ASSERT_THROW(simulation->getOutput().addTimestampFileCopyCompletion(
                          this->file_1,
                                  wrench::FileLocation::LOCATION(this->source_storage_service),
                                  nullptr), std::invalid_argument);

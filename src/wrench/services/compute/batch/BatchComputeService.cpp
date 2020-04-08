@@ -1354,12 +1354,12 @@ namespace wrench {
                                 },
                                 {}));
                 executor->start(executor, true, false); // Daemonized, no auto-restart
-                batch_job->setBeginTimeStamp(S4U_Simulation::getClock());
-                batch_job->setEndingTimeStamp(S4U_Simulation::getClock() + allocated_time);
+                batch_job->setBeginTimestamp(S4U_Simulation::getClock());
+                batch_job->setEndingTimestamp(S4U_Simulation::getClock() + allocated_time);
                 this->running_standard_job_executors.insert(executor);
 
 //          this->running_jobs.insert(std::move(batch_job_ptr));
-                this->timeslots.push_back(batch_job->getEndingTimeStamp());
+                this->timeslots.push_back(batch_job->getEndingTimestamp());
                 //remember the allocated resources for the job
                 batch_job->setAllocatedResources(resources);
 
@@ -1367,7 +1367,7 @@ namespace wrench {
                         new AlarmJobTimeOutMessage(batch_job, 0);
 
                 std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(this->simulation,
-                                                                              batch_job->getEndingTimeStamp(),
+                                                                              batch_job->getEndingTimestamp(),
                                                                               this->hostname,
                                                                               this->mailbox_name, msg,
                                                                               "batch_standard");
@@ -1405,16 +1405,16 @@ namespace wrench {
 
                 try {
                     cs->start(cs, true, false); // Daemonized, no auto-restart
-                    batch_job->setBeginTimeStamp(S4U_Simulation::getClock());
+                    batch_job->setBeginTimestamp(S4U_Simulation::getClock());
                     double ending_timestamp = S4U_Simulation::getClock() + (double)allocated_time;
-                    batch_job->setEndingTimeStamp(ending_timestamp);
+                    batch_job->setEndingTimestamp(ending_timestamp);
                 } catch (std::runtime_error &e) {
                     throw;
                 }
 
                 // Put the job in the running queue
 //          this->running_jobs.insert(std::move(batch_job_ptr));
-                this->timeslots.push_back(batch_job->getEndingTimeStamp());
+                this->timeslots.push_back(batch_job->getEndingTimestamp());
 
                 //remember the allocated resources for the job
                 batch_job->setAllocatedResources(resources);
@@ -1433,7 +1433,7 @@ namespace wrench {
                         new AlarmJobTimeOutMessage(batch_job, 0);
 
                 std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(this->simulation,
-                                                                              batch_job->getEndingTimeStamp(),
+                                                                              batch_job->getEndingTimestamp(),
                                                                               host_to_run_on,
                                                                               this->mailbox_name, msg,
                                                                               "batch_pilot");
