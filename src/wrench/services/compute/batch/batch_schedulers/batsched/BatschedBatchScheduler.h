@@ -14,23 +14,66 @@
 
 namespace wrench {
 
+/***********************/
+/** \cond INTERNAL     */
+/***********************/
+
+    /**
+     * @brief A class that defines a batsched batch scheduler
+     */
     class BatschedBatchScheduler : public BatchScheduler {
 
     public:
 
+        /**
+         * @brief Constructor
+         * @param cs: The computer service for which this scheduler is operating
+         */
         explicit BatschedBatchScheduler(BatchComputeService *cs) : BatchScheduler(cs) {}
 
+        /**
+         * @brief Initialization method
+         */
         void init() override;
+
+        /**
+         * @brief Launch method
+         */
         void launch() override;
+
+        /**
+         * @brief Shutdown method
+         */
         void shutdown() override;
 
+        /**
+         * @brief Method to process queued jobs
+         */
         void processQueuedJobs() override;
 
+        /**
+         * @brief Method to process a job submission
+         */
         void processJobSubmission(std::shared_ptr<BatchJob> batch_job) override;
+
+        /**
+         * @brief Method to process a job failure
+         */
         void processJobFailure(std::shared_ptr<BatchJob> batch_job) override;
+
+        /**
+         * @brief Method to process a job completion
+         */
         void processJobCompletion(std::shared_ptr<BatchJob> batch_job) override;
+
+        /**
+         * @brief Method to process a job termination
+         */
         void processJobTermination(std::shared_ptr<BatchJob> batch_job) override;
 
+        /**
+         * @brief Method to get start time estimates
+         */
         std::map<std::string, double> getStartTimeEstimates(std::set<std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs) override;
 
     private:
@@ -52,6 +95,10 @@ namespace wrench {
 #endif
 
     };
+
+/***********************/
+/** \endcond           */
+/***********************/
 
 }
 

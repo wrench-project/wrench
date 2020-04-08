@@ -2,7 +2,7 @@
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 #include <wrench-dev.h>
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(simulation_timestamps, "Log category for SimulationTimeStamps");
+WRENCH_LOG_NEW_DEFAULT_CATEGORY(simulation_timestamps, "Log category for SimulationTimestamps");
 
 
 namespace wrench {
@@ -132,7 +132,6 @@ namespace wrench {
 
     }
 
-
     /**
      * @brief Constructor
      * @param task: the WorkflowTask associated with this timestamp
@@ -189,7 +188,6 @@ namespace wrench {
      * @param file: the WorkflowFile associated with this file copy
      * @param src_location: the source location
      * @param dst_location: the destination location
-     * @param start_timestamp: the timestamp for the file copy start
      */
     SimulationTimestampFileCopy::SimulationTimestampFileCopy(WorkflowFile *file,
                                                              std::shared_ptr<FileLocation> src_location,
@@ -284,7 +282,9 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param start_timestamp: a pointer to the SimulationTimestampFileCopyStart associated with this timestamp
+     * @param file: A workflow file
+     * @param src: the source location
+     * @param dst: the destination location
      * @throw std::invalid_argument
      */
     SimulationTimestampFileCopyFailure::SimulationTimestampFileCopyFailure(WorkflowFile *file,
@@ -307,7 +307,9 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param start_timestamp: a pointer to the SimulationTimestampFileCopyStart associated with this timestamp
+     * @param file: a workflow file
+     * @param src: the source location
+     * @param dst: the destination location
      * @throw std::invalid_argument
      */
     SimulationTimestampFileCopyCompletion::SimulationTimestampFileCopyCompletion(WorkflowFile *file,
@@ -329,13 +331,12 @@ namespace wrench {
         setEndpoints();
     }
 
-
-
     /**
      * @brief Constructor
      * @param file: the WorkflowFile associated with this file read
      * @param src_location: the source location
      * @param service: service requesting file read
+     * @param task: a task associated to  this file read (or nullptr)
      */
     SimulationTimestampFileRead::SimulationTimestampFileRead(WorkflowFile *file,
                                                              FileLocation *src_location,
@@ -417,6 +418,7 @@ namespace wrench {
      * @param file: the WorkflowFile associated with this file read
      * @param src: the source location
      * @param service: service requesting file read
+     * @param task: a  task associated to  this file read (or nullptr)
      * @throw std::invalid_argument
      */
     SimulationTimestampFileReadStart::SimulationTimestampFileReadStart(WorkflowFile *file,
@@ -495,6 +497,7 @@ namespace wrench {
      * @param file: the WorkflowFile associated with this file write
      * @param dst_location: the destination location
      * @param service: service requesting file write
+     * @param task: a  task associated to  this file read (or nullptr)
      */
     SimulationTimestampFileWrite::SimulationTimestampFileWrite(WorkflowFile *file,
                                                                FileLocation *dst_location,
@@ -576,6 +579,7 @@ namespace wrench {
      * @param file: the WorkflowFile associated with this file write
      * @param dst: the destination location
      * @param service: service requesting file write
+     * @param task: a  task associated to  this file read (or nullptr)
      * @throw std::invalid_argument
      */
     SimulationTimestampFileWriteStart::SimulationTimestampFileWriteStart(WorkflowFile *file,

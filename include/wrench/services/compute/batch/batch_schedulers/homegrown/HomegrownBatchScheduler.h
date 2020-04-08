@@ -12,8 +12,16 @@
 
 #include "wrench/services/compute/batch/batch_schedulers/BatchScheduler.h"
 
+
 namespace wrench {
 
+/***********************/
+/** \cond INTERNAL     */
+/***********************/
+
+    /**
+     * @brief An abstract class that defines a batch scheduler
+     */
     class HomegrownBatchScheduler : public BatchScheduler {
 
     public:
@@ -30,6 +38,11 @@ namespace wrench {
 
     };
 
+/***********************/
+/** \endcond           */
+/***********************/
+
 }
+
 
 #endif //WRENCH_HOMEGROWNBATCHSCHEDULER_H

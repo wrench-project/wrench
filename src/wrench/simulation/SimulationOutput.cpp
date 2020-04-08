@@ -32,11 +32,16 @@ WRENCH_LOG_NEW_DEFAULT_CATEGORY(simulation_output, "Log category for Simulation 
 
 namespace wrench {
 
+
+    /******************/
+    /** \cond         */
+    /******************/
+
     nlohmann::json host_utilization_layout;
 
-    /**
-     * \cond
-     */
+    /******************/
+    /** \endcond      */
+    /******************/
 
     /**
      * @brief Object representing an instance when a WorkflowTask was run.
@@ -72,7 +77,6 @@ namespace wrench {
     } WorkflowTaskExecutionInstance;
 
 
-
     /**
      * @brief Function that generates a unified JSON file containing the information specified by boolean arguments.
      *
@@ -86,11 +90,11 @@ namespace wrench {
       *     layout to be generated
      */
     void SimulationOutput::dumpUnifiedJSON(Workflow *workflow, std::string file_path,
-                                                     bool include_platform,
-                                                     bool include_workflow_exec,
-                                                     bool include_workflow_graph,
-                                                     bool include_energy,
-                                                     bool generate_host_utilization_layout) {
+                                           bool include_platform,
+                                           bool include_workflow_exec,
+                                           bool include_workflow_graph,
+                                           bool include_energy,
+                                           bool generate_host_utilization_layout) {
 
         nlohmann::json unified_json;
 
@@ -480,24 +484,24 @@ namespace wrench {
                 task_json.push_back({
                                             {"task_id",                  task->getID()},
                                             {"execution_host", {
-                                                                     {"hostname", current_task_execution.execution_host},
-                                                                     {"flop_rate", Simulation::getHostFlopRate(
-                                                                                    current_task_execution.execution_host)},
-                                                                     {"memory", Simulation::getHostMemoryCapacity(
-                                                                                    current_task_execution.execution_host)},
-                                                                     {"cores", Simulation::getHostNumCores(
-                                                                                    current_task_execution.execution_host)}
-                                                                    }},
+                                                                                 {"hostname", current_task_execution.execution_host},
+                                                                                 {"flop_rate", Simulation::getHostFlopRate(
+                                                                                         current_task_execution.execution_host)},
+                                                                                 {"memory", Simulation::getHostMemoryCapacity(
+                                                                                         current_task_execution.execution_host)},
+                                                                                 {"cores", Simulation::getHostNumCores(
+                                                                                         current_task_execution.execution_host)}
+                                                                         }},
                                             {"num_cores_allocated",           current_task_execution.num_cores_allocated},
                                             {"whole_task", {
-                                                                   {"start",    current_task_execution.task_start},
-                                                                   {"end",       current_task_execution.task_end}
-                                                           }},
+                                                                                 {"start",    current_task_execution.task_start},
+                                                                                 {"end",       current_task_execution.task_end}
+                                                                         }},
                                             {"read",              file_reads},
                                             {"compute",       {
-                                                                      {"start",    current_task_execution.computation_start},
-                                                                      {"end",       current_task_execution.computation_end}
-                                                              }},
+                                                                                 {"start",    current_task_execution.computation_start},
+                                                                                 {"end",       current_task_execution.computation_end}
+                                                                         }},
                                             {"write",            file_writes},
                                             {"failed", current_task_execution.task_failed},
                                             {"terminated", current_task_execution.task_terminated}
@@ -524,7 +528,7 @@ namespace wrench {
                     for (auto & read_start_timestamp : read_start_timestamps){
                         if (read_start_timestamp->getContent()->getTask()->getID() == current_execution_instance.task_id) {
                             current_execution_instance.reads.emplace_back(read_start_timestamp->getContent()->getDate(),
-                                                                                      read_start_timestamp->getContent()->getEndpoint()->getDate(), read_start_timestamp->getContent()->getFile()->getID());
+                                                                          read_start_timestamp->getContent()->getEndpoint()->getDate(), read_start_timestamp->getContent()->getFile()->getID());
                         }
                     }
                 }
@@ -532,8 +536,8 @@ namespace wrench {
                 if (!write_start_timestamps.empty()) {
                     for (auto & write_start_timestamp : write_start_timestamps){
                         if (write_start_timestamp->getContent()->getTask()->getID() == current_execution_instance.task_id) {
-                        current_execution_instance.writes.emplace_back(write_start_timestamp->getContent()->getDate(),
-                                                                                  write_start_timestamp->getContent()->getEndpoint()->getDate(), write_start_timestamp->getContent()->getFile()->getID());
+                            current_execution_instance.writes.emplace_back(write_start_timestamp->getContent()->getDate(),
+                                                                           write_start_timestamp->getContent()->getEndpoint()->getDate(), write_start_timestamp->getContent()->getFile()->getID());
                         }
                     }
                 }
@@ -1157,4 +1161,267 @@ namespace wrench {
             output.close();
         }
     }
+
+
+    /**
+     * @brief Destructor
+     */
+    SimulationOutput::~SimulationOutput() {
+        for (auto t : this->traces) {
+            delete t.second;
+        }
+        this->traces.clear();
+    }
+
+    /**
+     * @brief Constructor
+     */
+    SimulationOutput::SimulationOutput()  {
+        // By default enable all task timestamps
+        this->setEnabled<SimulationTimestampTaskStart>(true);
+        this->setEnabled<SimulationTimestampTaskFailure>(true);
+        this->setEnabled<SimulationTimestampTaskCompletion>(true);
+        this->setEnabled<SimulationTimestampTaskTermination>(true);
+
+        // By default enable all file read timestamps
+        this->setEnabled<SimulationTimestampFileReadStart>(true);
+        this->setEnabled<SimulationTimestampFileReadFailure>(true);
+        this->setEnabled<SimulationTimestampFileReadCompletion>(true);
+
+        // By default enable all file write timestamps
+        this->setEnabled<SimulationTimestampFileWriteStart>(true);
+        this->setEnabled<SimulationTimestampFileWriteFailure>(true);
+        this->setEnabled<SimulationTimestampFileWriteCompletion>(true);
+
+        // By default enable all file copy timestamps
+        this->setEnabled<SimulationTimestampFileCopyStart>(true);
+        this->setEnabled<SimulationTimestampFileCopyFailure>(true);
+        this->setEnabled<SimulationTimestampFileCopyCompletion>(true);
+
+        // By default enable all power timestamps
+        this->setEnabled<SimulationTimestampPstateSet>(true);
+        this->setEnabled<SimulationTimestampEnergyConsumption>(true);
+    }
+
+    
+    /**
+     * @brief Add a task start timestamp
+     * @param task: a workflow task
+     */
+    void SimulationOutput::addTimestampTaskStart(WorkflowTask *task) {
+        if (this->isEnabled<SimulationTimestampTaskStart>()) {
+            this->addTimestamp<SimulationTimestampTaskStart>(new SimulationTimestampTaskStart(task));
+        }
+    }
+
+    /**
+     * @brief Add a task start failure
+     * @param task: a workflow task
+     */
+    void SimulationOutput::addTimestampTaskFailure(WorkflowTask *task) {
+        if (this->isEnabled<SimulationTimestampTaskFailure>()) {
+            this->addTimestamp<SimulationTimestampTaskFailure>(new SimulationTimestampTaskFailure(task));
+        }
+    }
+
+    /**
+     * @brief Add a task start completion
+     * @param task: a workflow task
+     */
+    void SimulationOutput::addTimestampTaskCompletion(WorkflowTask *task) {
+        if (this->isEnabled<SimulationTimestampTaskCompletion>()) {
+            this->addTimestamp<SimulationTimestampTaskCompletion>(new SimulationTimestampTaskCompletion(task));
+        }
+    }
+
+    /**
+    * @brief Add a task start termination
+    * @param task: a workflow task
+    */
+    void SimulationOutput::addTimestampTaskTermination(WorkflowTask *task) {
+        if (this->isEnabled<SimulationTimestampTaskTermination>()) {
+            this->addTimestamp<SimulationTimestampTaskTermination>(new SimulationTimestampTaskTermination(task));
+        }
+    }
+
+    /**
+     * @brief Add a file read start timestamp
+     * @param file: a workflow file
+     * @param src: the source location
+     * @param service: the source storage service
+     * @param task: the workflow task for which this read is done (or nullptr);
+     */
+    void SimulationOutput::addTimestampFileReadStart(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task) {
+        if (this->isEnabled<SimulationTimestampFileReadStart>()) {
+            this->addTimestamp<SimulationTimestampFileReadStart>(new SimulationTimestampFileReadStart(file, src, service, task));
+        }
+    }
+
+    /**
+    * @brief Add a file read failure timestamp
+    * @param file: a workflow file
+    * @param src: the source location
+    * @param service: the source storage service
+    * @param task: the workflow task for which this read is done (or nullptr);
+    */
+    void SimulationOutput::addTimestampFileReadFailure(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task) {
+        if (this->isEnabled<SimulationTimestampFileReadFailure>()) {
+            this->addTimestamp<SimulationTimestampFileReadFailure>(new SimulationTimestampFileReadFailure(file, src, service, task));
+        }
+    }
+
+    /**
+    * @brief Add a file read completion timestamp
+    * @param file: a workflow file
+    * @param src: the source location
+    * @param service: the source storage service
+    * @param task: the workflow task for which this read is done (or nullptr);
+    */
+    void SimulationOutput::addTimestampFileReadCompletion(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task) {
+        if (this->isEnabled<SimulationTimestampFileReadCompletion>()) {
+            this->addTimestamp<SimulationTimestampFileReadCompletion>(new SimulationTimestampFileReadCompletion(file, src, service, task));
+        }
+    }
+
+    /**
+     * @brief Add a file write start timestamp
+     * @param file: a workflow file
+     * @param src: the target location
+     * @param service: the target storage service
+     * @param task: the workflow task for which this write is done (or nullptr);
+     */
+    void SimulationOutput::addTimestampFileWriteStart(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task) {
+        if (this->isEnabled<SimulationTimestampFileWriteStart>()) {
+            this->addTimestamp<SimulationTimestampFileWriteStart>(new SimulationTimestampFileWriteStart(file, src, service, task));
+        }
+    }
+
+    /**
+    * @brief Add a file write failure timestamp
+    * @param file: a workflow file
+    * @param src: the target location
+    * @param service: the target storage service
+    * @param task: the workflow task for which this write is done (or nullptr);
+    */
+    void SimulationOutput::addTimestampFileWriteFailure(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task) {
+        if (this->isEnabled<SimulationTimestampFileWriteFailure>()) {
+            this->addTimestamp<SimulationTimestampFileWriteFailure>(new SimulationTimestampFileWriteFailure(file, src, service, task));
+        }
+    }
+
+    /**
+    * @brief Add a file write completion timestamp
+    * @param file: a workflow file
+    * @param src: the target location
+    * @param service: the target storage service
+    * @param task: the workflow task for which this write is done (or nullptr);
+    */
+    void SimulationOutput::addTimestampFileWriteCompletion(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task) {
+        if (this->isEnabled<SimulationTimestampFileWriteCompletion>()) {
+            this->addTimestamp<SimulationTimestampFileWriteCompletion>(new SimulationTimestampFileWriteCompletion(file, src, service, task));
+        }
+    }
+
+    /**
+     * @brief Add a file copy start timestamp
+     * @param file: a workflow file
+     * @param src: the source location
+     * @param dst: the target location
+     */
+    void SimulationOutput::addTimestampFileCopyStart(WorkflowFile *file, std::shared_ptr<FileLocation> src,
+                                                     std::shared_ptr<FileLocation> dst) {
+        if (this->isEnabled<SimulationTimestampFileCopyStart>()) {
+            this->addTimestamp<SimulationTimestampFileCopyStart>(new SimulationTimestampFileCopyStart(file, src, dst));
+        }
+    }
+
+    /**
+     * @brief Add a file copy failure timestamp
+     * @param file: a workflow file
+     * @param src: the source location
+     * @param dst: the target location
+     */
+    void SimulationOutput::addTimestampFileCopyFailure(WorkflowFile *file, std::shared_ptr<FileLocation> src,
+                                                     std::shared_ptr<FileLocation> dst) {
+        if (this->isEnabled<SimulationTimestampFileCopyFailure>()) {
+            this->addTimestamp<SimulationTimestampFileCopyFailure>(new SimulationTimestampFileCopyFailure(file, src, dst));
+        }
+    }
+
+    /**
+     * @brief Add a file copy completion timestamp
+     * @param file: a workflow file
+     * @param src: the source location
+     * @param dst: the target location
+     */
+    void SimulationOutput::addTimestampFileCopyCompletion(WorkflowFile *file, std::shared_ptr<FileLocation> src,
+                                                     std::shared_ptr<FileLocation> dst) {
+        if (this->isEnabled<SimulationTimestampFileCopyCompletion>()) {
+            this->addTimestamp<SimulationTimestampFileCopyCompletion>(new SimulationTimestampFileCopyCompletion(file, src, dst));
+        }
+    }
+
+    /**
+     * @brief Add a pstate change/set timestamp
+     * @param hostname: a hostname
+     * @param pstate: a pstate index
+     */
+    void SimulationOutput::addTimestampPstateSet(std::string hostname, int pstate) {
+        if (this->isEnabled<SimulationTimestampPstateSet>()) {
+            this->addTimestamp<SimulationTimestampPstateSet>(new SimulationTimestampPstateSet(hostname, pstate));
+        }
+    }
+    
+    /**
+     * @brief Add an energy consumption timestamp
+     * @param hostname: a hostname
+     * @param joules: consumption in joules
+     */
+    void SimulationOutput::addTimestampEnergyConsumption(std::string hostname, double joules) {
+        if (this->isEnabled<SimulationTimestampEnergyConsumption>()) {
+            this->addTimestamp<SimulationTimestampEnergyConsumption>(new SimulationTimestampEnergyConsumption(hostname, joules));
+        }
+    }
+    
+    /**
+     * @brief Enable or Disable the insertion of task-related timestamps in
+     *        the simulation output (enabled by default)
+     * @param enabled true to enable, false to disable
+     */
+    void SimulationOutput::enableWorkflowTaskTimestamps(bool enabled) {
+        this->setEnabled<SimulationTimestampTaskStart>(enabled);
+        this->setEnabled<SimulationTimestampTaskFailure>(enabled);
+        this->setEnabled<SimulationTimestampTaskCompletion>(enabled);
+        this->setEnabled<SimulationTimestampTaskTermination>(enabled);
+    }
+
+    /**
+     * @brief Enable or Disable the insertion of file-related timestamps in
+     *        the simulation output (enabled by default)
+     * @param enabled true to enable, false to disable
+     */
+    void SimulationOutput::enableFileReadWriteCopyTimestamps(bool enabled) {
+        this->setEnabled<SimulationTimestampFileReadStart>(enabled);
+        this->setEnabled<SimulationTimestampFileReadFailure>(enabled);
+        this->setEnabled<SimulationTimestampFileReadCompletion>(enabled);
+        this->setEnabled<SimulationTimestampFileWriteStart>(enabled);
+        this->setEnabled<SimulationTimestampFileWriteFailure>(enabled);
+        this->setEnabled<SimulationTimestampFileWriteCompletion>(enabled);
+        this->setEnabled<SimulationTimestampFileCopyStart>(enabled);
+        this->setEnabled<SimulationTimestampFileCopyFailure>(enabled);
+        this->setEnabled<SimulationTimestampFileCopyCompletion>(enabled);
+    }
+
+    /**
+     * @brief Enable or Disable the insertion of energy-related timestamps in
+     *        the simulation output (enabled by default)
+     * @param enabled true to enable, false to disable
+     */
+    void SimulationOutput::enableEnergyTimestamps(bool enabled) {
+        this->setEnabled<SimulationTimestampPstateSet>(true);
+        this->setEnabled<SimulationTimestampEnergyConsumption>(true);
+    }
+
+
+
 };

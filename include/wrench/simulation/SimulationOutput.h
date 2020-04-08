@@ -20,11 +20,11 @@
 #include "wrench/simulation/SimulationTrace.h"
 
 
-
-
 namespace wrench {
 
 
+
+    class Simulation;
 
     /**
      * @brief A class that contains post-mortem simulation-generated data
@@ -41,19 +41,19 @@ namespace wrench {
          * @return a vector of pointers to SimulationTimestampXXXX instances
          */
         template <class T> std::vector<SimulationTimestamp<T> *> getTrace() {
-          std::type_index type_index  = std::type_index(typeid(T));
+            std::type_index type_index  = std::type_index(typeid(T));
 
-          // Is the trace empty?
-          if (this->traces.find(type_index) == this->traces.end()) {
-            return {};
-          }
+            // Is the trace empty?
+            if (this->traces.find(type_index) == this->traces.end()) {
+                return {};
+            }
 
-          std::vector<SimulationTimestamp<T> *> non_generic_vector;
-          SimulationTrace<T> *trace = (SimulationTrace<T> *)(this->traces[type_index]);
-          for (auto ts : trace->getTrace()) {
-            non_generic_vector.push_back((SimulationTimestamp<T> *)ts);
-          }
-          return non_generic_vector;
+            std::vector<SimulationTimestamp<T> *> non_generic_vector;
+            auto trace = (SimulationTrace<T> *)(this->traces[type_index]);
+            for (auto ts : trace->getTrace()) {
+                non_generic_vector.push_back((SimulationTimestamp<T> *)ts);
+            }
+            return non_generic_vector;
         }
 
         void dumpWorkflowExecutionJSON(Workflow *workflow, std::string file_path, bool generate_host_utilization_layout = false, bool writing_file = true);
@@ -63,38 +63,46 @@ namespace wrench {
         void dumpUnifiedJSON(Workflow *workflow, std::string file_path, bool include_platform = false, bool include_workflow_exec = true,
                              bool include_workflow_graph = false, bool include_energy = false, bool generate_host_utilization_layout = false);
 
+        void enableWorkflowTaskTimestamps(bool enabled);
+        void enableFileReadWriteCopyTimestamps(bool enabled);
+        void enableEnergyTimestamps(bool enabled);
+
         /***********************/
         /** \cond DEVELOPER    */
         /***********************/
 
-        /**
-         * @brief Append a simulation timestamp to a simulation output trace
-         *
-         * @tparam a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
-         * @param timestamp: a pointer to a SimulationTimestampXXXX object
-         */
-        template <class T> void addTimestamp(T *timestamp) {
-          std::type_index type_index = std::type_index(typeid(T));
-          if (this->traces.find(type_index) == this->traces.end()) {
-            this->traces[type_index] = new SimulationTrace<T>();
-          }
-          ((SimulationTrace<T> *)(this->traces[type_index]))->addTimestamp(new SimulationTimestamp<T>(timestamp));
-        }
+        void addTimestampTaskStart(WorkflowTask *task);
+        void addTimestampTaskFailure(WorkflowTask *task);
+        void addTimestampTaskCompletion(WorkflowTask *task);
+        void addTimestampTaskTermination(WorkflowTask *task);
+
+        void addTimestampFileReadStart(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task = nullptr);
+        void addTimestampFileReadFailure(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task = nullptr);
+        void addTimestampFileReadCompletion(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task = nullptr);
+
+        void addTimestampFileWriteStart(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task = nullptr);
+        void addTimestampFileWriteFailure(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task = nullptr);
+        void addTimestampFileWriteCompletion(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task = nullptr);
+
+        void addTimestampFileCopyStart(WorkflowFile *file, std::shared_ptr<FileLocation> src, std::shared_ptr<FileLocation> dst);
+        void addTimestampFileCopyFailure(WorkflowFile *file, std::shared_ptr<FileLocation> src, std::shared_ptr<FileLocation> dst);
+        void addTimestampFileCopyCompletion(WorkflowFile *file, std::shared_ptr<FileLocation> src, std::shared_ptr<FileLocation> dst);
+
+        void addTimestampPstateSet(std::string hostname, int pstate);
+        void addTimestampEnergyConsumption(std::string hostname, double joules);
 
         /***********************/
         /** \endcond          */
         /***********************/
 
+        /***********************/
+        /** \cond              */
+        /***********************/
 
-        /***********************/
-        /** \cond          */
-        /***********************/
-        ~SimulationOutput() {
-          for (auto t : this->traces) {
-            delete t.second;
-          }
-          this->traces.clear();
-        }
+        ~SimulationOutput();
+
+        SimulationOutput();
+
         /***********************/
         /** \endcond          */
         /***********************/
@@ -106,6 +114,41 @@ namespace wrench {
         nlohmann::json workflow_graph_json_part;
         nlohmann::json energy_json_part;
 
+        std::map<std::type_index, bool> enabledStatus;
+
+        /**
+        * @brief Append a simulation timestamp to a simulation output trace
+        *
+        * @tparam a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
+        * @param timestamp: a pointer to a SimulationTimestampXXXX object
+        */
+        template <class T> void addTimestamp(T *timestamp) {
+            std::type_index type_index = std::type_index(typeid(T));
+            if (this->traces.find(type_index) == this->traces.end()) {
+                this->traces[type_index] = new SimulationTrace<T>();
+            }
+            ((SimulationTrace<T> *)(this->traces[type_index]))->addTimestamp(new SimulationTimestamp<T>(timestamp));
+        }
+
+        /**
+         * @brief  Determines whether a time stamp time is enabled
+         * @tparam a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
+         * @return true or false
+         */
+        template <class T> bool isEnabled() {
+            std::type_index type_index = std::type_index(typeid(T));
+            return this->enabledStatus[type_index];
+        }
+
+        /**
+         * @brief  Determines whether a time stamp time is enabled
+         * @tparam a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
+         * @param enabled true is the time stamp type should be enabled, false otherwise
+         */
+        template <class T> void setEnabled(bool enabled) {
+            std::type_index type_index = std::type_index(typeid(T));
+            this->enabledStatus[type_index] = enabled;
+        }
 
     };
 

@@ -5,7 +5,7 @@
         <host id="Host1" speed="1000Gf" core="10"/>
         <host id="Host2" speed="1000Gf" core="10"/>
         <host id="Host3" speed="1000Gf" core="10">
-            <disk id="large_disk" read_bw="100MBps" write_bw="40MBps">
+            <disk id="large_disk" read_bw="100MBps" write_bw="100MBps">
                 <prop id="size" value="5000GiB"/>
                 <prop id="mount" value="/"/>
             </disk>

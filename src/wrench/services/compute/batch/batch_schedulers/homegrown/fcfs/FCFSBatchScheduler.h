@@ -19,6 +19,9 @@
 
 namespace wrench {
 
+    /**
+     * @brief A class that implements a FCFS batch scheduler
+     */
     class FCFSBatchScheduler : public HomegrownBatchScheduler {
 
     public:

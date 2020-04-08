@@ -34,8 +34,12 @@ endif ()
 
 message(STATUS "Building WRENCH Version: ${WRENCH_RELEASE_VERSION}")
 
-include_directories(src/wrench/ include/ ${SimGrid_INCLUDE_DIR}/include /usr/include  /usr/local/include /opt/local/include)
+include_directories(src/wrench/ include/ ${SimGrid_INCLUDE_DIR}/include /usr/include /usr/local/include)
 
+
+# For MacOS's MacPorts
+set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} /opt/local/lib)
+include_directories(/opt/local/include)
 
 # library header files
 set(HEADER_FILES
@@ -372,7 +376,8 @@ install(DIRECTORY include/ DESTINATION include)
 # generate unit tests
 add_executable(unit_tests EXCLUDE_FROM_ALL ${SOURCE_FILES} ${HEADER_FILES} ${TEST_FILES})
 if (ENABLE_BATSCHED)
-    target_link_libraries(unit_tests ${GTEST_LIBRARY} wrenchpegasusworkflowparser wrench -lpthread -lm -lzmq)
+    find_library(ZMQ_LIBRARY NAMES zmq)
+    target_link_libraries(unit_tests ${GTEST_LIBRARY} wrenchpegasusworkflowparser wrench -lpthread -lm ${ZMQ_LIBRARY})
 else ()
     target_link_libraries(unit_tests ${GTEST_LIBRARY} wrenchpegasusworkflowparser wrench -lpthread -lm)
 endif ()
