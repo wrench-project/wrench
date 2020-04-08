@@ -25,7 +25,7 @@ namespace wrench {
 
     public:
 
-        CriticalPathPilotJobScheduler(Workflow *workflow) : workflow(workflow) {}
+        explicit CriticalPathPilotJobScheduler(Workflow *workflow) : workflow(workflow) {}
 
         /***********************/
         /** \cond DEVELOPER    */

@@ -96,7 +96,7 @@ namespace wrench {
      * @brief Get the arrival time stamp
      * @return a date
      */
-    double BatchJob::getArrivalTimeStamp() {
+    double BatchJob::getArrivalTimestamp() {
         return this->arrival_time_stamp;
     }
 
@@ -129,7 +129,7 @@ namespace wrench {
      * @brief Set the batch job's begin timestamp
      * @param time_stamp: a date
      */
-    void BatchJob::setBeginTimeStamp(double time_stamp) {
+    void BatchJob::setBeginTimestamp(double time_stamp) {
         this->begin_time_stamp = time_stamp;
     }
 
@@ -138,7 +138,7 @@ namespace wrench {
      * @brief Get the batch job's begin timestamp
      * @return a date
      */
-    double BatchJob::getBeginTimeStamp() {
+    double BatchJob::getBeginTimestamp() {
         return this->begin_time_stamp;
     }
 
@@ -146,7 +146,7 @@ namespace wrench {
      * @brief Get the batch job's end timestamp
      * @return a date
      */
-    double BatchJob::getEndingTimeStamp() {
+    double BatchJob::getEndingTimestamp() {
         return this->ending_time_stamp;
     }
 
@@ -154,10 +154,10 @@ namespace wrench {
      * @brief Set the batch job's end timestamp
      * @param time_stamp: a date
      */
-    void BatchJob::setEndingTimeStamp(double time_stamp) {
+    void BatchJob::setEndingTimestamp(double time_stamp) {
         if (this->ending_time_stamp > 0) {
             throw std::runtime_error(
-                    "BatchJob::setEndingTimeStamp(): Cannot set time stamp again for the same job"
+                    "BatchJob::setEndingTimestamp(): Cannot set time stamp again for the same job"
             );
         }
         this->ending_time_stamp = time_stamp;
