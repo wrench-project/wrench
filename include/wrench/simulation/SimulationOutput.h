@@ -68,7 +68,7 @@ namespace wrench {
         void enableEnergyTimestamps(bool enabled);
 
         /***********************/
-        /** \cond DEVELOPER    */
+        /** \cond INTERNAL     */
         /***********************/
 
         void addTimestampTaskStart(WorkflowTask *task);
