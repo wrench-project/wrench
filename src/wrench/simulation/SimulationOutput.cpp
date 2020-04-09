@@ -1203,7 +1203,6 @@ namespace wrench {
         this->setEnabled<SimulationTimestampEnergyConsumption>(true);
     }
 
-    
     /**
      * @brief Add a task start timestamp
      * @param task: a workflow task
