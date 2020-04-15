@@ -79,7 +79,7 @@ Here are the steps that a WRENCH-based simulator typically follows:
 -# **Create at least one workflow** --  This is done by creating an instance of the `wrench::Workflow` class, which has
  methods to manually add tasks and files to the workflow application, but also methods to import workflows
  from standard workflow description files ([DAX](http://workflowarchive.org) and 
- [JSON](https://github.com/wrench-project/wrench/tree/master/doc/schemas)). 
+ [JSON](https://github.com/workflowhub/workflow-schema)). 
  If there are input files to the workflow's entry tasks, these must be staged on instantiated storage
  services. 
  
