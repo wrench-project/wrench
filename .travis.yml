@@ -65,7 +65,7 @@ after_success:
       bash <(curl -s https://codecov.io/bash) -f coverage.info -t ${CODECOV_TOKEN};
     fi
   - docker cp wrench:/home/wrench/wrench/docs .;
-  - cp -R ./docs/gh-pages $HOME/gh-pages-to-deploy
+  - cp -R ./gh-pages $HOME/gh-pages-to-deploy
 
 deploy:
   provider: script
