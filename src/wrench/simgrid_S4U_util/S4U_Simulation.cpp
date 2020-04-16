@@ -336,6 +336,7 @@ namespace wrench {
             std::string disk_mountpoint =
                     FileLocation::sanitizePath(std::string(std::string(disk->get_property("mount"))));
             if (disk_mountpoint == mount_point) {
+                //this->simulation->getOutput().addTimestampDiskWriteStart(hostname, mount_point, num_bytes);
                 // TODO: WRITE START TIME STAMP
                 disk->write(num_bytes);
                 // TODO: WRITE END TIME STAMP

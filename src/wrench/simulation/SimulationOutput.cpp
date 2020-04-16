@@ -1193,6 +1193,16 @@ namespace wrench {
         this->setEnabled<SimulationTimestampFileWriteFailure>(true);
         this->setEnabled<SimulationTimestampFileWriteCompletion>(true);
 
+        //By default enable (for now) all disk read timestamps
+        this->setEnabled<SimulationTimestampDiskReadStart>(true);
+        this->setEnabled<SimulationTimestampDiskReadFailure>(true);
+        this->setEnabled<SimulationTimestampDiskReadCompletion>(true);
+
+        // By default enable (for now) all disk write timestamps
+        this->setEnabled<SimulationTimestampDiskWriteStart>(true);
+        this->setEnabled<SimulationTimestampDiskWriteFailure>(true);
+        this->setEnabled<SimulationTimestampDiskWriteCompletion>(true);
+
         // By default enable all file copy timestamps
         this->setEnabled<SimulationTimestampFileCopyStart>(true);
         this->setEnabled<SimulationTimestampFileCopyFailure>(true);
@@ -1322,6 +1332,78 @@ namespace wrench {
     }
 
     /**
+ * @brief Add a file read start timestamp
+ * @param hostname: hostname being read from
+ * @param mount: mountpoint of disk
+ * @param bytes: number of bytes read
+ */
+    void SimulationOutput::addTimestampDiskReadStart(std::string hostname, std::string mount, double bytes) {
+        if (this->isEnabled<SimulationTimestampDiskReadStart>()) {
+            this->addTimestamp<SimulationTimestampDiskReadStart>(new SimulationTimestampDiskReadStart(hostname, mount, bytes));
+        }
+    }
+
+    /**
+    * @brief Add a file read failure timestamp
+     * @param hostname: hostname being read from
+     * @param mount: mountpoint of disk
+     * @param bytes: number of bytes read
+    */
+    void SimulationOutput::addTimestampDiskReadFailure(std::string hostname, std::string mount, double bytes) {
+        if (this->isEnabled<SimulationTimestampDiskReadFailure>()) {
+            this->addTimestamp<SimulationTimestampDiskReadFailure>(new SimulationTimestampDiskReadFailure(hostname, mount, bytes));
+        }
+    }
+
+    /**
+    * @brief Add a file read completion timestamp
+     * @param hostname: hostname being read from
+     * @param mount: mountpoint of disk
+     * @param bytes: number of bytes read
+    */
+    void SimulationOutput::addTimestampDiskReadCompletion(std::string hostname, std::string mount, double bytes) {
+        if (this->isEnabled<SimulationTimestampDiskReadCompletion>()) {
+            this->addTimestamp<SimulationTimestampDiskReadCompletion>(new SimulationTimestampDiskReadCompletion(hostname, mount, bytes));
+        }
+    }
+
+    /**
+     * @brief Add a file write start timestamp
+     * @param hostname: hostname being read from
+     * @param mount: mountpoint of disk
+     * @param bytes: number of bytes read
+     */
+    void SimulationOutput::addTimestampDiskWriteStart(std::string hostname, std::string mount, double bytes) {
+        if (this->isEnabled<SimulationTimestampDiskWriteStart>()) {
+            this->addTimestamp<SimulationTimestampDiskWriteStart>(new SimulationTimestampDiskWriteStart(hostname, mount, bytes));
+        }
+    }
+
+    /**
+    * @brief Add a file write failure timestamp
+     * @param hostname: hostname being read from
+     * @param mount: mountpoint of disk
+     * @param bytes: number of bytes read
+    */
+    void SimulationOutput::addTimestampDiskWriteFailure(std::string hostname, std::string mount, double bytes) {
+        if (this->isEnabled<SimulationTimestampDiskWriteFailure>()) {
+            this->addTimestamp<SimulationTimestampDiskWriteFailure>(new SimulationTimestampDiskWriteFailure(hostname, mount, bytes));
+        }
+    }
+
+    /**
+    * @brief Add a file write completion timestamp
+    * @param hostname: hostname being read from
+    * @param mount: mountpoint of disk
+    * @param bytes: number of bytes read
+    */
+    void SimulationOutput::addTimestampDiskWriteCompletion(std::string hostname, std::string mount, double bytes) {
+        if (this->isEnabled<SimulationTimestampDiskWriteCompletion>()) {
+            this->addTimestamp<SimulationTimestampDiskWriteCompletion>(new SimulationTimestampDiskWriteCompletion(hostname, mount, bytes));
+        }
+    }
+
+    /**
      * @brief Add a file copy start timestamp
      * @param file: a workflow file
      * @param src: the source location
@@ -1392,6 +1474,20 @@ namespace wrench {
         this->setEnabled<SimulationTimestampTaskFailure>(enabled);
         this->setEnabled<SimulationTimestampTaskCompletion>(enabled);
         this->setEnabled<SimulationTimestampTaskTermination>(enabled);
+    }
+
+    /**
+     * @brief Enable or Disable the insertion of disk-related timestamps in
+     *        the simulation output (enabled by default)
+     * @param enabled true to enable, false to disable
+     */
+    void SimulationOutput::enableDiskTimestamps(bool enabled) {
+        this->setEnabled<SimulationTimestampDiskReadStart>(enabled);
+        this->setEnabled<SimulationTimestampDiskReadFailure>(enabled);
+        this->setEnabled<SimulationTimestampDiskReadCompletion>(enabled);
+        this->setEnabled<SimulationTimestampDiskWriteStart>(enabled);
+        this->setEnabled<SimulationTimestampDiskWriteFailure>(enabled);
+        this->setEnabled<SimulationTimestampDiskWriteCompletion>(enabled);
     }
 
     /**

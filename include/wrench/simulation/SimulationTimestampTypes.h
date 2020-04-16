@@ -20,6 +20,7 @@ using namespace std;
 /***********************/
 
 typedef std::tuple<void *, void *, void *> File;
+typedef std::tuple<std::string, std::string, double> DiskAccess;
 
 namespace std {
     template <>
@@ -28,6 +29,15 @@ namespace std {
         size_t operator()(const File &file ) const
         {
             return std::hash<void *>()(std::get<0>(file)) ^ std::hash<void *>()(std::get<1>(file)) ^ std::hash<void *>()(std::get<2>(file));
+        }
+    };
+
+    template <>
+    struct hash<DiskAccess>{
+    public :
+        size_t operator()(const DiskAccess &diskAccess ) const
+        {
+            return std::hash<std::string>()(std::get<0>(diskAccess)) ^ std::hash<std::string>()(std::get<1>(diskAccess)) ^ std::hash<double>()(std::get<2>(diskAccess));
         }
     };
 };
@@ -384,6 +394,158 @@ namespace wrench {
     private:
         friend class SimulationOutput;
         SimulationTimestampFileCopyCompletion(WorkflowFile *file, std::shared_ptr<FileLocation>  src, std::shared_ptr<FileLocation> dst);
+    };
+
+    class SimulationTimestampDiskReadStart;
+
+
+    /**
+     * @brief A base class for simulation timestamps regarding disk reads
+     */
+    class SimulationTimestampDiskRead : public SimulationTimestampPair {
+    public:
+
+        /**
+         * @brief Retrieve the matching endpoint, if any
+         */
+        SimulationTimestampDiskRead *getEndpoint() override;
+        double getBytes();
+        std::string getHostname();
+        std::string getMount();
+
+    protected:
+        /**
+         * @brief amount of bytes being read
+         */
+        double bytes;
+
+        /**
+         * @brief hostname of disk being read from
+         */
+        std::string hostname;
+
+        /**
+         * @brief mount point of disk being read from
+         */
+        std::string mount;
+
+        /**
+         * @brief the data structure that holds the ongoing disk reads.
+         */
+        static std::unordered_multimap<DiskAccess, SimulationTimestampDiskRead *> pending_disk_reads;
+
+        void setEndpoints();
+        friend class SimulationOutput;
+        SimulationTimestampDiskRead(std::string hostname, std::string mount, double bytes);
+    };
+
+    class SimulationTimestampDiskReadFailure;
+    class SimulationTimestampDiskReadCompletion;
+
+    /**
+     * @brief A simulation timestamp class for disk read start times
+     */
+    class SimulationTimestampDiskReadStart : public SimulationTimestampDiskRead {
+    public:
+        friend class SimulationOutput;
+        SimulationTimestampDiskReadStart(std::string hostname, std::string mount, double bytes);
+
+        friend class SimulationTimestampDiskReadFailure;
+        friend class SimulationTimestampDiskReadCompletion;
+    };
+
+    /**
+     * @brief A simulation timestamp class for disk read failure times
+     */
+    class SimulationTimestampDiskReadFailure : public SimulationTimestampDiskRead {
+    private:
+        friend class SimulationOutput;
+        SimulationTimestampDiskReadFailure(std::string hostname, std::string mount, double bytes);
+    };
+
+    /**
+     * @brief A simulation timestamp class for disk read completions
+     */
+    class SimulationTimestampDiskReadCompletion : public SimulationTimestampDiskRead {
+    private:
+        friend class SimulationOutput;
+        SimulationTimestampDiskReadCompletion(std::string hostname, std::string mount, double bytes);
+    };
+
+    class SimulationTimestampDiskWriteStart;
+
+
+    /**
+     * @brief A base class for simulation timestamps regarding disk writes
+     */
+    class SimulationTimestampDiskWrite : public SimulationTimestampPair {
+    public:
+
+        /**
+         * @brief Retrieve the matching endpoint, if any
+         */
+        SimulationTimestampDiskWrite *getEndpoint() override;
+        double getBytes();
+        std::string getHostname();
+        std::string getMount();
+
+    protected:
+        /**
+         * @brief amount of bytes being written
+         */
+        double bytes;
+
+        /**
+         * @brief hostname of disk being written to
+         */
+        std::string hostname;
+
+        /**
+         * @brief mount point of disk being written to
+         */
+        std::string mount;
+
+        /**
+         * @brief the data structure that holds the ongoing disk writes.
+         */
+        static std::unordered_multimap<DiskAccess, SimulationTimestampDiskWrite *> pending_disk_writes;
+
+        void setEndpoints();
+        friend class SimulationOutput;
+        SimulationTimestampDiskWrite(std::string hostname, std::string mount, double bytes);
+    };
+
+    class SimulationTimestampDiskWriteFailure;
+    class SimulationTimestampDiskWriteCompletion;
+
+    /**
+     * @brief A simulation timestamp class for disk write start times
+     */
+    class SimulationTimestampDiskWriteStart : public SimulationTimestampDiskWrite {
+    public:
+        friend class SimulationOutput;
+        SimulationTimestampDiskWriteStart(std::string hostname, std::string mount, double bytes);
+
+        friend class SimulationTimestampDiskWriteFailure;
+        friend class SimulationTimestampDiskWriteCompletion;
+    };
+
+    /**
+     * @brief A simulation timestamp class for disk write failure times
+     */
+    class SimulationTimestampDiskWriteFailure : public SimulationTimestampDiskWrite {
+    private:
+        friend class SimulationOutput;
+        SimulationTimestampDiskWriteFailure(std::string hostname, std::string mount, double bytes);
+    };
+
+    /**
+     * @brief A simulation timestamp class for disk write completions
+     */
+    class SimulationTimestampDiskWriteCompletion : public SimulationTimestampDiskWrite {
+    private:
+        friend class SimulationOutput;
+        SimulationTimestampDiskWriteCompletion(std::string hostname, std::string mount, double bytes);
     };
 
     /**
