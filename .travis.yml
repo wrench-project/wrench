@@ -48,6 +48,8 @@ script:
 
 after_success:
   # coverage analysis and sonarcloud
+  - docker cp wrench:/home/wrench/wrench/docs .;
+  - cp -R ./docs/gh-pages $HOME/gh-pages-to-deploy
   - if [[ "$TRAVIS_OS_NAME" == "linux" && $DIST == "ubuntu-bionic" && $COMPILER == "gcc7" && $batsched == "off" ]] || [[ "$TRAVIS_OS_NAME" == "linux" && $DIST == "ubuntu-bionic" && $COMPILER == "gcc7-batsched" && $batsched == "on" ]]; then
       docker exec -it wrench mkdir wrench/sonar;
       SONARPATH=$(dirname "`which build-wrapper-linux-x86-64`");
@@ -64,8 +66,6 @@ after_success:
       docker cp wrench:/home/wrench/wrench/build/coverage.info .;
       bash <(curl -s https://codecov.io/bash) -f coverage.info -t ${CODECOV_TOKEN};
     fi
-  - docker cp wrench:/home/wrench/wrench/docs .;
-  - cp -R ./gh-pages $HOME/gh-pages-to-deploy
 
 deploy:
   provider: script
