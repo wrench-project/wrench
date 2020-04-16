@@ -66,6 +66,7 @@ namespace wrench {
         void enableWorkflowTaskTimestamps(bool enabled);
         void enableFileReadWriteCopyTimestamps(bool enabled);
         void enableEnergyTimestamps(bool enabled);
+        void enableDiskTimestamps(bool enabled);
 
         /***********************/
         /** \cond INTERNAL     */
@@ -87,6 +88,14 @@ namespace wrench {
         void addTimestampFileCopyStart(WorkflowFile *file, std::shared_ptr<FileLocation> src, std::shared_ptr<FileLocation> dst);
         void addTimestampFileCopyFailure(WorkflowFile *file, std::shared_ptr<FileLocation> src, std::shared_ptr<FileLocation> dst);
         void addTimestampFileCopyCompletion(WorkflowFile *file, std::shared_ptr<FileLocation> src, std::shared_ptr<FileLocation> dst);
+
+        void addTimestampDiskReadStart(std::string hostname, std::string mount, double bytes);
+        void addTimestampDiskReadFailure(std::string hostname, std::string mount, double bytes);
+        void addTimestampDiskReadCompletion(std::string hostname, std::string mount, double bytes);
+
+        void addTimestampDiskWriteStart(std::string hostname, std::string mount, double bytes);
+        void addTimestampDiskWriteFailure(std::string hostname, std::string mount, double bytes);
+        void addTimestampDiskWriteCompletion(std::string hostname, std::string mount, double bytes);
 
         void addTimestampPstateSet(std::string hostname, int pstate);
         void addTimestampEnergyConsumption(std::string hostname, double joules);
