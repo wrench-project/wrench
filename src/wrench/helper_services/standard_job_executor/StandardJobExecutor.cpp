@@ -27,6 +27,7 @@
 #include "wrench/services/helpers/ServiceTerminationDetector.h"
 #include "wrench/services/helpers/HostStateChangeDetector.h"
 #include <wrench/services/helpers/HostStateChangeDetectorMessage.h>
+#include <wrench/workflow/failure_causes/HostError.h>
 
 
 #include <exception>

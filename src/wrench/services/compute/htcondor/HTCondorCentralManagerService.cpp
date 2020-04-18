@@ -18,6 +18,8 @@
 #include "wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessage.h"
 #include "wrench/services/compute/htcondor/HTCondorNegotiatorService.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
+#include <wrench/workflow/failure_causes/NetworkError.h>
+
 
 WRENCH_LOG_NEW_DEFAULT_CATEGORY(HTCondorCentralManager, "Log category for HTCondorCentralManagerService");
 

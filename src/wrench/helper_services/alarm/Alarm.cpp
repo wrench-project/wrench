@@ -12,7 +12,8 @@
 #include "wrench/services/helpers/Alarm.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
-#include "wrench/workflow/execution_events/FailureCause.h"
+#include "wrench/workflow/failure_causes/NetworkError.h"
+#include "wrench/workflow/failure_causes/HostError.h"
 
 WRENCH_LOG_NEW_DEFAULT_CATEGORY(alarm_service, "Log category for Alarm Service");
 

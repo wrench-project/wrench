@@ -14,8 +14,9 @@
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 #include "wrench/services/compute/ComputeService.h"
-#include "wrench/services/compute/cloud/CloudComputeService.h"
 #include "wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h"
+#include "wrench/workflow/failure_causes/JobTypeNotSupported.h"
+#include "wrench/workflow/failure_causes/NetworkError.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(HTCondor, "Log category for HTCondorComputeService Scheduler");
 

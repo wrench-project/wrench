@@ -10,7 +10,6 @@
 #include <nlohmann/json.hpp>
 #include <boost/algorithm/string.hpp>
 
-#include <wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h>
 #include <wrench/services/compute/cloud/CloudComputeService.h>
 #include <wrench/wms/WMS.h>
 #include "helper_services/standard_job_executor/StandardJobExecutorMessage.h"
@@ -26,10 +25,17 @@
 #include "wrench/util/TraceFileLoader.h"
 #include "wrench/workflow/job/PilotJob.h"
 #include "services/compute/batch/workload_helper_classes/WorkloadTraceFileReplayer.h"
-
 #include "batch_schedulers/homegrown/fcfs/FCFSBatchScheduler.h"
 #include "services/compute/batch/batch_schedulers/homegrown/conservative_bf/CONSERVATIVEBFBatchScheduler.h"
 #include "batch_schedulers/batsched/BatschedBatchScheduler.h"
+#include "wrench/workflow/failure_causes/JobTypeNotSupported.h"
+#include "wrench/workflow/failure_causes/FunctionalityNotAvailable.h"
+#include "wrench/workflow/failure_causes/JobKilled.h"
+#include "wrench/workflow/failure_causes/NetworkError.h"
+#include "wrench/workflow/failure_causes/NotEnoughResources.h"
+#include "wrench/workflow/failure_causes/JobTimeout.h"
+#include "wrench/workflow/failure_causes/NotAllowed.h"
+
 
 WRENCH_LOG_NEW_DEFAULT_CATEGORY(batch_service, "Log category for Batch Service");
 

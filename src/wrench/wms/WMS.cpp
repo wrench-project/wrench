@@ -18,9 +18,8 @@
 #include "wrench/managers/DataMovementManager.h"
 #include "wrench/services/compute/ComputeService.h"
 #include "wrench/services/compute/bare_metal/BareMetalComputeService.h"
-#include "wrench/services/compute/cloud/CloudComputeService.h"
-#include "wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h"
 #include "wrench/services/compute/batch/BatchComputeService.h"
+#include <wrench/workflow/failure_causes/NetworkError.h>
 
 WRENCH_LOG_NEW_DEFAULT_CATEGORY(wms, "Log category for WMS");
 
