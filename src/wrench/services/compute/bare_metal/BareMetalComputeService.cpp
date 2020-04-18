@@ -13,10 +13,9 @@
 #include <wrench/util/PointerUtil.h>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
+
 #include <wrench/services/compute/bare_metal/BareMetalComputeService.h>
 #include <wrench/services/helpers/HostStateChangeDetectorMessage.h>
-
-
 #include "wrench/services/ServiceMessage.h"
 #include "wrench/services/compute/ComputeServiceMessage.h"
 #include "helper_services/standard_job_executor/StandardJobExecutorMessage.h"
@@ -28,11 +27,11 @@
 #include "wrench/services/storage/StorageService.h"
 #include "wrench/simulation/Simulation.h"
 #include "wrench/workflow/job/PilotJob.h"
-#include "wrench/services/helpers/Alarm.h"
 #include "wrench/workflow/job/StandardJob.h"
-#include "wrench/workflow/job/PilotJob.h"
 #include "wrench/services/helpers/ServiceTerminationDetector.h"
 #include "wrench/services/helpers/HostStateChangeDetector.h"
+#include "wrench/workflow/failure_causes/JobTypeNotSupported.h"
+#include "wrench/workflow/failure_causes/HostError.h"
 
 WRENCH_LOG_NEW_DEFAULT_CATEGORY(bare_metal_compute_service, "Log category for BareMetalComputeService");
 

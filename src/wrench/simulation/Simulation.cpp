@@ -154,7 +154,11 @@ namespace wrench {
 
         // If version requested, put back the "--version" argument
         if (version_requested) {
-            std::cout << "WRENCH version " << getWRENCHVersionString() << "\n";
+            std::cout << "WRENCH version " << getWRENCHVersionString();
+#ifdef ENABLE_BATSCHED
+            std::cout << " (compiled with Batsched)";
+#endif
+            std::cout << "\n";
             argv[(*argc)] = strdup("--version");
             (*argc)++;
         }

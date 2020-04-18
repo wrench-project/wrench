@@ -9,14 +9,12 @@
 
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
-#include <wrench/services/helpers/ServiceTerminationDetectorMessage.h>
 
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
 #include "../failure_test_util/ResourceSwitcher.h"
-#include "wrench/services/helpers/ServiceTerminationDetector.h"
 #include "../failure_test_util/SleeperVictim.h"
-#include "../failure_test_util/ComputerVictim.h"
+#include <wrench/workflow/failure_causes/HostError.h>
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(service_start_restart_test, "Log category for ServiceStartRestartTest");
 

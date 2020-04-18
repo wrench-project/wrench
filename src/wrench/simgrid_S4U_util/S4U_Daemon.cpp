@@ -13,6 +13,7 @@
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include <wrench/logging/TerminalOutput.h>
 #include <boost/algorithm/string.hpp>
+#include <wrench/workflow/failure_causes/HostError.h>
 
 #ifdef MESSAGE_MANAGER
 #include <wrench/util/MessageManager.h>

@@ -17,6 +17,13 @@
 #include "wrench/wms/scheduler/PilotJobScheduler.h"
 #include "wrench/wms/scheduler/StandardJobScheduler.h"
 #include "wrench/services/compute/cloud/CloudComputeService.h"
+#include "wrench/workflow/execution_events/StandardJobCompletedEvent.h"
+#include "wrench/workflow/execution_events/StandardJobFailedEvent.h"
+#include "wrench/workflow/execution_events/PilotJobStartedEvent.h"
+#include "wrench/workflow/execution_events/PilotJobExpiredEvent.h"
+#include "wrench/workflow/execution_events/FileCopyCompletedEvent.h"
+#include "wrench/workflow/execution_events/FileCopyFailedEvent.h"
+#include "wrench/workflow/execution_events/TimerEvent.h"
 #include "wrench/workflow/Workflow.h"
 
 namespace wrench {

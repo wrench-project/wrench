@@ -15,7 +15,7 @@
 #include <wrench/util/UnitParser.h>
 #include <simgrid/plugins/energy.h>
 #include <simgrid/plugins/file_system.h>
-#include <wrench/workflow/execution_events/FailureCause.h>
+#include <wrench/workflow/failure_causes/FailureCause.h>
 #include "wrench/logging/TerminalOutput.h"
 
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"

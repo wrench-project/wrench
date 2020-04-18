@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <iostream>
+#include <wrench/workflow/failure_causes/NetworkError.h>
 
 #ifdef MESSAGE_MANAGER
 #include <wrench/util/MessageManager.h>
@@ -17,7 +18,7 @@
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/simgrid_S4U_util/S4U_PendingCommunication.h"
 #include "wrench/simulation/SimulationMessage.h"
-#include "wrench/workflow/execution_events/FailureCause.h"
+#include "wrench/workflow/failure_causes/FailureCause.h"
 
 WRENCH_LOG_NEW_DEFAULT_CATEGORY(pending_communication, "Log category for Pending Communication");
 
