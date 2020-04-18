@@ -740,9 +740,8 @@ namespace wrench {
         WRENCH_DEBUG("Inserting a DiskReadStart timestamp for disk read");
 
         // all information about a disk read should be passed
-        if ((this->hostname.empty())
-            || (this->mount.empty())
-            || (this->bytes == NULL))  {
+        if (this->hostname.empty()
+            || this->mount.empty()) {
 
             throw std::invalid_argument(
                     "SimulationTimestampDiskReadStart::SimulationTimestampDiskReadStart() cannot take nullptr arguments");
@@ -768,8 +767,7 @@ namespace wrench {
         WRENCH_DEBUG("Inserting a DiskReadFailure timestamp for disk read");
 
         if (hostname.empty()
-            || mount.empty()
-            || bytes == NULL) {
+            || mount.empty()) {
             throw std::invalid_argument(
                     "SimulationTimestampDiskReadFailure::SimulationTimestampDiskReadFailure() requires a valid pointer to file, destination and service objects");
         }
@@ -792,8 +790,7 @@ namespace wrench {
         WRENCH_DEBUG("Inserting a DiskReadCompletion timestamp for disk read");
 
         if (hostname.empty()
-            || mount.empty()
-            || bytes == NULL) {
+            || mount.empty()) {
             throw std::invalid_argument(
                     "SimulationTimestampDiskReadFailure::SimulationTimestampDiskReadFailure() requires a valid pointer to file, destination and service objects");
         }
@@ -888,9 +885,8 @@ namespace wrench {
         WRENCH_DEBUG("Inserting a DiskWriteStart timestamp for disk write");
 
         // all information about a disk write should be passed
-        if ((this->hostname.empty())
-            || (this->mount.empty())
-            || (this->bytes == NULL)) {
+        if (this->hostname.empty()
+            || this->mount.empty()) {
 
             throw std::invalid_argument(
                     "SimulationTimestampDiskWriteStart::SimulationTimestampDiskWriteStart() cannot take nullptr arguments");
@@ -916,8 +912,7 @@ namespace wrench {
         WRENCH_DEBUG("Inserting a DiskWriteFailure timestamp for disk write");
 
         if (hostname.empty()
-            || mount.empty()
-            || bytes == NULL) {
+            || mount.empty()) {
             throw std::invalid_argument(
                     "SimulationTimestampDiskWriteFailure::SimulationTimestampDiskWriteFailure() requires a valid pointer to file, destination and service objects");
         }
@@ -940,8 +935,7 @@ namespace wrench {
         WRENCH_DEBUG("Inserting a DiskWriteCompletion timestamp for disk write");
 
         if (hostname.empty()
-            || mount.empty()
-            || bytes == NULL) {
+            || mount.empty()) {
             throw std::invalid_argument(
                     "SimulationTimestampDiskWriteFailure::SimulationTimestampDiskWriteFailure() requires a valid pointer to file, destination and service objects");
         }

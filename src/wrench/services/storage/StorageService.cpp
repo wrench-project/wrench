@@ -19,6 +19,7 @@
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/simulation/Simulation.h"
 #include "wrench/simgrid_S4U_util/S4U_PendingCommunication.h"
+#include "wrench/workflow/failure_causes/NetworkError.h"
 
 WRENCH_LOG_NEW_DEFAULT_CATEGORY(storage_service, "Log category for Storage Service");
 

@@ -10,6 +10,7 @@
 
 #include <cfloat>
 #include <numeric>
+#include <wrench/workflow/failure_causes/JobTypeNotSupported.h>
 
 #include "CloudComputeServiceMessage.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"

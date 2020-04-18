@@ -415,11 +415,6 @@ namespace wrench {
 
     protected:
         /**
-         * @brief amount of bytes being read
-         */
-        double bytes;
-
-        /**
          * @brief hostname of disk being read from
          */
         std::string hostname;
@@ -428,6 +423,12 @@ namespace wrench {
          * @brief mount point of disk being read from
          */
         std::string mount;
+
+        /**
+         * @brief amount of bytes being read
+         */
+        double bytes;
+
 
         /**
          * @brief the data structure that holds the ongoing disk reads.
@@ -490,10 +491,6 @@ namespace wrench {
         std::string getMount();
 
     protected:
-        /**
-         * @brief amount of bytes being written
-         */
-        double bytes;
 
         /**
          * @brief hostname of disk being written to
@@ -504,6 +501,11 @@ namespace wrench {
          * @brief mount point of disk being written to
          */
         std::string mount;
+
+        /**
+         * @brief amount of bytes being written
+         */
+        double bytes;
 
         /**
          * @brief the data structure that holds the ongoing disk writes.

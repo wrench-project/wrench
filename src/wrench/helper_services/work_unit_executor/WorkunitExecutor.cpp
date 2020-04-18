@@ -23,11 +23,16 @@
 #include <wrench/workflow/job/StandardJob.h>
 #include <wrench/simulation/SimulationTimestampTypes.h>
 #include <wrench/services/compute/workunit_executor/Workunit.h>
+#include <wrench/workflow//failure_causes/NoScratchSpace.h>
 #include "ComputeThread.h"
 #include "wrench/simulation/Simulation.h"
 
 #include "wrench/logging/TerminalOutput.h"
 #include <wrench/services/compute/ComputeService.h>
+#include <wrench/workflow/failure_causes/FileNotFound.h>
+#include <wrench/workflow/failure_causes/NetworkError.h>
+#include <wrench/workflow/failure_causes/FatalFailure.h>
+#include <wrench/workflow/failure_causes/ComputeThreadHasDied.h>
 
 
 WRENCH_LOG_NEW_DEFAULT_CATEGORY(workunit_executor, "Log category for Multicore Workunit Executor");
