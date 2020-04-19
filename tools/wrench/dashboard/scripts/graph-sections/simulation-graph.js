@@ -1,9 +1,30 @@
+function getBoxWidthFromArray(d, section, scale) {
+    var dict = {
+        "start": scale(0),
+        "end": scale(0)
+    }
+    if (Object.keys(d[section]).length > 0) {
+        var min_time = Number.MAX_VALUE
+        var duration = 0
+        for (key in Object.keys(d[section])) {
+            var time = getBoxWidth(d[section], key, scale)
+            if (time != scale(0)) {
+                duration += time
+                min_time = scale(d[section][key].start) < min_time ? scale(d[section][key].start) : min_time
+            }
+        }
+        dict.start = min_time
+        dict.end = duration
+    }
+    return dict
+}
+
 function getBoxWidth(d, section, scale) {
     if (d[section].start != -1) {
         if (d[section].end == -1) {
             if (d.terminated != -1) {
                 return scale(d.terminated) - scale(d[section].start)
-            } else if (d.failed != -1){
+            } else if (d.failed != -1) {
                 return scale(d.failed) - scale(d[section].start)
             }
         } else {
@@ -54,10 +75,10 @@ function generateGraph(data, containerId, currGraphState, CONTAINER_WIDTH, CONTA
             <span id="tooltip-task-operation"></span><br>
             <span id="tooltip-task-operation-duration"></span>
         </div>`
-    
-    var read_color    = '#cbb5dd'
+
+    var read_color = '#cbb5dd'
     var compute_color = '#f7daad'
-    var write_color   = '#abdcf4'
+    var write_color = '#abdcf4'
     var container = d3.select(`#${containerId}`)
     const PADDING = 60
     const RANGE_END = 30
@@ -67,18 +88,18 @@ function generateGraph(data, containerId, currGraphState, CONTAINER_WIDTH, CONTA
         .attr('height', CONTAINER_HEIGHT)
         .attr('id', 'graph')
     var xscale = d3.scaleLinear()
-        .domain([0, d3.max(data, function(d) {
+        .domain([0, d3.max(data, function (d) {
             return Math.max(d['whole_task'].end, d['failed'], d['terminated'])
         })])
         .range([PADDING, CONTAINER_WIDTH - PADDING])
 
     var task_ids = []
-    data.forEach(function(task) {
+    data.forEach(function (task) {
         task_ids.push(task['task_id'])
     })
 
-    task_ids.sort(function(lhs, rhs) {
-       return parseInt(lhs.slice(4)) - parseInt(rhs.slice(4))
+    task_ids.sort(function (lhs, rhs) {
+        return parseInt(lhs.slice(4)) - parseInt(rhs.slice(4))
     })
 
     var yscale = d3.scaleBand()
@@ -108,7 +129,7 @@ function generateGraph(data, containerId, currGraphState, CONTAINER_WIDTH, CONTA
     svg.append("text")
         .attr("class", "x label")
         .attr("text-anchor", "end")
-        .attr("x", CONTAINER_WIDTH/2)
+        .attr("x", CONTAINER_WIDTH / 2)
         .attr("y", CONTAINER_HEIGHT - 6)
         .text("Time (seconds)")
 
@@ -119,19 +140,19 @@ function generateGraph(data, containerId, currGraphState, CONTAINER_WIDTH, CONTA
         .attr("id", "y-axis-label")
         .attr("transform", "rotate(-90)")
         .attr("y", 0)
-        .attr("x",0 - (CONTAINER_HEIGHT / 2))
+        .attr("x", 0 - (CONTAINER_HEIGHT / 2))
         .attr("dy", "1em")
         .style("text-anchor", "middle")
         .text(yAxisText)
 
-    data.forEach(function(d) {
-        var height = data.length > 1 ? yscale(data[0].task_id)-yscale(data[1].task_id) : CONTAINER_HEIGHT - PADDING - RANGE_END;
+    data.forEach(function (d) {
+        var height = data.length > 1 ? yscale(data[0].task_id) - yscale(data[1].task_id) : CONTAINER_HEIGHT - PADDING - RANGE_END;
         var yScaleNumber = data.length > 1 ? yscale(d.task_id) : RANGE_END
         var group = svg.append('g')
-           .attr('id', sanitizeId(d.task_id))
-        var readTime = getBoxWidth(d, "read", xscale)
+            .attr('id', sanitizeId(d.task_id))
+        var readTime = getBoxWidthFromArray(d, "read", xscale)
         var computeTime = getBoxWidth(d, "compute", xscale)
-        var writeTime = getBoxWidth(d, "write", xscale)
+        var writeTime = getBoxWidthFromArray(d, "write", xscale)
         var ft_point = determineFailedOrTerminatedPoint(d)
         if (ft_point != "none") {
             var x_ft = xscale(d.terminated == -1 ? d.failed : d.terminated)
@@ -146,54 +167,54 @@ function generateGraph(data, containerId, currGraphState, CONTAINER_WIDTH, CONTA
                 .attr('class', class_ft)
         }
         group.append('rect')
-            .attr('x', xscale(d.read.start))
+            .attr('x', readTime.start)
             .attr('y', yScaleNumber)
             .attr('height', height)
-            .attr('width', readTime)
-            .style('fill',read_color)
-            .attr('class','read')
+            .attr('width', readTime.end)
+            .style('fill', read_color)
+            .attr('class', 'read')
         if (ft_point != "read" || ft_point == "none") {
             group.append('rect')
                 .attr('x', xscale(d.compute.start))
                 .attr('y', yScaleNumber)
                 .attr('height', height)
                 .attr('width', computeTime)
-                .style('fill',compute_color)
-                .attr('class','compute')
+                .style('fill', compute_color)
+                .attr('class', 'compute')
         }
-        if ((ft_point != "read" && ft_point != "compute" )|| ft_point == "none") {
+        if ((ft_point != "read" && ft_point != "compute") || ft_point == "none") {
             group.append('rect')
-                .attr('x', xscale(d.write.start))
+                .attr('x', writeTime.start)
                 .attr('y', yScaleNumber)
                 .attr('height', height)
-                .attr('width', writeTime)
-                .style('fill',write_color)
-                .attr('class','write')
+                .attr('width', writeTime.end)
+                .style('fill', write_color)
+                .attr('class', 'write')
         }
         var tooltip = document.getElementById("tooltip-container")
-        var tooltip_task_id                 = d3.select("#tooltip-task-id")
-        var tooltip_host                    = d3.select("#tooltip-host")
-        var tooltip_task_operation          = d3.select("#tooltip-task-operation")
+        var tooltip_task_id = d3.select("#tooltip-task-id")
+        var tooltip_host = d3.select("#tooltip-host")
+        var tooltip_task_operation = d3.select("#tooltip-task-operation")
         var tooltip_task_operation_duration = d3.select("#tooltip-task-operation-duration")
         group.selectAll('rect')
-            .on('mouseover', function() {
+            .on('mouseover', function () {
                 tooltip.style.display = 'inline'
 
                 d3.select(this)
                     .attr('stroke', 'gray')
                     .style('stroke-width', '1')
             })
-            .on('mousemove', function() {
+            .on('mousemove', function () {
                 var offset = getOffset(document.getElementById(containerId), d3.mouse(this))
                 var x = window.scrollX + offset.left + 20
                 var y = window.scrollY + offset.top - 30 // 20 seems to account for the padding of the chart-block
-                
+
                 tooltip.style.left = x + 'px'
                 tooltip.style.top = y + 'px'
 
                 tooltip_task_id.text('TaskID: ' + d.task_id)
 
-                tooltip_host.text('Host Name: ' + d['execution host'].hostname)
+                tooltip_host.text('Host Name: ' + d['execution_host'].hostname)
 
                 var parent_group = d3.select(this).attr('class')
 
@@ -216,9 +237,9 @@ function generateGraph(data, containerId, currGraphState, CONTAINER_WIDTH, CONTA
                 } else {
                     tooltip_task_operation_duration.text('')
                 }
-                
+
             })
-            .on('mouseout', function() {
+            .on('mouseout', function () {
                 tooltip.style.display = 'none'
 
                 d3.select(this)

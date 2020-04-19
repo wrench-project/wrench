@@ -1,8 +1,7 @@
 const getDuration = (start, end) => {
     if (start === "Failed" || start === "Terminated") {
         return start
-    }
-    else if (end === "Failed" || end === "Terminated") {
+    } else if (end === "Failed" || end === "Terminated") {
         return end
     } else {
         return toFiveDecimalPlaces(end - start)
@@ -15,14 +14,25 @@ function findDuration(data, id, section) {
     for (var i = 0; i < data.length; i++) {
         var currData = data[i]
         if (currData.task_id == id) {
-            if (currData[section].end == -1) {
-                if (currData.terminated == -1) {
-                    return currData.failed - currData[section].start
-                } else if (currData.failed == -1) {
-                    return currData.terminated - currData[section].start
+            if (section == "read" || section == "write") {
+                if (Object.keys(currData[section]).length > 0) {
+                    var duration = 0
+                    for (key in Object.keys(currData[section])) {
+                        duration += currData[section][key].end - currData[section][key].start
+                    }
+                    return duration
                 }
+                return 0
+            } else {
+                if (currData[section].end == -1) {
+                    if (currData.terminated == -1) {
+                        return currData.failed - currData[section].start
+                    } else if (currData.failed == -1) {
+                        return currData.terminated - currData[section].start
+                    }
+                }
+                return currData[section].end - currData[section].start
             }
-            return currData[section].end - currData[section].start
         }
     }
 }
@@ -44,7 +54,7 @@ function getRandomColour() {
     var letters = '0123456789ABCDEF';
     var colour = '#';
     for (var i = 0; i < 6; i++) {
-      colour += letters[Math.floor(Math.random() * 16)];
+        colour += letters[Math.floor(Math.random() * 16)];
     }
     return colour;
 }
@@ -79,11 +89,11 @@ function populateLegend(currView) {
         }
         legend.append("small")
             .attr("class", "inline-block")
-            .attr("id","workflow-execution-chart-legend-failed")
+            .attr("id", "workflow-execution-chart-legend-failed")
             .text("Failed During Execution")
         legend.append("small")
             .attr("class", "inline-block")
-            .attr("id","workflow-execution-chart-legend-terminated")
+            .attr("id", "workflow-execution-chart-legend-terminated")
             .text("Terminated By User")
     }
 }
@@ -103,7 +113,7 @@ function determineTaskEnd(d) {
 
 function determineTaskOverlap(data) {
     var taskOverlap = {}
-    data.forEach(function(d) {
+    data.forEach(function (d) {
         var taskStart = d.whole_task.start
         var taskEnd = determineTaskEnd(d)
         if (Object.keys(taskOverlap).length === 0) {
@@ -151,14 +161,14 @@ function searchOverlap(taskId, taskOverlap) {
 }
 
 function extractFileContent(file) {
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
         let reader = new FileReader()
-        reader.onload = function(event) {
+        reader.onload = function (event) {
             resolve(event.target.result);
             // document.getElementById('fileContent').textContent = event.target.result;
         }
         reader.readAsText(file);
-        setTimeout(function() {
+        setTimeout(function () {
             reject()
         }, 5000)
     })
@@ -169,7 +179,7 @@ function processFile(files, fileType) {
         return
     }
     extractFileContent(files[0])
-        .then(function(rawDataString) {
+        .then(function (rawDataString) {
             switch (fileType) {
                 case "taskData":
                     const rawData = JSON.parse(rawDataString)
@@ -187,7 +197,7 @@ function processFile(files, fileType) {
             }
             initialise()
         })
-        .catch(function() {
+        .catch(function () {
             return
         })
 }
