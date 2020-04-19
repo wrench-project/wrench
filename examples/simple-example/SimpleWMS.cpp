@@ -16,7 +16,7 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(simple_wms, "Log category for Simple WMS");
 namespace wrench {
 
     /**
-     * @brief Constructor that creates a Simple WMS with a workflow instance,
+     * @brief Constructor that creates a Simple WMS with
      *        a scheduler implementation, and a list of compute services
      *
      * @param standard_job_scheduler: a standard job scheduler implementation (if nullptr none is used)
@@ -49,14 +49,10 @@ namespace wrench {
 
       TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
       
-      WRENCH_INFO("===> %ld", this->getWorkflow()->getNumLevels());
-
       // Check whether the WMS has a deferred start time
       checkDeferredStart();
 
-      WRENCH_INFO("Starting on host %s listening on mailbox_name %s",
-                  S4U_Simulation::getHostName().c_str(),
-                  this->mailbox_name.c_str());
+      WRENCH_INFO("Starting on host %s", S4U_Simulation::getHostName().c_str());
       WRENCH_INFO("About to execute a workflow with %lu tasks", this->getWorkflow()->getNumberOfTasks());
 
       // Create a job manager
