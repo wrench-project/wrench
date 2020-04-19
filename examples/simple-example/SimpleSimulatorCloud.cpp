@@ -81,7 +81,7 @@ int main(int argc, char **argv) {
     /* Create a list of storage services that will be used by the WMS */
     std::set<std::shared_ptr<wrench::StorageService>> storage_services;
 
-    /* Instantiate a storage service, to be stated on some host in the simulated platform,
+    /* Instantiate a storage service, to be started on some host in the simulated platform,
      * and adding it to the simulation.  A wrench::StorageService is an abstraction of a service on
      * which files can be written and read.  This particular storage service, which is an instance
      * of wrench::SimpleStorageService, is started on Host3 in the
@@ -129,7 +129,7 @@ int main(int argc, char **argv) {
 
 
 
-    /* Instantiate a WMS, to be stated on some host (wms_host), which is responsible
+    /* Instantiate a WMS, to be started on some host (wms_host), which is responsible
      * for executing the workflow, and uses a scheduler (CloudStandardJobScheduler). That scheduler
      * is instantiated with the cloud service, the list of hosts available for running
      * tasks, and also provided a pointer to the simulation object.
