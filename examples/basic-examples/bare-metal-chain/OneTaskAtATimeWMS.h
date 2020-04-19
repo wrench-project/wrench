@@ -7,38 +7,38 @@
  * (at your option) any later version.
  */
 
-#ifndef WRENCH_SIMPLEWMS_H
-#define WRENCH_SIMPLEWMS_H
+
+#ifndef WRENCH_ONE_TASK_AT_A_TIME_H
+#define WRENCH_ONE_TASK_AT_A_TIME_H
 
 #include <wrench-dev.h>
+
 
 namespace wrench {
 
     class Simulation;
 
     /**
-     *  @brief A simple WMS implementation
+     *  @brief A Workflow Management System (WMS) implementation (inherits from WMS)
      */
-    class SimpleWMS : public WMS {
+    class OneTaskAtATimeWMS : public WMS {
 
     public:
-        SimpleWMS(std::unique_ptr<StandardJobScheduler> standard_job_scheduler,
-                  std::unique_ptr<PilotJobScheduler> pilot_job_scheduler,
+        // Constructor
+        OneTaskAtATimeWMS(
                   const std::set<std::shared_ptr<ComputeService>> &compute_services,
                   const std::set<std::shared_ptr<StorageService>> &storage_services,
                   const std::string &hostname);
 
     protected:
 
-        void processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent>) override;
+        // Overriden method
+        void processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent>) override;
 
     private:
+        // main() method of the WMS
         int main() override;
 
-        /** @brief The job manager */
-        std::shared_ptr<JobManager> job_manager;
-        /** @brief Whether the workflow execution should be aborted */
-        bool abort = false;
     };
 }
-#endif //WRENCH_SIMPLEWMS_H
+#endif //WRENCH_ONE_TASK_AT_A_TIME_H
