@@ -19,10 +19,10 @@
  ** the completion time of each workflow task is printed.
  **
  ** Example invocation of the simulator for a 10-task workflow, with only WMS logging:
- **    ./bare-meta-chain-simulator 10 ./two_hosts.xml --wrench-no-logs --log=workflow_as_a_single_job_wms.threshold=info
+ **    ./bare-metal-chain-simulator 10 ./two_hosts.xml --wrench-no-logs --log=workflow_as_a_single_job_wms.threshold=info
  **
  ** Example invocation of the simulator for a 5-task workflow with full logging:
- **    ./bare-meta-chain-simulator 5 ./two_hosts.xml
+ **    ./bare-metal-chain-simulator 5 ./two_hosts.xml
  **/
 
 
