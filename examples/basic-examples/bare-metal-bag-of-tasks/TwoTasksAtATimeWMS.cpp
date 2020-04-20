@@ -22,7 +22,7 @@
 
 #include "TwoTasksAtATimeWMS.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(two_tasks_at_a_time_wms, "Log category for TwoTasksAtATimeWMS");
+XBT_LOG_NEW_DEFAULT_CATEGORY(custom_wms, "Log category for TwoTasksAtATimeWMS");
 
 namespace wrench {
 
@@ -87,6 +87,14 @@ namespace wrench {
             auto expensive_ready_task = ready_tasks.at(ready_tasks.size() - 1);
 
             /* Create a standard job for the tasks */
+            if (expensive_ready_task) {
+                WRENCH_INFO("Creating a job for tasks %s and %s",
+                            cheap_ready_task->getID().c_str(),
+                            expensive_ready_task->getID().c_str());
+            } else  {
+                WRENCH_INFO("Creating a job for task %s",
+                            cheap_ready_task->getID().c_str());
+            }
 
             /* First, we need to create a map of file locations, stating for each file
              * where is should be read/written */
@@ -106,12 +114,20 @@ namespace wrench {
             service_specific_args[cheap_ready_task->getID()] = "4";
             service_specific_args[expensive_ready_task->getID()] = "6";
 
+            WRENCH_INFO("Submitting the job, asking for %s cores for task %s, and "
+                        "%s cores for task %s",
+                        service_specific_args[cheap_ready_task->getID()].c_str(),
+                        cheap_ready_task->getID().c_str(),
+                        service_specific_args[expensive_ready_task->getID()].c_str(),
+                        expensive_ready_task->getID().c_str());
+
             /* Submit the job to the compute service */
             job_manager->submitJob(standard_job, compute_service, service_specific_args);
 
             /* Wait for a workflow execution event and process it. In this case we know that
              * the event will be a StandardJobCompletionEvent, which is processed by the method
              * processEventStandardJobCompletion() that this class overrides. */
+            WRENCH_INFO("Waiting for next event");
             this->waitForAndProcessNextEvent();
         }
 
@@ -127,9 +143,11 @@ namespace wrench {
     void TwoTasksAtATimeWMS::processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent> event) {
         /* Retrieve the job that this event is for */
         auto job = event->standard_job;
-        /* Retrieve the job's first (and in our case only) task */
-        auto task = job->getTasks().at(0);
-        WRENCH_INFO("Notified that a standard job has completed task %s", task->getID().c_str());
+        /* Retrieve the job's tasks */
+        for (auto const &task : job->getTasks()) {
+            WRENCH_INFO("Notified that a standard job has completed task %s",
+                        task->getID().c_str());
+        }
     }
 
     /**
@@ -146,7 +164,7 @@ namespace wrench {
         WRENCH_INFO("Notified that a standard job has failed for task %s with error %s",
                     task->getID().c_str(),
                     event->failure_cause->toString().c_str());
-        throw std::runtime_error("ABORTING DUE TO JOB FAILURE");
+        throw std::runtime_error("This should not happen in this example");
     }
 
 

@@ -23,7 +23,7 @@
 
 #include "TwoTasksAtATimeCloudWMS.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(two_tasks_at_a_time_cloud_wms, "Log category for TwoTasksAtATimeCloudWMS");
+XBT_LOG_NEW_DEFAULT_CATEGORY(custom_wms, "Log category for TwoTasksAtATimeCloudWMS");
 
 namespace wrench {
 
@@ -67,10 +67,12 @@ namespace wrench {
         auto storage_service = *(this->getAvailableStorageServices().begin());
 
         /* Create a VM instance with 5 cores and one with 2 cores (and 500M of RAM) */
+        WRENCH_INFO("Creating a 'large' VM with 5 cores  and a 'small' VM with 2 cores");
         auto large_vm = cloud_service->createVM(5, 500000);
         auto small_vm = cloud_service->createVM(2, 500000);
 
         /* Start the VMs */
+        WRENCH_INFO("Starting both VMs");
         auto large_vm_compute_service = cloud_service->startVM(large_vm);
         auto small_vm_compute_service = cloud_service->startVM(small_vm);
 
@@ -103,12 +105,16 @@ namespace wrench {
             file_locations1[cheap_ready_task->getOutputFiles().at(0)] = FileLocation::LOCATION(storage_service);
 
             /* Create the job  */
+            WRENCH_INFO("Creating a job to run task %s (%.2lf)",
+                    cheap_ready_task->getID().c_str(),  cheap_ready_task->getFlops());
+
             auto standard_job1 = job_manager->createStandardJob(cheap_ready_task, file_locations1);
 
             /* Submit the job to the small VM */
+            WRENCH_INFO("Submit this job to the small VM");
             job_manager->submitJob(standard_job1, small_vm_compute_service);
 
-            /* Submit the cheap task to the small VM */
+            /* Submit the expensive task to the large VM */
             /* First, we need to create a map of file locations, stating for each file
              * where is should be read/written */
             std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations2;
@@ -116,17 +122,23 @@ namespace wrench {
             file_locations2[expensive_ready_task->getOutputFiles().at(0)] = FileLocation::LOCATION(storage_service);
 
             /* Create the job  */
+            WRENCH_INFO("Creating a job to run task %s (%.2lf)",
+                        expensive_ready_task->getID().c_str(),  expensive_ready_task->getFlops());
+
             auto standard_job2 = job_manager->createStandardJob(expensive_ready_task, file_locations2);
 
-            /* Submit the job to the small VM */
+            /* Submit the job to the large VM */
+            WRENCH_INFO("Submit this job to the large VM");
             job_manager->submitJob(standard_job2, large_vm_compute_service);
 
             /* Wait for  workflow execution event and process it. In this case we know that
              * the event will be a StandardJobCompletionEvent, which is processed by the method
              * processEventStandardJobCompletion() that this class overrides. */
+            WRENCH_INFO("Wait for next event");
             this->waitForAndProcessNextEvent();
 
             /* And again! */
+            WRENCH_INFO("Wait for next event again");
             this->waitForAndProcessNextEvent();
         }
 

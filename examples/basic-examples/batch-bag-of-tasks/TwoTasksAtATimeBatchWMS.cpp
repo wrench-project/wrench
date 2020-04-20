@@ -23,7 +23,7 @@
 
 #include "TwoTasksAtATimeBatchWMS.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(two_tasks_at_a_time_batch_wms, "Log category for TwoTasksAtATimeBatchWMS");
+XBT_LOG_NEW_DEFAULT_CATEGORY(custom_wms, "Log category for TwoTasksAtATimeBatchWMS");
 
 namespace wrench {
 
@@ -78,7 +78,7 @@ namespace wrench {
         }
 
         /* Initialize and seed a RNG */
-        std::uniform_int_distribution<int> dist(0.0, 1000000000);
+        std::uniform_int_distribution<int> dist(0, 1000000000);
         std::mt19937 rng(42);
 
         /* While the workflow isn't done, repeat the main loop */
