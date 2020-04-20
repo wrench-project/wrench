@@ -4,6 +4,7 @@ set(EXAMPLES_CMAKEFILES_TXT
         examples/basic-examples/bare-metal-chain/CMakeLists.txt
         examples/basic-examples/bare-metal-chain-scratch/CMakeLists.txt
         examples/basic-examples/bare-metal-bag-of-tasks/CMakeLists.txt
+        examples/basic-examples/bare-metal-complex-job/CMakeLists.txt
         )
 
 foreach (cmakefile ${EXAMPLES_CMAKEFILES_TXT})

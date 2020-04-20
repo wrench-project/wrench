@@ -113,7 +113,7 @@ int main(int argc, char **argv) {
      * to a software infrastructure that can execute tasks on hardware resources.
      * This particular service is started on ComputeHost and has no scratch storage space (mount point argument = "").
      * This means that tasks running on this service will access data only from remote storage services. */
-    std::cerr << "Instantiating a BareMetalComputeService on WMSHost..." << std::endl;
+    std::cerr << "Instantiating a BareMetalComputeService on ComputeHost..." << std::endl;
     auto baremetal_service = simulation.add(new wrench::BareMetalComputeService(
             "ComputeHost", {"ComputeHost"}, "", {}, {}));
 
