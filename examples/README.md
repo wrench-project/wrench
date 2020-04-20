@@ -38,7 +38,7 @@ WRENCH, which is why it is used in these examples.
      the other on 4 cores.
 
   - ```bare-metal-complex-job```: A simulation of the execution of a
-    one-task workflow on a compute service as a job that includes not long
+    one-task workflow on a compute service as a job that includes not only
     the task computation but also data movements.
 
 
