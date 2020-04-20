@@ -19,9 +19,9 @@
 
 #include <iostream>
 
-#include "OneTaskAtATimeWMS.h"
+#include "WorkflowAsAsingleJobWMS.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(one_task_at_a_time_wms, "Log category for OneTaskAtATimeWMS");
+XBT_LOG_NEW_DEFAULT_CATEGORY(workflow_as_a_single_job_wms, "Log category for WorkflowAsAsingleJobWMS");
 
 namespace wrench {
 
@@ -32,9 +32,9 @@ namespace wrench {
      * @param storage_services: a set of storage services available to store files
      * @param hostname: the name of the host on which to start the WMS
      */
-    OneTaskAtATimeWMS::OneTaskAtATimeWMS(const std::set<std::shared_ptr<ComputeService>> &compute_services,
-                                         const std::set<std::shared_ptr<StorageService>> &storage_services,
-                                         const std::string &hostname) : WMS(
+    WorkflowAsAsingleJobWMS::WorkflowAsAsingleJobWMS(const std::set<std::shared_ptr<ComputeService>> &compute_services,
+                                                     const std::set<std::shared_ptr<StorageService>> &storage_services,
+                                                     const std::string &hostname) : WMS(
             nullptr, nullptr,
             compute_services,
             storage_services,
@@ -49,7 +49,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    int OneTaskAtATimeWMS::main() {
+    int WorkflowAsAsingleJobWMS::main() {
 
         /* Set the logging output to GREEN */
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
@@ -64,31 +64,39 @@ namespace wrench {
         auto compute_service = *(this->getAvailableComputeServices<BareMetalComputeService>().begin());
         auto storage_service = *(this->getAvailableStorageServices().begin());
 
-        /* While the workflow isn't done, repeat the main loop */
-        while (not this->getWorkflow()->isDone()) {
+        /* We want to execute the workflow tasks so that intermediate files are
+         * kept in the compute service's scratch place, and only the final output
+         * file is written back to the storage service at host WMSHost. However,
+         * files stored in the compute service's scratch space are erased
+         * after the job that created them has completed. So we ave the run
+         * the entire workflow as a single multi-task job! */
 
-            /* Get one ready task */
-            auto ready_task = this->getWorkflow()->getReadyTasks().at(0);
-
-            /* Create a standard job for the task */
-
-            /* First, we need to create a map of file locations, stating for each file
-             * where is should be read/written */
-            std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations;
-            file_locations[ready_task->getInputFiles().at(0)] = FileLocation::LOCATION(storage_service);
-            file_locations[ready_task->getOutputFiles().at(0)] = FileLocation::LOCATION(storage_service);
-
-            /* Create the job  */
-            auto standard_job = job_manager->createStandardJob(ready_task, file_locations);
-
-            /* Submit the job to the compute service */
-            job_manager->submitJob(standard_job, compute_service);
-
-            /* Wait for a workflow execution event and process it. In this case we know that
-             * the event will be a StandardJobCompletionEvent, which is processed by the method
-             * processEventStandardJobCompletion() that this class overrides. */
-            this->waitForAndProcessNextEvent();
+        /* First, we need to create a map of file locations, stating for each file
+         * where is should be read/written */
+        std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations;
+        // Set each file's location to the compute service's scratch space
+        for (auto const &file : this->getWorkflow()->getFiles()) {
+            file_locations[file] = FileLocation::SCRATCH;
         }
+        // For the workflow input files, in fact, set the location to the storage service
+        for (auto const &f  : this->getWorkflow()->getInputFiles()) {
+            file_locations[f] = FileLocation::LOCATION(storage_service);
+        }
+        // For the workflow output files, in fact, set the location to the storage service
+        for (auto const &f  : this->getWorkflow()->getOutputFiles()) {
+            file_locations[f] = FileLocation::LOCATION(storage_service);
+        }
+
+        /* Second, we create a job */
+        auto job = job_manager->createStandardJob(this->getWorkflow()->getTasks(), file_locations);
+
+        /* Submit the job to the compute service */
+        job_manager->submitJob(job, compute_service);
+
+        /* Wait for a workflow execution event and process it. In this case we know that
+         * the event will be a StandardJobCompletionEvent, which is processed by the method
+         * processEventStandardJobCompletion() that this class overrides. */
+        this->waitForAndProcessNextEvent();
 
         WRENCH_INFO("Workflow execution complete");
         return 0;
@@ -99,7 +107,7 @@ namespace wrench {
      *
      * @param event: the event
      */
-    void OneTaskAtATimeWMS::processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent> event) {
+    void WorkflowAsAsingleJobWMS::processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent> event) {
         /* Retrieve the job that this event is for */
         auto job = event->standard_job;
         /* Retrieve the job's first (and in our case only) task */
@@ -112,7 +120,7 @@ namespace wrench {
      *
      * @param event: the event
      */
-    void OneTaskAtATimeWMS::processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent> event) {
+    void WorkflowAsAsingleJobWMS::processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent> event) {
         /* Retrieve the job that this event is for */
         auto job = event->standard_job;
         /* Retrieve the job's first (and in our case only) task */

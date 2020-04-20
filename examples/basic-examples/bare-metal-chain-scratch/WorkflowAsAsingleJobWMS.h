@@ -8,8 +8,8 @@
  */
 
 
-#ifndef WRENCH_ONE_TASK_AT_A_TIME_H
-#define WRENCH_ONE_TASK_AT_A_TIME_H
+#ifndef WRENCH_ONE_TASK_AT_A_TIME_SCRATCH_H
+#define WRENCH_ONE_TASK_AT_A_TIME_SCRATCH_H
 
 #include <wrench-dev.h>
 
@@ -21,18 +21,18 @@ namespace wrench {
     /**
      *  @brief A Workflow Management System (WMS) implementation (inherits from WMS)
      */
-    class OneTaskAtATimeWMS : public WMS {
+    class WorkflowAsAsingleJobWMS : public WMS {
 
     public:
         // Constructor
-        OneTaskAtATimeWMS(
+        WorkflowAsAsingleJobWMS(
                   const std::set<std::shared_ptr<ComputeService>> &compute_services,
                   const std::set<std::shared_ptr<StorageService>> &storage_services,
                   const std::string &hostname);
 
     protected:
 
-        // Overriden method
+        // Overriden methods
         void processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent>) override;
         void processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent>) override;
 
@@ -42,4 +42,4 @@ namespace wrench {
 
     };
 }
-#endif //WRENCH_ONE_TASK_AT_A_TIME_H
+#endif //WRENCH_ONE_TASK_AT_A_TIME_SCRATCH_H
