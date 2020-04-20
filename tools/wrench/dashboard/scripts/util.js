@@ -98,7 +98,6 @@ function populateLegend(currView) {
     }
 }
 
-
 function determineTaskEnd(d) {
     var taskEnd
     if (d.terminated !== -1) {
@@ -112,46 +111,48 @@ function determineTaskEnd(d) {
 }
 
 function determineTaskOverlap(data) {
-    var taskOverlap = {}
+    let taskOverlap = {};
     data.forEach(function (d) {
-        var taskStart = d.whole_task.start
-        var taskEnd = determineTaskEnd(d)
-        if (Object.keys(taskOverlap).length === 0) {
-            taskOverlap[0] = []
-            taskOverlap[0].push(d)
-        } else {
-            var i = 0
-            var placed = false
+        let taskStart = d.whole_task.start;
+        let taskEnd = determineTaskEnd(d);
+
+        if (d.execution_host.hostname in taskOverlap) {
+            let i = 0;
+            let placed = false;
+            let executionHost = taskOverlap[d.execution_host.hostname];
+
             while (!placed) {
-                if (taskOverlap[i] === undefined) {
-                    taskOverlap[i] = []
+                if (executionHost[i] === undefined) {
+                    executionHost[i] = [];
                 }
-                var overlap = false
-                for (var j = 0; j < taskOverlap[i].length; j++) {
-                    var t = taskOverlap[i][j]
-                    var currTaskStart = t.whole_task.start
-                    var currTaskEnd = determineTaskEnd(t)
+                let overlap = false
+                for (let j = 0; j < executionHost[i].length; j++) {
+                    let t = executionHost[i][j]
+                    let currTaskStart = t.whole_task.start;
+                    let currTaskEnd = determineTaskEnd(t);
                     if ((taskStart >= currTaskStart && taskStart <= currTaskEnd) || (taskEnd >= currTaskStart && taskEnd <= currTaskEnd)) {
-                        i++
-                        overlap = true
-                        break
+                        i++;
+                        overlap = true;
+                        break;
                     }
                 }
                 if (!overlap) {
-                    taskOverlap[i].push(d)
-                    placed = true
+                    executionHost[i].push(d);
+                    placed = true;
                 }
             }
+        } else {
+            taskOverlap[d.execution_host.hostname] = [[d]];
         }
     })
     return taskOverlap
 }
 
 function searchOverlap(taskId, taskOverlap) {
-    for (var key in taskOverlap) {
-        if (taskOverlap.hasOwnProperty(key)) {
-            var currOverlap = taskOverlap[key]
-            for (var i = 0; i < currOverlap.length; i++) {
+    for (let host in taskOverlap) {
+        for (let key in taskOverlap[host]) {
+            var currOverlap = taskOverlap[host][key]
+            for (let i = 0; i < currOverlap.length; i++) {
                 if (currOverlap[i].task_id === taskId) {
                     return key
                 }

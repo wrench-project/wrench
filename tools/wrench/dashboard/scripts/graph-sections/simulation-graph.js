@@ -70,9 +70,9 @@ function getOffset(el, position) {
 function generateGraph(data, containerId, currGraphState, CONTAINER_WIDTH, CONTAINER_HEIGHT) {
     document.getElementById(containerId).innerHTML = //reset graph
         `<div class="text-left" id="tooltip-container">
-            <span id="tooltip-task-id"></span><br>
-            <span id="tooltip-host"></span><br>
-            <span id="tooltip-task-operation"></span><br>
+            <span id="tooltip-task-id"></span><br/>
+            <span id="tooltip-host"></span><br/>
+            <span id="tooltip-task-operation"></span><br/>
             <span id="tooltip-task-operation-duration"></span>
         </div>`
 
