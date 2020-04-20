@@ -60,8 +60,9 @@ namespace wrench {
         void dumpWorkflowGraphJSON(wrench::Workflow *workflow, std::string file_path, bool writing_file = true);
         void dumpHostEnergyConsumptionJSON(std::string file_path, bool writing_file = true);
         void dumpPlatformGraphJSON(std::string file_path, bool writing_file = true);
+        void dumpDiskOperationsJSON(std::string file_path, bool writing_file = true);
         void dumpUnifiedJSON(Workflow *workflow, std::string file_path, bool include_platform = false, bool include_workflow_exec = true,
-                             bool include_workflow_graph = false, bool include_energy = false, bool generate_host_utilization_layout = false);
+                             bool include_workflow_graph = false, bool include_energy = false, bool generate_host_utilization_layout = false, bool include_disk = false);
 
         void enableWorkflowTaskTimestamps(bool enabled);
         void enableFileReadWriteCopyTimestamps(bool enabled);
@@ -122,6 +123,7 @@ namespace wrench {
         nlohmann::json workflow_exec_json_part;
         nlohmann::json workflow_graph_json_part;
         nlohmann::json energy_json_part;
+        nlohmann::json disk_json_part;
 
         std::map<std::type_index, bool> enabledStatus;
 

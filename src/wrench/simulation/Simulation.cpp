@@ -557,6 +557,79 @@ namespace wrench {
         }
     }
 
+    /**
+     * Wrapper enabling timestamps for disk reads
+     * @param num_bytes - number of bytes read
+     * @param hostname - hostname to read from
+     * @param mount_point - mount point of disk to read from
+     *
+     * @throw invalid_argument
+     */
+    void Simulation::readFromDisk(double num_bytes, std::string hostname, std::string mount_point) {
+        this->getOutput().addTimestampDiskReadStart(hostname, mount_point, num_bytes);
+        try{
+            S4U_Simulation::readFromDisk(num_bytes, hostname, mount_point);
+        } catch (const std::invalid_argument &ia) {
+            this->getOutput().addTimestampDiskReadFailure(hostname, mount_point, num_bytes);
+            throw;
+        }
+        this->getOutput().addTimestampDiskReadCompletion(hostname, mount_point, num_bytes);
+    }
+
+    /**
+     * Wrapper enabling timestamps for concurrent disk read/writes
+     * @param num_bytes_to_read - number of bytes read
+     * @param num_bytes_to_write - number of bytes written
+     * @param hostname - hostname where disk is located
+     * @param read_mount_point - mount point of disk to read from
+     * @param write_mount_point - mount point of disk to write to
+     *
+     * @throw invalid_argument
+     */
+    void Simulation::readFromDiskAndWriteToDiskConcurrently(double num_bytes_to_read, double num_bytes_to_write,
+                                                            std::string hostname,
+                                                            std::string read_mount_point,
+                                                            std::string write_mount_point) {
+        this->getOutput().addTimestampDiskReadStart(hostname, read_mount_point, num_bytes_to_read);
+        this->getOutput().addTimestampDiskWriteStart(hostname, write_mount_point, num_bytes_to_write);
+        try{
+            S4U_Simulation::readFromDiskAndWriteToDiskConcurrently(num_bytes_to_read, num_bytes_to_write, hostname, read_mount_point, write_mount_point);
+        } catch (const std::invalid_argument &ia) {
+            this->getOutput().addTimestampDiskWriteFailure(hostname, write_mount_point, num_bytes_to_write);
+            this->getOutput().addTimestampDiskReadFailure(hostname, read_mount_point, num_bytes_to_read);
+            throw;
+        }
+        this->getOutput().addTimestampDiskWriteCompletion(hostname, write_mount_point, num_bytes_to_write);
+        this->getOutput().addTimestampDiskReadCompletion(hostname, read_mount_point, num_bytes_to_read);
+    }
+
+    /**
+     * Wrapper enabling timestamps for disk writes
+     * @param num_bytes - number of bytes written
+     * @param hostname - hostname to write to
+     * @param mount_point - mount point of disk to write to
+     *
+     * @throw invalid_argument
+     */
+    void Simulation::writeToDisk(double num_bytes, std::string hostname, std::string mount_point) {
+        this->getOutput().addTimestampDiskWriteStart(hostname, mount_point, num_bytes);
+        try{
+            S4U_Simulation::writeToDisk(num_bytes, hostname, mount_point);
+        } catch (const std::invalid_argument &ia) {
+            this->getOutput().addTimestampDiskWriteFailure(hostname, mount_point, num_bytes);
+            throw;
+        }
+        this->getOutput().addTimestampDiskWriteCompletion(hostname, mount_point, num_bytes);
+    }
+
+    /**
+     * Wrapper for S4U_Simulation hostExists()
+     * @param hostname - name of host being queried
+     * @return boolean of existence
+     */
+    bool Simulation::doesHostExist(std::string hostname) {
+        return S4U_Simulation::hostExists(hostname);
+    }
 
     /**
      * @brief Get the current simulated date

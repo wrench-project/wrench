@@ -92,10 +92,13 @@ namespace wrench {
         void stageFile(WorkflowFile *file, std::shared_ptr<StorageService> ss, std::string directory_absolute_path);
 
 
+
+
         /***********************/
         /** \cond DEVELOPER    */
         /***********************/
 
+        static bool doesHostExist(std::string hostname);
         static bool isHostOn(std::string hostname);
         static void turnOnHost(std::string hostname);
         static void turnOffHost(std::string hostname);
@@ -113,6 +116,13 @@ namespace wrench {
         std::shared_ptr<NetworkProximityService> startNewService(NetworkProximityService *service);
         std::shared_ptr<FileRegistryService> startNewService(FileRegistryService *service);
 
+        void readFromDisk(double num_bytes, std::string hostname, std::string mount_point);
+        void readFromDiskAndWriteToDiskConcurrently(double num_bytes_to_read, double num_bytes_to_write,
+                                                    std::string hostname,
+                                                    std::string read_mount_point,
+                                                    std::string write_mount_point);
+        void writeToDisk(double num_bytes, std::string hostname, std::string mount_point);
+
 
         static double getMemoryCapacity();
         static unsigned long getNumCores();
@@ -120,6 +130,7 @@ namespace wrench {
         static std::string getHostName();
 
         static double getCurrentSimulatedDate();
+
 
 
 
