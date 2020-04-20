@@ -41,7 +41,7 @@ namespace wrench {
             storage_services,
             {}, nullptr,
             hostname,
-            "one-task-at-a-time") {}
+            "two-tasks-at-a-time") {}
 
     /**
      * @brief main method of the TwoTasksAtATimeWMS daemon
