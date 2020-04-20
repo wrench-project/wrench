@@ -114,7 +114,7 @@ int main(int argc, char **argv) {
      * This particular service is started on ComputeHost and has scratch storage space (mount point argument = "/scratch").
      * This means that the WMS can opt to leave files in scratch. However, files in scratch are removed after
      * a job completes */
-    std::cerr << "Instantiating a BareMetalComputeService on WMSHost..." << std::endl;
+    std::cerr << "Instantiating a BareMetalComputeService on ComputeHost..." << std::endl;
     auto baremetal_service = simulation.add(new wrench::BareMetalComputeService(
             "ComputeHost", {"ComputeHost"}, "/scratch/", {}, {}));
 
