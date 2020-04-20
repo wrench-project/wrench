@@ -360,14 +360,40 @@ namespace wrench {
     /**
      * @brief Get the list of all tasks in the workflow
      *
+     * @return a map of tasks, indexed by ID
+     */
+    std::map<std::string, WorkflowTask *> Workflow::getTaskMap() {
+        std::map<std::string, WorkflowTask *> all_tasks;
+        for (auto const &t : this->tasks) {
+            all_tasks[t.first] = (t.second.get());
+        }
+        return all_tasks;
+    };
+
+    /**
+     * @brief Get the list of all tasks in the workflow
+     *
      * @return a vector of tasks
      */
     std::vector<WorkflowTask *> Workflow::getTasks() {
         std::vector<WorkflowTask *> all_tasks;
-        for (auto &it : this->tasks) {
-            all_tasks.push_back(it.second.get());
+        for (auto const &t : this->tasks) {
+            all_tasks.push_back(t.second.get());
         }
         return all_tasks;
+    };
+
+    /**
+     * @brief Get the list of all files in the workflow
+     *
+     * @return a map of files, indexed by file ID
+     */
+    std::map<std::string, WorkflowFile *> Workflow::getFileMap() {
+        std::map<std::string, WorkflowFile *> all_files;
+        for (auto &it : this->files) {
+            all_files[it.first] =  (it.second.get());
+        }
+        return all_files;
     };
 
     /**
@@ -377,8 +403,8 @@ namespace wrench {
      */
     std::vector<WorkflowFile *> Workflow::getFiles() {
         std::vector<WorkflowFile *> all_files;
-        for (auto &it : this->files) {
-            all_files.push_back(it.second.get());
+        for (auto const &f : this->files) {
+            all_files.push_back(f.second.get());
         }
         return all_files;
     };
@@ -519,12 +545,12 @@ namespace wrench {
 #endif
 
     /**
-     * @brief Retrieve a map (indexed by file id) of input files for a workflow (i.e., those files
+     * @brief Retrieve the list of the input files of the workflow (i.e., those files
      *        that are input to some tasks but output from none)
      *
-     * @return a std::map of files
+     * @return a map of files indexed by file ID
      */
-    std::map<std::string, WorkflowFile *> Workflow::getInputFiles() {
+    std::map<std::string, WorkflowFile *> Workflow::getInputFileMap() const {
         std::map<std::string, WorkflowFile *> input_files;
         for (auto const &x : this->files) {
             if ((x.second->output_of == nullptr) && (not x.second->input_of.empty())) {
@@ -534,18 +560,65 @@ namespace wrench {
         return input_files;
     }
 
+    /**
+     * @brief Retrieve the list of the input files of the workflow (i.e., those files
+     *        that are input to some tasks but output from none)
+     *
+     * @return a vector of files
+     */
+    std::vector<WorkflowFile *> Workflow::getInputFiles() const {
+        std::vector<WorkflowFile *> input_files;
+        for (auto const &x : this->files) {
+            if ((x.second->output_of == nullptr) && (not x.second->input_of.empty())) {
+                input_files.push_back(x.second.get());
+            }
+        }
+        return input_files;
+    }
+
+    /**
+    * @brief Retrieve a list of the output files of the workflow (i.e., those files
+    *        that are output from some tasks but input to none)
+    *
+    * @return a map of files indexed by ID
+    */
+    std::map<std::string, WorkflowFile *> Workflow::getOutputFileMap() const {
+        std::map<std::string, WorkflowFile *> output_files;
+        for (auto const &x : this->files) {
+            if ((x.second->output_of != nullptr) && (x.second->input_of.empty())) {
+                output_files.insert({x.first, x.second.get()});
+            }
+        }
+        return output_files;
+    }
+
+    /**
+   * @brief Retrieve a list of the output files of the workflow (i.e., those files
+   *        that are output from some tasks but input to none)
+   *
+   * @return a vector of files
+   */
+    std::vector<WorkflowFile *> Workflow::getOutputFiles() const {
+        std::vector<WorkflowFile *> output_files;
+        for (auto const &x : this->files) {
+            if ((x.second->output_of != nullptr) && (x.second->input_of.empty())) {
+                output_files.push_back(x.second.get());
+            }
+        }
+        return output_files;
+    }
 
     /**
      * @brief Get the total number of flops for a list of tasks
      *
-     * @param tasks: list of tasks
+     * @param tasks: a vector of tasks
      *
      * @return the total number of flops
      */
     double Workflow::getSumFlops(std::vector<WorkflowTask *> tasks) {
         double total_flops = 0;
-        for (auto it : tasks) {
-            total_flops += (*it).getFlops();
+        for (auto const &task : tasks) {
+            total_flops += task->getFlops();
         }
         return total_flops;
     }
@@ -843,20 +916,20 @@ namespace wrench {
      */
     std::vector<WorkflowTask *> Workflow::getTasksInTopLevelRange(unsigned long min, unsigned long max) {
         std::vector<WorkflowTask *> to_return;
-        for (auto t : this->getTasks()) {
-            if ((t->getTopLevel() >= min) and (t->getTopLevel() <= max)) {
-                to_return.push_back(t);
+        for (auto const &task : this->getTasks()) {
+            if ((task->getTopLevel() >= min) and (task->getTopLevel() <= max)) {
+                to_return.push_back(task);
             }
         }
         return to_return;
     }
 
     /**
-     * @brief Get the exit tasks of the workflow, i.e., those tasks
+     * @brief Get the list of exit tasks of the workflow, i.e., those tasks
      *        that don't have parents
      * @return A map of tasks indexed by their IDs
      */
-    std::map<std::string, WorkflowTask *> Workflow::getEntryTasks() const {
+    std::map<std::string, WorkflowTask *> Workflow::getEntryTaskMap() const {
         // TODO: This could be done more efficiently at the Lemon level
         std::map<std::string, WorkflowTask *> entry_tasks;
         for (auto const &t : this->tasks) {
@@ -869,11 +942,28 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the exit tasks of the workflow, i.e., those tasks
-     *        that don't have children
-     * @return A map of tasks indexed by their IDs
+     * @brief Get the list of exit tasks of the workflow, i.e., those tasks
+     *        that don't have parents
+     * @return A vector of tasks
      */
-    std::map<std::string, WorkflowTask *> Workflow::getExitTasks() const {
+    std::vector<WorkflowTask *> Workflow::getEntryTasks() const {
+        // TODO: This could be done more efficiently at the Lemon level
+        std::vector<WorkflowTask *> entry_tasks;
+        for (auto const &t : this->tasks) {
+            auto task = t.second.get();
+            if (task->getNumberOfParents() == 0) {
+                entry_tasks.push_back(task);
+            }
+        }
+        return entry_tasks;
+    }
+
+       /**
+        * @brief Get the exit tasks of the workflow, i.e., those tasks
+        *        that don't have children
+        * @return A map of tasks indexed by their IDs
+        */
+    std::map<std::string, WorkflowTask *> Workflow::getExitTaskMap() const {
         // TODO: This could be done more efficiently at the lemon level
         std::map<std::string, WorkflowTask *> exit_tasks;
         for (auto const &t : this->tasks) {
@@ -884,6 +974,24 @@ namespace wrench {
         }
         return exit_tasks;
     }
+
+    /**
+    * @brief Get the exit tasks of the workflow, i.e., those tasks
+    *        that don't have children
+    * @return A vector of tasks
+    */
+    std::vector<WorkflowTask *> Workflow::getExitTasks() const {
+        // TODO: This could be done more efficiently at the lemon level
+        std::vector<WorkflowTask *> exit_tasks;
+        for (auto const &t : this->tasks) {
+            auto task = t.second.get();
+            if (task->getNumberOfChildren() == 0) {
+                exit_tasks.push_back(task);
+            }
+        }
+        return exit_tasks;
+    }
+
 
     /**
      * @brief Returns the number of levels in the workflow

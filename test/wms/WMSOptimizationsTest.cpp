@@ -207,7 +207,7 @@ void WMSOptimizationsTest::do_staticOptimization_test() {
 
   // Staging the input_file on the storage service
   for (auto const &f : workflow->getInputFiles()) {
-      ASSERT_NO_THROW(simulation->stageFile(f.second, storage_service));
+      ASSERT_NO_THROW(simulation->stageFile(f, storage_service));
   }
 
   // Running a "run a single task" simulation
@@ -345,7 +345,7 @@ void WMSOptimizationsTest::do_dynamicOptimization_test() {
   // Staging the input_file on the storage service
     // Staging the input_file on the storage service
     for (auto const &f : workflow->getInputFiles()) {
-        ASSERT_NO_THROW(simulation->stageFile(f.second, storage_service));
+        ASSERT_NO_THROW(simulation->stageFile(f, storage_service));
     }
 
   // Running a "run a single task" simulation

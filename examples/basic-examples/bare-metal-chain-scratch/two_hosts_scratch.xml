@@ -14,6 +14,10 @@
         <!-- The host on which the BareMetalComputeService will run -->
         <host id="ComputeHost" speed="1Gf" core="10">
             <prop id="ram" value="16GB" />
+            <disk id="scratch" read_bw="100MBps" write_bw="100MBps">
+                <prop id="size" value="2000GiB"/>
+                <prop id="mount" value="/scratch"/>
+            </disk>
        </host>
 
         <!-- A network link...-->

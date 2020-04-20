@@ -171,7 +171,7 @@ int main(int argc, char **argv) {
     std::cerr << "Staging input files..." << std::endl;
     for (auto const &f : workflow->getInputFiles()) {
         try {
-            simulation.stageFile(f.second, storage_service);
+            simulation.stageFile(f, storage_service);
         } catch (std::runtime_error &e) {
             std::cerr << "Exception: " << e.what() << std::endl;
             return 0;
