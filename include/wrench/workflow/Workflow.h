@@ -72,10 +72,22 @@ namespace wrench {
 
         void exportToEPS(std::string);
 
-        std::map<std::string, WorkflowFile *> getInputFiles();
+        std::vector<WorkflowFile *> getFiles();
+        std::map<std::string, WorkflowFile *> getFileMap();
+        std::vector<WorkflowFile *> getInputFiles() const;
+        std::map<std::string, WorkflowFile *> getInputFileMap() const;
+        std::vector<WorkflowFile *> getOutputFiles() const;
+        std::map<std::string, WorkflowFile *> getOutputFileMap() const;
 
-        std::map<std::string, WorkflowTask *> getEntryTasks() const;
-        std::map<std::string, WorkflowTask *> getExitTasks() const;
+        std::vector<WorkflowTask *> getTasks();
+        std::map<std::string, WorkflowTask *> getTaskMap();
+        std::map<std::string, WorkflowTask *> getEntryTaskMap() const;
+        std::vector<WorkflowTask *> getEntryTasks() const;
+        std::map<std::string, WorkflowTask *> getExitTaskMap() const;
+        std::vector<WorkflowTask *> getExitTasks() const;
+
+        std::vector<WorkflowTask *> getTaskParents(const WorkflowTask *task);
+        std::vector<WorkflowTask *> getTaskChildren(const WorkflowTask *task);
 
         bool isDone();
 
@@ -88,14 +100,6 @@ namespace wrench {
         std::vector<WorkflowTask *> getReadyTasks();
 
         std::map<std::string, std::vector<WorkflowTask *>> getReadyClusters();
-
-        std::vector<WorkflowTask *> getTasks();
-
-        std::vector<WorkflowFile *> getFiles();
-
-        std::vector<WorkflowTask *> getTaskParents(const WorkflowTask *task);
-
-        std::vector<WorkflowTask *> getTaskChildren(const WorkflowTask *task);
 
         /***********************/
         /** \endcond           */

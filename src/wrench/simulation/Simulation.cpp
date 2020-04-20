@@ -351,11 +351,11 @@ namespace wrench {
             }
 
             // Check that each input file is staged on the file registry services
-            for (auto f : wms->workflow->getInputFiles()) {
+            for (auto file : wms->workflow->getInputFiles()) {
                 for (auto frs : this->file_registry_services) {
-                    if (frs->entries.find(f.second) == frs->entries.end()) {
+                    if (frs->entries.find(file) == frs->entries.end()) {
                         throw std::runtime_error(
-                                "Workflow input file " + f.second->getID() + " is not staged on any storage service!");
+                                "Workflow input file " + file->getID() + " is not staged on any storage service!");
                     }
                 }
             }

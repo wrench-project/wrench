@@ -19,7 +19,7 @@
  ** the completion time of each workflow task is printed.
  **
  ** Example invocation of the simulator for a 10-task workflow, with only WMS logging:
- **    ./bare-meta-chain-simulator 10 ./two_hosts.xml --wrench-no-logs --log=one_task_at_a_time_wms.threshold=info
+ **    ./bare-meta-chain-simulator 10 ./two_hosts.xml --wrench-no-logs --log=workflow_as_a_single_job_wms.threshold=info
  **
  ** Example invocation of the simulator for a 5-task workflow with full logging:
  **    ./bare-meta-chain-simulator 5 ./two_hosts.xml
@@ -29,7 +29,7 @@
 #include <iostream>
 #include <wrench.h>
 
-#include "OneTaskAtATimeWMS.h" // WMS implementation
+#include "WorkflowAsAsingleJobWMS.h" // WMS implementation
 
 /**
  * @brief The Simulator's main function
@@ -83,8 +83,8 @@ int main(int argc, char **argv) {
 
     /* Add workflow files */
     for (int i=0; i < num_tasks+1; i++) {
-        /* Create a 100MB file */
-        workflow.addFile("file_" + std::to_string(i), 100000000);
+        /* Create a 10MB file */
+        workflow.addFile("file_" + std::to_string(i), 10000000);
     }
 
     /* Set input/output files for each task */
@@ -102,27 +102,27 @@ int main(int argc, char **argv) {
      * is a basic storage service implementation provided by WRENCH.
      * Throughout the simulation execution, input/output files of workflow tasks will be located
      * in this storage service, and accessed remotely by the compute service. Note that the
-     * storage service is configured to use a buffer size of 50M when transferring data over
+     * storage service is configured to use a buffer size of 500M when transferring data over
      * the network (i.e., to pipeline disk reads/writes and network revs/sends). */
     std::cerr << "Instantiating a SimpleStorageService on WMSHost..." << std::endl;
     auto storage_service = simulation.add(new wrench::SimpleStorageService(
-            "WMSHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50000000"}}, {}));
+            "WMSHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "500000000"}}, {}));
 
     /* Instantiate a bare-metal compute service, and add it to the simulation.
      * A wrench::BareMetalComputeService is an abstraction of a compute service that corresponds to a
      * to a software infrastructure that can execute tasks on hardware resources.
-     * This particular service is started on ComputeHost and has no scratch storage space (mount point argument = "").
-     * This means that tasks running on this service will access data only from remote storage services. */
+     * This particular service is started on ComputeHost and has scratch storage space (mount point argument = "/scratch").
+     * This means that the WMS can opt to leave files in scratch. However, files in scratch are removed after
+     * a job completes */
     std::cerr << "Instantiating a BareMetalComputeService on WMSHost..." << std::endl;
     auto baremetal_service = simulation.add(new wrench::BareMetalComputeService(
-            "ComputeHost", {"ComputeHost"}, "", {}, {}));
+            "ComputeHost", {"ComputeHost"}, "/scratch/", {}, {}));
 
     /* Instantiate a WMS, to be stated on WMSHost, which is responsible
      * for executing the workflow. See comments in OneTaskAtATimeWMS.cpp
      * for more details */
-
     auto wms = simulation.add(
-            new wrench::OneTaskAtATimeWMS({baremetal_service}, {storage_service}, "WMSHost"));
+            new wrench::WorkflowAsAsingleJobWMS({baremetal_service}, {storage_service}, "WMSHost"));
 
     /* Associate the workflow to the WMS */
     wms->addWorkflow(&workflow);
