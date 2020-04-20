@@ -21,7 +21,7 @@
 
 #include "ComplexJobWMS.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(complex_job_wms, "Log category for ComplexJobWMS");
+XBT_LOG_NEW_DEFAULT_CATEGORY(custom_wms, "Log category for ComplexJobWMS");
 
 namespace wrench {
 
@@ -103,17 +103,20 @@ namespace wrench {
         /* Let's create a set of file deletion operations to be performed
         * AFTER the "post" file copies have been performed */
         std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  >> cleanup_file_deletions;
-        cleanup_file_deletions.push_back(std::make_tuple(outfile_2, FileLocation::LOCATION(storage_service2)));
+        cleanup_file_deletions.emplace_back(outfile_2, FileLocation::LOCATION(storage_service2));
 
         /* Create the standard job */
+        WRENCH_INFO("Creating a complex job with pre file copies, post file copies, and post file deletions to execute task  %s", task->getID().c_str());
         auto job = job_manager->createStandardJob({task}, file_locations, pre_file_copies, post_file_copies, cleanup_file_deletions);
 
         /* Submit the job to the compute service */
+        WRENCH_INFO("Submitting job to the compute service");
         job_manager->submitJob(job, compute_service);
 
         /* Wait for a workflow execution event and process it. In this case we know that
          * the event will be a StandardJobCompletionEvent, which is processed by the method
          * processEventStandardJobCompletion() that this class overrides. */
+        WRENCH_INFO("Waiting for next event");
         this->waitForAndProcessNextEvent();
 
         WRENCH_INFO("Workflow execution complete");

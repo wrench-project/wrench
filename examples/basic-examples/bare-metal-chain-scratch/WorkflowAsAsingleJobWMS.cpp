@@ -21,7 +21,7 @@
 
 #include "WorkflowAsAsingleJobWMS.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(workflow_as_a_single_job_wms, "Log category for WorkflowAsAsingleJobWMS");
+XBT_LOG_NEW_DEFAULT_CATEGORY(custom_wms, "Log category for WorkflowAsAsingleJobWMS");
 
 namespace wrench {
 
@@ -88,14 +88,17 @@ namespace wrench {
         }
 
         /* Second, we create a job */
+        WRENCH_INFO("Creating a job for the entire workflow");
         auto job = job_manager->createStandardJob(this->getWorkflow()->getTasks(), file_locations);
 
         /* Submit the job to the compute service */
+        WRENCH_INFO("Submitting the job to the compute sercvice");
         job_manager->submitJob(job, compute_service);
 
         /* Wait for a workflow execution event and process it. In this case we know that
          * the event will be a StandardJobCompletionEvent, which is processed by the method
          * processEventStandardJobCompletion() that this class overrides. */
+        WRENCH_INFO("Waiting for next event");
         this->waitForAndProcessNextEvent();
 
         WRENCH_INFO("Workflow execution complete");
@@ -111,8 +114,9 @@ namespace wrench {
         /* Retrieve the job that this event is for */
         auto job = event->standard_job;
         /* Retrieve the job's first (and in our case only) task */
-        auto task = job->getTasks().at(0);
-        WRENCH_INFO("Notified that a standard job has completed task %s", task->getID().c_str());
+        for (auto const &task : job->getTasks()) {
+            WRENCH_INFO("Notified that a standard job has completed task %s", task->getID().c_str());
+        }
     }
 
     /**

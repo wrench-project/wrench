@@ -21,7 +21,7 @@
 
 #include "OneTaskAtATimeWMS.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(one_task_at_a_time_wms, "Log category for OneTaskAtATimeWMS");
+XBT_LOG_NEW_DEFAULT_CATEGORY(custom_wms, "Log category for OneTaskAtATimeWMS");
 
 namespace wrench {
 
@@ -71,6 +71,7 @@ namespace wrench {
             auto ready_task = this->getWorkflow()->getReadyTasks().at(0);
 
             /* Create a standard job for the task */
+            WRENCH_INFO("Creating a job for task %s", ready_task->getID().c_str());
 
             /* First, we need to create a map of file locations, stating for each file
              * where is should be read/written */
@@ -82,6 +83,7 @@ namespace wrench {
             auto standard_job = job_manager->createStandardJob(ready_task, file_locations);
 
             /* Submit the job to the compute service */
+            WRENCH_INFO("Submitting the job to the compute service");
             job_manager->submitJob(standard_job, compute_service);
 
             /* Wait for a workflow execution event and process it. In this case we know that
