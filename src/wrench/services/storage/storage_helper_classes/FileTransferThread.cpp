@@ -277,7 +277,7 @@ namespace wrench {
                     // Issue the receive
                     auto req = S4U_Mailbox::igetMessage(mailbox);
                     // Write to disk
-                    S4U_Simulation::writeToDisk(msg->payload, location->getStorageService()->hostname,
+                    simulation->writeToDisk(msg->payload, location->getStorageService()->hostname,
                                                 location->getMountPoint());
                     // Wait for the comm to finish
                     msg = req->wait();
@@ -291,7 +291,7 @@ namespace wrench {
                     }
                 }
                 // I/O for the last chunk
-                S4U_Simulation::writeToDisk(msg->payload, location->getStorageService()->hostname,
+                simulation->writeToDisk(msg->payload, location->getStorageService()->hostname,
                                             location->getMountPoint());
             } catch (std::shared_ptr<NetworkError> &e) {
                 throw;
@@ -328,7 +328,7 @@ namespace wrench {
                 while (remaining > 0) {
                     double chunk_size = std::min<double>(this->buffer_size, remaining);
                     WRENCH_INFO("Reading %s bytes from disk", std::to_string(chunk_size).c_str());
-                    S4U_Simulation::readFromDisk(chunk_size, location->getStorageService()->hostname,
+                    simulation->readFromDisk(chunk_size, location->getStorageService()->hostname,
                                                  location->getMountPoint());
                     remaining -= this->buffer_size;
                     if (req) {
@@ -375,25 +375,25 @@ namespace wrench {
 
         } else {
             // Read the first chunk
-            S4U_Simulation::readFromDisk(to_send, src_location->getStorageService()->hostname,
+            simulation->readFromDisk(to_send, src_location->getStorageService()->hostname,
                                          src_location->getMountPoint());
             // start the pipeline
             while (remaining > this->buffer_size) {
 
-                S4U_Simulation::readFromDiskAndWriteToDiskConcurrently(
+                simulation->readFromDiskAndWriteToDiskConcurrently(
                         this->buffer_size, this->buffer_size, src_location->getStorageService()->hostname,
                         src_location->getMountPoint(), dst_location->getMountPoint());
 
 //
-//                S4U_Simulation::writeToDisk(this->buffer_size, dst_location->getStorageService()->hostname,
+//                simulation->writeToDisk(this->buffer_size, dst_location->getStorageService()->hostname,
 //                                            dst_location->getMountPoint());
-//                S4U_Simulation::readFromDisk(this->buffer_size, src_location->getStorageService()->hostname,
+//                simulation->readFromDisk(this->buffer_size, src_location->getStorageService()->hostname,
 //                                             src_location->getMountPoint());
 
                 remaining -= this->buffer_size;
             }
             // Write the last chunk
-            S4U_Simulation::writeToDisk(remaining, dst_location->getStorageService()->hostname,
+            simulation->writeToDisk(remaining, dst_location->getStorageService()->hostname,
                                         dst_location->getMountPoint());
         }
 
@@ -489,7 +489,7 @@ namespace wrench {
                     auto req = S4U_Mailbox::igetMessage(mailbox_that_should_receive_file_content);
 
                     // Do the I/O
-                    S4U_Simulation::writeToDisk(msg->payload,
+                    simulation->writeToDisk(msg->payload,
                                                 dst_location->getStorageService()->getHostname(),
                                                 dst_location->getMountPoint());
 
@@ -504,7 +504,7 @@ namespace wrench {
                     }
                 }
                 // Do the I/O for the last chunk
-                S4U_Simulation::writeToDisk(msg->payload,
+                simulation->writeToDisk(msg->payload,
                                             dst_location->getStorageService()->getHostname(),
                                             dst_location->getMountPoint());
             } catch (std::shared_ptr<NetworkError> &e) {
