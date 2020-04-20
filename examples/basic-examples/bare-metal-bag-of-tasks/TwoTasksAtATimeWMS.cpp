@@ -34,8 +34,8 @@ namespace wrench {
      * @param hostname: the name of the host on which to start the WMS
      */
     TwoTasksAtATimeWMS::TwoTasksAtATimeWMS(const std::set<std::shared_ptr<ComputeService>> &compute_services,
-                                         const std::set<std::shared_ptr<StorageService>> &storage_services,
-                                         const std::string &hostname) : WMS(
+                                           const std::set<std::shared_ptr<StorageService>> &storage_services,
+                                           const std::string &hostname) : WMS(
             nullptr, nullptr,
             compute_services,
             storage_services,
@@ -82,9 +82,9 @@ namespace wrench {
                           }
                       });
 
-            /*  Pick the least and most (if any) expensive task */
+            /*  Pick the least and most expensive task */
             auto cheap_ready_task = ready_tasks.at(0);
-            auto expensive_ready_task = (ready_tasks.size() > 1 ? ready_tasks.at(ready_tasks.size() - 1) : nullptr);
+            auto expensive_ready_task = ready_tasks.at(ready_tasks.size() - 1);
 
             /* Create a standard job for the tasks */
 
@@ -93,28 +93,18 @@ namespace wrench {
             std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations;
             file_locations[cheap_ready_task->getInputFiles().at(0)] = FileLocation::LOCATION(storage_service);
             file_locations[cheap_ready_task->getOutputFiles().at(0)] = FileLocation::LOCATION(storage_service);
-            if  (expensive_ready_task) {
-                file_locations[expensive_ready_task->getInputFiles().at(0)] = FileLocation::LOCATION(storage_service);
-                file_locations[expensive_ready_task->getOutputFiles().at(0)] = FileLocation::LOCATION(storage_service);
-            }
+            file_locations[expensive_ready_task->getInputFiles().at(0)] = FileLocation::LOCATION(storage_service);
+            file_locations[expensive_ready_task->getOutputFiles().at(0)] = FileLocation::LOCATION(storage_service);
 
             /* Create the job  */
-            StandardJob *standard_job;
-            if (expensive_ready_task) {
-                standard_job = job_manager->createStandardJob(
-                        {cheap_ready_task, expensive_ready_task}, file_locations);
-            } else  {
-                standard_job = job_manager->createStandardJob(
-                        cheap_ready_task, file_locations);
-            }
+            auto standard_job = job_manager->createStandardJob(
+                    {cheap_ready_task, expensive_ready_task}, file_locations);
 
             /* Then, we create the "service-specific arguments" that make it possible to configure
              * the way in which tasks in a job can run on the compute service */
             std::map<std::string, std::string> service_specific_args;
             service_specific_args[cheap_ready_task->getID()] = "4";
-            if  (expensive_ready_task) {
-                service_specific_args[expensive_ready_task->getID()] = "6";
-            }
+            service_specific_args[expensive_ready_task->getID()] = "6";
 
             /* Submit the job to the compute service */
             job_manager->submitJob(standard_job, compute_service, service_specific_args);

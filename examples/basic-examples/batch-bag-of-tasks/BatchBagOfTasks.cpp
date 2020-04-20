@@ -16,25 +16,26 @@
  **   ...
  **   InputFile #n -> Task #n -> OutputFile #n
  **
- ** The compute platform comprises four hosts, WMSHost,  CloudProviderHost, CloudHost1, and
- **  CloudHost2. On WMSHost runs a simple storage
- ** service and a WMS (defined in class TwoTasksAtATimeCloudWMS). On CloudProviderHost runs a cloud
- ** service, that has access to two hosts: CloudHost1 and CloudHost2. Once the simulation is done,
+ ** The compute platform comprises four hosts, WMSHost,  BatchHeadNode, BatchNode1, and
+ **  BatchNode2. On WMSHost runs a simple storage
+ ** service and a WMS (defined in class TwoTasksAtATimeBatchWMS). On BatchHeadNode runs a batch
+ ** service, that has access to two hosts: BatchNode1 and BatchNode2. Once the simulation is done,
  ** the completion time of each workflow task is printed.
  **
  ** Example invocation of the simulator for a 10-task workflow, with only WMS logging:
- **    ./cloud-bag-of-tasks-simulator 10 ./four_hosts.xml --wrench-no-logs --log=two_tasks_at_a_time_cloud_wms.threshold=info
+ **    ./batch-bag-of-tasks-simulator 10 ./four_hosts.xml --wrench-no-logs --log=two_tasks_at_a_time_batch_wms.threshold=info
  **
  ** Example invocation of the simulator for a 6-task workflow with full logging:
- **    ./cloud-bag-of-tasks-simulator 6 ./four_hosts.xml
+ **    ./batch-bag-of-tasks-simulator 6 ./four_hosts.xml
  **/
 
 
 #include <iostream>
 #include <wrench.h>
 
-#include "TwoTasksAtATimeCloudWMS.h" // WMS implementation
+#include "TwoTasksAtATimeBatchWMS.h" // WMS implementation
 
+#define TFLOP  1000000000000.0
 /**
  * @brief The Simulator's main function
  *
@@ -55,7 +56,7 @@ int main(int argc, char **argv) {
 
     /* Parsing of the command-line arguments for this WRENCH simulation */
     if (argc != 3) {
-        std::cerr << "Usage: " << argv[0] << " <and EVEN number of tasks> <xml platform file> [optional logging arguments]" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " <a number of tasks> <xml platform file> [optional logging arguments]" << std::endl;
         exit(1);
     }
 
@@ -68,9 +69,6 @@ int main(int argc, char **argv) {
     int num_tasks = 0;
     try {
         num_tasks = std::atoi(argv[1]);
-        if  (num_tasks % 2) {
-            throw std::invalid_argument("Number of tasks should be even");
-        }
     } catch (std::invalid_argument &e) {
         std::cerr << "Invalid number of tasks ("  << e.what() << ")\n";
         exit(1);
@@ -79,14 +77,11 @@ int main(int argc, char **argv) {
     /* Declare a workflow */
     wrench::Workflow workflow;
 
-    /* Initialize and seed a RNG */
-    std::uniform_int_distribution<double> dist(100000000.0,10000000000.0);
-    std::mt19937 rng(42);
-
-    /* Add workflow tasks and files */
+    /* Add workflow tasks  and files */
     for (int i=0; i < num_tasks; i++) {
         /* Create a task: 10GFlop, 1 to 10 cores, 0.90 parallel efficiency, 10MB memory footprint */
-        auto task = workflow.addTask("task_" + std::to_string(i), dist(rng), 1, 10, 0.90, 1000);
+        auto task = workflow.addTask("task_" + std::to_string(i), (100 + i * 500) * TFLOP,
+                1, 10, 0.90, 1000);
         task->addInputFile(workflow.addFile("input_" + std::to_string(i), 10000000));
         task->addOutputFile(workflow.addFile("output_" + std::to_string(i), 10000000));
     }
@@ -105,23 +100,22 @@ int main(int argc, char **argv) {
     auto storage_service = simulation.add(new wrench::SimpleStorageService(
             "WMSHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50000000"}}, {}));
 
-    /* Instantiate a cloud compute service, and add it to the simulation.
-     * A wrench::CloudComputeService is an abstraction of a compute service that corresponds
-     * to a cloud that responds to VM creating requests, and each VM exposes a "bare-metal" compute service.
-     * This particular service is started on CloudProviderHost, uses CloudHost1 and CloudHost2
+    /* Instantiate a batch compute service, and add it to the simulation.
+     * A wrench::BatchComputeService is an abstraction of a compute service that corresponds
+     * to a batch that responds to VM creating requests, and each VM exposes a "bare-metal" compute service.
+     * This particular service is started on BatchProviderHost, uses BatchHost1 and BatchHost2
      * as hardware resources, and has no scratch storage space (mount point argument = "").
      * This means that tasks running on this service will access data only from remote storage services. */
-    std::cerr << "Instantiating a CloudComputeService on CloudProviderHost..." << std::endl;
-    std::vector<std::string> cloud_hosts = {"CloudHost1", "CloudHost2"};
-    auto cloud_service = simulation.add(new wrench::CloudComputeService(
-            "CloudProviderHost", cloud_hosts, "", {}, {}));
+    std::cerr << "Instantiating a BatchComputeService on BatchHeadNode..." << std::endl;
+    std::vector<std::string> batch_nodes = {"BatchNode1", "BatchNode2"};
+    auto batch_service = simulation.add(new wrench::BatchComputeService(
+            "BatchHeadNode", batch_nodes, "", {}, {}));
 
     /* Instantiate a WMS, to be stated on WMSHost, which is responsible
      * for executing the workflow. See comments in TwoTasksAtATimeWMS.cpp
      * for more details */
-
     auto wms = simulation.add(
-            new wrench::TwoTasksAtATimeCloudWMS({cloud_service}, {storage_service}, "WMSHost"));
+            new wrench::TwoTasksAtATimeBatchWMS({batch_service}, {storage_service}, "WMSHost"));
 
     /* Associate the workflow to the WMS */
     wms->addWorkflow(&workflow);
@@ -153,10 +147,12 @@ int main(int argc, char **argv) {
 
     /* Simulation results can be examined via simulation.output, which provides access to traces
      * of events. In the code below, we print the  retrieve the trace of all task completion events, print how
-     * many such events there are, and print some information for the first such event. */
+     * many such events there are, and print some information for the first such event.  Also print
+     * out how many failures each task has experienced */
     auto trace = simulation.getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>();
     for (auto const &item : trace) {
-        std::cerr << "Task "  << item->getContent()->getTask()->getID() << " completed at time " << item->getDate()  << std::endl;
+        std::cerr << "Task "  << item->getContent()->getTask()->getID() << " completed at hour " << (item->getDate()/3600);
+        std::cerr << " with " << item->getContent()->getTask()->getFailureCount()  <<  " failures)\n";
     }
 
     return 0;
