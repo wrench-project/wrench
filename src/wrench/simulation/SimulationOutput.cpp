@@ -77,6 +77,8 @@ namespace wrench {
     } WorkflowTaskExecutionInstance;
 
 
+
+
     /**
      * @brief Function that generates a unified JSON file containing the information specified by boolean arguments.
      *
@@ -94,7 +96,8 @@ namespace wrench {
                                            bool include_workflow_exec,
                                            bool include_workflow_graph,
                                            bool include_energy,
-                                           bool generate_host_utilization_layout) {
+                                           bool generate_host_utilization_layout,
+                                           bool include_disk) {
 
         nlohmann::json unified_json;
 
@@ -116,6 +119,11 @@ namespace wrench {
         if(include_energy){
             dumpHostEnergyConsumptionJSON(file_path, false);
             unified_json["energy_consumption"] = energy_json_part;
+        }
+
+        if(include_disk){
+            dumpDiskOperationsJSON(file_path, false);
+            unified_json["disk_operations"] = disk_json_part;
         }
 
 
@@ -425,7 +433,7 @@ namespace wrench {
     void SimulationOutput::dumpWorkflowExecutionJSON(Workflow *workflow, std::string file_path,
                                                      bool generate_host_utilization_layout, bool writing_file) {
         if (workflow == nullptr || file_path.empty()) {
-            throw std::invalid_argument("SimulationOutput::dumpTaskDataJSON() requires a valid workflow and file_path");
+            throw std::invalid_argument("SimulationOutput::dumpWorkflowExecutionJSON() requires a valid workflow and file_path");
         }
 
         auto tasks = workflow->getTasks();
@@ -637,7 +645,7 @@ namespace wrench {
      */
     void SimulationOutput::dumpWorkflowGraphJSON(wrench::Workflow *workflow, std::string file_path, bool writing_file) {
         if (workflow == nullptr || file_path.empty()) {
-            throw std::invalid_argument("SimulationOutput::dumpTaskDataJSON() requires a valid workflow and file_path");
+            throw std::invalid_argument("SimulationOutput::dumpWorkflowGraphJSON() requires a valid workflow and file_path");
         }
 
         /* schema
@@ -1158,6 +1166,84 @@ namespace wrench {
         if(writing_file){
             std::ofstream output(file_path);
             output << std::setw(4) << nlohmann::json(platform) << std::endl;
+            output.close();
+        }
+    }
+
+    /**
+     * TODO
+     * @param file_path
+     * @param writing_file
+     */
+    void SimulationOutput::dumpDiskOperationsJSON(std::string file_path, bool writing_file) {
+        if (file_path.empty()) {
+            throw std::invalid_argument("SimulationOutput::dumpDiskOperationJSON() requires a valid workflow and file_path");
+        }
+
+
+        auto read_start_timestamps = this->getTrace<SimulationTimestampDiskReadStart>();
+        auto read_completion_timestamps = this->getTrace<wrench::SimulationTimestampDiskReadCompletion>();
+        auto read_failure_timestamps = this->getTrace<wrench::SimulationTimestampDiskReadFailure>();
+
+        auto write_start_timestamps = this->getTrace<SimulationTimestampDiskWriteStart>();
+        auto write_completion_timestamps = this->getTrace<wrench::SimulationTimestampDiskWriteCompletion>();
+        auto write_failure_timestamps = this->getTrace<wrench::SimulationTimestampDiskWriteFailure>();
+
+        std::vector<std::tuple<string, string, std::tuple<double, double, double>>> reads;
+        std::vector<std::tuple<string, string, std::tuple<double, double, double>>> writes;
+        std::tuple<string, string, std::tuple<double, double, double>> disk_operation;
+
+        if (!read_start_timestamps.empty()) {
+            for (auto & read_start_timestamp : read_start_timestamps){
+                disk_operation = std::make_tuple(read_start_timestamp->getContent()->getHostname().c_str(),
+                                   read_start_timestamp->getContent()->getMount().c_str(),
+                                   std::make_tuple(read_start_timestamp->getContent()->getDate(),
+                                           read_start_timestamp->getContent()->getEndpoint()->getDate(),
+                                           read_start_timestamp->getContent()->getBytes()));
+                reads.emplace_back(disk_operation);
+            }
+        }
+
+        if (!write_start_timestamps.empty()) {
+            for (auto & write_start_timestamp : write_start_timestamps){
+                writes.emplace_back(std::make_tuple(write_start_timestamp->getContent()->getHostname().c_str(),
+                                    write_start_timestamp->getContent()->getMount().c_str(),
+                                                    std::make_tuple(write_start_timestamp->getContent()->getDate(),
+                                                                    write_start_timestamp->getContent()->getEndpoint()->getDate(),
+                                                                    write_start_timestamp->getContent()->getBytes())));
+            }
+        }
+
+        nlohmann::json disk_reads;
+        for (auto const &r : reads) {
+            nlohmann::json disk_read = nlohmann::json::object({{"mount", std::get<1>(r)},
+                                                               {"hostname", std::get<0>(r)},
+                                                               {"start", std::get<0>(std::get<2>(r))},
+                                                               {"end", std::get<1>(std::get<2>(r))},
+                                                               {"bytes",std::get<2>(std::get<2>(r))}});
+            disk_reads.push_back(disk_read);
+        }
+
+        nlohmann::json disk_writes;
+        for (auto const &w : writes) {
+            nlohmann::json disk_write = nlohmann::json::object({{"mount", std::get<1>(w)},
+                                                                {"hostname", std::get<0>(w)},
+                                                                {"start", std::get<0>(std::get<2>(w))},
+                                                                {"end", std::get<1>(std::get<2>(w))},
+                                                                {"bytes",std::get<2>(std::get<2>(w))}});
+            disk_writes.push_back(disk_write);
+        }
+
+
+
+        nlohmann::json disk_operations_json;
+        disk_operations_json["reads"] = disk_reads;
+        disk_operations_json["writes"] = disk_writes;
+        disk_json_part = disk_operations_json;
+
+        if(writing_file) {
+            std::ofstream output(file_path);
+            output << std::setw(4) << disk_operations_json << std::endl;
             output.close();
         }
     }
