@@ -8,28 +8,32 @@
  */
 
 /**
- ** This simulator simulates the execution of a chain workflow, that is, of a workflow
- ** in which each task has at most a single parent and at most a single child:
+ ** This simulator simulates the execution of a bag-of-tasks workflow, that is, of a workflow
+ ** in which each task has its own input file and its own output file, and tasks can be
+ ** executed completely independently
  **
- **   File #0 -> Task #0 -> File #1 -> Task #1 -> File #2 -> .... -> Task #n-1 -> File #n
+ **   InputFile #0 -> Task #0 -> OutputFile #1
+ **   ...
+ **   InputFile #n -> Task #n -> OutputFile #n
  **
- ** The compute platform comprises two hosts, WMSHost and ComputeHost. On WMSHost runs a simple storage
- ** service and a WMS (defined in class OneTaskAtATimeWMS). On ComputeHost runs a bare metal
- ** compute service, that has access to the 10 cores of that host. Once the simulation is done,
+ ** The compute platform comprises four hosts, WMSHost,  CloudProviderHost, CloudHost1, and
+ **  CloudHost2. On WMSHost runs a simple storage
+ ** service and a WMS (defined in class TwoTasksAtATimeCloudWMS). On CloudProviderHost runs a cloud
+ ** service, that has access to two hosts: CloudHost1 and CloudHost2. Once the simulation is done,
  ** the completion time of each workflow task is printed.
  **
  ** Example invocation of the simulator for a 10-task workflow, with only WMS logging:
- **    ./bare-metal-chain-simulator 10 ./two_hosts.xml --wrench-no-logs --log=one_task_at_a_time_wms.threshold=info
+ **    ./cloud-bag-of-tasks-simulator 10 ./two_hosts.xml --wrench-no-logs --log=two_tasks_at_a_time_wms.threshold=info
  **
  ** Example invocation of the simulator for a 5-task workflow with full logging:
- **    ./bare-metal-chain-simulator 5 ./two_hosts.xml
+ **    ./cloud-bag-of-tasks-simulator 5 ./two_hosts.xml
  **/
 
 
 #include <iostream>
 #include <wrench.h>
 
-#include "OneTaskAtATimeWMS.h" // WMS implementation
+#include "TwoTasksAtATimeCloudWMS.h" // WMS implementation
 
 /**
  * @brief The Simulator's main function
@@ -40,9 +44,7 @@
  */
 int main(int argc, char **argv) {
 
-    /*
-     * Declare a WRENCH simulation object
-     */
+    /* Declare a WRENCH simulation object */
     wrench::Simulation simulation;
 
     /* Initialize the simulation, which may entail extracting WRENCH-specific and
@@ -62,7 +64,6 @@ int main(int argc, char **argv) {
     std::cerr << "Instantiating simulated platform..." << std::endl;
     simulation.instantiatePlatform(argv[2]);
 
-
     /* Parse the first command-line argument (number of tasks) */
     int num_tasks = 0;
     try {
@@ -75,23 +76,16 @@ int main(int argc, char **argv) {
     /* Declare a workflow */
     wrench::Workflow workflow;
 
-    /* Add workflow tasks */
+    /* Initialize and seed a RNG */
+    std::uniform_int_distribution<double> dist(100000000.0,10000000000.0);
+    std::mt19937 rng(42);
+
+    /* Add workflow tasks and files */
     for (int i=0; i < num_tasks; i++) {
         /* Create a task: 10GFlop, 1 to 10 cores, 0.90 parallel efficiency, 10MB memory footprint */
-        auto task = workflow.addTask("task_" + std::to_string(i), 10000000000.0, 1, 10, 0.90, 10000000);
-    }
-
-    /* Add workflow files */
-    for (int i=0; i < num_tasks+1; i++) {
-        /* Create a 100MB file */
-        workflow.addFile("file_" + std::to_string(i), 100000000);
-    }
-
-    /* Set input/output files for each task */
-    for (int i=0; i < num_tasks; i++) {
-        auto task = workflow.getTaskByID("task_" + std::to_string(i));
-        task->addInputFile(workflow.getFileByID("file_" + std::to_string(i)));
-        task->addOutputFile(workflow.getFileByID("file_" + std::to_string(i + 1)));
+        auto task = workflow.addTask("task_" + std::to_string(i), dist(rng), 1, 10, 0.90, 1000);
+        task->addInputFile(workflow.addFile("input_" + std::to_string(i), 10000000));
+        task->addOutputFile(workflow.addFile("output_" + std::to_string(i), 10000000));
     }
 
     /* Instantiate a storage service, and add it to the simulation.
@@ -108,21 +102,23 @@ int main(int argc, char **argv) {
     auto storage_service = simulation.add(new wrench::SimpleStorageService(
             "WMSHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50000000"}}, {}));
 
-    /* Instantiate a bare-metal compute service, and add it to the simulation.
-     * A wrench::BareMetalComputeService is an abstraction of a compute service that corresponds 
-     * to a software infrastructure that can execute tasks on hardware resources.
-     * This particular service is started on ComputeHost and has no scratch storage space (mount point argument = "").
+    /* Instantiate a cloud compute service, and add it to the simulation.
+     * A wrench::CloudComputeService is an abstraction of a compute service that corresponds
+     * to a cloud that responds to VM creating requests, and each VM exposes a "bare-metal" compute service.
+     * This particular service is started on CloudProviderHost, uses CloudHost1 and CloudHost2
+     * as hardware resources, and has no scratch storage space (mount point argument = "").
      * This means that tasks running on this service will access data only from remote storage services. */
-    std::cerr << "Instantiating a BareMetalComputeService on ComputeHost..." << std::endl;
-    auto baremetal_service = simulation.add(new wrench::BareMetalComputeService(
-            "ComputeHost", {"ComputeHost"}, "", {}, {}));
+    std::cerr << "Instantiating a BareMetalComputeService on CloudProviderHost..." << std::endl;
+    std::vector<std::string> cloud_hosts = {"CloudHost1", "CloudHost2"};
+    auto cloud_service = simulation.add(new wrench::CloudComputeService(
+            "CloudProviderHost", cloud_hosts, "", {}, {}));
 
     /* Instantiate a WMS, to be stated on WMSHost, which is responsible
-     * for executing the workflow. See comments in OneTaskAtATimeWMS.cpp
+     * for executing the workflow. See comments in TwoTasksAtATimeWMS.cpp
      * for more details */
 
     auto wms = simulation.add(
-            new wrench::OneTaskAtATimeWMS({baremetal_service}, {storage_service}, "WMSHost"));
+            new wrench::TwoTasksAtATimeCloudWMS({cloud_service}, {storage_service}, "WMSHost"));
 
     /* Associate the workflow to the WMS */
     wms->addWorkflow(&workflow);

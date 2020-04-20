@@ -9,20 +9,21 @@
 
 /**
  ** A Workflow Management System (WMS) implementation that operates as follows:
+ **  - Create two VMs
  **  - While the workflow is not done, repeat:
  **    - Pick up to two ready tasks
- **    - Submit both of them as part of a single job to the first available BareMetalComputeService so tbat:
- **       - The most expensive task uses 6 cores
- **       - The least expensive task uses 4 cores
+ **    - Submit both of them as  two  different jobs to the VMs
+ **       - The most expensive task on the more powerful VM
+ **       - The least expensive task on the less powerful VM
  **       - Each task reads the input file from the StorageService
  **       - Each task reads the output file from the StorageService
  **/
 
 #include <iostream>
 
-#include "TwoTasksAtATimeWMS.h"
+#include "TwoTasksAtATimeCloudWMS.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(two_tasks_at_a_time_wms, "Log category for TwoTasksAtATimeWMS");
+XBT_LOG_NEW_DEFAULT_CATEGORY(two_tasks_at_a_time_cloud_wms, "Log category for TwoTasksAtATimeCloudWMS");
 
 namespace wrench {
 
@@ -33,7 +34,7 @@ namespace wrench {
      * @param storage_services: a set of storage services available to store files
      * @param hostname: the name of the host on which to start the WMS
      */
-    TwoTasksAtATimeWMS::TwoTasksAtATimeWMS(const std::set<std::shared_ptr<ComputeService>> &compute_services,
+    TwoTasksAtATimeCloudWMS::TwoTasksAtATimeCloudWMS(const std::set<std::shared_ptr<ComputeService>> &compute_services,
                                          const std::set<std::shared_ptr<StorageService>> &storage_services,
                                          const std::string &hostname) : WMS(
             nullptr, nullptr,
@@ -41,16 +42,16 @@ namespace wrench {
             storage_services,
             {}, nullptr,
             hostname,
-            "two-tasks-at-a-time") {}
+            "two-tasks-at-a-time-cloud") {}
 
     /**
-     * @brief main method of the TwoTasksAtATimeWMS daemon
+     * @brief main method of the TwoTasksAtATimeCloudWMS daemon
      *
      * @return 0 on completion
      *
      * @throw std::runtime_error
      */
-    int TwoTasksAtATimeWMS::main() {
+    int TwoTasksAtATimeCloudWMS::main() {
 
         /* Set the logging output to GREEN */
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
@@ -62,8 +63,16 @@ namespace wrench {
         auto job_manager = this->createJobManager();
 
         /* Get the first available bare-metal compute service and storage service  */
-        auto compute_service = *(this->getAvailableComputeServices<BareMetalComputeService>().begin());
+        auto cloud_service = *(this->getAvailableComputeServices<CloudComputeService>().begin());
         auto storage_service = *(this->getAvailableStorageServices().begin());
+
+        /* Create a VM instance with 5 cores and one with 2 cores (and 500M of RAM) */
+        auto large_vm = cloud_service->createVM(5, 500000);
+        auto small_vm = cloud_service->createVM(2, 500000);
+
+        /* Start the VMs */
+        auto large_vm_compute_service = cloud_service->startVM(large_vm);
+        auto small_vm_compute_service = cloud_service->startVM(small_vm);
 
         /* While the workflow isn't done, repeat the main loop */
         while (not this->getWorkflow()->isDone()) {
@@ -86,42 +95,40 @@ namespace wrench {
             auto cheap_ready_task = ready_tasks.at(0);
             auto expensive_ready_task = (ready_tasks.size() > 1 ? ready_tasks.at(ready_tasks.size() - 1) : nullptr);
 
-            /* Create a standard job for the tasks */
-
+            /* Submit the cheap task to the small VM */
             /* First, we need to create a map of file locations, stating for each file
              * where is should be read/written */
             std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations;
             file_locations[cheap_ready_task->getInputFiles().at(0)] = FileLocation::LOCATION(storage_service);
             file_locations[cheap_ready_task->getOutputFiles().at(0)] = FileLocation::LOCATION(storage_service);
-            if  (expensive_ready_task) {
-                file_locations[expensive_ready_task->getInputFiles().at(0)] = FileLocation::LOCATION(storage_service);
-                file_locations[expensive_ready_task->getOutputFiles().at(0)] = FileLocation::LOCATION(storage_service);
-            }
 
             /* Create the job  */
-            StandardJob *standard_job;
+            auto standard_job = job_manager->createStandardJob(cheap_ready_task, file_locations);
+
+             /* Submit the job to the small VM */
+            job_manager->submitJob(standard_job, small_vm_compute_service);
+
             if (expensive_ready_task) {
-                standard_job = job_manager->createStandardJob(
-                        {cheap_ready_task, expensive_ready_task}, file_locations);
-            } else  {
-                standard_job = job_manager->createStandardJob(
-                        cheap_ready_task, file_locations);
+                /* Submit the cheap task to the small VM */
+                /* First, we need to create a map of file locations, stating for each file
+                 * where is should be read/written */
+                std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations;
+                file_locations[expensive_ready_task->getInputFiles().at(0)] = FileLocation::LOCATION(storage_service);
+                file_locations[expensive_ready_task->getOutputFiles().at(0)] = FileLocation::LOCATION(storage_service);
+
+                /* Create the job  */
+                auto standard_job = job_manager->createStandardJob(expensive_ready_task, file_locations);
+
+                /* Submit the job to the small VM */
+                job_manager->submitJob(standard_job, large_vm_compute_service);
             }
 
-            /* Then, we create the "service-specific arguments" that make it possible to configure
-             * the way in which tasks in a job can run on the compute service */
-            std::map<std::string, std::string> service_specific_args;
-            service_specific_args[cheap_ready_task->getID()] = "4";
-            if  (expensive_ready_task) {
-                service_specific_args[expensive_ready_task->getID()] = "6";
-            }
-
-            /* Submit the job to the compute service */
-            job_manager->submitJob(standard_job, compute_service, service_specific_args);
-
-            /* Wait for a workflow execution event and process it. In this case we know that
+            /* Wait for  workflow execution event and process it. In this case we know that
              * the event will be a StandardJobCompletionEvent, which is processed by the method
              * processEventStandardJobCompletion() that this class overrides. */
+            this->waitForAndProcessNextEvent();
+
+            /* And again! */
             this->waitForAndProcessNextEvent();
         }
 
@@ -134,7 +141,7 @@ namespace wrench {
      *
      * @param event: the event
      */
-    void TwoTasksAtATimeWMS::processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent> event) {
+    void TwoTasksAtATimeCloudWMS::processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent> event) {
         /* Retrieve the job that this event is for */
         auto job = event->standard_job;
         /* Retrieve the job's first (and in our case only) task */
@@ -147,7 +154,7 @@ namespace wrench {
      *
      * @param event: the event
      */
-    void TwoTasksAtATimeWMS::processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent> event) {
+    void TwoTasksAtATimeCloudWMS::processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent> event) {
         /* Retrieve the job that this event is for */
         auto job = event->standard_job;
         /* Retrieve the job's first (and in our case only) task */
