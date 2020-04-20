@@ -11,7 +11,7 @@
             </disk>
         </host>
 
-        <!-- The host on which the BareMetalComputeService will run -->
+        <!-- The host on which the CloudComputeService will run -->
         <host id="CloudProviderHost" speed="1Gf" core="1">
        </host>
 

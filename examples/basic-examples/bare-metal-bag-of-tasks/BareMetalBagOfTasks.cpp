@@ -24,8 +24,8 @@
  ** Example invocation of the simulator for a 10-task workflow, with only WMS logging:
  **    ./bare-metal-bag-of-tasks-simulator 10 ./two_hosts.xml --wrench-no-logs --log=two_tasks_at_a_time_wms.threshold=info
  **
- ** Example invocation of the simulator for a 5-task workflow with full logging:
- **    ./bare-metal-bag-of-tasks-simulator 5 ./two_hosts.xml
+ ** Example invocation of the simulator for a 6-task workflow with full logging:
+ **    ./bare-metal-bag-of-tasks-simulator 6 ./two_hosts.xml
  **/
 
 
@@ -56,7 +56,7 @@ int main(int argc, char **argv) {
 
     /* Parsing of the command-line arguments for this WRENCH simulation */
     if (argc != 3) {
-        std::cerr << "Usage: " << argv[0] << " <number of tasks> <xml platform file> [optional logging arguments]" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " <an EVEN number of tasks> <xml platform file> [optional logging arguments]" << std::endl;
         exit(1);
     }
 
@@ -69,8 +69,11 @@ int main(int argc, char **argv) {
     int num_tasks = 0;
     try {
         num_tasks = std::atoi(argv[1]);
+        if (num_tasks  %  2)  {
+            throw std::invalid_argument("Number of tasks should be even");
+        }
     } catch (std::invalid_argument &e) {
-        std::cerr << "Invalid number of tasks\n";
+        std::cerr << "Invalid number of tasks ("  << e.what() << ")\n";
         exit(1);
     }
 
@@ -78,7 +81,7 @@ int main(int argc, char **argv) {
     wrench::Workflow workflow;
 
     /* Initialize and seed a RNG */
-    std::uniform_int_distribution<double> dist(100000000.0,10000000000.0);
+    std::uniform_real_distribution<double> dist(100000000.0,10000000000.0);
     std::mt19937 rng(42);
 
     /* Add workflow tasks and files */

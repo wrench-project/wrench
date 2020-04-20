@@ -35,8 +35,8 @@ namespace wrench {
      * @param hostname: the name of the host on which to start the WMS
      */
     TwoTasksAtATimeCloudWMS::TwoTasksAtATimeCloudWMS(const std::set<std::shared_ptr<ComputeService>> &compute_services,
-                                         const std::set<std::shared_ptr<StorageService>> &storage_services,
-                                         const std::string &hostname) : WMS(
+                                                     const std::set<std::shared_ptr<StorageService>> &storage_services,
+                                                     const std::string &hostname) : WMS(
             nullptr, nullptr,
             compute_services,
             storage_services,
@@ -91,37 +91,35 @@ namespace wrench {
                           }
                       });
 
-            /*  Pick the least and most (if any) expensive task */
+            /*  Pick the least and most expensive task */
             auto cheap_ready_task = ready_tasks.at(0);
-            auto expensive_ready_task = (ready_tasks.size() > 1 ? ready_tasks.at(ready_tasks.size() - 1) : nullptr);
+            auto expensive_ready_task = ready_tasks.at(ready_tasks.size() - 1);
 
             /* Submit the cheap task to the small VM */
             /* First, we need to create a map of file locations, stating for each file
              * where is should be read/written */
-            std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations;
-            file_locations[cheap_ready_task->getInputFiles().at(0)] = FileLocation::LOCATION(storage_service);
-            file_locations[cheap_ready_task->getOutputFiles().at(0)] = FileLocation::LOCATION(storage_service);
+            std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations1;
+            file_locations1[cheap_ready_task->getInputFiles().at(0)] = FileLocation::LOCATION(storage_service);
+            file_locations1[cheap_ready_task->getOutputFiles().at(0)] = FileLocation::LOCATION(storage_service);
 
             /* Create the job  */
-            auto standard_job = job_manager->createStandardJob(cheap_ready_task, file_locations);
+            auto standard_job1 = job_manager->createStandardJob(cheap_ready_task, file_locations1);
 
-             /* Submit the job to the small VM */
-            job_manager->submitJob(standard_job, small_vm_compute_service);
+            /* Submit the job to the small VM */
+            job_manager->submitJob(standard_job1, small_vm_compute_service);
 
-            if (expensive_ready_task) {
-                /* Submit the cheap task to the small VM */
-                /* First, we need to create a map of file locations, stating for each file
-                 * where is should be read/written */
-                std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations;
-                file_locations[expensive_ready_task->getInputFiles().at(0)] = FileLocation::LOCATION(storage_service);
-                file_locations[expensive_ready_task->getOutputFiles().at(0)] = FileLocation::LOCATION(storage_service);
+            /* Submit the cheap task to the small VM */
+            /* First, we need to create a map of file locations, stating for each file
+             * where is should be read/written */
+            std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations2;
+            file_locations2[expensive_ready_task->getInputFiles().at(0)] = FileLocation::LOCATION(storage_service);
+            file_locations2[expensive_ready_task->getOutputFiles().at(0)] = FileLocation::LOCATION(storage_service);
 
-                /* Create the job  */
-                auto standard_job = job_manager->createStandardJob(expensive_ready_task, file_locations);
+            /* Create the job  */
+            auto standard_job2 = job_manager->createStandardJob(expensive_ready_task, file_locations2);
 
-                /* Submit the job to the small VM */
-                job_manager->submitJob(standard_job, large_vm_compute_service);
-            }
+            /* Submit the job to the small VM */
+            job_manager->submitJob(standard_job2, large_vm_compute_service);
 
             /* Wait for  workflow execution event and process it. In this case we know that
              * the event will be a StandardJobCompletionEvent, which is processed by the method
