@@ -31,7 +31,6 @@ const simulationDetailsHtml = `
         </thead>
 
         <tbody class="task-details-table" id="task-details-table-body">
-
         </tbody>
     </table>
 `

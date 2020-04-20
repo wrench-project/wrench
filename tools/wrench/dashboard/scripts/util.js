@@ -37,17 +37,27 @@ function findDuration(data, id, section) {
     }
 }
 
-function convertToTableFormat(d, section, startEnd) {
-    var metric = d[section][startEnd]
-    if (metric === -1) {
-        if (d.failed !== -1) {
-            return "Failed"
+function convertToTableFormat(d, section, property) {
+    let metric = 0;
+    if (section === "read" || section === "write") {
+        metric = property === "start" ? Number.MAX_VALUE : 0;
+        for (i in d[section]) {
+            metric = property === "start" ? d[section][i][property] < metric ?
+                d[section][i][property] : metric :
+                d[section][i][property] > metric ? d[section][i][property] : metric;
         }
-        if (d.terminated !== -1) {
-            return "Terminated"
+    } else {
+        metric = d[section][property];
+        if (metric === -1) {
+            if (d.failed !== -1) {
+                return "Failed";
+            }
+            if (d.terminated !== -1) {
+                return "Terminated";
+            }
         }
     }
-    return toFiveDecimalPlaces(metric)
+    return toFiveDecimalPlaces(metric);
 }
 
 function getRandomColour() {
