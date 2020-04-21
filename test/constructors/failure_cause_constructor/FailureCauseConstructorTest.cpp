@@ -62,6 +62,7 @@ TEST_F(FailureCauseConstructorTest, FatalFailure) {
 
 
 TEST_F(FailureCauseConstructorTest, HostError) {
-  wrench::HostError *cause;
-  ASSERT_NO_THROW(cause = new wrench::HostError("hostname"));
+    wrench::HostError *cause;
+    ASSERT_NO_THROW(cause = new wrench::HostError("hostname"));
+    cause->toString(); // Coverage
 }
