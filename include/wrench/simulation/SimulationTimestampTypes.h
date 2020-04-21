@@ -20,7 +20,7 @@ using namespace std;
 /***********************/
 
 typedef std::tuple<void *, void *, void *> File;
-typedef std::tuple<std::string, std::string, double> DiskAccess;
+typedef std::tuple<std::string, std::string, int> DiskAccess;
 
 namespace std {
     template <>
@@ -37,7 +37,7 @@ namespace std {
     public :
         size_t operator()(const DiskAccess &diskAccess ) const
         {
-            return std::hash<std::string>()(std::get<0>(diskAccess)) ^ std::hash<std::string>()(std::get<1>(diskAccess)) ^ std::hash<double>()(std::get<2>(diskAccess));
+            return std::hash<std::string>()(std::get<0>(diskAccess)) ^ std::hash<std::string>()(std::get<1>(diskAccess)) ^ std::hash<int>()(std::get<2>(diskAccess));
         }
     };
 };
@@ -412,6 +412,7 @@ namespace wrench {
         double getBytes();
         std::string getHostname();
         std::string getMount();
+        int getCounter();
 
     protected:
         /**
@@ -429,6 +430,11 @@ namespace wrench {
          */
         double bytes;
 
+        /**
+         * @brief counter to differentiate reads
+         */
+        int counter;
+
 
         /**
          * @brief the data structure that holds the ongoing disk reads.
@@ -437,7 +443,7 @@ namespace wrench {
 
         void setEndpoints();
         friend class SimulationOutput;
-        SimulationTimestampDiskRead(std::string hostname, std::string mount, double bytes);
+        SimulationTimestampDiskRead(std::string hostname, std::string mount, double bytes, int counter);
     };
 
     class SimulationTimestampDiskReadFailure;
@@ -449,7 +455,7 @@ namespace wrench {
     class SimulationTimestampDiskReadStart : public SimulationTimestampDiskRead {
     public:
         friend class SimulationOutput;
-        SimulationTimestampDiskReadStart(std::string hostname, std::string mount, double bytes);
+        SimulationTimestampDiskReadStart(std::string hostname, std::string mount, double bytes, int counter);
 
         friend class SimulationTimestampDiskReadFailure;
         friend class SimulationTimestampDiskReadCompletion;
@@ -461,7 +467,7 @@ namespace wrench {
     class SimulationTimestampDiskReadFailure : public SimulationTimestampDiskRead {
     private:
         friend class SimulationOutput;
-        SimulationTimestampDiskReadFailure(std::string hostname, std::string mount, double bytes);
+        SimulationTimestampDiskReadFailure(std::string hostname, std::string mount, double bytes, int counter);
     };
 
     /**
@@ -470,7 +476,7 @@ namespace wrench {
     class SimulationTimestampDiskReadCompletion : public SimulationTimestampDiskRead {
     private:
         friend class SimulationOutput;
-        SimulationTimestampDiskReadCompletion(std::string hostname, std::string mount, double bytes);
+        SimulationTimestampDiskReadCompletion(std::string hostname, std::string mount, double bytes, int counter);
     };
 
     class SimulationTimestampDiskWriteStart;
@@ -489,6 +495,7 @@ namespace wrench {
         double getBytes();
         std::string getHostname();
         std::string getMount();
+        int getCounter();
 
     protected:
 
@@ -508,13 +515,18 @@ namespace wrench {
         double bytes;
 
         /**
+         * @brief counter to differentiate writes
+         */
+        int counter;
+
+        /**
          * @brief the data structure that holds the ongoing disk writes.
          */
         static std::unordered_multimap<DiskAccess, SimulationTimestampDiskWrite *> pending_disk_writes;
 
         void setEndpoints();
         friend class SimulationOutput;
-        SimulationTimestampDiskWrite(std::string hostname, std::string mount, double bytes);
+        SimulationTimestampDiskWrite(std::string hostname, std::string mount, double bytes, int counter);
     };
 
     class SimulationTimestampDiskWriteFailure;
@@ -526,7 +538,7 @@ namespace wrench {
     class SimulationTimestampDiskWriteStart : public SimulationTimestampDiskWrite {
     public:
         friend class SimulationOutput;
-        SimulationTimestampDiskWriteStart(std::string hostname, std::string mount, double bytes);
+        SimulationTimestampDiskWriteStart(std::string hostname, std::string mount, double bytes, int counter);
 
         friend class SimulationTimestampDiskWriteFailure;
         friend class SimulationTimestampDiskWriteCompletion;
@@ -538,7 +550,7 @@ namespace wrench {
     class SimulationTimestampDiskWriteFailure : public SimulationTimestampDiskWrite {
     private:
         friend class SimulationOutput;
-        SimulationTimestampDiskWriteFailure(std::string hostname, std::string mount, double bytes);
+        SimulationTimestampDiskWriteFailure(std::string hostname, std::string mount, double bytes, int counter);
     };
 
     /**
@@ -547,7 +559,7 @@ namespace wrench {
     class SimulationTimestampDiskWriteCompletion : public SimulationTimestampDiskWrite {
     private:
         friend class SimulationOutput;
-        SimulationTimestampDiskWriteCompletion(std::string hostname, std::string mount, double bytes);
+        SimulationTimestampDiskWriteCompletion(std::string hostname, std::string mount, double bytes, int counter);
     };
 
     /**
