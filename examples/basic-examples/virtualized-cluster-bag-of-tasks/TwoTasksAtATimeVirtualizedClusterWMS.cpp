@@ -24,7 +24,7 @@
 
 #include "TwoTasksAtATimeVirtualizedClusterWMS.h"
 
-#define GB 1000000000
+#define GB 1000000000.0
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(custom_wms, "Log category for TwoTasksAtATimeVirtualizedClusterWMS");
 
