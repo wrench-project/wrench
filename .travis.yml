@@ -45,7 +45,7 @@ script:
       SONARPATH=$(dirname "`which build-wrapper-linux-x86-64`");
       docker cp $SONARPATH wrench:/home/wrench/wrench/sonar;
       docker exec -w /home/wrench/wrench/build -it wrench cmake -DENABLE_BATSCHED=${batsched} -DCMAKE_VERBOSE_MAKEFILE=ON ..;
-      docker exec -w /home/wrench/wrench/build -it wrench ./build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir bw-output make clean all unit_tests doc-gh;
+      docker exec -w /home/wrench/wrench/build -it wrench ../sonar/build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir bw-output make clean all unit_tests doc-gh;
     else
       docker exec -w /home/wrench/wrench/build -it wrench cmake -DENABLE_BATSCHED=${batsched} -DCMAKE_VERBOSE_MAKEFILE=ON ..;
       docker exec -w /home/wrench/wrench/build -it wrench make all unit_tests doc-gh;
