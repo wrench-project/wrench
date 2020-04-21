@@ -56,7 +56,7 @@ namespace wrench {
      * @param property_list: a property list that specifies BatchComputeServiceProperty values ({} means "use all defaults")
      * @param messagepayload_list: a message payload list that specifies BatchComputeServiceMessagePayload values ({} means "use all defaults")
      */
-    BatchComputeService::BatchComputeService(std::string &hostname,
+    BatchComputeService::BatchComputeService(const std::string &hostname,
                                              std::vector<std::string> compute_hosts,
                                              std::string scratch_space_mount_point,
                                              std::map<std::string, std::string> property_list,
@@ -81,7 +81,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    BatchComputeService::BatchComputeService(std::string hostname,
+    BatchComputeService::BatchComputeService(const std::string hostname,
                                              std::vector<std::string> compute_hosts,
                                              unsigned long cores_per_host,
                                              double ram_per_host,
