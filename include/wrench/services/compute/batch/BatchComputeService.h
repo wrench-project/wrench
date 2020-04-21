@@ -99,7 +99,7 @@ namespace wrench {
         };
 
     public:
-        BatchComputeService(std::string &hostname,
+        BatchComputeService(const std::string &hostname,
                             std::vector<std::string> compute_hosts,
                             std::string scratch_space_mount_point,
                             std::map<std::string, std::string> property_list = {},
@@ -130,7 +130,7 @@ namespace wrench {
         friend class CONSERVATIVEBFBatchScheduler;
         friend class BatschedBatchScheduler;
 
-        BatchComputeService(std::string hostname,
+        BatchComputeService(const std::string hostname,
                             std::vector<std::string> compute_hosts,
                             unsigned long cores_per_host,
                             double ram_per_host,
