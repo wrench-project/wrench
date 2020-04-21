@@ -7,8 +7,8 @@
  * (at your option) any later version.
  */
 
-#ifndef WRENCH_CRITICALPATHSCHEDULER_H
-#define WRENCH_CRITICALPATHSCHEDULER_H
+#ifndef WRENCH_EXAMPLE_CRITICALPATHSCHEDULER_H
+#define WRENCH_EXAMPLE_CRITICALPATHSCHEDULER_H
 
 #include <gtest/gtest_prod.h>
 #include <set>
@@ -53,4 +53,4 @@ namespace wrench {
 }
 
 
-#endif //WRENCH_CRITICALPATHSCHEDULER_H
+#endif //WRENCH_EXAMPLE_CRITICALPATHSCHEDULER_H

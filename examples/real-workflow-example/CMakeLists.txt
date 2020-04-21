@@ -19,12 +19,7 @@ set(SOURCE_FILES
 set(APP_CLOUD_FILES SimpleSimulatorCloud.cpp)
 add_executable(wrench-simple-example-cloud ${SOURCE_FILES} ${APP_CLOUD_FILES})
 
-if (ENABLE_BATSCHED)
-    find_library(ZMQ_LIBRARY NAMES zmq)
-    target_link_libraries(wrench-simple-example-cloud wrenchpegasusworkflowparser wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY} ${LEMON_LIBRARY} ${ZMQ_LIBRARY})
-else()
-    target_link_libraries(wrench-simple-example-cloud wrenchpegasusworkflowparser wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY} ${LEMON_LIBRARY})
-endif()
+target_link_libraries(wrench-simple-example-cloud wrenchpegasusworkflowparser wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY} ${LEMON_LIBRARY})
 
 
 
@@ -34,6 +29,7 @@ install(TARGETS wrench-simple-example-cloud DESTINATION bin)
 set(APP_BATCH_FILES SimpleSimulatorBatch.cpp)
 add_executable(wrench-simple-example-batch ${SOURCE_FILES} ${APP_BATCH_FILES})
 if (ENABLE_BATSCHED)
+    find_library(ZMQ_LIBRARY NAMES zmq)
     target_link_libraries(wrench-simple-example-batch wrenchpegasusworkflowparser wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY} ${LEMON_LIBRARY} ${ZMQ_LIBRARY})
 else()
     target_link_libraries(wrench-simple-example-batch wrenchpegasusworkflowparser wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY} ${LEMON_LIBRARY})

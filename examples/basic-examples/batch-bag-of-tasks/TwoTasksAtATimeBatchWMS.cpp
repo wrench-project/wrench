@@ -162,10 +162,10 @@ namespace wrench {
                 auto event = this->waitForNextEvent();
                 // Check that it is the expected event, just in  case
                 if (auto job_failed_event = std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(
-                        event)) { WRENCH_INFO("Received a job failure event (%s)",
+                        event)) { WRENCH_INFO("Notified of a job failure event (%s)",
                                               job_failed_event->failure_cause->toString().c_str());
                 } else if (auto job_completed_event = std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(
-                        event)) { WRENCH_INFO("Received a job completion event!");
+                        event)) { WRENCH_INFO("Notified of a job completion event!");
                 } else {
                     throw std::runtime_error("Unexpected event (" + event->toString() + ")");
                 }

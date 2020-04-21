@@ -8,8 +8,8 @@
  */
 
 
-#ifndef WRENCH_TWO_TASKS_AT_A_TIME_H
-#define WRENCH_TWO_TASKS_AT_A_TIME_H
+#ifndef WRENCH_EXAMPLE_TWO_TASKS_AT_A_TIME_H
+#define WRENCH_EXCAMPLE_TWO_TASKS_AT_A_TIME_H
 
 #include <wrench-dev.h>
 
@@ -42,4 +42,4 @@ namespace wrench {
 
     };
 }
-#endif //WRENCH_TWO_TASKS_AT_A_TIME_H
+#endif //WRENCH_EXAMPLE_TWO_TASKS_AT_A_TIME_H

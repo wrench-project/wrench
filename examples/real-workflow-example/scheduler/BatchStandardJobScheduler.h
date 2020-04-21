@@ -8,21 +8,21 @@
  *
  */
 
-#ifndef WRENCH_CLOUDSCHEDULER_H
-#define WRENCH_CLOUDSCHEDULER_H
+#ifndef WRENCH_EXAMPLE_BATCHSTANDARDJOBSCHEDULER_H
+#define WRENCH_EXAMPLE_BATCHSTANDARDJOBSCHEDULER_H
 
 #include <wrench-dev.h>
 
 namespace wrench {
 
     /**
-     * @brief A cloud Scheduler
+     * @brief A batch Scheduler
      */
-    class CloudStandardJobScheduler : public StandardJobScheduler {
-
+    class BatchStandardJobScheduler : public StandardJobScheduler {
 
     public:
-        explicit CloudStandardJobScheduler(std::shared_ptr<StorageService> default_storage_service) :
+
+        explicit BatchStandardJobScheduler(std::shared_ptr<StorageService> default_storage_service) :
                 default_storage_service(default_storage_service) {}
 
         /***********************/
@@ -30,17 +30,16 @@ namespace wrench {
         /***********************/
 
         void scheduleTasks(const std::set<std::shared_ptr<ComputeService>> &compute_services,
-                           const std::vector<WorkflowTask *> &tasks);
+                           const std::vector<WorkflowTask *> &tasks) override;
 
         /***********************/
         /** \endcond           */
         /***********************/
 
     private:
-        std::vector<std::string> execution_hosts;
         std::shared_ptr<StorageService> default_storage_service;
-        std::vector<std::shared_ptr<BareMetalComputeService>> compute_services_running_on_vms;
+
     };
 }
 
-#endif //WRENCH_CLOUDSCHEDULER_H
+#endif //WRENCH_EXAMPLE_BATCHSTANDARDJOBSCHEDULER_H

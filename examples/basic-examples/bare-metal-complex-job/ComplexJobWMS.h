@@ -8,8 +8,8 @@
  */
 
 
-#ifndef WRENCH_COMPLEX_JOB_H
-#define WRENCH_COMPLEX_JOB_H
+#ifndef WRENCH_EXAMPLE_COMPLEX_JOB_H
+#define WRENCH_EXAMPLE_COMPLEX_JOB_H
 
 #include <wrench-dev.h>
 
@@ -42,4 +42,4 @@ namespace wrench {
 
     };
 }
-#endif //WRENCH_COMPLEX_JOB_H
+#endif //WRENCH_EXAMPLE_COMPLEX_JOB_H
