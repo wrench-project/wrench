@@ -89,7 +89,8 @@ namespace wrench {
      * @param include_workflow_graph: boolean whether to include workflow graph in JSON
      * @param include_energy: boolean whether to include energy consumption in JSON
      * @param generate_host_utilization_layout: boolean specifying whether or not you would like a possible host utilization
-      *     layout to be generated
+     *         layout to be generated
+     * @param include_disk: boolean specifying whether to include disk operation in JSON
      */
     void SimulationOutput::dumpUnifiedJSON(Workflow *workflow, std::string file_path,
                                            bool include_platform,
