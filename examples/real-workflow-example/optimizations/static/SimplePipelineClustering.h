@@ -7,8 +7,8 @@
  * (at your option) any later version.
  */
 
-#ifndef WRENCH_SIMPLETASKCLUSTERING_H
-#define WRENCH_SIMPLETASKCLUSTERING_H
+#ifndef WRENCH_EXAMPLE_SIMPLETASKCLUSTERING_H
+#define WRENCH_EXAMPLE_SIMPLETASKCLUSTERING_H
 
 #include <wrench-dev.h>
 
@@ -35,4 +35,4 @@ namespace wrench {
 
 }
 
-#endif //WRENCH_SIMPLETASKCLUSTERING_H
+#endif //WRENCH_EXAMPLE_SIMPLETASKCLUSTERING_H
