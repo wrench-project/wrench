@@ -325,7 +325,7 @@ namespace wrench {
     void S4U_Simulation::writeToDisk(double num_bytes, std::string hostname, std::string mount_point) {
         mount_point  = FileLocation::sanitizePath(mount_point);
 
-        WRENCH_INFO("Writing %lf bytes to disk %s:%s", num_bytes, hostname.c_str(), mount_point.c_str());
+        WRENCH_DEBUG("Writing %lf bytes to disk %s:%s", num_bytes, hostname.c_str(), mount_point.c_str());
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         if (not host) {
             throw std::invalid_argument("S4U_Simulation::writeToDisk(): unknown host " + hostname);
@@ -360,7 +360,7 @@ namespace wrench {
                                                                 std::string write_mount_point) {
 
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
-        WRENCH_INFO("Reading %lf bytes from disk %s:%s and writing %lf bytes to disk %s:%s",
+        WRENCH_DEBUG("Reading %lf bytes from disk %s:%s and writing %lf bytes to disk %s:%s",
                 num_bytes_to_read, hostname.c_str(), read_mount_point.c_str(),
                 num_bytes_to_write, hostname.c_str(), write_mount_point.c_str());
 
@@ -401,7 +401,7 @@ namespace wrench {
     void S4U_Simulation::readFromDisk(double num_bytes, std::string hostname, std::string mount_point) {
         mount_point  = FileLocation::sanitizePath(mount_point);
 
-        WRENCH_INFO("Reading %lf bytes from disk %s:%s", num_bytes, hostname.c_str(), mount_point.c_str());
+        WRENCH_DEBUG("Reading %lf bytes from disk %s:%s", num_bytes, hostname.c_str(), mount_point.c_str());
 
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         if (not host) {
