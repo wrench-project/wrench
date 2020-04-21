@@ -55,7 +55,7 @@ int main(int argc, char **argv) {
 
     /* Parsing of the command-line arguments for this WRENCH simulation */
     if (argc != 3) {
-        std::cerr << "Usage: " << argv[0] << " <and EVEN number of tasks> <xml platform file> [--wrench-no-logs --log=custom_wms.threshold=info]" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " <an EVEN number of tasks> <xml platform file> [--wrench-no-logs --log=custom_wms.threshold=info]" << std::endl;
         exit(1);
     }
 
@@ -80,7 +80,7 @@ int main(int argc, char **argv) {
     wrench::Workflow workflow;
 
     /* Initialize and seed a RNG */
-    std::uniform_int_distribution<double> dist(100000000,10000000000);
+    std::uniform_int_distribution<long> dist(100000000,10000000000);
     std::mt19937 rng(42);
 
     /* Add workflow tasks and files */
@@ -117,8 +117,7 @@ int main(int argc, char **argv) {
             "CloudProviderHost", cloud_hosts, "", {}, {}));
 
     /* Instantiate a WMS, to be stated on WMSHost, which is responsible
-     * for executing the workflow. See comments in TwoTasksAtATimeWMS.cpp
-     * for more details */
+     * for executing the workflow. */
 
     auto wms = simulation.add(
             new wrench::TwoTasksAtATimeCloudWMS({cloud_service}, {storage_service}, "WMSHost"));
