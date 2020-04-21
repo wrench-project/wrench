@@ -1,0 +1,42 @@
+<?xml version='1.0'?>
+<!DOCTYPE platform SYSTEM "http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd">
+<platform version="4.1">
+    <zone id="AS0" routing="Full">
+
+        <!-- The host on which the WMS will run -->
+        <host id="WMSHost" speed="10Gf" core="1">
+        </host>
+
+        <!-- The host on which the BareMetalComputeService will run -->
+        <host id="ComputeHost" speed="1Gf" core="10">
+            <prop id="ram" value="16GB" />
+        </host>
+
+        <!-- The host on which the first StorageService will run -->
+        <host id="StorageHost1" speed="1Gf" core="1">
+            <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+                <prop id="size" value="5000GiB"/>
+                <prop id="mount" value="/"/>
+            </disk>
+        </host>
+
+        <!-- The host on which the second StorageService will run -->
+        <host id="StorageHost2" speed="1Gf" core="1">
+            <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+                <prop id="size" value="5000GiB"/>
+                <prop id="mount" value="/"/>
+            </disk>
+        </host>
+
+        <!-- A network link...-->
+        <link id="network_link" bandwidth="50MBps" latency="20us"/>
+
+        <!-- which connects all hosts together -->
+        <route src="WMSHost" dst="ComputeHost"> <link_ctn id="network_link"/> </route>
+        <route src="WMSHost" dst="StorageHost1"> <link_ctn id="network_link"/> </route>
+        <route src="WMSHost" dst="StorageHost2"> <link_ctn id="network_link"/> </route>
+        <route src="ComputeHost" dst="StorageHost1"> <link_ctn id="network_link"/> </route>
+        <route src="ComputeHost" dst="StorageHost2"> <link_ctn id="network_link"/> </route>
+        <route src="StorageHost1" dst="StorageHost2"> <link_ctn id="network_link"/> </route>
+    </zone>
+</platform>
