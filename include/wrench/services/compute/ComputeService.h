@@ -107,7 +107,6 @@ namespace wrench {
         /** \cond INTERNAL    **/
         /***********************/
 
-
         /**
          * @brief Method to submit a standard job to the service
          *
@@ -137,15 +136,26 @@ namespace wrench {
          */
         virtual void terminatePilotJob(PilotJob *job) = 0;
 
+        /**
+         * @brief Method that returns the computer service's scratch space's storage service
+         * @return the scratch space, or nullptr if none
+         */
+        std::shared_ptr<StorageService> getScratch();
+
+
+        /**
+         * @brief Constructor
+         * @param hostname: host on which  to run
+         * @param service_name: service name
+         * @param mailbox_name_prefix: mailbox prefix
+         * @param scratch_space_mount_point: mount point of the scratch space
+         */
         ComputeService(const std::string &hostname,
                        std::string service_name,
                        std::string mailbox_name_prefix,
                        std::string scratch_space_mount_point);
 
-
     protected:
-
-        std::shared_ptr<StorageService> getScratch();
 
         ComputeService(const std::string &hostname,
                        std::string service_name,

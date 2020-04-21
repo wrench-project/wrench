@@ -198,6 +198,23 @@ namespace wrench {
     }
 
     /**
+     * @brief  Wait for a workflow execution event
+     * @param timeout: a timeout value in seconds
+     * @return the event
+     */
+    std::shared_ptr<WorkflowExecutionEvent> WMS::waitForNextEvent(double timeout) {
+        return workflow->waitForNextExecutionEvent(timeout);
+    }
+
+    /**
+     * @brief  Wait for a workflow execution event
+     * @return the event
+     */
+    std::shared_ptr<WorkflowExecutionEvent> WMS::waitForNextEvent() {
+        return workflow->waitForNextExecutionEvent();
+    }
+
+    /**
      * @brief Process a standard job completion event
      *
      * @param event: a StandardJobCompletedEvent

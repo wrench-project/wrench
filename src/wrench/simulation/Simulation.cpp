@@ -114,7 +114,7 @@ namespace wrench {
             if ((not strcmp(argv[i], "--wrench-no-color")) or (not strcmp(argv[i], "--wrench-no-colors"))) {
                 TerminalOutput::disableColor();
             } else if ((not strcmp(argv[i], "--wrench-no-log")) or (not strcmp(argv[i], "--wrench-no-logs"))) {
-                TerminalOutput::disableColor();
+//                TerminalOutput::disableColor();
                 TerminalOutput::disableLog();
                 wrench_no_log = true;
             } else if (not strcmp(argv[i], "--activate-energy")) {
@@ -353,11 +353,11 @@ namespace wrench {
             }
 
             // Check that each input file is staged on the file registry services
-            for (auto f : wms->workflow->getInputFiles()) {
+            for (auto file : wms->workflow->getInputFiles()) {
                 for (auto frs : this->file_registry_services) {
-                    if (frs->entries.find(f.second) == frs->entries.end()) {
+                    if (frs->entries.find(file) == frs->entries.end()) {
                         throw std::runtime_error(
-                                "Workflow input file " + f.second->getID() + " is not staged on any storage service!");
+                                "Workflow input file " + file->getID() + " is not staged on any storage service!");
                     }
                 }
             }

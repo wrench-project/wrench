@@ -368,7 +368,7 @@ set(TEST_FILES
         test/pilot_job/CriticalPathSchedulerTest.cpp
         test/misc/PointerUtilTest.cpp
         test/misc/BogusMessageTest.cpp
-        examples/simple-example/scheduler/pilot_job/CriticalPathPilotJobScheduler.cpp
+        examples/real-workflow-example/scheduler/pilot_job/CriticalPathPilotJobScheduler.cpp
         test/compute_services/ScratchSpaceTest.cpp
         test/energy_consumption/EnergyConsumptionTest.cpp
         test/simulation/simulation_output/SimulationDumpJSONTest.cpp
