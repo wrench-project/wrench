@@ -47,6 +47,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     *
      * @param hostname: the hostname on which to start the service
      * @param compute_hosts: the list of names of the available compute hosts
      *                 - the hosts must be homogeneous (speed, number of cores, and RAM size)
@@ -68,6 +69,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     *
      * @param hostname: the hostname on which to start the service
      * @param compute_hosts: the list of names of the available compute hosts
      * @param cores_per_host: number of cores used per host
@@ -201,12 +203,14 @@ namespace wrench {
 
     /**
      * @brief Retrieve start time estimates for a set of job configurations
+     *
      * @param set_of_jobs: the set of job configurations, each of them with an id. Each configuration
      *         is a tuple as follows:
      *             - a configuration id (std::string)
      *             - a number of hosts (unsigned long)
      *             - a number of cores per host (unsigned long)
      *             - a duration in seconds (double)
+     *
      * @return start date predictions in seconds (as a map of ids). A prediction that's negative
      *         means that the job configuration can not run on the service (e.g., not enough hosts,
      *         not enough cores per host)

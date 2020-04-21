@@ -39,6 +39,8 @@ namespace wrench {
      *                             force these "redundant" dependencies to be added as edges in the workflow. Passing
      *                             redundant_dependencies=false will ignore these "redundant" dependencies. Most users
      *                             would likely pass "false".
+     * @return a workflow
+     *
      * @throw std::invalid_argument
      *
      */
@@ -208,6 +210,7 @@ namespace wrench {
      *                             force these "redundant" dependencies to be added as edges in the workflow. Passing
      *                             redundant_dependencies=false will ignore these "redundant" dependencies. Most users
      *                             woudl likely pass "false".
+    * @return a workflow
      * @throw std::invalid_argument
      */
     Workflow *PegasusWorkflowParser::createExecutableWorkflowFromJSON(const std::string &filename, const std::string &reference_flop_rate,
@@ -232,6 +235,8 @@ namespace wrench {
      *                             force these "redundant" dependencies to be added as edges in the workflow. Passing
      *                             redundant_dependencies=false will ignore these "redundant" dependencies. Most users
      *                             would likely pass "false".
+     *
+     * @return a workflow
      *
      * @throw std::invalid_argument
      */

@@ -7,11 +7,11 @@ WRENCH_LOG_NEW_DEFAULT_CATEGORY(simulation_timestamps, "Log category for Simulat
 
 namespace wrench {
 
-    /**
-     *
-     * @param file - tuple of three strings relating to File, Source and Whoami
-     * @return XOR of hashes of file
-     */
+    ///*
+    // *
+    // * @param file - tuple of three strings relating to File, Source and Whoami
+    // * @return XOR of hashes of file
+    // */
     ///size_t file_hash( const File & file )
     ///{
     ///    return std::hash<void *>()(std::get<0>(file)) ^ std::hash<void *>()(std::get<1>(file)) ^ std::hash<void *>()(std::get<2>(file));
