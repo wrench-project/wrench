@@ -6,6 +6,7 @@ set(EXAMPLES_CMAKEFILES_TXT
         examples/basic-examples/bare-metal-bag-of-tasks/CMakeLists.txt
         examples/basic-examples/bare-metal-complex-job/CMakeLists.txt
         examples/basic-examples/cloud-bag-of-tasks/CMakeLists.txt
+        examples/basic-examples/virtualized-cluster-bag-of-tasks/CMakeLists.txt
         examples/basic-examples/batch-bag-of-tasks/CMakeLists.txt
         examples/basic-examples/batch-pilot-job/CMakeLists.txt
         )

@@ -78,7 +78,7 @@ namespace wrench {
         }
 
         /* Initialize and seed a RNG */
-        std::uniform_int_distribution<int> dist(0, 1000000000);
+        std::uniform_int_distribution<long> dist(0, 1000000000);
         std::mt19937 rng(42);
 
         /* While the workflow isn't done, repeat the main loop */

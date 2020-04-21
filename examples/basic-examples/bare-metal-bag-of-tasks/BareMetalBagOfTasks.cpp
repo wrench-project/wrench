@@ -116,8 +116,7 @@ int main(int argc, char **argv) {
             "ComputeHost", {"ComputeHost"}, "", {}, {}));
 
     /* Instantiate a WMS, to be stated on WMSHost, which is responsible
-     * for executing the workflow. See comments in TwoTasksAtATimeWMS.cpp
-     * for more details */
+     * for executing the workflow. */
 
     auto wms = simulation.add(
             new wrench::TwoTasksAtATimeWMS({baremetal_service}, {storage_service}, "WMSHost"));

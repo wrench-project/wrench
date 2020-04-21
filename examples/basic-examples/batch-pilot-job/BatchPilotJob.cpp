@@ -101,8 +101,7 @@ int main(int argc, char **argv) {
             "BatchHeadNode", batch_nodes, "/scratch/", {}, {}));
 
     /* Instantiate a WMS, to be stated on WMSHost, which is responsible
-     * for executing the workflow. See comments in PilotJobWMS.cpp
-     * for more details */
+     * for executing the workflow.  */
     auto wms = simulation.add(
             new wrench::PilotJobWMS({batch_service}, {storage_service}, "WMSHost"));
 
