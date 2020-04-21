@@ -268,11 +268,14 @@ namespace wrench {
 
         std::map<WorkflowTask *, WorkflowTask::State> original_states;
 
+
         // Update the job state and insert it into the pending list
         switch (job->getType()) {
             case WorkflowJob::STANDARD: {
-                // Do a sanity check
-                for (auto t : ((StandardJob *) job)->tasks) {
+
+                auto sjob = (StandardJob*) job;
+                // Do a sanity check on task states
+                for (auto t : sjob->tasks) {
                     if ((t->getState() == WorkflowTask::State::COMPLETED) or
                         (t->getState() == WorkflowTask::State::PENDING)) {
                         throw std::invalid_argument("JobManager()::submitJob(): task " + t->getID() +
@@ -280,11 +283,25 @@ namespace wrench {
                                                     WorkflowTask::stateToString(t->getState()));
                     }
                 }
+
                 // Modify task states
-                ((StandardJob *) job)->state = StandardJob::PENDING;
-                for (auto t : ((StandardJob *) job)->tasks) {
+                sjob->state = StandardJob::PENDING;
+                for (auto t : sjob->tasks) {
                     original_states.insert(std::make_pair(t, t->getState()));
                     t->setState(WorkflowTask::State::PENDING);
+                }
+
+                // Do a sanity check on use of scratch space, and replace scratch space by the compute
+                // Service's scratch space
+                for (auto fl : sjob->file_locations) {
+                    if ((fl.second == FileLocation::SCRATCH) and (not compute_service->hasScratch())) {
+                        throw std::invalid_argument("JobManager():submitJob(): file location for file " +
+                        fl.first->getID() + " is scratch  space, but the compute service to which this "+
+                        "job is being submitted to doesn't have any!");
+                    }
+                    if (fl.second == FileLocation::SCRATCH) {
+                        sjob->file_locations[fl.first] = FileLocation::LOCATION(compute_service->getScratch());
+                    }
                 }
 
                 this->pending_standard_jobs.insert((StandardJob *) job);

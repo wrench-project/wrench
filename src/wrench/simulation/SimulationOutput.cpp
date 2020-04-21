@@ -447,7 +447,6 @@ namespace wrench {
         auto write_completion_timestamps = this->getTrace<wrench::SimulationTimestampFileWriteCompletion>();
         auto write_failure_timestamps = this->getTrace<wrench::SimulationTimestampFileWriteFailure>();
 
-
         std::vector<WorkflowTaskExecutionInstance> data;
 
         for (auto const &task : tasks) {

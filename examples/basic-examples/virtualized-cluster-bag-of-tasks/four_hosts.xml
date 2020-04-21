@@ -1,0 +1,36 @@
+<?xml version='1.0'?>
+<!DOCTYPE platform SYSTEM "http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd">
+<platform version="4.1">
+    <zone id="AS0" routing="Full">
+
+        <!-- The host on which the WMS will run -->
+        <host id="WMSHost" speed="10Gf" core="1">
+            <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+                <prop id="size" value="5000GiB"/>
+                <prop id="mount" value="/"/>
+            </disk>
+        </host>
+
+        <!-- The host on which the VirtualizedClusterComputeService will run -->
+        <host id="VirtualizedClusterProviderHost" speed="1Gf" core="1">
+       </host>
+
+        <host id="VirtualizedClusterHost1" speed="100Gf" core="10">
+            <prop id="ram" value="64GB" />
+        </host>
+        <host id="VirtualizedClusterHost2" speed="100Gf" core="10">
+            <prop id="ram" value="64GB" />
+        </host>
+
+        <!-- A network link...-->
+        <link id="network_link" bandwidth="50MBps" latency="20us"/>
+
+        <!-- which connects the two hosts -->
+        <route src="WMSHost" dst="VirtualizedClusterProviderHost"> <link_ctn id="network_link"/> </route>
+        <route src="WMSHost" dst="VirtualizedClusterHost1"> <link_ctn id="network_link"/> </route>
+        <route src="WMSHost" dst="VirtualizedClusterHost2"> <link_ctn id="network_link"/> </route>
+        <route src="VirtualizedClusterProviderHost" dst="VirtualizedClusterHost1"> <link_ctn id="network_link"/> </route>
+        <route src="VirtualizedClusterProviderHost" dst="VirtualizedClusterHost2"> <link_ctn id="network_link"/> </route>
+        <route src="VirtualizedClusterHost1" dst="VirtualizedClusterHost2"> <link_ctn id="network_link"/> </route>
+    </zone>
+</platform>

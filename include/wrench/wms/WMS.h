@@ -135,7 +135,8 @@ namespace wrench {
 
         void waitForAndProcessNextEvent();
         bool waitForAndProcessNextEvent(double timeout);
-
+        std::shared_ptr<WorkflowExecutionEvent>  waitForNextEvent();
+        std::shared_ptr<WorkflowExecutionEvent>  waitForNextEvent(double timeout);
         virtual void processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent>);
 
         virtual void processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent>);
