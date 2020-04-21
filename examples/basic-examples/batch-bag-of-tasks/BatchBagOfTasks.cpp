@@ -56,7 +56,7 @@ int main(int argc, char **argv) {
 
     /* Parsing of the command-line arguments for this WRENCH simulation */
     if (argc != 3) {
-        std::cerr << "Usage: " << argv[0] << " <a number of tasks> <xml platform file> [--wrench-no-logs --log=custom_wms.threshold=info]" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " <number of tasks> <xml platform file> [--wrench-no-logs --log=custom_wms.threshold=info]" << std::endl;
         exit(1);
     }
 
