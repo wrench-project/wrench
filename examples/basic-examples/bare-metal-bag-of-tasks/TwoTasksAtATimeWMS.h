@@ -9,7 +9,7 @@
 
 
 #ifndef WRENCH_EXAMPLE_TWO_TASKS_AT_A_TIME_H
-#define WRENCH_EXCAMPLE_TWO_TASKS_AT_A_TIME_H
+#define WRENCH_EXAMPLE_TWO_TASKS_AT_A_TIME_H
 
 #include <wrench-dev.h>
 
