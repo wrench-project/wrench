@@ -18,8 +18,12 @@ set(SOURCE_FILES
 # cloud example
 set(APP_CLOUD_FILES SimpleSimulatorCloud.cpp)
 add_executable(wrench-real-workflow-example-cloud ${SOURCE_FILES} ${APP_CLOUD_FILES})
-
-target_link_libraries(wrench-real-workflow-example-cloud wrenchpegasusworkflowparser wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY} ${LEMON_LIBRARY})
+if (ENABLE_BATSCHED)
+    find_library(ZMQ_LIBRARY NAMES zmq)
+    target_link_libraries(wrench-real-workflow-example-cloud wrenchpegasusworkflowparser wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY} ${LEMON_LIBRARY} ${ZMQ_LIBRARY})
+else()
+    target_link_libraries(wrench-real-workflow-example-cloud wrenchpegasusworkflowparser wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY} ${LEMON_LIBRARY})
+endif()
 
 install(TARGETS wrench-real-workflow-example-cloud DESTINATION bin)
 
