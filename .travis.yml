@@ -50,7 +50,7 @@ script:
       docker exec -w /home/wrench/wrench/build -it wrench cmake -DENABLE_BATSCHED=${batsched} -DCMAKE_VERBOSE_MAKEFILE=ON ..;
       docker exec -w /home/wrench/wrench/build -it wrench make all unit_tests doc-gh;
     fi
-    docker exec -w /home/wrench/wrench/build -it wrench ./unit_tests;
+  - docker exec -w /home/wrench/wrench/build -it wrench ./unit_tests;
 
 after_success:
   # coverage analysis and sonarcloud
