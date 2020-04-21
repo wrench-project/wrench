@@ -8,9 +8,6 @@ Installing WRENCH                  {#install}
 [TOC]
 
 
-
-
-
 # Prerequisites #                 {#install-prerequisites}
 
 WRENCH is developed in `C++`. The code follows the C++11 standard, and thus older 
@@ -55,12 +52,16 @@ make
 make install # try "sudo make install" if you do not have write privileges
 ~~~~~~~~~~~~~
 
+If you want to see actual compiler and linker invocations, add VERBOSE=1 to the compilation command:
+
+~~~~~~~~~~~~~{.sh}
+make VERBOSE=1
+~~~~~~~~~~~~~
+
 To enable the use of Batsched (provided you have installed that package, see above):
 ~~~~~~~~~~~~~{.sh}
 cmake -DENABLE_BATSCHED=on .
 ~~~~~~~~~~~~~
-
-
 
 If you want to stay on the bleeding edge, you should get the latest git version, and recompile it as you would do for an official archive:
 
@@ -68,31 +69,23 @@ If you want to stay on the bleeding edge, you should get the latest git version,
 git clone https://github.com/wrench-project/wrench
 ~~~~~~~~~~~~~
 
+## Compiling and running unit tests ##  {#install-unit-tests}
 
-
-
-## Existing Compilation Targets ##  {#install-source-targets}
-
-In most cases, compiling and installing WRENCH is enough:
+Building and running the unit tests, which requiresGoogle Test, is done as:
 
 ~~~~~~~~~~~~~{.sh}
-make
-make install # try "sudo make install" if you do not have write privileges
-~~~~~~~~~~~~~
-
-In addition, several compilation targets are provided in WRENCH:
-
-~~~~~~~~~~~~~{.sh}
-make doc               # Builds WRENCH documentation (in the ./docs directory) - Requires Doxygen
-make unit_tests        # Builds WRENCH unit tests  (run them by typing ./unit_tests) - Requires Google Test
+make unit_tests      
+./unit_tests
 ~~~~~~~~~~~~~
  
+## Installation Troubleshooting ##  {#install-troubleshooting}
 
-If you want to see actual compiler and linker invocations, add VERBOSE=1 to your compilation command:
-
-~~~~~~~~~~~~~{.sh}
-make VERBOSE=1
-~~~~~~~~~~~~~
+##### `Could NOT find PkgConfig (missing: PKG_CONFIG_EXECUTABLE)`
+    
+ - This error on MacOS is because the `pkg-config` package is not installed
+ - Solution: install this package
+    - MacPorts: `sudo port install pkg-config`
+    - Brew: `sudo brew install pkg-config`
 
 
 # Docker Containers #             {#install-docker}
@@ -122,11 +115,3 @@ docker run -it wrenchproject/wrench:unstable /bin/bash
 Additional tags are available for all WRENCH releases. 
 
 
-## Installation Troubleshooting ##  {#install-troubleshooting}
-
-##### `Could NOT find PkgConfig (missing: PKG_CONFIG_EXECUTABLE)`
-    
- - This error on MacOS is because the `pkg-config` package is not installed
- - Solution: install this package
-    - MacPorts: `sudo port install pkg-config`
-    - Brew: `sudo brew install pkg-config`
