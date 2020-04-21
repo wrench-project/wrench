@@ -35,6 +35,8 @@ WRENCH_LOG_NEW_DEFAULT_CATEGORY(simulation, "Log category for Simulation");
 
 namespace wrench {
 
+    int Simulation::disk_counter = 0;
+
     /**
      * \cond
      */
@@ -566,14 +568,15 @@ namespace wrench {
      * @throw invalid_argument
      */
     void Simulation::readFromDisk(double num_bytes, std::string hostname, std::string mount_point) {
-        this->getOutput().addTimestampDiskReadStart(hostname, mount_point, num_bytes);
+        disk_counter+=1;
+        this->getOutput().addTimestampDiskReadStart(hostname, mount_point, num_bytes, disk_counter);
         try{
             S4U_Simulation::readFromDisk(num_bytes, hostname, mount_point);
         } catch (const std::invalid_argument &ia) {
-            this->getOutput().addTimestampDiskReadFailure(hostname, mount_point, num_bytes);
+            this->getOutput().addTimestampDiskReadFailure(hostname, mount_point, num_bytes, disk_counter);
             throw;
         }
-        this->getOutput().addTimestampDiskReadCompletion(hostname, mount_point, num_bytes);
+        this->getOutput().addTimestampDiskReadCompletion(hostname, mount_point, num_bytes, disk_counter);
     }
 
     /**
@@ -590,17 +593,18 @@ namespace wrench {
                                                             std::string hostname,
                                                             std::string read_mount_point,
                                                             std::string write_mount_point) {
-        this->getOutput().addTimestampDiskReadStart(hostname, read_mount_point, num_bytes_to_read);
-        this->getOutput().addTimestampDiskWriteStart(hostname, write_mount_point, num_bytes_to_write);
+        disk_counter+=1;
+        this->getOutput().addTimestampDiskReadStart(hostname, read_mount_point, num_bytes_to_read, disk_counter);
+        this->getOutput().addTimestampDiskWriteStart(hostname, write_mount_point, num_bytes_to_write, disk_counter);
         try{
             S4U_Simulation::readFromDiskAndWriteToDiskConcurrently(num_bytes_to_read, num_bytes_to_write, hostname, read_mount_point, write_mount_point);
         } catch (const std::invalid_argument &ia) {
-            this->getOutput().addTimestampDiskWriteFailure(hostname, write_mount_point, num_bytes_to_write);
-            this->getOutput().addTimestampDiskReadFailure(hostname, read_mount_point, num_bytes_to_read);
+            this->getOutput().addTimestampDiskWriteFailure(hostname, write_mount_point, num_bytes_to_write, disk_counter);
+            this->getOutput().addTimestampDiskReadFailure(hostname, read_mount_point, num_bytes_to_read, disk_counter);
             throw;
         }
-        this->getOutput().addTimestampDiskWriteCompletion(hostname, write_mount_point, num_bytes_to_write);
-        this->getOutput().addTimestampDiskReadCompletion(hostname, read_mount_point, num_bytes_to_read);
+        this->getOutput().addTimestampDiskWriteCompletion(hostname, write_mount_point, num_bytes_to_write, disk_counter);
+        this->getOutput().addTimestampDiskReadCompletion(hostname, read_mount_point, num_bytes_to_read, disk_counter);
     }
 
     /**
@@ -612,14 +616,15 @@ namespace wrench {
      * @throw invalid_argument
      */
     void Simulation::writeToDisk(double num_bytes, std::string hostname, std::string mount_point) {
-        this->getOutput().addTimestampDiskWriteStart(hostname, mount_point, num_bytes);
+        disk_counter+=1;
+        this->getOutput().addTimestampDiskWriteStart(hostname, mount_point, num_bytes, disk_counter);
         try{
             S4U_Simulation::writeToDisk(num_bytes, hostname, mount_point);
         } catch (const std::invalid_argument &ia) {
-            this->getOutput().addTimestampDiskWriteFailure(hostname, mount_point, num_bytes);
+            this->getOutput().addTimestampDiskWriteFailure(hostname, mount_point, num_bytes, disk_counter);
             throw;
         }
-        this->getOutput().addTimestampDiskWriteCompletion(hostname, mount_point, num_bytes);
+        this->getOutput().addTimestampDiskWriteCompletion(hostname, mount_point, num_bytes, disk_counter);
     }
 
     /**
