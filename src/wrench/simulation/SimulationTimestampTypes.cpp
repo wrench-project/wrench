@@ -662,8 +662,9 @@ namespace wrench {
  */
     SimulationTimestampDiskRead::SimulationTimestampDiskRead(std::string hostname,
                                                              std::string mount,
-                                                             double bytes) :
-            hostname(hostname), mount(mount), bytes(bytes) {
+                                                             double bytes,
+                                                             int counter) :
+            hostname(hostname), mount(mount), bytes(bytes), counter(counter) {
     }
 
     /**
@@ -691,6 +692,14 @@ namespace wrench {
     }
 
     /**
+     * @brief To get counter of disk operation
+     * @return int of counter
+     */
+    int SimulationTimestampDiskRead::getCounter() {
+        return this->counter;
+    }
+
+    /**
      * @brief retrieves the corresponding SimulationTimestampDiskRead object
      * @return a pointer to the start or end SimulationTimestampDiskRead object
      */
@@ -708,7 +717,7 @@ namespace wrench {
      */
     void SimulationTimestampDiskRead::setEndpoints() {
         // find the SimulationTimestampDiskRead object containing the same task
-        auto pending_disk_reads_itr = pending_disk_reads.find(DiskAccess(this->hostname, this->mount, this->bytes));
+        auto pending_disk_reads_itr = pending_disk_reads.find(DiskAccess(this->hostname, this->mount, this->counter));
         if (pending_disk_reads_itr != pending_disk_reads.end()) {
             // set my endpoint to the SimulationTimestampDiskReadStart
             this->endpoint = (*pending_disk_reads_itr).second;
@@ -735,8 +744,9 @@ namespace wrench {
      */
     SimulationTimestampDiskReadStart::SimulationTimestampDiskReadStart(std::string hostname,
                                                                        std::string mount,
-                                                                       double bytes) :
-            SimulationTimestampDiskRead(hostname, mount, bytes) {
+                                                                       double bytes,
+                                                                       int counter) :
+            SimulationTimestampDiskRead(hostname, mount, bytes, counter) {
         WRENCH_DEBUG("Inserting a DiskReadStart timestamp for disk read");
 
         // all information about a disk read should be passed
@@ -748,7 +758,7 @@ namespace wrench {
         }
 
 
-        pending_disk_reads.insert(std::make_pair(DiskAccess(this->hostname, this->mount, this->bytes), this));
+        pending_disk_reads.insert(std::make_pair(DiskAccess(this->hostname, this->mount, this->counter), this));
 
     }
 
@@ -762,8 +772,9 @@ namespace wrench {
      */
     SimulationTimestampDiskReadFailure::SimulationTimestampDiskReadFailure(std::string hostname,
                                                                            std::string mount,
-                                                                           double bytes) :
-            SimulationTimestampDiskRead(hostname, mount, bytes) {
+                                                                           double bytes,
+                                                                           int counter) :
+            SimulationTimestampDiskRead(hostname, mount, bytes, counter) {
         WRENCH_DEBUG("Inserting a DiskReadFailure timestamp for disk read");
 
         if (hostname.empty()
@@ -785,8 +796,9 @@ namespace wrench {
      */
     SimulationTimestampDiskReadCompletion::SimulationTimestampDiskReadCompletion(std::string hostname,
                                                                                  std::string mount,
-                                                                                 double bytes) :
-            SimulationTimestampDiskRead(hostname, mount, bytes) {
+                                                                                 double bytes,
+                                                                                 int counter) :
+            SimulationTimestampDiskRead(hostname, mount, bytes, counter) {
         WRENCH_DEBUG("Inserting a DiskReadCompletion timestamp for disk read");
 
         if (hostname.empty()
@@ -807,8 +819,9 @@ namespace wrench {
  */
     SimulationTimestampDiskWrite::SimulationTimestampDiskWrite(std::string hostname,
                                                                std::string mount,
-                                                               double bytes) :
-            hostname(hostname), mount(mount), bytes(bytes) {
+                                                               double bytes,
+                                                               int counter) :
+            hostname(hostname), mount(mount), bytes(bytes), counter(counter) {
     }
 
     /**
@@ -836,6 +849,14 @@ namespace wrench {
     }
 
     /**
+     * @brief retrieves the counter for this disk operation
+     * @return int of counter
+     */
+    int SimulationTimestampDiskWrite::getCounter() {
+        return this->counter;
+    }
+
+    /**
      * @brief retrieves the corresponding SimulationTimestampDiskWrite object
      * @return a pointer to the start or end SimulationTimestampDiskWrite object
      */
@@ -853,7 +874,7 @@ namespace wrench {
      */
     void SimulationTimestampDiskWrite::setEndpoints() {
         // find the SimulationTimestampDiskWrite object containing the same task
-        auto pending_disk_writes_itr = pending_disk_writes.find(DiskAccess(this->hostname, this->mount, this->bytes));
+        auto pending_disk_writes_itr = pending_disk_writes.find(DiskAccess(this->hostname, this->mount, this->counter));
         if (pending_disk_writes_itr != pending_disk_writes.end()) {
             // set my endpoint to the SimulationTimestampDiskWriteStart
             this->endpoint = (*pending_disk_writes_itr).second;
@@ -880,8 +901,9 @@ namespace wrench {
      */
     SimulationTimestampDiskWriteStart::SimulationTimestampDiskWriteStart(std::string hostname,
                                                                          std::string mount,
-                                                                         double bytes) :
-            SimulationTimestampDiskWrite(hostname, mount, bytes) {
+                                                                         double bytes,
+                                                                         int counter) :
+            SimulationTimestampDiskWrite(hostname, mount, bytes, counter) {
         WRENCH_DEBUG("Inserting a DiskWriteStart timestamp for disk write");
 
         // all information about a disk write should be passed
@@ -893,7 +915,7 @@ namespace wrench {
         }
 
 
-        pending_disk_writes.insert(std::make_pair(DiskAccess(this->hostname, this->mount, this->bytes), this));
+        pending_disk_writes.insert(std::make_pair(DiskAccess(this->hostname, this->mount, this->counter), this));
 
     }
 
@@ -907,8 +929,9 @@ namespace wrench {
      */
     SimulationTimestampDiskWriteFailure::SimulationTimestampDiskWriteFailure(std::string hostname,
                                                                              std::string mount,
-                                                                             double bytes) :
-            SimulationTimestampDiskWrite(hostname, mount, bytes) {
+                                                                             double bytes,
+                                                                             int counter) :
+            SimulationTimestampDiskWrite(hostname, mount, bytes, counter) {
         WRENCH_DEBUG("Inserting a DiskWriteFailure timestamp for disk write");
 
         if (hostname.empty()
@@ -930,8 +953,9 @@ namespace wrench {
      */
     SimulationTimestampDiskWriteCompletion::SimulationTimestampDiskWriteCompletion(std::string hostname,
                                                                                    std::string mount,
-                                                                                   double bytes) :
-            SimulationTimestampDiskWrite(hostname, mount, bytes) {
+                                                                                   double bytes,
+                                                                                   int counter) :
+            SimulationTimestampDiskWrite(hostname, mount, bytes, counter) {
         WRENCH_DEBUG("Inserting a DiskWriteCompletion timestamp for disk write");
 
         if (hostname.empty()

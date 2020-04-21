@@ -90,13 +90,13 @@ namespace wrench {
         void addTimestampFileCopyFailure(WorkflowFile *file, std::shared_ptr<FileLocation> src, std::shared_ptr<FileLocation> dst);
         void addTimestampFileCopyCompletion(WorkflowFile *file, std::shared_ptr<FileLocation> src, std::shared_ptr<FileLocation> dst);
 
-        void addTimestampDiskReadStart(std::string hostname, std::string mount, double bytes);
-        void addTimestampDiskReadFailure(std::string hostname, std::string mount, double bytes);
-        void addTimestampDiskReadCompletion(std::string hostname, std::string mount, double bytes);
+        void addTimestampDiskReadStart(std::string hostname, std::string mount, double bytes, int counter);
+        void addTimestampDiskReadFailure(std::string hostname, std::string mount, double bytes, int counter);
+        void addTimestampDiskReadCompletion(std::string hostname, std::string mount, double bytes, int counter);
 
-        void addTimestampDiskWriteStart(std::string hostname, std::string mount, double bytes);
-        void addTimestampDiskWriteFailure(std::string hostname, std::string mount, double bytes);
-        void addTimestampDiskWriteCompletion(std::string hostname, std::string mount, double bytes);
+        void addTimestampDiskWriteStart(std::string hostname, std::string mount, double bytes, int counter);
+        void addTimestampDiskWriteFailure(std::string hostname, std::string mount, double bytes, int counter);
+        void addTimestampDiskWriteCompletion(std::string hostname, std::string mount, double bytes, int counter);
 
         void addTimestampPstateSet(std::string hostname, int pstate);
         void addTimestampEnergyConsumption(std::string hostname, double joules);

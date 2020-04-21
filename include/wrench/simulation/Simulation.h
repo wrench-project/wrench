@@ -124,6 +124,7 @@ namespace wrench {
         void writeToDisk(double num_bytes, std::string hostname, std::string mount_point);
 
 
+
         static double getMemoryCapacity();
         static unsigned long getNumCores();
         static double getFlopRate();
@@ -156,6 +157,8 @@ namespace wrench {
         std::set<std::shared_ptr<ComputeService>> compute_services;
 
         std::set<std::shared_ptr<StorageService>> storage_services;
+
+        static int disk_counter;
 
         void stageFile(WorkflowFile *file, std::shared_ptr<FileLocation> location);
 
