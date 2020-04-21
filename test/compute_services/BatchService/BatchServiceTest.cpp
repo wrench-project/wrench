@@ -2771,7 +2771,7 @@ private:
                 throw std::runtime_error(
                         "Expected a runtime error of insufficient cores in pilot job"
                 );
-            } catch (wrench::WorkflowExecutionException e) {
+            } catch (wrench::WorkflowExecutionException &e) {
             }
 
             this->getWorkflow()->removeTask(task);
