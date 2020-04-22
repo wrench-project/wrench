@@ -1,41 +1,52 @@
 Getting Started                        {#getting-started}
 ============
 
+<!--
 @WRENCHUserDoc <div class="doc-type">User Documentation</div><div class="doc-link">Other: <a href="../developer/getting-started.html">Developer</a> - <a href="../internal/getting-started.html">Internal</a></div> @endWRENCHDoc
 @WRENCHDeveloperDoc  <div class="doc-type">Developer Documentation</div><div class="doc-link">Other: <a href="../user/getting-started.html">User</a> - <a href="../internal/getting-started.html">Internal</a></div> @endWRENCHDoc
 @WRENCHInternalDoc  <div class="doc-type">Internal Documentation</div><div class="doc-link">Other: <a href="../user/getting-started.html">User</a> -  <a href="../developer/getting-started.html">Developer</a></div> @endWRENCHDoc
+-->
+
 
 [TOC]
 
-The first step is to install the WRENCH library, following the instructions
- on the [installation page](@ref install).
 
-# Running a First Example #         {#getting-started-example}
+Once you've have installed the WRENCH library, following the instructions
+on the [installation page](@ref install),  you are ready to create a WRENCH
+simulator. Let us start with running an example simulator, and then creating
+an "empty" WRENCH simulator.  Information about what can be simulated 
+and how are provided in the [WRENCH 101](@ref wrench101) and
+[WRENCH 102](@ref wrench102) pages.
 
- Typing `make` in the top-level directory
-will compile the examples, and `make install` will put the examples binaries in the `/usr/local/bin` 
-folder (for MacOS and most Linux distributions). 
+
+# Running an Example #         {#getting-started-example}
+
+The examples in the ```examples``` directory provide good starting points
+for developing your own simulators.  
+Typing `make` in the top-level directory compiles the examples in 
+the ```examples``` directory. 
 
 
-WRENCH provides a simple example in the `examples/simple-example` directory, which 
-generates two executables: a cloud-based 
-example `wrench-simple-example-cloud`, and a 
-batch-system-based (e.g., SLURM) example `wrench-simple-example-batch`.
-To run the examples, simply use 
-one of the following commands:
+Let us run the ```examples/basic-examples/bare-metal-bag-of-tasks``` by 
+navigating to that directory and typing:
 
 ~~~~~~~~~~~~~{.sh}
-# Runs the cloud-based implementation
-wrench-simple-example-cloud \
-    <PATH-TO-WRENCH-FOLDER>/examples/simple-example/platform_files/cloud_hosts.xml \
-    <PATH-TO-WRENCH-FOLDER>/examples/simple-example/workflow_files/genome.dax
-
-# Runs the batch-based implementation
-wrench-simple-example-batch \
-    <PATH-TO-WRENCH-FOLDER>/examples/simple-example/platform_files/batch_hosts.xml \
-    <PATH-TO-WRENCH-FOLDER>/examples/simple-example/workflow_files/genome.dax
+./wrench-example-bare-metal-bag-of-tasks 6 ./two_hosts.xml --wrench-no-logs --log=custom_wms.threshold=info
 ~~~~~~~~~~~~~
 
+You should see some output in the terminal. The output in white is
+produced by he simulator implemented with the WRENCH User API.  The output
+in green is produced by the  Workflow Management System implemented with
+the WRENCH Developer API.
+
+Although you can inspect the codes of the examples on your own, we highly
+recommend that you go through the [WRENCH 101](@ref wrench101) and [WRENCH
+102](@ref wrench102) pages first. These pages make direct references to the
+examples, a description of which is available in ```examples/README.md```
+in the WRENCH distribution.
+
+
+<!--
 
 ## Understanding the Simple Example      {#getting-started-example-simple}
 
@@ -77,81 +88,15 @@ The source file for the cloud-based simulator is at `examples/simple-example/Sim
 - The simulation is launched, executes, and completes.
 - Timestamps can be retrieved to analyze the simulated execution.
 
-
 This simple example can be used as a blueprint for starting a large WRENCH-based
 simulation project. The next section provides further details about this process.
 
-
-@WRENCHNotInternalDoc
-# WRENCH Initialization Tool #      {#getting-started-wrench-init}
-
-The `wrench-init` tool is a project generator built with WRENCH, which creates a simple
-project structure with example class files, as follows:
-
-~~~~~~~~~~~~~{.sh}
-project-folder/
-├── CMakeLists.txt
-├── README.md
-├── src/
-│   ├── SimpleSimulator.cpp
-│   ├── SimpleStandardJobScheduler.cpp
-│   ├── SimpleStandardJobScheduler.h
-│   ├── SimpleWMS.cpp
-│   └── SimpleWMS.h 
-├── test/
-├── doc/
-├── build/
-└── data/
-    ├── platform-files/
-    └── workflow-files/
-~~~~~~~~~~~~~
-
-The `SimpleSimulator.cpp` source file contains the class representing the simulator 
-(either cloud or batch). `SimpleStandardJobScheduler.h` and `SimpleStandardJobScheduler.cpp`
-contain a simple implementation for a `wrench::StandardJobScheduler`; `SimpleWMS.h`
-and `SimpleWMS.cpp` denote the implementation of a simple workflow management system.
-Example platform and workflow files are also generated into the `data` folder. These
-files provide the minimum necessary implementation for a WRENCH-enabled simulator.
-
-The `wrench-init` tool only requires a single argument, the name of the folder where
-the project skeleton will be generated: 
-
-~~~~~~~~~~~~~{.sh}
-$ wrench-init <PROJECT_FOLDER>
-~~~~~~~~~~~~~
- 
-Additional options supported by the tool can be found by using the `wrench-init --help` 
-command.
-@endWRENCHDoc
+-->
 
 
-# Preparing the Environment #         {#getting-started-prep}
 
-@WRENCHNotInternalDoc
-## Importing WRENCH ##                {#getting-started-prep-import}
 
-For ease of use, all WRENCH abstractions are accessed via a single 
-include statement:
-
-@WRENCHUserDoc
-~~~~~~~~~~~~~{.cpp}
-#include <wrench.h>
-~~~~~~~~~~~~~
-@endWRENCHDoc
-
-@WRENCHDeveloperDoc 
-~~~~~~~~~~~~~{.cpp}
-#include <wrench-dev.h>
-~~~~~~~~~~~~~
-
-Note that `wrench-dev.h` is the only necessary include statement to use WRENCH. 
-It includes all interfaces and services provided in `wrench.h` 
-([user API](../user/getting-started.html)), as well as additional interfaces to develop 
-your own algorithms and services.
- 
-@endWRENCHDoc
-
-## Creating Your CMakeLists.txt File ##                {#getting-started-prep-cmakelists}
+# Creating a CMakeLists.txt File By Hand##                {#getting-started-cmakelists}
 
 Below is an example of a `CMakeLists.txt` file that can be used as a starting 
 template for developing a WRENCH application compiled using cmake:
@@ -206,8 +151,49 @@ target_link_libraries(unit_tests
                      )
 ~~~~~~~~~~~~~
 
-@endWRENCHDoc
 
+# Using the WRENCH Initialization Tool #      {#getting-started-wrench-init}
+
+The `wrench-init` tool is a project generator built with WRENCH, which creates a simple
+project structure with example class files, as follows:
+
+~~~~~~~~~~~~~{.sh}
+project-folder/
+├── CMakeLists.txt
+├── README.md
+├── src/
+│   ├── SimpleSimulator.cpp
+│   ├── SimpleStandardJobScheduler.cpp
+│   ├── SimpleStandardJobScheduler.h
+│   ├── SimpleWMS.cpp
+│   └── SimpleWMS.h 
+├── test/
+├── doc/
+├── build/
+└── data/
+    ├── platform-files/
+    └── workflow-files/
+~~~~~~~~~~~~~
+
+The `SimpleSimulator.cpp` source file contains the class representing the simulator 
+(either cloud or batch). `SimpleStandardJobScheduler.h` and `SimpleStandardJobScheduler.cpp`
+contain a simple implementation for a `wrench::StandardJobScheduler`; `SimpleWMS.h`
+and `SimpleWMS.cpp` denote the implementation of a simple workflow management system.
+Example platform and workflow files are also generated into the `data` folder. These
+files provide the minimum necessary implementation for a WRENCH-enabled simulator.
+
+The `wrench-init` tool only requires a single argument, the name of the folder where
+the project skeleton will be generated: 
+
+~~~~~~~~~~~~~{.sh}
+$ wrench-init <PROJECT_FOLDER>
+~~~~~~~~~~~~~
+ 
+Additional options supported by the tool can be found by using the `wrench-init --help` 
+command.
+
+
+<!--
 @WRENCHInternalDoc
 
 Internal developers are expected to **contribute** code to WRENCH's core components.
@@ -238,4 +224,5 @@ WRENCH follows a standard C++ project directory and files structure:
 +-- README.md
 ~~~~~~~~~~~~~
 
+-->
 @endWRENCHDoc
