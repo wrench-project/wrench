@@ -802,6 +802,7 @@ INPUT                  = @CMAKE_HOME_DIRECTORY@/doc/index.md \
                          @CMAKE_HOME_DIRECTORY@/doc/install.md \
                          @CMAKE_HOME_DIRECTORY@/doc/getting_started.md \
                          @CMAKE_HOME_DIRECTORY@/doc/wrench_101.md \
+                         @CMAKE_HOME_DIRECTORY@/doc/wrench_102.md \
                          @CMAKE_HOME_DIRECTORY@/doc/guide.md \
                          @CMAKE_HOME_DIRECTORY@/doc/guide/baremetal.md \
                          @CMAKE_HOME_DIRECTORY@/doc/guide/batch.md \
