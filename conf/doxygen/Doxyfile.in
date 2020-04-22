@@ -803,15 +803,22 @@ INPUT                  = @CMAKE_HOME_DIRECTORY@/doc/index.md \
                          @CMAKE_HOME_DIRECTORY@/doc/getting_started.md \
                          @CMAKE_HOME_DIRECTORY@/doc/wrench_101.md \
                          @CMAKE_HOME_DIRECTORY@/doc/wrench_102.md \
-                         @CMAKE_HOME_DIRECTORY@/doc/guide.md \
-                         @CMAKE_HOME_DIRECTORY@/doc/guide/baremetal.md \
-                         @CMAKE_HOME_DIRECTORY@/doc/guide/batch.md \
-                         @CMAKE_HOME_DIRECTORY@/doc/guide/cloud.md \
-                         @CMAKE_HOME_DIRECTORY@/doc/guide/virtualizedcluster.md \
-                         @CMAKE_HOME_DIRECTORY@/doc/guide/htcondor.md \
-                         @CMAKE_HOME_DIRECTORY@/doc/guide/simplestorage.md \
-                         @CMAKE_HOME_DIRECTORY@/doc/guide/fileregistry.md \
-                         @CMAKE_HOME_DIRECTORY@/doc/guide/networkproximity.md \
+                         @CMAKE_HOME_DIRECTORY@/doc/service_guide_101/baremetal.md \
+                         @CMAKE_HOME_DIRECTORY@/doc/service_guide_101/batch.md \
+                         @CMAKE_HOME_DIRECTORY@/doc/service_guide_101/cloud.md \
+                         @CMAKE_HOME_DIRECTORY@/doc/service_guide_101/virtualizedcluster.md \
+                         @CMAKE_HOME_DIRECTORY@/doc/service_guide_101/htcondor.md \
+                         @CMAKE_HOME_DIRECTORY@/doc/service_guide_101/simplestorage.md \
+                         @CMAKE_HOME_DIRECTORY@/doc/service_guide_101/fileregistry.md \
+                         @CMAKE_HOME_DIRECTORY@/doc/service_guide_101/networkproximity.md \
+                         @CMAKE_HOME_DIRECTORY@/doc/service_guide_102/baremetal.md \
+                         @CMAKE_HOME_DIRECTORY@/doc/service_guide_102/batch.md \
+                         @CMAKE_HOME_DIRECTORY@/doc/service_guide_102/cloud.md \
+                         @CMAKE_HOME_DIRECTORY@/doc/service_guide_102/virtualizedcluster.md \
+                         @CMAKE_HOME_DIRECTORY@/doc/service_guide_102/htcondor.md \
+                         @CMAKE_HOME_DIRECTORY@/doc/service_guide_102/simplestorage.md \
+                         @CMAKE_HOME_DIRECTORY@/doc/service_guide_102/fileregistry.md \
+                         @CMAKE_HOME_DIRECTORY@/doc/service_guide_102/networkproximity.md \
                          @CMAKE_HOME_DIRECTORY@/src \
                          @CMAKE_HOME_DIRECTORY@/include
 

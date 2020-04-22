@@ -10,14 +10,13 @@ Getting started                        {#getting-started}
 
 
 
-once you've have installed the wrench library, following the instructions
+Once you've have installed the wrench library, following the instructions
 on the [installation page](@ref install),  you are ready to create a wrench
 simulator.  **information on what can be simulated and how to do it are
 provided in the [wrench 101](@ref wrench-101) and [wrench 102](@ref
 wrench102) pages. this page is only about the logistics of setting up a simulator project.**
 
 [TOC]
-
 
 # using the wrench initialization tool #      {#getting-started-wrench-init}
 
