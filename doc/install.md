@@ -1,9 +1,11 @@
 Installing WRENCH                  {#install}
 ============
 
+<!--
 @WRENCHUserDoc <div class="doc-type">User Documentation</div><div class="doc-link">Other: <a href="../developer/install.html">Developer</a> - <a href="../internal/install.html">Internal</a></div> @endWRENCHDoc
 @WRENCHDeveloperDoc  <div class="doc-type">Developer Documentation</div><div class="doc-link">Other: <a href="../user/install.html">User</a> - <a href="../internal/install.html">Internal</a></div> @endWRENCHDoc
 @WRENCHInternalDoc  <div class="doc-type">Internal Documentation</div><div class="doc-link">Other: <a href="../user/install.html">User</a> -  <a href="../developer/install.html">Developer</a></div> @endWRENCHDoc
+-->
 
 [TOC]
 
