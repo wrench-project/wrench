@@ -9,54 +9,7 @@ WRENCH 101                        {#wrench-101}
 -->
 
 
-<!-- OLD TEXT FROM PREVIOUS GETTING STARTED
-
-## Understanding the Simple Example      {#getting-started-example-simple}
-
-Both versions of the example (cloud of batch) require two command-line arguments: (1) a [SimGrid virtual platform 
-description file](https://simgrid.org/doc/latest/platform.html); and
-(2) a WRENCH workflow file.
-
-  - **SimGrid simulated platform description file:** 
-A [SimGrid](https://simgrid.org) simulation must be provided with the description 
-of the platform on which an application execution is to be simulated. This is done via
-a platform description file, in XML, that includes definitions of compute hosts, clusters of hosts, 
-storage resources, network links, routes between hosts, etc.
-A detailed description on how to create a platform description file can be found
-[here](https://simgrid.org/doc/latest/platform.html).
-
-  - **WRENCH workflow file:**
-WRENCH provides native parsers for [DAX](http://workflowarchive.org) (DAG in XML) 
-and [JSON](https://github.com/wrench-project/wrench/tree/master/doc/schemas) workflow description file formats. Refer to 
-their respective Web sites for detailed documentation.
-
-The source file for the cloud-based simulator is at `examples/simple-example/SimulatorCloud.cpp`
- and at `examples/simple-example/SimulatorBatch.cpp` for the batch-based example. These source files, which
- are heavily commented, and perform the following:
-
-- The first step is to read and parse the workflow and the platform files, and to
-  create a simulation object (`wrench::Simulation`).
-- A storage service (`wrench::SimpleStorageService`) is created and deployed on a host.
-- A cloud (`wrench::CloudComputeService`) or a batch (`wrench::BatchComputeService`) service is created and
-  deployed on a host. Both services are seen by the simulation as compute services
-  (`wrench::ComputeService`) – jobs can then be submitted to these services. 
-- A Workflow Management System (`wrench::WMS`) is instantiated (in this case the `SimpleWMS`) with a reference to 
-  a workflow object (`wrench::Workflow`) and a scheduler (`wrench::Scheduler`). The scheduler implements the
-  decision-making algorithms inside the WMS. These algorithms are modularized (so that the same WMS implementation can be iniated
-  with various decision-making algorithms in different simulations). The source codes for the schedulers,
-  which is of interest to "Developers" (i.e., those users who use the WRENCH Developer API), is in 
-  directory `examples/scheduler`. 
-- A file registry (`wrench::FileRegistryService`), a.k.a. a file replica catalog, which keeps track of files stored in different storage services, is deployed on a host. 
-- Workflow input files are staged on the storage service
-- The simulation is launched, executes, and completes.
-- Timestamps can be retrieved to analyze the simulated execution.
-
-This simple example can be used as a blueprint for starting a large WRENCH-based
-simulation project. The next section provides further details about this process.
-
--->
-
-This page is meant to provide high-level and detailed information about
+This page provides high-level and detailed information about
 what WRENCH simulators can simulate and how they do it. Full API details
 are provided in the [User API Reference](../user/annotated.html).  See the
 relevant pages for instructions on how to [install WRENCH](@ref install)
@@ -64,7 +17,6 @@ and how to [setup a simulator project](@ref getting-started).
 
 [TOC]
 
----
 
 # 10,000-ft view of a WRENCH simulator #      {#wrench-101-simulator-10000ft}
 
@@ -75,139 +27,354 @@ correspond to software that knows how to store data, perform computation,
 and many other useful things that real-world cyberinfrastructure services
 can do.
 
-The simulator then creates a workflow (or a set of workflows) to be
+The simulator then creates a workflow to be
 executed, which consists of a set of compute tasks each with input and
 output files, with control-  and data-dependencies between tasks.
 
 A special service is then created, called a Workflow Management System
 (WMS),  that will be in charge of executing the workflow on the platform using
 available hardware resources  and software services.  The WMS
-is implemented using the [WRENCH Developer](../developer/annotated.html)
-and  is discussed  in the [WRENCH 102](@ref wrench-102) page. 
+is implemented using the [WRENCH Developer API](../developer/annotated.html), as
+discussed in the [WRENCH 102](@ref wrench-102) page. 
 
 The simulation is then launched via a single call
-(```wrench::Simulation::launch()```), and returns only one the WMS has
-terminated (typically after completing the execution of the workflow, or
-failing to executed it). At that point simulation output can be analyzed
+(`wrench::Simulation::launch()`), and returns only once the WMS has
+terminated (after completing or failing to complete the execution of the workflow).
+Simulation output can be analyzed
 programmatically and/or dumped to a JSON file. This JSON file can be loaded
-into the *WRENCH dashboard* tool (just run the ```wrench-dashboard```
-executable, which should be installed on your system).
+into the *WRENCH dashboard* tool (just run the `wrench-dashboard`
+executable, which should have been installed on your system).
 
 
 # 1,000-ft view of a WRENCH simulator #         {#wrench-101-simulator-1000ft}
 
-In this section we dive deeper into the main steps that a typical  WRENCH
-simulator follows.  To provide context, we refer to the example simulator
-in the ```examples/basic-examples/bare-metal-chain``` directory of the
-WRENCH distribution. This simulator simulates the execution of a chain
-workflow on a two-host platform that runs a bare-metal compute service and
-a storage service. Although other examples are available (see
-```examples/README.md```), this simple example is sufficient to showcase
-most of what a WRENCH simulator does.
+In this section we dive deeper into what  it takes to implement a WRENCH simulator.  *To
+provide context, we refer to the example simulator in the
+`examples/basic-examples/bare-metal-chain` directory of the WRENCH
+distribution.* This simulator simulates the execution of a chain workflow
+on a two-host platform that runs one compute service and one storage
+service. Although other examples are available (see
+`examples/README.md`), this simple example is sufficient to showcase
+most of what a WRENCH simulator does, which consists in going through the
+following steps. Note that the simulator's code contains extensive
+comments as well. 
+
+### Step #1: Create and initialize a simulation
+
+The state of a WRENCH simulation is defined by the `wrench::Simulation` class. A simulator must create an instance of this class and initialize it
+with the `wrench::Simulation::init()` method.  The bare-metal-chain
+simulator does this as follows:
+
+~~~~~~~~~~~~~{.cpp}
+wrench::Simulation simulation;
+simulation.init(&argc, argv);
+~~~~~~~~~~~~~
 
 
--# **Create and initialize a simulation** -- In WRENCH, a user simulation
- is defined via the `wrench::Simulation` class.
- An instance of this class must be created, and the
- `wrench::Simulation::init()` method is called to initialize the simulation
- (and parse WRENCH-specific and
- [SimGrid-specific](https://simgrid.org/doc/latest/Configuring_SimGrid.html)
- command-line arguments).  Two useful such arguments are `--help-wrench`,
- which displays help messages about optional WRENCH-specific command-line
- arguments, and `--help-simgrid`, which displays help messages about
- optional Simgrid-specific command-line arguments.
+Note that this method takes in the command-line arguments passed to the main
+function of the simulator.  This is so that it
+can parse WRENCH-specific and
+[Simgrid-specific](https://simgrid.org/doc/latest/Configuring_Simgrid.html)
+command-line arguments. (Recall that WRENCH  is based  on
+[Simgrid](htts://simgrid.org).)  Two useful such arguments are `--help-wrench`,
+which displays a WRENCH help message, and `--help-simgrid`, which displays
+an extensive Simgrid help message.
 
--# **Instantiate a simulated platform** --  This is done with the `wrench::Simulation::instantiatePlatform()`
- method which takes as argument a 
- [SimGrid virtual platform description file](https://simgrid.org/doc/latest/platform.html).
- Any [SimGrid](https://simgrid.org) simulation must be provided with the description 
- of the platform on which an application/system execution is to be simulated (compute hosts, clusters of hosts, 
- storage resources, network links, routers, routes between hosts, etc.)
+### Step #2: Instantiate a simulated platform
 
--# **Instantiate services on the platform** -- The `wrench::Simulation::add()` method is used
- to add services to the simulation. Each class of service is created with a particular 
- constructor, which also specifies host(s) on which the service is to be started. Typical kinds of services
- include compute services, storage services, network proximity services, and file registry services.  
- 
--# **Create at least one workflow** --  This is done by creating an instance of the `wrench::Workflow` class, which has
- methods to manually add tasks and files to the workflow application, but also methods to import workflows
- from standard workflow description files ([DAX](http://workflowarchive.org) and 
- [JSON](https://github.com/workflowhub/workflow-schema)). 
- If there are input files to the workflow's entry tasks, these must be staged on instantiated storage
- services. 
- 
--# **Instantiate at least one WMS per workflow** -- At least one of the services instantiated must be a `wrench::WMS` 
- instance, i.e., a service that is in charge of executing the workflow, as implemented by a WRENCH "developer" using 
- the [Developer](../developer/wrench-101.html) API. Associating a workflow to a WMS is done via the 
- `wrench::WMS::addWorkflow()` method.
+This is done with the `wrench::Simulation::instantiatePlatform()`
+ method which takes as argument a [Simgrid virtual platform description
+ file](https://simgrid.org/doc/latest/platform.html).  Any Simgrid
+ simulation, and thus any WRENCH simulation, must be provided with the
+ description of the simulated hardware platform 
+ (compute hosts, clusters of hosts, storage
+ resources, network links, routers, routes between hosts, etc.). The
+ bare-metal-chain simulator comes with a platform  description file,
+`examples/basic-examples/bare-metal-chain/two_hosts.xml`, which we
+include here:
 
--# **Launch the simulation** -- This is done via the `wrench::Simulation::launch()` call which first
-   sanity checks the simulation setup and then launches all simulated services, until all WMS services
-   have exited (after they have completed or failed to complete workflows).
-      
--# **Process simulation output** -- The `wrench::Simulation::getOutput()` method returns an object that is a 
-  collection of time-stamped traces of simulation events. These traces can be processed/analyzed at will.  
-      
+~~~~~~~~~~~~~{.xml}
+<?xml version='1.0'?>
+<!DOCTYPE platform SYSTEM "http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd">
+<platform version="4.1">
+    <zone id="AS0" routing="Full">
 
-<!-- The above steps are depicted in the figure below: 
+        <!-- The host on which the WMS will run -->
+        <host id="WMSHost" speed="10Gf" core="1">
+            <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+                <prop id="size" value="5000GiB"/>
+                <prop id="mount" value="/"/>
+            </disk>
+        </host>
 
-![Overview of the WRENCH simulation setup.](images/wrench-simulation.png)
--->
+        <!-- The host on which the BareMetalComputeService will run -->
+        <host id="ComputeHost" speed="1Gf" core="10">
+            <prop id="ram" value="16GB" />
+       </host>
+
+        <!-- A network link...-->
+        <link id="network_link" bandwidth="50MBps" latency="20us"/>
+
+        <!-- which connects the two hosts -->
+        <route src="WMSHost" dst="ComputeHost">
+            <link_ctn id="network_link"/>
+        </route>
+    </zone>
+</platform>
+~~~~~~~~~~~~~
+
+This file defines a platform with two hosts,  `WMSHost` and `ComputeHost`. The
+former is a 1-core host with compute speed 10 Gflop/sec, with a 5000-GiB disk with
+100 MB/sec read and write bandwidth, which is mounted at '/'.  The latter is a 10-core
+host where each core computes at speed 1Gflop/sec and with a total RAM capacity of 16 GB.  Both hosts
+are interconnected by a network link with 50 MB/sec bandwidth and 20 us latency. We
+refer the reader to platform description files in other examples in the  `examples`
+directory  and to the  [the Simgrid documentation](https://simgrid.org/doc/latest/platform.html) for
+more information on how to create platform description files. 
+
+The bare-metal-chain simulator takes the path to the platform description as its 2nd command-line
+argument and thus instantiates the simulated platform as:
+
+~~~~~~~~~~~~~{.cpp}
+simulation.instantiatePlatform(argv[2]);
+~~~~~~~~~~~~~
+
+
+### Step #3: Instantiate services on the platform
+
+While the previous step defines the hardware platform, this step defines
+what software services run on that hardware. 
+The `wrench::Simulation::add()` method is used
+to add services to the simulation. Each class of service is created with a
+particular constructor, which also specifies host(s) on which the service
+is to be started. Typical kinds of services include compute services,
+storage services, and file registry services  (see 
+[below](@ref wrench-101-simulator-services) for more details).
+
+The bare-metal-chain simulator instantiates three services. The first one
+is a compute service:
+
+~~~~~~~~~~~~~{.cpp}
+auto bare_metal_service = simulation.add(new wrench::BareMetalComputeService("ComputeHost", {"ComputeHost"}, "", {}, {}));
+~~~~~~~~~~~~~
+
+The `wrench::BareMetalComputeService` class implements a simulation of a
+compute service that greedily runs jobs submitted to it. You can think of
+it as a compute server that simply fork-execs (possibly multi-threaded)
+processes upon  request, only ensuring that physical RAM capacity is not
+exceeded. In this particular case, the compute service is started on host 
+`ComputeHost`. It has access to the compute resources of that same 
+host (2nd argument). The third argument corresponds to the path of some scratch storage,
+i.e., storage in which data can be stored temporarily while a job runs. 
+In this case the scratch storage specification is empty as host ComputeHost has no disk attached to it. 
+(See the `examples/basic-examples/bare-metal-chain-scratch` example
+simulator, in which scratch storage is used). The last two
+arguments are maps (in this case both empty), that are used to configure
+properties of the compute service (see details in 
+[this section below](@wrench-101-customizing-services)).
+
+The second service is a storage  service:
+
+~~~~~~~~~~~~~{.cpp}
+auto storage_service = simulation.add(new wrench::SimpleStorageService( "WMSHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50000000"}}, {}));
+~~~~~~~~~~~~~
+
+The `wrench::SimpleStorageService` class implements a  simulation of a
+remotely-accessible storage service on which files can be stored, copies,
+deleted, read, and written. In this particular case, the storage service
+is  started on host `WMSHost`. It uses storage mounted as '/'.  The
+last two arguments, as for the compute service, are used to configure
+particular properties of the service. In this case, the service is
+configured to use a 50-MB buffer size to pipeline network and disk accesses
+(see details in [this section below](@ref wrench-101-customizing-services)).
+
+The third service is a file registry service:
+
+~~~~~~~~~~~~~{.cpp}
+auto file_registry_service = new wrench::FileRegistryService("WMSHost"); 
+simulation.add(file_registry_service); 
+~~~~~~~~~~~~~
+
+The `wrench::FileRegistryService`  class implements a simulation of a
+key-values pair  service that stores for each file (the key)  the locations
+where  the file is  available for read/write access (the values). This service
+can be used by a WMS to find out where  workflow files
+are located (and is often required - see Step #4 hereafter). 
+
+
+### Step #4: Create at least one workflow
+
+Every WRENCH simulator simulates the execution of a workflow, and thus
+must create an instance of the `wrench::Workflow` class. This class has
+ methods to manually create tasks and files and add them to the workflow.
+For instance, the  bare-metal-chain simulator does this as follows:
+
+~~~~~~~~~~~~~{.cpp}
+wrench::Workflow workflow;
+
+/* Add workflow tasks */
+for (int i=0; i < num_tasks; i++) {
+  /* Create a task: 10GFlop, 1 to 10 cores, 0.90 parallel efficiency, 10MB memory footprint */
+  auto task = workflow.addTask("task_" + std::to_string(i), 10000000000.0, 1, 10, 0.90, 10000000);
+}
+
+/* Add workflow files */
+for (int i=0; i < num_tasks+1; i++) {
+  /* Create a 100MB file */
+  workflow.addFile("file_" + std::to_string(i), 100000000);
+}
+
+/* Set input/output files for each task */
+for (int i=0; i < num_tasks; i++) {
+  auto task = workflow.getTaskByID("task_" + std::to_string(i));
+  task->addInputFile(workflow.getFileByID("file_" + std::to_string(i)));
+  task->addOutputFile(workflow.getFileByID("file_" + std::to_string(i + 1)));
+}
+~~~~~~~~~~~~~
+
+The above creates a "chain" workflow (hence the name of the simulator), in which the
+output from one task is input to the next task. The number of tasks is obtained 
+from a command-line argument.
+
+The `wrench::Workflow` class also provides methods to import workflows from
+workflow description files in standard ([DAX
+format](http://workflowarchive.org) and
+ [JSON format](https://github.com/workflowhub/workflow-schema)).
+
+The input files to the workflow must be available (at some storage service) before
+the simulated workflow execution begins.  These are the files that are input 
+to some tasks, but not output from any task. They must be "staged" on some
+storage service, and the  bare-metal-chain simulator does it as:
+
+~~~~~~~~~~~~~{.cpp}
+for (auto const &f : workflow.getInputFiles()) {
+  simulation.stageFile(f, storage_service);
+}
+~~~~~~~~~~~~~
+
+Note that in this particular case there is a single input  file. But the code
+above is more general, as it iterates over all workflow input files. The above
+code will throw an exception if no `wrench::FileRegistryService` instance
+has been added to the simulation. 
+
+
+### Step #5: Instantiate at least one WMS per workflow
+
+One special service that must be started is a  Workflow Management Service (WMS), i.e., 
+software that is in charge of executing the workflow given
+available software and hardware resources. The bare-metal-chain simulator does  this as:
+
+~~~~~~~~~~~~~{.cpp}
+auto wms = simulation.add(new wrench::OneTaskAtATimeWMS({baremetal_service}, {storage_service}, "WMSHost"));
+~~~~~~~~~~~~~
+
+Class wrench::OneTaskAtATimeWMS, which is  part of this example simulator,
+is implemented using the [WRENCH Developer
+API](../developer/annotated.html).  See the [wrench 102](@ref wrench-102)
+page for information on how to implement a WMS with WRENCH.
+
+The previously created workflow is then associated to the WMS as:
+
+~~~~~~~~~~~~~{.cpp}
+wms->addWorkflow(&workflow);
+~~~~~~~~~~~~~
+
+
+### Step #6: Launch the simulation
+
+This is the easiest step, and is done by calling `wrench::Simulation::launch()`:
+
+~~~~~~~~~~~~~{.cpp}
+simulation.launch();
+~~~~~~~~~~~~~
+
+This call checks the simulation setup, and blocks until the WMS terminates. 
+
+
+### Step #7: Process simulation output
+
+Once `wrench::Simulation::launch()` has returned, simulation output can be processed  programmatically.  The
+`wrench::Simulation::getOutput()` method returns an instance of class
+`wrench::SimulationOutput`.
+Note that there are methods to configure the type  and amount of
+output generated (see the `wrench::SimulationOutput::enable*Timestamps()` methods).
+The bare-metal-chain simulator does minimal
+output processing as:
+
+~~~~~~~~~~~~~{.cpp}
+auto trace = simulation.getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>();
+for (auto const &item : trace) {
+   std::cerr << "Task "  << item->getContent()->getTask()->getID() << " completed at time " << item->getDate()  << std::endl;
+~~~~~~~~~~~~~
+
+Specifically, class
+`wrench::SimulationOutput` has a templated
+`wrench::SimulationOutput::getTrace()` method to retrieve traces for
+various information types. The first line of code above returns a vector of
+time-stamped task completion events.  The second line of code iterates
+through this vector and prints task names and task completion dates (in
+seconds).  The classes that implement time-stamped events are all classes
+named `wrench::SimulationTimestampSomething`, where "Something" is
+self-explanatory (e.g., TaskCompletion, TaskFailure).
+
+Another kind of output is (simulated) energy consumption. 
+WRENCH leverages Simgrid's energy plugin, which provides accounting for
+computing time and dissipated energy in the simulated platform. Simgrid's
+energy plugin requires host pstate definitions (levels of performance, CPU
+frequency) in the XML platform description file.  The
+`wrench::Simulation::getEnergyConsumed()` method returns energy consumed 
+by all hosts in the platform.  **Important:** The energy plugin is NOT
+enabled by default in WRENCH simulations. To enable it, pass the
+`--activate-energy` command line option to the simulator. 
+
+Another option altogether is to dump all simulation output to a JSON file.
+This is done with the `wrench::SimulationOutput::dump*JSON()`
+methods.  See the documentation of each method to see the structure of the
+JSON output, in case  you want to parse/process the JSON yourself.
+Alternately, you  can run the installed `wrench-dashboard` tool, which
+provides interactive visualization/inspection of simulation output.
+
 
 # Available services #      {#wrench-101-simulator-services}
 
+Below is the list of services available to-date in WRENCH. 
+Click on the corresponding links for more information  when
+available. 
 
-XXXX MERGE WITH GUIDE CONTENT! XXX
+- **Compute Services**: These are services that know how to compute workflow tasks: 
 
-To date, these are the (simulated) services that can be instantiated on the
-simulated platform:
+  - [Bare-metal Servers](@ref guide-101-baremetal)
+  - [Cloud Platforms](@ref guide-101-cloud)
+  - [Virtualized Cluster Platforms](@ref guide-101-virtualizedcluster)
+  - [Batch-scheduled Clusters](@ref guide-101-batch)
+  - [HTCondor](@ref guide-101-htcondor)
 
+- **Storage Services**: These are services that know how to store and give access to workflow files:
 
-- **Compute Services** (classes that derive `wrench::ComputeService`): These are services
-  that know how to compute workflow tasks. These include bare-metal servers (`wrench::BareMetalComputeService`), cloud
-  platforms (`wrench::CloudComputeService`), virtualized cluster platforms (`wrench::VirtualizedClusterComputeService`),
-  batch-scheduled clusters (`wrench::BatchComputeService`).
-  It is not technically required to instantiate a compute service, but then no workflow task
-  can be executed by the WMS. 
+  - [Simple Storage Service](@ref guide-101-simplestorage)
 
-- **Storage Services** (classes that derive `wrench::StorageService`): 
-  These are services that know how to store workflow files, which can then be
-  accessed in reading/writing by the compute services when executing tasks that
-  read/write files. 
-  It is not technically required to instantiate a storage service, but then no workflow task
-  can have an input or an output file. 
+- **File Registry Services**: These services, also known as _replica catalogs_, are simply
+  databases of <filename, list of locations> key-values pairs of the storage services
+  on which a copies of files are available. 
 
-- **File Registry Services** (the `wrench::FileRegistryService` class): 
-  These services, often known as _replica catalogs_, are simply
-  databases of <filename, list of locations> key-value pairs of the storage services
-  on which a copies of files are available.  They are used during workflow execution to decide where
-  input files for tasks can be acquired. 
-  It is not required to instantiate a file registry service, unless the workflow's
-  entry tasks have input files (because in this case these files have to be stored at
-  some storage services
-  before the execution can start, and all file registry service are then automatically made
-  aware of where these files are stored). Note that some WMS implementations
-  may complain if no file registry service is available.
+   - [File Registry Service](@ref guide-101-fileregistry)
 
-- **Network Proximity Services** (the class `wrench::NetworkProximityService`): 
+- **Network Proximity Services**: 
   These are services that monitor the network and maintain a database of 
-  host-to-host network distances. This database can be queried by WMSs to make informed
-  decisions, e.g., to pick from which storage service a file should be retrieved
-  so as to reduce communication time.  Typically, network distances are estimated
-  based on round-trip-times between hosts. 
-  It is not required to instantiate a network proximity service, but some WMS implementations
-  may complain if none is available.
+  host-to-host network distances: 
 
-- **Workflow Management Systems (WMSs)** (classes that derive `wrench::WMS`): 
-  A workflow management system provides the mechanisms for executing workflow
-  applications, include decision-making for optimizing various objectives (the most
-  common one is to minimize workflow execution time).  By default,
-  WRENCH does not provide a WMS implementation as part of its core components, however a
-  simple implementation (`wrench::SimpleWMS`) is available in the `examples/simple-example` folder. Please,
-  refer to the [Developer 101 Guide](../developer/wrench-101.html) section for further information
-  on how to develop a WMS.  At least **one** WMS should be provided for running a simulation.
-  Additional WMSs implementations may also be found in the [WRENCH project website](http://wrench-project.org).
+   - [Network Proximity Service](@ref guide-101-networkproximity)
 
+- **Workflow Management Systems (WMSs)** (derives `wrench::WMS`): 
+  A WMS provides the mechanisms for executing workflow
+  applications, include decision-making for optimizing various objectives (often
+  attempting to minimize workflow execution time).  
+  At least **one** WMS should be provided for running a simulation.  By
+  default, WRENCH does **not** provide a WMS implementation as part of its
+  core components.  Each example simulator in the `examples/`
+  directory implements its own WMS.  Additional WMSs implementations may
+  also be found on the [WRENCH project website](http://wrench-project.org).
+  See [WRENCH 102](@ref wrench-102) for information on how to implement a WMS.
 
 
 # Customizing Services #         {#wrench-101-customizing-services}
@@ -218,103 +385,82 @@ For instance, the `wrench::Service` class has an associated `wrench::ServiceProp
 the `wrench::ComputeService` class has an associated `wrench::ComputeServiceProperty` class, and
 so on at all levels of the service class hierarchy. 
 
-The API documentation for these property classes explains what each property means, what possible 
-values are, and what default values are. Other properties have more to do with what the service 
+**The API documentation for these property classes explains what each property means, what possible 
+values are, and what default values are.** Other properties have more to do with what the service 
 can or should do when in operation. For instance, the `wrench::BatchComputeServiceProperty` class defines a
 `wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM` which specifies what scheduling algorithm
 a batch service should use for prioritizing jobs. All property classes inherit from the 
 `wrench::ServiceProperty` class, and one can explore that hierarchy to discover
 all possible (and there are many) service customization opportunities. 
 
-Finally, each service exchanges messages on the network with other services (e.g., a WMS service sends 
-a "do some work" message to a compute service). The size in bytes, or payload, of all messages can be 
-customized similarly to the properties, i.e., by passing a key-value map to the service's constructor. For instance, 
-the `wrench::ServiceMessagePayload` class defines a `wrench::ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD`
-property which can be used to customize the size, in bytes, of the control message sent to the
-service daemon (that is the entry point to the service) to tell it to terminate. 
-Each service class has a corresponding message payload class, and the API documentation for these
-message payload classes details all messages whose payload can be customized. 
+Finally, each service exchanges messages on the network with other services
+(e.g., a WMS service sends a "do some work" message to a compute service).
+The size in bytes, or payload, of all messages can be customized similarly
+to the properties, i.e., by passing a key-value map to the service's
+constructor. For instance, the `wrench::ServiceMessagePayload` class
+defines a `wrench::ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD`
+property which can be used to customize the size, in bytes, of the control
+message sent to the service daemon (that is the entry point to the service)
+to tell it to terminate.  Each service class has a corresponding message
+payload class, and the API documentation for these message payload classes
+details all messages whose payload can be customized.
 
 
 # Customizing logging  #        {#wrench-101-logging}
 
-When running a WRENCH simulator you will notice that there is quite a bit of logging output. While logging
-output can be useful to inspect visually the way in which the simulation proceeds, it often becomes necessary
-to disable it.  WRENCH's logging system is a thin layer on top of SimGrid's logging system, and as such
-is controlled via command-line arguments. The simple example in `examples/simple-example` is executed 
-as follows, assuming the working directory is `examples/simple-example`:
+When running a WRENCH simulator you may notice that there is quite a bit
+of logging output. While logging output can be useful to inspect visually
+the way in which the simulation proceeds, it is also convenient to
+disable it (and it slows down the simulation!).  WRENCH's logging system is a thin layer on top of Simgrid's
+logging system, and as such is controlled via command-line arguments. 
 
-~~~~~~~~~~~~~{.cpp}
-./wrench-simple-example-cloud  platform_files/cloud_hosts.xml workflow_files/genome.dax
+The bare-metal-chain example simulator  can be executed as follows in the
+`examples/basic-examples/bare-metal-chain` directory:
+
+~~~~~~~~~~~~~{.sh}
+./wrench-example-bare-metal-chain 10 ./two_hosts.xml
 ~~~~~~~~~~~~~
 
-One first way in which to modify logging is to disable colors, which can be useful to redirect output
-to a file, is to use the `--wrench-no-color` command-line option, anywhere in the argument list, for instance:
+You will note that quite a bit  of (multi-colored) output is produced. 
+
+A first way in which to modify logging is to disable colors, which can be useful to redirect output
+to a file. This is done with  the `--wrench-no-color` command-line option, anywhere in the argument list, for instance:
 
 ~~~~~~~~~~~~~{.cpp}
-./wrench-simple-example-cloud  --wrench-no-color platform_files/cloud_hosts.xml workflow_files/genome.dax
+./wrench-example-bare-metal-chain 10 ./two_hosts.xml --wrench-no-color
 ~~~~~~~~~~~~~
 
-Disabling all logging is done with the SimGrid option `--wrench-no-log`:
+Disabling all logging is done with the Simgrid option `--wrench-no-log`:
 
 ~~~~~~~~~~~~~{.cpp}
-./wrench-simple-example-cloud  --wrench-no-log platform_files/cloud_hosts.xml workflow_files/genome.dax
+./wrench-example-bare-metal-chain 10 ./two_hosts.xml --wrench-no-log
 ~~~~~~~~~~~~~
-
 
 The above `--wrench-no-log` option is a simple wrapper around the sophisticated Simgrid logging
 capabilities (it is equivalent to the Simgrid argument `--log=root.threshold:critical`). 
 Details on these capabilities are displayed when passing the
  `--help-logs` command-line argument to your simulator. In a nutshell particular "log categories" 
  can be toggled on and off. Log category names are attached to `*.cpp` files in the 
- WRENCH and SimGrid code. Using the `--help-log-categories` command-line
+simulator code, the WRENCH code, and the Simgrid code. Using the `--help-log-categories` command-line
  argument shows the
-entire log category hierarchy. For instance, there is a log category that is called `wms` for the
-WMS, i.e., those logging messages in the `wrench:WMS` class and a log category that is called
-`simple_wms` for logging message in the `wrench::SimpleWMS` class, which inherits from `wrench::WMS`. 
-These messages are thus logging output produced by the WMS in the simple example. They can be enabled
-while other messages are disabled as follows: 
+entire log category hierarchy. 
+
+In the bare-metal-chain example simulator,  there is a log category called
+`custom_wms` for the WMS (see one  of the  first lines of
+`examples/basic-examples/bare-metal-chain/OneTaskAtATimeWMS.cpp`). This category
+corresponds to the logging messages printed out by the WMS. It is typical to want
+to see these messages as the WMS is the brain of the workflow execution. 
+They can be enabled while other messages are disabled as follows: 
 
 ~~~~~~~~~~~~~{.cpp}
-./wrench-simple-example-cloud   platform_files/cloud_hosts.xml workflow_files/genome.dax --log=root.threshold:critical --log=simple_wms.threshold=debug --log=wms.threshold=debug
+./wrench-example-bare-metal-chain 10 ./two_hosts.xml --wrench-no-log --log=custom_wms.threshold=info
 ~~~~~~~~~~~~~
 
-Use the `--help-logs` option displays information on the way SimGrid logging works. See the 
-[full SimGrid logging documentation](https://simgrid.org/doc/latest/outcomes.html) for 
-all details.
+When running the simulator in  this  way, you should only see green output, which only includes messages printed by  the WMS. 
 
-
-# Analyzing Simulation Output #   {#wrench-101-simulation-output}
-
-Once the `wrench::Simulation::launch()` method has returned, it is possible to process time-stamped traces
-to analyze simulation output. The `wrench::Simulation::getOutput()` method returns an instance of 
-`wrench::SimulationOutput`. This object has a templated `wrench::SimulationOutput::getTrace()` method to 
-retrieve traces for various information types. For instance, the call
-```
-simulation.getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>()
-```
-returns a vector of time-stamped task completion events. The classes that implement time-stamped events
-are all classes named `wrench::SimulationTimestampSomething`, where `Something` is pretty self-explanatory
-(e.g., `TaskCompletion`).
-
-
-# Measuring Energy Consumption #                 {#wrench-101-energy}
-
-WRENCH leverages [SimGrid's energy plugin](https://simgrid.org/doc/latest/Plugins.html#host-energy),
-which provides accounting for computing time and dissipated energy in the simulated platform. SimGrid's energy plugin 
-requires host **pstate** definitions (levels of performance, CPU frequency) in the
-[XML platform description file](https://simgrid.org/doc/latest/platform.html). The following is a 
-list of current available information provided by the plugin: 
-
-- `wrench::Simulation::getNumberofPstates()`
-- `wrench::Simulation::getMinPowerConsumption()`
-- `wrench::Simulation::getMaxPowerConsumption()`
-- `wrench::Simulation::getListOfPstates()`
-
-**Note:** The energy plugin is NOT enabled by default in WRENCH simulation. To enable the plugin, the 
-`--activate-energy` command line option should be provided when running a simulator.
-
-
+See the [Simgrid logging
+documentation](https://simgrid.org/doc/latest/outcomes.html) for all
+details.
 
 
 
