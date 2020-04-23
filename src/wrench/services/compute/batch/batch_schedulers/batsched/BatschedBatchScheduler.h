@@ -53,26 +53,31 @@ namespace wrench {
 
         /**
          * @brief Method to process a job submission
+         * @param batch_job: the batch job that was submitted
          */
         void processJobSubmission(std::shared_ptr<BatchJob> batch_job) override;
 
         /**
          * @brief Method to process a job failure
+         * @param batch_job: the batch job that has failed
          */
         void processJobFailure(std::shared_ptr<BatchJob> batch_job) override;
 
         /**
          * @brief Method to process a job completion
+         * @param batch_job: the batch job that has completed
          */
         void processJobCompletion(std::shared_ptr<BatchJob> batch_job) override;
 
         /**
          * @brief Method to process a job termination
+         * @param batch_job: the batch job that was terminated
          */
         void processJobTermination(std::shared_ptr<BatchJob> batch_job) override;
 
         /**
          * @brief Method to get start time estimates
+         * @param set_of_jobs: the set of job configurations whose start times should be estimated
          */
         std::map<std::string, double> getStartTimeEstimates(std::set<std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs) override;
 

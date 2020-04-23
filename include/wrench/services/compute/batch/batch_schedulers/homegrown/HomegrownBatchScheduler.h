@@ -26,6 +26,11 @@ namespace wrench {
 
     public:
 
+        /**
+         * @brief Constructor
+         *
+         * @param cs: the batch compute service for which this scheduler is operating
+         */
         explicit HomegrownBatchScheduler(BatchComputeService *cs) : BatchScheduler(cs) {}
 
         void init() override {};
