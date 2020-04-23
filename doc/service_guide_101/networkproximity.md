@@ -28,7 +28,6 @@ customized to specify that the service performs network transfer
 experiments on average every 60 seconds, that the Vivaldi algorithm is
 used to compute network coordinates, and that
 the message sent to the service to lookup an entry is configured to be 1KiB:
-.
 
 ~~~~~~~~~~~~~{.cpp}
 auto np_service = simulation->add(
