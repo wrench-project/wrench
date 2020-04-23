@@ -60,9 +60,9 @@ command.
 
 
 
-# creating a cmakelists.txt file by hand##                {#getting-started-cmakelists}
+# creating a CMakeLists.txt file by hand##                {#getting-started-cmakelists}
 
-alternately, you can do a manual setup, i.e., create your own cmake project. 
+alternately, you can do a manual setup, i.e., create your own Cmake project. 
 below is an example of a `cmakelists.txt` file that can be used as a basic
 template:
 
@@ -134,9 +134,9 @@ navigating to that directory and typing:
 ~~~~~~~~~~~~~
 
 you should see some output in the terminal. the output in white is
-produced by he simulator implemented with the wrench user api.  the output
+produced by he simulator implemented with the wrench user API.  the output
 in green is produced by the  workflow management system implemented with
-the wrench developer api.
+the wrench developer API.
 
 although you can inspect the codes of the examples on your own, we highly
 recommend that you go through the [wrench 101](@ref wrench-101) and [wrench

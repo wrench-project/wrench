@@ -73,7 +73,7 @@ git clone https://github.com/wrench-project/wrench
 
 ## Compiling and running unit tests ##  {#install-unit-tests}
 
-Building and running the unit tests, which requiresGoogle Test, is done as:
+Building and running the unit tests, which requires Google Test, is done as:
 
 ~~~~~~~~~~~~~{.sh}
 make unit_tests      
