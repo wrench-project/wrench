@@ -1,22 +1,13 @@
 WRENCH 102                        {#wrench-102}
 ============
 
-
-<!--
-@WRENCHUserDoc <div class="doc-type">User Documentation</div><div class="doc-link">Other: <a href="../developer/wrench-101.html">Developer</a> - <a href="../internal/wrench-101.html">Internal</a></div> @endWRENCHDoc
-@WRENCHDeveloperDoc  <div class="doc-type">Developer Documentation</div><div class="doc-link">Other: <a href="../user/wrench-101.html">User</a> - <a href="../internal/wrench-101.html">Internal</a></div> @endWRENCHDoc
-@WRENCHInternalDoc  <div class="doc-type">Internal Documentation</div><div class="doc-link">Other: <a href="../user/wrench-101.html">User</a> -  <a href="../developer/wrench-101.html">Developer</a></div> @endWRENCHDoc
--->
-
-
-A Workflow Management System (WMS) is software that makes all decisions
- and takes all actions for executing a workflow using cyberinfrastructure  services. It is thus a crucial
-component in every WRENCH simulator. WRENCH does not provide any WMS
-implementation, but provides the means for developing custom WMSs.  This
-page is meant to provide high-level and detailed information about
-implementing  a Workflow  Management System (WMS) in  WRENCH.  Full API
-details are provided in the [Developer API
-Reference](../developer/annotated.html).
+A Workflow Management System (WMS) is a software that makes all decisions
+and takes all actions for executing a workflow using cyberinfrastructure 
+services. It is thus a crucial component in every WRENCH simulator. 
+WRENCH does not provide any WMS implementation, but provides the means for 
+developing custom WMSs. This page is meant to provide high-level and 
+detailed information about implementing a WMS in WRENCH. Full API details 
+are provided in the [Developer API Reference](../developer/annotated.html).
 
 [TOC]
 
@@ -24,7 +15,7 @@ Reference](../developer/annotated.html).
 
 # Basic blueprint for a WMS implementation #        {#wrench-102-WMS-10000ft}
 
-A WMS implementation needs to use many WRENCH  classes, which are accessed
+A WMS implementation needs to use many WRENCH classes, which are accessed
 by including a single header file:
 
 ~~~~~~~~~~~~~{.cpp}
@@ -32,24 +23,22 @@ by including a single header file:
 ~~~~~~~~~~~~~
 
 A WMS implementation must derive the `wrench::WMS` class, which means that
-it  can override  several virtual  methods, but also that a WMS is a
-service.  As such, it has a `main()` function that goes through a simple
-loop as follows:
+it can override several virtual methods, but also that a WMS is a service. 
+As such, it has a `main()` function that goes through a simple loop as follows:
 
 ~~~~~~~~~~~~~{.sh}
 // A) obtain information about running services
-while (workflow execution isn't completed/failed) {
+while (workflow execution is not completed/failed) {
   // B) interact with services 
   // C) wait for an event and react to it
 }
 ~~~~~~~~~~~~~
 
-The next  three sections we give detailed on how to do A, B, and C in the code
-above. To  provide context we make frequent  references to the WMS
-implementations in the example simulators in the `examples/` directory.  Afterwards
-are a few sections that highlight features and functionality relevant to
-WMS development.
-
+In the next three sections, we give details on how to implement A, B, and C in 
+the code above. To provide context, we make frequent references to the WMS
+implementations in the example simulators in the `examples/` directory. 
+Afterwards are a few sections that highlight features and functionality relevant 
+to WMS development.
 
 # A) Obtaining information about services #      {#wrench-102-obtain-information}
 

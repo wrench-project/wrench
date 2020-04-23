@@ -1,13 +1,15 @@
 WRENCH 101                        {#wrench-101}
 ============
 
-[TOC]
-
 This page provides high-level and detailed information about what WRENCH 
 simulators can simulate and how they do it. Full API details are provided 
 in the [User API Reference](../user/annotated.html). See the relevant pages 
 for instructions on how to [install WRENCH](@ref install) and how to 
 [setup a simulator project](@ref getting-started).
+
+[TOC]
+
+---
 
 # 10,000-ft view of a WRENCH simulator #      {#wrench-101-simulator-10000ft}
 
