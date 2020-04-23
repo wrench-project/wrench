@@ -2,15 +2,15 @@ Interacting with a virtualized cluster service     {#guide-102-virtualizedcluste
 ============
 
 The `wrench::VirtualizedClusterComputeService` derives the
-`wrench::CloudComputeService` class. It operates in  almost the same  way,
-and we refer you to [this page](@ref guide-102-cloud) for example
-interactions with a cloud service.  The one different between a virtualized
+`wrench::CloudComputeService` class. One interacts  with it in almost
+the same way as one [interacts with a  cloud servicde](@ref guide-102-cloud).
+The one difference between a virtualized
 cluster service and a cloud service is that the former exposes underlying
 physical resources, while the latter does not.  More simply put, with  a
 virtualized cluster service one can create VM instances on specific hosts,
 and migrate VM instances between hosts. 
 
-Here is an example interaction with virtualized cluster service,  in which 
+Here is an example interaction with a virtualized cluster service,  in which 
 VM instances are created and (live) migrated:
 
 ~~~~~~~~~~~~~{.cpp}
