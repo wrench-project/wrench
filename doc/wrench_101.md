@@ -59,6 +59,16 @@ most of what a WRENCH simulator does, which consists in going through the
 following steps. Note that the simulator's code contains extensive
 comments as well. 
 
+### Step #0: Include `wrench.h`
+
+For ease  of use, all WRENCH abstraction in  the 
+[WRENCH User API](../user/annotated.html)  are  available
+through a single header file:
+
+~~~~~~~~~~~~~{.cpp}
+#include <wrench.h>
+~~~~~~~~~~~~~
+
 ### Step #1: Create and initialize a simulation
 
 The state of a WRENCH simulation is defined by the `wrench::Simulation` class. A simulator must create an instance of this class and initialize it
@@ -271,9 +281,12 @@ auto wms = simulation.add(new wrench::OneTaskAtATimeWMS({baremetal_service}, {st
 Class wrench::OneTaskAtATimeWMS, which is  part of this example simulator,
 is implemented using the [WRENCH Developer
 API](../developer/annotated.html).  See the [wrench 102](@ref wrench-102)
-page for information on how to implement a WMS with WRENCH.
+page for information on how to implement a WMS with WRENCH. The code above
+passes the list of compute services (1st argument) and the list
+of storage services (2nd argument) to the WMS constructor. The 3rd
+argument specifies that the WMS should run on host `WMSHost`. 
 
-The previously created workflow is then associated to the WMS as:
+The previously created workflow is then associated to the WMS:
 
 ~~~~~~~~~~~~~{.cpp}
 wms->addWorkflow(&workflow);
@@ -337,9 +350,8 @@ provides interactive visualization/inspection of simulation output.
 
 # Available services #      {#wrench-101-simulator-services}
 
-Below is the list of services available to-date in WRENCH. 
-Click on the corresponding links for more information  when
-available. 
+Below is the list of services available to-date in WRENCH 
+(*click on the corresponding links for detailed information*):
 
 - **Compute Services**: These are services that know how to compute workflow tasks: 
 
