@@ -143,13 +143,6 @@ namespace wrench {
         std::shared_ptr<StorageService> getScratch();
 
 
-        /**
-         * @brief Constructor
-         * @param hostname: host on which  to run
-         * @param service_name: service name
-         * @param mailbox_name_prefix: mailbox prefix
-         * @param scratch_space_mount_point: mount point of the scratch space
-         */
         ComputeService(const std::string &hostname,
                        std::string service_name,
                        std::string mailbox_name_prefix,

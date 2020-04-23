@@ -187,9 +187,9 @@ See [this page](@ref guide-102-simplestorage) for  concrete examples of interact
 with a `wrench::SimpleStorageService`.
 
 
-## Interacting with compute services
+## Interacting with compute services    #{#wrench-102-interacting}
 
-### The Job  abstraction          {#wrench-102-jobs}
+### The Job  abstraction          
 
 The main activity of a WMS is to execute workflow tasks on compute services. 
 Rather than  submitting tasks directly to compute services, a WMS must

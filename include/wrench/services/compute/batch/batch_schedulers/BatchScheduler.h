@@ -35,6 +35,7 @@ namespace wrench {
 
         /**
          * @brief Constructor
+         * @param cs: the batch compute service to which this scheduler is associated
          */
         explicit BatchScheduler(BatchComputeService *cs) : cs(cs) {};
 
@@ -64,26 +65,36 @@ namespace wrench {
 
         /**
          * @brief Method to process a job submission
+         *
+         * @param batch_job: the batch job that was submitted
          */
         virtual void processJobSubmission(std::shared_ptr<BatchJob> batch_job) = 0;
 
         /**
          * @brief Method to process a job failure
+         *
+         * @param batch_job: the batch job that has failed
          */
         virtual void processJobFailure(std::shared_ptr<BatchJob> batch_job) = 0;
 
         /**
          * @brief Method to process a job completion
+         *
+         * @param batch_job: the batch job that has completed
          */
         virtual void processJobCompletion(std::shared_ptr<BatchJob> batch_job) = 0;
 
         /**
          * @brief Method to process a job termination
+         *
+         * @param batch_job: the batch job that was terminated
          */
         virtual void processJobTermination(std::shared_ptr<BatchJob> batch_job) = 0;
 
         /**
          * @brief Method to get start time estimates
+         *
+         * @param set_of_jobs: the set of job configurations whose start times should be estimated
          */
         virtual std::map<std::string, double> getStartTimeEstimates(std::set<std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs) = 0;
 

@@ -47,26 +47,46 @@ namespace wrench {
      * @brief Object representing an instance when a WorkflowTask was run.
      */
     typedef struct WorkflowTaskExecutionInstance {
+        /* @brief  a task ID */
         std::string task_id;
+        /* @brief number of allocated cores */
         unsigned long long num_cores_allocated;
+        /* @brief vertical position in gantt chart display */
         unsigned long long vertical_position;
 
+        /* @brief task geometry in gantt chart display */
         std::pair<double, double> whole_task;
+        /** @brief file read geometry in gantt chart display */
         std::pair<double, double> read;
+        /* @brief computation geometry in gantt chart display */
         std::pair<double, double> compute;
+        /* @brief file write geometry in gantt chart display */
         std::pair<double, double> write;
 
+        /* @brief file read operations */
         std::vector<std::tuple<double, double, string>> reads;
+        /* @brief file write operations */
         std::vector<std::tuple<double, double, string>> writes;
 
+        /* @brief whether the task has failed */
         double failed;
+        /* @brief whether the task was terminated */
         double terminated;
 
+        /* @brief name of the host that ran the task */
         std::string hostname;
+        /* @brief flop rate of the host that ran the task */
         double host_flop_rate;
+        /* @brief RAM capacity of the host that ran the task */
         double host_memory;
+        /* @brief number of cores of the host that ran the task */
         unsigned long long host_num_cores;
 
+        /* 
+         * @brief get the task end time
+         *
+         * @return a date
+         */
         double getTaskEndTime() {
             return std::max({
                                     this->whole_task.second,
@@ -1457,11 +1477,12 @@ namespace wrench {
     }
 
     /**
- * @brief Add a file read start timestamp
- * @param hostname: hostname being read from
- * @param mount: mountpoint of disk
- * @param bytes: number of bytes read
- */
+     * @brief Add a file read start timestamp
+     * @param hostname: hostname being read from
+     * @param mount: mountpoint of disk
+     * @param bytes: number of bytes read
+     * @param counter: an integer id
+     */
     void SimulationOutput::addTimestampDiskReadStart(std::string hostname, std::string mount, double bytes, int counter) {
         if (this->isEnabled<SimulationTimestampDiskReadStart>()) {
             this->addTimestamp<SimulationTimestampDiskReadStart>(new SimulationTimestampDiskReadStart(hostname, mount, bytes, counter));
@@ -1469,11 +1490,12 @@ namespace wrench {
     }
 
     /**
-    * @brief Add a file read failure timestamp
+     * @brief Add a file read failure timestamp
      * @param hostname: hostname being read from
      * @param mount: mountpoint of disk
      * @param bytes: number of bytes read
-    */
+     * @param counter: an integer id
+     */
     void SimulationOutput::addTimestampDiskReadFailure(std::string hostname, std::string mount, double bytes, int counter) {
         if (this->isEnabled<SimulationTimestampDiskReadFailure>()) {
             this->addTimestamp<SimulationTimestampDiskReadFailure>(new SimulationTimestampDiskReadFailure(hostname, mount, bytes, counter));
@@ -1481,11 +1503,12 @@ namespace wrench {
     }
 
     /**
-    * @brief Add a file read completion timestamp
+     * @brief Add a file read completion timestamp
      * @param hostname: hostname being read from
      * @param mount: mountpoint of disk
      * @param bytes: number of bytes read
-    */
+     * @param counter: an integer id
+     */
     void SimulationOutput::addTimestampDiskReadCompletion(std::string hostname, std::string mount, double bytes, int counter) {
         if (this->isEnabled<SimulationTimestampDiskReadCompletion>()) {
             this->addTimestamp<SimulationTimestampDiskReadCompletion>(new SimulationTimestampDiskReadCompletion(hostname, mount, bytes, counter));
@@ -1497,6 +1520,7 @@ namespace wrench {
      * @param hostname: hostname being read from
      * @param mount: mountpoint of disk
      * @param bytes: number of bytes read
+     * @param counter: an integer id
      */
     void SimulationOutput::addTimestampDiskWriteStart(std::string hostname, std::string mount, double bytes, int counter) {
         if (this->isEnabled<SimulationTimestampDiskWriteStart>()) {
@@ -1505,11 +1529,12 @@ namespace wrench {
     }
 
     /**
-    * @brief Add a file write failure timestamp
+     * @brief Add a file write failure timestamp
      * @param hostname: hostname being read from
      * @param mount: mountpoint of disk
      * @param bytes: number of bytes read
-    */
+     * @param counter: an integer id
+     */
     void SimulationOutput::addTimestampDiskWriteFailure(std::string hostname, std::string mount, double bytes, int counter) {
         if (this->isEnabled<SimulationTimestampDiskWriteFailure>()) {
             this->addTimestamp<SimulationTimestampDiskWriteFailure>(new SimulationTimestampDiskWriteFailure(hostname, mount, bytes, counter));
@@ -1521,6 +1546,7 @@ namespace wrench {
     * @param hostname: hostname being read from
     * @param mount: mountpoint of disk
     * @param bytes: number of bytes read
+    * @param counter: an integer id
     */
     void SimulationOutput::addTimestampDiskWriteCompletion(std::string hostname, std::string mount, double bytes, int counter) {
         if (this->isEnabled<SimulationTimestampDiskWriteCompletion>()) {
