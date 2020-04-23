@@ -1,4 +1,4 @@
-HTCondorComputeService                        {#guide-101-htcondor}
+Creating a HTCondor compute service                        {#guide-101-htcondor}
 ============
 
 [TOC]
@@ -22,7 +22,7 @@ compute service (`wrench::ComputeService`), which is defined by the
 `wrench::HTCondorComputeService` class. An instantiation of an HTCondor 
 service requires the following parameters:
 
-- A hostname on which to start the service;
+- The name of a host on which to start the service;
 - The HTCondor pool name;
 - A `std::set` of `wrench::ComputeService` available to the HTCondor pool; and
 - A `std::map` of properties (`wrench::HTCondorComputeServiceProperty`) and message 
@@ -31,7 +31,7 @@ service requires the following parameters:
 The set of compute services may represent any computing instance natively 
 provided by WRENCH (e.g., bare-metal servers, cloud platforms, batch-scheduled
 clusters, etc.) or additional services derived from the `wrench::ComputeService`
-base class. The example below shows how to create an instance of an HTCondor service
+base class. The example below creates an instance of an HTCondor service
 with a pool of resources containing a [Bare-metal](@ref guide-baremetal) server:
 
 ~~~~~~~~~~~~~{.cpp}

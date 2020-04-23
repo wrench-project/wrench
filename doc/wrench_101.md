@@ -350,8 +350,8 @@ provides interactive visualization/inspection of simulation output.
 
 # Available services #      {#wrench-101-simulator-services}
 
-Below is the list of services available to-date in WRENCH 
-(*click on the corresponding links for detailed information*):
+Below is the list of services available to-date in WRENCH. Click on the corresponding
+links for more information on what these services are and on how to create them.
 
 - **Compute Services**: These are services that know how to compute workflow tasks: 
 
