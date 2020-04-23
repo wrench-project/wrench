@@ -62,7 +62,7 @@ cloud_cs->shutdown(vm2);
 
 Note that the cloud service will decide on which physical resources VM instances should
 be started. The underlying physical resources are completely hidden by the cloud service
-abstraction. If you want more control over how the physical resoruces a are
+abstraction. If you want more control over how the physical resources are
 used you likely need a [virtualized cluster services](@ref guide-102-virtualizedcluster).
 
 See the WMS implementation in `examples/basic-examples/cloud-bag-of-tasks/TwoTasksAtATimeCloudWMS.cpp` for a more complete example.
