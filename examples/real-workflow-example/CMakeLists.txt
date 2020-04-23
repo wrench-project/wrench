@@ -38,10 +38,10 @@ else()
 endif()
 install(TARGETS wrench-example-real-workflow-batch DESTINATION bin)
 
-add_custom_command(TARGET wrench-example-real-workflow-cloud POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${CMAKE_SOURCE_DIR}/examples/real-workflow-example/platform_files $<TARGET_FILE_DIR:wrench-example-real-workflow-cloud>/platform_files)
-
-add_custom_command(TARGET wrench-example-real-workflow-cloud POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${CMAKE_SOURCE_DIR}/examples/real-workflow-example/workflow_files $<TARGET_FILE_DIR:wrench-example-real-workflow-cloud>/workflow_files)
+#add_custom_command(TARGET wrench-example-real-workflow-cloud POST_BUILD
+#        COMMAND ${CMAKE_COMMAND} -E copy_directory
+#        ${CMAKE_SOURCE_DIR}/examples/real-workflow-example/platform_files $<TARGET_FILE_DIR:wrench-example-real-workflow-cloud>/platform_files)
+#
+#add_custom_command(TARGET wrench-example-real-workflow-cloud POST_BUILD
+#        COMMAND ${CMAKE_COMMAND} -E copy_directory
+#        ${CMAKE_SOURCE_DIR}/examples/real-workflow-example/workflow_files $<TARGET_FILE_DIR:wrench-example-real-workflow-cloud>/workflow_files)
