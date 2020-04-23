@@ -48,3 +48,6 @@ auto cloud_cs = simulation.add(
 See the documentation of `wrench::CloudComputeServiceProperty` and
 `wrench::CloudComputeServiceMessagePayload` for all possible configuration
 options.
+
+Also see the simulators in the `examples/basic-examples/cloud-*/` directories, which use cloud compute services.
+
