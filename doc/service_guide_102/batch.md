@@ -18,7 +18,7 @@ provided to the [Slurm](https://slurm.schedmd.com/) batch scheduler.
 Here is an example job submission to the batch service:
 
 ~~~~~~~~~~~~~{.cpp}
-// Get the first catch compute service (assuming there's at least one)
+// Get the first batch compute service (assuming there's at least one)
 auto batch_service = *(this->getAvailableComputeServices<wrench::BatchComputeService>().begin());
 
 // Create a job manager
@@ -53,7 +53,7 @@ large), `wrench::JobManager::submitJob()` method throws a
 See the WMS implementation in `examples/basic-examples/batch-bag-of-tasks/TwoTasksAtATimeBatchWMS.cpp` for a more complete example.
 
 
-A batch compute service also supports pilot jobs, i.e., one can submit a `wrench::PilotJob`. Once started, the pilot job exposes a temporary  (until the pilot job expires) bare-metal compute service. Here is a simple code excerpt:
+A batch compute service also supports pilot jobs. Once started, a pilot job exposes a temporary  (only running until its containing pilot job expires) bare-metal compute service. Here is a simple code excerpt:
 
 ~~~~~~~~~~~~~{.cpp}
 // create a pilot job
@@ -74,6 +74,9 @@ auto cs = pilot_job->getComputeService();
 [...]
 
 ~~~~~~~~~~~~~
+
+While the pilot job is running,  [standard jobs can be submitted to its bare-metal service](@ref guide-102-baremetal).
+
 
 See the WMS implementation in `examples/basic-examples/basic-examples/batch-pilot-job/PilotJobWMS.cpp` for a more complete example.
 
