@@ -51,9 +51,9 @@ are a few sections that highlight features and functionality relevant to
 WMS development.
 
 
-# A) Obtaining information about services    {#wrench-102-obtain-information}
+# A) Obtaining information about services #      {#wrench-102-obtain-information}
 
-## Discovering running services
+## Discovering running services #                {#wrench-102-obtain-information-discovering}
 
 The `wrench::WMS` base class implements a set of methods named
 `wrench::WMS::getAvailableComputeServices()`,
@@ -82,7 +82,7 @@ instances. This is to free the developer from the responsibility of freeing
 memory.
 
 
-## Finding out information about running services
+## Finding out information about running services #        {#wrench-102-obtain-information-finding}
    
 Most service classes provide methods to get information about the
 capabilities and properties of the services.  For instance, a
@@ -114,14 +114,14 @@ and the core compute speed is stored in the `core_flop_rate` variable
 to be  re-used by  the WMS repeatedly throughout  its execution.
 
 
-# B)  Interacting with  services  #                  {#wrench-102-WMS-services}
+# B)  Interacting with services  #                  {#wrench-102-WMS-services}
 
 A WMS can have many and complex interactions with services, especially
 with compute and storage services. In this section we describe how WRENCH
 makes these  interactions relatively easy, providing examples for
 each kind  of interaction for each kind of service. 
 
-## Job Manager and Data Movement Manager
+## Job Manager and Data Movement Manager #           {#wrench-102-WMS-services-managers}
 
 As expected, each service type provides its own API. For instance, a network proximity
 service provides methods to query the service's host distance databases.
@@ -165,7 +165,7 @@ auto data_movement_manager = this->createDataMovementManager();
 Each manager has its own documented API, and is discussed further in
 sections below.
 
-## Interacting with storage services
+## Interacting with storage services #                 {#wrench-102-WMS-services-storage}
 
 The  possible interactions between a WMS and a storage  service include:
 
@@ -187,9 +187,9 @@ See [this page](@ref guide-102-simplestorage) for  concrete examples of interact
 with a `wrench::SimpleStorageService`.
 
 
-## Interacting with compute services    #{#wrench-102-interacting}
+## Interacting with compute services #               {#wrench-102-WMS-services-compute}
 
-### The Job  abstraction          
+### The Job abstraction #                            {#wrench-102-WMS-services-compute-job}
 
 The main activity of a WMS is to execute workflow tasks on compute services. 
 Rather than  submitting tasks directly to compute services, a WMS must
@@ -259,7 +259,7 @@ and examples of how jobs are submitted to each compute service type:
 
 
 
-## Interacting with file registry services
+## Interacting with file registry services #              {#wrench-102-WMS-services-registry}
 
 Interaction with a file registry service is straightforward and done by directly
 calling methods of the `wrench::FileRegistryService` class. Note that often
@@ -312,7 +312,7 @@ auto entries = fr_service->lookupEntry(some_file, "ReferenceHost", np_service);
 
 See the documentation of `wrench::FileRegistryService` for more API methods.
 
-## Interacting with network proximity services
+## Interacting with network proximity services #              {#wrench-102-WMS-services-network}
 
 Querying a network proximity service is straightforward. For instance, to
 obtain a measure of the network distance between hosts "Host1" and "Host3",
@@ -340,7 +340,7 @@ See the documentation of `wrench::NetworkProximityService` for more API methods.
 
 
 
-# C) Workflow execution events #    {#wrench-102-WMS-events}
+# C) Workflow execution events #                     {#wrench-102-WMS-events}
 
 
 Because the WMS performs asynchronous
@@ -534,7 +534,3 @@ The name of the logging category, in this case `custom_wms`, can then be passed 
 `--log` command-line argument. For instance, invoking the simulator with additional
 arguments `--wrench-no-logs --log=custom_wms.threshold=info` will make it so that
 only those `WRENCH_INFO` statements in  `TwoTasksAtATimeBatchWMS.cpp` will be printed (in green!). 
-  
-
-
-
