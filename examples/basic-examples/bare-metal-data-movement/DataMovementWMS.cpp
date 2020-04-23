@@ -130,7 +130,8 @@ namespace wrench {
             // Check that it is the expected event, just in  case
             if (auto file_copy_completion_event = std::dynamic_pointer_cast<wrench::FileCopyCompletedEvent>(
                     event)) {
-                WRENCH_INFO("Notified of the file copy completion!");
+                WRENCH_INFO("Notified of the file copy completion for file %s, as expected", 
+                        file_copy_completion_event->file->getID().c_str());
             } else {
                 throw std::runtime_error("Unexpected event (" + event->toString() + ")");
             }
