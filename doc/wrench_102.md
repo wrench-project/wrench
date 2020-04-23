@@ -248,11 +248,8 @@ The job manager provides the following expected methods:
 The next section gives many examples of interactions with each kind of compute service.
 
 
-### Example interactions with compute services
-
-Although the general interaction principles apply across the various compute services,
-there are  some key differences. Click on the following links   to see detailed descriptions
-and examples of interactions with each compute  service type:
+Click on the following links to see detailed descriptions of
+and examples of how jobs are submitted to each compute service type:
 
   - [Bare-metal compute service](@ref guide-102-baremetal)
   - [Batch compute service](@ref guide-102-batch)
