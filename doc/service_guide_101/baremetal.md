@@ -53,4 +53,4 @@ See the documentation of `wrench::BareMetalComputeServiceProperty` and
 `wrench::BareMetalComputeServiceMessagePayload` for all possible configuration
 options. 
 
-
+Also see the simulators in the `examples/basic-examples/bare-metal-*/` directories, which use bare-metal compute services.

@@ -43,3 +43,6 @@ auto storage_service = simulation->add(
 See the documentation of `wrench::SimpleStorageServiceProperty` and
 `wrench::SimpleStorageServiceMessagePayload` for all possible configuration
 options.
+
+Also see the simulators in the `examples/basic-examples/*` directories, which all  use simple storage services.
+
