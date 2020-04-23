@@ -45,5 +45,5 @@ See the documentation of `wrench::VirtualizedClusterComputeServiceProperty` and
 `wrench::VirtualizedClusterComputeServiceMessagePayload` for all possible configuration
 options.
 
-
+Also see the simulators in the `examples/basic-examples/virtualized-cluster-*/` directories, which use virtualized cluster services.
 

@@ -61,3 +61,5 @@ See the documentation of `wrench::BatchComputeServiceProperty` and
 `wrench::BatchComputeServiceMessagePayload` for all possible configuration
 options.
 
+Also see the simulators in the `examples/basic-examples/batch-*/` directories, which use batch compute services.
+
