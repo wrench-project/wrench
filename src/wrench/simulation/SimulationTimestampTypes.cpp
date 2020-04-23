@@ -740,6 +740,7 @@ namespace wrench {
      * @param hostname: hostname of disk being read
      * @param mount: mount point of disk being read
      * @param bytes: number of bytes read
+     * @param counter: an integer ID
      * @throw std::invalid_argument
      */
     SimulationTimestampDiskReadStart::SimulationTimestampDiskReadStart(std::string hostname,
@@ -768,6 +769,7 @@ namespace wrench {
      * @param hostname: hostname of disk being read
      * @param mount: mount point of disk being read
      * @param bytes: number of bytes read
+     * @param counter: an integer ID
      * @throw std::invalid_argument
      */
     SimulationTimestampDiskReadFailure::SimulationTimestampDiskReadFailure(std::string hostname,
@@ -792,6 +794,7 @@ namespace wrench {
      * @param hostname: hostname of disk being read
      * @param mount: mount point of disk being read
      * @param bytes: number of bytes read
+     * @param counter: an integer ID
      * @throw std::invalid_argument
      */
     SimulationTimestampDiskReadCompletion::SimulationTimestampDiskReadCompletion(std::string hostname,
@@ -816,6 +819,7 @@ namespace wrench {
  * @param hostname: hostname being write from
  * @param mount: mountpoint of disk
  * @param bytes: number of bytes written
+ * @param counter: an integer ID
  */
     SimulationTimestampDiskWrite::SimulationTimestampDiskWrite(std::string hostname,
                                                                std::string mount,
@@ -897,6 +901,7 @@ namespace wrench {
      * @param hostname: hostname of disk being write
      * @param mount: mount point of disk being write
      * @param bytes: number of bytes write
+     * @param counter: an integer ID
      * @throw std::invalid_argument
      */
     SimulationTimestampDiskWriteStart::SimulationTimestampDiskWriteStart(std::string hostname,
@@ -925,6 +930,7 @@ namespace wrench {
      * @param hostname: hostname of disk being write
      * @param mount: mount point of disk being write
      * @param bytes: number of bytes write
+     * @param counter: an integer ID
      * @throw std::invalid_argument
      */
     SimulationTimestampDiskWriteFailure::SimulationTimestampDiskWriteFailure(std::string hostname,
@@ -949,6 +955,7 @@ namespace wrench {
      * @param hostname: hostname of disk being write
      * @param mount: mount point of disk being write
      * @param bytes: number of bytes write
+     * @param counter: an integer ID
      * @throw std::invalid_argument
      */
     SimulationTimestampDiskWriteCompletion::SimulationTimestampDiskWriteCompletion(std::string hostname,

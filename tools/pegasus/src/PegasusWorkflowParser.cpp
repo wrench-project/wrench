@@ -44,8 +44,9 @@ namespace wrench {
      * @throw std::invalid_argument
      *
      */
-    Workflow *PegasusWorkflowParser::createWorkflowFromJSON(const std::string &filename, const std::string &reference_flop_rate,
-                                                                    bool redundant_dependencies) {
+    Workflow *PegasusWorkflowParser::createWorkflowFromJSON(const std::string &filename, 
+                                                            const std::string &reference_flop_rate,
+                                                            bool redundant_dependencies) {
 
         std::ifstream file;
         nlohmann::json j;

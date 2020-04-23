@@ -25,7 +25,7 @@ The workflow management system property documents the WMS used to run the workfl
 
 
 ## Workflow Property
-The workflow property is the core element of the trace file. It contains the workflow structure (jobs, depenencies, and files), as well as job characteristics and performance information. It is composed by the following sub-properties:
+The workflow property is the core element of the trace file. It contains the workflow structure (jobs, dependencies, and files), as well as job characteristics and performance information. It is composed by the following sub-properties:
 
 - [x] `makespan`: Workflow turnaround time in _seconds_.
 - [x] `executedAt`: Workflow start timestamp in the [ISO 8601](http://en.wikipedia.org/wiki/ISO_8601) format (e.g., `2016-11-27T15:19:28-08:00`).

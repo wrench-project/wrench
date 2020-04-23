@@ -1,9 +1,5 @@
-HTCondor                        {#guide-htcondor}
+Creating a HTCondor compute service                        {#guide-101-htcondor}
 ============
-
-@WRENCHUserDoc <div class="doc-type">User Documentation</div><div class="doc-link">Other: <a href="../developer/guide-htcondor.html">Developer</a> - <a href="../internal/guide-htcondor.html">Internal</a></div> @endWRENCHDoc
-@WRENCHDeveloperDoc  <div class="doc-type">Developer Documentation</div><div class="doc-link">Other: <a href="../user/guide-htcondor.html">User</a> - <a href="../internal/guide-htcondor.html">Internal</a></div> @endWRENCHDoc
-@WRENCHInternalDoc  <div class="doc-type">Internal Documentation</div><div class="doc-link">Other: <a href="../user/guide-htcondor.html">User</a> -  <a href="../developer/guide-htcondor.html">Developer</a></div> @endWRENCHDoc
 
 [TOC]
 
@@ -26,7 +22,7 @@ compute service (`wrench::ComputeService`), which is defined by the
 `wrench::HTCondorComputeService` class. An instantiation of an HTCondor 
 service requires the following parameters:
 
-- A hostname on which to start the service;
+- The name of a host on which to start the service;
 - The HTCondor pool name;
 - A `std::set` of `wrench::ComputeService` available to the HTCondor pool; and
 - A `std::map` of properties (`wrench::HTCondorComputeServiceProperty`) and message 
@@ -35,7 +31,7 @@ service requires the following parameters:
 The set of compute services may represent any computing instance natively 
 provided by WRENCH (e.g., bare-metal servers, cloud platforms, batch-scheduled
 clusters, etc.) or additional services derived from the `wrench::ComputeService`
-base class. The example below shows how to create an instance of an HTCondor service
+base class. The example below creates an instance of an HTCondor service
 with a pool of resources containing a [Bare-metal](@ref guide-baremetal) server:
 
 ~~~~~~~~~~~~~{.cpp}
@@ -78,24 +74,3 @@ to the Condor pool for execution.
 ![](images/htcondor-architecture.png)
 
 
-@WRENCHNotUserDoc  
-
-<p>&nbsp;</p>
-WRENCH HTCondor service implementation spawns two additional services during 
-execution: wrench::HTCondorCentralManagerService and wrench::HTCondorNegotiatorService.
-
-The wrench::HTCondorCentralManagerService coordinates the execution of jobs
-submitted to the HTCondor pool. Jobs submitted to the wrench::HTCondorComputeService
-are then queued in a `std::vector<wrench::StandardJob *>`, which are then 
-consumed as resources become available. The Central Manager also spawns the
-execution of the wrench::HTCondorNegotiatorService, which performs matchmaking
-between jobs and compute resources available in the pool. Note that job submission
-in HTCondor is asynchronous, thus our simulated services operates independent 
-from each other (see the 
-@WRENCHDeveloperDoc [Interacting with services](#wrench-101-WMS-services) section@endWRENCHDoc 
-@WRENCHInternalDoc Interacting with services section from the 
-Developer</a> Documentation @endWRENCHDoc
-).
-
-
-@endWRENCHDoc

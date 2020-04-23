@@ -158,12 +158,13 @@ namespace wrench {
     void TwoTasksAtATimeWMS::processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent> event) {
         /* Retrieve the job that this event is for */
         auto job = event->standard_job;
-        /* Retrieve the job's first (and in our case only) task */
-        auto task = job->getTasks().at(0);
-        /* Print some error message */
-        WRENCH_INFO("Notified that a standard job has failed for task %s with error %s",
-                    task->getID().c_str(),
-                    event->failure_cause->toString().c_str());
+        WRENCH_INFO("Notified that a standard job has failed (failure cause: %s)",
+                event->failure_cause->toString().c_str());
+        /* Retrieve the job's tasks */
+        WRENCH_INFO("As a result, the following tasks have failed:");
+        for (auto const &task : job->getTasks()) {
+            WRENCH_INFO(" - %s", task->getID().c_str());
+        }
         throw std::runtime_error("This should not happen in this example");
     }
 

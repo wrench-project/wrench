@@ -18,6 +18,7 @@ namespace wrench {
 
     /**
     * @brief Overriden Method to pick the next job to schedule
+    *
     * @return A batch job, or nullptr is none is found
     */
     std::shared_ptr<BatchJob> FCFSBatchScheduler::pickNextJobToSchedule() {
