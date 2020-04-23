@@ -11,7 +11,7 @@ auto bare_metal_service = *(this->getAvailableComputeServices<wrench::BareMetalC
 // Create a job manager
 auto job_manager = this->createJobManager();
 
-// Create a simple standard job with 4 tasks in the workflow
+// Create a simple standard job with 4 workflow tasks
 auto job = job_manager->createStandardJob(
                  {this->getWorklow()->getTaskByID("task1"),
                   this->getWorklow()->getTaskByID("task2"),
@@ -65,16 +65,16 @@ In the above  example, for instance, the job  submission could be done  as:
 // Create a service-specific argument
 std::map<std::string, std::string> service_specific_args;
 
-//   task1 will run on host Node1 with as many cores as possible
+// task1 will run on host Node1 with as many cores as possible
 service_specific_args["task1"] = "Node1";
 
-//   task2 will run on host Node2 with 16 cores
+// task2 will run on host Node2 with 16 cores
 service_specific_args["task2"] = "Node2:16";
 
-//   task3 will run on any host with as many cores as possible
+// task3 will run on any host with as many cores as possible
 service_specific_args["task3"] = "";  // could be omitted altogether
 
-//   task4 will run on some host with 4 cores
+// task4 will run on some host with 4 cores
 service_specific_args["task4"] = "4";
 
 // Submit the job
