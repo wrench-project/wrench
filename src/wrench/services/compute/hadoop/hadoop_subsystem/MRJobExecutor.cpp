@@ -63,6 +63,37 @@ namespace wrench {
         Service::stop();
     }
 
+    void MRJobExecutor::setup_workers(std::vector<std::shared_ptr<Service>> workers) {
+
+        // TODO: Right now these are all running on a single host
+        // But we should change this so that workers are spun up
+        // on the appropriate nodes.  As well as think about what
+        // to do when resorues do not match user specs.
+        workers.push_back(std::shared_ptr<HdfsService>(
+                new HdfsService(this->hostname, this->job, this->compute_resources,
+                                {},
+                                {})));
+
+        workers.push_back(std::shared_ptr<ShuffleService>(
+                new ShuffleService(this->hostname, this->job, this->compute_resources,
+                                   {},
+                                   {})));
+
+        for (int i = 0; i < this->job->getNumMappers(); i++) {
+            workers.push_back(std::shared_ptr<MapperService>(
+                    new MapperService(this->hostname, this->job, this->compute_resources,
+                                      {},
+                                      {})));
+        }
+
+        for (int i = 0; i < this->job->getNumReducers(); i++) {
+            workers.push_back(std::shared_ptr<ReducerService>(
+                    new ReducerService(this->hostname, this->job, this->compute_resources,
+                                       {},
+                                       {})));
+        }
+    }
+
     /**
      * @brief Main method of the daemon
      *
@@ -78,34 +109,12 @@ namespace wrench {
 
         this->success = true;
 
-        std::shared_ptr<HdfsService> hdfs = std::shared_ptr<HdfsService>(
-                new HdfsService(this->hostname, this->job, this->compute_resources,
-                                  {},
-                                  {}));
-        hdfs->simulation = this->simulation;
-
-        std::shared_ptr<MapperService> mapper = std::shared_ptr<MapperService>(
-                new MapperService(this->hostname, this->job, this->compute_resources,
-                                  {},
-                                  {}));
-        mapper->simulation = this->simulation;
-
-        std::shared_ptr<ReducerService> reducer = std::shared_ptr<ReducerService>(
-                new ReducerService(this->hostname, this->job, this->compute_resources,
-                                  {},
-                                  {}));
-        reducer->simulation = this->simulation;
-
-        std::shared_ptr<ShuffleService> shuffle = std::shared_ptr<ShuffleService>(
-                new ShuffleService(this->hostname, this->job, this->compute_resources,
-                                   {},
-                                   {}));
-        shuffle->simulation = this->simulation;
-
-        hdfs->start(hdfs, true, false);
-        mapper->start(mapper, true, false);
-        reducer->start(reducer, true, false);
-        shuffle->start(shuffle, true, false);
+        std::vector<std::shared_ptr<Service>> workers;
+        setup_workers(workers);
+        for (auto worker: workers) {
+            worker->simulation = this->simulation;
+            worker->start(worker, true, false);
+        }
 
         /** Main loop **/
         while (this->processNextMessage()) {

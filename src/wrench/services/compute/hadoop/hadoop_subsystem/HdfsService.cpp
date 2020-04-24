@@ -13,7 +13,9 @@
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/logging/TerminalOutput.h"
-#include "wrench/workflow/execution_events/FailureCause.h"
+#include "wrench/workflow/failure_causes/NetworkError.h"
+#include "../HadoopComputeServiceMessage.h"
+#include "wrench/simulation/Simulation.h"
 
 WRENCH_LOG_NEW_DEFAULT_CATEGORY(hdfs_servivce, "Log category for HDFS Actor");
 
@@ -109,9 +111,23 @@ namespace wrench {
             }
             return false;
 
+        } else if (auto msg = std::dynamic_pointer_cast<HdfsReadDataMessage>(message)) {
+            WRENCH_INFO("HDFS reading data for a mapper...");
+            simulation->readFromDisk(msg->data_size, this->hostname, "/");
+
+            try {
+                S4U_Mailbox::putMessage("mapper_service",
+                                        new HdfsReadComplete(msg->data_size,
+                                                this->getMessagePayloadValue(
+                                                HadoopComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+            } catch (std::shared_ptr<NetworkError> &cause) {
+                return false;
+            }
+
+            return true;
         } else {
-            throw std::runtime_error(
-                    "HdfsService::processNextMessage(): Received an unexpected [" + message->getName() + "] message!");
+                throw std::runtime_error(
+                        "HdfsService::processNextMessage(): Received an unexpected [" + message->getName() + "] message!");
         }
     }
 }

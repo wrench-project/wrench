@@ -19,6 +19,7 @@
 #include "HadoopComputeServiceMessagePayload.h"
 #include "wrench/services/compute/hadoop/MRJob.h"
 #include "wrench/services/compute/hadoop/hadoop_subsystem/MRJobExecutor.h"
+#include "wrench/workflow/failure_causes/NetworkError.h"
 
 namespace wrench {
 

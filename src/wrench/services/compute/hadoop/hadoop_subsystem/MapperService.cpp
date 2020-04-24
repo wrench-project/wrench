@@ -11,9 +11,11 @@
 #include "wrench/services/compute/hadoop/HadoopComputeService.h"
 #include "wrench/services/ServiceMessage.h"
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
+#include "wrench/simulation/Simulation.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
-#include "wrench/workflow/execution_events/FailureCause.h"
+#include "wrench/workflow/failure_causes/NetworkError.h"
+#include "../HadoopComputeServiceMessage.h"
 
 
 WRENCH_LOG_NEW_DEFAULT_CATEGORY(mapper_service, "Log category for Mapper Actor");
@@ -68,6 +70,21 @@ namespace wrench {
 
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
 
+        /** Request the data to start the job */
+        WRENCH_INFO("Mapper requesting data from HDFS...")
+        try {
+            S4U_Mailbox::putMessage(this->mailbox_name,
+                                    new RequestDataFromHdfs(
+                                            // The amount of data a mapper gets is an even share of
+                                            // overall data size.
+                                            this->job->getDataSize() / this->job->getNumMappers(),
+                                            this->getMessagePayloadValue(
+                                                    // TODO: use right message payload
+                                            HadoopComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+        } catch (std::shared_ptr<NetworkError> &cause) {
+            return false;
+        }
+
         /** Main loop */
         while (this->processNextMessage()) {
 
@@ -85,8 +102,6 @@ namespace wrench {
      * @throw std::runtime_error
      */
     bool MapperService::processNextMessage() {
-
-        //TODO: DEFINE SET OF MESSAGES THAT MAPPER SERVICE CAN SEND AND RECEIVE
 
         S4U_Simulation::computeZeroFlop();
 
@@ -112,6 +127,27 @@ namespace wrench {
             }
             return false;
 
+        } else if (auto msg = std::dynamic_pointer_cast<RequestDataFromHdfs>(message)) {
+            try {
+                S4U_Mailbox::putMessage("hdfs_service",
+                                        new HdfsReadDataMessage(
+                                                msg->data_size,
+                                                this->getMessagePayloadValue(
+                                                        // TODO: use right payload
+                                                HadoopComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+            } catch (std::shared_ptr<NetworkError> &cause) {
+                return false;
+            }
+
+            return true;
+        } else if (auto msg = std::dynamic_pointer_cast<HdfsReadComplete>(message)) {
+            // The mapper has the data, now compute.
+            // TODO: The mapper computes the user map function, writes spill files locally,
+            // and then merges all spill files back into a single map file.
+            WRENCH_INFO("Mapper computing stuff...")
+            Simulation::compute(this->job->getMapperFlops());
+
+            return true;
         } else {
             throw std::runtime_error(
                     "MapperService::processNextMessage(): Received an unexpected [" + message->getName() +

@@ -13,7 +13,7 @@
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/services/ServiceMessage.h"
-#include "wrench/workflow/execution_events/FailureCause.h"
+#include "wrench/workflow/failure_causes/NetworkError.h"
 
 WRENCH_LOG_NEW_DEFAULT_CATEGORY(reducer_servivce, "Log category for Reducer Actor");
 

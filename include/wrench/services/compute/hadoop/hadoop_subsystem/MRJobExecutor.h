@@ -59,6 +59,8 @@ namespace wrench {
 
         bool processNextMessage();
 
+        void setup_workers(std::vector<std::shared_ptr<Service>> workers);
+
     };
 }
 

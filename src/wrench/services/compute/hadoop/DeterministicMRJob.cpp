@@ -18,7 +18,9 @@ namespace wrench {
     DeterministicMRJob::DeterministicMRJob(
             int num_mappers, int num_reducers, double data_size,
             bool use_combiner, int sort_factor, double spill_percent,
-            int key_value_width
+            int mapper_key_width, int mapper_value_width,
+            double mapper_flops, int reducer_key_width, int reducer_value_width,
+            double reducer_flops
     ) {
         this->setNumMappers(num_mappers);
         this->setNumReducers(num_reducers);
@@ -26,7 +28,12 @@ namespace wrench {
         this->setDataSize(data_size);
         this->setSortFactor(sort_factor);
         this->setSpillPercent(spill_percent);
-        this->setKeyValueWidth(key_value_width);
+        this->setMapperKeyWidth(mapper_key_width);
+        this->setMapperValueWidth(mapper_value_width);
+        this->setMapperFlops(mapper_flops);
+        this->setReducerKeyWidth(reducer_key_width);
+        this->setReducerValueWidth(reducer_value_width);
+        this->setReducerFlops(reducer_flops);
         this->setJobType(std::string("deterministic"));
     }
 
@@ -38,7 +45,7 @@ namespace wrench {
         this->setDataSize(1048576);  // 2^20 bytes
         this->setSortFactor(10);
         this->setSpillPercent(0.8);
-        this->setKeyValueWidth(32);
+        this->setMapperKeyWidth(32);
         this->setJobType(std::string("deterministic"));
     };
 

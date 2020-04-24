@@ -19,6 +19,7 @@
 #include "wrench/logging/TerminalOutput.h"
 #include "HadoopComputeServiceMessage.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
+#include "wrench/workflow/failure_causes/NetworkError.h"
 
 WRENCH_LOG_NEW_DEFAULT_CATEGORY(hadoop_compute_servivce, "Log category for Hadoop Compute Service");
 

@@ -71,4 +71,38 @@ namespace wrench {
         this->job = job;
     }
 
+    /**
+     *
+     * @param job
+     * @param data_size
+     * @param payload
+     */
+    HdfsReadDataMessage::HdfsReadDataMessage(double data_size, double payload)
+            : HadoopComputeServiceMessage("HdfsReadDataMessage", payload) {
+        this->data_size = data_size;
+        this->payload = payload;
+    };
+
+    /**
+     *
+     * @param job
+     * @param data_size
+     * @param payload
+     */
+    RequestDataFromHdfs::RequestDataFromHdfs(double data_size, double payload)
+            : HadoopComputeServiceMessage("RequestDataFromHdfs", payload) {
+        this->data_size = data_size;
+        this->payload = payload;
+    };
+
+    /**
+     * 
+     * @param data_size
+     * @param payload
+     */
+    HdfsReadComplete::HdfsReadComplete(double data_size, double payload)
+            : HadoopComputeServiceMessage("HdfsReadComplete", payload) {
+        this->data_size = data_size;
+        this->payload = payload;
+    }
 };

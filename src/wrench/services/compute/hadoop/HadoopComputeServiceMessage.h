@@ -59,6 +59,28 @@ namespace wrench {
         MRJob *job;
     };
 
+    class HdfsReadDataMessage : public HadoopComputeServiceMessage {
+    public:
+        HdfsReadDataMessage(double data_size, double payload);
+
+        double data_size;
+        double payload;
+    };
+
+    class HdfsReadComplete : public HadoopComputeServiceMessage {
+    public:
+        HdfsReadComplete(double data_size, double payload);
+        double data_size;
+        double payload;
+    };
+
+    class RequestDataFromHdfs : public HadoopComputeServiceMessage {
+    public:
+        RequestDataFromHdfs(double data_size, double payload);
+        double data_size;
+        double payload;
+    };
+
 /***********************/
 /** \endcond          **/
 /***********************/

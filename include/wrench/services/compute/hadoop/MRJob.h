@@ -20,7 +20,12 @@ namespace wrench {
         int num_mappers;
         int num_reducers;
         int sort_factor;
-        int key_value_width;
+        int mapper_key_width;
+        int mapper_value_width;
+        double mapper_flops;
+        int reducer_key_width;
+        int reducer_value_width;
+        double reducer_flops;
         double spill_percent;
         bool use_combiner;
         double data_size;
@@ -53,8 +58,28 @@ namespace wrench {
             this->data_size = data_size;
         }
 
-        void setKeyValueWidth(int width) {
-            this->key_value_width = width;
+        void setMapperFlops(double flops) {
+            this->mapper_flops = flops;
+        }
+
+        void setMapperKeyWidth(int width) {
+            this->mapper_key_width = width;
+        }
+
+        void setMapperValueWidth(int width) {
+            this->mapper_value_width = width;
+        }
+
+        void setReducerFlops(double flops) {
+            this->reducer_flops = flops;
+        }
+
+        void setReducerKeyWidth(int width) {
+            this->reducer_key_width = width;
+        }
+
+        void setReducerValueWidth(int width) {
+            this->reducer_value_width = width;
         }
 
         void setJobType(std::string job_type) {
@@ -90,8 +115,28 @@ namespace wrench {
             return job_type;
         }
 
-        int getKeyValueWidth() {
-            return key_value_width;
+        double getMapperFlops() {
+            return mapper_flops;
+        }
+
+        int getMapperKeyWidth() {
+            return mapper_key_width;
+        }
+
+        int getMapperValueWidth() {
+            return mapper_value_width;
+        }
+
+        int getReducerFlops() {
+            return reducer_flops;
+        }
+
+        int getReducerKeyWidth() {
+            return reducer_key_width;
+        }
+
+        double getReducerValueWidth() {
+            return reducer_value_width;
         }
     };
 }
