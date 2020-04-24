@@ -79,8 +79,8 @@ namespace wrench {
         SimulationOutput &getOutput();
 
         //start energy related calls
-        double getEnergyConsumed(const std::string &hostname, bool record_as_time_stamp = false);
-        std::map<std::string, double> getEnergyConsumed(const std::vector<std::string> &hostnames, bool record_as_time_stamps = false);
+        double getEnergyConsumed(const std::string &hostname) { return this->getEnergyConsumed(hostname, false);}
+        std::map<std::string, double> getEnergyConsumed(const std::vector<std::string> &hostnames) {  return  this->getEnergyConsumed(hostnames, false);}
 //        double getEnergyTimestamp(const std::string &hostname, bool can_record = false);
 
         // pstate related calls
@@ -98,6 +98,9 @@ namespace wrench {
         /***********************/
         /** \cond DEVELOPER    */
         /***********************/
+
+        double getEnergyConsumed(const std::string &hostname, bool record_as_time_stamp);
+        std::map<std::string, double> getEnergyConsumed(const std::vector<std::string> &hostnames, bool record_as_time_stamps);
 
         static bool doesHostExist(std::string hostname);
         static bool isHostOn(std::string hostname);
