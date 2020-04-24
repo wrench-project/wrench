@@ -11,23 +11,34 @@
 #define WRENCH_DETERMINISTICMRJOB_H
 
 #include "MRJob.h"
+#include <utility>
 
 namespace wrench {
 
     class DeterministicMRJob : public MRJob {
+    private:
+        std::vector<int> &files;
     public:
 
         DeterministicMRJob(
-                int num_mappers, int num_reducers, double data_size,
-                bool use_combiner, int sort_factor,
-                double spill_percent, int mapper_key_width, int mapper_value_width,
+                int num_reducers, double data_size, int block_size,
+                bool use_combiner, int sort_factor, double spill_percent,
+                int mapper_key_width, int mapper_value_width, std::vector<int> &files,
                 double mapper_flops, int reducer_key_width, int reducer_value_width,
                 double reducer_flops
         );
 
-        DeterministicMRJob();
-
         ~DeterministicMRJob();
+
+        void setFiles(std::vector<int> files) {
+            this->files = std::move(files);
+        }
+
+        std::vector<int> &getFiles() {
+            return files;
+        }
+
+        int calculateNumMappers() override;
 
     };
 }

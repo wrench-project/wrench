@@ -77,8 +77,9 @@ namespace wrench {
      * @param data_size
      * @param payload
      */
-    HdfsReadDataMessage::HdfsReadDataMessage(double data_size, double payload)
+    HdfsReadDataMessage::HdfsReadDataMessage(double data_size, std::string return_mailbox, double payload)
             : HadoopComputeServiceMessage("HdfsReadDataMessage", payload) {
+        this->return_mailbox = std::move(return_mailbox);
         this->data_size = data_size;
         this->payload = payload;
     };
@@ -89,8 +90,8 @@ namespace wrench {
      * @param data_size
      * @param payload
      */
-    RequestDataFromHdfs::RequestDataFromHdfs(double data_size, double payload)
-            : HadoopComputeServiceMessage("RequestDataFromHdfs", payload) {
+    RequestDataFromHdfsMessage::RequestDataFromHdfsMessage(double data_size, double payload)
+            : HadoopComputeServiceMessage("RequestDataFromHdfsMessage", payload) {
         this->data_size = data_size;
         this->payload = payload;
     };
@@ -100,8 +101,8 @@ namespace wrench {
      * @param data_size
      * @param payload
      */
-    HdfsReadComplete::HdfsReadComplete(double data_size, double payload)
-            : HadoopComputeServiceMessage("HdfsReadComplete", payload) {
+    HdfsReadCompleteMessage::HdfsReadCompleteMessage(double data_size, double payload)
+            : HadoopComputeServiceMessage("HdfsReadCompleteMessage", payload) {
         this->data_size = data_size;
         this->payload = payload;
     }

@@ -11,6 +11,7 @@
 #define WRENCH_MRJOB_H
 
 #include <string>
+#include <vector>
 
 namespace wrench {
 
@@ -29,15 +30,22 @@ namespace wrench {
         double spill_percent;
         bool use_combiner;
         double data_size;
+        int block_size;
         std::string job_type;
+        std::string hdfs_mailbox_name;
 
     public:
 
+        virtual int calculateNumMappers();
+
         // Mutators
+        void setBlockSize(int block_size) {
+            this->block_size = block_size;
+        }
+
         void setNumMappers(int num_mappers) {
             this->num_mappers = num_mappers;
         }
-
         void setNumReducers(int num_reducers) {
             this->num_reducers = num_reducers;
         }
@@ -86,7 +94,16 @@ namespace wrench {
             this->job_type = job_type;
         }
 
+        void setHdfsMailboxName(std::string mailbox_name) {
+            this->hdfs_mailbox_name = mailbox_name;
+        }
+
         // Accessors
+
+        int getBlockSize() {
+            return block_size;
+        }
+
         int getNumMappers() {
             return num_mappers;
         }
@@ -127,7 +144,7 @@ namespace wrench {
             return mapper_value_width;
         }
 
-        int getReducerFlops() {
+        double getReducerFlops() {
             return reducer_flops;
         }
 
@@ -135,8 +152,12 @@ namespace wrench {
             return reducer_key_width;
         }
 
-        double getReducerValueWidth() {
+        int getReducerValueWidth() {
             return reducer_value_width;
+        }
+
+        std::string getHdfsMailboxName() {
+            return hdfs_mailbox_name;
         }
     };
 }

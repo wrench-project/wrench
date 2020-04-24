@@ -61,22 +61,23 @@ namespace wrench {
 
     class HdfsReadDataMessage : public HadoopComputeServiceMessage {
     public:
-        HdfsReadDataMessage(double data_size, double payload);
+        HdfsReadDataMessage(double data_size, std::string return_mailbox, double payload);
 
+        std::string return_mailbox;
         double data_size;
         double payload;
     };
 
-    class HdfsReadComplete : public HadoopComputeServiceMessage {
+    class HdfsReadCompleteMessage : public HadoopComputeServiceMessage {
     public:
-        HdfsReadComplete(double data_size, double payload);
+        HdfsReadCompleteMessage(double data_size, double payload);
         double data_size;
         double payload;
     };
 
-    class RequestDataFromHdfs : public HadoopComputeServiceMessage {
+    class RequestDataFromHdfsMessage : public HadoopComputeServiceMessage {
     public:
-        RequestDataFromHdfs(double data_size, double payload);
+        RequestDataFromHdfsMessage(double data_size, double payload);
         double data_size;
         double payload;
     };

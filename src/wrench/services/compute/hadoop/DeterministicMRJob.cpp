@@ -16,13 +16,13 @@ WRENCH_LOG_NEW_DEFAULT_CATEGORY(hadoop_compute_servivce, "Log category for Deter
 namespace wrench {
 
     DeterministicMRJob::DeterministicMRJob(
-            int num_mappers, int num_reducers, double data_size,
+            int num_reducers, double data_size, int block_size,
             bool use_combiner, int sort_factor, double spill_percent,
-            int mapper_key_width, int mapper_value_width,
+            int mapper_key_width, int mapper_value_width, std::vector<int> &files,
             double mapper_flops, int reducer_key_width, int reducer_value_width,
             double reducer_flops
-    ) {
-        this->setNumMappers(num_mappers);
+    ) : files(files) {
+        this->setBlockSize(block_size);
         this->setNumReducers(num_reducers);
         this->setUseCombiner(use_combiner);
         this->setDataSize(data_size);
@@ -37,18 +37,30 @@ namespace wrench {
         this->setJobType(std::string("deterministic"));
     }
 
-    // Typical set of parameters
-    DeterministicMRJob::DeterministicMRJob() {
-        this->setNumMappers(10);
-        this->setNumReducers(1);
-        this->setUseCombiner(false);
-        this->setDataSize(1048576);  // 2^20 bytes
-        this->setSortFactor(10);
-        this->setSpillPercent(0.8);
-        this->setMapperKeyWidth(32);
-        this->setJobType(std::string("deterministic"));
-    };
-
     DeterministicMRJob::~DeterministicMRJob() = default;
+
+    int DeterministicMRJob::calculateNumMappers() {
+        /*
+         * Finding the total number of mappers for a given job.
+         *
+         * number_of_map_tasks = sum(ceil(s_i / b))
+         * Where N is the number of files, s_i is the size of the ith file, and b is the block size.
+         */
+        int total_mappers = 0;
+        for (auto file: this->getFiles()) {
+            if (file < this->getBlockSize()) {
+                total_mappers += 1;
+            } else {
+                int file_copy = file;
+                while (file > this->getBlockSize()) {
+                    file_copy -= this->getBlockSize();
+                    total_mappers += 1;
+                }
+                total_mappers += 1;
+            }
+        }
+        this->setNumMappers(total_mappers);
+        return this->getNumMappers();
+    }
 
 }

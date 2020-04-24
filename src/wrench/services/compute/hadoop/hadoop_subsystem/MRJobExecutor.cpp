@@ -79,7 +79,7 @@ namespace wrench {
                                    {},
                                    {})));
 
-        for (int i = 0; i < this->job->getNumMappers(); i++) {
+        for (int i = 0; i < this->job->calculateNumMappers(); i++) {
             workers.push_back(std::shared_ptr<MapperService>(
                     new MapperService(this->hostname, this->job, this->compute_resources,
                                       {},

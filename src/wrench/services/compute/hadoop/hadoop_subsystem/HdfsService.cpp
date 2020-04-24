@@ -66,6 +66,7 @@ namespace wrench {
      */
     int HdfsService::main() {
         this->state = Service::UP;
+        this->job->setHdfsMailboxName(this->mailbox_name);
 
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
         while (this->processNextMessage()) {
@@ -116,8 +117,8 @@ namespace wrench {
             simulation->readFromDisk(msg->data_size, this->hostname, "/");
 
             try {
-                S4U_Mailbox::putMessage("mapper_service",
-                                        new HdfsReadComplete(msg->data_size,
+                S4U_Mailbox::putMessage(msg->return_mailbox,
+                                        new HdfsReadCompleteMessage(msg->data_size,
                                                 this->getMessagePayloadValue(
                                                 HadoopComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
             } catch (std::shared_ptr<NetworkError> &cause) {

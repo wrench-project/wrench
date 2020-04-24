@@ -74,10 +74,10 @@ namespace wrench {
         WRENCH_INFO("Mapper requesting data from HDFS...")
         try {
             S4U_Mailbox::putMessage(this->mailbox_name,
-                                    new RequestDataFromHdfs(
+                                    new RequestDataFromHdfsMessage(
                                             // The amount of data a mapper gets is an even share of
                                             // overall data size.
-                                            this->job->getDataSize() / this->job->getNumMappers(),
+                                            this->job->getBlockSize(),
                                             this->getMessagePayloadValue(
                                                     // TODO: use right message payload
                                             HadoopComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
@@ -127,11 +127,12 @@ namespace wrench {
             }
             return false;
 
-        } else if (auto msg = std::dynamic_pointer_cast<RequestDataFromHdfs>(message)) {
+        } else if (auto msg = std::dynamic_pointer_cast<RequestDataFromHdfsMessage>(message)) {
             try {
-                S4U_Mailbox::putMessage("hdfs_service",
+                S4U_Mailbox::putMessage(this->job->getHdfsMailboxName(),
                                         new HdfsReadDataMessage(
                                                 msg->data_size,
+                                                this->mailbox_name,
                                                 this->getMessagePayloadValue(
                                                         // TODO: use right payload
                                                 HadoopComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
@@ -140,13 +141,22 @@ namespace wrench {
             }
 
             return true;
-        } else if (auto msg = std::dynamic_pointer_cast<HdfsReadComplete>(message)) {
-            // The mapper has the data, now compute.
-            // TODO: The mapper computes the user map function, writes spill files locally,
+        } else if (auto msg = std::dynamic_pointer_cast<HdfsReadCompleteMessage>(message)) {
+            // The mapper computes the user map function, writes spill files locally,
             // and then merges all spill files back into a single map file.
-            WRENCH_INFO("Mapper computing stuff...")
-            Simulation::compute(this->job->getMapperFlops());
+            WRENCH_INFO("Mapper doing some work (spilling/merging)...")
+            // TODO: Actually compute the correct values given the job.
+            // The materilaized output is found via:
+            // https://github.com/wrench-project/understanding_hadoop/blob/00a1c5653ae025e9db723d4c3e2137f2bb2b5472/hadoop_mr_tests/map_output_materialized_bytes/run_test.py#L109
+            // For the spill phase refer to:
+            // https://github.com/wrench-project/understanding_hadoop/blob/master/resources/top_level_overview.markdown#point-3--4-mapping--handling-intermediate-map-values
 
+            // Compute map function
+            Simulation::compute(this->job->getMapperFlops());
+            // Write file(s)
+            simulation->writeToDisk(1, this->hostname, "/");
+            // Merge all spilled files to single output
+            Simulation::compute(this->job->getMapperFlops());
             return true;
         } else {
             throw std::runtime_error(
