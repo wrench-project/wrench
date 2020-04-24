@@ -19,7 +19,7 @@
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(scratch_service_test, "Log category for ScratchServiceTest");
+WRENCH_LOG_CATEGORY(scratch_service_test, "Log category for ScratchServiceTest");
 
 
 class ScratchSpaceTest : public ::testing::Test {

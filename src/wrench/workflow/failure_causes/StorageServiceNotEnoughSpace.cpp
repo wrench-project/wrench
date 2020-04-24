@@ -15,7 +15,7 @@
 #include "wrench/services/compute/ComputeService.h"
 #include <wrench/workflow/failure_causes/StorageServiceNotEnoughSpace.h>
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(storage_service_not_enough_space, "Log category for StorageServiceNotEnoughSpace");
+WRENCH_LOG_CATEGORY(wrench_core_storage_service_not_enough_space, "Log category for StorageServiceNotEnoughSpace");
 
 namespace wrench {
 

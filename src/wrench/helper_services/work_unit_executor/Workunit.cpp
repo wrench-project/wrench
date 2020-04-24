@@ -14,7 +14,7 @@
 #include "wrench/services/compute/workunit_executor/Workunit.h"
 #include <wrench-dev.h>
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(workunit, "Log category for Workunit");
+WRENCH_LOG_CATEGORY(wrench_core_workunit, "Log category for Workunit");
 
 
 namespace wrench {

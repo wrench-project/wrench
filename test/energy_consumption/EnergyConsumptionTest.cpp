@@ -21,7 +21,7 @@
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(energy_consumption_test, "Log category for EnergyConsumptionTest");
+WRENCH_LOG_CATEGORY(energy_consumption_test, "Log category for EnergyConsumptionTest");
 
 
 class EnergyConsumptionTest : public ::testing::Test {

@@ -20,7 +20,7 @@
 #include "wrench/simulation/SimulationMessage.h"
 #include "wrench/workflow/failure_causes/FailureCause.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(pending_communication, "Log category for Pending Communication");
+WRENCH_LOG_CATEGORY(wrench_core_pending_communication, "Log category for Pending Communication");
 
 namespace wrench {
 

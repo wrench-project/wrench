@@ -14,7 +14,7 @@
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(bare_metal_compute_service_test, "Log category for BareMetalComputeServiceOneTask test");
+WRENCH_LOG_CATEGORY(bare_metal_compute_service_test, "Log category for BareMetalComputeServiceOneTask test");
 
 
 class BareMetalComputeServiceOneTaskTest : public ::testing::Test {

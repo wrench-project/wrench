@@ -22,7 +22,7 @@
 
 #include "PilotJobWMS.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(custom_wms, "Log category for PilotJobWMS");
+WRENCH_LOG_CATEGORY(custom_wms, "Log category for PilotJobWMS");
 
 namespace wrench {
 

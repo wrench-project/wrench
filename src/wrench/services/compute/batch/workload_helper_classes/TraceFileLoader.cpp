@@ -13,7 +13,7 @@
 #include <nlohmann/json.hpp>
 #include "wrench/util/TraceFileLoader.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(trace_file_loader, "Log category for Trace File Loader");
+WRENCH_LOG_CATEGORY(wrench_core_trace_file_loader, "Log category for Trace File Loader");
 
 namespace wrench {
 

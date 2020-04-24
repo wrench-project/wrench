@@ -16,7 +16,7 @@
 #include "../failure_test_util/ResourceSwitcher.h"
 #include "../failure_test_util/ResourceRandomRepeatSwitcher.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(standard_job_executor_host_failures_test, "Log category for StandardJobExecutorHostFailuresTests");
+WRENCH_LOG_CATEGORY(standard_job_executor_host_failures_test, "Log category for StandardJobExecutorHostFailuresTests");
 
 
 class StandardJobExecutorHostFailuresTest : public ::testing::Test {

@@ -26,7 +26,7 @@
 #include "wrench/services/storage/storage_helpers/FileLocation.h"
 
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(simple_storage_service, "Log category for Simple Storage Service");
+WRENCH_LOG_CATEGORY(wrench_core_simple_storage_service, "Log category for Simple Storage Service");
 
 
 namespace wrench {

@@ -13,7 +13,7 @@
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(simulation_logging_test, "Log category for Simulation Logging Test");
+WRENCH_LOG_CATEGORY(simulation_logging_test, "Log category for Simulation Logging Test");
 
 
 class SimulationLoggingTest : public ::testing::Test {

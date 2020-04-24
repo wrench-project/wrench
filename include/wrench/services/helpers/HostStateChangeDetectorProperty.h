@@ -14,6 +14,10 @@
 
 namespace wrench {
 
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
+
     /**
      * @brief Configurable properties for a HostStateChangeDetector
      */
@@ -25,6 +29,10 @@ namespace wrench {
         DECLARE_PROPERTY_NAME(MONITORING_PERIOD);
 
     };
+
+    /***********************/
+    /** \endcond           */
+    /***********************/
 }
 
 

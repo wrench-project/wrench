@@ -11,7 +11,7 @@
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/Service.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(functionality_not_available, "Log category for FunctionalityNotAvailable");
+WRENCH_LOG_CATEGORY(wrench_core_functionality_not_available, "Log category for FunctionalityNotAvailable");
 
 namespace wrench {
 

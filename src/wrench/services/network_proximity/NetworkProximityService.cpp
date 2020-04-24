@@ -25,7 +25,7 @@
 #include <wrench/exceptions/WorkflowExecutionException.h>
 #include <wrench/workflow/failure_causes/NetworkError.h>
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(network_proximity_service, "Log category for Network Proximity Service");
+WRENCH_LOG_CATEGORY(wrench_core_network_proximity_service, "Log category for Network Proximity Service");
 
 namespace wrench {
 

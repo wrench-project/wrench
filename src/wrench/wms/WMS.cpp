@@ -21,7 +21,7 @@
 #include "wrench/services/compute/batch/BatchComputeService.h"
 #include <wrench/workflow/failure_causes/NetworkError.h>
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(wms, "Log category for WMS");
+WRENCH_LOG_CATEGORY(wrench_core_wms, "Log category for WMS");
 
 namespace wrench {
 

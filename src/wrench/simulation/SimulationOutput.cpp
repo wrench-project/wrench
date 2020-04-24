@@ -28,7 +28,7 @@
 #include <unordered_set>
 
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(simulation_output, "Log category for Simulation Output");
+WRENCH_LOG_CATEGORY(wrench_core_simulation_output, "Log category for Simulation Output");
 
 namespace wrench {
 
@@ -39,9 +39,9 @@ namespace wrench {
 
     nlohmann::json host_utilization_layout;
 
-    /******************/
-    /** \endcond      */
-    /******************/
+    /*******************/
+    /** \cond INTERNAL */
+    /*******************/
 
     /**
      * @brief Object representing an instance when a WorkflowTask was run.
@@ -96,7 +96,9 @@ namespace wrench {
         }
     } WorkflowTaskExecutionInstance;
 
-
+    /******************/
+    /** \endcond      */
+    /******************/
 
 
     /**

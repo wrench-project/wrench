@@ -33,7 +33,7 @@
 #include "wrench/workflow/failure_causes/JobTypeNotSupported.h"
 #include "wrench/workflow/failure_causes/HostError.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(bare_metal_compute_service, "Log category for BareMetalComputeService");
+WRENCH_LOG_CATEGORY(wrench_core_bare_metal_compute_service, "Log category for BareMetalComputeService");
 
 
 namespace wrench {

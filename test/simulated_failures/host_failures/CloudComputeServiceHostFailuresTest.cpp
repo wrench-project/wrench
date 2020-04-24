@@ -19,7 +19,7 @@
 #include "../failure_test_util/SleeperVictim.h"
 #include "../failure_test_util/ResourceRandomRepeatSwitcher.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(cloud_compute_service_host_failures_test, "Log category for CloudServiceHostFailuresTest");
+WRENCH_LOG_CATEGORY(cloud_compute_service_host_failures_test, "Log category for CloudServiceHostFailuresTest");
 
 
 class CloudServiceHostFailuresTest : public ::testing::Test {

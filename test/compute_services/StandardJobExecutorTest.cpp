@@ -18,7 +18,7 @@
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(standard_job_executor_test, "Log category for Simple StandardJobExecutorTest");
+WRENCH_LOG_CATEGORY(standard_job_executor_test, "Log category for Simple StandardJobExecutorTest");
 
 #define EPSILON 0.05
 

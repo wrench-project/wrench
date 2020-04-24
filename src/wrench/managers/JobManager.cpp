@@ -26,7 +26,7 @@
 #include "JobManagerMessage.h"
 
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(job_manager, "Log category for Job Manager");
+WRENCH_LOG_CATEGORY(wrench_core_job_manager, "Log category for Job Manager");
 
 namespace wrench {
 

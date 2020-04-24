@@ -12,7 +12,7 @@
 #include "wrench/simulation/SimulationMessage.h"
 #include "wrench/workflow/WorkflowFile.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(simulation_message, "Log category for SimulatinMessage");
+WRENCH_LOG_CATEGORY(wrench_core_simulation_message, "Log category for SimulationMessage");
 
 
 namespace wrench {

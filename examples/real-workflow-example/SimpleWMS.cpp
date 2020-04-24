@@ -11,7 +11,7 @@
 
 #include "SimpleWMS.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(simple_wms, "Log category for Simple WMS");
+WRENCH_LOG_CATEGORY(simple_wms, "Log category for Simple WMS");
 
 namespace wrench {
 

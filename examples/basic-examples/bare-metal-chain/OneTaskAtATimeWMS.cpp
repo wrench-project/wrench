@@ -21,7 +21,7 @@
 
 #include "OneTaskAtATimeWMS.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(custom_wms, "Log category for OneTaskAtATimeWMS");
+WRENCH_LOG_CATEGORY(custom_wms, "Log category for OneTaskAtATimeWMS");
 
 namespace wrench {
 

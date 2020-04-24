@@ -20,7 +20,7 @@
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/workflow/Workflow.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(workflow, "Log category for Workflow");
+WRENCH_LOG_CATEGORY(wrench_core_workflow, "Log category for Workflow");
 
 namespace wrench {
 

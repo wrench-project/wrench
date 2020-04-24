@@ -14,7 +14,7 @@
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(simple_storage_service_functional_test, "Log category for SimpleStorageServiceFunctionalTest");
+WRENCH_LOG_CATEGORY(simple_storage_service_functional_test, "Log category for SimpleStorageServiceFunctionalTest");
 
 
 class SimpleStorageServiceFunctionalTest : public ::testing::Test {

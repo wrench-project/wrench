@@ -15,7 +15,7 @@
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(workflow_task_test, "Log category for Workflow Task Test");
+WRENCH_LOG_CATEGORY(workflow_task_test, "Log category for Workflow Task Test");
 
 
 class WorkflowTaskTest : public ::testing::Test {

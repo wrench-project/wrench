@@ -12,7 +12,7 @@
 #include <wrench-dev.h>
 #include "ComputeThread.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(compute_thread, "Log category for ComputeThread");
+WRENCH_LOG_CATEGORY(wrench_core_compute_thread, "Log category for ComputeThread");
 
 namespace wrench {
 
