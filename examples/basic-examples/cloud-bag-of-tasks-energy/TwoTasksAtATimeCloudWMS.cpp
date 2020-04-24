@@ -131,6 +131,22 @@ namespace wrench {
             WRENCH_INFO("Submit this job to the large VM");
             job_manager->submitJob(standard_job2, large_vm_compute_service);
 
+            /* Sleep 10 seconds */
+            WRENCH_INFO("Sleeping for 10 seconds");
+            Simulation::sleep(10);
+
+            /* Change the pstate of CloudHost1  */
+            WRENCH_INFO("Changing the pstate of CloudHost1 to the lower pstate to save on energy temporarily");
+            this->simulation->setPstate("CloudHost1", 0);
+
+            /* Sleep 10 seconds */
+            WRENCH_INFO("Sleeping for 10 seconds");
+            Simulation::sleep(10);
+
+            /* Change the pstate of CloudHost1  */
+            WRENCH_INFO("Changing the pstate of CloudHost1 back to the higher pstate");
+            this->simulation->setPstate("CloudHost1", 1);
+
             /* Wait for  workflow execution event and process it. In this case we know that
              * the event will be a StandardJobCompletionEvent, which is processed by the method
              * processEventStandardJobCompletion() that this class overrides. */

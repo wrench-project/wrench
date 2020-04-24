@@ -565,7 +565,11 @@ namespace wrench {
     void S4U_Simulation::setPstate(const std::string &hostname, int pstate) {
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         if (host == nullptr) {
-            throw std::invalid_argument("Unknown hostname " + hostname);
+            throw std::invalid_argument("S4U_Simulation::setPstate(): Unknown hostname " + hostname);
+        }
+        if (host->get_pstate_count() < pstate) {
+            throw std::invalid_argument("S4U_Simulation::setPstate(): Invalid pstate index (host " + hostname + " only has "  +
+            std::to_string(host->get_pstate_count()) + " pstates)");
         }
         try {
             host->set_pstate(pstate);
