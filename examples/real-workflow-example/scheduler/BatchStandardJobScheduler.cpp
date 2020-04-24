@@ -10,7 +10,7 @@
 
 #include "BatchStandardJobScheduler.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(batch_scheduler, "Log category for Batch Scheduler");
+WRENCH_LOG_CATEGORY(batch_scheduler, "Log category for Batch Scheduler");
 
 namespace wrench {
 

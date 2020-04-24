@@ -14,7 +14,7 @@
 #include "wrench/workflow/job/WorkflowJob.h"
 #include "wrench/workflow/Workflow.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(workflow_job, "Log category for WorkflowJob");
+WRENCH_LOG_CATEGORY(wrench_core_workflow_job, "Log category for WorkflowJob");
 
 
 namespace wrench {

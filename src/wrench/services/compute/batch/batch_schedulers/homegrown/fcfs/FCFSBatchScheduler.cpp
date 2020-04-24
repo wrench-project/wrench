@@ -12,7 +12,7 @@
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/compute/batch/BatchComputeService.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(fcfs_batch_scheduler, "Log category for FCFSBatchScheduler");
+WRENCH_LOG_CATEGORY(wrench_core_fcfs_batch_scheduler, "Log category for FCFSBatchScheduler");
 
 namespace wrench {
 

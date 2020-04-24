@@ -8,7 +8,7 @@
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(simulation_timestamp_file_copy_test, "Log category for SimulationTimestampFileCopyTest");
+WRENCH_LOG_CATEGORY(simulation_timestamp_file_copy_test, "Log category for SimulationTimestampFileCopyTest");
 
 
 class SimulationTimestampFileCopyTest : public ::testing::Test {

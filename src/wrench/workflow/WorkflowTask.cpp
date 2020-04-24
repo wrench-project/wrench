@@ -18,7 +18,7 @@
 #include "wrench/simulation/Simulation.h"
 #include "wrench/simulation/SimulationTimestampTypes.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(workflow_task, "Log category for WorkflowTask");
+WRENCH_LOG_CATEGORY(wrench_core_workflow_task, "Log category for WorkflowTask");
 
 namespace wrench {
 

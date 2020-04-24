@@ -12,7 +12,7 @@
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/workflow/failure_causes/FailureCause.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(host_error, "Log category for HostError");
+WRENCH_LOG_CATEGORY(wrench_core_host_error, "Log category for HostError");
 
 namespace wrench {
 

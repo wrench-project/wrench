@@ -31,7 +31,7 @@
 #include <nlohmann/json.hpp>
 #include <fstream>
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(simulation, "Log category for Simulation");
+WRENCH_LOG_CATEGORY(wrench_core_simulation, "Log category for Simulation");
 
 namespace wrench {
 

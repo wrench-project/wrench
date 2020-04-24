@@ -14,7 +14,7 @@
 
 #define EPSILON 0.0001
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(energy_meter, "Log category for Energy Meter");
+WRENCH_LOG_CATEGORY(wrench_core_energy_meter, "Log category for Energy Meter");
 
 namespace wrench {
 
@@ -121,11 +121,11 @@ namespace wrench {
                         return lhs.second < rhs.second;
                     });
 
-            double time_to_next_measurement = min_el->second;
+            double time_to_next_measure = min_el->second;
             double before = Simulation::getCurrentSimulatedDate();
 
-            if (time_to_next_measurement > 0) {
-                if (not processNextMessage(time_to_next_measurement)) {
+            if (time_to_next_measure > 0) {
+                if (not processNextMessage(time_to_next_measure)) {
                     break;
                 }
             }

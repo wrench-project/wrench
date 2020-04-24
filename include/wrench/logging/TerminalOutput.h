@@ -24,7 +24,7 @@ namespace wrench {
  * to avoid generating useless (but space consuming) color ASCII codes
  */
 
-#define WRENCH_LOG_NEW_DEFAULT_CATEGORY(cname, desc) XBT_LOG_NEW_DEFAULT_CATEGORY(cname, desc)
+#define WRENCH_LOG_CATEGORY(cname, desc) XBT_LOG_NEW_DEFAULT_CATEGORY(cname, desc)
 
 #define WRENCH_INFO(...);  \
     if (_XBT_LOG_ISENABLEDV((*_simgrid_log_category__default), xbt_log_priority_info)) { \

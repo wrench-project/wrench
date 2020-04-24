@@ -13,7 +13,7 @@
 #include "wrench/workflow/WorkflowFile.h"
 #include "wrench/workflow/WorkflowTask.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(workflowFile, "Log category for WorkflowFile");
+WRENCH_LOG_CATEGORY(wrench_core_workflowFile, "Log category for WorkflowFile");
 
 namespace wrench {
 

@@ -12,7 +12,7 @@
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/workflow/job/WorkflowJob.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(job_timeout, "Log category for JobTimeout");
+WRENCH_LOG_CATEGORY(wrench_core_job_timeout, "Log category for JobTimeout");
 
 namespace wrench {
 

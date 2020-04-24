@@ -21,7 +21,7 @@
 
 #include "DataMovementWMS.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(custom_wms, "Log category for DataMovementWMS");
+WRENCH_LOG_CATEGORY(custom_wms, "Log category for DataMovementWMS");
 
 namespace wrench {
 

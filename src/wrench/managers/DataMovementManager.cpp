@@ -21,7 +21,7 @@
 #include  <wrench/workflow/failure_causes/FileAlreadyBeingCopied.h>
 #include  <wrench/workflow/failure_causes/NetworkError.h>
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(data_movement_manager, "Log category for Data Movement Manager");
+WRENCH_LOG_CATEGORY(wrench_core_data_movement_manager, "Log category for Data Movement Manager");
 
 namespace wrench {
 

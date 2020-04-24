@@ -12,7 +12,7 @@
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/compute/ComputeService.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(service_is_down, "Log category for ServiceIsDown");
+WRENCH_LOG_CATEGORY(wrench_core_service_is_down, "Log category for ServiceIsDown");
 
 namespace wrench {
 

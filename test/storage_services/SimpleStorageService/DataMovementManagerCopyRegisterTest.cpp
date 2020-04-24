@@ -5,7 +5,7 @@
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(data_movement_manager_copy_register_test, "Log category for DataMovementManagerCopyRegisterTest");
+WRENCH_LOG_CATEGORY(data_movement_manager_copy_register_test, "Log category for DataMovementManagerCopyRegisterTest");
 
 
 #define FILE_SIZE 100000.00

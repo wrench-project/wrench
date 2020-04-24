@@ -16,7 +16,7 @@
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(compute_thread_test, "Log category for ComputeThreadTest");
+WRENCH_LOG_CATEGORY(compute_thread_test, "Log category for ComputeThreadTest");
 
 
 class ComputeThreadTest : public ::testing::Test {

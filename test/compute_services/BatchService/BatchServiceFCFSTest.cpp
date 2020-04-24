@@ -21,7 +21,7 @@
 
 #define EPSILON 0.05
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(batch_service_fcfs_test, "Log category for BatchServiceFCFSTest");
+WRENCH_LOG_CATEGORY(batch_service_fcfs_test, "Log category for BatchServiceFCFSTest");
 
 class BatchServiceFCFSTest : public ::testing::Test {
 

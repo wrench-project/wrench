@@ -18,7 +18,7 @@
 #include "../failure_test_util/SleeperVictim.h"
 #include "../failure_test_util/ComputerVictim.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(storage_service_start_restart_host_failures_test, "Log category for StorageServiceReStartHostFailuresTest");
+WRENCH_LOG_CATEGORY(storage_service_start_restart_host_failures_test, "Log category for StorageServiceReStartHostFailuresTest");
 
 
 class StorageServiceReStartHostFailuresTest : public ::testing::Test {

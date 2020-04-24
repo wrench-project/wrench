@@ -13,7 +13,7 @@
 #include "wrench/workflow/job/WorkflowJob.h"
 #include "wrench/services/compute/ComputeService.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(not_enough_resources, "Log category for NotEnoughResources");
+WRENCH_LOG_CATEGORY(wrench_core_not_enough_resources, "Log category for NotEnoughResources");
 
 namespace wrench {
 

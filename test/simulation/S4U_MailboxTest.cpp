@@ -12,7 +12,7 @@
 #include "../include/UniqueTmpPathPrefix.h"
 #include "../include/TestWithFork.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(s4u_mailbox_test, "Log category for S4U_Mailbo test");
+WRENCH_LOG_CATEGORY(s4u_mailbox_test, "Log category for S4U_Mailbo test");
 
 
 class S4U_MailboxTest : public ::testing::Test {

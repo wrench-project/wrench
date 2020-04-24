@@ -12,7 +12,7 @@
 #include <wrench/simulation/Simulation.h>
 #include <wrench-dev.h>
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(resource_random_repeat_switcher, "Log category for ResourceRandomRepeatSwitcher");
+WRENCH_LOG_CATEGORY(resource_random_repeat_switcher, "Log category for ResourceRandomRepeatSwitcher");
 
 
 wrench::ResourceRandomRepeatSwitcher::ResourceRandomRepeatSwitcher(std::string host_on_which_to_run, double seed,

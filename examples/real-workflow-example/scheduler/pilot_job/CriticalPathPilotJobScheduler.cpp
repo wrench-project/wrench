@@ -12,7 +12,7 @@
 
 #include "CriticalPathPilotJobScheduler.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(critical_path_scheduler, "Log category for Critical Path Scheduler");
+WRENCH_LOG_CATEGORY(critical_path_scheduler, "Log category for Critical Path Scheduler");
 
 namespace wrench {
 

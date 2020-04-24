@@ -17,7 +17,7 @@
 #include <pugixml.hpp>
 #include <nlohmann/json.hpp>
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(pegasus_workflow_parser, "Log category for PegasusWorkflowParser");
+WRENCH_LOG_CATEGORY(pegasus_workflow_parser, "Log category for PegasusWorkflowParser");
 
 
 namespace wrench {
