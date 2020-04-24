@@ -184,7 +184,7 @@ set(SOURCE_FILES
         src/wrench/helper_services/work_unit_executor/WorkunitExecutor.cpp
         src/wrench/logging/TerminalOutput.cpp
         src/wrench/managers/DataMovementManager.cpp
-        src/wrench/managers/EnergyMeter.cpp
+        src/wrench/managers/EnergyMeterService.cpp
         src/wrench/managers/JobManager.cpp
         src/wrench/managers/JobManagerMessage.cpp
         src/wrench/managers/JobManagerMessage.h
@@ -373,8 +373,8 @@ set(TEST_FILES
         test/energy_consumption/EnergyConsumptionTest.cpp
         test/simulation/simulation_output/SimulationDumpJSONTest.cpp
         test/compute_services/HTCondorServiceTest.cpp
-        src/wrench/managers/EnergyMeter.cpp
-        include/wrench/managers/EnergyMeter.h
+        src/wrench/managers/EnergyMeterService.cpp
+        include/wrench/managers/EnergyMeterService.h
         test/simulated_failures/host_failures/ServiceStartReStartTest.cpp
         test/simulated_failures/host_failures/ComprehensiveIntegrationTest.cpp
         test/simulated_failures/host_failures/FailureDetectorHostFailuresTest.cpp

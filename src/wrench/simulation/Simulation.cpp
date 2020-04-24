@@ -406,6 +406,11 @@ namespace wrench {
                 frs->start(frs, true, false); // Daemonized, no auto-restart
             }
 
+            // Start the energy meter services
+            for (const auto &frs : this->energy_meter_services) {
+                frs->start(frs, true, false); // Daemonized, no auto-restart
+            }
+
         } catch (std::runtime_error &e) {
             throw;
         }
@@ -486,6 +491,22 @@ namespace wrench {
         }
         service->simulation = this;
         this->file_registry_services.insert(service);
+    }
+
+
+    /**
+      * @brief Add an EnergyMeter service to the simulation.
+      *
+      * @param service: an energy meter service
+      *
+      * @throw std::invalid_argument
+      */
+    void Simulation::addService(std::shared_ptr<EnergyMeterService> service) {
+        if (service == nullptr) {
+            throw std::invalid_argument("Simulation::addService(): invalid argument (nullptr service)");
+        }
+        service->simulation = this;
+        this->energy_meter_services.insert(service);
     }
 
 
