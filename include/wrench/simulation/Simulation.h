@@ -79,8 +79,8 @@ namespace wrench {
         SimulationOutput &getOutput();
 
         //start energy related calls
-        double getEnergyConsumed(const std::string &hostname) { return this->getEnergyConsumed(hostname, false);}
-        std::map<std::string, double> getEnergyConsumed(const std::vector<std::string> &hostnames) {  return  this->getEnergyConsumed(hostnames, false);}
+        double getEnergyConsumed(const std::string &hostname);
+        std::map<std::string, double> getEnergyConsumed(const std::vector<std::string> &hostnames);
 //        double getEnergyTimestamp(const std::string &hostname, bool can_record = false);
 
         // pstate related calls
@@ -91,8 +91,6 @@ namespace wrench {
 
         void stageFile(WorkflowFile *file, std::shared_ptr<StorageService> ss);
         void stageFile(WorkflowFile *file, std::shared_ptr<StorageService> ss, std::string directory_absolute_path);
-
-
 
 
         /***********************/
