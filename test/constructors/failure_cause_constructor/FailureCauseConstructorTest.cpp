@@ -49,7 +49,9 @@ TEST_F(FailureCauseConstructorTest, ComputeThreadHasDied) {
 
     wrench::ComputeThreadHasDied *cause = nullptr;
     ASSERT_NO_THROW(cause = new wrench::ComputeThreadHasDied());
-    cause->toString(); // Coverage
+    if (cause) {
+      cause->toString(); // Coverage
+    }
 }
 
 
@@ -57,12 +59,16 @@ TEST_F(FailureCauseConstructorTest, FatalFailure) {
 
     wrench::FatalFailure *cause = nullptr;
     ASSERT_NO_THROW(cause = new wrench::FatalFailure());
-    cause->toString(); // Coverage
+    if (cause) {
+      cause->toString(); // Coverage
+    }
 }
 
 
 TEST_F(FailureCauseConstructorTest, HostError) {
-    wrench::HostError *cause;
+    wrench::HostError *cause = nullptr;
     ASSERT_NO_THROW(cause = new wrench::HostError("hostname"));
-    cause->toString(); // Coverage
+    if (cause) {
+      cause->toString(); // Coverage
+    }
 }
