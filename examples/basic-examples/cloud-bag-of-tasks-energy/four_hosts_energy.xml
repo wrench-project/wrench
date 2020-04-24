@@ -9,7 +9,7 @@
                 <prop id="size" value="5000GiB"/>
                 <prop id="mount" value="/"/>
             </disk>
-            <!-- The power consumption in watt for each pstate  (idle:all_cores) -->
+            <!-- The power consumption in watt for each pstate (idle:all_cores) -->
             <prop id="wattage_per_state" value="10.00:100.00" />
         </host>
 
@@ -19,14 +19,14 @@
             <prop id="wattage_per_state" value="10.00:100.00" />
        </host>
 
-        <!-- A cloud compute host, 2 pstate (a 100Gf and  a 200Gf one)  -->
+        <!-- A cloud compute host, 2 pstate (a 100Gf and a 200Gf one), that starts in pstate 1  -->
         <host id="CloudHost1" speed="100Gf, 200Gf" pstate="1" core="10">
             <!-- The power consumption in watt for each pstate (idle:all_cores) -->
             <prop id="wattage_per_state" value="10.00:100.00,10.00:250.00" />
             <prop id="wattage_off" value="10" />
             <prop id="ram" value="64GB" />
         </host>
-        <!-- A cloud compute host, 2 pstate (a 100Gf and  a 200Gf one) -->
+        <!-- A cloud compute host, 2 pstate (a 100Gf and a 200Gf one), that starts in pstate 1 -->
         <host id="CloudHost2" speed="100Gf, 200Gf"  pstate="1" core="10">
             <!-- The power consumption in watt for each pstate (idle:all_cores) -->
             <prop id="wattage_per_state" value="10.00:150.00,10.00:280.00" />

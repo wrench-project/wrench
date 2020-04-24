@@ -85,7 +85,7 @@ it provides a recent and general overview on the framework.
 
 ```latex
 @inproceedings{wrench,
-  title = {WRENCH: A Framework for Simulating Workflow Management Systems},
+  title = {{WRENCH: A Framework for Simulating Workflow Management Systems}},
   author = {Casanova, Henri and Pandey, Suraj and Oeth, James and Tanaka, Ryan and Suter, Frederic and Ferreira da Silva, Rafael},
   booktitle = {13th Workshop on Workflows in Support of Large-Scale Science (WORKS'18)},
   year = {2018},
