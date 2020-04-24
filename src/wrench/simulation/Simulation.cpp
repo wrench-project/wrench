@@ -802,6 +802,17 @@ namespace wrench {
     }
 
     /**
+     * @brief Obtains the current energy consumption of a host
+     * @param hostname: the host name
+     * @return current energy consumption in joules
+     * @throws std::invalid_argument
+     */
+    double Simulation::getEnergyConsumed(const std::string &hostname) {
+        return this->getEnergyConsumed(hostname, false);
+    }
+
+
+    /**
      * @brief Obtains the current energy consumption of a host and will add SimulationTimestampEnergyConsumption to
      *          simulation output if can_record is set to true
      * @param hostname: the host name
@@ -823,6 +834,17 @@ namespace wrench {
 
         return consumption;
     }
+
+    /**
+    * @brief Obtains the current energy consumption of a host
+    * @param hostnames: the list of hostnames
+    * @return current energy consumption in joules for each host, as a map indexed by hostnames
+    * @throws std::invalid_argument
+    */
+    std::map<std::string, double> Simulation::getEnergyConsumed(const std::vector<std::string> &hostnames) {
+        return this->getEnergyConsumed(hostnames, false);
+    }
+
 
     /**
     * @brief Obtains the current energy consumption of a host and will add SimulationTimestampEnergyConsumption to
@@ -1082,6 +1104,7 @@ namespace wrench {
             }
         }
     }
+
 
 
 };

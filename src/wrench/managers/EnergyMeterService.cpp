@@ -48,7 +48,7 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @parame hostname: the name of the host on which this service is running
+     * @param hostname: the name of the host on which this service is running
      * @param hostnames: the list of metered hosts, as hostnames
      * @param measurement_period: the measurement period
      */
