@@ -171,11 +171,7 @@ namespace wrench {
      * @return a number of children
      */
     unsigned long WorkflowTask::getNumberOfChildren() const {
-        unsigned long count = 0;
-        for (lemon::ListDigraph::OutArcIt a(*DAG, DAG_node); a != lemon::INVALID; ++a) {
-            ++count;
-        }
-        return count;
+        return this->workflow->getTaskNumberOfChildren(this);
     }
 
     /**
@@ -193,11 +189,7 @@ namespace wrench {
      * @return a number of parents
      */
     unsigned long WorkflowTask::getNumberOfParents() const {
-        unsigned long count = 0;
-        for (lemon::ListDigraph::InArcIt a(*DAG, DAG_node); a != lemon::INVALID; ++a) {
-            ++count;
-        }
-        return count;
+        return this->workflow->getTaskNumberOfParents(this);
     }
 
     /**

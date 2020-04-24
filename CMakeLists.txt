@@ -278,6 +278,8 @@ set(SOURCE_FILES
         src/wrench/wms/WMSMessage.cpp
         src/wrench/wms/WMSMessage.h
         src/wrench/workflow/Workflow.cpp
+        src/wrench/workflow/DagOfTasks.cpp
+        include/wrench/workflow/DagOfTasks.h
         src/wrench/workflow/WorkflowFile.cpp
         src/wrench/workflow/WorkflowTask.cpp
         src/wrench/workflow/execution_events/WorkflowExecutionEvent.cpp
