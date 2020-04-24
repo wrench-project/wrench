@@ -21,7 +21,7 @@
 
 #include "WorkflowAsAsingleJobWMS.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(custom_wms, "Log category for WorkflowAsAsingleJobWMS");
+WRENCH_LOG_CATEGORY(custom_wms, "Log category for WorkflowAsAsingleJobWMS");
 
 namespace wrench {
 

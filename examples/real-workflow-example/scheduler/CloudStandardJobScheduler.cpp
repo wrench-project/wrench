@@ -12,7 +12,7 @@
 //#include <climits>
 //#include <numeric>
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(cloud_scheduler, "Log category for Cloud Scheduler");
+WRENCH_LOG_CATEGORY(cloud_scheduler, "Log category for Cloud Scheduler");
 
 namespace wrench {
 

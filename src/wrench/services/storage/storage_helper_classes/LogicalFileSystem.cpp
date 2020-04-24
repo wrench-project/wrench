@@ -10,7 +10,7 @@
 #include <wrench-dev.h>
 #include "wrench/services/storage/storage_helpers/LogicalFileSystem.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(logical_file_system, "Log category for Logical File System");
+WRENCH_LOG_CATEGORY(wrench_core_logical_file_system, "Log category for Logical File System");
 
 
 namespace wrench {

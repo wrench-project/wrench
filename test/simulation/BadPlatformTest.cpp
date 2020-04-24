@@ -13,7 +13,7 @@
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(bad_platform_test, "Log category for BadPlatform test");
+WRENCH_LOG_CATEGORY(bad_platform_test, "Log category for BadPlatform test");
 
 
 class BadPlatformTest : public ::testing::Test {

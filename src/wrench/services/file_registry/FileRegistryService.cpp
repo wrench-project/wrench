@@ -24,7 +24,7 @@
 #include <wrench/services/network_proximity/NetworkProximityService.h>
 #include <wrench/workflow/failure_causes/NetworkError.h>
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(file_registry_service, "Log category for File Registry Service");
+WRENCH_LOG_CATEGORY(wrench_core_file_registry_service, "Log category for File Registry Service");
 
 namespace wrench {
 

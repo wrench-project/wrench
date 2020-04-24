@@ -7,7 +7,7 @@
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(test_energy, "Log category for SimulationTimestampEnergyTest");
+WRENCH_LOG_CATEGORY(test_energy, "Log category for SimulationTimestampEnergyTest");
 
 
 class SimulationTimestampEnergyTest: public ::testing::Test {

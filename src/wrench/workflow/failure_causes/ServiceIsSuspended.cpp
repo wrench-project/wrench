@@ -11,7 +11,7 @@
 #include "wrench/workflow/failure_causes/ServiceIsSuspended.h"
 #include "wrench/services/Service.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(service_is_suspended, "Log category for ServiceIsSuspended");
+WRENCH_LOG_CATEGORY(wrench_core_service_is_suspended, "Log category for ServiceIsSuspended");
 
 namespace wrench {
 

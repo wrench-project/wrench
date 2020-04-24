@@ -11,7 +11,7 @@
 
 #include "FailureDynamicClustering.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(failure_dynamic_clustering, "Log category for Simple Dynamic Clustering for Failures");
+WRENCH_LOG_CATEGORY(failure_dynamic_clustering, "Log category for Simple Dynamic Clustering for Failures");
 
 namespace wrench {
 

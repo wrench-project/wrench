@@ -23,7 +23,7 @@
 
 #include "TwoTasksAtATimeCloudWMS.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(custom_wms, "Log category for TwoTasksAtATimeCloudWMS");
+WRENCH_LOG_CATEGORY(custom_wms, "Log category for TwoTasksAtATimeCloudWMS");
 
 namespace wrench {
 

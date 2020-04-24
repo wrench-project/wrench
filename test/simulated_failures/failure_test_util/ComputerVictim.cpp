@@ -12,7 +12,7 @@
 #include <wrench/simulation/Simulation.h>
 #include <wrench-dev.h>
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(computer_victim, "Log category for Computer");
+WRENCH_LOG_CATEGORY(computer_victim, "Log category for Computer");
 
 
 wrench::ComputerVictim::ComputerVictim(std::string host_on_which_to_run, double flops, SimulationMessage *msg, std::string mailbox_to_notify)

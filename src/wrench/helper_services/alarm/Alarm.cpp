@@ -15,7 +15,7 @@
 #include "wrench/workflow/failure_causes/NetworkError.h"
 #include "wrench/workflow/failure_causes/HostError.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(alarm_service, "Log category for Alarm Service");
+WRENCH_LOG_CATEGORY(wrench_core_alarm_service, "Log category for Alarm Service");
 
 namespace wrench {
 

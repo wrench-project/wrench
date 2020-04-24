@@ -20,7 +20,7 @@
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(job_manager_test, "Log category for JobManagerTest");
+WRENCH_LOG_CATEGORY(job_manager_test, "Log category for JobManagerTest");
 
 
 class JobManagerTest : public ::testing::Test {

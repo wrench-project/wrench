@@ -494,7 +494,7 @@ you will find the typical pattern:
 
 ~~~~~~~~~~~~~{.cpp}
 // Define a log category name for this file
-XBT_LOG_NEW_DEFAULT_CATEGORY(custom_wms, "Log category for TwoTasksAtATimeBatchWMS");
+WRENCH_LOG_CATEGORY(custom_wms, "Log category for TwoTasksAtATimeBatchWMS");
 
 [...]
 

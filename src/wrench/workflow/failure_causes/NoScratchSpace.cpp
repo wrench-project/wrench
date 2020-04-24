@@ -13,7 +13,7 @@
 #include "wrench/workflow/failure_causes/FailureCause.h"
 #include "wrench/workflow/WorkflowFile.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(no_scratch_space, "Log category for NoScratchSpace");
+WRENCH_LOG_CATEGORY(wrench_core_no_scratch_space, "Log category for NoScratchSpace");
 
 namespace wrench {
 

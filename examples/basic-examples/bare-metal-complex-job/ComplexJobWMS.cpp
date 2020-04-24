@@ -21,7 +21,7 @@
 
 #include "ComplexJobWMS.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(custom_wms, "Log category for ComplexJobWMS");
+WRENCH_LOG_CATEGORY(custom_wms, "Log category for ComplexJobWMS");
 
 namespace wrench {
 

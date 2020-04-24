@@ -18,7 +18,7 @@
 #include "../failure_test_util/SleeperVictim.h"
 #include "../failure_test_util/ComputerVictim.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(failure_detector_host_failure_test, "Log category for FailureDetectorHostFailuresTest");
+WRENCH_LOG_CATEGORY(failure_detector_host_failure_test, "Log category for FailureDetectorHostFailuresTest");
 
 
 class FailureDetectorHostFailuresTest : public ::testing::Test {

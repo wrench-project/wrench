@@ -13,7 +13,7 @@
 #include "../include/UniqueTmpPathPrefix.h"
 #include "../include/TestWithFork.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(host_state_change_detector_service_test, "Log category for HostStateChangeDetectorService test");
+WRENCH_LOG_CATEGORY(host_state_change_detector_service_test, "Log category for HostStateChangeDetectorService test");
 
 
 class HostStateChangeDetectorServiceTest : public ::testing::Test {

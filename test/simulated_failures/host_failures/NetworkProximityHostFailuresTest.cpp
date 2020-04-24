@@ -16,7 +16,7 @@
 #include "../../include/UniqueTmpPathPrefix.h"
 #include "../failure_test_util/ResourceSwitcher.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(network_proximity_failures, "Log category for NetworkProximityHostFailuresTest");
+WRENCH_LOG_CATEGORY(network_proximity_failures, "Log category for NetworkProximityHostFailuresTest");
 
 
 class NetworkProximityHostFailuresTest : public ::testing::Test {

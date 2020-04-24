@@ -11,7 +11,7 @@
 
 #include "wrench/logging/TerminalOutput.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(fatal_failure, "Log category for FatalFailure");
+WRENCH_LOG_CATEGORY(wrench_core_fatal_failure, "Log category for FatalFailure");
 
 namespace wrench {
 

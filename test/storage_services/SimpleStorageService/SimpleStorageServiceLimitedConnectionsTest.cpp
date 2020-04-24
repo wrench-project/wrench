@@ -17,7 +17,7 @@
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(simple_storage_service_limited_connection_test, "Log category for SimpleStorageServiceLimitedConnectionTest");
+WRENCH_LOG_CATEGORY(simple_storage_service_limited_connection_test, "Log category for SimpleStorageServiceLimitedConnectionTest");
 
 
 #define NUM_PARALLEL_TRANSFERS 7 // Changing this number  to a non n*3+ 1 number will ikely

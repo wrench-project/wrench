@@ -14,7 +14,7 @@
 
 #include "wrench/util/MessageManager.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(message_manager, "Log category for MessageManager");
+WRENCH_LOG_CATEGORY(wrench_core_message_manager, "Log category for MessageManager");
 
 
 namespace wrench {

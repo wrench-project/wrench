@@ -16,7 +16,7 @@
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(htcondor_service_test, "Log category for HTCondorServiceTest");
+WRENCH_LOG_CATEGORY(htcondor_service_test, "Log category for HTCondorServiceTest");
 
 
 class HTCondorServiceTest : public ::testing::Test {

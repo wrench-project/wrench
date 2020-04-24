@@ -25,7 +25,7 @@
 
 #define EPSILON 0.05
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(batch_service_output_csv_file_test, "Log category for BatchServiceOutputCSVFileTest");
+WRENCH_LOG_CATEGORY(batch_service_output_csv_file_test, "Log category for BatchServiceOutputCSVFileTest");
 
 
 class BatchServiceOutputCSVFileTest : public ::testing::Test {
