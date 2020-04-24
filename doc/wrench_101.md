@@ -364,6 +364,12 @@ to workflow files:
 
    - [Network Proximity Service](@ref guide-101-networkproximity)
 
+- **EnergyMeter Services**: These services are used to periodically measure host
+  energy consumption and include these measurements in the simulation output  
+  (see [this section](@ref wrench-101-simulator-1000ft-step-7)).
+
+   - [Energy Meter Service](@ref guide-101-energymeter)
+
 - **Workflow Management Systems (WMSs)** (derives `wrench::WMS`): 
   A WMS provides the mechanisms for executing workflow applications, include 
   decision-making for optimizing various objectives (often attempting to 

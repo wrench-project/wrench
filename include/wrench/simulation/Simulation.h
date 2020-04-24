@@ -25,6 +25,7 @@ namespace wrench {
     class Service;
     class NetworkProximityService;
     class FileRegistryService;
+    class EnergyMeterService;
     class ComputeService;
     class BatchComputeService;
     class BareMetalComputeService;
@@ -152,6 +153,8 @@ namespace wrench {
 
         std::set<std::shared_ptr<FileRegistryService>> file_registry_services;
 
+        std::set<std::shared_ptr<EnergyMeterService>> energy_meter_services;
+
         std::set<std::shared_ptr<NetworkProximityService>> network_proximity_services;
 
         std::set<std::shared_ptr<ComputeService>> compute_services;
@@ -173,6 +176,7 @@ namespace wrench {
         void addService(std::shared_ptr<NetworkProximityService> service);
         void addService(std::shared_ptr<WMS> service);
         void addService(std::shared_ptr<FileRegistryService> service);
+        void addService(std::shared_ptr<EnergyMeterService> service);
 
         std::string getWRENCHVersionString() { return WRENCH_VERSION_STRING; }
 

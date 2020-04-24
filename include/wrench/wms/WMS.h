@@ -10,7 +10,7 @@
 #ifndef WRENCH_WMS_H
 #define WRENCH_WMS_H
 
-#include <wrench/managers/EnergyMeter.h>
+#include <wrench/managers/EnergyMeterService.h>
 #include "wrench/services/Service.h"
 #include "wrench/wms/DynamicOptimization.h"
 #include "wrench/wms/StaticOptimization.h"
@@ -74,8 +74,8 @@ namespace wrench {
 
         std::shared_ptr<JobManager> createJobManager();
         std::shared_ptr<DataMovementManager> createDataMovementManager();
-        std::shared_ptr<EnergyMeter> createEnergyMeter(const std::map<std::string, double> &measurement_periods);
-        std::shared_ptr<EnergyMeter> createEnergyMeter(const std::vector<std::string> &hostnames, double measurement_period);
+        std::shared_ptr<EnergyMeterService> createEnergyMeter(const std::map<std::string, double> &measurement_periods);
+        std::shared_ptr<EnergyMeterService> createEnergyMeter(const std::vector<std::string> &hostnames, double measurement_period);
 
         void runDynamicOptimizations();
 

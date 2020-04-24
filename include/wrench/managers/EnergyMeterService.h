@@ -8,8 +8,8 @@
  */
 
 
-#ifndef WRENCH_ENERGYMETER_H
-#define WRENCH_ENERGYMETER_H
+#ifndef WRENCH_ENERGYMETERSERVICE_H
+#define WRENCH_ENERGYMETERSERVICE_H
 
 #include "wrench/services/Service.h"
 
@@ -20,28 +20,26 @@ namespace wrench {
     /**
      * @brief A service that measures and records energy consumption on a set of hosts at regular time intervals
      */
-    class EnergyMeter : public Service {
+    class EnergyMeterService : public Service {
 
     public:
 
+        EnergyMeterService(std::string hostname, const std::vector<std::string> &hostnames, double period);
+        EnergyMeterService(std::string hostname, const std::map<std::string, double> &measurement_periods);
+
+        /***********************/
+        /** \cond DEVELOPER    */
+        /***********************/
         void stop() override;
         void kill();
-
-    protected:
-
-        friend class WMS;
-
-        EnergyMeter(std::shared_ptr<WMS> wms, const std::map<std::string, double> &measurement_periods);
-        EnergyMeter(std::shared_ptr<WMS> wms, const std::vector<std::string> &hostnames, double period);
+        /***********************/
+        /** \endcond           */
+        /***********************/
 
 
     private:
         int main() override;
         bool processNextMessage(double timeout);
-
-
-            // Relevant WMS
-        std::shared_ptr<WMS> wms;
 
         std::map<std::string, double> measurement_periods;
         std::map<std::string, double> time_to_next_measurement;
@@ -51,4 +49,4 @@ namespace wrench {
 };
 
 
-#endif //WRENCH_ENERGYMETER_H
+#endif //WRENCH_ENERGYMETERSERVICE_H
