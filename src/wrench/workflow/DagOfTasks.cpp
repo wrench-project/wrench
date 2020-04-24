@@ -36,6 +36,10 @@ namespace wrench {
             throw std::runtime_error("wrench::DagOfTasks::removeVertex(): Trying to remove a non-existing vertex");
         }
         vertex_t to_remove = task_map[task];
+
+        // Remove all in and out edges at that vertex
+        boost::clear_vertex(to_remove, this->dag);
+
         // Remove the entry from the task map
         this->task_map.erase(task);
         // Remove the vertex
