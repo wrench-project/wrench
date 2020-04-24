@@ -22,11 +22,15 @@
  ** service, that has access to two hosts: CloudHost1 and CloudHost2. Once the simulation is done,
  ** the completion time of each workflow task is printed.
  **
+ ** This simulator simulates energy consumption. As such it must use a platform file that defines
+ ** host pstates (such .xml as the file in this directory). It also uses an EnergyMeterService
+ ** and outputs energy consumption measures. 
+ **
  ** Example invocation of the simulator for a 10-task workflow, with only WMS logging:
- **    ./cloud-bag-of-tasks-simulator 10 ./four_hosts.xml --wrench-no-logs --log=custom_wms.threshold=info
+ **    ./cloud-bag-of-tasks-simulator 10 ./four_hosts.xml --activate-energy --wrench-no-logs --log=custom_wms.threshold=info
  **
  ** Example invocation of the simulator for a 6-task workflow with full logging:
- **    ./cloud-bag-of-tasks-simulator 6 ./four_hosts.xml
+ **    ./cloud-bag-of-tasks-simulator 6 ./four_hosts.xml --activate-energy
  **/
 
 

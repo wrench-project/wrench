@@ -326,7 +326,10 @@ definitions (levels of performance, CPU frequency) in the
 The `wrench::Simulation::getEnergyConsumed()` method returns energy consumed 
 by all hosts in the platform.  **Important:** The energy plugin is NOT
 enabled by default in WRENCH simulations. To enable it, pass the
-`--activate-energy` command line option to the simulator. 
+`--activate-energy` command line option to the simulator.  See
+`examples/basic-examples/cloud-bag-of-tasks-energy` for an example
+simulator that makes use of this plugin  (and example platform
+description file that defines host power consumption profiles).
 
 Another option altogether is to dump all simulation output to a JSON file.
 This is done with the `wrench::SimulationOutput::dump*JSON()`
