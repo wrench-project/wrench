@@ -441,6 +441,29 @@ cause of the execution failure.  Other exceptions (e.g.,
 are used for detecting mis-uses of the WRENCH API or internal WRENCH
 errors.
 
+# Finding information and interacting with hardware resources {#wrench-102-WMS-hardware}
+
+The `wrench::Simulation` class provides many methods to discover information
+about the (simulated) hardware platform and interact with it. Some of these
+methods are static, but other are now. The `wrench:WMS` class includes a
+`simulation` object. Thus, the WMS can call methods on the `this->simulation`
+object. For instance, this fragment of code shows how a WMS can check that
+a host exists (given a hostname) and if so set its
+pstate (power state) to the highest possible. 
+
+~~~~~~~~~~~~~{.cpp}
+if (wrench::Simulation::doesHostExist("SomeHost"))  {
+  
+  this->simulation->setPstate("SomeHost", wrench::Simulation::getNumberofPstates("SomeHost")-1);
+}
+~~~~~~~~~~~~~
+
+See the documentation of the `wrench::Simulation` class for all details.
+Specifically regarding host pstates, see the example WMS in
+`examples/basic-examples/cloud-bag-of-tasks-energy/TwoTasksAtATimeCloudWMS.cpp`,
+which interacts with host pstates (and the
+`examples/basic-examples/cloud-bag-of-tasks-energy/four_hosts_energy.xml`
+platform description file which defines pstates).
 
 # Schedulers for decision-making #              {#wrench-102-WMS-schedulers}
 

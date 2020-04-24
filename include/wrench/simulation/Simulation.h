@@ -114,11 +114,23 @@ namespace wrench {
         void setPstate(const std::string &hostname, int pstate);
         static int getCurrentPstate(const std::string &hostname);
 
-
         std::shared_ptr<ComputeService> startNewService(ComputeService *service);
         std::shared_ptr<StorageService> startNewService(StorageService *service);
         std::shared_ptr<NetworkProximityService> startNewService(NetworkProximityService *service);
         std::shared_ptr<FileRegistryService> startNewService(FileRegistryService *service);
+
+        static double getCurrentSimulatedDate();
+
+        static void sleep(double duration);
+        static void compute(double flops);
+
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
 
         void readFromDisk(double num_bytes, std::string hostname, std::string mount_point);
         void readFromDiskAndWriteToDiskConcurrently(double num_bytes_to_read, double num_bytes_to_write,
@@ -128,23 +140,15 @@ namespace wrench {
         void writeToDisk(double num_bytes, std::string hostname, std::string mount_point);
 
 
-
         static double getMemoryCapacity();
         static unsigned long getNumCores();
         static double getFlopRate();
         static std::string getHostName();
 
-        static double getCurrentSimulatedDate();
-
-
-
-
-        static void sleep(double duration);
-        static void compute(double flops);
-
         /***********************/
         /** \endcond           */
         /***********************/
+
 
     private:
 
