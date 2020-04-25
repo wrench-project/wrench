@@ -22,8 +22,6 @@
 
 WRENCH_LOG_CATEGORY(wrench_core_s4u_simulation, "Log category for S4U_Simulation");
 
-
-
 namespace wrench {
 
     /**
