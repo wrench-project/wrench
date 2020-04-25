@@ -19,10 +19,10 @@
  ** the completion time of each workflow task is printed.
  **
  ** Example invocation of the simulator with only WMS logging:
- **    ./batch-pilot-job-simulator ./four_hosts_scratch.xml --wrench-no-logs --log=custom_wms.threshold=info
+ **    ./wrench-example-batch-pilot-job ./four_hosts_scratch.xml --wrench-no-logs --log=custom_wms.threshold=info
  **
  ** Example invocation of the simulator with full logging:
- **    ./batch-pilot-job-simulator ./four_hosts_scratch.xml
+ **    ./wrench-example-batch-pilot-job ./four_hosts_scratch.xml
  **/
 
 

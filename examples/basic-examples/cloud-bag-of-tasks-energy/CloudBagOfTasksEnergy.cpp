@@ -27,10 +27,10 @@
  ** and outputs energy consumption measures. 
  **
  ** Example invocation of the simulator for a 10-task workflow, with only WMS logging:
- **    ./cloud-bag-of-tasks-simulator 10 ./four_hosts.xml --activate-energy --wrench-no-logs --log=custom_wms.threshold=info
+ **    ./wrench-example-cloud-bag-of-tasks 10 ./four_hosts.xml --activate-energy --wrench-no-logs --log=custom_wms.threshold=info
  **
  ** Example invocation of the simulator for a 6-task workflow with full logging:
- **    ./cloud-bag-of-tasks-simulator 6 ./four_hosts.xml --activate-energy
+ **    ./wrench-example-cloud-bag-of-tasks 6 ./four_hosts.xml --activate-energy
  **/
 
 
