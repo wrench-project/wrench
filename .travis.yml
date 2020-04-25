@@ -15,34 +15,34 @@ services:
 jobs:
   include:
     - stage: "Source Build and Test"
-      name: "Ubuntu Xenial - clang"
-      env: DIST=ubuntu-xenial COMPILER=clang batsched=off
-    - name: "Ubuntu Xenial - g++-5"
+      name: "Ubuntu Xenial - g++-5"
       env: DIST=ubuntu-xenial COMPILER=gcc5 batsched=off
     - name: "Ubuntu Bionic - g++-7"
       env: DIST=ubuntu-bionic COMPILER=gcc7 batsched=off
     - name: "Ubuntu Bionic - g++-7 (batsched)"
       env: DIST=ubuntu-bionic COMPILER=gcc7-batsched batsched=on
-    - name: "Ubuntu Bionic - clang"
-      env: DIST=ubuntu-bionic COMPILER=clang batsched=off
+    - name: "Ubuntu Bionic - clang-9"
+      env: DIST=ubuntu-bionic COMPILER=clang9 batsched=off
     - name: "Ubuntu Focal - g++-9"
       env: DIST=ubuntu-focal COMPILER=gcc9 batsched=off
+    - name: "Ubuntu Focal - clang-10"
+      env: DIST=ubuntu-focal COMPILER=clang10 batsched=off
     - name: "Debian Stretch - g++-6"
       env: DIST=debian-stretch COMPILER=gcc6 batsched=off
     - name: "Debian Buster - g++-8"
       env: DIST=debian-buster COMPILER=gcc8 batsched=off
 
     - stage: "Documentation Build and Deployment"
-      name: "Ubuntu Bionic - g++-7"
-      env: DIST=ubuntu-bionic COMPILER=gcc7 batsched=off
+      name: "Ubuntu Focal - g++-9"
+      env: DIST=ubuntu-focal COMPILER=gcc9 batsched=off
 
     - stage: "Code Coverage"
-      name: "Ubuntu Bionic - g++-7"
-      env: DIST=ubuntu-bionic COMPILER=gcc7 batsched=off
+      name: "Ubuntu Focal - g++-9"
+      env: DIST=ubuntu-focal COMPILER=gcc9 batsched=off
 
     - stage: "Code Quality Analysis"
-      name: "Ubuntu Bionic - g++-7"
-      env: DIST=ubuntu-bionic COMPILER=gcc7 batsched=off
+      name: "Ubuntu Focal - g++-9"
+      env: DIST=ubuntu-focal COMPILER=gcc9 batsched=off
 
 before_install:
   # install container
