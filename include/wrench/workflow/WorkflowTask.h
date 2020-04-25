@@ -12,7 +12,6 @@
 
 #include <map>
 #include <stack>
-#include <lemon/list_graph.h>
 #include <set>
 
 #include "wrench/workflow/job/WorkflowJob.h"
