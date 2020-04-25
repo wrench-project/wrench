@@ -7,7 +7,6 @@
  * (at your option) any later version.
  */
 
-#include <lemon/list_graph.h>
 #include "wrench/logging/TerminalOutput.h"
 
 #include "wrench/logging/TerminalOutput.h"
