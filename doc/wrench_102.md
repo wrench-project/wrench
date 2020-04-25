@@ -537,5 +537,5 @@ int TwoTasksAtATimeBatchWMS::main() {
 
 The name of the logging category, in this case `custom_wms`, can then be passed  to the
 `--log` command-line argument. For instance, invoking the simulator with additional
-arguments `--wrench-no-logs --log=custom_wms.threshold=info` will make it so that
+argument `--log=custom_wms.threshold=info` will make it so that
 only those `WRENCH_INFO` statements in  `TwoTasksAtATimeBatchWMS.cpp` will be printed (in green!). 
