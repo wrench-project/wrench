@@ -24,11 +24,13 @@ namespace wrench {
 
     class WorkflowTask;
 
-    struct Vertex {
-         WorkflowTask *task;
+    struct VertexProperties {
+//    std::size_t index;
+//    boost::default_color_type color;
+        WorkflowTask *task;
     };
-    typedef boost::adjacency_list<boost::listS, boost::vecS, boost::bidirectionalS, Vertex> DAG;
-    typedef boost::graph_traits<DAG>::vertex_descriptor vertex_t;
+
+    typedef boost::adjacency_list<boost::listS, boost::vecS, boost::bidirectionalS, VertexProperties> DAG;
 
     /**
      * @brief An internal class that uses the Boost Graph Library to implement a DAG of WorkflowTask objects
@@ -57,28 +59,30 @@ namespace wrench {
 
     private:
 
+        void print_vertices();
+
         /**
          * @brief Nested class that's used for the BFS algorithm in the BGL
          */
         class custom_bfs_visitor : public boost::default_bfs_visitor {
         public:
 
-            vertex_t target;
+            WorkflowTask *target_task;
 
-            explicit custom_bfs_visitor(vertex_t a) : boost::default_bfs_visitor() {
-                this->target = a;
+            explicit custom_bfs_visitor(WorkflowTask *target_task) : boost::default_bfs_visitor() {
+                this->target_task = target_task;
             }
 
             template<typename Vertex, typename Graph>
             void discover_vertex(Vertex u,  Graph &g) {
-                std::cerr << "Visiting " << g[u].task->getID() << " " << g[target].task->getID() << std::endl;
-                if (g[u].task == g[target].task) {
-                    throw std::runtime_error("found it!");
+                if (g[u].task == target_task) {
+                    throw std::runtime_error("path found");
                 }
             }
         };
 
-        std::unordered_map<const WorkflowTask *, vertex_t> task_map;
+        std::vector<WorkflowTask*> task_list;
+
         DAG dag;
 
     };
@@ -86,7 +90,6 @@ namespace wrench {
 /***********************/
 /** \endcond           */
 /***********************/
-
 
 }
 
