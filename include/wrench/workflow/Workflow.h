@@ -10,7 +10,6 @@
 #ifndef WRENCH_WORKFLOW_H
 #define WRENCH_WORKFLOW_H
 
-#include <lemon/list_graph.h>
 #include <map>
 #include <set>
 
