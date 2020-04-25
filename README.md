@@ -67,8 +67,6 @@ make
 sudo make install 
 ```
 
-
-
 ## Get in Touch
 
 The main channel to reach the WRENCH team is via the support email: 
