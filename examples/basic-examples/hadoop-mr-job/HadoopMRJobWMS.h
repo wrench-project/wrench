@@ -8,8 +8,8 @@
  */
 
 
-#ifndef WRENCH_EXAMPLE_TWO_TASKS_AT_A_TIME_VIRTUALIZED_CLUSTER_H
-#define WRENCH_EXAMPLE_TWO_TASKS_AT_A_TIME_VIRTUALIZED_CLUSTER_H
+#ifndef WRENCH_EXAMPLE_HADOOP_MR_JOB_H
+#define WRENCH_EXAMPLE_HADOOP_MR_JOB_H
 
 #include <wrench-dev.h>
 
@@ -21,20 +21,14 @@ namespace wrench {
     /**
      *  @brief A Workflow Management System (WMS) implementation (inherits from WMS)
      */
-    class TwoTasksAtATimeVirtualizedClusterWMS : public WMS {
+    class HadoopMRJobWMS : public WMS {
 
     public:
         // Constructor
-        TwoTasksAtATimeVirtualizedClusterWMS(
-                  const std::set<std::shared_ptr<ComputeService>> &compute_services,
-                  const std::set<std::shared_ptr<StorageService>> &storage_services,
+        HadoopMRJobWMS(
                   const std::string &hostname);
 
     protected:
-
-        // Overriden method
-        void processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent>) override;
-        void processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent>) override;
 
     private:
         // main() method of the WMS
@@ -42,4 +36,4 @@ namespace wrench {
 
     };
 }
-#endif //WRENCH_EXAMPLE_TWO_TASKS_AT_A_TIME_VIRTUALIZED_CLUSTER_H
+#endif //WRENCH_EXAMPLE_HADOOP_MR_JOB_H
