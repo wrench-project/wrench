@@ -7,9 +7,6 @@
  * (at your option) any later version.
  */
 
-#include <lemon/list_graph.h>
-#include <lemon/graph_to_eps.h>
-#include <lemon/bfs.h>
 #include <pugixml.hpp>
 #include <nlohmann/json.hpp>
 #include <wrench/util/UnitParser.h>
@@ -587,7 +584,7 @@ namespace wrench {
      * @return A map of tasks indexed by their IDs
      */
     std::map<std::string, WorkflowTask *> Workflow::getEntryTaskMap() const {
-        // TODO: This could be done more efficiently at the Lemon level
+        // TODO: This could be done more efficiently at the DAG level
         std::map<std::string, WorkflowTask *> entry_tasks;
         for (auto const &t : this->tasks) {
             auto task = t.second.get();
@@ -604,7 +601,7 @@ namespace wrench {
      * @return A vector of tasks
      */
     std::vector<WorkflowTask *> Workflow::getEntryTasks() const {
-        // TODO: This could be done more efficiently at the Lemon level
+        // TODO: This could be done more efficiently at the DAG level
         std::vector<WorkflowTask *> entry_tasks;
         for (auto const &t : this->tasks) {
             auto task = t.second.get();
@@ -621,7 +618,7 @@ namespace wrench {
         * @return A map of tasks indexed by their IDs
         */
     std::map<std::string, WorkflowTask *> Workflow::getExitTaskMap() const {
-        // TODO: This could be done more efficiently at the lemon level
+        // TODO: This could be done more efficiently at the DAG level
         std::map<std::string, WorkflowTask *> exit_tasks;
         for (auto const &t : this->tasks) {
             auto task = t.second.get();
@@ -638,7 +635,7 @@ namespace wrench {
     * @return A vector of tasks
     */
     std::vector<WorkflowTask *> Workflow::getExitTasks() const {
-        // TODO: This could be done more efficiently at the lemon level
+        // TODO: This could be done more efficiently at the DAG level
         std::vector<WorkflowTask *> exit_tasks;
         for (auto const &t : this->tasks) {
             auto task = t.second.get();
