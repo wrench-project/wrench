@@ -273,6 +273,9 @@ namespace wrench {
         WorkflowJob *job;
 
         std::stack<WorkflowTaskExecution> execution_history;
+
+        friend class DagOfTasks;
+        unsigned long dag_vertex_index;
     };
 };
 
