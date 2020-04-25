@@ -23,10 +23,10 @@
  ** the completion time of each workflow task is printed.
  **
  ** Example invocation of the simulator for a 10-task workflow, with only WMS logging:
- **    ./virtualized_cluster-bag-of-tasks-simulator 10 ./four_hosts.xml --wrench-no-logs --log=custom_wms.threshold=info
+ **    ./wrench-example-virtualized_cluster-bag-of-tasks 10 ./four_hosts.xml --wrench-no-logs --log=custom_wms.threshold=info
  **
  ** Example invocation of the simulator for a 6-task workflow with full logging:
- **    ./virtualized_cluster-bag-of-tasks-simulator 6 ./four_hosts.xml
+ **    ./wrench-example-virtualized_cluster-bag-of-tasks 6 ./four_hosts.xml
  **/
 
 
