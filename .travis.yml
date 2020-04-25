@@ -49,7 +49,7 @@ jobs:
 before_install:
   # install container
   - docker pull wrenchproject/wrench-build:${DIST}-${COMPILER};
-  - docker run -m 1g -d -t --name=wrench wrenchproject/wrench-build:${DIST}-${COMPILER} bash;
+  - docker run -m 4g -d -t --name=wrench wrenchproject/wrench-build:${DIST}-${COMPILER} bash;
   - docker exec -it wrench git clone https://github.com/wrench-project/wrench;
   # if not the master branch, switch to branch
   - if [[ "$TRAVIS_BRANCH" != "HEAD" ]]; then

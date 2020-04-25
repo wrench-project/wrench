@@ -358,7 +358,7 @@ to workflow files:
 
 - **File Registry Services**: These services, also known as _replica catalogs_, 
   are simply databases of `<filename, list of locations>` key-values pairs of 
-  the storage services on which a copies of files are available. 
+  the storage services on which copies of files are available. 
 
    - [File Registry Service](@ref guide-101-fileregistry)
 
