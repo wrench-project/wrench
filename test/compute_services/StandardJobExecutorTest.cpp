@@ -1963,7 +1963,6 @@ private:
 
         }
 
-
         /** Case 3: Create three tasks that will run in parallel and then sequential with the default scheduling options **/
         {
             wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task3.1", 3600, 6, 6, 1.0, 0);

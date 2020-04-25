@@ -402,12 +402,11 @@ set(TEST_FILES
         test/simulation/S4U_MailboxTest.cpp)
 
 find_library(PUGIXML_LIBRARY NAMES pugixml)
-find_library(LEMON_LIBRARY NAMES emon lemon)
 find_library(GTEST_LIBRARY NAMES gtest)
 
 add_library(wrench STATIC ${SOURCE_FILES})
 set_target_properties(wrench PROPERTIES VERSION ${WRENCH_RELEASE_VERSION})
-target_link_libraries(wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY} ${LEMON_LIBRARY})
+target_link_libraries(wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY})
 
 # wrench version
 add_custom_command(TARGET wrench PRE_LINK COMMAND ${CMAKE_COMMAND} -DPROJECT_SOURCE_DIR=${PROJECT_SOURCE_DIR} -DWRENCH_RELEASE_VERSION=${WRENCH_RELEASE_VERSION} -P ${CMAKE_HOME_DIRECTORY}/conf/cmake/Version.cmake)
