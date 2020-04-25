@@ -18,11 +18,14 @@
  ** StorageHost2 run two storage services.  Once the simulation is done,
  ** the completion time of each workflow task is printed.
  **
+ ** Example invocation of the simulator with no logging:
+ **    ./wrench-example-bare-metal-complex-job ./four_hosts.xml
+ **
  ** Example invocation of the simulator with only WMS logging:
- **    ./wrench-example-bare-metal-complex-job ./four_hosts.xml --wrench-no-logs --log=custom_wms.threshold=info
+ **    ./wrench-example-bare-metal-complex-job ./four_hosts.xml --log=custom_wms.threshold=info
  **
  ** Example invocation of the simulator for a 5-task workflow with full logging:
- **    ./wrench-example-bare-metal-complex-job ./four_hosts.xml
+ **    ./wrench-example-bare-metal-complex-job ./four_hosts.xml --wrench-full-log
  **/
 
 
@@ -53,7 +56,7 @@ int main(int argc, char **argv) {
 
     /* Parsing of the command-line arguments for this WRENCH simulation */
     if (argc != 2) {
-        std::cerr << "Usage: " << argv[0] << " <xml platform file> [--wrench-no-logs --log=custom_wms.threshold=info]" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " <xml platform file> [--log=custom_wms.threshold=info]" << std::endl;
         exit(1);
     }
 

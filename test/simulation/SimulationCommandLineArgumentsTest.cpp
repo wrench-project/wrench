@@ -26,7 +26,7 @@ public:
     void do_HelpSimGridArgument_test();
     void do_HelpArgument_test();
     void do_NoColorArgument_test();
-    void do_NoLogArgument_test();
+    void do_FullLogArgument_test(std::string arg, int num_log_lines);
     void do_ActivateEnergyArgument_test();
 
 protected:
@@ -359,15 +359,16 @@ void SimulationCommandLineArgumentsTest::do_NoColorArgument_test() {
 
 
 /**********************************************************************/
-/**           NO-LOG COMMAND-LINE ARGUMENT                           **/
+/**           FULL_LOG COMMAND-LINE ARGUMENT                         **/
 /**********************************************************************/
 
 
-TEST_F(SimulationCommandLineArgumentsTest, NoLogArgument) {
-    DO_TEST_WITH_FORK(do_NoLogArgument_test);
+TEST_F(SimulationCommandLineArgumentsTest, FullLogArgument) {
+    DO_TEST_WITH_FORK_TWO_ARGS(do_FullLogArgument_test, "", 0);
+    DO_TEST_WITH_FORK_TWO_ARGS(do_FullLogArgument_test, "--wrench-full-log", 3);
 }
 
-void SimulationCommandLineArgumentsTest::do_NoLogArgument_test() {
+void SimulationCommandLineArgumentsTest::do_FullLogArgument_test(std::string arg, int num_log_lines) {
 
     // Undo the SimGrid Logging config for Google Tests
     xbt_log_control_set("root.thresh:info");
@@ -377,7 +378,7 @@ void SimulationCommandLineArgumentsTest::do_NoLogArgument_test() {
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--wrench-no-log");
+    argv[1] = strdup(arg.c_str());
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -403,7 +404,6 @@ void SimulationCommandLineArgumentsTest::do_NoLogArgument_test() {
     stderr_file = fopen((UNIQUE_TMP_PATH_PREFIX + "unit_tests.stderr").c_str(), "r");
     int linecount = 0;
     char *line = nullptr;
-    ssize_t read;
     size_t linecapp;
     while (getline(&line, &linecapp, stderr_file) != -1) {
         linecount++;
@@ -412,7 +412,7 @@ void SimulationCommandLineArgumentsTest::do_NoLogArgument_test() {
     }
     fclose(stderr_file);
 
-    ASSERT_EQ(linecount, 0);
+    ASSERT_EQ(linecount, num_log_lines);
 
     // Just in case
     xbt_log_control_set("root.thresh:critical");
@@ -422,6 +422,7 @@ void SimulationCommandLineArgumentsTest::do_NoLogArgument_test() {
     free(argv[1]);
     free(argv);
 }
+
 
 
 
