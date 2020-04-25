@@ -14,7 +14,7 @@ sonar.cfamily.build-wrapper-output=bw-output
 sonar.cpp.std=gnu++11
 sonar.sourceEncoding=UTF-8
 
-sonar.sources=src,include
+sonar.sources=src,include,examples
 sonar.tests=test
 
 sonar.cfamily.threads=1
