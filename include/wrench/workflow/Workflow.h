@@ -17,12 +17,16 @@
 #include "wrench/workflow/execution_events/WorkflowExecutionEvent.h"
 #include "WorkflowFile.h"
 #include "WorkflowTask.h"
+#include "DagOfTasks.h"
+
+#include <boost/graph/adjacency_list.hpp>
 
 class WorkflowTask;
 
 namespace wrench {
 
     class Simulation;
+
 
     /**
      * @brief A workflow (to be executed by a WMS)
@@ -48,21 +52,9 @@ namespace wrench {
 
         WorkflowFile *getFileByID(const std::string &id);
 
-        static double getSumFlops(std::vector<WorkflowTask *> tasks);
+        static double getSumFlops(const std::vector<WorkflowTask *> tasks);
 
         void addControlDependency(WorkflowTask *src, WorkflowTask *dest, bool redundant_dependencies = false);
-
-//        void loadFromDAX(const std::string &filename,
-//                         const std::string &reference_flop_rate,
-//                         bool redundant_dependencies = false);
-//
-//        void loadFromJSON(const std::string &filename,
-//                          const std::string &reference_flop_rate,
-//                          bool redundant_dependencies = false);
-//
-//        void loadFromDAXorJSON(const std::string &filename,
-//                               const std::string &reference_flop_rate,
-//                               bool redundant_dependencies = false);
 
         unsigned long getNumberOfTasks();
 
@@ -87,7 +79,9 @@ namespace wrench {
         std::vector<WorkflowTask *> getExitTasks() const;
 
         std::vector<WorkflowTask *> getTaskParents(const WorkflowTask *task);
+        long getTaskNumberOfParents(const  WorkflowTask *task);
         std::vector<WorkflowTask *> getTaskChildren(const WorkflowTask *task);
+        long getTaskNumberOfChildren(const WorkflowTask *task);
 
         bool isDone();
 
@@ -125,15 +119,14 @@ namespace wrench {
 
         friend class WorkflowTask;
 
-//        void setNumLevels(unsigned long);
+        struct Vertex{ WorkflowTask *task;};
+        typedef boost::adjacency_list<boost::listS, boost::vecS, boost::directedS, Vertex> DAG;
+        typedef boost::graph_traits<DAG>::vertex_descriptor vertex_t;
 
-        std::unique_ptr<lemon::ListDigraph> DAG;  // Lemon DiGraph
-        std::unique_ptr<lemon::ListDigraph::NodeMap<WorkflowTask *>> DAG_node_map;  // Lemon map
+        DagOfTasks dag;
 
         std::map<std::string, std::unique_ptr<WorkflowTask>> tasks;
         std::map<std::string, std::unique_ptr<WorkflowFile>> files;
-
-//        unsigned long num_levels;
 
         bool pathExists(WorkflowTask *, WorkflowTask *);
 
