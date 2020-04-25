@@ -32,6 +32,8 @@ namespace wrench {
 
     typedef boost::adjacency_list<boost::listS, boost::vecS, boost::bidirectionalS, VertexProperties> DAG;
 
+    typedef unsigned long vertex_t;  // To clean up later...
+
     /**
      * @brief An internal class that uses the Boost Graph Library to implement a DAG of WorkflowTask objects
      */
@@ -58,8 +60,6 @@ namespace wrench {
         std::vector<WorkflowTask *> getParents(const WorkflowTask *task);
 
     private:
-
-        void print_vertices();
 
         /**
          * @brief Nested class that's used for the BFS algorithm in the BGL
