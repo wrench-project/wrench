@@ -166,7 +166,7 @@ namespace wrench {
 
         std::set<std::shared_ptr<StorageService>> storage_services;
 
-        static int disk_counter;
+        static int unique_disk_sequence_number;
 
         void stageFile(WorkflowFile *file, std::shared_ptr<FileLocation> location);
 
