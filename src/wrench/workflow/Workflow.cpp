@@ -65,7 +65,7 @@ namespace wrench {
 
         // Create the WorkflowTask object
         auto task = new WorkflowTask(id, flops, min_num_cores, max_num_cores, parallel_efficiency,
-                                              memory_requirement);
+                                     memory_requirement);
         // Associate the workflow to the task
         task->workflow = this;
 
@@ -267,7 +267,7 @@ namespace wrench {
      * @return true if there is a path from src to dst, false otherwise
      */
     bool Workflow::pathExists(const WorkflowTask *src, const WorkflowTask *dst) {
-       return  this->dag.doesPathExist(src, dst);
+        return  this->dag.doesPathExist(src, dst);
     }
 
     /**
@@ -612,11 +612,11 @@ namespace wrench {
         return entry_tasks;
     }
 
-       /**
-        * @brief Get the exit tasks of the workflow, i.e., those tasks
-        *        that don't have children
-        * @return A map of tasks indexed by their IDs
-        */
+    /**
+     * @brief Get the exit tasks of the workflow, i.e., those tasks
+     *        that don't have children
+     * @return A map of tasks indexed by their IDs
+     */
     std::map<std::string, WorkflowTask *> Workflow::getExitTaskMap() const {
         // TODO: This could be done more efficiently at the DAG level
         std::map<std::string, WorkflowTask *> exit_tasks;
