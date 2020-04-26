@@ -27,7 +27,7 @@ namespace wrench {
     struct VertexProperties {
 //    std::size_t index;
 //    boost::default_color_type color;
-        WorkflowTask *task;
+        const WorkflowTask *task;
     };
 
     typedef boost::adjacency_list<boost::listS, boost::vecS, boost::bidirectionalS, VertexProperties> DAG;
@@ -41,7 +41,7 @@ namespace wrench {
 
     public:
 
-        void addVertex(WorkflowTask *task);
+        void addVertex(const WorkflowTask *task);
 
         void removeVertex(WorkflowTask *task);
 
@@ -49,7 +49,7 @@ namespace wrench {
 
         void removeEdge(WorkflowTask *src, WorkflowTask *dst);
 
-        bool doesPathExist(WorkflowTask *src, WorkflowTask *dst);
+        bool doesPathExist(const WorkflowTask *src, const WorkflowTask *dst);
 
         long getNumberOfChildren(const WorkflowTask *task);
 
@@ -67,9 +67,9 @@ namespace wrench {
         class custom_bfs_visitor : public boost::default_bfs_visitor {
         public:
 
-            WorkflowTask *target_task;
+            const WorkflowTask *target_task;
 
-            explicit custom_bfs_visitor(WorkflowTask *target_task) : boost::default_bfs_visitor() {
+            explicit custom_bfs_visitor(const WorkflowTask *target_task) : boost::default_bfs_visitor() {
                 this->target_task = target_task;
             }
 
@@ -81,7 +81,8 @@ namespace wrench {
             }
         };
 
-        std::vector<WorkflowTask*> task_list;
+        std::vector<const WorkflowTask*> task_list;
+        std::unordered_map<const WorkflowTask *, unsigned long> task_map;
 
         DAG dag;
 

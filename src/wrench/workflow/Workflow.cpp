@@ -378,7 +378,7 @@ namespace wrench {
      *
      * @return a map of files, indexed by file ID
      */
-    std::map<std::string, WorkflowFile *> Workflow::getFileMap() {
+    std::map<std::string, WorkflowFile *> Workflow::getFileMap() const {
         std::map<std::string, WorkflowFile *> all_files;
         for (auto &it : this->files) {
             all_files[it.first] =  (it.second.get());
@@ -391,7 +391,7 @@ namespace wrench {
      *
      * @return a vector of files
      */
-    std::vector<WorkflowFile *> Workflow::getFiles() {
+    std::vector<WorkflowFile *> Workflow::getFiles() const {
         std::vector<WorkflowFile *> all_files;
         for (auto const &f : this->files) {
             all_files.push_back(f.second.get());

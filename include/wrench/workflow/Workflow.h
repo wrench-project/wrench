@@ -63,8 +63,8 @@ namespace wrench {
 
         void exportToEPS(std::string);
 
-        std::vector<WorkflowFile *> getFiles();
-        std::map<std::string, WorkflowFile *> getFileMap();
+        std::vector<WorkflowFile *> getFiles() const;
+        std::map<std::string, WorkflowFile *> getFileMap() const;
         std::vector<WorkflowFile *> getInputFiles() const;
         std::map<std::string, WorkflowFile *> getInputFileMap() const;
         std::vector<WorkflowFile *> getOutputFiles() const;
