@@ -54,6 +54,7 @@ namespace wrench {
         static double getSumFlops(const std::vector<WorkflowTask *> tasks);
 
         void addControlDependency(WorkflowTask *src, WorkflowTask *dest, bool redundant_dependencies = false);
+        void removeControlDependency(WorkflowTask *src, WorkflowTask *dest);
 
         unsigned long getNumberOfTasks();
 

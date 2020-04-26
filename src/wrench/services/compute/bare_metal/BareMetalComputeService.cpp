@@ -9,7 +9,6 @@
 
 #include <typeinfo>
 #include <map>
-#include <memory>
 #include <wrench/util/PointerUtil.h>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
@@ -23,7 +22,6 @@
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
-#include "wrench/services/compute/bare_metal/BareMetalComputeService.h"
 #include "wrench/services/storage/StorageService.h"
 #include "wrench/simulation/Simulation.h"
 #include "wrench/workflow/job/PilotJob.h"
