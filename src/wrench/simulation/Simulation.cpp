@@ -584,14 +584,15 @@ namespace wrench {
      */
     void Simulation::readFromDisk(double num_bytes, std::string hostname, std::string mount_point) {
         unique_disk_sequence_number+=1;
-        this->getOutput().addTimestampDiskReadStart(hostname, mount_point, num_bytes, unique_disk_sequence_number);
+        int temp_unique_sequence_number = unique_disk_sequence_number;
+        this->getOutput().addTimestampDiskReadStart(hostname, mount_point, num_bytes, temp_unique_sequence_number);
         try{
             S4U_Simulation::readFromDisk(num_bytes, hostname, mount_point);
         } catch (const std::invalid_argument &ia) {
-            this->getOutput().addTimestampDiskReadFailure(hostname, mount_point, num_bytes, unique_disk_sequence_number);
+            this->getOutput().addTimestampDiskReadFailure(hostname, mount_point, num_bytes, temp_unique_sequence_number);
             throw;
         }
-        this->getOutput().addTimestampDiskReadCompletion(hostname, mount_point, num_bytes, unique_disk_sequence_number);
+        this->getOutput().addTimestampDiskReadCompletion(hostname, mount_point, num_bytes, temp_unique_sequence_number);
     }
 
     /**
@@ -609,17 +610,18 @@ namespace wrench {
                                                             std::string read_mount_point,
                                                             std::string write_mount_point) {
         unique_disk_sequence_number+=1;
-        this->getOutput().addTimestampDiskReadStart(hostname, read_mount_point, num_bytes_to_read, unique_disk_sequence_number);
-        this->getOutput().addTimestampDiskWriteStart(hostname, write_mount_point, num_bytes_to_write, unique_disk_sequence_number);
+        int temp_unique_sequence_number = unique_disk_sequence_number;
+        this->getOutput().addTimestampDiskReadStart(hostname, read_mount_point, num_bytes_to_read, temp_unique_sequence_number);
+        this->getOutput().addTimestampDiskWriteStart(hostname, write_mount_point, num_bytes_to_write, temp_unique_sequence_number);
         try{
             S4U_Simulation::readFromDiskAndWriteToDiskConcurrently(num_bytes_to_read, num_bytes_to_write, hostname, read_mount_point, write_mount_point);
         } catch (const std::invalid_argument &ia) {
-            this->getOutput().addTimestampDiskWriteFailure(hostname, write_mount_point, num_bytes_to_write, unique_disk_sequence_number);
-            this->getOutput().addTimestampDiskReadFailure(hostname, read_mount_point, num_bytes_to_read, unique_disk_sequence_number);
+            this->getOutput().addTimestampDiskWriteFailure(hostname, write_mount_point, num_bytes_to_write, temp_unique_sequence_number);
+            this->getOutput().addTimestampDiskReadFailure(hostname, read_mount_point, num_bytes_to_read, temp_unique_sequence_number);
             throw;
         }
-        this->getOutput().addTimestampDiskWriteCompletion(hostname, write_mount_point, num_bytes_to_write, unique_disk_sequence_number);
-        this->getOutput().addTimestampDiskReadCompletion(hostname, read_mount_point, num_bytes_to_read, unique_disk_sequence_number);
+        this->getOutput().addTimestampDiskWriteCompletion(hostname, write_mount_point, num_bytes_to_write, temp_unique_sequence_number);
+        this->getOutput().addTimestampDiskReadCompletion(hostname, read_mount_point, num_bytes_to_read, temp_unique_sequence_number);
     }
 
     /**
@@ -632,14 +634,15 @@ namespace wrench {
      */
     void Simulation::writeToDisk(double num_bytes, std::string hostname, std::string mount_point) {
         unique_disk_sequence_number+=1;
-        this->getOutput().addTimestampDiskWriteStart(hostname, mount_point, num_bytes, unique_disk_sequence_number);
+        int temp_unique_sequence_number = unique_disk_sequence_number;
+        this->getOutput().addTimestampDiskWriteStart(hostname, mount_point, num_bytes, temp_unique_sequence_number);
         try{
             S4U_Simulation::writeToDisk(num_bytes, hostname, mount_point);
         } catch (const std::invalid_argument &ia) {
-            this->getOutput().addTimestampDiskWriteFailure(hostname, mount_point, num_bytes, unique_disk_sequence_number);
+            this->getOutput().addTimestampDiskWriteFailure(hostname, mount_point, num_bytes, temp_unique_sequence_number);
             throw;
         }
-        this->getOutput().addTimestampDiskWriteCompletion(hostname, mount_point, num_bytes, unique_disk_sequence_number);
+        this->getOutput().addTimestampDiskWriteCompletion(hostname, mount_point, num_bytes, temp_unique_sequence_number);
     }
 
     /**
