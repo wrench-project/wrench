@@ -15,4 +15,4 @@ WRENCH_LOG_CATEGORY(wrench_core_failure_cause, "Log category for FailureCause");
 namespace wrench {
 
 
-};
+}

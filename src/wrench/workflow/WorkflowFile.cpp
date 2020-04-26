@@ -27,7 +27,7 @@ namespace wrench {
             id(name), size(s), output_of(nullptr) {
         this->input_of = {};
         this->output_of = nullptr;
-    };
+    }
 
     /**
      * @brief Get the file size
@@ -95,6 +95,6 @@ namespace wrench {
      */
     bool WorkflowFile::isOutput() {
         return (this->output_of != nullptr);
-    };
+    }
 
-};
+}

@@ -397,7 +397,7 @@ namespace wrench {
             all_tasks[t.first] = (t.second.get());
         }
         return all_tasks;
-    };
+    }
 
     /**
      * @brief Get the list of all tasks in the workflow
@@ -410,7 +410,7 @@ namespace wrench {
             all_tasks.push_back(t.second.get());
         }
         return all_tasks;
-    };
+    }
 
     /**
      * @brief Get the list of all files in the workflow
@@ -423,7 +423,7 @@ namespace wrench {
             all_files[it.first] =  (it.second.get());
         }
         return all_files;
-    };
+    }
 
     /**
      * @brief Get the list of all files in the workflow
@@ -436,7 +436,7 @@ namespace wrench {
             all_files.push_back(f.second.get());
         }
         return all_files;
-    };
+    }
 
     /**
      * @brief Get the list of children for a task
