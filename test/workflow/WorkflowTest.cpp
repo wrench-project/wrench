@@ -36,22 +36,24 @@ protected:
         f2 = workflow->addFile("file-02", 1);
         f3 = workflow->addFile("file-03", 1);
         f4 = workflow->addFile("file-04", 1);
+        f5 = workflow->addFile("file-05", 1);
 
         t1->addInputFile(f1);
         t1->addOutputFile(f2);
         t2->addInputFile(f2);
         t2->addOutputFile(f3);
         t3->addInputFile(f2);
+        t3->addOutputFile(f4);
         t4->addInputFile(f3);
         t4->addInputFile(f4);
-        t3->addOutputFile(f4);
+        t4->addOutputFile(f5);
     }
 
     // data members
     std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
     wrench::Workflow *workflow;
     wrench::WorkflowTask *t1, *t2, *t3, *t4;
-    wrench::WorkflowFile *f1, *f2, *f3, *f4;
+    wrench::WorkflowFile *f1, *f2, *f3, *f4, *f5;
 };
 
 TEST_F(WorkflowTest, WorkflowStructure) {
@@ -97,9 +99,9 @@ TEST_F(WorkflowTest, WorkflowStructure) {
 
     // Test file "getters"
     auto file_map = workflow->getFileMap();
-    ASSERT_EQ(4, file_map.size());
+    ASSERT_EQ(5, file_map.size());
     auto files = workflow->getFiles();
-    ASSERT_EQ(4, files.size());
+    ASSERT_EQ(5, files.size());
     auto ifile_map = workflow->getInputFileMap();
     ASSERT_EQ(1, ifile_map.size());
     auto ifiles = workflow->getInputFiles();
