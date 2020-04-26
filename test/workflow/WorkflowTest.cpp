@@ -160,6 +160,11 @@ TEST_F(WorkflowTest, ControlDependency) {
     ASSERT_THROW(workflow->addControlDependency(nullptr, nullptr), std::invalid_argument);
     ASSERT_THROW(workflow->addControlDependency(t1, nullptr), std::invalid_argument);
     ASSERT_THROW(workflow->addControlDependency(nullptr, t1), std::invalid_argument);
+    workflow->addControlDependency(t2, t3);
+    workflow->removeControlDependency(t2,t3);  // removes something
+    workflow->removeControlDependency(t1,t2);  // nope (data depencency)
+    ASSERT_EQ(true, workflow->pathExists(t1,t2));
+    workflow->removeControlDependency(t1,t4);  // nope (nothing)
 }
 
 TEST_F(WorkflowTest, WorkflowTaskThrow) {

@@ -97,7 +97,7 @@ namespace wrench {
  * @brief Method to check whether a path exists between to task vertices
  * @param src: the source task
  * @param dst: the destination task
- * @return trus if there is a path netween the tasks
+ * @return true if there is a path between the tasks
  */
     bool wrench::DagOfTasks::doesPathExist(const wrench::WorkflowTask *src,  const wrench::WorkflowTask *dst) {
         // Check that vertices exist
@@ -126,6 +126,29 @@ namespace wrench {
             return true;
         }
         return false;
+    }
+
+    /**
+ * @brief Method to check whether an edge exists between to task vertices
+ * @param src: the source task
+ * @param dst: the destination task
+ * @return true if there is a path between the tasks
+ */
+    bool wrench::DagOfTasks::doesEdgeExist(const wrench::WorkflowTask *src,  const wrench::WorkflowTask *dst) {
+        // Check that vertices exist
+        if (this->task_map[src] >= this->task_list.size()) {
+            throw std::runtime_error(
+                    "wrench::DagOfTasks::doesPathExist(): Trying to find a path from a non-existing vertex");
+        }
+        if (this->task_map[dst] >= this->task_list.size()) {
+            throw std::runtime_error(
+                    "wrench::DagOfTasks::doesPathExist(): Trying to find a path to a non-existing vertex");
+        }
+        // Find the vertices
+        auto src_vertex = this->task_map[src];
+        auto dst_vertex = this->task_map[dst];
+
+        return boost::edge(src_vertex,dst_vertex,this->dag).second;
     }
 
 /**

@@ -50,6 +50,7 @@ namespace wrench {
         void removeEdge(WorkflowTask *src, WorkflowTask *dst);
 
         bool doesPathExist(const WorkflowTask *src, const WorkflowTask *dst);
+        bool doesEdgeExist(const WorkflowTask *src, const WorkflowTask *dst);
 
         long getNumberOfChildren(const WorkflowTask *task);
 

@@ -106,7 +106,6 @@ namespace wrench {
         static std::string getThisProcessLoggingColor();
 
         static bool color_enabled;
-        static bool wrench_no_log;
 
     };
 
