@@ -193,6 +193,45 @@ namespace wrench {
     }
 
     /**
+     * @brief Remove a control dependency between tasks  (does nothing if none)
+     * @param src: the source task
+     * @param dst: the destination task
+     */
+    void  Workflow::removeControlDependency(WorkflowTask *src, WorkflowTask *dst) {
+        if ((src == nullptr) || (dst == nullptr)) {
+            throw std::invalid_argument("Workflow::removeControlDependency(): Invalid arguments");
+        }
+
+        /*  Check that the two tasks don't have a data dependency; if so, just return */
+        for (auto const &f : dst->getInputFiles()) {
+            if (f->getOutputOf() == src) {
+                return;
+            }
+        }
+
+        /* If there is an edge between the two tasks, remove it */
+        if (this->dag.doesEdgeExist(src, dst)) {
+            this->dag.removeEdge(src, dst);
+
+            dst->updateTopLevel();
+
+            /* Update state */
+            if (dst->getState() == WorkflowTask::State::NOT_READY) {
+                bool ready = true;
+                for (auto const &p :  dst->getParents()) {
+                    if (p->getState() != WorkflowTask::State::COMPLETED) {
+                        ready = false;
+                        break;
+                    }
+                }
+                if (ready) {
+                    dst->setState(WorkflowTask::State::READY);
+                }
+            }
+        }
+    }
+
+    /**
      * @brief Add a new file to the workflow
      *
      * @param id: a unique string id
