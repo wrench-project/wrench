@@ -1240,7 +1240,7 @@ namespace wrench {
         if (file_path.empty()) {
             throw std::invalid_argument("SimulationOutput::dumpDiskOperationJSON() requires a valid workflow and file_path");
         }
-
+        nlohmann::json disk_operations_json;
 
         auto read_start_timestamps = this->getTrace<SimulationTimestampDiskReadStart>();
         auto read_completion_timestamps = this->getTrace<wrench::SimulationTimestampDiskReadCompletion>();
@@ -1250,56 +1250,99 @@ namespace wrench {
         auto write_completion_timestamps = this->getTrace<wrench::SimulationTimestampDiskWriteCompletion>();
         auto write_failure_timestamps = this->getTrace<wrench::SimulationTimestampDiskWriteFailure>();
 
-        std::vector<std::tuple<string, string, std::tuple<double, double, double>>> reads;
-        std::vector<std::tuple<string, string, std::tuple<double, double, double>>> writes;
-        std::tuple<string, string, std::tuple<double, double, double>> disk_operation;
 
-        if (!read_start_timestamps.empty()) {
-            for (auto & read_start_timestamp : read_start_timestamps){
-                disk_operation = std::make_tuple(read_start_timestamp->getContent()->getHostname().c_str(),
-                                   read_start_timestamp->getContent()->getMount().c_str(),
-                                   std::make_tuple(read_start_timestamp->getContent()->getDate(),
-                                           read_start_timestamp->getContent()->getEndpoint()->getDate(),
-                                           read_start_timestamp->getContent()->getBytes()));
-                reads.emplace_back(disk_operation);
+        std::set<std::string> hostnames;
+
+        //std::tuple<string, string, std::tuple<double, double, double>> disk_operation;
+        std::tuple<double, double, double> disk_operation;
+
+        if(!read_start_timestamps.empty()){
+            for (auto & timestamp : read_start_timestamps) {
+                hostnames.insert(timestamp->getContent()->getHostname());
+            }
+        }
+        if(!write_start_timestamps.empty()){
+            for (auto & timestamp : write_start_timestamps) {
+                hostnames.insert(timestamp->getContent()->getHostname());
             }
         }
 
-        if (!write_start_timestamps.empty()) {
-            for (auto & write_start_timestamp : write_start_timestamps){
-                writes.emplace_back(std::make_tuple(write_start_timestamp->getContent()->getHostname().c_str(),
-                                    write_start_timestamp->getContent()->getMount().c_str(),
-                                                    std::make_tuple(write_start_timestamp->getContent()->getDate(),
-                                                                    write_start_timestamp->getContent()->getEndpoint()->getDate(),
-                                                                    write_start_timestamp->getContent()->getBytes())));
+        for(auto & host : hostnames) {
+            std::set<std::string> mounts;
+            if(!read_start_timestamps.empty()){
+                for (auto & timestamp : read_start_timestamps) {
+                    if(timestamp->getContent()->getHostname().compare(host) == 0){
+                        mounts.insert(timestamp->getContent()->getMount());
+                    }
+                }
             }
+            if(!write_start_timestamps.empty()){
+                for (auto & timestamp : write_start_timestamps) {
+                    if(timestamp->getContent()->getHostname().compare(host) == 0){
+                        mounts.insert(timestamp->getContent()->getMount());
+                    }
+                }
+            }
+            for (auto & mount : mounts) {
+                std::vector<std::tuple<double, double, double>> reads;
+                std::vector<std::tuple<double, double, double>> writes;
+
+                if (!read_start_timestamps.empty()) {
+                    for (auto & read_start_timestamp : read_start_timestamps){
+                        if (read_start_timestamp->getContent()->getHostname().compare(host) == 0 && read_start_timestamp->getContent()->getMount().compare(mount) == 0){
+                            disk_operation = std::make_tuple(read_start_timestamp->getContent()->getDate(),
+                                                             read_start_timestamp->getContent()->getEndpoint()->getDate(),
+                                                             read_start_timestamp->getContent()->getBytes());
+                            reads.emplace_back(disk_operation);
+                        }
+
+                    }
+                }
+                if (!write_start_timestamps.empty()) {
+                    for (auto & write_start_timestamp : write_start_timestamps){
+                        if (write_start_timestamp->getContent()->getHostname().compare(host) == 0 && write_start_timestamp->getContent()->getMount().compare(mount) == 0){
+                            disk_operation = std::make_tuple(write_start_timestamp->getContent()->getDate(),
+                                                             write_start_timestamp->getContent()->getEndpoint()->getDate(),
+                                                             write_start_timestamp->getContent()->getBytes());
+                            writes.emplace_back(disk_operation);
+                        }
+
+                    }
+                }
+                nlohmann::json disk_reads;
+                for (auto const &r : reads) {
+                    nlohmann::json disk_read = nlohmann::json::object({{"start", std::get<0>(r)},
+                                                                       {"end", std::get<1>(r)},
+                                                                       {"bytes",std::get<2>(r)}});
+                    disk_reads.push_back(disk_read);
+                }
+
+                nlohmann::json disk_writes;
+                for (auto const &w : writes) {
+                    nlohmann::json disk_write = nlohmann::json::object({{"start", std::get<0>(w)},
+                                                                        {"end", std::get<1>(w)},
+                                                                        {"bytes",std::get<2>(w)}});
+                    disk_writes.push_back(disk_write);
+                }
+                disk_operations_json[host][mount]["reads"] = disk_reads;
+                disk_operations_json[host][mount]["writes"] = disk_writes;
+            }
+
+
+
         }
 
-        nlohmann::json disk_reads;
-        for (auto const &r : reads) {
-            nlohmann::json disk_read = nlohmann::json::object({{"mount", std::get<1>(r)},
-                                                               {"hostname", std::get<0>(r)},
-                                                               {"start", std::get<0>(std::get<2>(r))},
-                                                               {"end", std::get<1>(std::get<2>(r))},
-                                                               {"bytes",std::get<2>(std::get<2>(r))}});
-            disk_reads.push_back(disk_read);
-        }
-
-        nlohmann::json disk_writes;
-        for (auto const &w : writes) {
-            nlohmann::json disk_write = nlohmann::json::object({{"mount", std::get<1>(w)},
-                                                                {"hostname", std::get<0>(w)},
-                                                                {"start", std::get<0>(std::get<2>(w))},
-                                                                {"end", std::get<1>(std::get<2>(w))},
-                                                                {"bytes",std::get<2>(std::get<2>(w))}});
-            disk_writes.push_back(disk_write);
-        }
 
 
 
-        nlohmann::json disk_operations_json;
-        disk_operations_json["reads"] = disk_reads;
-        disk_operations_json["writes"] = disk_writes;
+
+
+
+
+
+
+
+
         disk_json_part = disk_operations_json;
 
         if(writing_file) {
