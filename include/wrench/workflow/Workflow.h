@@ -82,6 +82,9 @@ namespace wrench {
         std::vector<WorkflowTask *> getTaskChildren(const WorkflowTask *task);
         long getTaskNumberOfChildren(const WorkflowTask *task);
 
+        bool pathExists(const WorkflowTask *src, const WorkflowTask *dst);
+
+
         bool isDone();
 
         /***********************/
@@ -127,7 +130,6 @@ namespace wrench {
         std::map<std::string, std::unique_ptr<WorkflowTask>> tasks;
         std::map<std::string, std::unique_ptr<WorkflowFile>> files;
 
-        bool pathExists(WorkflowTask *, WorkflowTask *);
 
         std::string callback_mailbox;
         ComputeService *parent_compute_service; // The compute service to which the job was submitted, if any

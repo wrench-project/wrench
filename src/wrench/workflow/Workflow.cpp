@@ -261,12 +261,12 @@ namespace wrench {
     /**
      * @brief Determine whether one source is an ancestor of a destination task
      *
-     * @param src: the source workflow task
+     * @param src: the source task
      * @param dst: the destination task
      *
      * @return true if there is a path from src to dst, false otherwise
      */
-    bool Workflow::pathExists(WorkflowTask *src, WorkflowTask *dst) {
+    bool Workflow::pathExists(const WorkflowTask *src, const WorkflowTask *dst) {
        return  this->dag.doesPathExist(src, dst);
     }
 
