@@ -40,7 +40,6 @@ namespace wrench {
             Service(hostname,
                     "hdfs_service",
                     "hdfs_service"), job(job) {
-
         this->compute_resources = compute_resources;
 
         // Set default and specified properties
@@ -48,7 +47,6 @@ namespace wrench {
 
         // Set default and specified message payloads
         this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
-
     }
 
     /**
@@ -70,7 +68,6 @@ namespace wrench {
 
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
         while (this->processNextMessage()) {
-
         }
 
         WRENCH_INFO("HdfsService on host %s terminating cleanly!", S4U_Simulation::getHostName().c_str());
@@ -85,7 +82,6 @@ namespace wrench {
     * @throw std::runtime_error
     */
     bool HdfsService::processNextMessage() {
-
         // TODO: DEFINE THE SET OF MESSAGES AN HDFSSERVICE CAN SEND AND RECEIVE
 
         S4U_Simulation::computeZeroFlop();
@@ -101,7 +97,6 @@ namespace wrench {
 
         WRENCH_INFO("Got a [%s] message", message->getName().c_str());
         if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
-
             // This is Synchronous
             try {
                 S4U_Mailbox::putMessage(msg->ack_mailbox,

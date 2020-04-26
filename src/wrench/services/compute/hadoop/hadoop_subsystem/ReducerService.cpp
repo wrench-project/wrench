@@ -18,7 +18,6 @@
 WRENCH_LOG_CATEGORY(reducer_servivce, "Log category for Reducer Actor");
 
 namespace wrench {
-
     ReducerService::ReducerService(
             const std::string &hostname,
             MRJob *job,
@@ -29,7 +28,6 @@ namespace wrench {
             Service(hostname,
                     "reducer_service",
                     "reducer_service"), job(job) {
-
         this->compute_resources = compute_resources;
 
         // Set default and specified properties
@@ -37,7 +35,6 @@ namespace wrench {
 
         // Set default and specified message payloads
         this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
-
     }
 
     void ReducerService::stop() {
@@ -50,7 +47,6 @@ namespace wrench {
 
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
         while (this->processNextMessage()) {
-
         }
 
         WRENCH_INFO("ReducerService on host %s terminating cleanly!", S4U_Simulation::getHostName().c_str());
@@ -58,7 +54,6 @@ namespace wrench {
     }
 
     bool ReducerService::processNextMessage() {
-
         //TODO: DEFINE SET OF MESSAGES THAT REDUCER SERVICE CAN SEND AND RECEIVE
 
         S4U_Simulation::computeZeroFlop();
@@ -74,7 +69,6 @@ namespace wrench {
 
         WRENCH_INFO("Got a [%s] message", message->getName().c_str());
         if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
-
             // This is Synchronous
             try {
                 S4U_Mailbox::putMessage(msg->ack_mailbox,
@@ -84,7 +78,6 @@ namespace wrench {
                 return false;
             }
             return false;
-
         } else {
             throw std::runtime_error(
                     "ReducerService::processNextMessage(): Received an unexpected [" + message->getName() + "] message!");

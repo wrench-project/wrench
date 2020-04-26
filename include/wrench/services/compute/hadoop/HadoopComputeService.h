@@ -25,10 +25,7 @@ namespace wrench {
 
 
     class HadoopComputeService : public Service {
-
-
     public:
-
         HadoopComputeService(
                 const std::string &hostname,
                 const std::set<std::string> compute_resources,
@@ -39,9 +36,7 @@ namespace wrench {
         void stop() override;
 
         void runMRJob(MRJob *job);
-
     private:
-
         class PendingJob {
         public:
 
@@ -54,7 +49,6 @@ namespace wrench {
                 this->executor = std::move(executor);
                 this->answer_mailbox = std::move(answer_mailbox);
             }
-
         };
 
         std::map<std::string, std::string> default_property_values = {};
@@ -75,6 +69,4 @@ namespace wrench {
 
     };
 }
-
-
 #endif //WRENCH_HADOOPCOMPUTESERVICE_H

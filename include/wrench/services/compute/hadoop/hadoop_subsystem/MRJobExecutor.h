@@ -20,12 +20,8 @@
 #include "wrench/services/compute/hadoop/MRJob.h"
 
 namespace wrench {
-
-
     class MRJobExecutor : public Service {
-
     public:
-
         MRJobExecutor(
                 const std::string &hostname,
                 MRJob *job,
@@ -36,9 +32,7 @@ namespace wrench {
         );
 
         void stop() override;
-
     private:
-
         MRJob *job;
         std::string notify_mailbox;
         bool success;
@@ -60,8 +54,6 @@ namespace wrench {
         bool processNextMessage();
 
         void setup_workers(std::vector<std::shared_ptr<Service>> workers);
-
     };
 }
-
 #endif //WRENCH_HADOOPCOMPUTESERVICE_H

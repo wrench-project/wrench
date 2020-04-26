@@ -15,10 +15,8 @@
 #include "wrench/services/compute/ComputeService.h"
 
 namespace wrench {
-
     class HdfsService : public Service {
     public:
-
         HdfsService(
                 const std::string &hostname,
                 MRJob *job,
@@ -28,9 +26,7 @@ namespace wrench {
         );
 
         void stop() override;
-
     private:
-
         MRJob *job;
 
         // TODO: Define these:
@@ -49,5 +45,4 @@ namespace wrench {
         bool processNextMessage();
     };
 }
-
 #endif //WRENCH_HDFS_H

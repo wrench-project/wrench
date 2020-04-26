@@ -37,7 +37,6 @@ namespace wrench {
             Service(hostname,
                     "shuffle_service",
                     "shuffle_service") {
-
         this->compute_resources = compute_resources;
 
         // Set default and specified properties
@@ -45,7 +44,6 @@ namespace wrench {
 
         // Set default and specified message payloads
         this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
-
     }
 
     /**
@@ -71,13 +69,11 @@ namespace wrench {
 
         /** Main loop **/
         while (this->processNextMessage()) {
-
         }
 
         WRENCH_INFO("ShuffleService on host %s terminating cleanly!", S4U_Simulation::getHostName().c_str());
         return 0;
     }
-
 
     /**
      * @brief Wait for and react to any incoming message
@@ -87,7 +83,6 @@ namespace wrench {
      * @throw std::runtime_error
      */
     bool ShuffleService::processNextMessage() {
-
         S4U_Simulation::computeZeroFlop();
 
         // Wait for a message
@@ -101,7 +96,6 @@ namespace wrench {
 
         WRENCH_INFO("Got a [%s] message", message->getName().c_str());
         if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
-
             // This is Synchronous
             try {
                 S4U_Mailbox::putMessage(msg->ack_mailbox,
@@ -111,7 +105,6 @@ namespace wrench {
                 return false;
             }
             return false;
-
         } else {
             throw std::runtime_error(
                     "MRJobExecutor::processNextMessage(): Received an unexpected [" + message->getName() +

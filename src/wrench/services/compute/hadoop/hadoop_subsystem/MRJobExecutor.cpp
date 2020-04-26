@@ -43,7 +43,6 @@ namespace wrench {
             Service(hostname,
                     "mr_job_executor",
                     "mr_job_executor") {
-
         this->compute_resources = compute_resources;
         this->notify_mailbox = std::move(notify_mailbox);
 
@@ -64,7 +63,6 @@ namespace wrench {
     }
 
     void MRJobExecutor::setup_workers(std::vector<std::shared_ptr<Service>> workers) {
-
         // TODO: Right now these are all running on a single host
         // But we should change this so that workers are spun up
         // on the appropriate nodes.  As well as think about what
@@ -118,7 +116,6 @@ namespace wrench {
 
         /** Main loop **/
         while (this->processNextMessage()) {
-
         }
 
         // Reply to my creator with job status
@@ -145,7 +142,6 @@ namespace wrench {
      * @throw std::runtime_error
      */
     bool MRJobExecutor::processNextMessage() {
-
         S4U_Simulation::computeZeroFlop();
 
         // Wait for a message
@@ -159,7 +155,6 @@ namespace wrench {
 
         WRENCH_INFO("Got a [%s] message", message->getName().c_str());
         if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
-
             // TODO: Kill all the subordinate services (mappers, reducers, whatever)
             // TODO: Or reject the stop request because a job  is running?
             // TODO: Or terminate brutally a running job?

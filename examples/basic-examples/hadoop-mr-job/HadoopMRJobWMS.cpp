@@ -43,7 +43,6 @@ namespace wrench {
      * @throw std::runtime_error
      */
     int HadoopMRJobWMS::main() {
-
         /* Set the logging output to GREEN */
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
 

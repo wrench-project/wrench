@@ -14,12 +14,10 @@
 #include <utility>
 
 namespace wrench {
-
     class DeterministicMRJob : public MRJob {
     private:
         std::vector<int> &files;
     public:
-
         DeterministicMRJob(
                 int num_reducers, double data_size, int block_size,
                 bool use_combiner, int sort_factor, double spill_percent,
@@ -37,8 +35,6 @@ namespace wrench {
         }
 
         int calculateNumMappers() override;
-
     };
 }
-
 #endif //WRENCH_DETERMINISTICMRJOB_H

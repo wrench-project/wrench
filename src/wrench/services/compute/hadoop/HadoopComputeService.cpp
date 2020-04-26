@@ -42,13 +42,11 @@ namespace wrench {
             Service(hostname,
                     "hadoop",
                     "hadoop") {
-
         // Set default and specified properties
         this->setProperties(this->default_property_values, std::move(property_list));
 
         // Set default and specified message payloads
         this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
-
     }
 
     /**
@@ -65,7 +63,6 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void HadoopComputeService::runMRJob(MRJob *job) {
-
         assertServiceIsUp();
 
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_mr_job");
@@ -99,7 +96,6 @@ namespace wrench {
             throw std::runtime_error(
                     "HadoopComputeService::runMRJob(): Received an unexpected [" + message->getName() + "] message!");
         }
-
     }
 
     /**
@@ -117,7 +113,6 @@ namespace wrench {
 
         /** Main loop **/
         while (this->processNextMessage()) {
-
         }
 
         WRENCH_INFO("HadoopComputeService on host %s terminating cleanly!", S4U_Simulation::getHostName().c_str());
@@ -133,7 +128,6 @@ namespace wrench {
      * @throw std::runtime_error
      */
     bool HadoopComputeService::processNextMessage() {
-
         S4U_Simulation::computeZeroFlop();
 
         // Wait for a message
@@ -147,9 +141,7 @@ namespace wrench {
 
         WRENCH_INFO("Got a [%s] message", message->getName().c_str());
         if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
-
             // TODO: Forward the stop request to the executor
-
             // This is Synchronous
             try {
                 S4U_Mailbox::putMessage(msg->ack_mailbox,
@@ -192,7 +184,6 @@ namespace wrench {
             return true;
 
         } else if (auto msg = std::dynamic_pointer_cast<MRJobExecutorNotificationMessage>(message)) {
-
             if (this->pending_jobs.find(msg->job) == this->pending_jobs.end()) {
                 throw std::runtime_error("Couldn't find MR Job in pending job list!");
             }
@@ -207,12 +198,10 @@ namespace wrench {
             }
             this->pending_jobs.erase(msg->job);
             return false;
-
         } else {
-
             throw std::runtime_error(
                     "HadoopComputeService::processNextMessage(): Received an unexpected [" + message->getName() +
                     "] message!");
         }
     }
-};
+}

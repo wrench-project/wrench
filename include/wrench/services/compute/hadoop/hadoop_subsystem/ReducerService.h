@@ -19,10 +19,8 @@
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 
 namespace wrench {
-
     class ReducerService : public Service {
     public:
-
         ReducerService(
                 const std::string &hostname,
                 MRJob *job,
@@ -32,9 +30,7 @@ namespace wrench {
         );
 
         void stop() override;
-
     private:
-
         MRJob *job;
 
         // TODO: Define these:
@@ -48,8 +44,6 @@ namespace wrench {
         int main() override;
 
         bool processNextMessage();
-
     };
 }
-
 #endif //WRENCH_REDUCER_H

@@ -16,10 +16,8 @@
 #include "wrench/services/compute/ComputeService.h"
 
 namespace wrench {
-
     class MapperService : public Service {
     public:
-
         MapperService(
                 const std::string &hostname,
                 MRJob *job,
@@ -29,9 +27,7 @@ namespace wrench {
         );
 
         void stop() override;
-
     private:
-
         MRJob *job;
 
         // TODO: Define these:
@@ -52,8 +48,6 @@ namespace wrench {
         int main() override;
 
         bool processNextMessage();
-
     };
 }
-
 #endif //WRENCH_MAPPER_H

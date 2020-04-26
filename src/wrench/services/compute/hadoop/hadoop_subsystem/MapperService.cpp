@@ -21,7 +21,6 @@
 WRENCH_LOG_CATEGORY(mapper_service, "Log category for Mapper Actor");
 
 namespace wrench {
-
     /**
      * @brief: MapperService constructor
      *
@@ -41,7 +40,6 @@ namespace wrench {
             Service(hostname,
                     "mapper_service",
                     "mapper_service"), job(job) {
-
         this->compute_resources = compute_resources;
 
         // Set default and specified properties
@@ -49,7 +47,6 @@ namespace wrench {
 
         // Set default and specified message payloads
         this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
-
     }
 
     /**
@@ -87,7 +84,6 @@ namespace wrench {
 
         /** Main loop */
         while (this->processNextMessage()) {
-
         }
 
         WRENCH_INFO("MapperService on host %s terminating cleanly!", S4U_Simulation::getHostName().c_str());
@@ -102,7 +98,6 @@ namespace wrench {
      * @throw std::runtime_error
      */
     bool MapperService::processNextMessage() {
-
         S4U_Simulation::computeZeroFlop();
 
         // Wait for a message
@@ -116,7 +111,6 @@ namespace wrench {
 
         WRENCH_INFO("Got a [%s] message", message->getName().c_str());
         if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
-
             // This is Synchronous
             try {
                 S4U_Mailbox::putMessage(msg->ack_mailbox,
@@ -126,7 +120,6 @@ namespace wrench {
                 return false;
             }
             return false;
-
         } else if (auto msg = std::dynamic_pointer_cast<RequestDataFromHdfsMessage>(message)) {
             try {
                 S4U_Mailbox::putMessage(this->job->getHdfsMailboxName(),
@@ -139,7 +132,6 @@ namespace wrench {
             } catch (std::shared_ptr<NetworkError> &cause) {
                 return false;
             }
-
             return true;
         } else if (auto msg = std::dynamic_pointer_cast<HdfsReadCompleteMessage>(message)) {
             // The mapper computes the user map function, writes spill files locally,

@@ -17,7 +17,6 @@ namespace wrench {
 
     class MRJob {
     private:
-
         int num_mappers;
         int num_reducers;
         int sort_factor;
@@ -33,9 +32,7 @@ namespace wrench {
         int block_size;
         std::string job_type;
         std::string hdfs_mailbox_name;
-
     public:
-
         virtual ~MRJob() = default;
 
         virtual int calculateNumMappers() = 0;
@@ -101,7 +98,6 @@ namespace wrench {
         }
 
         // Accessors
-
         int getBlockSize() {
             return block_size;
         }

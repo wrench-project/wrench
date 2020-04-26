@@ -13,16 +13,13 @@
 
 #include <wrench-dev.h>
 
-
 namespace wrench {
-
     class Simulation;
 
     /**
      *  @brief A Workflow Management System (WMS) implementation (inherits from WMS)
      */
     class HadoopMRJobWMS : public WMS {
-
     public:
         // Constructor
         HadoopMRJobWMS(
