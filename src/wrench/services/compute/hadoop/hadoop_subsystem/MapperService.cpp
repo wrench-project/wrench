@@ -18,7 +18,7 @@
 #include "../HadoopComputeServiceMessage.h"
 
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(mapper_service, "Log category for Mapper Actor");
+WRENCH_LOG_CATEGORY(mapper_service, "Log category for Mapper Actor");
 
 namespace wrench {
 

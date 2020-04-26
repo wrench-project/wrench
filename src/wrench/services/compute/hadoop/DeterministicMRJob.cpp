@@ -11,7 +11,7 @@
 #include "wrench/services/compute/hadoop/hadoop_subsystem/MapperService.h"
 #include "wrench/logging/TerminalOutput.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(hadoop_compute_servivce, "Log category for Deterministic MR Job");
+//WRENCH_LOG_CATEGORY(hadoop_compute_servivce, "Log category for Deterministic MR Job");
 
 namespace wrench {
 
@@ -37,8 +37,6 @@ namespace wrench {
         this->setJobType(std::string("deterministic"));
     }
 
-    DeterministicMRJob::~DeterministicMRJob() = default;
-
     int DeterministicMRJob::calculateNumMappers() {
         /*
          * Finding the total number of mappers for a given job.
@@ -60,7 +58,6 @@ namespace wrench {
             }
         }
         this->setNumMappers(total_mappers);
-        return this->getNumMappers();
+        return total_mappers;
     }
-
 }

@@ -11,7 +11,7 @@
 #include "HadoopMRJobWMS.h"
 
 #include <wrench/services/compute/hadoop/HadoopComputeService.h>
-#include <wrench/services/compute/hadoop/MRJob.h>
+#include <wrench/services/compute/hadoop/DeterministicMRJob.h>
 
 #define GB 1000000000.0
 
@@ -58,8 +58,15 @@ namespace wrench {
         hadoop_service->start(hadoop_service, true, false);
 
         WRENCH_INFO("Creating a MR Job");
-
-        auto mr_job = new MRJob(); //  TODO: PASS STUFF TO A CONSTRUCTOR!
+        /**
+        DeterministicMRJob::DeterministicMRJob(int num_reducers, double data_size, int block_size,
+                                               bool use_combiner, int sort_factor, double spill_percent,
+                                               int mapper_key_width, int mapper_value_width, std::vector<int> &files,
+                                               double mapper_flops, int reducer_key_width, int reducer_value_width,
+                                               double reducer_flops)
+         */
+        std::vector<int> files = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
+        auto mr_job = new DeterministicMRJob(1, 1000.0, 16, false, 1, 0.8, 16, 16, files, 1.0, 1, 1, 1.0);
 
         WRENCH_INFO("Submitting  the MR Job to the Hadoop Service");
         hadoop_service->runMRJob(mr_job);
@@ -70,7 +77,6 @@ namespace wrench {
         WRENCH_INFO("Exiting");
         return 0;
     }
-
 
 
 }

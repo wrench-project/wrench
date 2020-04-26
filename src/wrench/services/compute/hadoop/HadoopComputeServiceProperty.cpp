@@ -16,5 +16,7 @@ namespace wrench {
     SET_PROPERTY_NAME(HadoopComputeServiceProperty, REDUCER_STARTUP_OVERHEAD);
     SET_PROPERTY_NAME(HadoopComputeServiceProperty, MAP_SIDE_SPILL_PHASE);
     SET_PROPERTY_NAME(HadoopComputeServiceProperty, MAP_SIDE_MERGE_PHASE);
+    SET_PROPERTY_NAME(HadoopComputeServiceProperty, HDFS_READ);
+    SET_PROPERTY_NAME(HadoopComputeServiceProperty, HDFS_WRITE);
 
 }

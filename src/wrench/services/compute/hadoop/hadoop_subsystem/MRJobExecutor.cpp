@@ -18,7 +18,7 @@
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(mr_job_executor_servivce, "Log category for MR Job Executor Service");
+WRENCH_LOG_CATEGORY(mr_job_executor_servivce, "Log category for MR Job Executor Service");
 
 namespace wrench {
 

@@ -36,7 +36,9 @@ namespace wrench {
 
     public:
 
-        virtual int calculateNumMappers();
+        virtual ~MRJob() = default;
+
+        virtual int calculateNumMappers() = 0;
 
         // Mutators
         void setBlockSize(int block_size) {

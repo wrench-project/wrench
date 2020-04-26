@@ -15,7 +15,7 @@
 #include "wrench/services/ServiceMessage.h"
 #include "wrench/workflow/failure_causes/NetworkError.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(reducer_servivce, "Log category for Reducer Actor");
+WRENCH_LOG_CATEGORY(reducer_servivce, "Log category for Reducer Actor");
 
 namespace wrench {
 

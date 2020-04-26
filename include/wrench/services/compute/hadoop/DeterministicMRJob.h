@@ -28,8 +28,6 @@ namespace wrench {
                 double reducer_flops
         );
 
-        ~DeterministicMRJob();
-
         void setFiles(std::vector<int> files) {
             this->files = std::move(files);
         }

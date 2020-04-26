@@ -17,7 +17,7 @@
 #include "../HadoopComputeServiceMessage.h"
 #include "wrench/simulation/Simulation.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(hdfs_servivce, "Log category for HDFS Actor");
+WRENCH_LOG_CATEGORY(hdfs_servivce, "Log category for HDFS Actor");
 
 namespace wrench {
 
