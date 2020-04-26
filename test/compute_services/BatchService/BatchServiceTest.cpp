@@ -21,9 +21,7 @@
 
 WRENCH_LOG_CATEGORY(batch_service_test, "Log category for BatchServiceTest");
 
-
 class BatchServiceTest : public ::testing::Test {
-
 public:
     std::shared_ptr<wrench::StorageService> storage_service1 = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service2 = nullptr;
@@ -180,7 +178,6 @@ protected:
 /**********************************************************************/
 
 class BogusSetupTestWMS : public wrench::WMS {
-
 public:
     BogusSetupTestWMS(BatchServiceTest *test,
                       const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
@@ -261,7 +258,6 @@ void BatchServiceTest::do_BogusSetupTest_test() {
 /**********************************************************************/
 
 class TerminateOneStandardJobSubmissionTestWMS : public wrench::WMS {
-
 public:
     TerminateOneStandardJobSubmissionTestWMS(BatchServiceTest *test,
                                              const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
@@ -455,7 +451,6 @@ void BatchServiceTest::do_TerminateStandardJobsTest_test() {
 /**********************************************************************/
 
 class OneStandardJobSubmissionTestWMS : public wrench::WMS {
-
 public:
     OneStandardJobSubmissionTestWMS(BatchServiceTest *test,
                                     const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
@@ -611,7 +606,6 @@ void BatchServiceTest::do_OneStandardJobTaskTest_test() {
 /**********************************************************************/
 
 class TwoStandardJobSubmissionTestWMS : public wrench::WMS {
-
 public:
     TwoStandardJobSubmissionTestWMS(BatchServiceTest *test,
                                     const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
@@ -792,7 +786,6 @@ void BatchServiceTest::do_TwoStandardJobSubmissionTest_test() {
 /**********************************************************************/
 
 class OnePilotJobSubmissionTestWMS : public wrench::WMS {
-
 public:
     OnePilotJobSubmissionTestWMS(BatchServiceTest *test,
                                  const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
@@ -966,7 +959,6 @@ void BatchServiceTest::do_PilotJobTaskTest_test() {
 /**********************************************************************/
 
 class StandardPlusPilotJobSubmissionTestWMS : public wrench::WMS {
-
 public:
     StandardPlusPilotJobSubmissionTestWMS(BatchServiceTest *test,
                                           const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
@@ -1142,7 +1134,6 @@ void BatchServiceTest::do_StandardPlusPilotJobTaskTest_test() {
 /**************************************************************************/
 
 class InsufficientCoresJobSubmissionTestWMS : public wrench::WMS {
-
 public:
     InsufficientCoresJobSubmissionTestWMS(BatchServiceTest *test,
                                           const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
@@ -1274,7 +1265,6 @@ void BatchServiceTest::do_InsufficientCoresTaskTest_test() {
 /**********************************************************************/
 
 class NoArgumentsJobSubmissionTestWMS : public wrench::WMS {
-
 public:
     NoArgumentsJobSubmissionTestWMS(BatchServiceTest *test,
                                     const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
@@ -1397,7 +1387,6 @@ void BatchServiceTest::do_noArgumentsJobSubmissionTest_test() {
 /**********************************************************************/
 
 class StandardJobTimeoutSubmissionTestWMS : public wrench::WMS {
-
 public:
     StandardJobTimeoutSubmissionTestWMS(BatchServiceTest *test,
                                         const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
@@ -1546,7 +1535,6 @@ void BatchServiceTest::do_StandardJobTimeOutTaskTest_test() {
 /**********************************************************************/
 
 class PilotJobTimeoutSubmissionTestWMS : public wrench::WMS {
-
 public:
     PilotJobTimeoutSubmissionTestWMS(BatchServiceTest *test,
                                      const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
@@ -1673,7 +1661,6 @@ void BatchServiceTest::do_PilotJobTimeOutTaskTest_test() {
 /**********************************************************************/
 
 class BestFitStandardJobSubmissionTestWMS : public wrench::WMS {
-
 public:
     BestFitStandardJobSubmissionTestWMS(BatchServiceTest *test,
                                         const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
@@ -1902,7 +1889,6 @@ void BatchServiceTest::do_BestFitTaskTest_test() {
 /**********************************************************************/
 
 class FirstFitStandardJobSubmissionTestWMS : public wrench::WMS {
-
 public:
     FirstFitStandardJobSubmissionTestWMS(BatchServiceTest *test,
                                          const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
@@ -2061,7 +2047,6 @@ void BatchServiceTest::do_FirstFitTaskTest_test() {
 /**********************************************************************/
 
 class RoundRobinStandardJobSubmissionTestWMS : public wrench::WMS {
-
 public:
     RoundRobinStandardJobSubmissionTestWMS(BatchServiceTest *test,
                                            const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
@@ -2325,7 +2310,6 @@ void BatchServiceTest::do_RoundRobinTask_test() {
 /***********************************************************************************************/
 
 class StandardJobInsidePilotJobTimeoutSubmissionTestWMS : public wrench::WMS {
-
 public:
     StandardJobInsidePilotJobTimeoutSubmissionTestWMS(BatchServiceTest *test,
                                                       const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
@@ -2497,7 +2481,6 @@ void BatchServiceTest::do_StandardJobInsidePilotJobTimeOutTaskTest_test() {
 /**********************************************************************/
 
 class StandardJobInsidePilotJobSucessSubmissionTestWMS : public wrench::WMS {
-
 public:
     StandardJobInsidePilotJobSucessSubmissionTestWMS(BatchServiceTest *test,
                                                      const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
@@ -2659,7 +2642,6 @@ void BatchServiceTest::do_StandardJobInsidePilotJobSucessTaskTest_test() {
 /**********************************************************************/
 
 class InsufficientCoresInsidePilotJobSubmissionTestWMS : public wrench::WMS {
-
 public:
     InsufficientCoresInsidePilotJobSubmissionTestWMS(BatchServiceTest *test,
                                                      const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
@@ -2810,7 +2792,6 @@ void BatchServiceTest::do_InsufficientCoresInsidePilotJobTaskTest_test() {
 /**********************************************************************/
 
 class MultipleStandardJobSubmissionTestWMS : public wrench::WMS {
-
 public:
     MultipleStandardJobSubmissionTestWMS(BatchServiceTest *test,
                                          const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
@@ -2945,7 +2926,6 @@ void BatchServiceTest::do_MultipleStandardTaskTest_test() {
 /**********************************************************************/
 
 class DifferentBatchAlgorithmsSubmissionTestWMS : public wrench::WMS {
-
 public:
     DifferentBatchAlgorithmsSubmissionTestWMS(BatchServiceTest *test,
                                               const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
@@ -3092,7 +3072,6 @@ void BatchServiceTest::do_DifferentBatchAlgorithmsSubmissionTest_test() {
 /**********************************************************************/
 
 class ShutdownWithPendingRunningJobsTestWMS : public wrench::WMS {
-
 public:
     ShutdownWithPendingRunningJobsTestWMS(BatchServiceTest *test,
                                           const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
