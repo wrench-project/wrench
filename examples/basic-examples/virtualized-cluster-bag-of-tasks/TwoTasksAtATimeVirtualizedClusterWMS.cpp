@@ -24,7 +24,7 @@
 
 #include "TwoTasksAtATimeVirtualizedClusterWMS.h"
 
-#define GB 1000000000.0
+constexpr double GB=1000000000.0;
 
 WRENCH_LOG_CATEGORY(custom_wms, "Log category for TwoTasksAtATimeVirtualizedClusterWMS");
 

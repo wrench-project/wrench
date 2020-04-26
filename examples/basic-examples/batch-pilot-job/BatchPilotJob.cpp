@@ -34,7 +34,8 @@
 
 #include "PilotJobWMS.h" // WMS implementation
 
-#define TFLOP  1000000000000.0
+constexpr  double TFLOP=1000000000000.0;
+
 /**
  * @brief The Simulator's main function
  *
