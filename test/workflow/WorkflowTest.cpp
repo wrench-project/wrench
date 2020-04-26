@@ -75,8 +75,42 @@ TEST_F(WorkflowTest, WorkflowStructure) {
     ASSERT_EQ(1, t3->getTopLevel());
     ASSERT_EQ(2, t4->getTopLevel());
 
+    // testing paths
+    ASSERT_EQ(true, workflow->pathExists(t1, t3));
+    ASSERT_EQ(false, workflow->pathExists(t3, t2));
+
     ASSERT_EQ(3, workflow->getNumLevels());
 
+    //  Test task "getters"
+    auto task_map = workflow->getTaskMap();
+    ASSERT_EQ(4, task_map.size());
+    auto tasks =  workflow->getTasks();
+    ASSERT_EQ(4, tasks.size());
+    auto etask_map = workflow->getEntryTaskMap();
+    ASSERT_EQ(1, etask_map.size());
+    auto etasks =  workflow->getEntryTasks();
+    ASSERT_EQ(1, etasks.size());
+    auto xtask_map = workflow->getExitTaskMap();
+    ASSERT_EQ(1, xtask_map.size());
+    auto xtasks =  workflow->getExitTasks();
+    ASSERT_EQ(1, xtasks.size());
+
+    // Test file "getters"
+    auto file_map = workflow->getFileMap();
+    ASSERT_EQ(4, file_map.size());
+    auto files = workflow->getFiles();
+    ASSERT_EQ(4, files.size());
+    auto ifile_map = workflow->getInputFileMap();
+    ASSERT_EQ(1, ifile_map.size());
+    auto ifiles = workflow->getInputFiles();
+    ASSERT_EQ(1, ifiles.size());
+    auto ofile_map = workflow->getOutputFileMap();
+    ASSERT_EQ(1, ofile_map.size());
+    auto ofiles = workflow->getOutputFiles();
+    ASSERT_EQ(1, ofiles.size());
+
+    ASSERT_THROW(workflow->getTaskNumberOfChildren(nullptr), std::invalid_argument);
+    ASSERT_THROW(workflow->getTaskNumberOfParents(nullptr), std::invalid_argument);
     // Get tasks with a given top-level
     std::vector<wrench::WorkflowTask *> top_level_equal_to_1_or_2;
     top_level_equal_to_1_or_2 = workflow->getTasksInTopLevelRange(1, 2);
