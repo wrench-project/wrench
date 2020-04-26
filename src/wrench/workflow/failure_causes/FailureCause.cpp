@@ -10,9 +10,9 @@
 #include <wrench/workflow/failure_causes/FailureCause.h>
 #include "wrench/logging/TerminalOutput.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(failure_cause, "Log category for FailureCause");
+WRENCH_LOG_CATEGORY(wrench_core_failure_cause, "Log category for FailureCause");
 
 namespace wrench {
 
 
-};
+}

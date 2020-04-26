@@ -7,31 +7,29 @@
  * (at your option) any later version.
  */
 
-#include "wrench/managers/EnergyMeter.h"
+#include "wrench/managers/EnergyMeterService.h"
 #include <wrench/wms/WMS.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench-dev.h>
 
 #define EPSILON 0.0001
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(energy_meter, "Log category for Energy Meter");
+WRENCH_LOG_CATEGORY(wrench_core_energy_meter, "Log category for Energy Meter");
 
 namespace wrench {
 
     /**
      * @brief Constructor
      *
-     * @param wms: the WMS that uses this data movement manager
+     * @param hostname: the hostname on which the service shoudl start
      * @param measurement_periods: the measurement period for each metered host
      */
-    EnergyMeter::EnergyMeter(std::shared_ptr<WMS> wms, const std::map<std::string, double> &measurement_periods) :
-            Service(wms->hostname, "energy_meter", "energy_meter") {
+    EnergyMeterService::EnergyMeterService(const std::string hostname, const std::map<std::string, double> &measurement_periods) :
+            Service(hostname, "energy_meter", "energy_meter") {
 
         if (measurement_periods.empty()) {
             throw std::invalid_argument("EnergyMeter::EnergyMeter(): no host to meter!");
         }
-
-        this->wms = wms;
 
         for (auto &h : measurement_periods) {
             if (not S4U_Simulation::hostExists(h.first)) {
@@ -50,13 +48,13 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param wms: the WMS that uses this data movement manager
+     * @param hostname: the name of the host on which this service is running
      * @param hostnames: the list of metered hosts, as hostnames
      * @param measurement_period: the measurement period
      */
-    EnergyMeter::EnergyMeter(std::shared_ptr<WMS> wms, const std::vector<std::string> &hostnames,
-                             double measurement_period) :
-            Service(wms->hostname, "energy_meter", "energy_meter") {
+    EnergyMeterService::EnergyMeterService(const std::string hostname, const std::vector<std::string> &hostnames,
+                                           double measurement_period) :
+            Service(hostname, "energy_meter", "energy_meter") {
 
         if (hostnames.empty()) {
             throw std::invalid_argument("EnergyMeter::EnergyMeter(): no host to meter!");
@@ -64,8 +62,6 @@ namespace wrench {
         if (measurement_period < 1) {
             throw std::invalid_argument("EnergyMeter::EnergyMeter(): measurement period must be at least 1 second");
         }
-
-        this->wms = wms;
 
         for (auto const &h : hostnames) {
             if (not S4U_Simulation::hostExists(h)) {
@@ -79,7 +75,7 @@ namespace wrench {
     /**
      * @brief Kill the energy meter (brutally terminate the daemon)
      */
-    void EnergyMeter::kill() {
+    void EnergyMeterService::kill() {
         this->killActor();
     }
 
@@ -89,7 +85,7 @@ namespace wrench {
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
      */
-    void EnergyMeter::stop() {
+    void EnergyMeterService::stop() {
         try {
             S4U_Mailbox::putMessage(this->mailbox_name, new ServiceStopDaemonMessage("", 0.0));
         } catch (std::shared_ptr<NetworkError> &cause) {
@@ -101,12 +97,11 @@ namespace wrench {
      * @brief Main method of the daemon that implements the EnergyMeter
      * @return 0 on success
      */
-    int EnergyMeter::main() {
+    int EnergyMeterService::main() {
 
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
 
         WRENCH_INFO("New Energy Meter Manager starting (%s)", this->mailbox_name.c_str());
-
 
         /** Main loop **/
         while (true) {
@@ -121,11 +116,11 @@ namespace wrench {
                         return lhs.second < rhs.second;
                     });
 
-            double time_to_next_measurement = min_el->second;
+            double time_to_next_measure = min_el->second;
             double before = Simulation::getCurrentSimulatedDate();
 
-            if (time_to_next_measurement > 0) {
-                if (not processNextMessage(time_to_next_measurement)) {
+            if (time_to_next_measure > 0) {
+                if (not processNextMessage(time_to_next_measure)) {
                     break;
                 }
             }
@@ -155,7 +150,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    bool EnergyMeter::processNextMessage(double timeout) {
+    bool EnergyMeterService::processNextMessage(double timeout) {
 
         std::shared_ptr<SimulationMessage> message = nullptr;
 

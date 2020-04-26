@@ -18,7 +18,7 @@
 #include "NetworkProximityMessage.h"
 
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(network_daemons_service, "Log category for Network Daemons Service");
+WRENCH_LOG_CATEGORY(wrench_core_network_daemons_service, "Log category for Network Daemons Service");
 
 namespace wrench {
 

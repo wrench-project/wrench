@@ -16,7 +16,7 @@
 #include "../failure_test_util/SleeperVictim.h"
 #include <wrench/workflow/failure_causes/HostError.h>
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(service_start_restart_test, "Log category for ServiceStartRestartTest");
+WRENCH_LOG_CATEGORY(service_start_restart_test, "Log category for ServiceStartRestartTest");
 
 
 class ServiceReStartHostFailuresTest : public ::testing::Test {

@@ -13,7 +13,7 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 
-//WRENCH_LOG_NEW_DEFAULT_CATEGORY(file_location, "Log category for FileLocation");
+//WRENCH_LOG_CATEGORY(wrench_core_file_location, "Log category for FileLocation");
 
 
 namespace wrench {

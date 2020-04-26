@@ -17,7 +17,7 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <wrench/services/storage/storage_helpers/FileTransferThread.h>
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(file_transfer_thread, "Log category for File Transfer Thread");
+WRENCH_LOG_CATEGORY(wrench_core_file_transfer_thread, "Log category for File Transfer Thread");
 
 
 namespace wrench {

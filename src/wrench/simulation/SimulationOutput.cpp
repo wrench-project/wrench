@@ -28,7 +28,7 @@
 #include <unordered_set>
 
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(simulation_output, "Log category for Simulation Output");
+WRENCH_LOG_CATEGORY(wrench_core_simulation_output, "Log category for Simulation Output");
 
 namespace wrench {
 
@@ -39,9 +39,9 @@ namespace wrench {
 
     nlohmann::json host_utilization_layout;
 
-    /******************/
-    /** \endcond      */
-    /******************/
+    /*******************/
+    /** \cond INTERNAL */
+    /*******************/
 
     /**
      * @brief Object representing an instance when a WorkflowTask was run.
@@ -96,7 +96,9 @@ namespace wrench {
         }
     } WorkflowTaskExecutionInstance;
 
-
+    /******************/
+    /** \endcond      */
+    /******************/
 
 
     /**
@@ -1238,7 +1240,7 @@ namespace wrench {
         if (file_path.empty()) {
             throw std::invalid_argument("SimulationOutput::dumpDiskOperationJSON() requires a valid workflow and file_path");
         }
-
+        nlohmann::json disk_operations_json;
 
         auto read_start_timestamps = this->getTrace<SimulationTimestampDiskReadStart>();
         auto read_completion_timestamps = this->getTrace<wrench::SimulationTimestampDiskReadCompletion>();
@@ -1248,56 +1250,99 @@ namespace wrench {
         auto write_completion_timestamps = this->getTrace<wrench::SimulationTimestampDiskWriteCompletion>();
         auto write_failure_timestamps = this->getTrace<wrench::SimulationTimestampDiskWriteFailure>();
 
-        std::vector<std::tuple<string, string, std::tuple<double, double, double>>> reads;
-        std::vector<std::tuple<string, string, std::tuple<double, double, double>>> writes;
-        std::tuple<string, string, std::tuple<double, double, double>> disk_operation;
 
-        if (!read_start_timestamps.empty()) {
-            for (auto & read_start_timestamp : read_start_timestamps){
-                disk_operation = std::make_tuple(read_start_timestamp->getContent()->getHostname().c_str(),
-                                   read_start_timestamp->getContent()->getMount().c_str(),
-                                   std::make_tuple(read_start_timestamp->getContent()->getDate(),
-                                           read_start_timestamp->getContent()->getEndpoint()->getDate(),
-                                           read_start_timestamp->getContent()->getBytes()));
-                reads.emplace_back(disk_operation);
+        std::set<std::string> hostnames;
+
+        //std::tuple<string, string, std::tuple<double, double, double>> disk_operation;
+        std::tuple<double, double, double> disk_operation;
+
+        if(!read_start_timestamps.empty()){
+            for (auto & timestamp : read_start_timestamps) {
+                hostnames.insert(timestamp->getContent()->getHostname());
+            }
+        }
+        if(!write_start_timestamps.empty()){
+            for (auto & timestamp : write_start_timestamps) {
+                hostnames.insert(timestamp->getContent()->getHostname());
             }
         }
 
-        if (!write_start_timestamps.empty()) {
-            for (auto & write_start_timestamp : write_start_timestamps){
-                writes.emplace_back(std::make_tuple(write_start_timestamp->getContent()->getHostname().c_str(),
-                                    write_start_timestamp->getContent()->getMount().c_str(),
-                                                    std::make_tuple(write_start_timestamp->getContent()->getDate(),
-                                                                    write_start_timestamp->getContent()->getEndpoint()->getDate(),
-                                                                    write_start_timestamp->getContent()->getBytes())));
+        for(auto & host : hostnames) {
+            std::set<std::string> mounts;
+            if(!read_start_timestamps.empty()){
+                for (auto & timestamp : read_start_timestamps) {
+                    if(timestamp->getContent()->getHostname().compare(host) == 0){
+                        mounts.insert(timestamp->getContent()->getMount());
+                    }
+                }
             }
+            if(!write_start_timestamps.empty()){
+                for (auto & timestamp : write_start_timestamps) {
+                    if(timestamp->getContent()->getHostname().compare(host) == 0){
+                        mounts.insert(timestamp->getContent()->getMount());
+                    }
+                }
+            }
+            for (auto & mount : mounts) {
+                std::vector<std::tuple<double, double, double>> reads;
+                std::vector<std::tuple<double, double, double>> writes;
+
+                if (!read_start_timestamps.empty()) {
+                    for (auto & read_start_timestamp : read_start_timestamps){
+                        if (read_start_timestamp->getContent()->getHostname().compare(host) == 0 && read_start_timestamp->getContent()->getMount().compare(mount) == 0){
+                            disk_operation = std::make_tuple(read_start_timestamp->getContent()->getDate(),
+                                                             read_start_timestamp->getContent()->getEndpoint()->getDate(),
+                                                             read_start_timestamp->getContent()->getBytes());
+                            reads.emplace_back(disk_operation);
+                        }
+
+                    }
+                }
+                if (!write_start_timestamps.empty()) {
+                    for (auto & write_start_timestamp : write_start_timestamps){
+                        if (write_start_timestamp->getContent()->getHostname().compare(host) == 0 && write_start_timestamp->getContent()->getMount().compare(mount) == 0){
+                            disk_operation = std::make_tuple(write_start_timestamp->getContent()->getDate(),
+                                                             write_start_timestamp->getContent()->getEndpoint()->getDate(),
+                                                             write_start_timestamp->getContent()->getBytes());
+                            writes.emplace_back(disk_operation);
+                        }
+
+                    }
+                }
+                nlohmann::json disk_reads;
+                for (auto const &r : reads) {
+                    nlohmann::json disk_read = nlohmann::json::object({{"start", std::get<0>(r)},
+                                                                       {"end", std::get<1>(r)},
+                                                                       {"bytes",std::get<2>(r)}});
+                    disk_reads.push_back(disk_read);
+                }
+
+                nlohmann::json disk_writes;
+                for (auto const &w : writes) {
+                    nlohmann::json disk_write = nlohmann::json::object({{"start", std::get<0>(w)},
+                                                                        {"end", std::get<1>(w)},
+                                                                        {"bytes",std::get<2>(w)}});
+                    disk_writes.push_back(disk_write);
+                }
+                disk_operations_json[host][mount]["reads"] = disk_reads;
+                disk_operations_json[host][mount]["writes"] = disk_writes;
+            }
+
+
+
         }
 
-        nlohmann::json disk_reads;
-        for (auto const &r : reads) {
-            nlohmann::json disk_read = nlohmann::json::object({{"mount", std::get<1>(r)},
-                                                               {"hostname", std::get<0>(r)},
-                                                               {"start", std::get<0>(std::get<2>(r))},
-                                                               {"end", std::get<1>(std::get<2>(r))},
-                                                               {"bytes",std::get<2>(std::get<2>(r))}});
-            disk_reads.push_back(disk_read);
-        }
-
-        nlohmann::json disk_writes;
-        for (auto const &w : writes) {
-            nlohmann::json disk_write = nlohmann::json::object({{"mount", std::get<1>(w)},
-                                                                {"hostname", std::get<0>(w)},
-                                                                {"start", std::get<0>(std::get<2>(w))},
-                                                                {"end", std::get<1>(std::get<2>(w))},
-                                                                {"bytes",std::get<2>(std::get<2>(w))}});
-            disk_writes.push_back(disk_write);
-        }
 
 
 
-        nlohmann::json disk_operations_json;
-        disk_operations_json["reads"] = disk_reads;
-        disk_operations_json["writes"] = disk_writes;
+
+
+
+
+
+
+
+
         disk_json_part = disk_operations_json;
 
         if(writing_file) {
@@ -1476,83 +1521,7 @@ namespace wrench {
         }
     }
 
-    /**
-     * @brief Add a file read start timestamp
-     * @param hostname: hostname being read from
-     * @param mount: mountpoint of disk
-     * @param bytes: number of bytes read
-     * @param counter: an integer id
-     */
-    void SimulationOutput::addTimestampDiskReadStart(std::string hostname, std::string mount, double bytes, int counter) {
-        if (this->isEnabled<SimulationTimestampDiskReadStart>()) {
-            this->addTimestamp<SimulationTimestampDiskReadStart>(new SimulationTimestampDiskReadStart(hostname, mount, bytes, counter));
-        }
-    }
 
-    /**
-     * @brief Add a file read failure timestamp
-     * @param hostname: hostname being read from
-     * @param mount: mountpoint of disk
-     * @param bytes: number of bytes read
-     * @param counter: an integer id
-     */
-    void SimulationOutput::addTimestampDiskReadFailure(std::string hostname, std::string mount, double bytes, int counter) {
-        if (this->isEnabled<SimulationTimestampDiskReadFailure>()) {
-            this->addTimestamp<SimulationTimestampDiskReadFailure>(new SimulationTimestampDiskReadFailure(hostname, mount, bytes, counter));
-        }
-    }
-
-    /**
-     * @brief Add a file read completion timestamp
-     * @param hostname: hostname being read from
-     * @param mount: mountpoint of disk
-     * @param bytes: number of bytes read
-     * @param counter: an integer id
-     */
-    void SimulationOutput::addTimestampDiskReadCompletion(std::string hostname, std::string mount, double bytes, int counter) {
-        if (this->isEnabled<SimulationTimestampDiskReadCompletion>()) {
-            this->addTimestamp<SimulationTimestampDiskReadCompletion>(new SimulationTimestampDiskReadCompletion(hostname, mount, bytes, counter));
-        }
-    }
-
-    /**
-     * @brief Add a file write start timestamp
-     * @param hostname: hostname being read from
-     * @param mount: mountpoint of disk
-     * @param bytes: number of bytes read
-     * @param counter: an integer id
-     */
-    void SimulationOutput::addTimestampDiskWriteStart(std::string hostname, std::string mount, double bytes, int counter) {
-        if (this->isEnabled<SimulationTimestampDiskWriteStart>()) {
-            this->addTimestamp<SimulationTimestampDiskWriteStart>(new SimulationTimestampDiskWriteStart(hostname, mount, bytes, counter));
-        }
-    }
-
-    /**
-     * @brief Add a file write failure timestamp
-     * @param hostname: hostname being read from
-     * @param mount: mountpoint of disk
-     * @param bytes: number of bytes read
-     * @param counter: an integer id
-     */
-    void SimulationOutput::addTimestampDiskWriteFailure(std::string hostname, std::string mount, double bytes, int counter) {
-        if (this->isEnabled<SimulationTimestampDiskWriteFailure>()) {
-            this->addTimestamp<SimulationTimestampDiskWriteFailure>(new SimulationTimestampDiskWriteFailure(hostname, mount, bytes, counter));
-        }
-    }
-
-    /**
-    * @brief Add a file write completion timestamp
-    * @param hostname: hostname being read from
-    * @param mount: mountpoint of disk
-    * @param bytes: number of bytes read
-    * @param counter: an integer id
-    */
-    void SimulationOutput::addTimestampDiskWriteCompletion(std::string hostname, std::string mount, double bytes, int counter) {
-        if (this->isEnabled<SimulationTimestampDiskWriteCompletion>()) {
-            this->addTimestamp<SimulationTimestampDiskWriteCompletion>(new SimulationTimestampDiskWriteCompletion(hostname, mount, bytes, counter));
-        }
-    }
 
     /**
      * @brief Add a file copy start timestamp
@@ -1590,6 +1559,84 @@ namespace wrench {
                                                      std::shared_ptr<FileLocation> dst) {
         if (this->isEnabled<SimulationTimestampFileCopyCompletion>()) {
             this->addTimestamp<SimulationTimestampFileCopyCompletion>(new SimulationTimestampFileCopyCompletion(file, src, dst));
+        }
+    }
+
+    /**
+ * @brief Add a file read start timestamp
+ * @param hostname: hostname being read from
+ * @param mount: mountpoint of disk
+ * @param bytes: number of bytes read
+ * @param unique_sequence_number: an integer id
+ */
+    void SimulationOutput::addTimestampDiskReadStart(std::string hostname, std::string mount, double bytes, int unique_sequence_number) {
+        if (this->isEnabled<SimulationTimestampDiskReadStart>()) {
+            this->addTimestamp<SimulationTimestampDiskReadStart>(new SimulationTimestampDiskReadStart(hostname, mount, bytes, unique_sequence_number));
+        }
+    }
+
+    /**
+     * @brief Add a file read failure timestamp
+     * @param hostname: hostname being read from
+     * @param mount: mountpoint of disk
+     * @param bytes: number of bytes read
+     * @param unique_sequence_number: an integer id
+     */
+    void SimulationOutput::addTimestampDiskReadFailure(std::string hostname, std::string mount, double bytes, int unique_sequence_number) {
+        if (this->isEnabled<SimulationTimestampDiskReadFailure>()) {
+            this->addTimestamp<SimulationTimestampDiskReadFailure>(new SimulationTimestampDiskReadFailure(hostname, mount, bytes, unique_sequence_number));
+        }
+    }
+
+    /**
+     * @brief Add a file read completion timestamp
+     * @param hostname: hostname being read from
+     * @param mount: mountpoint of disk
+     * @param bytes: number of bytes read
+     * @param unique_sequence_number: an integer id
+     */
+    void SimulationOutput::addTimestampDiskReadCompletion(std::string hostname, std::string mount, double bytes, int unique_sequence_number) {
+        if (this->isEnabled<SimulationTimestampDiskReadCompletion>()) {
+            this->addTimestamp<SimulationTimestampDiskReadCompletion>(new SimulationTimestampDiskReadCompletion(hostname, mount, bytes, unique_sequence_number));
+        }
+    }
+
+    /**
+     * @brief Add a file write start timestamp
+     * @param hostname: hostname being read from
+     * @param mount: mountpoint of disk
+     * @param bytes: number of bytes read
+     * @param unique_sequence_number: an integer id
+     */
+    void SimulationOutput::addTimestampDiskWriteStart(std::string hostname, std::string mount, double bytes, int unique_sequence_number) {
+        if (this->isEnabled<SimulationTimestampDiskWriteStart>()) {
+            this->addTimestamp<SimulationTimestampDiskWriteStart>(new SimulationTimestampDiskWriteStart(hostname, mount, bytes, unique_sequence_number));
+        }
+    }
+
+    /**
+     * @brief Add a file write failure timestamp
+     * @param hostname: hostname being read from
+     * @param mount: mountpoint of disk
+     * @param bytes: number of bytes read
+     * @param unique_sequence_number: an integer id
+     */
+    void SimulationOutput::addTimestampDiskWriteFailure(std::string hostname, std::string mount, double bytes, int unique_sequence_number) {
+        if (this->isEnabled<SimulationTimestampDiskWriteFailure>()) {
+            this->addTimestamp<SimulationTimestampDiskWriteFailure>(new SimulationTimestampDiskWriteFailure(hostname, mount, bytes, unique_sequence_number));
+        }
+    }
+
+    /**
+    * @brief Add a file write completion timestamp
+    * @param hostname: hostname being read from
+    * @param mount: mountpoint of disk
+    * @param bytes: number of bytes read
+    * @param unique_sequence_number: an integer id
+    */
+    void SimulationOutput::addTimestampDiskWriteCompletion(std::string hostname, std::string mount, double bytes, int unique_sequence_number) {
+        if (this->isEnabled<SimulationTimestampDiskWriteCompletion>()) {
+            this->addTimestamp<SimulationTimestampDiskWriteCompletion>(new SimulationTimestampDiskWriteCompletion(hostname, mount, bytes, unique_sequence_number));
         }
     }
 

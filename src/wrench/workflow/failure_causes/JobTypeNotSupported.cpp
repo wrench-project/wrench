@@ -18,7 +18,7 @@
 #include "wrench/services/storage/StorageService.h"
 #include "wrench/services/compute/ComputeService.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(job_type_not_supported, "Log category for JobTypeNotSupported");
+WRENCH_LOG_CATEGORY(wrench_core_job_type_not_supported, "Log category for JobTypeNotSupported");
 
 namespace wrench {
 
@@ -57,4 +57,4 @@ namespace wrench {
                this->compute_service->getHostname() + " does not support jobs of type " + this->job->getTypeAsString();
     }
 
-};
+}

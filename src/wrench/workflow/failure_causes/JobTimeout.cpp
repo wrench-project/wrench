@@ -12,7 +12,7 @@
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/workflow/job/WorkflowJob.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(job_timeout, "Log category for JobTimeout");
+WRENCH_LOG_CATEGORY(wrench_core_job_timeout, "Log category for JobTimeout");
 
 namespace wrench {
 
@@ -39,7 +39,7 @@ namespace wrench {
      * @return the message
      */
     std::string JobTimeout::toString() {
-        return "Job has timed out - likely not enough time was requested from a (batch-scheduled?) compute service";
-    };
+        return std::string("Job has timed out - likely not enough time was requested from a (batch-scheduled?) compute service");
+    }
 
-};
+}

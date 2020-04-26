@@ -15,7 +15,7 @@
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(file_registry_service_test, "Log category for File Registry Service test");
+WRENCH_LOG_CATEGORY(file_registry_service_test, "Log category for File Registry Service test");
 
 
 class FileRegistryTest : public ::testing::Test {

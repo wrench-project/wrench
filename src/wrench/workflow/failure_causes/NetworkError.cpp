@@ -14,7 +14,7 @@
 #include "wrench/workflow/job/WorkflowJob.h"
 #include "wrench/services/compute/ComputeService.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(network_error, "Log category for NetworkError");
+WRENCH_LOG_CATEGORY(wrench_core_network_error, "Log category for NetworkError");
 
 namespace wrench {
 
@@ -89,8 +89,8 @@ namespace wrench {
             error = "link failure, or communication peer died";
         }
         return "Network error (" + error + ") while " + operation + " mailbox_name " + this->mailbox;
-    };
+    }
 
 
 
-};
+}

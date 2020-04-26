@@ -16,7 +16,7 @@
 #include "wrench/services/storage/StorageService.h"
 #include "wrench/services/compute/ComputeService.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(invalid_directory_path, "Log category for InvalidDirectoryPath");
+WRENCH_LOG_CATEGORY(wrench_core_invalid_directory_path, "Log category for InvalidDirectoryPath");
 
 namespace wrench {
 
@@ -57,4 +57,4 @@ namespace wrench {
                this->getInvalidPath() + " path";
     }
 
-};
+}

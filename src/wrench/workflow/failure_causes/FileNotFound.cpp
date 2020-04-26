@@ -13,7 +13,7 @@
 #include "wrench/workflow/failure_causes/FailureCause.h"
 #include "wrench/workflow/WorkflowFile.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(file_not_found, "Log category for FileNotFound");
+WRENCH_LOG_CATEGORY(wrench_core_file_not_found, "Log category for FileNotFound");
 
 namespace wrench {
 
@@ -51,4 +51,4 @@ namespace wrench {
         return "Couldn't find file " + this->file->getID() + " at location " + this->location->toString();
     }
 
-};
+}

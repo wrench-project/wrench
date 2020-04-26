@@ -9,7 +9,7 @@
 #include "../../include/UniqueTmpPathPrefix.h"
 
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(simulation_timestamp_file_write_test, "Log category for SimulationTimestampFileWriteTest");
+WRENCH_LOG_CATEGORY(simulation_timestamp_file_write_test, "Log category for SimulationTimestampFileWriteTest");
 
 
 class SimulationTimestampFileWriteTest : public ::testing::Test {

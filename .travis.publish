@@ -2,9 +2,9 @@
 
 set -e # exit with nonzero exit code if anything fails
 
-echo "Starting to update gh-pages"
+if [[ "$TRAVIS_BUILD_STAGE_NAME" == "Documentation Build and Deployment" ]]; then
 
-if [[ $TRAVIS_BRANCH == "master" && $TRAVIS_PULL_REQUEST == "false" && "$TRAVIS_OS_NAME" == "linux" && $DIST == "ubuntu-bionic" && $COMPILER == "gcc7" && $batsched == "off" ]] || [[ $TRAVIS_BRANCH == "master" && $TRAVIS_PULL_REQUEST == "false" && "$TRAVIS_OS_NAME" == "linux" && $DIST == "ubuntu-bionic" && $COMPILER == "gcc7-batsched" && $batsched == "on" ]]; then
+  echo "Starting to update gh-pages"
 
   #copy data we're interested in to other place
   git config --global user.email "travis@travis-ci.org"
@@ -25,6 +25,4 @@ if [[ $TRAVIS_BRANCH == "master" && $TRAVIS_PULL_REQUEST == "false" && "$TRAVIS_
 
   echo "Done updating gh-pages."
 
-else
- echo "Skipped updating gh-pages."
 fi;

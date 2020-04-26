@@ -92,7 +92,6 @@ set(test_files
 find_library(wrench_library names wrench)
 find_library(simgrid_library names simgrid)
 find_library(pugixml_library names pugixml)
-find_library(lemon_library names emon)
 find_library(gtest_library names gtest)
 
 # generating the executable
@@ -101,7 +100,6 @@ target_link_libraries(my-executable
                         ${wrench_library} 
                         ${simgrid_library} 
                         ${pugixml_library} 
-                        ${lemon_library}
                      )
 
 install(targets my-executable destination bin)

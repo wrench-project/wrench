@@ -37,7 +37,7 @@
 #include "wrench/workflow/failure_causes/NotAllowed.h"
 
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(batch_service, "Log category for Batch Service");
+WRENCH_LOG_CATEGORY(wrench_core_batch_service, "Log category for Batch Service");
 
 namespace wrench {
 

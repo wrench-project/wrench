@@ -63,7 +63,7 @@ header file:
 
 The state of a WRENCH simulation is defined by the `wrench::Simulation` 
 class. A simulator must create an instance of this class and initialize it
-with the `wrench::Simulation::init()` method.  The bare-metal-chain
+with the `wrench::Simulation::init()` member function.  The bare-metal-chain
 simulator does this as follows:
 
 ~~~~~~~~~~~~~{.cpp}
@@ -71,7 +71,7 @@ wrench::Simulation simulation;
 simulation.init(&argc, argv);
 ~~~~~~~~~~~~~
 
-Note that this method takes in the command-line arguments passed to the main
+Note that this member function takes in the command-line arguments passed to the main
 function of the simulator. This is so that it can parse WRENCH-specific and
 [SimGrid-specific](https://simgrid.org/doc/latest/Configuring_Simgrid.html)
 command-line arguments. (Recall that WRENCH is based on
@@ -82,7 +82,7 @@ an extensive SimGrid help message.
 ## Step 2: Instantiate a simulated platform #     {#wrench-101-simulator-1000ft-step-2}
 
 This is done with the `wrench::Simulation::instantiatePlatform()`
-method which takes as argument a [SimGrid virtual platform description
+member function which takes as argument a [SimGrid virtual platform description
 file](https://simgrid.org/doc/latest/platform.html).  Any SimGrid
 simulation, and thus any WRENCH simulation, must be provided with the
 description of the simulated hardware platform (compute hosts, clusters 
@@ -142,7 +142,7 @@ simulation.instantiatePlatform(argv[2]);
 
 While the previous step defines the hardware platform, this step defines
 what software services run on that hardware. 
-The `wrench::Simulation::add()` method is used
+The `wrench::Simulation::add()` member function is used
 to add services to the simulation. Each class of service is created with a
 particular constructor, which also specifies host(s) on which the service
 is to be started. Typical kinds of services include compute services,
@@ -205,7 +205,7 @@ are located (and is often required - see Step #4 hereafter).
 
 Every WRENCH simulator simulates the execution of a workflow, and thus
 must create an instance of the `wrench::Workflow` class. This class has
-methods to manually create tasks and files and add them to the workflow.
+member functions to manually create tasks and files and add them to the workflow.
 For instance, the bare-metal-chain simulator does this as follows:
 
 ~~~~~~~~~~~~~{.cpp}
@@ -235,7 +235,7 @@ The above creates a "chain" workflow (hence the name of the simulator), in which
 output from one task is input to the next task. The number of tasks is obtained 
 from a command-line argument.
 
-The `wrench::Workflow` class also provides methods to import workflows from
+The `wrench::Workflow` class also provides member functions to import workflows from
 workflow description files in standard  
 [JSON format](https://github.com/workflowhub/workflow-schema) and 
 [DAX format](http://workflowarchive.org).
@@ -295,10 +295,10 @@ This call checks the simulation setup, and blocks until the WMS terminates.
 ## Step 7: Process simulation output #       {#wrench-101-simulator-1000ft-step-7}
 
 Once `wrench::Simulation::launch()` has returned, simulation output can be 
-processed  programmatically. The `wrench::Simulation::getOutput()` method 
+processed  programmatically. The `wrench::Simulation::getOutput()` member function 
 returns an instance of class `wrench::SimulationOutput`.
-Note that there are methods to configure the type and amount of output generated 
-(see the `wrench::SimulationOutput::enable*Timestamps()` methods).
+Note that there are member functions to configure the type and amount of output generated 
+(see the `wrench::SimulationOutput::enable*Timestamps()` member functions).
 The bare-metal-chain simulator does minimal output processing as:
 
 ~~~~~~~~~~~~~{.cpp}
@@ -308,7 +308,7 @@ for (auto const &item : trace) {
 ~~~~~~~~~~~~~
 
 Specifically, class `wrench::SimulationOutput` has a templated
-`wrench::SimulationOutput::getTrace()` method to retrieve traces for
+`wrench::SimulationOutput::getTrace()` member function to retrieve traces for
 various information types. The first line of code above returns a 
 `std::vector` of time-stamped task completion events.  
 The second line of code iterates through this vector and prints task 
@@ -323,14 +323,17 @@ which provides accounting for computing time and dissipated energy in
 the simulated platform. SimGrid's energy plugin requires host `pstate` 
 definitions (levels of performance, CPU frequency) in the
 [XML platform description file](https://simgrid.org/doc/latest/platform.html). 
-The `wrench::Simulation::getEnergyConsumed()` method returns energy consumed 
+The `wrench::Simulation::getEnergyConsumed()` member function returns energy consumed 
 by all hosts in the platform.  **Important:** The energy plugin is NOT
 enabled by default in WRENCH simulations. To enable it, pass the
-`--activate-energy` command line option to the simulator. 
+`--activate-energy` command line option to the simulator.  See
+`examples/basic-examples/cloud-bag-of-tasks-energy` for an example
+simulator that makes use of this plugin  (and example platform
+description file that defines host power consumption profiles).
 
 Another option altogether is to dump all simulation output to a JSON file.
 This is done with the `wrench::SimulationOutput::dump*JSON()`
-methods. See the documentation of each method to see the structure of the
+member functions. See the documentation of each member function to see the structure of the
 JSON output, in case you want to parse/process the JSON yourself.
 Alternately, you can run the installed `wrench-dashboard` tool, which
 provides interactive visualization/inspection of simulation output.
@@ -355,7 +358,7 @@ to workflow files:
 
 - **File Registry Services**: These services, also known as _replica catalogs_, 
   are simply databases of `<filename, list of locations>` key-values pairs of 
-  the storage services on which a copies of files are available. 
+  the storage services on which copies of files are available. 
 
    - [File Registry Service](@ref guide-101-fileregistry)
 
@@ -363,6 +366,12 @@ to workflow files:
   and maintain a database of host-to-host network distances: 
 
    - [Network Proximity Service](@ref guide-101-networkproximity)
+
+- **EnergyMeter Services**: These services are used to periodically measure host
+  energy consumption and include these measurements in the simulation output  
+  (see [this section](@ref wrench-101-simulator-1000ft-step-7)).
+
+   - [Energy Meter Service](@ref guide-101-energymeter)
 
 - **Workflow Management Systems (WMSs)** (derives `wrench::WMS`): 
   A WMS provides the mechanisms for executing workflow applications, include 
@@ -422,45 +431,44 @@ The `bare-metal-chain` example simulator can be executed as follows in the
 ./wrench-example-bare-metal-chain 10 ./two_hosts.xml
 ~~~~~~~~~~~~~
 
-You will note that quite a bit of (multi-colored) output is produced. 
-
-A first way in which to modify logging is to disable colors, which can be 
-useful to redirect output to a file. This is done with  the `--wrench-no-color` 
-command-line option, anywhere in the argument list, for instance:
-
-~~~~~~~~~~~~~{.cpp}
-./wrench-example-bare-metal-chain 10 ./two_hosts.xml --wrench-no-color
-~~~~~~~~~~~~~
-
-Disabling all logging is done with the option `--wrench-no-log`:
+It is possible to obtain more output from the simulator by enabling some logging. 
+It turns out the WMS class in that example (`OneTaskAtATimeWMS.cpp`) defined a logging
+category names  `custom_wms`
+(see one of the first lines of `examples/basic-examples/bare-metal-chain/OneTaskAtATimeWMS.cpp`),
+which  can be enabled as:
 
 ~~~~~~~~~~~~~{.cpp}
-./wrench-example-bare-metal-chain 10 ./two_hosts.xml --wrench-no-log
+./wrench-example-bare-metal-chain 10 ./two_hosts.xml --log=custom_wms.threshold=info
 ~~~~~~~~~~~~~
 
-The above `--wrench-no-log` option is a simple wrapper around the 
-sophisticated SimGrid logging capabilities (it is equivalent to the 
-SimGrid argument `--log=root.threshold:critical`). 
-Details on these capabilities are displayed when passing the
-`--help-logs` command-line argument to your simulator. In a nutshell, 
-particular "log categories" can be toggled on and off. Log category 
-names are attached to `*.cpp` files in the simulator code, the WRENCH 
-code, and the SimGrid code. Using the `--help-log-categories` command-line
-argument shows the entire log category hierarchy. 
-
-In the `bare-metal-chain` example simulator, there is a log category called
-`custom_wms` for the WMS (see one of the  first lines of
-`examples/basic-examples/bare-metal-chain/OneTaskAtATimeWMS.cpp`). This category
-corresponds to the logging messages printed out by the WMS. It is typical to want
+You will now see some (green) logging output that is generated by  the WMS implementation. 
+It is typical to want
 to see these messages as the WMS is the brain of the workflow execution. 
 They can be enabled while other messages are disabled as follows: 
 
+
+One can disable the coloring of the logging output with the
+`--wrench-no-color` argument:
+
 ~~~~~~~~~~~~~{.cpp}
-./wrench-example-bare-metal-chain 10 ./two_hosts.xml --wrench-no-log --log=custom_wms.threshold=info
+./wrench-example-bare-metal-chain 10 ./two_hosts.xml --log=custom_wms.threshold=info --wrench-no-color
 ~~~~~~~~~~~~~
 
-When running the simulator in this way, you should only see green output, 
-which only includes messages printed by the WMS. 
+Disable color can be useful when redirecting the logging  output to a file. 
+
+Enabling all logging is done with the argument `--wrench-full-log`:
+
+~~~~~~~~~~~~~{.cpp}
+./wrench-example-bare-metal-chain 10 ./two_hosts.xml --wrench-full-log
+~~~~~~~~~~~~~
+
+The logging output now contains output produces by all the simulated
+running processed.  More details on logging capabilities are displayed when
+passing the `--help-logs` command-line argument to your simulator.  Log
+category names are attached to `*.cpp` files in the simulator code, the
+WRENCH code, and the SimGrid code. Using the `--help-log-categories`
+command-line argument shows the entire log category hierarchy (which is huge).  
+
 
 See the [Simgrid logging
 documentation](https://simgrid.org/doc/latest/outcomes.html) for all

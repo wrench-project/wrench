@@ -23,7 +23,7 @@
 #define NUM_STORAGE_SERVICES 10
 #define STORAGE_SERVICE_CAPACITY (0.5 * NUM_FILES * FILE_SIZE)
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(storage_service_link_failures_test, "Log category for StorageServiceLinkFailuresTest");
+WRENCH_LOG_CATEGORY(storage_service_link_failures_test, "Log category for StorageServiceLinkFailuresTest");
 
 
 class StorageServiceLinkFailuresTest : public ::testing::Test {

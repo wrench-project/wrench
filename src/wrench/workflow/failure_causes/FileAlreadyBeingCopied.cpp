@@ -13,7 +13,7 @@
 #include "wrench/workflow/WorkflowFile.h"
 #include "wrench/services/storage/StorageService.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(file_already_being_copied, "Log category for FileAlreadyBeingCopied");
+WRENCH_LOG_CATEGORY(wrench_core_file_already_being_copied, "Log category for FileAlreadyBeingCopied");
 
 namespace wrench {
 
@@ -66,4 +66,4 @@ namespace wrench {
     }
 
 
-};
+}

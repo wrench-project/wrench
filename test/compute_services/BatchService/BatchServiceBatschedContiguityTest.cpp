@@ -20,7 +20,7 @@
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(batch_service_contiguity_test, "Log category for BatchServiceTest");
+WRENCH_LOG_CATEGORY(batch_service_contiguity_test, "Log category for BatchServiceTest");
 
 
 class BatchServiceBatschedContiguityTest : public ::testing::Test {

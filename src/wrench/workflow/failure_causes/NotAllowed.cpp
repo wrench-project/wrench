@@ -11,7 +11,7 @@
 
 #include "wrench/logging/TerminalOutput.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(not_allowed, "Log category for NotAllowed");
+WRENCH_LOG_CATEGORY(wrench_core_not_allowed, "Log category for NotAllowed");
 
 namespace wrench {
 
@@ -46,4 +46,4 @@ namespace wrench {
     }
 
 
-};
+}

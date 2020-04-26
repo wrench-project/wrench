@@ -21,7 +21,7 @@
 #include <wrench/workflow/failure_causes/NetworkError.h>
 
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(HTCondorCentralManager, "Log category for HTCondorCentralManagerService");
+WRENCH_LOG_CATEGORY(wrench_core_HTCondorCentralManager, "Log category for HTCondorCentralManagerService");
 
 namespace wrench {
 

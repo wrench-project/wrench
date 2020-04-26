@@ -11,7 +11,7 @@
 
 #include <wrench/workflow/failure_causes/ComputeThreadHasDied.h>
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(compute_thread_has_died, "Log category for ComputeThreadHasDied");
+WRENCH_LOG_CATEGORY(wrench_core_compute_thread_has_died, "Log category for ComputeThreadHasDied");
 
 namespace wrench {
 
@@ -27,7 +27,7 @@ namespace wrench {
      * @return the message
      */
     std::string ComputeThreadHasDied::toString() {
-        return "A compute thread has died";
-    };
+        return std::string("A compute thread has died");
+    }
 
-};
+}

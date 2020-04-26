@@ -194,7 +194,7 @@ set(SOURCE_FILES
         src/wrench/helper_services/work_unit_executor/WorkunitExecutor.cpp
         src/wrench/logging/TerminalOutput.cpp
         src/wrench/managers/DataMovementManager.cpp
-        src/wrench/managers/EnergyMeter.cpp
+        src/wrench/managers/EnergyMeterService.cpp
         src/wrench/managers/JobManager.cpp
         src/wrench/managers/JobManagerMessage.cpp
         src/wrench/managers/JobManagerMessage.h
@@ -288,6 +288,8 @@ set(SOURCE_FILES
         src/wrench/wms/WMSMessage.cpp
         src/wrench/wms/WMSMessage.h
         src/wrench/workflow/Workflow.cpp
+        src/wrench/workflow/DagOfTasks.cpp
+        include/wrench/workflow/DagOfTasks.h
         src/wrench/workflow/WorkflowFile.cpp
         src/wrench/workflow/WorkflowTask.cpp
         src/wrench/workflow/execution_events/WorkflowExecutionEvent.cpp
@@ -396,8 +398,8 @@ set(TEST_FILES
         test/energy_consumption/EnergyConsumptionTest.cpp
         test/simulation/simulation_output/SimulationDumpJSONTest.cpp
         test/compute_services/HTCondorServiceTest.cpp
-        src/wrench/managers/EnergyMeter.cpp
-        include/wrench/managers/EnergyMeter.h
+        src/wrench/managers/EnergyMeterService.cpp
+        include/wrench/managers/EnergyMeterService.h
         test/simulated_failures/host_failures/ServiceStartReStartTest.cpp
         test/simulated_failures/host_failures/ComprehensiveIntegrationTest.cpp
         test/simulated_failures/host_failures/FailureDetectorHostFailuresTest.cpp
@@ -423,12 +425,11 @@ set(TEST_FILES
         test/simulation/S4U_MailboxTest.cpp)
 
 find_library(PUGIXML_LIBRARY NAMES pugixml)
-find_library(LEMON_LIBRARY NAMES emon lemon)
 find_library(GTEST_LIBRARY NAMES gtest)
 
 add_library(wrench STATIC ${SOURCE_FILES})
 set_target_properties(wrench PROPERTIES VERSION ${WRENCH_RELEASE_VERSION})
-target_link_libraries(wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY} ${LEMON_LIBRARY})
+target_link_libraries(wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY})
 
 # wrench version
 add_custom_command(TARGET wrench PRE_LINK COMMAND ${CMAKE_COMMAND} -DPROJECT_SOURCE_DIR=${PROJECT_SOURCE_DIR} -DWRENCH_RELEASE_VERSION=${WRENCH_RELEASE_VERSION} -P ${CMAKE_HOME_DIRECTORY}/conf/cmake/Version.cmake)

@@ -34,7 +34,7 @@
 
 #include "wrench/util/PointerUtil.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(standard_job_executor, "Log category for Standard Job Executor");
+WRENCH_LOG_CATEGORY(wrench_core_standard_job_executor, "Log category for Standard Job Executor");
 
 namespace wrench {
 
@@ -537,14 +537,6 @@ namespace wrench {
             // Create a workunit executor!
             WRENCH_INFO("Starting a work unit executor with %ld cores on host %s",
                         target_num_cores, target_host.c_str());
-
-//        std::cerr << "CREATING A WORKUNIT EXECUTOR\n";
-
-            // TODO: WAS THIS USEFUL BELOW? Henri has commented it out for now
-//        WorkflowJob* workflow_job = job;
-//        if (this->part_of_pilot_job) {
-//          workflow_job = this->parent_pilot_job;s
-//        }
 
             std::shared_ptr<WorkunitExecutor> workunit_executor = std::shared_ptr<WorkunitExecutor>(
                     new WorkunitExecutor(target_host,

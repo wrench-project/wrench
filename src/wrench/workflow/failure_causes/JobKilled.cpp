@@ -15,7 +15,7 @@
 #include "wrench/services/storage/StorageService.h"
 #include "wrench/services/compute/ComputeService.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(job_killed, "Log category for JobKilled");
+WRENCH_LOG_CATEGORY(wrench_core_job_killed, "Log category for JobKilled");
 
 namespace wrench {
 
@@ -55,4 +55,4 @@ namespace wrench {
     }
 
 
-};
+}

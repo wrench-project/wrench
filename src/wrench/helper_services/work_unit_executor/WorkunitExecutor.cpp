@@ -35,7 +35,7 @@
 #include <wrench/workflow/failure_causes/ComputeThreadHasDied.h>
 
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(workunit_executor, "Log category for Multicore Workunit Executor");
+WRENCH_LOG_CATEGORY(wrench_core_workunit_executor, "Log category for Multicore Workunit Executor");
 
 //#define S4U_KILL_JOIN_WORKS
 

@@ -12,11 +12,12 @@
 
 #include <map>
 #include <stack>
-#include <lemon/list_graph.h>
 #include <set>
 
 #include "wrench/workflow/job/WorkflowJob.h"
 #include "wrench/workflow/WorkflowFile.h"
+
+#include <boost/graph/adjacency_list.hpp>
 
 namespace wrench {
 
@@ -54,13 +55,6 @@ namespace wrench {
         /** \cond DEVELOPER    */
         /***********************/
 
-//        /** @brief Task types */
-//        enum TaskType {
-//            COMPUTE,
-//            AUXILIARY,
-//            TRANSFER
-//        };
-
         /** @brief Task states */
         enum State {
             /** @brief Not ready (parents have not completed) */
@@ -84,10 +78,6 @@ namespace wrench {
         std::string getClusterID() const;
 
         void setClusterID(std::string);
-
-//        void setTaskType(TaskType);
-//
-//        TaskType getTaskType() const;
 
         void setPriority(long);
 
@@ -140,10 +130,6 @@ namespace wrench {
         std::string getExecutionHost();
 
         WorkflowTask::State getState() const;
-
-//        void addSrcDest(WorkflowFile *, const std::string &, const std::string &);
-//
-//        std::map<WorkflowFile *, std::pair<std::string, std::string>> getFileTransfers() const;
 
         /***********************/
         /** \endcond           */
@@ -253,7 +239,6 @@ namespace wrench {
 
         std::string id;                    // Task ID
         std::string cluster_id;            // ID for clustered task
-//        TaskType task_type;                // Task type
         double flops;                      // Number of flops
         double average_cpu = -1;           // Average CPU utilization
         unsigned long bytes_read = -1;     // Total bytes read in KB
@@ -271,11 +256,9 @@ namespace wrench {
         InternalState internal_state;      // Not to be exposed to developer level
 
         Workflow *workflow;                                   // Containing workflow
-        lemon::ListDigraph *DAG;                              // Containing workflow
-        lemon::ListDigraph::Node DAG_node;                    // pointer to the underlying DAG node
+
         std::map<std::string, WorkflowFile *> output_files;   // List of output files
         std::map<std::string, WorkflowFile *> input_files;    // List of input files
-//        std::map<WorkflowFile *, std::pair<std::string, std::string>> fileTransfers;  // Map of transfer files and hosts
 
         // Private constructor (called by Workflow)
         WorkflowTask(std::string id,
@@ -288,12 +271,9 @@ namespace wrench {
         // Containing job
         WorkflowJob *job;
 
-        // Private helper function
-//        void addFileToMap(std::map<std::string, WorkflowFile *> &map_to_insert,
-//                          std::map<std::string, WorkflowFile *> &map_to_check,
-//                          WorkflowFile *f);
-
         std::stack<WorkflowTaskExecution> execution_history;
+
+        friend class DagOfTasks;
     };
 };
 

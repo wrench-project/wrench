@@ -16,7 +16,7 @@
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(compute_thread_link_failures_test, "Log category for link failure with ComputeThread");
+WRENCH_LOG_CATEGORY(compute_thread_link_failures_test, "Log category for link failure with ComputeThread");
 
 
 class ComputeThreadLinkFailuresTest : public ::testing::Test {

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2019. The WRENCH Team.
+ * Copyright (c) 2017-2020. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -3187,13 +3187,14 @@ protected:
 };
 
 TEST_F(WorkflowLoadFromJSONTest, DISABLED_LoadValidJSON) {
-
     std::unique_ptr<wrench::Workflow> workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
 
     wrench::Workflow *workflow = nullptr;
 
-    ASSERT_THROW(workflow = wrench::PegasusWorkflowParser::createWorkflowFromJSON("bogus", "1f", false), std::invalid_argument);
-    ASSERT_NO_THROW(workflow = wrench::PegasusWorkflowParser::createWorkflowFromJSON(this->json_file_path, "1f", false));
+    ASSERT_THROW(workflow = wrench::PegasusWorkflowParser::createWorkflowFromJSON("bogus", "1f", false),
+                 std::invalid_argument);
+    ASSERT_NO_THROW(
+            workflow = wrench::PegasusWorkflowParser::createWorkflowFromJSON(this->json_file_path, "1f", false));
     ASSERT_EQ(workflow->getNumberOfTasks(), 71);
     ASSERT_EQ(workflow->getFiles().size(), 69);
 
@@ -3223,5 +3224,4 @@ TEST_F(WorkflowLoadFromJSONTest, DISABLED_LoadValidJSON) {
     ASSERT_EQ(workflow->getTasksInTopLevelRange(5, 7).size(), 7);
 
     ASSERT_LT(workflow->getCompletionDate(), 0.0);
-
 }

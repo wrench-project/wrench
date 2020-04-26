@@ -18,7 +18,7 @@
 #include "wrench/workflow/failure_causes/JobTypeNotSupported.h"
 #include "wrench/workflow/failure_causes/NetworkError.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(HTCondor, "Log category for HTCondorComputeService Scheduler");
+WRENCH_LOG_CATEGORY(wrench_core_HTCondor, "Log category for HTCondorComputeService Scheduler");
 
 namespace wrench {
 

@@ -16,7 +16,7 @@
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(bogus_message_test, "Log category for BogusMessageTest");
+WRENCH_LOG_CATEGORY(bogus_message_test, "Log category for BogusMessageTest");
 
 
 class BogusMessageTest : public ::testing::Test {

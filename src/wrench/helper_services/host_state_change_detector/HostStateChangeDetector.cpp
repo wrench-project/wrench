@@ -16,7 +16,7 @@
 #include <wrench/services/helpers/HostStateChangeDetector.h>
 
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(host_state_change_detector, "Log category for HostStateChangeDetector");
+WRENCH_LOG_CATEGORY(wrench_core_host_state_change_detector, "Log category for HostStateChangeDetector");
 
 
 /**

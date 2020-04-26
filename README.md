@@ -35,7 +35,6 @@ And, one of the following:
 ### Required Dependencies 
 
 - [SimGrid](https://framagit.org/simgrid/simgrid/-/releases) - version 3.25
-- [Lemon C++ library](http://lemon.cs.elte.hu/) - version 1.3.1 or higher 
 - [PugiXML](http://pugixml.org/) - version 1.8 or higher 
 - [JSON for Modern C++](https://github.com/nlohmann/json) - version 3.7.0 or higher 
 
@@ -68,8 +67,6 @@ make
 sudo make install 
 ```
 
-
-
 ## Get in Touch
 
 The main channel to reach the WRENCH team is via the support email: 
@@ -85,7 +82,7 @@ it provides a recent and general overview on the framework.
 
 ```latex
 @inproceedings{wrench,
-  title = {WRENCH: A Framework for Simulating Workflow Management Systems},
+  title = {{WRENCH: A Framework for Simulating Workflow Management Systems}},
   author = {Casanova, Henri and Pandey, Suraj and Oeth, James and Tanaka, Ryan and Suter, Frederic and Ferreira da Silva, Rafael},
   booktitle = {13th Workshop on Workflows in Support of Large-Scale Science (WORKS'18)},
   year = {2018},

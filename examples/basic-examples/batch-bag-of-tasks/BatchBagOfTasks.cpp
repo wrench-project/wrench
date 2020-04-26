@@ -22,11 +22,14 @@
  ** service, that has access to two hosts: BatchNode1 and BatchNode2. Once the simulation is done,
  ** the completion time of each workflow task is printed.
  **
+ ** Example invocation of the simulator for a 10-task workflow, with no logging:
+ **    ./wrench-example-batch-bag-of-tasks 10 ./four_hosts.xml
+ **
  ** Example invocation of the simulator for a 10-task workflow, with only WMS logging:
- **    ./batch-bag-of-tasks-simulator 10 ./four_hosts.xml --wrench-no-logs --log=custom_wms.threshold=info
+ **    ./wrench-example-batch-bag-of-tasks 10 ./four_hosts.xml --log=custom_wms.threshold=info
  **
  ** Example invocation of the simulator for a 6-task workflow with full logging:
- **    ./batch-bag-of-tasks-simulator 6 ./four_hosts.xml
+ **    ./wrench-example-batch-bag-of-tasks 6 ./four_hosts.xml --wrench-full-log
  **/
 
 
@@ -56,7 +59,7 @@ int main(int argc, char **argv) {
 
     /* Parsing of the command-line arguments for this WRENCH simulation */
     if (argc != 3) {
-        std::cerr << "Usage: " << argv[0] << " <number of tasks> <xml platform file> [--wrench-no-logs --log=custom_wms.threshold=info]" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " <number of tasks> <xml platform file> [--log=custom_wms.threshold=info]" << std::endl;
         exit(1);
     }
 
