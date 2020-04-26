@@ -56,4 +56,4 @@ namespace wrench {
                this->storage_service->getName() + " due to lack of storage space";
     }
 
-};
+}

@@ -70,7 +70,7 @@ namespace wrench {
       }
       this->workflow = workflow;
       this->name = "standard_job_" + std::to_string(WorkflowJob::getNewUniqueNumber());
-    };
+    }
 
     /**
      * @brief Returns the minimum number of cores required, over all tasks in the job (i.e., at least
@@ -153,4 +153,4 @@ namespace wrench {
       return this->state;
     }
 
-};
+}

@@ -27,7 +27,7 @@ namespace wrench {
      * @return the message
      */
     std::string FatalFailure::toString() {
-        return "Internal implementation, likely a WRENCH bug";
-    };
+        return std::string("Internal implementation, likely a WRENCH bug");
+    }
 
-};
+}

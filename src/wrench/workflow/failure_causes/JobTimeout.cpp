@@ -39,7 +39,7 @@ namespace wrench {
      * @return the message
      */
     std::string JobTimeout::toString() {
-        return "Job has timed out - likely not enough time was requested from a (batch-scheduled?) compute service";
-    };
+        return std::string("Job has timed out - likely not enough time was requested from a (batch-scheduled?) compute service");
+    }
 
-};
+}

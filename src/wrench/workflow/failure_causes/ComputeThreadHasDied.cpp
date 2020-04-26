@@ -27,7 +27,7 @@ namespace wrench {
      * @return the message
      */
     std::string ComputeThreadHasDied::toString() {
-        return "A compute thread has died";
-    };
+        return std::string("A compute thread has died");
+    }
 
-};
+}
