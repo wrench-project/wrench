@@ -57,4 +57,4 @@ namespace wrench {
                this->compute_service->getHostname() + " does not support jobs of type " + this->job->getTypeAsString();
     }
 
-};
+}

@@ -51,4 +51,4 @@ namespace wrench {
         return "Couldn't find file " + this->file->getID() + " at location " + this->location->toString();
     }
 
-};
+}

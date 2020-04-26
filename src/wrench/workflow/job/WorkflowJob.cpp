@@ -54,10 +54,10 @@ namespace wrench {
     std::string WorkflowJob::getTypeAsString() {
       switch (this->type) {
         case STANDARD: {
-          return "Standard";
+          return std::string("Standard");
         }
         case PILOT: {
-          return "Pilot";
+          return std::string("Pilot");
         }
         default: {
           throw std::runtime_error("WorkflowJob::getTypeAsString(): WorkflowJob type '" +
@@ -173,4 +173,4 @@ namespace wrench {
     unsigned long WorkflowJob::getPriority() {
       return 0;
     }
-};
+}

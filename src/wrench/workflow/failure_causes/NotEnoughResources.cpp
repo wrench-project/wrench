@@ -57,4 +57,4 @@ namespace wrench {
         return text_msg;
     }
 
-};
+}

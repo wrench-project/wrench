@@ -89,8 +89,8 @@ namespace wrench {
             error = "link failure, or communication peer died";
         }
         return "Network error (" + error + ") while " + operation + " mailbox_name " + this->mailbox;
-    };
+    }
 
 
 
-};
+}
