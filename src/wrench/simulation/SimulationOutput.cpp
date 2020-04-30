@@ -104,6 +104,33 @@ namespace wrench {
     /**
      * @brief Function that generates a unified JSON file containing the information specified by boolean arguments.
      *
+     *
+     *
+     * JSON Structure:
+     * {
+     *     "disk_operations": {
+     *          ...
+     *      },
+     *      "energy_consumption": {
+     *          ...
+     *      },
+     *      "platform": {
+     *          ...
+     *      },
+     *      "workflow_execution": {
+     *          ...
+     *      },
+     *      "workflow_graph": {
+     *          ...
+     *      }
+     * }
+     *
+     * Any pieces not specified in the arguments are left out. For full structure see documentation of specific sections.
+     *
+     *
+     *
+     *
+     *
      * @param workflow: a pointer to the Workflow
      * @param file_path: path for generated JSON
      * @param include_platform: boolean whether to include platform in JSON
@@ -112,7 +139,7 @@ namespace wrench {
      * @param include_energy: boolean whether to include energy consumption in JSON
      * @param generate_host_utilization_layout: boolean specifying whether or not you would like a possible host utilization
      *         layout to be generated
-     * @param include_disk: boolean specifying whether to include disk operation in JSON
+     * @param include_disk: boolean specifying whether to include disk operation in JSON (disk timestamps must be enabled)
      */
     void SimulationOutput::dumpUnifiedJSON(Workflow *workflow, std::string file_path,
                                            bool include_platform,
@@ -919,7 +946,7 @@ namespace wrench {
      *            }
      *            }, . . .
      *      ],
-     *    routes: [
+     *      routes: [
      *           {
      *               source: <string>,
      *               target: <string>,
@@ -1203,30 +1230,30 @@ namespace wrench {
      *
      *{
      *  "disk_operations": {
-     *      "reads": [
-     *          {
-     *               "bytes": 1048576.0,
-     *               "end": 0.011059921999690343,
-     *               "hostname": "storage_db.edu",
-     *               "mount": "/",
-     *               "start": 0.000574159999741952
-     *          },
-     *          {
-     *              ...
+     *      "io_host": {
+     *          "/": {
+     *             "reads": [
+     *                  {
+     *                   "bytes": 1048576.0,
+     *                   "end": 0.011059921999690343,
+     *                   "start": 0.000574159999741952
+     *                  },
+     *                  {
+     *                     ...
+     *                  }
+     *                  ],
+     *             "writes": [
+     *                 {
+     *                  "bytes": 1048576.0,
+     *                  "end": 0.011059921999690343,
+     *                  "start": 0.000574159999741952
+     *                  },
+     *                  {
+     *                   ...
+     *                  }
+     *                  ]
+     *              }
      *          }
-     *          ],
-     *     "writes": [
-     *          {
-     *               "bytes": 1048576.0,
-     *               "end": 0.011059921999690343,
-     *               "hostname": "storage_db.edu",
-     *               "mount": "/",
-     *               "start": 0.000574159999741952
-     *          },
-     *          {
-     *              ...
-     *          }
-     *          ]
      *   }
      *}
      *
