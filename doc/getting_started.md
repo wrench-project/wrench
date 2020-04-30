@@ -1,26 +1,17 @@
 Getting started                        {#getting-started}
 ============
 
-<!--
-@wrenchuserdoc <div class="doc-type">user documentation</div><div class="doc-link">other: <a href="../developer/getting-started.html">developer</a> - <a href="../internal/getting-started.html">internal</a></div> @endwrenchdoc
-@wrenchdeveloperdoc  <div class="doc-type">developer documentation</div><div class="doc-link">other: <a href="../user/getting-started.html">user</a> - <a href="../internal/getting-started.html">internal</a></div> @endwrenchdoc
-@wrenchinternaldoc  <div class="doc-type">internal documentation</div><div class="doc-link">other: <a href="../user/getting-started.html">user</a> -  <a href="../developer/getting-started.html">developer</a></div> @endwrenchdoc
--->
-
-
-
-
 Once you've have installed the wrench library, following the instructions
-on the [installation page](@ref install),  you are ready to create a wrench
+on the [installation page](@ref install),  you are ready to create a WRENCH
 simulator.  **information on what can be simulated and how to do it are
-provided in the [wrench 101](@ref wrench-101) and [wrench 102](@ref
-wrench102) pages. this page is only about the logistics of setting up a simulator project.**
+provided in the [WRENCH 101](@ref wrench-101) and [WRENCH 102](@ref wrench-102) 
+pages. this page is only about the logistics of setting up a simulator project.**
 
 [TOC]
 
 # using the wrench initialization tool #      {#getting-started-wrench-init}
 
-the `wrench-init` tool is a project generator built with wrench, which creates a simple
+the `wrench-init` tool is a project generator built with WRENCH, which creates a simple
 project structure as follows:
 
 ~~~~~~~~~~~~~{.sh}
@@ -43,10 +34,10 @@ project-folder/
 
 the `simplesimulator.cpp` source file contains the class representing the simulator 
 (either cloud or batch). `simplestandardjobscheduler.h` and `simplestandardjobscheduler.cpp`
-contain a simple implementation for a `wrench::standardjobscheduler`; `simplewms.h`
+contain a simple implementation for a `wrench::StandardJobScheduler`; `simplewms.h`
 and `simplewms.cpp` denote the implementation of a simple workflow management system.
 example platform and workflow files are also generated into the `data` folder. these
-files provide the minimum necessary implementation for a wrench-enabled simulator.
+files provide the minimum necessary implementation for a WRENCH-enabled simulator.
 
 the `wrench-init` tool only requires a single argument, the name of the folder where
 the project skeleton will be generated: 
@@ -58,9 +49,7 @@ $ wrench-init <project_folder>
 additional options supported by the tool can be found by using the `wrench-init --help` 
 command.
 
-
-
-# creating a CMakeLists.txt file by hand##                {#getting-started-cmakelists}
+# Creating a CMakeLists.txt file by hand##                {#getting-started-cmakelists}
 
 alternately, you can do a manual setup, i.e., create your own Cmake project. 
 below is an example of a `cmakelists.txt` file that can be used as a basic
@@ -114,15 +103,11 @@ target_link_libraries(unit_tests
                      )
 ~~~~~~~~~~~~~
 
-
-
-
-# example wrench simulators  #         {#getting-started-example}
+# Example WRENCH simulators  #         {#getting-started-example}
 
 the examples in the ```examples``` directory provide good starting points
 for developing your own simulators.  typing `make` in the top-level
 directory compiles the examples in the ```examples``` directory.
-
 
 let us run the ```examples/basic-examples/bare-metal-bag-of-tasks``` by 
 navigating to that directory and typing:
@@ -132,15 +117,14 @@ navigating to that directory and typing:
 ~~~~~~~~~~~~~
 
 you should see some output in the terminal. the output in white is
-produced by he simulator implemented with the wrench user API.  the output
+produced by he simulator implemented with the WRENCH user API.  the output
 in green is produced by the  workflow management system implemented with
-the wrench developer API.
+the WRENCH developer API.
 
 although you can inspect the codes of the examples on your own, we highly
-recommend that you go through the [wrench 101](@ref wrench-101) and [wrench
-102](@ref wrench102) pages first. these pages make direct references to the
+recommend that you go through the [WRENCH 101](@ref wrench-101) and 
+[WRENCH 102](@ref wrench-102) pages first. these pages make direct references to the
 examples, a description of which is available in ```examples/readme.md```
-in the wrench distribution.
+in the WRENCH distribution.
 
 ---
-

@@ -7,7 +7,7 @@ services. It is thus a crucial component in every WRENCH simulator.
 WRENCH does not provide any WMS implementation, but provides the means for 
 developing custom WMSs. This page is meant to provide high-level and 
 detailed information about implementing a WMS in WRENCH. Full API details 
-are provided in the [Developer API Reference](../developer/annotated.html).
+are provided in the [Developer API Reference](./developer/annotated.html).
 
 [TOC]
 
@@ -116,7 +116,7 @@ each kind of interaction for each kind of service.
 
 As expected, each service type provides its own API. For instance, a network proximity
 service provides member functions to query the service's host distance databases.
-The [Developer API Reference](../developer/annotated.html) provides all
+The [Developer API Reference](./developer/annotated.html) provides all
 necessary documentation, which also explains which member functions are synchronous
 and which are asynchronous (in which case some
 [event](@ref wrench-102-WMS-events) will occur in the future).

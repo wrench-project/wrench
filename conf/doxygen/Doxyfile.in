@@ -798,29 +798,7 @@ WARN_LOGFILE           =
 # spaces. See also FILE_PATTERNS and EXTENSION_MAPPING
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = @CMAKE_HOME_DIRECTORY@/doc/index.md \
-                         @CMAKE_HOME_DIRECTORY@/doc/install.md \
-                         @CMAKE_HOME_DIRECTORY@/doc/getting_started.md \
-                         @CMAKE_HOME_DIRECTORY@/doc/wrench_101.md \
-                         @CMAKE_HOME_DIRECTORY@/doc/wrench_102.md \
-                         @CMAKE_HOME_DIRECTORY@/doc/service_guide_101/baremetal.md \
-                         @CMAKE_HOME_DIRECTORY@/doc/service_guide_101/batch.md \
-                         @CMAKE_HOME_DIRECTORY@/doc/service_guide_101/cloud.md \
-                         @CMAKE_HOME_DIRECTORY@/doc/service_guide_101/virtualizedcluster.md \
-                         @CMAKE_HOME_DIRECTORY@/doc/service_guide_101/htcondor.md \
-                         @CMAKE_HOME_DIRECTORY@/doc/service_guide_101/simplestorage.md \
-                         @CMAKE_HOME_DIRECTORY@/doc/service_guide_101/fileregistry.md \
-                         @CMAKE_HOME_DIRECTORY@/doc/service_guide_101/networkproximity.md \
-                         @CMAKE_HOME_DIRECTORY@/doc/service_guide_102/baremetal.md \
-                         @CMAKE_HOME_DIRECTORY@/doc/service_guide_102/batch.md \
-                         @CMAKE_HOME_DIRECTORY@/doc/service_guide_102/cloud.md \
-                         @CMAKE_HOME_DIRECTORY@/doc/service_guide_102/virtualizedcluster.md \
-                         @CMAKE_HOME_DIRECTORY@/doc/service_guide_102/htcondor.md \
-                         @CMAKE_HOME_DIRECTORY@/doc/service_guide_102/simplestorage.md \
-                         @CMAKE_HOME_DIRECTORY@/doc/service_guide_102/fileregistry.md \
-                         @CMAKE_HOME_DIRECTORY@/doc/service_guide_102/networkproximity.md \
-                         @CMAKE_HOME_DIRECTORY@/src \
-                         @CMAKE_HOME_DIRECTORY@/include
+INPUT                  = @WRENCH_DOC_INPUT@
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses

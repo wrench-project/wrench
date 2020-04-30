@@ -539,3 +539,10 @@ span.SRScope {
     font-weight: 700 !important;
     font-style: italic;
 }
+
+div.header {
+    background-image: none !important;
+    background-repeat: no-repeat !important;
+    background-color: #fff !important;
+    border-bottom: 1px solid #666 !important;
+}

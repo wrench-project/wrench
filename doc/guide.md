@@ -1,13 +1,6 @@
 Guide                        {#guide}
 ============
 
-<!--
-@WRENCHUserDoc <div class="doc-type">User Documentation</div><div class="doc-link">Other: <a href="../developer/guide.html">Developer</a> - <a href="../internal/guide.html">Internal</a></div> @endWRENCHDoc
-@WRENCHDeveloperDoc  <div class="doc-type">Developer Documentation</div><div class="doc-link">Other: <a href="../user/guide.html">User</a> - <a href="../internal/guide.html">Internal</a></div> @endWRENCHDoc
-@WRENCHInternalDoc  <div class="doc-type">Internal Documentation</div><div class="doc-link">Other: <a href="../user/guide.html">User</a> -  <a href="../developer/guide.html">Developer</a></div> @endWRENCHDoc
--->
-
-
 This page provides pointers to high-level information for WRENCH users who
 want to build simulators. The examples provided  in the  ```example/```
 directory are a great first start. This page goes further by detailing what
