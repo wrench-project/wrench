@@ -1,14 +1,7 @@
 Installing WRENCH                  {#install}
 ============
 
-<!--
-@WRENCHUserDoc <div class="doc-type">User Documentation</div><div class="doc-link">Other: <a href="../developer/install.html">Developer</a> - <a href="../internal/install.html">Internal</a></div> @endWRENCHDoc
-@WRENCHDeveloperDoc  <div class="doc-type">Developer Documentation</div><div class="doc-link">Other: <a href="../user/install.html">User</a> - <a href="../internal/install.html">Internal</a></div> @endWRENCHDoc
-@WRENCHInternalDoc  <div class="doc-type">Internal Documentation</div><div class="doc-link">Other: <a href="../user/install.html">User</a> -  <a href="../developer/install.html">Developer</a></div> @endWRENCHDoc
--->
-
 [TOC]
-
 
 # Prerequisites #                 {#install-prerequisites}
 
@@ -22,7 +15,6 @@ And, one of the following:
 - <b>g++</b> - version 5.0 or higher
 - <b>clang</b> - version 3.6 or higher
 
-
 ## Required Dependencies ##                  {#install-prerequisites-dependencies}
 
 - [SimGrid](https://simgrid.org/) -- version 3.25
@@ -35,10 +27,7 @@ And, one of the following:
 - [Doxygen](http://www.doxygen.org) -- version 1.8 or higher (only required for generating documentation)
 - [Batsched](https://gitlab.inria.fr/batsim/batsched) -- only needed for realistic simulation of resource managed by production batch schedulers
 
-
-
 # Source Install #                  {#install-source}
-
 
 ## Building WRENCH ##               {#install-source-build}
 
@@ -88,7 +77,6 @@ make unit_tests
     - MacPorts: `sudo port install pkg-config`
     - Brew: `sudo brew install pkg-config`
 
-
 # Docker Containers #             {#install-docker}
 
 WRENCH is also distributed in Docker containers. Please, visit the
@@ -101,18 +89,16 @@ The `latest` tag provides a container with the latest
 ~~~~~~~~~~~~~{.sh}
 docker pull wrenchproject/wrench 
 # or
-docker run -it wrenchproject/wrench /bin/bash
+docker run --rm -it wrenchproject/wrench /bin/bash
 ~~~~~~~~~~~~~
 
- The `unstable` tag provides a container with the current code in the GitHub's `master` 
-branch:
+The `unstable` tag provides a container with the current code in the GitHub's 
+`master` branch:
 
 ~~~~~~~~~~~~~{.sh}
 docker pull wrenchproject/wrench:unstable
 # or
-docker run -it wrenchproject/wrench:unstable /bin/bash
+docker run --rm -it wrenchproject/wrench:unstable /bin/bash
 ~~~~~~~~~~~~~ 
 
-Additional tags are available for all WRENCH releases. 
-
-
+Additional tags are available for all WRENCH releases.

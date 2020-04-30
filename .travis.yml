@@ -65,9 +65,9 @@ script:
   # documentation build and deployment
   - if [[ "$TRAVIS_BUILD_STAGE_NAME" == "Documentation Build and Deployment" ]]; then
       docker exec -w /home/wrench/wrench/build -it wrench cmake -DENABLE_BATSCHED=${batsched} -DCMAKE_VERBOSE_MAKEFILE=ON ..;
-      docker exec -w /home/wrench/wrench/build -it wrench make doc-gh;
+      docker exec -w /home/wrench/wrench/build -it wrench make doc;
       docker cp wrench:/home/wrench/wrench/docs .;
-      cp -R ./docs/gh-pages $HOME/gh-pages-to-deploy;
+      cp -R ./docs/wrench-doc $HOME/gh-pages-to-deploy;
     fi
   # code coverage
   - if [[ "$TRAVIS_BUILD_STAGE_NAME" == "Code Coverage" ]]; then

@@ -17,4 +17,4 @@ sonar.sourceEncoding=UTF-8
 sonar.sources=src,include,examples
 sonar.tests=test
 
-sonar.cfamily.threads=1
+sonar.cfamily.threads=2

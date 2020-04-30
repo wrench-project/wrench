@@ -1,12 +1,6 @@
 Overview                        {#mainpage}
 ============
 
-<!--
-@WRENCHUserDoc <div class="doc-type">User Documentation</div><div class="doc-link">Other: <a href="../developer/">Developer</a> - <a href="../internal/">Internal</a></div> @endWRENCHDoc
-@WRENCHDeveloperDoc  <div class="doc-type">Developer Documentation</div><div class="doc-link">Other: <a href="../user/">User</a> - <a href="../internal/">Internal</a></div> @endWRENCHDoc
-@WRENCHInternalDoc  <div class="doc-type">Internal Documentation</div><div class="doc-link">Other: <a href="../user/">User</a> -  <a href="../developer/">Developer</a></div> @endWRENCHDoc
--->
-
 [TOC]
 
 ![Workflow Management System Simulation Workbench](images/logo-vertical.png)
