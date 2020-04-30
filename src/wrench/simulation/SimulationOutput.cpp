@@ -435,30 +435,53 @@ namespace wrench {
       * The JSON array has the following format:
       *
       * <pre>
-      *    {
+      *     {
       *      "workflow_execution": {
       *         "tasks": [
-      *
-      *      {
-      *          task_id: <string>,
-      *          execution_host: {
-      *              hostname: <string>,
-      *              flop_rate: <double>,
-      *              memory: <double>,
-      *              cores: <unsigned_long>
-      *          },
-      *          num_cores_allocated: <unsigned_long>,
-      *          vertical_position: <unsigned_long>,
-      *          whole_task: { start: <double>, end: <double> },
-      *          read:       { start: <double>, end: <double> },
-      *          compute:    { start: <double>, end: <double> },
-      *          write:      { start: <double>, end: <double> },
-      *          failed: <double>,
-      *          terminated: <double>
-      *      }, . . .
-      *    ]
-      *    }
-      *    }
+      *             {
+      *                "compute": {
+      *                     "end": <double>,
+      *                     "start": <double>
+      *                },
+      *                "execution_host": {
+      *                     "cores": <unsigned_long>,
+      *                     "flop_rate": <double>,
+      *                     "hostname": <string>,
+      *                     "memory": <double>
+      *                },
+      *                "failed": <double>,
+      *                "num_cores_allocated": <unsigned_long>,
+      *                "read": [
+      *                     {
+      *                         "end": <double>,
+      *                         "start": <double>
+      *                     },
+      *                     {
+      *                         ...
+      *                     }
+      *                ],
+      *                "task_id": <string>,
+      *                "terminated": <double>,
+      *                "whole_task": {
+      *                     "end": <double>,
+      *                     "start": <double>
+      *                 },
+      *                 "write": [
+      *                     {
+      *                         "end": <double>,
+      *                         "start": <double>
+      *                     },
+      *                     {
+      *                         ...
+      *                     }
+      *                 ],
+      *             },
+      *             {
+      *                 ...
+      *             }
+      *             ]
+      *         }
+      *     }
       * </pre>
       *
       *   If generate_host_utilization_layout is set to true, a recursive function searches for a possible host
