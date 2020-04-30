@@ -105,7 +105,7 @@ namespace wrench {
      * @brief Function that generates a unified JSON file containing the information specified by boolean arguments.
      *
      *
-     *
+     *<pre>
      * JSON Structure:
      * {
      *     "disk_operations": {
@@ -124,6 +124,7 @@ namespace wrench {
      *          ...
      *      }
      * }
+     *</pre>
      *
      * Any pieces not specified in the arguments are left out. For full structure see documentation of specific sections.
      *
@@ -1224,19 +1225,20 @@ namespace wrench {
      * @brief Writes a JSON file containing disk operation information as a JSON array.
      *
      * >>>>>NOTE<<<<< The timestamps the JSON is generated from are disabled by default.
-     * Enable them with SimulationOutput::enableDiskTimestamps() to use
+     * Enable them with SimulationOutput::enableDiskTimestamps() to use.
      *
      * The JSON array has the following format:
      *
-     *{
+     * <pre>
+     * {
      *  "disk_operations": {
-     *      "io_host": {
-     *          "/": {
+     *      "io_host": {                        <--- Hostname
+     *          "/": {                          <--- Mount
      *             "reads": [
      *                  {
-     *                   "bytes": 1048576.0,
-     *                   "end": 0.011059921999690343,
-     *                   "start": 0.000574159999741952
+     *                   "bytes": <double>,
+     *                   "end": <double>,
+     *                   "start": <double>
      *                  },
      *                  {
      *                     ...
@@ -1244,9 +1246,9 @@ namespace wrench {
      *                  ],
      *             "writes": [
      *                 {
-     *                  "bytes": 1048576.0,
-     *                  "end": 0.011059921999690343,
-     *                  "start": 0.000574159999741952
+     *                  "bytes": <double>,
+     *                  "end": <double>,
+     *                  "start": <double>
      *                  },
      *                  {
      *                   ...
@@ -1255,8 +1257,8 @@ namespace wrench {
      *              }
      *          }
      *   }
-     *}
-     *
+     * }
+     * </pre>
      *
      * @param file_path - path to save JSON at
      * @param writing_file - boolean, default true, to write the JSON to the specified file path. Used for unified output.
