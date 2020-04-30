@@ -3,7 +3,7 @@ WRENCH 101                        {#wrench-101}
 
 This page provides high-level and detailed information about what WRENCH 
 simulators can simulate and how they do it. Full API details are provided 
-in the [User API Reference](../user/annotated.html). See the relevant pages 
+in the [User API Reference](./user/annotated.html). See the relevant pages 
 for instructions on how to [install WRENCH](@ref install) and how to 
 [setup a simulator project](@ref getting-started).
 
@@ -27,7 +27,7 @@ data-dependencies between tasks.
 A special service is then created, called a Workflow Management System
 (WMS),  that will be in charge of executing the workflow on the platform using
 available hardware resources  and software services.  The WMS
-is implemented using the [WRENCH Developer API](../developer/annotated.html), as
+is implemented using the [WRENCH Developer API](./developer/annotated.html), as
 discussed in the [WRENCH 102](@ref wrench-102) page. 
 
 The simulation is then launched via a single call
@@ -52,7 +52,7 @@ code contains extensive comments as well.
 ## Step 0: Include wrench.h #                   {#wrench-101-simulator-1000ft-step-0}
 
 For ease of use, all WRENCH abstraction in the 
-[WRENCH User API](../user/annotated.html) are available through a single 
+[WRENCH User API](./user/annotated.html) are available through a single 
 header file:
 
 ~~~~~~~~~~~~~{.cpp}
@@ -269,7 +269,7 @@ auto wms = simulation.add(new wrench::OneTaskAtATimeWMS({baremetal_service}, {st
 
 Class `wrench::OneTaskAtATimeWMS`, which is part of this example simulator,
 is implemented using the [WRENCH Developer
-API](../developer/annotated.html). See the [WRENCH 102](@ref wrench-102)
+API](./developer/annotated.html). See the [WRENCH 102](@ref wrench-102)
 page for information on how to implement a WMS with WRENCH. The code above
 passes the list of compute services (1st argument) and the list
 of storage services (2nd argument) to the WMS constructor. The 3rd
