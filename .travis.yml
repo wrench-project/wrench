@@ -70,14 +70,14 @@ script:
       cp -R ./docs/wrench-doc $HOME/gh-pages-to-deploy;
     fi
   # code coverage
-  - if [[ "$TRAVIS_BUILD_STAGE_NAME" == "Code Coverage" ]]; then
+  - if [[ "$TRAVIS_BUILD_STAGE_NAME" == "Code Coverage" ]] && [[ "$TRAVIS_BRANCH" == "HEAD" ]]; then
       docker exec -w /home/wrench/wrench/build -it wrench lcov --directory . --capture --output-file coverage.info;
       docker exec -w /home/wrench/wrench/build -it wrench lcov --remove coverage.info '*/test/*' '*/examples/*' '*/include/*' --output-file coverage.info;
       docker cp wrench:/home/wrench/wrench/build/coverage.info .;
       bash <(curl -s https://codecov.io/bash) -f coverage.info -t ${CODECOV_TOKEN};
     fi
   # code quality analysis
-  - if [[ "$TRAVIS_BUILD_STAGE_NAME" == "Code Quality Analysis" ]]; then
+  - if [[ "$TRAVIS_BUILD_STAGE_NAME" == "Code Quality Analysis" ]] && [[ "$TRAVIS_BRANCH" == "HEAD" ]]; then
       docker exec -it wrench mkdir wrench/sonar;
       SONARPATH=$(dirname "`which build-wrapper-linux-x86-64`");
       docker cp $SONARPATH wrench:/home/wrench/wrench/sonar;
