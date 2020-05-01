@@ -104,6 +104,34 @@ namespace wrench {
     /**
      * @brief Function that generates a unified JSON file containing the information specified by boolean arguments.
      *
+     *
+     *<pre>
+     * JSON Structure:
+     * {
+     *     "disk_operations": {
+     *          ...
+     *      },
+     *      "energy_consumption": {
+     *          ...
+     *      },
+     *      "platform": {
+     *          ...
+     *      },
+     *      "workflow_execution": {
+     *          ...
+     *      },
+     *      "workflow_graph": {
+     *          ...
+     *      }
+     * }
+     *</pre>
+     *
+     * Any pieces not specified in the arguments are left out. For full structure see documentation of specific sections.
+     *
+     *
+     *
+     *
+     *
      * @param workflow: a pointer to the Workflow
      * @param file_path: path for generated JSON
      * @param include_platform: boolean whether to include platform in JSON
@@ -112,7 +140,7 @@ namespace wrench {
      * @param include_energy: boolean whether to include energy consumption in JSON
      * @param generate_host_utilization_layout: boolean specifying whether or not you would like a possible host utilization
      *         layout to be generated
-     * @param include_disk: boolean specifying whether to include disk operation in JSON
+     * @param include_disk: boolean specifying whether to include disk operation in JSON (disk timestamps must be enabled)
      */
     void SimulationOutput::dumpUnifiedJSON(Workflow *workflow, std::string file_path,
                                            bool include_platform,
@@ -407,30 +435,53 @@ namespace wrench {
       * The JSON array has the following format:
       *
       * <pre>
-      *    {
+      *     {
       *      "workflow_execution": {
       *         "tasks": [
-      *
-      *      {
-      *          task_id: <string>,
-      *          execution_host: {
-      *              hostname: <string>,
-      *              flop_rate: <double>,
-      *              memory: <double>,
-      *              cores: <unsigned_long>
-      *          },
-      *          num_cores_allocated: <unsigned_long>,
-      *          vertical_position: <unsigned_long>,
-      *          whole_task: { start: <double>, end: <double> },
-      *          read:       { start: <double>, end: <double> },
-      *          compute:    { start: <double>, end: <double> },
-      *          write:      { start: <double>, end: <double> },
-      *          failed: <double>,
-      *          terminated: <double>
-      *      }, . . .
-      *    ]
-      *    }
-      *    }
+      *             {
+      *                "compute": {
+      *                     "end": <double>,
+      *                     "start": <double>
+      *                },
+      *                "execution_host": {
+      *                     "cores": <unsigned_long>,
+      *                     "flop_rate": <double>,
+      *                     "hostname": <string>,
+      *                     "memory": <double>
+      *                },
+      *                "failed": <double>,
+      *                "num_cores_allocated": <unsigned_long>,
+      *                "read": [
+      *                     {
+      *                         "end": <double>,
+      *                         "start": <double>
+      *                     },
+      *                     {
+      *                         ...
+      *                     }
+      *                ],
+      *                "task_id": <string>,
+      *                "terminated": <double>,
+      *                "whole_task": {
+      *                     "end": <double>,
+      *                     "start": <double>
+      *                 },
+      *                 "write": [
+      *                     {
+      *                         "end": <double>,
+      *                         "start": <double>
+      *                     },
+      *                     {
+      *                         ...
+      *                     }
+      *                 ],
+      *             },
+      *             {
+      *                 ...
+      *             }
+      *             ]
+      *         }
+      *     }
       * </pre>
       *
       *   If generate_host_utilization_layout is set to true, a recursive function searches for a possible host
@@ -919,7 +970,7 @@ namespace wrench {
      *            }
      *            }, . . .
      *      ],
-     *    routes: [
+     *      routes: [
      *           {
      *               source: <string>,
      *               target: <string>,
@@ -1197,39 +1248,40 @@ namespace wrench {
      * @brief Writes a JSON file containing disk operation information as a JSON array.
      *
      * >>>>>NOTE<<<<< The timestamps the JSON is generated from are disabled by default.
-     * Enable them with SimulationOutput::enableDiskTimestamps() to use
+     * Enable them with SimulationOutput::enableDiskTimestamps() to use.
      *
      * The JSON array has the following format:
      *
-     *{
+     * <pre>
+     * {
      *  "disk_operations": {
-     *      "reads": [
-     *          {
-     *               "bytes": 1048576.0,
-     *               "end": 0.011059921999690343,
-     *               "hostname": "storage_db.edu",
-     *               "mount": "/",
-     *               "start": 0.000574159999741952
-     *          },
-     *          {
-     *              ...
+     *      "io_host": {                        <--- Hostname
+     *          "/": {                          <--- Mount
+     *             "reads": [
+     *                  {
+     *                   "bytes": <double>,
+     *                   "end": <double>,
+     *                   "start": <double>
+     *                  },
+     *                  {
+     *                     ...
+     *                  }
+     *                  ],
+     *             "writes": [
+     *                 {
+     *                  "bytes": <double>,
+     *                  "end": <double>,
+     *                  "start": <double>
+     *                  },
+     *                  {
+     *                   ...
+     *                  }
+     *                  ]
+     *              }
      *          }
-     *          ],
-     *     "writes": [
-     *          {
-     *               "bytes": 1048576.0,
-     *               "end": 0.011059921999690343,
-     *               "hostname": "storage_db.edu",
-     *               "mount": "/",
-     *               "start": 0.000574159999741952
-     *          },
-     *          {
-     *              ...
-     *          }
-     *          ]
      *   }
-     *}
-     *
+     * }
+     * </pre>
      *
      * @param file_path - path to save JSON at
      * @param writing_file - boolean, default true, to write the JSON to the specified file path. Used for unified output.
