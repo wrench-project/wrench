@@ -1194,7 +1194,9 @@ HTML_EXTRA_STYLESHEET  = @CMAKE_HOME_DIRECTORY@/doc/layout/customdoxygen.css
 HTML_EXTRA_FILES       = @CMAKE_HOME_DIRECTORY@/doc/layout/doxy-boot.js \
                          @CMAKE_HOME_DIRECTORY@/doc/layout/jquery.smartmenus.js \
                          @CMAKE_HOME_DIRECTORY@/doc/layout/jquery.smartmenus.min.js \
-                         @CMAKE_HOME_DIRECTORY@/doc/layout/jquery.smartmenus.bootstrap.css
+                         @CMAKE_HOME_DIRECTORY@/doc/layout/jquery.smartmenus.bootstrap.css \
+                         @CMAKE_HOME_DIRECTORY@/doc/layout/bootstrap.min.css \
+                         @CMAKE_HOME_DIRECTORY@/doc/layout/bootstrap.min.js
 
 # The HTML_COLORSTYLE_HUE tag controls the color of the HTML output. Doxygen
 # will adjust the colors in the style sheet and background images according to
