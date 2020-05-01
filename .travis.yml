@@ -50,7 +50,7 @@ before_install:
   - docker run -m 4g -d -t --name=wrench wrenchproject/wrench-build:${DIST}-${COMPILER} bash;
   - docker exec -it wrench git clone https://github.com/wrench-project/wrench;
   # if not the master branch, switch to branch
-  - if [[ "$TRAVIS_BRANCH" != "HEAD" ]]; then
+  - if [[ "$TRAVIS_BRANCH" != "master" ]]; then
       docker exec -w /home/wrench/wrench -it wrench git checkout ${TRAVIS_BRANCH};
     fi
   - docker exec -it wrench mkdir wrench/build;
@@ -70,14 +70,14 @@ script:
       cp -R ./docs/wrench-doc $HOME/gh-pages-to-deploy;
     fi
   # code coverage
-  - if [[ "$TRAVIS_BUILD_STAGE_NAME" == "Code Coverage" ]] && [[ "$TRAVIS_BRANCH" == "HEAD" ]]; then
+  - if [[ "$TRAVIS_BUILD_STAGE_NAME" == "Code Coverage" ]] && [[ "$TRAVIS_BRANCH" == "master" ]]; then
       docker exec -w /home/wrench/wrench/build -it wrench lcov --directory . --capture --output-file coverage.info;
       docker exec -w /home/wrench/wrench/build -it wrench lcov --remove coverage.info '*/test/*' '*/examples/*' '*/include/*' --output-file coverage.info;
       docker cp wrench:/home/wrench/wrench/build/coverage.info .;
       bash <(curl -s https://codecov.io/bash) -f coverage.info -t ${CODECOV_TOKEN};
     fi
   # code quality analysis
-  - if [[ "$TRAVIS_BUILD_STAGE_NAME" == "Code Quality Analysis" ]] && [[ "$TRAVIS_BRANCH" == "HEAD" ]]; then
+  - if [[ "$TRAVIS_BUILD_STAGE_NAME" == "Code Quality Analysis" ]] && [[ "$TRAVIS_BRANCH" == "master" ]]; then
       docker exec -it wrench mkdir wrench/sonar;
       SONARPATH=$(dirname "`which build-wrapper-linux-x86-64`");
       docker cp $SONARPATH wrench:/home/wrench/wrench/sonar;
