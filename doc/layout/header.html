@@ -18,9 +18,11 @@
     <link href="$relpath^$stylesheet" rel="stylesheet" type="text/css"/>
     $extrastylesheet
     <link href='https://fonts.googleapis.com/css?family=Roboto+Slab' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="$relpath^bootstrap.min.css">
+    <script src="$relpath^bootstrap.min.js"></script>
     <link href="$relpath^jquery.smartmenus.bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css"
+          integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
 
     <script type="text/javascript" src="$relpath^jquery.smartmenus.js"></script>
     <script type="text/javascript" src="$relpath^jquery.smartmenus.bootstrap.js"></script>
@@ -38,16 +40,23 @@
         <div id="main-nav" class="nav navbar-nav navbar-right">
             <ul class="sm sm-dox nav navbar-nav navbar-right" id="main-menu">
                 <li class="nav-item"><a class="nav-link" href="/wrench/$projectnumber/index.html">Overview</a></li>
-                <li class="nav-item"><a class="nav-link" href="/wrench/$projectnumber/install.html">Installation</a></li>
-                <li class="nav-item"><a class="nav-link" href="/wrench/$projectnumber/getting-started.html">Getting Started</a></li>
-                <li class="nav-item"><a class="nav-link" href="/wrench/$projectnumber/wrench-101.html">WRENCH 101</a></li>
-                <li class="nav-item"><a class="nav-link" href="/wrench/$projectnumber/wrench-102.html">WRENCH 102</a></li>
+                <li class="nav-item"><a class="nav-link" href="/wrench/$projectnumber/install.html">Installation</a>
+                </li>
+                <li class="nav-item"><a class="nav-link" href="/wrench/$projectnumber/getting-started.html">Getting
+                    Started</a></li>
+                <li class="nav-item"><a class="nav-link" href="/wrench/$projectnumber/wrench-101.html">WRENCH 101</a>
+                </li>
+                <li class="nav-item"><a class="nav-link" href="/wrench/$projectnumber/wrench-102.html">WRENCH 102</a>
+                </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">APIs Reference</a>
+                    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button"
+                       aria-haspopup="true" aria-expanded="false">APIs Reference</a>
                     <div class="dropdown-menu">
                         <a class="small dropdown-item" href="/wrench/$projectnumber/user/annotated.html">User</a>
-                        <a class="small dropdown-item" href="/wrench/$projectnumber/developer/annotated.html">Developer</a>
-                        <a class="small dropdown-item" href="/wrench/$projectnumber/internal/annotated.html">Internal</a>
+                        <a class="small dropdown-item"
+                           href="/wrench/$projectnumber/developer/annotated.html">Developer</a>
+                        <a class="small dropdown-item"
+                           href="/wrench/$projectnumber/internal/annotated.html">Internal</a>
                     </div>
                 </li>
             </ul>
@@ -55,7 +64,7 @@
     </div>
 </nav>
 
-<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="top" style="padding-top: 4em !important"><!-- do not remove this div, it is closed by doxygen! -->
     <div class="content" id="content">
         <div class="container">
             <div class="row">
