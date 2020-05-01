@@ -16,20 +16,21 @@ project structure as follows:
 
 ~~~~~~~~~~~~~{.sh}
 project-folder/
-├── cmakelists.txt
-├── readme.md
+├── CMakeLists.txt
+├── CMakeModules
+│   └── FindSimGrid.cmake
 ├── src/
-│   ├── simplesimulator.cpp
-│   ├── simplestandardjobscheduler.cpp
-│   ├── simplestandardjobscheduler.h
-│   ├── simplewms.cpp
-│   └── simplewms.h 
+│   ├── SimpleSimulator.cpp
+│   ├── SimpleStandardJobScheduler.cpp
+│   ├── SimpleStandardJobScheduler.h
+│   ├── SimpleWMS.cpp
+│   └── SimpleWMS.h 
 ├── test/
 ├── doc/
 ├── build/
 └── data/
-    ├── platform-files/
-    └── workflow-files/
+    └── platform-files/
+        └── hosts.xml
 ~~~~~~~~~~~~~
 
 The `simplesimulator.cpp` source file contains the class representing the simulator 
