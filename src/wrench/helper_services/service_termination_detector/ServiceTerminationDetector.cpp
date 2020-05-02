@@ -13,7 +13,7 @@
 #include <wrench/simulation/Simulation.h>
 #include <wrench-dev.h>
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(failure_detector, "Log category for ServiceTerminationDetector");
+WRENCH_LOG_CATEGORY(wrench_core_failure_detector, "Log category for ServiceTerminationDetector");
 
 /**
  * @brief Constructor

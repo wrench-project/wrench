@@ -18,11 +18,10 @@
 #include "wrench/managers/DataMovementManager.h"
 #include "wrench/services/compute/ComputeService.h"
 #include "wrench/services/compute/bare_metal/BareMetalComputeService.h"
-#include "wrench/services/compute/cloud/CloudComputeService.h"
-#include "wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h"
 #include "wrench/services/compute/batch/BatchComputeService.h"
+#include <wrench/workflow/failure_causes/NetworkError.h>
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(wms, "Log category for WMS");
+WRENCH_LOG_CATEGORY(wrench_core_wms, "Log category for WMS");
 
 namespace wrench {
 
@@ -199,6 +198,23 @@ namespace wrench {
     }
 
     /**
+     * @brief  Wait for a workflow execution event
+     * @param timeout: a timeout value in seconds
+     * @return the event
+     */
+    std::shared_ptr<WorkflowExecutionEvent> WMS::waitForNextEvent(double timeout) {
+        return workflow->waitForNextExecutionEvent(timeout);
+    }
+
+    /**
+     * @brief  Wait for a workflow execution event
+     * @return the event
+     */
+    std::shared_ptr<WorkflowExecutionEvent> WMS::waitForNextEvent() {
+        return workflow->waitForNextExecutionEvent();
+    }
+
+    /**
      * @brief Process a standard job completion event
      *
      * @param event: a StandardJobCompletedEvent
@@ -349,9 +365,9 @@ namespace wrench {
      *
      * @return an energy meter
      */
-    std::shared_ptr<EnergyMeter> WMS::createEnergyMeter(const std::map<std::string, double> &measurement_periods) {
-        auto energy_meter_raw_ptr = new EnergyMeter(this->getSharedPtr<WMS>(), measurement_periods);
-        std::shared_ptr<EnergyMeter> energy_meter = std::shared_ptr<EnergyMeter>(energy_meter_raw_ptr);
+    std::shared_ptr<EnergyMeterService> WMS::createEnergyMeter(const std::map<std::string, double> &measurement_periods) {
+        auto energy_meter_raw_ptr = new EnergyMeterService(this->hostname, measurement_periods);
+        std::shared_ptr<EnergyMeterService> energy_meter = std::shared_ptr<EnergyMeterService>(energy_meter_raw_ptr);
         energy_meter->simulation = this->simulation;
         energy_meter->start(energy_meter, true, false); // Always daemonize, no auto-restart
         return energy_meter;
@@ -363,10 +379,10 @@ namespace wrench {
      * @param measurement_period: the measurement period
      * @return an energy meter
      */
-    std::shared_ptr<EnergyMeter>
+    std::shared_ptr<EnergyMeterService>
     WMS::createEnergyMeter(const std::vector<std::string> &hostnames, double measurement_period) {
-        auto energy_meter_raw_ptr = new EnergyMeter(this->getSharedPtr<WMS>(), hostnames, measurement_period);
-        std::shared_ptr<EnergyMeter> energy_meter = std::shared_ptr<EnergyMeter>(energy_meter_raw_ptr);
+        auto energy_meter_raw_ptr = new EnergyMeterService(this->hostname, hostnames, measurement_period);
+        std::shared_ptr<EnergyMeterService> energy_meter = std::shared_ptr<EnergyMeterService>(energy_meter_raw_ptr);
         energy_meter->simulation = this->simulation;
         energy_meter->start(energy_meter, true, false); // Always daemonize, no auto-restart
         return energy_meter;

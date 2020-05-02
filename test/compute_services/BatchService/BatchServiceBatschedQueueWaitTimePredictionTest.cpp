@@ -21,7 +21,7 @@
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(batch_service_queue_wait_time_prediction_test, "Log category for BatchServiceBatschedQueueWaitTimePredictionTest");
+WRENCH_LOG_CATEGORY(batch_service_queue_wait_time_prediction_test, "Log category for BatchServiceBatschedQueueWaitTimePredictionTest");
 
 
 class BatchServiceBatschedQueueWaitTimePredictionTest : public ::testing::Test {
@@ -211,7 +211,6 @@ private:
                     throw std::runtime_error(
                             "Got the expected exception, but the failure cause does not point to the right service");
                 }
-
                 WRENCH_INFO("toString: %s", cause->toString().c_str());  // for coverage
             }
 

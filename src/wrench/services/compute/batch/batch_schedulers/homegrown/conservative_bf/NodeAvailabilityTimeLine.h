@@ -15,7 +15,7 @@
 #include "BatchJobSet.h"
 
 /***********************/
-/** \cond INTERNAL     */
+/** \cond              */
 /***********************/
 
 namespace wrench {
@@ -23,6 +23,9 @@ namespace wrench {
 
     class BatchJob;
 
+    /**
+     * @brief A class that implements a node availability time line abstraction
+     */
     class NodeAvailabilityTimeLine {
 
     public:

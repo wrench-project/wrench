@@ -10,26 +10,17 @@
 
 #include <gtest/gtest.h>
 #include <map>
-#include <wrench/services/compute/batch/BatchComputeServiceMessage.h>
 
-#include "wrench/workflow/WorkflowFile.h"
-#include "wrench/workflow/Workflow.h"
-#include "services/file_registry/FileRegistryMessage.h"
-#include "wrench/services/compute/ComputeServiceMessage.h"
-#include "services/storage/StorageServiceMessage.h"
-#include "services/compute/virtualized_cluster/VirtualizedClusterComputeServiceMessage.h"
-#include "services/network_proximity/NetworkProximityMessage.h"
-#include "wrench/workflow/execution_events/FailureCause.h"
+#include "wrench/workflow/failure_causes/HostError.h"
+#include "wrench/workflow/failure_causes/NetworkError.h"
+#include "wrench/workflow/failure_causes/ComputeThreadHasDied.h"
+#include "wrench/workflow/failure_causes/FatalFailure.h"
 
 class FailureCauseConstructorTest : public ::testing::Test {
 protected:
     FailureCauseConstructorTest() {
-
     }
-
 };
-
-
 
 TEST_F(FailureCauseConstructorTest, NetworkError) {
 
@@ -58,7 +49,9 @@ TEST_F(FailureCauseConstructorTest, ComputeThreadHasDied) {
 
     wrench::ComputeThreadHasDied *cause = nullptr;
     ASSERT_NO_THROW(cause = new wrench::ComputeThreadHasDied());
-    cause->toString(); // Coverage
+    if (cause) {
+      cause->toString(); // Coverage
+    }
 }
 
 
@@ -66,11 +59,16 @@ TEST_F(FailureCauseConstructorTest, FatalFailure) {
 
     wrench::FatalFailure *cause = nullptr;
     ASSERT_NO_THROW(cause = new wrench::FatalFailure());
-    cause->toString(); // Coverage
+    if (cause) {
+      cause->toString(); // Coverage
+    }
 }
 
 
 TEST_F(FailureCauseConstructorTest, HostError) {
-  wrench::HostError *cause;
-  ASSERT_NO_THROW(cause = new wrench::HostError("hostname"));
+    wrench::HostError *cause = nullptr;
+    ASSERT_NO_THROW(cause = new wrench::HostError("hostname"));
+    if (cause) {
+      cause->toString(); // Coverage
+    }
 }

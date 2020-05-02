@@ -18,7 +18,7 @@
 #include "../failure_test_util/ResourceSwitcher.h"
 #include <wms/WMSMessage.h>
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(alarm_link_failures_test, "Log category for AlarmLinkFailuresTest");
+WRENCH_LOG_CATEGORY(alarm_link_failures_test, "Log category for AlarmLinkFailuresTest");
 
 
 class AlarmLinkFailuresTest : public ::testing::Test {

@@ -12,12 +12,25 @@
 
 #include "wrench/services/compute/batch/batch_schedulers/BatchScheduler.h"
 
+
 namespace wrench {
 
+/***********************/
+/** \cond INTERNAL     */
+/***********************/
+
+    /**
+     * @brief An abstract class that defines a batch scheduler
+     */
     class HomegrownBatchScheduler : public BatchScheduler {
 
     public:
 
+        /**
+         * @brief Constructor
+         *
+         * @param cs: the batch compute service for which this scheduler is operating
+         */
         explicit HomegrownBatchScheduler(BatchComputeService *cs) : BatchScheduler(cs) {}
 
         void init() override {};
@@ -30,6 +43,11 @@ namespace wrench {
 
     };
 
+/***********************/
+/** \endcond           */
+/***********************/
+
 }
+
 
 #endif //WRENCH_HOMEGROWNBATCHSCHEDULER_H

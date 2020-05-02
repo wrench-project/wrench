@@ -4,7 +4,7 @@
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(logical_file_system_test, "Log category for LogicalFileSystemTest");
+WRENCH_LOG_CATEGORY(logical_file_system_test, "Log category for LogicalFileSystemTest");
 
 
 class LogicalFileSystemTest : public ::testing::Test {

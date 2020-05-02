@@ -10,7 +10,6 @@
 #include <nlohmann/json.hpp>
 #include <boost/algorithm/string.hpp>
 
-#include <wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h>
 #include <wrench/services/compute/cloud/CloudComputeService.h>
 #include <wrench/wms/WMS.h>
 #include "helper_services/standard_job_executor/StandardJobExecutorMessage.h"
@@ -26,12 +25,19 @@
 #include "wrench/util/TraceFileLoader.h"
 #include "wrench/workflow/job/PilotJob.h"
 #include "services/compute/batch/workload_helper_classes/WorkloadTraceFileReplayer.h"
-
 #include "batch_schedulers/homegrown/fcfs/FCFSBatchScheduler.h"
 #include "services/compute/batch/batch_schedulers/homegrown/conservative_bf/CONSERVATIVEBFBatchScheduler.h"
 #include "batch_schedulers/batsched/BatschedBatchScheduler.h"
+#include "wrench/workflow/failure_causes/JobTypeNotSupported.h"
+#include "wrench/workflow/failure_causes/FunctionalityNotAvailable.h"
+#include "wrench/workflow/failure_causes/JobKilled.h"
+#include "wrench/workflow/failure_causes/NetworkError.h"
+#include "wrench/workflow/failure_causes/NotEnoughResources.h"
+#include "wrench/workflow/failure_causes/JobTimeout.h"
+#include "wrench/workflow/failure_causes/NotAllowed.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(batch_service, "Log category for Batch Service");
+
+WRENCH_LOG_CATEGORY(wrench_core_batch_service, "Log category for Batch Service");
 
 namespace wrench {
 
@@ -41,6 +47,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     *
      * @param hostname: the hostname on which to start the service
      * @param compute_hosts: the list of names of the available compute hosts
      *                 - the hosts must be homogeneous (speed, number of cores, and RAM size)
@@ -50,7 +57,7 @@ namespace wrench {
      * @param property_list: a property list that specifies BatchComputeServiceProperty values ({} means "use all defaults")
      * @param messagepayload_list: a message payload list that specifies BatchComputeServiceMessagePayload values ({} means "use all defaults")
      */
-    BatchComputeService::BatchComputeService(std::string &hostname,
+    BatchComputeService::BatchComputeService(const std::string &hostname,
                                              std::vector<std::string> compute_hosts,
                                              std::string scratch_space_mount_point,
                                              std::map<std::string, std::string> property_list,
@@ -62,6 +69,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     *
      * @param hostname: the hostname on which to start the service
      * @param compute_hosts: the list of names of the available compute hosts
      * @param cores_per_host: number of cores used per host
@@ -75,7 +83,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    BatchComputeService::BatchComputeService(std::string hostname,
+    BatchComputeService::BatchComputeService(const std::string hostname,
                                              std::vector<std::string> compute_hosts,
                                              unsigned long cores_per_host,
                                              double ram_per_host,
@@ -195,12 +203,14 @@ namespace wrench {
 
     /**
      * @brief Retrieve start time estimates for a set of job configurations
+     *
      * @param set_of_jobs: the set of job configurations, each of them with an id. Each configuration
      *         is a tuple as follows:
      *             - a configuration id (std::string)
      *             - a number of hosts (unsigned long)
      *             - a number of cores per host (unsigned long)
      *             - a duration in seconds (double)
+     *
      * @return start date predictions in seconds (as a map of ids). A prediction that's negative
      *         means that the job configuration can not run on the service (e.g., not enough hosts,
      *         not enough cores per host)
@@ -1354,12 +1364,12 @@ namespace wrench {
                                 },
                                 {}));
                 executor->start(executor, true, false); // Daemonized, no auto-restart
-                batch_job->setBeginTimeStamp(S4U_Simulation::getClock());
-                batch_job->setEndingTimeStamp(S4U_Simulation::getClock() + allocated_time);
+                batch_job->setBeginTimestamp(S4U_Simulation::getClock());
+                batch_job->setEndingTimestamp(S4U_Simulation::getClock() + allocated_time);
                 this->running_standard_job_executors.insert(executor);
 
 //          this->running_jobs.insert(std::move(batch_job_ptr));
-                this->timeslots.push_back(batch_job->getEndingTimeStamp());
+                this->timeslots.push_back(batch_job->getEndingTimestamp());
                 //remember the allocated resources for the job
                 batch_job->setAllocatedResources(resources);
 
@@ -1367,7 +1377,7 @@ namespace wrench {
                         new AlarmJobTimeOutMessage(batch_job, 0);
 
                 std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(this->simulation,
-                                                                              batch_job->getEndingTimeStamp(),
+                                                                              batch_job->getEndingTimestamp(),
                                                                               this->hostname,
                                                                               this->mailbox_name, msg,
                                                                               "batch_standard");
@@ -1405,16 +1415,16 @@ namespace wrench {
 
                 try {
                     cs->start(cs, true, false); // Daemonized, no auto-restart
-                    batch_job->setBeginTimeStamp(S4U_Simulation::getClock());
+                    batch_job->setBeginTimestamp(S4U_Simulation::getClock());
                     double ending_timestamp = S4U_Simulation::getClock() + (double)allocated_time;
-                    batch_job->setEndingTimeStamp(ending_timestamp);
+                    batch_job->setEndingTimestamp(ending_timestamp);
                 } catch (std::runtime_error &e) {
                     throw;
                 }
 
                 // Put the job in the running queue
 //          this->running_jobs.insert(std::move(batch_job_ptr));
-                this->timeslots.push_back(batch_job->getEndingTimeStamp());
+                this->timeslots.push_back(batch_job->getEndingTimestamp());
 
                 //remember the allocated resources for the job
                 batch_job->setAllocatedResources(resources);
@@ -1433,7 +1443,7 @@ namespace wrench {
                         new AlarmJobTimeOutMessage(batch_job, 0);
 
                 std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(this->simulation,
-                                                                              batch_job->getEndingTimeStamp(),
+                                                                              batch_job->getEndingTimestamp(),
                                                                               host_to_run_on,
                                                                               this->mailbox_name, msg,
                                                                               "batch_pilot");

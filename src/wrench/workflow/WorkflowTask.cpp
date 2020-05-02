@@ -7,7 +7,6 @@
  * (at your option) any later version.
  */
 
-#include <lemon/list_graph.h>
 #include "wrench/logging/TerminalOutput.h"
 
 #include "wrench/logging/TerminalOutput.h"
@@ -18,7 +17,7 @@
 #include "wrench/simulation/Simulation.h"
 #include "wrench/simulation/SimulationTimestampTypes.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(workflow_task, "Log category for WorkflowTask");
+WRENCH_LOG_CATEGORY(wrench_core_workflow_task, "Log category for WorkflowTask");
 
 namespace wrench {
 
@@ -171,11 +170,7 @@ namespace wrench {
      * @return a number of children
      */
     unsigned long WorkflowTask::getNumberOfChildren() const {
-        unsigned long count = 0;
-        for (lemon::ListDigraph::OutArcIt a(*DAG, DAG_node); a != lemon::INVALID; ++a) {
-            ++count;
-        }
-        return count;
+        return this->workflow->getTaskNumberOfChildren(this);
     }
 
     /**
@@ -193,11 +188,7 @@ namespace wrench {
      * @return a number of parents
      */
     unsigned long WorkflowTask::getNumberOfParents() const {
-        unsigned long count = 0;
-        for (lemon::ListDigraph::InArcIt a(*DAG, DAG_node); a != lemon::INVALID; ++a) {
-            ++count;
-        }
-        return count;
+        return this->workflow->getTaskNumberOfParents(this);
     }
 
     /**

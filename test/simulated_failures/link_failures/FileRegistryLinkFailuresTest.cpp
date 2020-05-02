@@ -20,7 +20,7 @@
 #define NUM_FILES 100
 #define NUM_STORAGE_SERVICES 10
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(file_registry_link_failures_test, "Log category for FileRegistryLinkFailuresTest");
+WRENCH_LOG_CATEGORY(file_registry_link_failures_test, "Log category for FileRegistryLinkFailuresTest");
 
 
 class FileRegistryLinkFailuresTest : public ::testing::Test {

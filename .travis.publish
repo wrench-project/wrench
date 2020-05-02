@@ -2,29 +2,27 @@
 
 set -e # exit with nonzero exit code if anything fails
 
-echo "Starting to update gh-pages"
+if [[ "$TRAVIS_BUILD_STAGE_NAME" == "Documentation Build and Deployment" ]]; then
 
-if [[ $TRAVIS_BRANCH == "master" && $TRAVIS_PULL_REQUEST == "false" && "$TRAVIS_OS_NAME" == "linux" && $DIST == "ubuntu-bionic" && $COMPILER == "gcc7" && $BATSCHED == "off" ]] || [[ $TRAVIS_BRANCH == "master" && $TRAVIS_PULL_REQUEST == "false" && "$TRAVIS_OS_NAME" == "linux" && $DIST == "ubuntu-bionic" && $COMPILER == "gcc7-batsched" && $BATSCHED == "on" ]]; then
+  echo "Starting to update gh-pages"
 
-#copy data we're interested in to other place
-git config --global user.email "travis@travis-ci.org"
-git config --global user.name "Travis"
+  #copy data we're interested in to other place
+  git config --global user.email "travis@travis-ci.org"
+  git config --global user.name "Travis"
 
-#using token clone gh-pages branch
-git clone --quiet --branch=gh-pages https://${GITHUB_TOKEN}@github.com/wrench-project/wrench.git gh-pages > /dev/null
+  #using token clone gh-pages branch
+  git clone --quiet --branch=gh-pages https://${GITHUB_TOKEN}@github.com/wrench-project/wrench.git gh-pages > /dev/null
 
-#go into directory and copy data we're interested in to that directory
-cd gh-pages
-cp -Rf $HOME/gh-pages-to-deploy/* .
-touch .nojekyll
+  #go into directory and copy data we're interested in to that directory
+  cd gh-pages
+  cp -Rf $HOME/gh-pages-to-deploy/* .
+  touch .nojekyll
 
-#add, commit and push files
-git add -f .
-git diff-index --quiet HEAD || git commit -m "Travis build $TRAVIS_BUILD_NUMBER"
-git push -fq origin gh-pages > /dev/null
+  #add, commit and push files
+  git add -f .
+  git diff-index --quiet HEAD || git commit -m "Travis build $TRAVIS_BUILD_NUMBER"
+  git push -fq origin gh-pages > /dev/null
 
-echo "Done updating gh-pages."
+  echo "Done updating gh-pages."
 
-else
- echo "Skipped updating gh-pages."
 fi;

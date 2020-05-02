@@ -21,7 +21,7 @@
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(batch_service_trace_file_test, "Log category for BatchServiceTest");
+WRENCH_LOG_CATEGORY(batch_service_trace_file_test, "Log category for BatchServiceTest");
 
 
 class BatchServiceTest : public ::testing::Test {

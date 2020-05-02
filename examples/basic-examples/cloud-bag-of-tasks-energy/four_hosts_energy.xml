@@ -1,0 +1,48 @@
+<?xml version='1.0'?>
+<!DOCTYPE platform SYSTEM "http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd">
+<platform version="4.1">
+    <zone id="AS0" routing="Full">
+
+        <!-- The host on which the WMS will run (only one 10Gf pstate) -->
+        <host id="WMSHost" speed="10Gf" pstate="0" core="1">
+            <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+                <prop id="size" value="5000GiB"/>
+                <prop id="mount" value="/"/>
+            </disk>
+            <!-- The power consumption in watt for each pstate (idle:all_cores) -->
+            <prop id="wattage_per_state" value="10.00:100.00" />
+        </host>
+
+        <!-- The host on which the CloudComputeService will run (only one 1Gf pstate) -->
+        <host id="CloudProviderHost" speed="1Gf" pstate="0" core="1">
+            <!-- The power consumption in watt for each pstate (idle:all_cores) -->
+            <prop id="wattage_per_state" value="10.00:100.00" />
+       </host>
+
+        <!-- A cloud compute host, 2 pstate (a 100Gf and a 200Gf one), that starts in pstate 1  -->
+        <host id="CloudHost1" speed="100Gf, 200Gf" pstate="1" core="10">
+            <!-- The power consumption in watt for each pstate (idle:all_cores) -->
+            <prop id="wattage_per_state" value="10.00:100.00,10.00:250.00" />
+            <prop id="wattage_off" value="10" />
+            <prop id="ram" value="64GB" />
+        </host>
+        <!-- A cloud compute host, 2 pstate (a 100Gf and a 200Gf one), that starts in pstate 1 -->
+        <host id="CloudHost2" speed="100Gf, 200Gf"  pstate="1" core="10">
+            <!-- The power consumption in watt for each pstate (idle:all_cores) -->
+            <prop id="wattage_per_state" value="10.00:150.00,10.00:280.00" />
+            <prop id="wattage_off" value="10" />
+            <prop id="ram" value="64GB" />
+        </host>
+
+        <!-- A network link...-->
+        <link id="network_link" bandwidth="50MBps" latency="20us"/>
+
+        <!-- which connects the two hosts -->
+        <route src="WMSHost" dst="CloudProviderHost"> <link_ctn id="network_link"/> </route>
+        <route src="WMSHost" dst="CloudHost1"> <link_ctn id="network_link"/> </route>
+        <route src="WMSHost" dst="CloudHost2"> <link_ctn id="network_link"/> </route>
+        <route src="CloudProviderHost" dst="CloudHost1"> <link_ctn id="network_link"/> </route>
+        <route src="CloudProviderHost" dst="CloudHost2"> <link_ctn id="network_link"/> </route>
+        <route src="CloudHost1" dst="CloudHost2"> <link_ctn id="network_link"/> </route>
+    </zone>
+</platform>

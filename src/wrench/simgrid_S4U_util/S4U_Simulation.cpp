@@ -15,14 +15,12 @@
 #include <wrench/util/UnitParser.h>
 #include <simgrid/plugins/energy.h>
 #include <simgrid/plugins/file_system.h>
-#include <wrench/workflow/execution_events/FailureCause.h>
+#include <wrench/workflow/failure_causes/FailureCause.h>
 #include "wrench/logging/TerminalOutput.h"
 
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(s4u_simulation, "Log category for S4U_Simulation");
-
-
+WRENCH_LOG_CATEGORY(wrench_core_s4u_simulation, "Log category for S4U_Simulation");
 
 namespace wrench {
 
@@ -325,7 +323,7 @@ namespace wrench {
     void S4U_Simulation::writeToDisk(double num_bytes, std::string hostname, std::string mount_point) {
         mount_point  = FileLocation::sanitizePath(mount_point);
 
-        WRENCH_INFO("Writing %lf bytes to disk %s:%s", num_bytes, hostname.c_str(), mount_point.c_str());
+        WRENCH_DEBUG("Writing %lf bytes to disk %s:%s", num_bytes, hostname.c_str(), mount_point.c_str());
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         if (not host) {
             throw std::invalid_argument("S4U_Simulation::writeToDisk(): unknown host " + hostname);
@@ -360,7 +358,7 @@ namespace wrench {
                                                                 std::string write_mount_point) {
 
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
-        WRENCH_INFO("Reading %lf bytes from disk %s:%s and writing %lf bytes to disk %s:%s",
+        WRENCH_DEBUG("Reading %lf bytes from disk %s:%s and writing %lf bytes to disk %s:%s",
                 num_bytes_to_read, hostname.c_str(), read_mount_point.c_str(),
                 num_bytes_to_write, hostname.c_str(), write_mount_point.c_str());
 
@@ -384,8 +382,9 @@ namespace wrench {
         read_activity->start();
         // Do synchronous write
         write_disk->write(num_bytes_to_write);
-        // Wait for asycnrhonous read to be done
+        // Wait for asychronous read to be done
         read_activity->wait();
+
 
     }
 
@@ -400,7 +399,7 @@ namespace wrench {
     void S4U_Simulation::readFromDisk(double num_bytes, std::string hostname, std::string mount_point) {
         mount_point  = FileLocation::sanitizePath(mount_point);
 
-        WRENCH_INFO("Reading %lf bytes from disk %s:%s", num_bytes, hostname.c_str(), mount_point.c_str());
+        WRENCH_DEBUG("Reading %lf bytes from disk %s:%s", num_bytes, hostname.c_str(), mount_point.c_str());
 
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         if (not host) {
@@ -564,7 +563,11 @@ namespace wrench {
     void S4U_Simulation::setPstate(const std::string &hostname, int pstate) {
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         if (host == nullptr) {
-            throw std::invalid_argument("Unknown hostname " + hostname);
+            throw std::invalid_argument("S4U_Simulation::setPstate(): Unknown hostname " + hostname);
+        }
+        if (host->get_pstate_count() < pstate) {
+            throw std::invalid_argument("S4U_Simulation::setPstate(): Invalid pstate index (host " + hostname + " only has "  +
+            std::to_string(host->get_pstate_count()) + " pstates)");
         }
         try {
             host->set_pstate(pstate);

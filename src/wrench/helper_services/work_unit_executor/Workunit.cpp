@@ -14,7 +14,7 @@
 #include "wrench/services/compute/workunit_executor/Workunit.h"
 #include <wrench-dev.h>
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(workunit, "Log category for Workunit");
+WRENCH_LOG_CATEGORY(wrench_core_workunit, "Log category for Workunit");
 
 
 namespace wrench {
@@ -165,7 +165,7 @@ namespace wrench {
 
         // Add dependencies between task work units, if any
         for (auto const &task_work_unit : task_work_units) {
-            const WorkflowTask *task = task_work_unit->task;
+            WorkflowTask *task = task_work_unit->task;
 
             if (task->getInternalState() != WorkflowTask::InternalState::TASK_READY) {
                 std::vector<WorkflowTask *> current_task_parents = task->getWorkflow()->getTaskParents(task);
