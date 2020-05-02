@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2019. The WRENCH Team.
+ * Copyright (c) 2017-2020. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,9 +40,11 @@ namespace wrench {
         double getMemoryRequirement() const;
 
         unsigned long getNumberOfChildren() const;
+
         std::vector<WorkflowTask *> getChildren() const;
 
         unsigned long getNumberOfParents() const;
+
         std::vector<WorkflowTask *> getParents() const;
 
         void addInputFile(WorkflowFile *file);
@@ -58,15 +60,15 @@ namespace wrench {
         /** @brief Task states */
         enum State {
             /** @brief Not ready (parents have not completed) */
-                    NOT_READY,
+            NOT_READY,
             /** @brief Ready (parents have completed) */
-                    READY,
+            READY,
             /** @brief Pending (has been submitted to a compute service) */
-                    PENDING,
+            PENDING,
             /** @brief Completed (successfully completed) */
-                    COMPLETED,
+            COMPLETED,
             /** @brief Some Unknown state (should not happen) */
-                    UNKNOWN
+            UNKNOWN
         };
 
         static std::string stateToString(WorkflowTask::State state);
@@ -226,7 +228,7 @@ namespace wrench {
              *
              * @param task_start: Task start time
              */
-            WorkflowTaskExecution(double task_start) : task_start(task_start) { }
+            WorkflowTaskExecution(double task_start) : task_start(task_start) {}
 
         };
 

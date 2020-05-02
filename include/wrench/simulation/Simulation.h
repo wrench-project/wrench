@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2019. The WRENCH Team.
+ * Copyright (c) 2017-2020. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,7 +36,6 @@ namespace wrench {
     class SimulationOutput;
     class S4U_Simulation;
     class FileLocation;
-
 
     /**
      * @brief A class that provides basic simulation methods.  Once the simulation object has been
@@ -75,7 +74,6 @@ namespace wrench {
             return s;
         }
 
-
         SimulationOutput &getOutput();
 
         //start energy related calls
@@ -92,11 +90,9 @@ namespace wrench {
         void stageFile(WorkflowFile *file, std::shared_ptr<StorageService> ss);
         void stageFile(WorkflowFile *file, std::shared_ptr<StorageService> ss, std::string directory_absolute_path);
 
-
         /***********************/
         /** \cond DEVELOPER    */
         /***********************/
-
         double getEnergyConsumed(const std::string &hostname, bool record_as_time_stamp);
         std::map<std::string, double> getEnergyConsumed(const std::vector<std::string> &hostnames, bool record_as_time_stamps);
 
@@ -121,7 +117,6 @@ namespace wrench {
 
         static void sleep(double duration);
         static void compute(double flops);
-
         /***********************/
         /** \endcond           */
         /***********************/
@@ -129,7 +124,6 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-
         void readFromDisk(double num_bytes, std::string hostname, std::string mount_point);
         void readFromDiskAndWriteToDiskConcurrently(double num_bytes_to_read, double num_bytes_to_write,
                                                     std::string hostname,
@@ -137,19 +131,15 @@ namespace wrench {
                                                     std::string write_mount_point);
         void writeToDisk(double num_bytes, std::string hostname, std::string mount_point);
 
-
         static double getMemoryCapacity();
         static unsigned long getNumCores();
         static double getFlopRate();
         static std::string getHostName();
-
         /***********************/
         /** \endcond           */
         /***********************/
 
-
     private:
-
         SimulationOutput output;
 
         std::unique_ptr<S4U_Simulation> s4u_simulation;
@@ -170,7 +160,6 @@ namespace wrench {
 
         void stageFile(WorkflowFile *file, std::shared_ptr<FileLocation> location);
 
-
         void platformSanityCheck();
         void checkSimulationSetup();
         bool isRunning();
@@ -188,8 +177,6 @@ namespace wrench {
         bool is_running = false;
 
         unsigned int on_state_change_callback_id;
-
-
     };
 
 };
