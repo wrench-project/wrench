@@ -16,8 +16,8 @@ namespace wrench {
     class BatchJob {
     public:
         //job, jobid, -t, -N, -c, ending s4u_timestamp (-1 as undetermined)
-        BatchJob(WorkflowJob* job, unsigned long jobid, unsigned long time_in_minutes, unsigned long number_nodes,
-                 unsigned long cores_per_node,double ending_time_stamp, double arrival_time_stamp);
+        BatchJob(WorkflowJob* job, unsigned long job_id, unsigned long time_in_minutes, unsigned long number_nodes,
+                 unsigned long cores_per_node, double ending_time_stamp, double arrival_time_stamp);
 
 
         unsigned long getJobID();
@@ -25,13 +25,13 @@ namespace wrench {
         void setRequestedTime(unsigned long time);
         unsigned long getRequestedCoresPerNode();
         double getMemoryRequirement();
-        double getBeginTimeStamp();
-        void setBeginTimeStamp(double time_stamp);
-        double getEndingTimeStamp();
-        double getArrivalTimeStamp();
+        double getBeginTimestamp();
+        void setBeginTimestamp(double time_stamp);
+        double getEndingTimestamp();
+        double getArrivalTimestamp();
         unsigned long getRequestedNumNodes();
         WorkflowJob* getWorkflowJob();
-        void setEndingTimeStamp(double time_stamp);
+        void setEndingTimestamp(double time_stamp);
         std::map<std::string, std::tuple<unsigned long, double>> getResourcesAllocated();
         void setAllocatedResources(std::map<std::string, std::tuple<unsigned long, double>> resources);
 
@@ -41,7 +41,7 @@ namespace wrench {
         u_int32_t conservative_bf_start_date;           // Field used by CONSERVATIVE_BF
         u_int32_t conservative_bf_expected_end_date;    // Field used by CONSERVATIVE_BF
 
-        unsigned long jobid;
+        unsigned long job_id;
         unsigned long requested_num_nodes;
         unsigned long  requested_time;
         WorkflowJob* job;

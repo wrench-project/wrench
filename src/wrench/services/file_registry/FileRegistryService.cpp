@@ -7,6 +7,8 @@
  * (at your option) any later version.
  */
 
+#include <algorithm>
+
 #include <wrench/services/compute/bare_metal/BareMetalComputeService.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
@@ -20,10 +22,9 @@
 #include <wrench/workflow/WorkflowFile.h>
 #include <wrench/exceptions/WorkflowExecutionException.h>
 #include <wrench/services/network_proximity/NetworkProximityService.h>
-#include <algorithm>
-#include <iostream>
+#include <wrench/workflow/failure_causes/NetworkError.h>
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(file_registry_service, "Log category for File Registry Service");
+WRENCH_LOG_CATEGORY(wrench_core_file_registry_service, "Log category for File Registry Service");
 
 namespace wrench {
 

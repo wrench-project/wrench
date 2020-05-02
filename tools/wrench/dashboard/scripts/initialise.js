@@ -3,15 +3,15 @@ function prepareData(data) {
         start: 0,
         end: 0
     }
-    data.forEach(function(d) {
+    data.forEach(function (d) {
         if (d.read === null) {
-            d.read = nullReplacement
+            d.read = [nullReplacement]
         }
         if (d.compute === null) {
             d.compute = nullReplacement
         }
         if (d.write === null) {
-            d.write = nullReplacement
+            d.write = [nullReplacement]
         }
     })
     return data
@@ -33,14 +33,14 @@ function initialise() {
         noFileDiv.style.display = "none"
         mainBodyDiv.style.display = "block"
         if (Object.keys(energyData).length !== 0) {
-            Array.from(energyTitles).forEach(function(et) {
+            Array.from(energyTitles).forEach(function (et) {
                 et.style.display = "block"
             })
             noEnergyFileDiv.style.display = "none"
             generateConsumedEnergyGraph(energyData, "consumedEnergyGraph", "consumedEnergyGraphLegend")
             generatePStateGraph(energyData, "pStateGraph", "pStateGraphLegend")
         } else {
-            Array.from(energyTitles).forEach(function(et) {
+            Array.from(energyTitles).forEach(function (et) {
                 et.style.display = "none"
             })
             noEnergyFileDiv.style.display = "block"
@@ -51,7 +51,7 @@ function initialise() {
             populateLegend("taskView")
             populateWorkflowTaskDataTable(data.contents, "task-details-table", "task-details-table-body", "task-details-table-td")
             getOverallWorkflowMetrics(data.contents, "overall-metrics-table", "task-details-table-td")
-            generate3dGraph(data.contents, true, true, "three-d-graph-svg", "origin-x", "origin-y", "time-interval", "scale-input")
+            // generate3dGraph(data.contents, true, true, "three-d-graph-svg", "origin-x", "origin-y", "time-interval", "scale-input")
             generateHostUtilizationGraph(data.contents, "host-utilization-chart", "host-utilization-chart-tooltip", "host-utilization-chart-tooltip-task-id", "host-utilization-chart-tooltip-compute-time", 1000, 1000)
         }
     }

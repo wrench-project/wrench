@@ -14,7 +14,7 @@
 #include "WorkloadTraceFileReplayer.h"
 #include "WorkloadTraceFileReplayerEventReceiver.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(workload_trace_file_replayer, "Log category for Trace File Replayer");
+WRENCH_LOG_CATEGORY(wrench_core_workload_trace_file_replayer, "Log category for Trace File Replayer");
 
 namespace wrench {
 

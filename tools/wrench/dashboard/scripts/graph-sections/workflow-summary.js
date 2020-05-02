@@ -25,8 +25,8 @@ function getOverallWorkflowMetrics(data, tableContainer, taskClass) {
     var averageReadDuration
     var averageComputeDuration
     var averageWriteDuration
-    data.forEach(function(d) {
-        var currHost = d['execution host']
+    data.forEach(function (d) {
+        var currHost = d['execution_host']
         hosts.add(currHost)
 
         if (d.failed != -1) {
@@ -36,7 +36,7 @@ function getOverallWorkflowMetrics(data, tableContainer, taskClass) {
         if (d.terminated != -1) {
             noTerminated++
         }
-    
+
         var whole_task = d.whole_task
         if (whole_task.start < overallStartTime) {
             overallStartTime = whole_task.start
@@ -65,7 +65,7 @@ function getOverallWorkflowMetrics(data, tableContainer, taskClass) {
 
         var writeDuration = getDuration(write.start, write.end)
         if (writeDuration !== write.start && writeDuration !== write.end) {
-            totalWriteDuration == writeDuration
+            totalWriteDuration += writeDuration
         }
 
         averageReadDuration = totalReadDuration / noTasks

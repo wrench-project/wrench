@@ -1,18 +1,7 @@
 function determineNumCores(data) {
-    var numCores = 0;
-    var taskOverlap = determineTaskOverlap(data);
-    for (var i = 0; i < Object.keys(taskOverlap).length; i++) {
-        var currOverlap = taskOverlap[i];
-        var maxCores = 0;
-        for (var j = 0; j < currOverlap.length; j++) {
-            var t = currOverlap[j];
-            if (t.num_cores_allocated > maxCores) {
-                maxCores = t.num_cores_allocated;
-            }
-        }
-        numCores += maxCores;
-    }
-    return numCores;
+    // let numCores = 0;
+    // let taskOverlap = determineTaskOverlap(data);
+    return 1;
 }
 
 function getComputeTime(d) {
@@ -20,7 +9,7 @@ function getComputeTime(d) {
         if (d["compute"].end == -1) {
             if (d.terminated != -1) {
                 return d.terminated - d["compute"].start
-            } else if (d.failed != -1){
+            } else if (d.failed != -1) {
                 return d.failed - d["compute"].start
             }
         } else {
@@ -30,10 +19,16 @@ function getComputeTime(d) {
     return 0 //Box shouldn't be displayed if start is -1
 }
 
-function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskId, tooltipComputeTime, CONTAINER_WIDTH, CONTAINER_HEIGHT) {
+function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskId, tooltipComputeTime,
+                                      CONTAINER_WIDTH, CONTAINER_HEIGHT) {
+
     var num_cores = determineNumCores(data);
     var container = d3.select(`#${containerId}`);
-    document.getElementById(containerId).innerHTML = hostUtilizationHtml
+    document.getElementById(containerId).innerHTML =
+        `<div class="text-left" id="host-utilization-chart-tooltip">
+            <span id="host-utilization-chart-tooltip-task-id"></span><br/>
+            <span id="host-utilization-chart-tooltip-compute-time"></span><br/>
+        </div>`
     var chart = document.getElementById(containerId);
     const PADDING = 60;
 
@@ -43,27 +38,29 @@ function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskI
         svg.remove();
     }
 
-    var tooltip                         = d3.select(`#${tooltipId}`);
-    var tooltip_task_id                 = d3.select(`#${tooltipTaskId}`);
-    var tooltip_compute_time            = d3.select(`#${tooltipComputeTime}`)
+    var tooltip = d3.select(`#${tooltipId}`);
+    var tooltip_task_id = d3.select(`#${tooltipTaskId}`);
+    var tooltip_compute_time = d3.select(`#${tooltipComputeTime}`);
 
     svg = container.append("svg")
         .attr("width", CONTAINER_WIDTH)
         .attr("height", CONTAINER_HEIGHT);
 
     var x_scale = d3.scaleLinear()
-        .domain([0, d3.max(data, function(d) {
+        .domain([0, d3.max(data, function (d) {
             return d3.max([d.whole_task.end, d.terminated, d.failed]);
         })])
         .range([PADDING, CONTAINER_WIDTH - PADDING]);
 
     var tasks_by_hostname = d3.nest()
-        .key(function(d) { return d['execution_host'].hostname; })
+        .key(function (d) {
+            return d['execution_host'].hostname;
+        })
         .sortKeys(d3.ascending)
         .entries(data);
 
     var y_hosts = d3.scaleBand()
-        .domain(tasks_by_hostname.map(function(d) {
+        .domain(tasks_by_hostname.map(function (d) {
             return d.key;
         }))
         .range([CONTAINER_HEIGHT - PADDING, 10])
@@ -71,30 +68,30 @@ function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskI
 
     var y_cores_per_host = d3.map();
 
-    if (num_cores === 0) {
-        tasks_by_hostname.forEach(function (d) {
-            y_cores_per_host.set(d.key,
-                d3.scaleLinear()
-                    .domain([0, d.values[0]['execution_host'].cores])
-                    .range([y_hosts(d.key) + y_hosts.bandwidth(), y_hosts(d.key)])
-            );
-        });
-    } else {
-        tasks_by_hostname.forEach(function (d) {
-            y_cores_per_host.set(d.key,
-                d3.scaleLinear()
-                    .domain([0, num_cores])
-                    .range([y_hosts(d.key) + y_hosts.bandwidth(), y_hosts(d.key)])
-            );
-        });
-    }
+    // if (num_cores === 0) {
+    tasks_by_hostname.forEach(function (d) {
+        y_cores_per_host.set(d.key,
+            d3.scaleLinear()
+                .domain([0, d.values[0]['execution_host'].cores])
+                .range([y_hosts(d.key) + y_hosts.bandwidth(), y_hosts(d.key)])
+        );
+    });
+    // } else {
+    //     tasks_by_hostname.forEach(function (d) {
+    //         y_cores_per_host.set(d.key,
+    //             d3.scaleLinear()
+    //                 .domain([0, num_cores])
+    //                 .range([y_hosts(d.key) + y_hosts.bandwidth(), y_hosts(d.key)])
+    //         );
+    //     });
+    // }
 
     svg.append('g').selectAll('rect')
         .data(y_cores_per_host.keys())
         .enter()
         .append("rect")
         .attr("x", PADDING)
-        .attr("y", function(d) {
+        .attr("y", function (d) {
             return y_hosts(d);
         })
         .attr("width", CONTAINER_WIDTH - PADDING - PADDING)
@@ -102,23 +99,22 @@ function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskI
         .attr("opacity", 0.3)
         .attr("fill", "#ffd8f8");
 
-
     svg.append('g').selectAll("rect")
         .data(data)
         .enter()
         .append("rect")
-        .attr("x", function(d) {
+        .attr("x", function (d) {
             if (d.compute.start === -1) {
                 return 0
             }
             return x_scale(d.compute.start);
         })
-        .attr("y", function(d) {
+        .attr("y", function (d) {
             var y_scale = y_cores_per_host.get(d['execution_host'].hostname);
             var vertical_position = searchOverlap(d.task_id, determineTaskOverlap(data))
-            return y_scale(vertical_position);
+            return y_scale(vertical_position + 1);
         })
-        .attr("width", function(d) {
+        .attr("width", function (d) {
             if (d.compute.start === -1) {
                 return 0
             }
@@ -127,19 +123,19 @@ function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskI
             }
             return x_scale(d.compute.end) - x_scale(d.compute.start);
         })
-        .attr("height", function(d) {
+        .attr("height", function (d) {
             var y_scale = y_cores_per_host.get(d['execution_host'].hostname);
             return y_scale(0) - y_scale(d.num_cores_allocated);
         })
         .attr("fill", "#f7daad")
         .attr("stroke", "gray")
-        .on('mouseover', function() {
+        .on('mouseover', function () {
             tooltip.style('display', 'inline');
 
             d3.select(this)
                 .attr('fill', '#ffdd7f');
         })
-        .on('mousemove', function(d) {
+        .on('mousemove', function (d) {
             var offset = getOffset(chart, d3.mouse(this));
             var x = window.scrollX + offset.left + 20
             var y = window.scrollY + offset.top - 30 // 20 se
@@ -148,18 +144,17 @@ function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskI
                 .style('top', y + 'px');
 
             tooltip_task_id.text('TaskID: ' + d.task_id);
-            tooltip_compute_time.text('Compute Time: ' + getComputeTime(d) + 's');
+            tooltip_compute_time.text('Compute Time: ' + toFiveDecimalPlaces(getComputeTime(d)) + 's');
         })
-        .on('mouseout', function(d) {
+        .on('mouseout', function (d) {
             tooltip.style('display', 'none');
 
             d3.select(this)
                 .attr('fill', '#f7daad')
         });
 
-
     var x_axis = d3.axisBottom(x_scale)
-        .ticks(d3.max(data, function(d) {
+        .ticks(d3.max(data, function (d) {
             return d.end;
         }));
 
@@ -181,10 +176,11 @@ function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskI
         .attr("transform", "rotate(-90)")
         .attr("text-anchor", "middle");
 
-    y_cores_per_host.entries().forEach(function(entry) {
+    y_cores_per_host.entries().forEach(function (entry) {
         var axis = d3.axisLeft(entry.value)
             .tickValues(d3.range(0, entry.value.domain()[1] + 1, 1))
-            .tickFormat(d3.format(""));;
+            .tickFormat(d3.format(""));
+        ;
 
         svg.append("g")
             .attr("class", "y-axis2")
@@ -197,7 +193,7 @@ function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskI
         .attr("transform",
             "translate(" + (CONTAINER_WIDTH / 2) + " ," + (CONTAINER_HEIGHT - 10) + ")")
         .style("text-anchor", "middle")
-        .attr('font-size', 12+'px')
+        .attr('font-size', 12 + 'px')
         .attr('fill', 'gray')
         .text("Time (seconds)");
 
@@ -208,7 +204,7 @@ function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskI
         .attr("x", 0 - (CONTAINER_HEIGHT / 2))
         .attr("dy", "1em")
         .attr("text-anchor", "middle")
-        .attr('font-size', 12+'px')
+        .attr('font-size', 12 + 'px')
         .attr('fill', 'gray')
         .text("Host");
 }

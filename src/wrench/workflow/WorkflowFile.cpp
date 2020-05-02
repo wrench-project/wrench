@@ -13,7 +13,7 @@
 #include "wrench/workflow/WorkflowFile.h"
 #include "wrench/workflow/WorkflowTask.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(workflowFile, "Log category for WorkflowFile");
+WRENCH_LOG_CATEGORY(wrench_core_workflowFile, "Log category for WorkflowFile");
 
 namespace wrench {
 
@@ -27,7 +27,7 @@ namespace wrench {
             id(name), size(s), output_of(nullptr) {
         this->input_of = {};
         this->output_of = nullptr;
-    };
+    }
 
     /**
      * @brief Get the file size
@@ -95,6 +95,6 @@ namespace wrench {
      */
     bool WorkflowFile::isOutput() {
         return (this->output_of != nullptr);
-    };
+    }
 
-};
+}

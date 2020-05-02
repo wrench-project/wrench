@@ -20,6 +20,10 @@ namespace wrench {
     class WorkflowFile;
     class SimulationTimestampFileCopyStart;
 
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
+
     /** @brief A helper class that implements the concept of a communication
      *  thread that performs a file transfer
      */
@@ -88,6 +92,9 @@ namespace wrench {
 
     };
 
+    /***********************/
+    /** \endcond           */
+    /***********************/
 }
 
 #endif //WRENCH_FILETRANSFERTHREAD_H

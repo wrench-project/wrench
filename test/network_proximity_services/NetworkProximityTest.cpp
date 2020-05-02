@@ -15,7 +15,7 @@
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(network_proximity_service_test, "Log category for NetworkProximityTest");
+WRENCH_LOG_CATEGORY(network_proximity_service_test, "Log category for NetworkProximityTest");
 
 
 class NetworkProximityTest : public ::testing::Test {

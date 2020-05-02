@@ -12,12 +12,13 @@
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/compute/batch/BatchComputeService.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(fcfs_batch_scheduler, "Log category for FCFSBatchScheduler");
+WRENCH_LOG_CATEGORY(wrench_core_fcfs_batch_scheduler, "Log category for FCFSBatchScheduler");
 
 namespace wrench {
 
     /**
     * @brief Overriden Method to pick the next job to schedule
+    *
     * @return A batch job, or nullptr is none is found
     */
     std::shared_ptr<BatchJob> FCFSBatchScheduler::pickNextJobToSchedule() {
@@ -30,7 +31,7 @@ namespace wrench {
 
 
     /**
-     * #brief Override Method to find hosts on which to scheduled a  job
+     * @brief Override Method to find hosts on which to scheduled a  job
      * @param num_nodes: the job's requested num nodes
      * @param cores_per_node: the job's num cores per node
      * @param ram_per_node: the job's ram per node
@@ -185,7 +186,7 @@ namespace wrench {
 
         // Update core availabilities for jobs that are currently running
         for (auto job : cs->running_jobs) {
-            double time_to_finish = std::max<double>(0, job->getBeginTimeStamp() +
+            double time_to_finish = std::max<double>(0, job->getBeginTimestamp() +
                                                         job->getRequestedTime() -
                                                         cs->simulation->getCurrentSimulatedDate());
             for (auto resource : job->getResourcesAllocated()) {
@@ -328,6 +329,10 @@ namespace wrench {
         return predictions;
     }
 
+
+    /**
+     * @brief Method to process queued  jobs
+     */
     void FCFSBatchScheduler::processQueuedJobs() {
 
         while (true) {

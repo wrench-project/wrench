@@ -10,13 +10,20 @@
 #ifndef WRENCH_WMS_H
 #define WRENCH_WMS_H
 
-#include <wrench/managers/EnergyMeter.h>
+#include <wrench/managers/EnergyMeterService.h>
 #include "wrench/services/Service.h"
 #include "wrench/wms/DynamicOptimization.h"
 #include "wrench/wms/StaticOptimization.h"
 #include "wrench/wms/scheduler/PilotJobScheduler.h"
 #include "wrench/wms/scheduler/StandardJobScheduler.h"
 #include "wrench/services/compute/cloud/CloudComputeService.h"
+#include "wrench/workflow/execution_events/StandardJobCompletedEvent.h"
+#include "wrench/workflow/execution_events/StandardJobFailedEvent.h"
+#include "wrench/workflow/execution_events/PilotJobStartedEvent.h"
+#include "wrench/workflow/execution_events/PilotJobExpiredEvent.h"
+#include "wrench/workflow/execution_events/FileCopyCompletedEvent.h"
+#include "wrench/workflow/execution_events/FileCopyFailedEvent.h"
+#include "wrench/workflow/execution_events/TimerEvent.h"
 #include "wrench/workflow/Workflow.h"
 
 namespace wrench {
@@ -67,8 +74,8 @@ namespace wrench {
 
         std::shared_ptr<JobManager> createJobManager();
         std::shared_ptr<DataMovementManager> createDataMovementManager();
-        std::shared_ptr<EnergyMeter> createEnergyMeter(const std::map<std::string, double> &measurement_periods);
-        std::shared_ptr<EnergyMeter> createEnergyMeter(const std::vector<std::string> &hostnames, double measurement_period);
+        std::shared_ptr<EnergyMeterService> createEnergyMeter(const std::map<std::string, double> &measurement_periods);
+        std::shared_ptr<EnergyMeterService> createEnergyMeter(const std::vector<std::string> &hostnames, double measurement_period);
 
         void runDynamicOptimizations();
 
@@ -128,7 +135,8 @@ namespace wrench {
 
         void waitForAndProcessNextEvent();
         bool waitForAndProcessNextEvent(double timeout);
-
+        std::shared_ptr<WorkflowExecutionEvent>  waitForNextEvent();
+        std::shared_ptr<WorkflowExecutionEvent>  waitForNextEvent(double timeout);
         virtual void processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent>);
 
         virtual void processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent>);

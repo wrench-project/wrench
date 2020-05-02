@@ -12,7 +12,7 @@
 #include "wrench/workflow/Workflow.h"
 #include "wrench/workflow/job/StandardJob.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(standard_job, "Log category for StandardJob");
+WRENCH_LOG_CATEGORY(wrench_core_standard_job, "Log category for StandardJob");
 
 
 namespace wrench {
@@ -70,7 +70,7 @@ namespace wrench {
       }
       this->workflow = workflow;
       this->name = "standard_job_" + std::to_string(WorkflowJob::getNewUniqueNumber());
-    };
+    }
 
     /**
      * @brief Returns the minimum number of cores required, over all tasks in the job (i.e., at least
@@ -153,4 +153,4 @@ namespace wrench {
       return this->state;
     }
 
-};
+}

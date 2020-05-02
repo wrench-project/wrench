@@ -257,9 +257,11 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test(){
     ASSERT_EQ(failed_task_start->getTask(), failed_task_failed->getTask());
 
     // test constructors
-    ASSERT_THROW(wrench::SimulationTimestampTaskStart(nullptr), std::invalid_argument);
-    ASSERT_THROW(wrench::SimulationTimestampTaskFailure(nullptr), std::invalid_argument);
-    ASSERT_THROW(wrench::SimulationTimestampTaskCompletion(nullptr), std::invalid_argument);
+
+    ASSERT_THROW(simulation->getOutput().addTimestampTaskStart(nullptr), std::invalid_argument);
+    ASSERT_THROW(simulation->getOutput().addTimestampTaskFailure(nullptr), std::invalid_argument);
+    ASSERT_THROW(simulation->getOutput().addTimestampTaskCompletion(nullptr), std::invalid_argument);
+    ASSERT_THROW(simulation->getOutput().addTimestampTaskTermination(nullptr), std::invalid_argument);
 
     delete simulation;
     free(argv[0]);

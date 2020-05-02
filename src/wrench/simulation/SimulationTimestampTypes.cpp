@@ -2,16 +2,16 @@
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 #include <wrench-dev.h>
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(simulation_timestamps, "Log category for SimulationTimeStamps");
+WRENCH_LOG_CATEGORY(wrench_core_simulation_timestamps, "Log category for SimulationTimestamps");
 
 
 namespace wrench {
 
-    /**
-     *
-     * @param file - tuple of three strings relating to File, Source and Whoami
-     * @return XOR of hashes of file
-     */
+    ///*
+    // *
+    // * @param file - tuple of three strings relating to File, Source and Whoami
+    // * @return XOR of hashes of file
+    // */
     ///size_t file_hash( const File & file )
     ///{
     ///    return std::hash<void *>()(std::get<0>(file)) ^ std::hash<void *>()(std::get<1>(file)) ^ std::hash<void *>()(std::get<2>(file));
@@ -132,7 +132,6 @@ namespace wrench {
 
     }
 
-
     /**
      * @brief Constructor
      * @param task: the WorkflowTask associated with this timestamp
@@ -189,7 +188,6 @@ namespace wrench {
      * @param file: the WorkflowFile associated with this file copy
      * @param src_location: the source location
      * @param dst_location: the destination location
-     * @param start_timestamp: the timestamp for the file copy start
      */
     SimulationTimestampFileCopy::SimulationTimestampFileCopy(WorkflowFile *file,
                                                              std::shared_ptr<FileLocation> src_location,
@@ -284,7 +282,9 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param start_timestamp: a pointer to the SimulationTimestampFileCopyStart associated with this timestamp
+     * @param file: A workflow file
+     * @param src: the source location
+     * @param dst: the destination location
      * @throw std::invalid_argument
      */
     SimulationTimestampFileCopyFailure::SimulationTimestampFileCopyFailure(WorkflowFile *file,
@@ -307,7 +307,9 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param start_timestamp: a pointer to the SimulationTimestampFileCopyStart associated with this timestamp
+     * @param file: a workflow file
+     * @param src: the source location
+     * @param dst: the destination location
      * @throw std::invalid_argument
      */
     SimulationTimestampFileCopyCompletion::SimulationTimestampFileCopyCompletion(WorkflowFile *file,
@@ -329,13 +331,12 @@ namespace wrench {
         setEndpoints();
     }
 
-
-
     /**
      * @brief Constructor
      * @param file: the WorkflowFile associated with this file read
      * @param src_location: the source location
      * @param service: service requesting file read
+     * @param task: a task associated to  this file read (or nullptr)
      */
     SimulationTimestampFileRead::SimulationTimestampFileRead(WorkflowFile *file,
                                                              FileLocation *src_location,
@@ -417,6 +418,7 @@ namespace wrench {
      * @param file: the WorkflowFile associated with this file read
      * @param src: the source location
      * @param service: service requesting file read
+     * @param task: a  task associated to  this file read (or nullptr)
      * @throw std::invalid_argument
      */
     SimulationTimestampFileReadStart::SimulationTimestampFileReadStart(WorkflowFile *file,
@@ -495,6 +497,7 @@ namespace wrench {
      * @param file: the WorkflowFile associated with this file write
      * @param dst_location: the destination location
      * @param service: service requesting file write
+     * @param task: a  task associated to  this file read (or nullptr)
      */
     SimulationTimestampFileWrite::SimulationTimestampFileWrite(WorkflowFile *file,
                                                                FileLocation *dst_location,
@@ -576,6 +579,7 @@ namespace wrench {
      * @param file: the WorkflowFile associated with this file write
      * @param dst: the destination location
      * @param service: service requesting file write
+     * @param task: a  task associated to  this file read (or nullptr)
      * @throw std::invalid_argument
      */
     SimulationTimestampFileWriteStart::SimulationTimestampFileWriteStart(WorkflowFile *file,
@@ -650,7 +654,326 @@ namespace wrench {
         setEndpoints();
     }
 
+    /**
+ * @brief Constructor
+ * @param hostname: hostname being read from
+ * @param mount: mountpoint of disk
+ * @param bytes: number of bytes read
+ */
+    SimulationTimestampDiskRead::SimulationTimestampDiskRead(std::string hostname,
+                                                             std::string mount,
+                                                             double bytes,
+                                                             int counter) :
+            hostname(hostname), mount(mount), bytes(bytes), counter(counter) {
+    }
 
+    /**
+     * @brief retrieves the hostname where read occurs
+     * @return string of hostname
+     */
+    std::string SimulationTimestampDiskRead::getHostname() {
+        return this->hostname;
+    }
+
+    /**
+     * @brief retrieves mount point of read
+     * @return string of mount point
+     */
+    std::string SimulationTimestampDiskRead::getMount() {
+        return this->mount;
+    }
+
+    /**
+     * @brief retrieves the amount of bytes being read
+     * @return number of bytes as double
+     */
+    double SimulationTimestampDiskRead::getBytes() {
+        return this->bytes;
+    }
+
+    /**
+     * @brief To get counter of disk operation
+     * @return int of counter
+     */
+    int SimulationTimestampDiskRead::getCounter() {
+        return this->counter;
+    }
+
+    /**
+     * @brief retrieves the corresponding SimulationTimestampDiskRead object
+     * @return a pointer to the start or end SimulationTimestampDiskRead object
+     */
+    SimulationTimestampDiskRead *SimulationTimestampDiskRead::getEndpoint() {
+        return dynamic_cast<SimulationTimestampDiskRead *>(this->endpoint);
+    }
+
+    /**
+     * @brief A static unordered multimap of SimulationTimestampDiskReadStart objects that have yet to be matched with Failure, Terminated or Completion timestamps
+     */
+    std::unordered_multimap<DiskAccess, SimulationTimestampDiskRead *> SimulationTimestampDiskRead::pending_disk_reads;
+
+    /**
+     * @brief Sets the endpoint of the calling object (SimulationTimestampDiskReadFailure, SimulationTimestampDiskReadTerminated, SimulationTimestampDiskReadStart) with a SimulationTimestampDiskReadStart object
+     */
+    void SimulationTimestampDiskRead::setEndpoints() {
+        // find the SimulationTimestampDiskRead object containing the same task
+        auto pending_disk_reads_itr = pending_disk_reads.find(DiskAccess(this->hostname, this->mount, this->counter));
+        if (pending_disk_reads_itr != pending_disk_reads.end()) {
+            // set my endpoint to the SimulationTimestampDiskReadStart
+            this->endpoint = (*pending_disk_reads_itr).second;
+
+            // set the SimulationTimestampDiskReadStart's endpoint to me
+            (*pending_disk_reads_itr).second->endpoint = this;
+
+            // the SimulationTimestampDiskReadStart is no longer waiting to be matched with an end timestamp, remove it from the map
+            pending_disk_reads.erase(pending_disk_reads_itr);
+        } else {
+            throw std::runtime_error(
+                    "SimulationTimestampDiskRead::setEndpoints() could not find a SimulationTimestampDiskReadStart object.");
+        }
+    }
+
+
+
+    /**
+     * @brief Constructor
+     * @param hostname: hostname of disk being read
+     * @param mount: mount point of disk being read
+     * @param bytes: number of bytes read
+     * @param counter: an integer ID
+     * @throw std::invalid_argument
+     */
+    SimulationTimestampDiskReadStart::SimulationTimestampDiskReadStart(std::string hostname,
+                                                                       std::string mount,
+                                                                       double bytes,
+                                                                       int counter) :
+            SimulationTimestampDiskRead(hostname, mount, bytes, counter) {
+        WRENCH_DEBUG("Inserting a DiskReadStart timestamp for disk read");
+
+        // all information about a disk read should be passed
+        if (this->hostname.empty()
+            || this->mount.empty()) {
+
+            throw std::invalid_argument(
+                    "SimulationTimestampDiskReadStart::SimulationTimestampDiskReadStart() cannot take nullptr arguments");
+        }
+
+
+        pending_disk_reads.insert(std::make_pair(DiskAccess(this->hostname, this->mount, this->counter), this));
+
+    }
+
+
+    /**
+     * @brief Constructor
+     * @param hostname: hostname of disk being read
+     * @param mount: mount point of disk being read
+     * @param bytes: number of bytes read
+     * @param counter: an integer ID
+     * @throw std::invalid_argument
+     */
+    SimulationTimestampDiskReadFailure::SimulationTimestampDiskReadFailure(std::string hostname,
+                                                                           std::string mount,
+                                                                           double bytes,
+                                                                           int counter) :
+            SimulationTimestampDiskRead(hostname, mount, bytes, counter) {
+        WRENCH_DEBUG("Inserting a DiskReadFailure timestamp for disk read");
+
+        if (hostname.empty()
+            || mount.empty()) {
+            throw std::invalid_argument(
+                    "SimulationTimestampDiskReadFailure::SimulationTimestampDiskReadFailure() requires a valid pointer to file, destination and service objects");
+        }
+
+        // match this timestamp with a SimulationTimestampDiskReadStart
+        setEndpoints();
+    }
+
+    /**
+     * @brief Constructor
+     * @param hostname: hostname of disk being read
+     * @param mount: mount point of disk being read
+     * @param bytes: number of bytes read
+     * @param counter: an integer ID
+     * @throw std::invalid_argument
+     */
+    SimulationTimestampDiskReadCompletion::SimulationTimestampDiskReadCompletion(std::string hostname,
+                                                                                 std::string mount,
+                                                                                 double bytes,
+                                                                                 int counter) :
+            SimulationTimestampDiskRead(hostname, mount, bytes, counter) {
+        WRENCH_DEBUG("Inserting a DiskReadCompletion timestamp for disk read");
+
+        if (hostname.empty()
+            || mount.empty()) {
+            throw std::invalid_argument(
+                    "SimulationTimestampDiskReadFailure::SimulationTimestampDiskReadFailure() requires a valid pointer to file, destination and service objects");
+        }
+
+        // match this timestamp with a SimulationTimestampDiskReadStart
+        setEndpoints();
+    }
+
+    /**
+ * @brief Constructor
+ * @param hostname: hostname being write from
+ * @param mount: mountpoint of disk
+ * @param bytes: number of bytes written
+ * @param counter: an integer ID
+ */
+    SimulationTimestampDiskWrite::SimulationTimestampDiskWrite(std::string hostname,
+                                                               std::string mount,
+                                                               double bytes,
+                                                               int counter) :
+            hostname(hostname), mount(mount), bytes(bytes), counter(counter) {
+    }
+
+    /**
+     * @brief retrieves the hostname where write occurs
+     * @return string of hostname
+     */
+    std::string SimulationTimestampDiskWrite::getHostname() {
+        return this->hostname;
+    }
+
+    /**
+     * @brief retrieves mount point of write
+     * @return string of mount point
+     */
+    std::string SimulationTimestampDiskWrite::getMount() {
+        return this->mount;
+    }
+
+    /**
+     * @brief retrieves the amount of bytes being written
+     * @return number of bytes as double
+     */
+    double SimulationTimestampDiskWrite::getBytes() {
+        return this->bytes;
+    }
+
+    /**
+     * @brief retrieves the counter for this disk operation
+     * @return int of counter
+     */
+    int SimulationTimestampDiskWrite::getCounter() {
+        return this->counter;
+    }
+
+    /**
+     * @brief retrieves the corresponding SimulationTimestampDiskWrite object
+     * @return a pointer to the start or end SimulationTimestampDiskWrite object
+     */
+    SimulationTimestampDiskWrite *SimulationTimestampDiskWrite::getEndpoint() {
+        return dynamic_cast<SimulationTimestampDiskWrite *>(this->endpoint);
+    }
+
+    /**
+     * @brief A static unordered multimap of SimulationTimestampDiskWriteStart objects that have yet to be matched with Failure, Terminated or Completion timestamps
+     */
+    std::unordered_multimap<DiskAccess, SimulationTimestampDiskWrite *> SimulationTimestampDiskWrite::pending_disk_writes;
+
+    /**
+     * @brief Sets the endpoint of the calling object (SimulationTimestampDiskWriteFailure, SimulationTimestampDiskWriteTerminated, SimulationTimestampDiskWriteStart) with a SimulationTimestampDiskWriteStart object
+     */
+    void SimulationTimestampDiskWrite::setEndpoints() {
+        // find the SimulationTimestampDiskWrite object containing the same task
+        auto pending_disk_writes_itr = pending_disk_writes.find(DiskAccess(this->hostname, this->mount, this->counter));
+        if (pending_disk_writes_itr != pending_disk_writes.end()) {
+            // set my endpoint to the SimulationTimestampDiskWriteStart
+            this->endpoint = (*pending_disk_writes_itr).second;
+
+            // set the SimulationTimestampDiskWriteStart's endpoint to me
+            (*pending_disk_writes_itr).second->endpoint = this;
+
+            // the SimulationTimestampDiskWriteStart is no longer waiting to be matched with an end timestamp, remove it from the map
+            pending_disk_writes.erase(pending_disk_writes_itr);
+        } else {
+            throw std::runtime_error(
+                    "SimulationTimestampDiskWrite::setEndpoints() could not find a SimulationTimestampDiskWriteStart object.");
+        }
+    }
+
+
+
+    /**
+     * @brief Constructor
+     * @param hostname: hostname of disk being write
+     * @param mount: mount point of disk being write
+     * @param bytes: number of bytes write
+     * @param counter: an integer ID
+     * @throw std::invalid_argument
+     */
+    SimulationTimestampDiskWriteStart::SimulationTimestampDiskWriteStart(std::string hostname,
+                                                                         std::string mount,
+                                                                         double bytes,
+                                                                         int counter) :
+            SimulationTimestampDiskWrite(hostname, mount, bytes, counter) {
+        WRENCH_DEBUG("Inserting a DiskWriteStart timestamp for disk write");
+
+        // all information about a disk write should be passed
+        if (this->hostname.empty()
+            || this->mount.empty()) {
+
+            throw std::invalid_argument(
+                    "SimulationTimestampDiskWriteStart::SimulationTimestampDiskWriteStart() cannot take nullptr arguments");
+        }
+
+
+        pending_disk_writes.insert(std::make_pair(DiskAccess(this->hostname, this->mount, this->counter), this));
+
+    }
+
+
+    /**
+     * @brief Constructor
+     * @param hostname: hostname of disk being write
+     * @param mount: mount point of disk being write
+     * @param bytes: number of bytes write
+     * @param counter: an integer ID
+     * @throw std::invalid_argument
+     */
+    SimulationTimestampDiskWriteFailure::SimulationTimestampDiskWriteFailure(std::string hostname,
+                                                                             std::string mount,
+                                                                             double bytes,
+                                                                             int counter) :
+            SimulationTimestampDiskWrite(hostname, mount, bytes, counter) {
+        WRENCH_DEBUG("Inserting a DiskWriteFailure timestamp for disk write");
+
+        if (hostname.empty()
+            || mount.empty()) {
+            throw std::invalid_argument(
+                    "SimulationTimestampDiskWriteFailure::SimulationTimestampDiskWriteFailure() requires a valid pointer to file, destination and service objects");
+        }
+
+        // match this timestamp with a SimulationTimestampDiskWriteStart
+        setEndpoints();
+    }
+
+    /**
+     * @brief Constructor
+     * @param hostname: hostname of disk being write
+     * @param mount: mount point of disk being write
+     * @param bytes: number of bytes write
+     * @param counter: an integer ID
+     * @throw std::invalid_argument
+     */
+    SimulationTimestampDiskWriteCompletion::SimulationTimestampDiskWriteCompletion(std::string hostname,
+                                                                                   std::string mount,
+                                                                                   double bytes,
+                                                                                   int counter) :
+            SimulationTimestampDiskWrite(hostname, mount, bytes, counter) {
+        WRENCH_DEBUG("Inserting a DiskWriteCompletion timestamp for disk write");
+
+        if (hostname.empty()
+            || mount.empty()) {
+            throw std::invalid_argument(
+                    "SimulationTimestampDiskWriteFailure::SimulationTimestampDiskWriteFailure() requires a valid pointer to file, destination and service objects");
+        }
+
+        // match this timestamp with a SimulationTimestampDiskWriteStart
+        setEndpoints();
+    }
 
 
     /**

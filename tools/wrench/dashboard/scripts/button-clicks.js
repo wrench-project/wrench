@@ -14,8 +14,8 @@ function showHideArrow(id, arrowId) {
 function getHostNames(data) {
     var hostNames = new Set();
 
-    data.forEach(function(task) {
-        var hostName = task['execution host'].hostname
+    data.forEach(function (task) {
+        var hostName = task['execution_host'].hostname
         hostNames.add(hostName)
     })
 
@@ -34,7 +34,7 @@ function switchToHostView(data, selectedHost) {
     var hostNames = getHostNames(data)
 
     if (!hostColoursJSONPopulated()) {
-        hostNames.forEach(function(hostName) {
+        hostNames.forEach(function (hostName) {
             var colour = getRandomColour()
             while (colour === '#FF0000' || colour === '#FFA500') {
                 colour = getRandomColour()
@@ -42,10 +42,10 @@ function switchToHostView(data, selectedHost) {
             hostColours[hostName] = colour
         })
     }
-    
 
-    data.forEach(function(task) {
-        var hostName = task['execution host'].hostname
+
+    data.forEach(function (task) {
+        var hostName = task['execution_host'].hostname
         var sanitizedId = sanitizeId(task.task_id)
         var taskRead = d3.select(`#${sanitizedId} .read`)
         var taskCompute = d3.select(`#${sanitizedId} .compute`)
@@ -114,7 +114,6 @@ function legendHover(hostName, id, alreadySelected) {
 }
 
 
-
 function legendClick(hostName, id) {
     var legendElement = d3.select(`#${id}`)
     if (hostName === currentlySelectedHost.hostName) {
@@ -124,7 +123,7 @@ function legendClick(hostName, id) {
         legendElement.style("font-weight", "normal")
         switchToHostView(data.contents, "")
         return
-    } 
+    }
     if (currentlySelectedHost.hostName !== "" && hostName !== currentlySelectedHost.hostName) {
         // deselect different host
         var currentlySelectedLegendElement = d3.select(`#${currentlySelectedHost.id}`)

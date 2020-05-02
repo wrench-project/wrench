@@ -1,8 +1,9 @@
 sonar.projectKey=wrench
 sonar.projectName=WRENCH
 sonar.projectVersion=@WRENCH_RELEASE_VERSION@
+sonar.organization=wrench
 
-sonar.links.homepage=http://wrench-project.org
+sonar.links.homepage=https://wrench-project.org
 sonar.links.ci=https://travis-ci.org/wrench-project/wrench
 sonar.links.issue=https://github.com/wrench-project/wrench/issues
 sonar.links.scm=https://github.com/wrench-project/wrench.git
@@ -15,3 +16,5 @@ sonar.sourceEncoding=UTF-8
 
 sonar.sources=src,include,examples
 sonar.tests=test
+
+sonar.cfamily.threads=2

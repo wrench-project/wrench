@@ -16,7 +16,7 @@
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(test_bare_metalk_compute_service_scheduling, "Log category for BareMetalComputeServiceTestScheduling");
+WRENCH_LOG_CATEGORY(test_bare_metalk_compute_service_scheduling, "Log category for BareMetalComputeServiceTestScheduling");
 
 #define EPSILON 0.005
 

@@ -10,7 +10,7 @@
 
 #include <wrench/logging/TerminalOutput.h>
 #include "wrench/services/network_proximity/NetworkProximityDaemon.h"
-#include "wrench/workflow/execution_events/FailureCause.h"
+#include "wrench/workflow/failure_causes/NetworkError.h"
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <wrench/simulation/SimulationMessage.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
@@ -18,7 +18,7 @@
 #include "NetworkProximityMessage.h"
 
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(network_daemons_service, "Log category for Network Daemons Service");
+WRENCH_LOG_CATEGORY(wrench_core_network_daemons_service, "Log category for Network Daemons Service");
 
 namespace wrench {
 

@@ -175,7 +175,7 @@ function gridPlane(grid, options, point$$1, angles){
             var pl = [points[p1], points[p2], points[p3], points[p4]];
 
             if (p3 < 0) {
-                continue
+                continue;
             }
 
             pl.plane    = 'plane_' + cnt++;

@@ -16,8 +16,13 @@
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/services/ServiceMessagePayload.h"
+#include "wrench/workflow/failure_causes/ServiceIsDown.h"
+#include "wrench/workflow/failure_causes/ServiceIsSuspended.h"
+#include "wrench/workflow/failure_causes/HostError.h"
+#include "wrench/workflow/failure_causes/NetworkError.h"
+#include "wrench/workflow/failure_causes/NotAllowed.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(service, "Log category for Service");
+WRENCH_LOG_CATEGORY(wrench_core_service, "Log category for Service");
 
 
 namespace wrench {

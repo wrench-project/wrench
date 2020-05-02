@@ -17,7 +17,7 @@
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(simple_storage_service_performance_test, "Log category for SimpleStorageServicePerformanceTest");
+WRENCH_LOG_CATEGORY(simple_storage_service_performance_test, "Log category for SimpleStorageServicePerformanceTest");
 
 
 #define FILE_SIZE (10*1000*1000*1000.00) // 10 GB

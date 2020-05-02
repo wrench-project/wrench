@@ -16,7 +16,7 @@
 #include <simgrid/plugins/live_migration.h>
 
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(s4u_virtual_machine, "Log category for S4U_VirtualMachine");
+WRENCH_LOG_CATEGORY(wrench_core_s4u_virtual_machine, "Log category for S4U_VirtualMachine");
 
 namespace wrench {
 

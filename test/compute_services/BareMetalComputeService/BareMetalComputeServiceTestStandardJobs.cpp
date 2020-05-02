@@ -17,7 +17,7 @@
 
 #define EPSILON 0.05
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(bare_metal_compute_service_test_standard_jobs, "Log category for BareMetalComputeServiceTestStandardJobs");
+WRENCH_LOG_CATEGORY(bare_metal_compute_service_test_standard_jobs, "Log category for BareMetalComputeServiceTestStandardJobs");
 
 
 class BareMetalComputeServiceTestStandardJobs : public ::testing::Test {

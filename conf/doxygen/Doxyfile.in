@@ -798,21 +798,7 @@ WARN_LOGFILE           =
 # spaces. See also FILE_PATTERNS and EXTENSION_MAPPING
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = @CMAKE_HOME_DIRECTORY@/doc/index.md \
-                         @CMAKE_HOME_DIRECTORY@/doc/install.md \
-                         @CMAKE_HOME_DIRECTORY@/doc/getting_started.md \
-                         @CMAKE_HOME_DIRECTORY@/doc/wrench_101.md \
-                         @CMAKE_HOME_DIRECTORY@/doc/guide.md \
-                         @CMAKE_HOME_DIRECTORY@/doc/guide/baremetal.md \
-                         @CMAKE_HOME_DIRECTORY@/doc/guide/batch.md \
-                         @CMAKE_HOME_DIRECTORY@/doc/guide/cloud.md \
-                         @CMAKE_HOME_DIRECTORY@/doc/guide/virtualizedcluster.md \
-                         @CMAKE_HOME_DIRECTORY@/doc/guide/htcondor.md \
-                         @CMAKE_HOME_DIRECTORY@/doc/guide/simplestorage.md \
-                         @CMAKE_HOME_DIRECTORY@/doc/guide/fileregistry.md \
-                         @CMAKE_HOME_DIRECTORY@/doc/guide/networkproximity.md \
-                         @CMAKE_HOME_DIRECTORY@/src \
-                         @CMAKE_HOME_DIRECTORY@/include
+INPUT                  = @WRENCH_DOC_INPUT@
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -1208,7 +1194,9 @@ HTML_EXTRA_STYLESHEET  = @CMAKE_HOME_DIRECTORY@/doc/layout/customdoxygen.css
 HTML_EXTRA_FILES       = @CMAKE_HOME_DIRECTORY@/doc/layout/doxy-boot.js \
                          @CMAKE_HOME_DIRECTORY@/doc/layout/jquery.smartmenus.js \
                          @CMAKE_HOME_DIRECTORY@/doc/layout/jquery.smartmenus.min.js \
-                         @CMAKE_HOME_DIRECTORY@/doc/layout/jquery.smartmenus.bootstrap.css
+                         @CMAKE_HOME_DIRECTORY@/doc/layout/jquery.smartmenus.bootstrap.css \
+                         @CMAKE_HOME_DIRECTORY@/doc/layout/bootstrap.min.css \
+                         @CMAKE_HOME_DIRECTORY@/doc/layout/bootstrap.min.js
 
 # The HTML_COLORSTYLE_HUE tag controls the color of the HTML output. Doxygen
 # will adjust the colors in the style sheet and background images according to
@@ -2175,12 +2163,6 @@ EXTERNAL_GROUPS        = YES
 
 EXTERNAL_PAGES         = YES
 
-# The PERL_PATH should be the absolute path and name of the perl script
-# interpreter (i.e. the result of 'which perl').
-# The default file (with absolute path) is: /usr/bin/perl.
-
-PERL_PATH              = /usr/bin/perl
-
 #---------------------------------------------------------------------------
 # Configuration options related to the dot tool
 #---------------------------------------------------------------------------
@@ -2193,15 +2175,6 @@ PERL_PATH              = /usr/bin/perl
 # The default value is: YES.
 
 CLASS_DIAGRAMS         = YES
-
-# You can define message sequence charts within doxygen comments using the \msc
-# command. Doxygen will then run the mscgen tool (see:
-# http://www.mcternan.me.uk/mscgen/)) to produce the chart and insert it in the
-# documentation. The MSCGEN_PATH tag allows you to specify the directory where
-# the mscgen tool resides. If left empty the tool is assumed to be found in the
-# default search path.
-
-MSCGEN_PATH            =
 
 # You can include diagrams made with dia in doxygen documentation. Doxygen will
 # then run dia to produce the diagram and insert it in the documentation. The

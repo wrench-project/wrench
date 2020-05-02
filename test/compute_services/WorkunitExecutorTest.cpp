@@ -21,7 +21,7 @@
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(workunit_executor_test, "Log category for Simple WorkunitExecutorTest");
+WRENCH_LOG_CATEGORY(workunit_executor_test, "Log category for Simple WorkunitExecutorTest");
 
 #define EPSILON 0.05
 

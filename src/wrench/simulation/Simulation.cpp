@@ -31,9 +31,11 @@
 #include <nlohmann/json.hpp>
 #include <fstream>
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(simulation, "Log category for Simulation");
+WRENCH_LOG_CATEGORY(wrench_core_simulation, "Log category for Simulation");
 
 namespace wrench {
+
+    int Simulation::unique_disk_sequence_number = 0;
 
     /**
      * \cond
@@ -66,7 +68,6 @@ namespace wrench {
 
         // Create the S4U simulation wrapper
         this->s4u_simulation = std::unique_ptr<S4U_Simulation>(new S4U_Simulation());
-
     }
 
     /**
@@ -104,17 +105,17 @@ namespace wrench {
         bool wrench_help_requested = false;
         bool simulator_help_requested = false;
         bool version_requested = false;
-        bool wrench_no_log = false;
+
+        // By  default, logs are disabled
+        xbt_log_control_set("root.thresh:critical");
 
         std::vector<std::string> cleanedup_args;
 
         for (i = 0; i < *argc; i++) {
             if ((not strcmp(argv[i], "--wrench-no-color")) or (not strcmp(argv[i], "--wrench-no-colors"))) {
                 TerminalOutput::disableColor();
-            } else if ((not strcmp(argv[i], "--wrench-no-log")) or (not strcmp(argv[i], "--wrench-no-logs"))) {
-                TerminalOutput::disableColor();
-                TerminalOutput::disableLog();
-                wrench_no_log = true;
+            } else if ((not strcmp(argv[i], "--wrench-full-log")) or (not strcmp(argv[i], "--wrench-full-logs"))) {
+                xbt_log_control_set("root.thresh:info");
             } else if (not strcmp(argv[i], "--activate-energy")) {
                 sg_host_energy_plugin_init();
             } else if (not strcmp(argv[i], "--help-wrench")) {
@@ -136,8 +137,9 @@ namespace wrench {
         if (wrench_help_requested) {
             std::cout << "General WRENCH command-line arguments:\n";
             std::cout << "   --wrench-no-color: disables colored terminal output\n";
-            std::cout << "   --wrench-no-log: disables logging\n";
-            std::cout << "     (use --help-logs for detailed help on SimGrid's logging options/syntax)\n";
+            std::cout << "   --wrench-full-log: enables full logging\n";
+            std::cout << "     (use --log=xxx.threshold=info to enable log category xxxx)\n";
+            std::cout << "   --help-logs for detailed help on (SimGrid's) logging options/syntax)\n";
             std::cout << "   --activate-energy: activates SimGrid's energy plugin\n";
             std::cout << "     (requires host pstate definitions in XML platform description file)\n";
             std::cout << "   --help-simgrid: show full help on general Simgrid command-line arguments\n";
@@ -147,14 +149,19 @@ namespace wrench {
 
         *argc = 0;
         for (auto a : cleanedup_args) {
-//            std::cerr << "Writing to element argv[" << *argc  << "]    " << a << "\n";
             argv[(*argc)] = strdup(a.c_str());
             (*argc)++;
         }
 
         // If version requested, put back the "--version" argument
         if (version_requested) {
-            std::cout << "WRENCH version " << getWRENCHVersionString() << "\n";
+            std::cout << "WRENCH version " << getWRENCHVersionString();
+#ifdef ENABLE_BATSCHED
+            std::cout << " (compiled with Batsched)";
+#endif
+            std::cout << "\n";
+            // put the argument back in so that we also see the
+            // SimGrid message
             argv[(*argc)] = strdup("--version");
             (*argc)++;
         }
@@ -166,12 +173,6 @@ namespace wrench {
             argv[(*argc)] = strdup("--help");
             (*argc)++;
             std::cout << "\nSimgrid command-line arguments:\n\n";
-        }
-
-        // If WRENCH no logging is requested, put back and convert it to a SimGrid argument
-        if (wrench_no_log) {
-            argv[(*argc)] = strdup("--log=root.threshold:critical");
-            (*argc)++;
         }
 
         this->s4u_simulation->initialize(argc, argv);
@@ -256,9 +257,7 @@ namespace wrench {
         // Even if the energy-plugin is not activated, getCurrentPstate(hostname) can
         // still be called.
         for (const auto &hostname: this->getHostnameList()) {
-            this->getOutput().addTimestamp<SimulationTimestampPstateSet>(
-                    new SimulationTimestampPstateSet(hostname, getCurrentPstate(hostname))
-            );
+            this->getOutput().addTimestampPstateSet(hostname, getCurrentPstate(hostname));
         }
 
         // Start all services (and the WMS)
@@ -349,11 +348,11 @@ namespace wrench {
             }
 
             // Check that each input file is staged on the file registry services
-            for (auto f : wms->workflow->getInputFiles()) {
+            for (auto file : wms->workflow->getInputFiles()) {
                 for (auto frs : this->file_registry_services) {
-                    if (frs->entries.find(f.second) == frs->entries.end()) {
+                    if (frs->entries.find(file) == frs->entries.end()) {
                         throw std::runtime_error(
-                                "Workflow input file " + f.second->getID() + " is not staged on any storage service!");
+                                "Workflow input file " + file->getID() + " is not staged on any storage service!");
                     }
                 }
             }
@@ -399,6 +398,11 @@ namespace wrench {
 
             // Start the file registry services
             for (const auto &frs : this->file_registry_services) {
+                frs->start(frs, true, false); // Daemonized, no auto-restart
+            }
+
+            // Start the energy meter services
+            for (const auto &frs : this->energy_meter_services) {
                 frs->start(frs, true, false); // Daemonized, no auto-restart
             }
 
@@ -485,6 +489,22 @@ namespace wrench {
     }
 
 
+    /**
+      * @brief Add an EnergyMeter service to the simulation.
+      *
+      * @param service: an energy meter service
+      *
+      * @throw std::invalid_argument
+      */
+    void Simulation::addService(std::shared_ptr<EnergyMeterService> service) {
+        if (service == nullptr) {
+            throw std::invalid_argument("Simulation::addService(): invalid argument (nullptr service)");
+        }
+        service->simulation = this;
+        this->energy_meter_services.insert(service);
+    }
+
+
 
     /**
     * @brief Stage a copy of a file at a storage service in the root of the (unique) mount point
@@ -555,6 +575,85 @@ namespace wrench {
         }
     }
 
+    /**
+     * Wrapper enabling timestamps for disk reads
+     * @param num_bytes - number of bytes read
+     * @param hostname - hostname to read from
+     * @param mount_point - mount point of disk to read from
+     *
+     * @throw invalid_argument
+     */
+    void Simulation::readFromDisk(double num_bytes, std::string hostname, std::string mount_point) {
+        unique_disk_sequence_number+=1;
+        int temp_unique_sequence_number = unique_disk_sequence_number;
+        this->getOutput().addTimestampDiskReadStart(hostname, mount_point, num_bytes, temp_unique_sequence_number);
+        try{
+            S4U_Simulation::readFromDisk(num_bytes, hostname, mount_point);
+        } catch (const std::invalid_argument &ia) {
+            this->getOutput().addTimestampDiskReadFailure(hostname, mount_point, num_bytes, temp_unique_sequence_number);
+            throw;
+        }
+        this->getOutput().addTimestampDiskReadCompletion(hostname, mount_point, num_bytes, temp_unique_sequence_number);
+    }
+
+    /**
+     * Wrapper enabling timestamps for concurrent disk read/writes
+     * @param num_bytes_to_read - number of bytes read
+     * @param num_bytes_to_write - number of bytes written
+     * @param hostname - hostname where disk is located
+     * @param read_mount_point - mount point of disk to read from
+     * @param write_mount_point - mount point of disk to write to
+     *
+     * @throw invalid_argument
+     */
+    void Simulation::readFromDiskAndWriteToDiskConcurrently(double num_bytes_to_read, double num_bytes_to_write,
+                                                            std::string hostname,
+                                                            std::string read_mount_point,
+                                                            std::string write_mount_point) {
+        unique_disk_sequence_number+=1;
+        int temp_unique_sequence_number = unique_disk_sequence_number;
+        this->getOutput().addTimestampDiskReadStart(hostname, read_mount_point, num_bytes_to_read, temp_unique_sequence_number);
+        this->getOutput().addTimestampDiskWriteStart(hostname, write_mount_point, num_bytes_to_write, temp_unique_sequence_number);
+        try{
+            S4U_Simulation::readFromDiskAndWriteToDiskConcurrently(num_bytes_to_read, num_bytes_to_write, hostname, read_mount_point, write_mount_point);
+        } catch (const std::invalid_argument &ia) {
+            this->getOutput().addTimestampDiskWriteFailure(hostname, write_mount_point, num_bytes_to_write, temp_unique_sequence_number);
+            this->getOutput().addTimestampDiskReadFailure(hostname, read_mount_point, num_bytes_to_read, temp_unique_sequence_number);
+            throw;
+        }
+        this->getOutput().addTimestampDiskWriteCompletion(hostname, write_mount_point, num_bytes_to_write, temp_unique_sequence_number);
+        this->getOutput().addTimestampDiskReadCompletion(hostname, read_mount_point, num_bytes_to_read, temp_unique_sequence_number);
+    }
+
+    /**
+     * Wrapper enabling timestamps for disk writes
+     * @param num_bytes - number of bytes written
+     * @param hostname - hostname to write to
+     * @param mount_point - mount point of disk to write to
+     *
+     * @throw invalid_argument
+     */
+    void Simulation::writeToDisk(double num_bytes, std::string hostname, std::string mount_point) {
+        unique_disk_sequence_number+=1;
+        int temp_unique_sequence_number = unique_disk_sequence_number;
+        this->getOutput().addTimestampDiskWriteStart(hostname, mount_point, num_bytes, temp_unique_sequence_number);
+        try{
+            S4U_Simulation::writeToDisk(num_bytes, hostname, mount_point);
+        } catch (const std::invalid_argument &ia) {
+            this->getOutput().addTimestampDiskWriteFailure(hostname, mount_point, num_bytes, temp_unique_sequence_number);
+            throw;
+        }
+        this->getOutput().addTimestampDiskWriteCompletion(hostname, mount_point, num_bytes, temp_unique_sequence_number);
+    }
+
+    /**
+     * Wrapper for S4U_Simulation hostExists()
+     * @param hostname - name of host being queried
+     * @return boolean of existence
+     */
+    bool Simulation::doesHostExist(std::string hostname) {
+        return S4U_Simulation::hostExists(hostname);
+    }
 
     /**
      * @brief Get the current simulated date
@@ -701,6 +800,17 @@ namespace wrench {
     }
 
     /**
+     * @brief Obtains the current energy consumption of a host
+     * @param hostname: the host name
+     * @return current energy consumption in joules
+     * @throws std::invalid_argument
+     */
+    double Simulation::getEnergyConsumed(const std::string &hostname) {
+        return this->getEnergyConsumed(hostname, false);
+    }
+
+
+    /**
      * @brief Obtains the current energy consumption of a host and will add SimulationTimestampEnergyConsumption to
      *          simulation output if can_record is set to true
      * @param hostname: the host name
@@ -717,12 +827,22 @@ namespace wrench {
         double consumption = S4U_Simulation::getEnergyConsumedByHost(hostname);
 
         if (record_as_time_stamp) {
-            this->getOutput().addTimestamp<SimulationTimestampEnergyConsumption>(
-                    new SimulationTimestampEnergyConsumption(hostname, consumption));
+            this->getOutput().addTimestampEnergyConsumption(hostname, consumption);
         }
 
         return consumption;
     }
+
+    /**
+    * @brief Obtains the current energy consumption of a host
+    * @param hostnames: the list of hostnames
+    * @return current energy consumption in joules for each host, as a map indexed by hostnames
+    * @throws std::invalid_argument
+    */
+    std::map<std::string, double> Simulation::getEnergyConsumed(const std::vector<std::string> &hostnames) {
+        return this->getEnergyConsumed(hostnames, false);
+    }
+
 
     /**
     * @brief Obtains the current energy consumption of a host and will add SimulationTimestampEnergyConsumption to
@@ -752,8 +872,7 @@ namespace wrench {
      */
     void Simulation::setPstate(const std::string &hostname, int pstate) {
         S4U_Simulation::setPstate(hostname, pstate);
-        this->getOutput().addTimestamp<SimulationTimestampPstateSet>(
-                new SimulationTimestampPstateSet(hostname, pstate));
+        this->getOutput().addTimestampPstateSet(hostname, pstate);
     }
 
     /**
@@ -983,6 +1102,7 @@ namespace wrench {
             }
         }
     }
+
 
 
 };
