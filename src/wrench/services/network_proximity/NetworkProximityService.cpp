@@ -7,6 +7,13 @@
  * (at your option) any later version.
  */
 
+#include <random>
+#include <fstream>
+#include <limits>
+#include <iomanip>
+
+#include <boost/algorithm/string.hpp>
+
 #include <wrench/logging/TerminalOutput.h>
 #include "wrench/services/network_proximity/NetworkProximityService.h"
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
@@ -15,16 +22,10 @@
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/services/ServiceMessage.h>
 #include "NetworkProximityMessage.h"
-
 #include <wrench/exceptions/WorkflowExecutionException.h>
-#include <random>
-#include <fstream>
-#include <limits>
-#include <iomanip>
+#include <wrench/workflow/failure_causes/NetworkError.h>
 
-#include <boost/algorithm/string.hpp>
-
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(network_proximity_service, "Log category for Network Proximity Service");
+WRENCH_LOG_CATEGORY(wrench_core_network_proximity_service, "Log category for Network Proximity Service");
 
 namespace wrench {
 

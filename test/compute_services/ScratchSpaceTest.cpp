@@ -19,7 +19,7 @@
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(scratch_service_test, "Log category for ScratchServiceTest");
+WRENCH_LOG_CATEGORY(scratch_service_test, "Log category for ScratchServiceTest");
 
 
 class ScratchSpaceTest : public ::testing::Test {
@@ -958,7 +958,7 @@ private:
         throw std::runtime_error(
                 "Non-scratch space have / partition unless created by copying something into a new partition name"
         );
-      } catch(wrench::WorkflowExecutionException) {
+      } catch(wrench::WorkflowExecutionException &e) {
       }
 
       //try to copy file1 from / partition of storage service1 into storage service2 in job1's partition, this should succeed
@@ -968,7 +968,7 @@ private:
                                          wrench::FileLocation::LOCATION(this->test->storage_service2,
                                                                         this->test->storage_service2->getMountPoint() + job1->getName()));
 
-      } catch(wrench::WorkflowExecutionException) {
+      } catch(wrench::WorkflowExecutionException &e) {
         throw std::runtime_error(
                 "We should have been able to copy from / partition of non-scratch to a new partition into another non-scratch space"
         );
@@ -980,7 +980,7 @@ private:
                                          wrench::FileLocation::LOCATION(this->test->storage_service2),
                                          wrench::FileLocation::LOCATION(this->test->storage_service1));
 
-      } catch(wrench::WorkflowExecutionException) {
+      } catch(wrench::WorkflowExecutionException &e) {
         throw std::runtime_error(
                 "We should have been able to copy from / of one non-scratch space to / of another non-scratch space"
         );
@@ -993,7 +993,7 @@ private:
                                          wrench::FileLocation::LOCATION(this->test->storage_service2,
                                                                         this->test->storage_service2->getMountPoint() + "/test"));
 
-      }catch(wrench::WorkflowExecutionException) {
+      } catch(wrench::WorkflowExecutionException  &e) {
         throw std::runtime_error(
                 "We should have been able to copy from one partition to another partition of the same storage service"
         );

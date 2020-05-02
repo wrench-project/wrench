@@ -13,13 +13,14 @@
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include <wrench/logging/TerminalOutput.h>
 #include <boost/algorithm/string.hpp>
+#include <wrench/workflow/failure_causes/HostError.h>
 
 #ifdef MESSAGE_MANAGER
 #include <wrench/util/MessageManager.h>
 #endif
 
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(s4u_daemon, "Log category for S4U_Daemon");
+WRENCH_LOG_CATEGORY(wrench_core_s4u_daemon, "Log category for S4U_Daemon");
 
 #ifdef ACTOR_TRACKING_OUTPUT
 std::map<std::string, unsigned long> num_actors;

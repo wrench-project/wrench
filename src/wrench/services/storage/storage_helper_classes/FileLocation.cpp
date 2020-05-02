@@ -13,7 +13,7 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 
-//WRENCH_LOG_NEW_DEFAULT_CATEGORY(file_location, "Log category for FileLocation");
+//WRENCH_LOG_CATEGORY(wrench_core_file_location, "Log category for FileLocation");
 
 
 namespace wrench {
@@ -145,7 +145,7 @@ namespace wrench {
 
     /**
      * @brief Method to sanitize an absolute path (and make it absolute if it's not)
-     * @param path
+     * @param path: an absolute path
      * @return
      */
     std::string FileLocation::sanitizePath(std::string path) {
@@ -201,8 +201,8 @@ namespace wrench {
 
     /**
      * @brief Helper method to find if a path is a proper prefix of another path
-     * @param a path
-     * @param another path 
+     * @param path1: a path
+     * @param path2: another path
      * @return true if one of the two paths is a proper prefix of the other
      */
     bool FileLocation::properPathPrefix(std::string path1, std::string path2) {
@@ -232,7 +232,5 @@ namespace wrench {
 
         return true;
     }
-
-
 }
 

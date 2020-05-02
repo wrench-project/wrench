@@ -16,7 +16,7 @@
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(virtualized_cluster_service_resource_allocation_test, "Log category for VirtualizedClusterServiceResourceAllocationTest");
+WRENCH_LOG_CATEGORY(virtualized_cluster_service_resource_allocation_test, "Log category for VirtualizedClusterServiceResourceAllocationTest");
 
 #define EPSILON 0.001
 

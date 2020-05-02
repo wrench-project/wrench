@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2020. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(standard_job_executor_test, "Log category for Simple StandardJobExecutorTest");
+WRENCH_LOG_CATEGORY(standard_job_executor_test, "Log category for Simple StandardJobExecutorTest");
 
 #define EPSILON 0.05
 
@@ -29,7 +29,6 @@ public:
     std::shared_ptr<wrench::StorageService> storage_service2 = nullptr;
     wrench::Simulation *simulation;
 
-
     void do_StandardJobExecutorConstructorTest_test();
 
     void do_OneSingleCoreTaskTest_test();
@@ -39,7 +38,9 @@ public:
     void do_OneSingleCoreTaskMissingFileTest_test();
 
     void do_OneMultiCoreTaskTestCase1_test();
+
     void do_OneMultiCoreTaskTestCase2_test();
+
     void do_OneMultiCoreTaskTestCase3_test();
 
     void do_DependentTasksTest_test();
@@ -58,7 +59,7 @@ public:
 
     void do_WorkUnit_test();
 
-    static bool isJustABitGreater(double base, double variable,  double epsilon) {
+    static bool isJustABitGreater(double base, double variable, double epsilon) {
         return ((variable > base) && (variable < base + epsilon));
     }
 
@@ -141,9 +142,7 @@ protected:
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
     std::unique_ptr<wrench::Workflow> workflow;
-
 };
-
 
 /**********************************************************************/
 /**  DO CONSTRUCTOR TEST                                             **/
@@ -156,17 +155,14 @@ public:
                                           const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                           const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                           std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
-
 private:
-
     StandardJobExecutorTest *test;
 
     int main() {
-
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -181,15 +177,19 @@ private:
         auto job = job_manager->createStandardJob(
                 {task},
                 {
-                        {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
-                        {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service2)}
+                        {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
+                                this->test->storage_service1)},
+                        {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(
+                                this->test->storage_service2)}
                 },
                 {},
                 {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
-                        this->getWorkflow()->getFileByID("output_file"), wrench::FileLocation::LOCATION(this->test->storage_service2),
+                        this->getWorkflow()->getFileByID("output_file"),
+                        wrench::FileLocation::LOCATION(this->test->storage_service2),
                         wrench::FileLocation::LOCATION(this->test->storage_service1))},
-                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("output_file"),
-                                                                                           wrench::FileLocation::LOCATION(this->test->storage_service2))});
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(
+                        this->getWorkflow()->getFileByID("output_file"),
+                        wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
         std::string my_mailbox = "test_callback_mailbox";
 
@@ -223,7 +223,8 @@ private:
                             my_mailbox,
                             wrench::Simulation::getHostnameList()[0],
                             nullptr,
-                            {std::make_pair(wrench::Simulation::getHostnameList()[0], std::make_tuple(2, wrench::ComputeService::ALL_RAM))},
+                            {std::make_pair(wrench::Simulation::getHostnameList()[0],
+                                            std::make_tuple(2, wrench::ComputeService::ALL_RAM))},
                             nullptr,
                             false,
                             nullptr,
@@ -261,14 +262,16 @@ private:
                             my_mailbox,
                             wrench::Simulation::getHostnameList()[0],
                             job,
-                            {std::make_pair(wrench::Simulation::getHostnameList()[0], std::make_tuple(0, wrench::ComputeService::ALL_RAM))},
+                            {std::make_pair(wrench::Simulation::getHostnameList()[0],
+                                            std::make_tuple(0, wrench::ComputeService::ALL_RAM))},
                             nullptr,
                             false,
                             nullptr,
                             {{wrench::StandardJobExecutorProperty::TASK_STARTUP_OVERHEAD, std::to_string(
                                     thread_startup_overhead)}}, {}
                     ));
-            throw std::runtime_error("Should not be able to create a standard job executor with zero cores on a resource");
+            throw std::runtime_error(
+                    "Should not be able to create a standard job executor with zero cores on a resource");
         } catch (std::invalid_argument &e) {
         }
 
@@ -280,14 +283,16 @@ private:
                             my_mailbox,
                             wrench::Simulation::getHostnameList()[0],
                             job,
-                            {std::make_pair(wrench::Simulation::getHostnameList()[0], std::make_tuple(100, wrench::ComputeService::ALL_RAM))},
+                            {std::make_pair(wrench::Simulation::getHostnameList()[0],
+                                            std::make_tuple(100, wrench::ComputeService::ALL_RAM))},
                             nullptr,
                             false,
                             nullptr,
                             {{wrench::StandardJobExecutorProperty::TASK_STARTUP_OVERHEAD, std::to_string(
                                     thread_startup_overhead)}}, {}
                     ));
-            throw std::runtime_error("Should not be able to create a standard job executor with more cores than available on a resource");
+            throw std::runtime_error(
+                    "Should not be able to create a standard job executor with more cores than available on a resource");
         } catch (std::invalid_argument &e) {
         }
 
@@ -299,14 +304,16 @@ private:
                             my_mailbox,
                             wrench::Simulation::getHostnameList()[0],
                             job,
-                            {std::make_pair(wrench::Simulation::getHostnameList()[0], std::make_tuple(wrench::ComputeService::ALL_CORES, -1))},
+                            {std::make_pair(wrench::Simulation::getHostnameList()[0],
+                                            std::make_tuple(wrench::ComputeService::ALL_CORES, -1))},
                             nullptr,
                             false,
                             nullptr,
                             {{wrench::StandardJobExecutorProperty::TASK_STARTUP_OVERHEAD, std::to_string(
                                     thread_startup_overhead)}}, {}
                     ));
-            throw std::runtime_error("Should not be able to create a standard job executor with negative RAM on a resource");
+            throw std::runtime_error(
+                    "Should not be able to create a standard job executor with negative RAM on a resource");
         } catch (std::invalid_argument &e) {
         }
 
@@ -325,14 +332,15 @@ private:
                             {{wrench::StandardJobExecutorProperty::TASK_STARTUP_OVERHEAD, std::to_string(
                                     thread_startup_overhead)}}, {}
                     ));
-            throw std::runtime_error("Should not be able to create a standard job executor with more RAM than available on a resource");
+            throw std::runtime_error(
+                    "Should not be able to create a standard job executor with more RAM than available on a resource");
         } catch (std::invalid_argument &e) {
         }
 
-
         // Create a bogus StandardJobExecutor (not enough Cores specified)
         this->getWorkflow()->removeTask(task);
-        wrench::WorkflowTask *task_too_many_cores = this->getWorkflow()->addTask("task_too_many_cores", 3600, 20, 20, 1.0, 0);
+        wrench::WorkflowTask *task_too_many_cores = this->getWorkflow()->addTask("task_too_many_cores", 3600, 20, 20,
+                                                                                 1.0, 0);
         task_too_many_cores->addInputFile(this->getWorkflow()->getFileByID("input_file"));
         task_too_many_cores->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
 //        // Forget the previous job!
@@ -342,15 +350,19 @@ private:
         job = job_manager->createStandardJob(
                 {task_too_many_cores},
                 {
-                        {*(task_too_many_cores->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
-                        {*(task_too_many_cores->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service2)}
+                        {*(task_too_many_cores->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
+                                this->test->storage_service1)},
+                        {*(task_too_many_cores->getOutputFiles().begin()), wrench::FileLocation::LOCATION(
+                                this->test->storage_service2)}
                 },
                 {},
                 {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
-                        this->getWorkflow()->getFileByID("output_file"), wrench::FileLocation::LOCATION(this->test->storage_service2),
+                        this->getWorkflow()->getFileByID("output_file"),
+                        wrench::FileLocation::LOCATION(this->test->storage_service2),
                         wrench::FileLocation::LOCATION(this->test->storage_service1))},
-                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("output_file"),
-                                                                                           wrench::FileLocation::LOCATION(this->test->storage_service2))});
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(
+                        this->getWorkflow()->getFileByID("output_file"),
+                        wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
         try {
             executor = std::shared_ptr<wrench::StandardJobExecutor>(
@@ -366,16 +378,15 @@ private:
                             {{wrench::StandardJobExecutorProperty::TASK_STARTUP_OVERHEAD, std::to_string(
                                     thread_startup_overhead)}}, {}
                     ));
-            throw std::runtime_error("Should not be able to create a standard job executor with insufficient RAM to run the job");
+            throw std::runtime_error(
+                    "Should not be able to create a standard job executor with insufficient RAM to run the job");
         } catch (std::invalid_argument &e) {
         }
 
-
         // Create a bogus StandardJobExecutor (not enough RAM specified)
-
-
         this->getWorkflow()->removeTask(task_too_many_cores);
-        wrench::WorkflowTask *task_too_much_ram = this->getWorkflow()->addTask("task_too_much_ram", 3600, 1, 1, 1.0, 500.00);
+        wrench::WorkflowTask *task_too_much_ram = this->getWorkflow()->addTask("task_too_much_ram", 3600, 1, 1, 1.0,
+                                                                               500.00);
         task_too_much_ram->addInputFile(this->getWorkflow()->getFileByID("input_file"));
         task_too_much_ram->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
 
@@ -386,15 +397,19 @@ private:
         job = job_manager->createStandardJob(
                 {task_too_much_ram},
                 {
-                        {*(task_too_much_ram->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
-                        {*(task_too_much_ram->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service2)}
+                        {*(task_too_much_ram->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
+                                this->test->storage_service1)},
+                        {*(task_too_much_ram->getOutputFiles().begin()), wrench::FileLocation::LOCATION(
+                                this->test->storage_service2)}
                 },
                 {},
                 {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
-                        this->getWorkflow()->getFileByID("output_file"), wrench::FileLocation::LOCATION(this->test->storage_service2),
+                        this->getWorkflow()->getFileByID("output_file"),
+                        wrench::FileLocation::LOCATION(this->test->storage_service2),
                         wrench::FileLocation::LOCATION(this->test->storage_service1))},
-                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("output_file"),
-                                                                                           wrench::FileLocation::LOCATION(this->test->storage_service2))});
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(
+                        this->getWorkflow()->getFileByID("output_file"),
+                        wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
         try {
             executor = std::shared_ptr<wrench::StandardJobExecutor>(
@@ -410,7 +425,8 @@ private:
                             {{wrench::StandardJobExecutorProperty::TASK_STARTUP_OVERHEAD, std::to_string(
                                     thread_startup_overhead)}}, {}
                     ));
-            throw std::runtime_error("Should not be able to create a standard job executor with insufficient RAM to run the job");
+            throw std::runtime_error(
+                    "Should not be able to create a standard job executor with insufficient RAM to run the job");
         } catch (std::invalid_argument &e) {
         }
 
@@ -428,15 +444,19 @@ private:
         job = job_manager->createStandardJob(
                 {task},
                 {
-                        {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
-                        {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service2)}
+                        {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
+                                this->test->storage_service1)},
+                        {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(
+                                this->test->storage_service2)}
                 },
                 {},
                 {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
-                        this->getWorkflow()->getFileByID("output_file"), wrench::FileLocation::LOCATION(this->test->storage_service2),
+                        this->getWorkflow()->getFileByID("output_file"),
+                        wrench::FileLocation::LOCATION(this->test->storage_service2),
                         wrench::FileLocation::LOCATION(this->test->storage_service1))},
-                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("output_file"),
-                                                                                           wrench::FileLocation::LOCATION(this->test->storage_service2))});
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(
+                        this->getWorkflow()->getFileByID("output_file"),
+                        wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
         try {
             executor = std::shared_ptr<wrench::StandardJobExecutor>(
@@ -445,7 +465,8 @@ private:
                             my_mailbox,
                             wrench::Simulation::getHostnameList()[0],
                             job,
-                            {std::make_pair("Host1", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                            {std::make_pair("Host1", std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                     wrench::ComputeService::ALL_RAM))},
                             nullptr,
                             false,
                             nullptr,
@@ -483,7 +504,6 @@ TEST_F(StandardJobExecutorTest, ConstructorTest) {
 }
 
 void StandardJobExecutorTest::do_StandardJobExecutorConstructorTest_test() {
-
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
     int argc = 1;
@@ -503,7 +523,9 @@ void StandardJobExecutorTest::do_StandardJobExecutorConstructorTest_test() {
     std::shared_ptr<wrench::ComputeService> compute_service;
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname1,
-                                                {std::make_pair(hostname1, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                {std::make_pair(hostname1,
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                wrench::ComputeService::ALL_RAM))},
                                                 {})));
 
     // Create a Storage Service
@@ -518,7 +540,7 @@ void StandardJobExecutorTest::do_StandardJobExecutorConstructorTest_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
             new StandardJobExecutorConstructorTestWMS(
-                    this,  {compute_service}, {storage_service1, storage_service2}, hostname1)));
+                    this, {compute_service}, {storage_service1, storage_service2}, hostname1)));
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
@@ -531,7 +553,6 @@ void StandardJobExecutorTest::do_StandardJobExecutorConstructorTest_test() {
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-
     // Running a "run a single task" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
@@ -542,7 +563,6 @@ void StandardJobExecutorTest::do_StandardJobExecutorConstructorTest_test() {
     free(argv[0]);
     free(argv);
 }
-
 
 /**********************************************************************/
 /**  ONE SINGLE-CORE TASK SIMULATION TEST ON ONE HOST                **/
@@ -555,20 +575,16 @@ public:
                              const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                              const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                              std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
-
 private:
-
     StandardJobExecutorTest *test;
 
     int main() {
-
         // Create a job manager
         auto job_manager = this->createJobManager();
-
 
         {
             // Create a sequential task that lasts one hour
@@ -580,21 +596,24 @@ private:
             wrench::StandardJob *job = job_manager->createStandardJob(
                     {task},
                     {
-                            {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
-                            {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service2)}
+                            {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
+                                    this->test->storage_service1)},
+                            {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(
+                                    this->test->storage_service2)}
                     },
                     {},
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
-                            this->getWorkflow()->getFileByID("output_file"), wrench::FileLocation::LOCATION(this->test->storage_service2),
+                            this->getWorkflow()->getFileByID("output_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2),
                             wrench::FileLocation::LOCATION(this->test->storage_service1))},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("output_file"),
-                                                                                               wrench::FileLocation::LOCATION(this->test->storage_service2))});
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("output_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
             std::string my_mailbox = "test_callback_mailbox";
 
             double before = wrench::S4U_Simulation::getClock();
             double thread_startup_overhead = 10.0;
-
 
             // Create a StandardJobExecutor that will run stuff on one host and one core
             std::shared_ptr<wrench::StandardJobExecutor> executor = std::shared_ptr<wrench::StandardJobExecutor>(
@@ -603,7 +622,8 @@ private:
                             my_mailbox,
                             "Host1",
                             job,
-                            {std::make_pair(wrench::Simulation::getHostnameList()[0], std::make_tuple(2, wrench::ComputeService::ALL_RAM))},
+                            {std::make_pair(wrench::Simulation::getHostnameList()[0],
+                                            std::make_tuple(2, wrench::ComputeService::ALL_RAM))},
                             nullptr,
                             false,
                             nullptr,
@@ -617,7 +637,8 @@ private:
             try {
                 message = wrench::S4U_Mailbox::getMessage(my_mailbox);
             } catch (std::shared_ptr<wrench::NetworkError> &cause) {
-                throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
+                throw std::runtime_error(
+                        "Network error while getting reply from StandardJobExecutor!" + cause->toString());
             }
 
             // Did we get the expected message?
@@ -678,7 +699,6 @@ TEST_F(StandardJobExecutorTest, OneSingleCoreTaskTest) {
 }
 
 void StandardJobExecutorTest::do_OneSingleCoreTaskTest_test() {
-
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
     int argc = 1;
@@ -698,7 +718,9 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskTest_test() {
     std::shared_ptr<wrench::ComputeService> compute_service;
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname1,
-                                                {std::make_pair(hostname1, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                {std::make_pair(hostname1,
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                wrench::ComputeService::ALL_RAM))},
                                                 {})));
 
     // Create a Storage Service
@@ -713,7 +735,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskTest_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new OneSingleCoreTaskTestWMS(
-                    this,  {compute_service}, {storage_service1, storage_service2}, hostname1)));
+                    this, {compute_service}, {storage_service1, storage_service2}, hostname1)));
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
@@ -726,7 +748,6 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskTest_test() {
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-
     // Running a "run a single task" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
@@ -737,8 +758,6 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskTest_test() {
     free(argv[0]);
     free(argv);
 }
-
-
 
 /****************************************************************************/
 /**  ONE SINGLE-CORE TASK SIMULATION TEST ON ONE HOST: BOGUS PRE FILE COPY **/
@@ -751,17 +770,14 @@ public:
                                              const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                              const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                              std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
-
 private:
-
     StandardJobExecutorTest *test;
 
     int main() {
-
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -781,19 +797,22 @@ private:
             wrench::StandardJob *job = job_manager->createStandardJob(
                     {task},
                     {
-                            {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
-                            {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service2)}
+                            {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
+                                    this->test->storage_service1)},
+                            {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(
+                                    this->test->storage_service2)}
                     },
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
-                            this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service2),
+                            this->getWorkflow()->getFileByID("input_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2),
                             wrench::FileLocation::LOCATION(this->test->storage_service1))},
                     {},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("output_file"),
-                                                                                               wrench::FileLocation::LOCATION(this->test->storage_service2))});
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("output_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
 
             std::string my_mailbox = "test_callback_mailbox";
-
 
             // Create a StandardJobExecutor that will run stuff on one host and two core
             double thread_startup_overhead = 10.0;
@@ -803,7 +822,8 @@ private:
                         my_mailbox,
                         wrench::Simulation::getHostnameList()[0],
                         job,
-                        {std::make_pair(wrench::Simulation::getHostnameList()[0], std::make_tuple(2, wrench::ComputeService::ALL_RAM))},
+                        {std::make_pair(wrench::Simulation::getHostnameList()[0],
+                                        std::make_tuple(2, wrench::ComputeService::ALL_RAM))},
                         nullptr,
                         false,
                         nullptr,
@@ -820,7 +840,8 @@ private:
             try {
                 message = wrench::S4U_Mailbox::getMessage(my_mailbox);
             } catch (std::shared_ptr<wrench::NetworkError> &cause) {
-                throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
+                throw std::runtime_error(
+                        "Network error while getting reply from StandardJobExecutor!" + cause->toString());
             }
 
             // Did we get the expected message?
@@ -858,7 +879,6 @@ TEST_F(StandardJobExecutorTest, OneSingleCoreTaskBogusPreFileCopyTest) {
 }
 
 void StandardJobExecutorTest::do_OneSingleCoreTaskBogusPreFileCopyTest_test() {
-
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
     int argc = 1;
@@ -878,7 +898,9 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskBogusPreFileCopyTest_test() {
     std::shared_ptr<wrench::ComputeService> compute_service;
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname1,
-                                                {std::make_pair(hostname1, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                {std::make_pair(hostname1,
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                wrench::ComputeService::ALL_RAM))},
                                                 {})));
 
     // Create a Storage Service
@@ -893,7 +915,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskBogusPreFileCopyTest_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new OneSingleCoreTaskBogusPreFileCopyTestWMS(
-                    this,  {compute_service}, {storage_service1, storage_service2}, hostname1)));
+                    this, {compute_service}, {storage_service1, storage_service2}, hostname1)));
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
@@ -906,7 +928,6 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskBogusPreFileCopyTest_test() {
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-
     // Running a "run a single task" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
@@ -917,10 +938,6 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskBogusPreFileCopyTest_test() {
     free(argv[0]);
     free(argv);
 }
-
-
-
-
 
 /*************************************************************************/
 /**  ONE SINGLE-CORE TASK SIMULATION TEST ON ONE HOST: MISSING FILE **/
@@ -933,17 +950,15 @@ public:
                                         const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                         const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                         std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
 
 private:
-
     StandardJobExecutorTest *test;
 
     int main() {
-
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -963,18 +978,20 @@ private:
             wrench::StandardJob *job = job_manager->createStandardJob(
                     {task},
                     {
-                            {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service2)},
-                            {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service2)}
+                            {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
+                                    this->test->storage_service2)},
+                            {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(
+                                    this->test->storage_service2)}
                     },
                     {},
                     {},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("output_file"),
-                                                                                               wrench::FileLocation::LOCATION(this->test->storage_service2))});
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("output_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
             job->getFileLocations(); // coverage
             job->getPriority(); // coverage
             job->getMinimumRequiredNumCores(); // coverage
-
 
             std::string my_mailbox = "test_callback_mailbox";
 
@@ -987,7 +1004,8 @@ private:
                         my_mailbox,
                         wrench::Simulation::getHostnameList()[1],
                         job,
-                        {std::make_pair(wrench::Simulation::getHostnameList()[1], std::make_tuple(2, wrench::ComputeService::ALL_RAM))},
+                        {std::make_pair(wrench::Simulation::getHostnameList()[1],
+                                        std::make_tuple(2, wrench::ComputeService::ALL_RAM))},
                         nullptr,
                         false,
                         nullptr,
@@ -1004,7 +1022,8 @@ private:
             try {
                 message = wrench::S4U_Mailbox::getMessage(my_mailbox);
             } catch (std::shared_ptr<wrench::NetworkError> &cause) {
-                throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
+                throw std::runtime_error(
+                        "Network error while getting reply from StandardJobExecutor!" + cause->toString());
             }
 
             // Did we get the expected message?
@@ -1042,7 +1061,6 @@ TEST_F(StandardJobExecutorTest, OneSingleCoreTaskMissingFileTest) {
 }
 
 void StandardJobExecutorTest::do_OneSingleCoreTaskMissingFileTest_test() {
-
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
     int argc = 1;
@@ -1062,7 +1080,9 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskMissingFileTest_test() {
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname1,
-                                                {std::make_pair(hostname1, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                {std::make_pair(hostname1,
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                wrench::ComputeService::ALL_RAM))},
                                                 {})));
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
@@ -1076,7 +1096,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskMissingFileTest_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new OneSingleCoreTaskMissingFileTestWMS(
-                    this,  {compute_service}, {storage_service1, storage_service2}, hostname1)));
+                    this, {compute_service}, {storage_service1, storage_service2}, hostname1)));
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
@@ -1089,7 +1109,6 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskMissingFileTest_test() {
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-
     // Running a "run a single task" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
@@ -1100,9 +1119,6 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskMissingFileTest_test() {
     free(argv[0]);
     free(argv);
 }
-
-
-
 
 /**********************************************************************/
 /**  STANDARD JOB WITH DEPENDENT TASKS                               **/
@@ -1115,20 +1131,16 @@ public:
                           const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                           const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                           std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
-
 private:
-
     StandardJobExecutorTest *test;
 
     int main() {
-
         // Create a job manager
         auto job_manager = this->createJobManager();
-
 
         {
 
@@ -1187,8 +1199,9 @@ private:
                             my_mailbox,
                             wrench::Simulation::getHostnameList()[0],
                             job,
-                            {std::make_pair(wrench::Simulation::getHostnameList()[0], std::make_tuple(2, wrench::ComputeService::ALL_RAM))},
-                            this->test->storage_service1 , // This should be a scratch space of a compute service, but since this
+                            {std::make_pair(wrench::Simulation::getHostnameList()[0],
+                                            std::make_tuple(2, wrench::ComputeService::ALL_RAM))},
+                            this->test->storage_service1, // This should be a scratch space of a compute service, but since this
                             //standard job executor is being created direclty (not by any Compute Service), we pass a dummy storage as a scratch space
                             false,
                             nullptr,
@@ -1203,7 +1216,8 @@ private:
             try {
                 message = wrench::S4U_Mailbox::getMessage(my_mailbox);
             } catch (std::shared_ptr<wrench::NetworkError> &cause) {
-                throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
+                throw std::runtime_error(
+                        "Network error while getting reply from StandardJobExecutor!" + cause->toString());
             }
 
             // Did we get the expected message?
@@ -1251,7 +1265,6 @@ TEST_F(StandardJobExecutorTest, DependentTasksTest) {
 }
 
 void StandardJobExecutorTest::do_DependentTasksTest_test() {
-
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
     int argc = 1;
@@ -1274,14 +1287,16 @@ void StandardJobExecutorTest::do_DependentTasksTest_test() {
     std::shared_ptr<wrench::ComputeService> compute_service;
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                {std::make_pair(hostname,
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                wrench::ComputeService::ALL_RAM))},
                                                 {})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new DependentTasksTestWMS(
-                    this,  {compute_service}, {storage_service1}, hostname)));
+                    this, {compute_service}, {storage_service1}, hostname)));
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
@@ -1293,12 +1308,10 @@ void StandardJobExecutorTest::do_DependentTasksTest_test() {
     free(argv);
 }
 
-
 /*******************************************************************************************/
 /**  ONE MULTI-CORE TASK SIMULATION TEST : CASE 1                                         **/
 /**  Case 1: Create a multicore task with perfect parallel efficiency that lasts one hour **/
 /*******************************************************************************************/
-
 
 class OneMultiCoreTaskTestWMSCase1 : public wrench::WMS {
 
@@ -1307,17 +1320,14 @@ public:
                                  const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                  const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                  std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
-
 private:
-
     StandardJobExecutorTest *test;
 
     int main() {
-
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -1329,8 +1339,10 @@ private:
         wrench::StandardJob *job = job_manager->createStandardJob(
                 task,
                 {
-                        {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
-                        {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service1)}
+                        {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
+                                this->test->storage_service1)},
+                        {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(
+                                this->test->storage_service1)}
                 });
 
         std::string my_mailbox = "test_callback_mailbox";
@@ -1344,7 +1356,8 @@ private:
                         my_mailbox,
                         wrench::Simulation::getHostnameList()[1],
                         job,
-                        {std::make_pair(wrench::Simulation::getHostnameList()[1], std::make_tuple(6, wrench::ComputeService::ALL_RAM))},
+                        {std::make_pair(wrench::Simulation::getHostnameList()[1],
+                                        std::make_tuple(6, wrench::ComputeService::ALL_RAM))},
                         nullptr,
                         false,
                         nullptr,
@@ -1391,7 +1404,6 @@ TEST_F(StandardJobExecutorTest, OneMultiCoreTaskTestCase1) {
 }
 
 void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase1_test() {
-
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
     int argc = 1;
@@ -1410,7 +1422,9 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase1_test() {
     std::shared_ptr<wrench::ComputeService> compute_service;
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                {std::make_pair(hostname,
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                wrench::ComputeService::ALL_RAM))},
                                                 {})));
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
@@ -1420,7 +1434,7 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase1_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new OneMultiCoreTaskTestWMSCase1(
-                    this,  {compute_service}, {storage_service1}, hostname)));
+                    this, {compute_service}, {storage_service1}, hostname)));
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
@@ -1445,8 +1459,6 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase1_test() {
     free(argv);
 }
 
-
-
 /*******************************************************************************************/
 /**  ONE MULTI-CORE TASK SIMULATION TEST : CASE 2                                         **/
 /**  Case 2: Create a multicore task with 50% parallel efficiency that lasts one hour     **/
@@ -1459,17 +1471,14 @@ public:
                                  const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                  const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                  std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
-
 private:
-
     StandardJobExecutorTest *test;
 
     int main() {
-
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -1481,8 +1490,10 @@ private:
         wrench::StandardJob *job = job_manager->createStandardJob(
                 task,
                 {
-                        {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
-                        {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service1)}
+                        {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
+                                this->test->storage_service1)},
+                        {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(
+                                this->test->storage_service1)}
                 });
 
         std::string my_mailbox = "test_callback_mailbox";
@@ -1496,7 +1507,8 @@ private:
                         my_mailbox,
                         wrench::Simulation::getHostnameList()[1],
                         job,
-                        {std::make_pair(wrench::Simulation::getHostnameList()[1], std::make_tuple(10, wrench::ComputeService::ALL_RAM))},
+                        {std::make_pair(wrench::Simulation::getHostnameList()[1],
+                                        std::make_tuple(10, wrench::ComputeService::ALL_RAM))},
                         nullptr,
                         false,
                         nullptr,
@@ -1547,7 +1559,6 @@ TEST_F(StandardJobExecutorTest, OneMultiCoreTaskTestCase2) {
 }
 
 void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase2_test() {
-
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
     int argc = 1;
@@ -1566,7 +1577,9 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase2_test() {
     std::shared_ptr<wrench::ComputeService> compute_service;
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                {std::make_pair(hostname,
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                wrench::ComputeService::ALL_RAM))},
                                                 {})));
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
@@ -1576,7 +1589,7 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase2_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new OneMultiCoreTaskTestWMSCase2(
-                    this,  {compute_service}, {storage_service1}, hostname)));
+                    this, {compute_service}, {storage_service1}, hostname)));
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
@@ -1589,7 +1602,6 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase2_test() {
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-
     // Running a "run a single task" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
@@ -1601,13 +1613,10 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase2_test() {
     free(argv);
 }
 
-
-
 /*******************************************************************************************************/
 /**  ONE MULTI-CORE TASK SIMULATION TEST : CASE 3                                                     **/
 /**  Case 3: Create a multicore task with 50% parallel efficiency and include thread startup overhead **/
 /*******************************************************************************************************/
-
 
 class OneMultiCoreTaskTestWMSCase3 : public wrench::WMS {
 
@@ -1616,17 +1625,14 @@ public:
                                  const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                  const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                  std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
-
 private:
-
     StandardJobExecutorTest *test;
 
     int main() {
-
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -1638,8 +1644,10 @@ private:
         wrench::StandardJob *job = job_manager->createStandardJob(
                 task,
                 {
-                        {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
-                        {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service1)}
+                        {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
+                                this->test->storage_service1)},
+                        {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(
+                                this->test->storage_service1)}
                 });
 
         std::string my_mailbox = "test_callback_mailbox";
@@ -1654,7 +1662,8 @@ private:
                         my_mailbox,
                         wrench::Simulation::getHostnameList()[1],
                         job,
-                        {std::make_pair(wrench::Simulation::getHostnameList()[1], std::make_tuple(10, wrench::ComputeService::ALL_RAM))},
+                        {std::make_pair(wrench::Simulation::getHostnameList()[1],
+                                        std::make_tuple(10, wrench::ComputeService::ALL_RAM))},
                         nullptr,
                         false,
                         nullptr,
@@ -1705,7 +1714,6 @@ TEST_F(StandardJobExecutorTest, OneMultiCoreTaskTestCase3) {
 }
 
 void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase3_test() {
-
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
     int argc = 1;
@@ -1724,7 +1732,9 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase3_test() {
     std::shared_ptr<wrench::ComputeService> compute_service;
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                {std::make_pair(hostname,
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                wrench::ComputeService::ALL_RAM))},
                                                 {})));
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
@@ -1734,7 +1744,7 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase3_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new OneMultiCoreTaskTestWMSCase3(
-                    this,  {compute_service}, {storage_service1}, hostname)));
+                    this, {compute_service}, {storage_service1}, hostname)));
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
@@ -1747,7 +1757,6 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase3_test() {
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-
     // Running a "run a single task" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
@@ -1758,9 +1767,6 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase3_test() {
     free(argv[0]);
     free(argv);
 }
-
-
-
 
 /**********************************************************************/
 /**  TWO MULTI-CORE TASKS SIMULATION TEST ON ONE HOST               **/
@@ -1777,16 +1783,12 @@ public:
         this->test = test;
     }
 
-
 private:
-
     StandardJobExecutorTest *test;
 
     int main() {
-
         // Create a job manager
         auto job_manager = this->createJobManager();
-
 
         /** Case 1: Create two tasks that will run in sequence with the default scheduling options **/
         {
@@ -1800,15 +1802,19 @@ private:
             wrench::StandardJob *job = job_manager->createStandardJob(
                     {task1, task2},
                     {
-                            {this->getWorkflow()->getFileByID("input_file"),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
-                            {this->getWorkflow()->getFileByID("output_file"), wrench::FileLocation::LOCATION(this->test->storage_service1)}
+                            {this->getWorkflow()->getFileByID("input_file"),  wrench::FileLocation::LOCATION(
+                                    this->test->storage_service1)},
+                            {this->getWorkflow()->getFileByID("output_file"), wrench::FileLocation::LOCATION(
+                                    this->test->storage_service1)}
                     },
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
-                            this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
+                            this->getWorkflow()->getFileByID("input_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service1),
                             wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                               wrench::FileLocation::LOCATION(this->test->storage_service2))}
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))}
             );
 
             std::string my_mailbox = "test_callback_mailbox";
@@ -1822,7 +1828,8 @@ private:
                             my_mailbox,
                             wrench::Simulation::getHostnameList()[0],
                             job,
-                            {std::make_pair(wrench::Simulation::getHostnameList()[0], std::make_tuple(10, wrench::ComputeService::ALL_RAM))},
+                            {std::make_pair(wrench::Simulation::getHostnameList()[0],
+                                            std::make_tuple(10, wrench::ComputeService::ALL_RAM))},
                             nullptr,
                             false,
                             nullptr,
@@ -1835,7 +1842,8 @@ private:
             try {
                 message = wrench::S4U_Mailbox::getMessage(my_mailbox);
             } catch (std::shared_ptr<wrench::NetworkError> &cause) {
-                throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
+                throw std::runtime_error(
+                        "Network error while getting reply from StandardJobExecutor!" + cause->toString());
             }
 
             // Did we get the expected message?
@@ -1859,7 +1867,8 @@ private:
             }
 
             // Do individual task completion times make sense?
-            if (!StandardJobExecutorTest::isJustABitGreater(before + task1->getFlops() / 6, task1->getEndDate(), EPSILON)) {
+            if (!StandardJobExecutorTest::isJustABitGreater(before + task1->getFlops() / 6, task1->getEndDate(),
+                                                            EPSILON)) {
                 throw std::runtime_error("Case 1: Unexpected task1 end date: " + std::to_string(task1->getEndDate()));
             }
 
@@ -1875,7 +1884,6 @@ private:
                                                wrench::FileLocation::LOCATION(this->test->storage_service1));
         }
 
-
         /** Case 2: Create two tasks that will run in parallel with the default scheduling options **/
         {
             wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task2.1", 3600, 6, 6, 1.0, 0);
@@ -1888,15 +1896,19 @@ private:
             wrench::StandardJob *job = job_manager->createStandardJob(
                     {task1, task2},
                     {
-                            {this->getWorkflow()->getFileByID("input_file"),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
-                            {this->getWorkflow()->getFileByID("output_file"), wrench::FileLocation::LOCATION(this->test->storage_service1)}
+                            {this->getWorkflow()->getFileByID("input_file"),  wrench::FileLocation::LOCATION(
+                                    this->test->storage_service1)},
+                            {this->getWorkflow()->getFileByID("output_file"), wrench::FileLocation::LOCATION(
+                                    this->test->storage_service1)}
                     },
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
-                            this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
+                            this->getWorkflow()->getFileByID("input_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service1),
                             wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                               wrench::FileLocation::LOCATION(this->test->storage_service2))}
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))}
             );
 
             std::string my_mailbox = "test_callback_mailbox";
@@ -1910,7 +1922,8 @@ private:
                             my_mailbox,
                             wrench::Simulation::getHostnameList()[0],
                             job,
-                            {std::make_pair(wrench::Simulation::getHostnameList()[0], std::make_tuple(10, wrench::ComputeService::ALL_RAM))},
+                            {std::make_pair(wrench::Simulation::getHostnameList()[0],
+                                            std::make_tuple(10, wrench::ComputeService::ALL_RAM))},
                             nullptr,
                             false,
                             nullptr,
@@ -1923,7 +1936,8 @@ private:
             try {
                 message = wrench::S4U_Mailbox::getMessage(my_mailbox);
             } catch (std::shared_ptr<wrench::NetworkError> &cause) {
-                throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
+                throw std::runtime_error(
+                        "Network error while getting reply from StandardJobExecutor!" + cause->toString());
             }
 
             // Did we get the expected message?
@@ -1947,11 +1961,13 @@ private:
             }
 
             // Do individual task completion times make sense?
-            if (!StandardJobExecutorTest::isJustABitGreater(before + task1->getFlops() / 6, task1->getEndDate(), EPSILON)) {
+            if (!StandardJobExecutorTest::isJustABitGreater(before + task1->getFlops() / 6, task1->getEndDate(),
+                                                            EPSILON)) {
                 throw std::runtime_error("Case 2: Unexpected task1 end date: " + std::to_string(task1->getEndDate()));
             }
 
-            if (!StandardJobExecutorTest::isJustABitGreater(before + task2->getFlops() / 4, task2->getEndDate(), EPSILON)) {
+            if (!StandardJobExecutorTest::isJustABitGreater(before + task2->getFlops() / 4, task2->getEndDate(),
+                                                            EPSILON)) {
                 throw std::runtime_error("Case 2: Unexpected task2 end date: " + std::to_string(task2->getEndDate()));
             }
 
@@ -1962,7 +1978,6 @@ private:
                     wrench::FileLocation::LOCATION(this->test->storage_service1));
 
         }
-
 
         /** Case 3: Create three tasks that will run in parallel and then sequential with the default scheduling options **/
         {
@@ -1978,8 +1993,10 @@ private:
             wrench::StandardJob *job = job_manager->createStandardJob(
                     {task1, task2, task3},
                     {
-                            {this->getWorkflow()->getFileByID("input_file"),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
-                            {this->getWorkflow()->getFileByID("output_file"), wrench::FileLocation::LOCATION(this->test->storage_service1)}
+                            {this->getWorkflow()->getFileByID("input_file"),  wrench::FileLocation::LOCATION(
+                                    this->test->storage_service1)},
+                            {this->getWorkflow()->getFileByID("output_file"), wrench::FileLocation::LOCATION(
+                                    this->test->storage_service1)}
                     },
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
                             this->getWorkflow()->getFileByID("input_file"),
@@ -2002,7 +2019,8 @@ private:
                             my_mailbox,
                             wrench::Simulation::getHostnameList()[0],
                             job,
-                            {std::make_pair(wrench::Simulation::getHostnameList()[0], std::make_tuple(10, wrench::ComputeService::ALL_RAM))},
+                            {std::make_pair(wrench::Simulation::getHostnameList()[0],
+                                            std::make_tuple(10, wrench::ComputeService::ALL_RAM))},
                             nullptr,
                             false,
                             nullptr,
@@ -2015,7 +2033,8 @@ private:
             try {
                 message = wrench::S4U_Mailbox::getMessage(my_mailbox);
             } catch (std::shared_ptr<wrench::NetworkError> &cause) {
-                throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
+                throw std::runtime_error(
+                        "Network error while getting reply from StandardJobExecutor!" + cause->toString());
             }
 
             // Did we get the expected message?
@@ -2040,10 +2059,12 @@ private:
             }
 
             // Do the individual task completion times make sense
-            if (!StandardJobExecutorTest::isJustABitGreater(before + task1->getFlops() / 6.0, task1->getEndDate(), EPSILON)) {
+            if (!StandardJobExecutorTest::isJustABitGreater(before + task1->getFlops() / 6.0, task1->getEndDate(),
+                                                            EPSILON)) {
                 throw std::runtime_error("Case 3: Unexpected task1 end date: " + std::to_string(task1->getEndDate()));
             }
-            if (!StandardJobExecutorTest::isJustABitGreater(before + task2->getFlops() / 4.0, task2->getEndDate(), EPSILON)) {
+            if (!StandardJobExecutorTest::isJustABitGreater(before + task2->getFlops() / 4.0, task2->getEndDate(),
+                                                            EPSILON)) {
                 throw std::runtime_error("Case 3: Unexpected task1 end date: " + std::to_string(task2->getEndDate()));
             }
             if (!StandardJobExecutorTest::isJustABitGreater(
@@ -2070,7 +2091,6 @@ TEST_F(StandardJobExecutorTest, TwoMultiCoreTasksTest) {
 }
 
 void StandardJobExecutorTest::do_TwoMultiCoreTasksTest_test() {
-
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
     int argc = 1;
@@ -2090,7 +2110,9 @@ void StandardJobExecutorTest::do_TwoMultiCoreTasksTest_test() {
     std::shared_ptr<wrench::ComputeService> compute_service;
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname1,
-                                                {std::make_pair(hostname1, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                {std::make_pair(hostname1,
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                wrench::ComputeService::ALL_RAM))},
                                                 {})));
     // Create a Storage Services
     ASSERT_NO_THROW(storage_service1 = simulation->add(
@@ -2129,7 +2151,6 @@ void StandardJobExecutorTest::do_TwoMultiCoreTasksTest_test() {
     free(argv);
 }
 
-
 /**********************************************************************/
 /**  MULTI-HOST TEST                                                 **/
 /**********************************************************************/
@@ -2141,16 +2162,13 @@ public:
                      const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                      const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                      std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
-
-
 
     StandardJobExecutorTest *test;
 
     int main() {
-
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -2172,15 +2190,19 @@ public:
             wrench::StandardJob *job = job_manager->createStandardJob(
                     {task1, task2},
                     {
-                            {this->getWorkflow()->getFileByID("input_file"),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
-                            {this->getWorkflow()->getFileByID("output_file"), wrench::FileLocation::LOCATION(this->test->storage_service1)}
+                            {this->getWorkflow()->getFileByID("input_file"),  wrench::FileLocation::LOCATION(
+                                    this->test->storage_service1)},
+                            {this->getWorkflow()->getFileByID("output_file"), wrench::FileLocation::LOCATION(
+                                    this->test->storage_service1)}
                     },
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
-                            this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
+                            this->getWorkflow()->getFileByID("input_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service1),
                             wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                               wrench::FileLocation::LOCATION(this->test->storage_service2))}
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))}
             );
 
             std::string my_mailbox = "test_callback_mailbox";
@@ -2194,8 +2216,10 @@ public:
                             my_mailbox,
                             wrench::Simulation::getHostnameList()[0],
                             job,
-                            {std::make_pair(wrench::Simulation::getHostnameList()[0], std::make_tuple(10, wrench::ComputeService::ALL_RAM)),
-                             std::make_pair(wrench::Simulation::getHostnameList()[1], std::make_tuple(10, wrench::ComputeService::ALL_RAM))},
+                            {std::make_pair(wrench::Simulation::getHostnameList()[0],
+                                            std::make_tuple(10, wrench::ComputeService::ALL_RAM)),
+                             std::make_pair(wrench::Simulation::getHostnameList()[1],
+                                            std::make_tuple(10, wrench::ComputeService::ALL_RAM))},
                             nullptr,
                             false,
                             nullptr,
@@ -2208,7 +2232,8 @@ public:
             try {
                 message = wrench::S4U_Mailbox::getMessage(my_mailbox);
             } catch (std::shared_ptr<wrench::NetworkError> &cause) {
-                throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
+                throw std::runtime_error(
+                        "Network error while getting reply from StandardJobExecutor!" + cause->toString());
             }
 
             // Did we get the expected message?
@@ -2232,7 +2257,8 @@ public:
             }
 
             // Do individual task completion times make sense?
-            if (!StandardJobExecutorTest::isJustABitGreater(before + task1->getFlops() / 6, task1->getEndDate(), EPSILON)) {
+            if (!StandardJobExecutorTest::isJustABitGreater(before + task1->getFlops() / 6, task1->getEndDate(),
+                                                            EPSILON)) {
                 throw std::runtime_error("Case 1: Unexpected task1 end date: " + std::to_string(task1->getEndDate()));
             }
 
@@ -2262,15 +2288,19 @@ public:
             wrench::StandardJob *job = job_manager->createStandardJob(
                     {task1, task2, task3, task4},
                     {
-                            {this->getWorkflow()->getFileByID("input_file"),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
-                            {this->getWorkflow()->getFileByID("output_file"), wrench::FileLocation::LOCATION(this->test->storage_service1)}
+                            {this->getWorkflow()->getFileByID("input_file"),  wrench::FileLocation::LOCATION(
+                                    this->test->storage_service1)},
+                            {this->getWorkflow()->getFileByID("output_file"), wrench::FileLocation::LOCATION(
+                                    this->test->storage_service1)}
                     },
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
-                            this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
+                            this->getWorkflow()->getFileByID("input_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service1),
                             wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                               wrench::FileLocation::LOCATION(this->test->storage_service2))}
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))}
             );
 
             std::string my_mailbox = "test_callback_mailbox";
@@ -2284,8 +2314,10 @@ public:
                             my_mailbox,
                             wrench::Simulation::getHostnameList()[0],
                             job,
-                            {std::make_pair(wrench::Simulation::getHostnameList()[0], std::make_tuple(10, wrench::ComputeService::ALL_RAM)),
-                             std::make_pair(wrench::Simulation::getHostnameList()[1], std::make_tuple(10, wrench::ComputeService::ALL_RAM))},
+                            {std::make_pair(wrench::Simulation::getHostnameList()[0],
+                                            std::make_tuple(10, wrench::ComputeService::ALL_RAM)),
+                             std::make_pair(wrench::Simulation::getHostnameList()[1],
+                                            std::make_tuple(10, wrench::ComputeService::ALL_RAM))},
                             nullptr,
                             false,
                             nullptr,
@@ -2298,7 +2330,8 @@ public:
             try {
                 message = wrench::S4U_Mailbox::getMessage(my_mailbox);
             } catch (std::shared_ptr<wrench::NetworkError> &cause) {
-                throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
+                throw std::runtime_error(
+                        "Network error while getting reply from StandardJobExecutor!" + cause->toString());
             }
 
             // Did we get the expected message?
@@ -2315,8 +2348,9 @@ public:
 
             double observed_duration = after - before;
 
-            double expected_duration = std::max(std::max(std::max(task1->getFlops() / 6, task2->getFlops() / 2), task4->getFlops() / 2),
-                                                task3->getFlops() / 8);
+            double expected_duration = std::max(
+                    std::max(std::max(task1->getFlops() / 6, task2->getFlops() / 2), task4->getFlops() / 2),
+                    task3->getFlops() / 8);
 
             // Does the overall completion time make sense?
             if (!StandardJobExecutorTest::isJustABitGreater(expected_duration, observed_duration, EPSILON)) {
@@ -2334,7 +2368,6 @@ public:
 //        if (!StandardJobExecutorTest::isJustABitGreater(before + task2->getFlops()/4, task2->getEndDate())) {
 //          throw std::runtime_error("Case 2: Unexpected task2 end date: " + std::to_string(task2->getEndDate()));
 //        }
-
             this->getWorkflow()->removeTask(task1);
             this->getWorkflow()->removeTask(task2);
             this->getWorkflow()->removeTask(task3);
@@ -2350,7 +2383,6 @@ TEST_F(StandardJobExecutorTest, MultiHostTest) {
 }
 
 void StandardJobExecutorTest::do_MultiHostTest_test() {
-
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
     int argc = 1;
@@ -2369,7 +2401,9 @@ void StandardJobExecutorTest::do_MultiHostTest_test() {
     std::shared_ptr<wrench::ComputeService> compute_service;
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                {std::make_pair(hostname,
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                wrench::ComputeService::ALL_RAM))},
                                                 {})));
     // Create a Storage Services
     ASSERT_NO_THROW(storage_service1 = simulation->add(
@@ -2383,7 +2417,7 @@ void StandardJobExecutorTest::do_MultiHostTest_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new MultiHostTestWMS(
-                    this,  {compute_service}, {storage_service1, storage_service2}, hostname)));
+                    this, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
@@ -2396,7 +2430,6 @@ void StandardJobExecutorTest::do_MultiHostTest_test() {
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-
     // Running a "run a single task" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
@@ -2407,9 +2440,6 @@ void StandardJobExecutorTest::do_MultiHostTest_test() {
     free(argv[0]);
     free(argv);
 }
-
-
-
 
 /**********************************************************************/
 /**  TERMINATION TEST    #1  (DURING COMPUTATION)                    **/
@@ -2422,23 +2452,19 @@ public:
                                             const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                             const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                             std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
-
 private:
-
     StandardJobExecutorTest *test;
 
     int main() {
-
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-
         wrench::StorageService::deleteFile(this->getWorkflow()->getFileByID("input_file"),
-                wrench::FileLocation::LOCATION(this->test->storage_service1));
+                                           wrench::FileLocation::LOCATION(this->test->storage_service1));
         /**  Create a 4-task job and kill it **/
         {
             wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1.1", 3600, 6, 6, 1.0, 0);
@@ -2455,16 +2481,21 @@ private:
                     {task1, task2, task3, task4},
 //                {task1},
                     {
-                            {this->getWorkflow()->getFileByID("input_file"),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
-                            {this->getWorkflow()->getFileByID("output_file1"), wrench::FileLocation::LOCATION(this->test->storage_service1)},
-                            {this->getWorkflow()->getFileByID("output_file2"), wrench::FileLocation::LOCATION(this->test->storage_service1)},
+                            {this->getWorkflow()->getFileByID("input_file"),   wrench::FileLocation::LOCATION(
+                                    this->test->storage_service1)},
+                            {this->getWorkflow()->getFileByID("output_file1"), wrench::FileLocation::LOCATION(
+                                    this->test->storage_service1)},
+                            {this->getWorkflow()->getFileByID("output_file2"), wrench::FileLocation::LOCATION(
+                                    this->test->storage_service1)},
                     },
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
-                            this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
+                            this->getWorkflow()->getFileByID("input_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service1),
                             wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                               wrench::FileLocation::LOCATION(this->test->storage_service2))}
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))}
             );
 
             std::string my_mailbox = "test_callback_mailbox";
@@ -2511,7 +2542,6 @@ TEST_F(StandardJobExecutorTest, JobTerminationTestDuringAComputation) {
 }
 
 void StandardJobExecutorTest::do_JobTerminationTestDuringAComputation_test() {
-
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
     int argc = 1;
@@ -2527,7 +2557,9 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringAComputation_test() {
     std::shared_ptr<wrench::ComputeService> compute_service;
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService("Host3",
-                                                {std::make_pair("Host3", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                {std::make_pair("Host3",
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                wrench::ComputeService::ALL_RAM))},
                                                 {})));
     // Create a Storage Services
     ASSERT_NO_THROW(storage_service1 = simulation->add(
@@ -2541,7 +2573,7 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringAComputation_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new JobTerminationTestDuringAComputationWMS(
-                    this,  {compute_service}, {storage_service1, storage_service2}, "Host3")));
+                    this, {compute_service}, {storage_service1, storage_service2}, "Host3")));
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
@@ -2580,20 +2612,16 @@ public:
                                          const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                          const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                          std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
-
 private:
-
     StandardJobExecutorTest *test;
 
     int main() {
-
         // Create a job manager
         auto job_manager = this->createJobManager();
-
 
         /**  Create a 4-task job and kill it **/
         {
@@ -2610,16 +2638,21 @@ private:
             wrench::StandardJob *job = job_manager->createStandardJob(
                     {task1, task2, task3, task4},
                     {
-                            {this->getWorkflow()->getFileByID("input_file"),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
-                            {this->getWorkflow()->getFileByID("output_file1"), wrench::FileLocation::LOCATION(this->test->storage_service1)},
-                            {this->getWorkflow()->getFileByID("output_file2"), wrench::FileLocation::LOCATION(this->test->storage_service1)}
+                            {this->getWorkflow()->getFileByID("input_file"),   wrench::FileLocation::LOCATION(
+                                    this->test->storage_service1)},
+                            {this->getWorkflow()->getFileByID("output_file1"), wrench::FileLocation::LOCATION(
+                                    this->test->storage_service1)},
+                            {this->getWorkflow()->getFileByID("output_file2"), wrench::FileLocation::LOCATION(
+                                    this->test->storage_service1)}
                     },
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
-                            this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
+                            this->getWorkflow()->getFileByID("input_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service1),
                             wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                               wrench::FileLocation::LOCATION(this->test->storage_service2))}
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))}
             );
 
             std::string my_mailbox = "test_callback_mailbox";
@@ -2665,7 +2698,6 @@ TEST_F(StandardJobExecutorTest, JobTerminationTestDuringATransfer) {
 }
 
 void StandardJobExecutorTest::do_JobTerminationTestDuringATransfer_test() {
-
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
     int argc = 1;
@@ -2681,7 +2713,9 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringATransfer_test() {
     std::shared_ptr<wrench::ComputeService> compute_service;
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService("Host3",
-                                                {std::make_pair("Host3", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                {std::make_pair("Host3",
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                wrench::ComputeService::ALL_RAM))},
                                                 {})));
     // Create a Storage Services
     ASSERT_NO_THROW(storage_service1 = simulation->add(
@@ -2721,7 +2755,6 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringATransfer_test() {
     free(argv);
 }
 
-
 /**********************************************************************/
 /**  TERMINATION TEST    #3 (RANDOM TIME)                            **/
 /**********************************************************************/
@@ -2733,16 +2766,14 @@ public:
                                        const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                        const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                        std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
 private:
-
     StandardJobExecutorTest *test;
 
     int main() {
-
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -2758,16 +2789,18 @@ private:
 
         unsigned long NUM_TRIALS = 150;
 
-        for (unsigned long trial = 0; trial < NUM_TRIALS; trial++) {
-            WRENCH_INFO("Trial %lu", trial);
+        for (unsigned long trial = 0; trial < NUM_TRIALS; trial++) { WRENCH_INFO("Trial %lu", trial);
 
             /**  Create a 4-task job and kill it **/
             {
-                wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task" + std::to_string(trial) + ".1", 3600, 6, 6, 1.0, 0);
-                wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task" + std::to_string(trial) + ".2", 1000, 2, 2, 1.0, 0);
-                wrench::WorkflowTask *task3 = this->getWorkflow()->addTask("task" + std::to_string(trial) + ".3", 800, 7, 7, 1.0, 0);
-                wrench::WorkflowTask *task4 = this->getWorkflow()->addTask("task" + std::to_string(trial) + ".4", 600, 2, 2, 1.0, 0);
-
+                wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task" + std::to_string(trial) + ".1", 3600,
+                                                                           6, 6, 1.0, 0);
+                wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task" + std::to_string(trial) + ".2", 1000,
+                                                                           2, 2, 1.0, 0);
+                wrench::WorkflowTask *task3 = this->getWorkflow()->addTask("task" + std::to_string(trial) + ".3", 800,
+                                                                           7, 7, 1.0, 0);
+                wrench::WorkflowTask *task4 = this->getWorkflow()->addTask("task" + std::to_string(trial) + ".4", 600,
+                                                                           2, 2, 1.0, 0);
                 task1->addInputFile(this->getWorkflow()->getFileByID("input_file"));
 //          task1->addOutputFile(workflow->getFileByID("output_file"));
 
@@ -2777,11 +2810,13 @@ private:
                         {task1, task3},
 //                {task1},
                         {
-                                {this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1)},
+                                {this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(
+                                        this->test->storage_service1)},
 //                          {workflow->getFileByID("output_file"), wrench::FileLocation::LOCATION(this->test->storage_service1)}
                         },
                         {
-                                std::make_tuple(this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
+                                std::make_tuple(this->getWorkflow()->getFileByID("input_file"),
+                                                wrench::FileLocation::LOCATION(this->test->storage_service1),
                                                 wrench::FileLocation::LOCATION(this->test->storage_service2))
 //                        std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
 //                          workflow->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
@@ -2816,8 +2851,7 @@ private:
                 executor->start(executor, true, false); // Daemonized, no auto-restart
 
                 // Sleep some random number of seconds
-                double sleep_time = dist(rng);
-                WRENCH_INFO("Sleeping for %.3lf seconds", sleep_time);
+                double sleep_time = dist(rng);WRENCH_INFO("Sleeping for %.3lf seconds", sleep_time);
                 wrench::Simulation::sleep(sleep_time);
 
                 // Terminate the executor
@@ -2841,7 +2875,6 @@ TEST_F(StandardJobExecutorTest, JobTerminationTestAtRandomTimes) {
 }
 
 void StandardJobExecutorTest::do_JobTerminationTestAtRandomTimes_test() {
-
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
     int argc = 1;
@@ -2857,7 +2890,9 @@ void StandardJobExecutorTest::do_JobTerminationTestAtRandomTimes_test() {
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService("Host3",
-                                                {std::make_pair("Host3", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                {std::make_pair("Host3",
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                wrench::ComputeService::ALL_RAM))},
                                                 {})));
     // Create a Storage Services
     ASSERT_NO_THROW(storage_service1 = simulation->add(
@@ -2871,7 +2906,7 @@ void StandardJobExecutorTest::do_JobTerminationTestAtRandomTimes_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new JobTerminationTestAtRandomTimesWMS(
-                    this,  {compute_service}, {storage_service1, storage_service2}, "Host3")));
+                    this, {compute_service}, {storage_service1, storage_service2}, "Host3")));
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
@@ -2896,19 +2931,15 @@ void StandardJobExecutorTest::do_JobTerminationTestAtRandomTimes_test() {
     free(argv);
 }
 
-
 /**********************************************************************/
 /**  WORK UNIT TEST (INTERNAL)                                       **/
 /**********************************************************************/
-
-
 
 TEST_F(StandardJobExecutorTest, WorkUnitTest) {
     DO_TEST_WITH_FORK(do_WorkUnit_test);
 }
 
 void StandardJobExecutorTest::do_WorkUnit_test() {
-
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
     int argc = 1;
@@ -2921,19 +2952,20 @@ void StandardJobExecutorTest::do_WorkUnit_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Create two WorkUnits
-    std::shared_ptr<wrench::Workunit> wu1 = std::make_shared<wrench::Workunit>(nullptr,
-                                                                               (std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>>){},
-                                                                               nullptr,
-                                                                               (std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>){},
-                                                                               (std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>>){},
-                                                                               (std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>>){});
-    std::shared_ptr<wrench::Workunit> wu2 = std::make_shared<wrench::Workunit>(nullptr,
-                                                                               (std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>>){},
-                                                                               nullptr,
-                                                                               (std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>){},
-                                                                               (std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>>){},
-                                                                               (std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>>){});
-
+    std::shared_ptr<wrench::Workunit> wu1 = std::make_shared<wrench::Workunit>(
+            nullptr,
+            (std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>>) {},
+            nullptr,
+            (std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>) {},
+            (std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>>) {},
+            (std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>>) {});
+    std::shared_ptr<wrench::Workunit> wu2 = std::make_shared<wrench::Workunit>(
+            nullptr,
+            (std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>>) {},
+            nullptr,
+            (std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>) {},
+            (std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>>) {},
+            (std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>>) {});
 
     ASSERT_THROW(wrench::Workunit::addDependency(wu1, nullptr), std::invalid_argument);
     ASSERT_THROW(wrench::Workunit::addDependency(nullptr, wu2), std::invalid_argument);
@@ -2942,16 +2974,11 @@ void StandardJobExecutorTest::do_WorkUnit_test() {
 
     ASSERT_NO_THROW(wrench::Workunit::addDependency(wu1, wu2));
 
-
     delete simulation;
 
     free(argv[0]);
     free(argv);
 }
-
-
-
-
 
 /**********************************************************************/
 /**  NO-TASK TEST                                                    **/
@@ -2968,13 +2995,10 @@ public:
         this->test = test;
     }
 
-
 private:
-
     StandardJobExecutorTest *test;
 
     int main() {
-
         // Create a job manager
         auto job_manager = this->createJobManager();
 
@@ -2983,11 +3007,13 @@ private:
                 {},
                 {},
                 {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
-                        this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
+                        this->getWorkflow()->getFileByID("input_file"),
+                        wrench::FileLocation::LOCATION(this->test->storage_service1),
                         wrench::FileLocation::LOCATION(this->test->storage_service2))},
                 {},
-                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                           wrench::FileLocation::LOCATION(this->test->storage_service2))}
+                {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(
+                        this->getWorkflow()->getFileByID("input_file"),
+                        wrench::FileLocation::LOCATION(this->test->storage_service2))}
         );
 
         std::string my_mailbox = "test_callback_mailbox";
@@ -3033,7 +3059,6 @@ TEST_F(StandardJobExecutorTest, NoTaskTest) {
 }
 
 void StandardJobExecutorTest::do_NoTaskTest_test() {
-
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
     int argc = 1;
@@ -3054,7 +3079,8 @@ void StandardJobExecutorTest::do_NoTaskTest_test() {
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname1,
                                                 {std::make_pair(hostname1,
-                                                                std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                wrench::ComputeService::ALL_RAM))},
                                                 {})));
     // Create a Storage Services
     ASSERT_NO_THROW(storage_service1 = simulation->add(
@@ -3091,5 +3117,3 @@ void StandardJobExecutorTest::do_NoTaskTest_test() {
     free(argv[0]);
     free(argv);
 }
-
-

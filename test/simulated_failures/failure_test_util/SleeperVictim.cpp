@@ -12,7 +12,7 @@
 #include <wrench/simulation/Simulation.h>
 #include <wrench-dev.h>
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(sleeper_victom, "Log category for Sleeper");
+WRENCH_LOG_CATEGORY(sleeper_victom, "Log category for Sleeper");
 
 
 wrench::SleeperVictim::SleeperVictim(std::string host_on_which_to_run, double seconds_of_life, SimulationMessage *msg, std::string mailbox_to_notify)

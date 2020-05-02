@@ -9,6 +9,10 @@
 
 #include <climits>
 #include <services/storage/storage_helper_classes/FileTransferThreadMessage.h>
+#include <wrench/workflow/failure_causes/InvalidDirectoryPath.h>
+#include <wrench/workflow/failure_causes/FileNotFound.h>
+#include <wrench/workflow/failure_causes/StorageServiceNotEnoughSpace.h>
+#include <wrench/workflow/failure_causes/NetworkError.h>
 
 #include "wrench/services/storage/simple/SimpleStorageService.h"
 #include "wrench/services/ServiceMessage.h"
@@ -22,7 +26,7 @@
 #include "wrench/services/storage/storage_helpers/FileLocation.h"
 
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(simple_storage_service, "Log category for Simple Storage Service");
+WRENCH_LOG_CATEGORY(wrench_core_simple_storage_service, "Log category for Simple Storage Service");
 
 
 namespace wrench {
@@ -457,8 +461,7 @@ namespace wrench {
 
             if (not fs->hasEnoughFreeSpace(file->getSize())) {
 
-                this->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyFailure>(
-                        new SimulationTimestampFileCopyFailure(file, src_location, dst_location));
+                this->simulation->getOutput().addTimestampFileCopyFailure(file, src_location, dst_location);
 
                 try {
                     S4U_Mailbox::putMessage(answer_mailbox,
@@ -561,8 +564,7 @@ namespace wrench {
                         file, dst_location->getAbsolutePathAtMountPoint());
                 // Deal with time stamps, previously we could test whether a real timestamp was passed, now this. May be no corresponding timestamp.
                 try{
-                    this->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyCompletion>(
-                            new SimulationTimestampFileCopyCompletion(file, src_location, dst_location));
+                    this->simulation->getOutput().addTimestampFileCopyCompletion(file, src_location, dst_location);
                 } catch(invalid_argument &e){
                 }
 

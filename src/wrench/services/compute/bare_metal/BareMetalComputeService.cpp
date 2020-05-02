@@ -9,14 +9,12 @@
 
 #include <typeinfo>
 #include <map>
-#include <memory>
 #include <wrench/util/PointerUtil.h>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
+
 #include <wrench/services/compute/bare_metal/BareMetalComputeService.h>
 #include <wrench/services/helpers/HostStateChangeDetectorMessage.h>
-
-
 #include "wrench/services/ServiceMessage.h"
 #include "wrench/services/compute/ComputeServiceMessage.h"
 #include "helper_services/standard_job_executor/StandardJobExecutorMessage.h"
@@ -24,17 +22,16 @@
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
-#include "wrench/services/compute/bare_metal/BareMetalComputeService.h"
 #include "wrench/services/storage/StorageService.h"
 #include "wrench/simulation/Simulation.h"
 #include "wrench/workflow/job/PilotJob.h"
-#include "wrench/services/helpers/Alarm.h"
 #include "wrench/workflow/job/StandardJob.h"
-#include "wrench/workflow/job/PilotJob.h"
 #include "wrench/services/helpers/ServiceTerminationDetector.h"
 #include "wrench/services/helpers/HostStateChangeDetector.h"
+#include "wrench/workflow/failure_causes/JobTypeNotSupported.h"
+#include "wrench/workflow/failure_causes/HostError.h"
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(bare_metal_compute_service, "Log category for BareMetalComputeService");
+WRENCH_LOG_CATEGORY(wrench_core_bare_metal_compute_service, "Log category for BareMetalComputeService");
 
 
 namespace wrench {
@@ -446,7 +443,12 @@ namespace wrench {
         // Set default and specified message payloads
         this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
 
+
         // Check that there is at least one core per host and that hosts have enough cores
+        if (compute_resources.empty()) {
+            throw std::invalid_argument(
+                    "BareMetalComputeService::initiateInstance(): the resource list is empty");
+        }
         for (auto host : compute_resources) {
 
             std::string hname = host.first;

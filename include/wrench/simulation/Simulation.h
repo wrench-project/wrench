@@ -25,6 +25,7 @@ namespace wrench {
     class Service;
     class NetworkProximityService;
     class FileRegistryService;
+    class EnergyMeterService;
     class ComputeService;
     class BatchComputeService;
     class BareMetalComputeService;
@@ -78,8 +79,8 @@ namespace wrench {
         SimulationOutput &getOutput();
 
         //start energy related calls
-        double getEnergyConsumed(const std::string &hostname, bool record_as_time_stamp = false);
-        std::map<std::string, double> getEnergyConsumed(const std::vector<std::string> &hostnames, bool record_as_time_stamps = false);
+        double getEnergyConsumed(const std::string &hostname);
+        std::map<std::string, double> getEnergyConsumed(const std::vector<std::string> &hostnames);
 //        double getEnergyTimestamp(const std::string &hostname, bool can_record = false);
 
         // pstate related calls
@@ -96,6 +97,10 @@ namespace wrench {
         /** \cond DEVELOPER    */
         /***********************/
 
+        double getEnergyConsumed(const std::string &hostname, bool record_as_time_stamp);
+        std::map<std::string, double> getEnergyConsumed(const std::vector<std::string> &hostnames, bool record_as_time_stamps);
+
+        static bool doesHostExist(std::string hostname);
         static bool isHostOn(std::string hostname);
         static void turnOnHost(std::string hostname);
         static void turnOffHost(std::string hostname);
@@ -107,21 +112,12 @@ namespace wrench {
         void setPstate(const std::string &hostname, int pstate);
         static int getCurrentPstate(const std::string &hostname);
 
-
         std::shared_ptr<ComputeService> startNewService(ComputeService *service);
         std::shared_ptr<StorageService> startNewService(StorageService *service);
         std::shared_ptr<NetworkProximityService> startNewService(NetworkProximityService *service);
         std::shared_ptr<FileRegistryService> startNewService(FileRegistryService *service);
 
-
-        static double getMemoryCapacity();
-        static unsigned long getNumCores();
-        static double getFlopRate();
-        static std::string getHostName();
-
         static double getCurrentSimulatedDate();
-
-
 
         static void sleep(double duration);
         static void compute(double flops);
@@ -129,6 +125,28 @@ namespace wrench {
         /***********************/
         /** \endcond           */
         /***********************/
+
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+
+        void readFromDisk(double num_bytes, std::string hostname, std::string mount_point);
+        void readFromDiskAndWriteToDiskConcurrently(double num_bytes_to_read, double num_bytes_to_write,
+                                                    std::string hostname,
+                                                    std::string read_mount_point,
+                                                    std::string write_mount_point);
+        void writeToDisk(double num_bytes, std::string hostname, std::string mount_point);
+
+
+        static double getMemoryCapacity();
+        static unsigned long getNumCores();
+        static double getFlopRate();
+        static std::string getHostName();
+
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
 
     private:
 
@@ -140,11 +158,15 @@ namespace wrench {
 
         std::set<std::shared_ptr<FileRegistryService>> file_registry_services;
 
+        std::set<std::shared_ptr<EnergyMeterService>> energy_meter_services;
+
         std::set<std::shared_ptr<NetworkProximityService>> network_proximity_services;
 
         std::set<std::shared_ptr<ComputeService>> compute_services;
 
         std::set<std::shared_ptr<StorageService>> storage_services;
+
+        static int unique_disk_sequence_number;
 
         void stageFile(WorkflowFile *file, std::shared_ptr<FileLocation> location);
 
@@ -159,6 +181,7 @@ namespace wrench {
         void addService(std::shared_ptr<NetworkProximityService> service);
         void addService(std::shared_ptr<WMS> service);
         void addService(std::shared_ptr<FileRegistryService> service);
+        void addService(std::shared_ptr<EnergyMeterService> service);
 
         std::string getWRENCHVersionString() { return WRENCH_VERSION_STRING; }
 

@@ -16,8 +16,9 @@
 #include "wrench/workflow/WorkflowTask.h"
 #include "wrench/workflow/job/PilotJob.h"
 #include "wrench/workflow/job/StandardJob.h"
+#include <wrench/workflow/failure_causes/NetworkError.h>
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(htcondor_negotiator, "Log category for HTCondorNegotiator");
+WRENCH_LOG_CATEGORY(wrench_core_htcondor_negotiator, "Log category for HTCondorNegotiator");
 
 namespace wrench {
 

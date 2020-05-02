@@ -20,7 +20,7 @@
 #include "../failure_test_util/ResourceRandomRepeatSwitcher.h"
 
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(comprehensive_integration_host_failure_test, "Log category for ComprehensiveIntegrationHostFailuresTest");
+WRENCH_LOG_CATEGORY(comprehensive_integration_host_failure_test, "Log category for ComprehensiveIntegrationHostFailuresTest");
 
 #define NUM_TASKS 100
 #define MAX_TASK_DURATION_WITH_ON_CORE 3600

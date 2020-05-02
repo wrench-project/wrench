@@ -28,40 +28,65 @@
 #include <unordered_set>
 
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(simulation_output, "Log category for Simulation Output");
+WRENCH_LOG_CATEGORY(wrench_core_simulation_output, "Log category for Simulation Output");
 
 namespace wrench {
 
+
+    /******************/
+    /** \cond         */
+    /******************/
+
     nlohmann::json host_utilization_layout;
 
-    /**
-     * \cond
-     */
+    /*******************/
+    /** \cond INTERNAL */
+    /*******************/
 
     /**
      * @brief Object representing an instance when a WorkflowTask was run.
      */
     typedef struct WorkflowTaskExecutionInstance {
+        /* @brief  a task ID */
         std::string task_id;
+        /* @brief number of allocated cores */
         unsigned long long num_cores_allocated;
+        /* @brief vertical position in gantt chart display */
         unsigned long long vertical_position;
 
+        /* @brief task geometry in gantt chart display */
         std::pair<double, double> whole_task;
+        /** @brief file read geometry in gantt chart display */
         std::pair<double, double> read;
+        /* @brief computation geometry in gantt chart display */
         std::pair<double, double> compute;
+        /* @brief file write geometry in gantt chart display */
         std::pair<double, double> write;
 
-        std::vector<std::pair<double, double>> reads;
-        std::vector<std::pair<double, double>> writes;
+        /* @brief file read operations */
+        std::vector<std::tuple<double, double, string>> reads;
+        /* @brief file write operations */
+        std::vector<std::tuple<double, double, string>> writes;
 
+        /* @brief whether the task has failed */
         double failed;
+        /* @brief whether the task was terminated */
         double terminated;
 
+        /* @brief name of the host that ran the task */
         std::string hostname;
+        /* @brief flop rate of the host that ran the task */
         double host_flop_rate;
+        /* @brief RAM capacity of the host that ran the task */
         double host_memory;
+        /* @brief number of cores of the host that ran the task */
         unsigned long long host_num_cores;
 
+        /* 
+         * @brief get the task end time
+         *
+         * @return a date
+         */
         double getTaskEndTime() {
             return std::max({
                                     this->whole_task.second,
@@ -71,10 +96,41 @@ namespace wrench {
         }
     } WorkflowTaskExecutionInstance;
 
+    /******************/
+    /** \endcond      */
+    /******************/
 
 
     /**
      * @brief Function that generates a unified JSON file containing the information specified by boolean arguments.
+     *
+     *
+     *<pre>
+     * JSON Structure:
+     * {
+     *     "disk_operations": {
+     *          ...
+     *      },
+     *      "energy_consumption": {
+     *          ...
+     *      },
+     *      "platform": {
+     *          ...
+     *      },
+     *      "workflow_execution": {
+     *          ...
+     *      },
+     *      "workflow_graph": {
+     *          ...
+     *      }
+     * }
+     *</pre>
+     *
+     * Any pieces not specified in the arguments are left out. For full structure see documentation of specific sections.
+     *
+     *
+     *
+     *
      *
      * @param workflow: a pointer to the Workflow
      * @param file_path: path for generated JSON
@@ -83,14 +139,16 @@ namespace wrench {
      * @param include_workflow_graph: boolean whether to include workflow graph in JSON
      * @param include_energy: boolean whether to include energy consumption in JSON
      * @param generate_host_utilization_layout: boolean specifying whether or not you would like a possible host utilization
-      *     layout to be generated
+     *         layout to be generated
+     * @param include_disk: boolean specifying whether to include disk operation in JSON (disk timestamps must be enabled)
      */
     void SimulationOutput::dumpUnifiedJSON(Workflow *workflow, std::string file_path,
-                                                     bool include_platform,
-                                                     bool include_workflow_exec,
-                                                     bool include_workflow_graph,
-                                                     bool include_energy,
-                                                     bool generate_host_utilization_layout) {
+                                           bool include_platform,
+                                           bool include_workflow_exec,
+                                           bool include_workflow_graph,
+                                           bool include_energy,
+                                           bool generate_host_utilization_layout,
+                                           bool include_disk) {
 
         nlohmann::json unified_json;
 
@@ -112,6 +170,11 @@ namespace wrench {
         if(include_energy){
             dumpHostEnergyConsumptionJSON(file_path, false);
             unified_json["energy_consumption"] = energy_json_part;
+        }
+
+        if(include_disk){
+            dumpDiskOperationsJSON(file_path, false);
+            unified_json["disk_operations"] = disk_json_part;
         }
 
 
@@ -150,8 +213,8 @@ namespace wrench {
 
         nlohmann::json file_reads;
         for (auto const &r : w.reads) {
-            nlohmann::json file_read = nlohmann::json::object({{"end", r.second},
-                                                              {"start", r.first}});
+            nlohmann::json file_read = nlohmann::json::object({{"end", std::get<1>(r)},
+                                                               {"start", std::get<0>(r)}, {"id", std::get<2>(r)}});
             file_reads.push_back(file_read);
         }
 
@@ -165,8 +228,8 @@ namespace wrench {
 
         nlohmann::json file_writes;
         for (auto const &r : w.writes) {
-            nlohmann::json file_write = nlohmann::json::object({{"end", r.second},
-                                                               {"start", r.first}});
+            nlohmann::json file_write = nlohmann::json::object({{"end", std::get<1>(r)},
+                                                                {"start", std::get<0>(r)}, {"id", std::get<2>(r)}});
             file_writes.push_back(file_write);
         }
 
@@ -372,30 +435,53 @@ namespace wrench {
       * The JSON array has the following format:
       *
       * <pre>
-      *    {
+      *     {
       *      "workflow_execution": {
       *         "tasks": [
-      *
-      *      {
-      *          task_id: <string>,
-      *          execution_host: {
-      *              hostname: <string>,
-      *              flop_rate: <double>,
-      *              memory: <double>,
-      *              cores: <unsigned_long>
-      *          },
-      *          num_cores_allocated: <unsigned_long>,
-      *          vertical_position: <unsigned_long>,
-      *          whole_task: { start: <double>, end: <double> },
-      *          read:       { start: <double>, end: <double> },
-      *          compute:    { start: <double>, end: <double> },
-      *          write:      { start: <double>, end: <double> },
-      *          failed: <double>,
-      *          terminated: <double>
-      *      }, . . .
-      *    ]
-      *    }
-      *    }
+      *             {
+      *                "compute": {
+      *                     "end": <double>,
+      *                     "start": <double>
+      *                },
+      *                "execution_host": {
+      *                     "cores": <unsigned_long>,
+      *                     "flop_rate": <double>,
+      *                     "hostname": <string>,
+      *                     "memory": <double>
+      *                },
+      *                "failed": <double>,
+      *                "num_cores_allocated": <unsigned_long>,
+      *                "read": [
+      *                     {
+      *                         "end": <double>,
+      *                         "start": <double>
+      *                     },
+      *                     {
+      *                         ...
+      *                     }
+      *                ],
+      *                "task_id": <string>,
+      *                "terminated": <double>,
+      *                "whole_task": {
+      *                     "end": <double>,
+      *                     "start": <double>
+      *                 },
+      *                 "write": [
+      *                     {
+      *                         "end": <double>,
+      *                         "start": <double>
+      *                     },
+      *                     {
+      *                         ...
+      *                     }
+      *                 ],
+      *             },
+      *             {
+      *                 ...
+      *             }
+      *             ]
+      *         }
+      *     }
       * </pre>
       *
       *   If generate_host_utilization_layout is set to true, a recursive function searches for a possible host
@@ -421,7 +507,7 @@ namespace wrench {
     void SimulationOutput::dumpWorkflowExecutionJSON(Workflow *workflow, std::string file_path,
                                                      bool generate_host_utilization_layout, bool writing_file) {
         if (workflow == nullptr || file_path.empty()) {
-            throw std::invalid_argument("SimulationOutput::dumpTaskDataJSON() requires a valid workflow and file_path");
+            throw std::invalid_argument("SimulationOutput::dumpWorkflowExecutionJSON() requires a valid workflow and file_path");
         }
 
         auto tasks = workflow->getTasks();
@@ -434,7 +520,6 @@ namespace wrench {
         auto write_start_timestamps = this->getTrace<SimulationTimestampFileWriteStart>();
         auto write_completion_timestamps = this->getTrace<wrench::SimulationTimestampFileWriteCompletion>();
         auto write_failure_timestamps = this->getTrace<wrench::SimulationTimestampFileWriteFailure>();
-
 
         std::vector<WorkflowTaskExecutionInstance> data;
 
@@ -450,7 +535,7 @@ namespace wrench {
                     for (auto & read_start_timestamp : read_start_timestamps){
                         if (read_start_timestamp->getContent()->getTask()->getID() == current_execution_instance.task_id) {
                             current_execution_instance.reads.emplace_back(read_start_timestamp->getContent()->getDate(),
-                                                                          read_start_timestamp->getContent()->getEndpoint()->getDate());
+                                                                          read_start_timestamp->getContent()->getEndpoint()->getDate(), read_start_timestamp->getContent()->getFile()->getID());
                         }
                     }
                 }
@@ -459,45 +544,45 @@ namespace wrench {
                     for (auto & write_start_timestamp : write_start_timestamps){
                         if (write_start_timestamp->getContent()->getTask()->getID() == current_execution_instance.task_id) {
                             current_execution_instance.writes.emplace_back(write_start_timestamp->getContent()->getDate(),
-                                                                           write_start_timestamp->getContent()->getEndpoint()->getDate());
+                                                                           write_start_timestamp->getContent()->getEndpoint()->getDate(), write_start_timestamp->getContent()->getFile()->getID());
                         }
                     }
                 }
 
                 nlohmann::json file_reads;
                 for (auto const &r : current_execution_instance.reads) {
-                    nlohmann::json file_read = nlohmann::json::object({{"end", r.second},
-                                                                       {"start", r.first}});
+                    nlohmann::json file_read = nlohmann::json::object({{"end", std::get<1>(r)},
+                                                                       {"start", std::get<0>(r)}, {"id", std::get<2>(r)}});
                     file_reads.push_back(file_read);
                 }
 
                 nlohmann::json file_writes;
                 for (auto const &r : current_execution_instance.writes) {
-                    nlohmann::json file_write = nlohmann::json::object({{"end", r.second},
-                                                                        {"start", r.first}});
+                    nlohmann::json file_write = nlohmann::json::object({{"end", std::get<1>(r)},
+                                                                        {"start", std::get<0>(r)}, {"id", std::get<2>(r)}});
                     file_writes.push_back(file_write);
                 }
                 task_json.push_back({
                                             {"task_id",                  task->getID()},
                                             {"execution_host", {
-                                                                     {"hostname", current_task_execution.execution_host},
-                                                                     {"flop_rate", Simulation::getHostFlopRate(
-                                                                                    current_task_execution.execution_host)},
-                                                                     {"memory", Simulation::getHostMemoryCapacity(
-                                                                                    current_task_execution.execution_host)},
-                                                                     {"cores", Simulation::getHostNumCores(
-                                                                                    current_task_execution.execution_host)}
-                                                                    }},
+                                                                                 {"hostname", current_task_execution.execution_host},
+                                                                                 {"flop_rate", Simulation::getHostFlopRate(
+                                                                                         current_task_execution.execution_host)},
+                                                                                 {"memory", Simulation::getHostMemoryCapacity(
+                                                                                         current_task_execution.execution_host)},
+                                                                                 {"cores", Simulation::getHostNumCores(
+                                                                                         current_task_execution.execution_host)}
+                                                                         }},
                                             {"num_cores_allocated",           current_task_execution.num_cores_allocated},
                                             {"whole_task", {
-                                                                   {"start",    current_task_execution.task_start},
-                                                                   {"end",       current_task_execution.task_end}
-                                                           }},
+                                                                                 {"start",    current_task_execution.task_start},
+                                                                                 {"end",       current_task_execution.task_end}
+                                                                         }},
                                             {"read",              file_reads},
                                             {"compute",       {
-                                                                      {"start",    current_task_execution.computation_start},
-                                                                      {"end",       current_task_execution.computation_end}
-                                                              }},
+                                                                                 {"start",    current_task_execution.computation_start},
+                                                                                 {"end",       current_task_execution.computation_end}
+                                                                         }},
                                             {"write",            file_writes},
                                             {"failed", current_task_execution.task_failed},
                                             {"terminated", current_task_execution.task_terminated}
@@ -524,7 +609,7 @@ namespace wrench {
                     for (auto & read_start_timestamp : read_start_timestamps){
                         if (read_start_timestamp->getContent()->getTask()->getID() == current_execution_instance.task_id) {
                             current_execution_instance.reads.emplace_back(read_start_timestamp->getContent()->getDate(),
-                                                                                      read_start_timestamp->getContent()->getEndpoint()->getDate());
+                                                                          read_start_timestamp->getContent()->getEndpoint()->getDate(), read_start_timestamp->getContent()->getFile()->getID());
                         }
                     }
                 }
@@ -532,8 +617,8 @@ namespace wrench {
                 if (!write_start_timestamps.empty()) {
                     for (auto & write_start_timestamp : write_start_timestamps){
                         if (write_start_timestamp->getContent()->getTask()->getID() == current_execution_instance.task_id) {
-                        current_execution_instance.writes.emplace_back(write_start_timestamp->getContent()->getDate(),
-                                                                                  write_start_timestamp->getContent()->getEndpoint()->getDate());
+                            current_execution_instance.writes.emplace_back(write_start_timestamp->getContent()->getDate(),
+                                                                           write_start_timestamp->getContent()->getEndpoint()->getDate(), write_start_timestamp->getContent()->getFile()->getID());
                         }
                     }
                 }
@@ -633,7 +718,7 @@ namespace wrench {
      */
     void SimulationOutput::dumpWorkflowGraphJSON(wrench::Workflow *workflow, std::string file_path, bool writing_file) {
         if (workflow == nullptr || file_path.empty()) {
-            throw std::invalid_argument("SimulationOutput::dumpTaskDataJSON() requires a valid workflow and file_path");
+            throw std::invalid_argument("SimulationOutput::dumpWorkflowGraphJSON() requires a valid workflow and file_path");
         }
 
         /* schema
@@ -885,7 +970,7 @@ namespace wrench {
      *            }
      *            }, . . .
      *      ],
-     *    routes: [
+     *      routes: [
      *           {
      *               source: <string>,
      *               target: <string>,
@@ -1157,4 +1242,531 @@ namespace wrench {
             output.close();
         }
     }
+
+    /**
+     *
+     * @brief Writes a JSON file containing disk operation information as a JSON array.
+     *
+     * >>>>>NOTE<<<<< The timestamps the JSON is generated from are disabled by default.
+     * Enable them with SimulationOutput::enableDiskTimestamps() to use.
+     *
+     * The JSON array has the following format:
+     *
+     * <pre>
+     * {
+     *  "disk_operations": {
+     *      "io_host": {                        <--- Hostname
+     *          "/": {                          <--- Mount
+     *             "reads": [
+     *                  {
+     *                   "bytes": <double>,
+     *                   "end": <double>,
+     *                   "start": <double>
+     *                  },
+     *                  {
+     *                     ...
+     *                  }
+     *                  ],
+     *             "writes": [
+     *                 {
+     *                  "bytes": <double>,
+     *                  "end": <double>,
+     *                  "start": <double>
+     *                  },
+     *                  {
+     *                   ...
+     *                  }
+     *                  ]
+     *              }
+     *          }
+     *   }
+     * }
+     * </pre>
+     *
+     * @param file_path - path to save JSON at
+     * @param writing_file - boolean, default true, to write the JSON to the specified file path. Used for unified output.
+     *
+     * @throws invalid_argument
+     */
+    void SimulationOutput::dumpDiskOperationsJSON(std::string file_path, bool writing_file) {
+        if (file_path.empty()) {
+            throw std::invalid_argument("SimulationOutput::dumpDiskOperationJSON() requires a valid workflow and file_path");
+        }
+        nlohmann::json disk_operations_json;
+
+        auto read_start_timestamps = this->getTrace<SimulationTimestampDiskReadStart>();
+        auto read_completion_timestamps = this->getTrace<wrench::SimulationTimestampDiskReadCompletion>();
+        auto read_failure_timestamps = this->getTrace<wrench::SimulationTimestampDiskReadFailure>();
+
+        auto write_start_timestamps = this->getTrace<SimulationTimestampDiskWriteStart>();
+        auto write_completion_timestamps = this->getTrace<wrench::SimulationTimestampDiskWriteCompletion>();
+        auto write_failure_timestamps = this->getTrace<wrench::SimulationTimestampDiskWriteFailure>();
+
+
+        std::set<std::string> hostnames;
+
+        //std::tuple<string, string, std::tuple<double, double, double>> disk_operation;
+        std::tuple<double, double, double> disk_operation;
+
+        if(!read_start_timestamps.empty()){
+            for (auto & timestamp : read_start_timestamps) {
+                hostnames.insert(timestamp->getContent()->getHostname());
+            }
+        }
+        if(!write_start_timestamps.empty()){
+            for (auto & timestamp : write_start_timestamps) {
+                hostnames.insert(timestamp->getContent()->getHostname());
+            }
+        }
+
+        for(auto & host : hostnames) {
+            std::set<std::string> mounts;
+            if(!read_start_timestamps.empty()){
+                for (auto & timestamp : read_start_timestamps) {
+                    if(timestamp->getContent()->getHostname().compare(host) == 0){
+                        mounts.insert(timestamp->getContent()->getMount());
+                    }
+                }
+            }
+            if(!write_start_timestamps.empty()){
+                for (auto & timestamp : write_start_timestamps) {
+                    if(timestamp->getContent()->getHostname().compare(host) == 0){
+                        mounts.insert(timestamp->getContent()->getMount());
+                    }
+                }
+            }
+            for (auto & mount : mounts) {
+                std::vector<std::tuple<double, double, double>> reads;
+                std::vector<std::tuple<double, double, double>> writes;
+
+                if (!read_start_timestamps.empty()) {
+                    for (auto & read_start_timestamp : read_start_timestamps){
+                        if (read_start_timestamp->getContent()->getHostname().compare(host) == 0 && read_start_timestamp->getContent()->getMount().compare(mount) == 0){
+                            disk_operation = std::make_tuple(read_start_timestamp->getContent()->getDate(),
+                                                             read_start_timestamp->getContent()->getEndpoint()->getDate(),
+                                                             read_start_timestamp->getContent()->getBytes());
+                            reads.emplace_back(disk_operation);
+                        }
+
+                    }
+                }
+                if (!write_start_timestamps.empty()) {
+                    for (auto & write_start_timestamp : write_start_timestamps){
+                        if (write_start_timestamp->getContent()->getHostname().compare(host) == 0 && write_start_timestamp->getContent()->getMount().compare(mount) == 0){
+                            disk_operation = std::make_tuple(write_start_timestamp->getContent()->getDate(),
+                                                             write_start_timestamp->getContent()->getEndpoint()->getDate(),
+                                                             write_start_timestamp->getContent()->getBytes());
+                            writes.emplace_back(disk_operation);
+                        }
+
+                    }
+                }
+                nlohmann::json disk_reads;
+                for (auto const &r : reads) {
+                    nlohmann::json disk_read = nlohmann::json::object({{"start", std::get<0>(r)},
+                                                                       {"end", std::get<1>(r)},
+                                                                       {"bytes",std::get<2>(r)}});
+                    disk_reads.push_back(disk_read);
+                }
+
+                nlohmann::json disk_writes;
+                for (auto const &w : writes) {
+                    nlohmann::json disk_write = nlohmann::json::object({{"start", std::get<0>(w)},
+                                                                        {"end", std::get<1>(w)},
+                                                                        {"bytes",std::get<2>(w)}});
+                    disk_writes.push_back(disk_write);
+                }
+                disk_operations_json[host][mount]["reads"] = disk_reads;
+                disk_operations_json[host][mount]["writes"] = disk_writes;
+            }
+
+
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+        disk_json_part = disk_operations_json;
+
+        if(writing_file) {
+            std::ofstream output(file_path);
+            output << std::setw(4) << disk_operations_json << std::endl;
+            output.close();
+        }
+    }
+
+
+    /**
+     * @brief Destructor
+     */
+    SimulationOutput::~SimulationOutput() {
+        for (auto t : this->traces) {
+            delete t.second;
+        }
+        this->traces.clear();
+    }
+
+    /**
+     * @brief Constructor
+     */
+    SimulationOutput::SimulationOutput()  {
+        // By default enable all task timestamps
+        this->setEnabled<SimulationTimestampTaskStart>(true);
+        this->setEnabled<SimulationTimestampTaskFailure>(true);
+        this->setEnabled<SimulationTimestampTaskCompletion>(true);
+        this->setEnabled<SimulationTimestampTaskTermination>(true);
+
+        // By default enable all file read timestamps
+        this->setEnabled<SimulationTimestampFileReadStart>(true);
+        this->setEnabled<SimulationTimestampFileReadFailure>(true);
+        this->setEnabled<SimulationTimestampFileReadCompletion>(true);
+
+        // By default enable all file write timestamps
+        this->setEnabled<SimulationTimestampFileWriteStart>(true);
+        this->setEnabled<SimulationTimestampFileWriteFailure>(true);
+        this->setEnabled<SimulationTimestampFileWriteCompletion>(true);
+
+        //By default disable (for now) all disk read timestamps
+        this->setEnabled<SimulationTimestampDiskReadStart>(false);
+        this->setEnabled<SimulationTimestampDiskReadFailure>(false);
+        this->setEnabled<SimulationTimestampDiskReadCompletion>(false);
+
+        // By default disable (for now) all disk write timestamps
+        this->setEnabled<SimulationTimestampDiskWriteStart>(false);
+        this->setEnabled<SimulationTimestampDiskWriteFailure>(false);
+        this->setEnabled<SimulationTimestampDiskWriteCompletion>(false);
+
+        // By default enable all file copy timestamps
+        this->setEnabled<SimulationTimestampFileCopyStart>(true);
+        this->setEnabled<SimulationTimestampFileCopyFailure>(true);
+        this->setEnabled<SimulationTimestampFileCopyCompletion>(true);
+
+        // By default enable all power timestamps
+        this->setEnabled<SimulationTimestampPstateSet>(true);
+        this->setEnabled<SimulationTimestampEnergyConsumption>(true);
+    }
+
+    /**
+     * @brief Add a task start timestamp
+     * @param task: a workflow task
+     */
+    void SimulationOutput::addTimestampTaskStart(WorkflowTask *task) {
+        if (this->isEnabled<SimulationTimestampTaskStart>()) {
+            this->addTimestamp<SimulationTimestampTaskStart>(new SimulationTimestampTaskStart(task));
+        }
+    }
+
+    /**
+     * @brief Add a task start failure
+     * @param task: a workflow task
+     */
+    void SimulationOutput::addTimestampTaskFailure(WorkflowTask *task) {
+        if (this->isEnabled<SimulationTimestampTaskFailure>()) {
+            this->addTimestamp<SimulationTimestampTaskFailure>(new SimulationTimestampTaskFailure(task));
+        }
+    }
+
+    /**
+     * @brief Add a task start completion
+     * @param task: a workflow task
+     */
+    void SimulationOutput::addTimestampTaskCompletion(WorkflowTask *task) {
+        if (this->isEnabled<SimulationTimestampTaskCompletion>()) {
+            this->addTimestamp<SimulationTimestampTaskCompletion>(new SimulationTimestampTaskCompletion(task));
+        }
+    }
+
+    /**
+    * @brief Add a task start termination
+    * @param task: a workflow task
+    */
+    void SimulationOutput::addTimestampTaskTermination(WorkflowTask *task) {
+        if (this->isEnabled<SimulationTimestampTaskTermination>()) {
+            this->addTimestamp<SimulationTimestampTaskTermination>(new SimulationTimestampTaskTermination(task));
+        }
+    }
+
+    /**
+     * @brief Add a file read start timestamp
+     * @param file: a workflow file
+     * @param src: the source location
+     * @param service: the source storage service
+     * @param task: the workflow task for which this read is done (or nullptr);
+     */
+    void SimulationOutput::addTimestampFileReadStart(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task) {
+        if (this->isEnabled<SimulationTimestampFileReadStart>()) {
+            this->addTimestamp<SimulationTimestampFileReadStart>(new SimulationTimestampFileReadStart(file, src, service, task));
+        }
+    }
+
+    /**
+    * @brief Add a file read failure timestamp
+    * @param file: a workflow file
+    * @param src: the source location
+    * @param service: the source storage service
+    * @param task: the workflow task for which this read is done (or nullptr);
+    */
+    void SimulationOutput::addTimestampFileReadFailure(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task) {
+        if (this->isEnabled<SimulationTimestampFileReadFailure>()) {
+            this->addTimestamp<SimulationTimestampFileReadFailure>(new SimulationTimestampFileReadFailure(file, src, service, task));
+        }
+    }
+
+    /**
+    * @brief Add a file read completion timestamp
+    * @param file: a workflow file
+    * @param src: the source location
+    * @param service: the source storage service
+    * @param task: the workflow task for which this read is done (or nullptr);
+    */
+    void SimulationOutput::addTimestampFileReadCompletion(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task) {
+        if (this->isEnabled<SimulationTimestampFileReadCompletion>()) {
+            this->addTimestamp<SimulationTimestampFileReadCompletion>(new SimulationTimestampFileReadCompletion(file, src, service, task));
+        }
+    }
+
+    /**
+     * @brief Add a file write start timestamp
+     * @param file: a workflow file
+     * @param src: the target location
+     * @param service: the target storage service
+     * @param task: the workflow task for which this write is done (or nullptr);
+     */
+    void SimulationOutput::addTimestampFileWriteStart(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task) {
+        if (this->isEnabled<SimulationTimestampFileWriteStart>()) {
+            this->addTimestamp<SimulationTimestampFileWriteStart>(new SimulationTimestampFileWriteStart(file, src, service, task));
+        }
+    }
+
+    /**
+    * @brief Add a file write failure timestamp
+    * @param file: a workflow file
+    * @param src: the target location
+    * @param service: the target storage service
+    * @param task: the workflow task for which this write is done (or nullptr);
+    */
+    void SimulationOutput::addTimestampFileWriteFailure(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task) {
+        if (this->isEnabled<SimulationTimestampFileWriteFailure>()) {
+            this->addTimestamp<SimulationTimestampFileWriteFailure>(new SimulationTimestampFileWriteFailure(file, src, service, task));
+        }
+    }
+
+    /**
+    * @brief Add a file write completion timestamp
+    * @param file: a workflow file
+    * @param src: the target location
+    * @param service: the target storage service
+    * @param task: the workflow task for which this write is done (or nullptr);
+    */
+    void SimulationOutput::addTimestampFileWriteCompletion(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task) {
+        if (this->isEnabled<SimulationTimestampFileWriteCompletion>()) {
+            this->addTimestamp<SimulationTimestampFileWriteCompletion>(new SimulationTimestampFileWriteCompletion(file, src, service, task));
+        }
+    }
+
+
+
+    /**
+     * @brief Add a file copy start timestamp
+     * @param file: a workflow file
+     * @param src: the source location
+     * @param dst: the target location
+     */
+    void SimulationOutput::addTimestampFileCopyStart(WorkflowFile *file, std::shared_ptr<FileLocation> src,
+                                                     std::shared_ptr<FileLocation> dst) {
+        if (this->isEnabled<SimulationTimestampFileCopyStart>()) {
+            this->addTimestamp<SimulationTimestampFileCopyStart>(new SimulationTimestampFileCopyStart(file, src, dst));
+        }
+    }
+
+    /**
+     * @brief Add a file copy failure timestamp
+     * @param file: a workflow file
+     * @param src: the source location
+     * @param dst: the target location
+     */
+    void SimulationOutput::addTimestampFileCopyFailure(WorkflowFile *file, std::shared_ptr<FileLocation> src,
+                                                     std::shared_ptr<FileLocation> dst) {
+        if (this->isEnabled<SimulationTimestampFileCopyFailure>()) {
+            this->addTimestamp<SimulationTimestampFileCopyFailure>(new SimulationTimestampFileCopyFailure(file, src, dst));
+        }
+    }
+
+    /**
+     * @brief Add a file copy completion timestamp
+     * @param file: a workflow file
+     * @param src: the source location
+     * @param dst: the target location
+     */
+    void SimulationOutput::addTimestampFileCopyCompletion(WorkflowFile *file, std::shared_ptr<FileLocation> src,
+                                                     std::shared_ptr<FileLocation> dst) {
+        if (this->isEnabled<SimulationTimestampFileCopyCompletion>()) {
+            this->addTimestamp<SimulationTimestampFileCopyCompletion>(new SimulationTimestampFileCopyCompletion(file, src, dst));
+        }
+    }
+
+    /**
+ * @brief Add a file read start timestamp
+ * @param hostname: hostname being read from
+ * @param mount: mountpoint of disk
+ * @param bytes: number of bytes read
+ * @param unique_sequence_number: an integer id
+ */
+    void SimulationOutput::addTimestampDiskReadStart(std::string hostname, std::string mount, double bytes, int unique_sequence_number) {
+        if (this->isEnabled<SimulationTimestampDiskReadStart>()) {
+            this->addTimestamp<SimulationTimestampDiskReadStart>(new SimulationTimestampDiskReadStart(hostname, mount, bytes, unique_sequence_number));
+        }
+    }
+
+    /**
+     * @brief Add a file read failure timestamp
+     * @param hostname: hostname being read from
+     * @param mount: mountpoint of disk
+     * @param bytes: number of bytes read
+     * @param unique_sequence_number: an integer id
+     */
+    void SimulationOutput::addTimestampDiskReadFailure(std::string hostname, std::string mount, double bytes, int unique_sequence_number) {
+        if (this->isEnabled<SimulationTimestampDiskReadFailure>()) {
+            this->addTimestamp<SimulationTimestampDiskReadFailure>(new SimulationTimestampDiskReadFailure(hostname, mount, bytes, unique_sequence_number));
+        }
+    }
+
+    /**
+     * @brief Add a file read completion timestamp
+     * @param hostname: hostname being read from
+     * @param mount: mountpoint of disk
+     * @param bytes: number of bytes read
+     * @param unique_sequence_number: an integer id
+     */
+    void SimulationOutput::addTimestampDiskReadCompletion(std::string hostname, std::string mount, double bytes, int unique_sequence_number) {
+        if (this->isEnabled<SimulationTimestampDiskReadCompletion>()) {
+            this->addTimestamp<SimulationTimestampDiskReadCompletion>(new SimulationTimestampDiskReadCompletion(hostname, mount, bytes, unique_sequence_number));
+        }
+    }
+
+    /**
+     * @brief Add a file write start timestamp
+     * @param hostname: hostname being read from
+     * @param mount: mountpoint of disk
+     * @param bytes: number of bytes read
+     * @param unique_sequence_number: an integer id
+     */
+    void SimulationOutput::addTimestampDiskWriteStart(std::string hostname, std::string mount, double bytes, int unique_sequence_number) {
+        if (this->isEnabled<SimulationTimestampDiskWriteStart>()) {
+            this->addTimestamp<SimulationTimestampDiskWriteStart>(new SimulationTimestampDiskWriteStart(hostname, mount, bytes, unique_sequence_number));
+        }
+    }
+
+    /**
+     * @brief Add a file write failure timestamp
+     * @param hostname: hostname being read from
+     * @param mount: mountpoint of disk
+     * @param bytes: number of bytes read
+     * @param unique_sequence_number: an integer id
+     */
+    void SimulationOutput::addTimestampDiskWriteFailure(std::string hostname, std::string mount, double bytes, int unique_sequence_number) {
+        if (this->isEnabled<SimulationTimestampDiskWriteFailure>()) {
+            this->addTimestamp<SimulationTimestampDiskWriteFailure>(new SimulationTimestampDiskWriteFailure(hostname, mount, bytes, unique_sequence_number));
+        }
+    }
+
+    /**
+    * @brief Add a file write completion timestamp
+    * @param hostname: hostname being read from
+    * @param mount: mountpoint of disk
+    * @param bytes: number of bytes read
+    * @param unique_sequence_number: an integer id
+    */
+    void SimulationOutput::addTimestampDiskWriteCompletion(std::string hostname, std::string mount, double bytes, int unique_sequence_number) {
+        if (this->isEnabled<SimulationTimestampDiskWriteCompletion>()) {
+            this->addTimestamp<SimulationTimestampDiskWriteCompletion>(new SimulationTimestampDiskWriteCompletion(hostname, mount, bytes, unique_sequence_number));
+        }
+    }
+
+    /**
+     * @brief Add a pstate change/set timestamp
+     * @param hostname: a hostname
+     * @param pstate: a pstate index
+     */
+    void SimulationOutput::addTimestampPstateSet(std::string hostname, int pstate) {
+        if (this->isEnabled<SimulationTimestampPstateSet>()) {
+            this->addTimestamp<SimulationTimestampPstateSet>(new SimulationTimestampPstateSet(hostname, pstate));
+        }
+    }
+    
+    /**
+     * @brief Add an energy consumption timestamp
+     * @param hostname: a hostname
+     * @param joules: consumption in joules
+     */
+    void SimulationOutput::addTimestampEnergyConsumption(std::string hostname, double joules) {
+        if (this->isEnabled<SimulationTimestampEnergyConsumption>()) {
+            this->addTimestamp<SimulationTimestampEnergyConsumption>(new SimulationTimestampEnergyConsumption(hostname, joules));
+        }
+    }
+    
+    /**
+     * @brief Enable or Disable the insertion of task-related timestamps in
+     *        the simulation output (enabled by default)
+     * @param enabled true to enable, false to disable
+     */
+    void SimulationOutput::enableWorkflowTaskTimestamps(bool enabled) {
+        this->setEnabled<SimulationTimestampTaskStart>(enabled);
+        this->setEnabled<SimulationTimestampTaskFailure>(enabled);
+        this->setEnabled<SimulationTimestampTaskCompletion>(enabled);
+        this->setEnabled<SimulationTimestampTaskTermination>(enabled);
+    }
+
+    /**
+     * @brief Enable or Disable the insertion of disk-related timestamps in
+     *        the simulation output (enabled by default)
+     * @param enabled true to enable, false to disable
+     */
+    void SimulationOutput::enableDiskTimestamps(bool enabled) {
+        this->setEnabled<SimulationTimestampDiskReadStart>(enabled);
+        this->setEnabled<SimulationTimestampDiskReadFailure>(enabled);
+        this->setEnabled<SimulationTimestampDiskReadCompletion>(enabled);
+        this->setEnabled<SimulationTimestampDiskWriteStart>(enabled);
+        this->setEnabled<SimulationTimestampDiskWriteFailure>(enabled);
+        this->setEnabled<SimulationTimestampDiskWriteCompletion>(enabled);
+    }
+
+    /**
+     * @brief Enable or Disable the insertion of file-related timestamps in
+     *        the simulation output (enabled by default)
+     * @param enabled true to enable, false to disable
+     */
+    void SimulationOutput::enableFileReadWriteCopyTimestamps(bool enabled) {
+        this->setEnabled<SimulationTimestampFileReadStart>(enabled);
+        this->setEnabled<SimulationTimestampFileReadFailure>(enabled);
+        this->setEnabled<SimulationTimestampFileReadCompletion>(enabled);
+        this->setEnabled<SimulationTimestampFileWriteStart>(enabled);
+        this->setEnabled<SimulationTimestampFileWriteFailure>(enabled);
+        this->setEnabled<SimulationTimestampFileWriteCompletion>(enabled);
+        this->setEnabled<SimulationTimestampFileCopyStart>(enabled);
+        this->setEnabled<SimulationTimestampFileCopyFailure>(enabled);
+        this->setEnabled<SimulationTimestampFileCopyCompletion>(enabled);
+    }
+
+    /**
+     * @brief Enable or Disable the insertion of energy-related timestamps in
+     *        the simulation output (enabled by default)
+     * @param enabled true to enable, false to disable
+     */
+    void SimulationOutput::enableEnergyTimestamps(bool enabled) {
+        this->setEnabled<SimulationTimestampPstateSet>(true);
+        this->setEnabled<SimulationTimestampEnergyConsumption>(true);
+    }
+
+
+
 };

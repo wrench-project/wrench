@@ -1,7 +1,7 @@
 [![Build Status][travis-badge]][travis-link]
 [![GitHub Release][release-badge]][release-link]
 [![License: LGPL v3][license-badge]](LICENSE.md)
-[![Coverage Status][coveralls-badge]][coveralls-link]
+[![Coverage Status][codecov-badge]][codecov-link]
 [![Codacy Badge][codacy-badge]][codacy-link]
 [![SonarCloud Badge][sonarcloud-badge]][sonarcloud-link]
 [![CII Best Practices][cii-badge]][cii-link]
@@ -35,7 +35,6 @@ And, one of the following:
 ### Required Dependencies 
 
 - [SimGrid](https://framagit.org/simgrid/simgrid/-/releases) - version 3.25
-- [Lemon C++ library](http://lemon.cs.elte.hu/) - version 1.3.1 or higher 
 - [PugiXML](http://pugixml.org/) - version 1.8 or higher 
 - [JSON for Modern C++](https://github.com/nlohmann/json) - version 3.7.0 or higher 
 
@@ -68,8 +67,6 @@ make
 sudo make install 
 ```
 
-
-
 ## Get in Touch
 
 The main channel to reach the WRENCH team is via the support email: 
@@ -85,7 +82,7 @@ it provides a recent and general overview on the framework.
 
 ```latex
 @inproceedings{wrench,
-  title = {WRENCH: A Framework for Simulating Workflow Management Systems},
+  title = {{WRENCH: A Framework for Simulating Workflow Management Systems}},
   author = {Casanova, Henri and Pandey, Suraj and Oeth, James and Tanaka, Ryan and Suter, Frederic and Ferreira da Silva, Rafael},
   booktitle = {13th Workshop on Workflows in Support of Large-Scale Science (WORKS'18)},
   year = {2018},
@@ -108,6 +105,8 @@ WRENCH has been funded by the National Science Foundation (NSF), and the Nationa
 [travis-badge]:             https://travis-ci.org/wrench-project/wrench.svg?branch=master
 [travis-link]:              https://travis-ci.org/wrench-project/wrench
 [license-badge]:            https://img.shields.io/badge/License-LGPL%20v3-blue.svg
+[codecov-badge]:            https://codecov.io/gh/wrench-project/wrench/branch/master/graph/badge.svg
+[codecov-link]:             https://codecov.io/gh/wrench-project/wrench
 [coveralls-badge]:          https://coveralls.io/repos/github/wrench-project/wrench/badge.svg?branch=master
 [coveralls-link]:           https://coveralls.io/github/wrench-project/wrench?branch=master
 [release-badge]:            https://img.shields.io/github/release/wrench-project/wrench/all.svg

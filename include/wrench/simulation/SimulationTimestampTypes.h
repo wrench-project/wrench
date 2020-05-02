@@ -15,8 +15,12 @@
 #include <unordered_map>
 
 using namespace std;
+/***********************/
+/** \cond              */
+/***********************/
 
 typedef std::tuple<void *, void *, void *> File;
+typedef std::tuple<std::string, std::string, int> DiskAccess;
 
 namespace std {
     template <>
@@ -27,9 +31,23 @@ namespace std {
             return std::hash<void *>()(std::get<0>(file)) ^ std::hash<void *>()(std::get<1>(file)) ^ std::hash<void *>()(std::get<2>(file));
         }
     };
+
+    template <>
+    struct hash<DiskAccess>{
+    public :
+        size_t operator()(const DiskAccess &diskAccess ) const
+        {
+            return std::hash<std::string>()(std::get<0>(diskAccess)) ^ std::hash<std::string>()(std::get<1>(diskAccess)) ^ std::hash<int>()(std::get<2>(diskAccess));
+        }
+    };
 };
 
+/***********************/
+/** \endcond           */
+/***********************/
+
 namespace wrench {
+
 
     class WorkflowTask;
     class StorageService;
@@ -69,7 +87,7 @@ namespace wrench {
         /***********************/
         SimulationTimestampPair();
         SimulationTimestampPair(SimulationTimestampPair *endpoint);
-        virtual ~SimulationTimestampPair() {}
+        virtual ~SimulationTimestampPair() = default;
         /***********************/
         /** \endcond           */
         /***********************/
@@ -88,23 +106,16 @@ namespace wrench {
 
     public:
 
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
-        SimulationTimestampTask(WorkflowTask *);
-        /***********************/
-        /** \endcond           */
-        /***********************/
-
         WorkflowTask *getTask();
         SimulationTimestampTask *getEndpoint() override;
 
     protected:
         static std::map<std::string, SimulationTimestampTask *> pending_task_timestamps;
-
         void setEndpoints();
+        explicit SimulationTimestampTask(WorkflowTask *);
 
     private:
+        friend class SimulationOutput;
         WorkflowTask *task;
     };
 
@@ -112,57 +123,36 @@ namespace wrench {
      * @brief A simulation timestamp class for WorkflowTask start times
      */
     class SimulationTimestampTaskStart : public SimulationTimestampTask {
-    public:
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
-        SimulationTimestampTaskStart(WorkflowTask *);
-        /***********************/
-        /** \endcond           */
-        /***********************/
+    private:
+        friend class SimulationOutput;
+        explicit SimulationTimestampTaskStart(WorkflowTask *task);
     };
 
     /**
      * @brief A simulation timestamp class for WorkflowTask failure times
      */
     class SimulationTimestampTaskFailure : public SimulationTimestampTask {
-    public:
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
-        SimulationTimestampTaskFailure(WorkflowTask *);
-        /***********************/
-        /** \endcond           */
-        /***********************/
-
+    private:
+        friend class SimulationOutput;
+        explicit SimulationTimestampTaskFailure(WorkflowTask *task);
     };
 
     /**
      * @brief A simulation timestamp class for WorkflowTask completion times
      */
     class SimulationTimestampTaskCompletion : public SimulationTimestampTask {
-    public:
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
-        SimulationTimestampTaskCompletion(WorkflowTask *);
-        /***********************/
-        /** \endcond           */
-        /***********************/
+    private:
+        friend class SimulationOutput;
+        explicit SimulationTimestampTaskCompletion(WorkflowTask *);
     };
 
     /**
      * @brief A simulation timestamp class for WorkflowTask termination times
      */
      class SimulationTimestampTaskTermination : public SimulationTimestampTask {
-     public:
-         /***********************/
-         /** \cond INTERNAL     */
-         /***********************/
-         SimulationTimestampTaskTermination(WorkflowTask *);
-         /***********************/
-         /** \endcond           */
-         /***********************/
+     private:
+         friend class SimulationOutput;
+         explicit SimulationTimestampTaskTermination(WorkflowTask *);
      };
 
     class SimulationTimestampFileReadStart;
@@ -173,14 +163,6 @@ namespace wrench {
      */
     class SimulationTimestampFileRead : public SimulationTimestampPair {
     public:
-
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
-        SimulationTimestampFileRead(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task = nullptr);
-        /***********************/
-        /** \endcond           */
-        /***********************/
 
         /**
          * @brief Retrieve the matching endpoint, if any
@@ -219,6 +201,8 @@ namespace wrench {
         static std::unordered_multimap<File, std::pair<SimulationTimestampFileRead *, WorkflowTask *>> pending_file_reads;
 
         void setEndpoints();
+        friend class SimulationOutput;
+        SimulationTimestampFileRead(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task = nullptr);
     };
 
     class SimulationTimestampFileReadFailure;
@@ -229,13 +213,8 @@ namespace wrench {
      */
     class SimulationTimestampFileReadStart : public SimulationTimestampFileRead {
     public:
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
+        friend class SimulationOutput;
         SimulationTimestampFileReadStart(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task = nullptr);
-        /***********************/
-        /** \endcond           */
-        /***********************/
 
         friend class SimulationTimestampFileReadFailure;
         friend class SimulationTimestampFileReadCompletion;
@@ -245,28 +224,18 @@ namespace wrench {
      * @brief A simulation timestamp class for file read failure times
      */
     class SimulationTimestampFileReadFailure : public SimulationTimestampFileRead {
-    public:
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
+    private:
+        friend class SimulationOutput;
         SimulationTimestampFileReadFailure(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task = nullptr);
-        /***********************/
-        /** \endcond           */
-        /***********************/
     };
 
     /**
      * @brief A simulation timestamp class for file read completions
      */
     class SimulationTimestampFileReadCompletion : public SimulationTimestampFileRead {
-    public:
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
+    private:
+        friend class SimulationOutput;
         SimulationTimestampFileReadCompletion(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task = nullptr);
-        /***********************/
-        /** \endcond           */
-        /***********************/
     };
 
     class SimulationTimestampFileWriteStart;
@@ -277,14 +246,6 @@ namespace wrench {
      */
     class SimulationTimestampFileWrite : public SimulationTimestampPair {
     public:
-
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
-        SimulationTimestampFileWrite(WorkflowFile *file, FileLocation *dst, StorageService *service, WorkflowTask *task = nullptr);
-        /***********************/
-        /** \endcond           */
-        /***********************/
 
         /**
          * @brief Retrieve the matching endpoint, if any
@@ -323,6 +284,9 @@ namespace wrench {
         static std::unordered_multimap<File, std::pair<SimulationTimestampFileWrite *, WorkflowTask *>> pending_file_writes;
 
         void setEndpoints();
+
+        friend class SimulationOutput;
+        SimulationTimestampFileWrite(WorkflowFile *file, FileLocation *dst, StorageService *service, WorkflowTask *task = nullptr);
     };
 
     class SimulationTimestampFileWriteFailure;
@@ -332,45 +296,29 @@ namespace wrench {
      * @brief A simulation timestamp class for file write start times
      */
     class SimulationTimestampFileWriteStart : public SimulationTimestampFileWrite {
-    public:
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
-        SimulationTimestampFileWriteStart(WorkflowFile *file, FileLocation *dst, StorageService *service, WorkflowTask *task = nullptr);
-        /***********************/
-        /** \endcond           */
-        /***********************/
-
+    private:
+        friend class SimulationOutput;
         friend class SimulationTimestampFileWriteFailure;
         friend class SimulationTimestampFileWriteCompletion;
+        SimulationTimestampFileWriteStart(WorkflowFile *file, FileLocation *dst, StorageService *service, WorkflowTask *task = nullptr);
     };
 
     /**
      * @brief A simulation timestamp class for file write failure times
      */
     class SimulationTimestampFileWriteFailure : public SimulationTimestampFileWrite {
-    public:
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
+    private:
+        friend class SimulationOutput;
         SimulationTimestampFileWriteFailure(WorkflowFile *file, FileLocation *dst, StorageService *service, WorkflowTask *task = nullptr);
-        /***********************/
-        /** \endcond           */
-        /***********************/
     };
 
     /**
      * @brief A simulation timestamp class for file write completions
      */
     class SimulationTimestampFileWriteCompletion : public SimulationTimestampFileWrite {
-    public:
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
+    private:
+        friend class SimulationOutput;
         SimulationTimestampFileWriteCompletion(WorkflowFile *file, FileLocation *dst, StorageService *service, WorkflowTask *task = nullptr);
-        /***********************/
-        /** \endcond           */
-        /***********************/
     };
 
     class SimulationTimestampFileCopyStart;
@@ -382,14 +330,6 @@ namespace wrench {
     class SimulationTimestampFileCopy : public SimulationTimestampPair {
     public:
 
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
-        SimulationTimestampFileCopy(WorkflowFile *file, std::shared_ptr<FileLocation>  src, std::shared_ptr<FileLocation> dst);
-        /***********************/
-        /** \endcond           */
-        /***********************/
-
         /**
          * @brief Retrieve the matching endpoint, if any
          */
@@ -399,7 +339,9 @@ namespace wrench {
         std::shared_ptr<FileLocation> getDestination();
 
     protected:
-        /** 
+        SimulationTimestampFileCopy(WorkflowFile *file, std::shared_ptr<FileLocation>  src, std::shared_ptr<FileLocation> dst);
+
+        /**
          * @brief The WorkflowFile that was being copied
          */
         WorkflowFile *file;
@@ -413,8 +355,6 @@ namespace wrench {
          * @brief The location where the WorkflowFile was being copied to
          */
         std::shared_ptr<FileLocation> destination;
-
-
 
         /**
          * @brief the data structure that holds the ongoing file writes.
@@ -431,66 +371,208 @@ namespace wrench {
      * @brief A simulation timestamp class for file copy start times
      */
     class SimulationTimestampFileCopyStart : public SimulationTimestampFileCopy {
-    public:
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
-        SimulationTimestampFileCopyStart(WorkflowFile *file, std::shared_ptr<FileLocation> src, std::shared_ptr<FileLocation> dst);
-        /***********************/
-        /** \endcond           */
-        /***********************/
-
+    private:
+        friend class SimulationOutput;
         friend class SimulationTimestampFileCopyFailure;
         friend class SimulationTimestampFileCopyCompletion;
+        SimulationTimestampFileCopyStart(WorkflowFile *file, std::shared_ptr<FileLocation> src, std::shared_ptr<FileLocation> dst);
     };
 
     /**
      * @brief A simulation timestamp class for file copy failure times
      */
     class SimulationTimestampFileCopyFailure : public SimulationTimestampFileCopy {
-    public:
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
+    private:
+        friend class SimulationOutput;
         SimulationTimestampFileCopyFailure(WorkflowFile *file, std::shared_ptr<FileLocation>  src, std::shared_ptr<FileLocation> dst);
-        /***********************/
-        /** \endcond           */
-        /***********************/
     };
 
     /**
      * @brief A simulation timestamp class for file copy completions
      */
     class SimulationTimestampFileCopyCompletion : public SimulationTimestampFileCopy {
-    public:
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
+    private:
+        friend class SimulationOutput;
         SimulationTimestampFileCopyCompletion(WorkflowFile *file, std::shared_ptr<FileLocation>  src, std::shared_ptr<FileLocation> dst);
-        /***********************/
-        /** \endcond           */
-        /***********************/
     };
 
+    class SimulationTimestampDiskReadStart;
 
 
+    /**
+     * @brief A base class for simulation timestamps regarding disk reads
+     */
+    class SimulationTimestampDiskRead : public SimulationTimestampPair {
+    public:
+
+        /**
+         * @brief Retrieve the matching endpoint, if any
+         */
+        SimulationTimestampDiskRead *getEndpoint() override;
+        double getBytes();
+        std::string getHostname();
+        std::string getMount();
+        int getCounter();
+
+    protected:
+        /**
+         * @brief hostname of disk being read from
+         */
+        std::string hostname;
+
+        /**
+         * @brief mount point of disk being read from
+         */
+        std::string mount;
+
+        /**
+         * @brief amount of bytes being read
+         */
+        double bytes;
+
+        /**
+         * @brief counter to differentiate reads
+         */
+        int counter;
+
+
+        /**
+         * @brief the data structure that holds the ongoing disk reads.
+         */
+        static std::unordered_multimap<DiskAccess, SimulationTimestampDiskRead *> pending_disk_reads;
+
+        void setEndpoints();
+        friend class SimulationOutput;
+        SimulationTimestampDiskRead(std::string hostname, std::string mount, double bytes, int counter);
+    };
+
+    class SimulationTimestampDiskReadFailure;
+    class SimulationTimestampDiskReadCompletion;
+
+    /**
+     * @brief A simulation timestamp class for disk read start times
+     */
+    class SimulationTimestampDiskReadStart : public SimulationTimestampDiskRead {
+    public:
+        friend class SimulationOutput;
+        SimulationTimestampDiskReadStart(std::string hostname, std::string mount, double bytes, int counter);
+
+        friend class SimulationTimestampDiskReadFailure;
+        friend class SimulationTimestampDiskReadCompletion;
+    };
+
+    /**
+     * @brief A simulation timestamp class for disk read failure times
+     */
+    class SimulationTimestampDiskReadFailure : public SimulationTimestampDiskRead {
+    private:
+        friend class SimulationOutput;
+        SimulationTimestampDiskReadFailure(std::string hostname, std::string mount, double bytes, int counter);
+    };
+
+    /**
+     * @brief A simulation timestamp class for disk read completions
+     */
+    class SimulationTimestampDiskReadCompletion : public SimulationTimestampDiskRead {
+    private:
+        friend class SimulationOutput;
+        SimulationTimestampDiskReadCompletion(std::string hostname, std::string mount, double bytes, int counter);
+    };
+
+    class SimulationTimestampDiskWriteStart;
+
+
+    /**
+     * @brief A base class for simulation timestamps regarding disk writes
+     */
+    class SimulationTimestampDiskWrite : public SimulationTimestampPair {
+    public:
+
+        /**
+         * @brief Retrieve the matching endpoint, if any
+         */
+        SimulationTimestampDiskWrite *getEndpoint() override;
+        double getBytes();
+        std::string getHostname();
+        std::string getMount();
+        int getCounter();
+
+    protected:
+
+        /**
+         * @brief hostname of disk being written to
+         */
+        std::string hostname;
+
+        /**
+         * @brief mount point of disk being written to
+         */
+        std::string mount;
+
+        /**
+         * @brief amount of bytes being written
+         */
+        double bytes;
+
+        /**
+         * @brief counter to differentiate writes
+         */
+        int counter;
+
+        /**
+         * @brief the data structure that holds the ongoing disk writes.
+         */
+        static std::unordered_multimap<DiskAccess, SimulationTimestampDiskWrite *> pending_disk_writes;
+
+        void setEndpoints();
+        friend class SimulationOutput;
+        SimulationTimestampDiskWrite(std::string hostname, std::string mount, double bytes, int counter);
+    };
+
+    class SimulationTimestampDiskWriteFailure;
+    class SimulationTimestampDiskWriteCompletion;
+
+    /**
+     * @brief A simulation timestamp class for disk write start times
+     */
+    class SimulationTimestampDiskWriteStart : public SimulationTimestampDiskWrite {
+    public:
+        friend class SimulationOutput;
+        SimulationTimestampDiskWriteStart(std::string hostname, std::string mount, double bytes, int counter);
+
+        friend class SimulationTimestampDiskWriteFailure;
+        friend class SimulationTimestampDiskWriteCompletion;
+    };
+
+    /**
+     * @brief A simulation timestamp class for disk write failure times
+     */
+    class SimulationTimestampDiskWriteFailure : public SimulationTimestampDiskWrite {
+    private:
+        friend class SimulationOutput;
+        SimulationTimestampDiskWriteFailure(std::string hostname, std::string mount, double bytes, int counter);
+    };
+
+    /**
+     * @brief A simulation timestamp class for disk write completions
+     */
+    class SimulationTimestampDiskWriteCompletion : public SimulationTimestampDiskWrite {
+    private:
+        friend class SimulationOutput;
+        SimulationTimestampDiskWriteCompletion(std::string hostname, std::string mount, double bytes, int counter);
+    };
 
     /**
      * @brief A simulation timestamp class for changes in a host's pstate
      */
     class SimulationTimestampPstateSet : public SimulationTimestampType {
     public:
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
-        SimulationTimestampPstateSet(std::string hostname, int pstate);
-        /***********************/
-        /** \endcond           */
-        /***********************/
-
         std::string getHostname();
         int getPstate();
+
     private:
+        friend class SimulationOutput;
+        SimulationTimestampPstateSet(std::string hostname, int pstate);
         std::string hostname;
         int pstate;
     };
@@ -500,18 +582,12 @@ namespace wrench {
      */
     class SimulationTimestampEnergyConsumption: public SimulationTimestampType {
     public:
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
-        SimulationTimestampEnergyConsumption(std::string hostname, double joules);
-        /***********************/
-        /** \endcond           */
-        /***********************/
-
         std::string getHostname();
         double getConsumption();
 
     private:
+        friend class SimulationOutput;
+        SimulationTimestampEnergyConsumption(std::string hostname, double joules);
         std::string hostname;
         double joules;
     };

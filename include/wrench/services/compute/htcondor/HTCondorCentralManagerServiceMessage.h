@@ -18,6 +18,10 @@
 
 namespace wrench {
 
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
+
     /**
      * @brief Top-level class for messages received/sent by a HTCondorCentralManagerService
      */
@@ -37,6 +41,10 @@ namespace wrench {
         /** @brief List of scheduled jobs */
         std::vector<WorkflowJob *> scheduled_jobs;
     };
+
+    /***********************/
+    /** \endcond INTERNAL  */
+    /***********************/
 }
 
 #endif //WRENCH_HTCONDORCENTRALMANAGERSERVICEMESSAGE_H

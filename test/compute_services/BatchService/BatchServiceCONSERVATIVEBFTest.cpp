@@ -21,7 +21,7 @@
 
 #define EPSILON 0.05
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(batch_service_conservative_bf_test, "Log category for BatchServiceCONSERVATIVEBFTest");
+WRENCH_LOG_CATEGORY(batch_service_conservative_bf_test, "Log category for BatchServiceCONSERVATIVEBFTest");
 
 class BatchServiceCONSERVATIVE_BFTest : public ::testing::Test {
 

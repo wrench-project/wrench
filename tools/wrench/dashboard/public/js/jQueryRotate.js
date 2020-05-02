@@ -63,7 +63,7 @@
 
     // Library agnostic interface
 
-    Wilq32=window.Wilq32||{};
+    var Wilq32=window.Wilq32||{};
     Wilq32.PhotoEffect=(function(){
 
       if (supportedCSS) {
@@ -317,7 +317,7 @@
           }
 
       })()
-      }
+      };
 
       if (IE)
       {

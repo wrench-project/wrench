@@ -17,7 +17,7 @@
 #include <pugixml.hpp>
 #include <nlohmann/json.hpp>
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(pegasus_workflow_parser, "Log category for PegasusWorkflowParser");
+WRENCH_LOG_CATEGORY(pegasus_workflow_parser, "Log category for PegasusWorkflowParser");
 
 
 namespace wrench {
@@ -39,11 +39,14 @@ namespace wrench {
      *                             force these "redundant" dependencies to be added as edges in the workflow. Passing
      *                             redundant_dependencies=false will ignore these "redundant" dependencies. Most users
      *                             would likely pass "false".
+     * @return a workflow
+     *
      * @throw std::invalid_argument
      *
      */
-    Workflow *PegasusWorkflowParser::createWorkflowFromJSON(const std::string &filename, const std::string &reference_flop_rate,
-                                                                    bool redundant_dependencies) {
+    Workflow *PegasusWorkflowParser::createWorkflowFromJSON(const std::string &filename, 
+                                                            const std::string &reference_flop_rate,
+                                                            bool redundant_dependencies) {
 
         std::ifstream file;
         nlohmann::json j;
@@ -208,6 +211,7 @@ namespace wrench {
      *                             force these "redundant" dependencies to be added as edges in the workflow. Passing
      *                             redundant_dependencies=false will ignore these "redundant" dependencies. Most users
      *                             woudl likely pass "false".
+    * @return a workflow
      * @throw std::invalid_argument
      */
     Workflow *PegasusWorkflowParser::createExecutableWorkflowFromJSON(const std::string &filename, const std::string &reference_flop_rate,
@@ -232,6 +236,8 @@ namespace wrench {
      *                             force these "redundant" dependencies to be added as edges in the workflow. Passing
      *                             redundant_dependencies=false will ignore these "redundant" dependencies. Most users
      *                             would likely pass "false".
+     *
+     * @return a workflow
      *
      * @throw std::invalid_argument
      */

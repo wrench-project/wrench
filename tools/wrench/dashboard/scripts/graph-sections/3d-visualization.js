@@ -5,8 +5,10 @@ var scale
 var svg
 var cubesGroup
 var originXBox, originYBox, timeIntervalBox, scaleBox
-var key = function(d) { return d.task_id; }
-var color  = d3.scaleOrdinal(d3.schemeCategory20)
+var key = function (d) {
+    return d.task_id;
+}
+var color = d3.scaleOrdinal(d3.schemeCategory20)
 var mx, my, mouseX, mouseY
 var threeDColourMap = {}
 var currentlySelectedCube
@@ -15,12 +17,12 @@ var grid3d, scale3d, cubes3d
 
 function initialise3dGraph() {
     origin = [0, 200]
-    startAngle = Math.PI/4
+    startAngle = Math.PI / 4
     yAngle = startAngle
     xAngle = -startAngle
     taskOverlap = determineTaskOverlap(data.contents)
     maxTaskOverlap = Object.keys(taskOverlap).length + 1
-    maxTime = d3.max(data.contents, function(d) {
+    maxTime = d3.max(data.contents, function (d) {
         return Math.max(d['whole_task'].end, d['failed'], d['terminated'])
     })
     timeScalingFactor = maxTime / 32 // 32 is the ideal number of columns for the width of the space
@@ -33,21 +35,27 @@ function initialise3dGraph() {
     grid3d = d3._3d()
         .shape('GRID', maxTaskOverlap)
         .origin(origin)
-        .rotateY( startAngle)
+        .rotateY(startAngle)
         .rotateX(-startAngle)
         .scale(scale)
     scale3d = d3._3d()
         .shape('LINE_STRIP')
         .origin(origin)
-        .rotateY( startAngle)
+        .rotateY(startAngle)
         .rotateX(-startAngle)
         .scale(scale)
     cubes3d = d3._3d()
         .shape('CUBE')
-        .x(function(d){ return d.x; })
-        .y(function(d){ return d.y; })
-        .z(function(d){ return d.z; })
-        .rotateY( startAngle)
+        .x(function (d) {
+            return d.x;
+        })
+        .y(function (d) {
+            return d.y;
+        })
+        .z(function (d) {
+            return d.z;
+        })
+        .rotateY(startAngle)
         .rotateX(-startAngle)
         .origin(origin)
         .scale(scale)
@@ -72,9 +80,15 @@ function changeOriginOrScale(newOrigin, newScale) {
 
     cubes3d = d3._3d()
         .shape('CUBE')
-        .x(function(d){ return d.x; })
-        .y(function(d){ return d.y; })
-        .z(function(d){ return d.z; })
+        .x(function (d) {
+            return d.x;
+        })
+        .y(function (d) {
+            return d.y;
+        })
+        .z(function (d) {
+            return d.z;
+        })
         .rotateY(yAngle)
         .rotateX(xAngle)
         .origin(origin)
@@ -84,7 +98,7 @@ function changeOriginOrScale(newOrigin, newScale) {
         grid3d(xGrid),
         scale3d([yLine]),
         cubes3d(cubesData),
-        scale3d([xLine]), 
+        scale3d([xLine]),
         data.contents,
         cubes3d(ftCubesData)
     ]
@@ -105,7 +119,7 @@ function showInstructions(instructions, img) {
 
 function determineMaxNumCoresAllocated(data) {
     var max = 0
-    data.forEach(function(d) {
+    data.forEach(function (d) {
         if (d.num_cores_allocated >= max) {
             max = d.num_cores_allocated
         }
@@ -113,26 +127,26 @@ function determineMaxNumCoresAllocated(data) {
     return max
 }
 
-function makeCube(h, x, z, duration, colour, taskId){
+function makeCube(h, x, z, duration, colour, taskId) {
     return [
-        {x: x    , y: h, z: z + duration}, // FRONT TOP LEFT
-        {x: x    , y: 0, z: z + duration}, // FRONT BOTTOM LEFT
+        {x: x, y: h, z: z + duration}, // FRONT TOP LEFT
+        {x: x, y: 0, z: z + duration}, // FRONT BOTTOM LEFT
         {x: x + 1, y: 0, z: z + duration}, // FRONT BOTTOM RIGHT
         {x: x + 1, y: h, z: z + duration}, // FRONT TOP RIGHT
-        {x: x    , y: h, z: z}, // BACK  TOP LEFT
-        {x: x    , y: 0, z: z}, // BACK  BOTTOM LEFT
+        {x: x, y: h, z: z}, // BACK  TOP LEFT
+        {x: x, y: 0, z: z}, // BACK  BOTTOM LEFT
         {x: x + 1, y: 0, z: z}, // BACK  BOTTOM RIGHT
         {x: x + 1, y: h, z: z}, // BACK  TOP RIGHT
-        { colour },
-        { taskId }
+        {colour},
+        {taskId}
     ];
 }
 
-function dragged(){
+function dragged() {
     mouseX = mouseX || 0;
     mouseY = mouseY || 0;
-    beta   = (d3.event.x - mx + mouseX) * Math.PI / 230 ;
-    alpha  = (d3.event.y - my + mouseY) * Math.PI / 230  * (-1);
+    var beta = (d3.event.x - mx + mouseX) * Math.PI / 230;
+    var alpha = (d3.event.y - my + mouseY) * Math.PI / 230 * (-1);
     yAngle = beta + startAngle
     xAngle = alpha - startAngle
     var rotatedData = [
@@ -146,12 +160,12 @@ function dragged(){
     processData(rotatedData, 0, false);
 }
 
-function dragStart(){
+function dragStart() {
     mx = d3.event.x;
     my = d3.event.y;
 }
 
-function dragEnd(){
+function dragEnd() {
     mouseX = d3.event.x - mx + mouseX;
     mouseY = d3.event.y - my + mouseY;
 }
@@ -160,17 +174,20 @@ function sort3dLegend() {
     var legend = document.getElementById('three-d-legend')
     var legendItems = Array.from(legend.children)
     var ftItems = []
-    legendItems.sort(function(a, b) {
-        return a.innerHTML.toLowerCase().localeCompare(b.innerHTML.toLowerCase(), undefined, {numeric: true, sensitivity: 'base'})
+    legendItems.sort(function (a, b) {
+        return a.innerHTML.toLowerCase().localeCompare(b.innerHTML.toLowerCase(), undefined, {
+            numeric: true,
+            sensitivity: 'base'
+        })
     })
     legend.innerHTML = ''
-    legendItems.forEach(function(l) {
+    legendItems.forEach(function (l) {
         if (l.innerHTML === "Failed During Execution" || l.innerHTML === "Terminated by User") {
             ftItems.push(l)
         }
         legend.appendChild(l)
     })
-    ftItems.forEach(function(l) {
+    ftItems.forEach(function (l) {
         legend.appendChild(l)
     })
 }
@@ -186,7 +203,7 @@ function showAndPopulateTooltip(d) {
 
     tooltipTaskId.text('TaskID: ' + d.task_id)
 
-    tooltipHost.text('Host Name: ' + d['execution host'].hostname)
+    tooltipHost.text('Host Name: ' + d['execution_host'].hostname)
 
     var durationFull = findDuration(data.contents, d.task_id, "whole_task")
     tooltipDuration.text('Duration: ' + toFiveDecimalPlaces(durationFull) + 's')
@@ -206,7 +223,7 @@ function selectCube(taskId, hover) {
     if (!hover) {
         currentlySelectedCube = taskId
     }
-    currData.forEach(function(d) {
+    currData.forEach(function (d) {
         if (d.task_id === taskId) {
             document.getElementById(`three-d-legend-${taskId}`).style.fontWeight = 'bold'
             document.getElementById(`cube-${taskId}`).style.fill = threeDColourMap[taskId]
@@ -231,7 +248,7 @@ function deselectCube(hover) {
         currentlySelectedCube = ''
     }
     var currData = data.contents
-    currData.forEach(function(d) {
+    currData.forEach(function (d) {
         document.getElementById(`cube-${d.task_id}`).style.fill = threeDColourMap[d.task_id]
         document.getElementById(`three-d-legend-${d.task_id}`).style.fontWeight = 'normal'
         var ftCube = document.getElementById(`cube-ft-${d.task_id}`)
@@ -242,7 +259,7 @@ function deselectCube(hover) {
     hideTooltip()
 }
 
-function processData(data, tt, populateLegend){
+function processData(data, tt, populateLegend) {
     /* ----------- GRID ----------- */
 
     var xGrid = svg.selectAll('path.grid').data(data[0], key);
@@ -259,7 +276,7 @@ function processData(data, tt, populateLegend){
 
     xGrid.exit().remove();
 
-     /* ----------- y-Scale ----------- */
+    /* ----------- y-Scale ----------- */
 
     var yScale = svg.selectAll('path.yScale').data(data[1]);
 
@@ -274,7 +291,7 @@ function processData(data, tt, populateLegend){
 
     yScale.exit().remove();
 
-        /* ----------- y-Scale Text ----------- */
+    /* ----------- y-Scale Text ----------- */
 
     var yText = svg.selectAll('text.yText').data(data[1][0]);
 
@@ -284,14 +301,18 @@ function processData(data, tt, populateLegend){
         .attr('class', '_3d yText')
         .attr('dx', '.3em')
         .merge(yText)
-        .each(function(d){
+        .each(function (d) {
             d.centroid = {x: d.rotated.x, y: d.rotated.y, z: d.rotated.z};
         })
-        .attr('x', function(d){ return d.projected.x; })
-        .attr('y', function(d){ return d.projected.y; })
+        .attr('x', function (d) {
+            return d.projected.x;
+        })
+        .attr('y', function (d) {
+            return d.projected.y;
+        })
         .attr('font-size', '0.5em')
-        .text(function(d, i){
-            if (i+1 === (data[1][0]).length) {
+        .text(function (d, i) {
+            if (i + 1 === (data[1][0]).length) {
                 return "Cores Allocated"
             }
             if (d[1] <= 0) {
@@ -318,7 +339,7 @@ function processData(data, tt, populateLegend){
 
     xScale.exit().remove();
 
-        /* ----------- x-Scale Text ----------- */
+    /* ----------- x-Scale Text ----------- */
 
     var xText = svg.selectAll('text.xText').data(data[3][0]);
 
@@ -328,19 +349,27 @@ function processData(data, tt, populateLegend){
         .attr('class', '_3d xText')
         .attr('dx', '.3em')
         .merge(xText)
-        .each(function(d){
+        .each(function (d) {
             d.centroid = {x: d.rotated.x, y: d.rotated.y, z: d.rotated.z};
         })
-        .attr('x', function(d){ return d.projected.x; })
-        .attr('y', function(d){ return d.projected.y; })
+        .attr('x', function (d) {
+            return d.projected.x;
+        })
+        .attr('y', function (d) {
+            return d.projected.y;
+        })
         .attr('font-size', '0.5em')
-        .text(function(d){ return d[3] })
+        .text(function (d) {
+            return d[3]
+        })
 
     xText.exit().remove();
 
     /* --------- CUBES ---------*/
 
-    var cubes = cubesGroup.selectAll('g.cube').data(data[2], function(d){ return d.id });
+    var cubes = cubesGroup.selectAll('g.cube').data(data[2], function (d) {
+        return d.id
+    });
 
     var legend = d3.select('#three-d-legend')
 
@@ -360,10 +389,10 @@ function processData(data, tt, populateLegend){
         .enter()
         .append('g')
         .attr('class', 'cube')
-        .attr('id', function(d, i) {
+        .attr('id', function (d, i) {
             return `cube-${data[4][i].task_id}`
         })
-        .attr('fill', function(d, i){
+        .attr('fill', function (d, i) {
             var colour = getRandomColour()
             threeDColourMap[data[4][i].task_id] = colour
             legend.append("small")
@@ -371,18 +400,18 @@ function processData(data, tt, populateLegend){
                 .attr("id", `three-d-legend-${data[4][i].task_id}`)
                 .style("border-left", `15px solid ${colour}`)
                 .text(data[4][i].task_id)
-                .on('click', function() {
+                .on('click', function () {
                     selectCube(data[4][i].task_id, false)
-                    if (currentlySelectedCube === '' ) {
+                    if (currentlySelectedCube === '') {
                         cubeIsClicked = false
                     } else {
                         cubeIsClicked = true
                     }
                 })
-                .on('mouseover', function() {
+                .on('mouseover', function () {
                     selectCube(data[4][i].task_id, true)
                 })
-                .on('mouseout', function() {
+                .on('mouseout', function () {
                     if (!cubeIsClicked) {
                         deselectCube(true)
                     } else {
@@ -391,7 +420,9 @@ function processData(data, tt, populateLegend){
                 })
             return colour
         })
-        .attr('stroke', function(d){ return d3.color(color(d.id)); })
+        .attr('stroke', function (d) {
+            return d3.color(color(d.id));
+        })
         .merge(cubes)
 
     sort3dLegend()
@@ -400,7 +431,11 @@ function processData(data, tt, populateLegend){
 
     /* --------- FACES ---------*/
 
-    var faces = cubes.merge(ce).selectAll('path.face').data(function(d){ return d.faces; }, function(d){ return d.face; });
+    var faces = cubes.merge(ce).selectAll('path.face').data(function (d) {
+        return d.faces;
+    }, function (d) {
+        return d.face;
+    });
 
     faces.enter()
         .append('path')
@@ -409,30 +444,38 @@ function processData(data, tt, populateLegend){
         .classed('_3d', true)
         .merge(faces)
         .transition().duration(tt)
-        .attr('d', cubes3d.draw)        
+        .attr('d', cubes3d.draw)
 
     faces.exit().remove();
 
     /* --------- FT CUBES ---------*/
 
-    var ftCubes = cubesGroup.selectAll('g.cube').data(data[5], function(d){ return d.id });
+    var ftCubes = cubesGroup.selectAll('g.cube').data(data[5], function (d) {
+        return d.id
+    });
 
     var ftCE = ftCubes
         .enter()
         .append('g')
         .attr('class', 'cube')
-        .attr('id', function(d, i) {
+        .attr('id', function (d, i) {
             return `cube-ft-${d[9].taskId}`
         })
-        .attr('fill', function(d, i){
+        .attr('fill', function (d, i) {
             return d[8].colour
         })
-        .attr('stroke', function(d){ return d3.color(color(d.id)); })
+        .attr('stroke', function (d) {
+            return d3.color(color(d.id));
+        })
         .merge(cubes)
-    
+
     /* --------- FT FACES ---------*/
 
-    var ftFaces = ftCubes.merge(ftCE).selectAll('path.face').data(function(d){ return d.faces; }, function(d){ return d.face; });
+    var ftFaces = ftCubes.merge(ftCE).selectAll('path.face').data(function (d) {
+        return d.faces;
+    }, function (d) {
+        return d.face;
+    });
 
     ftFaces.enter()
         .append('path')
@@ -441,7 +484,7 @@ function processData(data, tt, populateLegend){
         .classed('_3d', true)
         .merge(ftFaces)
         .transition().duration(tt)
-        .attr('d', cubes3d.draw)    
+        .attr('d', cubes3d.draw)
 
 }
 
@@ -461,7 +504,7 @@ function generate3dGraph(data, populateLegend, needToInitialise, svgId, originXI
     }
 
     if (svgId) {
-        svg    = d3.select(`#${svgId}`).call(d3.drag().on('drag', dragged).on('start', dragStart).on('end', dragEnd)).append('g')
+        svg = d3.select(`#${svgId}`).call(d3.drag().on('drag', dragged).on('start', dragStart).on('end', dragEnd)).append('g')
         cubesGroup = svg.append('g').attr('class', 'cubes')
     }
 
@@ -486,19 +529,19 @@ function generate3dGraph(data, populateLegend, needToInitialise, svgId, originXI
     timeIntervalBox.value = timeScalingFactor
     scaleBox.value = scale
 
-    originXBox.onchange = function(e) {
+    originXBox.onchange = function (e) {
         changeOriginOrScale([parseFloat(e.target.value), origin[1]], scale)
     }
 
-    originYBox.onchange = function(e) {
+    originYBox.onchange = function (e) {
         changeOriginOrScale([origin[0], parseFloat(e.target.value)], scale)
     }
 
-    timeIntervalBox.onchange = function(e) {
+    timeIntervalBox.onchange = function (e) {
         changeTimeScalingFactor(parseFloat(e.target.value))
     }
 
-    scaleBox.onchange = function(e) {
+    scaleBox.onchange = function (e) {
         changeOriginOrScale(origin, e.target.value)
     }
 
@@ -506,22 +549,26 @@ function generate3dGraph(data, populateLegend, needToInitialise, svgId, originXI
         showInstructions("three-d-instructions", "three-d-information-img")
     }
 
-    xGrid = [], scatter = [], yLine = [], xLine = []
-    for(var z = 0; z <= maxTime + timeScalingFactor; z+=timeScalingFactor){
-        for(var x = 0; x < maxTaskOverlap; x++) {
-            xGrid.push([x, 1, z/timeScalingFactor])
+    var xGrid = [], scatter = [], yLine = [], xLine = []
+    for (var z = 0; z <= maxTime + timeScalingFactor; z += timeScalingFactor) {
+        for (var x = 0; x < maxTaskOverlap; x++) {
+            xGrid.push([x, 1, z / timeScalingFactor])
         }
     }
 
     var maxNumCoresAllocated = determineMaxNumCoresAllocated(data)
-    d3.range(-1, maxNumCoresAllocated + 1, 1).forEach(function(d) { yLine.push([0, -d, 0]) })
+    d3.range(-1, maxNumCoresAllocated + 1, 1).forEach(function (d) {
+        yLine.push([0, -d, 0])
+    })
 
-    d3.range(0, maxTime, timeScalingFactor).forEach(function(d) { xLine.push([0, 1, d / timeScalingFactor, d]) })
-    xLine.push([0,1,(maxTime / timeScalingFactor) + 1, "Time (seconds)"]) // for axis label
+    d3.range(0, maxTime, timeScalingFactor).forEach(function (d) {
+        xLine.push([0, 1, d / timeScalingFactor, d])
+    })
+    xLine.push([0, 1, (maxTime / timeScalingFactor) + 1, "Time (seconds)"]) // for axis label
 
-    cubesData = []
-    ftCubesData = []
-    data.forEach(function(d) {
+    var cubesData = []
+    var ftCubesData = []
+    data.forEach(function (d) {
         var h = d.num_cores_allocated
         var z = d.whole_task.start / timeScalingFactor
         var x = searchOverlap(d.task_id, taskOverlap)

@@ -16,7 +16,7 @@
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(bogus_message_test, "Log category for BogusMessageTest");
+WRENCH_LOG_CATEGORY(bogus_message_test, "Log category for BogusMessageTest");
 
 
 class BogusMessageTest : public ::testing::Test {
@@ -174,7 +174,7 @@ private:
 
 /*************************************************************
  ** WARNING: THESE TESTS ARE A NICE THOUGHT, AND THEY WORK
- ** BUT ALTHOUGH THE "UNEXPECTED MESSAGE" EXECPTIONS ARE THROWN
+ ** BUT ALTHOUGH THE "UNEXPECTED MESSAGE" EXCEPTIONS ARE THROWN
  ** THE LINES OF CODE THAT THROW ARE NOT MARKED AS COVERED
  ** BY COVERALLS...
  *************************************************************/

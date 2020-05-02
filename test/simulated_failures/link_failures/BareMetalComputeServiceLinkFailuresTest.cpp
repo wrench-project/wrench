@@ -18,7 +18,7 @@
 #include "../failure_test_util/ResourceRandomRepeatSwitcher.h"
 
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(bare_metal_compute_service_link_failures_test, "Log category for BareMetalComputeServiceLinkFailuresTest");
+WRENCH_LOG_CATEGORY(bare_metal_compute_service_link_failures_test, "Log category for BareMetalComputeServiceLinkFailuresTest");
 
 
 class BareMetalComputeServiceLinkFailuresTest : public ::testing::Test {

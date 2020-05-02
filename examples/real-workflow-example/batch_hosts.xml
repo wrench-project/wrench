@@ -1,0 +1,34 @@
+<?xml version='1.0'?>
+<!DOCTYPE platform SYSTEM "http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd">
+<platform version="4.1">
+    <zone id="AS0" routing="Full">
+        <host id="Host1" speed="1000Gf" core="10"/>
+        <host id="Host2" speed="1000Gf" core="10"/>
+        <host id="Host3" speed="1000Gf" core="10">
+            <disk id="large_disk" read_bw="100MBps" write_bw="100MBps">
+                <prop id="size" value="5000GiB"/>
+                <prop id="mount" value="/"/>
+            </disk>
+        </host>
+        <host id="Host4" speed="1000Gf" core="10"/>
+        <link id="1" bandwidth="5000GBps" latency="0us"/>
+        <route src="Host1" dst="Host2">
+            <link_ctn id="1"/>
+        </route>
+        <route src="Host1" dst="Host3">
+            <link_ctn id="1"/>
+        </route>
+        <route src="Host1" dst="Host4">
+            <link_ctn id="1"/>
+        </route>
+        <route src="Host2" dst="Host3">
+            <link_ctn id="1"/>
+        </route>
+        <route src="Host2" dst="Host4">
+            <link_ctn id="1"/>
+        </route>
+        <route src="Host3" dst="Host4">
+            <link_ctn id="1"/>
+        </route>
+    </zone>
+</platform>

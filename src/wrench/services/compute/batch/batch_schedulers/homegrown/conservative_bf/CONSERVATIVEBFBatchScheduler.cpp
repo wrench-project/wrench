@@ -14,7 +14,7 @@
 
 //#define  PRINT_SCHEDULE 1
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(conservative_bf_batch_scheduler, "Log category for CONSERVATIVEBFBatchScheduler");
+WRENCH_LOG_CATEGORY(wrench_core_conservative_bf_batch_scheduler, "Log category for CONSERVATIVEBFBatchScheduler");
 
 namespace wrench {
 

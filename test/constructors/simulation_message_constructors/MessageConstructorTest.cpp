@@ -19,7 +19,7 @@
 #include "services/compute/cloud/CloudComputeServiceMessage.h"
 #include "services/compute/virtualized_cluster/VirtualizedClusterComputeServiceMessage.h"
 #include "services/network_proximity/NetworkProximityMessage.h"
-#include "wrench/workflow/execution_events/FailureCause.h"
+#include "wrench/workflow/failure_causes/FileNotFound.h"
 #include "wrench/services/compute/batch/BatchJob.h"
 
 class MessageConstructorTest : public ::testing::Test {

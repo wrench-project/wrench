@@ -16,6 +16,7 @@
 #include "wrench/services/compute/batch/BatschedNetworkListener.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
+#include "wrench/workflow/failure_causes/NetworkError.h"
 
 #ifdef ENABLE_BATSCHED // Only include these files below if Batsched is enabled
 
@@ -27,7 +28,7 @@
 
 #endif
 
-WRENCH_LOG_NEW_DEFAULT_CATEGORY(batch_network_listener_service, "Log category for Batch Network Listener Service");
+WRENCH_LOG_CATEGORY(wrench_core_batch_network_listener_service, "Log category for Batch Network Listener Service");
 
 //class context_t;
 

@@ -1,0 +1,30 @@
+#!/bin/bash
+#
+# Copyright (c) 2019-2020. The WRENCH Team.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+
+path=@CMAKE_INSTALL_PREFIX@/wrench/dashboard/index.html
+
+if [[ "$OSTYPE" == "linux-gnu" ]]; then
+    xdg-open "$path"
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+    # Mac OSX
+    open "$path"
+elif [[ "$OSTYPE" == "cygwin" ]]; then
+    # POSIX compatibility layer and Linux environment emulation for Windows
+    cygstart "$path"
+elif [[ "$OSTYPE" == "msys" ]]; then
+    # Lightweight shell and GNU utilities compiled for Windows (part of MinGW)
+    start "$path"
+elif [[ "$OSTYPE" == "win32" ]]; then
+    # I'm not sure this can happen.
+    start "$path"
+else
+    # Unknown.
+    echo "Unknown OS"
+fi
