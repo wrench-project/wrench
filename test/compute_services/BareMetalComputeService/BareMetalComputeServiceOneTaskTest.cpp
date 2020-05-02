@@ -1973,6 +1973,7 @@ private:
         // Suspend the service
         test->compute_service->suspend();
 
+
         // Create a job
         job = job_manager->createStandardJob(test->task,
                                              {{test->input_file,  wrench::FileLocation::LOCATION(
@@ -1996,6 +1997,9 @@ private:
                         "Got the expected failure, but the failure cause does not point to the right compute service");
             }
         }
+
+        // Sleep for 1 sec
+        wrench::Simulation::sleep(1);
 
         // Resume the service
         test->compute_service->resume();
