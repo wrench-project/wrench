@@ -68,7 +68,6 @@ namespace wrench {
 
         // Create the S4U simulation wrapper
         this->s4u_simulation = std::unique_ptr<S4U_Simulation>(new S4U_Simulation());
-
     }
 
     /**
@@ -161,6 +160,8 @@ namespace wrench {
             std::cout << " (compiled with Batsched)";
 #endif
             std::cout << "\n";
+            // put the argument back in so that we also see the
+            // SimGrid message
             argv[(*argc)] = strdup("--version");
             (*argc)++;
         }
