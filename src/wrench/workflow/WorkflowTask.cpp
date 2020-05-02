@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2019. The WRENCH Team.
+ * Copyright (c) 2017-2020. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,19 +53,19 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     void WorkflowTask::addInputFile(WorkflowFile *file) {
-
         WRENCH_DEBUG("Adding file '%s' as input to task %s", file->getID().c_str(), this->getID().c_str());
 
         // If the file is alreadxy an input file of the task, complain
         if (this->input_files.find(file->getID()) != this->input_files.end()) {
-            throw std::invalid_argument(" WorkflowTask::addInputFile(): File ID '" + file->getID() + "' is already an input file of task '" + this->getID() + "'");
+            throw std::invalid_argument(" WorkflowTask::addInputFile(): File ID '" + file->getID() +
+                                        "' is already an input file of task '" + this->getID() + "'");
         }
 
         // If file is already an output file of the task, complain
         if (this->output_files.find(file->getID()) != this->output_files.end()) {
-            throw std::invalid_argument(" WorkflowTask::addInputFile(): File ID '" + file->getID() + "' is already an output file of task '" + this->getID() + "'");
+            throw std::invalid_argument(" WorkflowTask::addInputFile(): File ID '" + file->getID() +
+                                        "' is already an output file of task '" + this->getID() + "'");
         }
-
 
         // Add the file
         this->input_files[file->getID()] = file;
@@ -83,7 +83,6 @@ namespace wrench {
      * @param file: the file
      */
     void WorkflowTask::addOutputFile(WorkflowFile *file) {
-
         WRENCH_DEBUG("Adding file '%s' as output t task %s", file->getID().c_str(), this->getID().c_str());
 
         // If the file is already input, complain
@@ -106,7 +105,6 @@ namespace wrench {
         for (auto const &x : file->getInputOf()) {
             workflow->addControlDependency(this, x.second);
         }
-
     }
 
     /**
@@ -163,7 +161,6 @@ namespace wrench {
         return this->memory_requirement;
     }
 
-
     /**
      * @brief Get the number of children of a task
      *
@@ -218,7 +215,6 @@ namespace wrench {
         return this->upcoming_visible_state;
     }
 
-
     /**
      * @brief Get the state of the task (as known to the "internal" layer)
      *
@@ -258,7 +254,6 @@ namespace wrench {
      * @return an internal state as a string
      */
     std::string WorkflowTask::stateToString(WorkflowTask::InternalState state) {
-
         switch (state) {
             case TASK_NOT_READY:
                 return "NOT READY";
@@ -600,9 +595,9 @@ namespace wrench {
         return this->execution_history;
     }
 
-
     /**
      * @brief Get the number of times a task has failed
+     *
      * @return a failure count
      */
     unsigned int WorkflowTask::getFailureCount() {
@@ -772,7 +767,6 @@ namespace wrench {
 
     /**
      * @brief Sets the host on which this task is running
-     *
      * @param hostname: the host name
      */
     void WorkflowTask::setExecutionHost(std::string hostname) {
@@ -796,28 +790,4 @@ namespace wrench {
                     "WorkflowTask::setNumCoresAllocated() cannot be called before WorkflowTask::setStartDate()");
         }
     }
-
-//    /**
-//     * @brief Get a map of src and dst hosts for file transfers
-//     *        (only available for WorkflowTask::TaskType::TRANSFER_IN or WorkflowTask::TaskType::TRANSFER_OUT tasks)
-//     * @return transfer src and dst pair
-//     */
-//    std::map<WorkflowFile *, std::pair<std::string, std::string>> WorkflowTask::getFileTransfers() const {
-//        return this->fileTransfers;
-//    }
-//
-//    /**
-//     * @brief Set a pair of src and dest hosts for transfers (it is only meaningful for
-//     *        WorkflowTask::TaskType::TRANSFER tasks)
-//     *
-//     * @param workflow_file: a pointer to a file to be transferred
-//     * @param src: source hostname
-//     * @param dst: destination hostname
-//     */
-//    void WorkflowTask::addSrcDest(WorkflowFile *workflow_file, const std::string &src, const std::string &dst) {
-//        if (this->fileTransfers.find(workflow_file) == this->fileTransfers.end()) {
-//            this->fileTransfers.insert(std::make_pair(workflow_file, std::make_pair(src, dst)));
-//        }
-//    }
-
 };
