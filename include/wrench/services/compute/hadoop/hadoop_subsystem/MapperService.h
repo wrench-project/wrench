@@ -27,6 +27,7 @@ namespace wrench {
         );
 
         void stop() override;
+
     private:
         MRJob *job;
 
@@ -38,6 +39,7 @@ namespace wrench {
 
         // TODO: And define these:
         std::map<std::string, double> default_messagepayload_values = {
+                {MRJobExecutorMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,         1024},
                 {MRJobExecutorMessagePayload::MAP_SIDE_HDFS_DATA_DELIVERY_PAYLOAD, 1024},
                 {MRJobExecutorMessagePayload::MAP_SIDE_HDFS_DATA_REQUEST_PAYLOAD,  1024},
                 {MRJobExecutorMessagePayload::MAP_SIDE_SHUFFLE_REQUEST_PAYLOAD,    1024},

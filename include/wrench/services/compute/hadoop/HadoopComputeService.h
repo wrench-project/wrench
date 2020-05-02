@@ -36,6 +36,7 @@ namespace wrench {
         void stop() override;
 
         void runMRJob(MRJob *job);
+
     private:
         class PendingJob {
         public:
@@ -54,9 +55,10 @@ namespace wrench {
         std::map<std::string, std::string> default_property_values = {};
 
         std::map<std::string, double> default_messagepayload_values = {
-                {HadoopComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,        1024},
-                {HadoopComputeServiceMessagePayload::RUN_MR_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {HadoopComputeServiceMessagePayload::RUN_MR_JOB_ANSWER_MESSAGE_PAYLOAD,  1024},
+                {HadoopComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,            1024},
+                {HadoopComputeServiceMessagePayload::RUN_MR_JOB_REQUEST_MESSAGE_PAYLOAD,     1024},
+                {HadoopComputeServiceMessagePayload::RUN_MR_JOB_ANSWER_MESSAGE_PAYLOAD,      1024},
+                {HadoopComputeServiceMessagePayload::NOTIFY_EXECUTOR_STATUS_MESSAGE_PAYLOAD, 1024},
         };
 
         std::set<std::string> compute_resources;

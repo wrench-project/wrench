@@ -21,7 +21,7 @@
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/workflow/failure_causes/NetworkError.h"
 
-WRENCH_LOG_CATEGORY(hadoop_compute_servivce, "Log category for Hadoop Compute Service");
+WRENCH_LOG_CATEGORY(hadoop_compute_service, "Log category for Hadoop Compute Service");
 
 namespace wrench {
 
@@ -41,12 +41,17 @@ namespace wrench {
     ) :
             Service(hostname,
                     "hadoop",
-                    "hadoop") {
+                    "hadoop"), compute_resources(compute_resources) {
         // Set default and specified properties
         this->setProperties(this->default_property_values, std::move(property_list));
 
         // Set default and specified message payloads
         this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
+
+        if (compute_resources.empty()) {
+            throw std::invalid_argument(
+                    "HadoopComputeService::HadoopComputeService(): at least one compute hosts must be provided");
+        }
     }
 
     /**
@@ -63,11 +68,12 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void HadoopComputeService::runMRJob(MRJob *job) {
+        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
         assertServiceIsUp();
 
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_mr_job");
 
-        //  send a "run a MR job" message to the daemon's mailbox_name
+        WRENCH_INFO("HadoopComputeService::runMRJob(): Sending a RunMRJob Message to this daemon's mailbox.")
         try {
             S4U_Mailbox::putMessage(this->mailbox_name,
                                     new HadoopComputeServiceRunMRJobRequestMessage(
@@ -104,11 +110,10 @@ namespace wrench {
      * @return 0 on termination
      */
     int HadoopComputeService::main() {
+        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
         this->state = Service::UP;
 
-        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
-
-        WRENCH_INFO("New HadoopComputeService starting (%s) on %ld hosts",
+        WRENCH_INFO("New HadoopComputeService (%s) starting on %ld hosts",
                     this->mailbox_name.c_str(), this->compute_resources.size());
 
         /** Main loop **/
@@ -128,6 +133,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     bool HadoopComputeService::processNextMessage() {
+        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
         S4U_Simulation::computeZeroFlop();
 
         // Wait for a message
@@ -140,6 +146,7 @@ namespace wrench {
         }
 
         WRENCH_INFO("Got a [%s] message", message->getName().c_str());
+
         if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
             // TODO: Forward the stop request to the executor
             // This is Synchronous
@@ -167,6 +174,8 @@ namespace wrench {
                 return false;
             }
 
+            WRENCH_INFO("HadoopComputeService::ProcessNextMessage(): Creating an MRJobExecutor.");
+
             // TODO: Double check that the job can run (e.g., do we have enough compute resources?)
             // Start a MRJobExecutor service
             std::shared_ptr<MRJobExecutor> executor = std::shared_ptr<MRJobExecutor>(
@@ -192,7 +201,7 @@ namespace wrench {
                 S4U_Mailbox::putMessage((this->pending_jobs.at(msg->job))->answer_mailbox,
                                         new HadoopComputeServiceRunMRJobAnswerMessage(msg->success,
                                                                                       this->getMessagePayloadValue(
-                                                                                              MRJobExecutorMessagePayload::NOTIFY_EXECUTOR_STATUS_MESSAGE_PAYLOAD)));
+                                                                                              HadoopComputeServiceMessagePayload::NOTIFY_EXECUTOR_STATUS_MESSAGE_PAYLOAD)));
             } catch (std::shared_ptr<NetworkError> &cause) {
 
             }

@@ -70,14 +70,11 @@ namespace wrench {
         /** Request the data to start the job */
         WRENCH_INFO("Mapper requesting data from HDFS...")
         try {
-            S4U_Mailbox::putMessage(this->mailbox_name,
-                                    new RequestDataFromHdfsMessage(
-                                            // The amount of data a mapper gets is an even share of
-                                            // overall data size.
-                                            this->job->getBlockSize(),
-                                            this->getMessagePayloadValue(
-                                                    // TODO: use right message payload
-                                            HadoopComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+            S4U_Mailbox::putMessage(this->job->getHdfsMailboxName(),
+                                    new HdfsReadDataMessage(this->job->getDataSize(),
+                                                            this->mailbox_name,
+                                                            this->getMessagePayloadValue(
+                                                                    MRJobExecutorMessagePayload::MAP_SIDE_HDFS_DATA_REQUEST_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
             return false;
         }
@@ -115,29 +112,16 @@ namespace wrench {
             try {
                 S4U_Mailbox::putMessage(msg->ack_mailbox,
                                         new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
-                                                HadoopComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+                                                MRJobExecutorMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
             } catch (std::shared_ptr<NetworkError> &cause) {
                 return false;
             }
             return false;
-        } else if (auto msg = std::dynamic_pointer_cast<RequestDataFromHdfsMessage>(message)) {
-            try {
-                S4U_Mailbox::putMessage(this->job->getHdfsMailboxName(),
-                                        new HdfsReadDataMessage(
-                                                msg->data_size,
-                                                this->mailbox_name,
-                                                this->getMessagePayloadValue(
-                                                        // TODO: use right payload
-                                                HadoopComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
-            } catch (std::shared_ptr<NetworkError> &cause) {
-                return false;
-            }
-            return true;
         } else if (auto msg = std::dynamic_pointer_cast<HdfsReadCompleteMessage>(message)) {
             // The mapper computes the user map function, writes spill files locally,
             // and then merges all spill files back into a single map file.
             WRENCH_INFO("Mapper doing some work (spilling/merging)...")
-            // TODO: Actually compute the correct values given the job.
+            // TODO: Actually compute the correct values given the job, and extract to a helper function.
             // The materilaized output is found via:
             // https://github.com/wrench-project/understanding_hadoop/blob/00a1c5653ae025e9db723d4c3e2137f2bb2b5472/hadoop_mr_tests/map_output_materialized_bytes/run_test.py#L109
             // For the spill phase refer to:
@@ -146,10 +130,21 @@ namespace wrench {
             // Compute map function
             Simulation::compute(this->job->getMapperFlops());
             // Write file(s)
-            simulation->writeToDisk(1, this->hostname, "/");
+            simulation->writeToDisk(this->job->getDataSize(), "WMSHost", "/");
             // Merge all spilled files to single output
             Simulation::compute(this->job->getMapperFlops());
-            return true;
+
+            // TODO: We shouldn't really be returning false here,
+            // but for now, just tell the executor we finished.
+            try {
+                S4U_Mailbox::putMessage(this->job->getExecutorMailbox(),
+                                        new ServiceStopDaemonMessage(this->mailbox_name,
+                                                                     this->getMessagePayloadValue(
+                                                                             MRJobExecutorMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD)));
+            } catch (std::shared_ptr<NetworkError> &cause) {
+                return false;
+            }
+            return false;
         } else {
             throw std::runtime_error(
                     "MapperService::processNextMessage(): Received an unexpected [" + message->getName() +

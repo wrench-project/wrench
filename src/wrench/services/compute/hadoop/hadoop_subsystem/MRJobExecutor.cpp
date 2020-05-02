@@ -18,7 +18,7 @@
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 
-WRENCH_LOG_CATEGORY(mr_job_executor_servivce, "Log category for MR Job Executor Service");
+WRENCH_LOG_CATEGORY(mr_job_executor_service, "Log category for MR Job Executor Service");
 
 namespace wrench {
 
@@ -42,7 +42,7 @@ namespace wrench {
     ) :
             Service(hostname,
                     "mr_job_executor",
-                    "mr_job_executor") {
+                    "mr_job_executor"), job(job), success(false) {
         this->compute_resources = compute_resources;
         this->notify_mailbox = std::move(notify_mailbox);
 
@@ -67,29 +67,6 @@ namespace wrench {
         // But we should change this so that workers are spun up
         // on the appropriate nodes.  As well as think about what
         // to do when resorues do not match user specs.
-        workers.push_back(std::shared_ptr<HdfsService>(
-                new HdfsService(this->hostname, this->job, this->compute_resources,
-                                {},
-                                {})));
-
-        workers.push_back(std::shared_ptr<ShuffleService>(
-                new ShuffleService(this->hostname, this->job, this->compute_resources,
-                                   {},
-                                   {})));
-
-        for (int i = 0; i < this->job->calculateNumMappers(); i++) {
-            workers.push_back(std::shared_ptr<MapperService>(
-                    new MapperService(this->hostname, this->job, this->compute_resources,
-                                      {},
-                                      {})));
-        }
-
-        for (int i = 0; i < this->job->getNumReducers(); i++) {
-            workers.push_back(std::shared_ptr<ReducerService>(
-                    new ReducerService(this->hostname, this->job, this->compute_resources,
-                                       {},
-                                       {})));
-        }
     }
 
     /**
@@ -100,19 +77,40 @@ namespace wrench {
     int MRJobExecutor::main() {
         this->state = Service::UP;
 
-        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
+        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_CYAN);
 
         WRENCH_INFO("New MRJobExecutor starting (%s) on %ld hosts",
                     this->mailbox_name.c_str(), this->compute_resources.size());
 
         this->success = true;
+        this->job->setExecutorMailbox(this->mailbox_name);
 
-        std::vector<std::shared_ptr<Service>> workers;
-        setup_workers(workers);
-        for (auto worker: workers) {
-            worker->simulation = this->simulation;
-            worker->start(worker, true, false);
-        }
+        // TODO: Fix setup_workers
+        WRENCH_INFO("Starting mapper in MRJobExecutor...")
+        std::shared_ptr<MapperService> mapper = std::shared_ptr<MapperService>(
+                new MapperService(
+                        this->hostname,
+                        this->job,
+                        this->compute_resources,
+                        {},
+                        {}));
+
+        // TODO: Fix setup_workers
+        WRENCH_INFO("Starting HDFS in MRJobExecutor...")
+        std::shared_ptr<HdfsService> hdfs = std::shared_ptr<HdfsService>(
+                new HdfsService(
+                        this->hostname,
+                        this->job,
+                        this->compute_resources,
+                        {},
+                        {}));
+
+        hdfs->simulation = this->simulation;
+        mapper->simulation = this->simulation;
+
+        hdfs->start(mapper, true, false);
+        mapper->start(mapper, true, false);
+
 
         /** Main loop **/
         while (this->processNextMessage()) {
@@ -159,13 +157,14 @@ namespace wrench {
             // TODO: Or reject the stop request because a job  is running?
             // TODO: Or terminate brutally a running job?
 
-            // Right now, assume the job fails.
-            this->success = false;
+            // This is a total lie of a statement.
+            this->success = true;
+
             // This is Synchronous
             try {
                 S4U_Mailbox::putMessage(msg->ack_mailbox,
                                         new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
-                                                HadoopComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+                                                HadoopComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD)));
             } catch (std::shared_ptr<NetworkError> &cause) {
                 return false;
             }

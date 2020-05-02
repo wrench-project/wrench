@@ -161,6 +161,7 @@ set(HEADER_FILES
         include/wrench/workflow/job/WorkflowJob.h
         include/wrench/services/compute/hadoop/DeterministicMRJob.h
         include/wrench/services/compute/hadoop/MRJob.h
+        include/wrench/services/compute/hadoop/HadoopComputeService.h
         include/wrench/services/compute/hadoop/hadoop_subsystem/MRJobExecutor.h
         include/wrench/services/compute/hadoop/hadoop_subsystem/MRJobExecutorMessagePayload.h
         include/wrench/services/compute/hadoop/hadoop_subsystem/ShuffleService.h
@@ -315,7 +316,6 @@ set(SOURCE_FILES
         src/wrench/workflow/job/StandardJob.cpp
         src/wrench/workflow/job/WorkflowJob.cpp
         src/wrench/services/compute/hadoop/HadoopComputeService.cpp
-        include/wrench/services/compute/hadoop/HadoopComputeService.h
         src/wrench/services/compute/hadoop/HadoopComputeServiceProperty.cpp
         src/wrench/services/compute/hadoop/HadoopComputeServiceMessage.cpp
         src/wrench/services/compute/hadoop/HadoopComputeServiceMessage.h

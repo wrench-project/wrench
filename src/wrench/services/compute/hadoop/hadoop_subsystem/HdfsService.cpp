@@ -17,7 +17,7 @@
 #include "../HadoopComputeServiceMessage.h"
 #include "wrench/simulation/Simulation.h"
 
-WRENCH_LOG_CATEGORY(hdfs_servivce, "Log category for HDFS Actor");
+WRENCH_LOG_CATEGORY(hdfs_service, "Log category for HDFS Actor");
 
 namespace wrench {
 
@@ -95,7 +95,7 @@ namespace wrench {
             return true;
         }
 
-        WRENCH_INFO("Got a [%s] message", message->getName().c_str());
+        WRENCH_INFO("HdfsService::HdfsService() Got a [%s] message", message->getName().c_str());
         if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
             // This is Synchronous
             try {
@@ -109,18 +109,19 @@ namespace wrench {
 
         } else if (auto msg = std::dynamic_pointer_cast<HdfsReadDataMessage>(message)) {
             WRENCH_INFO("HDFS reading data for a mapper...");
-            simulation->readFromDisk(msg->data_size, this->hostname, "/");
+            simulation->readFromDisk(msg->data_size, "WMSHost", "/");
 
             try {
                 S4U_Mailbox::putMessage(msg->return_mailbox,
                                         new HdfsReadCompleteMessage(msg->data_size,
                                                 this->getMessagePayloadValue(
-                                                HadoopComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+                                                        MRJobExecutorMessagePayload::MAP_SIDE_HDFS_DATA_DELIVERY_PAYLOAD)));
             } catch (std::shared_ptr<NetworkError> &cause) {
                 return false;
             }
 
-            return true;
+            // TODO: Don't really return false here.
+            return false;
         } else {
                 throw std::runtime_error(
                         "HdfsService::processNextMessage(): Received an unexpected [" + message->getName() + "] message!");

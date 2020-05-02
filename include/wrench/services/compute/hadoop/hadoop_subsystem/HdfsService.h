@@ -10,6 +10,7 @@
 #ifndef WRENCH_HDFS_H
 #define WRENCH_HDFS_H
 
+#include <wrench/services/compute/hadoop/HadoopComputeService.h>
 #include <wrench/services/compute/hadoop/HadoopComputeServiceProperty.h>
 #include "wrench/services/compute/hadoop/MRJob.h"
 #include "wrench/services/compute/ComputeService.h"
@@ -26,17 +27,21 @@ namespace wrench {
         );
 
         void stop() override;
+
     private:
         MRJob *job;
 
         // TODO: Define these:
         std::map<std::string, std::string> default_property_values = {
-                {HadoopComputeServiceProperty::HDFS_READ, "0.0"},
+                {HadoopComputeServiceProperty::HDFS_READ,  "0.0"},
                 {HadoopComputeServiceProperty::HDFS_WRITE, "0.0"}
         };
 
         // TODO: And define these:
-        std::map<std::string, double> default_messagepayload_values = {};
+        std::map<std::string, double> default_messagepayload_values = {
+                {MRJobExecutorMessagePayload::MAP_SIDE_HDFS_DATA_DELIVERY_PAYLOAD, 1024},
+                {MRJobExecutorMessagePayload::MAP_SIDE_HDFS_DATA_REQUEST_PAYLOAD,  1024},
+        };
 
         std::set<std::string> compute_resources;
 

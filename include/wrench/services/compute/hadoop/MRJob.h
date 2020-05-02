@@ -32,12 +32,17 @@ namespace wrench {
         int block_size;
         std::string job_type;
         std::string hdfs_mailbox_name;
+        std::string executor_mailbox;
     public:
         virtual ~MRJob() = default;
 
         virtual int calculateNumMappers() = 0;
 
         // Mutators
+        void setExecutorMailbox(std::string executor) {
+            this->executor_mailbox = executor;
+        }
+
         void setBlockSize(int block_size) {
             this->block_size = block_size;
         }
@@ -98,6 +103,10 @@ namespace wrench {
         }
 
         // Accessors
+
+        std::string getExecutorMailbox() {
+            return executor_mailbox;
+        }
         int getBlockSize() {
             return block_size;
         }
