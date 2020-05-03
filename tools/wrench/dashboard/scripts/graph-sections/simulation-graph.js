@@ -64,17 +64,19 @@ function getOffset(el, position) {
 
 /*
     data: simulation data,
-    containerId: id of <div> container of graph
     currGraphState: pass in "hostView" to see the host view and "taskView" to see the task view
+    CONTAINER_WIDTH: width of the container
+    CONTAINER_HEIGHT: height of the container
 */
-function generateGraph(data, containerId, currGraphState, CONTAINER_WIDTH, CONTAINER_HEIGHT) {
-    document.getElementById(containerId).innerHTML = //reset graph
-        `<div class="text-left" id="tooltip-container">
-            <span id="tooltip-task-id"></span><br/>
-            <span id="tooltip-host"></span><br/>
-            <span id="tooltip-task-operation"></span><br/>
-            <span id="tooltip-task-operation-duration"></span>
-        </div>`
+function generateGraph(data, currGraphState, CONTAINER_WIDTH, CONTAINER_HEIGHT) {
+    const containerId = "graph-container"
+    // document.getElementById(containerId).innerHTML = //reset graph
+    //     `<div class="text-left" id="tooltip-container">
+    //         <span id="tooltip-task-id"></span><br/>
+    //         <span id="tooltip-host"></span><br/>
+    //         <span id="tooltip-task-operation"></span><br/>
+    //         <span id="tooltip-task-operation-duration"></span>
+    //     </div>`
 
     var read_color = '#cbb5dd'
     var compute_color = '#f7daad'

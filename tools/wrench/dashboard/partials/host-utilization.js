@@ -1,3 +1,10 @@
+const hostUtilizationTooltipHtml = 
+    `<div class="text-left" id="host-utilization-chart-tooltip">
+        <span id="host-utilization-chart-tooltip-task-id"></span><br/>
+        <span id="host-utilization-chart-tooltip-compute-time"></span><br/>
+    </div>
+`
+
 const hostUtilizationHtml = `
     <div class="container legend" id="host-utilization-chart-legend">
         <small class="inline-block" id="host-utilization-chart-legend-compute-time">Compute Time</small>

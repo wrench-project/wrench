@@ -1,12 +1,8 @@
-function determineNumCores(data) {
-    let numCores = 0;
-    for (let task in data) {
-        if (data[task].execution_host.cores > numCores) {
-            numCores = data[task].execution_host.cores;
-        }
-    }
-    return numCores;
-}
+// function determineNumCores(data) {
+//     // let numCores = 0;
+//     // let taskOverlap = determineTaskOverlap(data);
+//     return 1;
+// }
 
 function getComputeTime(d) {
     if (d["compute"].start != -1) {
@@ -23,18 +19,21 @@ function getComputeTime(d) {
     return 0 //Box shouldn't be displayed if start is -1
 }
 
-function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskId, tooltipComputeTime,
-                                      CONTAINER_WIDTH, CONTAINER_HEIGHT) {
-
-    let num_cores = determineNumCores(data);
+/*
+    data: data to generate graph in json array
+    CONTAINER_WIDTH: Width of the container that holds the graph
+    CONTAINER_HEIGHT: Height of the container that holds the graph
+    PADDING: Padding value for container
+*/
+function generateHostUtilizationGraph(data, CONTAINER_WIDTH, CONTAINER_HEIGHT, PADDING) {
+    // var num_cores = determineNumCores(data);
+    const containerId = "host-utilization-chart"
+    const tooltipId = "host-utilization-chart-tooltip"
+    const tooltipTaskId = "host-utilization-chart-tooltip-task-id"
+    const tooltipComputeTime = "host-utilization-chart-tooltip-compute-time"
     var container = d3.select(`#${containerId}`);
-    document.getElementById(containerId).innerHTML =
-        `<div class="text-left" id="host-utilization-chart-tooltip">
-            <span id="host-utilization-chart-tooltip-task-id"></span><br/>
-            <span id="host-utilization-chart-tooltip-compute-time"></span><br/>
-        </div>`
+    document.getElementById(containerId).innerHTML = hostUtilizationTooltipHtml
     var chart = document.getElementById(containerId);
-    const PADDING = 60;
 
     var svg = d3.select("svg");
 

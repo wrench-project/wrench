@@ -1,9 +1,9 @@
 /*
     data: task data
-    taskClass: class to apply to <td> elements
 */
-function getOverallWorkflowMetrics(data, taskClass) {
+function getOverallWorkflowMetrics(data) {
     const tableContainer = 'overall-metrics-table'
+    const taskClass = "task-details-table-td"
     document.getElementById(tableContainer).innerHTML = workflowSummaryInnerHtml
     var hosts = new Set()
     var noFailed = 0
