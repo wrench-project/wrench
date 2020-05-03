@@ -90,7 +90,7 @@ function toggleView() {
         }
         currGraphState = "hostView"
     } else if (currGraphState === "hostView") {
-        generateGraph(data.contents, "graph-container", "hostView", 1000, 1000)
+        generateGraph(data.contents, "taskView", 1000, 1000)
         d3.select("#y-axis-label").text("TaskID")
         populateLegend("taskView")
         d3.select("#toggle-view-button").text("Switch to Host View")

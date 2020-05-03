@@ -68,7 +68,7 @@ function getOverallWorkflowMetrics(data) {
 
     var metrics = {
         totalHosts: {
-            value: toFiveDecimalPlaces(totalHosts),
+            value: totalHosts,
             display: 'Total Hosts Utilized'
         },
         totalDuration: {
@@ -77,19 +77,19 @@ function getOverallWorkflowMetrics(data) {
             unit: 's'
         },
         noTasks: {
-            value: toFiveDecimalPlaces(noTasks),
+            value: noTasks,
             display: 'Number of Tasks'
         },
         noFailed: {
-            value: toFiveDecimalPlaces(noFailed),
+            value: noFailed,
             display: 'Failed Tasks'
         },
         noTerminated: {
-            value: toFiveDecimalPlaces(noTerminated),
+            value: noTerminated,
             display: 'Terminated Tasks'
         },
         noSuccesful: {
-            value: toFiveDecimalPlaces(noSuccesful),
+            value: noSuccesful,
             display: 'Succesful Tasks'
         },
         averageReadDuration: {

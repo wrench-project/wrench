@@ -1,12 +1,40 @@
 const getDuration = (start, end) => {
-    if (start === "Failed" || start === "Terminated") {
+    if (start === -1 || start === -1) {
         return start
-    } else if (end === "Failed" || end === "Terminated") {
+    } else if (end === -1 || end === -1) {
         return end
     } else {
         return toFiveDecimalPlaces(end - start)
     }
 }
+
+/* TODO: fix this function to fix workflow summary */
+function determineFailedOrTerminatedPoint(d) {
+    if (d.failed == -1 && d.terminated == -1) {
+        return "none"
+    }
+    if (d.read.end == -1) {
+        return "read"
+    }
+    if (d.compute.end == -1) {
+        return "compute"
+    }
+    if (d.write.end == -1) {
+        return "write"
+    }
+}
+
+// const getDuration = (data, section, failed, terminated) => {
+//     if (section === "compute") {
+//         const { start, end }
+//         if (start === -1) {
+//             return 0
+//         }
+//         if (end === -1) {
+
+//         }
+//     }
+// }
 
 const toFiveDecimalPlaces = d3.format('.5f')
 

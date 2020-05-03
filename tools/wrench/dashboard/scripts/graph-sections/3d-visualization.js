@@ -496,6 +496,10 @@ function generate3dGraph(data, populateLegend, needToInitialise) {
     const originYId = "origin-y"
     const timeIntervalId = "time-interval"
     const scaleInputId = "scale-input"
+    const containerId = "three-d-graph-container"
+    
+    document.getElementById(containerId).innerHTML = threedVisualizationHtml
+
     if (needToInitialise) {
         initialise3dGraph()
     }
