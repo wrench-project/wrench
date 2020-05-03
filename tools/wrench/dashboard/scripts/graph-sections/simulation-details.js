@@ -1,11 +1,10 @@
 /*
     data: simulation data array
-    tableId: id of the <table> element
-    tableBodyId: id of the <tbody> element
-    tdClass: class name you want applied to each td
 */
-function populateWorkflowTaskDataTable(data, tableId, tableBodyId, tdClass) {
-
+function populateWorkflowTaskDataTable(data) {
+    const tableId = "task-details-table" 
+    const tableBodyId = "task-details-table-body"
+    const tdClass = "task-details-table-td"
     document.getElementById(tableId).innerHTML = simulationDetailsHtml;
     d3.select(`#${tableId}`).style('display', 'block');
 

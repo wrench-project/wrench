@@ -489,13 +489,13 @@ function processData(data, tt, populateLegend) {
     data: data to generate graph in json array
     populateLegend: pass in true, this is for initial dashboard
     needToInitialse: whether you want to reset all of the parameters for the 3d graph
-    svgId: id of the <svg> that will contain the graph
-    originXId: id of the <input> element that has the value for the X origin 
-    originyId: id of the <input> element that has the value for the Y origin
-    timeIntervalId: id of the <input> element that has the value for the time interval on the time axis of the graph
-    scaleInputId: id of the <input> element that has the value for the scale of the Z axis
 */
-function generate3dGraph(data, populateLegend, needToInitialise, svgId, originXId, originYId, timeIntervalId, scaleInputId) {
+function generate3dGraph(data, populateLegend, needToInitialise) {
+    const svgId = "three-d-graph-svg"
+    const originXId = "origin-x"
+    const originYId = "origin-y"
+    const timeIntervalId = "time-interval"
+    const scaleInputId = "scale-input"
     if (needToInitialise) {
         initialise3dGraph()
     }
