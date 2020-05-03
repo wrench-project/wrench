@@ -5,15 +5,13 @@ var scale
 var svg
 var cubesGroup
 var originXBox, originYBox, timeIntervalBox, scaleBox
-var key = function (d) {
-    return d.task_id;
-}
 var color = d3.scaleOrdinal(d3.schemeCategory20)
 var mx, my, mouseX, mouseY
 var threeDColourMap = {}
 var currentlySelectedCube
 var cubeIsClicked = false
 var grid3d, scale3d, cubes3d
+var xGrid, yLine, cubesData, xLine, ftCubesData
 
 function initialise3dGraph() {
     origin = [0, 200]
@@ -203,7 +201,7 @@ function showAndPopulateTooltip(d) {
 
     tooltipTaskId.text('TaskID: ' + d.task_id)
 
-    tooltipHost.text('Host Name: ' + d['execution_host'].hostname)
+    tooltipHost.text('Host Name: ' + d['execution host'].hostname)
 
     var durationFull = findDuration(data.contents, d.task_id, "whole_task")
     tooltipDuration.text('Duration: ' + toFiveDecimalPlaces(durationFull) + 's')
@@ -261,8 +259,7 @@ function deselectCube(hover) {
 
 function processData(data, tt, populateLegend) {
     /* ----------- GRID ----------- */
-
-    var xGrid = svg.selectAll('path.grid').data(data[0], key);
+    xGrid = svg.selectAll('path.grid').data(data[0], d => { return d.task_id });
 
     xGrid
         .enter()
@@ -549,7 +546,7 @@ function generate3dGraph(data, populateLegend, needToInitialise, svgId, originXI
         showInstructions("three-d-instructions", "three-d-information-img")
     }
 
-    var xGrid = [], scatter = [], yLine = [], xLine = []
+    xGrid = [], yLine = [], xLine = []
     for (var z = 0; z <= maxTime + timeScalingFactor; z += timeScalingFactor) {
         for (var x = 0; x < maxTaskOverlap; x++) {
             xGrid.push([x, 1, z / timeScalingFactor])
@@ -566,8 +563,8 @@ function generate3dGraph(data, populateLegend, needToInitialise, svgId, originXI
     })
     xLine.push([0, 1, (maxTime / timeScalingFactor) + 1, "Time (seconds)"]) // for axis label
 
-    var cubesData = []
-    var ftCubesData = []
+    cubesData = []
+    ftCubesData = []
     data.forEach(function (d) {
         var h = d.num_cores_allocated
         var z = d.whole_task.start / timeScalingFactor

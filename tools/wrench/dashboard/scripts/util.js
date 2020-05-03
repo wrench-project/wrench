@@ -126,10 +126,10 @@ function determineTaskOverlap(data) {
         let taskStart = d.whole_task.start;
         let taskEnd = determineTaskEnd(d);
 
-        if (d.execution_host.hostname in taskOverlap) {
+        if (d['execution host'].hostname in taskOverlap) {
             let i = 0;
             let placed = false;
-            let executionHost = taskOverlap[d.execution_host.hostname];
+            let executionHost = taskOverlap[d['execution host'].hostname];
 
             while (!placed) {
                 if (executionHost[i] === undefined) {
@@ -152,7 +152,7 @@ function determineTaskOverlap(data) {
                 }
             }
         } else {
-            taskOverlap[d.execution_host.hostname] = [[d]];
+            taskOverlap[d['execution host'].hostname] = [[d]];
         }
     })
     return taskOverlap
@@ -242,7 +242,8 @@ function processFile(files, fileType) {
             }
             initialise()
         })
-        .catch(function () {
+        .catch(function (err) {
+            console.error(err)
             return
         })
 }

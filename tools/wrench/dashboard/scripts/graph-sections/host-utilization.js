@@ -58,7 +58,7 @@ function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskI
 
     var tasks_by_hostname = d3.nest()
         .key(function (d) {
-            return d['execution_host'].hostname;
+            return d['execution host'].hostname;
         })
         .sortKeys(d3.ascending)
         .entries(data);
@@ -76,7 +76,7 @@ function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskI
         let n_cores = num_cores === 0 ? d.values[0]['execution_host'].cores : num_cores;
         y_cores_per_host.set(d.key,
             d3.scaleLinear()
-                .domain([0, n_cores])
+                .domain([0, d.values[0]['execution host'].cores])
                 .range([y_hosts(d.key) + y_hosts.bandwidth(), y_hosts(d.key)])
         );
     });
@@ -105,9 +105,9 @@ function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskI
             return x_scale(d.compute.start);
         })
         .attr("y", function (d) {
-            var y_scale = y_cores_per_host.get(d['execution_host'].hostname);
-            let vertical_position = determineVerticalPosition(d, determineTaskOverlap(data));
-            return y_scale(vertical_position + d.num_cores_allocated);
+            var y_scale = y_cores_per_host.get(d['execution host'].hostname);
+            var vertical_position = searchOverlap(d.task_id, determineTaskOverlap(data))
+            return y_scale(vertical_position + 1);
         })
         .attr("width", function (d) {
             if (d.compute.start === -1) {
@@ -119,7 +119,7 @@ function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskI
             return x_scale(d.compute.end) - x_scale(d.compute.start);
         })
         .attr("height", function (d) {
-            var y_scale = y_cores_per_host.get(d['execution_host'].hostname);
+            var y_scale = y_cores_per_host.get(d['execution host'].hostname);
             return y_scale(0) - y_scale(d.num_cores_allocated);
         })
         .attr("fill", "#f7daad")

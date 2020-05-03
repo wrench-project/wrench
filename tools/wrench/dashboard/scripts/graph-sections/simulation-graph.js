@@ -7,7 +7,7 @@ function getBoxWidthFromArray(d, section, scale) {
         var min_time = Number.MAX_VALUE
         var duration = 0
         for (key in Object.keys(d[section])) {
-            var time = getBoxWidth(d[section], key, scale)
+            var time = getBoxWidth(d, section, scale)
             if (time != scale(0)) {
                 duration += time
                 min_time = scale(d[section][key].start) < min_time ? scale(d[section][key].start) : min_time
@@ -214,7 +214,7 @@ function generateGraph(data, containerId, currGraphState, CONTAINER_WIDTH, CONTA
 
                 tooltip_task_id.text('TaskID: ' + d.task_id)
 
-                tooltip_host.text('Host Name: ' + d['execution_host'].hostname)
+                tooltip_host.text('Host Name: ' + d['execution host'].hostname)
 
                 var parent_group = d3.select(this).attr('class')
 
