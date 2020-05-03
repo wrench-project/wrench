@@ -82,8 +82,6 @@ namespace wrench {
     * @throw std::runtime_error
     */
     bool HdfsService::processNextMessage() {
-        // TODO: DEFINE THE SET OF MESSAGES AN HDFSSERVICE CAN SEND AND RECEIVE
-
         S4U_Simulation::computeZeroFlop();
 
         // Wait for a message
@@ -106,25 +104,22 @@ namespace wrench {
                 return false;
             }
             return false;
-
         } else if (auto msg = std::dynamic_pointer_cast<HdfsReadDataMessage>(message)) {
-            WRENCH_INFO("HDFS reading data for a mapper...");
             simulation->readFromDisk(msg->data_size, "WMSHost", "/");
 
             try {
                 S4U_Mailbox::putMessage(msg->return_mailbox,
                                         new HdfsReadCompleteMessage(msg->data_size,
-                                                this->getMessagePayloadValue(
-                                                        MRJobExecutorMessagePayload::MAP_SIDE_HDFS_DATA_DELIVERY_PAYLOAD)));
+                                                                    this->getMessagePayloadValue(
+                                                                            MRJobExecutorMessagePayload::MAP_SIDE_HDFS_DATA_DELIVERY_PAYLOAD)));
             } catch (std::shared_ptr<NetworkError> &cause) {
                 return false;
             }
 
-            // TODO: Don't really return false here.
-            return false;
+            return true;
         } else {
-                throw std::runtime_error(
-                        "HdfsService::processNextMessage(): Received an unexpected [" + message->getName() + "] message!");
+            throw std::runtime_error(
+                    "HdfsService::processNextMessage(): Received an unexpected [" + message->getName() + "] message!");
         }
     }
 }

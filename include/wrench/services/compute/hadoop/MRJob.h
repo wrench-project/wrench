@@ -22,25 +22,31 @@ namespace wrench {
         int sort_factor;
         int mapper_key_width;
         int mapper_value_width;
-        double mapper_flops;
         int reducer_key_width;
         int reducer_value_width;
+        int block_size;
+        double mapper_flops;
         double reducer_flops;
         double spill_percent;
-        bool use_combiner;
         double data_size;
-        int block_size;
+        bool use_combiner;
         std::string job_type;
         std::string hdfs_mailbox_name;
         std::string executor_mailbox;
+        std::string shuffle_mailbox;
+
     public:
         virtual ~MRJob() = default;
 
         virtual int calculateNumMappers() = 0;
 
         // Mutators
-        void setExecutorMailbox(std::string executor) {
-            this->executor_mailbox = executor;
+        void setShuffleMailbox(std::string shuffle_mailbox) {
+            this->shuffle_mailbox = shuffle_mailbox;
+        }
+
+        void setExecutorMailbox(std::string executor_mailbox) {
+            this->executor_mailbox = executor_mailbox;
         }
 
         void setBlockSize(int block_size) {
@@ -103,10 +109,14 @@ namespace wrench {
         }
 
         // Accessors
+        std::string getShuffleMailbox() {
+            return shuffle_mailbox;
+        }
 
         std::string getExecutorMailbox() {
             return executor_mailbox;
         }
+
         int getBlockSize() {
             return block_size;
         }

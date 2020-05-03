@@ -62,11 +62,54 @@ namespace wrench {
         Service::stop();
     }
 
-    void MRJobExecutor::setup_workers(std::vector<std::shared_ptr<Service>> workers) {
+    void MRJobExecutor::setup_workers(std::vector<std::shared_ptr<Service>> &mappers,
+                                      std::vector<std::shared_ptr<Service>> &reducers,
+                                      std::shared_ptr<Service> &hdfs,
+                                      std::shared_ptr<Service> &shuffle) {
         // TODO: Right now these are all running on a single host
         // But we should change this so that workers are spun up
         // on the appropriate nodes.  As well as think about what
-        // to do when resorues do not match user specs.
+        // to do when resources do not match user specs.
+        hdfs = std::shared_ptr<HdfsService>(
+                new HdfsService(
+                        this->hostname,
+                        this->job,
+                        this->compute_resources,
+                        {},
+                        {}));
+        hdfs->simulation = this->simulation;
+
+        shuffle = std::shared_ptr<ShuffleService>(
+                new ShuffleService(
+                        this->hostname,
+                        this->job,
+                        this->compute_resources,
+                        {},
+                        {}));
+        shuffle->simulation = this->simulation;
+        this->job->setShuffleMailbox(shuffle->mailbox_name);
+
+        for (int i = 0; i < this->job->getNumMappers(); i++) {
+            mappers.push_back(std::shared_ptr<MapperService>(
+                    new MapperService(
+                            this->hostname,
+                            this->job,
+                            this->compute_resources,
+                            {},
+                            {})));
+            mappers.back()->simulation = this->simulation;
+        }
+
+        for (int i = 0; i < this->job->getNumReducers(); i++) {
+            reducers.push_back(std::shared_ptr<ReducerService>(
+                    new ReducerService(
+                            this->hostname,
+                            this->job,
+                            this->compute_resources,
+                            {},
+                            {})));
+            reducers.back()->simulation = this->simulation;
+        }
     }
 
     /**
@@ -76,41 +119,29 @@ namespace wrench {
      */
     int MRJobExecutor::main() {
         this->state = Service::UP;
-
-        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_CYAN);
-
-        WRENCH_INFO("New MRJobExecutor starting (%s) on %ld hosts",
-                    this->mailbox_name.c_str(), this->compute_resources.size());
-
-        this->success = true;
         this->job->setExecutorMailbox(this->mailbox_name);
 
-        // TODO: Fix setup_workers
-        WRENCH_INFO("Starting mapper in MRJobExecutor...")
-        std::shared_ptr<MapperService> mapper = std::shared_ptr<MapperService>(
-                new MapperService(
-                        this->hostname,
-                        this->job,
-                        this->compute_resources,
-                        {},
-                        {}));
+        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_CYAN);WRENCH_INFO(
+                "New MRJobExecutor starting (%s) on %ld hosts",
+                this->mailbox_name.c_str(), this->compute_resources.size());
 
-        // TODO: Fix setup_workers
-        WRENCH_INFO("Starting HDFS in MRJobExecutor...")
-        std::shared_ptr<HdfsService> hdfs = std::shared_ptr<HdfsService>(
-                new HdfsService(
-                        this->hostname,
-                        this->job,
-                        this->compute_resources,
-                        {},
-                        {}));
+        // TODO:  This is updated when the reducer(s) send a success message.
+        this->success = false;
 
-        hdfs->simulation = this->simulation;
-        mapper->simulation = this->simulation;
+        setup_workers(this->mappers, this->reducers, this->hdfs, this->shuffle);
 
-        hdfs->start(mapper, true, false);
-        mapper->start(mapper, true, false);
+        // Start the HDFS and Shuffle services first
+        WRENCH_INFO("MRJobExecutor::main(): Starting up the MRJob's Services.")
+        hdfs->start(hdfs, true, false);
+        shuffle->start(shuffle, true, false);
 
+        // Now start up our mappers and reducers.
+        for (auto mapper : mappers) {
+            mapper->start(mapper, true, false);
+        }
+        for (auto reducer : reducers) {
+            reducer->start(reducer, true, false);
+        }
 
         /** Main loop **/
         while (this->processNextMessage()) {

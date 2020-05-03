@@ -69,6 +69,7 @@ namespace wrench {
                 false, 1, 0.8, 16,
                 16, files, 1.0, 1,
                 1, 1.0);
+        mr_job->calculateNumMappers();
 
         WRENCH_INFO("Submitting  the MR Job to the Hadoop Service!");
         hadoop_service->runMRJob(mr_job);

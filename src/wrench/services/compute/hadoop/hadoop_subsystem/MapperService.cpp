@@ -64,11 +64,9 @@ namespace wrench {
      */
     int MapperService::main() {
         this->state = Service::UP;
-
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
 
-        /** Request the data to start the job */
-        WRENCH_INFO("Mapper requesting data from HDFS...")
+        /** Request data to start the job */
         try {
             S4U_Mailbox::putMessage(this->job->getHdfsMailboxName(),
                                     new HdfsReadDataMessage(this->job->getDataSize(),
@@ -120,7 +118,7 @@ namespace wrench {
         } else if (auto msg = std::dynamic_pointer_cast<HdfsReadCompleteMessage>(message)) {
             // The mapper computes the user map function, writes spill files locally,
             // and then merges all spill files back into a single map file.
-            WRENCH_INFO("Mapper doing some work (spilling/merging)...")
+
             // TODO: Actually compute the correct values given the job, and extract to a helper function.
             // The materilaized output is found via:
             // https://github.com/wrench-project/understanding_hadoop/blob/00a1c5653ae025e9db723d4c3e2137f2bb2b5472/hadoop_mr_tests/map_output_materialized_bytes/run_test.py#L109
@@ -129,22 +127,15 @@ namespace wrench {
 
             // Compute map function
             Simulation::compute(this->job->getMapperFlops());
-            // Write file(s)
+
+            // Write spill file(s)
             simulation->writeToDisk(this->job->getDataSize(), "WMSHost", "/");
+
             // Merge all spilled files to single output
             Simulation::compute(this->job->getMapperFlops());
 
-            // TODO: We shouldn't really be returning false here,
-            // but for now, just tell the executor we finished.
-            try {
-                S4U_Mailbox::putMessage(this->job->getExecutorMailbox(),
-                                        new ServiceStopDaemonMessage(this->mailbox_name,
-                                                                     this->getMessagePayloadValue(
-                                                                             MRJobExecutorMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD)));
-            } catch (std::shared_ptr<NetworkError> &cause) {
-                return false;
-            }
-            return false;
+            // TODO: Pass map output files to the ShuffleService
+            return true;
         } else {
             throw std::runtime_error(
                     "MapperService::processNextMessage(): Received an unexpected [" + message->getName() +

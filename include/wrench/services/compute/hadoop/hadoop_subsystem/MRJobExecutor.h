@@ -32,13 +32,18 @@ namespace wrench {
         );
 
         void stop() override;
+
     private:
         MRJob *job;
         std::string notify_mailbox;
         bool success;
+        std::vector<std::shared_ptr<Service>> mappers;
+        std::vector<std::shared_ptr<Service>> reducers;
+        std::shared_ptr<Service> hdfs;
+        std::shared_ptr<Service> shuffle;
 
         std::map<std::string, std::string> default_property_values = {
-                {HadoopComputeServiceProperty::MAP_STARTUP_OVERHEAD, "0.0"},
+                {HadoopComputeServiceProperty::MAP_STARTUP_OVERHEAD,     "0.0"},
                 {HadoopComputeServiceProperty::REDUCER_STARTUP_OVERHEAD, "0.0"},
         };
 
@@ -56,7 +61,10 @@ namespace wrench {
 
         bool processNextMessage();
 
-        void setup_workers(std::vector<std::shared_ptr<Service>> workers);
+        void setup_workers(std::vector<std::shared_ptr<Service>> &mappers,
+                           std::vector<std::shared_ptr<Service>> &reducers,
+                           std::shared_ptr<Service> &hdfs,
+                           std::shared_ptr<Service> &shuffle);
     };
 }
 #endif //WRENCH_HADOOPCOMPUTESERVICE_H

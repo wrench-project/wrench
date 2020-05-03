@@ -50,7 +50,7 @@ namespace wrench {
                 total_mappers += 1;
             } else {
                 int file_copy = file;
-                while (file > this->getBlockSize()) {
+                while (file_copy > this->getBlockSize()) {
                     file_copy -= this->getBlockSize();
                     total_mappers += 1;
                 }

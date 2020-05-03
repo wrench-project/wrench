@@ -31,7 +31,6 @@
  * @return 0 on success, non-zero otherwise
  */
 int main(int argc, char **argv) {
-
     /* Declare a WRENCH simulation object */
     wrench::Simulation simulation;
 

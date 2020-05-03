@@ -18,8 +18,7 @@ namespace wrench {
     /**
      * @brief Configurable properties for a HadoopComputeService
      */
-    class HadoopComputeServiceProperty: public ComputeServiceProperty {
-
+    class HadoopComputeServiceProperty : public ComputeServiceProperty {
     public:
         /**
          * @brief The overhead to start a map task (placeholder example property to be changed later)

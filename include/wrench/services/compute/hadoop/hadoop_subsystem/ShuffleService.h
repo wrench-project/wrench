@@ -17,7 +17,6 @@ namespace wrench {
 
     class ShuffleService : public Service {
     public:
-
         ShuffleService(
                 const std::string &hostname,
                 MRJob *job,
@@ -29,7 +28,6 @@ namespace wrench {
         void stop() override;
 
     private:
-
         MRJob *job;
 
         // TODO: Define these:

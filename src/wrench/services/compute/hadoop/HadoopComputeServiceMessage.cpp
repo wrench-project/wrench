@@ -53,7 +53,6 @@ namespace wrench {
     HadoopComputeServiceRunMRJobAnswerMessage::HadoopComputeServiceRunMRJobAnswerMessage(bool success,
                                                                                          double payload)
             : HadoopComputeServiceMessage("HadoopComputeServiceRunMRJobAnswerMessage", payload) {
-
         this->success = success;
     }
 

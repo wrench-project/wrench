@@ -30,6 +30,7 @@ namespace wrench {
         );
 
         void stop() override;
+
     private:
         MRJob *job;
 

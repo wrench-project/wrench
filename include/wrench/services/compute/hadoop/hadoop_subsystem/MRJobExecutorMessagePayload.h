@@ -18,7 +18,6 @@ namespace wrench {
      * @brief Configurable message payloads for a MRJobExecutor
      */
     class MRJobExecutorMessagePayload : public ComputeServiceMessagePayload {
-
     public:
         DECLARE_MESSAGEPAYLOAD_NAME(NOTIFY_EXECUTOR_STATUS_MESSAGE_PAYLOAD);
         DECLARE_MESSAGEPAYLOAD_NAME(STOP_DAEMON_MESSAGE_PAYLOAD);

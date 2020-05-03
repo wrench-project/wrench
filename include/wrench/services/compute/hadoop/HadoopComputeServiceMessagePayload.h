@@ -18,7 +18,6 @@ namespace wrench {
      * @brief Configurable message payloads for a HadoopComputeService
      */
     class HadoopComputeServiceMessagePayload : public ComputeServiceMessagePayload {
-
     public:
         DECLARE_MESSAGEPAYLOAD_NAME(RUN_MR_JOB_REQUEST_MESSAGE_PAYLOAD);
         DECLARE_MESSAGEPAYLOAD_NAME(RUN_MR_JOB_ANSWER_MESSAGE_PAYLOAD);
