@@ -1,3 +1,12 @@
+const simulationGraphTooltipHtml = `
+    <div class="text-left" id="tooltip-container">
+        <span id="tooltip-task-id"></span><br/>
+        <span id="tooltip-host"></span><br/>
+        <span id="tooltip-task-operation"></span><br/>
+        <span id="tooltip-task-operation-duration"></span>
+    </div>
+`
+
 const simulationGraphHtml = `
     <div id='button-and-information-container'>
         <button id='toggle-view-button' onclick="toggleView()">Switch to Host View</button>

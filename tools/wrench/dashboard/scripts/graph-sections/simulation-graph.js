@@ -34,21 +34,6 @@ function getBoxWidth(d, section, scale) {
     return scale(0) //Box shouldn't be displayed if start is -1
 }
 
-function determineFailedOrTerminatedPoint(d) {
-    if (d.failed == -1 && d.terminated == -1) {
-        return "none"
-    }
-    if (d.read.end == -1) {
-        return "read"
-    }
-    if (d.compute.end == -1) {
-        return "compute"
-    }
-    if (d.write.end == -1) {
-        return "write"
-    }
-}
-
 /**
  * Helper function used to get the position of the mouse within the browser window
  * so that we can have nice moving tooltips. The input is the DOM element we are
@@ -70,14 +55,7 @@ function getOffset(el, position) {
 */
 function generateGraph(data, currGraphState, CONTAINER_WIDTH, CONTAINER_HEIGHT) {
     const containerId = "graph-container"
-    // document.getElementById(containerId).innerHTML = //reset graph
-    //     `<div class="text-left" id="tooltip-container">
-    //         <span id="tooltip-task-id"></span><br/>
-    //         <span id="tooltip-host"></span><br/>
-    //         <span id="tooltip-task-operation"></span><br/>
-    //         <span id="tooltip-task-operation-duration"></span>
-    //     </div>`
-
+    document.getElementById(containerId).innerHTML = simulationGraphTooltipHtml
     var read_color = '#cbb5dd'
     var compute_color = '#f7daad'
     var write_color = '#abdcf4'
