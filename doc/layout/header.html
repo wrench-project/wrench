@@ -1,20 +1,16 @@
-<!-- HTML header for doxygen 1.8.8-->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
 <head>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <!-- For Mobile Devices -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
     <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
     <meta name="generator" content="Doxygen $doxygenversion"/>
 
-    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-
     <!--BEGIN PROJECT_NAME--><title>$projectname: $title</title><!--END PROJECT_NAME-->
     <!--BEGIN !PROJECT_NAME--><title>$title</title><!--END !PROJECT_NAME-->
-    <!--<link href="$relpath^tabs.css" rel="stylesheet" type="text/css"/>-->
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
     <script type="text/javascript" src="$relpath^dynsections.js"></script>
     $treeview
     $search
@@ -22,42 +18,53 @@
     <link href="$relpath^$stylesheet" rel="stylesheet" type="text/css"/>
     $extrastylesheet
     <link href='https://fonts.googleapis.com/css?family=Roboto+Slab' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="$relpath^bootstrap.min.css">
+    <script src="$relpath^bootstrap.min.js"></script>
     <link href="$relpath^jquery.smartmenus.bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css"
+          integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
 
     <script type="text/javascript" src="$relpath^jquery.smartmenus.js"></script>
-    <!-- SmartMenus jQuery Bootstrap Addon -->
     <script type="text/javascript" src="$relpath^jquery.smartmenus.bootstrap.js"></script>
-    <!-- SmartMenus jQuery plugin -->
 </head>
 <body>
 
-<nav class="navbar navbar-default" role="navigation">
+<nav class="navbar navbar-expand-lg navbar-light bg-light" role="navigation">
     <div class="container">
         <div class="navbar-header">
-            <a href="http://wrench-project.org" class="navbar-brand">
+            <a href="https://wrench-project.org" class="navbar-brand">
                 <img alt="Logo" src="$relpath$$projectlogo" width="160" style="float: left"/>
                 $projectnumber
             </a>
         </div>
         <div id="main-nav" class="nav navbar-nav navbar-right">
             <ul class="sm sm-dox nav navbar-nav navbar-right" id="main-menu">
-                <li><a href="index.html">Overview</a></li>
-                <li><a href="install.html">Installation</a></li>
-                <li><a href="getting-started.html">Getting Started</a></li>
-                <li><a href="wrench-101.html">WRENCH 101</a></li>
-                <li><a href="wrench-102.html">WRENCH 102</a></li>
-                <li><a href="annotated.html">API Reference</a></li>
-                <li style="float: right">
-                    <input type="hidden" id="MSearchField">
+                <li class="nav-item"><a class="nav-link" href="/wrench/$projectnumber/index.html">Overview</a></li>
+                <li class="nav-item"><a class="nav-link" href="/wrench/$projectnumber/install.html">Installation</a>
+                </li>
+                <li class="nav-item"><a class="nav-link" href="/wrench/$projectnumber/getting-started.html">Getting
+                    Started</a></li>
+                <li class="nav-item"><a class="nav-link" href="/wrench/$projectnumber/wrench-101.html">WRENCH 101</a>
+                </li>
+                <li class="nav-item"><a class="nav-link" href="/wrench/$projectnumber/wrench-102.html">WRENCH 102</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button"
+                       aria-haspopup="true" aria-expanded="false">APIs Reference</a>
+                    <div class="dropdown-menu">
+                        <a class="small dropdown-item" href="/wrench/$projectnumber/user/annotated.html">User</a>
+                        <a class="small dropdown-item"
+                           href="/wrench/$projectnumber/developer/annotated.html">Developer</a>
+                        <a class="small dropdown-item"
+                           href="/wrench/$projectnumber/internal/annotated.html">Internal</a>
+                    </div>
                 </li>
             </ul>
         </div>
     </div>
 </nav>
 
-<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="top" style="padding-top: 4em !important"><!-- do not remove this div, it is closed by doxygen! -->
     <div class="content" id="content">
         <div class="container">
             <div class="row">

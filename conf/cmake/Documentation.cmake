@@ -2,9 +2,11 @@ find_package(Doxygen)
 
 if (DOXYGEN_FOUND)
 
+    # WRENCH APIs documentation
     foreach (SECTION USER DEVELOPER INTERNAL)
         string(TOLOWER ${SECTION} SECTION_LOWER)
         set(DOXYGEN_OUT ${CMAKE_HOME_DIRECTORY}/docs/logs/Doxyfile_${SECTION})
+        set(WRENCH_DOC_INPUT "${CMAKE_HOME_DIRECTORY}/src ${CMAKE_HOME_DIRECTORY}/include")
 
         if (${SECTION} STREQUAL "INTERNAL")
             set(WRENCH_SECTIONS "INTERNAL DEVELOPER USER")
@@ -29,18 +31,36 @@ if (DOXYGEN_FOUND)
         LIST(APPEND WRENCH_SECTIONS_LIST doc-${SECTION_LOWER})
     endforeach ()
 
+    # WRENCH documentation pages
+    set(DOXYGEN_OUT ${CMAKE_HOME_DIRECTORY}/docs/logs/Doxyfile_pages)
+    set(WRENCH_DOC_INPUT "${CMAKE_HOME_DIRECTORY}/doc ${CMAKE_HOME_DIRECTORY}/src ${CMAKE_HOME_DIRECTORY}/include")
+    set(WRENCH_SECTIONS "INTERNAL DEVELOPER USER")
+    set(WRENCH_SECTIONS_OUTPUT "pages")
+
+    configure_file(${CMAKE_HOME_DIRECTORY}/conf/doxygen/Doxyfile.in ${DOXYGEN_OUT} @ONLY)
+
+    add_custom_target(doc-pages
+            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+            COMMENT "Generating WRENCH documentation pages" VERBATIM)
+
+    add_custom_command(TARGET doc-pages
+            COMMAND mkdir -p ${CMAKE_HOME_DIRECTORY}/docs/${WRENCH_RELEASE_VERSION}/pages
+            COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT})
+    LIST(APPEND WRENCH_SECTIONS_LIST doc-pages)
+
+    add_custom_target(doc-deploy DEPENDS wrench ${WRENCH_SECTIONS_LIST})
+    foreach (DEP_NAME user developer internal)
+        add_custom_command(TARGET doc-deploy
+                COMMAND mkdir -p ${CMAKE_HOME_DIRECTORY}/docs/wrench-doc/${WRENCH_RELEASE_VERSION}/${DEP_NAME}
+                COMMAND cp -R ${CMAKE_HOME_DIRECTORY}/docs/${WRENCH_RELEASE_VERSION}/${DEP_NAME}/html/* ${CMAKE_HOME_DIRECTORY}/docs/wrench-doc/${WRENCH_RELEASE_VERSION}/${DEP_NAME})
+    endforeach ()
+    add_custom_command(TARGET doc-deploy
+            COMMAND cp -R ${CMAKE_HOME_DIRECTORY}/docs/${WRENCH_RELEASE_VERSION}/pages/html/* ${CMAKE_HOME_DIRECTORY}/docs/wrench-doc/${WRENCH_RELEASE_VERSION})
+
     get_directory_property(extra_clean_files ADDITIONAL_MAKE_CLEAN_FILES)
     set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${extra_clean_files};${CMAKE_HOME_DIRECTORY}/docs")
 
-    add_custom_target(doc DEPENDS wrench ${WRENCH_SECTIONS_LIST})
-
-    # generate docs for github pages
-    add_custom_target(doc-gh DEPENDS doc)
-    foreach (DEP_NAME user developer internal)
-        add_custom_command(TARGET doc-gh
-                COMMAND mkdir -p ${CMAKE_HOME_DIRECTORY}/docs/gh-pages/${WRENCH_RELEASE_VERSION}/${DEP_NAME}
-                COMMAND cp -R ${CMAKE_HOME_DIRECTORY}/docs/${WRENCH_RELEASE_VERSION}/${DEP_NAME}/html/* ${CMAKE_HOME_DIRECTORY}/docs/gh-pages/${WRENCH_RELEASE_VERSION}/${DEP_NAME})
-    endforeach ()
+    add_custom_target(doc DEPENDS doc-deploy)
 
 else (DOXYGEN_FOUND)
     message("Doxygen need to be installed to generate WRENCH documentation")

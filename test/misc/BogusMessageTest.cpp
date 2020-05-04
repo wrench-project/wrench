@@ -174,7 +174,7 @@ private:
 
 /*************************************************************
  ** WARNING: THESE TESTS ARE A NICE THOUGHT, AND THEY WORK
- ** BUT ALTHOUGH THE "UNEXPECTED MESSAGE" EXECPTIONS ARE THROWN
+ ** BUT ALTHOUGH THE "UNEXPECTED MESSAGE" EXCEPTIONS ARE THROWN
  ** THE LINES OF CODE THAT THROW ARE NOT MARKED AS COVERED
  ** BY COVERALLS...
  *************************************************************/

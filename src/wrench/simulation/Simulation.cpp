@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2019. The WRENCH Team.
+ * Copyright (c) 2017-2020. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -56,7 +56,6 @@ namespace wrench {
      * @brief  Constructor
      */
     Simulation::Simulation() {
-
         // Customize the logging format
         xbt_log_control_set("root.fmt:[%.20d][%h:%t(%i)]%e%m%n");
 
@@ -68,7 +67,6 @@ namespace wrench {
 
         // Create the S4U simulation wrapper
         this->s4u_simulation = std::unique_ptr<S4U_Simulation>(new S4U_Simulation());
-
     }
 
     /**
@@ -92,7 +90,6 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     void Simulation::init(int *argc, char **argv) {
-
         if (*argc < 1) {
             throw std::invalid_argument("Simulation::init(): Invalid argc argument (must be >= 1)");
         }
@@ -156,11 +153,22 @@ namespace wrench {
 
         // If version requested, put back the "--version" argument
         if (version_requested) {
-            std::cout << "WRENCH version " << getWRENCHVersionString();
+            std::cout << "This program was linked against WRENCH version " << getWRENCHVersionString();
 #ifdef ENABLE_BATSCHED
             std::cout << " (compiled with Batsched)";
 #endif
-            std::cout << "\n";
+            std::cout << "\n\nTo cite WRENCH in a publication, please use:\n"
+                         "  @inproceedings{wrench,\n"
+                         "    title = {{WRENCH: A Framework for Simulating Workflow Management Systems}},\n"
+                         "    author = {Casanova, Henri and Pandey, Suraj and Oeth, James and Tanaka, Ryan and Suter, Frederic and Ferreira da Silva, Rafael},\n"
+                         "    booktitle = {13th Workshop on Workflows in Support of Large-Scale Science (WORKS'18)},\n"
+                         "    year = {2018},\n"
+                         "    pages = {74--85},\n"
+                         "    doi = {10.1109/WORKS.2018.00013}\n"
+                         "  }\n\n"
+                         "-----------------------------------------------------------------------------------\n\n";
+            // put the argument back in so that we also see the
+            // SimGrid message
             argv[(*argc)] = strdup("--version");
             (*argc)++;
         }
@@ -185,7 +193,6 @@ namespace wrench {
             argv[*argc] = strdup("--help");
             (*argc)++;
         }
-
     }
 
     /**
@@ -209,7 +216,7 @@ namespace wrench {
 
         try {
             this->platformSanityCheck();
-        } catch(std::exception &e) {
+        } catch (std::exception &e) {
             throw;
         }
 
@@ -220,7 +227,6 @@ namespace wrench {
      * @brief Get the list of names of all the hosts in the platform
      *
      * @return a vector of hostnames
-     *
      */
     std::vector<std::string> Simulation::getHostnameList() {
         return S4U_Simulation::getAllHostnames();
@@ -240,10 +246,8 @@ namespace wrench {
      * @brief Launch the simulation
      *
      * @throw std::runtime_error
-		 */
+     */
     void Simulation::launch() {
-
-
         // Check that the simulation is correctly initialized
         try {
             this->checkSimulationSetup();
@@ -266,7 +270,6 @@ namespace wrench {
             throw std::runtime_error("Simulation::launch(): " + std::string(e.what()));
         }
 
-
         // Run the simulation
         try {
             this->is_running = true;
@@ -276,16 +279,12 @@ namespace wrench {
             this->is_running = false;
             throw;
         }
-
-
-
     }
 
     /**
      * @brief Checks whether the simulation is running or not
      *
      * @return true or false
-     *
 	 */
     bool Simulation::isRunning() {
         return this->is_running;
@@ -297,7 +296,6 @@ namespace wrench {
      * @throw std::runtime_exception
      */
     void Simulation::checkSimulationSetup() {
-
         // Check that the simulation is initialized
         if (not this->s4u_simulation->isInitialized()) {
             throw std::runtime_error("Simulation is not initialized");
@@ -364,7 +362,6 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void Simulation::startAllProcesses() {
-
         try {
             // Start the WMSes
             for (const auto &wms : this->wmses) {
@@ -455,14 +452,13 @@ namespace wrench {
         this->storage_services.insert(service);
     }
 
-
     /**
-   * @brief Add a WMS to the simulation.
-   *
-   * @param service: a WMS
-   *
-   * @throw std::invalid_argument
-   */
+     * @brief Add a WMS to the simulation.
+     *
+     * @param service: a WMS
+     *
+     * @throw std::invalid_argument
+     */
     void Simulation::addService(std::shared_ptr<WMS> service) {
         if (service == nullptr) {
             throw std::invalid_argument("Simulation::addService(): invalid argument (nullptr service)");
@@ -470,7 +466,6 @@ namespace wrench {
         service->simulation = this;
         this->wmses.insert(service);
     }
-
 
     /**
       * @brief Add a FileRegistryService to the simulation.
@@ -487,7 +482,6 @@ namespace wrench {
         this->file_registry_services.insert(service);
     }
 
-
     /**
       * @brief Add an EnergyMeter service to the simulation.
       *
@@ -503,8 +497,6 @@ namespace wrench {
         this->energy_meter_services.insert(service);
     }
 
-
-
     /**
     * @brief Stage a copy of a file at a storage service in the root of the (unique) mount point
     *
@@ -518,7 +510,6 @@ namespace wrench {
         Simulation::stageFile(file, FileLocation::LOCATION(storage_service));
     }
 
-
     /**
     * @brief Stage a copy of a file at a storage service in a particular directory
     *
@@ -529,10 +520,10 @@ namespace wrench {
     * @throw std::runtime_error
     * @throw std::invalid_argument
     */
-    void Simulation::stageFile(WorkflowFile *file, std::shared_ptr<StorageService> storage_service, std::string directory_absolute_path) {
+    void Simulation::stageFile(WorkflowFile *file, std::shared_ptr<StorageService> storage_service,
+                               std::string directory_absolute_path) {
         Simulation::stageFile(file, FileLocation::LOCATION(storage_service, directory_absolute_path));
     }
-
 
     /**
      * @brief State a copy of a file at a location
@@ -540,13 +531,12 @@ namespace wrench {
      * @param location: the location
      */
     void Simulation::stageFile(WorkflowFile *file, std::shared_ptr<FileLocation> location) {
-
         if ((file == nullptr) or (location == nullptr)) {
             throw std::invalid_argument("Simulation::stageFile(): Invalid arguments");
         }
 
         if (this->is_running) {
-            throw  std::runtime_error(" Simulation::stageFile(): Cannot stage a file once the simulation has started");
+            throw std::runtime_error(" Simulation::stageFile(): Cannot stage a file once the simulation has started");
         }
 
         // Check that a FileRegistryService has been set
@@ -575,7 +565,8 @@ namespace wrench {
     }
 
     /**
-     * Wrapper enabling timestamps for disk reads
+     * @brief Wrapper enabling timestamps for disk reads
+     *
      * @param num_bytes - number of bytes read
      * @param hostname - hostname to read from
      * @param mount_point - mount point of disk to read from
@@ -583,20 +574,22 @@ namespace wrench {
      * @throw invalid_argument
      */
     void Simulation::readFromDisk(double num_bytes, std::string hostname, std::string mount_point) {
-        unique_disk_sequence_number+=1;
+        unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
         this->getOutput().addTimestampDiskReadStart(hostname, mount_point, num_bytes, temp_unique_sequence_number);
-        try{
+        try {
             S4U_Simulation::readFromDisk(num_bytes, hostname, mount_point);
         } catch (const std::invalid_argument &ia) {
-            this->getOutput().addTimestampDiskReadFailure(hostname, mount_point, num_bytes, temp_unique_sequence_number);
+            this->getOutput().addTimestampDiskReadFailure(hostname, mount_point, num_bytes,
+                                                          temp_unique_sequence_number);
             throw;
         }
         this->getOutput().addTimestampDiskReadCompletion(hostname, mount_point, num_bytes, temp_unique_sequence_number);
     }
 
     /**
-     * Wrapper enabling timestamps for concurrent disk read/writes
+     * @brief Wrapper enabling timestamps for concurrent disk read/writes
+     *
      * @param num_bytes_to_read - number of bytes read
      * @param num_bytes_to_write - number of bytes written
      * @param hostname - hostname where disk is located
@@ -609,23 +602,31 @@ namespace wrench {
                                                             std::string hostname,
                                                             std::string read_mount_point,
                                                             std::string write_mount_point) {
-        unique_disk_sequence_number+=1;
+        unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
-        this->getOutput().addTimestampDiskReadStart(hostname, read_mount_point, num_bytes_to_read, temp_unique_sequence_number);
-        this->getOutput().addTimestampDiskWriteStart(hostname, write_mount_point, num_bytes_to_write, temp_unique_sequence_number);
-        try{
-            S4U_Simulation::readFromDiskAndWriteToDiskConcurrently(num_bytes_to_read, num_bytes_to_write, hostname, read_mount_point, write_mount_point);
+        this->getOutput().addTimestampDiskReadStart(hostname, read_mount_point, num_bytes_to_read,
+                                                    temp_unique_sequence_number);
+        this->getOutput().addTimestampDiskWriteStart(hostname, write_mount_point, num_bytes_to_write,
+                                                     temp_unique_sequence_number);
+        try {
+            S4U_Simulation::readFromDiskAndWriteToDiskConcurrently(num_bytes_to_read, num_bytes_to_write, hostname,
+                                                                   read_mount_point, write_mount_point);
         } catch (const std::invalid_argument &ia) {
-            this->getOutput().addTimestampDiskWriteFailure(hostname, write_mount_point, num_bytes_to_write, temp_unique_sequence_number);
-            this->getOutput().addTimestampDiskReadFailure(hostname, read_mount_point, num_bytes_to_read, temp_unique_sequence_number);
+            this->getOutput().addTimestampDiskWriteFailure(hostname, write_mount_point, num_bytes_to_write,
+                                                           temp_unique_sequence_number);
+            this->getOutput().addTimestampDiskReadFailure(hostname, read_mount_point, num_bytes_to_read,
+                                                          temp_unique_sequence_number);
             throw;
         }
-        this->getOutput().addTimestampDiskWriteCompletion(hostname, write_mount_point, num_bytes_to_write, temp_unique_sequence_number);
-        this->getOutput().addTimestampDiskReadCompletion(hostname, read_mount_point, num_bytes_to_read, temp_unique_sequence_number);
+        this->getOutput().addTimestampDiskWriteCompletion(hostname, write_mount_point, num_bytes_to_write,
+                                                          temp_unique_sequence_number);
+        this->getOutput().addTimestampDiskReadCompletion(hostname, read_mount_point, num_bytes_to_read,
+                                                         temp_unique_sequence_number);
     }
 
     /**
-     * Wrapper enabling timestamps for disk writes
+     * @brief Wrapper enabling timestamps for disk writes
+     *
      * @param num_bytes - number of bytes written
      * @param hostname - hostname to write to
      * @param mount_point - mount point of disk to write to
@@ -633,20 +634,22 @@ namespace wrench {
      * @throw invalid_argument
      */
     void Simulation::writeToDisk(double num_bytes, std::string hostname, std::string mount_point) {
-        unique_disk_sequence_number+=1;
+        unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
         this->getOutput().addTimestampDiskWriteStart(hostname, mount_point, num_bytes, temp_unique_sequence_number);
-        try{
+        try {
             S4U_Simulation::writeToDisk(num_bytes, hostname, mount_point);
         } catch (const std::invalid_argument &ia) {
-            this->getOutput().addTimestampDiskWriteFailure(hostname, mount_point, num_bytes, temp_unique_sequence_number);
+            this->getOutput().addTimestampDiskWriteFailure(hostname, mount_point, num_bytes,
+                                                           temp_unique_sequence_number);
             throw;
         }
-        this->getOutput().addTimestampDiskWriteCompletion(hostname, mount_point, num_bytes, temp_unique_sequence_number);
+        this->getOutput().addTimestampDiskWriteCompletion(hostname, mount_point, num_bytes,
+                                                          temp_unique_sequence_number);
     }
 
     /**
-     * Wrapper for S4U_Simulation hostExists()
+     * @brief Wrapper for S4U_Simulation hostExists()
      * @param hostname - name of host being queried
      * @return boolean of existence
      */
@@ -714,12 +717,11 @@ namespace wrench {
         S4U_Simulation::turnOnHost(hostname);
     }
 
-
     /**
-    * @brief Returns whether a link is on or not
-    * @param linkname: the linkname
-    * @return true or false
-    */
+     * @brief Returns whether a link is on or not
+     * @param linkname: the linkname
+     * @return true or false
+     */
     bool Simulation::isLinkOn(std::string linkname) {
         return S4U_Simulation::isLinkOn(linkname);
     }
@@ -739,7 +741,6 @@ namespace wrench {
     void Simulation::turnOnLink(std::string linkname) {
         S4U_Simulation::turnOnLink(linkname);
     }
-
 
     /**
      * @brief Get the memory capacity of the host on which the calling process is running
@@ -772,7 +773,6 @@ namespace wrench {
     std::string Simulation::getHostName() {
         return S4U_Simulation::getHostName();
     }
-
 
     /**
      * @brief Make the calling process sleep for a number of (simulated) seconds
@@ -808,10 +808,9 @@ namespace wrench {
         return this->getEnergyConsumed(hostname, false);
     }
 
-
     /**
      * @brief Obtains the current energy consumption of a host and will add SimulationTimestampEnergyConsumption to
-     *          simulation output if can_record is set to true
+     *        simulation output if can_record is set to true
      * @param hostname: the host name
      * @param record_as_time_stamp: bool signaling whether or not to record a SimulationTimestampEnergyConsumption object
      * @return current energy consumption in joules
@@ -841,7 +840,6 @@ namespace wrench {
     std::map<std::string, double> Simulation::getEnergyConsumed(const std::vector<std::string> &hostnames) {
         return this->getEnergyConsumed(hostnames, false);
     }
-
 
     /**
     * @brief Obtains the current energy consumption of a host and will add SimulationTimestampEnergyConsumption to
@@ -901,7 +899,6 @@ namespace wrench {
         return S4U_Simulation::getListOfPstates(hostname);
     }
 
-
     /**
      * @brief Get the minimum power consumption for the host (i.e., idling) at its current pstate
      * @param hostname: the host name
@@ -920,14 +917,12 @@ namespace wrench {
         return S4U_Simulation::getMaxPowerConsumption(hostname);
     }
 
-
     /**
      * @brief Starts a new compute service during WMS execution (i.e., one that was not passed to Simulation::add() before
      *        Simulation::launch() was called). The simulation takes ownership of
      *        the reference and will call the destructor.
      * @param service: An instance of a service
      * @return A pointer to the service instance
-     *
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
@@ -959,12 +954,10 @@ namespace wrench {
      *        the reference and will call the destructor.
      * @param service: An instance of a service
      * @return A pointer to the service instance
-     *
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
     std::shared_ptr<StorageService> Simulation::startNewService(StorageService *service) {
-
         if (service == nullptr) {
             throw std::invalid_argument("Simulation::startNewService(): invalid argument (nullptr service)");
         }
@@ -987,12 +980,10 @@ namespace wrench {
      *        the reference and will call the destructor.
      * @param service: An instance of a service
      * @return A pointer to the service instance
-     *
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
     std::shared_ptr<NetworkProximityService> Simulation::startNewService(NetworkProximityService *service) {
-
         if (service == nullptr) {
             throw std::invalid_argument("Simulation::startNewService(): invalid argument (nullptr service)");
         }
@@ -1015,12 +1006,10 @@ namespace wrench {
      *        the reference and will call the destructor.
      * @param service: An instance of a service
      * @return A pointer to the service instance
-     *
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
     std::shared_ptr<FileRegistryService> Simulation::startNewService(FileRegistryService *service) {
-
         if (service == nullptr) {
             throw std::invalid_argument("Simulation::startNewService(): invalid argument (nullptr service)");
         }
@@ -1039,7 +1028,6 @@ namespace wrench {
 
     /**
      * @brief Checks that the platform is well defined
-     *
      * @throw std::invalid_argument
      */
     void Simulation::platformSanityCheck() {
@@ -1069,8 +1057,8 @@ namespace wrench {
         // Check Disk Prefixness
         for (auto const &h : hostnames) {
             auto disks = S4U_Simulation::getDisks(h);
-            for (unsigned int i=0; i < disks.size(); i++) {
-                for (unsigned int j=0; j < disks.size(); j++) {
+            for (unsigned int i = 0; i < disks.size(); i++) {
+                for (unsigned int j = 0; j < disks.size(); j++) {
                     if (j == i) {
                         continue;
                     }
@@ -1078,7 +1066,8 @@ namespace wrench {
                         throw std::invalid_argument("Simulation::platformSanityCheck(): Host " + h +
                                                     " has two disks with the same mount point '" + disks[i] + "'");
                     }
-                    if ((disks[j] != "/") and  (disks[i] != "/") and (FileLocation::properPathPrefix(disks[i], disks[j]))) {
+                    if ((disks[j] != "/") and (disks[i] != "/") and
+                        (FileLocation::properPathPrefix(disks[i], disks[j]))) {
                         throw std::invalid_argument("Simulation::platformSanityCheck(): Host " + h +
                                                     " has two disks, with one of them having a mount point that "
                                                     "is a prefix of the other (" + disks[j] + " and " + disks[i] + ")");
@@ -1093,15 +1082,12 @@ namespace wrench {
             for (auto const &d : simgrid::s4u::Host::by_name(h)->get_disks()) {
                 double read_bw = d->get_read_bandwidth();
                 double write_bw = d->get_write_bandwidth();
-                if(std::abs<double>(read_bw - write_bw) > DBL_EPSILON) {
-                    throw  std::invalid_argument("Simulation::platformSanityCheck(): For now, disks must have equal "
-                                                 "read and write bandwidth (offending disk: " +
-                                                 h + ":" + d->get_property("mount"));
+                if (std::abs<double>(read_bw - write_bw) > DBL_EPSILON) {
+                    throw std::invalid_argument("Simulation::platformSanityCheck(): For now, disks must have equal "
+                                                "read and write bandwidth (offending disk: " +
+                                                h + ":" + d->get_property("mount"));
                 }
             }
         }
     }
-
-
-
 };
