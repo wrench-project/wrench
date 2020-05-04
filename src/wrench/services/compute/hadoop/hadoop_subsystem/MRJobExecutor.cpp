@@ -39,19 +39,12 @@ namespace wrench {
             std::string notify_mailbox,
             std::map<std::string, std::string> property_list,
             std::map<std::string, double> messagepayload_list
-    ) :
-            Service(hostname,
-                    "mr_job_executor",
-                    "mr_job_executor"), job(job), success(false) {
+    ) : Service(hostname, "mr_job_executor",
+                "mr_job_executor"), job(job), success(false) {
         this->compute_resources = compute_resources;
         this->notify_mailbox = std::move(notify_mailbox);
-
-        // Set default and specified properties
         this->setProperties(this->default_property_values, std::move(property_list));
-
-        // Set default and specified message payloads
         this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
-
     }
 
     /**

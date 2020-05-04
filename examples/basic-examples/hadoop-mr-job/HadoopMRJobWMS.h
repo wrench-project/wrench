@@ -21,14 +21,10 @@ namespace wrench {
      */
     class HadoopMRJobWMS : public WMS {
     public:
-        // Constructor
         HadoopMRJobWMS(
-                  const std::string &hostname);
-
-    protected:
+                const std::string &hostname);
 
     private:
-        // main() method of the WMS
         int main() override;
 
     };

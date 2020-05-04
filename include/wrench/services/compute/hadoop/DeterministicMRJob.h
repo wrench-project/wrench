@@ -37,4 +37,5 @@ namespace wrench {
         int calculateNumMappers() override;
     };
 }
+
 #endif //WRENCH_DETERMINISTICMRJOB_H

@@ -16,12 +16,12 @@
 
 namespace wrench {
 
-/***********************/
-/** \cond INTERNAL     */
-/***********************/
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
 
     /**
-     * @brief Top-level class for messages received/sent by a HadoopComputeService
+     * @brief Top-level class for messages received/sent by a HadoopComputeService.
      */
     class HadoopComputeServiceMessage : public ComputeServiceMessage {
     protected:
@@ -29,7 +29,7 @@ namespace wrench {
     };
 
     /**
-     * @brief A message sent to a HadoopComputeService to run a MR job
+     * @brief A message sent to a HadoopComputeService to run a MR job.
      */
     class HadoopComputeServiceRunMRJobRequestMessage : public HadoopComputeServiceMessage {
     public:
@@ -42,7 +42,7 @@ namespace wrench {
     };
 
     /**
-     * @brief A message sent by a HadoopComputeService after running a MR job
+     * @brief A message sent by a HadoopComputeService after running a MR job.
      */
     class HadoopComputeServiceRunMRJobAnswerMessage : public HadoopComputeServiceMessage {
     public:
@@ -51,6 +51,9 @@ namespace wrench {
         bool success;
     };
 
+    /**
+     * @brief A message sent by an MRJobExecutor with a notification about the job status.
+     */
     class MRJobExecutorNotificationMessage : public HadoopComputeServiceMessage {
     public:
         MRJobExecutorNotificationMessage(bool success, MRJob *job, double payload);
@@ -59,6 +62,9 @@ namespace wrench {
         MRJob *job;
     };
 
+    /**
+     * @brief A message sent by a MapperService to HDFS to read the data.
+     */
     class HdfsReadDataMessage : public HadoopComputeServiceMessage {
     public:
         HdfsReadDataMessage(double data_size, std::string return_mailbox, double payload);
@@ -68,25 +74,20 @@ namespace wrench {
         double payload;
     };
 
+    /**
+     * @brief A message sent by HdfsService when the data read is complete.
+     */
     class HdfsReadCompleteMessage : public HadoopComputeServiceMessage {
     public:
         HdfsReadCompleteMessage(double data_size, double payload);
+
         double data_size;
         double payload;
     };
 
-    class RequestDataFromHdfsMessage : public HadoopComputeServiceMessage {
-    public:
-        RequestDataFromHdfsMessage(double data_size, double payload);
-        double data_size;
-        double payload;
-    };
-
-/***********************/
-/** \endcond          **/
-/***********************/
-
+    /***********************/
+    /** \endcond          **/
+    /***********************/
 }
-
 
 #endif //WRENCH_HADOOPCOMPUTESERVICEMESSAGE_H

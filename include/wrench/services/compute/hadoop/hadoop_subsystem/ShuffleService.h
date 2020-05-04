@@ -14,7 +14,6 @@
 #include "wrench/services/compute/hadoop/HadoopComputeService.h"
 
 namespace wrench {
-
     class ShuffleService : public Service {
     public:
         ShuffleService(
@@ -30,10 +29,8 @@ namespace wrench {
     private:
         MRJob *job;
 
-        // TODO: Define these:
         std::map<std::string, std::string> default_property_values = {};
 
-        // TODO: And define these:
         std::map<std::string, double> default_messagepayload_values = {};
 
         std::set<std::string> compute_resources;

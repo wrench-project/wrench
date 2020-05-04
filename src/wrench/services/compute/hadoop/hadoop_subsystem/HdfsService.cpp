@@ -36,16 +36,10 @@ namespace wrench {
             const std::set<std::string> compute_resources,
             std::map<std::string, std::string> property_list,
             std::map<std::string, double> messagepayload_list
-    ) :
-            Service(hostname,
-                    "hdfs_service",
-                    "hdfs_service"), job(job) {
+    ) : Service(hostname, "hdfs_service",
+                "hdfs_service"), job(job) {
         this->compute_resources = compute_resources;
-
-        // Set default and specified properties
         this->setProperties(this->default_property_values, std::move(property_list));
-
-        // Set default and specified message payloads
         this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
     }
 

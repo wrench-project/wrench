@@ -52,4 +52,5 @@ namespace wrench {
         bool processNextMessage();
     };
 }
+
 #endif //WRENCH_MAPPER_H

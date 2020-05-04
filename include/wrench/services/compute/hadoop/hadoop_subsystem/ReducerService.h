@@ -47,4 +47,5 @@ namespace wrench {
         bool processNextMessage();
     };
 }
+
 #endif //WRENCH_REDUCER_H

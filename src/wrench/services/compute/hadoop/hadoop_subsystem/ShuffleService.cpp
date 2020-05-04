@@ -27,22 +27,14 @@ namespace wrench {
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      */
-    ShuffleService::ShuffleService(
-            const std::string &hostname,
-            MRJob *job,
-            const std::set<std::string> compute_resources,
-            std::map<std::string, std::string> property_list,
-            std::map<std::string, double> messagepayload_list
-    ) :
-            Service(hostname,
-                    "shuffle_service",
-                    "shuffle_service") {
+    ShuffleService::ShuffleService(const std::string &hostname, MRJob *job,
+                                   const std::set<std::string> compute_resources,
+                                   std::map<std::string, std::string> property_list,
+                                   std::map<std::string, double> messagepayload_list
+    ) : Service(hostname, "shuffle_service",
+                "shuffle_service") {
         this->compute_resources = compute_resources;
-
-        // Set default and specified properties
         this->setProperties(this->default_property_values, std::move(property_list));
-
-        // Set default and specified message payloads
         this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
     }
 
@@ -60,9 +52,8 @@ namespace wrench {
      * @return 0 on termination
      */
     int ShuffleService::main() {
-        this->state = Service::UP;
-
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
+        this->state = Service::UP;
 
         WRENCH_INFO("New ShuffleService starting (%s) on %ld hosts",
                     this->mailbox_name.c_str(), this->compute_resources.size());

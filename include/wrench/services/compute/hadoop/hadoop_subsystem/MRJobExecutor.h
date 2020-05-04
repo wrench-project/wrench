@@ -67,4 +67,5 @@ namespace wrench {
                            std::shared_ptr<Service> &shuffle);
     };
 }
+
 #endif //WRENCH_HADOOPCOMPUTESERVICE_H

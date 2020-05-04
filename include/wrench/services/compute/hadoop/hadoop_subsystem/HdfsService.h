@@ -50,4 +50,5 @@ namespace wrench {
         bool processNextMessage();
     };
 }
+
 #endif //WRENCH_HDFS_H

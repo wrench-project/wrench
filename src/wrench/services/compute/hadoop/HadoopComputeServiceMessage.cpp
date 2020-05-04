@@ -11,7 +11,6 @@
 
 namespace wrench {
 
-
     /**
      * @brief Constructor
      *
@@ -22,14 +21,14 @@ namespace wrench {
             ComputeServiceMessage("HadoopComputeServiceMessage::" + name, payload) {
     }
 
-/**
- * @brief Constructor
- * @param answer_mailbox: the mailbox to reply to
- * @param job: the MR job
- * @param payload: the message size in bytes
- *
- * @throw std::invalid_argument
- */
+    /**
+     * @brief Constructor
+     * @param answer_mailbox: the mailbox to reply to
+     * @param job: the MR job
+     * @param payload: the message size in bytes
+     *
+     * @throw std::invalid_argument
+     */
     HadoopComputeServiceRunMRJobRequestMessage::HadoopComputeServiceRunMRJobRequestMessage(std::string answer_mailbox,
                                                                                            MRJob *job,
                                                                                            double payload)
@@ -43,13 +42,13 @@ namespace wrench {
     }
 
 
-/**
- * @brief Constructor
- * @param success: the job success status
- * @param payload: the message size in bytes
- *
- * @throw std::invalid_argument
- */
+    /**
+     * @brief Constructor
+     * @param success: the job success status
+     * @param payload: the message size in bytes
+     *
+     * @throw std::invalid_argument
+     */
     HadoopComputeServiceRunMRJobAnswerMessage::HadoopComputeServiceRunMRJobAnswerMessage(bool success,
                                                                                          double payload)
             : HadoopComputeServiceMessage("HadoopComputeServiceRunMRJobAnswerMessage", payload) {
@@ -64,7 +63,7 @@ namespace wrench {
      *
      * @throw: std::invalid_argument
      */
-    MRJobExecutorNotificationMessage::MRJobExecutorNotificationMessage(bool success,  MRJob *job, double payload)
+    MRJobExecutorNotificationMessage::MRJobExecutorNotificationMessage(bool success, MRJob *job, double payload)
             : HadoopComputeServiceMessage("MRJobExecutorNotificationMessage", payload) {
         this->success = success;
         this->job = job;
@@ -81,19 +80,7 @@ namespace wrench {
         this->return_mailbox = std::move(return_mailbox);
         this->data_size = data_size;
         this->payload = payload;
-    };
-
-    /**
-     *
-     * @param job
-     * @param data_size
-     * @param payload
-     */
-    RequestDataFromHdfsMessage::RequestDataFromHdfsMessage(double data_size, double payload)
-            : HadoopComputeServiceMessage("RequestDataFromHdfsMessage", payload) {
-        this->data_size = data_size;
-        this->payload = payload;
-    };
+    }
 
     /**
      * 

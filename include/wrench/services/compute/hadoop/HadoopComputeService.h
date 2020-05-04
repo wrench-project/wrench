@@ -22,8 +22,6 @@
 #include "wrench/workflow/failure_causes/NetworkError.h"
 
 namespace wrench {
-
-
     class HadoopComputeService : public Service {
     public:
         HadoopComputeService(
@@ -71,4 +69,5 @@ namespace wrench {
 
     };
 }
+
 #endif //WRENCH_HADOOPCOMPUTESERVICE_H

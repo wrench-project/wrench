@@ -11,13 +11,9 @@
 #include <wrench/services/compute/hadoop/hadoop_subsystem/MRJobExecutorMessagePayload.h>
 #include "wrench/services/compute/hadoop/HadoopComputeService.h"
 #include "HadoopComputeServiceMessage.h"
-
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
-
 #include "wrench/services/compute/ComputeService.h"
-
 #include "wrench/logging/TerminalOutput.h"
-#include "HadoopComputeServiceMessage.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/workflow/failure_causes/NetworkError.h"
 
@@ -33,19 +29,13 @@ namespace wrench {
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      */
-    HadoopComputeService::HadoopComputeService(
-            const std::string &hostname,
-            const std::set<std::string> compute_resources,
-            std::map<std::string, std::string> property_list,
-            std::map<std::string, double> messagepayload_list
-    ) :
-            Service(hostname,
-                    "hadoop",
-                    "hadoop"), compute_resources(compute_resources) {
-        // Set default and specified properties
+    HadoopComputeService::HadoopComputeService(const std::string &hostname,
+                                               const std::set<std::string> compute_resources,
+                                               std::map<std::string, std::string> property_list,
+                                               std::map<std::string, double> messagepayload_list
+    ) : Service(hostname, "hadoop",
+                "hadoop"), compute_resources(compute_resources) {
         this->setProperties(this->default_property_values, std::move(property_list));
-
-        // Set default and specified message payloads
         this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
 
         if (compute_resources.empty()) {
@@ -68,8 +58,8 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void HadoopComputeService::runMRJob(MRJob *job) {
-        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
         assertServiceIsUp();
+        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
 
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_mr_job");
 
@@ -158,7 +148,6 @@ namespace wrench {
                 return false;
             }
             return false;
-
         } else if (auto msg = std::dynamic_pointer_cast<HadoopComputeServiceRunMRJobRequestMessage>(message)) {
             // If an executor is already running, reject the request
             if (not this->pending_jobs.empty()) {
@@ -191,7 +180,6 @@ namespace wrench {
             this->pending_jobs[msg->job] =
                     std::unique_ptr<PendingJob>(new PendingJob(msg->job, executor, msg->answer_mailbox));
             return true;
-
         } else if (auto msg = std::dynamic_pointer_cast<MRJobExecutorNotificationMessage>(message)) {
             if (this->pending_jobs.find(msg->job) == this->pending_jobs.end()) {
                 throw std::runtime_error("Couldn't find MR Job in pending job list!");
@@ -205,6 +193,7 @@ namespace wrench {
             } catch (std::shared_ptr<NetworkError> &cause) {
 
             }
+
             this->pending_jobs.erase(msg->job);
             return false;
         } else {
