@@ -104,8 +104,6 @@ namespace wrench {
         /** \cond INTERNAL     */
         /***********************/
 
-        void validateProperties();
-
         void submitStandardJob(StandardJob *job, std::map<std::string, std::string> &service_specific_args) override;
 
         void submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_args) override;
@@ -124,6 +122,8 @@ namespace wrench {
 
         friend class Simulation;
 
+        void validateProperties();
+        
         // Low-level Constructor
         BareMetalComputeService(const std::string &hostname,
                                 std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
