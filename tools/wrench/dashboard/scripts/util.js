@@ -137,10 +137,10 @@ function determineTaskOverlap(data) {
                 }
                 let overlap = false
                 for (let j = 0; j < executionHost[i].length; j++) {
-                    let t = executionHost[i][j]
+                    let t = executionHost[i][j];
                     let currTaskStart = t.whole_task.start;
                     let currTaskEnd = determineTaskEnd(t);
-                    if ((taskStart >= currTaskStart && taskStart <= currTaskEnd) || (taskEnd >= currTaskStart && taskEnd <= currTaskEnd)) {
+                    if (taskEnd >= currTaskStart && taskStart <= currTaskEnd) {
                         i++;
                         overlap = true;
                         break;
@@ -164,7 +164,7 @@ function searchOverlap(taskId, taskOverlap) {
             var currOverlap = taskOverlap[host][key]
             for (let i = 0; i < currOverlap.length; i++) {
                 if (currOverlap[i].task_id === taskId) {
-                    return key
+                    return key;
                 }
             }
         }
