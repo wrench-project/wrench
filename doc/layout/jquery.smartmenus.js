@@ -1170,7 +1170,7 @@
 			} catch(e) {
 				dataOpts = null;
 				alert('ERROR\n\nSmartMenus jQuery init:\nInvalid "data-sm-options" attribute value syntax.');
-			};
+			}
 		}
 		return this.each(function() {
 			new $.SmartMenus(this, $.extend({}, $.fn.smartmenus.defaults, options, dataOpts));
