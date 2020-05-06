@@ -4,7 +4,7 @@
     padding: 10px;
     background-color: #f2f2f2;
     border-radius: 2px;
-    border: 0px solid #000;
+    border: 0 solid #000;
     display: none;
     pointer-events: none;
     font-family: sans-serif;
@@ -16,7 +16,7 @@
     padding: 10px;
     background-color: #f2f2f2;
     border-radius: 2px;
-    border: 0px solid #000;
+    border: 0 solid #000;
     display: none;
     pointer-events: none;
     font-family: sans-serif;
@@ -102,7 +102,7 @@
 }
 .read-col {
     background-color: #efe8f4;
-} 
+}
   
 .compute-col {
     background-color: #f9eedb;
@@ -121,7 +121,7 @@
 .task-details-table-header {
     border-top: 1px solid #dee2e6;
     font-size: 12px;
-    padding: 0.5em 0.2em 0.5em 0.2em;
+    padding: 0.5em 0.2em;
 }
 
 .title-container {
@@ -150,7 +150,7 @@
 }
 
 td {
-    word-wrap: break-word; 
+    word-wrap: break-word;
     word-break: break-all;
 }
 
@@ -169,7 +169,7 @@ td {
     text-align: center;
     float: right;
     /* prevent highlighting with double click */
-    -webkit-user-select: none; /* Chrome/Safari */        
+    -webkit-user-select: none; /* Chrome/Safari */
     -moz-user-select: none; /* Firefox */
     -ms-user-select: none; /* IE10+ */
 }
@@ -253,7 +253,7 @@ td {
     padding: 10px;
     background-color: #f2f2f2;
     border-radius: 2px;
-    border: 0px solid #000;
+    border: 0 solid #000;
     pointer-events: none;
     font-family: sans-serif;
     font-size: 12px;
@@ -289,7 +289,7 @@ td {
     padding: 10px;
     background-color: #f2f2f2;
     border-radius: 2px;
-    border: 0px solid #000;
+    border: 0 solid #000;
     display: none;
     pointer-events: none;
     font-family: sans-serif;
