@@ -1,17 +1,8 @@
 function determineNumCores(data) {
     let numCores = 0;
-    let taskOverlap = determineTaskOverlap(data);
-    for (let host in taskOverlap) {
-        let currOverlap = taskOverlap[host];
-        let maxCores = 0;
-        for (let i = 0; i < currOverlap.length; i++) {
-            for (let j = 0; j < currOverlap[i].length; j++) {
-                let t = currOverlap[i][j];
-                if (t.num_cores_allocated > maxCores) {
-                    maxCores = t.num_cores_allocated;
-                }
-            }
-            numCores += maxCores;
+    for (let task in data) {
+        if (data[task].execution_host.cores > numCores) {
+            numCores = data[task].execution_host.cores;
         }
     }
     return numCores;
@@ -115,8 +106,8 @@ function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskI
         })
         .attr("y", function (d) {
             var y_scale = y_cores_per_host.get(d['execution_host'].hostname);
-            let vertical_position = parseInt(searchOverlap(d.task_id, determineTaskOverlap(data)), 10);
-            return y_scale(vertical_position + 1);
+            let vertical_position = determineVerticalPosition(d, determineTaskOverlap(data));
+            return y_scale(vertical_position + d.num_cores_allocated);
         })
         .attr("width", function (d) {
             if (d.compute.start === -1) {
