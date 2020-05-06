@@ -175,7 +175,7 @@ function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskI
         var axis = d3.axisLeft(entry.value)
             .tickValues(d3.range(0, entry.value.domain()[1] + 1, 1))
             .tickFormat(d3.format(""));
-        ;
+        
 
         svg.append("g")
             .attr("class", "y-axis2")
