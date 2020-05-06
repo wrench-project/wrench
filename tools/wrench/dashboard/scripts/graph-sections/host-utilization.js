@@ -34,7 +34,7 @@ function getComputeTime(d) {
 
 function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskId, tooltipComputeTime,
                                       CONTAINER_WIDTH, CONTAINER_HEIGHT) {
-    
+
     let num_cores = determineNumCores(data);
     var container = d3.select(`#${containerId}`);
     document.getElementById(containerId).innerHTML =
@@ -82,7 +82,7 @@ function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskI
     var y_cores_per_host = d3.map();
 
     tasks_by_hostname.forEach(function (d) {
-        let n_cores = num_cores == 0 ? d.values[0]['execution_host'].cores : num_cores;
+        let n_cores = num_cores === 0 ? d.values[0]['execution_host'].cores : num_cores;
         y_cores_per_host.set(d.key,
             d3.scaleLinear()
                 .domain([0, n_cores])
@@ -115,7 +115,7 @@ function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskI
         })
         .attr("y", function (d) {
             var y_scale = y_cores_per_host.get(d['execution_host'].hostname);
-            let vertical_position = parseInt(searchOverlap(d.task_id, determineTaskOverlap(data)))
+            let vertical_position = parseInt(searchOverlap(d.task_id, determineTaskOverlap(data)), 10);
             return y_scale(vertical_position + 1);
         })
         .attr("width", function (d) {
