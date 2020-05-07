@@ -1,16 +1,16 @@
 function getBoxWidthFromArray(d, section, scale) {
-    var dict = {
+    let dict = {
         "start": scale(0),
         "end": scale(0)
     }
     if (Object.keys(d[section]).length > 0) {
-        var min_time = Number.MAX_VALUE
-        var duration = 0
+        let min_time = Number.MAX_VALUE;
+        let duration = 0;
         for (key in Object.keys(d[section])) {
-            var time = scale(getDuration(d, section))
+            let time = getBoxWidth(d[section], key, scale);
             if (time != scale(0)) {
-                duration += time
-                min_time = scale(d[section][key].start) < min_time ? scale(d[section][key].start) : min_time
+                duration += time;
+                min_time = scale(d[section][key].start) < min_time ? scale(d[section][key].start) : min_time;
             }
         }
         dict.start = min_time
@@ -18,6 +18,22 @@ function getBoxWidthFromArray(d, section, scale) {
     }
     return dict
 }
+
+function getBoxWidth(d, section, scale) {
+    if (d[section].start != -1) {
+        if (d[section].end == -1) {
+            if (d.terminated != -1) {
+                return scale(d.terminated) - scale(d[section].start)
+            } else if (d.failed != -1) {
+                return scale(d.failed) - scale(d[section].start)
+            }
+        } else {
+            return scale(d[section].end) - scale(d[section].start)
+        }
+    }
+    return scale(0) //Box shouldn't be displayed if start is -1
+}
+
 
 /**
  * Helper function used to get the position of the mouse within the browser window
@@ -116,8 +132,7 @@ function generateGraph(data, currGraphState, CONTAINER_WIDTH, CONTAINER_HEIGHT) 
         var group = svg.append('g')
             .attr('id', sanitizeId(d.task_id))
         var readTime = getBoxWidthFromArray(d, "read", xscale)
-        var computeDuration = getDuration(d, "compute")
-        var computeTime = computeDuration === 0 ? 0 : xscale(getDuration(d, "compute"))
+        var computeTime = getBoxWidth(d, "compute", xscale)
         var writeTime = getBoxWidthFromArray(d, "write", xscale)
         var ft_point = determineFailedOrTerminatedPoint(d)
         if (ft_point != "none") {

@@ -1,8 +1,12 @@
-// function determineNumCores(data) {
-//     // let numCores = 0;
-//     // let taskOverlap = determineTaskOverlap(data);
-//     return 1;
-// }
+function determineNumCores(data) {
+    let numCores = 0;
+    for (let task in data) {
+        if (data[task].execution_host.cores > numCores) {
+            numCores = data[task].execution_host.cores;
+        }
+    }
+    return numCores;
+}
 
 function getComputeTime(d) {
     if (d["compute"].start != -1) {
@@ -26,7 +30,6 @@ function getComputeTime(d) {
     PADDING: Padding value for container
 */
 function generateHostUtilizationGraph(data, CONTAINER_WIDTH, CONTAINER_HEIGHT, PADDING) {
-    // var num_cores = determineNumCores(data);
     const containerId = "host-utilization-chart"
     const tooltipId = "host-utilization-chart-tooltip"
     const tooltipTaskId = "host-utilization-chart-tooltip-task-id"
@@ -71,11 +74,12 @@ function generateHostUtilizationGraph(data, CONTAINER_WIDTH, CONTAINER_HEIGHT, P
 
     var y_cores_per_host = d3.map();
 
+    let num_cores = determineNumCores(data);
     tasks_by_hostname.forEach(function (d) {
-        // let n_cores = num_cores === 0 ? d.values[0]['execution_host'].cores : num_cores;
+        let n_cores = num_cores === 0 ? d.values[0][executionHostKey].cores : num_cores;
         y_cores_per_host.set(d.key,
             d3.scaleLinear()
-                .domain([0, d.values[0][executionHostKey].cores])
+                .domain([0, n_cores])
                 .range([y_hosts(d.key) + y_hosts.bandwidth(), y_hosts(d.key)])
         );
     });
@@ -105,8 +109,8 @@ function generateHostUtilizationGraph(data, CONTAINER_WIDTH, CONTAINER_HEIGHT, P
         })
         .attr("y", function (d) {
             var y_scale = y_cores_per_host.get(d[executionHostKey].hostname);
-            var vertical_position = searchOverlap(d.task_id, determineTaskOverlap(data))
-            return y_scale(vertical_position + 1);
+            let vertical_position = determineVerticalPosition(d, determineTaskOverlap(data));
+            return y_scale(vertical_position + d.num_cores_allocated);
         })
         .attr("width", function (d) {
             if (d.compute.start === -1) {
