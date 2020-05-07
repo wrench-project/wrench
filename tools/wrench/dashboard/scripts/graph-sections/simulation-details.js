@@ -19,17 +19,17 @@ function populateWorkflowTaskDataTable(data) {
 
         let read_start = convertToTableFormat(task, "read", "start");
         let read_end = convertToTableFormat(task, "read", "end");
-        let read_duration = getDuration(read_start, read_end);
+        let read_duration = toFiveDecimalPlaces(getDuration(task, "read"));
 
         let compute_start = convertToTableFormat(task, "compute", "start");
         let compute_end = convertToTableFormat(task, "compute", "end");
-        let compute_duration = getDuration(compute_start, compute_end);
+        let compute_duration = toFiveDecimalPlaces(getDuration(task, "compute"));
 
         let write_start = convertToTableFormat(task, "write", "start");
         let write_end = convertToTableFormat(task, "write", "end");
-        let write_duration = getDuration(write_start, write_end);
+        let write_duration = toFiveDecimalPlaces(getDuration(task, "write"));
 
-        let task_duration = getDuration(read_start, write_end);
+        let task_duration = toFiveDecimalPlaces(getDuration(task, "whole_task"));
 
         if (Number.isNaN(task_duration)) {
             task_duration = Math.abs(task_duration);

@@ -201,7 +201,7 @@ function showAndPopulateTooltip(d) {
 
     tooltipTaskId.text('TaskID: ' + d.task_id)
 
-    tooltipHost.text('Host Name: ' + d['execution host'].hostname)
+    tooltipHost.text('Host Name: ' + d[executionHostKey].hostname)
 
     var durationFull = findDuration(data.contents, d.task_id, "whole_task")
     tooltipDuration.text('Duration: ' + toFiveDecimalPlaces(durationFull) + 's')

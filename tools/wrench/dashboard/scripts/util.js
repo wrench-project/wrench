@@ -1,10 +1,36 @@
-const getDuration = (start, end) => {
-    if (start === -1 || start === -1) {
-        return start
-    } else if (end === -1 || end === -1) {
-        return end
-    } else {
-        return toFiveDecimalPlaces(end - start)
+const executionHostKey = 'execution_host'
+
+// const getDuration = (start, end) => {
+//     if (start === -1 || start === -1) {
+//         return start
+//     } else if (end === -1 || end === -1) {
+//         return end
+//     } else {
+//         return toFiveDecimalPlaces(end - start)
+//     }
+// }
+
+const getDuration = (d, section) => {
+    if (section === "read" || section === "write") {
+        let total = 0
+        if (d[section] !== null) {
+            d[section].forEach(t => {
+                total += (t.end - t.start)
+            })
+        }
+        return total
+    } else if (section === "compute" || section === "whole_task") {
+        if (d[section].start === -1) {
+            return 0
+        } else if (d[section].end === -1) {
+            if (d.terminated === -1) {
+                return d.failed - d[section].start
+            } else if (d.failed === -1) {
+                return d.terminated - d[section].start
+            }
+        } else {
+            return d[section].end - d[section].start
+        }
     }
 }
 
@@ -154,10 +180,10 @@ function determineTaskOverlap(data) {
         let taskStart = d.whole_task.start;
         let taskEnd = determineTaskEnd(d);
 
-        if (d['execution host'].hostname in taskOverlap) {
+        if (d[executionHostKey].hostname in taskOverlap) {
             let i = 0;
             let placed = false;
-            let executionHost = taskOverlap[d['execution host'].hostname];
+            let executionHost = taskOverlap[d[executionHostKey].hostname];
 
             while (!placed) {
                 if (executionHost[i] === undefined) {
@@ -180,7 +206,7 @@ function determineTaskOverlap(data) {
                 }
             }
         } else {
-            taskOverlap[d['execution host'].hostname] = [[d]];
+            taskOverlap[d[executionHostKey].hostname] = [[d]];
         }
     })
     return taskOverlap
@@ -277,7 +303,7 @@ function processFile(files, fileType) {
 }
 
 function sanitizeId(id) {
-    id = id.replace('#', '')
-    id = id.replace(' ', '')
+    id = id.replace(/#/g, '')
+    id = id.replace(/ /g, '')
     return id
 }
