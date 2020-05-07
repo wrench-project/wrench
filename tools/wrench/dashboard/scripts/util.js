@@ -15,21 +15,21 @@ const getDuration = (d, section) => {
         let total = 0
         if (d[section] !== null) {
             d[section].forEach(t => {
-                total += (t.end - t.start)
+                total += (t.end - t.start);
             })
         }
-        return total
+        return total;
     } else if (section === "compute" || section === "whole_task") {
         if (d[section].start === -1) {
-            return 0
+            return 0;
         } else if (d[section].end === -1) {
             if (d.terminated === -1) {
-                return d.failed - d[section].start
+                return d.failed - d[section].start;
             } else if (d.failed === -1) {
-                return d.terminated - d[section].start
+                return d.terminated - d[section].start;
             }
         } else {
-            return d[section].end - d[section].start
+            return d[section].end - d[section].start;
         }
     }
 }
