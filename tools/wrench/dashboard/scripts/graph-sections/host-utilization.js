@@ -133,7 +133,9 @@ function generateHostUtilizationGraph(data, CONTAINER_WIDTH, CONTAINER_HEIGHT, P
             tooltip.style('display', 'inline');
 
             d3.select(this)
-                .attr('fill', '#ffdd7f');
+                .attr('fill', function(d)  {
+                    return brighterColor(determineTaskColor(d))
+                });
         })
         .on('mousemove', function (d) {
             var offset = getOffset(chart, d3.mouse(this));
@@ -150,7 +152,9 @@ function generateHostUtilizationGraph(data, CONTAINER_WIDTH, CONTAINER_HEIGHT, P
             tooltip.style('display', 'none');
 
             d3.select(this)
-                .attr('fill', '#f7daad')
+                .attr('fill', function(d) {
+                    return determineTaskColor(d)
+                })
         });
 
     var x_axis = d3.axisBottom(x_scale)

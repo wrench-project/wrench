@@ -115,9 +115,9 @@ function convertToTableFormat(d, section, property) {
 }
 
 function getRandomColour() {
-    var letters = '0123456789ABCDEF';
-    var colour = '#';
-    for (var i = 0; i < 6; i++) {
+    let letters = '0123456789ABCDEF';
+    let colour = '#';
+    for (let i = 0; i < 6; i++) {
         colour += letters[Math.floor(Math.random() * 16)];
     }
     return colour;
@@ -163,7 +163,7 @@ function populateLegend(currView) {
 }
 
 function determineTaskEnd(d) {
-    var taskEnd
+    let taskEnd
     if (d.terminated !== -1) {
         taskEnd = d.terminated
     } else if (d.failed !== -1) {
@@ -175,13 +175,27 @@ function determineTaskEnd(d) {
 }
 
 function determineTaskColor(d) {
-    var taskColor
-    if (d.color === "") {
+    let taskColor
+    console.log(d)
+    if ((!d.hasOwnProperty("color")) || (d.color === "")) {
         taskColor = "#f7daad"
     } else {
         taskColor = d.color
     }
     return taskColor
+}
+
+function brighterColor(c) {
+    let bytes = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(c)
+    let brightness_increment = 25
+    let brighter = "#"
+    for (let i = 1; i <= 3; i++) {
+        let intValue = Math.min(255, brightness_increment + parseInt(bytes[i], 16));
+        let hexString = intValue.toString(16);
+        hexString = hexString.length === 1 ? "0" + hexString : hexString
+        brighter += hexString
+    }
+    return brighter
 }
 
 function determineTaskOverlap(data) {
@@ -302,7 +316,7 @@ function processFile(files) {
                 console.log(rawData.energy_consumption)
                 energyData = rawData.energy_consumption
             }
-            
+
             initialise()
         })
         .catch(function (err) {
