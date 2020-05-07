@@ -273,27 +273,26 @@ function extractFileContent(file) {
     })
 }
 
-function processFile(files, fileType) {
+function processFile(files) {
     if (files.length === 0) {
         return
     }
     extractFileContent(files[0])
         .then(function (rawDataString) {
-            switch (fileType) {
-                case "taskData":
-                    const rawData = JSON.parse(rawDataString)
-                    if (!rawData.workflow_execution || !rawData.workflow_execution.tasks) {
-                        break
-                    }
-                    data = {
-                        file: files[0].name,
-                        contents: rawData.workflow_execution.tasks
-                    }
-                    break
-                case "energy":
-                    energyData = JSON.parse(rawData)
-                    break
+            const rawData = JSON.parse(rawDataString)
+            if (!rawData.workflow_execution || !rawData.workflow_execution.tasks) {
+                return
             }
+            data = {
+                file: files[0].name,
+                contents: rawData.workflow_execution.tasks
+            }
+
+            if (rawData.energy_consumption) {
+                console.log(rawData.energy_consumption)
+                energyData = rawData.energy_consumption
+            }
+            
             initialise()
         })
         .catch(function (err) {
