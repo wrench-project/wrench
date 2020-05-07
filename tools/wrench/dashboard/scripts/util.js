@@ -174,6 +174,16 @@ function determineTaskEnd(d) {
     return taskEnd
 }
 
+function determineTaskColor(d) {
+    var taskColor
+    if (d.color === "") {
+        taskColor = "#f7daad"
+    } else {
+        taskColor = d.color
+    }
+    return taskColor
+}
+
 function determineTaskOverlap(data) {
     let taskOverlap = {};
     data.forEach(function (d) {
