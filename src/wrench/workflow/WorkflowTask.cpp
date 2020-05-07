@@ -790,4 +790,20 @@ namespace wrench {
                     "WorkflowTask::setNumCoresAllocated() cannot be called before WorkflowTask::setStartDate()");
         }
     }
+
+    /**
+     * @brief Get the task's color ("" if none)
+     * @return A color string in  "#rrggbb" format
+     */
+    std::string WorkflowTask::getColor() {
+        return this->color;
+    }
+
+    /**
+     * @brief Set the task's color
+     * @param color A color string in  "#rrggbb" format
+     */
+    void WorkflowTask::setColor(std::string color) {
+        this->color = color;
+    }
 };

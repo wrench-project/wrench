@@ -564,6 +564,7 @@ namespace wrench {
                 }
                 task_json.push_back({
                                             {"task_id",                  task->getID()},
+                                            {"color",                    task->getColor()},
                                             {"execution_host", {
                                                                                  {"hostname", current_task_execution.execution_host},
                                                                                  {"flop_rate", Simulation::getHostFlopRate(

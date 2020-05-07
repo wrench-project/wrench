@@ -125,7 +125,9 @@ function generateHostUtilizationGraph(data, CONTAINER_WIDTH, CONTAINER_HEIGHT, P
             var y_scale = y_cores_per_host.get(d[executionHostKey].hostname);
             return y_scale(0) - y_scale(d.num_cores_allocated);
         })
-        .attr("fill", "#f7daad")
+        .attr("fill", function(d) {
+            return determineTaskColor(d)
+        })
         .attr("stroke", "gray")
         .on('mouseover', function () {
             tooltip.style('display', 'inline');

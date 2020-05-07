@@ -123,7 +123,7 @@ namespace wrench {
         friend class Simulation;
 
         void validateProperties();
-        
+
         // Low-level Constructor
         BareMetalComputeService(const std::string &hostname,
                                 std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
