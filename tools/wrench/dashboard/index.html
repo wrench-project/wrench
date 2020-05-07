@@ -29,20 +29,15 @@
                     <h3>WRENCH Dashboard</h3>
                 </div>
                 <div id='file-upload'>
-                    <h5 id='file-upload-title'>Upload files here:</h5>
+                    <h5 id='file-upload-title'>Upload file here:</h5>
                     <div class='file-upload-container'>
-                        <p class='file-upload-subtitle'>Workflow Data: </p>
-                        <input type='file' accept='application/json' onchange='processFile(this.files, "taskData");'>
-                    </div>
-                    <div class='file-upload-container'>
-                        <p class='file-upload-subtitle'>Energy Data: </p>
-                        <input type='file' accept='application/json' onchange='processFile(this.files, "energy");'>
+                        <input type='file' accept='application/json' onchange='processFile(this.files);'>
                     </div>
                 </div>
             </div>
         </div>
         <div id="no-file">
-            <h6>Please upload your JSON files in the file upload above</h6>
+            <h6>Please upload your JSON file in the file upload above</h6>
         </div>      
         <div id="main-body">
             <template id="graph-template">

@@ -1,12 +1,66 @@
-const getDuration = (start, end) => {
-    if (start === "Failed" || start === "Terminated") {
-        return start
-    } else if (end === "Failed" || end === "Terminated") {
-        return end
-    } else {
-        return toFiveDecimalPlaces(end - start)
+const executionHostKey = 'execution_host'
+
+// const getDuration = (start, end) => {
+//     if (start === -1 || start === -1) {
+//         return start
+//     } else if (end === -1 || end === -1) {
+//         return end
+//     } else {
+//         return toFiveDecimalPlaces(end - start)
+//     }
+// }
+
+const getDuration = (d, section) => {
+    if (section === "read" || section === "write") {
+        let total = 0
+        if (d[section] !== null) {
+            d[section].forEach(t => {
+                total += (t.end - t.start)
+            })
+        }
+        return total
+    } else if (section === "compute" || section === "whole_task") {
+        if (d[section].start === -1) {
+            return 0
+        } else if (d[section].end === -1) {
+            if (d.terminated === -1) {
+                return d.failed - d[section].start
+            } else if (d.failed === -1) {
+                return d.terminated - d[section].start
+            }
+        } else {
+            return d[section].end - d[section].start
+        }
     }
 }
+
+/* TODO: fix this function to fix workflow summary */
+function determineFailedOrTerminatedPoint(d) {
+    if (d.failed == -1 && d.terminated == -1) {
+        return "none"
+    }
+    if (d.read.end == -1) {
+        return "read"
+    }
+    if (d.compute.end == -1) {
+        return "compute"
+    }
+    if (d.write.end == -1) {
+        return "write"
+    }
+}
+
+// const getDuration = (data, section, failed, terminated) => {
+//     if (section === "compute") {
+//         const { start, end }
+//         if (start === -1) {
+//             return 0
+//         }
+//         if (end === -1) {
+
+//         }
+//     }
+// }
 
 const toFiveDecimalPlaces = d3.format('.5f')
 
@@ -126,10 +180,10 @@ function determineTaskOverlap(data) {
         let taskStart = d.whole_task.start;
         let taskEnd = determineTaskEnd(d);
 
-        if (d.execution_host.hostname in taskOverlap) {
+        if (d[executionHostKey].hostname in taskOverlap) {
             let i = 0;
             let placed = false;
-            let executionHost = taskOverlap[d.execution_host.hostname];
+            let executionHost = taskOverlap[d[executionHostKey].hostname];
 
             while (!placed) {
                 if (executionHost[i] === undefined) {
@@ -152,7 +206,7 @@ function determineTaskOverlap(data) {
                 }
             }
         } else {
-            taskOverlap[d.execution_host.hostname] = [[d]];
+            taskOverlap[d[executionHostKey].hostname] = [[d]];
         }
     })
     return taskOverlap
@@ -219,36 +273,36 @@ function extractFileContent(file) {
     })
 }
 
-function processFile(files, fileType) {
+function processFile(files) {
     if (files.length === 0) {
         return
     }
     extractFileContent(files[0])
         .then(function (rawDataString) {
-            switch (fileType) {
-                case "taskData":
-                    const rawData = JSON.parse(rawDataString)
-                    if (!rawData.workflow_execution || !rawData.workflow_execution.tasks) {
-                        break
-                    }
-                    data = {
-                        file: files[0].name,
-                        contents: rawData.workflow_execution.tasks
-                    }
-                    break
-                case "energy":
-                    energyData = JSON.parse(rawData)
-                    break
+            const rawData = JSON.parse(rawDataString)
+            if (!rawData.workflow_execution || !rawData.workflow_execution.tasks) {
+                return
             }
+            data = {
+                file: files[0].name,
+                contents: rawData.workflow_execution.tasks
+            }
+
+            if (rawData.energy_consumption) {
+                console.log(rawData.energy_consumption)
+                energyData = rawData.energy_consumption
+            }
+            
             initialise()
         })
-        .catch(function () {
+        .catch(function (err) {
+            console.error(err)
             return
         })
 }
 
 function sanitizeId(id) {
-    id = id.replace('#', '')
-    id = id.replace(' ', '')
+    id = id.replace(/#/g, '')
+    id = id.replace(/ /g, '')
     return id
 }

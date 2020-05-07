@@ -1,6 +1,6 @@
 <img src="public/img/logo-vertical.png" width="100" />
 
-# Wrench Dashboard 
+# WRENCH Dashboard 
 
 Welcome to the Wrench Dashboard! This is where you can fulfill all of your data visualisation needs.
 

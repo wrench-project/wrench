@@ -7,7 +7,7 @@ function getBoxWidthFromArray(d, section, scale) {
         var min_time = Number.MAX_VALUE
         var duration = 0
         for (key in Object.keys(d[section])) {
-            var time = getBoxWidth(d[section], key, scale)
+            var time = scale(getDuration(d, section))
             if (time != scale(0)) {
                 duration += time
                 min_time = scale(d[section][key].start) < min_time ? scale(d[section][key].start) : min_time
@@ -17,36 +17,6 @@ function getBoxWidthFromArray(d, section, scale) {
         dict.end = duration
     }
     return dict
-}
-
-function getBoxWidth(d, section, scale) {
-    if (d[section].start != -1) {
-        if (d[section].end == -1) {
-            if (d.terminated != -1) {
-                return scale(d.terminated) - scale(d[section].start)
-            } else if (d.failed != -1) {
-                return scale(d.failed) - scale(d[section].start)
-            }
-        } else {
-            return scale(d[section].end) - scale(d[section].start)
-        }
-    }
-    return scale(0) //Box shouldn't be displayed if start is -1
-}
-
-function determineFailedOrTerminatedPoint(d) {
-    if (d.failed == -1 && d.terminated == -1) {
-        return "none"
-    }
-    if (d.read.end == -1) {
-        return "read"
-    }
-    if (d.compute.end == -1) {
-        return "compute"
-    }
-    if (d.write.end == -1) {
-        return "write"
-    }
 }
 
 /**
@@ -64,18 +34,13 @@ function getOffset(el, position) {
 
 /*
     data: simulation data,
-    containerId: id of <div> container of graph
     currGraphState: pass in "hostView" to see the host view and "taskView" to see the task view
+    CONTAINER_WIDTH: width of the container
+    CONTAINER_HEIGHT: height of the container
 */
-function generateGraph(data, containerId, currGraphState, CONTAINER_WIDTH, CONTAINER_HEIGHT) {
-    document.getElementById(containerId).innerHTML = //reset graph
-        `<div class="text-left" id="tooltip-container">
-            <span id="tooltip-task-id"></span><br/>
-            <span id="tooltip-host"></span><br/>
-            <span id="tooltip-task-operation"></span><br/>
-            <span id="tooltip-task-operation-duration"></span>
-        </div>`
-
+function generateGraph(data, currGraphState, CONTAINER_WIDTH, CONTAINER_HEIGHT) {
+    const containerId = "graph-container"
+    document.getElementById(containerId).innerHTML = simulationGraphTooltipHtml
     var read_color = '#cbb5dd'
     var compute_color = '#f7daad'
     var write_color = '#abdcf4'
@@ -151,7 +116,8 @@ function generateGraph(data, containerId, currGraphState, CONTAINER_WIDTH, CONTA
         var group = svg.append('g')
             .attr('id', sanitizeId(d.task_id))
         var readTime = getBoxWidthFromArray(d, "read", xscale)
-        var computeTime = getBoxWidth(d, "compute", xscale)
+        var computeDuration = getDuration(d, "compute")
+        var computeTime = computeDuration === 0 ? 0 : xscale(getDuration(d, "compute"))
         var writeTime = getBoxWidthFromArray(d, "write", xscale)
         var ft_point = determineFailedOrTerminatedPoint(d)
         if (ft_point != "none") {
@@ -214,7 +180,7 @@ function generateGraph(data, containerId, currGraphState, CONTAINER_WIDTH, CONTA
 
                 tooltip_task_id.text('TaskID: ' + d.task_id)
 
-                tooltip_host.text('Host Name: ' + d['execution_host'].hostname)
+                tooltip_host.text('Host Name: ' + d[executionHostKey].hostname)
 
                 var parent_group = d3.select(this).attr('class')
 
