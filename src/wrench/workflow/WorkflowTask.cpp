@@ -34,7 +34,7 @@ namespace wrench {
     WorkflowTask::WorkflowTask(const std::string id, const double flops, const unsigned long min_num_cores,
                                const unsigned long max_num_cores, const double parallel_efficiency,
                                const double memory_requirement) :
-            id(id), flops(flops),
+            id(id), color(""), flops(flops),
             min_num_cores(min_num_cores),
             max_num_cores(max_num_cores),
             parallel_efficiency(parallel_efficiency),
