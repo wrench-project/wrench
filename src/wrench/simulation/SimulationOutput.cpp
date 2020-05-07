@@ -461,6 +461,7 @@ namespace wrench {
       *                     }
       *                ],
       *                "task_id": <string>,
+      *                "color": <string>,
       *                "terminated": <double>,
       *                "whole_task": {
       *                     "end": <double>,
