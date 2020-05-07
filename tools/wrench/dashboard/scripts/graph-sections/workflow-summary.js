@@ -11,11 +11,11 @@ function getOverallWorkflowMetrics(data) {
     var overallStartTime = data[0].whole_task.start
     var overallEndTime = 0
     var noTasks = data.length
-    var averageReadDuration
-    var averageComputeDuration
-    var averageWriteDuration
+    var totalReadDuration = 0
+    var totalComputeDuration = 0
+    var totalWriteDuration = 0
     data.forEach(function (d) {
-        var currHost = d['execution host']
+        var currHost = d[executionHostKey]
         hosts.add(currHost)
 
         if (d.failed != -1) {
@@ -34,33 +34,19 @@ function getOverallWorkflowMetrics(data) {
             overallEndTime = whole_task.end
         }
 
-        var read = d.read
-        var compute = d.compute
-        var write = d.write
+        var readDuration = getDuration(d, "read")
+        totalReadDuration += readDuration
 
-        var totalReadDuration = 0
-        var totalComputeDuration = 0
-        var totalWriteDuration = 0
+        var computeDuration = getDuration(d, "compute")
+        totalComputeDuration += computeDuration
 
-        var readDuration = getDuration(read.start, read.end)
-        if (readDuration !== read.start && readDuration !== read.end) {
-            totalReadDuration += readDuration
-        }
-
-        var computeDuration = getDuration(compute.start, compute.end)
-        if (computeDuration !== compute.start && computeDuration !== compute.end) {
-            totalComputeDuration += computeDuration
-        }
-
-        var writeDuration = getDuration(write.start, write.end)
-        if (writeDuration !== write.start && writeDuration !== write.end) {
-            totalWriteDuration += writeDuration
-        }
-
-        averageReadDuration = totalReadDuration / noTasks
-        averageComputeDuration = totalComputeDuration / noTasks
-        averageWriteDuration = totalWriteDuration / noTasks
+        var writeDuration = getDuration(d, "write")
+        totalWriteDuration += writeDuration
     })
+
+    var averageReadDuration = totalReadDuration / noTasks
+    var averageComputeDuration = totalComputeDuration / noTasks
+    var averageWriteDuration = totalWriteDuration / noTasks
 
     var totalHosts = hosts.size
     var noSuccesful = noTasks - (noFailed + noTerminated)

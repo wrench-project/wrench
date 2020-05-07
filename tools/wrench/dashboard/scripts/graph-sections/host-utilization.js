@@ -57,7 +57,7 @@ function generateHostUtilizationGraph(data, CONTAINER_WIDTH, CONTAINER_HEIGHT, P
 
     var tasks_by_hostname = d3.nest()
         .key(function (d) {
-            return d['execution host'].hostname;
+            return d[executionHostKey].hostname;
         })
         .sortKeys(d3.ascending)
         .entries(data);
@@ -72,10 +72,10 @@ function generateHostUtilizationGraph(data, CONTAINER_WIDTH, CONTAINER_HEIGHT, P
     var y_cores_per_host = d3.map();
 
     tasks_by_hostname.forEach(function (d) {
-        let n_cores = num_cores === 0 ? d.values[0]['execution_host'].cores : num_cores;
+        // let n_cores = num_cores === 0 ? d.values[0]['execution_host'].cores : num_cores;
         y_cores_per_host.set(d.key,
             d3.scaleLinear()
-                .domain([0, d.values[0]['execution host'].cores])
+                .domain([0, d.values[0][executionHostKey].cores])
                 .range([y_hosts(d.key) + y_hosts.bandwidth(), y_hosts(d.key)])
         );
     });
@@ -104,7 +104,7 @@ function generateHostUtilizationGraph(data, CONTAINER_WIDTH, CONTAINER_HEIGHT, P
             return x_scale(d.compute.start);
         })
         .attr("y", function (d) {
-            var y_scale = y_cores_per_host.get(d['execution host'].hostname);
+            var y_scale = y_cores_per_host.get(d[executionHostKey].hostname);
             var vertical_position = searchOverlap(d.task_id, determineTaskOverlap(data))
             return y_scale(vertical_position + 1);
         })
@@ -118,7 +118,7 @@ function generateHostUtilizationGraph(data, CONTAINER_WIDTH, CONTAINER_HEIGHT, P
             return x_scale(d.compute.end) - x_scale(d.compute.start);
         })
         .attr("height", function (d) {
-            var y_scale = y_cores_per_host.get(d['execution host'].hostname);
+            var y_scale = y_cores_per_host.get(d[executionHostKey].hostname);
             return y_scale(0) - y_scale(d.num_cores_allocated);
         })
         .attr("fill", "#f7daad")
