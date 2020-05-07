@@ -53,6 +53,7 @@ namespace wrench {
 
         unsigned int getFailureCount();
 
+
         /***********************/
         /** \cond DEVELOPER    */
         /***********************/
@@ -132,6 +133,10 @@ namespace wrench {
         std::string getExecutionHost();
 
         WorkflowTask::State getState() const;
+
+        std::string getColor();
+
+        void setColor(std::string);
 
         /***********************/
         /** \endcond           */
@@ -241,6 +246,7 @@ namespace wrench {
 
         std::string id;                    // Task ID
         std::string cluster_id;            // ID for clustered task
+        std::string color;                 // A RGB color formatted as "#rrggbb"
         double flops;                      // Number of flops
         double average_cpu = -1;           // Average CPU utilization
         unsigned long bytes_read = -1;     // Total bytes read in KB
