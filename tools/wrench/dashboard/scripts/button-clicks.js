@@ -15,7 +15,7 @@ function getHostNames(data) {
     var hostNames = new Set();
 
     data.forEach(function (task) {
-        var hostName = task['execution_host'].hostname
+        var hostName = task[executionHostKey].hostname
         hostNames.add(hostName)
     })
 
@@ -45,7 +45,7 @@ function switchToHostView(data, selectedHost) {
 
 
     data.forEach(function (task) {
-        var hostName = task['execution_host'].hostname
+        var hostName = task[executionHostKey].hostname
         var sanitizedId = sanitizeId(task.task_id)
         var taskRead = d3.select(`#${sanitizedId} .read`)
         var taskCompute = d3.select(`#${sanitizedId} .compute`)
@@ -90,7 +90,7 @@ function toggleView() {
         }
         currGraphState = "hostView"
     } else if (currGraphState === "hostView") {
-        generateGraph(data.contents, "graph-container", "hostView", 1000, 1000)
+        generateGraph(data.contents, "taskView", 1000, 1000)
         d3.select("#y-axis-label").text("TaskID")
         populateLegend("taskView")
         d3.select("#toggle-view-button").text("Switch to Host View")

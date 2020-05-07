@@ -1,12 +1,8 @@
-function determineNumCores(data) {
-    let numCores = 0;
-    for (let task in data) {
-        if (data[task].execution_host.cores > numCores) {
-            numCores = data[task].execution_host.cores;
-        }
-    }
-    return numCores;
-}
+// function determineNumCores(data) {
+//     // let numCores = 0;
+//     // let taskOverlap = determineTaskOverlap(data);
+//     return 1;
+// }
 
 function getComputeTime(d) {
     if (d["compute"].start != -1) {
@@ -23,18 +19,21 @@ function getComputeTime(d) {
     return 0 //Box shouldn't be displayed if start is -1
 }
 
-function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskId, tooltipComputeTime,
-                                      CONTAINER_WIDTH, CONTAINER_HEIGHT) {
-
-    let num_cores = determineNumCores(data);
+/*
+    data: data to generate graph in json array
+    CONTAINER_WIDTH: Width of the container that holds the graph
+    CONTAINER_HEIGHT: Height of the container that holds the graph
+    PADDING: Padding value for container
+*/
+function generateHostUtilizationGraph(data, CONTAINER_WIDTH, CONTAINER_HEIGHT, PADDING) {
+    // var num_cores = determineNumCores(data);
+    const containerId = "host-utilization-chart"
+    const tooltipId = "host-utilization-chart-tooltip"
+    const tooltipTaskId = "host-utilization-chart-tooltip-task-id"
+    const tooltipComputeTime = "host-utilization-chart-tooltip-compute-time"
     var container = d3.select(`#${containerId}`);
-    document.getElementById(containerId).innerHTML =
-        `<div class="text-left" id="host-utilization-chart-tooltip">
-            <span id="host-utilization-chart-tooltip-task-id"></span><br/>
-            <span id="host-utilization-chart-tooltip-compute-time"></span><br/>
-        </div>`
+    document.getElementById(containerId).innerHTML = hostUtilizationTooltipHtml
     var chart = document.getElementById(containerId);
-    const PADDING = 60;
 
     var svg = d3.select("svg");
 
@@ -58,7 +57,7 @@ function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskI
 
     var tasks_by_hostname = d3.nest()
         .key(function (d) {
-            return d['execution_host'].hostname;
+            return d[executionHostKey].hostname;
         })
         .sortKeys(d3.ascending)
         .entries(data);
@@ -73,10 +72,10 @@ function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskI
     var y_cores_per_host = d3.map();
 
     tasks_by_hostname.forEach(function (d) {
-        let n_cores = num_cores === 0 ? d.values[0]['execution_host'].cores : num_cores;
+        // let n_cores = num_cores === 0 ? d.values[0]['execution_host'].cores : num_cores;
         y_cores_per_host.set(d.key,
             d3.scaleLinear()
-                .domain([0, n_cores])
+                .domain([0, d.values[0][executionHostKey].cores])
                 .range([y_hosts(d.key) + y_hosts.bandwidth(), y_hosts(d.key)])
         );
     });
@@ -105,9 +104,9 @@ function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskI
             return x_scale(d.compute.start);
         })
         .attr("y", function (d) {
-            var y_scale = y_cores_per_host.get(d['execution_host'].hostname);
-            let vertical_position = determineVerticalPosition(d, determineTaskOverlap(data));
-            return y_scale(vertical_position + d.num_cores_allocated);
+            var y_scale = y_cores_per_host.get(d[executionHostKey].hostname);
+            var vertical_position = searchOverlap(d.task_id, determineTaskOverlap(data))
+            return y_scale(vertical_position + 1);
         })
         .attr("width", function (d) {
             if (d.compute.start === -1) {
@@ -119,7 +118,7 @@ function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskI
             return x_scale(d.compute.end) - x_scale(d.compute.start);
         })
         .attr("height", function (d) {
-            var y_scale = y_cores_per_host.get(d['execution_host'].hostname);
+            var y_scale = y_cores_per_host.get(d[executionHostKey].hostname);
             return y_scale(0) - y_scale(d.num_cores_allocated);
         })
         .attr("fill", "#f7daad")
