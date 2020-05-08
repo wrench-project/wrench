@@ -95,7 +95,7 @@ function generateHostUtilizationGraph(data, CONTAINER_WIDTH, CONTAINER_HEIGHT, P
         .attr("width", CONTAINER_WIDTH - PADDING - PADDING)
         .attr("height", y_hosts.bandwidth())
         .attr("opacity", 0.3)
-        .attr("fill", "#ffd8f8");
+        .attr("fill", "#ffe8e8");
 
     svg.append('g').selectAll("rect")
         .data(data)

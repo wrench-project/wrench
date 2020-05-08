@@ -176,7 +176,6 @@ function determineTaskEnd(d) {
 
 function determineTaskColor(d) {
     let taskColor
-    console.log(d)
     if ((!d.hasOwnProperty("color")) || (d.color === "")) {
         taskColor = "#f7daad"
     } else {
