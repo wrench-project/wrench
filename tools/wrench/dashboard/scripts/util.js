@@ -217,7 +217,7 @@ function determineTaskOverlap(data) {
                     let t = executionHost[i][j];
                     let currTaskStart = t.whole_task.start;
                     let currTaskEnd = determineTaskEnd(t);
-                    if (taskEnd >= currTaskStart && taskStart <= currTaskEnd) {
+                    if (taskEnd > currTaskStart && taskStart < currTaskEnd) {
                         i++;
                         overlap = true;
                         break;
@@ -312,7 +312,6 @@ function processFile(files) {
             }
 
             if (rawData.energy_consumption) {
-                console.log(rawData.energy_consumption)
                 energyData = rawData.energy_consumption
             }
 
