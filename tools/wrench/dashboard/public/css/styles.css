@@ -1,3 +1,7 @@
+html, body {
+    height: 100%;
+}
+
 #tooltip-container {
     position: absolute;
     width: auto;
@@ -21,9 +25,6 @@
     pointer-events: none;
     font-family: sans-serif;
     font-size: 12px;
-}
-#logo {
-    width: 7rem;
 }
 
 #overall-graph-container {
@@ -187,6 +188,7 @@ td {
 
 #no-file {
     text-align: center;
+    height: 75%;
 }
 
 .instructions-container {
