@@ -305,3 +305,7 @@ td {
 #host-utilization-chart-legend-idle-time {
     border-left: 15px solid #ffeded;
 }
+
+.navbar {
+    box-shadow: 3px 3px 3px #ccc;
+}
