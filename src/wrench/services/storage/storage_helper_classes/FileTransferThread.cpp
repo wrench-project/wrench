@@ -159,7 +159,7 @@ namespace wrench {
         std::shared_ptr<NetworkError> failure_cause = nullptr;
 
         WRENCH_INFO("New FileTransferThread (file=%s, src_mailbox=%s; src_location=%s; dst_mailbox=%s; dst_location=%s; "
-                    "answer_mailbox_if_copy=%s; answer_mailbox_if_copy=%s; answer_mailbox_if_copy=%s",
+                    "answer_mailbox_if_read=%s; answer_mailbox_if_write=%s; answer_mailbox_if_copy=%s",
                     file->getID().c_str(),
                     (src_mailbox.empty() ? "none" : src_mailbox.c_str()),
                     (src_location == nullptr ? "none" : src_location->toString().c_str()),
@@ -208,7 +208,7 @@ namespace wrench {
 
         } else if ((this->src_location) and (this->src_location->getStorageService() == this->parent) and
                    (this->dst_location) and (this->dst_location->getStorageService() == this->parent)) {
-            /** Copying a file local file */
+            /** Copying a local file */
             copyFileLocally(this->file, this->src_location, this->dst_location);
 
         } else if (((this->src_location) and (this->dst_location) and
