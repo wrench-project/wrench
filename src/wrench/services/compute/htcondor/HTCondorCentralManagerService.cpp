@@ -283,7 +283,7 @@ namespace wrench {
             return false;
         }
 
-        WRENCH_INFO("HTCondor Central Manager got a [%s] message", message->getName().c_str());
+        WRENCH_DEBUG("HTCondor Central Manager got a [%s] message", message->getName().c_str());
 
         if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
             this->terminate();
