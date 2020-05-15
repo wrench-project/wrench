@@ -346,10 +346,6 @@ namespace wrench {
             current_execution_instance.vertical_position = vertical_position;
 
 
-
-
-
-
             auto current_rect_y_range = std::pair<unsigned long long, unsigned long long>(
                     vertical_position,
                     vertical_position + num_cores_allocated

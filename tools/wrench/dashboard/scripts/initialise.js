@@ -26,6 +26,7 @@ function initialise() {
         localStorage.setItem("firstVisit", true)
         firstVisit = true
     }
+
     if (data.file === undefined && Object.keys(energyData).length === 0) {
         noFileDiv.style.display = "block"
         mainBodyDiv.style.display = "none"
