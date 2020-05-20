@@ -16,10 +16,6 @@
 // Services and Service Properties
 #include "wrench/services/compute/bare_metal/BareMetalComputeService.h"
 #include "wrench/services/compute/bare_metal/BareMetalComputeServiceProperty.h"
-#include "wrench/services/storage/simple/SimpleStorageService.h"
-#include "wrench/services/storage/simple/SimpleStorageServiceProperty.h"
-#include "wrench/services/file_registry/FileRegistryService.h"
-#include "wrench/services/file_registry/FileRegistryServiceProperty.h"
 #include "wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h"
 #include "wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceProperty.h"
 #include "wrench/services/compute/cloud/CloudComputeService.h"
@@ -28,6 +24,12 @@
 #include "wrench/services/compute/batch/BatchComputeServiceProperty.h"
 #include "wrench/services/compute/htcondor/HTCondorComputeService.h"
 #include "wrench/services/compute/htcondor/HTCondorComputeServiceProperty.h"
+#include "wrench/services/compute/hadoop/HadoopComputeService.h"
+#include "wrench/services/compute/hadoop/HadoopComputeServiceProperty.h"
+#include "wrench/services/storage/simple/SimpleStorageService.h"
+#include "wrench/services/storage/simple/SimpleStorageServiceProperty.h"
+#include "wrench/services/file_registry/FileRegistryService.h"
+#include "wrench/services/file_registry/FileRegistryServiceProperty.h"
 #include "wrench/services/network_proximity/NetworkProximityService.h"
 #include "wrench/services/network_proximity/NetworkProximityServiceProperty.h"
 

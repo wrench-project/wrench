@@ -8,6 +8,7 @@ set(EXAMPLES_CMAKEFILES_TXT
         examples/basic-examples/cloud-bag-of-tasks/CMakeLists.txt
         examples/basic-examples/cloud-bag-of-tasks-energy/CMakeLists.txt
         examples/basic-examples/virtualized-cluster-bag-of-tasks/CMakeLists.txt
+        examples/basic-examples/hadoop-mr-job/CMakeLists.txt
         examples/basic-examples/batch-bag-of-tasks/CMakeLists.txt
         examples/basic-examples/batch-pilot-job/CMakeLists.txt
         examples/real-workflow-example/CMakeLists.txt

@@ -159,6 +159,17 @@ set(HEADER_FILES
         include/wrench/workflow/job/PilotJob.h
         include/wrench/workflow/job/StandardJob.h
         include/wrench/workflow/job/WorkflowJob.h
+        include/wrench/services/compute/hadoop/DeterministicMRJob.h
+        include/wrench/services/compute/hadoop/MRJob.h
+        include/wrench/services/compute/hadoop/HadoopComputeService.h
+        include/wrench/services/compute/hadoop/hadoop_subsystem/MRJobExecutor.h
+        include/wrench/services/compute/hadoop/hadoop_subsystem/MRJobExecutorMessagePayload.h
+        include/wrench/services/compute/hadoop/hadoop_subsystem/ShuffleService.h
+        include/wrench/services/compute/hadoop/hadoop_subsystem/HdfsService.h
+        include/wrench/services/compute/hadoop/hadoop_subsystem/ReducerService.h
+        include/wrench/services/compute/hadoop/hadoop_subsystem/MapperService.h
+        include/wrench/services/compute/hadoop/HadoopComputeServiceProperty.h
+        include/wrench/services/compute/hadoop/HadoopComputeServiceMessagePayload.h
         )
 
 # source files
@@ -304,6 +315,18 @@ set(SOURCE_FILES
         src/wrench/workflow/job/PilotJob.cpp
         src/wrench/workflow/job/StandardJob.cpp
         src/wrench/workflow/job/WorkflowJob.cpp
+        src/wrench/services/compute/hadoop/HadoopComputeService.cpp
+        src/wrench/services/compute/hadoop/HadoopComputeServiceProperty.cpp
+        src/wrench/services/compute/hadoop/HadoopComputeServiceMessage.cpp
+        src/wrench/services/compute/hadoop/HadoopComputeServiceMessage.h
+        src/wrench/services/compute/hadoop/HadoopComputeServiceMessagePayload.cpp
+        src/wrench/services/compute/hadoop/DeterministicMRJob.cpp
+        src/wrench/services/compute/hadoop/hadoop_subsystem/MRJobExecutor.cpp
+        src/wrench/services/compute/hadoop/hadoop_subsystem/MRJobExecutorMessagePayload.cpp
+        src/wrench/services/compute/hadoop/hadoop_subsystem/MapperService.cpp
+        src/wrench/services/compute/hadoop/hadoop_subsystem/ReducerService.cpp
+        src/wrench/services/compute/hadoop/hadoop_subsystem/HdfsService.cpp
+        src/wrench/services/compute/hadoop/hadoop_subsystem/ShuffleService.cpp
         )
 
 # test files
