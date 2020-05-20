@@ -53,6 +53,7 @@ namespace wrench {
                 {MRJobExecutorMessagePayload::MAP_SIDE_SHUFFLE_REQUEST_PAYLOAD,       1024},
                 {MRJobExecutorMessagePayload::MAP_SIDE_HDFS_DATA_DELIVERY_PAYLOAD,    1024},
                 {MRJobExecutorMessagePayload::MAP_SIDE_HDFS_DATA_REQUEST_PAYLOAD,     1024},
+                {MRJobExecutorMessagePayload::MAP_OUTPUT_MATERIALIZED_BYTES_PAYLOAD,  1024},
         };
 
         std::set<std::string> compute_resources;
@@ -61,10 +62,10 @@ namespace wrench {
 
         bool processNextMessage();
 
-        void setup_workers(std::vector<std::shared_ptr<Service>> &mappers,
-                           std::vector<std::shared_ptr<Service>> &reducers,
-                           std::shared_ptr<Service> &hdfs,
-                           std::shared_ptr<Service> &shuffle);
+        void setup_workers(std::vector<std::shared_ptr<Service>> &mapper_vec,
+                           std::vector<std::shared_ptr<Service>> &reducer_vec,
+                           std::shared_ptr<Service> &hdfs_ptr,
+                           std::shared_ptr<Service> &shuffle_ptr);
     };
 }
 

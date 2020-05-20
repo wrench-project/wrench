@@ -30,12 +30,11 @@ namespace wrench {
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      */
-    HdfsService::HdfsService(
-            const std::string &hostname,
-            MRJob *job,
-            const std::set<std::string> compute_resources,
-            std::map<std::string, std::string> property_list,
-            std::map<std::string, double> messagepayload_list
+    HdfsService::HdfsService(const std::string &hostname,
+                             MRJob *job,
+                             const std::set<std::string> compute_resources,
+                             std::map<std::string, std::string> property_list,
+                             std::map<std::string, double> messagepayload_list
     ) : Service(hostname, "hdfs_service",
                 "hdfs_service"), job(job) {
         this->compute_resources = compute_resources;

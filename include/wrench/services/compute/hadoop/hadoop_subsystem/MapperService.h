@@ -21,7 +21,7 @@ namespace wrench {
         MapperService(
                 const std::string &hostname,
                 MRJob *job,
-                const std::set<std::string> compute_resources,
+                const std::set<std::string> &compute_resources,
                 std::map<std::string, std::string> property_list,
                 std::map<std::string, double> messagepayload_list
         );
@@ -30,19 +30,19 @@ namespace wrench {
 
     private:
         MRJob *job;
+        double materialized_ouput_bytes = 0.0;
 
-        // TODO: Define these:
         std::map<std::string, std::string> default_property_values = {
                 {HadoopComputeServiceProperty::MAP_SIDE_SPILL_PHASE, "0.0"},
                 {HadoopComputeServiceProperty::MAP_SIDE_MERGE_PHASE, "0.0"}
         };
 
-        // TODO: And define these:
         std::map<std::string, double> default_messagepayload_values = {
-                {MRJobExecutorMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,         1024},
-                {MRJobExecutorMessagePayload::MAP_SIDE_HDFS_DATA_DELIVERY_PAYLOAD, 1024},
-                {MRJobExecutorMessagePayload::MAP_SIDE_HDFS_DATA_REQUEST_PAYLOAD,  1024},
-                {MRJobExecutorMessagePayload::MAP_SIDE_SHUFFLE_REQUEST_PAYLOAD,    1024},
+                {MRJobExecutorMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,           1024},
+                {MRJobExecutorMessagePayload::MAP_SIDE_HDFS_DATA_DELIVERY_PAYLOAD,   1024},
+                {MRJobExecutorMessagePayload::MAP_SIDE_HDFS_DATA_REQUEST_PAYLOAD,    1024},
+                {MRJobExecutorMessagePayload::MAP_SIDE_SHUFFLE_REQUEST_PAYLOAD,      1024},
+                {MRJobExecutorMessagePayload::MAP_OUTPUT_MATERIALIZED_BYTES_PAYLOAD, 1024},
         };
 
         std::set<std::string> compute_resources;

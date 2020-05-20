@@ -14,6 +14,23 @@ WRENCH_LOG_CATEGORY(deterministic_mr_job, "Log category for Deterministic MR Job
 
 namespace wrench {
 
+    /**
+     * @brief Constructor
+     *
+     * @param num_reducers
+     * @param data_size
+     * @param block_size
+     * @param use_combiner
+     * @param sort_factor
+     * @param spill_percent
+     * @param mapper_key_width
+     * @param mapper_value_width
+     * @param files
+     * @param mapper_flops
+     * @param reducer_key_width
+     * @param reducer_value_width
+     * @param reducer_flops
+     */
     DeterministicMRJob::DeterministicMRJob(int num_reducers, double data_size, int block_size,
                                            bool use_combiner, int sort_factor, double spill_percent,
                                            int mapper_key_width, int mapper_value_width, std::vector<int> &files,
@@ -35,6 +52,11 @@ namespace wrench {
         this->setJobType(std::string("deterministic"));
     }
 
+    /**
+     * @brief Caluculate the number of map tasks based off user-specified block size.
+     *
+     * @return
+     */
     int DeterministicMRJob::calculateNumMappers() {
         int total_mappers = 0;
         for (auto file: this->getFiles()) {

@@ -9,6 +9,8 @@
 
 #include "./HadoopComputeServiceMessage.h"
 
+#include <utility>
+
 namespace wrench {
 
     /**
@@ -83,13 +85,61 @@ namespace wrench {
     }
 
     /**
-     * 
+     * @brief Cnon
      * @param data_size
      * @param payload
      */
     HdfsReadCompleteMessage::HdfsReadCompleteMessage(double data_size, double payload)
             : HadoopComputeServiceMessage("HdfsReadCompleteMessage", payload) {
         this->data_size = data_size;
+        this->payload = payload;
+    }
+
+    /**
+     * @brief Constructor
+     *
+     * @param success
+     * @param return_mailbox
+     * @param payload
+     */
+    MapTaskCompleteMessage::MapTaskCompleteMessage(bool success, std::string return_mailbox, double payload)
+            : HadoopComputeServiceMessage("MapTaskCompleteMessage", payload) {
+        this->success = success;
+        this->return_mailbox = std::move(return_mailbox);
+        this->payload = payload;
+    }
+
+    /**
+     * @brief Constructor
+     *
+     * @param mapper_mailbox
+     * @param payload
+     */
+    NotifyShuffleServiceToFetchMapperOutputMessage::NotifyShuffleServiceToFetchMapperOutputMessage(
+            std::string mapper_mailbox, double payload) : HadoopComputeServiceMessage(
+            "NotifyShuffleServiceToFetchMapperOutputMessage", payload) {
+        this->mapper_mailbox = std::move(mapper_mailbox);
+        this->payload = payload;
+    }
+
+    RequestMapperMaterializedOutputMessage::RequestMapperMaterializedOutputMessage(std::string return_mailbox,
+                                                                                   double payload)
+            : HadoopComputeServiceMessage("RequestMapperMaterializedOutputMessage", payload) {
+        this->return_mailbox = std::move(return_mailbox);
+        this->payload = payload;
+    }
+
+    SendMaterializedOutputMessage::SendMaterializedOutputMessage(double materialized_bytes,
+                                                                 double payload) : HadoopComputeServiceMessage(
+            "SendMapperMaterializedOutputMessage", payload) {
+        this->materialized_bytes = materialized_bytes;
+        this->payload = payload;
+    }
+
+    TransferOutputFromMapperToReducerMessage::TransferOutputFromMapperToReducerMessage(double materialized_bytes,
+                                                                                       double payload)
+            : HadoopComputeServiceMessage("TransferOutputFromMapperToReducerMessage", payload) {
+        this->materialized_bytes = materialized_bytes;
         this->payload = payload;
     }
 };

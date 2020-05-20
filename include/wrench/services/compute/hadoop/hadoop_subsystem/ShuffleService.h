@@ -19,7 +19,7 @@ namespace wrench {
         ShuffleService(
                 const std::string &hostname,
                 MRJob *job,
-                const std::set<std::string> compute_resources,
+                const std::set<std::string> &compute_resources,
                 std::map<std::string, std::string> property_list,
                 std::map<std::string, double> messagepayload_list
         );
@@ -28,10 +28,14 @@ namespace wrench {
 
     private:
         MRJob *job;
+        std::vector<double> mapper_outputs;
 
         std::map<std::string, std::string> default_property_values = {};
 
-        std::map<std::string, double> default_messagepayload_values = {};
+        std::map<std::string, double> default_messagepayload_values = {
+                {MRJobExecutorMessagePayload::MAP_SIDE_SHUFFLE_REQUEST_PAYLOAD,      1024},
+                {MRJobExecutorMessagePayload::MAP_OUTPUT_MATERIALIZED_BYTES_PAYLOAD, 1024},
+        };
 
         std::set<std::string> compute_resources;
 

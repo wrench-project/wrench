@@ -85,6 +85,47 @@ namespace wrench {
         double payload;
     };
 
+    class MapTaskCompleteMessage : public HadoopComputeServiceMessage {
+    public:
+        MapTaskCompleteMessage(bool success, std::string return_mailbox, double payload);
+
+        bool success;
+        std::string return_mailbox;
+        double payload;
+    };
+
+    class NotifyShuffleServiceToFetchMapperOutputMessage : public HadoopComputeServiceMessage {
+    public:
+        NotifyShuffleServiceToFetchMapperOutputMessage(std::string mapper_mailbox, double payload);
+
+        std::string mapper_mailbox;
+        double payload;
+    };
+
+    class RequestMapperMaterializedOutputMessage : public HadoopComputeServiceMessage {
+    public:
+        RequestMapperMaterializedOutputMessage(std::string return_mailbox, double payload);
+
+        std::string return_mailbox;
+        double payload;
+    };
+
+    class SendMaterializedOutputMessage : public HadoopComputeServiceMessage {
+    public:
+        SendMaterializedOutputMessage(double materialized_bytes, double payload);
+
+        double materialized_bytes;
+        double payload;
+    };
+
+    class TransferOutputFromMapperToReducerMessage : public HadoopComputeServiceMessage {
+    public:
+        TransferOutputFromMapperToReducerMessage(double materialized_bytes, double payload);
+
+        double materialized_bytes;
+        double payload;
+    };
+
     /***********************/
     /** \endcond          **/
     /***********************/

@@ -34,6 +34,7 @@ namespace wrench {
         std::string hdfs_mailbox_name;
         std::string executor_mailbox;
         std::string shuffle_mailbox;
+        std::vector<std::string> reducer_mailboxes;
 
     public:
         virtual ~MRJob() = default;
@@ -41,6 +42,11 @@ namespace wrench {
         virtual int calculateNumMappers() = 0;
 
         // Mutators
+
+        void appendReducerMailbox(std::string reducer_mailbox) {
+            this->reducer_mailboxes.push_back(reducer_mailbox);
+        }
+
         void setShuffleMailbox(std::string shuffle_mailbox) {
             this->shuffle_mailbox = shuffle_mailbox;
         }
@@ -101,14 +107,19 @@ namespace wrench {
         }
 
         void setJobType(std::string job_type) {
-            this->job_type = job_type;
+            this->job_type = std::move(job_type);
         }
 
         void setHdfsMailboxName(std::string mailbox_name) {
-            this->hdfs_mailbox_name = mailbox_name;
+            this->hdfs_mailbox_name = std::move(mailbox_name);
         }
 
         // Accessors
+
+        std::vector<std::string> getReducerMailboxes() {
+            return reducer_mailboxes;
+        }
+
         std::string getShuffleMailbox() {
             return shuffle_mailbox;
         }
@@ -117,31 +128,31 @@ namespace wrench {
             return executor_mailbox;
         }
 
-        int getBlockSize() {
+        int getBlockSize() const {
             return block_size;
         }
 
-        int getNumMappers() {
+        int getNumMappers() const {
             return num_mappers;
         }
 
-        int getNumReducers() {
+        int getNumReducers() const {
             return num_reducers;
         }
 
-        double getSpillPercent() {
+        double getSpillPercent() const {
             return spill_percent;
         }
 
-        int getSortFactor() {
+        int getSortFactor() const {
             return sort_factor;
         }
 
-        bool getUseCombiner() {
+        bool getUseCombiner() const {
             return use_combiner;
         }
 
-        double getDataSize() {
+        double getDataSize() const {
             return data_size;
         }
 
@@ -149,27 +160,27 @@ namespace wrench {
             return job_type;
         }
 
-        double getMapperFlops() {
+        double getMapperFlops() const {
             return mapper_flops;
         }
 
-        int getMapperKeyWidth() {
+        int getMapperKeyWidth() const {
             return mapper_key_width;
         }
 
-        int getMapperValueWidth() {
+        int getMapperValueWidth() const {
             return mapper_value_width;
         }
 
-        double getReducerFlops() {
+        double getReducerFlops() const {
             return reducer_flops;
         }
 
-        int getReducerKeyWidth() {
+        int getReducerKeyWidth() const {
             return reducer_key_width;
         }
 
-        int getReducerValueWidth() {
+        int getReducerValueWidth() const {
             return reducer_value_width;
         }
 

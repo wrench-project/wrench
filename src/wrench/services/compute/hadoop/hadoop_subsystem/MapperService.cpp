@@ -31,7 +31,7 @@ namespace wrench {
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      */
     MapperService::MapperService(const std::string &hostname,
-                                 MRJob *job, const std::set<std::string> compute_resources,
+                                 MRJob *job, const std::set<std::string> &compute_resources,
                                  std::map<std::string, std::string> property_list,
                                  std::map<std::string, double> messagepayload_list
     ) : Service(hostname, "mapper_service",
@@ -96,7 +96,7 @@ namespace wrench {
             return true;
         }
 
-        WRENCH_INFO("Got a [%s] message", message->getName().c_str());
+        WRENCH_INFO("MapperService::MapperService() Got a [%s] message", message->getName().c_str());
         if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
             // This is Synchronous
             try {
@@ -108,14 +108,19 @@ namespace wrench {
             }
             return false;
         } else if (auto msg = std::dynamic_pointer_cast<HdfsReadCompleteMessage>(message)) {
+            // TODO: Use the correct values.
             // The mapper computes the user map function, writes spill files locally,
             // and then merges all spill files back into a single map file.
 
-            // TODO: Actually compute the correct values given the job, and extract to a helper function.
             // The materilaized output is found via:
             // https://github.com/wrench-project/understanding_hadoop/blob/00a1c5653ae025e9db723d4c3e2137f2bb2b5472/hadoop_mr_tests/map_output_materialized_bytes/run_test.py#L109
+            this->materialized_ouput_bytes = 1000.0;
+
             // For the spill phase refer to:
             // https://github.com/wrench-project/understanding_hadoop/blob/master/resources/top_level_overview.markdown#point-3--4-mapping--handling-intermediate-map-values
+
+            // TODO: Consider how to handle a map task failure.
+            bool success = true;
 
             // Compute map function
             Simulation::compute(this->job->getMapperFlops());
@@ -126,7 +131,22 @@ namespace wrench {
             // Merge all spilled files to single output
             Simulation::compute(this->job->getMapperFlops());
 
-            // TODO: Pass map output files to the ShuffleService
+            // Notify the MRJobExecutor that we have finished
+            try {
+                S4U_Mailbox::putMessage(this->job->getExecutorMailbox(),
+                                        new MapTaskCompleteMessage(success, this->mailbox_name,
+                                                                   this->getMessagePayloadValue(
+                                                                           MRJobExecutorMessagePayload::MAP_SIDE_SHUFFLE_REQUEST_PAYLOAD)));
+            } catch (std::shared_ptr<NetworkError> &cause) {
+                return false;
+            }
+
+            return true;
+        } else if (auto msg = std::dynamic_pointer_cast<RequestMapperMaterializedOutputMessage>(message)) {
+            S4U_Mailbox::putMessage(msg->return_mailbox,
+                                    new SendMaterializedOutputMessage(this->materialized_ouput_bytes,
+                                                                      this->getMessagePayloadValue(
+                                                                                    MRJobExecutorMessagePayload::MAP_OUTPUT_MATERIALIZED_BYTES_PAYLOAD)));
             return true;
         } else {
             throw std::runtime_error(

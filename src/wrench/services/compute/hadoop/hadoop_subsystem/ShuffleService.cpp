@@ -13,8 +13,10 @@
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 #include "wrench/workflow/failure_causes/NetworkError.h"
+#include "../HadoopComputeServiceMessage.h"
+#include "wrench/simulation/Simulation.h"
 
-WRENCH_LOG_CATEGORY(shuffle_servivce, "Log category for Shuffle Actor");
+WRENCH_LOG_CATEGORY(shuffle_service, "Log category for Shuffle Actor");
 
 namespace wrench {
 
@@ -28,11 +30,11 @@ namespace wrench {
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      */
     ShuffleService::ShuffleService(const std::string &hostname, MRJob *job,
-                                   const std::set<std::string> compute_resources,
+                                   const std::set<std::string> &compute_resources,
                                    std::map<std::string, std::string> property_list,
                                    std::map<std::string, double> messagepayload_list
     ) : Service(hostname, "shuffle_service",
-                "shuffle_service") {
+                "shuffle_service"), job(job) {
         this->compute_resources = compute_resources;
         this->setProperties(this->default_property_values, std::move(property_list));
         this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
@@ -85,7 +87,7 @@ namespace wrench {
             return true;
         }
 
-        WRENCH_INFO("Got a [%s] message", message->getName().c_str());
+        WRENCH_INFO("ShuffleService::ShuffleService() Got a [%s] message", message->getName().c_str());
         if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
             // This is Synchronous
             try {
@@ -96,6 +98,43 @@ namespace wrench {
                 return false;
             }
             return false;
+        } else if (auto msg = std::dynamic_pointer_cast<NotifyShuffleServiceToFetchMapperOutputMessage>(message)) {
+            try {
+                S4U_Mailbox::putMessage(msg->mapper_mailbox,
+                                        new RequestMapperMaterializedOutputMessage(this->mailbox_name,
+                                                                                   this->getMessagePayloadValue(
+                                                                                           MRJobExecutorMessagePayload::MAP_SIDE_SHUFFLE_REQUEST_PAYLOAD)));
+            } catch (std::shared_ptr<NetworkError> &cause) { WRENCH_INFO(
+                        "Network error... Failing");
+                return false;
+            }
+            return true;
+        } else if (auto msg = std::dynamic_pointer_cast<SendMaterializedOutputMessage>(message)) {
+            mapper_outputs.push_back(msg->materialized_bytes);
+
+            if (mapper_outputs.size() == this->job->getNumMappers()) {
+                // We have received output files from all of the mapper services.
+                std::vector<double> reducer_output_vec(this->job->getNumReducers());
+                while (reducer_output_vec.size() < this->job->getNumReducers()) {
+                    // This is a hack that just adds values together until we reach `merge_factor`
+                    double temp = mapper_outputs.back();
+                    mapper_outputs.pop_back();
+                    reducer_output_vec.push_back(temp + mapper_outputs.back());
+                    mapper_outputs.pop_back();
+                }
+
+                // TODO: Figure out the cost in flops of the Shuffle phase merge factor algorithm
+                Simulation::compute(1.0);
+
+                for (int i = 0; i < reducer_output_vec.size(); i++) {
+                    S4U_Mailbox::putMessage(this->job->getReducerMailboxes()[i],
+                                            new TransferOutputFromMapperToReducerMessage(reducer_output_vec[i],
+                                                                                         this->getMessagePayloadValue(
+                                                                                                 MRJobExecutorMessagePayload::MAP_OUTPUT_MATERIALIZED_BYTES_PAYLOAD)));
+                }
+                return false;
+            }
+            return true;
         } else {
             throw std::runtime_error(
                     "MRJobExecutor::processNextMessage(): Received an unexpected [" + message->getName() +

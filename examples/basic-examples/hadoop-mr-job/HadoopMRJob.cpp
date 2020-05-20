@@ -42,7 +42,7 @@ int main(int argc, char **argv) {
 
     /* Parsing of the command-line arguments for this WRENCH simulation */
     if (argc != 2) {
-        std::cerr << "Usage: " << argv[0] << "  <xml platform file> [--log=custom_wms.threshold=info]" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " <xml platform file> [--log=custom_wms.threshold=info]" << std::endl;
         exit(1);
     }
 

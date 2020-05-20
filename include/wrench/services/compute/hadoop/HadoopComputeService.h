@@ -26,7 +26,7 @@ namespace wrench {
     public:
         HadoopComputeService(
                 const std::string &hostname,
-                const std::set<std::string> compute_resources,
+                const std::set<std::string>& compute_resources,
                 std::map<std::string, std::string> property_list,
                 std::map<std::string, double> messagepayload_list
         );

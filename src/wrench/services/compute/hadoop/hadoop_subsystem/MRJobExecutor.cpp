@@ -32,13 +32,12 @@ namespace wrench {
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      */
-    MRJobExecutor::MRJobExecutor(
-            const std::string &hostname,
-            MRJob *job,
-            const std::set<std::string> compute_resources,
-            std::string notify_mailbox,
-            std::map<std::string, std::string> property_list,
-            std::map<std::string, double> messagepayload_list
+    MRJobExecutor::MRJobExecutor(const std::string &hostname,
+                                 MRJob *job,
+                                 const std::set<std::string> compute_resources,
+                                 std::string notify_mailbox,
+                                 std::map<std::string, std::string> property_list,
+                                 std::map<std::string, double> messagepayload_list
     ) : Service(hostname, "mr_job_executor",
                 "mr_job_executor"), job(job), success(false) {
         this->compute_resources = compute_resources;
@@ -55,53 +54,62 @@ namespace wrench {
         Service::stop();
     }
 
-    void MRJobExecutor::setup_workers(std::vector<std::shared_ptr<Service>> &mappers,
-                                      std::vector<std::shared_ptr<Service>> &reducers,
-                                      std::shared_ptr<Service> &hdfs,
-                                      std::shared_ptr<Service> &shuffle) {
+    /**
+     * @brief Prepare all of the MRJob's services.
+     *
+     * @param mapper_vec
+     * @param reducer_vec
+     * @param hdfs_ptr
+     * @param shuffle_ptr
+     */
+    void MRJobExecutor::setup_workers(std::vector<std::shared_ptr<Service>> &mapper_vec,
+                                      std::vector<std::shared_ptr<Service>> &reducer_vec,
+                                      std::shared_ptr<Service> &hdfs_ptr,
+                                      std::shared_ptr<Service> &shuffle_ptr) {
         // TODO: Right now these are all running on a single host
         // But we should change this so that workers are spun up
         // on the appropriate nodes.  As well as think about what
         // to do when resources do not match user specs.
-        hdfs = std::shared_ptr<HdfsService>(
+        hdfs_ptr = std::shared_ptr<HdfsService>(
                 new HdfsService(
                         this->hostname,
                         this->job,
                         this->compute_resources,
                         {},
                         {}));
-        hdfs->simulation = this->simulation;
+        hdfs_ptr->simulation = this->simulation;
 
-        shuffle = std::shared_ptr<ShuffleService>(
+        shuffle_ptr = std::shared_ptr<ShuffleService>(
                 new ShuffleService(
                         this->hostname,
                         this->job,
                         this->compute_resources,
                         {},
                         {}));
-        shuffle->simulation = this->simulation;
-        this->job->setShuffleMailbox(shuffle->mailbox_name);
+        shuffle_ptr->simulation = this->simulation;
+        this->job->setShuffleMailbox(shuffle_ptr->mailbox_name);
 
         for (int i = 0; i < this->job->getNumMappers(); i++) {
-            mappers.push_back(std::shared_ptr<MapperService>(
+            mapper_vec.push_back(std::shared_ptr<MapperService>(
                     new MapperService(
                             this->hostname,
                             this->job,
                             this->compute_resources,
                             {},
                             {})));
-            mappers.back()->simulation = this->simulation;
+            mapper_vec.back()->simulation = this->simulation;
         }
 
         for (int i = 0; i < this->job->getNumReducers(); i++) {
-            reducers.push_back(std::shared_ptr<ReducerService>(
+            reducer_vec.push_back(std::shared_ptr<ReducerService>(
                     new ReducerService(
                             this->hostname,
                             this->job,
                             this->compute_resources,
                             {},
                             {})));
-            reducers.back()->simulation = this->simulation;
+            reducer_vec.back()->simulation = this->simulation;
+            this->job->appendReducerMailbox(reducer_vec.back()->mailbox_name);
         }
     }
 
@@ -118,7 +126,7 @@ namespace wrench {
                 "New MRJobExecutor starting (%s) on %ld hosts",
                 this->mailbox_name.c_str(), this->compute_resources.size());
 
-        // TODO:  This is updated when the reducer(s) send a success message.
+        // TODO: This is updated when the reducer(s) send a success message.
         this->success = false;
 
         setup_workers(this->mappers, this->reducers, this->hdfs, this->shuffle);
@@ -129,10 +137,10 @@ namespace wrench {
         shuffle->start(shuffle, true, false);
 
         // Now start up our mappers and reducers.
-        for (auto mapper : mappers) {
+        for (const auto& mapper : mappers) {
             mapper->start(mapper, true, false);
         }
-        for (auto reducer : reducers) {
+        for (const auto& reducer : reducers) {
             reducer->start(reducer, true, false);
         }
 
@@ -193,7 +201,17 @@ namespace wrench {
                 return false;
             }
             return false;
-
+        } else if (auto msg = std::dynamic_pointer_cast<MapTaskCompleteMessage>(message)) {
+            try {
+                S4U_Mailbox::putMessage(this->job->getShuffleMailbox(),
+                                        new NotifyShuffleServiceToFetchMapperOutputMessage(msg->return_mailbox,
+                                                                                           this->getMessagePayloadValue(
+                                                                                                   MRJobExecutorMessagePayload::MAP_SIDE_SHUFFLE_REQUEST_PAYLOAD)));
+            } catch (std::shared_ptr<NetworkError> &cause) { WRENCH_INFO(
+                    "Got a network error while getting some message... failing fast");
+                return false;
+            }
+            return true;
         } else {
             throw std::runtime_error(
                     "MRJobExecutor::processNextMessage(): Received an unexpected [" + message->getName() +

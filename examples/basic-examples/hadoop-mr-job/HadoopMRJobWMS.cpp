@@ -65,7 +65,7 @@ namespace wrench {
                                                double reducer_flops)
          */
         std::vector<int> files = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
-        auto mr_job = new DeterministicMRJob(1, 1000.0, 16,
+        auto mr_job = new DeterministicMRJob(10, 1000.0, 16,
                 false, 1, 0.8, 16,
                 16, files, 1.0, 1,
                 1, 1.0);
@@ -75,7 +75,9 @@ namespace wrench {
         hadoop_service->runMRJob(mr_job);
 
         WRENCH_INFO("Waiting for next event");
-        // Not sure what's up, this is causing an "Oops Deadlock, or code not perfectly clean" error.
+
+        // TODO: MRJob isn't integrated as a job that can be submitted
+        // So we can't make the following call:
         // auto event = this->waitForNextEvent();
 
         WRENCH_INFO("Exiting");

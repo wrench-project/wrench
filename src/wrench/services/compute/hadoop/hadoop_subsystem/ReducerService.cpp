@@ -14,8 +14,9 @@
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/services/ServiceMessage.h"
 #include "wrench/workflow/failure_causes/NetworkError.h"
+#include "../HadoopComputeServiceMessage.h"
 
-WRENCH_LOG_CATEGORY(reducer_servivce, "Log category for Reducer Actor");
+WRENCH_LOG_CATEGORY(reducer_service, "Log category for Reducer Actor");
 
 namespace wrench {
     ReducerService::ReducerService(const std::string &hostname,
@@ -37,7 +38,7 @@ namespace wrench {
     int ReducerService::main() {
         this->state = Service::UP;
 
-        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
+        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
         while (this->processNextMessage()) {
         }
 
@@ -45,6 +46,13 @@ namespace wrench {
         return 0;
     }
 
+    /**
+     * @brief Wait for and react to any incoming message
+     *
+     * @return false if the daemon should terminate, true otherwise
+     *
+     * @throw std::runtime_error
+     */
     bool ReducerService::processNextMessage() {
         S4U_Simulation::computeZeroFlop();
 
@@ -57,7 +65,7 @@ namespace wrench {
             return true;
         }
 
-        WRENCH_INFO("Got a [%s] message", message->getName().c_str());
+        WRENCH_INFO("ReducerService::ReducerService() Got a [%s] message", message->getName().c_str());
         if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
             // This is Synchronous
             try {
@@ -67,6 +75,9 @@ namespace wrench {
             } catch (std::shared_ptr<NetworkError> &cause) {
                 return false;
             }
+            return false;
+        } else if (auto msg = std::dynamic_pointer_cast<TransferOutputFromMapperToReducerMessage>(message)) {
+            // TODO: Handle this message.
             return false;
         } else {
             throw std::runtime_error(
