@@ -158,13 +158,15 @@ namespace wrench {
             std::cout << " (compiled with Batsched)";
 #endif
             std::cout << "\n\nTo cite WRENCH in a publication, please use:\n"
-                         "  @inproceedings{wrench,\n"
-                         "    title = {{WRENCH: A Framework for Simulating Workflow Management Systems}},\n"
-                         "    author = {Casanova, Henri and Pandey, Suraj and Oeth, James and Tanaka, Ryan and Suter, Frederic and Ferreira da Silva, Rafael},\n"
-                         "    booktitle = {13th Workshop on Workflows in Support of Large-Scale Science (WORKS'18)},\n"
-                         "    year = {2018},\n"
-                         "    pages = {74--85},\n"
-                         "    doi = {10.1109/WORKS.2018.00013}\n"
+                         "  @article{wrench,\n"
+                         "    title = {{Developing Accurate and Scalable Simulators of Production Workflow Management Systems with WRENCH}},\n"
+                         "    author = {Casanova, Henri and Ferreira da Silva, Rafael and Tanaka, Ryan and Pandey, Suraj and Jethwani, Gautam and Koch, William and Albrecht, Spencer and Oeth, James and Suter, Frederic},\n"
+                         "    journal = {Future Generation Computer Systems},\n"
+                         "    volume = {in press},\n"
+                         "    number = {},\n"
+                         "    year = {2020},\n"
+                         "    pages = {},\n"
+                         "    doi = {}\n"
                          "  }\n\n"
                          "-----------------------------------------------------------------------------------\n\n";
             // put the argument back in so that we also see the
