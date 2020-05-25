@@ -127,7 +127,7 @@ void SimulationCommandLineArgumentsTest::do_versionArgument_test() {
             ASSERT_EQ(strncmp(line, "This program was linked against WRENCH version ",
                               strlen("This program was linked against WRENCH version ")), 0);
         }
-        if (linecount == 15) {
+        if (linecount == 17) {
             ASSERT_EQ(strncmp(line, "This program was linked against SimGrid version ",
                               strlen("This program was linked against SimGrid version ")), 0);
         }
