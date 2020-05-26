@@ -166,7 +166,7 @@ namespace wrench {
                          "    number = {},\n"
                          "    year = {2020},\n"
                          "    pages = {},\n"
-                         "    doi = {}\n"
+                         "    doi = {10.1016/j.future.2020.05.030}\n"
                          "  }\n\n"
                          "-----------------------------------------------------------------------------------\n\n";
             // put the argument back in so that we also see the
