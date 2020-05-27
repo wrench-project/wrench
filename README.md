@@ -20,7 +20,7 @@ More information and Documentation: [WRENCH Project Website](http://wrench-proje
   Albrecht, J. Oeth, and F. Suter, [Developing Accurate and Scalable Simulators of
   Production Workflow Management Systems with 
   WRENCH](https://rafaelsilva.com/files/publications/casanova2020fgcs.pdf), 
-  Future Generation Computer Systems, 2020. 
+  Future Generation Computer Systems, vol. 112, p. 162-175, 2020. 
 
 ## Prerequisites
 
@@ -89,11 +89,11 @@ it provides a recent and general overview on the framework.
   title = {Developing Accurate and Scalable Simulators of Production Workflow Management Systems with WRENCH},
   author = {Casanova, Henri and Ferreira da Silva, Rafael and Tanaka, Ryan and Pandey, Suraj and Jethwani, Gautam and Koch, William and Albrecht, Spencer and Oeth, James and Suter, Fr\'{e}d\'{e}ric},
   journal = {Future Generation Computer Systems},
-  volume = {in press},
+  volume = {112},
   number = {},
-  pages = {},
+  pages = {162--175},
   year = {2020},
-  doi = {}
+  doi = {10.1016/j.future.2020.05.030}
 }
 ```
 
