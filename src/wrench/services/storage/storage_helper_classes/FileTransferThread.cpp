@@ -159,7 +159,7 @@ namespace wrench {
         std::shared_ptr<NetworkError> failure_cause = nullptr;
 
         WRENCH_INFO("New FileTransferThread (file=%s, src_mailbox=%s; src_location=%s; dst_mailbox=%s; dst_location=%s; "
-                    "answer_mailbox_if_read=%s; answer_mailbox_if_write=%s; answer_mailbox_if_copy=%s",
+                    "answer_mailbox_if_read=%s; answer_mailbox_if_write=%s; answer_mailbox_if_copy=%s; buffer size=%lu",
                     file->getID().c_str(),
                     (src_mailbox.empty() ? "none" : src_mailbox.c_str()),
                     (src_location == nullptr ? "none" : src_location->toString().c_str()),
@@ -167,7 +167,8 @@ namespace wrench {
                     (dst_location == nullptr ? "none" : dst_location->toString().c_str()),
                     (answer_mailbox_if_read.empty() ? "none" : answer_mailbox_if_read.c_str()),
                     (answer_mailbox_if_write.empty() ? "none" : answer_mailbox_if_write.c_str()),
-                    (answer_mailbox_if_copy.empty() ? "none" : answer_mailbox_if_copy.c_str())
+                    (answer_mailbox_if_copy.empty() ? "none" : answer_mailbox_if_copy.c_str()),
+                    this->buffer_size
         );
 
         // Create a message to send back (some field of which may be overwritten below)
@@ -330,14 +331,14 @@ namespace wrench {
                     WRENCH_INFO("Reading %s bytes from disk", std::to_string(chunk_size).c_str());
                     simulation->readFromDisk(chunk_size, location->getStorageService()->hostname,
                                                  location->getMountPoint());
-                    remaining -= this->buffer_size;
+                    remaining -= (double)(this->buffer_size);
                     if (req) {
                         req->wait();
                     }
                     req = S4U_Mailbox::iputMessage(mailbox,
                                                    new StorageServiceFileContentChunkMessage(
                                                            this->file,
-                                                           chunk_size, (remaining <= 0)));
+                                                           (unsigned long)chunk_size, (remaining <= 0)));
                 }
                 req->wait();
             } catch (std::shared_ptr<NetworkError> &e) {
