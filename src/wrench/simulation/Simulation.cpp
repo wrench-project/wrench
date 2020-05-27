@@ -162,10 +162,10 @@ namespace wrench {
                          "    title = {{Developing Accurate and Scalable Simulators of Production Workflow Management Systems with WRENCH}},\n"
                          "    author = {Casanova, Henri and Ferreira da Silva, Rafael and Tanaka, Ryan and Pandey, Suraj and Jethwani, Gautam and Koch, William and Albrecht, Spencer and Oeth, James and Suter, Frederic},\n"
                          "    journal = {Future Generation Computer Systems},\n"
-                         "    volume = {in press},\n"
+                         "    volume = {112},\n"
                          "    number = {},\n"
                          "    year = {2020},\n"
-                         "    pages = {},\n"
+                         "    pages = {162--175},\n"
                          "    doi = {10.1016/j.future.2020.05.030}\n"
                          "  }\n\n"
                          "-----------------------------------------------------------------------------------\n\n";
