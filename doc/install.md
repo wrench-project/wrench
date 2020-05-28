@@ -25,7 +25,7 @@ And, one of the following:
 
 - [Google Test](https://github.com/google/googletest) -- version 1.8 or higher (only required for running test cases)
 - [Doxygen](http://www.doxygen.org) -- version 1.8 or higher (only required for generating documentation)
-- [Batsched](https://gitlab.inria.fr/batsim/batsched) -- only needed for realistic simulation of resource managed by production batch schedulers
+- [Batsched](https://gitlab.inria.fr/batsim/batsched) -- only needed for realistic simulation of compute resources managed by production batch schedulers
 
 # Source Install #                  {#install-source}
 
@@ -80,11 +80,11 @@ make unit_tests
 # Docker Containers #             {#install-docker}
 
 WRENCH is also distributed in Docker containers. Please, visit the
-[WRENCH's Repository on Docker Hub](https://hub.docker.com/r/wrenchproject/wrench/)
+[WRENCH Repository on Docker Hub](https://hub.docker.com/r/wrenchproject/wrench/)
 to pull WRENCH's Docker images.
 
 The `latest` tag provides a container with the latest 
-[WRENCH's release](https://github.com/wrench-project/wrench/releases):
+[WRENCH release](https://github.com/wrench-project/wrench/releases):
 
 ~~~~~~~~~~~~~{.sh}
 docker pull wrenchproject/wrench 

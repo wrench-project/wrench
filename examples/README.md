@@ -22,14 +22,14 @@ Details on the specifics of each simulator are in extensive source code
     service. The compute  service runs on a 10-core host, and each task is
     executed as a single job  that uses 10 cores
 
-  - `basic-examples/bare-metal-chain-scratch`: Similar, but the compute service now
-    has scratch space to hold intermediate workflow files. Since  files
+  - `basic-examples/bare-metal-chain-scratch`: Similar to the previous simulator, but the compute service now
+    has scratch space to hold intermediate workflow files. Since files
     created in the scratch space during a job's execution are erased after
-    that job's completion. As a result, the workflow is executed as a single
+    that job's completion, the workflow is executed as a single
     multi-task job.
 
   - `basic-examples/bare-metal-bag-of-tasks`: A simulation of the execution of a
-     bag-of-task workflow by a Workflow Management System on a bare-metal compute
+     bag-of-tasks workflow by a Workflow Management System on a bare-metal compute
      service, with all workflow data being read/written from/to a single
      storage service. Up to two workflow tasks are executed concurrently on
      the compute service, in which case one task is executed on 6 cores and
@@ -47,7 +47,7 @@ Details on the specifics of each simulator are in extensive source code
 #### Simulators that showcase the use of the cloud compute service
 
   - `basic-examples/cloud-bag-of-tasks`: A simulation of the execution of a
-       bag-of-task workflow by a Workflow Management System on a cloud compute
+       bag-of-tasks workflow by a Workflow Management System on a cloud compute
        service, with all workflow data being read/written from/to a single
        storage service. Up to two workflow tasks are executed concurrently on
        the compute service, in which case one task is executed on 6 cores and
@@ -60,7 +60,7 @@ Details on the specifics of each simulator are in extensive source code
 #### Simulators that showcase the use of the batch compute service
 
   - `basic-examples/batch-bag-of-tasks`: A simulation of the execution of a
-      bag-of-task workflow by a Workflow Management System on a batch compute
+      bag-of-tasks workflow by a Workflow Management System on a batch compute
       service, with all workflow data being read/written from/to a single
       storage service. Up to two workflow tasks are executed concurrently on
       the compute service on  two compute nodes, each of them using 10 cores.
@@ -79,6 +79,6 @@ Details on the specifics of each simulator are in extensive source code
      using  a batch compute service,  and another in which the  workflow is executed
      using a cloud compute service. These simulators take as input workflow description
      files from real-world workflow applications. They use the scheduler abstraction
-     provided by WREMNCH to implement complex Workflow Management System. 
+     provided by WRENCH to implement complex Workflow Management System. 
      
 ---
