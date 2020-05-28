@@ -21,8 +21,8 @@ and many other useful things that real-world cyberinfrastructure services
 can do.
 
 The simulator then creates a workflow to be executed, which consists of 
-a set of compute tasks each with input and output files, with control- and 
-data-dependencies between tasks.
+a set of compute tasks each with input and output files, with control and/or
+data dependencies between tasks.
 
 A special service is then created, called a Workflow Management System
 (WMS),  that will be in charge of executing the workflow on the platform using
@@ -51,7 +51,7 @@ code contains extensive comments as well.
 
 ## Step 0: Include wrench.h #                   {#wrench-101-simulator-1000ft-step-0}
 
-For ease of use, all WRENCH abstraction in the 
+For ease of use, all WRENCH abstractions in the 
 [WRENCH User API](./user/annotated.html) are available through a single 
 header file:
 
@@ -73,9 +73,9 @@ simulation.init(&argc, argv);
 
 Note that this member function takes in the command-line arguments passed to the main
 function of the simulator. This is so that it can parse WRENCH-specific and
-[SimGrid-specific](https://simgrid.org/doc/latest/Configuring_Simgrid.html)
+[SimGrid-specific](https://simgrid.org/doc/latest/Configuring_SimGrid.html)
 command-line arguments. (Recall that WRENCH is based on
-[SimGrid](htts://simgrid.org).) Two useful such arguments are `--help-wrench`,
+[SimGrid](https://simgrid.org).) Two useful such arguments are `--help-wrench`,
 which displays a WRENCH help message, and `--help-simgrid`, which displays
 an extensive SimGrid help message.
 
@@ -171,7 +171,7 @@ has no disk attached to it.
 simulator, in which scratch storage is used). The last two
 arguments are `std::map` objects (in this case both empty), that are used 
 to configure properties of the compute service (see details in 
-[this section below](@wrench-101-customizing-services)).
+[this section below](@ref wrench-101-customizing-services)).
 
 The second service is a storage service:
 
@@ -236,8 +236,7 @@ output from one task is input to the next task. The number of tasks is obtained
 from a command-line argument.
 
 The `wrench::Workflow` class also provides member functions to import workflows from
-workflow description files in standard  
-[JSON format](https://github.com/workflowhub/workflow-schema) and 
+workflow description files in standard [JSON format](https://github.com/workflowhub/workflow-schema) and 
 [DAX format](http://workflowarchive.org).
 
 The input files to the workflow must be available (at some storage service) before
@@ -328,14 +327,14 @@ by all hosts in the platform.  **Important:** The energy plugin is NOT
 enabled by default in WRENCH simulations. To enable it, pass the
 `--activate-energy` command line option to the simulator.  See
 `examples/basic-examples/cloud-bag-of-tasks-energy` for an example
-simulator that makes use of this plugin  (and example platform
+simulator that makes use of this plugin  (and an example platform
 description file that defines host power consumption profiles).
 
 Another option altogether is to dump all simulation output to a JSON file.
 This is done with the `wrench::SimulationOutput::dump*JSON()`
 member functions. See the documentation of each member function to see the structure of the
 JSON output, in case you want to parse/process the JSON yourself.
-Alternately, you can run the installed `wrench-dashboard` tool, which
+Alternatively, you can run the installed `wrench-dashboard` tool, which
 provides interactive visualization/inspection of simulation output.
 
 # Available services #      {#wrench-101-simulator-services}
@@ -351,8 +350,7 @@ links for more information on what these services are and on how to create them.
   - [Batch-scheduled Clusters](@ref guide-101-batch)
   - [HTCondor](@ref guide-101-htcondor)
 
-- **Storage Services**: These are services that know how to store and give access  
-to workflow files:
+- **Storage Services**: These are services that know how to store and give access to workflow files:
 
   - [Simple Storage Service](@ref guide-101-simplestorage)
 
@@ -380,11 +378,11 @@ to workflow files:
   At least **one** WMS should be provided for running a simulation.  By
   default, WRENCH does **not** provide a WMS implementation as part of its
   core components.  Each example simulator in the `examples/`
-  directory implements its own WMS.  Additional WMSs implementations may
+  directory implements its own WMS.  Additional WMS implementations may
   also be found on the [WRENCH project website](https://wrench-project.org/usages.html).
   See [WRENCH 102](@ref wrench-102) for information on how to implement a WMS.
 
-# Customizing Services #         {#wrench-101-customizing-services}
+# Customizing services #         {#wrench-101-customizing-services}
 
 Each service is customizable by passing to its constructor a _property list_, 
 i.e., a key-value map where each key is a property and each value is a string. 
@@ -417,10 +415,9 @@ details all messages whose payload can be customized.
 
 # Customizing logging  #        {#wrench-101-logging}
 
-When running a WRENCH simulator you may notice that there is quite a bit
-of logging output. While logging output can be useful to inspect visually
-the way in which the simulation proceeds, it is also convenient to
-disable it (and it slows down the simulation!).  WRENCH's logging system 
+When running a WRENCH simulator you may notice that there is no
+logging output. By default logging output is disabled, but it is often
+useful to enable it (remembering that it can slow down the simulation). WRENCH's logging system 
 is a thin layer on top of SimGrid's logging system, and as such is controlled 
 via command-line arguments. 
 
@@ -431,11 +428,12 @@ The `bare-metal-chain` example simulator can be executed as follows in the
 ./wrench-example-bare-metal-chain 10 ./two_hosts.xml
 ~~~~~~~~~~~~~
 
-It is possible to obtain more output from the simulator by enabling some logging. 
-It turns out the WMS class in that example (`OneTaskAtATimeWMS.cpp`) defined a logging
-category names  `custom_wms`
+The above generates no output whatsoever. 
+It is possible to enable some logging to the terminal. 
+It turns out the WMS class in that example (`OneTaskAtATimeWMS.cpp`) defines a logging
+category named  `custom_wms`
 (see one of the first lines of `examples/basic-examples/bare-metal-chain/OneTaskAtATimeWMS.cpp`),
-which  can be enabled as:
+which can be enabled as:
 
 ~~~~~~~~~~~~~{.cpp}
 ./wrench-example-bare-metal-chain 10 ./two_hosts.xml --log=custom_wms.threshold=info
@@ -454,7 +452,7 @@ One can disable the coloring of the logging output with the
 ./wrench-example-bare-metal-chain 10 ./two_hosts.xml --log=custom_wms.threshold=info --wrench-no-color
 ~~~~~~~~~~~~~
 
-Disable color can be useful when redirecting the logging  output to a file. 
+Disabling color can be useful when redirecting the logging  output to a file. 
 
 Enabling all logging is done with the argument `--wrench-full-log`:
 
@@ -462,7 +460,7 @@ Enabling all logging is done with the argument `--wrench-full-log`:
 ./wrench-example-bare-metal-chain 10 ./two_hosts.xml --wrench-full-log
 ~~~~~~~~~~~~~
 
-The logging output now contains output produces by all the simulated
+The logging output now contains output produced by all the simulated
 running processed.  More details on logging capabilities are displayed when
 passing the `--help-logs` command-line argument to your simulator.  Log
 category names are attached to `*.cpp` files in the simulator code, the

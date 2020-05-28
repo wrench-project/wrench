@@ -12,7 +12,7 @@ are then queued in a `std::vector<wrench::StandardJob *>`, which are then
 consumed as resources become available. The Central Manager also spawns the
 execution of the wrench::HTCondorNegotiatorService, which performs matchmaking
 between jobs and compute resources available in the pool. Note that job submission
-in HTCondor is asynchronous, thus our simulated services operates independent 
-from each other 
+in HTCondor is asynchronous, thus our simulated services operates independently 
+of each other 
 
 
