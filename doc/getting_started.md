@@ -52,7 +52,7 @@ command.
 
 # Creating a CMakeLists.txt file by hand##                {#getting-started-cmakelists}
 
-Alternately, you can do a manual setup, i.e., create your own Cmake project. 
+Alternatively, you can do a manual setup, i.e., create your own Cmake project. 
 Below is an example of a `CMakeLists.txt` file that can be used as a basic
 template:
 
