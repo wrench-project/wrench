@@ -22,11 +22,12 @@ Details on the specifics of each simulator are in extensive source code
     service. The compute  service runs on a 10-core host, and each task is
     executed as a single job  that uses 10 cores
 
-  - `basic-examples/bare-metal-chain-scratch`: Similar to the previous simulator, but the compute service now
+  - `basic-examples/bare-metal-chain-scratch`: Similar to the previous
+    simulator, but the compute service now
     has scratch space to hold intermediate workflow files. Since files
     created in the scratch space during a job's execution are erased after
-    that job's completion, the workflow is executed as a single
-    multi-task job.
+    that job's completion, the workflow is executed as a single multi-task
+    job.
 
   - `basic-examples/bare-metal-bag-of-tasks`: A simulation of the execution of a
      bag-of-tasks workflow by a Workflow Management System on a bare-metal compute
@@ -41,7 +42,7 @@ Details on the specifics of each simulator are in extensive source code
     
   - `basic-examples/bare-metal-data-movement`: A simulation that is similar
     to the previous one, but instead  of using a complex job to do data movements
-    and deletions, the WMS does it "by hang".
+    and deletions, the WMS does it "by hand".
 
 
 #### Simulators that showcase the use of the cloud compute service
@@ -75,8 +76,8 @@ Details on the specifics of each simulator are in extensive source code
 
 ### Examples with real workflows and more sophisticated WMS implementations
 
-  - `real-workflow-example`: Two simulators, one in which  the  workflow  is executed
-     using  a batch compute service,  and another in which the  workflow is executed
+  - `real-workflow-example`: Two simulators, one in which the workflow is executed
+     using a batch compute service, and another in which the workflow is executed
      using a cloud compute service. These simulators take as input workflow description
      files from real-world workflow applications. They use the scheduler abstraction
      provided by WRENCH to implement complex Workflow Management System. 
