@@ -331,16 +331,20 @@ namespace wrench {
                     WRENCH_INFO("Reading %s bytes from disk", std::to_string(chunk_size).c_str());
                     simulation->readFromDisk(chunk_size, location->getStorageService()->hostname,
                                                  location->getMountPoint());
+                    WRENCH_INFO("Read %s bytes from disk", std::to_string(chunk_size).c_str());
                     remaining -= (double)(this->buffer_size);
                     if (req) {
                         req->wait();
+                        WRENCH_INFO("Bytes sent over the network were received");
                     }
+                    WRENCH_INFO("Asynchronously sending %s bytes over the network", std::to_string(chunk_size).c_str());
                     req = S4U_Mailbox::iputMessage(mailbox,
                                                    new StorageServiceFileContentChunkMessage(
                                                            this->file,
                                                            (unsigned long)chunk_size, (remaining <= 0)));
                 }
                 req->wait();
+                WRENCH_INFO("Bytes sent over the network were received");
             } catch (std::shared_ptr<NetworkError> &e) {
                 throw;
             }
