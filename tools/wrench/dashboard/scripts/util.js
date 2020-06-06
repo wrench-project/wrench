@@ -237,12 +237,15 @@ function determineTaskOverlap(data) {
 
 function determineVerticalPosition(task, taskOverlap) {
     let task_core = 0;
+    let task_host = "";
     for (let host in taskOverlap) {
-        for (let core_num in taskOverlap[host]) {
-            let currOverlap = taskOverlap[host][core_num];
+        for (let task_idx in taskOverlap[host]) {
+            let currOverlap = taskOverlap[host][task_idx];
             for (let i = 0; i < currOverlap.length; i++) {
                 if (currOverlap[i].task_id === task.task_id) {
-                    task_core = core_num;
+                    task_core = parseInt(task_idx);
+                    task_host = host;
+                    break;
                 }
             }
         }
@@ -250,19 +253,21 @@ function determineVerticalPosition(task, taskOverlap) {
 
     let v_pos = 0;
     for (let host in taskOverlap) {
-        for (let core_num in taskOverlap[host]) {
-            if (parseInt(core_num, 10) < task_core) {
-                let curr_v_pos = 0;
-                let currOverlap = taskOverlap[host][core_num];
-                for (let i = 0; i < currOverlap.length; i++) {
-                    let t = currOverlap[i];
-                    if (task.whole_task.end >= t.whole_task.start && task.whole_task.start <= t.whole_task.end) {
-                        if (curr_v_pos < t.num_cores_allocated) {
-                            curr_v_pos = t.num_cores_allocated;
+        if (host === task_host) {
+            for (let core_num in taskOverlap[host]) {
+                if (parseInt(core_num) < task_core) {
+                    let curr_v_pos = 0;
+                    let currOverlap = taskOverlap[host][core_num];
+                    for (let i = 0; i < currOverlap.length; i++) {
+                        let t = currOverlap[i];
+                        if (task.whole_task.end > t.whole_task.start && task.whole_task.start < t.whole_task.end) {
+                            if (curr_v_pos < t.num_cores_allocated) {
+                                curr_v_pos = t.num_cores_allocated;
+                            }
                         }
                     }
+                    v_pos += curr_v_pos;
                 }
-                v_pos += curr_v_pos;
             }
         }
     }

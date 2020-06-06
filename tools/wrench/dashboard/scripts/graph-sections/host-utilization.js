@@ -84,6 +84,8 @@ function generateHostUtilizationGraph(data, CONTAINER_WIDTH, CONTAINER_HEIGHT, P
         );
     });
 
+    let taskOverlap = determineTaskOverlap(data);
+
     svg.append('g').selectAll('rect')
         .data(y_cores_per_host.keys())
         .enter()
@@ -109,7 +111,7 @@ function generateHostUtilizationGraph(data, CONTAINER_WIDTH, CONTAINER_HEIGHT, P
         })
         .attr("y", function (d) {
             var y_scale = y_cores_per_host.get(d[executionHostKey].hostname);
-            let vertical_position = determineVerticalPosition(d, determineTaskOverlap(data));
+            let vertical_position = determineVerticalPosition(d, taskOverlap);
             return y_scale(vertical_position + d.num_cores_allocated);
         })
         .attr("width", function (d) {
