@@ -333,3 +333,16 @@ function sanitizeId(id) {
     id = id.replace(/ /g, '')
     return id
 }
+
+/**
+ * Helper function used to get the position of the mouse within the browser window
+ * so that we can have nice moving tooltips. The input is the DOM element we are
+ * interested in (in this case the #chart element).
+ */
+function getOffset(el, position) {
+    const rect = el.getBoundingClientRect()
+    return {
+        left: rect.left + position[0],
+        top: rect.top + position[1]
+    }
+}

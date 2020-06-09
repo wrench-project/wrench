@@ -34,20 +34,6 @@ function getBoxWidth(d, section, scale) {
     return scale(0) //Box shouldn't be displayed if start is -1
 }
 
-
-/**
- * Helper function used to get the position of the mouse within the browser window
- * so that we can have nice moving tooltips. The input is the DOM element we are
- * interested in (in this case the #chart element).
- */
-function getOffset(el, position) {
-    const rect = el.getBoundingClientRect()
-    return {
-        left: rect.left + position[0],
-        top: rect.top + position[1]
-    }
-}
-
 /*
     data: simulation data,
     currGraphState: pass in "hostView" to see the host view and "taskView" to see the task view
