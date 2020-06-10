@@ -37,7 +37,7 @@ namespace wrench {
      *        Setting the buffer size to "0" corresponds to a fully fluid model in which individual
      *        data chunk operations are not simulated, thus achieving both accuracy (unless one specifically wishes
      *        to study the effects of buffering) and quick simulation times. For now, setting the buffer
-     *        size to "0" is not implemented. The default buffer size is 1 MiB (note that the user can
+     *        size to "0" is not implemented. The default buffer size is 10 MiB (note that the user can
      *        always declare a disk with arbitrary bandwidth in the platform description XML).
      */
     class SimpleStorageService : public StorageService {
@@ -45,7 +45,7 @@ namespace wrench {
     private:
         std::map<std::string, std::string> default_property_values = {
                  {SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS,  "infinity"},
-                 {SimpleStorageServiceProperty::BUFFER_SIZE,  "1048576"}, // 1 MEGA BYTE
+                 {SimpleStorageServiceProperty::BUFFER_SIZE,  "10485760"}, // 10 MEGA BYTE
                 };
 
         std::map<std::string, double> default_messagepayload_values = {
