@@ -161,7 +161,7 @@ namespace wrench {
         // terminate a pilot job
         void terminatePilotJob(PilotJob *job) override;
 
-        std::vector<std::tuple<std::string, double, double, double, double, unsigned int>> workload_trace;
+        std::vector<std::tuple<std::string, double, double, double, double, unsigned int, std::string>> workload_trace;
         std::shared_ptr<WorkloadTraceFileReplayer> workload_trace_replayer;
 
         bool clean_exit = false;

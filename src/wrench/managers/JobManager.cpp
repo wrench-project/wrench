@@ -248,7 +248,7 @@ namespace wrench {
      *             this many cores, but will choose the host on which to run it.
      *           - If a "hostname:num_cores" value is provided for a task, then the service will run that
      *             task with the specified number of cores on that host.
-     *      - to a BatchComputeService: {{"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}}
+     *      - to a BatchComputeService: {{"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}[,{"-u":"<string>" (username)}]}
      *      - to a VirtualizedClusterComputeService: {} (jobs should not be submitted directly to the service)}
      *      - to a CloudComputeService: {} (jobs should not be submitted directly to the service)}
      *

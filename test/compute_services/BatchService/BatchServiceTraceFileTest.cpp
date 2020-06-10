@@ -112,7 +112,7 @@ private:
         // Submit the jobs
         unsigned long num_submitted_jobs = 0;
         {
-            std::vector<std::tuple<std::string, double, double, double, double, unsigned int>> trace_file_jobs;
+            std::vector<std::tuple<std::string, double, double, double, double, unsigned int, std::string>> trace_file_jobs;
             //Let's load the trace file
             try {
                 trace_file_jobs = wrench::TraceFileLoader::loadFromTraceFile("../test/trace_files/NASA-iPSC-1993-3.swf", false, 0);
