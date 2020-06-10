@@ -11,7 +11,6 @@
 
 namespace wrench {
 
-
     SET_PROPERTY_NAME(BareMetalComputeServiceProperty, TASK_STARTUP_OVERHEAD);
     SET_PROPERTY_NAME(BareMetalComputeServiceProperty, TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN);
 
