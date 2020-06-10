@@ -276,6 +276,11 @@ namespace wrench {
             throw;
         }
 
+        std::string username = "you";
+        if (batch_job_args.find("-u") != batch_job_args.end()) {
+            username = batch_job_args["-u"];
+        }
+
         // Sanity check
         if ((num_hosts == 0) or (num_cores_per_host == 0) or  (time_asked_for_in_minutes == 0)) {
             throw std::invalid_argument("BatchComputeService::submitWorkflowJob(): service-specific arguments should have non-zero values");
@@ -284,7 +289,7 @@ namespace wrench {
         // Create a Batch Job
         unsigned long jobid = this->generateUniqueJobID();
         auto batch_job = std::shared_ptr<BatchJob>(new BatchJob(job, jobid, time_asked_for_in_minutes,
-                                       num_hosts, num_cores_per_host, -1, S4U_Simulation::getClock()));
+                                       num_hosts, num_cores_per_host, username,-1, S4U_Simulation::getClock()));
 
         // Set job display color for csv output
         auto it = batch_job_args.find("-color");
@@ -348,6 +353,7 @@ namespace wrench {
      *      - "-N": number of hosts
      *      - "-c": number of cores on each host
      *      - "-t": duration (in seconds)
+     *      - "-u": username (optional)
      *
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
@@ -371,6 +377,7 @@ namespace wrench {
      *      - "-N": number of hosts
      *      - "-c": number of cores on each host
      *      - "-t": duration (in seconds)
+     *      - "-u": username (optional)
      *
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
