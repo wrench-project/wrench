@@ -1732,7 +1732,7 @@ private:
 
             std::vector<std::tuple<std::string, int, int, int, int, double, double>> queue_state = cs->getQueue();
             if (queue_state.size() != 4) {
-              throw std::runtime_error("Unexpected queue state (should have 4 entries)");
+              throw std::runtime_error("Unexpected queue state (should have 4 entries - has " + std::to_string(queue_state.size()) + ")");
             }
             int num_positive_start_times = 0;
             for (auto const &j : queue_state) {
@@ -1762,7 +1762,7 @@ private:
 
             std::vector<std::tuple<std::string, int, int, int, int, double, double>> queue_state = cs->getQueue();
             if (queue_state.size() != 3) {
-                throw std::runtime_error("Unexpected queue state (should have 3 entries)");
+                throw std::runtime_error("Unexpected queue state (should have 3 entries - has " + std::to_string(queue_state.size()) + + ")");
             }
             int num_positive_start_times = 0;
             for (auto const &j : queue_state) {
@@ -1802,6 +1802,7 @@ void BatchServiceTest::do_GetQueueState_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("batch_service_test");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
