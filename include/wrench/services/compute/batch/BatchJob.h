@@ -24,6 +24,7 @@ namespace wrench {
         unsigned long getRequestedTime();
         void setRequestedTime(unsigned long time);
         unsigned long getRequestedCoresPerNode();
+        std::string getUsername();
         double getMemoryRequirement();
         double getBeginTimestamp();
         void setBeginTimestamp(double time_stamp);

@@ -61,6 +61,14 @@ namespace wrench {
     }
 
     /**
+     * @brief Get the username
+     * @return a username
+     */
+    std::string BatchJob::getUsername() {
+        return this->username;
+    }
+
+    /**
      * @brief Get the requested time
      * @return a time in seconds
      */

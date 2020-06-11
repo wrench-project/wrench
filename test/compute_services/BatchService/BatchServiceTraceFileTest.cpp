@@ -40,6 +40,8 @@ public:
     void do_WorkloadTraceFileDifferentTimeOriginSWF_test();
     void do_BatchTraceFileReplayTestWithFailedJob_test();
     void do_WorkloadTraceFileTestJSON_test();
+    void do_GetQueueState_test();
+
 
 protected:
     BatchServiceTest() {
@@ -196,7 +198,7 @@ void BatchServiceTest::do_BatchTraceFileReplayTest_test() {
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
     int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
+    auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("batch_service_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -270,7 +272,7 @@ void BatchServiceTest::do_BatchTraceFileReplayTestWithFailedJob_test() {
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
     int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
+    auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("batch_service_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -326,9 +328,9 @@ class WorkloadTraceFileSWFBatchServiceShutdownTestWMS : public wrench::WMS {
 
 public:
     WorkloadTraceFileSWFBatchServiceShutdownTestWMS(BatchServiceTest *test,
-                                const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                                std::string hostname) :
+                                                    const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                                    const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                                                    std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
                         hostname, "test") {
         this->test = test;
@@ -364,7 +366,7 @@ void BatchServiceTest::do_WorkloadTraceFileTestSWFBatchServiceShutdown_test() {
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
     int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
+    auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("batch_service_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -552,7 +554,7 @@ void BatchServiceTest::do_WorkloadTraceFileTestSWF_test() {
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
     int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
+    auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("batch_service_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -888,7 +890,7 @@ private:
 #ifdef ENABLE_BATSCHED
 TEST_F(BatchServiceTest, WorkloadTraceFileSWFRequestedTimesTest) {
 #else
-    TEST_F(BatchServiceTest, DISABLED_WorkloadTraceFileSWFRequestedTimesTest) {
+TEST_F(BatchServiceTest, DISABLED_WorkloadTraceFileSWFRequestedTimesTest) {
 #endif
     DO_TEST_WITH_FORK(do_WorkloadTraceFileRequestedTimesSWF_test);
 }
@@ -900,7 +902,7 @@ void BatchServiceTest::do_WorkloadTraceFileRequestedTimesSWF_test() {
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
     int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
+    auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("batch_service_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -963,9 +965,9 @@ class WorkloadTraceFileSWFDifferentTimeOriginTestWMS : public wrench::WMS {
 
 public:
     WorkloadTraceFileSWFDifferentTimeOriginTestWMS(BatchServiceTest *test,
-                                              const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                              const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                                              std::string hostname) :
+                                                   const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                                   const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                                                   std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
                         hostname, "test") {
         this->test = test;
@@ -1064,7 +1066,7 @@ void BatchServiceTest::do_WorkloadTraceFileDifferentTimeOriginSWF_test() {
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
     int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
+    auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("batch_service_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -1280,7 +1282,7 @@ void BatchServiceTest::do_WorkloadTraceFileTestJSON_test() {
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
     int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
+    auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("batch_service_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -1691,6 +1693,152 @@ void BatchServiceTest::do_WorkloadTraceFileTestJSON_test() {
     // Running a "run a single task" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
+    ASSERT_NO_THROW(simulation->launch());
+
+    delete simulation;
+
+    free(argv[0]);
+    free(argv);
+}
+
+
+/**********************************************************************/
+/**  GET QUEUE STATE TEST                                            **/
+/**********************************************************************/
+
+class GetQueueStateTestWMS : public wrench::WMS {
+
+public:
+    GetQueueStateTestWMS(BatchServiceTest *test,
+                         const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                         const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                         std::string hostname) :
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
+                        hostname, "test") {
+        this->test = test;
+    }
+
+private:
+
+    BatchServiceTest *test;
+
+    int main() {
+
+        auto cs = *(this->getAvailableComputeServices<wrench::BatchComputeService>().begin());
+
+        {
+            wrench::Simulation::sleep(10);
+
+            std::vector<std::tuple<std::string, int, int, int, int, double, double>> queue_state = cs->getQueue();
+            if (queue_state.size() != 4) {
+              throw std::runtime_error("Unexpected queue state (should have 4 entries)");
+            }
+            int num_positive_start_times = 0;
+            for (auto const &j : queue_state) {
+                if (std::get<6>(j) > 0) {
+                    num_positive_start_times++;
+                }
+            }
+            if (num_positive_start_times != 1) {
+            throw std::runtime_error("Exactly one job should be shown as having started");
+            }
+
+//            WRENCH_INFO("QUEUE STATE:");
+//            for (auto const &j : queue_state) {
+//                WRENCH_INFO("%s %d %d %d %d %.2lf %.2lf",
+//                            std::get<0>(j).c_str(),
+//                            std::get<1>(j),
+//                            std::get<2>(j),
+//                            std::get<3>(j),
+//                            std::get<4>(j),
+//                            std::get<5>(j),
+//                            std::get<6>(j));
+//            }
+        }
+
+        {
+            wrench::Simulation::sleep(4000);
+
+            std::vector<std::tuple<std::string, int, int, int, int, double, double>> queue_state = cs->getQueue();
+            if (queue_state.size() != 3) {
+                throw std::runtime_error("Unexpected queue state (should have 3 entries)");
+            }
+            int num_positive_start_times = 0;
+            for (auto const &j : queue_state) {
+                if (std::get<6>(j) > 0) {
+                    num_positive_start_times++;
+                }
+            }
+            if (num_positive_start_times != 2) {
+                throw std::runtime_error("Exactly two jobs should be shown as having started");
+            }
+
+//            WRENCH_INFO("QUEUE STATE:");
+//            for (auto const &j : queue_state) {
+//                WRENCH_INFO("%s %d %d %d %d %.2lf %.2lf",
+//                            std::get<0>(j).c_str(),
+//                            std::get<1>(j),
+//                            std::get<2>(j),
+//                            std::get<3>(j),
+//                            std::get<4>(j),
+//                            std::get<5>(j),
+//                            std::get<6>(j));
+//            }
+        }
+
+        return 0;
+    }
+};
+
+TEST_F(BatchServiceTest, GetQueueStateTest) {
+    DO_TEST_WITH_FORK(do_GetQueueState_test);
+}
+
+void BatchServiceTest::do_GetQueueState_test() {
+
+    // Create and initialize a simulation
+    auto simulation = new wrench::Simulation();
+    int argc = 1;
+    auto argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("batch_service_test");
+
+    ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+    // Setting up the platform
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    // Get a hostname
+    std::string hostname = "Host1";
+
+    std::string trace_file_path = UNIQUE_TMP_PATH_PREFIX + "swf_trace.swf";
+    FILE *trace_file;
+
+    // Create a trace file
+    trace_file = fopen(trace_file_path.c_str(), "w");
+    fprintf(trace_file, "1 0 -1 3600 -1 -1 -1 4 5600 -1 1 3\n");  // job that takes the whole machine
+    fprintf(trace_file, "2 1 -1 3600 -1 -1 -1 2 8666 -1 1 12\n");  // job that takes half the machine
+    fprintf(trace_file, "3 3 -1 3600 -1 -1 -1 2 9000 -1 1 3\n");  // job that takes half the machine
+    fprintf(trace_file, "3 3 -1 3600 -1 -1 -1 4 3000 -1 1 5\n");  // job that takes half the machine
+    fclose(trace_file);
+
+
+    // Create a Batch Service
+    ASSERT_NO_THROW(compute_service = simulation->add(
+            new wrench::BatchComputeService(hostname,
+                                            {"Host1", "Host2", "Host3", "Host4"}, "",
+                                            {
+                                                    {wrench::BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path},
+                                                    {wrench::BatchComputeServiceProperty::USE_REAL_RUNTIMES_AS_REQUESTED_RUNTIMES_IN_WORKLOAD_TRACE_FILE, "false"}
+                                            }
+            )));
+
+    // Create a WMS
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    ASSERT_NO_THROW(wms = simulation->add(new GetQueueStateTestWMS(
+            this, {compute_service}, {}, hostname)));
+
+    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;

@@ -359,7 +359,7 @@ namespace wrench {
 
             auto resources = this->scheduleOnHosts(num_nodes_asked_for, cores_per_node_asked_for, ComputeService::ALL_RAM);
             if (resources.empty()) {
-                WRENCH_INFO("Can't run job %s right now", workflow_job->getName().c_str());
+//                WRENCH_INFO("Can't run job %s right now", workflow_job->getName().c_str());
                 break;
             }
 

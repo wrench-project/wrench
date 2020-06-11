@@ -79,7 +79,7 @@ namespace wrench {
                 wrench::S4U_Simulation::sleep(sleeptime);
 
             // Get job information
-            std::string job_id = std::get<0>(job);
+            std::string username = std::get<0>(job);
             double time = std::get<2>(job);
             double requested_time = std::get<3>(job);
             if (this->use_actual_runtimes_as_requested_runtimes) {
@@ -117,14 +117,16 @@ namespace wrench {
             batch_job_args["-N"] = std::to_string(num_nodes); // Number of nodes/taks
             batch_job_args["-t"] = std::to_string(1 + requested_time / 60); // Time in minutes (note the +1)
             batch_job_args["-c"] = std::to_string(num_cores_per_node); //number of cores per task
+            batch_job_args["-u"] = username; //number of cores per task
             batch_job_args["-color"] = "green";
 
             // Submit this job to the batch service
-            WRENCH_INFO("#%lu: Submitting a [-N:%s, -t:%s, -c:%s] job",
+            WRENCH_INFO("#%lu: Submitting a [-N:%s, -t:%s, -c:%s, -u:%s] job",
                         counter++,
                         batch_job_args["-N"].c_str(),
                         batch_job_args["-t"].c_str(),
-                        batch_job_args["-c"].c_str());
+                        batch_job_args["-c"].c_str(),
+                        batch_job_args["-u"].c_str());
             try {
                 job_manager->submitJob(standard_job, this->batch_service, batch_job_args);
             } catch (WorkflowExecutionException &e) {
