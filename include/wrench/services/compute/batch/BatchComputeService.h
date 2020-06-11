@@ -111,6 +111,8 @@ namespace wrench {
         /***********************/
         std::map<std::string,double> getStartTimeEstimates(std::set<std::tuple<std::string,unsigned long,unsigned long, double>> resources);
 
+        std::vector<std::tuple<std::string, int, int, int, int, double, double>> getQueue();
+
         /***********************/
         /** \endcond          **/
         /***********************/
