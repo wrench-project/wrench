@@ -125,13 +125,14 @@ private:
             }
 
 
+            int counter = 0;
             for (auto const &job : trace_file_jobs) {
                 double sub_time = std::get<1>(job);
                 double curtime = wrench::S4U_Simulation::getClock();
                 double sleeptime = sub_time - curtime;
                 if (sleeptime > 0)
                     wrench::S4U_Simulation::sleep(sleeptime);
-                std::string id = std::get<0>(job);
+                std::string username = std::get<0>(job);
                 double flops = std::get<2>(job);
                 double requested_flops = std::get<3>(job);
                 double requested_ram = std::get<4>(job);
@@ -145,7 +146,7 @@ private:
                 }
 //          std::cerr << "SUBMITTING " << "sub="<< sub_time << "num_nodes=" << num_nodes << " id="<<id << " flops="<<flops << " rflops="<<requested_flops << " ram="<<requested_ram << "\n";
                 // TODO: Should we use the "requested_ram" instead of 0 below?
-                wrench::WorkflowTask *task = this->getWorkflow()->addTask(id, flops, min_num_cores, max_num_cores,
+                wrench::WorkflowTask *task = this->getWorkflow()->addTask(username + "_" + std::to_string(counter++), flops, min_num_cores, max_num_cores,
                                                                           parallel_efficiency, 0);
 
                 wrench::StandardJob *standard_job = job_manager->createStandardJob(
