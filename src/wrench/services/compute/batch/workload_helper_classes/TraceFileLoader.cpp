@@ -21,10 +21,8 @@ namespace wrench {
     std::string generateRandomUsername(unsigned long userid) {
         //Type of random number distribution
         const char charset[] =
-                "0123456789"
-                "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                "abcdefghijklmnopqrstuvwxyz";
-        std::uniform_int_distribution<int> dist(0, 10+2*26-1);
+                "aabccdeeefghijklmnooopqrstttuuvwxyzz";
+        std::uniform_int_distribution<int> dist(0, sizeof(charset)-2);
         //Mersenne Twister: Good quality random number generator
         std::mt19937 rng;
         rng.seed(userid);  // Consistent for the same userid
@@ -284,7 +282,7 @@ namespace wrench {
                 // Add the job to the list
                 std::tuple<std::string, double, double, double, double, unsigned int, std::string> job =
                         std::tuple<std::string, double, double, double, double, unsigned int, std::string>(
-                                id, sub_time, time, requested_time, requested_ram,
+                                username, sub_time, time, requested_time, requested_ram,
                                 (unsigned int) requested_num_nodes, username);
                 trace_file_jobs.push_back(job);
             }

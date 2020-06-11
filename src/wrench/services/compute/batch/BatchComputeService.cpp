@@ -231,6 +231,61 @@ namespace wrench {
     }
 
     /**
+    * @brief Gets the state of the batch queue
+    * @return A vector of tuples:
+    *              - std::string: username
+    *              - int: job id
+    *              - int: num hosts
+    *              - int: num cores per host
+    *              - int: time in seconds
+    *              - double: submit time
+    *              - double: start time (-1.0 if not started yet)
+    */
+    std::vector<std::tuple<std::string, int, int, int, int, double, double>> BatchComputeService::getQueue() {
+        // Go through the currently running jobs
+        std::vector<std::tuple<std::string, int, int, int, int, double, double>> queue_state;
+        for (auto const &j : this->running_jobs) {
+            auto tuple = std::make_tuple(
+                    j->getUsername(),
+                    j->getJobID(),
+                    j->getRequestedNumNodes(),
+                    j->getRequestedCoresPerNode(),
+                    j->getRequestedTime(),
+                    j->getArrivalTimestamp(),
+                    j->getBeginTimestamp()
+            );
+            queue_state.push_back(tuple);
+        }
+        // Sort the running jobs by  arrival  time
+        std::sort(queue_state.begin(), queue_state.end(),
+                  [](const std::tuple<std::string, int, int, int, int, double, double> j1,
+                     const std::tuple<std::string, int, int, int, int, double, double> j2) -> bool {
+                        if (std::get<6>(j1) == std::get<6>(j2)) {
+                            return (std::get<1>(j1) > std::get<1>(j2));
+                        } else {
+                            return (std::get<6>(j1) > std::get<6>(j2));
+                        }
+                  });
+
+        std::vector<std::tuple<std::string, int, int, int, int, double>> pending_jobs;
+        for (auto const &j : this->batch_queue) {
+            auto tuple = std::make_tuple(
+                    j->getUsername(),
+                    j->getJobID(),
+                    j->getRequestedNumNodes(),
+                    j->getRequestedCoresPerNode(),
+                    j->getRequestedTime(),
+                    j->getArrivalTimestamp(),
+                    -1.0
+            );
+            queue_state.push_back(tuple);
+        }
+
+        return queue_state;
+    }
+
+
+    /**
      * @brief Helper function for service-specific job arguments
      * @param key: the argument key ("-N", "-c", "-t")
      * @param args: the argument map
@@ -289,7 +344,7 @@ namespace wrench {
         // Create a Batch Job
         unsigned long jobid = this->generateUniqueJobID();
         auto batch_job = std::shared_ptr<BatchJob>(new BatchJob(job, jobid, time_asked_for_in_minutes,
-                                       num_hosts, num_cores_per_host, username,-1, S4U_Simulation::getClock()));
+                                                                num_hosts, num_cores_per_host, username,-1, S4U_Simulation::getClock()));
 
         // Set job display color for csv output
         auto it = batch_job_args.find("-color");
@@ -1756,5 +1811,6 @@ namespace wrench {
         startJob(resources, workflow_job, batch_job, num_nodes_allocated, time_in_seconds,
                  cores_per_node_asked_for);
     }
+
 
 };
