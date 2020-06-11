@@ -242,6 +242,7 @@ namespace wrench {
     *              - double: start time (-1.0 if not started yet)
     */
     std::vector<std::tuple<std::string, int, int, int, int, double, double>> BatchComputeService::getQueue() {
+
         // Go through the currently running jobs
         std::vector<std::tuple<std::string, int, int, int, int, double, double>> queue_state;
         for (auto const &j : this->running_jobs) {
@@ -256,18 +257,22 @@ namespace wrench {
             );
             queue_state.push_back(tuple);
         }
-        // Sort the running jobs by  arrival  time
-        std::sort(queue_state.begin(), queue_state.end(),
-                  [](const std::tuple<std::string, int, int, int, int, double, double> j1,
-                     const std::tuple<std::string, int, int, int, int, double, double> j2) -> bool {
-                        if (std::get<6>(j1) == std::get<6>(j2)) {
-                            return (std::get<1>(j1) > std::get<1>(j2));
-                        } else {
-                            return (std::get<6>(j1) > std::get<6>(j2));
-                        }
-                  });
 
-        std::vector<std::tuple<std::string, int, int, int, int, double>> pending_jobs;
+        //  Go through the waiting jobs (BATSCHED only)
+        for (auto const &j : this->waiting_jobs) {
+            auto tuple = std::make_tuple(
+                    j->getUsername(),
+                    j->getJobID(),
+                    j->getRequestedNumNodes(),
+                    j->getRequestedCoresPerNode(),
+                    j->getRequestedTime(),
+                    j->getArrivalTimestamp(),
+                    -1.0
+            );
+            queue_state.push_back(tuple);
+        }
+
+        // Go through the pending jobs
         for (auto const &j : this->batch_queue) {
             auto tuple = std::make_tuple(
                     j->getUsername(),
@@ -280,6 +285,17 @@ namespace wrench {
             );
             queue_state.push_back(tuple);
         }
+
+        // Sort all jobs by  arrival  time
+        std::sort(queue_state.begin(), queue_state.end(),
+                  [](const std::tuple<std::string, int, int, int, int, double, double> j1,
+                     const std::tuple<std::string, int, int, int, int, double, double> j2) -> bool {
+                      if (std::get<6>(j1) == std::get<6>(j2)) {
+                          return (std::get<1>(j1) > std::get<1>(j2));
+                      } else {
+                          return (std::get<6>(j1) > std::get<6>(j2));
+                      }
+                  });
 
         return queue_state;
     }
