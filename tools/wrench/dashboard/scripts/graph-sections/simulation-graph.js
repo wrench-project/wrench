@@ -20,27 +20,39 @@ function getBoxWidthFromArray(d, section, scale) {
 }
 
 function getBoxWidth(d, section, scale) {
-    if (d[section].start != -1) {
-        if (d[section].end == -1) {
+    const timeObj = section === "" ? d : d[section]
+    if (timeObj.start != -1) {
+        if (timeObj.end == -1) {
             if (d.terminated != -1) {
-                return scale(d.terminated) - scale(d[section].start)
+                return scale(d.terminated) - scale(timeObj.start)
             } else if (d.failed != -1) {
-                return scale(d.failed) - scale(d[section].start)
+                return scale(d.failed) - scale(timeObj.start)
             }
         } else {
-            return scale(d[section].end) - scale(d[section].start)
+            return scale(timeObj.end) - scale(timeObj.start)
         }
     }
     return scale(0) //Box shouldn't be displayed if start is -1
 }
 
+function addBox(group, x, y, height, width, fill, className) {
+    group.append('rect')
+        .attr('x', x)
+        .attr('y', y)
+        .attr('height', height)
+        .attr('width', width)
+        .style('fill', fill)
+        .attr('class', className)
+}
+
 /*
     data: simulation data,
-    currGraphState: pass in "hostView" to see the host view and "taskView" to see the task view
+    currGraphState: pass in "hostView" to see the host view and "taskView" to see the task view,
+    partitionIO: boolean for whether or not to partition the I/O sections of the graph
     CONTAINER_WIDTH: width of the container
     CONTAINER_HEIGHT: height of the container
 */
-function generateGraph(data, currGraphState, CONTAINER_WIDTH, CONTAINER_HEIGHT) {
+function generateGraph(data, currGraphState, partitionIO, CONTAINER_WIDTH, CONTAINER_HEIGHT) {
     const containerId = "graph-container"
     document.getElementById(containerId).innerHTML = simulationGraphTooltipHtml
     var read_color = '#cbb5dd'
@@ -133,31 +145,32 @@ function generateGraph(data, currGraphState, CONTAINER_WIDTH, CONTAINER_HEIGHT) 
                 .style('fill', colour_ft)
                 .attr('class', class_ft)
         }
-        group.append('rect')
-            .attr('x', readTime.start)
-            .attr('y', yScaleNumber)
-            .attr('height', height)
-            .attr('width', readTime.end)
-            .style('fill', read_color)
-            .attr('class', 'read')
+
+        /* READ */
+        if (partitionIO) {
+            d.read.forEach(r => {
+                addBox(group, xscale(r.start), yScaleNumber, height, getBoxWidth(r, "", xscale), read_color, 'read')
+            })
+        } else {
+            addBox(group, readTime.start, yScaleNumber, height, readTime.end, read_color, 'read')
+        }
+        
+        /* COMPUTE */
         if (ft_point != "read" || ft_point == "none") {
-            group.append('rect')
-                .attr('x', xscale(d.compute.start))
-                .attr('y', yScaleNumber)
-                .attr('height', height)
-                .attr('width', computeTime)
-                .style('fill', compute_color)
-                .attr('class', 'compute')
+            addBox(group, xscale(d.compute.start), yScaleNumber, height, computeTime, compute_color, 'compute')
         }
-        if ((ft_point != "read" && ft_point != "compute") || ft_point == "none") {
-            group.append('rect')
-                .attr('x', writeTime.start)
-                .attr('y', yScaleNumber)
-                .attr('height', height)
-                .attr('width', writeTime.end)
-                .style('fill', write_color)
-                .attr('class', 'write')
+
+        /* WRITE */
+        if (partitionIO) {
+            d.write.forEach(w => {
+                addBox(group, xscale(w.start), yScaleNumber, height, getBoxWidth(w, "", xscale), write_color, 'write')
+            })
+        } else {
+            if ((ft_point != "read" && ft_point != "compute") || ft_point == "none") {
+                addBox(group, writeTime.start, yScaleNumber, height, writeTime.end, write_color, 'write')
+            }
         }
+        
         var tooltip = document.getElementById("tooltip-container")
         var tooltip_task_id = d3.select("#tooltip-task-id")
         var tooltip_host = d3.select("#tooltip-host")

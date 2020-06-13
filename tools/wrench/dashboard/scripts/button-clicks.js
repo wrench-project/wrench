@@ -30,6 +30,10 @@ function hostColoursJSONPopulated() {
     return false
 }
 
+function showIoView() {
+    generateGraph(data.contents, currGraphState, true, 1000, 1000)
+}
+
 function switchToHostView(data, selectedHost) {
     var hostNames = getHostNames(data)
 
@@ -90,7 +94,7 @@ function toggleView() {
         }
         currGraphState = "hostView"
     } else if (currGraphState === "hostView") {
-        generateGraph(data.contents, "taskView", 1000, 1000)
+        generateGraph(data.contents, "taskView", false, 1000, 1000)
         d3.select("#y-axis-label").text("TaskID")
         populateLegend("taskView")
         d3.select("#toggle-view-button").text("Switch to Host View")
