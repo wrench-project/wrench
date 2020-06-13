@@ -45,6 +45,16 @@ function addBox(group, x, y, height, width, fill, className) {
         .attr('class', className)
 }
 
+function addLine(group, x1, y1, x2, y2) {
+    group.append('line')
+        .attr('x1', x1)
+        .attr('y1', y1)
+        .attr('x2', x2)
+        .attr('y2', y2)
+        .style('stroke', 'rgb(0,0,0)')
+        .style('stroke-width', 2)
+}
+
 /*
     data: simulation data,
     currGraphState: pass in "hostView" to see the host view and "taskView" to see the task view,
@@ -148,9 +158,13 @@ function generateGraph(data, currGraphState, partitionIO, CONTAINER_WIDTH, CONTA
 
         /* READ */
         if (partitionIO) {
-            d.read.forEach(r => {
+            for (var i = 0; i < d.read.length; i++) {
+                const r = d.read[i]
                 addBox(group, xscale(r.start), yScaleNumber, height, getBoxWidth(r, "", xscale), read_color, 'read')
-            })
+                if (i < d.read.length - 1) {
+                    addLine(group, xscale(r.end), yScaleNumber, xscale(r.end), yScaleNumber + height)
+                }
+            }
         } else {
             addBox(group, readTime.start, yScaleNumber, height, readTime.end, read_color, 'read')
         }
@@ -162,9 +176,13 @@ function generateGraph(data, currGraphState, partitionIO, CONTAINER_WIDTH, CONTA
 
         /* WRITE */
         if (partitionIO) {
-            d.write.forEach(w => {
+            for (var i = 0; i < d.write.length; i++) {
+                const w = d.write[i]
                 addBox(group, xscale(w.start), yScaleNumber, height, getBoxWidth(w, "", xscale), write_color, 'write')
-            })
+                if (i < d.write.length - 1) {
+                    addLine(group, xscale(w.end), yScaleNumber, xscale(w.end), yScaleNumber + height)
+                }
+            }
         } else {
             if ((ft_point != "read" && ft_point != "compute") || ft_point == "none") {
                 addBox(group, writeTime.start, yScaleNumber, height, writeTime.end, write_color, 'write')
