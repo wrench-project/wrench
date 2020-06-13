@@ -11,6 +11,7 @@ const simulationGraphHtml = `
     <div id='button-and-information-container'>
         <button id='toggle-view-button' onclick="toggleView()">Switch to Host View</button>
         <img id='information-img' class='information-img' src='public/img/information.png' onclick='showInstructions("host-instructions", "information-img")'/>
+        <button id='show-io-view' onclick="showIoView()">Show I/O partitions</button>
     </div>
     <div id='host-instructions' class='instructions-container'>
         <div id='host-instructions-close-button-container' class='instructions-close-button-container'>
