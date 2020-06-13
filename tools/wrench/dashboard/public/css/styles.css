@@ -316,3 +316,7 @@ td {
     left: 0;
     width: 100%;
 }
+
+.pointer {
+    cursor: pointer;
+}
