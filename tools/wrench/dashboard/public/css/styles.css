@@ -309,3 +309,10 @@ td {
 .navbar {
     box-shadow: 3px 3px 3px #ccc;
 }
+
+.bottom-navbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+}

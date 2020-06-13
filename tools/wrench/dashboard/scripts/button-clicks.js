@@ -31,7 +31,15 @@ function hostColoursJSONPopulated() {
 }
 
 function showIoView() {
+    document.getElementById('show-io-view-button').style.display = 'none'
+    document.getElementById('hide-io-view-button').style.display = 'block'
     generateGraph(data.contents, currGraphState, true, 1000, 1000)
+}
+
+function hideIoView() {
+    document.getElementById('show-io-view-button').style.display = 'block'
+    document.getElementById('hide-io-view-button').style.display = 'none'
+    generateGraph(data.contents, currGraphState, false, 1000, 1000)
 }
 
 function switchToHostView(data, selectedHost) {

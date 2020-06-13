@@ -35,14 +35,15 @@ function getBoxWidth(d, section, scale) {
     return scale(0) //Box shouldn't be displayed if start is -1
 }
 
-function addBox(group, x, y, height, width, fill, className) {
+function addBox(group, x, y, height, width, fill, operation, parentGroup) {
     group.append('rect')
         .attr('x', x)
         .attr('y', y)
         .attr('height', height)
         .attr('width', width)
         .style('fill', fill)
-        .attr('class', className)
+        .attr('operation', operation)
+        .attr('parentGroup', parentGroup)
 }
 
 function addLine(group, x1, y1, x2, y2) {
@@ -160,32 +161,32 @@ function generateGraph(data, currGraphState, partitionIO, CONTAINER_WIDTH, CONTA
         if (partitionIO) {
             for (var i = 0; i < d.read.length; i++) {
                 const r = d.read[i]
-                addBox(group, xscale(r.start), yScaleNumber, height, getBoxWidth(r, "", xscale), read_color, 'read')
+                addBox(group, xscale(r.start), yScaleNumber, height, getBoxWidth(r, "", xscale), read_color, r.id, 'read')
                 if (i < d.read.length - 1) {
                     addLine(group, xscale(r.end), yScaleNumber, xscale(r.end), yScaleNumber + height)
                 }
             }
         } else {
-            addBox(group, readTime.start, yScaleNumber, height, readTime.end, read_color, 'read')
+            addBox(group, readTime.start, yScaleNumber, height, readTime.end, read_color, 'Read Input', 'read')
         }
         
         /* COMPUTE */
         if (ft_point != "read" || ft_point == "none") {
-            addBox(group, xscale(d.compute.start), yScaleNumber, height, computeTime, compute_color, 'compute')
+            addBox(group, xscale(d.compute.start), yScaleNumber, height, computeTime, compute_color, 'Computation', 'compute')
         }
 
         /* WRITE */
         if (partitionIO) {
             for (var i = 0; i < d.write.length; i++) {
                 const w = d.write[i]
-                addBox(group, xscale(w.start), yScaleNumber, height, getBoxWidth(w, "", xscale), write_color, 'write')
+                addBox(group, xscale(w.start), yScaleNumber, height, getBoxWidth(w, "", xscale), write_color, w.id, 'write')
                 if (i < d.write.length - 1) {
                     addLine(group, xscale(w.end), yScaleNumber, xscale(w.end), yScaleNumber + height)
                 }
             }
         } else {
             if ((ft_point != "read" && ft_point != "compute") || ft_point == "none") {
-                addBox(group, writeTime.start, yScaleNumber, height, writeTime.end, write_color, 'write')
+                addBox(group, writeTime.start, yScaleNumber, height, writeTime.end, write_color, 'Write Output', 'write')
             }
         }
         
@@ -214,20 +215,10 @@ function generateGraph(data, currGraphState, partitionIO, CONTAINER_WIDTH, CONTA
 
                 tooltip_host.text('Host Name: ' + d[executionHostKey].hostname)
 
-                var parent_group = d3.select(this).attr('class')
+                const operation = d3.select(this).attr('operation')
+                tooltip_task_operation.text(operation)
 
-                if (parent_group == 'read') {
-                    tooltip_task_operation.text('Read Input')
-                } else if (parent_group == 'compute') {
-                    tooltip_task_operation.text('Computation')
-                } else if (parent_group == 'write') {
-                    tooltip_task_operation.text('Write Output')
-                } else if (parent_group == "terminated") {
-                    tooltip_task_operation.text('Terminated')
-                } else if (parent_group == "failed") {
-                    tooltip_task_operation.text('Failed')
-                }
-
+                const parent_group = d3.select(this).attr('parentGroup')
                 var durationFull = findDuration(data, d.task_id, parent_group)
                 if (parent_group != "failed" && parent_group != "terminated") {
                     var duration = toFiveDecimalPlaces(durationFull)
