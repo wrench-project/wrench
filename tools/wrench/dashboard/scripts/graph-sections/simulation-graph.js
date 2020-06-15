@@ -44,6 +44,7 @@ function addBox(group, x, y, height, width, fill, operation, parentGroup) {
         .style('fill', fill)
         .attr('operation', operation)
         .attr('parentGroup', parentGroup)
+        .attr('class', parentGroup)
 }
 
 function addLine(group, x1, y1, x2, y2) {
