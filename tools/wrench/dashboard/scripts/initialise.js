@@ -48,7 +48,7 @@ function initialise() {
         }
         if (data.file !== undefined) {
             data.contents = prepareData(data.contents)
-            generateGraph(data.contents, currGraphState, 1000, 1000)
+            generateGraph(data.contents, currGraphState, false, 1000, 1000)
             populateLegend("taskView")
             populateWorkflowTaskDataTable(data.contents)
             getOverallWorkflowMetrics(data.contents)

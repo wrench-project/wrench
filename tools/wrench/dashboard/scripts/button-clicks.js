@@ -30,6 +30,18 @@ function hostColoursJSONPopulated() {
     return false
 }
 
+function showIoView() {
+    document.getElementById('show-io-view-button').style.display = 'none'
+    document.getElementById('hide-io-view-button').style.display = 'block'
+    generateGraph(data.contents, currGraphState, true, 1000, 1000)
+}
+
+function hideIoView() {
+    document.getElementById('show-io-view-button').style.display = 'block'
+    document.getElementById('hide-io-view-button').style.display = 'none'
+    generateGraph(data.contents, currGraphState, false, 1000, 1000)
+}
+
 function switchToHostView(data, selectedHost) {
     var hostNames = getHostNames(data)
 
@@ -42,7 +54,6 @@ function switchToHostView(data, selectedHost) {
             hostColours[hostName] = colour
         })
     }
-
 
     data.forEach(function (task) {
         var hostName = task[executionHostKey].hostname
@@ -90,7 +101,7 @@ function toggleView() {
         }
         currGraphState = "hostView"
     } else if (currGraphState === "hostView") {
-        generateGraph(data.contents, "taskView", 1000, 1000)
+        generateGraph(data.contents, "taskView", false, 1000, 1000)
         d3.select("#y-axis-label").text("TaskID")
         populateLegend("taskView")
         d3.select("#toggle-view-button").text("Switch to Host View")
