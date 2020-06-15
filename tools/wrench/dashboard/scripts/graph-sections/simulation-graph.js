@@ -20,27 +20,51 @@ function getBoxWidthFromArray(d, section, scale) {
 }
 
 function getBoxWidth(d, section, scale) {
-    if (d[section].start != -1) {
-        if (d[section].end == -1) {
+    const timeObj = section === "" ? d : d[section]
+    if (timeObj.start != -1) {
+        if (timeObj.end == -1) {
             if (d.terminated != -1) {
-                return scale(d.terminated) - scale(d[section].start)
+                return scale(d.terminated) - scale(timeObj.start)
             } else if (d.failed != -1) {
-                return scale(d.failed) - scale(d[section].start)
+                return scale(d.failed) - scale(timeObj.start)
             }
         } else {
-            return scale(d[section].end) - scale(d[section].start)
+            return scale(timeObj.end) - scale(timeObj.start)
         }
     }
     return scale(0) //Box shouldn't be displayed if start is -1
 }
 
+function addBox(group, x, y, height, width, fill, operation, parentGroup) {
+    group.append('rect')
+        .attr('x', x)
+        .attr('y', y)
+        .attr('height', height)
+        .attr('width', width)
+        .style('fill', fill)
+        .attr('operation', operation)
+        .attr('parentGroup', parentGroup)
+        .attr('class', parentGroup)
+}
+
+function addLine(group, x1, y1, x2, y2) {
+    group.append('line')
+        .attr('x1', x1)
+        .attr('y1', y1)
+        .attr('x2', x2)
+        .attr('y2', y2)
+        .style('stroke', 'rgb(0,0,0)')
+        .style('stroke-width', 2)
+}
+
 /*
     data: simulation data,
-    currGraphState: pass in "hostView" to see the host view and "taskView" to see the task view
+    currGraphState: pass in "hostView" to see the host view and "taskView" to see the task view,
+    partitionIO: boolean for whether or not to partition the I/O sections of the graph
     CONTAINER_WIDTH: width of the container
     CONTAINER_HEIGHT: height of the container
 */
-function generateGraph(data, currGraphState, CONTAINER_WIDTH, CONTAINER_HEIGHT) {
+function generateGraph(data, currGraphState, partitionIO, CONTAINER_WIDTH, CONTAINER_HEIGHT) {
     const containerId = "graph-container"
     document.getElementById(containerId).innerHTML = simulationGraphTooltipHtml
     var read_color = '#cbb5dd'
@@ -133,31 +157,40 @@ function generateGraph(data, currGraphState, CONTAINER_WIDTH, CONTAINER_HEIGHT) 
                 .style('fill', colour_ft)
                 .attr('class', class_ft)
         }
-        group.append('rect')
-            .attr('x', readTime.start)
-            .attr('y', yScaleNumber)
-            .attr('height', height)
-            .attr('width', readTime.end)
-            .style('fill', read_color)
-            .attr('class', 'read')
+
+        /* READ */
+        if (partitionIO) {
+            for (var i = 0; i < d.read.length; i++) {
+                const r = d.read[i]
+                addBox(group, xscale(r.start), yScaleNumber, height, getBoxWidth(r, "", xscale), read_color, r.id, 'read')
+                if (i < d.read.length - 1) {
+                    addLine(group, xscale(r.end), yScaleNumber, xscale(r.end), yScaleNumber + height)
+                }
+            }
+        } else {
+            addBox(group, readTime.start, yScaleNumber, height, readTime.end, read_color, 'Read Input', 'read')
+        }
+        
+        /* COMPUTE */
         if (ft_point != "read" || ft_point == "none") {
-            group.append('rect')
-                .attr('x', xscale(d.compute.start))
-                .attr('y', yScaleNumber)
-                .attr('height', height)
-                .attr('width', computeTime)
-                .style('fill', compute_color)
-                .attr('class', 'compute')
+            addBox(group, xscale(d.compute.start), yScaleNumber, height, computeTime, compute_color, 'Computation', 'compute')
         }
-        if ((ft_point != "read" && ft_point != "compute") || ft_point == "none") {
-            group.append('rect')
-                .attr('x', writeTime.start)
-                .attr('y', yScaleNumber)
-                .attr('height', height)
-                .attr('width', writeTime.end)
-                .style('fill', write_color)
-                .attr('class', 'write')
+
+        /* WRITE */
+        if (partitionIO) {
+            for (var i = 0; i < d.write.length; i++) {
+                const w = d.write[i]
+                addBox(group, xscale(w.start), yScaleNumber, height, getBoxWidth(w, "", xscale), write_color, w.id, 'write')
+                if (i < d.write.length - 1) {
+                    addLine(group, xscale(w.end), yScaleNumber, xscale(w.end), yScaleNumber + height)
+                }
+            }
+        } else {
+            if ((ft_point != "read" && ft_point != "compute") || ft_point == "none") {
+                addBox(group, writeTime.start, yScaleNumber, height, writeTime.end, write_color, 'Write Output', 'write')
+            }
         }
+        
         var tooltip = document.getElementById("tooltip-container")
         var tooltip_task_id = d3.select("#tooltip-task-id")
         var tooltip_host = d3.select("#tooltip-host")
@@ -183,20 +216,10 @@ function generateGraph(data, currGraphState, CONTAINER_WIDTH, CONTAINER_HEIGHT) 
 
                 tooltip_host.text('Host Name: ' + d[executionHostKey].hostname)
 
-                var parent_group = d3.select(this).attr('class')
+                const operation = d3.select(this).attr('operation')
+                tooltip_task_operation.text(operation)
 
-                if (parent_group == 'read') {
-                    tooltip_task_operation.text('Read Input')
-                } else if (parent_group == 'compute') {
-                    tooltip_task_operation.text('Computation')
-                } else if (parent_group == 'write') {
-                    tooltip_task_operation.text('Write Output')
-                } else if (parent_group == "terminated") {
-                    tooltip_task_operation.text('Terminated')
-                } else if (parent_group == "failed") {
-                    tooltip_task_operation.text('Failed')
-                }
-
+                const parent_group = d3.select(this).attr('parentGroup')
                 var durationFull = findDuration(data, d.task_id, parent_group)
                 if (parent_group != "failed" && parent_group != "terminated") {
                     var duration = toFiveDecimalPlaces(durationFull)
