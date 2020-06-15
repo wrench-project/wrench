@@ -55,7 +55,6 @@ function switchToHostView(data, selectedHost) {
         })
     }
 
-
     data.forEach(function (task) {
         var hostName = task[executionHostKey].hostname
         var sanitizedId = sanitizeId(task.task_id)
