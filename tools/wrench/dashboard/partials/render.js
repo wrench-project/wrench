@@ -18,6 +18,12 @@ const graphInfoArray = [
         "html": simulationDetailsHtml
     },
     {
+        "title": "Host Utilization Graph",
+        "containerId": "host-utilization-graph-container",
+        "arrowId": "host-utilization-arrow",
+        "html": hostUtilizationHtml
+    },
+    {
         "title": "Energy Graphs",
         "containerId": "energy-graph",
         "arrowId": "energy-graph-arrow",
@@ -28,12 +34,6 @@ const graphInfoArray = [
         "containerId": "three-d-graph-container",
         "arrowId": "three-d-graph-arrow",
         "html": threedVisualizationHtml
-    },
-    {
-        "title": "Host Utilization Graph",
-        "containerId": "host-utilization-graph-container",
-        "arrowId": "host-utilization-arrow",
-        "html": hostUtilizationHtml
     }
 ]
 
@@ -41,7 +41,7 @@ function render() {
     const template = document.getElementById('graph-template').innerHTML
     const renderGraphs = Handlebars.compile(template)
     document.getElementById('main-body').innerHTML = renderGraphs({ graphInfo: graphInfoArray })
-    
+
 }
 
 render()

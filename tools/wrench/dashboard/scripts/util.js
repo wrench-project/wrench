@@ -1,15 +1,5 @@
 const executionHostKey = 'execution_host'
 
-// const getDuration = (start, end) => {
-//     if (start === -1 || start === -1) {
-//         return start
-//     } else if (end === -1 || end === -1) {
-//         return end
-//     } else {
-//         return toFiveDecimalPlaces(end - start)
-//     }
-// }
-
 const getDuration = (d, section) => {
     if (section === "read" || section === "write") {
         let total = 0
@@ -49,18 +39,6 @@ function determineFailedOrTerminatedPoint(d) {
         return "write"
     }
 }
-
-// const getDuration = (data, section, failed, terminated) => {
-//     if (section === "compute") {
-//         const { start, end }
-//         if (start === -1) {
-//             return 0
-//         }
-//         if (end === -1) {
-
-//         }
-//     }
-// }
 
 const toFiveDecimalPlaces = d3.format('.5f')
 
@@ -320,11 +298,10 @@ function processFile(files) {
                 energyData = rawData.energy_consumption
             }
 
-            initialise()
+            initialize();
         })
         .catch(function (err) {
             console.error(err)
-            return
         })
 }
 
