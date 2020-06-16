@@ -32,11 +32,11 @@ namespace wrench {
                                   std::shared_ptr<BatchComputeService> batch_service,
                                   unsigned long num_cores_per_node,
                                   bool use_actual_runtimes_as_requested_runtimes,
-                                  std::vector<std::tuple<std::string, double, double, double, double, unsigned int>> &workload_trace
+                                  std::vector<std::tuple<std::string, double, double, double, double, unsigned int, std::string>> &workload_trace
         );
 
     private:
-        std::vector<std::tuple<std::string, double, double, double, double, unsigned int>> &workload_trace;
+        std::vector<std::tuple<std::string, double, double, double, double, unsigned int, std::string>> &workload_trace;
         std::shared_ptr<BatchComputeService> batch_service;
         unsigned long num_cores_per_node;
         bool use_actual_runtimes_as_requested_runtimes;

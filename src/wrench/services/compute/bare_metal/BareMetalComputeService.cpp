@@ -524,7 +524,7 @@ namespace wrench {
 
         WRENCH_INFO("New BareMetal Compute Service starting (%s) on %ld hosts with a total of %ld cores",
                     this->mailbox_name.c_str(), this->compute_resources.size(), this->total_num_cores);
-        std::string msg = "";
+        std::string msg = "\n";
         //         std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
         for (auto cr : this->compute_resources) {
             auto host = cr.first;
@@ -588,7 +588,6 @@ namespace wrench {
         double new_host_to_avoid_ram_capacity = 0;
         for (auto const &r : this->compute_resources) {
 
-
             // If there is a required host, then don't even look at others
             if (not required_host.empty() and (r.first != required_host)) {
                 continue;
@@ -630,6 +629,7 @@ namespace wrench {
             possible_hosts.insert(r.first);
         }
 
+
         // If none, then reply with an empty tuple
         if (possible_hosts.empty()) {
             // Host to avoid is the one with the lowest ram availability
@@ -654,7 +654,7 @@ namespace wrench {
                 used_num_cores = required_num_cores;
             }
             // A totally heuristic load estimate
-            double load = ((double) ((num_running_threads + used_num_cores) / num_cores)) / flop_rate;
+            double load = ( (((double)(num_running_threads +  used_num_cores)) / (double)num_cores)) / (flop_rate/(1000.0*1000.0*1000.0));
             if (load < lowest_load) {
                 lowest_load = load;
                 picked_host = h;
@@ -790,7 +790,7 @@ namespace wrench {
             return true;
         }
 
-        WRENCH_INFO("Got a [%s] message", message->getName().c_str());
+        WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
         if (auto msg = std::dynamic_pointer_cast<HostHasTurnedOnMessage>(message)) {
             // Do nothing, just wake up
             return true;
