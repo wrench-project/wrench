@@ -1,5 +1,5 @@
 const energyGraphsHtml = `
-    <h6 id='no-energy-file'>Please upload your energy JSON file in the file upload above</h6>
+    <h6 id='no-energy-file'>The file you uploaded does not have energy data</h6>
 
     <!-- Markup -->
     <b><p class="energy-title" style="align-content: center">Consumed Energy Graph</p></b>

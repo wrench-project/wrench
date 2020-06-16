@@ -43,10 +43,11 @@ namespace wrench {
      *          - If a number of cores is provided (e.g., {"task1", "12"}), the service will pick the host on which to run the task
      *          - If a hostname and a number of cores is provided (e.g., {"task1", "host1:12"}, the service will run the task on that host
      *            with the specified number of cores
-     *      - to a BatchComputeService: {"-t":"<int>","-N":"<int>","-c":"<int>"} (SLURM-like)
+     *      - to a BatchComputeService: {"-t":"<int>","-N":"<int>","-c":"<int>"[,{"-u":"<string>"}]} (SLURM-like)
      *         - "-t": number of requested job duration in minutes
      *         - "-N": number of requested compute hosts
      *         - "-c": number of requested cores per compute host
+     *         - "-u": username (optional)
      *      - to a CloudComputeService: {}
      *
      * @throw WorkflowExecutionException

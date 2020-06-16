@@ -52,7 +52,7 @@ command.
 
 # Creating a CMakeLists.txt file by hand##                {#getting-started-cmakelists}
 
-Alternately, you can do a manual setup, i.e., create your own Cmake project. 
+Alternatively, you can do a manual setup, i.e., create your own Cmake project. 
 Below is an example of a `CMakeLists.txt` file that can be used as a basic
 template:
 
@@ -114,7 +114,7 @@ Let us run the `examples/basic-examples/bare-metal-bag-of-tasks` by
 navigating to that directory and typing:
 
 ~~~~~~~~~~~~~{.sh}
-./wrench-example-bare-metal-bag-of-tasks 6 ./two_hosts.xml --wrench-no-logs --log=custom_wms.threshold=info
+./wrench-example-bare-metal-bag-of-tasks 6 ./two_hosts.xml --log=custom_wms.threshold=info
 ~~~~~~~~~~~~~
 
 You should see some output in the terminal. The output in white is

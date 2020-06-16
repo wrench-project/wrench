@@ -346,10 +346,6 @@ namespace wrench {
             current_execution_instance.vertical_position = vertical_position;
 
 
-
-
-
-
             auto current_rect_y_range = std::pair<unsigned long long, unsigned long long>(
                     vertical_position,
                     vertical_position + num_cores_allocated
@@ -461,6 +457,7 @@ namespace wrench {
       *                     }
       *                ],
       *                "task_id": <string>,
+      *                "color": <string>,
       *                "terminated": <double>,
       *                "whole_task": {
       *                     "end": <double>,
@@ -564,6 +561,7 @@ namespace wrench {
                 }
                 task_json.push_back({
                                             {"task_id",                  task->getID()},
+                                            {"color",                    task->getColor()},
                                             {"execution_host", {
                                                                                  {"hostname", current_task_execution.execution_host},
                                                                                  {"flop_rate", Simulation::getHostFlopRate(

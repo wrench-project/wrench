@@ -20,11 +20,12 @@ namespace wrench {
      * @param time_in_minutes: the requested execution time in minutes
      * @param num_nodes: the requested number of compute nodes (hosts)
      * @param cores_per_node: the requested number of cores per node
+     * @param username: the username of the user submitting the job
      * @param ending_time_stamp: the job's end date
      * @param arrival_time_stamp: the job's arrival date
      */
     BatchJob::BatchJob(WorkflowJob *job, unsigned long job_id, unsigned long time_in_minutes, unsigned long num_nodes,
-                       unsigned long cores_per_node, double ending_time_stamp, double arrival_time_stamp) {
+                       unsigned long cores_per_node, std::string username, double ending_time_stamp, double arrival_time_stamp) {
         if (job == nullptr) {
             throw std::invalid_argument(
                     "BatchJob::BatchJob(): StandardJob cannot be null"
@@ -44,6 +45,7 @@ namespace wrench {
         this->requested_time = time_in_minutes * 60;
         this->requested_num_nodes = num_nodes;
         this->requested_cores_per_node = cores_per_node;
+        this->username = username;
         this->ending_time_stamp = ending_time_stamp;
         this->arrival_time_stamp = arrival_time_stamp;
 
@@ -56,6 +58,14 @@ namespace wrench {
      */
     unsigned long BatchJob::getRequestedCoresPerNode() {
         return this->requested_cores_per_node;
+    }
+
+    /**
+     * @brief Get the username
+     * @return a username
+     */
+    std::string BatchJob::getUsername() {
+        return this->username;
     }
 
     /**

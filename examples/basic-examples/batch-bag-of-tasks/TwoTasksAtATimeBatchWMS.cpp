@@ -158,6 +158,7 @@ namespace wrench {
              * Note that this does not use the higher-level waitForAndProcessNextEvent()
              * method, but instead calls the lower-level waitForNextExecutionEvent() method */
             WRENCH_INFO("Waiting for the next event");
+
             try {
                 auto event = this->waitForNextEvent();
                 // Check that it is the expected event, just in  case

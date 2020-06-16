@@ -1,85 +1,98 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8" />
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-        <title>WRENCH Dashboard</title>
+    <title>WRENCH Dashboard</title>
 
-        <link rel="stylesheet" href="public/css/bootstrap.min.css" />
-        <link rel="stylesheet" href="public/css/styles.css" />
-        <link rel="icon" href="public/img/favicon.ico" />
+    <link rel="stylesheet" href="public/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="public/css/styles.css"/>
+    <link rel="icon" href="public/img/favicon.ico"/>
 
-        <script src='public/js/jquery-3.3.1.min.js' type='text/javascript'></script>
-        <script src="public/js/d3.min.js" type="text/javascript"></script>
-        <script src="public/js/jQueryRotate.js" type="text/javascript"></script>
-        <script src="public/js/d3-3d.js" type="text/javascript"></script>
-        <script src="public/js/handlebars.min-v4.7.2.js" type="text/javascript"></script>
+    <script src='public/js/jquery-3.3.1.min.js' type='text/javascript'></script>
+    <script src="public/js/d3.min.js" type="text/javascript"></script>
+    <script src="public/js/jQueryRotate.js" type="text/javascript"></script>
+    <script src="public/js/d3-3d.js" type="text/javascript"></script>
+    <script src="public/js/handlebars.min-v4.7.2.js" type="text/javascript"></script>
 
-        <!-- billboard.js scripts -->
-        <script src="https://cdn.jsdelivr.net/npm/billboard.js/dist/billboard.min.js"></script>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/billboard.js/dist/billboard.min.css">
-    </head>
-    <body>
-        <div id='info-container'>
-            <div id='nav-bar-top-half'>
-                <div id='logo-and-title'>
-                    <img src='public/img/logo-vertical.png' id='logo'>
-                    <h3>WRENCH Dashboard</h3>
-                </div>
-                <div id='file-upload'>
-                    <h5 id='file-upload-title'>Upload files here:</h5>
-                    <div class='file-upload-container'>
-                        <p class='file-upload-subtitle'>Workflow Data: </p>
-                        <input type='file' accept='application/json' onchange='processFile(this.files, "taskData");'>
-                    </div>
-                    <div class='file-upload-container'>
-                        <p class='file-upload-subtitle'>Energy Data: </p>
-                        <input type='file' accept='application/json' onchange='processFile(this.files, "energy");'>
-                    </div>
-                </div>
+    <!-- billboard.js scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/billboard.js/dist/billboard.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/billboard.js/dist/billboard.min.css">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top justify-content-between">
+    <a class="navbar-brand" href="#">
+        <img src="public/img/logo-vertical.png" id="logo" width="50"/>
+        WRENCH <span class="small">dashboard</span>
+    </a>
+    <form class="form-inline">
+        <div class="input-group small">
+            <div class="input-group-prepend small">
+                <span class="input-group-text badge-secondary" style="font-size: 1.2em" id="inputGroupFileAddon01">Upload</span>
+            </div>
+            <div class="custom-file">
+                <input type="file" accept="application/json" onchange="processFile(this.files);"
+                       class="btn-light" id="inputGroupFile01"
+                       aria-describedby="inputGroupFileAddon01">
+                <label class="custom-file-label badge-light" for="inputGroupFile01">Choose JSON File</label>
             </div>
         </div>
-        <div id="no-file">
-            <h6>Please upload your JSON files in the file upload above</h6>
-        </div>      
-        <div id="main-body">
-            <template id="graph-template">
-                {{#each graphInfo}}
-                    <div class='element-and-title-container'>
-                        <div class='title-container' onclick='showHideArrow("{{containerId}}", "{{arrowId}}")'>
-                            <h6 class='title-text'>{{title}}</h6>
-                            <div class='arrow-div'>
-                                <span class='arrow-helper'></span>
-                                <img id='{{arrowId}}' class='arrow-img' src='public/img/expand-arrow.png'/>
-                            </div>
-                        </div>
-                        
-                        <div class='hidden' id='{{containerId}}'>
-                            {{{html}}}
-                        </div>
-                    </div>
-                {{/each}}
-            </template>    
-        </div>
-    </body>
-    <script src="partials/workflow-summary.js"></script>
-    <script src="partials/simulation-graph.js"></script>
-    <script src="partials/simulation-details.js"></script>
-    <script src="partials/energy-graphs.js"></script>
-    <script src="partials/3d-visualization.js"></script>
-    <script src="partials/host-utilization.js"></script>
-    <script src="partials/render.js"></script>
+    </form>
+</nav>
 
-    <script src="scripts/data.js" ></script>
-    <script src="scripts/util.js" ></script>
-    <script src="scripts/button-clicks.js"></script>
-    <script src="scripts/graph-sections/3d-visualization.js"></script>
-    <script src="scripts/graph-sections/energy-graphs.js"></script>
-    <script src="scripts/graph-sections/simulation-details.js"></script>
-    <script src="scripts/graph-sections/simulation-graph.js"></script>
-    <script src="scripts/graph-sections/workflow-summary.js"></script>
-    <script src="scripts/graph-sections/host-utilization.js"></script>
-    <script src="scripts/initialise.js"></script>
+<div class="jumbotron jumbotron-fluid m-5" id="no-file">
+    <div class="container">
+        <h2>Welcome to the WRENCH dashboard!</h2>
+        <hr class="my-4 m-5">
+        <p class="lead">To get started, please upload your JSON file in the file upload above.</p>
+    </div>
+</div>
+
+<div id="main-body" class="mt-5 mb-5">
+    <template id="graph-template">
+        {{#each graphInfo}}
+        <div class='element-and-title-container'>
+            <div class='title-container' onclick='showHideArrow("{{containerId}}", "{{arrowId}}")'>
+                <h6 class='title-text'>{{title}}</h6>
+                <div class='arrow-div'>
+                    <span class='arrow-helper'></span>
+                    <img id='{{arrowId}}' class='arrow-img' src='public/img/expand-arrow.png'/>
+                </div>
+            </div>
+
+            <div class='hidden' id='{{containerId}}'>
+                {{{html}}}
+            </div>
+        </div>
+        {{/each}}
+    </template>
+</div>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light sticky-bottom justify-content-between small" style="color: #999">
+    <label>&copy; WRENCH</label>
+    <a href="https://wrench-project.org" target="_blank" style="color: #999">https://wrench-project.org</a>
+</nav>
+
+</body>
+<script src="partials/workflow-summary.js"></script>
+<script src="partials/simulation-graph.js"></script>
+<script src="partials/simulation-details.js"></script>
+<script src="partials/energy-graphs.js"></script>
+<script src="partials/3d-visualization.js"></script>
+<script src="partials/host-utilization.js"></script>
+<script src="partials/render.js"></script>
+
+<script src="scripts/data.js"></script>
+<script src="scripts/util.js"></script>
+<script src="scripts/button-clicks.js"></script>
+<script src="scripts/graph-sections/3d-visualization.js"></script>
+<script src="scripts/graph-sections/energy-graphs.js"></script>
+<script src="scripts/graph-sections/simulation-details.js"></script>
+<script src="scripts/graph-sections/simulation-graph.js"></script>
+<script src="scripts/graph-sections/workflow-summary.js"></script>
+<script src="scripts/graph-sections/host-utilization.js"></script>
+<script src="scripts/initialise.js"></script>
 </html>

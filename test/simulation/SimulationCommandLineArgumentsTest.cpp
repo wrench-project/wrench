@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2020. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,15 +22,20 @@ public:
     std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
 
     void do_versionArgument_test();
+
     void do_HelpWrenchArgument_test();
+
     void do_HelpSimGridArgument_test();
+
     void do_HelpArgument_test();
+
     void do_NoColorArgument_test();
+
     void do_FullLogArgument_test(std::string arg, int num_log_lines);
+
     void do_ActivateEnergyArgument_test();
 
 protected:
-
     SimulationCommandLineArgumentsTest() {
         // Create the simplest workflow
         workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
@@ -62,7 +67,6 @@ public:
     }
 
 private:
-
     SimulationCommandLineArgumentsTest *test;
 
     int main() {
@@ -83,13 +87,11 @@ private:
 /**           VERSION COMMAND-LINE ARGUMENT                          **/
 /**********************************************************************/
 
-
 TEST_F(SimulationCommandLineArgumentsTest, VersionArgument) {
     DO_TEST_WITH_FORK(do_versionArgument_test);
 }
 
 void SimulationCommandLineArgumentsTest::do_versionArgument_test() {
-
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
     int argc = 2;
@@ -122,10 +124,12 @@ void SimulationCommandLineArgumentsTest::do_versionArgument_test() {
     while (getline(&line, &linecapp, stdout_file) != -1) {
         linecount++;
         if (linecount == 1) {
-            ASSERT_EQ(strncmp(line, "WRENCH version ", strlen("WRENCH version ")), 0);
+            ASSERT_EQ(strncmp(line, "This program was linked against WRENCH version ",
+                              strlen("This program was linked against WRENCH version ")), 0);
         }
-        if (linecount == 2) {
-            ASSERT_EQ(strncmp(line, "This program was linked against SimGrid version ", strlen("This program was linked against SimGrid version ")), 0);
+        if (linecount == 17) {
+            ASSERT_EQ(strncmp(line, "This program was linked against SimGrid version ",
+                              strlen("This program was linked against SimGrid version ")), 0);
         }
         free(line);
         line = nullptr;
@@ -152,7 +156,6 @@ TEST_F(SimulationCommandLineArgumentsTest, HelpWrenchArgument) {
 }
 
 void SimulationCommandLineArgumentsTest::do_HelpWrenchArgument_test() {
-
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
     int argc = 2;
@@ -207,7 +210,6 @@ TEST_F(SimulationCommandLineArgumentsTest, HelpSimGridArgument) {
 }
 
 void SimulationCommandLineArgumentsTest::do_HelpSimGridArgument_test() {
-
     auto *simulation = new wrench::Simulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
@@ -265,7 +267,6 @@ TEST_F(SimulationCommandLineArgumentsTest, HelpArgument) {
 }
 
 void SimulationCommandLineArgumentsTest::do_HelpArgument_test() {
-
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
     int argc = 2;
@@ -294,7 +295,6 @@ TEST_F(SimulationCommandLineArgumentsTest, NoColorArgument) {
 }
 
 void SimulationCommandLineArgumentsTest::do_NoColorArgument_test() {
-
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
     int argc = 2;
@@ -355,9 +355,6 @@ void SimulationCommandLineArgumentsTest::do_NoColorArgument_test() {
 }
 
 
-
-
-
 /**********************************************************************/
 /**           FULL_LOG COMMAND-LINE ARGUMENT                         **/
 /**********************************************************************/
@@ -369,7 +366,6 @@ TEST_F(SimulationCommandLineArgumentsTest, FullLogArgument) {
 }
 
 void SimulationCommandLineArgumentsTest::do_FullLogArgument_test(std::string arg, int num_log_lines) {
-
     // Undo the SimGrid Logging config for Google Tests
     xbt_log_control_set("root.thresh:info");
 
@@ -424,8 +420,6 @@ void SimulationCommandLineArgumentsTest::do_FullLogArgument_test(std::string arg
 }
 
 
-
-
 /**********************************************************************/
 /**   ACTIVATE-ENERGY  COMMAND-LINE ARGUMENT                         **/
 /**********************************************************************/
@@ -437,7 +431,6 @@ TEST_F(SimulationCommandLineArgumentsTest, ActivateEnergyArgument) {
 }
 
 void SimulationCommandLineArgumentsTest::do_ActivateEnergyArgument_test() {
-
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
     int argc = 2;
@@ -463,5 +456,3 @@ void SimulationCommandLineArgumentsTest::do_ActivateEnergyArgument_test() {
     free(argv[1]);
     free(argv);
 }
-
-
