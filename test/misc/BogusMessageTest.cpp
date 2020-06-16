@@ -186,9 +186,6 @@ TEST_F(BogusMessageTest, FileRegistryService) {
 TEST_F(BogusMessageTest, SimpleStorage) {
     DO_TEST_WITH_FORK_ONE_ARG_EXPECT_FATAL_FAILURE(do_BogusMessage_Test, "simple_storage", true);
 }
-TEST_F(BogusMessageTest, BareMetalCompute) {
-    DO_TEST_WITH_FORK_ONE_ARG_EXPECT_FATAL_FAILURE(do_BogusMessage_Test, "bare_metal_compute", true);
-}
 
 TEST_F(BogusMessageTest, WMS) {
     DO_TEST_WITH_FORK_ONE_ARG_EXPECT_FATAL_FAILURE(do_BogusMessage_Test, "wms", true);
