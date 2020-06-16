@@ -1035,6 +1035,11 @@ namespace wrench {
     void Simulation::platformSanityCheck() {
         auto hostnames = wrench::Simulation::getHostnameList();
 
+        // Check link bandwidths (should be >0)
+        this->s4u_simulation->checkLinkBandwidths();
+        // Check host speeds (should be >)
+        this->s4u_simulation->checkHostSpeeds();
+
         // Check RAM Capacities
         for (auto const &h : hostnames) {
             S4U_Simulation::getHostMemoryCapacity(h);
