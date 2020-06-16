@@ -90,19 +90,6 @@ namespace wrench {
     }
 
     /**
-     * @brief Method to check that all host speeds are >0
-     */
-    void S4U_Simulation::checkHostSpeeds() {
-        auto hosts = this->engine->get_all_hosts();
-        for (auto const &h : hosts) {
-            if (h->get_speed() <= 0) {
-                throw std::invalid_argument("XML Platform error: host " +
-                                            h->get_name() + " has zero speed");
-            }
-        }
-    }
-
-    /**
      * @brief Initialize the simulated platform. Must only be called once.
      *
      * @param filename: the path to an XML platform description file
