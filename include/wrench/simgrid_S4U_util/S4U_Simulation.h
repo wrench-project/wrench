@@ -65,7 +65,6 @@ namespace wrench {
         static bool hostHasMountPoint(std::string hostname, std::string mount_point);
 
         void checkLinkBandwidths();
-        void checkHostSpeeds();
 
         static void yield();
         static std::string getHostProperty(std::string hostname, std::string property_name);

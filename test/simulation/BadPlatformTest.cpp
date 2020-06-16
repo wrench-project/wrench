@@ -166,8 +166,8 @@ TEST_F(BadPlatformTest, BadPlatform) {
             this->bad_disk1_xml,
             this->bad_disk2_xml,
             this->bad_disk3_xml,
-            this->zero_bandwidth_link,
-            this->zero_speed_host};
+            this->zero_bandwidth_link
+    };
     for (auto const &xml : bad_xmls) {
         DO_TEST_WITH_FORK_ONE_ARG(do_badPlatformTest_test, xml);
     }
