@@ -257,6 +257,10 @@ private:
         } catch (std::invalid_argument &e) {
         }
 
+        // For coverage
+        wrench::Simulation::getLinknameList();
+        wrench::Simulation::getLinkBandwidth("1");
+        wrench::Simulation::getLinkUsage("1");
         // Wait for workflow execution events
         for (auto const & task : tasks) {
             std::shared_ptr<wrench::WorkflowExecutionEvent> event;
