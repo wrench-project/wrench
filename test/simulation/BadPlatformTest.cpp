@@ -103,7 +103,23 @@ protected:
                                 "   </zone> "
                                 "</platform>";
 
+    std::string zero_bandwidth_link = "<?xml version='1.0'?>"
+                                  "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                                  "<platform version=\"4.1\"> "
+                                  "   <zone id=\"AS01\" routing=\"Full\"> "
+                                  "       <link id=\"link\" bandwidth=\"0Mbps\" latency=\"0us\" > "
+                                  "       </link>  "
+                                  "   </zone> "
+                                  "</platform>";
 
+    std::string zero_speed_host = "<?xml version='1.0'?>"
+                                "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                                "<platform version=\"4.1\"> "
+                                "   <zone id=\"AS01\" routing=\"Full\"> "
+                                "       <host id=\"Host\" speed=\"0f\" core=\"2\" > "
+                                "       </host>  "
+                                "   </zone> "
+                                "</platform>";
 
 
 
@@ -149,7 +165,9 @@ TEST_F(BadPlatformTest, BadPlatform) {
             this->bad_ram2_xml,
             this->bad_disk1_xml,
             this->bad_disk2_xml,
-            this->bad_disk3_xml};
+            this->bad_disk3_xml,
+            this->zero_bandwidth_link,
+            this->zero_speed_host};
     for (auto const &xml : bad_xmls) {
         DO_TEST_WITH_FORK_ONE_ARG(do_badPlatformTest_test, xml);
     }
