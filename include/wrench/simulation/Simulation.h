@@ -59,6 +59,7 @@ namespace wrench {
         static unsigned long getHostNumCores(std::string hostname);
         static double getHostFlopRate(std::string hostname);
 
+
         void launch();
 
         /**
@@ -135,6 +136,10 @@ namespace wrench {
         static unsigned long getNumCores();
         static double getFlopRate();
         static std::string getHostName();
+
+        static std::vector<std::string> getLinknameList();
+        static double getLinkUsage(std::string linkname);
+        static double getLinkBandwidth(std::string linkname);
         /***********************/
         /** \endcond           */
         /***********************/

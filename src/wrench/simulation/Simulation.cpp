@@ -235,6 +235,35 @@ namespace wrench {
     }
 
     /**
+     * @brief Get the list of names of all the links in the platform
+     *
+     * @return a vector of link names
+     */
+    std::vector<std::string> Simulation::getLinknameList() {
+        return S4U_Simulation::getAllLinknames();
+    }
+
+    /**
+     * @brief Get the max bandwidth of a particular link
+     * @param link_name: the link's name
+     *
+     * @return a bandwidth in Bps
+     */
+    double Simulation::getLinkBandwidth(std::string link_name) {
+        return S4U_Simulation::getLinkBandwidth(link_name);
+    }
+
+    /**
+     * @brief Get the current usage of a particular link
+     * @param link_name: the link's name
+     *
+     * @return a bandwidth usage
+     */
+    double Simulation::getLinkUsage(std::string link_name) {
+        return S4U_Simulation::getLinkUsage(link_name);
+    }
+
+    /**
      * @brief Get the list of names of all the hosts in each cluster composing the platform
      *
      * @return a map of lists of hosts, indexed by cluster name
