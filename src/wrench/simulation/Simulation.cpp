@@ -1037,8 +1037,6 @@ namespace wrench {
 
         // Check link bandwidths (should be >0)
         this->s4u_simulation->checkLinkBandwidths();
-        // Check host speeds (should be >)
-        this->s4u_simulation->checkHostSpeeds();
 
         // Check RAM Capacities
         for (auto const &h : hostnames) {
