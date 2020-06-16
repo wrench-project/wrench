@@ -77,6 +77,19 @@ namespace wrench {
     }
 
     /**
+     * @brief Method to check that all link bandwidths are >0
+     */
+    void S4U_Simulation::checkLinkBandwidths() {
+        auto links = this->engine->get_all_links();
+        for (auto const &l : links) {
+            if (l->get_bandwidth() <= 0) {
+                throw std::invalid_argument("XML Platform error: link " +
+                                            l->get_name() + " has zero bandwidth");
+            }
+        }
+    }
+
+    /**
      * @brief Initialize the simulated platform. Must only be called once.
      *
      * @param filename: the path to an XML platform description file
@@ -359,8 +372,8 @@ namespace wrench {
 
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         WRENCH_DEBUG("Reading %.2lf bytes from disk %s:%s and writing %lf bytes to disk %s:%s",
-                num_bytes_to_read, hostname.c_str(), read_mount_point.c_str(),
-                num_bytes_to_write, hostname.c_str(), write_mount_point.c_str());
+                     num_bytes_to_read, hostname.c_str(), read_mount_point.c_str(),
+                     num_bytes_to_write, hostname.c_str(), write_mount_point.c_str());
 
         simgrid::s4u::Disk *read_disk = nullptr;
         simgrid::s4u::Disk *write_disk = nullptr;
@@ -567,7 +580,7 @@ namespace wrench {
         }
         if (host->get_pstate_count() < pstate) {
             throw std::invalid_argument("S4U_Simulation::setPstate(): Invalid pstate index (host " + hostname + " only has "  +
-            std::to_string(host->get_pstate_count()) + " pstates)");
+                                        std::to_string(host->get_pstate_count()) + " pstates)");
         }
         try {
             host->set_pstate(pstate);
