@@ -1,7 +1,11 @@
 function determineNumCores(data) {
-    // let numCores = 0;
-    // let taskOverlap = determineTaskOverlap(data);
-    return 1;
+    let numCores = 0;
+    for (let task in data) {
+        if (data[task].execution_host.cores > numCores) {
+            numCores = data[task].execution_host.cores;
+        }
+    }
+    return numCores;
 }
 
 function getComputeTime(d) {
@@ -19,18 +23,20 @@ function getComputeTime(d) {
     return 0 //Box shouldn't be displayed if start is -1
 }
 
-function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskId, tooltipComputeTime,
-                                      CONTAINER_WIDTH, CONTAINER_HEIGHT) {
-
-    var num_cores = determineNumCores(data);
+/*
+    data: data to generate graph in json array
+    CONTAINER_WIDTH: Width of the container that holds the graph
+    CONTAINER_HEIGHT: Height of the container that holds the graph
+    PADDING: Padding value for container
+*/
+function generateHostUtilizationGraph(data, CONTAINER_WIDTH, CONTAINER_HEIGHT, PADDING) {
+    const containerId = "host-utilization-chart"
+    const tooltipId = "host-utilization-chart-tooltip"
+    const tooltipTaskId = "host-utilization-chart-tooltip-task-id"
+    const tooltipComputeTime = "host-utilization-chart-tooltip-compute-time"
     var container = d3.select(`#${containerId}`);
-    document.getElementById(containerId).innerHTML =
-        `<div class="text-left" id="host-utilization-chart-tooltip">
-            <span id="host-utilization-chart-tooltip-task-id"></span><br/>
-            <span id="host-utilization-chart-tooltip-compute-time"></span><br/>
-        </div>`
+    document.getElementById(containerId).innerHTML = hostUtilizationTooltipHtml
     var chart = document.getElementById(containerId);
-    const PADDING = 60;
 
     var svg = d3.select("svg");
 
@@ -54,7 +60,7 @@ function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskI
 
     var tasks_by_hostname = d3.nest()
         .key(function (d) {
-            return d['execution_host'].hostname;
+            return d[executionHostKey].hostname;
         })
         .sortKeys(d3.ascending)
         .entries(data);
@@ -68,23 +74,17 @@ function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskI
 
     var y_cores_per_host = d3.map();
 
-    // if (num_cores === 0) {
+    let num_cores = determineNumCores(data);
     tasks_by_hostname.forEach(function (d) {
+        let n_cores = num_cores === 0 ? d.values[0][executionHostKey].cores : num_cores;
         y_cores_per_host.set(d.key,
             d3.scaleLinear()
-                .domain([0, d.values[0]['execution_host'].cores])
+                .domain([0, n_cores])
                 .range([y_hosts(d.key) + y_hosts.bandwidth(), y_hosts(d.key)])
         );
     });
-    // } else {
-    //     tasks_by_hostname.forEach(function (d) {
-    //         y_cores_per_host.set(d.key,
-    //             d3.scaleLinear()
-    //                 .domain([0, num_cores])
-    //                 .range([y_hosts(d.key) + y_hosts.bandwidth(), y_hosts(d.key)])
-    //         );
-    //     });
-    // }
+
+    let taskOverlap = determineTaskOverlap(data);
 
     svg.append('g').selectAll('rect')
         .data(y_cores_per_host.keys())
@@ -97,7 +97,7 @@ function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskI
         .attr("width", CONTAINER_WIDTH - PADDING - PADDING)
         .attr("height", y_hosts.bandwidth())
         .attr("opacity", 0.3)
-        .attr("fill", "#ffd8f8");
+        .attr("fill", "#ffe8e8");
 
     svg.append('g').selectAll("rect")
         .data(data)
@@ -110,9 +110,9 @@ function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskI
             return x_scale(d.compute.start);
         })
         .attr("y", function (d) {
-            var y_scale = y_cores_per_host.get(d['execution_host'].hostname);
-            var vertical_position = searchOverlap(d.task_id, determineTaskOverlap(data))
-            return y_scale(vertical_position + 1);
+            var y_scale = y_cores_per_host.get(d[executionHostKey].hostname);
+            let vertical_position = determineVerticalPosition(d, taskOverlap);
+            return y_scale(vertical_position + d.num_cores_allocated);
         })
         .attr("width", function (d) {
             if (d.compute.start === -1) {
@@ -124,16 +124,20 @@ function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskI
             return x_scale(d.compute.end) - x_scale(d.compute.start);
         })
         .attr("height", function (d) {
-            var y_scale = y_cores_per_host.get(d['execution_host'].hostname);
+            var y_scale = y_cores_per_host.get(d[executionHostKey].hostname);
             return y_scale(0) - y_scale(d.num_cores_allocated);
         })
-        .attr("fill", "#f7daad")
+        .attr("fill", function(d) {
+            return determineTaskColor(d)
+        })
         .attr("stroke", "gray")
         .on('mouseover', function () {
             tooltip.style('display', 'inline');
 
             d3.select(this)
-                .attr('fill', '#ffdd7f');
+                .attr('fill', function(d)  {
+                    return brighterColor(determineTaskColor(d))
+                });
         })
         .on('mousemove', function (d) {
             var offset = getOffset(chart, d3.mouse(this));
@@ -150,7 +154,9 @@ function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskI
             tooltip.style('display', 'none');
 
             d3.select(this)
-                .attr('fill', '#f7daad')
+                .attr('fill', function(d) {
+                    return determineTaskColor(d)
+                })
         });
 
     var x_axis = d3.axisBottom(x_scale)
@@ -180,7 +186,7 @@ function generateHostUtilizationGraph(data, containerId, tooltipId, tooltipTaskI
         var axis = d3.axisLeft(entry.value)
             .tickValues(d3.range(0, entry.value.domain()[1] + 1, 1))
             .tickFormat(d3.format(""));
-        ;
+        
 
         svg.append("g")
             .attr("class", "y-axis2")

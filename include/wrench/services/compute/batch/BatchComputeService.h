@@ -111,6 +111,8 @@ namespace wrench {
         /***********************/
         std::map<std::string,double> getStartTimeEstimates(std::set<std::tuple<std::string,unsigned long,unsigned long, double>> resources);
 
+        std::vector<std::tuple<std::string, int, int, int, int, double, double>> getQueue();
+
         /***********************/
         /** \endcond          **/
         /***********************/
@@ -161,7 +163,7 @@ namespace wrench {
         // terminate a pilot job
         void terminatePilotJob(PilotJob *job) override;
 
-        std::vector<std::tuple<std::string, double, double, double, double, unsigned int>> workload_trace;
+        std::vector<std::tuple<std::string, double, double, double, double, unsigned int, std::string>> workload_trace;
         std::shared_ptr<WorkloadTraceFileReplayer> workload_trace_replayer;
 
         bool clean_exit = false;

@@ -1,9 +1,28 @@
 WRENCH Release Notes
 ------
 
+### WRENCH 1.6
+
+(May 7, 2020) This release includes a series of new features and bug fixes, including:
+
+This release includes a series of **new features**, **enhancements**, and **bug fixes**, including:
+
+- Refactored the WRENCH documentation: WRENCH 101 for users, and WRENCH 102 for developers ([#156](https://github.com/wrench-project/wrench/issues/156))
+- New collection of examples provided with WRENCH distribution: over 10 examples of simulators ([#157](https://github.com/wrench-project/wrench/issues/157))
+- Removed dependency to Lemon library: we now use Boost, which is already used by SimGrid ([#159](https://github.com/wrench-project/wrench/issues/159))
+- Simulation logging in now disabled by default: can be enabled using `--wrench-full-log` ([#158](https://github.com/wrench-project/wrench/issues/158))
+- Refactored the BatchComputeService class: includes a conservative backfilling algorithm for validation purposes ([#152](https://github.com/wrench-project/wrench/issues/152))
+- Improvements to simulation output processing and JSON output: includes task, host, disk I/O, and energy ([#154](https://github.com/wrench-project/wrench/issues/154), [#122](https://github.com/wrench-project/wrench/issues/122), [#129](https://github.com/wrench-project/wrench/issues/129), [#133](https://github.com/wrench-project/wrench/issues/133))
+- Improvements to the WRENCH Dashboard: [#130](https://github.com/wrench-project/wrench/issues/130), [#136](https://github.com/wrench-project/wrench/issues/136), [#137](https://github.com/wrench-project/wrench/issues/137), [#139](https://github.com/wrench-project/wrench/issues/139), [#146](https://github.com/wrench-project/wrench/issues/146), [#147](https://github.com/wrench-project/wrench/issues/147), [#148](https://github.com/wrench-project/wrench/issues/148), [#164](https://github.com/wrench-project/wrench/issues/164)
+- Bug fixes and small enhancements: [#110](https://github.com/wrench-project/wrench/issues/110), [#141](https://github.com/wrench-project/wrench/issues/141), [#143](https://github.com/wrench-project/wrench/issues/143), [#144](https://github.com/wrench-project/wrench/issues/144), [#145](https://github.com/wrench-project/wrench/issues/145), [#151](https://github.com/wrench-project/wrench/issues/151), [#153](https://github.com/wrench-project/wrench/issues/153), [#160](https://github.com/wrench-project/wrench/issues/160), [#162](https://github.com/wrench-project/wrench/issues/162), [#163](https://github.com/wrench-project/wrench/issues/163)
+
+**Note**: WRENCH 1.6 requires [SimGrid 3.25](https://simgrid.org).
+
+---
+
 ### WRENCH 1.5
 
-(Feb 07, 2020) This release includes a series of new features and bug fixes, including:
+(Feb 7, 2020) This release includes a series of new features and bug fixes, including:
 
 - Simulation of failures
 - WRENCH Dashboard

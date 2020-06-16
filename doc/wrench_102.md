@@ -1,7 +1,7 @@
 WRENCH 102                        {#wrench-102}
 ============
 
-A Workflow Management System (WMS) is a software that makes all decisions
+A Workflow Management System (WMS) is software that makes all decisions
 and takes all actions for executing a workflow using cyberinfrastructure 
 services. It is thus a crucial component in every WRENCH simulator. 
 WRENCH does not provide any WMS implementation, but provides the means for 
@@ -195,7 +195,7 @@ to a compute service (provided that service supports pilot jobs), and when
 it starts it just looks to the WMS like a temporary (bare-metal) compute
 service to which standard jobs can be submitted.
 
-The most common kind of jobs is the **standard job**. A standard job is a unit
+The most common kind of job is the **standard job**. A standard job is a unit
 of execution by which a WMS tells a compute service to do a set of operations. More
 specifically, in its most complete form, a standard job specifies:
 
@@ -203,7 +203,7 @@ specifically, in its most complete form, a standard job specifies:
     task without all its predecessors in the set is ready;
 
   - A `std::map` of `<wrench::WorkflowFile*, std::shared_ptr<wrench::StorageService>>`
-    values that specifies from which storage services particular input files
+    pairs that specifies from which storage services particular input files
     should be read and to which storage services output files should be
     written;
 
@@ -237,7 +237,7 @@ The job manager provides the following expected member functions:
 
 The next section gives many examples of interactions with each kind of compute service.
 
-Click on the following links to see detailed descriptions of
+Click on the following links to see detailed descriptions
 and examples of how jobs are submitted to each compute service type:
 
   - [Bare-metal compute service](@ref guide-102-baremetal)
@@ -392,8 +392,7 @@ void TwoTasksAtATimeWMS::processEventStandardJobFailure(
 You may note some difference between the above code  and that in
 `examples/basic-examples/bare-metal-bag-of-tasks/TwoTasksAtATimeWMS.cpp`.
 This is for clarity purposes, and especially because we have not yet
-explained  how  WRENCH does message logging. See                
-[an upcoming section about logging](@ref wrench-102-WMS-logging).
+explained  how  WRENCH does message logging. See [an upcoming section about logging](@ref wrench-102-WMS-logging).
 
 While the above callbacks are convenient, sometimes it is desirable to do
 things more manually.  That is, wait for an event and then  process it in
@@ -431,18 +430,18 @@ thus part of the simulation). Each such exception contains a
 `wrench::FailureCause` object, which can be accessed to understand the root
 cause of the execution failure.  Other exceptions (e.g.,
 `std::invalid_arguments`, `std::runtime_error`) are thrown as well, which
-are used for detecting mis-uses of the WRENCH API or internal WRENCH
+are used for detecting misuses of the WRENCH API or internal WRENCH
 errors.
 
 # Finding information and interacting with hardware resources {#wrench-102-WMS-hardware}
 
 The `wrench::Simulation` class provides many member functions to discover information
 about the (simulated) hardware platform and interact with it. Some of these
-member functions are static, but other are not. The `wrench:WMS` class includes a
+member functions are static, but others are not. The `wrench:WMS` class includes a
 `simulation` object. Thus, the WMS can call member functions on the `this->simulation`
 object. For instance, this fragment of code shows how a WMS can check that
-a host exists (given a hostname) and if so set its `pstate` (power state) 
-to the highest possible. 
+a host exists (given a hostname) and, if so, set its `pstate` (power state) 
+to the highest possible setting. 
 
 ~~~~~~~~~~~~~{.cpp}
 if (wrench::Simulation::doesHostExist("SomeHost"))  {
@@ -473,7 +472,7 @@ if not needed):
     member function (to be overwritten) that can be invoked at any time by the WMS to submit pilot jobs to compute services.
 
 Although not required, it is possible to implement most (or even all)
-decision-making in these two member functions so at to have a clean separation of
+decision-making in these two member functions so as to have a clean separation of
 concern between the decision-making part of the WMS and the rest of its
 functionality.  This kind of design is used in the example simulators in the 
 `examples/real-workflow-example/` directory.

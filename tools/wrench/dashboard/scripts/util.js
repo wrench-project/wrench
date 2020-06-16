@@ -1,12 +1,66 @@
-const getDuration = (start, end) => {
-    if (start === "Failed" || start === "Terminated") {
-        return start
-    } else if (end === "Failed" || end === "Terminated") {
-        return end
-    } else {
-        return toFiveDecimalPlaces(end - start)
+const executionHostKey = 'execution_host'
+
+// const getDuration = (start, end) => {
+//     if (start === -1 || start === -1) {
+//         return start
+//     } else if (end === -1 || end === -1) {
+//         return end
+//     } else {
+//         return toFiveDecimalPlaces(end - start)
+//     }
+// }
+
+const getDuration = (d, section) => {
+    if (section === "read" || section === "write") {
+        let total = 0
+        if (d[section] !== null) {
+            d[section].forEach(t => {
+                total += (t.end - t.start);
+            })
+        }
+        return total;
+    } else if (section === "compute" || section === "whole_task") {
+        if (d[section].start === -1) {
+            return 0;
+        } else if (d[section].end === -1) {
+            if (d.terminated === -1) {
+                return d.failed - d[section].start;
+            } else if (d.failed === -1) {
+                return d.terminated - d[section].start;
+            }
+        } else {
+            return d[section].end - d[section].start;
+        }
     }
 }
+
+/* TODO: fix this function to fix workflow summary */
+function determineFailedOrTerminatedPoint(d) {
+    if (d.failed == -1 && d.terminated == -1) {
+        return "none"
+    }
+    if (d.read.end == -1) {
+        return "read"
+    }
+    if (d.compute.end == -1) {
+        return "compute"
+    }
+    if (d.write.end == -1) {
+        return "write"
+    }
+}
+
+// const getDuration = (data, section, failed, terminated) => {
+//     if (section === "compute") {
+//         const { start, end }
+//         if (start === -1) {
+//             return 0
+//         }
+//         if (end === -1) {
+
+//         }
+//     }
+// }
 
 const toFiveDecimalPlaces = d3.format('.5f')
 
@@ -61,9 +115,9 @@ function convertToTableFormat(d, section, property) {
 }
 
 function getRandomColour() {
-    var letters = '0123456789ABCDEF';
-    var colour = '#';
-    for (var i = 0; i < 6; i++) {
+    let letters = '0123456789ABCDEF';
+    let colour = '#';
+    for (let i = 0; i < 6; i++) {
         colour += letters[Math.floor(Math.random() * 16)];
     }
     return colour;
@@ -109,7 +163,7 @@ function populateLegend(currView) {
 }
 
 function determineTaskEnd(d) {
-    var taskEnd
+    let taskEnd
     if (d.terminated !== -1) {
         taskEnd = d.terminated
     } else if (d.failed !== -1) {
@@ -120,16 +174,39 @@ function determineTaskEnd(d) {
     return taskEnd
 }
 
+function determineTaskColor(d) {
+    let taskColor
+    if ((!d.hasOwnProperty("color")) || (d.color === "")) {
+        taskColor = "#f7daad"
+    } else {
+        taskColor = d.color
+    }
+    return taskColor
+}
+
+function brighterColor(c) {
+    let bytes = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(c)
+    let brightness_increment = 25
+    let brighter = "#"
+    for (let i = 1; i <= 3; i++) {
+        let intValue = Math.min(255, brightness_increment + parseInt(bytes[i], 16));
+        let hexString = intValue.toString(16);
+        hexString = hexString.length === 1 ? "0" + hexString : hexString
+        brighter += hexString
+    }
+    return brighter
+}
+
 function determineTaskOverlap(data) {
     let taskOverlap = {};
     data.forEach(function (d) {
         let taskStart = d.whole_task.start;
         let taskEnd = determineTaskEnd(d);
 
-        if (d.execution_host.hostname in taskOverlap) {
+        if (d[executionHostKey].hostname in taskOverlap) {
             let i = 0;
             let placed = false;
-            let executionHost = taskOverlap[d.execution_host.hostname];
+            let executionHost = taskOverlap[d[executionHostKey].hostname];
 
             while (!placed) {
                 if (executionHost[i] === undefined) {
@@ -137,10 +214,10 @@ function determineTaskOverlap(data) {
                 }
                 let overlap = false
                 for (let j = 0; j < executionHost[i].length; j++) {
-                    let t = executionHost[i][j]
+                    let t = executionHost[i][j];
                     let currTaskStart = t.whole_task.start;
                     let currTaskEnd = determineTaskEnd(t);
-                    if ((taskStart >= currTaskStart && taskStart <= currTaskEnd) || (taskEnd >= currTaskStart && taskEnd <= currTaskEnd)) {
+                    if (taskEnd > currTaskStart && taskStart < currTaskEnd) {
                         i++;
                         overlap = true;
                         break;
@@ -152,10 +229,49 @@ function determineTaskOverlap(data) {
                 }
             }
         } else {
-            taskOverlap[d.execution_host.hostname] = [[d]];
+            taskOverlap[d[executionHostKey].hostname] = [[d]];
         }
     })
     return taskOverlap
+}
+
+function determineVerticalPosition(task, taskOverlap) {
+    let task_core = 0;
+    let task_host = "";
+    for (let host in taskOverlap) {
+        for (let task_idx in taskOverlap[host]) {
+            let currOverlap = taskOverlap[host][task_idx];
+            for (let i = 0; i < currOverlap.length; i++) {
+                if (currOverlap[i].task_id === task.task_id) {
+                    task_core = parseInt(task_idx);
+                    task_host = host;
+                    break;
+                }
+            }
+        }
+    }
+
+    let v_pos = 0;
+    for (let host in taskOverlap) {
+        if (host === task_host) {
+            for (let core_num in taskOverlap[host]) {
+                if (parseInt(core_num) < task_core) {
+                    let curr_v_pos = 0;
+                    let currOverlap = taskOverlap[host][core_num];
+                    for (let i = 0; i < currOverlap.length; i++) {
+                        let t = currOverlap[i];
+                        if (task.whole_task.end > t.whole_task.start && task.whole_task.start < t.whole_task.end) {
+                            if (curr_v_pos < t.num_cores_allocated) {
+                                curr_v_pos = t.num_cores_allocated;
+                            }
+                        }
+                    }
+                    v_pos += curr_v_pos;
+                }
+            }
+        }
+    }
+    return v_pos;
 }
 
 function searchOverlap(taskId, taskOverlap) {
@@ -164,7 +280,7 @@ function searchOverlap(taskId, taskOverlap) {
             var currOverlap = taskOverlap[host][key]
             for (let i = 0; i < currOverlap.length; i++) {
                 if (currOverlap[i].task_id === taskId) {
-                    return key
+                    return key;
                 }
             }
         }
@@ -185,36 +301,48 @@ function extractFileContent(file) {
     })
 }
 
-function processFile(files, fileType) {
+function processFile(files) {
     if (files.length === 0) {
         return
     }
     extractFileContent(files[0])
         .then(function (rawDataString) {
-            switch (fileType) {
-                case "taskData":
-                    const rawData = JSON.parse(rawDataString)
-                    if (!rawData.workflow_execution || !rawData.workflow_execution.tasks) {
-                        break
-                    }
-                    data = {
-                        file: files[0].name,
-                        contents: rawData.workflow_execution.tasks
-                    }
-                    break
-                case "energy":
-                    energyData = JSON.parse(rawData)
-                    break
+            const rawData = JSON.parse(rawDataString)
+            if (!rawData.workflow_execution || !rawData.workflow_execution.tasks) {
+                return
             }
+            data = {
+                file: files[0].name,
+                contents: rawData.workflow_execution.tasks
+            }
+
+            if (rawData.energy_consumption) {
+                energyData = rawData.energy_consumption
+            }
+
             initialise()
         })
-        .catch(function () {
+        .catch(function (err) {
+            console.error(err)
             return
         })
 }
 
 function sanitizeId(id) {
-    id = id.replace('#', '')
-    id = id.replace(' ', '')
+    id = id.replace(/#/g, '')
+    id = id.replace(/ /g, '')
     return id
+}
+
+/**
+ * Helper function used to get the position of the mouse within the browser window
+ * so that we can have nice moving tooltips. The input is the DOM element we are
+ * interested in (in this case the #chart element).
+ */
+function getOffset(el, position) {
+    const rect = el.getBoundingClientRect()
+    return {
+        left: rect.left + position[0],
+        top: rect.top + position[1]
+    }
 }

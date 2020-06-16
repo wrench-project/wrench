@@ -286,6 +286,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowExecutionJSON_test() {
                     "num_cores_allocated": 10,
                     "read": null,
                     "task_id": "task1",
+                    "color": "",
                     "terminated": -1.0,
                     "whole_task": {
                         "end": 3.0,
@@ -308,6 +309,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowExecutionJSON_test() {
                     "num_cores_allocated": 8,
                     "read": null,
                     "task_id": "task1",
+                    "color": "",
                     "terminated": -1.0,
                     "whole_task": {
                         "end": 2.0,
@@ -330,6 +332,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowExecutionJSON_test() {
                     "num_cores_allocated": 20,
                     "read": null,
                     "task_id": "task2",
+                    "color": "",
                     "terminated": -1.0,
                     "whole_task": {
                         "end": 4.0,
@@ -1505,6 +1508,7 @@ void SimulationDumpJSONTest::do_SimulationDumpUnifiedJSON_test() {
                     "num_cores_allocated": 10,
                     "read": null,
                     "task_id": "task1",
+                    "color": "",
                     "terminated": -1.0,
                     "whole_task": {
                         "end": 3.0,
@@ -1527,6 +1531,7 @@ void SimulationDumpJSONTest::do_SimulationDumpUnifiedJSON_test() {
                     "num_cores_allocated": 8,
                     "read": null,
                     "task_id": "task1",
+                    "color": "",
                     "terminated": -1.0,
                     "whole_task": {
                         "end": 2.0,
@@ -1549,6 +1554,7 @@ void SimulationDumpJSONTest::do_SimulationDumpUnifiedJSON_test() {
                     "num_cores_allocated": 20,
                     "read": null,
                     "task_id": "task2",
+                    "color": "",
                     "terminated": -1.0,
                     "whole_task": {
                         "end": 4.0,

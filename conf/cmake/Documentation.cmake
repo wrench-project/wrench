@@ -1,4 +1,4 @@
-find_package(Doxygen)
+find_package(Doxygen QUIET)
 
 if (DOXYGEN_FOUND)
 
@@ -63,5 +63,5 @@ if (DOXYGEN_FOUND)
     add_custom_target(doc DEPENDS doc-deploy)
 
 else (DOXYGEN_FOUND)
-    message("Doxygen need to be installed to generate WRENCH documentation")
+    message("-- Doxygen: No (warning: Doxygen is needed in case you want to generate WRENCH documentation)")
 endif (DOXYGEN_FOUND)

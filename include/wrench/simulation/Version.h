@@ -9,5 +9,5 @@
  */
 
 namespace wrench {
-  #define WRENCH_VERSION_STRING "1.6-dev"
+  #define WRENCH_VERSION_STRING "1.7-dev"
 }

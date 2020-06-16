@@ -1,32 +1,21 @@
 /*
     data: task data
-    tableContainer: id of the <table> which will contain the data
-    taskClass: class to apply to <td> elements
 */
-function getOverallWorkflowMetrics(data, tableContainer, taskClass) {
-    // document.getElementById(tableContainer).innerHTML = `
-    //     <colgroup>
-    //         <col span="1" class='overall-metrics-table-col read-col'></col>
-    //         <col span="1" class='overall-metrics-table-col write-col'></col>
-    //     </colgroup>
-    //     <thead>
-    //         <tr>
-    //             <th class='task-details-table-td'>Metric</th>
-    //             <th class='task-details-table-td'>Value</th>
-    //         </tr>
-    //     </thead>
-    // `
+function getOverallWorkflowMetrics(data) {
+    const tableContainer = 'overall-metrics-table'
+    const taskClass = "task-details-table-td"
+    document.getElementById(tableContainer).innerHTML = workflowSummaryInnerHtml
     var hosts = new Set()
     var noFailed = 0
     var noTerminated = 0
     var overallStartTime = data[0].whole_task.start
     var overallEndTime = 0
     var noTasks = data.length
-    var averageReadDuration
-    var averageComputeDuration
-    var averageWriteDuration
+    var totalReadDuration = 0
+    var totalComputeDuration = 0
+    var totalWriteDuration = 0
     data.forEach(function (d) {
-        var currHost = d['execution_host']
+        var currHost = d[executionHostKey]
         hosts.add(currHost)
 
         if (d.failed != -1) {
@@ -45,33 +34,19 @@ function getOverallWorkflowMetrics(data, tableContainer, taskClass) {
             overallEndTime = whole_task.end
         }
 
-        var read = d.read
-        var compute = d.compute
-        var write = d.write
+        var readDuration = getDuration(d, "read")
+        totalReadDuration += readDuration
 
-        var totalReadDuration = 0
-        var totalComputeDuration = 0
-        var totalWriteDuration = 0
+        var computeDuration = getDuration(d, "compute")
+        totalComputeDuration += computeDuration
 
-        var readDuration = getDuration(read.start, read.end)
-        if (readDuration !== read.start && readDuration !== read.end) {
-            totalReadDuration += readDuration
-        }
-
-        var computeDuration = getDuration(compute.start, compute.end)
-        if (computeDuration !== compute.start && computeDuration !== compute.end) {
-            totalComputeDuration += computeDuration
-        }
-
-        var writeDuration = getDuration(write.start, write.end)
-        if (writeDuration !== write.start && writeDuration !== write.end) {
-            totalWriteDuration += writeDuration
-        }
-
-        averageReadDuration = totalReadDuration / noTasks
-        averageComputeDuration = totalComputeDuration / noTasks
-        averageWriteDuration = totalWriteDuration / noTasks
+        var writeDuration = getDuration(d, "write")
+        totalWriteDuration += writeDuration
     })
+
+    var averageReadDuration = totalReadDuration / noTasks
+    var averageComputeDuration = totalComputeDuration / noTasks
+    var averageWriteDuration = totalWriteDuration / noTasks
 
     var totalHosts = hosts.size
     var noSuccesful = noTasks - (noFailed + noTerminated)
@@ -79,7 +54,7 @@ function getOverallWorkflowMetrics(data, tableContainer, taskClass) {
 
     var metrics = {
         totalHosts: {
-            value: toFiveDecimalPlaces(totalHosts),
+            value: totalHosts,
             display: 'Total Hosts Utilized'
         },
         totalDuration: {
@@ -88,19 +63,19 @@ function getOverallWorkflowMetrics(data, tableContainer, taskClass) {
             unit: 's'
         },
         noTasks: {
-            value: toFiveDecimalPlaces(noTasks),
+            value: noTasks,
             display: 'Number of Tasks'
         },
         noFailed: {
-            value: toFiveDecimalPlaces(noFailed),
+            value: noFailed,
             display: 'Failed Tasks'
         },
         noTerminated: {
-            value: toFiveDecimalPlaces(noTerminated),
+            value: noTerminated,
             display: 'Terminated Tasks'
         },
         noSuccesful: {
-            value: toFiveDecimalPlaces(noSuccesful),
+            value: noSuccesful,
             display: 'Succesful Tasks'
         },
         averageReadDuration: {

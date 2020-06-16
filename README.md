@@ -16,7 +16,11 @@ abstractions to provide the **building blocks** for developing custom simulators
 More information and Documentation: [WRENCH Project Website](http://wrench-project.org)
 
 **WRENCH Research Paper:**
-- H. Casanova, S. Pandey, J. Oeth, R. Tanaka, F. Suter, and R. Ferreira da Silva, “[WRENCH: A Framework for Simulating Workflow Management Systems](http://rafaelsilva.com/wp-content/papercite-data/pdf/casanova-works-2018.pdf),” in 13th Workshop on Workflows in Support of Large-Scale Science (WORKS’18), 2018, p. 74–85. 
+- H. Casanova, R. Ferreira da Silva, R. Tanaka, S. Pandey, G. Jethwani, W. Koch, S.
+  Albrecht, J. Oeth, and F. Suter, [Developing Accurate and Scalable Simulators of
+  Production Workflow Management Systems with 
+  WRENCH](https://rafaelsilva.com/files/publications/casanova2020fgcs.pdf), 
+  Future Generation Computer Systems, vol. 112, p. 162-175, 2020. 
 
 ## Prerequisites
 
@@ -81,13 +85,15 @@ When citing WRENCH, please use the following paper. You should also actually rea
 it provides a recent and general overview on the framework.
 
 ```latex
-@inproceedings{wrench,
-  title = {{WRENCH: A Framework for Simulating Workflow Management Systems}},
-  author = {Casanova, Henri and Pandey, Suraj and Oeth, James and Tanaka, Ryan and Suter, Frederic and Ferreira da Silva, Rafael},
-  booktitle = {13th Workshop on Workflows in Support of Large-Scale Science (WORKS'18)},
-  year = {2018},
-  pages = {74--85},
-  doi = {10.1109/WORKS.2018.00013}
+@article{wrench,
+  title = {Developing Accurate and Scalable Simulators of Production Workflow Management Systems with WRENCH},
+  author = {Casanova, Henri and Ferreira da Silva, Rafael and Tanaka, Ryan and Pandey, Suraj and Jethwani, Gautam and Koch, William and Albrecht, Spencer and Oeth, James and Suter, Fr\'{e}d\'{e}ric},
+  journal = {Future Generation Computer Systems},
+  volume = {112},
+  number = {},
+  pages = {162--175},
+  year = {2020},
+  doi = {10.1016/j.future.2020.05.030}
 }
 ```
 
