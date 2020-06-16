@@ -64,6 +64,8 @@ namespace wrench {
         static std::vector<std::string> getDisks(std::string hostname);
         static bool hostHasMountPoint(std::string hostname, std::string mount_point);
 
+        void checkLinkBandwidths();
+
         static void yield();
         static std::string getHostProperty(std::string hostname, std::string property_name);
 
