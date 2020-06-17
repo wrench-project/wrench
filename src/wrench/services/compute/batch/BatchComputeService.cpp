@@ -309,7 +309,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     unsigned long BatchComputeService::parseUnsignedLongServiceSpecificArgument(std::string key,
-                                                                                std::map<std::string, std::string> &args) {
+                                                                                const std::map<std::string, std::string> &args) {
         unsigned long value = 0;
         auto it = args.find(key);
         if (it != args.end()) {
@@ -330,7 +330,7 @@ namespace wrench {
      * @param job
      * @param batch_job_args
      */
-    void BatchComputeService::submitWorkflowJob(WorkflowJob *job, std::map<std::string, std::string> &batch_job_args) {
+    void BatchComputeService::submitWorkflowJob(WorkflowJob *job, const std::map<std::string, std::string> &batch_job_args) {
 
         assertServiceIsUp();
 
@@ -349,7 +349,7 @@ namespace wrench {
 
         std::string username = "you";
         if (batch_job_args.find("-u") != batch_job_args.end()) {
-            username = batch_job_args["-u"];
+            username = batch_job_args.at("-u");
         }
 
         // Sanity check
@@ -431,7 +431,7 @@ namespace wrench {
      * @throw std::invalid_argument
      *
      */
-    void BatchComputeService::submitStandardJob(StandardJob *job, std::map<std::string, std::string> &batch_job_args) {
+    void BatchComputeService::submitStandardJob(StandardJob *job, const std::map<std::string, std::string> &batch_job_args) {
 
         try {
             this->submitWorkflowJob(job, batch_job_args);
@@ -453,7 +453,7 @@ namespace wrench {
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
      */
-    void BatchComputeService::submitPilotJob(PilotJob *job, std::map<std::string, std::string> &batch_job_args) {
+    void BatchComputeService::submitPilotJob(PilotJob *job, const std::map<std::string, std::string> &batch_job_args) {
 
         try {
             this->submitWorkflowJob(job, batch_job_args);

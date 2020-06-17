@@ -49,9 +49,9 @@ namespace wrench {
         /***********************/
 
         void submitStandardJob(StandardJob *job,
-                               std::map<std::string, std::string> &service_specific_arguments) override;
+                               const std::map<std::string, std::string> &service_specific_arguments) override;
 
-        void submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_arguments) override;
+        void submitPilotJob(PilotJob *job, const std::map<std::string, std::string> &service_specific_arguments) override;
 
 
         /***********************/

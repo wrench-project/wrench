@@ -115,7 +115,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void HTCondorComputeService::submitStandardJob(StandardJob *job,
-                                                   std::map<std::string, std::string> &service_specific_args) {
+                                                   const std::map<std::string, std::string> &service_specific_args) {
 
         serviceSanityCheck();
 
@@ -162,7 +162,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void HTCondorComputeService::submitPilotJob(PilotJob *job,
-                                                std::map<std::string, std::string> &service_specific_args) {
+                                                const std::map<std::string, std::string> &service_specific_args) {
         serviceSanityCheck();
 
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_pilot_job");
@@ -318,7 +318,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void HTCondorComputeService::processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
-                                                          std::map<std::string, std::string> &service_specific_args) {
+                                                          const std::map<std::string, std::string> &service_specific_args) {
 
         WRENCH_INFO("Asked to run a standard job with %ld tasks", job->getNumTasks());
         if (not this->supportsStandardJobs()) {
@@ -361,7 +361,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void HTCondorComputeService::processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job,
-                                                       std::map<std::string, std::string> &service_specific_args) {
+                                                       const std::map<std::string, std::string> &service_specific_args) {
 
         WRENCH_INFO("Asked to run a pilot job");
         if (not this->supportsPilotJobs()) {
