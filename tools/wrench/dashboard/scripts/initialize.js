@@ -14,12 +14,13 @@ function prepareData(data) {
             d.write = [nullReplacement];
         }
     })
-    return data
+    return data;
 }
 
 function initialize() {
     const noFileDiv = document.getElementById("no-file");
     const mainBodyDiv = document.getElementById("main-body");
+    const mainMenuDiv = document.getElementById("main-sidebar");
     const energyTitles = document.getElementsByClassName("energy-title");
     const noEnergyFileDiv = document.getElementById("no-energy-file");
 
@@ -31,10 +32,12 @@ function initialize() {
     if (data.file === undefined && Object.keys(energyData).length === 0) {
         noFileDiv.style.display = "block";
         mainBodyDiv.style.display = "none";
+        mainMenuDiv.style.display = "none";
 
     } else {
         noFileDiv.style.display = "none";
         mainBodyDiv.style.display = "block";
+        mainMenuDiv.style.display = "block";
 
         if (Object.keys(energyData).length !== 0) {
             Array.from(energyTitles).forEach(function (et) {
@@ -52,10 +55,11 @@ function initialize() {
         }
 
         if (data.file !== undefined) {
-            data.contents = prepareData(data.contents);
+            data.contents = prepareData(data.contents); // TODO: remove
+            data.tasks = prepareData(data.tasks);
 
-            generateGanttChart(data.contents);
-            generateHostUtilizationChart(data.contents);
+            generateGanttChart(data);
+            generateHostUtilizationChart(data);
 
             // generateGraph(data.contents, currGraphState, false, 1000, 1000)
             // populateLegend("taskView")

@@ -76,9 +76,9 @@ function generateGanttChart(rawData) {
         ]
     }
 
-    let keys = Object.keys(rawData);
+    let keys = Object.keys(rawData.tasks);
     keys.forEach(function (key) {
-        let task = rawData[key];
+        let task = rawData.tasks[key];
         data.labels.push(task.task_id);
 
         // read
@@ -139,9 +139,9 @@ function generateHostGanttChart(rawData) {
     // define host colors
     let hosts = {}
     let hostIndex = 0;
-    let keys = Object.keys(rawData);
+    let keys = Object.keys(rawData.tasks);
     keys.forEach(function (key) {
-        let task = rawData[key];
+        let task = rawData.tasks[key];
         if (!(task.execution_host.hostname in hosts)) {
             hosts[task.execution_host.hostname] = hostIndex++;
             data.datasets.push({
@@ -154,7 +154,7 @@ function generateHostGanttChart(rawData) {
     });
 
     keys.forEach(function (key) {
-        let task = rawData[key];
+        let task = rawData.tasks[key];
         data.labels.push(task.task_id);
 
         let index = hosts[task.execution_host.hostname];

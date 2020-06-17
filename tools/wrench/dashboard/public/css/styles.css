@@ -27,11 +27,6 @@ html, body {
     font-size: 12px;
 }
 
-#overall-graph-container {
-    width: 1000px;
-    margin: auto;
-}
-
 #nav-bar-top-half {
     display: flex;
 }
@@ -225,11 +220,6 @@ td {
 
 #button-and-information-container {
     margin-top: 6px;
-}
-
-#three-d-graph-container {
-    width: 1000px;
-    margin: auto;
 }
 
 #up-down-arrow-container {

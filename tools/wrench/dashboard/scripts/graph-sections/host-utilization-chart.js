@@ -1,5 +1,31 @@
 let hostUtilizationChart = null;
 
+function fillEmptyValues(datasets, end, labels) {
+    for (let i = datasets.length; i < end; i++) {
+        datasets.push({
+            data: [],
+            backgroundColor: [],
+            taskId: [],
+            borderColor: "rgba(0, 0, 0, 0.3)",
+            borderWidth: 1,
+            barPercentage: 1.2,
+        });
+    }
+    for (let i = 0; i < datasets.length; i++) {
+        for (let j = datasets[i].data.length; j < labels.length - 1; j++) {
+            datasets[i].data.push([0, 0]);
+            datasets[i].backgroundColor.push("");
+            datasets[i].taskId.push("");
+        }
+    }
+}
+
+function ingestData(obj, start, end, color, id) {
+    obj.data.push([start, end]);
+    obj.backgroundColor.push(color);
+    obj.taskId.push(id);
+}
+
 function findTaskScheduling(data, hosts) {
     let keys = Object.keys(hosts);
     keys.forEach(function (key) {
@@ -60,9 +86,9 @@ function generateHostUtilizationChart(rawData) {
 
     // obtain list of hosts
     let hosts = {};
-    let keys = Object.keys(rawData);
+    let keys = Object.keys(rawData.tasks);
     keys.forEach(function (key) {
-        let task = rawData[key];
+        let task = rawData.tasks[key];
         if (!(task.execution_host.hostname in hosts)) {
             hosts[task.execution_host.hostname] = {
                 cores: task.execution_host.cores,
@@ -74,39 +100,48 @@ function generateHostUtilizationChart(rawData) {
         }
     });
 
-    findTaskScheduling(rawData, hosts);
+    findTaskScheduling(rawData.tasks, hosts);
 
     // populate data
     keys = Object.keys(hosts);
     keys.forEach(function (key) {
         let host = hosts[key];
+
+        // add disk operations
+        if (rawData.disk && rawData.disk[key]) {
+            let mounts = Object.keys(rawData.disk[key]);
+            mounts.forEach(function (mount) {
+                let diskMounts = rawData.disk[key];
+
+                // read operations
+                data.labels.push(key + " (mount: " + mount + " - reads)");
+                fillEmptyValues(data.datasets, diskMounts[mount].reads.length, data.labels);
+                let index = 0;
+                for (let i = 0; i < diskMounts[mount].reads.length; i++) {
+                    let operation = diskMounts[mount].reads[i];
+                    ingestData(data.datasets[i], operation.start, operation.end, "green", "read");
+                }
+
+                // write operations
+                data.labels.push(key + " (mount: " + mount + " - writes)");
+                fillEmptyValues(data.datasets, diskMounts[mount].writes.length, data.labels);
+                for (let i = 0; i < diskMounts[mount].writes.length; i++) {
+                    let operation = diskMounts[mount].writes[i];
+                    ingestData(data.datasets[i], operation.start, operation.end, "blue", "write");
+                }
+            });
+        }
+
+        // add compute tasks
         let tasks = Object.keys(host.tasks);
         tasks.forEach(function (core) {
             let coreTasks = host.tasks[core];
-            data.labels.push(key + " #" + core);
+            data.labels.push(key + " (core #" + core + ")");
             // filling empty values
-            for (let i = data.datasets.length; i < coreTasks.length; i++) {
-                data.datasets.push({
-                    data: [],
-                    backgroundColor: [],
-                    taskId: [],
-                    borderColor: "rgba(0, 0, 0, 0.3)",
-                    borderWidth: 1,
-                    barPercentage: 1.2
-                });
-            }
-            for (let i = 0; i < data.datasets.length; i++) {
-                for (let j = data.datasets[i].data.length; j < data.labels.length - 1; j++) {
-                    data.datasets[i].data.push([0, 0]);
-                    data.datasets[i].backgroundColor.push("");
-                    data.datasets[i].taskId.push("");
-                }
-            }
+            fillEmptyValues(data.datasets, coreTasks.length, data.labels, percentage=1.2);
             for (let i = 0; i < coreTasks.length; i++) {
                 let task = coreTasks[i];
-                data.datasets[i].data.push([task.compute.start, task.compute.end]);
-                data.datasets[i].backgroundColor.push(task.color || "#f7daad");
-                data.datasets[i].taskId.push(task.task_id);
+                ingestData(data.datasets[i], task.compute.start, task.compute.end, task.color || "#f7daad", task.task_id);
             }
         });
     });
