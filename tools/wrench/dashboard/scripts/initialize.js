@@ -55,14 +55,14 @@ function initialize() {
             data.contents = prepareData(data.contents);
 
             generateGanttChart(data.contents);
-            // generateHostUtilizationChart(data.contents);
+            generateHostUtilizationChart(data.contents);
 
             // generateGraph(data.contents, currGraphState, false, 1000, 1000)
             // populateLegend("taskView")
             populateWorkflowTaskDataTable(data.contents)
             getOverallWorkflowMetrics(data.contents)
             generate3dGraph(data.contents, true, true)
-            generateHostUtilizationGraph(data.contents, 1000, 1000, 60)
+            // generateHostUtilizationGraph(data.contents, 1000, 1000, 60)
         }
     }
 }

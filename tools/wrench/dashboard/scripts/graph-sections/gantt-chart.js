@@ -147,7 +147,7 @@ function generateHostGanttChart(rawData) {
             data.datasets.push({
                 data: [],
                 details: [],
-                backgroundColor: getRandomColour(),
+                backgroundColor: getRandomColor(),
                 label: ''
             });
         }
