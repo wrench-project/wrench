@@ -382,7 +382,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void CloudComputeService::submitStandardJob(StandardJob *job,
-                                                std::map<std::string, std::string> &service_specific_args) {
+                                                const std::map<std::string, std::string> &service_specific_args) {
 
         assertServiceIsUp();
 
@@ -415,7 +415,7 @@ namespace wrench {
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
      */
-    void CloudComputeService::submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_args) {
+    void CloudComputeService::submitPilotJob(PilotJob *job, const std::map<std::string, std::string> &service_specific_args) {
 
         assertServiceIsUp();
 
