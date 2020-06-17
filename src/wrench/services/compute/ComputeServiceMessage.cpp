@@ -35,7 +35,7 @@ namespace wrench {
     ComputeServiceSubmitStandardJobRequestMessage::ComputeServiceSubmitStandardJobRequestMessage(
             const std::string answer_mailbox,
             StandardJob *job,
-            std::map<std::string, std::string> &service_specific_args,
+            const std::map<std::string, std::string> service_specific_args,
             double payload) :
             ComputeServiceMessage("SUBMIT_STANDARD_JOB_REQUEST", payload),
             service_specific_args(service_specific_args) {
@@ -179,7 +179,7 @@ namespace wrench {
      */
     ComputeServiceSubmitPilotJobRequestMessage::ComputeServiceSubmitPilotJobRequestMessage(std::string answer_mailbox,
                                                                                            PilotJob *job,
-                                                                                           std::map<std::string, std::string> &service_specific_args,
+                                                                                           const std::map<std::string, std::string> service_specific_args,
                                                                                            double payload)
             : ComputeServiceMessage(
             "SUBMIT_PILOT_JOB_REQUEST", payload) {

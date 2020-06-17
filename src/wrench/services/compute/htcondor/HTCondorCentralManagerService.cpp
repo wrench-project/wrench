@@ -84,7 +84,7 @@ namespace wrench {
      */
     void HTCondorCentralManagerService::submitStandardJob(
             StandardJob *job,
-            std::map<std::string, std::string> &service_specific_args) {
+            const std::map<std::string, std::string> &service_specific_args) {
 
         serviceSanityCheck();
 
@@ -132,7 +132,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void HTCondorCentralManagerService::submitPilotJob(PilotJob *job,
-                                                       std::map<std::string, std::string> &service_specific_args) {
+                                                       const std::map<std::string, std::string> &service_specific_args) {
         serviceSanityCheck();
 
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_pilot_job");
