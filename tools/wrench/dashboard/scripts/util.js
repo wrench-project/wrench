@@ -13,19 +13,49 @@ Chart.plugins.register({
 });
 
 function getRandomColor() {
-    let letters = '0123456789ABCDEF';
-    let color = '#';
-    for (let i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
+    return "#" + Math.floor(Math.random() * 16777215).toString(16);
 }
 
+function extractFileContent(file) {
+    return new Promise(function (resolve, reject) {
+        let reader = new FileReader()
+        reader.onload = function (event) {
+            resolve(event.target.result);
+        }
+        reader.readAsText(file);
+        setTimeout(function () {
+            reject()
+        }, 5000);
+    })
+}
 
+function processFile(files) {
+    if (files.length === 0) {
+        return;
+    }
+    extractFileContent(files[0])
+        .then(function (rawDataString) {
+            const rawData = JSON.parse(rawDataString);
+            if (!rawData.workflow_execution || !rawData.workflow_execution.tasks) {
+                return;
+            }
+            data = {
+                file: files[0].name,
+                tasks: rawData.workflow_execution.tasks,
+                disk: rawData.disk_operations,
+                contents: rawData.workflow_execution.tasks // TODO: remove
+            };
 
-
-
-
+            if (rawData.energy_consumption) {
+                energyData = rawData.energy_consumption;
+            }
+            document.getElementById("simulation-json").value = files[0].name;
+            initialize();
+        })
+        .catch(function (err) {
+            console.error(err)
+        });
+}
 
 
 const getDuration = (d, section) => {
@@ -119,7 +149,6 @@ function convertToTableFormat(d, section, property) {
     }
     return toFiveDecimalPlaces(metric);
 }
-
 
 
 function populateLegend(currView) {
@@ -286,45 +315,6 @@ function searchOverlap(taskId, taskOverlap) {
     }
 }
 
-function extractFileContent(file) {
-    return new Promise(function (resolve, reject) {
-        let reader = new FileReader()
-        reader.onload = function (event) {
-            resolve(event.target.result);
-            // document.getElementById('fileContent').textContent = event.target.result;
-        }
-        reader.readAsText(file);
-        setTimeout(function () {
-            reject()
-        }, 5000)
-    })
-}
-
-function processFile(files) {
-    if (files.length === 0) {
-        return
-    }
-    extractFileContent(files[0])
-        .then(function (rawDataString) {
-            const rawData = JSON.parse(rawDataString)
-            if (!rawData.workflow_execution || !rawData.workflow_execution.tasks) {
-                return
-            }
-            data = {
-                file: files[0].name,
-                contents: rawData.workflow_execution.tasks
-            }
-
-            if (rawData.energy_consumption) {
-                energyData = rawData.energy_consumption
-            }
-
-            initialize();
-        })
-        .catch(function (err) {
-            console.error(err)
-        })
-}
 
 function sanitizeId(id) {
     id = id.replace(/#/g, '')
