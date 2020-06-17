@@ -1,5 +1,33 @@
 const executionHostKey = 'execution_host'
 
+Chart.plugins.register({
+    beforeDraw: function (chart, easing) {
+        if (chart.config.options.chartArea && chart.config.options.chartArea.backgroundColor) {
+            let ctx = chart.chart.ctx;
+            ctx.fillStyle = chart.config.options.chartArea.backgroundColor;
+
+            let chartArea = chart.chartArea;
+            ctx.fillRect(chartArea.left, chartArea.top, chartArea.right - chartArea.left, chartArea.bottom - chartArea.top);
+        }
+    }
+});
+
+function getRandomColor() {
+    let letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
+
+
+
+
+
+
+
+
 const getDuration = (d, section) => {
     if (section === "read" || section === "write") {
         let total = 0
@@ -92,14 +120,7 @@ function convertToTableFormat(d, section, property) {
     return toFiveDecimalPlaces(metric);
 }
 
-function getRandomColour() {
-    let letters = '0123456789ABCDEF';
-    let colour = '#';
-    for (let i = 0; i < 6; i++) {
-        colour += letters[Math.floor(Math.random() * 16)];
-    }
-    return colour;
-}
+
 
 function populateLegend(currView) {
     if (currView === "taskView") {
