@@ -119,7 +119,7 @@ function generateHostUtilizationChart(rawData) {
                 let index = 0;
                 for (let i = 0; i < diskMounts[mount].reads.length; i++) {
                     let operation = diskMounts[mount].reads[i];
-                    ingestData(data.datasets[i], operation.start, operation.end, "green", "read");
+                    ingestData(data.datasets[i], operation.start, operation.end, "#77dd91", "read");
                 }
 
                 // write operations
@@ -127,7 +127,7 @@ function generateHostUtilizationChart(rawData) {
                 fillEmptyValues(data.datasets, diskMounts[mount].writes.length, data.labels);
                 for (let i = 0; i < diskMounts[mount].writes.length; i++) {
                     let operation = diskMounts[mount].writes[i];
-                    ingestData(data.datasets[i], operation.start, operation.end, "blue", "write");
+                    ingestData(data.datasets[i], operation.start, operation.end, "#8bb7e2", "write");
                 }
             });
         }
