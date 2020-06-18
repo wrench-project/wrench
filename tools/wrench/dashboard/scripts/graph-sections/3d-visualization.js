@@ -498,8 +498,6 @@ function generate3dGraph(data, populateLegend, needToInitialise) {
     const scaleInputId = "scale-input"
     const containerId = "three-d-graph-container"
     
-    document.getElementById(containerId).innerHTML = threedVisualizationHtml
-
     if (needToInitialise) {
         initialise3dGraph()
     }

@@ -26,9 +26,9 @@ function toggleView(obj) {
 }
 
 function resizeBox(size, id) {
-    let width = size === "full" ? "sixteen" : "seven";
+    let width = size === "full" ? "sixteen" : "eight";
     let otherSize = size === "full" ? "half" : "full";
-        document.getElementById(id).className = width + ' wide column';
+    document.getElementById(id).className = width + ' wide column';
     document.getElementById("dd-width-" + size + "-" + id).className = 'check icon';
     document.getElementById("dd-width-" + otherSize + "-" + id).className = 'icon';
 }
