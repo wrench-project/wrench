@@ -78,7 +78,7 @@ namespace wrench {
      * @return a <cores, ram> tuple
      * @throw std::invalid_argument
      */
-    static std::tuple<std::string, unsigned long> parseResourceSpec(const std::string spec) {
+    static std::tuple<std::string, unsigned long> parseResourceSpec(const std::string &spec) {
         std::vector<std::string> tokens;
         boost::algorithm::split(tokens, spec, boost::is_any_of(":"));
         switch (tokens.size()) {
