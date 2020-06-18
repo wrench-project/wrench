@@ -5,9 +5,11 @@ function toggleDashboard(id) {
     if (el.hasClass("active")) {
         el.removeClass("active");
         els.style.display = 'none';
+        els.style.visibility = 'hidden';
     } else {
         el.addClass("active");
         els.style.display = 'block';
+        els.style.visibility = 'visible';
     }
 }
 
@@ -21,6 +23,14 @@ function toggleView(obj) {
         currGraphState = "taskView";
         obj.innerHTML = "<i class=\"exchange icon\"></i> Switch to Host View";
     }
+}
+
+function resizeBox(size, id) {
+    let width = size === "full" ? "sixteen" : "seven";
+    let otherSize = size === "full" ? "half" : "full";
+        document.getElementById(id).className = width + ' wide column';
+    document.getElementById("dd-width-" + size + "-" + id).className = 'check icon';
+    document.getElementById("dd-width-" + otherSize + "-" + id).className = 'icon';
 }
 
 

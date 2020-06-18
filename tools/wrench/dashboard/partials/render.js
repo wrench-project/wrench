@@ -53,3 +53,7 @@ function render() {
 }
 
 render()
+
+$('.ui.dropdown')
+    .dropdown()
+;
