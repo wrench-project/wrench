@@ -64,18 +64,18 @@
     <div id="main-body" class="ui grid">
         <template id="graph-template">
             {{#each graphInfo}}
-            <div class="sixteen wide column" id="{{containerId}}">
+            <div class="sixteen wide column" id="{{containerId}}" style="margin-left: 0;  margin-right: 0">
                 <div class="ui raised segments visible">
                     <div class="ui inverted grey segment">
                         <i class="{{icon}} icon"></i>
                         {{title}}
                         <a class="ui top right attached grey dropdown label">
                             <i class="cog icon"></i>
-                            <div class="menu">
+                            <div class="small menu">
                                 <div class="item">
                                     <i class="dropdown icon"></i>
                                     <span class="text">Box Width</span>
-                                    <div class="menu">
+                                    <div class="small menu">
                                         <div class="item" onclick="resizeBox('full', '{{containerId}}');">
                                             <i class="check icon" id="dd-width-full-{{containerId}}"></i>
                                             Full Width

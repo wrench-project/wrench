@@ -14,6 +14,7 @@ html, body {
     font-family: sans-serif;
     font-size: 12px;
 }
+
 #host-tooltip-container {
     position: absolute;
     width: auto;
@@ -64,6 +65,7 @@ html, body {
 #workflow-execution-chart-legend {
     overflow-wrap: break-word;
 }
+
 #workflow-execution-chart-legend-read-input {
     border-left: 15px solid #cbb5dd;
 }
@@ -75,35 +77,41 @@ html, body {
 #workflow-execution-chart-legend-write-output {
     border-left: 15px solid #abdcf4;
 }
+
 #workflow-execution-chart-legend-failed {
     border-left: 15px solid orange;
 }
+
 #workflow-execution-chart-legend-terminated {
     border-left: 15px solid red;
 }
+
 .task-details-table {
     width: 1000px;
     margin: auto;
     text-align: center;
     table-layout: fixed;
 }
+
 .legend {
     text-align: center;
 }
+
 .legend small {
     margin: auto;
     padding-left: 3px;
     margin-right: 5px;
     border-radius: 3px;
 }
+
 .read-col {
     background-color: #efe8f4;
 }
-  
+
 .compute-col {
     background-color: #f9eedb;
 }
-  
+
 .write-col {
     background-color: #e2f5ff;
 }
@@ -310,4 +318,8 @@ td {
 
 .pointer {
     cursor: pointer;
+}
+
+.ui.grid > [class*="eight wide"].column {
+    width: 49.8% !important;
 }
