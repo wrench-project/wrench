@@ -8,8 +8,9 @@ function toggleDashboard(id) {
         els.style.visibility = 'hidden';
     } else {
         el.addClass("active");
-        els.style.display = 'block';
+        els.style.display = 'inline-block';
         els.style.visibility = 'visible';
+        // els.className = "eight wide column";
     }
 }
 
@@ -28,9 +29,9 @@ function toggleView(obj) {
 function resizeBox(size, id) {
     let width = size === "full" ? "sixteen" : "eight";
     let otherSize = size === "full" ? "half" : "full";
-    document.getElementById(id).className = width + ' wide column';
-    document.getElementById("dd-width-" + size + "-" + id).className = 'check icon';
-    document.getElementById("dd-width-" + otherSize + "-" + id).className = 'icon';
+    document.getElementById(id).className = width + " wide column";
+    document.getElementById("dd-width-" + size + "-" + id).className = "check icon";
+    document.getElementById("dd-width-" + otherSize + "-" + id).className = "icon";
 }
 
 
