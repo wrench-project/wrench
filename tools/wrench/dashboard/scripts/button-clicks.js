@@ -10,7 +10,6 @@ function toggleDashboard(id) {
         el.addClass("active");
         els.style.display = 'inline-block';
         els.style.visibility = 'visible';
-        // els.className = "eight wide column";
     }
 }
 
