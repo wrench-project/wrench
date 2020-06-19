@@ -38,12 +38,12 @@ const graphInfoArray = [
 ]
 
 function render() {
-    const template = document.getElementById('graph-template').innerHTML
-    const templateMenu = document.getElementById('graph-template-menu').innerHTML
-    const renderGraphs = Handlebars.compile(template)
-    const renderGraphsMenu = Handlebars.compile(templateMenu)
-    document.getElementById('main-body').innerHTML = renderGraphs({graphInfo: graphInfoArray})
-    document.getElementById('main-sidebar').innerHTML = renderGraphsMenu({graphInfo: graphInfoArray})
+    const template = document.getElementById('graph-template').innerHTML;
+    const templateMenu = document.getElementById('graph-template-menu').innerHTML;
+    const renderGraphs = Handlebars.compile(template);
+    const renderGraphsMenu = Handlebars.compile(templateMenu);
+    document.getElementById('main-body').innerHTML = renderGraphs({graphInfo: graphInfoArray});
+    document.getElementById('main-sidebar').innerHTML = renderGraphsMenu({graphInfo: graphInfoArray});
 }
 
 render();
