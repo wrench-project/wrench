@@ -43,7 +43,7 @@
 <div class="ui container" style="width: auto; padding: 1em 1em 1em 16em; height: 100%">
 
     <div class="ui tertiary raised segment">
-        <div class="ui small left action icon fluid input">
+        <div class="ui small left action icon input">
             <input type="file" accept="application/json" onchange="processFile(this.files);"
                    id="inputGroupFile01" hidden>
             <label for="inputGroupFile01" class="ui grey labeled icon button">
@@ -52,6 +52,23 @@
             </label>
             <i class="file icon"></i>
             <input type="text" class="grey" id="simulation-json" value="No File Uploaded" readonly>
+        </div>
+        <div class="ui right floated icon grey dropdown button" id="main-cog" style="visibility: hidden">
+            <i class="cog icon"></i>
+            <div class="small menu">
+                <div class="item">
+                    <i class="dropdown icon"></i>
+                    <span class="text">Resize All Box Width</span>
+                    <div class="small menu">
+                        <div class="item" onclick="resizeAllBox('full');">
+                            Full Width
+                        </div>
+                        <div class="item" onclick="resizeAllBox('half');">
+                            Half Width
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 

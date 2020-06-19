@@ -33,6 +33,17 @@ function resizeBox(size, id) {
     document.getElementById("dd-width-" + otherSize + "-" + id).className = "icon";
 }
 
+function resizeAllBox(size) {
+    let width = size === "full" ? "sixteen" : "eight";
+    let otherSize = size === "full" ? "half" : "full";
+    for (let i = 0; i < graphInfoArray.length; i++) {
+        let id = graphInfoArray[i].containerId;
+        document.getElementById(id).className = width + " wide column";
+        document.getElementById("dd-width-" + size + "-" + id).className = "check icon";
+        document.getElementById("dd-width-" + otherSize + "-" + id).className = "icon";
+    }
+}
+
 
 function showHideArrow(id, arrowId) {
     var overallDiv = $(`#${id}`)
