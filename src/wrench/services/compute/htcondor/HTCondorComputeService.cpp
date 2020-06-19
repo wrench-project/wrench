@@ -339,16 +339,12 @@ namespace wrench {
         this->central_manager->submitStandardJob(job, service_specific_args);
 
         // send positive answer
-//      try {
         S4U_Mailbox::dputMessage(
                 answer_mailbox,
                 new ComputeServiceSubmitStandardJobAnswerMessage(
                         job, this->getSharedPtr<HTCondorComputeService>(), true, nullptr, this->getMessagePayloadValue(
                                 HTCondorComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
         return;
-//      } catch (std::shared_ptr<NetworkError> &cause) {
-//        return;
-//      }
     }
 
     /**
