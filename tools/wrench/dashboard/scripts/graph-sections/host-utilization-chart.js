@@ -69,7 +69,14 @@ function findTaskScheduling(data, hosts) {
     });
 }
 
-function generateHostUtilizationChart(rawData) {
+/**
+ * Generates the host utilization chart
+ *
+ * @param rawData: simulation data
+ * @param hostsList: list of host names to be displayed (empty list displays all hosts)
+ * @param operations: type of operations to be shown ('all', 'compute', 'io', 'write', 'read')
+ */
+function generateHostUtilizationChart(rawData, hostsList = [], operations = "all") {
     // clean chart
     if (hostUtilizationChart !== null) {
         hostUtilizationChart.destroy();
@@ -89,6 +96,9 @@ function generateHostUtilizationChart(rawData) {
     let keys = Object.keys(rawData.tasks);
     keys.forEach(function (key) {
         let task = rawData.tasks[key];
+        if (hostsList.length > 0 && !(hostsList.includes(task.execution_host.hostname))) {
+            return;
+        }
         if (!(task.execution_host.hostname in hosts)) {
             hosts[task.execution_host.hostname] = {
                 cores: task.execution_host.cores,
@@ -99,6 +109,7 @@ function generateHostUtilizationChart(rawData) {
             }
         }
     });
+    console.log(hosts);
 
     findTaskScheduling(rawData.tasks, hosts);
 
