@@ -6,75 +6,125 @@
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
     <title>WRENCH Dashboard</title>
-
-    <link rel="stylesheet" href="public/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="public/css/styles.css"/>
     <link rel="icon" href="public/img/favicon.ico"/>
 
+    <link rel="stylesheet" href="public/css/semantic.min.css"/>
+    <link rel="stylesheet" href="public/css/styles.css"/>
+    <link rel="stylesheet" href="public/css/Chart.min.css"/>
+    <script src="public/js/Chart.min.js" type="text/javascript"></script>
     <script src='public/js/jquery-3.3.1.min.js' type='text/javascript'></script>
-    <script src="public/js/d3.min.js" type="text/javascript"></script>
     <script src="public/js/jQueryRotate.js" type="text/javascript"></script>
+    <script src="public/js/semantic.min.js" type="text/javascript"></script>
+    <script src="public/js/d3.min.js" type="text/javascript"></script>
     <script src="public/js/d3-3d.js" type="text/javascript"></script>
     <script src="public/js/handlebars.min-v4.7.2.js" type="text/javascript"></script>
-
-    <!-- billboard.js scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/billboard.js/dist/billboard.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/billboard.js/dist/billboard.min.css">
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top justify-content-between">
-    <a class="navbar-brand" href="#">
-        <img src="public/img/logo-vertical.png" id="logo" width="50"/>
-        WRENCH <span class="small">dashboard</span>
-    </a>
-    <form class="form-inline">
-        <div class="input-group small">
-            <!-- <div class="input-group-prepend small">
-                <span class="input-group-text badge-secondary" style="font-size: 1.2em" id="inputGroupFileAddon01">Upload</span>
-            </div> -->
-            <div class="custom-file">
-                <input type="file" accept="application/json" onchange="processFile(this.files);"
-                       class="btn-light" id="inputGroupFile01"
-                       aria-describedby="inputGroupFileAddon01">
-                <label class="pointer custom-file-label badge-light" for="inputGroupFile01">Choose JSON File</label>
-            </div>
+<div class="ui vertical inverted visible sidebar left menu uncover" style="width: 15em; float: left; position: fixed">
+    <div class="item" style="padding-bottom: 2em !important; padding-top: 2em; text-align: center">
+        <img src="public/img/logo-vertical.png" style="width: 10em"/>
+        <div style="margin-top: 1em; color: #ccc; text-align: center">
+            <h2>WRENCH<br/><span style="font-size: 0.7em">dashboard</span></h2>
         </div>
-    </form>
-</nav>
-
-<div class="jumbotron jumbotron-fluid m-5" id="no-file">
-    <div class="container">
-        <h2>Welcome to the WRENCH dashboard!</h2>
-        <hr class="my-4 m-5">
-        <p class="lead">To get started, please upload your JSON file in the file upload above.</p>
+    </div>
+    <div id="main-sidebar" class="hidden">
+        <template id="graph-template-menu">
+            {{#each graphInfo}}
+            <a class="item active" id="btn-{{containerId}}" onclick="toggleDashboard('{{containerId}}');">
+                <i class="{{icon}} icon"></i>
+                {{title}}
+            </a>
+            {{/each}}
+        </template>
     </div>
 </div>
 
-<div id="main-body" class="mt-5 mb-5">
-    <template id="graph-template">
-        {{#each graphInfo}}
-        <div class='element-and-title-container'>
-            <div class='title-container' onclick='showHideArrow("{{containerId}}", "{{arrowId}}")'>
-                <h6 class='title-text'>{{title}}</h6>
-                <div class='arrow-div'>
-                    <span class='arrow-helper'></span>
-                    <img id='{{arrowId}}' class='arrow-img' src='public/img/expand-arrow.png'/>
+<div class="ui container" style="width: auto; padding: 1em 1em 1em 16em; height: 100%">
+
+    <div class="ui tertiary raised segment">
+        <div class="ui small left action icon input">
+            <input type="file" accept="application/json" onchange="processFile(this.files);"
+                   id="inputGroupFile01" hidden>
+            <label for="inputGroupFile01" class="ui grey labeled icon button">
+                <i class="upload icon"></i>
+                Simulation Output JSON
+            </label>
+            <i class="file icon"></i>
+            <input type="text" class="grey" id="simulation-json" value="No File Uploaded" readonly>
+        </div>
+        <div class="ui right floated icon grey dropdown button" id="main-cog" style="visibility: hidden">
+            <i class="cog icon"></i>
+            <div class="small menu">
+                <div class="item">
+                    <i class="dropdown icon"></i>
+                    <span class="text">Resize All Box Width</span>
+                    <div class="small menu">
+                        <div class="item" onclick="resizeAllBox('full');">
+                            Full Width
+                        </div>
+                        <div class="item" onclick="resizeAllBox('half');">
+                            Half Width
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            <div class='hidden' id='{{containerId}}'>
-                {{{html}}}
-            </div>
         </div>
-        {{/each}}
-    </template>
-</div>
+    </div>
 
-<nav class="bottom-navbar navbar navbar-expand-lg navbar-light bg-light sticky-bottom justify-content-between small" style="color: #999">
-    <label>&copy; WRENCH</label>
-    <a href="https://wrench-project.org" target="_blank" style="color: #999">https://wrench-project.org</a>
-</nav>
+    <div class="ui tertiary segment" style="height: 85%; padding: 10em" id="no-file">
+        <h1>Welcome to the WRENCH dashboard!</h1>
+        <div class="ui divider"></div>
+        <p class="lead">To get started, please upload your JSON file in the file upload above.</p>
+    </div>
+
+    <div id="main-body" class="ui grid">
+        <template id="graph-template">
+            {{#each graphInfo}}
+            <div class="sixteen wide column" id="{{containerId}}" style="margin-left: 0;  margin-right: 0">
+                <div class="ui raised segments visible">
+                    <div class="ui inverted grey segment">
+                        <i class="{{icon}} icon"></i>
+                        {{title}}
+                        <a class="ui top right attached grey dropdown label">
+                            <i class="cog icon"></i>
+                            <div class="small menu">
+                                <div class="item">
+                                    <i class="dropdown icon"></i>
+                                    <span class="text">Box Width</span>
+                                    <div class="small menu">
+                                        <div class="item" onclick="resizeBox('full', '{{containerId}}');">
+                                            <i class="check icon" id="dd-width-full-{{containerId}}"></i>
+                                            Full Width
+                                        </div>
+                                        <div class="item" onclick="resizeBox('half', '{{containerId}}');">
+                                            <i class="icon" id="dd-width-half-{{containerId}}"></i>
+                                            Half Width
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="ui segment" style="overflow: auto">
+                        {{{html}}}
+                    </div>
+                </div>
+            </div>
+            {{/each}}
+        </template>
+    </div>
+
+    <div class="ui small grey menu" style="margin-bottom: 2em">
+        <div class="header item" style="color: #999">
+            &copy; WRENCH<br/>
+        </div>
+        <a class="right item" href="https://wrench-project.org" target="_blank" style="color: #999">
+            https://wrench-project.org
+        </a>
+    </div>
+
+</div>
 
 </body>
 <script src="partials/workflow-summary.js"></script>
@@ -85,6 +135,10 @@
 <script src="partials/host-utilization.js"></script>
 <script src="partials/render.js"></script>
 
+<!-- CHARTS -->
+<script src="scripts/graph-sections/gantt-chart.js" type="text/javascript"></script>
+<script src="scripts/graph-sections/host-utilization-chart.js" type="text/javascript"></script>
+
 <script src="scripts/data.js"></script>
 <script src="scripts/util.js"></script>
 <script src="scripts/button-clicks.js"></script>
@@ -94,5 +148,5 @@
 <script src="scripts/graph-sections/simulation-graph.js"></script>
 <script src="scripts/graph-sections/workflow-summary.js"></script>
 <script src="scripts/graph-sections/host-utilization.js"></script>
-<script src="scripts/initialise.js"></script>
+<script src="scripts/initialize.js"></script>
 </html>
