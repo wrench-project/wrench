@@ -31,5 +31,4 @@ namespace wrench {
     SET_PROPERTY_NAME(BatchComputeServiceProperty, BATSCHED_LOGGING_MUTED);
     SET_PROPERTY_NAME(BatchComputeServiceProperty, BATSCHED_CONTIGUOUS_ALLOCATION);
 
-
 }
