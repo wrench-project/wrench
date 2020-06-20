@@ -138,7 +138,7 @@ function generateHostUtilizationChart(rawData) {
             let coreTasks = host.tasks[core];
             data.labels.push(key + " (core #" + core + ")");
             // filling empty values
-            fillEmptyValues(data.datasets, coreTasks.length, data.labels, percentage=1.2);
+            fillEmptyValues(data.datasets, coreTasks.length, data.labels, percentage = 1.2);
             for (let i = 0; i < coreTasks.length; i++) {
                 let task = coreTasks[i];
                 ingestData(data.datasets[i], task.compute.start, task.compute.end, task.color || "#f7daad", task.task_id);
@@ -171,6 +171,9 @@ function generateHostUtilizationChart(rawData) {
                 display: false
             },
             tooltips: {
+                position: 'nearest',
+                mode: 'point',
+                intersect: 'false',
                 callbacks: {
                     label: function (tooltipItem, data) {
                         let value = tooltipItem.value.replace("[", "").replace("]", "").split(", ");
@@ -183,7 +186,7 @@ function generateHostUtilizationChart(rawData) {
                             return label;
                         }
                         return "";
-                    }
+                    },
                 }
             }
         }
