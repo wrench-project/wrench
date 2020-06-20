@@ -29,7 +29,6 @@ function ingestData(obj, start, end, color, id) {
 function findTaskScheduling(data, hosts) {
     let keys = Object.keys(hosts);
     keys.forEach(function (key) {
-        let host = hosts[key];
         let hostTasks = [];
         // obtaining sorted list of tasks by start time
         for (let i = 0; i < data.length; i++) {
@@ -50,19 +49,29 @@ function findTaskScheduling(data, hosts) {
             }
         }
         // distributing tasks into cores
+        let host = hosts[key];
         for (let i = 0; i < hostTasks.length; i++) {
             let task = hostTasks[i];
             for (let j = 0; j < host.cores; j++) {
-                let tasks = host.tasks[j];
-                if (tasks.length === 0) {
-                    tasks.push(task);
-                    break;
-                } else {
-                    let lastTask = tasks[tasks.length - 1];
-                    if (lastTask.whole_task.end <= task.whole_task.start) {
-                        tasks.push(task);
-                        break;
+                let inserted = false;
+                for (let k = 0; k < task.num_cores_allocated; k++) {
+                    if (k > 0) {
+                        j++;
                     }
+                    let tasks = host.tasks[j];
+                    if (tasks.length === 0) {
+                        tasks.push(task);
+                        inserted = true;
+                    } else {
+                        let lastTask = tasks[tasks.length - 1];
+                        if (lastTask.whole_task.end <= task.whole_task.start) {
+                            tasks.push(task);
+                            inserted = true;
+                        }
+                    }
+                }
+                if (inserted) {
+                    break;
                 }
             }
         }
@@ -109,7 +118,6 @@ function generateHostUtilizationChart(rawData, hostsList = [], operations = "all
             }
         }
     });
-    console.log(hosts);
 
     findTaskScheduling(rawData.tasks, hosts);
 
