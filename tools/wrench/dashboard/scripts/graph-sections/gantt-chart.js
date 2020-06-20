@@ -103,6 +103,9 @@ function generateGanttChart(rawData) {
         options: {
             scales: ganttChartScales,
             tooltips: {
+                position: 'nearest',
+                mode: 'point',
+                intersect: 'false',
                 callbacks: {
                     label: function (tooltipItem, data) {
                         let value = tooltipItem.value.replace("[", "").replace("]", "").split(", ");
@@ -197,6 +200,9 @@ function generateHostGanttChart(rawData) {
         options: {
             scales: ganttChartScales,
             tooltips: {
+                position: 'nearest',
+                mode: 'point',
+                intersect: 'false',
                 callbacks: {
                     label: function (tooltipItem, data) {
                         return "";
