@@ -228,6 +228,7 @@ set(SOURCE_FILES
         src/wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessage.cpp
         src/wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessagePayload.cpp
         src/wrench/services/compute/htcondor/HTCondorComputeService.cpp
+        src/wrench/services/compute/htcondor/HTCondorComputeServiceProperty.cpp
         src/wrench/services/compute/htcondor/HTCondorNegotiatorService.cpp
         src/wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.cpp
         src/wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceMessage.cpp
