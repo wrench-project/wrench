@@ -119,6 +119,22 @@ function generateHostUtilizationChart(rawData, hostsList = [], operations = "all
         }
     });
 
+    // obtain additional hosts without tasks
+    if (rawData.disk) {
+        keys = Object.keys(rawData.disk);
+        keys.forEach(function (key) {
+            if (hostsList.length > 0 && !(hostsList.includes(key))) {
+                return;
+            }
+            if (!(key in hosts)) {
+                hosts[key] = {
+                    cores: 1,
+                    tasks: {}
+                }
+            }
+        });
+    }
+
     findTaskScheduling(rawData.tasks, hosts);
 
     // populate data
@@ -133,20 +149,24 @@ function generateHostUtilizationChart(rawData, hostsList = [], operations = "all
                 let diskMounts = rawData.disk[key];
 
                 // read operations
-                data.labels.push(key + " (mount: " + mount + " - reads)");
-                fillEmptyValues(data.datasets, diskMounts[mount].reads.length, data.labels);
-                let index = 0;
-                for (let i = 0; i < diskMounts[mount].reads.length; i++) {
-                    let operation = diskMounts[mount].reads[i];
-                    ingestData(data.datasets[i], operation.start, operation.end, "#77dd91", "read");
+                if (diskMounts[mount].reads) {
+                    data.labels.push(key + " (mount: " + mount + " - reads)");
+                    fillEmptyValues(data.datasets, diskMounts[mount].reads.length, data.labels);
+                    let index = 0;
+                    for (let i = 0; i < diskMounts[mount].reads.length; i++) {
+                        let operation = diskMounts[mount].reads[i];
+                        ingestData(data.datasets[i], operation.start, operation.end, "#77dd91", "read");
+                    }
                 }
 
                 // write operations
-                data.labels.push(key + " (mount: " + mount + " - writes)");
-                fillEmptyValues(data.datasets, diskMounts[mount].writes.length, data.labels);
-                for (let i = 0; i < diskMounts[mount].writes.length; i++) {
-                    let operation = diskMounts[mount].writes[i];
-                    ingestData(data.datasets[i], operation.start, operation.end, "#8bb7e2", "write");
+                if (diskMounts[mount].writes) {
+                    data.labels.push(key + " (mount: " + mount + " - writes)");
+                    fillEmptyValues(data.datasets, diskMounts[mount].writes.length, data.labels);
+                    for (let i = 0; i < diskMounts[mount].writes.length; i++) {
+                        let operation = diskMounts[mount].writes[i];
+                        ingestData(data.datasets[i], operation.start, operation.end, "#8bb7e2", "write");
+                    }
                 }
             });
         }
