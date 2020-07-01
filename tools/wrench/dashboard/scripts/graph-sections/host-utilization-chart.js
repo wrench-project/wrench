@@ -82,10 +82,11 @@ function findTaskScheduling(data, hosts) {
  * Generates the host utilization chart
  *
  * @param rawData: simulation data
- * @param hostsList: list of host names to be displayed (empty list displays all hosts)
+ * @param hostsList: list of host names in which compute tasks will be displayed (empty list displays all hosts)
+ * @param diskHostsList: list of host names in which the disk usage will be displayed (empty list displays all hosts)
  * @param operations: type of operations to be shown ('all', 'compute', 'io', 'write', 'read')
  */
-function generateHostUtilizationChart(rawData, hostsList = [], operations = "all") {
+function generateHostUtilizationChart(rawData, hostsList = [], diskHostsList = [], operations = "all") {
     // clean chart
     if (hostUtilizationChart !== null) {
         hostUtilizationChart.destroy();
@@ -123,7 +124,7 @@ function generateHostUtilizationChart(rawData, hostsList = [], operations = "all
     if (rawData.disk) {
         keys = Object.keys(rawData.disk);
         keys.forEach(function (key) {
-            if (hostsList.length > 0 && !(hostsList.includes(key))) {
+            if (diskHostsList.length > 0 && !(diskHostsList.includes(key))) {
                 return;
             }
             if (!(key in hosts)) {
@@ -143,7 +144,7 @@ function generateHostUtilizationChart(rawData, hostsList = [], operations = "all
         let host = hosts[key];
 
         // add disk operations
-        if (rawData.disk && rawData.disk[key]) {
+        if ((diskHostsList.length === 0 || diskHostsList.includes(key)) && (rawData.disk && rawData.disk[key])) {
             let mounts = Object.keys(rawData.disk[key]);
             mounts.forEach(function (mount) {
                 let diskMounts = rawData.disk[key];
@@ -172,17 +173,19 @@ function generateHostUtilizationChart(rawData, hostsList = [], operations = "all
         }
 
         // add compute tasks
-        let tasks = Object.keys(host.tasks);
-        tasks.forEach(function (core) {
-            let coreTasks = host.tasks[core];
-            data.labels.push(key + " (core #" + core + ")");
-            // filling empty values
-            fillEmptyValues(data.datasets, coreTasks.length, data.labels, percentage = 1.2);
-            for (let i = 0; i < coreTasks.length; i++) {
-                let task = coreTasks[i];
-                ingestData(data.datasets[i], task.compute.start, task.compute.end, task.color || "#f7daad", task.task_id);
-            }
-        });
+        if (hostsList.length === 0 || hostsList.includes(key)) {
+            let tasks = Object.keys(host.tasks);
+            tasks.forEach(function (core) {
+                let coreTasks = host.tasks[core];
+                data.labels.push(key + " (core #" + core + ")");
+                // filling empty values
+                fillEmptyValues(data.datasets, coreTasks.length, data.labels, percentage = 1.2);
+                for (let i = 0; i < coreTasks.length; i++) {
+                    let task = coreTasks[i];
+                    ingestData(data.datasets[i], task.compute.start, task.compute.end, task.color || "#f7daad", task.task_id);
+                }
+            });
+        }
     });
 
     hostUtilizationChart = new Chart(ctx, {
