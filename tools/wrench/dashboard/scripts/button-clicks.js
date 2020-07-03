@@ -15,11 +15,11 @@ function toggleDashboard(id) {
 
 function toggleView(obj) {
     if (currGraphState === "taskView") {
-        generateHostGanttChart(data);
+        generateHostGanttChart(data, currZoomState["overall-graph-container"]);
         currGraphState = "hostView";
         obj.innerHTML = "<i class=\"exchange icon\"></i> Switch to Task View";
     } else if (currGraphState === "hostView") {
-        generateGanttChart(data);
+        generateGanttChart(data, currZoomState["overall-graph-container"]);
         currGraphState = "taskView";
         obj.innerHTML = "<i class=\"exchange icon\"></i> Switch to Host View";
     }
@@ -42,6 +42,21 @@ function resizeAllBox(size) {
         document.getElementById("dd-width-" + size + "-" + id).className = "check icon";
         document.getElementById("dd-width-" + otherSize + "-" + id).className = "icon";
     }
+}
+
+function toggleZoom(id) {
+    let zoom = id in currZoomState ? currZoomState[id] : true;
+    if (id === "host-utilization-graph-container") {
+        generateHostUtilizationChart(data, [], [], !zoom);
+    } else if (id === "overall-graph-container") {
+        if (currGraphState === "taskView") {
+            generateGanttChart(data, !zoom);
+        } else if (currGraphState === "hostView") {
+            generateHostGanttChart(data, !zoom);
+        }
+    }
+    currZoomState[id] = !zoom;
+    document.getElementById("dd-zoom-" + id).className = !zoom ? "check icon" : "icon";
 }
 
 
