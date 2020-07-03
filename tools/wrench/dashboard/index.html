@@ -12,12 +12,19 @@
     <link rel="stylesheet" href="public/css/styles.css"/>
     <link rel="stylesheet" href="public/css/Chart.min.css"/>
     <script src="public/js/Chart.min.js" type="text/javascript"></script>
+    <script src="public/js/hammer.min.js" type="text/javascript"></script>
+    <script src="public/js/chartjs-plugin-zoom.min.js" type="text/javascript"></script>
     <script src='public/js/jquery-3.3.1.min.js' type='text/javascript'></script>
     <script src="public/js/jQueryRotate.js" type="text/javascript"></script>
     <script src="public/js/semantic.min.js" type="text/javascript"></script>
     <script src="public/js/d3.min.js" type="text/javascript"></script>
     <script src="public/js/d3-3d.js" type="text/javascript"></script>
     <script src="public/js/handlebars.min-v4.7.2.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        Handlebars.registerHelper('ifEquals', function (arg1, arg2, arg3, options) {
+            return (arg1 === arg2 || arg1 === arg3) ? options.fn(this) : options.inverse(this);
+        });
+    </script>
 </head>
 <body>
 
@@ -103,6 +110,12 @@
                                         </div>
                                     </div>
                                 </div>
+                                {{#ifEquals containerId "overall-graph-container" "host-utilization-graph-container"}}
+                                <div class="item" onclick="toggleZoom('{{containerId}}');">
+                                    <i class="check icon" id="dd-zoom-{{containerId}}"></i>
+                                    Zoom
+                                </div>
+                                {{/ifEquals}}
                             </div>
                         </a>
                     </div>

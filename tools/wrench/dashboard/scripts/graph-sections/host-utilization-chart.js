@@ -86,7 +86,7 @@ function findTaskScheduling(data, hosts) {
  * @param diskHostsList: list of host names in which the disk usage will be displayed (empty list displays all hosts)
  * @param operations: type of operations to be shown ('all', 'compute', 'io', 'write', 'read')
  */
-function generateHostUtilizationChart(rawData, hostsList = [], diskHostsList = [], operations = "all") {
+function generateHostUtilizationChart(rawData, hostsList = [], diskHostsList = [], zoom = true, operations = "all") {
     // clean chart
     if (hostUtilizationChart !== null) {
         hostUtilizationChart.destroy();
@@ -100,6 +100,7 @@ function generateHostUtilizationChart(rawData, hostsList = [], diskHostsList = [
         labels: [],
         datasets: [],
     }
+    let zoomMaxRange = 0;
 
     // obtain list of hosts
     let hosts = {};
@@ -183,10 +184,34 @@ function generateHostUtilizationChart(rawData, hostsList = [], diskHostsList = [
                 for (let i = 0; i < coreTasks.length; i++) {
                     let task = coreTasks[i];
                     ingestData(data.datasets[i], task.compute.start, task.compute.end, task.color || "#f7daad", task.task_id);
+                    zoomMaxRange = Math.max(zoomMaxRange, task.compute.end);
                 }
             });
         }
     });
+
+    // zoom properties
+    let pluginsProperties = {}
+    if (zoom) {
+        pluginsProperties["zoom"] = {
+            pan: {
+                enabled: true,
+                mode: 'x'
+            },
+            zoom: {
+                enabled: true,
+                mode: 'x',
+                rangeMin: {
+                    x: 0
+                },
+                rangeMax: {
+                    x: Math.ceil(zoomMaxRange)
+                },
+                threshold: 20,
+                speed: 0.05
+            }
+        }
+    }
 
     hostUtilizationChart = new Chart(ctx, {
         type: 'horizontalBar',
@@ -230,7 +255,8 @@ function generateHostUtilizationChart(rawData, hostsList = [], diskHostsList = [
                         return "";
                     },
                 }
-            }
+            },
+            plugins: pluginsProperties
         }
     });
 }
