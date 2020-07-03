@@ -735,6 +735,7 @@ namespace wrench {
 
             // Pick a VM name (and being paranoid about mistakenly picking an actual hostname!)
             std::string vm_name = "";
+            std::string error_msg = "";
 
             if (desired_vm_name.empty()) {
                 do {
@@ -743,12 +744,14 @@ namespace wrench {
             } else {
                 if (this->vm_list.find(desired_vm_name) == this->vm_list.end()) {
                     vm_name = desired_vm_name;
+                } else {
+                    error_msg = "Desired VM name already in use";
                 }
             }
 
             if (vm_name.empty()) {
                 std::string empty = std::string();
-                std::string error_msg = "Invalid requested VM name";
+
                 msg_to_send_back = new CloudComputeServiceCreateVMAnswerMessage(
                         false,
                         empty,

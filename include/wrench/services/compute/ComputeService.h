@@ -66,7 +66,7 @@ namespace wrench {
 
         void stop() override;
 
-        void submitJob(WorkflowJob *job, const std::map<std::string, std::string>& = {});
+//        void submitJob(WorkflowJob *job, const std::map<std::string, std::string>& = {});
 
         void terminateJob(WorkflowJob *job);
 
@@ -150,6 +150,10 @@ namespace wrench {
 
     protected:
 
+        friend class JobManager;
+
+        void submitJob(WorkflowJob *job, const std::map<std::string, std::string>& = {});
+
         ComputeService(const std::string &hostname,
                        std::string service_name,
                        std::string mailbox_name_prefix,
@@ -173,6 +177,7 @@ namespace wrench {
         /***********************/
 
     private:
+
 
         std::shared_ptr<StorageService> scratch_space_storage_service_shared_ptr;
 
