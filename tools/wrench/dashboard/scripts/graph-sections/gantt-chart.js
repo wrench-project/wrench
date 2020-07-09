@@ -29,7 +29,7 @@ function processIO(taskIO) {
     let minStart = 0;
     let maxEnd = 0;
 
-    if (Object.keys(taskIO).length > 0) {
+    if (taskIO && Object.keys(taskIO).length > 0) {
         minStart = Number.MAX_VALUE;
         let ioKeys = Object.keys(taskIO);
         ioKeys.forEach(function (ioKey) {
