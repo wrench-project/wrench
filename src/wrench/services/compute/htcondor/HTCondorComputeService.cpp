@@ -78,7 +78,6 @@ namespace wrench {
             //if(!grid_universe_batch_service->getPropertyValueAsString(wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM).empty()) {
             if(grid_universe_batch_service) {
                 at_least_one_service_supports_grid_jobs = true;
-                break;
             }
         } catch(const std::invalid_argument& ia) {
 
@@ -369,7 +368,7 @@ namespace wrench {
 
         ///Checks if grid universe was requested in job service specific args.
         ///If so, must condor must support grid universe.
-        if(service_specific_args['universe'].compare('grid') == 0 && not this->supportsGridJobs()){
+        if(service_specific_args["universe"].compare("grid") == 0 && not this->supportsGridUniverse()){
             S4U_Mailbox::dputMessage(
                     answer_mailbox,
                     new ComputeServiceSubmitStandardJobAnswerMessage(
