@@ -31,6 +31,8 @@ namespace wrench {
      * @param compute_resources: a set of compute resources available via the HTCondor pool
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
+     * @param grid_universe_batch_service: batch service for grid universe jobs to be sent. Not used for vanilla
+     * or unspecified universe jobs
      *
      * @throw std::runtime_error
      */
@@ -38,7 +40,8 @@ namespace wrench {
                                                    const std::string &pool_name,
                                                    std::set<ComputeService *> compute_resources,
                                                    std::map<std::string, std::string> property_list,
-                                                   std::map<std::string, double> messagepayload_list) :
+                                                   std::map<std::string, double> messagepayload_list,
+                                                   ComputeService *grid_universe_batch_service) :
             ComputeService(hostname, "htcondor_service", "htcondor_service", "") {
 
         if (pool_name.empty()) {
@@ -71,15 +74,14 @@ namespace wrench {
         }
 
         bool at_least_one_service_supports_grid_jobs = false;
-        for (auto const & cs: compute_resources) {
-            try {
-                if(!cs->getPropertyValueAsString(wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM).empty()) {
-                    at_least_one_service_supports_grid_jobs = true;
-                    break;
-                }
-            } catch(const std::invalid_argument& ia) {
-
+        try {
+            //if(!grid_universe_batch_service->getPropertyValueAsString(wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM).empty()) {
+            if(grid_universe_batch_service) {
+                at_least_one_service_supports_grid_jobs = true;
+                break;
             }
+        } catch(const std::invalid_argument& ia) {
+
         }
 
 
@@ -112,7 +114,8 @@ namespace wrench {
 
         // create central manager service
         this->central_manager = std::make_shared<HTCondorCentralManagerService>(hostname, compute_resources,
-                                                                                property_list, messagepayload_list);
+                                                                                property_list, messagepayload_list,
+                                                                                grid_universe_batch_service);
     }
 
     /**
@@ -363,6 +366,22 @@ namespace wrench {
 //        }
             return;
         }
+
+        ///Checks if grid universe was requested in job service specific args.
+        ///If so, must condor must support grid universe.
+        if(service_specific_args['universe'].compare('grid') == 0 && not this->supportsGridJobs()){
+            S4U_Mailbox::dputMessage(
+                    answer_mailbox,
+                    new ComputeServiceSubmitStandardJobAnswerMessage(
+                            job, this->getSharedPtr<HTCondorComputeService>(), false, std::shared_ptr<FailureCause>(
+                                    new JobTypeNotSupported(job, this->getSharedPtr<HTCondorComputeService>())),
+                            this->getMessagePayloadValue(
+                                    HTCondorComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
+
+            return;
+        }
+
+
 
         this->central_manager->submitStandardJob(job, service_specific_args);
 

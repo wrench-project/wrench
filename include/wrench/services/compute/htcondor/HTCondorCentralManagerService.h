@@ -42,7 +42,8 @@ namespace wrench {
         HTCondorCentralManagerService(const std::string &hostname,
                                       std::set<ComputeService *> compute_resources,
                                       std::map<std::string, std::string> property_list = {},
-                                      std::map<std::string, double> messagepayload_list = {});
+                                      std::map<std::string, double> messagepayload_list = {},
+                                      ComputeService *grid_universe_batch_service = nullptr);
 
         /***********************/
         /** \cond DEVELOPER   **/
@@ -95,6 +96,8 @@ namespace wrench {
 
         /** set of compute resources **/
         std::set<ComputeService *> compute_resources;
+        /** batch compute service for grid universe jobs**/
+        ComputeService *grid_universe_batch_service;
         /** queue of pending jobs **/
         std::vector<std::tuple<WorkflowJob *, std::map<std::string, std::string>>> pending_jobs;
         /** whether a negotiator is dispatching jobs **/
