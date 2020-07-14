@@ -36,9 +36,11 @@ namespace wrench {
             std::map<std::shared_ptr<ComputeService>, unsigned long> &compute_resources,
             std::map<WorkflowJob *, std::shared_ptr<ComputeService>> &running_jobs,
             std::vector<std::tuple<WorkflowJob *, std::map<std::string, std::string>>> &pending_jobs,
-            std::string &reply_mailbox)
+            std::string &reply_mailbox,
+            std::shared_ptr<ComputeService> &grid_universe_batch_service)
             : Service(hostname, "htcondor_negotiator", "htcondor_negotiator"), reply_mailbox(reply_mailbox),
-              compute_resources(&compute_resources), running_jobs(&running_jobs), pending_jobs(pending_jobs) {
+              compute_resources(&compute_resources), running_jobs(&running_jobs), pending_jobs(pending_jobs),
+              grid_universe_batch_service(&grid_universe_batch_service) {
 
         this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
     }
@@ -86,9 +88,31 @@ namespace wrench {
             auto job = std::get<0>(entry);
             auto service_specific_arguments = std::get<1>(entry);
 
-            // STANDARD JOB
-            if (auto standard_job = dynamic_cast<StandardJob *>(job)) {
+            //GRID STANDARD JOB
+            //Diverts grid jobs to batch service if it has been provided when initializing condor.
+            if (auto standard_job = dynamic_cast<StandardJob *>(job) and service_specific_arguments['universe'].compare('grid') == 0) {
+                WRENCH_INFO("Dispatching job %s with %ld tasks", standard_job->getName().c_str(),
+                            standard_job->getTasks().size());
+
+                for (auto task : standard_job->getTasks()) {
+                    // temporary printing task IDs
+                    WRENCH_INFO("    Task ID: %s", task->getID().c_str());
+                }
+
+                WRENCH_INFO("---> %lu", service_specific_arguments.size());
+
+                standard_job->pushCallbackMailbox(this->reply_mailbox);
+                grid_universe_batch_service->submitStandardJob(standard_job, service_specific_arguments);
+                this->running_jobs->insert(std::make_pair(job, grid_universe_batch_service));
+                scheduled_jobs.push_back(job);
+                standard_job->getMinimumRequiredNumCores();
+
+                WRENCH_INFO("Dispatched grid universe job %s with %ld tasks to batch service", standard_job->getName().c_str(),
+                            standard_job->getTasks().size());
+
+            } else if (auto standard_job = dynamic_cast<StandardJob *>(job)) { //VANILLA STANDARD JOB
                 for (auto &item : *this->compute_resources) {
+
 
                     if (not item.first->supportsStandardJobs()) {
                         continue;

@@ -37,7 +37,8 @@ namespace wrench {
                                   std::map<std::shared_ptr<ComputeService>, unsigned long> &compute_resources,
                                   std::map<WorkflowJob *, std::shared_ptr<ComputeService>> &running_jobs,
                                   std::vector<std::tuple<WorkflowJob *, std::map<std::string, std::string>>> &pending_jobs,
-                                  std::string &reply_mailbox);
+                                  std::string &reply_mailbox,
+                                  std::shared_ptr<ComputeService> *grid_universe_batch_service);
 
         ~HTCondorNegotiatorService();
 
@@ -53,6 +54,7 @@ namespace wrench {
         std::string reply_mailbox;
         /** set of compute resources **/
         std::map<std::shared_ptr<ComputeService>, unsigned long> *compute_resources;
+        std::shared_ptr<ComputeService> grid_universe_batch_service;
         std::map<WorkflowJob *, std::shared_ptr<ComputeService>> *running_jobs;
         /** queue of pending jobs **/
         std::vector<std::tuple<WorkflowJob *, std::map<std::string, std::string>>> pending_jobs;
