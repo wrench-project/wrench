@@ -39,7 +39,8 @@ namespace wrench {
             const std::string &hostname,
             std::set<ComputeService *> compute_resources,
             std::map<std::string, std::string> property_list,
-            std::map<std::string, double> messagepayload_list)
+            std::map<std::string, double> messagepayload_list,
+            ComputeService *grid_universe_batch_service)
             : ComputeService(hostname, "htcondor_central_manager", "htcondor_central_manager", "") {
 
         // Check compute_resource viability
@@ -61,6 +62,8 @@ namespace wrench {
 
         // Set default and specified message payloads
         this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
+
+        this->grid_universe_batch_service = grid_universe_batch_service;
     }
 
     /**
@@ -71,6 +74,7 @@ namespace wrench {
         this->compute_resources.clear();
         this->compute_resources_map.clear();
         this->running_jobs.clear();
+        this->grid_universe_batch_service.clear();
     }
 
     /**
@@ -202,6 +206,7 @@ namespace wrench {
 
         // start the compute resource services
         try {
+            auto grid_universe_batch_service_shared_ptr = this->simulation->startNewService(grid_universe_batch_service);
             for (auto cs : this->compute_resources) {
                 auto cs_shared_ptr = this->simulation->startNewService(cs);
 
@@ -247,7 +252,8 @@ namespace wrench {
                     auto negotiator = std::shared_ptr<HTCondorNegotiatorService>(
                             new HTCondorNegotiatorService(this->hostname, this->compute_resources_map,
                                                           this->running_jobs,
-                                                          this->pending_jobs, this->mailbox_name));
+                                                          this->pending_jobs, this->mailbox_name,
+                                                          this->grid_universe_batch_service_shared_ptr));
                     negotiator->simulation = this->simulation;
                     negotiator->start(negotiator, true, false); // Daemonized, no auto-restart
 
