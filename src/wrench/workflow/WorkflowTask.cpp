@@ -38,7 +38,7 @@ namespace wrench {
             id(id), color(""), flops(flops),
             min_num_cores(min_num_cores),
             max_num_cores(max_num_cores),
-            parallel_efficiency(parallel_efficiency),
+            multicore_performance_spec(spec),
             memory_requirement(memory_requirement),
             execution_host(""),
             visible_state(WorkflowTask::State::READY),
