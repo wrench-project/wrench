@@ -16,9 +16,9 @@
 
 #include "wrench/workflow/job/WorkflowJob.h"
 #include "wrench/workflow/WorkflowFile.h"
+#include "wrench/workflow/multicoreperformancespec/MulticorePerformanceSpec.h"
 
 #include <boost/graph/adjacency_list.hpp>
-#include <wrench/workflow/multicoreperformancespec/MulticorePerformanceSpec.h>
 
 namespace wrench {
 
