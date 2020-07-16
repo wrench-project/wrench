@@ -259,6 +259,25 @@ namespace wrench {
         }
     }
 
+
+    /**
+     * @brief Get the compute service running on a VM, if any
+     *
+     * @param vm_name: the name of the VM
+     *
+     * @return A BareMetalComputeService that runs on the VM, or nullptr if none
+     *
+     * @throw WorkflowExecutionException
+     * @throw std::invalid_argument
+     */
+    std::shared_ptr<BareMetalComputeService> CloudComputeService::getVMComputeService(const std::string &vm_name) {
+
+        if (this->vm_list.find(vm_name) == this->vm_list.end()) {
+            throw std::invalid_argument("CloudComputeService::startVM(): Unknown VM name '" + vm_name + "'");
+        }
+        return this->vm_list.at(vm_name).second;
+    }
+
     /**
      * @brief Suspend a running VM
      *

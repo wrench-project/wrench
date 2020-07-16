@@ -28,11 +28,12 @@ namespace wrench {
      * @param flops: the task's number of flops
      * @param min_cores: the minimum number of cores required for running the task
      * @param max_cores: the maximum number of cores that the task can use (infinity: ULONG_MAX)
-     * @param parallel_efficiency: the multi-core parallel efficiency
+     * @param spec: the multi-core parallel performance model
      * @param memory_requirement: memory requirement in bytes
      */
     WorkflowTask::WorkflowTask(const std::string id, const double flops, const unsigned long min_num_cores,
-                               const unsigned long max_num_cores, const double parallel_efficiency,
+                               const unsigned long max_num_cores,
+                               std::shared_ptr<MulticorePerformanceSpec> spec,
                                const double memory_requirement) :
             id(id), color(""), flops(flops),
             min_num_cores(min_num_cores),
@@ -806,4 +807,13 @@ namespace wrench {
     void WorkflowTask::setColor(std::string color) {
         this->color = color;
     }
+
+    /**
+     * @brief Get the task's multicore performance model
+     * @return the performance model
+     */
+    std::shared_ptr<MulticorePerformanceSpec> WorkflowTask::getMulticorePerformanceSpec() {
+        return this->multicore_performance_spec;
+    }
+
 };
