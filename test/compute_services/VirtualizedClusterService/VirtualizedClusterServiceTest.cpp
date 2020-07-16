@@ -353,8 +353,19 @@ private:
 
         }
 
+        // Check that we cannot get the CS back
+        if (cs->getVMComputeService(vm_name) != nullptr) {
+            throw std::runtime_error("A non-started VM should have a nullptr compute service");
+        }
+
         // Start the VM
         auto vm_cs = cs->startVM(vm_name);
+
+        // Check that we can get the CS back
+        auto vm_cs_should_be_same = cs->getVMComputeService(vm_name);
+        if (vm_cs != vm_cs_should_be_same) {
+            throw std::runtime_error("It should be possible to get the computer service of a started VM");
+        }
 
         // Check the state
         if (not cs->isVMRunning(vm_name)) {
