@@ -10,9 +10,11 @@
 #ifndef WRENCH_MULTICOREPERFORMANCESPEC_H
 #define WRENCH_MULTICOREPERFORMANCESPEC_H
 
-#include <wrench/workflow/WorkflowTask.h>
+#include <vector>
 
 namespace wrench {
+
+    class WorkflowTask;
 
     class MulticorePerformanceSpec {
 
