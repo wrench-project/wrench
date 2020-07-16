@@ -95,6 +95,8 @@ namespace wrench {
 
         virtual std::shared_ptr<BareMetalComputeService> startVM(const std::string &vm_name);
 
+        virtual std::shared_ptr<BareMetalComputeService> getVMComputeService(const std::string &vm_name);
+
         virtual void suspendVM(const std::string &vm_name);
 
         virtual void resumeVM(const std::string &vm_name);

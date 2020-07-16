@@ -19,6 +19,7 @@
 #include "DagOfTasks.h"
 
 #include <boost/graph/adjacency_list.hpp>
+#include <wrench/workflow/multicoreperformancespec/MulticorePerformanceSpec.h>
 
 class WorkflowTask;
 
@@ -38,7 +39,6 @@ namespace wrench {
         WorkflowTask *addTask(std::string, double flops,
                               unsigned long min_num_cores,
                               unsigned long max_num_cores,
-                              double parallel_efficiency,
                               double memory_requirement);
 
         void removeTask(WorkflowTask *task);
@@ -55,6 +55,8 @@ namespace wrench {
 
         void addControlDependency(WorkflowTask *src, WorkflowTask *dest, bool redundant_dependencies = false);
         void removeControlDependency(WorkflowTask *src, WorkflowTask *dest);
+
+        void setMulticorePerformanceSpec(std::shared_ptr<MulticorePerformanceSpec> spec);
 
         unsigned long getNumberOfTasks();
 
