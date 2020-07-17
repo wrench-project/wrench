@@ -648,7 +648,7 @@ private:
             job_manager->submitJob(two_task_job, vm_cs);
 
             // migrating the VM
-            wrench::Simulation::sleep(0.01); // TODO Without this sleep, the test hangs! This is being investigated...
+            wrench::Simulation::sleep(0.01); // TODO: Without this sleep, the test hangs! This is being investigated...
 
             try { // try a bogus one for coverage
                 cs->migrateVM("NON-EXISTENT", "DualCoreHost");
@@ -660,7 +660,17 @@ private:
                 throw std::runtime_error("Should not be able to migrate a VM to a host without sufficient resources");
             } catch (wrench::WorkflowExecutionException &e) {}
 
-            cs->migrateVM(vm_name, "DualCoreHost");
+            // Get the runnin physical hostname
+            auto hostname_pre = cs->getVMPhysicalHostname(vm_name);
+            if (hostname_pre != src_host) {
+                throw std::runtime_error("VM should be running on physical host " + src_host);
+            }
+            std::string dst_host = "DualCoreHost";
+            cs->migrateVM(vm_name, dst_host);
+            auto hostname_post = cs->getVMPhysicalHostname(vm_name);
+            if (hostname_post != dst_host) {
+                throw std::runtime_error("VM should, after migration, be running on physical host " + dst_host);
+            }
 
         } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error(e.what());
