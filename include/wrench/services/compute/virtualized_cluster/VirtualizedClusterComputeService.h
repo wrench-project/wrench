@@ -64,7 +64,10 @@ namespace wrench {
 
         virtual std::shared_ptr<BareMetalComputeService> startVM(const std::string &vm_name, const std::string &pm_name);
 
-        virtual void migrateVM(const std::string &vm_hostname, const std::string &dest_pm_hostname);
+        virtual void migrateVM(const std::string &vm_name, const std::string &dest_pm_hostname);
+
+        std::string getVMPhysicalHostname(const std::string &vm_name);
+
 
         /***********************/
         /** \endcond          **/
