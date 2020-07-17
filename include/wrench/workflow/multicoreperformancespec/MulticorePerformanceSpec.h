@@ -25,13 +25,14 @@ namespace wrench {
         /***********************/
 
         virtual std::vector<double> getWorkPerThread(unsigned long num_threads) = 0;
-        void setTask(WorkflowTask *task) { this->task = task; };
+//        void setTask(WorkflowTask *task) { this->task = task; };
 
         /***********************/
         /** \endcond          **/
         /***********************/
 
     protected:
+        friend class WorkflowTask;
         WorkflowTask *task = nullptr;
     };
 
