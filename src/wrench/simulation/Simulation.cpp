@@ -264,6 +264,29 @@ namespace wrench {
     }
 
     /**
+     * @brief Obtains the current link bandwidth usage on a link and will add SimulationTimestampLinkUsage to
+     *        simulation output if record_as_time_stamp is set to true
+     * @param linkname: the link name
+     * @param record_as_time_stamp: bool signaling whether or not to record a SimulationTimestampLinkUsage object
+     * @return current bandwidth usage in Bps
+     * @throws std::invalid_argument
+     */
+    double Simulation::getLinkUsage(const std::string &linkname, bool record_as_time_stamp) {
+        if (linkname.empty()) {
+            throw std::invalid_argument("Simulation::getLinkUsage() requires a valid linkname");
+        }
+
+        double time_now = getCurrentSimulatedDate();
+        double usage = S4U_Simulation::getLinkUsage(linkname);
+
+        if (record_as_time_stamp) {
+            this->getOutput().addTimestampLinkUsage(linkname, usage);
+        }
+
+        return usage;
+    }
+
+    /**
      * @brief Get the list of names of all the hosts in each cluster composing the platform
      *
      * @return a map of lists of hosts, indexed by cluster name
@@ -529,6 +552,21 @@ namespace wrench {
     }
 
     /**
+      * @brief Add a BandwidthMeter service to the simulation.
+      *
+      * @param service: a link usage meter service
+      *
+      * @throw std::invalid_argument
+      */
+    void Simulation::addService(std::shared_ptr<BandwidthMeterService> service) {
+        if (service == nullptr) {
+            throw std::invalid_argument("Simulation::addService(): invalid argument (nullptr service)");
+        }
+        service->simulation = this;
+        this->bandwidth_meter_services.insert(service);
+    }
+
+    /**
     * @brief Stage a copy of a file at a storage service in the root of the (unique) mount point
     *
     * @param file: a file to stage on a storage service
@@ -686,6 +724,15 @@ namespace wrench {
      */
     bool Simulation::doesHostExist(std::string hostname) {
         return S4U_Simulation::hostExists(hostname);
+    }
+
+    /**
+     * @brief Wrapper for S4U_Simulation linkExists()
+     * @param linkname - name of link being queried
+     * @return boolean of existence
+     */
+    bool Simulation::doesLinkExist(std::string linkname) {
+        return S4U_Simulation::linkExists(linkname);
     }
 
     /**

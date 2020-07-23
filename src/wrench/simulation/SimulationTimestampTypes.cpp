@@ -1036,5 +1036,35 @@ namespace wrench {
         return this->joules;
     }
 
+    /**
+     * @brief Constructor
+     * @param linkname: the link for which this bandwidth usage timestamp applies to
+     * @param bytes_per_second: the bandwidth usage in bytes per second
+     */
+    SimulationTimestampLinkUsage::SimulationTimestampLinkUsage(std::string linkname, double bytes_per_second)
+            : linkname(linkname), bytes_per_second(bytes_per_second) {
+
+        if (linkname.empty() || bytes_per_second < 0.0) {
+            throw std::invalid_argument(
+                    "SimulationTimestampLinkUsage::SimulationTimestampLinkUsage() requires a valid linkname and a link usage amount >= 0.0");
+        }
+    }
+
+    /**
+     * @brief Get the linkname associated with this timestamp
+     * @return the linkname associated with this timestamp
+     */
+    std::string SimulationTimestampLinkUsage::getLinkname() {
+        return this->linkname;
+    }
+
+    /**
+     * @brief Get the bandwidth usage in bytes per second
+     * @return the bandwidth usage in bytes per second
+     */
+    double SimulationTimestampLinkUsage::getUsage() {
+        return this->bytes_per_second;
+    }
+
 }
 
