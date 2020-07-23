@@ -90,58 +90,58 @@ namespace wrench {
 
             //GRID STANDARD JOB
             //Diverts grid jobs to batch service if it has been provided when initializing condor.
-            if (auto standard_job = dynamic_cast<StandardJob *>(job) and service_specific_arguments["universe"].compare("grid") == 0) {
-                WRENCH_INFO("Dispatching job %s with %ld tasks", standard_job->getName().c_str(),
-                            standard_job->getTasks().size());
+            if (auto standard_job = dynamic_cast<StandardJob *>(job)) {
+                if(service_specific_arguments["universe"].compare("grid") == 0) {
+                    WRENCH_INFO("Dispatching job %s with %ld tasks", standard_job->getName().c_str(),
+                                standard_job->getTasks().size());
 
-                for (auto task : standard_job->getTasks()) {
-                    // temporary printing task IDs
-                    WRENCH_INFO("    Task ID: %s", task->getID().c_str());
-                }
-
-                WRENCH_INFO("---> %lu", service_specific_arguments.size());
-
-                standard_job->pushCallbackMailbox(this->reply_mailbox);
-                grid_universe_batch_service->submitStandardJob(standard_job, service_specific_arguments);
-                this->running_jobs->insert(std::make_pair(job, grid_universe_batch_service));
-                scheduled_jobs.push_back(job);
-                standard_job->getMinimumRequiredNumCores();
-
-                WRENCH_INFO("Dispatched grid universe job %s with %ld tasks to batch service", standard_job->getName().c_str(),
-                            standard_job->getTasks().size());
-
-            } else if (auto standard_job = dynamic_cast<StandardJob *>(job)) { //VANILLA STANDARD JOB
-                for (auto &item : *this->compute_resources) {
-
-
-                    if (not item.first->supportsStandardJobs()) {
-                        continue;
+                    for (auto task : standard_job->getTasks()) {
+                        // temporary printing task IDs
+                        WRENCH_INFO("    Task ID: %s", task->getID().c_str());
                     }
 
-                    if (item.second >= standard_job->getMinimumRequiredNumCores()) {
+                    WRENCH_INFO("---> %lu", service_specific_arguments.size());
 
-                        WRENCH_INFO("Dispatching job %s with %ld tasks", standard_job->getName().c_str(),
-                                    standard_job->getTasks().size());
+                    standard_job->pushCallbackMailbox(this->reply_mailbox);
+                    grid_universe_batch_service->submitStandardJob(standard_job, service_specific_arguments);
+                    this->running_jobs->insert(std::make_pair(job, grid_universe_batch_service));
+                    scheduled_jobs.push_back(job);
+                    standard_job->getMinimumRequiredNumCores();
 
-                        for (auto task : standard_job->getTasks()) {
-                            // temporary printing task IDs
-                            WRENCH_INFO("    Task ID: %s", task->getID().c_str());
+                    WRENCH_INFO("Dispatched grid universe job %s with %ld tasks to batch service", standard_job->getName().c_str(),
+                                standard_job->getTasks().size());
+                } else {
+                    for (auto &item : *this->compute_resources) {
+
+
+                        if (not item.first->supportsStandardJobs()) {
+                            continue;
                         }
 
-                        WRENCH_INFO("---> %lu", service_specific_arguments.size());
+                        if (item.second >= standard_job->getMinimumRequiredNumCores()) {
 
-                        standard_job->pushCallbackMailbox(this->reply_mailbox);
-                        item.first->submitStandardJob(standard_job, service_specific_arguments);
-                        this->running_jobs->insert(std::make_pair(job, item.first));
-                        scheduled_jobs.push_back(job);
-                        item.second -= standard_job->getMinimumRequiredNumCores();
+                            WRENCH_INFO("Dispatching job %s with %ld tasks", standard_job->getName().c_str(),
+                                        standard_job->getTasks().size());
 
-                        WRENCH_INFO("Dispatched job %s with %ld tasks", standard_job->getName().c_str(),
-                                    standard_job->getTasks().size());
-                        break;
+                            for (auto task : standard_job->getTasks()) {
+                                // temporary printing task IDs
+                                WRENCH_INFO("    Task ID: %s", task->getID().c_str());
+                            }
+
+                            WRENCH_INFO("---> %lu", service_specific_arguments.size());
+
+                            standard_job->pushCallbackMailbox(this->reply_mailbox);
+                            item.first->submitStandardJob(standard_job, service_specific_arguments);
+                            this->running_jobs->insert(std::make_pair(job, item.first));
+                            scheduled_jobs.push_back(job);
+                            item.second -= standard_job->getMinimumRequiredNumCores();
+
+                            WRENCH_INFO("Dispatched job %s with %ld tasks", standard_job->getName().c_str(),
+                                        standard_job->getTasks().size());
+                            break;
+                        }
                     }
                 }
-
             } else if (auto pilot_job = dynamic_cast<PilotJob *>(job)) { // PILOT JOB
 
                 for (auto &item : *this->compute_resources) {

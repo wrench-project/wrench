@@ -34,7 +34,7 @@ endif ()
 
 message(STATUS "Building WRENCH Version: ${WRENCH_RELEASE_VERSION}")
 
-include_directories(src/wrench/ include/ ${SimGrid_INCLUDE_DIR}/include /usr/include /usr/local/include)
+include_directories(src/wrench/ include/ ${SimGrid_INCLUDE_DIR}/include /usr/include /usr/local/include /opt/simgrid/include)
 
 
 # For MacOS's MacPorts
