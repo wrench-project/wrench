@@ -92,6 +92,7 @@ namespace wrench {
             //Diverts grid jobs to batch service if it has been provided when initializing condor.
             if (auto standard_job = dynamic_cast<StandardJob *>(job)) {
                 if(service_specific_arguments["universe"].compare("grid") == 0) {
+                    service_specific_arguments.erase("universe");
                     WRENCH_INFO("Dispatching job %s with %ld tasks", standard_job->getName().c_str(),
                                 standard_job->getTasks().size());
 
@@ -111,6 +112,7 @@ namespace wrench {
                     WRENCH_INFO("Dispatched grid universe job %s with %ld tasks to batch service", standard_job->getName().c_str(),
                                 standard_job->getTasks().size());
                 } else {
+                    service_specific_arguments.erase("universe");
                     for (auto &item : *this->compute_resources) {
 
 
