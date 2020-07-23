@@ -216,6 +216,15 @@ namespace wrench {
     }
 
 /**
+ * @brief Determines whether a link exists for a given linkname
+ * @param link_id: the name of the link
+ * @return true or false
+ */
+    bool S4U_Simulation::linkExists(std::string linkname) {
+        return (simgrid::s4u::Link::by_name_or_null(linkname) != nullptr);
+    }
+
+/**
  * @brief Get the number of cores of a host
  *
  * @param hostname: the name of the host

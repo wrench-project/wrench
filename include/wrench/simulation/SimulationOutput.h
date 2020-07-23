@@ -75,6 +75,8 @@ namespace wrench {
 
         void enableDiskTimestamps(bool enabled);
 
+        void enableLinkTimestamps(bool enabled);
+
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
@@ -135,6 +137,8 @@ namespace wrench {
         void addTimestampPstateSet(std::string hostname, int pstate);
 
         void addTimestampEnergyConsumption(std::string hostname, double joules);
+
+        void addTimestampLinkUsage(std::string linkname, double bytes_per_second);
 
         /**
         * @brief Append a simulation timestamp to a simulation output trace

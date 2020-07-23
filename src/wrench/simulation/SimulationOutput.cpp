@@ -1451,6 +1451,9 @@ namespace wrench {
         // By default enable all power timestamps
         this->setEnabled<SimulationTimestampPstateSet>(true);
         this->setEnabled<SimulationTimestampEnergyConsumption>(true);
+
+        // By default enable all link usage timestamps
+        this->setEnabled<SimulationTimestampLinkUsage>(true);
     }
 
     /**
@@ -1711,6 +1714,17 @@ namespace wrench {
             this->addTimestamp<SimulationTimestampEnergyConsumption>(new SimulationTimestampEnergyConsumption(hostname, joules));
         }
     }
+
+    /**
+     * @brief Add a link usage timestamp
+     * @param linkname: a linkname
+     * @param bytes_per_second: link usage in bytes_per_second
+     */
+    void SimulationOutput::addTimestampLinkUsage(std::string linkname, double bytes_per_second) {
+        if (this->isEnabled<SimulationTimestampLinkUsage>()) {
+            this->addTimestamp<SimulationTimestampLinkUsage>(new SimulationTimestampLinkUsage(linkname, bytes_per_second));
+        }
+    }
     
     /**
      * @brief Enable or Disable the insertion of task-related timestamps in
@@ -1763,6 +1777,15 @@ namespace wrench {
     void SimulationOutput::enableEnergyTimestamps(bool enabled) {
         this->setEnabled<SimulationTimestampPstateSet>(true);
         this->setEnabled<SimulationTimestampEnergyConsumption>(true);
+    }
+
+    /**
+     * @brief Enable or Disable the insertion of link-usage-related timestamps in
+     *        the simulation output (enabled by default)
+     * @param enabled true to enable, false to disable
+     */
+    void SimulationOutput::enableLinkTimestamps(bool enabled) {
+        this->setEnabled<SimulationTimestampLinkUsage>(true);
     }
 
 
