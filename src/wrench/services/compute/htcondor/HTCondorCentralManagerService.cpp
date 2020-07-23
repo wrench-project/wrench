@@ -206,7 +206,9 @@ namespace wrench {
 
         // start the compute resource services
         try {
-            auto grid_universe_batch_service_shared_ptr = this->simulation->startNewService(grid_universe_batch_service);
+            if(grid_universe_batch_service){
+                auto grid_universe_batch_service_shared_ptr = this->simulation->startNewService(grid_universe_batch_service);
+            }
             for (auto cs : this->compute_resources) {
                 auto cs_shared_ptr = this->simulation->startNewService(cs);
 
