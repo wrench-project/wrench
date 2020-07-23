@@ -74,7 +74,6 @@ namespace wrench {
         this->compute_resources.clear();
         this->compute_resources_map.clear();
         this->running_jobs.clear();
-        this->grid_universe_batch_service.clear();
     }
 
     /**
@@ -204,6 +203,7 @@ namespace wrench {
         WRENCH_INFO("HTCondor Service starting on host %s listening on mailbox_name %s",
                     this->hostname.c_str(), this->mailbox_name.c_str());
 
+
         // start the compute resource services
         try {
             auto grid_universe_batch_service_shared_ptr = this->simulation->startNewService(grid_universe_batch_service);
@@ -253,7 +253,7 @@ namespace wrench {
                             new HTCondorNegotiatorService(this->hostname, this->compute_resources_map,
                                                           this->running_jobs,
                                                           this->pending_jobs, this->mailbox_name,
-                                                          this->grid_universe_batch_service_shared_ptr));
+                                                          grid_universe_batch_service_shared_ptr));
                     negotiator->simulation = this->simulation;
                     negotiator->start(negotiator, true, false); // Daemonized, no auto-restart
 

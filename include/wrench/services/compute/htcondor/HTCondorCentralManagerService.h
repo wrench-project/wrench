@@ -98,6 +98,8 @@ namespace wrench {
         std::set<ComputeService *> compute_resources;
         /** batch compute service for grid universe jobs**/
         ComputeService *grid_universe_batch_service;
+        /** shared ptr for grid universe batch service**/
+        std::shared_ptr<ComputeService> grid_universe_batch_service_shared_ptr;
         /** queue of pending jobs **/
         std::vector<std::tuple<WorkflowJob *, std::map<std::string, std::string>>> pending_jobs;
         /** whether a negotiator is dispatching jobs **/
