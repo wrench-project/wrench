@@ -184,6 +184,7 @@ protected:
     std::string workflow_graph_json_file_path = UNIQUE_TMP_PATH_PREFIX + "workflow_graph_data.json";
     std::string energy_consumption_data_file_path = UNIQUE_TMP_PATH_PREFIX + "energy_consumption.json";
     std::string platform_graph_json_file_path = UNIQUE_TMP_PATH_PREFIX + "platform_graph.json";
+    std::string link_usage_json_file_path = UNIQUE_TMP_PATH_PREFIX + "link_usage.json";
     std::string unified_json_file_path = UNIQUE_TMP_PATH_PREFIX + "unified_output.json";
     std::unique_ptr<wrench::Workflow> workflow;
 
@@ -1168,6 +1169,87 @@ bool compareEdges(const nlohmann::json &lhs, const nlohmann::json &rhs) {
 bool compareRoutes(const nlohmann::json &lhs, const nlohmann::json &rhs) {
     return (lhs["source"].get<std::string>() + "-" + lhs["target"].get<std::string>()) <
            (rhs["source"].get<std::string>() + "-" + rhs["target"].get<std::string>());
+}
+
+/**********************************************************************/
+/**               SimulationDumpLinkUsageJSONTest                    **/
+/**********************************************************************/
+class SimulationOutputDumpLinkUsageTestWMS : public wrench::WMS {
+public:
+    SimulationOutputDumpLinkUsageTestWMS(SimulationDumpJSONTest *test,
+    std::string &hostname) :
+    wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+        this->test = test;
+    }
+
+private:
+    SimulationDumpJSONTest *test;
+
+    int main() {
+
+        const std::vector<std::string> linknames = wrench::Simulation::getLinknameList();
+        const double TWO_SECOND_PERIOD = 2.0;
+
+        auto em = this->createBandwidthMeter(linknames, TWO_SECOND_PERIOD);
+
+        const double MEGAFLOP = 1000.0 * 1000.0;
+        wrench::S4U_Simulation::compute(6.0 * 100.0 * MEGAFLOP); // compute for 6 seconds
+
+
+        return 0;
+    }
+
+};
+
+TEST_F(SimulationDumpJSONTest, SimulationDumpLinkUsageTest) {
+DO_TEST_WITH_FORK(do_SimulationDumpLinkUsageJSON_test);
+}
+
+bool compareTime(const nlohmann::json &lhs, const nlohmann::json &rhs) {
+    return lhs["time"] < rhs["time"];
+}
+
+bool compareHostname(const nlohmann::json &lhs, const nlohmann::json &rhs) {
+    return lhs["linkname"] < rhs["linkname"];
+}
+
+void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
+    auto simulation = new wrench::Simulation();
+    int argc = 2;
+    auto argv = (char **)calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
+    //argv[1] = strdup("--activate-energy");
+
+    EXPECT_NO_THROW(simulation->init(&argc, argv));
+
+    EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path2));
+
+    // get the single host
+    std::string host = wrench::Simulation::getHostnameList()[0];
+
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    EXPECT_NO_THROW(wms = simulation->add(
+            new SimulationOutputDumpLinkUsageTestWMS(
+                    this, host
+            )
+    ));
+
+    EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
+
+    EXPECT_NO_THROW(simulation->launch());
+
+    EXPECT_THROW(simulation->getOutput().dumpLinkUsageJSON(""), std::invalid_argument);
+
+    EXPECT_NO_THROW(simulation->getOutput().dumpLinkUsageJSON(this->energy_consumption_data_file_path));
+    //simulation->getOutput().dumpUnifiedJSON(workflow.get(), "energy_unified.json", false, true, true, true, false);
+
+
+    //EXPECT_TRUE(expected_json == result_json);
+
+    delete simulation;
+    free(argv[0]);
+    free(argv[1]);
+    free(argv);
 }
 
 /**********************************************************************/
