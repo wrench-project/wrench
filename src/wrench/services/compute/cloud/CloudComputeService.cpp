@@ -260,6 +260,25 @@ namespace wrench {
     }
 
     /**
+     * @brief Get the compute service running on a VM, if any
+     *
+     * @param vm_name: the name of the VM
+     *
+     * @return A BareMetalComputeService that runs on the VM, or nullptr if none
+     *
+     * @throw WorkflowExecutionException
+     * @throw std::invalid_argument
+     */
+    std::shared_ptr<BareMetalComputeService> CloudComputeService::getVMComputeService(const std::string &vm_name) {
+
+        if (this->vm_list.find(vm_name) == this->vm_list.end()) {
+            throw std::invalid_argument("CloudComputeService::startVM(): Unknown VM name '" + vm_name + "'");
+        }
+        return this->vm_list.at(vm_name).second;
+    }
+
+
+    /**
      * @brief Suspend a running VM
      *
      * @param vm_name: the name of the VM
@@ -735,6 +754,7 @@ namespace wrench {
 
             // Pick a VM name (and being paranoid about mistakenly picking an actual hostname!)
             std::string vm_name = "";
+            std::string error_msg = "";
 
             if (desired_vm_name.empty()) {
                 do {
@@ -743,12 +763,14 @@ namespace wrench {
             } else {
                 if (this->vm_list.find(desired_vm_name) == this->vm_list.end()) {
                     vm_name = desired_vm_name;
+                } else {
+                    error_msg = "Desired VM name already in use";
                 }
             }
 
             if (vm_name.empty()) {
                 std::string empty = std::string();
-                std::string error_msg = "Invalid requested VM name";
+
                 msg_to_send_back = new CloudComputeServiceCreateVMAnswerMessage(
                         false,
                         empty,
