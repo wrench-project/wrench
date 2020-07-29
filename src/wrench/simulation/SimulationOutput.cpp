@@ -114,6 +114,9 @@ namespace wrench {
      *      "energy_consumption": {
      *          ...
      *      },
+     *      "link_usage": {
+     *          ...
+     *      },
      *      "platform": {
      *          ...
      *      },
@@ -1404,23 +1407,24 @@ namespace wrench {
      *
      *<pre>
      * {
-     *  "bandwidth_usage": {
+     *  "link_usage": {
+     *      "links": [
      *                  {
-     *                   "linkname": <string>,
-     *                   "link_usage_trace":
-     *                      {
+     *                   "link_usage_trace": [
      *                          {
-     *                           "time": <double>,
      *                           "bytes per second": <double>,
+     *                           "time": <double>
      *                          },
      *                          {
      *                              ...
      *                          },
-     *                      }
+     *                      ],
+     *                      "linkname": <string>
      *                  },
      *                  {
      *                      ...
      *                  }
+     *              ]
      *   }
      * }
      * </pre>
@@ -1460,8 +1464,10 @@ namespace wrench {
             }
 
             nlohmann::json link_usage;
-            link_usage["bandwidth_usage"] = bandwidth_json;
-            bandwidth_json_part = bandwidth_json;
+            nlohmann::json links_list;
+            links_list["links"] = bandwidth_json;
+            link_usage["link_usage"] = links_list;
+            bandwidth_json_part = links_list;
 
             if(writing_file) {
                 std::ofstream output(file_path);

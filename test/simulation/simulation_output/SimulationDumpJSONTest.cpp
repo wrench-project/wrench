@@ -38,6 +38,7 @@ public:
     void do_SimulationDumpHostEnergyConsumptionJSON_test();
     void do_SimulationDumpPlatformGraphJSON_test();
     void do_SimulationDumpPlatformGraphJSONBrokenRouting_test();
+    void do_SimulationDumpLinkUsageJSON_test();
     void do_SimulationDumpUnifiedJSON_test();
 
 protected:
@@ -172,6 +173,33 @@ protected:
         fprintf(platform_file4, "%s", xml4.c_str());
         fclose(platform_file4);
 
+        // platform for Link Usage
+        std::string xml5 = "<?xml version='1.0'?>"
+                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                           "<platform version=\"4.1\"> "
+                           "   <zone id=\"AS0\" routing=\"Full\"> "
+                           "       <host id=\"host1\" speed=\"1f\" core=\"10\"> "
+                           "         <prop id=\"ram\" value=\"10B\"/>"
+                           "         <disk id=\"large_disk\" read_bw=\"100000TBps\" write_bw=\"100000TBps\">"
+                           "                            <prop id=\"size\" value=\"5000GiB\"/>"
+                           "                            <prop id=\"mount\" value=\"/\"/>"
+                           "         </disk>"
+                           "       </host>"
+                           "       <host id=\"host2\" speed=\"1f\" core=\"20\"> "
+                           "          <prop id=\"ram\" value=\"20B\"/> "
+                           "          <disk id=\"large_disk1\" read_bw=\"100000TBps\" write_bw=\"100000TBps\">"
+                           "                            <prop id=\"size\" value=\"5000GiB\"/>"
+                           "                            <prop id=\"mount\" value=\"/\"/>"
+                           "       </disk>"
+                           "       </host>"
+                           "       <link id=\"1\" bandwidth=\"1Gbps\" latency=\"1us\"/>"
+                           "       <route src=\"host1\" dst=\"host2\"> <link_ctn id=\"1\"/> </route>"
+                           "   </zone> "
+                           "</platform>";
+        FILE *platform_file5 = fopen(platform_file_path5.c_str(), "w");
+        fprintf(platform_file5, "%s", xml5.c_str());
+        fclose(platform_file5);
+
         workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
     }
 
@@ -180,6 +208,7 @@ protected:
     std::string platform_file_path3 = UNIQUE_TMP_PATH_PREFIX + "platform3.xml";
     std::string platform_file_path3_broken = UNIQUE_TMP_PATH_PREFIX + "platform3_broken.xml";
     std::string platform_file_path4 = UNIQUE_TMP_PATH_PREFIX + "platform4.xml";
+    std::string platform_file_path5 = UNIQUE_TMP_PATH_PREFIX + "platform5.xml";
     std::string execution_data_json_file_path = UNIQUE_TMP_PATH_PREFIX + "workflow_data.json";
     std::string workflow_graph_json_file_path = UNIQUE_TMP_PATH_PREFIX + "workflow_graph_data.json";
     std::string energy_consumption_data_file_path = UNIQUE_TMP_PATH_PREFIX + "energy_consumption.json";
@@ -1177,25 +1206,38 @@ bool compareRoutes(const nlohmann::json &lhs, const nlohmann::json &rhs) {
 class SimulationOutputDumpLinkUsageTestWMS : public wrench::WMS {
 public:
     SimulationOutputDumpLinkUsageTestWMS(SimulationDumpJSONTest *test,
-    std::string &hostname) :
-    wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+    std::string &hostname,
+    const std::set<std::shared_ptr<wrench::StorageService>> &storage_services) :
+    wrench::WMS(nullptr, nullptr, {}, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
 private:
     SimulationDumpJSONTest *test;
+    wrench::WorkflowFile *file;
 
     int main() {
-
+        //creating the bandwidth meter service
         const std::vector<std::string> linknames = wrench::Simulation::getLinknameList();
         const double TWO_SECOND_PERIOD = 2.0;
-
         auto em = this->createBandwidthMeter(linknames, TWO_SECOND_PERIOD);
 
-        const double MEGAFLOP = 1000.0 * 1000.0;
-        wrench::S4U_Simulation::compute(6.0 * 100.0 * MEGAFLOP); // compute for 6 seconds
 
-
+        //Setting up storage services to accommodate data transfer.
+        auto data_manager = this->createDataMovementManager();
+        std::shared_ptr<wrench::StorageService> client_storage_service, server_storage_service;
+        for (const auto &ss : this->getAvailableStorageServices()) {
+            if (ss->getHostname() == "host1") {
+                client_storage_service = ss;
+            } else {
+                server_storage_service = ss;
+            }
+        }
+        //copying file to force link usage.
+        auto file = *(this->getWorkflow()->getFiles().begin());
+        data_manager->doSynchronousFileCopy(file,
+                                            wrench::FileLocation::LOCATION(client_storage_service),
+                                            wrench::FileLocation::LOCATION(server_storage_service));
         return 0;
     }
 
@@ -1205,50 +1247,444 @@ TEST_F(SimulationDumpJSONTest, SimulationDumpLinkUsageTest) {
 DO_TEST_WITH_FORK(do_SimulationDumpLinkUsageJSON_test);
 }
 
-bool compareTime(const nlohmann::json &lhs, const nlohmann::json &rhs) {
-    return lhs["time"] < rhs["time"];
-}
-
-bool compareHostname(const nlohmann::json &lhs, const nlohmann::json &rhs) {
+bool compareLinkname(const nlohmann::json &lhs, const nlohmann::json &rhs) {
     return lhs["linkname"] < rhs["linkname"];
 }
 
 void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
     auto simulation = new wrench::Simulation();
-    int argc = 2;
+    int argc = 1;
     auto argv = (char **)calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    //argv[1] = strdup("--activate-energy");
 
     EXPECT_NO_THROW(simulation->init(&argc, argv));
 
-    EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path2));
+    EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path5));
 
     // get the single host
     std::string host = wrench::Simulation::getHostnameList()[0];
-
+    std::set<std::shared_ptr<wrench::StorageService>> storage_services_list;
     std::shared_ptr<wrench::WMS> wms = nullptr;;
+
+    std::shared_ptr<wrench::StorageService> client_storage_service;
+    client_storage_service = simulation->add(new wrench::SimpleStorageService("host1", {"/"}, {}));
+    std::shared_ptr<wrench::StorageService> server_storage_service;
+    server_storage_service = simulation->add(new wrench::SimpleStorageService("host2", {"/"}, {}));
+    storage_services_list.insert(client_storage_service);
+    storage_services_list.insert(server_storage_service);
+
+    const double GB = 1000.0 * 1000.0 * 1000.0;
+    //wrench::WorkflowFile *file = new wrench::WorkflowFile("test_file", 10*GB);
+    std::unique_ptr<wrench::Workflow> link_usage_workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+    wrench::WorkflowTask *single_task;
+    single_task = link_usage_workflow->addTask("dummy_task",1,1,1,1.0,8*GB);
+    single_task->addInputFile(link_usage_workflow->addFile("test_file", 10*GB));
+
+
     EXPECT_NO_THROW(wms = simulation->add(
             new SimulationOutputDumpLinkUsageTestWMS(
-                    this, host
+                    this,
+                    host,
+                    storage_services_list
             )
     ));
 
-    EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
+
+
+    EXPECT_NO_THROW(wms->addWorkflow(link_usage_workflow.get()));
+
+    simulation->add(new wrench::FileRegistryService("host1"));
+    for (auto const &file : link_usage_workflow->getInputFiles()) {
+        simulation->stageFile(file, client_storage_service);
+    }
 
     EXPECT_NO_THROW(simulation->launch());
 
     EXPECT_THROW(simulation->getOutput().dumpLinkUsageJSON(""), std::invalid_argument);
 
-    EXPECT_NO_THROW(simulation->getOutput().dumpLinkUsageJSON(this->energy_consumption_data_file_path));
+    EXPECT_NO_THROW(simulation->getOutput().dumpLinkUsageJSON(this->link_usage_json_file_path));
     //simulation->getOutput().dumpUnifiedJSON(workflow.get(), "energy_unified.json", false, true, true, true, false);
 
+    nlohmann::json expected_json_link_usage = R"(
+    {
+        "link_usage": {
+            "links": [
+                {
+                    "link_usage_trace": [
+                        {
+                            "bytes per second": 0.0,
+                            "time": 0.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 2.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 4.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 6.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 8.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 10.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 12.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 14.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 16.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 18.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 20.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 22.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 24.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 26.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 28.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 30.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 32.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 34.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 36.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 38.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 40.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 42.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 44.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 46.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 48.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 50.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 52.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 54.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 56.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 58.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 60.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 62.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 64.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 66.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 68.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 70.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 72.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 74.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 76.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 78.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 80.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 82.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 84.0
+                        },
+                        {
+                            "bytes per second": 121250000.0,
+                            "time": 86.0
+                        }
+                    ],
+                    "linkname": "1"
+                },
+                {
+                    "link_usage_trace": [
+                        {
+                            "bytes per second": 0.0,
+                            "time": 0.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 2.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 4.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 6.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 8.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 10.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 12.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 14.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 16.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 18.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 20.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 22.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 24.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 26.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 28.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 30.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 32.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 34.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 36.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 38.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 40.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 42.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 44.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 46.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 48.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 50.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 52.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 54.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 56.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 58.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 60.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 62.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 64.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 66.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 68.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 70.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 72.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 74.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 76.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 78.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 80.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 82.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 84.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 86.0
+                        }
+                    ],
+                    "linkname": "__loopback__"
+                }
+            ]
+        }
+    }
+    )"_json;
 
-    //EXPECT_TRUE(expected_json == result_json);
+
+    std::ifstream json_file(link_usage_json_file_path);
+    nlohmann::json result_json;
+    json_file >> result_json;
+
+    EXPECT_TRUE(expected_json_link_usage == result_json);
 
     delete simulation;
     free(argv[0]);
-    free(argv[1]);
     free(argv);
 }
 
