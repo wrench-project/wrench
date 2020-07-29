@@ -57,6 +57,24 @@ function processFile(files) {
         });
 }
 
+function prepareData(data) {
+    const nullReplacement = {
+        start: 0,
+        end: 0
+    };
+    data.forEach(function (d) {
+        if (d.read === null) {
+            d.read = [nullReplacement];
+        }
+        if (d.compute === null) {
+            d.compute = nullReplacement;
+        }
+        if (d.write === null) {
+            d.write = [nullReplacement];
+        }
+    })
+    return data;
+}
 
 const getDuration = (d, section) => {
     if (section === "read" || section === "write") {

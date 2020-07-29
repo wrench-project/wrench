@@ -82,10 +82,11 @@ function findTaskScheduling(data, hosts) {
  * Generates the host utilization chart
  *
  * @param rawData: simulation data
- * @param hostsList: list of host names to be displayed (empty list displays all hosts)
+ * @param hostsList: list of host names in which compute tasks will be displayed (empty list displays all hosts)
+ * @param diskHostsList: list of host names in which the disk usage will be displayed (empty list displays all hosts)
  * @param operations: type of operations to be shown ('all', 'compute', 'io', 'write', 'read')
  */
-function generateHostUtilizationChart(rawData, hostsList = [], operations = "all") {
+function generateHostUtilizationChart(rawData, hostsList = [], diskHostsList = [], zoom = true, operations = "all") {
     // clean chart
     if (hostUtilizationChart !== null) {
         hostUtilizationChart.destroy();
@@ -99,6 +100,7 @@ function generateHostUtilizationChart(rawData, hostsList = [], operations = "all
         labels: [],
         datasets: [],
     }
+    let zoomMaxRange = 0;
 
     // obtain list of hosts
     let hosts = {};
@@ -119,6 +121,22 @@ function generateHostUtilizationChart(rawData, hostsList = [], operations = "all
         }
     });
 
+    // obtain additional hosts without tasks
+    if (rawData.disk) {
+        keys = Object.keys(rawData.disk);
+        keys.forEach(function (key) {
+            if (diskHostsList.length > 0 && !(diskHostsList.includes(key))) {
+                return;
+            }
+            if (!(key in hosts)) {
+                hosts[key] = {
+                    cores: 1,
+                    tasks: {}
+                }
+            }
+        });
+    }
+
     findTaskScheduling(rawData.tasks, hosts);
 
     // populate data
@@ -127,43 +145,73 @@ function generateHostUtilizationChart(rawData, hostsList = [], operations = "all
         let host = hosts[key];
 
         // add disk operations
-        if (rawData.disk && rawData.disk[key]) {
+        if ((diskHostsList.length === 0 || diskHostsList.includes(key)) && (rawData.disk && rawData.disk[key])) {
             let mounts = Object.keys(rawData.disk[key]);
             mounts.forEach(function (mount) {
                 let diskMounts = rawData.disk[key];
 
                 // read operations
-                data.labels.push(key + " (mount: " + mount + " - reads)");
-                fillEmptyValues(data.datasets, diskMounts[mount].reads.length, data.labels);
-                let index = 0;
-                for (let i = 0; i < diskMounts[mount].reads.length; i++) {
-                    let operation = diskMounts[mount].reads[i];
-                    ingestData(data.datasets[i], operation.start, operation.end, "#77dd91", "read");
+                if (diskMounts[mount].reads) {
+                    data.labels.push(key + " (mount: " + mount + " - reads)");
+                    fillEmptyValues(data.datasets, diskMounts[mount].reads.length, data.labels);
+                    let index = 0;
+                    for (let i = 0; i < diskMounts[mount].reads.length; i++) {
+                        let operation = diskMounts[mount].reads[i];
+                        ingestData(data.datasets[i], operation.start, operation.end, "#77dd91", "read");
+                    }
                 }
 
                 // write operations
-                data.labels.push(key + " (mount: " + mount + " - writes)");
-                fillEmptyValues(data.datasets, diskMounts[mount].writes.length, data.labels);
-                for (let i = 0; i < diskMounts[mount].writes.length; i++) {
-                    let operation = diskMounts[mount].writes[i];
-                    ingestData(data.datasets[i], operation.start, operation.end, "#8bb7e2", "write");
+                if (diskMounts[mount].writes) {
+                    data.labels.push(key + " (mount: " + mount + " - writes)");
+                    fillEmptyValues(data.datasets, diskMounts[mount].writes.length, data.labels);
+                    for (let i = 0; i < diskMounts[mount].writes.length; i++) {
+                        let operation = diskMounts[mount].writes[i];
+                        ingestData(data.datasets[i], operation.start, operation.end, "#8bb7e2", "write");
+                    }
                 }
             });
         }
 
         // add compute tasks
-        let tasks = Object.keys(host.tasks);
-        tasks.forEach(function (core) {
-            let coreTasks = host.tasks[core];
-            data.labels.push(key + " (core #" + core + ")");
-            // filling empty values
-            fillEmptyValues(data.datasets, coreTasks.length, data.labels, percentage = 1.2);
-            for (let i = 0; i < coreTasks.length; i++) {
-                let task = coreTasks[i];
-                ingestData(data.datasets[i], task.compute.start, task.compute.end, task.color || "#f7daad", task.task_id);
-            }
-        });
+        if (hostsList.length === 0 || hostsList.includes(key)) {
+            let tasks = Object.keys(host.tasks);
+            tasks.forEach(function (core) {
+                let coreTasks = host.tasks[core];
+                data.labels.push(key + " (core #" + core + ")");
+                // filling empty values
+                fillEmptyValues(data.datasets, coreTasks.length, data.labels, percentage = 1.2);
+                for (let i = 0; i < coreTasks.length; i++) {
+                    let task = coreTasks[i];
+                    ingestData(data.datasets[i], task.compute.start, task.compute.end, task.color || "#f7daad", task.task_id);
+                    zoomMaxRange = Math.max(zoomMaxRange, task.compute.end);
+                }
+            });
+        }
     });
+
+    // zoom properties
+    let pluginsProperties = {}
+    if (zoom) {
+        pluginsProperties["zoom"] = {
+            pan: {
+                enabled: true,
+                mode: 'x'
+            },
+            zoom: {
+                enabled: true,
+                mode: 'x',
+                rangeMin: {
+                    x: 0
+                },
+                rangeMax: {
+                    x: Math.ceil(zoomMaxRange)
+                },
+                threshold: 20,
+                speed: 0.05
+            }
+        }
+    }
 
     hostUtilizationChart = new Chart(ctx, {
         type: 'horizontalBar',
@@ -207,7 +255,8 @@ function generateHostUtilizationChart(rawData, hostsList = [], operations = "all
                         return "";
                     },
                 }
-            }
+            },
+            plugins: pluginsProperties
         }
     });
 }

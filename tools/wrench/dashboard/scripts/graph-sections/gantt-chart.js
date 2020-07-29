@@ -29,7 +29,7 @@ function processIO(taskIO) {
     let minStart = 0;
     let maxEnd = 0;
 
-    if (Object.keys(taskIO).length > 0) {
+    if (taskIO && Object.keys(taskIO).length > 0) {
         minStart = Number.MAX_VALUE;
         let ioKeys = Object.keys(taskIO);
         ioKeys.forEach(function (ioKey) {
@@ -41,7 +41,33 @@ function processIO(taskIO) {
     return [minStart, maxEnd];
 }
 
-function generateGanttChart(rawData) {
+function definePluginsProperties(zoom, zoomMaxRange) {
+    if (zoom) {
+        return {
+            zoom: {
+                pan: {
+                    enabled: true,
+                    mode: 'x'
+                },
+                zoom: {
+                    enabled: true,
+                    mode: 'x',
+                    rangeMin: {
+                        x: 0
+                    },
+                    rangeMax: {
+                        x: Math.ceil(zoomMaxRange)
+                    },
+                    threshold: 20,
+                    speed: 0.05
+                }
+            }
+        }
+    }
+    return {};
+}
+
+function generateGanttChart(rawData, zoom=true) {
     cleanGanttChart();
     const containerId = "graph-container";
     let ctx = document.getElementById(containerId);
@@ -75,6 +101,7 @@ function generateGanttChart(rawData) {
             }
         ]
     }
+    let zoomMaxRange = 0;
 
     let keys = Object.keys(rawData.tasks);
     keys.forEach(function (key) {
@@ -95,7 +122,12 @@ function generateGanttChart(rawData) {
         data.datasets[2].data.push(processIO(task.write));
         data.datasets[2].backgroundColor.push(colors.write);
         data.datasets[2].host.push(task.execution_host.hostname);
+
+        zoomMaxRange = Math.max(zoomMaxRange, task.whole_task.end);
     });
+
+    // zoom properties
+    let pluginsProperties = definePluginsProperties(zoom, zoomMaxRange);
 
     ganttChart = new Chart(ctx, {
         type: 'horizontalBar',
@@ -123,12 +155,13 @@ function generateGanttChart(rawData) {
                         return "Execution Host: " + data.datasets[tooltipItem[0].datasetIndex].host[tooltipItem[0].index];
                     }
                 }
-            }
+            },
+            plugins: pluginsProperties
         }
     });
 }
 
-function generateHostGanttChart(rawData) {
+function generateHostGanttChart(rawData, zoom=true) {
     cleanGanttChart();
     const containerId = "graph-container";
     let ctx = document.getElementById(containerId);
@@ -138,6 +171,7 @@ function generateHostGanttChart(rawData) {
         labels: [],
         datasets: []
     }
+    let zoomMaxRange = 0;
 
     // define host colors
     let hosts = {}
@@ -192,7 +226,11 @@ function generateHostGanttChart(rawData) {
             }
             data.datasets[index].label = task.execution_host.hostname;
         }
+        zoomMaxRange = Math.max(zoomMaxRange, task.whole_task.end);
     });
+
+    // zoom properties
+    let pluginsProperties = definePluginsProperties(zoom, zoomMaxRange);
 
     ganttChart = new Chart(ctx, {
         type: 'horizontalBar',
@@ -232,7 +270,8 @@ function generateHostGanttChart(rawData) {
                         return content;
                     }
                 }
-            }
+            },
+            plugins: pluginsProperties
         }
     });
 }
