@@ -1240,7 +1240,6 @@ private:
                                             wrench::FileLocation::LOCATION(server_storage_service));
         return 0;
     }
-
 };
 
 TEST_F(SimulationDumpJSONTest, SimulationDumpLinkUsageTest) {
