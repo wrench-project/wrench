@@ -25,7 +25,6 @@ namespace wrench {
      */
     BandwidthMeterService::BandwidthMeterService(const std::string hostname, const std::map<std::string, double> &measurement_periods) :
             Service(hostname, "bandwidth_meter", "bandwidth_meter") {
- 
         if (measurement_periods.empty()) {
             throw std::invalid_argument("BandwidthMeter::BandwidthMeter(): no host to meter!");
         }
@@ -54,7 +53,6 @@ namespace wrench {
     BandwidthMeterService::BandwidthMeterService(const std::string hostname, const std::vector<std::string> &linknames,
                                            double measurement_period) :
             Service(hostname, "bandwidth_meter", "bandwidth_meter") {
-
         if (linknames.empty()) {
             throw std::invalid_argument("BandwidthMeter::BandwidthMeter(): no host to meter!");
         }
@@ -97,7 +95,6 @@ namespace wrench {
      * @return 0 on success
      */
     int BandwidthMeterService::main() {
-
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
 
         WRENCH_INFO("New Energy Meter Manager starting (%s)", this->mailbox_name.c_str());
@@ -150,7 +147,6 @@ namespace wrench {
      * @throw std::runtime_error
      */
     bool BandwidthMeterService::processNextMessage(double timeout) {
-
         std::shared_ptr<SimulationMessage> message = nullptr;
 
         try {
@@ -167,7 +163,6 @@ namespace wrench {
         }
 
         throw std::runtime_error("BandwidthMeter::waitForNextMessage(): Unexpected [" + message->getName() + "] message");
-
     }
 
      
