@@ -1043,7 +1043,6 @@ namespace wrench {
      */
     SimulationTimestampLinkUsage::SimulationTimestampLinkUsage(std::string linkname, double bytes_per_second)
             : linkname(linkname), bytes_per_second(bytes_per_second) {
-
         if (linkname.empty() || bytes_per_second < 0.0) {
             throw std::invalid_argument(
                     "SimulationTimestampLinkUsage::SimulationTimestampLinkUsage() requires a valid linkname and a link usage amount >= 0.0");

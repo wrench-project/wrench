@@ -20,9 +20,7 @@ namespace wrench {
      * @brief A service that measures and records bandwidth usage on a set of links at regular time intervals
      */
     class BandwidthMeterService : public Service {
-
     public:
-
         BandwidthMeterService(std::string hostname, const std::vector<std::string> &linknames, double period);
         BandwidthMeterService(std::string hostname, const std::map<std::string, double> &measurement_periods);
 
@@ -42,7 +40,6 @@ namespace wrench {
 
         std::map<std::string, double> measurement_periods;
         std::map<std::string, double> time_to_next_measurement;
-
     };
 }
 
