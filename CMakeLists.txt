@@ -34,7 +34,7 @@ endif ()
 
 message(STATUS "Building WRENCH Version: ${WRENCH_RELEASE_VERSION}")
 
-include_directories(src/wrench/ include/ ${SimGrid_INCLUDE_DIR}/include /usr/include /usr/local/include)
+include_directories(src/wrench/ include/ ${SimGrid_INCLUDE_DIR}/include /usr/include /usr/local/include /opt/simgrid/include)
 
 
 # For MacOS's MacPorts
@@ -185,6 +185,7 @@ set(SOURCE_FILES
         src/wrench/logging/TerminalOutput.cpp
         src/wrench/managers/DataMovementManager.cpp
         src/wrench/managers/EnergyMeterService.cpp
+        src/wrench/managers/BandwidthMeterService.cpp
         src/wrench/managers/JobManager.cpp
         src/wrench/managers/JobManagerMessage.cpp
         src/wrench/managers/JobManagerMessage.h
@@ -376,7 +377,9 @@ set(TEST_FILES
         test/simulation/simulation_output/SimulationDumpJSONTest.cpp
         test/compute_services/HTCondorServiceTest.cpp
         src/wrench/managers/EnergyMeterService.cpp
+        src/wrench/managers/BandwidthMeterService.cpp
         include/wrench/managers/EnergyMeterService.h
+        include/wrench/managers/BandwidthMeterService.h
         test/simulated_failures/host_failures/ServiceStartReStartTest.cpp
         test/simulated_failures/host_failures/ComprehensiveIntegrationTest.cpp
         test/simulated_failures/host_failures/FailureDetectorHostFailuresTest.cpp
