@@ -11,6 +11,7 @@
 #define WRENCH_WMS_H
 
 #include <wrench/managers/EnergyMeterService.h>
+#include <wrench/managers/BandwidthMeterService.h>
 #include "wrench/services/Service.h"
 #include "wrench/wms/DynamicOptimization.h"
 #include "wrench/wms/StaticOptimization.h"
@@ -76,6 +77,8 @@ namespace wrench {
         std::shared_ptr<DataMovementManager> createDataMovementManager();
         std::shared_ptr<EnergyMeterService> createEnergyMeter(const std::map<std::string, double> &measurement_periods);
         std::shared_ptr<EnergyMeterService> createEnergyMeter(const std::vector<std::string> &hostnames, double measurement_period);
+        std::shared_ptr<BandwidthMeterService> createBandwidthMeter(const std::map<std::string, double> &measurement_periods);
+        std::shared_ptr<BandwidthMeterService> createBandwidthMeter(const std::vector<std::string> &linknames, double measurement_period);
 
         void runDynamicOptimizations();
 
