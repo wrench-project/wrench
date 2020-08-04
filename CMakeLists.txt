@@ -159,7 +159,8 @@ set(HEADER_FILES
         include/wrench/workflow/job/PilotJob.h
         include/wrench/workflow/job/StandardJob.h
         include/wrench/workflow/job/WorkflowJob.h
-        )
+        include/wrench/services/memory/MemoryManager.h
+        include/wrench/services/memory/Block.h)
 
 # source files
 set(SOURCE_FILES
@@ -305,7 +306,8 @@ set(SOURCE_FILES
         src/wrench/workflow/job/PilotJob.cpp
         src/wrench/workflow/job/StandardJob.cpp
         src/wrench/workflow/job/WorkflowJob.cpp
-        )
+        src/wrench/services/memory/MemoryManager.cpp
+        src/wrench/services/memory/Block.cpp)
 
 # test files
 set(TEST_FILES
