@@ -37,6 +37,8 @@ namespace wrench {
 
     int Simulation::unique_disk_sequence_number = 0;
 
+    bool Simulation::writeback = false;
+
     /**
      * \cond
      */
@@ -124,6 +126,8 @@ namespace wrench {
                 simgrid_help_requested = true;
             } else if (not strcmp(argv[i], "--version")) {
                 version_requested = true;
+            } else if (not strcmp(argv[i], "--writeback")) {
+                writeback = true;
             } else {
                 cleanedup_args.emplace_back(argv[i]);
             }
@@ -195,6 +199,7 @@ namespace wrench {
             argv[*argc] = strdup("--help");
             (*argc)++;
         }
+
     }
 
     /**
@@ -284,6 +289,10 @@ namespace wrench {
         }
 
         return usage;
+    }
+
+    bool Simulation::isWriteback() {
+        return writeback;
     }
 
     /**
