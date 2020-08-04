@@ -143,6 +143,7 @@ namespace wrench {
         static std::vector<std::string> getLinknameList();
         static double getLinkUsage(std::string linkname);
         static double getLinkBandwidth(std::string linkname);
+        static bool isWriteback();
         /***********************/
         /** \endcond           */
         /***********************/
@@ -188,6 +189,8 @@ namespace wrench {
         bool is_running = false;
 
         unsigned int on_state_change_callback_id;
+
+        static bool writeback;
     };
 
 };
