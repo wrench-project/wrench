@@ -8,7 +8,7 @@
  */
 
 
-//#include "wrench/workflow/multicoreperformancespec/MulticorePerformanceSpec.h"
+#include "wrench/workflow/multicoreperformancespec/MulticorePerformanceSpec.h"
 
 #include "wrench/logging/TerminalOutput.h"
 

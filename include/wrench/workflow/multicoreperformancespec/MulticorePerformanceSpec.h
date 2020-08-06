@@ -24,8 +24,7 @@ namespace wrench {
         /** \cond INTERNAL    **/
         /***********************/
 
-        virtual std::vector<double> getWorkPerThread(unsigned long num_threads) = 0;
-//        void setTask(WorkflowTask *task) { this->task = task; };
+        virtual std::vector<double> getWorkPerThread(double total_work, unsigned long num_threads) = 0;
 
         /***********************/
         /** \endcond          **/
