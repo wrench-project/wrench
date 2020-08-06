@@ -277,7 +277,6 @@ namespace wrench {
                      double t,
                      unsigned long min_num_cores,
                      unsigned long max_num_cores,
-                     std::shared_ptr<MulticorePerformanceSpec> spec,
                      double memory_requirement);
 
         // Containing job

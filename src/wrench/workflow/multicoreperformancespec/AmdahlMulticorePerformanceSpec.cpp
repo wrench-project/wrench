@@ -20,13 +20,20 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param alpha: the fraction (i.e., a number between 0.0 and 1.0) of the task's
-     *                work that is perfectly parallelizable.
+     *                work that is perfectly parallelizable. Setting this value to 0 means
+     *                that the task is purely sequential, and setting it to 1 means that the
+     *                task is perfectly parallelizable
      */
-    AmdahlMulticorePerformanceSpec::AmdahlMulticorePerformanceSpec(double alpha) {
+    AmdahlMulticorePerformanceSpec::AmdahlMulticorePerformanceSpec(WorkflowTask *task, double alpha) {
         if (alpha < 0.0 or alpha > 1.0) {
             throw std::runtime_error("AmdahlMulticorePerformanceSpec::AmdahlMulticorePerformanceSpec(): "
                                      "Invalid alpha argument (must be between 0.0 and 1.0)");
         }
+
+        if (task == nullptr) {
+            throw std::runtime_error("AmdahlMulticorePerformanceSpec::AmdahlMulticorePerformanceSpec(): Invalid task argument");
+        }
+        this->task = task;
         this->alpha = alpha;
     }
 
@@ -35,9 +42,8 @@ namespace wrench {
      * @param numThreads: the number of threads
      * @return a vector of work amounts
      */
-    std::vector<double> AmdahlMulticorePerformanceSpec::getWorkPerThread(unsigned long num_threads) {
+    std::vector<double> AmdahlMulticorePerformanceSpec::getWorkPerThread(double total_work, unsigned long num_threads) {
 
-        double total_work = this->task->getFlops();
         double sequential_work = (1 - this->alpha) * total_work;
         double per_thread_parallel_work = (total_work - sequential_work) / (double)num_threads;
         std::vector<double> work_per_threads;

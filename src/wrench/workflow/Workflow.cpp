@@ -55,7 +55,6 @@ namespace wrench {
 
         // Create the WorkflowTask object
         auto task = new WorkflowTask(id, flops, min_num_cores, max_num_cores,
-                            std::shared_ptr<AmdahlMulticorePerformanceSpec>(new  AmdahlMulticorePerformanceSpec(1.0)),
                                      memory_requirement);
         // Associate the workflow to the task
         task->workflow = this;

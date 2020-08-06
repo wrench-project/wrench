@@ -17,7 +17,7 @@ namespace wrench {
     class AmdahlMulticorePerformanceSpec : public MulticorePerformanceSpec {
 
     public:
-        AmdahlMulticorePerformanceSpec(double alpha);
+        AmdahlMulticorePerformanceSpec(WorkflowTask *task, double alpha);
 
         /***********************/
         /** \cond INTERNAL    **/
@@ -31,6 +31,7 @@ namespace wrench {
 
     private:
         double alpha; // Fraction of the work  that's parallelizable
+        WorkflowTask *task; // Workflow task
     };
 
 
