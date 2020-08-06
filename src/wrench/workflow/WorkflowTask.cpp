@@ -7,6 +7,7 @@
  * (at your option) any later version.
  */
 
+#include <wrench/workflow/multicoreperformancespec/AmdahlMulticorePerformanceSpec.h>
 #include "wrench/logging/TerminalOutput.h"
 
 #include "wrench/logging/TerminalOutput.h"
@@ -33,18 +34,18 @@ namespace wrench {
      */
     WorkflowTask::WorkflowTask(const std::string id, const double flops, const unsigned long min_num_cores,
                                const unsigned long max_num_cores,
-                               std::shared_ptr<MulticorePerformanceSpec> spec,
                                const double memory_requirement) :
             id(id), color(""), flops(flops),
             min_num_cores(min_num_cores),
             max_num_cores(max_num_cores),
-            multicore_performance_spec(spec),
             memory_requirement(memory_requirement),
             execution_host(""),
             visible_state(WorkflowTask::State::READY),
             upcoming_visible_state(WorkflowTask::State::UNKNOWN),
             internal_state(WorkflowTask::InternalState::TASK_READY),
             job(nullptr) {
+        // The default is that the task is perfectly parallelizable
+        this->multicore_performance_spec = std::shared_ptr<AmdahlMulticorePerformanceSpec>(new AmdahlMulticorePerformanceSpec(this, 1.0));
     }
 
     /**
@@ -149,7 +150,7 @@ namespace wrench {
      *
      * @return a parallel efficiency (number between 0.0 and 1.0)
      */
-    double WorkflowTask::getParallelEfficiency() const {
+    WorkflowTask::getParallelEfficiency() const {
         return this->parallel_efficiency;
     }
 
