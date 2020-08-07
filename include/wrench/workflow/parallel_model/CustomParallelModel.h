@@ -7,36 +7,41 @@
  * (at your option) any later version.
  */
 
-#ifndef WRENCH_PARALLELMODEL_H
-#define WRENCH_PARALLELMODEL_H
+#ifndef WRENCH_CUSTOMPARALLELMODEL_H
+#define WRENCH_CUSTOMPARALLELMODEL_H
+
+#include "wrench/workflow/parallel_model/ParallelModel.h"
 
 #include <vector>
 
 namespace wrench {
 
-    class ParallelModel {
+    class CustomParallelModel : public ParallelModel {
 
     public:
-
-        static std::shared_ptr<ParallelModel> AMDAHL(double alpha);
-        static std::shared_ptr<ParallelModel> CONSTANTEFFICIENCY(double efficiency);
-        static std::shared_ptr<ParallelModel> CUSTOM(std::function<std::vector<double>(double, long)> lambda);
 
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
 
-        virtual std::vector<double> getWorkPerThread(double total_work, unsigned long num_threads) = 0;
-        virtual ~ParallelModel() {};
+        std::vector<double> getWorkPerThread(double total_work, unsigned long num_threads) override;
+        ~CustomParallelModel() override {}
 
         /***********************/
         /** \endcond          **/
         /***********************/
 
-    private:
+    protected:
 
+    private:
+        friend class ParallelModel;
+
+        CustomParallelModel(std::function<std::vector<double>(double, unsigned long)> lambda);
+
+        std::function<std::vector<double>(double, unsigned long)> lambda;
     };
+
 
 }
 
-#endif //WRENCH_PARALLELMODEL_H
+#endif //WRENCH_CUSTOMPARALLELMODEL_H
