@@ -107,17 +107,17 @@ private:
 
         auto job_manager = this->createJobManager();
 
-        this->test->task1 = this->getWorkflow()->addTask("task1", 10.0, 1, 1, 1.0, 0);
+        this->test->task1 = this->getWorkflow()->addTask("task1", 10.0, 1, 1, 0);
         wrench::StandardJob *job1 = job_manager->createStandardJob(this->test->task1, {});
         job_manager->submitJob(job1, this->test->compute_service);
         this->waitForAndProcessNextEvent();
 
-        this->test->task2 = this->getWorkflow()->addTask("task2", 10.0, 1, 1, 1.0, 0);
+        this->test->task2 = this->getWorkflow()->addTask("task2", 10.0, 1, 1, 0);
         wrench::StandardJob *job2 = job_manager->createStandardJob(this->test->task2, {});
         job_manager->submitJob(job2, this->test->compute_service);
         this->waitForAndProcessNextEvent();
 
-        this->test->failed_task = this->getWorkflow()->addTask("failed_task", 100000.0, 1, 1, 1.0, 0);
+        this->test->failed_task = this->getWorkflow()->addTask("failed_task", 100000.0, 1, 1, 0);
         this->test->failed_task->addInputFile(this->test->large_input_file);
         this->test->failed_task->addInputFile(this->test->small_input_file);
 
@@ -294,7 +294,7 @@ private:
 
         auto job_manager = this->createJobManager();
 
-        this->test->task1 = this->getWorkflow()->addTask("task1", 10.0, 1, 1, 1.0, 0);
+        this->test->task1 = this->getWorkflow()->addTask("task1", 10.0, 1, 1, 0);
 
         int num_task1_runs = 2;
 
@@ -307,7 +307,7 @@ private:
             this->waitForAndProcessNextEvent();
         }
 
-        this->test->failed_task = this->getWorkflow()->addTask("failed_task", 10, 1, 1, 1.0 ,0);
+        this->test->failed_task = this->getWorkflow()->addTask("failed_task", 10, 1, 1, 0);
         this->test->failed_task->addInputFile(this->test->large_input_file);
         this->test->failed_task->addInputFile(this->test->small_input_file);
 
@@ -510,14 +510,14 @@ private:
 
         auto job_manager = this->createJobManager();
 
-        this->test->task1 = this->getWorkflow()->addTask("terminated_task", 1000.0, 1, 1, 1.0, 0);
+        this->test->task1 = this->getWorkflow()->addTask("terminated_task", 1000.0, 1, 1, 0);
         wrench::StandardJob *job_that_will_be_terminated = job_manager->createStandardJob(this->test->task1, {});
         job_manager->submitJob(job_that_will_be_terminated, this->test->compute_service);
         wrench::S4U_Simulation::sleep(10.0);
         job_manager->terminateJob(job_that_will_be_terminated);
         // should a StandardJobTerminated event be sent? (if terminateJob is called then waitForAndProcessNextEvent() we get stuck)
 
-        this->test->task2 = this->getWorkflow()->addTask("failed_task", 1000.0, 1, 1, 1.0, 0);
+        this->test->task2 = this->getWorkflow()->addTask("failed_task", 1000.0, 1, 1, 0);
         wrench::StandardJob *job_that_will_fail = job_manager->createStandardJob(this->test->task2, {});
         job_manager->submitJob(job_that_will_fail, this->test->compute_service);
         wrench::S4U_Simulation::sleep(10.0);

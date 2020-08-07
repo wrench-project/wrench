@@ -488,7 +488,7 @@ namespace wrench {
     void WorkunitExecutor::runMulticoreComputationForTask(WorkflowTask *task,
                                                           bool simulate_computation_as_sleep) {
 
-        std::vector<double> work_per_thread = task->getMulticorePerformanceSpec()->getWorkPerThread(this->num_cores);
+        std::vector<double> work_per_thread = task->getParallelModel()->getWorkPerThread(task->getFlops(), this->num_cores);
         double max_work_per_thread = *(std::max_element(work_per_thread.begin(), work_per_thread.end()));
 
         std::string tmp_mailbox = S4U_Mailbox::generateUniqueMailboxName("workunit_executor");

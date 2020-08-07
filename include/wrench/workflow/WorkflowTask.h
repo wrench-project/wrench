@@ -16,7 +16,9 @@
 
 #include "wrench/workflow/job/WorkflowJob.h"
 #include "wrench/workflow/WorkflowFile.h"
-#include "wrench/workflow/multicoreperformancespec/MulticorePerformanceSpec.h"
+#include "wrench/workflow/parallel_model/ParallelModel.h"
+#include "wrench/workflow/parallel_model/AmdahlParallelModel.h"
+#include "wrench/workflow/parallel_model/ConstantEfficiencyParallelModel.h"
 
 #include <boost/graph/adjacency_list.hpp>
 
@@ -36,7 +38,9 @@ namespace wrench {
 
         unsigned long getMaxNumCores() const;
 
-        double getParallelEfficiency() const;
+        std::shared_ptr<ParallelModel> getParallelModel();
+
+        void setParallelModel(std::shared_ptr<ParallelModel> model);
 
         double getMemoryRequirement() const;
 
@@ -239,7 +243,6 @@ namespace wrench {
 
         };
 
-        std::shared_ptr<MulticorePerformanceSpec> getMulticorePerformanceSpec();
 
         /***********************/
         /** \endcond           */
@@ -257,7 +260,7 @@ namespace wrench {
         unsigned long bytes_written = -1;  // Total bytes written in KB
         unsigned long min_num_cores;
         unsigned long max_num_cores;
-        std::shared_ptr<MulticorePerformanceSpec> multicore_performance_spec;
+        std::shared_ptr<ParallelModel> parallel_model;
         double memory_requirement;
         unsigned long priority = 0;        // Task priority
         unsigned long toplevel;            // 0 if entry task

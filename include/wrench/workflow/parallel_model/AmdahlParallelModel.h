@@ -7,34 +7,42 @@
  * (at your option) any later version.
  */
 
-#ifndef WRENCH_MULTICOREPERFORMANCESPEC_H
-#define WRENCH_MULTICOREPERFORMANCESPEC_H
+#ifndef WRENCH_AMDAHLPARALLELMODEL_H
+#define WRENCH_AMDAHLPARALLELMODEL_H
+
+#include "wrench/workflow/parallel_model/ParallelModel.h"
 
 #include <vector>
 
 namespace wrench {
 
-    class WorkflowTask;
-
-    class MulticorePerformanceSpec {
+    class AmdahlParallelModel : public ParallelModel {
 
     public:
+
+        double getAlpha();
 
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
 
-        virtual std::vector<double> getWorkPerThread(double total_work, unsigned long num_threads) = 0;
+        std::vector<double> getWorkPerThread(double total_work, unsigned long num_threads) override;
+        ~AmdahlParallelModel() override {}
 
         /***********************/
         /** \endcond          **/
         /***********************/
 
     protected:
-        friend class WorkflowTask;
-        WorkflowTask *task = nullptr;
+
+    private:
+        friend class ParallelModel;
+
+        AmdahlParallelModel(double alpha);
+        double alpha; // Fraction of the work that's parallelizable
     };
+
 
 }
 
-#endif //WRENCH_MULTICOREPERFORMANCESPEC_H
+#endif //WRENCH_AMDAHLPARALLELMODEL_H

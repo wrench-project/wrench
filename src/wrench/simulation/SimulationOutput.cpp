@@ -688,7 +688,6 @@ namespace wrench {
      *                  flops: <double>,
      *                  min_cores: <unsigned_long>,
      *                  max_cores: <unsigned_long>,
-     *                  parallel_efficiency: <double>,
      *                  memory: <double>,
      *              },
      *              {
@@ -733,7 +732,6 @@ namespace wrench {
                                        {"flops",               task->getFlops()},
                                        {"min_cores",           task->getMinNumCores()},
                                        {"max_cores",           task->getMaxNumCores()},
-                                       {"parallel_efficiency", task->getParallelEfficiency()},
                                        {"memory",              task->getMemoryRequirement()}
                                });
         }

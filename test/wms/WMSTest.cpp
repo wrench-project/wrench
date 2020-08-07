@@ -104,7 +104,7 @@ private:
         auto vm_cs = cloud->startVM(vm_name);
 
         // Get a "STANDARD JOB COMPLETION" event (default handler)
-        wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 10.0, 1, 1, 1.0, 0);
+        wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 10.0, 1, 1, 0);
         wrench::StandardJob *job1 = job_manager->createStandardJob(task1, {});
         job_manager->submitJob(job1, vm_cs);
         this->waitForAndProcessNextEvent();
@@ -139,7 +139,7 @@ private:
         }
 
         // Get a "STANDARD JOB FAILED" and "PILOT JOB EXPIRED" event (default handler)
-        wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task2", 100.0, 1, 1, 1.0, 0);
+        wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task2", 100.0, 1, 1, 0);
         wrench::StandardJob *job3 = job_manager->createStandardJob(task2, {});
         job_manager->submitJob(job3, job2->getComputeService());
         this->waitForAndProcessNextEvent();
@@ -291,7 +291,7 @@ private:
         auto vm_name = cloud->createVM(4, 0.0);
         auto vm_cs = cloud->startVM(vm_name);
 
-        wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 10.0, 1, 1, 1.0, 0);
+        wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 10.0, 1, 1, 0);
         wrench::StandardJob *job1 = job_manager->createStandardJob(task1, {});
         job_manager->submitJob(job1, vm_cs);
         this->waitForAndProcessNextEvent();
@@ -309,7 +309,7 @@ private:
         }
 
         // Get a "STANDARD JOB FAILED" and "PILOT JOB EXPIRED" event (default handler)
-        wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task2", 200.0, 1, 1, 1.0, 0);
+        wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task2", 200.0, 1, 1, 0);
         wrench::StandardJob *job3 = job_manager->createStandardJob(task2, {});
         job_manager->submitJob(job3, job2->getComputeService());
         this->waitForAndProcessNextEvent();

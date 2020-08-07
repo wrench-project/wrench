@@ -160,8 +160,9 @@ set(HEADER_FILES
         include/wrench/workflow/job/StandardJob.h
         include/wrench/workflow/job/WorkflowJob.h
         include/wrench/workflow/DagOfTasks.h
-        include/wrench/workflow/multicoreperformancespec/MulticorePerformanceSpec.h
-        include/wrench/workflow/multicoreperformancespec/AmdahlMulticorePerformanceSpec.h
+        include/wrench/workflow/parallel_model/ParallelModel.h
+        include/wrench/workflow/parallel_model/AmdahlParallelModel.h
+        include/wrench/workflow/parallel_model/ConstantEfficiencyParallelModel.h
         )
 
 # source files
@@ -284,8 +285,9 @@ set(SOURCE_FILES
         src/wrench/workflow/DagOfTasks.cpp
         src/wrench/workflow/WorkflowFile.cpp
         src/wrench/workflow/WorkflowTask.cpp
-        src/wrench/workflow/multicoreperformancespec/MulticorePerformanceSpec.cpp
-        src/wrench/workflow/multicoreperformancespec/AmdahlMulticorePerformanceSpec.cpp
+        src/wrench/workflow/parallel_model/ParallelModel.cpp
+        src/wrench/workflow/parallel_model/AmdahlParallelModel.cpp
+        src/wrench/workflow/parallel_model/ConstantEfficiencyParallelModel.cpp
         src/wrench/workflow/execution_events/WorkflowExecutionEvent.cpp
         src/wrench/workflow/failure_causes/ComputeThreadHasDied.cpp
         src/wrench/workflow/failure_causes/FailureCause.cpp
