@@ -163,6 +163,7 @@ set(HEADER_FILES
         include/wrench/workflow/parallel_model/ParallelModel.h
         include/wrench/workflow/parallel_model/AmdahlParallelModel.h
         include/wrench/workflow/parallel_model/ConstantEfficiencyParallelModel.h
+        include/wrench/workflow/parallel_model/CustomParallelModel.h
         )
 
 # source files
@@ -288,6 +289,7 @@ set(SOURCE_FILES
         src/wrench/workflow/parallel_model/ParallelModel.cpp
         src/wrench/workflow/parallel_model/AmdahlParallelModel.cpp
         src/wrench/workflow/parallel_model/ConstantEfficiencyParallelModel.cpp
+        src/wrench/workflow/parallel_model/CustomParallelModel.cpp
         src/wrench/workflow/execution_events/WorkflowExecutionEvent.cpp
         src/wrench/workflow/failure_causes/ComputeThreadHasDied.cpp
         src/wrench/workflow/failure_causes/FailureCause.cpp
@@ -322,6 +324,7 @@ set(TEST_FILES
         test/workflow/WorkflowTest.cpp
         test/workflow/WorkflowFileTest.cpp
         test/workflow/WorkflowTaskTest.cpp
+        test/workflow/WorkflowParallelModelTest.cpp
         test/workflow/WorkflowLoadFromDAXTest.cpp
         test/workflow/WorkflowLoadFromJSONTest.cpp
         test/compute_services/BareMetalComputeService/BareMetalComputeServiceOneTaskTest.cpp
