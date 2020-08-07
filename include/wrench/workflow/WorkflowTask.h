@@ -19,6 +19,7 @@
 #include "wrench/workflow/parallel_model/ParallelModel.h"
 #include "wrench/workflow/parallel_model/AmdahlParallelModel.h"
 #include "wrench/workflow/parallel_model/ConstantEfficiencyParallelModel.h"
+#include "wrench/workflow/parallel_model/CustomParallelModel.h"
 
 #include <boost/graph/adjacency_list.hpp>
 
