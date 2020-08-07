@@ -13,6 +13,7 @@
 #include "wrench/workflow/parallel_model/ParallelModel.h"
 
 #include <vector>
+#include <functional>
 
 namespace wrench {
 
