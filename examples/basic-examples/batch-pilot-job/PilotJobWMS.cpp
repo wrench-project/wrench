@@ -78,7 +78,9 @@ namespace wrench {
         /* For each task, estimate its execution time in minutes */
         std::map<WorkflowTask *, long> execution_times_in_minutes;
         for (auto  const &t : this->getWorkflow()->getTasks())  {
-            double in_seconds = (t->getFlops() / core_flop_rate) /  (10 * t->getParallelEfficiency());
+            double parallel_efficiency =
+                    std::dynamic_pointer_cast<wrench::ConstantEfficiencyParallelModel>(t->getParallelModel())->getEfficiency();
+            double in_seconds = (t->getFlops() / core_flop_rate) /  (10 * parallel_efficiency);
             execution_times_in_minutes[t] = 1 + std::lround(in_seconds / 60.0);
             // The +1 above is just  so that we don't cut it too tight
             WRENCH_INFO("Task %s should run in under %ld minutes",
