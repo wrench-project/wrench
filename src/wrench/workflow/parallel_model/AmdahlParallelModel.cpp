@@ -8,12 +8,11 @@
  */
 
 
-#include <wrench/workflow/multicoreperformancespec/AmdahlMulticorePerformanceSpec.h>
-#include <wrench/workflow/WorkflowTask.h>
+#include <wrench/workflow/parallel_model/AmdahlParallelModel.h>
 
 #include "wrench/logging/TerminalOutput.h"
 
-WRENCH_LOG_CATEGORY(wrench_core_amdahlmulticorePerformanceSpec, "Log category for AmdahlMulticorePerformanceSpec");
+WRENCH_LOG_CATEGORY(wrench_core_amdahl_parallel_model, "Log category for AmdahlParallelModel");
 
 namespace wrench {
 
@@ -22,27 +21,31 @@ namespace wrench {
      * @param alpha: the fraction (i.e., a number between 0.0 and 1.0) of the task's
      *                work that is perfectly parallelizable. Setting this value to 0 means
      *                that the task is purely sequential, and setting it to 1 means that the
-     *                task is perfectly parallelizable
+     *                task is perfectly parallelizable.
      */
-    AmdahlMulticorePerformanceSpec::AmdahlMulticorePerformanceSpec(WorkflowTask *task, double alpha) {
+    AmdahlParallelModel::AmdahlParallelModel(double alpha) {
         if (alpha < 0.0 or alpha > 1.0) {
-            throw std::runtime_error("AmdahlMulticorePerformanceSpec::AmdahlMulticorePerformanceSpec(): "
+            throw std::invalid_argument("AmdahlParallelModel::AmdahlParallelModel(): "
                                      "Invalid alpha argument (must be between 0.0 and 1.0)");
         }
-
-        if (task == nullptr) {
-            throw std::runtime_error("AmdahlMulticorePerformanceSpec::AmdahlMulticorePerformanceSpec(): Invalid task argument");
-        }
-        this->task = task;
         this->alpha = alpha;
     }
 
     /**
+     * @brief Get the
+     * @return
+     */
+    double AmdahlParallelModel::getAlpha() {
+        return this->alpha;
+    }
+
+    /**
      * @brief Returns the amount of work each thread much perform
-     * @param numThreads: the number of threads
+     * @param total_work: total amount of work
+     * @param num_threads: the number of threads
      * @return a vector of work amounts
      */
-    std::vector<double> AmdahlMulticorePerformanceSpec::getWorkPerThread(double total_work, unsigned long num_threads) {
+    std::vector<double> AmdahlParallelModel::getWorkPerThread(double total_work, unsigned long num_threads) {
 
         double sequential_work = (1 - this->alpha) * total_work;
         double per_thread_parallel_work = (total_work - sequential_work) / (double)num_threads;

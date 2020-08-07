@@ -139,15 +139,14 @@ private:
                 int num_nodes = std::get<5>(job);
                 int min_num_cores = 10;
                 int max_num_cores = 10;
-                double parallel_efficiency = 1.0;
+                double ram = 0.0;
                 // Ignore jobs that are too big
                 if (num_nodes > 4) {
                     continue;
                 }
 //          std::cerr << "SUBMITTING " << "sub="<< sub_time << "num_nodes=" << num_nodes << " id="<<id << " flops="<<flops << " rflops="<<requested_flops << " ram="<<requested_ram << "\n";
                 // TODO: Should we use the "requested_ram" instead of 0 below?
-                wrench::WorkflowTask *task = this->getWorkflow()->addTask(username + "_" + std::to_string(counter++), flops, min_num_cores, max_num_cores,
-                                                                          parallel_efficiency, 0);
+                wrench::WorkflowTask *task = this->getWorkflow()->addTask(username + "_" + std::to_string(counter++), flops, min_num_cores, max_num_cores, ram);
 
                 wrench::StandardJob *standard_job = job_manager->createStandardJob(
                         {task},
@@ -456,11 +455,10 @@ private:
             double time_fudge = 1; // 1 second seems to make it all work!
             double task_flops = 10 * (1 * (1800 - time_fudge));
             int num_cores = 10;
-            double parallel_efficiency = 1.0;
+            double ram = 0.0;
             tasks.push_back(this->getWorkflow()->addTask("test_job_1_task_" + std::to_string(i),
                                                          task_flops,
-                                                         num_cores, num_cores, parallel_efficiency,
-                                                         0.0));
+                                                         num_cores, num_cores, ram));
         }
 
         // Create a Standard Job with only the tasks
@@ -482,11 +480,10 @@ private:
             double time_fudge = 1; // 1 second seems to make it all work!
             double task_flops = 10 * (1 * (1800 - time_fudge));
             int num_cores = 10;
-            double parallel_efficiency = 1.0;
+            double ram = 0.0;
             tasks.push_back(this->getWorkflow()->addTask("test_job_2_task_" + std::to_string(i),
                                                          task_flops,
-                                                         num_cores, num_cores, parallel_efficiency,
-                                                         0.0));
+                                                         num_cores, num_cores, ram));
         }
 
 
@@ -828,11 +825,10 @@ private:
             double time_fudge = 1; // 1 second seems to make it all work!
             double task_flops = 10 * (1 * (600 - time_fudge));
             int num_cores = 10;
-            double parallel_efficiency = 1.0;
+            double ram = 0.0;
             tasks.push_back(this->getWorkflow()->addTask("test_job_1_task_" + std::to_string(i),
                                                          task_flops,
-                                                         num_cores, num_cores, parallel_efficiency,
-                                                         0.0));
+                                                         num_cores, num_cores, ram));
         }
 
         // Create a Standard Job with only the tasks
@@ -993,11 +989,10 @@ private:
             double time_fudge = 1; // 1 second seems to make it all work!
             double task_flops = 10 * (1 * (600 - time_fudge));
             int num_cores = 10;
-            double parallel_efficiency = 1.0;
+            double ram = 0.0;
             tasks.push_back(this->getWorkflow()->addTask("test_job_1_task_" + std::to_string(i),
                                                          task_flops,
-                                                         num_cores, num_cores, parallel_efficiency,
-                                                         0.0));
+                                                         num_cores, num_cores, ram));
         }
 
         // Create a Standard Job with only the tasks
@@ -1184,11 +1179,10 @@ private:
             double time_fudge = 1; // 1 second seems to make it all work!
             double task_flops = 10 * (1 * (1800 - time_fudge));
             int num_cores = 10;
-            double parallel_efficiency = 1.0;
+            double ram = 0.0;
             tasks.push_back(this->getWorkflow()->addTask("test_job_1_task_" + std::to_string(i),
                                                          task_flops,
-                                                         num_cores, num_cores, parallel_efficiency,
-                                                         0.0));
+                                                         num_cores, num_cores, ram));
         }
 
         // Create a Standard Job with only the tasks
@@ -1210,11 +1204,10 @@ private:
             double time_fudge = 1; // 1 second seems to make it all work!
             double task_flops = 10 * (1 * (1800 - time_fudge));
             int num_cores = 10;
-            double parallel_efficiency = 1.0;
+            double ram = 0.0;
             tasks.push_back(this->getWorkflow()->addTask("test_job_2_task_" + std::to_string(i),
                                                          task_flops,
-                                                         num_cores, num_cores, parallel_efficiency,
-                                                         0.0));
+                                                         num_cores, num_cores, ram));
         }
 
 
