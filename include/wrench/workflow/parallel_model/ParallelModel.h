@@ -11,6 +11,7 @@
 #define WRENCH_PARALLELMODEL_H
 
 #include <vector>
+#include <memory>
 
 namespace wrench {
 
