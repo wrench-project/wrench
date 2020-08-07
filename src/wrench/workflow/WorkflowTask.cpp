@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include <wrench/workflow/multicoreperformancespec/AmdahlMulticorePerformanceSpec.h>
+#include "wrench/workflow/parallel_model/AmdahlParallelModel.h"
 #include "wrench/logging/TerminalOutput.h"
 
 #include "wrench/logging/TerminalOutput.h"
@@ -45,7 +45,7 @@ namespace wrench {
             internal_state(WorkflowTask::InternalState::TASK_READY),
             job(nullptr) {
         // The default is that the task is perfectly parallelizable
-        this->multicore_performance_spec = std::shared_ptr<AmdahlMulticorePerformanceSpec>(new AmdahlMulticorePerformanceSpec(this, 1.0));
+        this->parallel_model = ParallelModel::CONSTANTEFFICIENCY(1.0);
     }
 
     /**
@@ -143,15 +143,6 @@ namespace wrench {
      */
     unsigned long WorkflowTask::getMaxNumCores() const {
         return this->max_num_cores;
-    }
-
-    /**
-     * @brief Get the parallel efficiency of the task
-     *
-     * @return a parallel efficiency (number between 0.0 and 1.0)
-     */
-    WorkflowTask::getParallelEfficiency() const {
-        return this->parallel_efficiency;
     }
 
     /**
@@ -810,11 +801,19 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the task's multicore performance model
-     * @return the performance model
+     * @brief Set the task's parallel model
+     * @param model: a parallel model
      */
-    std::shared_ptr<MulticorePerformanceSpec> WorkflowTask::getMulticorePerformanceSpec() {
-        return this->multicore_performance_spec;
+    void WorkflowTask::setParallelModel(std::shared_ptr<ParallelModel> model) {
+        this->parallel_model = model;
+    }
+
+    /**
+     * @brief Get the task's parallel model
+     * @return the parallel model
+     */
+    std::shared_ptr<ParallelModel> WorkflowTask::getParallelModel() {
+        return this->parallel_model;
     }
 
 };

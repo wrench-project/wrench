@@ -11,7 +11,7 @@
 #include <nlohmann/json.hpp>
 #include <wrench/util/UnitParser.h>
 #include <wrench/workflow/WorkflowTask.h>
-#include <wrench/workflow/multicoreperformancespec/AmdahlMulticorePerformanceSpec.h>
+#include <wrench/workflow/parallel_model/AmdahlParallelModel.h>
 
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/simulation/SimulationMessage.h"
