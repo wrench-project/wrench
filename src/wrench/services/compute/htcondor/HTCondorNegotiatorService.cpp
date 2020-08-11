@@ -37,7 +37,7 @@ namespace wrench {
             std::map<WorkflowJob *, std::shared_ptr<ComputeService>> &running_jobs,
             std::vector<std::tuple<WorkflowJob *, std::map<std::string, std::string>>> &pending_jobs,
             std::string &reply_mailbox,
-            std::shared_ptr<ComputeService> grid_universe_batch_service)
+            std::shared_ptr<ComputeService> &grid_universe_batch_service)
             : Service(hostname, "htcondor_negotiator", "htcondor_negotiator"), reply_mailbox(reply_mailbox),
               compute_resources(&compute_resources), running_jobs(&running_jobs), pending_jobs(pending_jobs),
               grid_universe_batch_service(grid_universe_batch_service) {
@@ -88,11 +88,39 @@ namespace wrench {
             auto job = std::get<0>(entry);
             auto service_specific_arguments = std::get<1>(entry);
 
+
             //GRID STANDARD JOB
             //Diverts grid jobs to batch service if it has been provided when initializing condor.
             if (auto standard_job = dynamic_cast<StandardJob *>(job)) {
                 if(service_specific_arguments["universe"].compare("grid") == 0) {
+
+                    //instead of erasing here, going to iterate through.
                     service_specific_arguments.erase("universe");
+
+                    std::map<std::string, std::string> service_specs_copy;
+                    //std::map<std::string, std::string>::iterator it = service_specific_arguments.begin();
+
+
+                    /**
+                    for(auto const &x: service_specific_arguments) {
+                        WRENCH_INFO("xxx %s : %s", x.first.c_str(), x.second.c_str());
+                    }
+
+
+                    while (it != service_specific_arguments.end()) {
+                        if(it->first.compare("universe") != 0) {
+                            service_specs_copy.insert(std::pair<std::string, std::string>(it->first,it->second));
+                            it++;
+                        } else {
+                            it++;
+                        }
+                    }
+
+                    for(auto const &x: service_specs_copy) {
+                        WRENCH_INFO("xxx %s : %s", x.first.c_str(), x.second.c_str());
+                    }
+                     **/
+
                     WRENCH_INFO("Dispatching job %s with %ld tasks", standard_job->getName().c_str(),
                                 standard_job->getTasks().size());
 
@@ -100,12 +128,14 @@ namespace wrench {
                         // temporary printing task IDs
                         WRENCH_INFO("    Task ID: %s", task->getID().c_str());
                     }
-
-                    WRENCH_INFO("---> %lu", service_specific_arguments.size());
-
+                    /**
+                    WRENCH_INFO("---> %lu", service_specs_copy.size());
+                    WRENCH_INFO("batch service---> %p", this->grid_universe_batch_service.get());
+                    WRENCH_INFO("---> %p", standard_job);
+                     **/
                     standard_job->pushCallbackMailbox(this->reply_mailbox);
-                    grid_universe_batch_service->submitStandardJob(standard_job, service_specific_arguments);
-                    this->running_jobs->insert(std::make_pair(job, grid_universe_batch_service));
+                    this->grid_universe_batch_service->submitStandardJob(standard_job, service_specific_arguments);
+                    this->running_jobs->insert(std::make_pair(job, this->grid_universe_batch_service));
                     scheduled_jobs.push_back(job);
                     standard_job->getMinimumRequiredNumCores();
 
@@ -113,6 +143,10 @@ namespace wrench {
                                 standard_job->getTasks().size());
                 } else {
                     service_specific_arguments.erase("universe");
+                    //std::map<std::string, std::string> service_specs_copy;
+                    //std::map<std::string, std::string>::iterator it = service_specific_arguments.begin();
+
+
                     for (auto &item : *this->compute_resources) {
 
 

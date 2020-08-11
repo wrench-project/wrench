@@ -69,6 +69,7 @@ namespace wrench {
 
         void terminatePilotJob(PilotJob *job) override;
 
+
         /***********************/
         /** \endcond          **/
         /***********************/
