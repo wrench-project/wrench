@@ -39,6 +39,7 @@ public:
     void do_StandardJobTaskTest_test();
     void do_PilotJobTaskTest_test();
     void do_SimpleServiceTest_test();
+    void do_GridUniverseTest_test();
 
 protected:
     HTCondorServiceTest() {
@@ -104,9 +105,66 @@ protected:
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
+
+        //Grid Universe Platform file.
+        std::string xml1 = "<?xml version='1.0'?>"
+                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                           "<platform version=\"4.1\"> "
+                           "   <zone id=\"AS0\" routing=\"Full\"> "
+                           "       <host id=\"DualCoreHost\" speed=\"1f\" core=\"2\" > "
+                           "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                           "             <prop id=\"size\" value=\"100B\"/>"
+                           "             <prop id=\"mount\" value=\"/\"/>"
+                           "          </disk>"
+                           "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                           "             <prop id=\"size\" value=\"1000000B\"/>"
+                           "             <prop id=\"mount\" value=\"/scratch\"/>"
+                           "          </disk>"
+                           "       </host>"
+                           "       <host id=\"QuadCoreHost\" speed=\"1f\" core=\"4\" > "
+                           "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                           "             <prop id=\"size\" value=\"100B\"/>"
+                           "             <prop id=\"mount\" value=\"/\"/>"
+                           "          </disk>"
+                           "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                           "             <prop id=\"size\" value=\"1000000B\"/>"
+                           "             <prop id=\"mount\" value=\"/scratch\"/>"
+                           "          </disk>"
+                           "       </host>"
+                           "       <host id=\"BatchHost1\" speed=\"1f\" core=\"10\"> "
+                           "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                           "             <prop id=\"size\" value=\"1000000B\"/>"
+                           "             <prop id=\"mount\" value=\"/scratch\"/>"
+                           "          </disk>"
+                           "       </host>"
+                           "       <host id=\"BatchHost2\" speed=\"1f\" core=\"10\"> "
+                           "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                           "             <prop id=\"size\" value=\"1000000B\"/>"
+                           "             <prop id=\"mount\" value=\"/scratch\"/>"
+                           "          </disk>"
+                           "       </host>"
+                           "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
+                           "       <link id=\"2\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
+                           "       <link id=\"3\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
+                           "       <link id=\"4\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
+                           "       <link id=\"5\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
+                           "       <link id=\"6\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
+                           "       <route src=\"DualCoreHost\" dst=\"QuadCoreHost\"> <link_ctn id=\"1\"/> </route>"
+                           "       <route src=\"BatchHost1\" dst=\"BatchHost2\"> <link_ctn id=\"2\"/> </route>"
+                           "       <route src=\"DualCoreHost\" dst=\"BatchHost1\"> <link_ctn id=\"3\"/> </route>"
+                           "       <route src=\"DualCoreHost\" dst=\"BatchHost2\"> <link_ctn id=\"4\"/> </route>"
+                           "       <route src=\"QuadCoreHost\" dst=\"BatchHost1\"> <link_ctn id=\"5\"/> </route>"
+                           "       <route src=\"QuadCoreHost\" dst=\"BatchHost2\"> <link_ctn id=\"6\"/> </route>"
+                           "   </zone> "
+                           "</platform>";
+
+        FILE *platform_file1 = fopen(platform_file_path1.c_str(), "w");
+        fprintf(platform_file1, "%s", xml1.c_str());
+        fclose(platform_file1);
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
+    std::string platform_file_path1 = UNIQUE_TMP_PATH_PREFIX + "platform1.xml";
     wrench::Workflow *workflow;
     std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
 };
@@ -145,6 +203,7 @@ private:
                                  wrench::FileLocation::LOCATION(this->test->storage_service),
                                  wrench::FileLocation::SCRATCH)},
                 {}, {});
+
 
         // Submit the 2-task job for execution
         try {
@@ -503,6 +562,143 @@ void HTCondorServiceTest::do_SimpleServiceTest_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new HTCondorSimpleServiceTestWMS(this, {compute_service}, {storage_service}, hostname)));
+
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+
+    // Create a file registry
+    ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
+
+    // Staging the input_file on the storage service
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+
+    // Running a "run a single task" simulation
+    ASSERT_NO_THROW(simulation->launch());
+
+    delete simulation;
+    free(argv[0]);
+    free(argv);
+}
+
+
+/**********************************************************************/
+/**          STANDARD JOB SUBMISSION TEST FOR GRID UNIVERSE          **/
+/**********************************************************************/
+
+class HTCondorGridUniverseTestWMS : public wrench::WMS {
+
+public:
+    HTCondorGridUniverseTestWMS(HTCondorServiceTest *test,
+                               const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                               const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                               std::string &hostname) :
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+        this->test = test;
+    }
+
+private:
+
+    HTCondorServiceTest *test;
+
+    int main() {
+        // Create a data movement manager
+        auto data_movement_manager = this->createDataMovementManager();
+
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+        // Create a 2-task job
+        wrench::StandardJob *two_task_job = job_manager->createStandardJob(
+                {this->test->task1},
+                {},
+                {std::make_tuple(this->test->input_file,
+                                 wrench::FileLocation::LOCATION(this->test->storage_service),
+                                 wrench::FileLocation::SCRATCH)},
+                {}, {});
+
+        std::map<std::string, std::string> test_service_specs;
+        test_service_specs.insert(std::pair<std::string, std::string>("universe","grid"));
+
+        // Submit the 2-task job for execution
+        try {
+            job_manager->submitJob(two_task_job, this->test->compute_service, test_service_specs);
+        } catch (wrench::WorkflowExecutionException &e) {
+            throw std::runtime_error(e.what());
+        }
+
+        // Wait for a workflow execution event
+        std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+        try {
+            event = this->getWorkflow()->waitForNextExecutionEvent();
+        } catch (wrench::WorkflowExecutionException &e) {
+            throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
+        }
+
+        if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
+            throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
+        }
+
+        return 0;
+    }
+};
+
+TEST_F(HTCondorServiceTest, HTCondorGridUniverseTest) {
+DO_TEST_WITH_FORK(do_GridUniverseTest_test);
+}
+
+void HTCondorServiceTest::do_GridUniverseTest_test() {
+
+    // Create and initialize a simulation
+    auto *simulation = new wrench::Simulation();
+    int argc = 2;
+    auto argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
+    argv[1] = strdup("--wrench-full-log");
+
+    ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+    // Setting up the platform
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path1));
+
+    // Get a hostname
+    std::string hostname = "DualCoreHost";
+
+    // Create a Storage Service
+    ASSERT_NO_THROW(storage_service = simulation->add(
+            new wrench::SimpleStorageService(hostname, {"/"})));
+
+    // Create list of compute services
+    std::set<wrench::ComputeService *> compute_services;
+    std::string execution_host = wrench::Simulation::getHostnameList()[1];
+    std::vector<std::string> execution_hosts;
+    execution_hosts.push_back(execution_host);
+    compute_services.insert(new wrench::BareMetalComputeService(
+            execution_host,
+            {std::make_pair(
+                    execution_host,
+                    std::make_tuple(wrench::Simulation::getHostNumCores(execution_host),
+                                    wrench::Simulation::getHostMemoryCapacity(execution_host)))},
+            "/scratch"));
+
+    auto batch_service = new wrench::BatchComputeService("BatchHost1",
+                                                         {"BatchHost1", "BatchHost2"}, "");
+
+
+    // Create a HTCondor Service
+    ASSERT_NO_THROW(compute_service = simulation->add(
+            new wrench::HTCondorComputeService(
+                    hostname, "local", std::move(compute_services),
+                    {
+                            {wrench::HTCondorComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"},
+                            {wrench::HTCondorComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"},
+                            {wrench::HTCondorComputeServiceProperty::SUPPORTS_GRID_UNIVERSE, "true"},
+                    },
+                    {},
+                    batch_service)));
+
+    // Create a WMS
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    ASSERT_NO_THROW(wms = simulation->add(
+            new HTCondorGridUniverseTestWMS(this, {compute_service}, {storage_service}, hostname)));
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
