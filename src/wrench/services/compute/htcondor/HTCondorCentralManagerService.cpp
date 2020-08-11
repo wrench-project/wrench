@@ -125,6 +125,7 @@ namespace wrench {
         }
     }
 
+
     /**
      * @brief Asynchronously submit a pilot job to the cloud service
      *
@@ -207,7 +208,8 @@ namespace wrench {
         // start the compute resource services
         try {
             if(grid_universe_batch_service){
-                auto grid_universe_batch_service_shared_ptr = this->simulation->startNewService(grid_universe_batch_service);
+                this->grid_universe_batch_service_shared_ptr = this->simulation->startNewService(grid_universe_batch_service);
+                WRENCH_INFO("starting service---> %p", grid_universe_batch_service_shared_ptr.get());
             }
             for (auto cs : this->compute_resources) {
                 auto cs_shared_ptr = this->simulation->startNewService(cs);
@@ -251,11 +253,12 @@ namespace wrench {
                 if (not this->pending_jobs.empty()) {
 
                     this->dispatching_jobs = true;
+                    WRENCH_INFO("adding batch service to new negotiator---> %p", this->grid_universe_batch_service_shared_ptr.get());
                     auto negotiator = std::shared_ptr<HTCondorNegotiatorService>(
                             new HTCondorNegotiatorService(this->hostname, this->compute_resources_map,
                                                           this->running_jobs,
                                                           this->pending_jobs, this->mailbox_name,
-                                                          grid_universe_batch_service_shared_ptr));
+                                                          this->grid_universe_batch_service_shared_ptr));
                     negotiator->simulation = this->simulation;
                     negotiator->start(negotiator, true, false); // Daemonized, no auto-restart
 
@@ -302,7 +305,7 @@ namespace wrench {
                         new ServiceDaemonStoppedMessage(
                                 this->getMessagePayloadValue(
                                         HTCondorCentralManagerServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
-            } catch (std::shared_ptr<NetworkError> &cause) {
+            } catch (std::shared_ptr <NetworkError> &cause) {
                 return false;
             }
             return false;
@@ -331,8 +334,8 @@ namespace wrench {
             processNegotiatorCompletion(msg->scheduled_jobs);
             return true;
 
-        } else {
-            throw std::runtime_error("Unexpected [" + message->getName() + "] message");
+        }else {
+                throw std::runtime_error("Unexpected [" + message->getName() + "] message");
         }
     }
 
@@ -359,6 +362,7 @@ namespace wrench {
                         this->getMessagePayloadValue(
                                 HTCondorCentralManagerServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
     }
+
 
     /**
      * @brief Process a submit pilot job request
