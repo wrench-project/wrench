@@ -8,12 +8,13 @@
  */
 
 #include <memory>
+#include "wrench/logging/TerminalOutput.h"
 #include <wrench/services/storage/StorageService.h>
 #include <wrench/services/storage/storage_helpers/FileLocation.h>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 
-//WRENCH_LOG_CATEGORY(wrench_core_file_location, "Log category for FileLocation");
+WRENCH_LOG_CATEGORY(wrench_core_file_location, "Log category for FileLocation");
 
 
 namespace wrench {
@@ -58,17 +59,20 @@ namespace wrench {
         if (absolute_path.empty()) {
             throw std::invalid_argument("FileLocation::LOCATION(): must specify a non-empty path");
         }
-
+        WRENCH_INFO("Storage Service---> %p", ss.get());
+        WRENCH_INFO("Absolute Path ---> %s", absolute_path.c_str());
         absolute_path = FileLocation::sanitizePath(absolute_path);
 
         std::string mount_point = "";
         for (auto const &mp : ss->getMountPoints()) {
             // This works because we disallowed two mounts from being proper prefixes of each other
+            WRENCH_INFO("Mount point tested: %s", mp.c_str());
             if ((mp != "/") and (absolute_path.find(mp) == 0)) {
                 mount_point = mp;
                 break;
             }
         }
+        WRENCH_INFO("Mount point arrived on: %s", mount_point.c_str());
         if (mount_point.empty()) {
             if (ss->hasMountPoint("/")) {
                 mount_point = "/";

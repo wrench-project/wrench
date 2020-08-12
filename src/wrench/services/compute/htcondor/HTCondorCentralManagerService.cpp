@@ -209,7 +209,7 @@ namespace wrench {
         try {
             if(grid_universe_batch_service){
                 this->grid_universe_batch_service_shared_ptr = this->simulation->startNewService(grid_universe_batch_service);
-                WRENCH_INFO("starting service---> %p", grid_universe_batch_service_shared_ptr.get());
+                //WRENCH_INFO("starting service---> %p", grid_universe_batch_service_shared_ptr.get());
             }
             for (auto cs : this->compute_resources) {
                 auto cs_shared_ptr = this->simulation->startNewService(cs);
@@ -253,7 +253,7 @@ namespace wrench {
                 if (not this->pending_jobs.empty()) {
 
                     this->dispatching_jobs = true;
-                    WRENCH_INFO("adding batch service to new negotiator---> %p", this->grid_universe_batch_service_shared_ptr.get());
+                    //WRENCH_INFO("adding batch service to new negotiator---> %p", this->grid_universe_batch_service_shared_ptr.get());
                     auto negotiator = std::shared_ptr<HTCondorNegotiatorService>(
                             new HTCondorNegotiatorService(this->hostname, this->compute_resources_map,
                                                           this->running_jobs,

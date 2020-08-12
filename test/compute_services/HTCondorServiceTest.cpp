@@ -35,6 +35,7 @@ public:
     wrench::WorkflowTask *task6;
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service = nullptr;
+    std::shared_ptr<wrench::StorageService> storage_service2 = nullptr;
 
     void do_StandardJobTaskTest_test();
     void do_PilotJobTaskTest_test();
@@ -116,7 +117,7 @@ protected:
                            "             <prop id=\"size\" value=\"100B\"/>"
                            "             <prop id=\"mount\" value=\"/\"/>"
                            "          </disk>"
-                           "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                           "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                            "             <prop id=\"size\" value=\"1000000B\"/>"
                            "             <prop id=\"mount\" value=\"/scratch\"/>"
                            "          </disk>"
@@ -126,19 +127,27 @@ protected:
                            "             <prop id=\"size\" value=\"100B\"/>"
                            "             <prop id=\"mount\" value=\"/\"/>"
                            "          </disk>"
-                           "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                           "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                            "             <prop id=\"size\" value=\"1000000B\"/>"
                            "             <prop id=\"mount\" value=\"/scratch\"/>"
                            "          </disk>"
                            "       </host>"
                            "       <host id=\"BatchHost1\" speed=\"1f\" core=\"10\"> "
                            "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                           "             <prop id=\"size\" value=\"100GB\"/>"
+                           "             <prop id=\"mount\" value=\"/\"/>"
+                           "          </disk>"
+                           "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                            "             <prop id=\"size\" value=\"1000000B\"/>"
                            "             <prop id=\"mount\" value=\"/scratch\"/>"
                            "          </disk>"
                            "       </host>"
                            "       <host id=\"BatchHost2\" speed=\"1f\" core=\"10\"> "
                            "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                           "             <prop id=\"size\" value=\"100GB\"/>"
+                           "             <prop id=\"mount\" value=\"/\"/>"
+                           "          </disk>"
+                           "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                            "             <prop id=\"size\" value=\"1000000B\"/>"
                            "             <prop id=\"mount\" value=\"/scratch\"/>"
                            "          </disk>"
@@ -510,9 +519,10 @@ void HTCondorServiceTest::do_SimpleServiceTest_test() {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
-    int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
+    int argc = 2;
+    auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -606,12 +616,14 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        // Create a 2-task job
-        wrench::StandardJob *two_task_job = job_manager->createStandardJob(
-                {this->test->task1},
+
+        auto htcondor_cs = *(this->getAvailableComputeServices<wrench::HTCondorComputeService>().begin());
+
+        wrench::StandardJob *grid_job = job_manager->createStandardJob(
+                {this->test->task2},
                 {},
                 {std::make_tuple(this->test->input_file,
-                                 wrench::FileLocation::LOCATION(this->test->storage_service),
+                                 wrench::FileLocation::LOCATION(htcondor_cs->getLocalStorageService()),
                                  wrench::FileLocation::SCRATCH)},
                 {}, {});
 
@@ -620,7 +632,7 @@ private:
 
         // Submit the 2-task job for execution
         try {
-            job_manager->submitJob(two_task_job, this->test->compute_service, test_service_specs);
+            job_manager->submitJob(grid_job, this->test->compute_service, test_service_specs);
         } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error(e.what());
         }
@@ -636,6 +648,8 @@ private:
         if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
+
+        this->test->compute_service->stop();
 
         return 0;
     }
@@ -661,10 +675,14 @@ void HTCondorServiceTest::do_GridUniverseTest_test() {
 
     // Get a hostname
     std::string hostname = "DualCoreHost";
+    //std::string batchhostname = "BatchHost1";
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
             new wrench::SimpleStorageService(hostname, {"/"})));
+
+    //ASSERT_NO_THROW(storage_service2 = simulation->add(
+    //       new wrench::SimpleStorageService(batchhostname, {"/"})));
 
     // Create list of compute services
     std::set<wrench::ComputeService *> compute_services;
@@ -680,7 +698,7 @@ void HTCondorServiceTest::do_GridUniverseTest_test() {
             "/scratch"));
 
     auto batch_service = new wrench::BatchComputeService("BatchHost1",
-                                                         {"BatchHost1", "BatchHost2"}, "");
+                                                         {"BatchHost1", "BatchHost2"}, "/scratch");
 
 
     // Create a HTCondor Service
@@ -694,6 +712,8 @@ void HTCondorServiceTest::do_GridUniverseTest_test() {
                     },
                     {},
                     batch_service)));
+
+    std::dynamic_pointer_cast<wrench::HTCondorComputeService>(compute_service)->setLocalStorageService(storage_service);
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
