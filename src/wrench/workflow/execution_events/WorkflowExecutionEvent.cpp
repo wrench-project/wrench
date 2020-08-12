@@ -106,7 +106,8 @@ namespace wrench {
             return std::shared_ptr<TimerEvent>(new TimerEvent(m->message));
         } else {
             throw std::runtime_error(
-                    "WorkflowExecutionEvent::waitForNextExecutionEvent(): Non-handled message type when generating execution event");
+                    "WorkflowExecutionEvent::waitForNextExecutionEvent(): Non-handled message type when generating execution event (" +
+                    message->getName() +")");
         }
     }
 

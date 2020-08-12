@@ -5,6 +5,7 @@
 [![Codacy Badge][codacy-badge]][codacy-link]
 [![SonarCloud Badge][sonarcloud-badge]][sonarcloud-link]
 [![CII Best Practices][cii-badge]][cii-link]
+[![Slack][slack-badge]][slack-link]
 
 <img src="doc/images/logo-vertical.png" width="100" />
 
@@ -123,6 +124,8 @@ WRENCH has been funded by the National Science Foundation (NSF), and the Nationa
 [sonarcloud-link]:          https://sonarcloud.io/dashboard?id=wrench
 [cii-badge]:                https://bestpractices.coreinfrastructure.org/projects/2357/badge
 [cii-link]:                 https://bestpractices.coreinfrastructure.org/projects/2357
+[slack-badge]:              https://img.shields.io/badge/slack-%40wrench--project-yellow?logo=slack
+[slack-link]:               https://join.slack.com/t/wrench-project/shared_invite/zt-g88hfxj7-pcuxOBMS7jSBkq1EhAn2~Q
 [nsf-20191-badge]:          https://img.shields.io/badge/NSF-1923539-blue
 [nsf-20191-link]:           https://nsf.gov/awardsearch/showAward?AWD_ID=1923539
 [nsf-20192-badge]:          https://img.shields.io/badge/NSF-1923621-blue

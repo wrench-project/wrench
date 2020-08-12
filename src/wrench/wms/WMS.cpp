@@ -388,6 +388,36 @@ namespace wrench {
         return energy_meter;
     }
 
+    /**
+     * @brief Instantiate and start a bandwidth meter
+     *
+     * @param measurement_periods: the measurement period for each metered link
+     *
+     * @return a link meter
+     */
+    std::shared_ptr<BandwidthMeterService> WMS::createBandwidthMeter(const std::map<std::string, double> &measurement_periods) {
+        auto bandwidth_meter_raw_ptr = new BandwidthMeterService(this->hostname, measurement_periods);
+        std::shared_ptr<BandwidthMeterService> bandwidth_meter = std::shared_ptr<BandwidthMeterService>(bandwidth_meter_raw_ptr);
+        bandwidth_meter->simulation = this->simulation;
+        bandwidth_meter->start(bandwidth_meter, true, false); // Always daemonize, no auto-restart
+        return bandwidth_meter;
+    }
+
+    /**
+     * @brief Instantiate and start a bandwidth meter
+     * @param linknames: the list of metered links, as linknames
+     * @param measurement_period: the measurement period
+     * @return a link meter
+     */
+    std::shared_ptr<BandwidthMeterService>
+    WMS::createBandwidthMeter(const std::vector<std::string> &linknames, double measurement_period) {
+        auto bandwidth_meter_raw_ptr = new BandwidthMeterService(this->hostname, linknames, measurement_period);
+        std::shared_ptr<BandwidthMeterService> bandwidth_meter = std::shared_ptr<BandwidthMeterService>(bandwidth_meter_raw_ptr);
+        bandwidth_meter->simulation = this->simulation;
+        bandwidth_meter->start(bandwidth_meter, true, false); // Always daemonize, no auto-restart
+        return bandwidth_meter;
+    }
+
 
     /**
      * @brief Get the WMS's pilot scheduler

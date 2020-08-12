@@ -78,7 +78,7 @@ namespace wrench {
      * @return a <cores, ram> tuple
      * @throw std::invalid_argument
      */
-    static std::tuple<std::string, unsigned long> parseResourceSpec(std::string spec) {
+    static std::tuple<std::string, unsigned long> parseResourceSpec(const std::string &spec) {
         std::vector<std::string> tokens;
         boost::algorithm::split(tokens, spec, boost::is_any_of(":"));
         switch (tokens.size()) {
@@ -128,7 +128,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void BareMetalComputeService::submitStandardJob(StandardJob *job,
-                                                    std::map<std::string, std::string> &service_specific_args) {
+                                                    const std::map<std::string, std::string> &service_specific_args) {
 
         assertServiceIsUp();
 
@@ -152,11 +152,11 @@ namespace wrench {
         for (auto t : job->getTasks()) {
 
             if ((service_specific_args.find(t->getID()) != service_specific_args.end()) and
-                (not service_specific_args[t->getID()].empty())) {
+                (not service_specific_args.at(t->getID()).empty())) {
                 std::tuple<std::string, unsigned long> parsed_spec;
 
                 try {
-                    parsed_spec = parseResourceSpec(service_specific_args[t->getID()]);
+                    parsed_spec = parseResourceSpec(service_specific_args.at(t->getID()));
                 } catch (std::invalid_argument &e) {
                     throw;
                 }
@@ -168,7 +168,7 @@ namespace wrench {
                 if (not target_host.empty()) {
                     if (this->compute_resources.find(target_host) == this->compute_resources.end()) {
                         throw std::invalid_argument(
-                                "Invalid service-specific argument '" + service_specific_args[t->getID()] +
+                                "Invalid service-specific argument '" + service_specific_args.at(t->getID()) +
                                 "' for task '" +
                                 t->getID() + "': no such host");
                     }
@@ -177,14 +177,14 @@ namespace wrench {
                 if (target_num_cores > 0) {
                     if (target_num_cores < t->getMinNumCores()) {
                         throw std::invalid_argument(
-                                "Invalid service-specific argument '" + service_specific_args[t->getID()] +
+                                "Invalid service-specific argument '" + service_specific_args.at(t->getID()) +
                                 "' for task '" +
                                 t->getID() + "': the task requires at least " + std::to_string(t->getMinNumCores()) +
                                 " cores");
                     }
                     if (target_num_cores > t->getMaxNumCores()) {
                         throw std::invalid_argument(
-                                "Invalid service-specific argument '" + service_specific_args[t->getID()] +
+                                "Invalid service-specific argument '" + service_specific_args.at(t->getID()) +
                                 "' for task '" +
                                 t->getID() + "': the task can use at most " + std::to_string(t->getMaxNumCores()) +
                                 " cores");
@@ -242,7 +242,7 @@ namespace wrench {
      */
     void
     BareMetalComputeService::submitPilotJob(PilotJob *job,
-                                            std::map<std::string, std::string> &service_specific_args) {
+                                            const std::map<std::string, std::string> &service_specific_args) {
 
         assertServiceIsUp();
 

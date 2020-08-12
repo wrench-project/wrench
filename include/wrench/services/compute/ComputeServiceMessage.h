@@ -40,7 +40,7 @@ namespace wrench {
     class ComputeServiceSubmitStandardJobRequestMessage : public ComputeServiceMessage {
     public:
         ComputeServiceSubmitStandardJobRequestMessage(const std::string answer_mailbox, StandardJob *,
-                                                      std::map<std::string, std::string> &service_specific_args,
+                                                      const std::map<std::string, std::string> service_specific_args,
                                                       double payload);
 
         /** @brief The mailbox to which the answer message should be sent */
@@ -136,7 +136,7 @@ namespace wrench {
     class ComputeServiceSubmitPilotJobRequestMessage : public ComputeServiceMessage {
     public:
         ComputeServiceSubmitPilotJobRequestMessage(std::string answer_mailbox, PilotJob *,
-                                                   std::map<std::string, std::string> &service_specific_args,
+                                                   const std::map<std::string, std::string> service_specific_args,
                                                    double payload);
 
         /** @brief The mailbox to which the answer message should be sent */

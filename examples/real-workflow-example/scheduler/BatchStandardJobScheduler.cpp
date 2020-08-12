@@ -14,7 +14,6 @@ WRENCH_LOG_CATEGORY(batch_scheduler, "Log category for Batch Scheduler");
 
 namespace wrench {
 
-
     /**
      * @brief Schedule and run a set of ready tasks on the batch service
      *

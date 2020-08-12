@@ -54,7 +54,7 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    void ComputeService::submitJob(WorkflowJob *job, std::map<std::string, std::string> service_specific_args) {
+    void ComputeService::submitJob(WorkflowJob *job, const std::map<std::string, std::string> &service_specific_args) {
 
         if (job == nullptr) {
             throw std::invalid_argument("ComputeService::submitJob(): invalid argument");

@@ -71,10 +71,10 @@ namespace wrench {
 
     public:
         CloudComputeService(const std::string &hostname,
-                     std::vector<std::string> &execution_hosts,
-                     std::string scratch_space_mount_point,
-                     std::map<std::string, std::string> property_list = {},
-                     std::map<std::string, double> messagepayload_list = {});
+                            std::vector<std::string> &execution_hosts,
+                            std::string scratch_space_mount_point,
+                            std::map<std::string, std::string> property_list = {},
+                            std::map<std::string, double> messagepayload_list = {});
 
         /***********************/
         /** \cond DEVELOPER    */
@@ -94,6 +94,8 @@ namespace wrench {
         virtual void shutdownVM(const std::string &vm_name);
 
         virtual std::shared_ptr<BareMetalComputeService> startVM(const std::string &vm_name);
+
+        virtual std::shared_ptr<BareMetalComputeService> getVMComputeService(const std::string &vm_name);
 
         virtual void suspendVM(const std::string &vm_name);
 
@@ -116,9 +118,9 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL    */
         /***********************/
-        void submitStandardJob(StandardJob *job, std::map<std::string, std::string> &service_specific_args) override;
+        void submitStandardJob(StandardJob *job, const std::map<std::string, std::string> &service_specific_args) override;
 
-        void submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_args) override;
+        void submitPilotJob(PilotJob *job, const std::map<std::string, std::string> &service_specific_args) override;
 
         void terminateStandardJob(StandardJob *job) override;
         void terminatePilotJob(PilotJob *job) override;
