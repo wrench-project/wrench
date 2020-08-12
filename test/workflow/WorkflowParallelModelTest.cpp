@@ -255,8 +255,8 @@ void ParallelModelTest::do_CustomParallelModelTest_test() {
             [] (double work, unsigned long num_threads) {
                 std::vector<double> works;
                 for (int i=0; i < num_threads; i++) {
-                    double work = (i+1) * 10.0;
-                    works.push_back(work);
+                    double thread_work = (i+1) * 10.0;
+                    works.push_back(thread_work);
                 }
                 return works;
             }
