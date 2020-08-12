@@ -390,7 +390,7 @@ function processData(data, tt, populateLegend) {
             return `cube-${data[4][i].task_id}`
         })
         .attr('fill', function (d, i) {
-            var colour = getRandomColour()
+            var colour = getRandomColor()
             threeDColourMap[data[4][i].task_id] = colour
             legend.append("small")
                 .attr("class", "inline-block")
@@ -498,8 +498,6 @@ function generate3dGraph(data, populateLegend, needToInitialise) {
     const scaleInputId = "scale-input"
     const containerId = "three-d-graph-container"
     
-    document.getElementById(containerId).innerHTML = threedVisualizationHtml
-
     if (needToInitialise) {
         initialise3dGraph()
     }

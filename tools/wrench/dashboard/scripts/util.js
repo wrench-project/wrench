@@ -1,14 +1,80 @@
 const executionHostKey = 'execution_host'
 
-// const getDuration = (start, end) => {
-//     if (start === -1 || start === -1) {
-//         return start
-//     } else if (end === -1 || end === -1) {
-//         return end
-//     } else {
-//         return toFiveDecimalPlaces(end - start)
-//     }
-// }
+Chart.plugins.register({
+    beforeDraw: function (chart, easing) {
+        if (chart.config.options.chartArea && chart.config.options.chartArea.backgroundColor) {
+            let ctx = chart.chart.ctx;
+            ctx.fillStyle = chart.config.options.chartArea.backgroundColor;
+
+            let chartArea = chart.chartArea;
+            ctx.fillRect(chartArea.left, chartArea.top, chartArea.right - chartArea.left, chartArea.bottom - chartArea.top);
+        }
+    }
+});
+
+function getRandomColor() {
+    return "#" + Math.floor(Math.random() * 16777215).toString(16);
+}
+
+function extractFileContent(file) {
+    return new Promise(function (resolve, reject) {
+        let reader = new FileReader()
+        reader.onload = function (event) {
+            resolve(event.target.result);
+        }
+        reader.readAsText(file);
+        setTimeout(function () {
+            reject()
+        }, 5000);
+    })
+}
+
+function processFile(files) {
+    if (files.length === 0) {
+        return;
+    }
+    extractFileContent(files[0])
+        .then(function (rawDataString) {
+            const rawData = JSON.parse(rawDataString);
+            if (!rawData.workflow_execution || !rawData.workflow_execution.tasks) {
+                return;
+            }
+            data = {
+                file: files[0].name,
+                tasks: rawData.workflow_execution.tasks,
+                disk: rawData.disk_operations,
+                contents: rawData.workflow_execution.tasks // TODO: remove
+            };
+
+            if (rawData.energy_consumption) {
+                energyData = rawData.energy_consumption;
+            }
+            document.getElementById("simulation-json").value = files[0].name;
+            initialize();
+        })
+        .catch(function (err) {
+            console.error(err)
+        });
+}
+
+function prepareData(data) {
+    const nullReplacement = {
+        start: 0,
+        end: 0
+    };
+    data.forEach(function (d) {
+        if (d.read === null) {
+            d.read = [nullReplacement];
+        }
+        if (d.compute === null) {
+            d.compute = nullReplacement;
+        }
+        if (d.write === null) {
+            d.write = [nullReplacement];
+        }
+    })
+    return data;
+}
 
 const getDuration = (d, section) => {
     if (section === "read" || section === "write") {
@@ -49,18 +115,6 @@ function determineFailedOrTerminatedPoint(d) {
         return "write"
     }
 }
-
-// const getDuration = (data, section, failed, terminated) => {
-//     if (section === "compute") {
-//         const { start, end }
-//         if (start === -1) {
-//             return 0
-//         }
-//         if (end === -1) {
-
-//         }
-//     }
-// }
 
 const toFiveDecimalPlaces = d3.format('.5f')
 
@@ -114,14 +168,6 @@ function convertToTableFormat(d, section, property) {
     return toFiveDecimalPlaces(metric);
 }
 
-function getRandomColour() {
-    let letters = '0123456789ABCDEF';
-    let colour = '#';
-    for (let i = 0; i < 6; i++) {
-        colour += letters[Math.floor(Math.random() * 16)];
-    }
-    return colour;
-}
 
 function populateLegend(currView) {
     if (currView === "taskView") {
@@ -287,46 +333,6 @@ function searchOverlap(taskId, taskOverlap) {
     }
 }
 
-function extractFileContent(file) {
-    return new Promise(function (resolve, reject) {
-        let reader = new FileReader()
-        reader.onload = function (event) {
-            resolve(event.target.result);
-            // document.getElementById('fileContent').textContent = event.target.result;
-        }
-        reader.readAsText(file);
-        setTimeout(function () {
-            reject()
-        }, 5000)
-    })
-}
-
-function processFile(files) {
-    if (files.length === 0) {
-        return
-    }
-    extractFileContent(files[0])
-        .then(function (rawDataString) {
-            const rawData = JSON.parse(rawDataString)
-            if (!rawData.workflow_execution || !rawData.workflow_execution.tasks) {
-                return
-            }
-            data = {
-                file: files[0].name,
-                contents: rawData.workflow_execution.tasks
-            }
-
-            if (rawData.energy_consumption) {
-                energyData = rawData.energy_consumption
-            }
-
-            initialise()
-        })
-        .catch(function (err) {
-            console.error(err)
-            return
-        })
-}
 
 function sanitizeId(id) {
     id = id.replace(/#/g, '')

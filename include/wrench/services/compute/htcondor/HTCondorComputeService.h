@@ -56,9 +56,9 @@ namespace wrench {
         /***********************/
 
         void submitStandardJob(StandardJob *job,
-                               std::map<std::string, std::string> &service_specific_arguments) override;
+                               const std::map<std::string, std::string> &service_specific_arguments) override;
 
-        void submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_arguments) override;
+        void submitPilotJob(PilotJob *job, const std::map<std::string, std::string> &service_specific_arguments) override;
 
         std::shared_ptr<StorageService> getLocalStorageService() const;
 
@@ -91,10 +91,10 @@ namespace wrench {
         bool processNextMessage();
 
         void processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
-                                      std::map<std::string, std::string> &service_specific_args);
+                                      const std::map<std::string, std::string> &service_specific_args);
 
         void processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job,
-                                   std::map<std::string, std::string> &service_specific_args);
+                                   const std::map<std::string, std::string> &service_specific_args);
 
         void terminate();
 
