@@ -37,8 +37,16 @@ namespace wrench {
                 this->interval, this->expired_time);
 
         while (this->getState() == State::UP) {
-            WRENCH_INFO("Flush on host %s", this->getHostname().c_str());
-            S4U_Simulation::sleep(this->interval - 0);
+            WRENCH_INFO("Start periodical flushing on host %s", this->getHostname().c_str());
+
+            double start_time = S4U_Simulation::getClock();
+            pdflush();
+            double end_time = S4U_Simulation::getClock();
+            WRENCH_INFO("Periodical flushing completed in %lf sec", end_time - start_time);
+
+            if (end_time - start_time < interval) {
+                S4U_Simulation::sleep(interval + start_time - end_time);
+            }
         }
 
         this->setStateToDown();
@@ -95,22 +103,22 @@ namespace wrench {
         dirty_ratio = dirtyRatio;
     }
 
-    long MemoryManager::getFree() const {
+    double MemoryManager::getFree() const {
         return free;
     }
 
-    long MemoryManager::getCached() const {
+    double MemoryManager::getCached() const {
         return cached;
     }
 
-    long MemoryManager::getDirty() const {
+    double MemoryManager::getDirty() const {
         return dirty;
     }
 
-    long MemoryManager::flush_lru_list(std::vector<Block*> &list, long amount) {
+    double MemoryManager::flushLruList(std::vector<Block *> &list, double amount) {
 
         if (amount <= 0) return 0;
-        long flushed = 0;
+        double flushed = 0;
 
         for (auto blk : list) {
 
@@ -140,27 +148,30 @@ namespace wrench {
         return flushed;
     }
 
-    long MemoryManager::flush(long amount) {
+    double MemoryManager::flush(double amount) {
 
-        long flushed_inactive = flush_lru_list(inactive_list, amount);
+        long flushed_inactive = flushLruList(inactive_list, amount);
 
         long flushed_active = 0;
         if (flushed_inactive < amount) {
-            flushed_active = flush_lru_list(active_list, amount - flushed_inactive);
+            flushed_active = flushLruList(active_list, amount - flushed_inactive);
         }
 
         return flushed_inactive + flushed_active;
     }
 
-    long MemoryManager::pdflush_lru_list(std::vector<Block*> &list) {
+    double MemoryManager::flushExpiredData(std::vector<Block *> &list) {
 
-        long flushed = 0;
+        double flushed = 0;
 
         for (auto blk : list) {
             if (!blk->isDirty()) continue;
             if (S4U_Simulation::getClock() - blk->getLastAccess() >= expired_time) {
                 blk->setDirty(false);
                 flushed += blk->getSize();
+
+                s4u_Disk *disk = getDisk(blk->getFilename());
+                disk->write(blk->getSize());
             }
         }
 
@@ -168,17 +179,17 @@ namespace wrench {
         return flushed;
     }
 
-    long MemoryManager::flush_expired_data() {
+    double MemoryManager::pdflush() {
         long flushed = 0;
-        flushed += pdflush_lru_list(inactive_list);
-        flushed += pdflush_lru_list(active_list);
+        flushed += flushExpiredData(inactive_list);
+        flushed += flushExpiredData(active_list);
         return flushed;
     }
 
-    long MemoryManager::evict(long amount) {
+    double MemoryManager::evict(double amount) {
 
         if (amount <= 0) return 0;
-        long evicted = 0;
+        double evicted = 0;
 
         for (int i=0; i<inactive_list.size(); i++) {
 
@@ -206,23 +217,23 @@ namespace wrench {
         return evicted;
     }
 
-    void MemoryManager::read_to_cache(std::string &filename, long amount) {
+    void MemoryManager::readToCache(std::string &filename, double amount) {
         // Change stats
         free -= amount;
         cached += amount;
         // Push cached data to inactive list
         inactive_list.push_back(new Block(filename, amount, S4U_Simulation::getClock(), false));
-        cache_balance_and_sort();
+        balanceAndSortCache();
     }
 
     /**
      * Simulate a read from cache, re-access and update cached file data
      * @param filename: name of the file read
      */
-    void MemoryManager::cache_read(std::string &filename) {
+    void MemoryManager::readFromCache(std::string &filename) {
 
-        long dirty_reaccessed = 0;
-        long clean_reaccessed = 0;
+        double dirty_reaccessed = 0;
+        double clean_reaccessed = 0;
 
         // Calculate dirty cached data
         for (int i = 0; i < inactive_list.size(); i++) {
@@ -265,7 +276,7 @@ namespace wrench {
             active_list.push_back(new_blk);
         }
 
-        cache_balance_and_sort();
+        balanceAndSortCache();
     }
 
     /**
@@ -273,7 +284,7 @@ namespace wrench {
      * @param filename: name of the file written
      * @param amount: amount of data written
      */
-    void MemoryManager::cache_write(std::string &filename, long amount) {
+    void MemoryManager::writeToCache(std::string &filename, double amount) {
 
         Block *blk = new Block(filename, amount, S4U_Simulation::getClock(), true);
         inactive_list.push_back(blk);
@@ -283,24 +294,31 @@ namespace wrench {
         this->dirty += amount;
     }
 
-    bool compare_last_access(Block &blk1,Block &blk2) {
-        return blk1.getLastAccess() < blk2.getLastAccess();
+    bool compare_last_access(Block *blk1, Block *blk2) {
+        return blk1->getLastAccess() < blk2->getLastAccess();
     }
 
-    void MemoryManager::cache_balance_and_sort() {
-        balance_lru_lists();
+    void MemoryManager::balanceAndSortCache() {
+        balanceLruLists();
         std::sort(active_list.begin(), active_list.end(), compare_last_access);
         std::sort(inactive_list.begin(), inactive_list.end(), compare_last_access);
     }
 
-    void MemoryManager::balance_lru_lists() {
+    void MemoryManager::balanceLruLists() {
 
-        auto sum = [&] (Block &blk1, Block &blk2) {
-            return blk1.getSize() + blk2.getSize();
+        auto sum = [] (Block *blk1, Block *blk2) {
+            return blk1->getSize() + blk2->getSize();
         };
 
-        long inactive_size = std::accumulate(inactive_list.begin(), inactive_list.end(), 0, sum);
-        long active_size = std::accumulate(active_list.begin(), active_list.end(), 0, sum);
+        double inactive_size = 0;
+        std::for_each(inactive_list.begin(), inactive_list.end(), [&] (Block* blk) {
+            inactive_size += blk->getSize();
+        });
+
+        double active_size = 0;
+        std::for_each(active_list.begin(), active_list.end(), [&] (Block* blk) {
+            active_size += blk->getSize();
+        });
 
         if (active_size > 2 * inactive_size) {
 
@@ -331,7 +349,24 @@ namespace wrench {
         }
     }
 
-    s4u_Disk *MemoryManager::get_disk(std::string filename) {
+    s4u_Disk *MemoryManager::getDisk(const std::string &filename) {
+
+        std::string mount_point  = FileLocation::sanitizePath(filename);
+
+        auto host = simgrid::s4u::Host::by_name_or_null(hostname);
+        if (not host) {
+            throw std::invalid_argument("MemoryManager::get_disk: unknown host " + hostname);
+        }
+
+        auto disk_list = simgrid::s4u::Host::by_name(hostname)->get_disks();
+        for (auto disk : disk_list) {
+            std::string disk_mountpoint =
+                    FileLocation::sanitizePath(std::string(std::string(disk->get_property("mount"))));
+            if (disk_mountpoint == mount_point) {
+                return disk;
+            }
+        }
+
         return nullptr;
     }
 

@@ -24,20 +24,20 @@ namespace wrench {
         std::vector<Block*> active_list;
 
         // We keep track of these properties since we don't want to traverse through two LRU lists to get them.
-        long free;
-        long cached;
-        long dirty;
+        double free;
+        double cached;
+        double dirty;
 
 
         MemoryManager(s4u_Disk *memory, double dirty_ratio, int interval, int expired_time, std::string hostname);
 
         int main() override;
 
-        void balance_lru_lists();
-        void cache_balance_and_sort();
-        long flush_lru_list(std::vector<Block*> &list, long amount);
-        long pdflush_lru_list(std::vector<Block*> &list);
-        s4u_Disk* get_disk(std::string filename);
+        void balanceLruLists();
+        void balanceAndSortCache();
+        double flushLruList(std::vector<Block *> &list, double amount);
+        double flushExpiredData(std::vector<Block *> &list);
+        s4u_Disk* getDisk(const std::string &filename);
 
     public:
 
@@ -54,23 +54,23 @@ namespace wrench {
 
         void setDirtyRatio(double dirtyRatio);
 
-        long getFree() const;
+        double getFree() const;
 
-        long getCached() const;
+        double getCached() const;
 
-        long getDirty() const;
+        double getDirty() const;
 
-        long flush(long amount);
+        double flush(double amount);
 
-        long flush_expired_data();
+        double pdflush();
 
-        long evict(long amount);
+        double evict(double amount);
 
-        void read_to_cache(std::string &filename, long amount);
+        void readToCache(std::string &filename, double amount);
 
-        void cache_read(std::string &filename);
+        void readFromCache(std::string &filename);
 
-        void cache_write(std::string &filename, long amount);
+        void writeToCache(std::string &filename, double amount);
 
     };
 
