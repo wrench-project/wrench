@@ -971,7 +971,7 @@ namespace wrench {
             /** Perform scratch cleanup */
             for (auto f : files_stored_in_scratch) {
                 try {
-                    StorageService::deleteFile(f, FileLocation::LOCATION(this->scratch_space, job->getName()));
+                    StorageService::deleteFile(f, FileLocation::LOCATION(this->scratch_space, "/scratch/"+job->getName()));
                 } catch (WorkflowExecutionException &e) {
                     throw;
                 }
