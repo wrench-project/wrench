@@ -556,6 +556,7 @@ namespace wrench {
             // Wait for all actors to complete
 #ifndef S4U_KILL_JOIN_WORKS
             for (unsigned long i = 0; i < this->compute_threads.size(); i++) {
+                WRENCH_INFO("Waiting for message from a compute threads...");
                 try {
                     S4U_Mailbox::getMessage(tmp_mailbox);
                 } catch (std::shared_ptr<NetworkError> &e) {
@@ -564,6 +565,8 @@ namespace wrench {
                     success = false;
                     continue;
                 }
+                WRENCH_INFO("Got it...");
+
             }
 #else
             for (unsigned long i=0; i < this->compute_threads.size(); i++) {

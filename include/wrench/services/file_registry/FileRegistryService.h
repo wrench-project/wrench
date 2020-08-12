@@ -1,12 +1,11 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2020. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-
 
 #ifndef WRENCH_FILEREGISTRYSERVICE_H
 #define WRENCH_FILEREGISTRYSERVICE_H
@@ -29,21 +28,17 @@ namespace wrench {
 
     /**
      * @brief A file registry service (a.k.a. replica catalog) that holds a database
-     *        of which files are available at which storage services. More specifically,
+     *        of which files are available at which storage services. Specifically,
      *        the database holds a set of <file, storage service> entries. A WMS can add,
      *        lookup, and remove entries at will from this database.
      */
     class FileRegistryService : public Service {
 
-    public:
-
-
     private:
-
-        std::map<std::string, std::string> default_property_values = {
-                {FileRegistryServiceProperty::LOOKUP_COMPUTE_COST,                      "0.0"},
-                {FileRegistryServiceProperty::ADD_ENTRY_COMPUTE_COST,                   "0.0"},
-                {FileRegistryServiceProperty::REMOVE_ENTRY_COMPUTE_COST,                "0.0"},
+        std::map <std::string, std::string> default_property_values = {
+                {FileRegistryServiceProperty::LOOKUP_COMPUTE_COST,       "0.0"},
+                {FileRegistryServiceProperty::ADD_ENTRY_COMPUTE_COST,    "0.0"},
+                {FileRegistryServiceProperty::REMOVE_ENTRY_COMPUTE_COST, "0.0"},
         };
 
         std::map<std::string, double> default_messagepayload_values = {
@@ -58,11 +53,9 @@ namespace wrench {
         };
 
     public:
-
-
         // Public Constructor
         explicit FileRegistryService(std::string hostname,
-                                     std::map<std::string, std::string> property_list = {},
+                                     std::map <std::string, std::string> property_list = {},
                                      std::map<std::string, double> messagepayload_list = {}
         );
 
@@ -70,14 +63,15 @@ namespace wrench {
         /** \cond DEVELOPER         */
         /****************************/
 
-        std::set<std::shared_ptr<FileLocation>> lookupEntry(WorkflowFile *file);
+        std::set <std::shared_ptr<FileLocation>> lookupEntry(WorkflowFile *file);
 
-        std::map<double, std::shared_ptr<FileLocation>> lookupEntry(WorkflowFile *file, std::string reference_host,
-                                                                    std::shared_ptr<NetworkProximityService> network_proximity_service);
+        std::map<double, std::shared_ptr<FileLocation>> lookupEntry(
+                WorkflowFile *file, std::string reference_host,
+                std::shared_ptr <NetworkProximityService> network_proximity_service);
 
-        void addEntry(WorkflowFile *file, std::shared_ptr<FileLocation> location);
+        void addEntry(WorkflowFile *file, std::shared_ptr <FileLocation> location);
 
-        void removeEntry(WorkflowFile *file, std::shared_ptr<FileLocation> location);
+        void removeEntry(WorkflowFile *file, std::shared_ptr <FileLocation> location);
 
         /****************************/
         /** \endcond                */
@@ -94,23 +88,20 @@ namespace wrench {
         /****************************/
 
     private:
-
         friend class Simulation;
 
-        void addEntryToDatabase(WorkflowFile *file, std::shared_ptr<FileLocation> location);
+        void addEntryToDatabase(WorkflowFile *file, std::shared_ptr <FileLocation> location);
 
-        bool removeEntryFromDatabase(WorkflowFile *file, std::shared_ptr<FileLocation> location);
+        bool removeEntryFromDatabase(WorkflowFile *file, std::shared_ptr <FileLocation> location);
 
         int main() override;
 
         bool processNextMessage();
 
-        std::map<WorkflowFile *, std::set<std::shared_ptr<FileLocation>>> entries;
+        std::map<WorkflowFile *, std::set < std::shared_ptr < FileLocation>>>
+        entries;
     };
 
-
-
 };
-
 
 #endif //WRENCH_FILEREGISTRYSERVICE_H
