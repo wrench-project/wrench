@@ -6,30 +6,30 @@
 
 namespace wrench {
 
-    Block::Block(std::string &filename, long size, double last_access, bool dirty) :
-            filename(filename), size(size), last_access(last_access), dirty(dirty) {}
+    Block::Block(std::string &fn, double sz, double last_access, bool is_dirty) :
+            filename(fn), size(sz), last_access(last_access), dirty(is_dirty) {}
 
     const std::string &Block::getFilename() const {
         return filename;
     }
 
-    void Block::setFilename(const std::string &filename) {
-        Block::filename = filename;
+    void Block::setFilename(const std::string &fn) {
+        Block::filename = fn;
     }
 
-    long Block::getSize() const {
+    double Block::getSize() const {
         return size;
     }
 
-    void Block::setSize(long size) {
-        Block::size = size;
+    void Block::setSize(double sz) {
+        Block::size = sz;
     }
 
-    long Block::getLastAccess() const {
+    double Block::getLastAccess() const {
         return last_access;
     }
 
-    void Block::setLastAccess(long lastAccess) {
+    void Block::setLastAccess(double lastAccess) {
         last_access = lastAccess;
     }
 
@@ -37,8 +37,8 @@ namespace wrench {
         return dirty;
     }
 
-    void Block::setDirty(bool dirty) {
-        Block::dirty = dirty;
+    void Block::setDirty(bool is_dirty) {
+        Block::dirty = is_dirty;
     }
 
 }

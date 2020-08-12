@@ -12,27 +12,27 @@ namespace wrench {
     class Block {
 
     public:
-        Block(std::string &filename, long size, double last_access, bool dirty);
+        Block(std::string &fn, double sz, double last_access, bool is_dirty);
 
         const std::string &getFilename() const;
 
-        void setFilename(const std::string &filename);
+        void setFilename(const std::string &fn);
 
-        long getSize() const;
+        double getSize() const;
 
-        void setSize(long size);
+        void setSize(double sz);
 
-        long getLastAccess() const;
+        double getLastAccess() const;
 
-        void setLastAccess(long lastAccess);
+        void setLastAccess(double lastAccess);
 
         bool isDirty() const;
 
-        void setDirty(bool dirty);
+        void setDirty(bool is_dirty);
 
     private:
         std::string filename;
-        long size;
+        double size;
         double last_access;
         bool dirty;
     };
