@@ -591,6 +591,21 @@ namespace wrench {
         std::string hostname;
         double joules;
     };
+
+    /**
+     * @brief A simulation timestamp class for link usage
+     */
+    class SimulationTimestampLinkUsage: public SimulationTimestampType {
+    public:
+        std::string getLinkname();
+        double getUsage();
+
+    private:
+        friend class SimulationOutput;
+        SimulationTimestampLinkUsage(std::string linkname, double bytes_per_second);
+        std::string linkname;
+        double bytes_per_second;
+    };
 };
 
 #endif //WRENCH_SIMULATIONTIMESTAMPTYPES_H
