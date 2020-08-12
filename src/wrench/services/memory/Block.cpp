@@ -6,7 +6,7 @@
 
 namespace wrench {
 
-    Block::Block(std::string filename, long size, long last_access, bool dirty) :
+    Block::Block(std::string &filename, long size, double last_access, bool dirty) :
             filename(filename), size(size), last_access(last_access), dirty(dirty) {}
 
     const std::string &Block::getFilename() const {

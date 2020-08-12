@@ -20,13 +20,21 @@ namespace wrench {
         double dirty_ratio;
         int interval;
         int expired_time;
-        std::vector<Block> inactive_list;
-        std::vector<Block> active_list;
+        std::vector<Block*> inactive_list;
+        std::vector<Block*> active_list;
+
+        // We keep track of these properties since we don't want to traverse through two LRU lists to get them.
+        long free;
+        long cached;
+        long dirty;
 
 
         MemoryManager(s4u_Disk *memory, double dirty_ratio, int interval, int expired_time, std::string hostname);
 
         int main() override;
+
+        void balance_lru_lists();
+        void cache_balance_and_sort();
 
     public:
 
@@ -43,9 +51,11 @@ namespace wrench {
 
         void setDirtyRatio(double dirtyRatio);
 
-        const std::vector<Block> &getInactiveList() const;
+        long getFree() const;
 
-        const std::vector<Block> &getActiveList() const;
+        long getCached() const;
+
+        long getDirty() const;
 
         long flush(long amount);
 
@@ -53,9 +63,11 @@ namespace wrench {
 
         long evict(long amount);
 
-        void cache_read(std::string filename);
+        void read_to_cache(std::string &filename, long amount);
 
-        void cache_write(std::string filename, long amount);
+        void cache_read(std::string &filename);
+
+        void cache_write(std::string &filename, long amount);
 
     };
 
