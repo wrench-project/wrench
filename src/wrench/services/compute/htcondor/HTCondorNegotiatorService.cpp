@@ -96,6 +96,9 @@ namespace wrench {
 
                     //instead of erasing here, going to iterate through.
                     service_specific_arguments.erase("universe");
+                    service_specific_arguments.insert(std::pair<std::string, std::string>("-N","1"));
+                    service_specific_arguments.insert(std::pair<std::string, std::string>("-c","1"));
+                    service_specific_arguments.insert(std::pair<std::string, std::string>("-t","9999"));
 
                     std::map<std::string, std::string> service_specs_copy;
                     //std::map<std::string, std::string>::iterator it = service_specific_arguments.begin();
