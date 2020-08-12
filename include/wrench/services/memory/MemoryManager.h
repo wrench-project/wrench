@@ -35,6 +35,9 @@ namespace wrench {
 
         void balance_lru_lists();
         void cache_balance_and_sort();
+        long flush_lru_list(std::vector<Block*> &list, long amount);
+        long pdflush_lru_list(std::vector<Block*> &list);
+        s4u_Disk* get_disk(std::string filename);
 
     public:
 
