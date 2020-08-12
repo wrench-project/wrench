@@ -12,7 +12,7 @@ namespace wrench {
     class Block {
 
     public:
-        Block(std::string filename, long size, long last_access, bool dirty);
+        Block(std::string &filename, long size, double last_access, bool dirty);
 
         const std::string &getFilename() const;
 
@@ -33,7 +33,7 @@ namespace wrench {
     private:
         std::string filename;
         long size;
-        long last_access;
+        double last_access;
         bool dirty;
     };
 
