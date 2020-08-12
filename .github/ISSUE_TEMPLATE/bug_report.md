@@ -8,7 +8,7 @@ assignees: ''
 ---
 
 **WRENCH Information**
-- WRENCH version: [e.g., 1.5, master branch, etc.]
+- WRENCH version: [e.g., 1.6, master branch, etc.]
 - CMake version: [e.g., 3.5]
 - Compiler name and version: [e.g., g++ 7]
 
@@ -26,7 +26,7 @@ If applicable, add screenshots to help explain your problem.
 
 **Desktop (please complete the following information):**
  - OS: [e.g. Ubuntu]
- - Version [e.g. 18.04]
+ - Version [e.g. 20.04]
 
 **Additional context**
 Add any other context about the problem here.
