@@ -145,7 +145,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void HTCondorComputeService::submitStandardJob(StandardJob *job,
-                                                   std::map<std::string, std::string> &service_specific_args) {
+                                                   const std::map<std::string, std::string> &service_specific_args) {
 
         serviceSanityCheck();
 
@@ -193,7 +193,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void HTCondorComputeService::submitPilotJob(PilotJob *job,
-                                                std::map<std::string, std::string> &service_specific_args) {
+                                                const std::map<std::string, std::string> &service_specific_args) {
         serviceSanityCheck();
 
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_pilot_job");
@@ -349,7 +349,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void HTCondorComputeService::processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
-                                                          std::map<std::string, std::string> &service_specific_args) {
+                                                          const std::map<std::string, std::string> &service_specific_args) {
 
         WRENCH_INFO("Asked to run a standard job with %ld tasks", job->getNumTasks());
         if (not this->supportsStandardJobs()) {
@@ -386,16 +386,12 @@ namespace wrench {
         this->central_manager->submitStandardJob(job, service_specific_args);
 
         // send positive answer
-//      try {
         S4U_Mailbox::dputMessage(
                 answer_mailbox,
                 new ComputeServiceSubmitStandardJobAnswerMessage(
                         job, this->getSharedPtr<HTCondorComputeService>(), true, nullptr, this->getMessagePayloadValue(
                                 HTCondorComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
         return;
-//      } catch (std::shared_ptr<NetworkError> &cause) {
-//        return;
-//      }
     }
 
     /**
@@ -408,7 +404,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void HTCondorComputeService::processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job,
-                                                       std::map<std::string, std::string> &service_specific_args) {
+                                                       const std::map<std::string, std::string> &service_specific_args) {
 
         WRENCH_INFO("Asked to run a pilot job");
         if (not this->supportsPilotJobs()) {

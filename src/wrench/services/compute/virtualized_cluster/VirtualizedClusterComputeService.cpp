@@ -96,9 +96,22 @@ namespace wrench {
     }
 
     /**
+     * @brief Get the name of the physical host on which a VM is running
+     * @param vm_name: virtual machine name
+     * @return physical host name
+     */
+    std::string VirtualizedClusterComputeService::getVMPhysicalHostname(const std::string &vm_name) {
+        if (this->vm_list.find(vm_name) == this->vm_list.end()) {
+            throw std::invalid_argument(
+                    "VirtualizedClusterComputeService::migrateVM(): Unknown VM name '" + vm_name + "'");
+        }
+        return this->vm_list[vm_name].first->getPhysicalHostname();
+    }
+
+    /**
      * @brief Synchronously migrate a VM to another physical host
      *
-     * @param vm_name: virtual machine hostname
+     * @param vm_name: virtual machine name
      * @param dest_pm_hostname: the name of the destination physical machine host
      *
      * @throw std::invalid_argument

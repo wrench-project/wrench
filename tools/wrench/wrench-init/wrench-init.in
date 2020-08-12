@@ -432,7 +432,7 @@ def _write_simple_wms(project_dir):
         '    }',
         '  }',
         '',
-        '  wrench::S4U_Simulation::sleep(10);',
+        '  wrench::Simulation::sleep(10);',
         '',
         '  this->job_manager.reset();',
         '',

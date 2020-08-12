@@ -1,6 +1,7 @@
-var data={}
+let data={};
 var energyData=[]
-var currGraphState = "taskView"
+let currGraphState = "taskView";
+let currZoomState = {};
 var hostColours = {}
 var currentlySelectedHost = {hostName: "", id: ""}
 var firstVisit

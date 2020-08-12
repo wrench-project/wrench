@@ -66,7 +66,7 @@ namespace wrench {
 
         void stop() override;
 
-        void submitJob(WorkflowJob *job, std::map<std::string, std::string> = {});
+//        void submitJob(WorkflowJob *job, const std::map<std::string, std::string>& = {});
 
         void terminateJob(WorkflowJob *job);
 
@@ -114,7 +114,7 @@ namespace wrench {
          * @param service_specific_arguments: the set of service-specific arguments
          */
         virtual void
-        submitStandardJob(StandardJob *job, std::map<std::string, std::string> &service_specific_arguments) = 0;
+        submitStandardJob(StandardJob *job, const std::map<std::string, std::string> &service_specific_arguments) = 0;
 
         /**
          * @brief Method to submit a pilot job to the service
@@ -122,7 +122,7 @@ namespace wrench {
          * @param job: The job being submitted
          * @param service_specific_arguments: the set of service-specific arguments
          */
-        virtual void submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_arguments) = 0;
+        virtual void submitPilotJob(PilotJob *job, const std::map<std::string, std::string> &service_specific_arguments) = 0;
 
         /**
          * @brief Method to terminate a running standard job
@@ -150,6 +150,10 @@ namespace wrench {
 
     protected:
 
+        friend class JobManager;
+
+        void submitJob(WorkflowJob *job, const std::map<std::string, std::string>& = {});
+
         ComputeService(const std::string &hostname,
                        std::string service_name,
                        std::string mailbox_name_prefix,
@@ -173,6 +177,7 @@ namespace wrench {
         /***********************/
 
     private:
+
 
         std::shared_ptr<StorageService> scratch_space_storage_service_shared_ptr;
 
