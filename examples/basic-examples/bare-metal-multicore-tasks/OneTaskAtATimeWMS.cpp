@@ -60,7 +60,6 @@ namespace wrench {
 
         /* Get the first available bare-metal compute service and storage service  */
         auto compute_service = *(this->getAvailableComputeServices<BareMetalComputeService>().begin());
-        auto storage_service = *(this->getAvailableStorageServices().begin());
 
         /* While the workflow isn't done, repeat the main loop */
         while (not this->getWorkflow()->isDone()) {
