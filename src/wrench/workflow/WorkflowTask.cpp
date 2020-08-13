@@ -759,12 +759,18 @@ namespace wrench {
     }
 
     /**
-     * @brief Sets the host on which this task is running
+     * @brief Sets the host on which this task is running.If the hostname is a VM name, then
+     * the corresponding physical host name will be set!
      * @param hostname: the host name
      */
     void WorkflowTask::setExecutionHost(std::string hostname) {
+        /** Convert the hostname to a physical hostname if needed **/
+        std::string physical_hostname = hostname;
+        if (S4U_VirtualMachine::vm_to_pm_map.find(hostname) != S4U_VirtualMachine::vm_to_pm_map.end()) {
+            physical_hostname = S4U_VirtualMachine::vm_to_pm_map[hostname];
+        }
         if (not this->execution_history.empty()) {
-            this->execution_history.top().execution_host = hostname;
+            this->execution_history.top().execution_host = physical_hostname;
         } else {
             throw std::runtime_error(
                     "WorkflowTask::setExecutionHost() cannot be called before WorkflowTask::setStartDate()");
