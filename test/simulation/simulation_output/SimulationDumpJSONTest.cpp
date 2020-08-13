@@ -1268,7 +1268,7 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
     //wrench::WorkflowFile *file = new wrench::WorkflowFile("test_file", 10*GB);
     std::unique_ptr<wrench::Workflow> link_usage_workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
     wrench::WorkflowTask *single_task;
-    single_task = link_usage_workflow->addTask("dummy_task",1,1,1,1.0,8*GB);
+    single_task = link_usage_workflow->addTask("dummy_task",1,1,1,8*GB);
     single_task->addInputFile(link_usage_workflow->addFile("test_file", 10*GB));
 
 
