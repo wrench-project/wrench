@@ -16,12 +16,12 @@ namespace wrench {
     class MemoryManager : public Service {
 
     private:
-        s4u_Disk* memory;
+        s4u_Disk *memory;
         double dirty_ratio;
         int interval;
         int expired_time;
-        std::vector<Block*> inactive_list;
-        std::vector<Block*> active_list;
+        std::vector<Block *> inactive_list;
+        std::vector<Block *> active_list;
 
         // We keep track of these properties since we don't want to traverse through two LRU lists to get them.
         double free;
@@ -34,19 +34,26 @@ namespace wrench {
         int main() override;
 
         void balanceLruLists();
+
         void balanceAndSortCache();
-        double flushLruList(std::vector<Block *> &list, double amount);
+
+        double pdflush();
+
         double flushExpiredData(std::vector<Block *> &list);
-        s4u_Disk* getDisk(const std::string &filename);
+
+        double flushLruList(std::vector<Block *> &list, double amount);
+
+        s4u_Disk *getDisk(const std::string &filename);
 
     public:
 
         static std::shared_ptr<MemoryManager> initAndStart(Simulation *simulation, s4u_Disk *memory,
-                double dirty_ratio, int interval, int expired_time, std::string hostname);
+                                                           double dirty_ratio, int interval, int expired_time,
+                                                           std::string hostname);
 
         void kill();
 
-        s4u_Disk* getMemory() const;
+        s4u_Disk *getMemory() const;
 
         void setMemory(s4u_Disk *memory);
 
@@ -61,8 +68,6 @@ namespace wrench {
         double getDirty() const;
 
         double flush(double amount);
-
-        double pdflush();
 
         double evict(double amount);
 
