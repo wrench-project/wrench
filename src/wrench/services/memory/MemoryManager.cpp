@@ -115,6 +115,12 @@ namespace wrench {
         return dirty;
     }
 
+    /**
+     * Flush dirty data in a LRU list
+     * @param list: the LRU list whose data will be flushed
+     * @param amount: the amount requested to flush
+     * @return flushed amount
+     */
     double MemoryManager::flushLruList(std::vector<Block *> &list, double amount) {
 
         if (amount <= 0) return 0;
@@ -129,7 +135,7 @@ namespace wrench {
                     flushed += blk->getSize();
                 } else if (flushed < amount && amount < flushed + blk->getSize()) {
 
-                    long blk_flushed = amount - flushed;
+                    double blk_flushed = amount - flushed;
                     flushed = amount;
                     // split
                     blk->setSize(blk->getSize() - blk_flushed);
@@ -148,11 +154,16 @@ namespace wrench {
         return flushed;
     }
 
+    /**
+     * Flush dirty data from cache
+     * @param amount: request amount to be flushed
+     * @return flushed amount
+     */
     double MemoryManager::flush(double amount) {
 
-        long flushed_inactive = flushLruList(inactive_list, amount);
+        double flushed_inactive = flushLruList(inactive_list, amount);
 
-        long flushed_active = 0;
+        double flushed_active = 0;
         if (flushed_inactive < amount) {
             flushed_active = flushLruList(active_list, amount - flushed_inactive);
         }
@@ -160,6 +171,12 @@ namespace wrench {
         return flushed_inactive + flushed_active;
     }
 
+    /**
+     * Flush expired dirty data in a list.
+     * Expired dirty data is the dirty data not accessed in a period longer than expired_time
+     * @param list: the LRU to be flushed
+     * @return flushed amount
+     */
     double MemoryManager::flushExpiredData(std::vector<Block *> &list) {
 
         double flushed = 0;
@@ -179,6 +196,11 @@ namespace wrench {
         return flushed;
     }
 
+    /**
+     * Periodical flushing, which flushes expired dirty data in a list.
+     * Expired dirty data is the dirty data not accessed in a period longer than expired_time
+     * @return flushed amount
+     */
     double MemoryManager::pdflush() {
         long flushed = 0;
         flushed += flushExpiredData(inactive_list);
@@ -186,6 +208,11 @@ namespace wrench {
         return flushed;
     }
 
+    /**
+     * Evicted clean data from cache.
+     * @param amount: the requested amount of data to be flushed
+     * @return flushed amount
+     */
     double MemoryManager::evict(double amount) {
 
         if (amount <= 0) return 0;
@@ -217,6 +244,11 @@ namespace wrench {
         return evicted;
     }
 
+    /**
+     * Read data from disk to cache.
+     * @param filename
+     * @param amount
+     */
     void MemoryManager::readToCache(std::string &filename, double amount) {
         // Change stats
         free -= amount;
@@ -298,12 +330,20 @@ namespace wrench {
         return blk1->getLastAccess() < blk2->getLastAccess();
     }
 
+    /**
+     * Balance the LRU lists and sort these lists by last access of the blocks
+     */
     void MemoryManager::balanceAndSortCache() {
         balanceLruLists();
         std::sort(active_list.begin(), active_list.end(), compare_last_access);
         std::sort(inactive_list.begin(), inactive_list.end(), compare_last_access);
     }
 
+    /**
+     * Balance the amount of data in LRU lists.
+     * If the amount of data in the active list is more than doubled of the inactive list,
+     * move blocks from the active list to the inactive list to make their sizes equal.
+     */
     void MemoryManager::balanceLruLists() {
 
         auto sum = [] (Block *blk1, Block *blk2) {
@@ -349,6 +389,11 @@ namespace wrench {
         }
     }
 
+    /**
+     * Retrieve the disk where the file is stored.
+     * @param filename
+     * @return
+     */
     s4u_Disk *MemoryManager::getDisk(const std::string &filename) {
 
         std::string mount_point  = FileLocation::sanitizePath(filename);
