@@ -24,7 +24,6 @@
  ** Example invocation of the simulator for a 10-task workflow, with no logging:
  **    ./wrench-example-bare-metal-bag-of-tasks 10 ./two_hosts.xml
  **
- ** Example invocation of the simulator for a 6-task workflow with full logging:
  ** Example invocation of the simulator for a 10-task workflow, with only WMS logging:
  **    ./wrench-example-bare-metal-bag-of-tasks 10 ./two_hosts.xml --log=custom_wms.threshold=info
  **

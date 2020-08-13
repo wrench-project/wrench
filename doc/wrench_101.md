@@ -213,8 +213,8 @@ wrench::Workflow workflow;
 
 /* Add workflow tasks */
 for (int i=0; i < num_tasks; i++) {
-  /* Create a task: 10GFlop, 1 to 10 cores, 0.90 parallel efficiency, 10MB memory footprint */
-  auto task = workflow.addTask("task_" + std::to_string(i), 10000000000.0, 1, 10, 0.90, 10000000);
+  /* Create a task: 10GFlop, 1 to 10 cores, 10MB memory footprint */
+  auto task = workflow.addTask("task_" + std::to_string(i), 10000000000.0, 1, 10, 10000000);
 }
 
 /* Add workflow files */
@@ -233,7 +233,11 @@ for (int i=0; i < num_tasks; i++) {
 
 The above creates a "chain" workflow (hence the name of the simulator), in which the
 output from one task is input to the next task. The number of tasks is obtained 
-from a command-line argument.
+from a command-line argument. In the above code, each task has 100% parallel efficiency
+(e.g., will run 10 times faster when running on 10 cores than when running on 1 core). It is
+possible to customize the parallel efficiency behavior of a task, as demonstrated
+in `examples/basic-examples/bare-metal-multicore-tasks` for an example
+simulator in which tasks with different parallel efficiency models are created and executed. 
 
 The `wrench::Workflow` class also provides member functions to import workflows from
 workflow description files in standard [JSON format](https://github.com/workflowhub/workflow-schema) and 
