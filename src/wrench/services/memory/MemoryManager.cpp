@@ -104,11 +104,11 @@ namespace wrench {
         dirty_ratio = dirtyRatio;
     }
 
-    double MemoryManager::getFree() const {
+    double MemoryManager::getFreeMemory() const {
         return free;
     }
 
-    void MemoryManager::setFree(double free_amt) {
+    void MemoryManager::setFreeMemory(double free_amt) {
         this->free = free_amt;
     }
 
@@ -120,12 +120,16 @@ namespace wrench {
         return dirty;
     }
 
-    double MemoryManager::getEvictable() {
+    double MemoryManager::getEvictableMemory() {
         double sum = 0;
         std::for_each(this->inactive_list.begin(), this->inactive_list.end(), [&] (Block *blk) {
             sum += blk->getSize();
         });
         return sum;
+    }
+
+    double MemoryManager::getAvailableMemory() {
+        return this->free + this->cached - this->dirty;
     }
 
     /**
@@ -173,6 +177,7 @@ namespace wrench {
      * @return flushed amount
      */
     double MemoryManager::flush(std::string mountpoint, double amount) {
+        if (amount <= 0) return 0;
 
         double flushed_inactive = flushLruList(inactive_list, amount);
 
@@ -232,6 +237,7 @@ namespace wrench {
     double MemoryManager::evict(double amount) {
 
         if (amount <= 0) return 0;
+
         double evicted = 0;
 
         for (int i = 0; i < inactive_list.size(); i++) {
@@ -337,7 +343,7 @@ namespace wrench {
      * @param filename: name of the file written
      * @param amount: amount of data written
      */
-    void MemoryManager::writeToCache(std::string &filename, double amount) {
+    void MemoryManager::writeToCache(std::string filename, double amount) {
 
         Block *blk = new Block(filename, amount, S4U_Simulation::getClock(), true);
         inactive_list.push_back(blk);
@@ -345,6 +351,8 @@ namespace wrench {
         this->cached -= amount;
         this->free -= amount;
         this->dirty += amount;
+
+        memory->write(amount);
     }
 
     bool compare_last_access(Block *blk1, Block *blk2) {
