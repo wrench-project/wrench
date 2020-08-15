@@ -23,6 +23,8 @@
 #include "wrench/simulation/Simulation.h"
 #include "simgrid/plugins/energy.h"
 #include "wrench/simgrid_S4U_util/S4U_VirtualMachine.h"
+#include "wrench/services/memory/MemoryManager.h"
+#include "wrench/workflow/WorkflowFile.h"
 
 #ifdef MESSAGE_MANAGER
 #include <wrench/util/MessageManager.h>
@@ -291,9 +293,27 @@ namespace wrench {
         return usage;
     }
 
+    /**
+     * Check if writeback mode is activated
+     * @return
+     */
     bool Simulation::isWriteback() {
         return writeback;
     }
+
+    /**
+     * Retrieve MemoryManager by hostname
+     * @param hostname
+     * @return
+     */
+//    MemoryManager* Simulation::getMemoryManagerByHost(std::string hostname) {
+//        for (auto mem_mng: this->memory_managers) {
+//            if (strcmp(mem_mng.get()->getHostname().c_str(), hostname.c_str()) == 0) {
+//                return mem_mng.get();
+//            }
+//        }
+//        return nullptr;
+//    }
 
     /**
      * @brief Get the list of names of all the hosts in each cluster composing the platform
@@ -576,6 +596,21 @@ namespace wrench {
     }
 
     /**
+      * @brief Add a MemoryManager to the simulation.
+      *
+      * @param service: a MemoryManager
+      *
+      * @throw std::invalid_argument
+      */
+//    void Simulation::addService(std::shared_ptr<MemoryManager> memory_manager) {
+//        if (memory_manager == nullptr) {
+//            throw std::invalid_argument("Simulation::addService(): invalid argument (nullptr memory_manager)");
+//        }
+//        memory_manager->simulation = this;
+//        this->memory_managers.insert(memory_manager);
+//    }
+
+    /**
     * @brief Stage a copy of a file at a storage service in the root of the (unique) mount point
     *
     * @param file: a file to stage on a storage service
@@ -724,6 +759,64 @@ namespace wrench {
         }
         this->getOutput().addTimestampDiskWriteCompletion(hostname, mount_point, num_bytes,
                                                           temp_unique_sequence_number);
+    }
+
+    /**
+     * Read file from a host, only available if writeback is activated.
+     * @param filename: name of the file read.
+     * @param mountpoint: mountpoint where file is located.
+     * @param hostname: name of the host where the file is stored.
+     */
+    void Simulation::readFromHost(WorkflowFile *file, std::string mountpoint, std::string hostname) {
+
+        MemoryManager *mem_mng = this->getMemoryManagerByHost(hostname);
+        double cached_amt = mem_mng->getCachedData(file->getID());
+        double flushed_amt =
+                mem_mng->flush(mountpoint, 2 * file->getSize() - cached_amt - mem_mng->getFree() - mem_mng->getEvictable());
+        mem_mng->evict(2 * file->getSize() - cached_amt - mem_mng->getFree());
+
+        simgrid::s4u::IoPtr cache_read;
+        simgrid::s4u::IoPtr disk_read;
+        if (cached_amt > 0) {
+            cache_read = mem_mng->readFromCache(file->getID(), true);
+        }
+
+        double from_disk_amt = file->getSize() - cached_amt;
+        if (from_disk_amt > 0) {
+            disk_read = mem_mng->readToCache(file->getID(), mountpoint, from_disk_amt, true);
+        }
+
+        // cache read and disk read are concurrent, wait for them to finish
+        cache_read->wait();
+        disk_read->wait();
+
+        // reduce free memory as the file is read in to anonymous memory
+        // Here we assume that the used amount is equal to file size.
+        mem_mng->setFree(mem_mng->getFree() - file->getSize());
+    }
+
+    /**
+     * Write a file to host, only available if writeback is activated.
+     * @param filename: name of the file written.
+     * @param mountpoint: mount point where file is located.
+     * @param hostname: name of the host where the file is stored.
+     */
+    void Simulation::writeToHost(WorkflowFile *file, std::string mountpoint, std::string hostname) {
+
+    }
+
+    /**
+     * Find a MemoryManager of a host with hostname
+     * @param hostname: name of the host
+     * @return MemoryManager of the host
+     */
+    MemoryManager *Simulation::getMemoryManagerByHost(std::string hostname) {
+        for (const auto &ptr : this->memory_managers) {
+            if (strcmp(ptr->getHostname().c_str(), hostname.c_str()) == 0) {
+                return ptr.get();
+            }
+        }
+        return nullptr;
     }
 
     /**
@@ -1180,4 +1273,5 @@ namespace wrench {
             }
         }
     }
+
 };
