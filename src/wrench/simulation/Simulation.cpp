@@ -771,9 +771,9 @@ namespace wrench {
 
         MemoryManager *mem_mng = this->getMemoryManagerByHost(hostname);
         double cached_amt = mem_mng->getCachedData(file->getID());
-        double flushed_amt =
-                mem_mng->flush(mountpoint, 2 * file->getSize() - cached_amt - mem_mng->getFree() - mem_mng->getEvictable());
-        mem_mng->evict(2 * file->getSize() - cached_amt - mem_mng->getFree());
+        double flushed_amt = mem_mng->flush(mountpoint, 2 * file->getSize() - cached_amt
+                                                        - mem_mng->getFreeMemory() - mem_mng->getEvictableMemory());
+        mem_mng->evict(2 * file->getSize() - cached_amt - mem_mng->getFreeMemory());
 
         simgrid::s4u::IoPtr cache_read;
         simgrid::s4u::IoPtr disk_read;
@@ -792,7 +792,7 @@ namespace wrench {
 
         // reduce free memory as the file is read in to anonymous memory
         // Here we assume that the used amount is equal to file size.
-        mem_mng->setFree(mem_mng->getFree() - file->getSize());
+        mem_mng->setFreeMemory(mem_mng->getFreeMemory() - file->getSize());
     }
 
     /**
@@ -803,6 +803,28 @@ namespace wrench {
      */
     void Simulation::writeToHost(WorkflowFile *file, std::string mountpoint, std::string hostname) {
 
+        MemoryManager *mem_mng = this->getMemoryManagerByHost(hostname);
+
+        double remaining_dirty = mem_mng->getDirtyRatio() * mem_mng->getAvailableMemory() - mem_mng->getDirty();
+        double mem_bw_amt = 0;
+
+        // free write to cache without forced flushing
+        if (remaining_dirty > 0) {
+            mem_bw_amt = std::max(file->getSize(), remaining_dirty);
+            mem_mng->evict(mem_bw_amt - mem_mng->getFreeMemory());
+            mem_mng->writeToCache(file->getID(), mem_bw_amt);
+        }
+
+        double disk_bw_amt = file->getSize() - mem_bw_amt;
+        if (disk_bw_amt > 0) {
+            mem_mng->flush(mountpoint, disk_bw_amt);
+            mem_mng->evict(disk_bw_amt - mem_mng->getFreeMemory());
+
+            mem_mng->writeToCache(file->getID(), std::min(mem_mng->getFreeMemory(), disk_bw_amt));
+
+            s4u_Disk *disk = MemoryManager::getDisk(mountpoint, hostname);
+            disk->write(disk_bw_amt);
+        }
     }
 
     /**
