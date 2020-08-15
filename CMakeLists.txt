@@ -104,6 +104,8 @@ set(HEADER_FILES
         include/wrench/services/storage/simple/SimpleStorageServiceMessagePayload.h
         include/wrench/services/storage/simple/SimpleStorageServiceProperty.h
         include/wrench/services/storage/storage_helpers/FileLocation.h
+        include/wrench/services/memory/Block.h
+        include/wrench/services/memory/MemoryManager.h
         include/wrench/simgrid_S4U_util/S4U_Daemon.h
         include/wrench/simgrid_S4U_util/S4U_Mailbox.h
         include/wrench/simgrid_S4U_util/S4U_PendingCommunication.h
@@ -158,9 +160,7 @@ set(HEADER_FILES
         include/wrench/workflow/failure_causes/StorageServiceNotEnoughSpace.h
         include/wrench/workflow/job/PilotJob.h
         include/wrench/workflow/job/StandardJob.h
-        include/wrench/workflow/job/WorkflowJob.h
-        include/wrench/services/memory/MemoryManager.h
-        include/wrench/services/memory/Block.h)
+        include/wrench/workflow/job/WorkflowJob.h)
 
 # source files
 set(SOURCE_FILES
@@ -259,6 +259,8 @@ set(SOURCE_FILES
         src/wrench/services/storage/storage_helper_classes/FileTransferThread.cpp
         src/wrench/services/storage/storage_helper_classes/FileTransferThreadMessage.h
         src/wrench/services/storage/storage_helper_classes/LogicalFileSystem.cpp
+        src/wrench/services/memory/Block.cpp
+        src/wrench/services/memory/MemoryManager.cpp
         src/wrench/simgrid_S4U_util/S4U_Daemon.cpp
         src/wrench/simgrid_S4U_util/S4U_DaemonActor.cpp
         src/wrench/simgrid_S4U_util/S4U_DaemonActor.h
@@ -306,8 +308,7 @@ set(SOURCE_FILES
         src/wrench/workflow/job/PilotJob.cpp
         src/wrench/workflow/job/StandardJob.cpp
         src/wrench/workflow/job/WorkflowJob.cpp
-        src/wrench/services/memory/MemoryManager.cpp
-        src/wrench/services/memory/Block.cpp)
+        )
 
 # test files
 set(TEST_FILES
