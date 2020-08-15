@@ -7,11 +7,10 @@
 
 #include <string>
 #include <wrench/services/Service.h>
+#include <wrench/simulation/Simulation.h>
 #include "Block.h"
 
 namespace wrench {
-
-    class Simulation;
 
     class MemoryManager : public Service {
 
@@ -43,8 +42,6 @@ namespace wrench {
 
         double flushLruList(std::vector<Block *> &list, double amount);
 
-        s4u_Disk *getDisk(const std::string &filename);
-
     public:
 
         static std::shared_ptr<MemoryManager> initAndStart(Simulation *simulation, s4u_Disk *memory,
@@ -63,19 +60,27 @@ namespace wrench {
 
         double getFree() const;
 
+        void setFree(double free_amt);
+
         double getCached() const;
 
         double getDirty() const;
 
-        double flush(double amount);
+        double getEvictable();
+
+        double flush(std::string mountpoint, double amount);
 
         double evict(double amount);
 
-        void readToCache(std::string &filename, double amount);
+        simgrid::s4u::IoPtr readToCache(std::string filename, std::string mount_point, double amount, bool async);
 
-        void readFromCache(std::string &filename);
+        simgrid::s4u::IoPtr readFromCache(std::string filename, bool async);
 
         void writeToCache(std::string &filename, double amount);
+
+        double getCachedData(std::string filename);
+
+        static s4u_Disk *getDisk(std::string filename, std::string hostname);
 
     };
 

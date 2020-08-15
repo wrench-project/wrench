@@ -15,7 +15,6 @@
 #include <vector>
 #include <nlohmann/json.hpp>
 #include "Version.h"
-
 #include <wrench/simulation/SimulationOutput.h>
 
 
@@ -37,6 +36,7 @@ namespace wrench {
     class SimulationOutput;
     class S4U_Simulation;
     class FileLocation;
+    class MemoryManager;
 
     /**
      * @brief A class that provides basic simulation methods.  Once the simulation object has been
@@ -135,6 +135,10 @@ namespace wrench {
                                                     std::string write_mount_point);
         void writeToDisk(double num_bytes, std::string hostname, std::string mount_point);
 
+        void readFromHost(WorkflowFile *file, std::string mountpoint, std::string hostname);
+        void writeToHost(WorkflowFile *file, std::string mountpoint, std::string hostname);
+        MemoryManager* getMemoryManagerByHost(std::string hostname);
+
         static double getMemoryCapacity();
         static unsigned long getNumCores();
         static double getFlopRate();
@@ -144,6 +148,7 @@ namespace wrench {
         static double getLinkUsage(std::string linkname);
         static double getLinkBandwidth(std::string linkname);
         static bool isWriteback();
+
         /***********************/
         /** \endcond           */
         /***********************/
@@ -167,6 +172,8 @@ namespace wrench {
 
         std::set<std::shared_ptr<StorageService>> storage_services;
 
+        std::set<std::shared_ptr<MemoryManager>> memory_managers;
+
         static int unique_disk_sequence_number;
 
         void stageFile(WorkflowFile *file, std::shared_ptr<FileLocation> location);
@@ -183,6 +190,7 @@ namespace wrench {
         void addService(std::shared_ptr<FileRegistryService> service);
         void addService(std::shared_ptr<EnergyMeterService> service);
         void addService(std::shared_ptr<BandwidthMeterService> service);
+        void addService(std::shared_ptr<MemoryManager> memory_manager);
 
         std::string getWRENCHVersionString() { return WRENCH_VERSION_STRING; }
 
