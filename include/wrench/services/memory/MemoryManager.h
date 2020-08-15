@@ -58,15 +58,17 @@ namespace wrench {
 
         void setDirtyRatio(double dirtyRatio);
 
-        double getFree() const;
+        double getFreeMemory() const;
 
-        void setFree(double free_amt);
+        void setFreeMemory(double free_amt);
 
         double getCached() const;
 
         double getDirty() const;
 
-        double getEvictable();
+        double getEvictableMemory();
+
+        double getAvailableMemory();
 
         double flush(std::string mountpoint, double amount);
 
@@ -76,11 +78,11 @@ namespace wrench {
 
         simgrid::s4u::IoPtr readFromCache(std::string filename, bool async);
 
-        void writeToCache(std::string &filename, double amount);
+        void writeToCache(std::string filename, double amount);
 
         double getCachedData(std::string filename);
 
-        static s4u_Disk *getDisk(std::string filename, std::string hostname);
+        static s4u_Disk *getDisk(std::string mountpoint, std::string hostname);
 
     };
 
