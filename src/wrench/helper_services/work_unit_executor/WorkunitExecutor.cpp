@@ -177,7 +177,6 @@ namespace wrench {
         // Check that there is no Scratch Space weirdness
         bool scratch_space_ok = true;
         if (this->scratch_space == nullptr) {
-            WRENCH_INFO("Scratch space nullptr");
             for (auto const &pfc : workunit->pre_file_copies) {
                 auto src = std::get<1>(pfc);
                 auto dst = std::get<2>(pfc);
@@ -212,7 +211,6 @@ namespace wrench {
             }
         }
         if (not scratch_space_ok) {
-            WRENCH_INFO("Scratch space error");
             success = false;
             msg_to_send_back = new WorkunitExecutorFailedMessage(
                     this->getSharedPtr<WorkunitExecutor>(),

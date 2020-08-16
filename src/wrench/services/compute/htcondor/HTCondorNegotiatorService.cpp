@@ -92,7 +92,7 @@ namespace wrench {
             //GRID STANDARD JOB
             //Diverts grid jobs to batch service if it has been provided when initializing condor.
             if (auto standard_job = dynamic_cast<StandardJob *>(job)) {
-                if(service_specific_arguments["universe"].compare("grid") == 0) {
+                if(service_specific_arguments["universe"] == "grid") {
 
                     //instead of erasing here, going to iterate through.
                     service_specific_arguments.erase("universe");
@@ -101,28 +101,6 @@ namespace wrench {
                     service_specific_arguments.insert(std::pair<std::string, std::string>("-t","9999"));
 
                     std::map<std::string, std::string> service_specs_copy;
-                    //std::map<std::string, std::string>::iterator it = service_specific_arguments.begin();
-
-
-                    /**
-                    for(auto const &x: service_specific_arguments) {
-                        WRENCH_INFO("xxx %s : %s", x.first.c_str(), x.second.c_str());
-                    }
-
-
-                    while (it != service_specific_arguments.end()) {
-                        if(it->first.compare("universe") != 0) {
-                            service_specs_copy.insert(std::pair<std::string, std::string>(it->first,it->second));
-                            it++;
-                        } else {
-                            it++;
-                        }
-                    }
-
-                    for(auto const &x: service_specs_copy) {
-                        WRENCH_INFO("xxx %s : %s", x.first.c_str(), x.second.c_str());
-                    }
-                     **/
 
                     WRENCH_INFO("Dispatching job %s with %ld tasks", standard_job->getName().c_str(),
                                 standard_job->getTasks().size());
@@ -131,11 +109,7 @@ namespace wrench {
                         // temporary printing task IDs
                         WRENCH_INFO("    Task ID: %s", task->getID().c_str());
                     }
-                    /**
-                    WRENCH_INFO("---> %lu", service_specs_copy.size());
-                    WRENCH_INFO("batch service---> %p", this->grid_universe_batch_service.get());
-                    WRENCH_INFO("---> %p", standard_job);
-                     **/
+
                     standard_job->pushCallbackMailbox(this->reply_mailbox);
                     this->grid_universe_batch_service->submitStandardJob(standard_job, service_specific_arguments);
                     this->running_jobs->insert(std::make_pair(job, this->grid_universe_batch_service));
@@ -146,10 +120,6 @@ namespace wrench {
                                 standard_job->getTasks().size());
                 } else {
                     service_specific_arguments.erase("universe");
-                    //std::map<std::string, std::string> service_specs_copy;
-                    //std::map<std::string, std::string>::iterator it = service_specific_arguments.begin();
-
-
                     for (auto &item : *this->compute_resources) {
 
 
