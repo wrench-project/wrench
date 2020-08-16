@@ -369,7 +369,7 @@ namespace wrench {
 
         ///Checks if grid universe was requested in job service specific args.
         ///If so, must condor must support grid universe.
-        if(service_specific_args["universe"].compare("grid") == 0 && not this->supportsGridUniverse()){
+        if(service_specific_args.at("universe").compare("grid") == 0 and not this->supportsGridUniverse()){
             S4U_Mailbox::dputMessage(
                     answer_mailbox,
                     new ComputeServiceSubmitStandardJobAnswerMessage(

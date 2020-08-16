@@ -23,6 +23,7 @@ class HTCondorServiceTest : public ::testing::Test {
 
 public:
     wrench::WorkflowFile *input_file;
+    wrench::WorkflowFile *input_file_large;
     wrench::WorkflowFile *output_file1;
     wrench::WorkflowFile *output_file2;
     wrench::WorkflowFile *output_file3;
@@ -33,6 +34,7 @@ public:
     wrench::WorkflowTask *task4;
     wrench::WorkflowTask *task5;
     wrench::WorkflowTask *task6;
+    wrench::WorkflowTask *task7;
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service2 = nullptr;
@@ -51,6 +53,7 @@ protected:
 
         // Create the files
         input_file = workflow->addFile("input_file", 10.0);
+        input_file_large = workflow->addFile("input_file_large", 10.0);
         output_file1 = workflow->addFile("output_file1", 10.0);
         output_file2 = workflow->addFile("output_file2", 10.0);
         output_file3 = workflow->addFile("output_file3", 10.0);
@@ -63,6 +66,8 @@ protected:
         task4 = workflow->addTask("task_4_10s_2cores", 10.0, 2, 2, 1.0, 0);
         task5 = workflow->addTask("task_5_30s_1_to_3_cores", 30.0, 1, 3, 1.0, 0);
         task6 = workflow->addTask("task_6_10s_1_to_2_cores", 12.0, 1, 2, 1.0, 0);
+        task7 = workflow->addTask("grid_task", 10.0, 1, 1, 1.0, 0);
+
 
         // Add file-task dependencies
         task1->addInputFile(input_file);
@@ -71,6 +76,7 @@ protected:
         task4->addInputFile(input_file);
         task5->addInputFile(input_file);
         task6->addInputFile(input_file);
+        task7->addInputFile(input_file_large);
 
         task1->addOutputFile(output_file1);
 
@@ -114,21 +120,21 @@ protected:
                            "   <zone id=\"AS0\" routing=\"Full\"> "
                            "       <host id=\"DualCoreHost\" speed=\"1f\" core=\"2\" > "
                            "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                           "             <prop id=\"size\" value=\"100B\"/>"
+                           "             <prop id=\"size\" value=\"100GB\"/>"
                            "             <prop id=\"mount\" value=\"/\"/>"
                            "          </disk>"
                            "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                           "             <prop id=\"size\" value=\"1000000B\"/>"
+                           "             <prop id=\"size\" value=\"1000000GB\"/>"
                            "             <prop id=\"mount\" value=\"/scratch\"/>"
                            "          </disk>"
                            "       </host>"
                            "       <host id=\"QuadCoreHost\" speed=\"1f\" core=\"4\" > "
                            "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                           "             <prop id=\"size\" value=\"100B\"/>"
+                           "             <prop id=\"size\" value=\"100GB\"/>"
                            "             <prop id=\"mount\" value=\"/\"/>"
                            "          </disk>"
                            "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                           "             <prop id=\"size\" value=\"1000000B\"/>"
+                           "             <prop id=\"size\" value=\"1000000GB\"/>"
                            "             <prop id=\"mount\" value=\"/scratch\"/>"
                            "          </disk>"
                            "       </host>"
@@ -138,7 +144,7 @@ protected:
                            "             <prop id=\"mount\" value=\"/\"/>"
                            "          </disk>"
                            "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                           "             <prop id=\"size\" value=\"1000000B\"/>"
+                           "             <prop id=\"size\" value=\"1000000GB\"/>"
                            "             <prop id=\"mount\" value=\"/scratch\"/>"
                            "          </disk>"
                            "       </host>"
@@ -148,7 +154,7 @@ protected:
                            "             <prop id=\"mount\" value=\"/\"/>"
                            "          </disk>"
                            "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                           "             <prop id=\"size\" value=\"1000000B\"/>"
+                           "             <prop id=\"size\" value=\"1000000GB\"/>"
                            "             <prop id=\"mount\" value=\"/scratch\"/>"
                            "          </disk>"
                            "       </host>"
@@ -620,9 +626,9 @@ private:
         auto htcondor_cs = *(this->getAvailableComputeServices<wrench::HTCondorComputeService>().begin());
 
         wrench::StandardJob *grid_job = job_manager->createStandardJob(
-                {this->test->task2},
+                {this->test->task7},
                 {},
-                {std::make_tuple(this->test->input_file,
+                {std::make_tuple(this->test->input_file_large,
                                  wrench::FileLocation::LOCATION(htcondor_cs->getLocalStorageService()),
                                  wrench::FileLocation::SCRATCH)},
                 {}, {});
@@ -726,10 +732,13 @@ void HTCondorServiceTest::do_GridUniverseTest_test() {
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on the storage service
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+    ASSERT_NO_THROW(simulation->stageFile(input_file_large, storage_service));
+    //ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
+
+    simulation->getOutput().dumpUnifiedJSON(workflow, "/tmp/workflow_data.json", false, true, false, false, false, false, false);
 
     delete simulation;
     free(argv[0]);
