@@ -27,6 +27,8 @@ namespace wrench {
 
     public:
 
+        static std::unordered_map<std::string, std::string> vm_to_pm_map;
+
         /** @brief VM state enum */
         enum State {
             DOWN,
@@ -49,7 +51,6 @@ namespace wrench {
         void shutdown();
 
         void migrate(const std::string &dst_pm_name);
-
 
         std::string getPhysicalHostname();
         unsigned long getNumCores();

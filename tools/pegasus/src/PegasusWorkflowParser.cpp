@@ -106,7 +106,7 @@ namespace wrench {
                         throw std::invalid_argument("Workflow::createWorkflowFromJson(): Job " + name + " has uknown type " + type);
                     }
 
-                    task = workflow->addTask(name, runtime * flop_rate, num_procs, num_procs, 1.0, 0.0);
+                    task = workflow->addTask(name, runtime * flop_rate, num_procs, num_procs, 0.0);
 
                     // task priority
                     try {
@@ -286,8 +286,8 @@ namespace wrench {
             }
 
             // Create the task
-            // If the DAX says num_procs = x, then we set min_cores=1, max_cores=x, efficiency=1.0
-            task = workflow->addTask(id, runtime * flop_rate, 1, num_procs, 1.0, 0.0);
+            // If the DAX says num_procs = x, then we set min_cores=1, max_cores=x, ram = 0.0
+            task = workflow->addTask(id, runtime * flop_rate, 1, num_procs, 0.0);
 
             // Go through the children "uses" nodes
             for (pugi::xml_node uses = job.child("uses"); uses; uses = uses.next_sibling("uses")) {
