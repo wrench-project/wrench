@@ -68,7 +68,6 @@ protected:
         task6 = workflow->addTask("task_6_10s_1_to_2_cores", 12.0, 1, 2, 1.0, 0);
         task7 = workflow->addTask("grid_task", 10.0, 1, 1, 1.0, 0);
 
-
         // Add file-task dependencies
         task1->addInputFile(input_file);
         task2->addInputFile(input_file);

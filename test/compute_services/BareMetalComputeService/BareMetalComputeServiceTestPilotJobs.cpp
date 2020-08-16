@@ -57,7 +57,7 @@ protected:
         output_file1 = workflow->addFile("output_file1", 10.0);
 
         // Create one task
-        task1 = workflow->addTask("task_1_10s_1core", 10.0, 1, 1, 1.0, 0);
+        task1 = workflow->addTask("task_1_10s_1core", 10.0, 1, 1, 0);
 
         // Add file-task dependencies
         task1->addInputFile(input_file);

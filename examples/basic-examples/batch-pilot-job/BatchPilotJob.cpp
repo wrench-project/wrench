@@ -69,8 +69,10 @@ int main(int argc, char **argv) {
     wrench::Workflow workflow;
 
     /* Add workflow tasks and files */
-    auto task0 = workflow.addTask("task_0", 100 * TFLOP,  1, 10, 0.90, 1000);
-    auto task1 = workflow.addTask("task_1", 300 * TFLOP,  1, 5, 0.90, 1000);
+    auto task0 = workflow.addTask("task_0", 100 * TFLOP,  1, 10, 1000);
+    task0->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(0.9));
+    auto task1 = workflow.addTask("task_1", 300 * TFLOP,  1, 5, 1000);
+    task1->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(0.9));
     auto file0 = workflow.addFile("file_0", 10000000);
     auto file1 = workflow.addFile("file_1", 20000000);
     auto file2 = workflow.addFile("file_2", 15000000);

@@ -19,10 +19,10 @@ protected:
         workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(workflow);
 
         // create simple diamond workflow
-        t1 = workflow->addTask("task-test-01", 1, 1, 1, 1.0, 0);
-        t2 = workflow->addTask("task-test-02", 1, 1, 1, 1.0, 0);
-        t3 = workflow->addTask("task-test-03", 1, 1, 1, 1.0, 0);
-        t4 = workflow->addTask("task-test-04", 1, 1, 1, 1.0, 0);
+        t1 = workflow->addTask("task-test-01", 1, 1, 1, 0);
+        t2 = workflow->addTask("task-test-02", 1, 1, 1, 0);
+        t3 = workflow->addTask("task-test-03", 1, 1, 1, 0);
+        t4 = workflow->addTask("task-test-04", 1, 1, 1, 0);
 
         t2->setClusterID("cluster-01");
         t3->setClusterID("cluster-01");
@@ -169,25 +169,27 @@ TEST_F(WorkflowTest, ControlDependency) {
 
 TEST_F(WorkflowTest, WorkflowTaskThrow) {
     // testing invalid task creation
-    ASSERT_THROW(workflow->addTask("task-error", -100, 1, 1, 1.0, 0), std::invalid_argument);
-    ASSERT_THROW(workflow->addTask("task-error", 100, 2, 1, 1.0, 0), std::invalid_argument);
-    ASSERT_THROW(workflow->addTask("task-error", 100, 1, 1, -2.0, 0), std::invalid_argument);
-    ASSERT_THROW(workflow->addTask("task-error", 100, 1, 1, 2.0, 0), std::invalid_argument);
-    ASSERT_THROW(workflow->addTask("task-error", 100, 1, 1, 1.0, -1.0), std::invalid_argument);
+    ASSERT_THROW(workflow->addTask("task-error", -100, 1, 1, 0), std::invalid_argument);
+    ASSERT_THROW(workflow->addTask("task-error", 100, 2, 1, 0), std::invalid_argument);
+    ASSERT_THROW(workflow->addTask("task-error", 100, 1, 1, -1.0), std::invalid_argument);
 
     // testing whether a task id exists
     ASSERT_THROW(workflow->getTaskByID("task-test-00"), std::invalid_argument);
     ASSERT_TRUE(workflow->getTaskByID("task-test-01")->getID() == t1->getID());
 
     // testing whether a task already exists (check via task id)
-    ASSERT_THROW(workflow->addTask("task-test-01", 1, 1, 1, 1.0, 0), std::invalid_argument);
+    ASSERT_THROW(workflow->addTask("task-test-01", 1, 1, 1, 0), std::invalid_argument);
 
     // remove tasks
     ASSERT_THROW(workflow->removeTask(nullptr), std::invalid_argument);
     workflow->removeTask(t1);
 
     wrench::Workflow *bogus_workflow = new wrench::Workflow();
-    wrench::WorkflowTask *bogus = bogus_workflow->addTask("bogus", 100.0, 1, 1, 1.0, 0.0);
+    wrench::WorkflowTask *bogus = bogus_workflow->addTask("bogus", 100.0, 1, 1, 0.0);
+    ASSERT_THROW(bogus->setParallelModel(wrench::ParallelModel::AMDAHL(-2.0)), std::invalid_argument);
+    ASSERT_THROW(bogus->setParallelModel(wrench::ParallelModel::AMDAHL(2.0)), std::invalid_argument);
+    ASSERT_THROW(bogus->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(-2.0)), std::invalid_argument);
+    ASSERT_THROW(bogus->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(2.0)), std::invalid_argument);
     ASSERT_THROW(workflow->removeTask(bogus), std::invalid_argument);
     bogus_workflow->removeTask(bogus);
     delete bogus_workflow;
@@ -252,10 +254,10 @@ protected:
         workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(workflow);
 
         // create simple diamond workflow
-        t1 = workflow->addTask("task-test-01", 1, 1, 1, 1.0, 0);
-        t2 = workflow->addTask("task-test-02", 1, 1, 1, 1.0, 0);
-        t3 = workflow->addTask("task-test-03", 1, 1, 1, 1.0, 0);
-        t4 = workflow->addTask("task-test-04", 1, 1, 1, 1.0, 0);
+        t1 = workflow->addTask("task-test-01", 1, 1, 1, 0);
+        t2 = workflow->addTask("task-test-02", 1, 1, 1, 0);
+        t3 = workflow->addTask("task-test-03", 1, 1, 1, 0);
+        t4 = workflow->addTask("task-test-04", 1, 1, 1, 0);
 
         workflow->addControlDependency(t1, t2, true);
         workflow->addControlDependency(t1, t3, true);
