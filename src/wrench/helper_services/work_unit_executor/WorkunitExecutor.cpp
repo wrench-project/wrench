@@ -373,8 +373,7 @@ namespace wrench {
 
             try {
                 task->setComputationStartDate(S4U_Simulation::getClock());
-                runMulticoreComputation(task->getFlops(), task->getParallelEfficiency(),
-                                        this->simulate_computation_as_sleep);
+                runMulticoreComputationForTask(task, this->simulate_computation_as_sleep);
                 task->setComputationEndDate(S4U_Simulation::getClock());
             } catch (WorkflowExecutionEvent &e) {
                 this->failure_timestamp_should_be_generated = true;
@@ -484,11 +483,13 @@ namespace wrench {
     /**
      * @brief Simulate the execution of a multicore computation
      * @param flops: the number of flops
-     * @param parallel_efficiency: the parallel efficiency
+     * @param multicore_performance_spec: the parallel efficiency
      */
-    void WorkunitExecutor::runMulticoreComputation(double flops, double parallel_efficiency,
-                                                   bool simulate_computation_as_sleep) {
-        double effective_flops = (flops / (this->num_cores * parallel_efficiency));
+    void WorkunitExecutor::runMulticoreComputationForTask(WorkflowTask *task,
+                                                          bool simulate_computation_as_sleep) {
+
+        std::vector<double> work_per_thread = task->getParallelModel()->getWorkPerThread(task->getFlops(), this->num_cores);
+        double max_work_per_thread = *(std::max_element(work_per_thread.begin(), work_per_thread.end()));
 
         std::string tmp_mailbox = S4U_Mailbox::generateUniqueMailboxName("workunit_executor");
 
@@ -496,11 +497,11 @@ namespace wrench {
 
             /** Simulate computation as sleep **/
 
-            // Still sleep for the thread startup overhead
+            // Sleep for the thread startup overhead
             S4U_Simulation::sleep(this->num_cores * this->thread_startup_overhead);
 
             // Then sleep for the computation duration
-            double sleep_time = (flops / (this->num_cores * parallel_efficiency)) / Simulation::getFlopRate();
+            double sleep_time = (max_work_per_thread) / Simulation::getFlopRate();
             Simulation::sleep(sleep_time);
 
         } else {
@@ -525,7 +526,7 @@ namespace wrench {
                 std::shared_ptr<ComputeThread> compute_thread;
                 try {
                     compute_thread = std::shared_ptr<ComputeThread>(
-                            new ComputeThread(S4U_Simulation::getHostName(), effective_flops, tmp_mailbox));
+                            new ComputeThread(S4U_Simulation::getHostName(), work_per_thread.at(i), tmp_mailbox));
                     compute_thread->simulation = this->simulation;
                     compute_thread->start(compute_thread, true, false); // Daemonized, no auto-restart
                 } catch (std::exception &e) {

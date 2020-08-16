@@ -115,6 +115,7 @@ namespace wrench {
      * @return the hostname as a string
      */
     std::string S4U_Simulation::getHostName() {
+
         return simgrid::s4u::Host::current()->get_name();
     }
 

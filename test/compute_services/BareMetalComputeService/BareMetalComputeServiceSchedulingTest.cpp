@@ -116,10 +116,10 @@ private:
 
         // Create a few tasks
         std::vector<wrench::WorkflowTask *> tasks;
-        tasks.push_back(this->getWorkflow()->addTask("task1", 60, 1, 1, 1.0, 500));
-        tasks.push_back(this->getWorkflow()->addTask("task2", 60, 1, 1, 1.0, 600));
-        tasks.push_back(this->getWorkflow()->addTask("task3", 60, 1, 1, 1.0, 500));
-        tasks.push_back(this->getWorkflow()->addTask("task4", 60, 1, 1, 1.0, 000));
+        tasks.push_back(this->getWorkflow()->addTask("task1", 60, 1, 1, 500));
+        tasks.push_back(this->getWorkflow()->addTask("task2", 60, 1, 1, 600));
+        tasks.push_back(this->getWorkflow()->addTask("task3", 60, 1, 1, 500));
+        tasks.push_back(this->getWorkflow()->addTask("task4", 60, 1, 1, 000));
 
         // Submit them in order
         for (auto const & t : tasks) {
@@ -266,10 +266,10 @@ private:
 
         // Create a few tasks
         std::vector<wrench::WorkflowTask *> tasks;
-        tasks.push_back(this->getWorkflow()->addTask("task1", 100, 4, 4, 1.0, 500));
-        tasks.push_back(this->getWorkflow()->addTask("task2", 100, 4, 4, 1.0, 500));
-        tasks.push_back(this->getWorkflow()->addTask("task3", 100, 4, 4, 1.0, 500));
-        tasks.push_back(this->getWorkflow()->addTask("task4", 100, 4, 4, 1.0, 500));
+        tasks.push_back(this->getWorkflow()->addTask("task1", 100, 4, 4, 500));
+        tasks.push_back(this->getWorkflow()->addTask("task2", 100, 4, 4, 500));
+        tasks.push_back(this->getWorkflow()->addTask("task3", 100, 4, 4, 500));
+        tasks.push_back(this->getWorkflow()->addTask("task4", 100, 4, 4, 500));
 
         // Submit them in order
         for (auto const & t : tasks) {
@@ -400,10 +400,10 @@ private:
 
         // Create a few tasks
         std::vector<wrench::WorkflowTask *> tasks;
-        tasks.push_back(this->getWorkflow()->addTask("task1", 100, 4, 4, 1.0, 100));
-        tasks.push_back(this->getWorkflow()->addTask("task2", 100, 4, 4, 1.0, 100));
-        tasks.push_back(this->getWorkflow()->addTask("task3", 100, 4, 4, 1.0, 100));
-        tasks.push_back(this->getWorkflow()->addTask("task4", 100, 4, 4, 1.0, 100));
+        tasks.push_back(this->getWorkflow()->addTask("task1", 100, 4, 4, 100));
+        tasks.push_back(this->getWorkflow()->addTask("task2", 100, 4, 4, 100));
+        tasks.push_back(this->getWorkflow()->addTask("task3", 100, 4, 4, 100));
+        tasks.push_back(this->getWorkflow()->addTask("task4", 100, 4, 4, 100));
 
         // Submit them in order
         for (auto const & t : tasks) {

@@ -66,10 +66,10 @@ namespace wrench {
         auto cloud_service = *(this->getAvailableComputeServices<CloudComputeService>().begin());
         auto storage_service = *(this->getAvailableStorageServices().begin());
 
-        /* Create a VM instance with 5 cores and one with 2 cores (and 500M of RAM) */
-        WRENCH_INFO("Creating a 'large' VM with 5 cores  and a 'small' VM with 2 cores");
-        auto large_vm = cloud_service->createVM(5, 500000);
-        auto small_vm = cloud_service->createVM(2, 500000);
+        /* Create a VM instance with 10 cores and one with 4 cores (and 500M of RAM) */
+        WRENCH_INFO("Creating a 'large' VM with 10 cores  and a 'small' VM with 4 cores");
+        auto large_vm = cloud_service->createVM(10, 500000);
+        auto small_vm = cloud_service->createVM(4, 500000);
 
         /* Start the VMs */
         WRENCH_INFO("Starting both VMs");
