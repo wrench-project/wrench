@@ -92,37 +92,8 @@ namespace wrench {
             //GRID STANDARD JOB
             //Diverts grid jobs to batch service if it has been provided when initializing condor.
             if (auto standard_job = dynamic_cast<StandardJob *>(job)) {
-                if(service_specific_arguments["universe"] == "grid") {
-
-                    //instead of erasing here, going to iterate through.
-                    service_specific_arguments.erase("universe");
-                    service_specific_arguments.insert(std::pair<std::string, std::string>("-N","1"));
-                    service_specific_arguments.insert(std::pair<std::string, std::string>("-c","1"));
-                    service_specific_arguments.insert(std::pair<std::string, std::string>("-t","9999"));
-
-                    std::map<std::string, std::string> service_specs_copy;
-
-                    WRENCH_INFO("Dispatching job %s with %ld tasks", standard_job->getName().c_str(),
-                                standard_job->getTasks().size());
-
-                    for (auto task : standard_job->getTasks()) {
-                        // temporary printing task IDs
-                        WRENCH_INFO("    Task ID: %s", task->getID().c_str());
-                    }
-
-                    standard_job->pushCallbackMailbox(this->reply_mailbox);
-                    this->grid_universe_batch_service->submitStandardJob(standard_job, service_specific_arguments);
-                    this->running_jobs->insert(std::make_pair(job, this->grid_universe_batch_service));
-                    scheduled_jobs.push_back(job);
-                    standard_job->getMinimumRequiredNumCores();
-
-                    WRENCH_INFO("Dispatched grid universe job %s with %ld tasks to batch service", standard_job->getName().c_str(),
-                                standard_job->getTasks().size());
-                } else {
-                    service_specific_arguments.erase("universe");
+                if (service_specific_arguments.find("universe") == service_specific_arguments.end()) {
                     for (auto &item : *this->compute_resources) {
-
-
                         if (not item.first->supportsStandardJobs()) {
                             continue;
                         }
@@ -150,6 +121,37 @@ namespace wrench {
                             break;
                         }
                     }
+                } else {
+                    if (service_specific_arguments["universe"].compare("grid") == 0) {
+
+                        //instead of erasing here, going to iterate through.
+                        service_specific_arguments.erase("universe");
+                        service_specific_arguments.insert(std::pair<std::string, std::string>("-N", "1"));
+                        service_specific_arguments.insert(std::pair<std::string, std::string>("-c", "1"));
+                        service_specific_arguments.insert(std::pair<std::string, std::string>("-t", "9999"));
+
+                        std::map<std::string, std::string> service_specs_copy;
+
+                        WRENCH_INFO("Dispatching job %s with %ld tasks", standard_job->getName().c_str(),
+                                    standard_job->getTasks().size());
+
+                        for (auto task : standard_job->getTasks()) {
+                            // temporary printing task IDs
+                            WRENCH_INFO("    Task ID: %s", task->getID().c_str());
+                        }
+
+                        //S4U_Simulation::sleep(120.0);
+
+                        standard_job->pushCallbackMailbox(this->reply_mailbox);
+                        this->grid_universe_batch_service->submitStandardJob(standard_job, service_specific_arguments);
+                        this->running_jobs->insert(std::make_pair(job, this->grid_universe_batch_service));
+                        scheduled_jobs.push_back(job);
+                        standard_job->getMinimumRequiredNumCores();
+
+                        WRENCH_INFO("Dispatched grid universe job %s with %ld tasks to batch service",
+                                    standard_job->getName().c_str(),
+                                    standard_job->getTasks().size());
+                    }
                 }
             } else if (auto pilot_job = dynamic_cast<PilotJob *>(job)) { // PILOT JOB
 
@@ -169,19 +171,18 @@ namespace wrench {
             }
         }
 
-        // Send the callback to the originator
-        try {
-            S4U_Mailbox::putMessage(
-                    this->reply_mailbox, new NegotiatorCompletionMessage(
-                            scheduled_jobs, this->getMessagePayloadValue(
-                                    HTCondorCentralManagerServiceMessagePayload::HTCONDOR_NEGOTIATOR_DONE_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            return 1;
-        }
+            // Send the callback to the originator
+            try {
+                S4U_Mailbox::putMessage(
+                        this->reply_mailbox, new NegotiatorCompletionMessage(
+                                scheduled_jobs, this->getMessagePayloadValue(
+                                        HTCondorCentralManagerServiceMessagePayload::HTCONDOR_NEGOTIATOR_DONE_MESSAGE_PAYLOAD)));
+            } catch (std::shared_ptr<NetworkError> &cause) {
+                return 1;
+            }
 
-        WRENCH_INFO("HTCondorNegotiator Service on host %s cleanly terminating!",
-                    S4U_Simulation::getHostName().c_str());
-        return 0;
+            WRENCH_INFO("HTCondorNegotiator Service on host %s cleanly terminating!",
+                        S4U_Simulation::getHostName().c_str());
+            return 0;
     }
-
 }

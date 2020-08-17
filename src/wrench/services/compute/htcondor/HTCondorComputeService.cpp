@@ -369,16 +369,20 @@ namespace wrench {
 
         ///Checks if grid universe was requested in job service specific args.
         ///If so, must condor must support grid universe.
-        if(service_specific_args.at("universe").compare("grid") == 0 and not this->supportsGridUniverse()){
-            S4U_Mailbox::dputMessage(
-                    answer_mailbox,
-                    new ComputeServiceSubmitStandardJobAnswerMessage(
-                            job, this->getSharedPtr<HTCondorComputeService>(), false, std::shared_ptr<FailureCause>(
-                                    new JobTypeNotSupported(job, this->getSharedPtr<HTCondorComputeService>())),
-                            this->getMessagePayloadValue(
-                                    HTCondorComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
+        if(service_specific_args.find("universe") == service_specific_args.end()){
+            ;
+        } else {
+            if(service_specific_args.at("universe").compare("grid") == 0 and not this->supportsGridUniverse()){
+                S4U_Mailbox::dputMessage(
+                        answer_mailbox,
+                        new ComputeServiceSubmitStandardJobAnswerMessage(
+                                job, this->getSharedPtr<HTCondorComputeService>(), false, std::shared_ptr<FailureCause>(
+                                        new JobTypeNotSupported(job, this->getSharedPtr<HTCondorComputeService>())),
+                                this->getMessagePayloadValue(
+                                        HTCondorComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
 
-            return;
+                return;
+            }
         }
 
 
