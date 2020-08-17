@@ -23,7 +23,7 @@ class HTCondorServiceTest : public ::testing::Test {
 
 public:
     wrench::WorkflowFile *input_file;
-    wrench::WorkflowFile *input_file_large;
+    wrench::WorkflowFile *input_file2;
     wrench::WorkflowFile *output_file1;
     wrench::WorkflowFile *output_file2;
     wrench::WorkflowFile *output_file3;
@@ -51,9 +51,13 @@ protected:
         workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
         workflow = workflow_unique_ptr.get();
 
+        //Creating separate workflow for grid universe
+        workflow_unique_ptr1 = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+        grid_workflow = workflow_unique_ptr1.get();
+
         // Create the files
         input_file = workflow->addFile("input_file", 10.0);
-        //input_file_large = workflow->addFile("input_file_large", 10.0);
+        input_file2 = grid_workflow->addFile("input_file2", 6500000000.0);
         output_file1 = workflow->addFile("output_file1", 10.0);
         output_file2 = workflow->addFile("output_file2", 10.0);
         output_file3 = workflow->addFile("output_file3", 10.0);
@@ -66,7 +70,7 @@ protected:
         task4 = workflow->addTask("task_4_10s_2cores", 10.0, 2, 2, 0);
         task5 = workflow->addTask("task_5_30s_1_to_3_cores", 30.0, 1, 3, 0);
         task6 = workflow->addTask("task_6_10s_1_to_2_cores", 12.0, 1, 2, 0);
-        //task7 = workflow->addTask("grid_task", 10.0, 1, 1, 0);
+        task7 = grid_workflow->addTask("grid_task1", 10.0, 1, 1, 0);
 
         // Add file-task dependencies
         task1->addInputFile(input_file);
@@ -75,7 +79,7 @@ protected:
         task4->addInputFile(input_file);
         task5->addInputFile(input_file);
         task6->addInputFile(input_file);
-        //task7->addInputFile(input_file_large);
+        task7->addInputFile(input_file2);
 
         task1->addOutputFile(output_file1);
 
@@ -180,7 +184,9 @@ protected:
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
     std::string platform_file_path1 = UNIQUE_TMP_PATH_PREFIX + "platform1.xml";
     wrench::Workflow *workflow;
+    wrench::Workflow *grid_workflow;
     std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
+    std::unique_ptr<wrench::Workflow> workflow_unique_ptr1;
 };
 
 /**********************************************************************/
@@ -625,9 +631,9 @@ private:
         auto htcondor_cs = *(this->getAvailableComputeServices<wrench::HTCondorComputeService>().begin());
 
         wrench::StandardJob *grid_job = job_manager->createStandardJob(
-                {this->test->task2},
+                {this->test->task7},
                 {},
-                {std::make_tuple(this->test->input_file,
+                {std::make_tuple(this->test->input_file2,
                                  wrench::FileLocation::LOCATION(htcondor_cs->getLocalStorageService()),
                                  wrench::FileLocation::SCRATCH)},
                 {}, {});
@@ -725,19 +731,19 @@ void HTCondorServiceTest::do_GridUniverseTest_test() {
     ASSERT_NO_THROW(wms = simulation->add(
             new HTCondorGridUniverseTestWMS(this, {compute_service}, {storage_service}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+    ASSERT_NO_THROW(wms->addWorkflow(grid_workflow));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on the storage service
     //ASSERT_NO_THROW(simulation->stageFile(input_file_large, storage_service));
-    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+    ASSERT_NO_THROW(simulation->stageFile(input_file2, storage_service));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    simulation->getOutput().dumpUnifiedJSON(workflow, "/tmp/workflow_data.json", false, true, false, false, false, false, false);
+    simulation->getOutput().dumpUnifiedJSON(grid_workflow, "/tmp/workflow_data.json", false, true, false, false, false, false, false);
 
     delete simulation;
     free(argv[0]);
