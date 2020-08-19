@@ -151,7 +151,7 @@ void WorkunitExecutorTest::do_WorkunitConstructor_test() {
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 10000000.0);
 
     // Create a task
-    auto task = this->workflow->addTask("task", 1.0, 1, 1, 1.0, 1.0);
+    auto task = this->workflow->addTask("task", 1.0, 1, 1, 0.0);
 
     {
         std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>> pre_file_copies;
@@ -338,7 +338,7 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create some  standard job
-        auto task = this->getWorkflow()->addTask("task", 3600, 1, 1, 1.0, 0);
+        auto task = this->getWorkflow()->addTask("task", 3600, 1, 1, 0);
         task->addInputFile(input_file);
         task->addOutputFile(output_file);
         auto job = job_manager->createStandardJob(

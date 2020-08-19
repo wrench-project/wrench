@@ -115,6 +115,7 @@ namespace wrench {
      * @return the hostname as a string
      */
     std::string S4U_Simulation::getHostName() {
+
         return simgrid::s4u::Host::current()->get_name();
     }
 
@@ -213,6 +214,15 @@ namespace wrench {
  */
     bool S4U_Simulation::hostExists(std::string hostname) {
         return (simgrid::s4u::Host::by_name_or_null(hostname) != nullptr);
+    }
+
+/**
+ * @brief Determines whether a link exists for a given linkname
+ * @param link_id: the name of the link
+ * @return true or false
+ */
+    bool S4U_Simulation::linkExists(std::string linkname) {
+        return (simgrid::s4u::Link::by_name_or_null(linkname) != nullptr);
     }
 
 /**

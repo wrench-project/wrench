@@ -20,12 +20,12 @@ namespace wrench {
           workflow = workflow_unique_ptr.get();
 
           // create simple diamond workflow
-          t1 = workflow->addTask("task-test-01", 100, 1, 1, 1.0, 0);
-          t2 = workflow->addTask("task-test-02", 200, 1, 1, 1.0, 0);
-          t3 = workflow->addTask("task-test-03", 100, 1, 1, 1.0, 0);
-          t4 = workflow->addTask("task-test-04", 200, 1, 1, 1.0, 0);
-          t5 = workflow->addTask("task-test-05", 100, 1, 1, 1.0, 0);
-          t6 = workflow->addTask("task-test-06", 100, 1, 1, 1.0, 0);
+          t1 = workflow->addTask("task-test-01", 100, 1, 1, 0);
+          t2 = workflow->addTask("task-test-02", 200, 1, 1, 0);
+          t3 = workflow->addTask("task-test-03", 100, 1, 1, 0);
+          t4 = workflow->addTask("task-test-04", 200, 1, 1, 0);
+          t5 = workflow->addTask("task-test-05", 100, 1, 1, 0);
+          t6 = workflow->addTask("task-test-06", 100, 1, 1, 0);
 
           workflow->addControlDependency(t1, t2);
           workflow->addControlDependency(t1, t3);

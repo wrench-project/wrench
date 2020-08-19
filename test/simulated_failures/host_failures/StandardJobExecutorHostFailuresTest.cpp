@@ -47,7 +47,7 @@ protected:
         output_file = workflow->addFile("output_file", 20000.0);
 
         // Create one task
-        task = workflow->addTask("task", 3600, 1, 1, 1.0, 0);
+        task = workflow->addTask("task", 3600, 1, 1, 0);
         task->addInputFile(input_file);
         task->addOutputFile(output_file);
 
@@ -415,7 +415,7 @@ private:
             switch2->start(switch2, true, false); // Daemonized, no auto-restart
 
             // Add a task to the workflow
-            auto task = this->test->workflow->addTask("task_" + std::to_string(trial), 80, 1, 1, 1.0, 0);
+            auto task = this->test->workflow->addTask("task_" + std::to_string(trial), 80, 1, 1, 0);
             auto output_file = this->test->workflow->addFile("output_file_" + std::to_string(trial), 2000);
             task->addInputFile(this->test->input_file);
             task->addOutputFile(output_file);

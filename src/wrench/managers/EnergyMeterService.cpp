@@ -21,7 +21,7 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param hostname: the hostname on which the service shoudl start
+     * @param hostname: the hostname on which the service should start
      * @param measurement_periods: the measurement period for each metered host
      */
     EnergyMeterService::EnergyMeterService(const std::string hostname, const std::map<std::string, double> &measurement_periods) :

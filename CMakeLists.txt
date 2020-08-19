@@ -159,6 +159,11 @@ set(HEADER_FILES
         include/wrench/workflow/job/PilotJob.h
         include/wrench/workflow/job/StandardJob.h
         include/wrench/workflow/job/WorkflowJob.h
+        include/wrench/workflow/DagOfTasks.h
+        include/wrench/workflow/parallel_model/ParallelModel.h
+        include/wrench/workflow/parallel_model/AmdahlParallelModel.h
+        include/wrench/workflow/parallel_model/ConstantEfficiencyParallelModel.h
+        include/wrench/workflow/parallel_model/CustomParallelModel.h
         )
 
 # source files
@@ -185,6 +190,7 @@ set(SOURCE_FILES
         src/wrench/logging/TerminalOutput.cpp
         src/wrench/managers/DataMovementManager.cpp
         src/wrench/managers/EnergyMeterService.cpp
+        src/wrench/managers/BandwidthMeterService.cpp
         src/wrench/managers/JobManager.cpp
         src/wrench/managers/JobManagerMessage.cpp
         src/wrench/managers/JobManagerMessage.h
@@ -279,9 +285,12 @@ set(SOURCE_FILES
         src/wrench/wms/WMSMessage.h
         src/wrench/workflow/Workflow.cpp
         src/wrench/workflow/DagOfTasks.cpp
-        include/wrench/workflow/DagOfTasks.h
         src/wrench/workflow/WorkflowFile.cpp
         src/wrench/workflow/WorkflowTask.cpp
+        src/wrench/workflow/parallel_model/ParallelModel.cpp
+        src/wrench/workflow/parallel_model/AmdahlParallelModel.cpp
+        src/wrench/workflow/parallel_model/ConstantEfficiencyParallelModel.cpp
+        src/wrench/workflow/parallel_model/CustomParallelModel.cpp
         src/wrench/workflow/execution_events/WorkflowExecutionEvent.cpp
         src/wrench/workflow/failure_causes/ComputeThreadHasDied.cpp
         src/wrench/workflow/failure_causes/FailureCause.cpp
@@ -316,6 +325,7 @@ set(TEST_FILES
         test/workflow/WorkflowTest.cpp
         test/workflow/WorkflowFileTest.cpp
         test/workflow/WorkflowTaskTest.cpp
+        test/workflow/WorkflowParallelModelTest.cpp
         test/workflow/WorkflowLoadFromDAXTest.cpp
         test/workflow/WorkflowLoadFromJSONTest.cpp
         test/compute_services/BareMetalComputeService/BareMetalComputeServiceOneTaskTest.cpp
@@ -376,7 +386,9 @@ set(TEST_FILES
         test/simulation/simulation_output/SimulationDumpJSONTest.cpp
         test/compute_services/HTCondorServiceTest.cpp
         src/wrench/managers/EnergyMeterService.cpp
+        src/wrench/managers/BandwidthMeterService.cpp
         include/wrench/managers/EnergyMeterService.h
+        include/wrench/managers/BandwidthMeterService.h
         test/simulated_failures/host_failures/ServiceStartReStartTest.cpp
         test/simulated_failures/host_failures/ComprehensiveIntegrationTest.cpp
         test/simulated_failures/host_failures/FailureDetectorHostFailuresTest.cpp

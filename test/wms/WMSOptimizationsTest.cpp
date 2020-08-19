@@ -75,9 +75,9 @@ protected:
       workflow_unique_ptrs.push_back(std::unique_ptr<wrench::Workflow>(workflow));
 
       // Create the tasks
-      task1 = workflow->addTask("task_1_10s_1core", 10.0, 1, 1, 1.0, 0);
-      task2 = workflow->addTask("task_2_10s_1core", 10.0, 1, 1, 1.0, 0);
-      task3 = workflow->addTask("task_3_10s_1core", 10.0, 1, 1, 1.0, 0);
+      task1 = workflow->addTask("task_1_10s_1core", 10.0, 1, 1, 0);
+      task2 = workflow->addTask("task_2_10s_1core", 10.0, 1, 1, 0);
+      task3 = workflow->addTask("task_3_10s_1core", 10.0, 1, 1, 0);
 
       workflow->addControlDependency(task1, task2);
       workflow->addControlDependency(task1, task3);

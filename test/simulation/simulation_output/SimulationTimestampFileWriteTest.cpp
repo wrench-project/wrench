@@ -109,7 +109,7 @@ private:
 
         auto job_manager = this->createJobManager();
 
-        this->test->task = this->getWorkflow()->addTask("task1", 10.0, 1, 1, 1.0, 0);
+        this->test->task = this->getWorkflow()->addTask("task1", 10.0, 1, 1, 0);
         this->test->task->addOutputFile(this->test->file_1);
         this->test->task->addOutputFile(this->test->file_2);
         this->test->task->addOutputFile(this->test->file_3);

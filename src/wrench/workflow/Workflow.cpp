@@ -11,6 +11,7 @@
 #include <nlohmann/json.hpp>
 #include <wrench/util/UnitParser.h>
 #include <wrench/workflow/WorkflowTask.h>
+#include <wrench/workflow/parallel_model/AmdahlParallelModel.h>
 
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/simulation/SimulationMessage.h"
@@ -30,7 +31,6 @@ namespace wrench {
      * @param flops: number of flops
      * @param min_num_cores: the minimum number of cores required to run the task
      * @param max_num_cores: the maximum number of cores that can be used by the task (use INT_MAX for infinity)
-     * @param parallel_efficiency: the multi-core parallel efficiency (number between 0.0 and 1.0)
      * @param memory_requirement: memory requirement (in bytes)
      *
      * @return the WorkflowTask instance
@@ -41,22 +41,12 @@ namespace wrench {
                                     double flops,
                                     unsigned long min_num_cores,
                                     unsigned long max_num_cores,
-                                    double parallel_efficiency,
                                     double memory_requirement) {
 
 
-        if ((flops < 0.0) || (min_num_cores < 1) || (min_num_cores > max_num_cores) ||
-            (parallel_efficiency <= 0.0) || (parallel_efficiency > 1.0) || (memory_requirement < 0)) {
+        if ((flops < 0.0) || (min_num_cores < 1) || (min_num_cores > max_num_cores) || (memory_requirement < 0)) {
             throw std::invalid_argument("WorkflowTask::addTask(): Invalid argument");
         }
-
-//        if ((min_num_cores == 0) and (max_num_cores != 0)) {
-//            throw std::invalid_argument("WorkflowTask::addTask(): A task with a minimum number of cores set to 0 must also have a maximum number of cores set to 0");
-//        }
-//
-//        if ((min_num_cores == 0) and (flops > 0)) {
-//            throw std::invalid_argument("WorkflowTask::addTask(): A task with a minimum number of cores set to 0 must have 0 flops");
-//        }
 
         // Check that the task doesn't really exist
         if (tasks.find(id) != tasks.end()) {
@@ -64,7 +54,7 @@ namespace wrench {
         }
 
         // Create the WorkflowTask object
-        auto task = new WorkflowTask(id, flops, min_num_cores, max_num_cores, parallel_efficiency,
+        auto task = new WorkflowTask(id, flops, min_num_cores, max_num_cores,
                                      memory_requirement);
         // Associate the workflow to the task
         task->workflow = this;
