@@ -89,7 +89,8 @@ int main(int argc, char **argv) {
     /* Add workflow tasks and files */
     for (int i=0; i < num_tasks; i++) {
         /* Create a task: random GFlop, 1 to 10 cores, 0.90 parallel efficiency, 10MB memory footprint */
-        auto task = workflow.addTask("task_" + std::to_string(i), dist(rng), 1, 10, 0.90, 1000);
+        auto task = workflow.addTask("task_" + std::to_string(i), dist(rng), 1, 10, 1000);
+        task->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(0.9));
         task->addInputFile(workflow.addFile("input_" + std::to_string(i), 10000000));
         task->addOutputFile(workflow.addFile("output_" + std::to_string(i), 10000000));
     }
@@ -158,8 +159,11 @@ int main(int argc, char **argv) {
      * many such events there are, and print some information for the first such event. */
     auto trace = simulation.getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>();
     for (auto const &item : trace) {
-        std::cerr << "Task "  << item->getContent()->getTask()->getID() << " completed at time " << item->getDate()  << std::endl;
+        std::cerr << "Task "  << item->getContent()->getTask()->getID() << " completed at time " << item->getDate()  << " on host " << item->getContent()->getTask()->getExecutionHost() << std::endl;
     }
+
+    simulation.getOutput().dumpUnifiedJSON(&workflow, "/tmp/wrench.json");
+
 
     return 0;
 }

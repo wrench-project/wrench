@@ -467,7 +467,7 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(st
     srand(666);
     for (int i=0; i < NUM_TASKS; i++) {
 //        auto task = workflow->addTask("task_" + std::to_string(i), 1 + rand() % MAX_TASK_DURATION_WITH_ON_CORE, 1, 3, 1.0, 0);
-        auto task = workflow->addTask("task_" + std::to_string(i), MAX_TASK_DURATION_WITH_ON_CORE, 1, 3, 1.0, 40);
+        auto task = workflow->addTask("task_" + std::to_string(i), MAX_TASK_DURATION_WITH_ON_CORE, 1, 3, 40);
         auto input_file = workflow->addFile(task->getID() + ".input", 1 + rand() % 100);
         auto output_file = workflow->addFile(task->getID() + ".output", 1 + rand() % 100);
         task->addInputFile(input_file);

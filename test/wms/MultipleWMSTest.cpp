@@ -78,8 +78,8 @@ protected:
         output_file2 = workflow->addFile("output_file2", 10.0);
 
         // Create the tasks
-        task1 = workflow->addTask("task_1_10s_1core", 10.0, 1, 1, 1.0, 0);
-        task2 = workflow->addTask("task_2_10s_1core", 10.0, 1, 1, 1.0, 0);
+        task1 = workflow->addTask("task_1_10s_1core", 10.0, 1, 1, 0);
+        task2 = workflow->addTask("task_2_10s_1core", 10.0, 1, 1, 0);
 
         // Add file-task dependencies
         task1->addInputFile(input_file);

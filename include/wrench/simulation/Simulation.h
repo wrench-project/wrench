@@ -26,6 +26,7 @@ namespace wrench {
     class NetworkProximityService;
     class FileRegistryService;
     class EnergyMeterService;
+    class BandwidthMeterService;
     class ComputeService;
     class BatchComputeService;
     class BareMetalComputeService;
@@ -95,12 +96,14 @@ namespace wrench {
         /** \cond DEVELOPER    */
         /***********************/
         double getEnergyConsumed(const std::string &hostname, bool record_as_time_stamp);
+        double getLinkUsage(const std::string &linkname, bool  record_as_time_stamp);
         std::map<std::string, double> getEnergyConsumed(const std::vector<std::string> &hostnames, bool record_as_time_stamps);
 
         static bool doesHostExist(std::string hostname);
         static bool isHostOn(std::string hostname);
         static void turnOnHost(std::string hostname);
         static void turnOffHost(std::string hostname);
+        static bool doesLinkExist(std::string linkname);
         static bool isLinkOn(std::string linkname);
         static void turnOnLink(std::string linkname);
         static void turnOffLink(std::string linkname);
@@ -155,6 +158,8 @@ namespace wrench {
 
         std::set<std::shared_ptr<EnergyMeterService>> energy_meter_services;
 
+        std::set<std::shared_ptr<BandwidthMeterService>> bandwidth_meter_services;
+
         std::set<std::shared_ptr<NetworkProximityService>> network_proximity_services;
 
         std::set<std::shared_ptr<ComputeService>> compute_services;
@@ -176,6 +181,7 @@ namespace wrench {
         void addService(std::shared_ptr<WMS> service);
         void addService(std::shared_ptr<FileRegistryService> service);
         void addService(std::shared_ptr<EnergyMeterService> service);
+        void addService(std::shared_ptr<BandwidthMeterService> service);
 
         std::string getWRENCHVersionString() { return WRENCH_VERSION_STRING; }
 

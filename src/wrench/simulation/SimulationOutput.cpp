@@ -114,6 +114,9 @@ namespace wrench {
      *      "energy_consumption": {
      *          ...
      *      },
+     *      "link_usage": {
+     *          ...
+     *      },
      *      "platform": {
      *          ...
      *      },
@@ -148,7 +151,8 @@ namespace wrench {
                                            bool include_workflow_graph,
                                            bool include_energy,
                                            bool generate_host_utilization_layout,
-                                           bool include_disk) {
+                                           bool include_disk,
+                                           bool include_bandwidth) {
 
         nlohmann::json unified_json;
 
@@ -175,6 +179,11 @@ namespace wrench {
         if(include_disk){
             dumpDiskOperationsJSON(file_path, false);
             unified_json["disk_operations"] = disk_json_part;
+        }
+
+        if(include_bandwidth){
+            dumpLinkUsageJSON(file_path, false);
+            unified_json["link_usage"] = bandwidth_json_part;
         }
 
 
@@ -688,7 +697,6 @@ namespace wrench {
      *                  flops: <double>,
      *                  min_cores: <unsigned_long>,
      *                  max_cores: <unsigned_long>,
-     *                  parallel_efficiency: <double>,
      *                  memory: <double>,
      *              },
      *              {
@@ -733,7 +741,6 @@ namespace wrench {
                                        {"flops",               task->getFlops()},
                                        {"min_cores",           task->getMinNumCores()},
                                        {"max_cores",           task->getMaxNumCores()},
-                                       {"parallel_efficiency", task->getParallelEfficiency()},
                                        {"memory",              task->getMemoryRequirement()}
                                });
         }
@@ -1288,7 +1295,7 @@ namespace wrench {
      */
     void SimulationOutput::dumpDiskOperationsJSON(std::string file_path, bool writing_file) {
         if (file_path.empty()) {
-            throw std::invalid_argument("SimulationOutput::dumpDiskOperationJSON() requires a valid workflow and file_path");
+            throw std::invalid_argument("SimulationOutput::dumpDiskOperationJSON() requires a valid file_path");
         }
         nlohmann::json disk_operations_json;
 
@@ -1382,23 +1389,91 @@ namespace wrench {
 
         }
 
-
-
-
-
-
-
-
-
-
-
-
         disk_json_part = disk_operations_json;
 
         if(writing_file) {
             std::ofstream output(file_path);
             output << std::setw(4) << disk_operations_json << std::endl;
             output.close();
+        }
+    }
+
+    /** Writes a JSON file containing link usage information as a JSON array.
+     *
+     * This information will not be generated without using the bandwidth meter service and providing it with linknames
+     * to monitor.
+     *
+     *<pre>
+     * {
+     *  "link_usage": {
+     *      "links": [
+     *                  {
+     *                   "link_usage_trace": [
+     *                          {
+     *                           "bytes per second": <double>,
+     *                           "time": <double>
+     *                          },
+     *                          {
+     *                              ...
+     *                          },
+     *                      ],
+     *                      "linkname": <string>
+     *                  },
+     *                  {
+     *                      ...
+     *                  }
+     *              ]
+     *   }
+     * }
+     * </pre>
+     *
+     *
+     * @param file_path: path where json file is written
+     * @param writing_file: whether to write file to disk. Enabled by default.
+     *
+     * @throws std::invalid_argument
+     * @throws std::runtime_error
+     */
+    void SimulationOutput::dumpLinkUsageJSON(std::string file_path, bool writing_file) {
+        if (file_path.empty()) {
+            throw std::invalid_argument("SimulationOutput::dumpLinkUsageJSON() requires a valid file_path");
+        }
+
+        nlohmann::json bandwidth_json;
+
+        try {
+            auto simgrid_engine = simgrid::s4u::Engine::get_instance();
+            std::vector<simgrid::s4u::Link *> links = simgrid_engine->get_all_links();
+
+            for( const auto &link: links) {
+                nlohmann::json datum;
+                datum["linkname"] = link->get_name();
+
+                for (const auto &link_usage_timestamp : this->getTrace<SimulationTimestampLinkUsage>()) {
+                    if (link->get_name() == link_usage_timestamp->getContent()->getLinkname()) {
+                        datum["link_usage_trace"].push_back({
+                                                                         {"time",   link_usage_timestamp->getDate()},
+                                                                         {"bytes per second", link_usage_timestamp->getContent()->getUsage()}
+                                                                 });
+                    }
+                }
+
+                bandwidth_json.push_back(datum);
+            }
+
+            nlohmann::json link_usage;
+            nlohmann::json links_list;
+            links_list["links"] = bandwidth_json;
+            link_usage["link_usage"] = links_list;
+            bandwidth_json_part = links_list;
+
+            if(writing_file) {
+                std::ofstream output(file_path);
+                output << std::setw(4) << link_usage << std::endl;
+                output.close();
+            }
+        } catch (std::runtime_error &e) {
+            std::cerr << e.what() << std::endl;
         }
     }
 
@@ -1451,6 +1526,9 @@ namespace wrench {
         // By default enable all power timestamps
         this->setEnabled<SimulationTimestampPstateSet>(true);
         this->setEnabled<SimulationTimestampEnergyConsumption>(true);
+
+        // By default enable all link usage timestamps
+        this->setEnabled<SimulationTimestampLinkUsage>(true);
     }
 
     /**
@@ -1711,6 +1789,17 @@ namespace wrench {
             this->addTimestamp<SimulationTimestampEnergyConsumption>(new SimulationTimestampEnergyConsumption(hostname, joules));
         }
     }
+
+    /**
+     * @brief Add a link usage timestamp
+     * @param linkname: a linkname
+     * @param bytes_per_second: link usage in bytes_per_second
+     */
+    void SimulationOutput::addTimestampLinkUsage(std::string linkname, double bytes_per_second) {
+        if (this->isEnabled<SimulationTimestampLinkUsage>()) {
+            this->addTimestamp<SimulationTimestampLinkUsage>(new SimulationTimestampLinkUsage(linkname, bytes_per_second));
+        }
+    }
     
     /**
      * @brief Enable or Disable the insertion of task-related timestamps in
@@ -1763,6 +1852,15 @@ namespace wrench {
     void SimulationOutput::enableEnergyTimestamps(bool enabled) {
         this->setEnabled<SimulationTimestampPstateSet>(true);
         this->setEnabled<SimulationTimestampEnergyConsumption>(true);
+    }
+
+    /**
+     * @brief Enable or Disable the insertion of link-usage-related timestamps in
+     *        the simulation output (enabled by default)
+     * @param enabled true to enable, false to disable
+     */
+    void SimulationOutput::enableBandwidthTimestamps(bool enabled) {
+        this->setEnabled<SimulationTimestampLinkUsage>(true);
     }
 
 
