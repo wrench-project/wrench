@@ -1266,6 +1266,7 @@ namespace wrench {
      *                  {
      *                   "bytes": <double>,
      *                   "end": <double>,
+     *                   "failure": <>,
      *                   "start": <double>
      *                  },
      *                  {
@@ -1324,6 +1325,8 @@ namespace wrench {
             }
         }
 
+
+
         for(auto & host : hostnames) {
             std::set<std::string> mounts;
             if(!read_start_timestamps.empty()){
@@ -1341,8 +1344,8 @@ namespace wrench {
                 }
             }
             for (auto & mount : mounts) {
-                std::vector<std::tuple<double, double, double>> reads;
-                std::vector<std::tuple<double, double, double>> writes;
+                std::vector<std::tuple<std::pair<double, double>, double, double>> reads;
+                std::vector<std::tuple<std::pair<double, double>, double, double>> writes;
 
                 if (!read_start_timestamps.empty()) {
                     for (auto & read_start_timestamp : read_start_timestamps){
@@ -1366,13 +1369,18 @@ namespace wrench {
 
                     }
                 }
-                nlohmann::json disk_reads;
-                for (auto const &r : reads) {
-                    nlohmann::json disk_read = nlohmann::json::object({{"start", std::get<0>(r)},
-                                                                       {"end", std::get<1>(r)},
-                                                                       {"bytes",std::get<2>(r)}});
-                    disk_reads.push_back(disk_read);
+
+                if(read_failure_timestamps.empty()){
+                    nlohmann::json disk_reads;
+                    for (auto const &r : reads) {
+                        nlohmann::json disk_read = nlohmann::json::object({{"start", std::get<0>(r)},
+                                                                           {"end", std::get<1>(r)},
+                                                                           {"bytes",std::get<2>(r)},
+                                                                           {"failure", "-1"}});
+                        disk_reads.push_back(disk_read);
+                    }
                 }
+
 
                 nlohmann::json disk_writes;
                 for (auto const &w : writes) {
