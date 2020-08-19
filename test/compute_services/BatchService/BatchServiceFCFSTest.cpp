@@ -97,7 +97,7 @@ private:
         wrench::WorkflowTask *tasks[8];
         wrench::StandardJob *jobs[8];
         for (int i=0; i < 8; i++) {
-            tasks[i] = this->getWorkflow()->addTask("task" + std::to_string(i), 60, 1, 1, 1.0, 0);
+            tasks[i] = this->getWorkflow()->addTask("task" + std::to_string(i), 60, 1, 1, 0);
             jobs[i] = job_manager->createStandardJob(tasks[i], {});
         }
 
@@ -271,7 +271,7 @@ private:
         wrench::WorkflowTask *tasks[9];
         wrench::StandardJob *jobs[9];
         for (int i=0; i < 9; i++) {
-            tasks[i] = this->getWorkflow()->addTask("task" + std::to_string(i), 60, 1, 1, 1.0, 0);
+            tasks[i] = this->getWorkflow()->addTask("task" + std::to_string(i), 60, 1, 1, 0);
             jobs[i] = job_manager->createStandardJob(tasks[i], {});
         }
 

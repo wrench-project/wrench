@@ -7,6 +7,7 @@
  * (at your option) any later version.
  */
 
+#include "wrench/workflow/parallel_model/AmdahlParallelModel.h"
 #include "wrench/logging/TerminalOutput.h"
 
 #include "wrench/logging/TerminalOutput.h"
@@ -28,22 +29,23 @@ namespace wrench {
      * @param flops: the task's number of flops
      * @param min_cores: the minimum number of cores required for running the task
      * @param max_cores: the maximum number of cores that the task can use (infinity: ULONG_MAX)
-     * @param parallel_efficiency: the multi-core parallel efficiency
+     * @param spec: the multi-core parallel performance model
      * @param memory_requirement: memory requirement in bytes
      */
     WorkflowTask::WorkflowTask(const std::string id, const double flops, const unsigned long min_num_cores,
-                               const unsigned long max_num_cores, const double parallel_efficiency,
+                               const unsigned long max_num_cores,
                                const double memory_requirement) :
             id(id), color(""), flops(flops),
             min_num_cores(min_num_cores),
             max_num_cores(max_num_cores),
-            parallel_efficiency(parallel_efficiency),
             memory_requirement(memory_requirement),
             execution_host(""),
             visible_state(WorkflowTask::State::READY),
             upcoming_visible_state(WorkflowTask::State::UNKNOWN),
             internal_state(WorkflowTask::InternalState::TASK_READY),
             job(nullptr) {
+        // The default is that the task is perfectly parallelizable
+        this->parallel_model = ParallelModel::CONSTANTEFFICIENCY(1.0);
     }
 
     /**
@@ -141,15 +143,6 @@ namespace wrench {
      */
     unsigned long WorkflowTask::getMaxNumCores() const {
         return this->max_num_cores;
-    }
-
-    /**
-     * @brief Get the parallel efficiency of the task
-     *
-     * @return a parallel efficiency (number between 0.0 and 1.0)
-     */
-    double WorkflowTask::getParallelEfficiency() const {
-        return this->parallel_efficiency;
     }
 
     /**
@@ -766,12 +759,18 @@ namespace wrench {
     }
 
     /**
-     * @brief Sets the host on which this task is running
+     * @brief Sets the host on which this task is running.If the hostname is a VM name, then
+     * the corresponding physical host name will be set!
      * @param hostname: the host name
      */
     void WorkflowTask::setExecutionHost(std::string hostname) {
+        /** Convert the hostname to a physical hostname if needed **/
+        std::string physical_hostname = hostname;
+        if (S4U_VirtualMachine::vm_to_pm_map.find(hostname) != S4U_VirtualMachine::vm_to_pm_map.end()) {
+            physical_hostname = S4U_VirtualMachine::vm_to_pm_map[hostname];
+        }
         if (not this->execution_history.empty()) {
-            this->execution_history.top().execution_host = hostname;
+            this->execution_history.top().execution_host = physical_hostname;
         } else {
             throw std::runtime_error(
                     "WorkflowTask::setExecutionHost() cannot be called before WorkflowTask::setStartDate()");
@@ -806,4 +805,21 @@ namespace wrench {
     void WorkflowTask::setColor(std::string color) {
         this->color = color;
     }
+
+    /**
+     * @brief Set the task's parallel model
+     * @param model: a parallel model
+     */
+    void WorkflowTask::setParallelModel(std::shared_ptr<ParallelModel> model) {
+        this->parallel_model = model;
+    }
+
+    /**
+     * @brief Get the task's parallel model
+     * @return the parallel model
+     */
+    std::shared_ptr<ParallelModel> WorkflowTask::getParallelModel() {
+        return this->parallel_model;
+    }
+
 };

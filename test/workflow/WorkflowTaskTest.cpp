@@ -35,14 +35,15 @@ protected:
     WorkflowTaskTest() {
         workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
 
-        t1 = workflow->addTask("task-01", 100000, 1, 1, 1.0, 0);
-        t2 = workflow->addTask("task-02", 100, 2, 4, 0.5, 0);
+        t1 = workflow->addTask("task-01", 100000, 1, 1, 0);
+        t2 = workflow->addTask("task-02", 100, 2, 4, 0);
+        t2->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(0.5));
         t2->setAverageCPU(90.2);
 
         workflow->addControlDependency(t1, t2);
 
         // t3 is created in InputOutputFile test..
-        t4 = workflow->addTask("task-04", 10, 1, 3, 1.0, 0);
+        t4 = workflow->addTask("task-04", 10, 1, 3, 0);
 
 
         large_input_file = workflow->addFile("large_input_file", 1000000);
@@ -56,8 +57,8 @@ protected:
         t4->setBytesWritten(1000);
         t4->setAverageCPU(50.5);
 
-        t5 = workflow->addTask("task-05", 100, 1, 2, 1.0, 0);
-        t6 = workflow->addTask("task-06", 100, 1, 3, 1.0, 0);
+        t5 = workflow->addTask("task-05", 100, 1, 2, 0);
+        t6 = workflow->addTask("task-06", 100, 1, 3, 0);
 
         std::string xml = "<?xml version='1.0'?>"
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
@@ -100,10 +101,8 @@ TEST_F(WorkflowTaskTest, TaskStructure) {
 
     ASSERT_EQ(t1->getMinNumCores(), 1);
     ASSERT_EQ(t1->getMaxNumCores(), 1);
-    ASSERT_EQ(t1->getParallelEfficiency(), 1.0);
     ASSERT_EQ(t2->getMinNumCores(), 2);
     ASSERT_EQ(t2->getMaxNumCores(), 4);
-    ASSERT_EQ(t2->getParallelEfficiency(), 0.5);
 
     ASSERT_EQ(t1->getState(), wrench::WorkflowTask::State::READY);
     ASSERT_EQ(t2->getState(), wrench::WorkflowTask::State::NOT_READY); // due to control dependency
@@ -223,7 +222,7 @@ TEST_F(WorkflowTaskTest, InputOutputFile) {
     ASSERT_THROW(workflow->removeFile(f1), std::invalid_argument);
     ASSERT_THROW(workflow->removeFile(f2), std::invalid_argument);
 
-    wrench::WorkflowTask *t3 = workflow->addTask("task-03", 50, 2, 4, 1.0, 0);
+    wrench::WorkflowTask *t3 = workflow->addTask("task-03", 50, 2, 4, 0);
     t3->addInputFile(f2);
 
     ASSERT_EQ(t3->getNumberOfParents(), 1);

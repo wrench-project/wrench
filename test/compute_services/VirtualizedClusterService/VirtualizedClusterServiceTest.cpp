@@ -80,12 +80,12 @@ protected:
         output_file6 = workflow->addFile("output_file6", 10.0);
 
         // Create the tasks
-        task1 = workflow->addTask("task_1_10s_1core", 10.0, 1, 1, 1.0, 0);
-        task2 = workflow->addTask("task_2_10s_1core", 10.0, 1, 1, 1.0, 0);
-        task3 = workflow->addTask("task_3_10s_2cores", 10.0, 2, 2, 1.0, 0);
-        task4 = workflow->addTask("task_4_10s_2cores", 10.0, 2, 2, 1.0, 0);
-        task5 = workflow->addTask("task_5_30s_1_to_3_cores", 30.0, 1, 3, 1.0, 0);
-        task6 = workflow->addTask("task_6_10s_1_to_2_cores", 12.0, 1, 2, 1.0, 0);
+        task1 = workflow->addTask("task_1_10s_1core", 10.0, 1, 1, 0);
+        task2 = workflow->addTask("task_2_10s_1core", 10.0, 1, 1, 0);
+        task3 = workflow->addTask("task_3_10s_2cores", 10.0, 2, 2, 0);
+        task4 = workflow->addTask("task_4_10s_2cores", 10.0, 2, 2, 0);
+        task5 = workflow->addTask("task_5_30s_1_to_3_cores", 30.0, 1, 3, 0);
+        task6 = workflow->addTask("task_6_10s_1_to_2_cores", 12.0, 1, 2, 0);
 
         // Add file-task dependencies
         task1->addInputFile(input_file);
@@ -353,8 +353,19 @@ private:
 
         }
 
+        // Check that we cannot get the CS back
+        if (cs->getVMComputeService(vm_name) != nullptr) {
+            throw std::runtime_error("A non-started VM should have a nullptr compute service");
+        }
+
         // Start the VM
         auto vm_cs = cs->startVM(vm_name);
+
+        // Check that we can get the CS back
+        auto vm_cs_should_be_same = cs->getVMComputeService(vm_name);
+        if (vm_cs != vm_cs_should_be_same) {
+            throw std::runtime_error("It should be possible to get the computer service of a started VM");
+        }
 
         // Check the state
         if (not cs->isVMRunning(vm_name)) {
@@ -637,7 +648,7 @@ private:
             job_manager->submitJob(two_task_job, vm_cs);
 
             // migrating the VM
-            wrench::Simulation::sleep(0.01); // TODO Without this sleep, the test hangs! This is being investigated...
+            wrench::Simulation::sleep(0.01); // TODO: Without this sleep, the test hangs! This is being investigated...
 
             try { // try a bogus one for coverage
                 cs->migrateVM("NON-EXISTENT", "DualCoreHost");
@@ -649,7 +660,17 @@ private:
                 throw std::runtime_error("Should not be able to migrate a VM to a host without sufficient resources");
             } catch (wrench::WorkflowExecutionException &e) {}
 
-            cs->migrateVM(vm_name, "DualCoreHost");
+            // Get the runnin physical hostname
+            auto hostname_pre = cs->getVMPhysicalHostname(vm_name);
+            if (hostname_pre != src_host) {
+                throw std::runtime_error("VM should be running on physical host " + src_host);
+            }
+            std::string dst_host = "DualCoreHost";
+            cs->migrateVM(vm_name, dst_host);
+            auto hostname_post = cs->getVMPhysicalHostname(vm_name);
+            if (hostname_post != dst_host) {
+                throw std::runtime_error("VM should, after migration, be running on physical host " + dst_host);
+            }
 
         } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error(e.what());

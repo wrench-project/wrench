@@ -232,8 +232,8 @@ private:
         }
 
 
-        wrench::WorkflowTask *t1 = this->getWorkflow()->addTask("t1", 1.0, 1, 1, 1.0, 0.0);
-        wrench::WorkflowTask *t2 = this->getWorkflow()->addTask("t2", 1.0, 1, 1, 1.0, 0.0);
+        wrench::WorkflowTask *t1 = this->getWorkflow()->addTask("t1", 1.0, 1, 1, 0.0);
+        wrench::WorkflowTask *t2 = this->getWorkflow()->addTask("t2", 1.0, 1, 1, 0.0);
         wrench::WorkflowFile *f = this->getWorkflow()->addFile("f", 100);
         t1->addOutputFile(f);
         t2->addInputFile(f);
@@ -586,8 +586,8 @@ void JobManagerTest::do_JobManagerResubmitJobTest_test() {
                     this, "Host1", {cs1, cs2})));
 
     // Add tasks to the workflow
-    wrench::WorkflowTask *task1 = workflow->addTask("task1", 10.0, 10, 10, 1.0, 0.0);
-    wrench::WorkflowTask *task2 = workflow->addTask("task2", 10.0, 10, 10, 1.0, 0.0);
+    wrench::WorkflowTask *task1 = workflow->addTask("task1", 10.0, 10, 10, 0.0);
+    wrench::WorkflowTask *task2 = workflow->addTask("task2", 10.0, 10, 10, 0.0);
     workflow->addControlDependency(task1, task2);
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
@@ -632,10 +632,10 @@ private:
         auto cs = *(this->getAvailableComputeServices<wrench::ComputeService>().begin());
 
         // Add tasks to the workflow
-        wrench::WorkflowTask *t1 = this->getWorkflow()->addTask("task1", 600, 10, 10, 1.0, 80);
-        wrench::WorkflowTask *t2 = this->getWorkflow()->addTask("task2", 600, 9, 10, 1.0, 80);
-        wrench::WorkflowTask *t3 = this->getWorkflow()->addTask("task3", 600, 8, 10, 1.0, 0);
-        wrench::WorkflowTask *t4 = this->getWorkflow()->addTask("task4", 600, 10, 10, 1.0, 0);
+        wrench::WorkflowTask *t1 = this->getWorkflow()->addTask("task1", 600, 10, 10, 80);
+        wrench::WorkflowTask *t2 = this->getWorkflow()->addTask("task2", 600, 9, 10, 80);
+        wrench::WorkflowTask *t3 = this->getWorkflow()->addTask("task3", 600, 8, 10, 0);
+        wrench::WorkflowTask *t4 = this->getWorkflow()->addTask("task4", 600, 10, 10, 0);
 
         /* t1 and t2 can't run at the same time in this example, due to RAM */
 

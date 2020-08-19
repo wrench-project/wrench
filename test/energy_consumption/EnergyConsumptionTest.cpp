@@ -160,7 +160,7 @@ private:
             std::vector<std::string> simulation_hosts = wrench::Simulation::getHostnameList();
 
             //Now based on this default speed, (100MF), execute a job requiring 10^10 flops and check the time
-            wrench::WorkflowTask *task = this->getWorkflow()->addTask("task1", 10000000000, 1, 1, 1.0, 1.0);
+            wrench::WorkflowTask *task = this->getWorkflow()->addTask("task1", 10000000000, 1, 1, 1.0);
 
             // Create a StandardJob
             wrench::StandardJob *job = job_manager->createStandardJob(
@@ -368,7 +368,7 @@ private:
             std::vector<std::string> simulation_hosts = wrench::Simulation::getHostnameList();
 
             //Now based on this default speed, (100MF), execute a job requiring 10^10 flops and check the time
-            wrench::WorkflowTask *task = this->getWorkflow()->addTask("task1", 10000000000, 1, 1, 1.0, 1.0);
+            wrench::WorkflowTask *task = this->getWorkflow()->addTask("task1", 10000000000, 1, 1, 1.0);
 
             // Create a StandardJob
             wrench::StandardJob *job = job_manager->createStandardJob(
@@ -564,7 +564,7 @@ private:
         {
 
             //Now based on this default speed, (100MF), execute a job requiring 10^10 flops and check the time
-            wrench::WorkflowTask *task = this->getWorkflow()->addTask("task1", 10000000000, 1, 1, 1.0, 1.0);
+            wrench::WorkflowTask *task = this->getWorkflow()->addTask("task1", 10000000000, 1, 1, 1.0);
 
             // Create a StandardJob
             wrench::StandardJob *job = job_manager->createStandardJob(
@@ -876,7 +876,7 @@ private:
             std::vector<std::string> simulation_hosts = wrench::Simulation::getHostnameList();
 
             //Now based on this default speed, (100MF), execute a job requiring 10^10 flops and check the time
-            wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 10000000000, 1, 1, 1.0, 1.0);
+            wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 10000000000, 1, 1, 1.0);
 
             // Create a StandardJob
             wrench::StandardJob *job1 = job_manager->createStandardJob(
@@ -885,7 +885,7 @@ private:
                     });
 
             //Now based on this default speed, (100MF), execute a job requiring 10^10 flops and check the time
-            wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task2", 10000000000, 1, 1, 1.0, 1.0);
+            wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task2", 10000000000, 1, 1, 1.0);
 
             // Create a StandardJob
             wrench::StandardJob *job2 = job_manager->createStandardJob(
