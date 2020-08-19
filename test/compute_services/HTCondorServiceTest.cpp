@@ -79,7 +79,7 @@ protected:
         task4->addInputFile(input_file);
         task5->addInputFile(input_file);
         task6->addInputFile(input_file);
-        task7->addInputFile(input_file2);
+        //task7->addInputFile(input_file2);
 
         task1->addOutputFile(output_file1);
 
@@ -629,7 +629,6 @@ private:
 
 
         auto htcondor_cs = *(this->getAvailableComputeServices<wrench::HTCondorComputeService>().begin());
-
         wrench::StandardJob *grid_job = job_manager->createStandardJob(
                 {this->test->task7},
                 {},
@@ -637,6 +636,7 @@ private:
                                  wrench::FileLocation::LOCATION(htcondor_cs->getLocalStorageService()),
                                  wrench::FileLocation::SCRATCH)},
                 {}, {});
+
 
         std::map<std::string, std::string> test_service_specs;
         test_service_specs.insert(std::pair<std::string, std::string>("universe","grid"));
