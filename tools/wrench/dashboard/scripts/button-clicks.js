@@ -104,48 +104,6 @@ function hideIoView() {
     generateGraph(data.contents, currGraphState, false, 1000, 1000)
 }
 
-// function switchToHostView(data, selectedHost) {
-// var hostNames = getHostNames(data)
-//
-// if (!hostColoursJSONPopulated()) {
-//     hostNames.forEach(function (hostName) {
-//         var colour = getRandomColour()
-//         while (colour === '#FF0000' || colour === '#FFA500') {
-//             colour = getRandomColour()
-//         }
-//         hostColours[hostName] = colour
-//     })
-// }
-//
-// data.forEach(function (task) {
-//     var hostName = task[executionHostKey].hostname
-//     var sanitizedId = sanitizeId(task.task_id)
-//     var taskRead = d3.select(`#${sanitizedId} .read`)
-//     var taskCompute = d3.select(`#${sanitizedId} .compute`)
-//     var taskWrite = d3.select(`#${sanitizedId} .write`)
-//
-//     taskRead.style("fill", hostColours[hostName])
-//     taskRead.style("opacity", 1)
-//
-//     taskCompute.style("fill", hostColours[hostName])
-//     taskCompute.style("opacity", 1)
-//
-//     taskWrite.style("fill", hostColours[hostName])
-//     taskWrite.style("opacity", 1)
-//
-//     if (selectedHost !== '' && selectedHost !== hostName) {
-//         taskRead.style("fill", "gray")
-//         taskRead.style("opacity", 0.2)
-//
-//         taskCompute.style("fill", "gray")
-//         taskCompute.style("opacity", 0.2)
-//
-//         taskWrite.style("fill", "gray")
-//         taskWrite.style("opacity", 0.2)
-//     }
-// })
-// }
-
 function legendHover(hostName, id, alreadySelected) {
     if (currentlySelectedHost.hostName !== '') {
         return
