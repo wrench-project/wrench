@@ -67,9 +67,16 @@ function definePluginsProperties(zoom, zoomMaxRange) {
     return {};
 }
 
-function generateGanttChart(rawData, zoom=true) {
+/**
+ * Generates the gantt chart
+ *
+ * @param rawData: simulation data
+ * @param containedId: id for the chart container element
+ * @param zoom: whether to allow zoom functionality in the chart
+ */
+function generateGanttChart(rawData, containedId = null, zoom = true) {
     cleanGanttChart();
-    const containerId = "graph-container";
+    const containerId = containedId ? containedId : "graph-container";
     let ctx = document.getElementById(containerId);
     const colors = {
         'read': '#cbb5dd',
@@ -161,7 +168,7 @@ function generateGanttChart(rawData, zoom=true) {
     });
 }
 
-function generateHostGanttChart(rawData, zoom=true) {
+function generateHostGanttChart(rawData, zoom = true) {
     cleanGanttChart();
     const containerId = "graph-container";
     let ctx = document.getElementById(containerId);
