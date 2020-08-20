@@ -352,6 +352,11 @@ namespace wrench {
             username = batch_job_args.at("-u");
         }
 
+        //sleep to match real world behavior in communication lag between HTCondor and Batch service (slurm)
+        if (this->getPropertyValueAsBoolean(BatchComputeServiceProperty::SUPPORTS_GRID_UNIVERSE)) {
+            S4U_Simulation::sleep(20);
+        }
+
         // Sanity check
         if ((num_hosts == 0) or (num_cores_per_host == 0) or  (time_asked_for_in_minutes == 0)) {
             throw std::invalid_argument("BatchComputeService::submitWorkflowJob(): service-specific arguments should have non-zero values");
@@ -432,6 +437,9 @@ namespace wrench {
      *
      */
     void BatchComputeService::submitStandardJob(StandardJob *job, const std::map<std::string, std::string> &batch_job_args) {
+        if(batch_job_args.find("universe") != batch_job_args.end()) {
+            this->setProperties(this->default_property_values, {{BatchComputeServiceProperty::SUPPORTS_GRID_UNIVERSE, "true"}});
+        }
 
         try {
             this->submitWorkflowJob(job, batch_job_args);
@@ -1258,6 +1266,10 @@ namespace wrench {
         }
         this->finished_standard_job_executors.clear();
 
+
+        if(this->getPropertyValueAsBoolean(BatchComputeServiceProperty::SUPPORTS_GRID_UNIVERSE)) {
+            S4U_Simulation::sleep(120);
+        }
 
         if (not executor_on_the_list) {
             WRENCH_WARN("BatchComputeService::processStandardJobCompletion(): Received a standard job completion, but the executor is not in the executor list - Likely getting wires crossed due to concurrent completion and time-outs.. ignoring")
