@@ -156,6 +156,15 @@ namespace wrench {
         */
         DECLARE_PROPERTY_NAME(BATSCHED_CONTIGUOUS_ALLOCATION);
 
+        /** @brief Indicates batch service being used for grid universe through HTCondor
+         *      - defaults to false
+         *      - If true, upon standard job completion there will be additional delay (sleep) to mirror real world
+         *      delay in this environment
+         *      - property is set on first receiving grid universe job.
+         */
+        DECLARE_PROPERTY_NAME(SUPPORTS_GRID_UNIVERSE);
+
+
 
         /***********************/
         /** \cond INTERNAL     */
@@ -165,6 +174,7 @@ namespace wrench {
         /***********************/
         /** \endcond           */
         /***********************/
+
 
     };
 }

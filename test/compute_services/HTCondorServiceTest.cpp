@@ -709,7 +709,9 @@ void HTCondorServiceTest::do_GridUniverseTest_test() {
             "/scratch"));
 
     auto batch_service = new wrench::BatchComputeService("BatchHost1",
-                                                         {"BatchHost1", "BatchHost2"}, "/scratch");
+                                                         {"BatchHost1", "BatchHost2"},
+                                                         "/scratch",
+                                                         {{wrench::BatchComputeServiceProperty::SUPPORTS_GRID_UNIVERSE, "true"}});
 
 
     // Create a HTCondor Service

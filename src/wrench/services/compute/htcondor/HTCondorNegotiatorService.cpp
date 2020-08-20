@@ -125,7 +125,7 @@ namespace wrench {
                     if (service_specific_arguments["universe"].compare("grid") == 0) {
 
                         //instead of erasing here, going to iterate through.
-                        service_specific_arguments.erase("universe");
+                        //service_specific_arguments.erase("universe");
                         service_specific_arguments.insert(std::pair<std::string, std::string>("-N", "1"));
                         service_specific_arguments.insert(std::pair<std::string, std::string>("-c", "1"));
                         service_specific_arguments.insert(std::pair<std::string, std::string>("-t", "9999"));
