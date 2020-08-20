@@ -19,7 +19,7 @@ function toggleView(obj) {
         currGraphState = "hostView";
         obj.innerHTML = "<i class=\"exchange icon\"></i> Switch to Task View";
     } else if (currGraphState === "hostView") {
-        generateGanttChart(data, currZoomState["overall-graph-container"]);
+        generateGanttChart(data, null, currZoomState["overall-graph-container"]);
         currGraphState = "taskView";
         obj.innerHTML = "<i class=\"exchange icon\"></i> Switch to Host View";
     }
@@ -47,10 +47,10 @@ function resizeAllBox(size) {
 function toggleZoom(id) {
     let zoom = id in currZoomState ? currZoomState[id] : true;
     if (id === "host-utilization-graph-container") {
-        generateHostUtilizationChart(data, [], [], !zoom);
+        generateHostUtilizationChart(data, null, [], [], !zoom);
     } else if (id === "overall-graph-container") {
         if (currGraphState === "taskView") {
-            generateGanttChart(data, !zoom);
+            generateGanttChart(data, null, !zoom);
         } else if (currGraphState === "hostView") {
             generateHostGanttChart(data, !zoom);
         }
