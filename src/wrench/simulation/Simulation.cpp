@@ -810,8 +810,8 @@ namespace wrench {
 
         // free write to cache without forced flushing
         if (remaining_dirty > 0) {
-            mem_bw_amt = std::max(file->getSize(), remaining_dirty);
-            mem_mng->evict(mem_bw_amt - mem_mng->getFreeMemory());
+            mem_mng->evict(std::min(file->getSize(), remaining_dirty) - mem_mng->getFreeMemory());
+            mem_bw_amt = std::min(file->getSize(), mem_mng->getFreeMemory());
             mem_mng->writeToCache(file->getID(), mem_bw_amt);
         }
 
