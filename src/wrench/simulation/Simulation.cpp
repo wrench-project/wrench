@@ -602,13 +602,13 @@ namespace wrench {
       *
       * @throw std::invalid_argument
       */
-//    void Simulation::addService(std::shared_ptr<MemoryManager> memory_manager) {
-//        if (memory_manager == nullptr) {
-//            throw std::invalid_argument("Simulation::addService(): invalid argument (nullptr memory_manager)");
-//        }
-//        memory_manager->simulation = this;
-//        this->memory_managers.insert(memory_manager);
-//    }
+    void Simulation::addService(std::shared_ptr<MemoryManager> memory_manager) {
+        if (memory_manager == nullptr) {
+            throw std::invalid_argument("Simulation::addService(): invalid argument (nullptr memory_manager)");
+        }
+        memory_manager->simulation = this;
+        this->memory_managers.insert(memory_manager);
+    }
 
     /**
     * @brief Stage a copy of a file at a storage service in the root of the (unique) mount point
