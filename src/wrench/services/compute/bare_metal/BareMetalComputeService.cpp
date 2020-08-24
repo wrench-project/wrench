@@ -561,7 +561,7 @@ namespace wrench {
             simgrid::s4u::Disk* memory = simgrid::s4u::Host::by_name(this->getHostname())->get_disks().at(0);
             std::shared_ptr<MemoryManager> memory_manager_ptr = MemoryManager::initAndStart(this->simulation, memory,
                                                                                      0.4, 5, 30, this->hostname);
-//            this->simulation->add(memory_manager_ptr.get());
+            this->simulation->add(memory_manager_ptr.get());
         }
 
         /** Main loop **/
