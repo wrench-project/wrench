@@ -24,10 +24,10 @@ class HTCondorServiceTest : public ::testing::Test {
 public:
     wrench::WorkflowFile *input_file;
     wrench::WorkflowFile *input_file2;
+    wrench::WorkflowFile *input_file3;
     wrench::WorkflowFile *output_file1;
     wrench::WorkflowFile *output_file2;
     wrench::WorkflowFile *output_file3;
-    wrench::WorkflowFile *output_file4;
     wrench::WorkflowTask *task1;
     wrench::WorkflowTask *task2;
     wrench::WorkflowTask *task3;
@@ -35,6 +35,7 @@ public:
     wrench::WorkflowTask *task5;
     wrench::WorkflowTask *task6;
     wrench::WorkflowTask *task7;
+    //wrench::WorkflowTask *task8;
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service2 = nullptr;
@@ -58,10 +59,10 @@ protected:
         // Create the files
         input_file = workflow->addFile("input_file", 10.0);
         input_file2 = grid_workflow->addFile("input_file2", 6500000000.0);
+        input_file3 = grid_workflow->addFile("input_file3", 10.0);
         output_file1 = workflow->addFile("output_file1", 10.0);
         output_file2 = workflow->addFile("output_file2", 10.0);
         output_file3 = workflow->addFile("output_file3", 10.0);
-        output_file4 = workflow->addFile("output_file4", 10.0);
 
         // Create the tasks
         task1 = workflow->addTask("task_1_10s_1core", 10.0, 1, 1, 0);
@@ -71,6 +72,8 @@ protected:
         task5 = workflow->addTask("task_5_30s_1_to_3_cores", 30.0, 1, 3, 0);
         task6 = workflow->addTask("task_6_10s_1_to_2_cores", 12.0, 1, 2, 0);
         task7 = grid_workflow->addTask("grid_task1", 10.0, 1, 1, 0);
+        //task8 = grid_workflow->addTask("grid_task2", 10.0, 1, 1, 0);
+
 
         // Add file-task dependencies
         task1->addInputFile(input_file);
@@ -79,9 +82,11 @@ protected:
         task4->addInputFile(input_file);
         task5->addInputFile(input_file);
         task6->addInputFile(input_file);
-        //task7->addInputFile(input_file2);
+        task7->addInputFile(input_file2);
+        //task8->addInputFile(input_file3);
 
         task1->addOutputFile(output_file1);
+
 
         // Create a platform file
         std::string xml = "<?xml version='1.0'?>"
@@ -530,10 +535,10 @@ void HTCondorServiceTest::do_SimpleServiceTest_test() {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
-    int argc = 2;
+    int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--wrench-full-log");
+    //argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -674,10 +679,10 @@ void HTCondorServiceTest::do_GridUniverseTest_test() {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
-    int argc = 2;
+    int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--wrench-full-log");
+    //argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -741,13 +746,13 @@ void HTCondorServiceTest::do_GridUniverseTest_test() {
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on the storage service
-    //ASSERT_NO_THROW(simulation->stageFile(input_file_large, storage_service));
     ASSERT_NO_THROW(simulation->stageFile(input_file2, storage_service));
+    ASSERT_NO_THROW(simulation->stageFile(input_file3, storage_service));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    simulation->getOutput().dumpUnifiedJSON(grid_workflow, "/tmp/workflow_data.json", false, true, false, false, false, false, false);
+    //simulation->getOutput().dumpUnifiedJSON(grid_workflow, "/tmp/workflow_data.json", false, true, false, false, false, false, false);
 
     delete simulation;
     free(argv[0]);
