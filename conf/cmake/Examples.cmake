@@ -12,6 +12,7 @@ set(EXAMPLES_CMAKEFILES_TXT
         examples/basic-examples/batch-bag-of-tasks/CMakeLists.txt
         examples/basic-examples/batch-pilot-job/CMakeLists.txt
         examples/real-workflow-example/CMakeLists.txt
+        examples/condor-grid-example/CMakeLists.txt
         )
 
 foreach (cmakefile ${EXAMPLES_CMAKEFILES_TXT})
