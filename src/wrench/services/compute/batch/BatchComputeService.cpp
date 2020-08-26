@@ -354,7 +354,7 @@ namespace wrench {
 
         //sleep to match real world behavior in communication lag between HTCondor and Batch service (slurm)
         if (this->getPropertyValueAsBoolean(BatchComputeServiceProperty::SUPPORTS_GRID_UNIVERSE)) {
-            S4U_Simulation::sleep(20);
+            S4U_Simulation::sleep(17);
         }
 
         // Sanity check
