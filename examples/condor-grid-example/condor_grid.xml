@@ -1,0 +1,58 @@
+<?xml version='1.0'?>
+<!DOCTYPE platform SYSTEM "http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd">
+<platform version="4.1">
+   <zone id="AS0" routing="Full">
+       <host id="DualCoreHost" speed="1f" core="2" >
+          <disk id="large_disk" read_bw="100MBps" write_bw="100MBps">
+             <prop id="size" value="100GB"/>
+             <prop id="mount" value="/"/>
+          </disk>
+          <disk id="scratch" read_bw="100MBps" write_bw="100MBps">
+             <prop id="size" value="1000000GB"/>
+             <prop id="mount" value="/scratch"/>
+          </disk>
+       </host>
+       <host id="QuadCoreHost" speed="1f" core="4" >
+          <disk id="large_disk" read_bw="100MBps" write_bw="100MBps">
+             <prop id="size" value="100GB"/>
+             <prop id="mount" value="/"/>
+          </disk>
+          <disk id="scratch" read_bw="100MBps" write_bw="100MBps">
+             <prop id="size" value="1000000GB"/>
+             <prop id="mount" value="/scratch"/>
+          </disk>
+       </host>
+       <host id="BatchHost1" speed="1f" core="10">
+          <disk id="large_disk" read_bw="100MBps" write_bw="100MBps">
+             <prop id="size" value="100GB"/>
+             <prop id="mount" value="/"/>
+          </disk>
+          <disk id="scratch" read_bw="100MBps" write_bw="100MBps">
+             <prop id="size" value="1000000GB"/>
+             <prop id="mount" value="/scratch"/>
+          </disk>
+       </host>
+       <host id="BatchHost2" speed="1f" core="10">
+          <disk id="large_disk" read_bw="100MBps" write_bw="100MBps">
+             <prop id="size" value="100GB"/>
+             <prop id="mount" value="/"/>
+          </disk>
+          <disk id="scratch" read_bw="100MBps" write_bw="100MBps">
+             <prop id="size" value="1000000GB"/>
+             <prop id="mount" value="/scratch"/>
+          </disk>
+       </host>
+       <link id="1" bandwidth="5000GBps" latency="0us"/>
+       <link id="2" bandwidth="5000GBps" latency="0us"/>
+       <link id="3" bandwidth="5000GBps" latency="0us"/>
+       <link id="4" bandwidth="5000GBps" latency="0us"/>
+       <link id="5" bandwidth="5000GBps" latency="0us"/>
+       <link id="6" bandwidth="5000GBps" latency="0us"/>
+       <route src="DualCoreHost" dst="QuadCoreHost"> <link_ctn id="1"/> </route>
+       <route src="BatchHost1" dst="BatchHost2"> <link_ctn id="2"/> </route>
+       <route src="DualCoreHost" dst="BatchHost1"> <link_ctn id="3"/> </route>
+       <route src="DualCoreHost" dst="BatchHost2"> <link_ctn id="4"/> </route>
+       <route src="QuadCoreHost" dst="BatchHost1"> <link_ctn id="5"/> </route>
+       <route src="QuadCoreHost" dst="BatchHost2"> <link_ctn id="6"/> </route>
+   </zone>
+</platform>

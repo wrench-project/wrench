@@ -105,7 +105,6 @@ namespace wrench {
     class SimulationTimestampTask : public SimulationTimestampPair {
 
     public:
-
         WorkflowTask *getTask();
         SimulationTimestampTask *getEndpoint() override;
 
