@@ -39,8 +39,8 @@ int main(int argc, char **argv) {
     workflow_unique_ptr1 = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
     grid_workflow = workflow_unique_ptr1.get();
 
-    input_file = grid_workflow->addFile("input_file", 6500000000.0);
-    task1 = grid_workflow->addTask("grid_task1", 10.0, 1, 1, 0);
+    input_file = grid_workflow->addFile("input_file", 10.0);
+    task1 = grid_workflow->addTask("grid_task1", 87867450000.0, 1, 1, 0);
     task1->addInputFile(input_file);
 
 
@@ -99,7 +99,6 @@ int main(int argc, char **argv) {
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Staging the input_file on the storage service
-    //simulation->stageFile(input_file_large, storage_service));
     simulation->stageFile(input_file, storage_service);
 
     // Running a "run a single task" simulation

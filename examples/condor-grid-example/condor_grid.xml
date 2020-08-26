@@ -22,7 +22,7 @@
              <prop id="mount" value="/scratch"/>
           </disk>
        </host>
-       <host id="BatchHost1" speed="1f" core="10">
+       <host id="BatchHost1" speed="3050000000f" core="10">
           <disk id="large_disk" read_bw="100MBps" write_bw="100MBps">
              <prop id="size" value="100GB"/>
              <prop id="mount" value="/"/>
@@ -32,7 +32,7 @@
              <prop id="mount" value="/scratch"/>
           </disk>
        </host>
-       <host id="BatchHost2" speed="1f" core="10">
+       <host id="BatchHost2" speed="3050000000f" core="10">
           <disk id="large_disk" read_bw="100MBps" write_bw="100MBps">
              <prop id="size" value="100GB"/>
              <prop id="mount" value="/"/>
