@@ -7,7 +7,7 @@ function populateWorkflowTaskDataTable(data, tableID = null) {
 
     let tableId = tableID ? tableID : "task-details-table";
     const tableBodyId = tableId + "-body";
-    const tdClass = tableId + "-td";
+    const tdClass = "task-details-td";
 
     document.getElementById(tableId).innerHTML = `
         <table class="task-details-table" id='${tableId}'>
