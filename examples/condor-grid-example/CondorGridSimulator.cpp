@@ -40,7 +40,9 @@ int main(int argc, char **argv) {
     grid_workflow = workflow_unique_ptr1.get();
 
     input_file = grid_workflow->addFile("input_file", 10.0);
-    task1 = grid_workflow->addTask("grid_task1", 87867450000.0, 1, 1, 0);
+    //task1 = grid_workflow->addTask("grid_task1", 87867450000.0, 1, 1, 0);
+    //task1 = grid_workflow->addTask("grid_task1", 3050000000.0, 1, 1, 0);
+    task1 = grid_workflow->addTask("grid_task1", 753350000000.0, 1, 1, 0);
     task1->addInputFile(input_file);
 
 
