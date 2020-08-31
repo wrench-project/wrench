@@ -9,6 +9,6 @@ set(SOURCE_FILES
 # condor grid
 set(CONDOR_GRID CondorGridSimulator.cpp)
 add_executable(wrench-example-condor-grid-universe ${SOURCE_FILES} ${CONDOR_GRID})
-target_link_libraries(wrench-example-condor-grid-universe wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY})
+target_link_libraries(wrench-example-condor-grid-universe wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY} ${ZMQ_LIBRARY})
 
 install(TARGETS wrench-example-condor-grid-universe DESTINATION bin)
