@@ -1,11 +1,50 @@
-/*
-    data: simulation data array
-*/
-function populateWorkflowTaskDataTable(data) {
-    const tableId = "task-details-table" 
-    const tableBodyId = "task-details-table-body"
-    const tdClass = "task-details-table-td"
-    document.getElementById(tableId).innerHTML = simulationDetailsHtml;
+/**
+ *
+ * @param data
+ * @param tableID
+ */
+function populateWorkflowTaskDataTable(data, tableID = null) {
+
+    let tableId = tableID ? tableID : "task-details-table";
+    const tableBodyId = tableId + "-body";
+    const tdClass = tableId + "-td";
+
+    document.getElementById(tableId).innerHTML = `
+        <table class="task-details-table" id='${tableId}'>
+            <colgroup>
+                <col span="1"></col>
+                <col span="3" class="read-col"></col>
+                <col span="3" class="compute-col"></col>
+                <col span="3" class="write-col"></col>
+                <col span="1"></col>
+            </colgroup>
+            <thead class="${tableId}">
+                <tr>
+                    <td></td>
+                    <td colspan="3" class="text-center ${tdClass}">Read Input</td>
+                    <td colspan="3" class="text-center ${tdClass}">Computation</td>
+                    <td colspan="3" class="text-center ${tdClass}">Write Output</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th scope="col" class="task-details-table-header">TaskID</th>
+                    <th scope="col" class="task-details-table-header">Start Time</th>
+                    <th scope="col" class="task-details-table-header">End Time</th>
+                    <th scope="col" class="task-details-table-header">Duration</th>
+                    <th scope="col" class="task-details-table-header">Start Time</th>
+                    <th scope="col" class="task-details-table-header">End Time</th>
+                    <th scope="col" class="task-details-table-header">Duration</th>
+                    <th scope="col" class="task-details-table-header">Start Time</th>
+                    <th scope="col" class="task-details-table-header">End Time</th>
+                    <th scope="col" class="task-details-table-header">Duration</th>
+                    <th scope="col" class="task-details-table-header">Task Duration</th>
+                </tr>
+            </thead>
+    
+            <tbody class="task-details-table" id="${tableBodyId}">
+            </tbody>
+        </table >`;
+
     d3.select(`#${tableId}`).style('display', 'block');
 
     let task_details_table_body = d3.select(`#${tableBodyId}`);
