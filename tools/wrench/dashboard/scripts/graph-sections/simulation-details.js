@@ -2,41 +2,77 @@
  *
  * @param data
  * @param tableID
+ * @param label
  */
-function populateWorkflowTaskDataTable(data, tableID = null) {
+function populateWorkflowTaskDataTable(data, tableID = null, label = null) {
 
     let tableId = tableID ? tableID : "task-details-table";
     const tableBodyId = tableId + "-body";
     const tdClass = "task-details-td";
 
-    document.getElementById(tableId).innerHTML = `
+    let labels = label ? label : {
+        read: {display: true, label: 'Read Input'},
+        compute: {display: true, label: 'Computation'},
+        write: {display: true, label: 'Write Output'},
+    };
+
+    let table_structure = `
         <table class="task-details-table" id='${tableId}'>
             <colgroup>
-                <col span="1"></col>
-                <col span="3" class="read-col"></col>
-                <col span="3" class="compute-col"></col>
-                <col span="3" class="write-col"></col>
+                <col span="1"></col>`;
+
+    if (labels.read.display) {
+        table_structure += '<col span="3" class="read-col"></col>';
+    }
+    if (labels.compute.display) {
+        table_structure += '<col span="3" class="compute-col"></col>';
+    }
+    if (labels.write.display) {
+        table_structure += '<col span="3" class="write-col"></col>';
+    }
+
+    table_structure += `
                 <col span="1"></col>
             </colgroup>
             <thead class="${tableId}">
                 <tr>
-                    <td></td>
-                    <td colspan="3" class="text-center ${tdClass}">Read Input</td>
-                    <td colspan="3" class="text-center ${tdClass}">Computation</td>
-                    <td colspan="3" class="text-center ${tdClass}">Write Output</td>
+                    <td></td>`;
+
+    if (labels.read.display) {
+        table_structure += '<td colspan="3" class="text-center ${tdClass}">' + labels.read.label + '</td>';
+    }
+    if (labels.compute.display) {
+        table_structure += '<td colspan="3" class="text-center ${tdClass}">' + labels.compute.label + '</td>';
+    }
+    if (labels.write.display) {
+        table_structure += '<td colspan="3" class="text-center ${tdClass}">' + labels.write.label + '</td>';
+    }
+
+    table_structure += `                  
                     <td></td>
                 </tr>
                 <tr>
-                    <th scope="col" class="task-details-table-header">TaskID</th>
-                    <th scope="col" class="task-details-table-header">Start Time</th>
-                    <th scope="col" class="task-details-table-header">End Time</th>
-                    <th scope="col" class="task-details-table-header">Duration</th>
-                    <th scope="col" class="task-details-table-header">Start Time</th>
-                    <th scope="col" class="task-details-table-header">End Time</th>
-                    <th scope="col" class="task-details-table-header">Duration</th>
-                    <th scope="col" class="task-details-table-header">Start Time</th>
-                    <th scope="col" class="task-details-table-header">End Time</th>
-                    <th scope="col" class="task-details-table-header">Duration</th>
+                    <th scope="col" class="task-details-table-header">TaskID</th>`;
+
+    if (labels.read.display) {
+        table_structure += `
+            <th scope="col" class="task-details-table-header">Start Time</th>
+            <th scope="col" class="task-details-table-header">End Time</th>
+            <th scope="col" class="task-details-table-header">Duration</th>`;
+    }
+    if (labels.compute.display) {
+        table_structure += `
+            <th scope="col" class="task-details-table-header">Start Time</th>
+            <th scope="col" class="task-details-table-header">End Time</th>
+            <th scope="col" class="task-details-table-header">Duration</th>`;
+    }
+    if (labels.write.display) {
+        table_structure += `
+            <th scope="col" class="task-details-table-header">Start Time</th>
+            <th scope="col" class="task-details-table-header">End Time</th>
+            <th scope="col" class="task-details-table-header">Duration</th>`;
+    }
+    table_structure += `        
                     <th scope="col" class="task-details-table-header">Task Duration</th>
                 </tr>
             </thead>
@@ -44,6 +80,8 @@ function populateWorkflowTaskDataTable(data, tableID = null) {
             <tbody class="task-details-table" id="${tableBodyId}">
             </tbody>
         </table >`;
+
+    document.getElementById(tableId).innerHTML = table_structure;
 
     d3.select(`#${tableId}`).style('display', 'block');
 
@@ -80,33 +118,43 @@ function populateWorkflowTaskDataTable(data, tableID = null) {
         tr.append("td")
             .html(task_id)
             .attr("class", tdClass);
-        tr.append("td")
-            .html(read_start)
-            .attr("class", tdClass);
-        tr.append("td")
-            .html(read_end)
-            .attr("class", tdClass);
-        tr.append("td")
-            .html(read_duration)
-            .attr("class", tdClass);
-        tr.append("td")
-            .html(compute_start)
-            .attr("class", tdClass);
-        tr.append("td")
-            .html(compute_end)
-            .attr("class", tdClass);
-        tr.append("td")
-            .html(compute_duration)
-            .attr("class", tdClass);
-        tr.append("td")
-            .html(write_start)
-            .attr("class", tdClass);
-        tr.append("td")
-            .html(write_end)
-            .attr("class", tdClass);
-        tr.append("td")
-            .html(write_duration)
-            .attr("class", tdClass);
+
+        if (labels.read.display) {
+            tr.append("td")
+                .html(read_start)
+                .attr("class", tdClass);
+            tr.append("td")
+                .html(read_end)
+                .attr("class", tdClass);
+            tr.append("td")
+                .html(read_duration)
+                .attr("class", tdClass);
+        }
+
+        if (labels.compute.display) {
+            tr.append("td")
+                .html(compute_start)
+                .attr("class", tdClass);
+            tr.append("td")
+                .html(compute_end)
+                .attr("class", tdClass);
+            tr.append("td")
+                .html(compute_duration)
+                .attr("class", tdClass);
+        }
+
+        if (labels.write.display) {
+            tr.append("td")
+                .html(write_start)
+                .attr("class", tdClass);
+            tr.append("td")
+                .html(write_end)
+                .attr("class", tdClass);
+            tr.append("td")
+                .html(write_duration)
+                .attr("class", tdClass);
+        }
+
         tr.append("td")
             .html(task_duration)
             .attr("class", tdClass);
