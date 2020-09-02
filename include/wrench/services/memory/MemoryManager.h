@@ -34,13 +34,11 @@ namespace wrench {
 
         void balanceLruLists();
 
-        void balanceAndSortCache();
-
         double pdflush();
 
         double flushExpiredData(std::vector<Block *> &list);
 
-        double flushLruList(std::vector<Block *> &list, double amount);
+        double flushLruList(std::vector<Block *> &list, double amount, std::string excluded_filename);
 
     public:
 
@@ -70,17 +68,21 @@ namespace wrench {
 
         double getAvailableMemory();
 
-        double flush(std::string mountpoint, double amount);
+        double flush(double amount, std::string excluded_filename);
 
-        double evict(double amount);
+        double evict(double amount, std::string excluded_filename);
 
         simgrid::s4u::IoPtr readToCache(std::string filename, std::string mount_point, double amount, bool async);
 
         simgrid::s4u::IoPtr readFromCache(std::string filename, bool async);
 
-        void writeToCache(std::string filename, double amount);
+        void readChunkFromCache(std::string filename, double amount);
 
-        double getCachedData(std::string filename);
+        void writeToCache(std::string filename, std::string mnt_pt, double amount);
+
+        double getCachedAmount(std::string filename);
+
+        std::vector<Block*> getCachedBlocks(std::string filename);
 
         static s4u_Disk *getDisk(std::string mountpoint, std::string hostname);
 
