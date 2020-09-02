@@ -11,27 +11,27 @@ function populateWorkflowTaskDataTable(data, tableID = null, label = null) {
     const tdClass = "task-details-td";
 
     let labels = label ? label : {
-        read: {display: true, label: 'Read Input'},
-        compute: {display: true, label: 'Computation'},
-        write: {display: true, label: 'Write Output'},
+        read: {display: true, label: "Read Input"},
+        compute: {display: true, label: "Computation"},
+        write: {display: true, label: "Write Output"},
     };
 
-    let table_structure = `
+    let tableContents = `
         <table class="task-details-table" id='${tableId}'>
             <colgroup>
                 <col span="1"></col>`;
 
     if (labels.read.display) {
-        table_structure += '<col span="3" class="read-col"></col>';
+        tableContents += `<col span="3" class="read-col"></col>`;
     }
     if (labels.compute.display) {
-        table_structure += '<col span="3" class="compute-col"></col>';
+        tableContents += `<col span="3" class="compute-col"></col>`;
     }
     if (labels.write.display) {
-        table_structure += '<col span="3" class="write-col"></col>';
+        tableContents += `<col span="3" class="write-col"></col>`;
     }
 
-    table_structure += `
+    tableContents += `
                 <col span="1"></col>
             </colgroup>
             <thead class="${tableId}">
@@ -39,40 +39,40 @@ function populateWorkflowTaskDataTable(data, tableID = null, label = null) {
                     <td></td>`;
 
     if (labels.read.display) {
-        table_structure += '<td colspan="3" class="text-center ${tdClass}">' + labels.read.label + '</td>';
+        tableContents += `<td colspan="3" class="text-center ${tdClass}">` + labels.read.label + `</td>`;
     }
     if (labels.compute.display) {
-        table_structure += '<td colspan="3" class="text-center ${tdClass}">' + labels.compute.label + '</td>';
+        tableContents += `<td colspan="3" class="text-center ${tdClass}">` + labels.compute.label + `</td>`;
     }
     if (labels.write.display) {
-        table_structure += '<td colspan="3" class="text-center ${tdClass}">' + labels.write.label + '</td>';
+        tableContents += `<td colspan="3" class="text-center ${tdClass}">` + labels.write.label + `</td>`;
     }
 
-    table_structure += `                  
+    tableContents += `                  
                     <td></td>
                 </tr>
                 <tr>
                     <th scope="col" class="task-details-table-header">TaskID</th>`;
 
     if (labels.read.display) {
-        table_structure += `
+        tableContents += `
             <th scope="col" class="task-details-table-header">Start Time</th>
             <th scope="col" class="task-details-table-header">End Time</th>
             <th scope="col" class="task-details-table-header">Duration</th>`;
     }
     if (labels.compute.display) {
-        table_structure += `
+        tableContents += `
             <th scope="col" class="task-details-table-header">Start Time</th>
             <th scope="col" class="task-details-table-header">End Time</th>
             <th scope="col" class="task-details-table-header">Duration</th>`;
     }
     if (labels.write.display) {
-        table_structure += `
+        tableContents += `
             <th scope="col" class="task-details-table-header">Start Time</th>
             <th scope="col" class="task-details-table-header">End Time</th>
             <th scope="col" class="task-details-table-header">Duration</th>`;
     }
-    table_structure += `        
+    tableContents += `        
                     <th scope="col" class="task-details-table-header">Task Duration</th>
                 </tr>
             </thead>
@@ -81,7 +81,7 @@ function populateWorkflowTaskDataTable(data, tableID = null, label = null) {
             </tbody>
         </table >`;
 
-    document.getElementById(tableId).innerHTML = table_structure;
+    document.getElementById(tableId).innerHTML = tableContents;
 
     d3.select(`#${tableId}`).style('display', 'block');
 
