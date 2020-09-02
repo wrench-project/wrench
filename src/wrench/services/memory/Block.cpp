@@ -6,15 +6,31 @@
 
 namespace wrench {
 
-    Block::Block(std::string &fn, double sz, double last_access, bool is_dirty) :
-            filename(fn), size(sz), last_access(last_access), dirty(is_dirty) {}
+    Block::Block(std::string fn, std::string mount_point, double sz, double last_access, bool is_dirty) :
+            filename(fn), mountpoint(mount_point), size(sz), last_access(last_access), dirty(is_dirty) {}
 
-    const std::string &Block::getFilename() const {
+    Block::Block(Block *blk) {
+        this->filename = blk->getFilename();
+        this->mountpoint = blk->getMountpoint();
+        this->last_access = blk->getLastAccess();
+        this->size = blk->getSize();
+        this->dirty = blk->isDirty();
+    }
+
+    std::string Block::getFilename() {
         return filename;
     }
 
-    void Block::setFilename(const std::string &fn) {
+    void Block::setFilename(std::string &fn) {
         Block::filename = fn;
+    }
+
+    std::string Block::getMountpoint() {
+        return this->mountpoint;
+    }
+
+    void Block::setMountpoint(std::string mountpoint) {
+        this->mountpoint = mountpoint;
     }
 
     double Block::getSize() const {
@@ -39,6 +55,17 @@ namespace wrench {
 
     void Block::setDirty(bool is_dirty) {
         Block::dirty = is_dirty;
+    }
+
+    Block *Block::split(double remaining) {
+
+        if (remaining > this->size) remaining = this->size;
+        if (remaining < 0) remaining = 0;
+
+        Block *new_blk = new Block(this->filename, this->mountpoint, this->size - remaining, this->last_access,
+                                   this->dirty);
+        this->size = remaining;
+        return new_blk;
     }
 
 }
