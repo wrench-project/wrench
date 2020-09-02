@@ -770,10 +770,10 @@ namespace wrench {
     void Simulation::readFromHost(WorkflowFile *file, std::string mountpoint, std::string hostname) {
 
         MemoryManager *mem_mng = this->getMemoryManagerByHost(hostname);
-        double cached_amt = mem_mng->getCachedData(file->getID());
-        double flushed_amt = mem_mng->flush(mountpoint, 2 * file->getSize() - cached_amt
-                                                        - mem_mng->getFreeMemory() - mem_mng->getEvictableMemory());
-        mem_mng->evict(2 * file->getSize() - cached_amt - mem_mng->getFreeMemory());
+        double cached_amt = mem_mng->getCachedAmount(file->getID());
+        double flushed_amt = mem_mng->flush(2 * file->getSize() - cached_amt - mem_mng->getFreeMemory() -
+                mem_mng->getEvictableMemory(), "");
+        mem_mng->evict(2 * file->getSize() - cached_amt - mem_mng->getFreeMemory(), "");
 
         simgrid::s4u::IoPtr cache_read;
         simgrid::s4u::IoPtr disk_read;
@@ -795,6 +795,30 @@ namespace wrench {
         mem_mng->setFreeMemory(mem_mng->getFreeMemory() - file->getSize());
     }
 
+    void Simulation::readFromHost(WorkflowFile *file, double n_bytes, std::string mountpoint, std::string hostname) {
+
+        MemoryManager *mem_mng = getMemoryManagerByHost(hostname);
+        std::vector<Block*> file_blocks = mem_mng->getCachedBlocks(file->getID());
+        long cached_amt = 0;
+        for (int i = 0; i< file_blocks.size(); i++) {
+            cached_amt += file_blocks[i]->getSize();
+        }
+
+        double from_disk = std::min(n_bytes, file->getSize() - cached_amt);
+        double from_cache = n_bytes - from_disk;
+
+        mem_mng->flush(n_bytes + from_disk - mem_mng->getFreeMemory() - mem_mng->getEvictableMemory(),
+                file->getID());
+        mem_mng->evict(n_bytes + from_disk - mem_mng->getFreeMemory(), file->getID());
+        if (from_disk > 0) {
+            mem_mng->readToCache(file->getID(), mountpoint, from_disk, false);
+        }
+
+        if (from_cache > 0) {
+            mem_mng->readChunkFromCache(file->getID(), from_cache);
+        }
+    }
+
     /**
      * Write a file to host, only available if writeback is activated.
      * @param filename: name of the file written.
@@ -810,17 +834,50 @@ namespace wrench {
 
         // free write to cache without forced flushing
         if (remaining_dirty > 0) {
-            mem_mng->evict(std::min(file->getSize(), remaining_dirty) - mem_mng->getFreeMemory());
+            mem_mng->evict(std::min(file->getSize(), remaining_dirty) - mem_mng->getFreeMemory(), "");
             mem_bw_amt = std::min(file->getSize(), mem_mng->getFreeMemory());
-            mem_mng->writeToCache(file->getID(), mem_bw_amt);
+            mem_mng->writeToCache(file->getID(), mountpoint, mem_bw_amt);
         }
 
         double disk_bw_amt = file->getSize() - mem_bw_amt;
         if (disk_bw_amt > 0) {
-            mem_mng->flush(mountpoint, disk_bw_amt);
-            mem_mng->evict(disk_bw_amt - mem_mng->getFreeMemory());
+            mem_mng->flush(disk_bw_amt, "");
+            mem_mng->evict(disk_bw_amt - mem_mng->getFreeMemory(), "");
 
-            mem_mng->writeToCache(file->getID(), std::min(mem_mng->getFreeMemory(), disk_bw_amt));
+            mem_mng->writeToCache(file->getID(), mountpoint, std::min(mem_mng->getFreeMemory(), disk_bw_amt));
+
+            s4u_Disk *disk = MemoryManager::getDisk(mountpoint, hostname);
+            disk->write(disk_bw_amt);
+        }
+    }
+
+    /**
+     * Write a file to host, only available if writeback is activated.
+     * @param filename: name of the file written.
+     * @param amount: amount of data of the file to be written.
+     * @param mountpoint: mount point where file is located.
+     * @param hostname: name of the host where the file is stored.
+     */
+    void Simulation::writeToHost(WorkflowFile *file, double amount, std::string mountpoint, std::string hostname) {
+
+        MemoryManager *mem_mng = this->getMemoryManagerByHost(hostname);
+
+        double remaining_dirty = mem_mng->getDirtyRatio() * mem_mng->getAvailableMemory() - mem_mng->getDirty();
+        double mem_bw_amt = 0;
+
+        // free write to cache without forced flushing
+        if (remaining_dirty > 0) {
+            mem_mng->evict(std::min(amount, remaining_dirty) - mem_mng->getFreeMemory(), "");
+            mem_bw_amt = std::min(amount, mem_mng->getFreeMemory());
+            mem_mng->writeToCache(file->getID(), mountpoint, mem_bw_amt);
+        }
+
+        double disk_bw_amt = amount - mem_bw_amt;
+        if (disk_bw_amt > 0) {
+            mem_mng->flush(disk_bw_amt, "");
+            mem_mng->evict(disk_bw_amt - mem_mng->getFreeMemory(), "");
+
+            mem_mng->writeToCache(file->getID(), mountpoint, std::min(mem_mng->getFreeMemory(), disk_bw_amt));
 
             s4u_Disk *disk = MemoryManager::getDisk(mountpoint, hostname);
             disk->write(disk_bw_amt);

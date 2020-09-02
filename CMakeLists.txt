@@ -446,4 +446,4 @@ include(${CMAKE_HOME_DIRECTORY}/conf/cmake/Tools.cmake)
 include(${CMAKE_HOME_DIRECTORY}/conf/cmake/Examples.cmake)
 
 # build documentation
-include(${CMAKE_HOME_DIRECTORY}/conf/cmake/Documentation.cmake)
+#include(${CMAKE_HOME_DIRECTORY}/conf/cmake/Documentation.cmake)
