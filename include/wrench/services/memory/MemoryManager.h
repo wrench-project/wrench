@@ -21,12 +21,17 @@ namespace wrench {
         int expired_time;
         std::vector<Block *> inactive_list;
         std::vector<Block *> active_list;
+        double total;
 
         // We keep track of these properties since we don't want to traverse through two LRU lists to get them.
         double free;
         double cached;
         double dirty;
 
+        std::vector<double> time_log;
+        std::vector<double> dirty_log;
+        std::vector<double> cached_log;
+        std::vector<double> free_log;
 
         MemoryManager(s4u_Disk *memory, double dirty_ratio, int interval, int expired_time, std::string hostname);
 
@@ -85,6 +90,10 @@ namespace wrench {
         std::vector<Block*> getCachedBlocks(std::string filename);
 
         static s4u_Disk *getDisk(std::string mountpoint, std::string hostname);
+
+        void log();
+
+        void export_log(std::string filename);
 
     };
 
