@@ -23,5 +23,20 @@
         <route src="WMSHost" dst="ComputeHost">
             <link_ctn id="network_link"/>
         </route>
+
+        <!-- WMSHost's local "loopback" link...-->
+        <link id="loopback_WMSHost" bandwidth="1000EBps" latency="0us"/>
+        <!-- which us used for IPC on a single host -->
+        <route src="WMSHost" dst="WMSHost">
+            <link_ctn id="loopback_WMSHost"/>
+        </route>
+
+        <!--ComputeHost's local "loopback" link...-->
+        <link id="loopback_ComputeHost" bandwidth="1000EBps" latency="0us"/>
+        <!-- which us used for IPC on a single host -->
+        <route src="ComputeHost" dst="ComputeHost">
+            <link_ctn id="loopback_ComputeHost"/>
+        </route>
+
     </zone>
 </platform>

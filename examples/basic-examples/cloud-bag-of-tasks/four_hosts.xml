@@ -32,5 +32,30 @@
         <route src="CloudProviderHost" dst="CloudHost1"> <link_ctn id="network_link"/> </route>
         <route src="CloudProviderHost" dst="CloudHost2"> <link_ctn id="network_link"/> </route>
         <route src="CloudHost1" dst="CloudHost2"> <link_ctn id="network_link"/> </route>
+
+        <!-- WMSHost's local "loopback" link...-->
+        <link id="loopback_WMSHost" bandwidth="1000EBps" latency="0us"/>
+        <route src="WMSHost" dst="WMSHost">
+            <link_ctn id="loopback_WMSHost"/>
+        </route>
+
+        <!--CloudProviderHost's local "loopback" link...-->
+        <link id="loopback_CloudProviderHost" bandwidth="1000EBps" latency="0us"/>
+        <route src="CloudProviderHost" dst="CloudProviderHost">
+            <link_ctn id="loopback_CloudProviderHost"/>
+        </route>
+
+        <!--CloudHost1's local "loopback" link...-->
+        <link id="loopback_CloudHost1" bandwidth="1000EBps" latency="0us"/>
+        <route src="CloudHost1" dst="CloudHost1">
+            <link_ctn id="loopback_CloudHost1"/>
+        </route>
+
+        <!--CloudHost2's local "loopback" link...-->
+        <link id="loopback_CloudHost2" bandwidth="1000EBps" latency="0us"/>
+        <route src="CloudHost2" dst="CloudHost2">
+            <link_ctn id="loopback_CloudHost2"/>
+        </route>
+        
     </zone>
 </platform>
