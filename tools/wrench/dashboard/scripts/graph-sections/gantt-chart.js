@@ -67,14 +67,29 @@ function definePluginsProperties(zoom, zoomMaxRange) {
     return {};
 }
 
-function generateGanttChart(rawData, zoom=true) {
+/**
+ * Generates the gantt chart
+ *
+ * @param rawData: simulation data
+ * @param containedId: id for the chart container element
+ * @param zoom: whether to allow zoom functionality in the chart
+ * @param label: labels to be displayed
+ */
+function generateGanttChart(rawData, containedId = null, zoom = true, label = null) {
     cleanGanttChart();
-    const containerId = "graph-container";
+    const containerId = containedId ? containedId : "graph-container";
     let ctx = document.getElementById(containerId);
+
+    let labels = label ? label : {
+        read: {display: true, label: "Reading Input"},
+        compute: {display: true, label: "Performing Computation"},
+        write: {display: true, label: "Writing Output"},
+    };
+
     const colors = {
-        'read': '#cbb5dd',
-        'compute': '#f7daad',
-        'write': '#abdcf4'
+        "read": '#cbb5dd',
+        "compute": '#f7daad',
+        "write": '#abdcf4'
     };
 
     // prepare data
@@ -85,19 +100,19 @@ function generateGanttChart(rawData, zoom=true) {
                 data: [],
                 backgroundColor: [],
                 host: [],
-                label: 'Reading Input'
+                label: labels.read.label
             },
             {
                 data: [],
                 backgroundColor: [],
                 host: [],
-                label: 'Performing Computation'
+                label: labels.compute.label
             },
             {
                 data: [],
                 host: [],
                 backgroundColor: [],
-                label: 'Writing Output'
+                label: labels.write.label
             }
         ]
     }
@@ -125,6 +140,20 @@ function generateGanttChart(rawData, zoom=true) {
 
         zoomMaxRange = Math.max(zoomMaxRange, task.whole_task.end);
     });
+
+    // parse labels
+    let datasets = []
+    if (labels.read.display) {
+        datasets.push(data.datasets[0]);
+    }
+    if (labels.compute.display) {
+        datasets.push(data.datasets[1]);
+    }
+    if (labels.write.display) {
+        datasets.push(data.datasets[2]);
+    }
+
+    data.datasets = datasets;
 
     // zoom properties
     let pluginsProperties = definePluginsProperties(zoom, zoomMaxRange);
@@ -161,7 +190,7 @@ function generateGanttChart(rawData, zoom=true) {
     });
 }
 
-function generateHostGanttChart(rawData, zoom=true) {
+function generateHostGanttChart(rawData, zoom = true) {
     cleanGanttChart();
     const containerId = "graph-container";
     let ctx = document.getElementById(containerId);
