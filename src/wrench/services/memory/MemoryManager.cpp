@@ -25,7 +25,8 @@ namespace wrench {
             Service(hostname, "periodic_flush_" + hostname, "periodic_flush_" + hostname),
             memory(memory), dirty_ratio(dirty_ratio), interval(interval), expired_time(expired_time) {
 
-        free = S4U_Simulation::getHostMemoryCapacity(hostname);
+        total = S4U_Simulation::getHostMemoryCapacity(hostname);
+        free = total;
         dirty = 0;
         cached = 0;
     }
@@ -624,6 +625,30 @@ namespace wrench {
         }
 
         return nullptr;
+    }
+
+    void MemoryManager::log(){
+        this->time_log.push_back(this->simulation->getCurrentSimulatedDate());
+        this->dirty_log.push_back(this->dirty);
+        this->cached_log.push_back(this->cached);
+        this->free_log.push_back(this->free);
+    }
+
+    void MemoryManager::export_log(std::string filename){
+        FILE *log_file = fopen(filename.c_str(), "w");
+        fprintf(log_file, "time, total_mem, dirty, cache, used_mem");
+
+        double start = this->time_log.at(0);
+        for (int i=0; i<this->time_log.size(); i++) {
+            fprintf(log_file, "%lf, %lf, %lf, %lf, %lf",
+                    this->time_log.at(i) - start,
+                    total,
+                    this->dirty_log.at(i),
+                    this->cached_log.at(i),
+                    total - this->free_log.at(i));
+        }
+
+        fclose(log_file);
     }
 
 }
