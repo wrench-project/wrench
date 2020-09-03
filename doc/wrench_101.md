@@ -110,13 +110,26 @@ which we include here:
             <prop id="ram" value="16GB" />
        </host>
 
-        <!-- A network link...-->
+        <!-- A network link that connects both hosts -->
         <link id="network_link" bandwidth="50MBps" latency="20us"/>
+        <!-- WMSHost's local "loopback" link -->
+        <link id="loopback_WMSHost" bandwidth="1000EBps" latency="0us"/>
+        <!--ComputeHost's local "loopback" link -->
+        <link id="loopback_ComputeHost" bandwidth="1000EBps" latency="0us"/>
 
-        <!-- which connects the two hosts -->
+        <!-- Network routes -->
         <route src="WMSHost" dst="ComputeHost">
             <link_ctn id="network_link"/>
         </route>
+
+        <!-- Each loopback link connects each host to itself -->
+        <route src="WMSHost" dst="WMSHost">
+            <link_ctn id="loopback_WMSHost"/>
+        </route>
+        <route src="ComputeHost" dst="ComputeHost">
+            <link_ctn id="loopback_ComputeHost"/>
+        </route>
+
     </zone>
 </platform>
 ~~~~~~~~~~~~~
@@ -125,8 +138,21 @@ This file defines a platform with two hosts,  `WMSHost` and `ComputeHost`.
 The former is a 1-core host with compute speed 10 Gflop/sec, with a 5000-GiB 
 disk with 100 MB/sec read and write bandwidth, which is mounted at `/`. 
 The latter is a 10-core host where each core computes at speed 1Gflop/sec and 
-with a total RAM capacity of 16 GB.  Both hosts are interconnected by a 
-network link with 50 MB/sec bandwidth and 20 us latency. We refer the reader 
+with a total RAM capacity of 16 GB.  The platform also declares three network links.
+The first one, called `network_link` is an actual network link to interconnect the two
+hosts, with 50 MB/sec bandwidth and 20 microsecond latency.
+The other two links (`loopback_WMSHost` and `loopback_ComputeHost`) are used to model
+inter-process communication (IPC) performance within each host.   Last, network routes are declared.
+The route from host `WMSHost` and `ComputeHost` is through `network_link`. Then, there
+is a route from each host to itself using each loopback link. Note that these loopback routes
+are optional. By default SimGrid includes a loopback route for each host, with bandwidths and
+latencies based on measurements obtained on actual computers. The above XML file  does not
+use these defaults, and instead declare loop routes through much faster loopback links (zero latency
+and extremely high bandwidth). This is because, for this simulation, we want to model a platform
+in  which IPC on a host is essentially free. 
+ 
+
+We refer the reader 
 to platform description files in other examples in the  `examples` directory 
 and to the [SimGrid documentation](https://simgrid.org/doc/latest/platform.html) 
 for more information on how to create platform description files. 
