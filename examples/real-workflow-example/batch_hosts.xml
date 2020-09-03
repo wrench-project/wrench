@@ -11,46 +11,49 @@
             </disk>
         </host>
         <host id="Host4" speed="1000Gf" core="10"/>
-        <link id="1" bandwidth="5000GBps" latency="0us"/>
-        <route src="Host1" dst="Host2">
-            <link_ctn id="1"/>
-        </route>
-        <route src="Host1" dst="Host3">
-            <link_ctn id="1"/>
-        </route>
-        <route src="Host1" dst="Host4">
-            <link_ctn id="1"/>
-        </route>
-        <route src="Host2" dst="Host3">
-            <link_ctn id="1"/>
-        </route>
-        <route src="Host2" dst="Host4">
-            <link_ctn id="1"/>
-        </route>
-        <route src="Host3" dst="Host4">
-            <link_ctn id="1"/>
-        </route>
 
+
+        <!-- A network link -->
+        <link id="network_link" bandwidth="5000GBps" latency="0us"/>
         <!-- Host1's local "loopback" link...-->
         <link id="loopback_Host1" bandwidth="1000EBps" latency="0us"/>
+        <!-- Host2's local "loopback" link...-->
+        <link id="loopback_Host2" bandwidth="1000EBps" latency="0us"/>
+        <!-- Host3's local "loopback" link...-->
+        <link id="loopback_Host3" bandwidth="1000EBps" latency="0us"/>
+        <!-- Host4's local "loopback" link...-->
+        <link id="loopback_Host4" bandwidth="1000EBps" latency="0us"/>
+
+        <!-- The network link connects all hosts together -->
+        <route src="Host1" dst="Host2">
+            <link_ctn id="network_link"/>
+        </route>
+        <route src="Host1" dst="Host3">
+            <link_ctn id="network_link"/>
+        </route>
+        <route src="Host1" dst="Host4">
+            <link_ctn id="network_link"/>
+        </route>
+        <route src="Host2" dst="Host3">
+            <link_ctn id="network_link"/>
+        </route>
+        <route src="Host2" dst="Host4">
+            <link_ctn id="network_link"/>
+        </route>
+        <route src="Host3" dst="Host4">
+            <link_ctn id="network_link"/>
+        </route>
+
+        <!-- Each loopback link connects each host to itself -->
         <route src="Host1" dst="Host1">
             <link_ctn id="loopback_Host1"/>
         </route>
-        
-        <!-- Host2's local "loopback" link...-->
-        <link id="loopback_Host2" bandwidth="1000EBps" latency="0us"/>
         <route src="Host2" dst="Host2">
             <link_ctn id="loopback_Host2"/>
         </route>
-        
-        <!-- Host3's local "loopback" link...-->
-        <link id="loopback_Host3" bandwidth="1000EBps" latency="0us"/>
         <route src="Host3" dst="Host3">
             <link_ctn id="loopback_Host3"/>
         </route>
-        
-        <!-- Host4's local "loopback" link...-->
-        <link id="loopback_Host4" bandwidth="1000EBps" latency="0us"/>
         <route src="Host4" dst="Host4">
             <link_ctn id="loopback_Host4"/>
         </route>
