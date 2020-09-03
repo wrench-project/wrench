@@ -636,11 +636,11 @@ namespace wrench {
 
     void MemoryManager::export_log(std::string filename){
         FILE *log_file = fopen(filename.c_str(), "w");
-        fprintf(log_file, "time, total_mem, dirty, cache, used_mem");
+        fprintf(log_file, "time, total_mem, dirty, cache, used_mem\n");
 
         double start = this->time_log.at(0);
         for (int i=0; i<this->time_log.size(); i++) {
-            fprintf(log_file, "%lf, %lf, %lf, %lf, %lf",
+            fprintf(log_file, "%lf, %lf, %lf, %lf, %lf\n",
                     this->time_log.at(i) - start,
                     total,
                     this->dirty_log.at(i),
