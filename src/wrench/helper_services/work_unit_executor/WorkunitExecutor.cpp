@@ -135,7 +135,6 @@ namespace wrench {
 
         this->acquireDaemonLock();
 
-
         // Then kill all compute threads, if any
         WRENCH_INFO("Killing %ld compute threads", this->compute_threads.size());
         for (auto const &compute_thread : this->compute_threads) {
