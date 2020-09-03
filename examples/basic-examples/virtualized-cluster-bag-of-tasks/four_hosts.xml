@@ -22,10 +22,18 @@
             <prop id="ram" value="64GB" />
         </host>
 
-        <!-- A network link...-->
+        <!-- A network link -->
         <link id="network_link" bandwidth="50MBps" latency="20us"/>
+        <!-- WMSHost's local "loopback" link -->
+        <link id="loopback_WMSHost" bandwidth="1000EBps" latency="0us"/>
+        <!--VirtualizedClusterProviderHost's local "loopback" link -->
+        <link id="loopback_VirtualizedClusterProviderHost" bandwidth="1000EBps" latency="0us"/>
+        <!--VirtualizedClusterHost1's local "loopback" link -->
+        <link id="loopback_VirtualizedClusterHost1" bandwidth="1000EBps" latency="0us"/>
+        <!--VirtualizedClusterHost2's local "loopback" link -->
+        <link id="loopback_VirtualizedClusterHost2" bandwidth="1000EBps" latency="0us"/>
 
-        <!-- which connects the two hosts -->
+        <!-- The network link connects the two hosts -->
         <route src="WMSHost" dst="VirtualizedClusterProviderHost"> <link_ctn id="network_link"/> </route>
         <route src="WMSHost" dst="VirtualizedClusterHost1"> <link_ctn id="network_link"/> </route>
         <route src="WMSHost" dst="VirtualizedClusterHost2"> <link_ctn id="network_link"/> </route>
@@ -33,26 +41,16 @@
         <route src="VirtualizedClusterProviderHost" dst="VirtualizedClusterHost2"> <link_ctn id="network_link"/> </route>
         <route src="VirtualizedClusterHost1" dst="VirtualizedClusterHost2"> <link_ctn id="network_link"/> </route>
 
-        <!-- WMSHost's local "loopback" link...-->
-        <link id="loopback_WMSHost" bandwidth="1000EBps" latency="0us"/>
+        <!-- Each loopback link connects each host to itself -->
         <route src="WMSHost" dst="WMSHost">
             <link_ctn id="loopback_WMSHost"/>
         </route>
-
-        <!--VirtualizedClusterProviderHost's local "loopback" link...-->
-        <link id="loopback_VirtualizedClusterProviderHost" bandwidth="1000EBps" latency="0us"/>
         <route src="VirtualizedClusterProviderHost" dst="VirtualizedClusterProviderHost">
             <link_ctn id="loopback_VirtualizedClusterProviderHost"/>
         </route>
-
-        <!--VirtualizedClusterHost1's local "loopback" link...-->
-        <link id="loopback_VirtualizedClusterHost1" bandwidth="1000EBps" latency="0us"/>
         <route src="VirtualizedClusterHost1" dst="VirtualizedClusterHost1">
             <link_ctn id="loopback_VirtualizedClusterHost1"/>
         </route>
-
-        <!--VirtualizedClusterHost2's local "loopback" link...-->
-        <link id="loopback_VirtualizedClusterHost2" bandwidth="1000EBps" latency="0us"/>
         <route src="VirtualizedClusterHost2" dst="VirtualizedClusterHost2">
             <link_ctn id="loopback_VirtualizedClusterHost2"/>
         </route>
