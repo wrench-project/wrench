@@ -30,5 +30,30 @@
         <route src="Host3" dst="Host4">
             <link_ctn id="1"/>
         </route>
+
+        <!-- Host1's local "loopback" link...-->
+        <link id="loopback_Host1" bandwidth="1000EBps" latency="0us"/>
+        <route src="Host1" dst="Host1">
+            <link_ctn id="loopback_Host1"/>
+        </route>
+        
+        <!-- Host2's local "loopback" link...-->
+        <link id="loopback_Host2" bandwidth="1000EBps" latency="0us"/>
+        <route src="Host2" dst="Host2">
+            <link_ctn id="loopback_Host2"/>
+        </route>
+        
+        <!-- Host3's local "loopback" link...-->
+        <link id="loopback_Host3" bandwidth="1000EBps" latency="0us"/>
+        <route src="Host3" dst="Host3">
+            <link_ctn id="loopback_Host3"/>
+        </route>
+        
+        <!-- Host4's local "loopback" link...-->
+        <link id="loopback_Host4" bandwidth="1000EBps" latency="0us"/>
+        <route src="Host4" dst="Host4">
+            <link_ctn id="loopback_Host4"/>
+        </route>
+        
     </zone>
 </platform>

@@ -38,5 +38,30 @@
         <route src="ComputeHost" dst="StorageHost1"> <link_ctn id="network_link"/> </route>
         <route src="ComputeHost" dst="StorageHost2"> <link_ctn id="network_link"/> </route>
         <route src="StorageHost1" dst="StorageHost2"> <link_ctn id="network_link"/> </route>
+
+        <!-- WMSHost's local "loopback" link...-->
+        <link id="loopback_WMSHost" bandwidth="1000EBps" latency="0us"/>
+        <route src="WMSHost" dst="WMSHost">
+            <link_ctn id="loopback_WMSHost"/>
+        </route>
+
+        <!--ComputeHost's local "loopback" link...-->
+        <link id="loopback_ComputeHost" bandwidth="1000EBps" latency="0us"/>
+        <route src="ComputeHost" dst="ComputeHost">
+            <link_ctn id="loopback_ComputeHost"/>
+        </route>
+
+        <!--StorageHost1's local "loopback" link...-->
+        <link id="loopback_StorageHost1" bandwidth="1000EBps" latency="0us"/>
+        <route src="StorageHost1" dst="StorageHost1">
+            <link_ctn id="loopback_StorageHost1"/>
+        </route>
+
+        <!--StorageHost2's local "loopback" link...-->
+        <link id="loopback_StorageHost2" bandwidth="1000EBps" latency="0us"/>
+        <route src="StorageHost2" dst="StorageHost2">
+            <link_ctn id="loopback_StorageHost2"/>
+        </route>
+
     </zone>
 </platform>
