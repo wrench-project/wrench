@@ -491,10 +491,10 @@ namespace wrench {
      */
     void MemoryManager::writeToCache(std::string filename, std::string mnt_pt, double amount) {
 
-        Block *blk = new Block(filename, mnt_pt, amount, S4U_Simulation::getClock(), false);
+        Block *blk = new Block(filename, mnt_pt, amount, S4U_Simulation::getClock(), true);
         inactive_list.push_back(blk);
 
-        this->cached -= amount;
+        this->cached += amount;
         this->free -= amount;
         this->dirty += amount;
 
@@ -642,10 +642,10 @@ namespace wrench {
         for (int i=0; i<this->time_log.size(); i++) {
             fprintf(log_file, "%lf, %lf, %lf, %lf, %lf\n",
                     this->time_log.at(i) - start,
-                    total,
-                    this->dirty_log.at(i),
-                    this->cached_log.at(i),
-                    total - this->free_log.at(i));
+                    total / 1000000.0,
+                    this->dirty_log.at(i) / 1000000.0,
+                    this->cached_log.at(i) / 1000000.0,
+                    (total - this->free_log.at(i)) / 1000000.0);
         }
 
         fclose(log_file);
