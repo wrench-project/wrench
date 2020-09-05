@@ -12,7 +12,7 @@ namespace wrench {
     class Block {
 
     public:
-        Block(std::string fn, std::string mount_point, double sz, double last_access, bool is_dirty);
+        Block(std::string fn, std::string mount_point, double sz, double last_access, bool is_dirty, double dirty_time);
 
         Block(Block *blk);
 
@@ -36,6 +36,10 @@ namespace wrench {
 
         void setDirty(bool is_dirty);
 
+        double getDirtyTime() const;
+
+        void setDirtyTime(double dirtyTime);
+
         Block* split(double remaining);
 
     private:
@@ -44,6 +48,7 @@ namespace wrench {
         double size;
         double last_access;
         bool dirty;
+        double dirty_time;
     };
 
 }
