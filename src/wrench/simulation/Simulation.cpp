@@ -812,7 +812,6 @@ namespace wrench {
         mem_mng->evict(n_bytes + from_disk - mem_mng->getFreeMemory(), file->getID());
         if (from_disk > 0) {
             mem_mng->readToCache(file->getID(), mountpoint, from_disk, false);
-            mem_mng->setFreeMemory(mem_mng->getFreeMemory() - from_disk);
         }
 
         if (from_cache > 0) {
