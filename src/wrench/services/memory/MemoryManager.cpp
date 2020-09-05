@@ -166,7 +166,7 @@ namespace wrench {
 
                     std::string fn = blk->getFilename();
                     inactive_list.push_back(new Block(fn, blk->getMountpoint(), blk_flushed, blk->getLastAccess(),
-                                                      false));
+                                                      false, blk->getDirtyTime()));
                 } else {
                     // done flushing
                     break;
@@ -305,7 +305,7 @@ namespace wrench {
         free -= amount;
         cached += amount;
         // Push cached data to inactive list
-        inactive_list.push_back(new Block(filename, mount_point, amount, S4U_Simulation::getClock(), false));
+        inactive_list.push_back(new Block(filename, mount_point, amount, S4U_Simulation::getClock(), false, 0));
         balanceLruLists();
 
         s4u_Disk *disk = getDisk(mount_point, this->hostname);
@@ -370,11 +370,11 @@ namespace wrench {
 
         // create new blocks and put in the active list
         if (clean_reaccessed > 0) {
-            Block *new_blk = new Block(filename, mnt_pt, clean_reaccessed, S4U_Simulation::getClock(), false);
+            Block *new_blk = new Block(filename, mnt_pt, clean_reaccessed, S4U_Simulation::getClock(), false, 0);
             active_list.push_back(new_blk);
         }
         if (dirty_reaccessed > 0) {
-            Block *new_blk = new Block(filename, mnt_pt, dirty_reaccessed, S4U_Simulation::getClock(), true);
+            Block *new_blk = new Block(filename, mnt_pt, dirty_reaccessed, S4U_Simulation::getClock(), true, 0);
             active_list.push_back(new_blk);
         }
 
@@ -394,7 +394,6 @@ namespace wrench {
         double clean_reaccessed = 0;
         double read = 0;
 
-        // Calculate dirty cached data
         for (int i = 0; i < inactive_list.size(); i++) {
 
             if (read >= amount) {
@@ -412,26 +411,27 @@ namespace wrench {
                     read += blk->getSize();
                     if (blk->isDirty()) {
                         dirty_reaccessed += blk->getSize();
+                        this->active_list.push_back(blk);
                     } else {
                         clean_reaccessed += blk->getSize();
                     }
-                    // remove the existing old block
+                    // remove the existing old block from inactive list
                     inactive_list.erase(inactive_list.begin() + i);
                     i--;
                 } else {
-                    double blk_read = amount - read;
-                    read += blk_read;
-                    blk->split(blk->getSize() - blk_read);
+                    double blk_read_amt = amount - read;
+                    read += blk_read_amt;
+                    Block* read_blk = blk->split(blk->getSize() - blk_read_amt);
                     if (blk->isDirty()) {
-                        dirty_reaccessed += blk_read;
+                        dirty_reaccessed += blk_read_amt;
+                        this->active_list.push_back(read_blk);
                     } else {
-                        clean_reaccessed += blk_read;
+                        clean_reaccessed += blk_read_amt;
                     }
                 }
             }
         }
 
-        // Calculate clean cached data
         for (int i = 0; i < active_list.size(); i++) {
 
             if (read >= amount) {
@@ -448,21 +448,24 @@ namespace wrench {
                 if (read + blk->getSize() <= amount) {
                     read += blk->getSize();
                     if (blk->isDirty()) {
+                        // move the block to the end of the list
                         dirty_reaccessed += blk->getSize();
+                        std::rotate(active_list.begin() + i, active_list.begin() + i + 1, active_list.end());
                     } else {
+                        // delete to create a new clean block
                         clean_reaccessed += blk->getSize();
+                        active_list.erase(active_list.begin() + i);
                     }
-
-                    active_list.erase(active_list.begin() + i);
                     i--;
                 } else {
-                    double blk_read = amount - read;
-                    read += blk_read;
-                    blk->split(blk->getSize() - blk_read);
+                    double blk_read_amt = amount - read;
+                    read += blk_read_amt;
+                    Block* read_blk = blk->split(blk->getSize() - blk_read_amt);
                     if (blk->isDirty()) {
-                        dirty_reaccessed += blk_read;
+                        dirty_reaccessed += blk_read_amt;
+                        this->active_list.push_back(read_blk);
                     } else {
-                        clean_reaccessed += blk_read;
+                        clean_reaccessed += blk_read_amt;
                     }
                 }
 
@@ -471,13 +474,13 @@ namespace wrench {
 
         // create new blocks and put in the active list
         if (clean_reaccessed > 0) {
-            Block *new_blk = new Block(filename, mnt_pt, clean_reaccessed, S4U_Simulation::getClock(), false);
+            Block *new_blk = new Block(filename, mnt_pt, clean_reaccessed, S4U_Simulation::getClock(), false, 0);
             active_list.push_back(new_blk);
         }
-        if (dirty_reaccessed > 0) {
-            Block *new_blk = new Block(filename, mnt_pt, dirty_reaccessed, S4U_Simulation::getClock(), true);
-            active_list.push_back(new_blk);
-        }
+//        if (dirty_reaccessed > 0) {
+//            Block *new_blk = new Block(filename, mnt_pt, dirty_reaccessed, S4U_Simulation::getClock(), true);
+//            active_list.push_back(new_blk);
+//        }
 
         balanceLruLists();
 
@@ -491,7 +494,7 @@ namespace wrench {
      */
     void MemoryManager::writeToCache(std::string filename, std::string mnt_pt, double amount) {
 
-        Block *blk = new Block(filename, mnt_pt, amount, S4U_Simulation::getClock(), true);
+        Block *blk = new Block(filename, mnt_pt, amount, S4U_Simulation::getClock(), true, S4U_Simulation::getClock());
         inactive_list.push_back(blk);
 
         this->cached += amount;
@@ -539,7 +542,7 @@ namespace wrench {
                     // split the block
                     std::string fn = blk->getFilename();
                     Block *new_blk = new Block(fn, blk->getMountpoint(), to_move_amt - moved_amt, blk->getLastAccess(),
-                                               blk->isDirty());
+                                               blk->isDirty(), blk->getDirtyTime());
                     inactive_list.push_back(new_blk);
 
                     blk->setSize(blk->getSize() + moved_amt - to_move_amt);
