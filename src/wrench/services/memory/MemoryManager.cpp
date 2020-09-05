@@ -221,7 +221,7 @@ namespace wrench {
 
         for (auto blk : list) {
             if (!blk->isDirty()) continue;
-            if (S4U_Simulation::getClock() - blk->getLastAccess() >= expired_time) {
+            if (S4U_Simulation::getClock() - blk->getDirtyTime() >= expired_time) {
                 blk->setDirty(false);
                 flushed += blk->getSize();
                 flushing_map[blk->getMountpoint()] += blk->getSize();
