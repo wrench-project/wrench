@@ -6,8 +6,10 @@
 
 namespace wrench {
 
-    Block::Block(std::string fn, std::string mount_point, double sz, double last_access, bool is_dirty) :
-            filename(fn), mountpoint(mount_point), size(sz), last_access(last_access), dirty(is_dirty) {}
+    Block::Block(std::string fn, std::string mount_point, double sz,
+            double last_access, bool is_dirty, double dirty_time) :
+            filename(fn), mountpoint(mount_point), size(sz),
+            last_access(last_access), dirty(is_dirty), dirty_time(dirty_time) {}
 
     Block::Block(Block *blk) {
         this->filename = blk->getFilename();
@@ -15,6 +17,7 @@ namespace wrench {
         this->last_access = blk->getLastAccess();
         this->size = blk->getSize();
         this->dirty = blk->isDirty();
+        this->dirty_time = blk->getDirtyTime();
     }
 
     std::string Block::getFilename() {
@@ -57,13 +60,21 @@ namespace wrench {
         Block::dirty = is_dirty;
     }
 
+    double Block::getDirtyTime() const {
+        return dirty_time;
+    }
+
+    void Block::setDirtyTime(double dirtyTime) {
+        dirty_time = dirtyTime;
+    }
+
     Block *Block::split(double remaining) {
 
         if (remaining > this->size) remaining = this->size;
         if (remaining < 0) remaining = 0;
 
         Block *new_blk = new Block(this->filename, this->mountpoint, this->size - remaining, this->last_access,
-                                   this->dirty);
+                                   this->dirty, this->dirty_time);
         this->size = remaining;
         return new_blk;
     }
