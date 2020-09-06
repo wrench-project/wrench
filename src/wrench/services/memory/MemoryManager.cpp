@@ -61,15 +61,18 @@ namespace wrench {
 
     int MemoryManager::main() {
 
-        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);WRENCH_INFO(
-                "Periodic Flush starting with interval = %d , expired time = %d",
-                this->interval, this->expired_time);
+        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
+        WRENCH_INFO("Periodic Flush starting with interval = %d , expired time = %d",
+                    this->interval, this->expired_time);
 
         while (this->getState() == State::UP) {
 
             double start_time = S4U_Simulation::getClock();
-            pdflush();
+            double amt = pdflush();
             double end_time = S4U_Simulation::getClock();
+            if (amt > 0) {
+                WRENCH_INFO("Periodically flushed %lf MB in %lf", amt / 1000000, end_time - start_time)
+            }
 
             if (end_time - start_time < interval) {
                 S4U_Simulation::sleep(interval + start_time - end_time);
@@ -217,23 +220,20 @@ namespace wrench {
 
         double flushed = 0;
 
-        std::map<std::string, double> flushing_map;
-
         for (auto blk : list) {
             if (!blk->isDirty()) continue;
             if (S4U_Simulation::getClock() - blk->getDirtyTime() >= expired_time) {
                 blk->setDirty(false);
                 flushed += blk->getSize();
-                flushing_map[blk->getMountpoint()] += blk->getSize();
+                s4u_Disk *disk = getDisk(blk->getMountpoint(), this->hostname);
+                disk->write(blk->getSize());
+
+                this->dirty -= blk->getSize();
+                flushed += blk->getSize();
+                this->log();
             }
         }
 
-        for (auto it = flushing_map.begin(); it != flushing_map.end(); it++) {
-            s4u_Disk *disk = getDisk(it->first, this->hostname);
-            disk->write(it->second);
-        }
-
-        dirty -= flushed;
         return flushed;
     }
 
@@ -244,12 +244,10 @@ namespace wrench {
      */
     double MemoryManager::pdflush() {
         double flushed = 0;
+        this->log();
         flushed += flushExpiredData(inactive_list);
         flushed += flushExpiredData(active_list);
-        if (flushed > 0) {
-            WRENCH_INFO("Periodically flushed %lf MB", flushed / 1000000)
-        }
-
+        this->log();
         return flushed;
     }
 
@@ -379,7 +377,7 @@ namespace wrench {
         }
 
         balanceLruLists();
-
+        this->log();
         return this->memory->read_async(clean_reaccessed + dirty_reaccessed);
     }
 
@@ -502,6 +500,7 @@ namespace wrench {
         this->dirty += amount;
 
         memory->write(amount);
+        this->log();
     }
 
     bool compare_last_access(Block *blk1, Block *blk2) {
