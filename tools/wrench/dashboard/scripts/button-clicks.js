@@ -54,6 +54,8 @@ function toggleZoom(id) {
         } else if (currGraphState === "hostView") {
             generateHostGanttChart(data, !zoom);
         }
+    } else if (id === "network-graph-container") {
+        generateBandwidthUsage(data, dataSizeUnits.KB, null, !zoom, []);
     }
     currZoomState[id] = !zoom;
     document.getElementById("dd-zoom-" + id).className = !zoom ? "check icon" : "icon";

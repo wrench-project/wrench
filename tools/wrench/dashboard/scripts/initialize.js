@@ -1,4 +1,3 @@
-
 function initialize() {
     const noFileDiv = document.getElementById("no-file");
     const mainBodyDiv = document.getElementById("main-body");
@@ -46,6 +45,7 @@ function initialize() {
 
             generateGanttChart(data);
             generateHostUtilizationChart(data);
+            generateBandwidthUsage(data);
 
             populateWorkflowTaskDataTable(data.contents)
             getOverallWorkflowMetrics(data.contents)

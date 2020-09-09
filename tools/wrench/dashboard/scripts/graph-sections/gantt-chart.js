@@ -41,34 +41,8 @@ function processIO(taskIO) {
     return [minStart, maxEnd];
 }
 
-function definePluginsProperties(zoom, zoomMaxRange) {
-    if (zoom) {
-        return {
-            zoom: {
-                pan: {
-                    enabled: true,
-                    mode: 'x'
-                },
-                zoom: {
-                    enabled: true,
-                    mode: 'x',
-                    rangeMin: {
-                        x: 0
-                    },
-                    rangeMax: {
-                        x: Math.ceil(zoomMaxRange)
-                    },
-                    threshold: 20,
-                    speed: 0.05
-                }
-            }
-        }
-    }
-    return {};
-}
-
 /**
- * Generates the gantt chart
+ * Generates the gantt chart.
  *
  * @param rawData: simulation data
  * @param containedId: id for the chart container element

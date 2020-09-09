@@ -24,6 +24,12 @@ const graphInfoArray = [
         "icon": "chart bar"
     },
     {
+        "title": "Network Bandwidth Usage",
+        "containerId": "network-graph-container",
+        "html": networkBandwidthHtml,
+        "icon": "tachometer alternate"
+    },
+    {
         "title": "Energy Consumption",
         "containerId": "energy-graph",
         "html": energyGraphsHtml,

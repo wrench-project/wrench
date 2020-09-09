@@ -1,5 +1,14 @@
 const executionHostKey = 'execution_host'
 
+const dataSizeUnits = {
+    B: ['B', 'Bytes', 1],
+    KB: ['KB', 'Kilobytes', 3],
+    MB: ['MB', 'Megabytes', 6],
+    GB: ['GB', 'Gigabytes', 9],
+    TB: ['TB', 'Terabytes', 12],
+    PB: ['PB', 'Petabytes', 15],
+}
+
 Chart.plugins.register({
     beforeDraw: function (chart, easing) {
         if (chart.config.options.chartArea && chart.config.options.chartArea.backgroundColor) {
@@ -43,6 +52,7 @@ function processFile(files) {
                 file: files[0].name,
                 tasks: rawData.workflow_execution.tasks,
                 disk: rawData.disk_operations,
+                network: rawData.link_usage.links,
                 contents: rawData.workflow_execution.tasks // TODO: remove
             };
 
@@ -55,6 +65,32 @@ function processFile(files) {
         .catch(function (err) {
             console.error(err)
         });
+}
+
+function definePluginsProperties(zoom, zoomMaxRange) {
+    if (zoom) {
+        return {
+            zoom: {
+                pan: {
+                    enabled: true,
+                    mode: 'x'
+                },
+                zoom: {
+                    enabled: true,
+                    mode: 'x',
+                    rangeMin: {
+                        x: 0
+                    },
+                    rangeMax: {
+                        x: Math.ceil(zoomMaxRange)
+                    },
+                    threshold: 20,
+                    speed: 0.05
+                }
+            }
+        }
+    }
+    return {};
 }
 
 function prepareData(data) {

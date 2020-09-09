@@ -198,27 +198,7 @@ function generateHostUtilizationChart(rawData,
     });
 
     // zoom properties
-    let pluginsProperties = {}
-    if (zoom) {
-        pluginsProperties["zoom"] = {
-            pan: {
-                enabled: true,
-                mode: 'x'
-            },
-            zoom: {
-                enabled: true,
-                mode: 'x',
-                rangeMin: {
-                    x: 0
-                },
-                rangeMax: {
-                    x: Math.ceil(zoomMaxRange)
-                },
-                threshold: 20,
-                speed: 0.05
-            }
-        }
-    }
+    let pluginsProperties = definePluginsProperties(zoom, zoomMaxRange);
 
     hostUtilizationChart = new Chart(ctx, {
         type: 'horizontalBar',
