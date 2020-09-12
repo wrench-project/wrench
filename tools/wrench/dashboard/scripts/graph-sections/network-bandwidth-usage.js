@@ -80,7 +80,7 @@ function generateBandwidthUsage(rawData,
             label: link.linkname,
             fill: true,
             backgroundColor: getRandomColor(),
-            steppedLine: "middle",
+            steppedLine: "before",
             data: bytes
         });
     });
