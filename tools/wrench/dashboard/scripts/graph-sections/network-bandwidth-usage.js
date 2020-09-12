@@ -71,7 +71,7 @@ function generateBandwidthUsage(rawData,
                     labels.push(entry.time);
                 }
                 zoomMaxRange = Math.max(zoomMaxRange, entry.time);
-                bytes.push(entry["bytes per second"] / Math.pow(10, unit[2]));
+                bytes.push(parseFloat(entry["bytes per second"] / Math.pow(10, unit[2])).toFixed(3));
             }
         }
 
@@ -79,7 +79,7 @@ function generateBandwidthUsage(rawData,
             label: link.linkname,
             fill: true,
             backgroundColor: getRandomColor(),
-            steppedLine: true,
+            steppedLine: "middle",
             data: bytes
         });
     });
