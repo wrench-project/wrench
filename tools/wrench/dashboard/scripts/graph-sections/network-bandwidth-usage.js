@@ -67,8 +67,9 @@ function generateBandwidthUsage(rawData,
         for (let idx in link.link_usage_trace) {
             let entry = link.link_usage_trace[idx];
             if (!range || (range && entry.time >= range[0] && entry.time <= range[1])) {
-                if (!labels.includes(entry.time)) {
-                    labels.push(entry.time);
+                let parsedTime = parseFloat(entry.time).toFixed(2);
+                if (!labels.includes(parsedTime)) {
+                    labels.push(parsedTime);
                 }
                 zoomMaxRange = Math.max(zoomMaxRange, entry.time);
                 bytes.push(parseFloat(entry["bytes per second"] / Math.pow(10, unit[2])).toFixed(3));
