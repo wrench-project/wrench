@@ -33,9 +33,9 @@ namespace wrench {
             if (not S4U_Simulation::hostExists(h.first)) {
                 throw std::invalid_argument("BandwidthMeter::BandwidthMeter(): unknown host " + h.first);
             }
-            if (h.second < 1.0) {
+            if (h.second < 0.01) {
                 throw std::invalid_argument(
-                        "BandwidthMeter::BandwidthMeter(): measurement period must be at least 1 second (host " + h.first +
+                        "BandwidthMeter::BandwidthMeter(): measurement period must be at least 0.01 second (host " + h.first +
                         ")");
             }
             this->measurement_periods[h.first] = h.second;
@@ -56,8 +56,8 @@ namespace wrench {
         if (linknames.empty()) {
             throw std::invalid_argument("BandwidthMeter::BandwidthMeter(): no host to meter!");
         }
-        if (measurement_period < 1) {
-            throw std::invalid_argument("BandwidthMeter::BandwidthMeter(): measurement period must be at least 1 second");
+        if (measurement_period < 0.01) {
+            throw std::invalid_argument("BandwidthMeter::BandwidthMeter(): measurement period must be at least 0.01 second");
         }
 
         for (auto const &l : linknames) {
@@ -97,7 +97,10 @@ namespace wrench {
     int BandwidthMeterService::main() {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
 
-        WRENCH_INFO("New Energy Meter Manager starting (%s)", this->mailbox_name.c_str());
+        WRENCH_INFO("New Bandwidth Meter Manager starting (%s) and monitoring links", this->mailbox_name.c_str());
+        for (auto const &l : this->measurement_periods) {
+            WRENCH_INFO("  - %s", l.first.c_str());
+        }
 
         /** Main loop **/
         while (true) {
