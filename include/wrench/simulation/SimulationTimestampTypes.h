@@ -74,6 +74,8 @@ namespace wrench {
         double getDate();
 
     private:
+        friend  class SimulationOutput;
+        void setDate(double date);
         double date = -0.1;
     };
 
