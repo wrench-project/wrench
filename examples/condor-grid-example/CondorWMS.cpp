@@ -67,6 +67,8 @@ namespace wrench {
 
         std::map<std::string, std::string> test_service_specs;
         test_service_specs.insert(std::pair<std::string, std::string>("universe","grid"));
+        //test_service_specs.insert(std::pair<std::string, std::string>("grid_pre_delay","50.0"));
+        //test_service_specs.insert(std::pair<std::string, std::string>("grid_post_delay","400.0"));
 
         // Submit the 2-task job for execution
         try {

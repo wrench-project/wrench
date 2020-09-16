@@ -23,6 +23,10 @@ int main(int argc, char **argv) {
     // Setting up the platform
     char *platform_file = argv[1];
     simulation->instantiatePlatform(platform_file);
+    double pre_execution_overhead = std::stod(std::string(argv[2]));
+    double post_execution_overhead = std::stod(std::string(argv[3]));
+
+
 
     wrench::WorkflowFile *input_file;
     wrench::WorkflowTask *task1;
@@ -73,6 +77,8 @@ int main(int argc, char **argv) {
                                                          "/scratch",
                                                          {
                                                                  {wrench::BatchComputeServiceProperty::SUPPORTS_GRID_UNIVERSE, "true"},
+                                                                 {wrench::BatchComputeServiceProperty::GRID_PRE_EXECUTION_DELAY, std::to_string(pre_execution_overhead)},
+                                                                 {wrench::BatchComputeServiceProperty::GRID_POST_EXECUTION_DELAY, std::to_string(post_execution_overhead)},
                                                          });
 
 
@@ -90,7 +96,7 @@ int main(int argc, char **argv) {
 
     std::dynamic_pointer_cast<wrench::HTCondorComputeService>(compute_service)->setLocalStorageService(storage_service);
 
-    // Create a WMS
+    // Create a WMSROBL
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     wms = simulation->add(
             new wrench::CondorWMS({compute_service}, {storage_service}, hostname));
