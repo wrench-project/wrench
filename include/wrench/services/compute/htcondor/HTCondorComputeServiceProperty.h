@@ -23,6 +23,12 @@ namespace wrench {
 
         /** @brief Whether the condor service supports grid jobs that are offloaded to batch service **/
         DECLARE_PROPERTY_NAME(SUPPORTS_GRID_UNIVERSE);
+
+        /** @brief Overhead delay in seconds between condor and slurm for the start of execution **/
+        DECLARE_PROPERTY_NAME(GRID_PRE_EXECUTION_DELAY);
+
+        /** @brief Overhead delay in seconds between condor and slurm for the completion of execution **/
+        DECLARE_PROPERTY_NAME(GRID_POST_EXECUTION_DELAY);
     };
 }
 
