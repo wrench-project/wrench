@@ -1812,9 +1812,33 @@ namespace wrench {
      * @param joules: consumption in joules
      */
     void SimulationOutput::addTimestampEnergyConsumption(std::string hostname, double joules) {
-        if (this->isEnabled<SimulationTimestampEnergyConsumption>()) {
-            this->addTimestamp<SimulationTimestampEnergyConsumption>(new SimulationTimestampEnergyConsumption(hostname, joules));
+        static std::unordered_map<std::string, std::vector<SimulationTimestampEnergyConsumption*>> last_two_timestamps;
+
+        if (not this->isEnabled<SimulationTimestampEnergyConsumption>()) {
+            return;
         }
+
+        auto new_timestamp = new SimulationTimestampEnergyConsumption(hostname,joules);
+
+        // If less thant 2 time-stamp for that host, just record and add
+        if (last_two_timestamps[hostname].size()  < 2) {
+            last_two_timestamps[hostname].push_back(new_timestamp);
+            this->addTimestamp<SimulationTimestampEnergyConsumption>(new_timestamp);
+            return;
+        }
+
+        // Otherwise, check whether we can merge
+        bool can_merge = DBL_EQUAL(last_two_timestamps[hostname].at(0)->getConsumption(), last_two_timestamps[hostname].at(1)->getConsumption()) and
+                         DBL_EQUAL(last_two_timestamps[hostname].at(1)->getConsumption(), new_timestamp->getConsumption());
+
+        if (can_merge) {
+            last_two_timestamps[hostname].at(1)->setDate(new_timestamp->getDate());
+        } else {
+            last_two_timestamps[hostname][0] = last_two_timestamps[hostname][1];
+            last_two_timestamps[hostname][1] = new_timestamp;
+            this->addTimestamp<SimulationTimestampEnergyConsumption>(new_timestamp);
+        }
+
     }
 
     /**
