@@ -667,6 +667,7 @@ namespace wrench {
  * @param hostname: hostname being read from
  * @param mount: mountpoint of disk
  * @param bytes: number of bytes read
+ * @param counter: An integer ID
  */
     SimulationTimestampDiskRead::SimulationTimestampDiskRead(std::string hostname,
                                                              std::string mount,

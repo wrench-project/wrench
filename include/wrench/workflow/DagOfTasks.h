@@ -24,15 +24,24 @@ namespace wrench {
 
     class WorkflowTask;
 
+    /**
+     * @brief Data structure to store vertex properties
+     */
     struct VertexProperties {
 //    std::size_t index;
 //    boost::default_color_type color;
         const WorkflowTask *task;
     };
 
+    /**
+     * @brief Convenient DAG typedef
+     */
     typedef boost::adjacency_list<boost::listS, boost::vecS, boost::bidirectionalS, VertexProperties> DAG;
 
-    typedef unsigned long vertex_t;  // To clean up later...
+    /**
+     * @brief Convenient vertext_t typedef
+     */
+    typedef unsigned long vertex_t;  // To clean up some day...
 
     /**
      * @brief An internal class that uses the Boost Graph Library to implement a DAG of WorkflowTask objects

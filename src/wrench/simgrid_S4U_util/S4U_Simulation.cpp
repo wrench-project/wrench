@@ -218,7 +218,7 @@ namespace wrench {
 
 /**
  * @brief Determines whether a link exists for a given linkname
- * @param link_id: the name of the link
+ * @param linkname: the name of the link
  * @return true or false
  */
     bool S4U_Simulation::linkExists(std::string linkname) {
