@@ -145,6 +145,7 @@ namespace wrench {
      * @param generate_host_utilization_layout: boolean specifying whether or not you would like a possible host utilization
      *         layout to be generated
      * @param include_disk: boolean specifying whether to include disk operation in JSON (disk timestamps must be enabled)
+     * @param include_bandwidth: boolean specifying whether to include link bandwidth measurements in JSON
      */
     void SimulationOutput::dumpUnifiedJSON(Workflow *workflow, std::string file_path,
                                            bool include_platform,
