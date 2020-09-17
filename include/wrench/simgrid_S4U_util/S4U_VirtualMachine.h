@@ -27,6 +27,9 @@ namespace wrench {
 
     public:
 
+        /**
+         * @brief A map to keep track of VM-to-PM mapping
+         */
         static std::unordered_map<std::string, std::string> vm_to_pm_map;
 
         /** @brief VM state enum */

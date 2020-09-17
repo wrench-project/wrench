@@ -16,6 +16,10 @@
 
 namespace wrench {
 
+    /**
+     * @brief A virtual class (with convenient static methods) to define 
+     *        parallel task performance models
+     */
     class ParallelModel {
 
     public:
@@ -28,6 +32,15 @@ namespace wrench {
         /** \cond INTERNAL    **/
         /***********************/
 
+        /**
+         * @brief A method the, for this parallel model, computes how much work each thread that is
+         * part of a parallel task should do
+         *
+         * @param total_work: the total amount of work (in flops)
+         * @param num_threads: the number of threads
+         *
+         * @return an amount of work (in flop) per thread
+         */
         virtual std::vector<double> getWorkPerThread(double total_work, unsigned long num_threads) = 0;
         virtual ~ParallelModel() {};
 
