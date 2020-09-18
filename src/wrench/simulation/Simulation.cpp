@@ -793,7 +793,7 @@ namespace wrench {
         }
 
 //        Anonymous used by application
-        mem_mng->useAnonymousMemory(mem_mng->getFreeMemory() - n_bytes);
+        mem_mng->useAnonymousMemory(n_bytes);
     }
 
     /**
