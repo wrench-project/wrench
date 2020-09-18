@@ -110,8 +110,14 @@ namespace wrench {
         return free;
     }
 
-    void MemoryManager::setFreeMemory(double free_amt) {
-        this->free = free_amt;
+    void MemoryManager::releaseMemory(double released_amt) {
+        this->free += released_amt;
+        if (this->free > this->total) this->free = this->total;
+    }
+
+    void MemoryManager::useAnonymousMemory(double used_amt) {
+        this->free -= used_amt;
+        if (this->free < 0) this->free = 0;
     }
 
     double MemoryManager::getCached() const {
