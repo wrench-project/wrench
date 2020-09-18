@@ -12,13 +12,13 @@ namespace wrench {
     class Block {
 
     public:
-        Block(std::string fn, std::string mount_point, double sz, double last_access, bool is_dirty, double dirty_time);
+        Block(std::string fid, std::string mount_point, double sz, double last_access, bool is_dirty, double dirty_time);
 
         Block(Block *blk);
 
-        std::string getFilename();
+        std::string getFileId();
 
-        void setFilename(std::string &fn);
+        void setFileId(std::string &fid);
 
         std::string getMountpoint();
 
@@ -38,12 +38,12 @@ namespace wrench {
 
         double getDirtyTime() const;
 
-        void setDirtyTime(double dirtyTime);
+        void setDirtyTime(double time);
 
         Block* split(double remaining);
 
     private:
-        std::string filename;
+        std::string file_id;
         std::string mountpoint;
         double size;
         double last_access;

@@ -149,7 +149,7 @@ namespace wrench {
 
         for (auto blk : list) {
 
-            if (!excluded_filename.empty() && blk->getFilename().compare(excluded_filename) == 0) {
+            if (!excluded_filename.empty() && blk->getFileId().compare(excluded_filename) == 0) {
                 continue;
             }
 
@@ -167,7 +167,7 @@ namespace wrench {
                     // split
                     blk->setSize(blk->getSize() - blk_flushed);
 
-                    std::string fn = blk->getFilename();
+                    std::string fn = blk->getFileId();
                     inactive_list.push_back(new Block(fn, blk->getMountpoint(), blk_flushed, blk->getLastAccess(),
                                                       false, blk->getDirtyTime()));
                 } else {
@@ -266,7 +266,7 @@ namespace wrench {
 
             Block *blk = inactive_list.at(i);
 
-            if (!excluded_filename.empty() && blk->getFilename().compare(excluded_filename) == 0) {
+            if (!excluded_filename.empty() && blk->getFileId().compare(excluded_filename) == 0) {
                 continue;
             }
 
@@ -328,7 +328,7 @@ namespace wrench {
         // Calculate dirty cached data
         for (int i = 0; i < inactive_list.size(); i++) {
             Block *blk = inactive_list.at(i);
-            if (blk->getFilename().compare(filename) == 0) {
+            if (blk->getFileId().compare(filename) == 0) {
 
                 if (mnt_pt.empty()) {
                     mnt_pt = blk->getMountpoint();
@@ -348,7 +348,7 @@ namespace wrench {
         // Calculate clean cached data
         for (int i = 0; i < active_list.size(); i++) {
             Block *blk = active_list.at(i);
-            if (blk->getFilename().compare(filename) == 0) {
+            if (blk->getFileId().compare(filename) == 0) {
 
                 if (mnt_pt.empty()) {
                     mnt_pt = blk->getMountpoint();
@@ -399,7 +399,7 @@ namespace wrench {
             }
 
             Block *blk = inactive_list.at(i);
-            if (blk->getFilename().compare(filename) == 0) {
+            if (blk->getFileId().compare(filename) == 0) {
 
                 if (mnt_pt.empty()) {
                     mnt_pt = blk->getMountpoint();
@@ -437,7 +437,7 @@ namespace wrench {
             }
 
             Block *blk = active_list.at(i);
-            if (blk->getFilename().compare(filename) == 0) {
+            if (blk->getFileId().compare(filename) == 0) {
 
                 if (mnt_pt.empty()) {
                     mnt_pt = blk->getMountpoint();
@@ -539,7 +539,7 @@ namespace wrench {
                     i--;
                 } else {
                     // split the block
-                    std::string fn = blk->getFilename();
+                    std::string fn = blk->getFileId();
                     Block *new_blk = new Block(fn, blk->getMountpoint(), to_move_amt - moved_amt, blk->getLastAccess(),
                                                blk->isDirty(), blk->getDirtyTime());
                     inactive_list.push_back(new_blk);
@@ -564,13 +564,13 @@ namespace wrench {
         double amt = 0;
 
         for (int i = 0; i < inactive_list.size(); i++) {
-            if (inactive_list[i]->getFilename().compare(filename) == 0) {
+            if (inactive_list[i]->getFileId().compare(filename) == 0) {
                 amt += inactive_list[i]->getSize();
             }
         }
 
         for (int i = 0; i < active_list.size(); i++) {
-            if (active_list[i]->getFilename().compare(filename) == 0) {
+            if (active_list[i]->getFileId().compare(filename) == 0) {
                 amt += active_list[i]->getSize();
             }
         }
@@ -588,12 +588,12 @@ namespace wrench {
         std::vector<Block *> block_list;
 
         for (int i = 0; i < inactive_list.size(); i++) {
-            if (inactive_list[i]->getFilename().compare(filename) == 0) {
+            if (inactive_list[i]->getFileId().compare(filename) == 0) {
                 block_list.push_back(new Block(inactive_list[i]));
             }
         }
         for (int i = 0; i < active_list.size(); i++) {
-            if (active_list[i]->getFilename().compare(filename) == 0) {
+            if (active_list[i]->getFileId().compare(filename) == 0) {
                 block_list.push_back(new Block(active_list[i]));
             }
         }
