@@ -48,11 +48,12 @@ function processFile(files) {
             if (!rawData.workflow_execution || !rawData.workflow_execution.tasks) {
                 return;
             }
+            let links = rawData.link_usage ? rawData.link_usage.links : [];
             data = {
                 file: files[0].name,
                 tasks: rawData.workflow_execution.tasks,
                 disk: rawData.disk_operations,
-                network: rawData.link_usage.links,
+                network: links,
                 contents: rawData.workflow_execution.tasks // TODO: remove
             };
 
