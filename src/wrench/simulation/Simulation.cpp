@@ -762,40 +762,14 @@ namespace wrench {
     }
 
     /**
-     * Read file from a host, only available if writeback is activated.
+     * Read file locally, only available if writeback is activated.
      * @param filename: name of the file read.
+     * @param n_bytes: amount of read data in byte.
      * @param mountpoint: mountpoint where file is located.
-     * @param hostname: name of the host where the file is stored.
      */
-    void Simulation::readFromHost(WorkflowFile *file, std::string mountpoint, std::string hostname) {
+    void Simulation::readWithMemoryCache(WorkflowFile *file, double n_bytes, std::string mountpoint) {
 
-        MemoryManager *mem_mng = this->getMemoryManagerByHost(hostname);
-        double cached_amt = mem_mng->getCachedAmount(file->getID());
-        double flushed_amt = mem_mng->flush(2 * file->getSize() - cached_amt - mem_mng->getFreeMemory() -
-                mem_mng->getEvictableMemory(), "");
-        mem_mng->evict(2 * file->getSize() - cached_amt - mem_mng->getFreeMemory(), "");
-
-        simgrid::s4u::IoPtr cache_read;
-        simgrid::s4u::IoPtr disk_read;
-        if (cached_amt > 0) {
-            cache_read = mem_mng->readFromCache(file->getID(), true);
-        }
-
-        double from_disk_amt = file->getSize() - cached_amt;
-        if (from_disk_amt > 0) {
-            disk_read = mem_mng->readToCache(file->getID(), mountpoint, from_disk_amt, true);
-        }
-
-        // cache read and disk read are concurrent, wait for them to finish
-        cache_read->wait();
-        disk_read->wait();
-
-        // reduce free memory as the file is read in to anonymous memory
-        // Here we assume that the used amount is equal to file size.
-        mem_mng->setFreeMemory(mem_mng->getFreeMemory() - file->getSize());
-    }
-
-    void Simulation::readFromHost(WorkflowFile *file, double n_bytes, std::string mountpoint, std::string hostname) {
+        std::string hostname = getHostName();
 
         MemoryManager *mem_mng = getMemoryManagerByHost(hostname);
         std::vector<Block*> file_blocks = mem_mng->getCachedBlocks(file->getID());
@@ -822,12 +796,14 @@ namespace wrench {
     }
 
     /**
-     * Write a file to host, only available if writeback is activated.
+     * Write a file locally, only available if writeback is activated.
      * @param filename: name of the file written.
+     * @param n_bytes: amount of written data in byte.
      * @param mountpoint: mount point where file is located.
-     * @param hostname: name of the host where the file is stored.
      */
-    void Simulation::writeToHost(WorkflowFile *file, std::string mountpoint, std::string hostname) {
+    void Simulation::writeWithMemoryCache(WorkflowFile *file, double n_bytes, std::string mountpoint) {
+
+        std::string hostname = getHostName();
 
         MemoryManager *mem_mng = this->getMemoryManagerByHost(hostname);
 
@@ -836,45 +812,12 @@ namespace wrench {
 
         // free write to cache without forced flushing
         if (remaining_dirty > 0) {
-            mem_mng->evict(std::min(file->getSize(), remaining_dirty) - mem_mng->getFreeMemory(), "");
-            mem_bw_amt = std::min(file->getSize(), mem_mng->getFreeMemory());
+            mem_mng->evict(std::min(n_bytes, remaining_dirty) - mem_mng->getFreeMemory(), "");
+            mem_bw_amt = std::min(n_bytes, mem_mng->getFreeMemory());
             mem_mng->writeToCache(file->getID(), mountpoint, mem_bw_amt);
         }
 
-        double disk_bw_amt = file->getSize() - mem_bw_amt;
-        if (disk_bw_amt > 0) {
-            mem_mng->flush(disk_bw_amt, "");
-            mem_mng->evict(disk_bw_amt - mem_mng->getFreeMemory(), "");
-
-            mem_mng->writeToCache(file->getID(), mountpoint, std::min(mem_mng->getFreeMemory(), disk_bw_amt));
-
-            s4u_Disk *disk = MemoryManager::getDisk(mountpoint, hostname);
-            disk->write(disk_bw_amt);
-        }
-    }
-
-    /**
-     * Write a file to host, only available if writeback is activated.
-     * @param filename: name of the file written.
-     * @param amount: amount of data of the file to be written.
-     * @param mountpoint: mount point where file is located.
-     * @param hostname: name of the host where the file is stored.
-     */
-    void Simulation::writeToHost(WorkflowFile *file, double amount, std::string mountpoint, std::string hostname) {
-
-        MemoryManager *mem_mng = this->getMemoryManagerByHost(hostname);
-
-        double remaining_dirty = mem_mng->getDirtyRatio() * mem_mng->getAvailableMemory() - mem_mng->getDirty();
-        double mem_bw_amt = 0;
-
-        // free write to cache without forced flushing
-        if (remaining_dirty > 0) {
-            mem_mng->evict(std::min(amount, remaining_dirty) - mem_mng->getFreeMemory(), "");
-            mem_bw_amt = std::min(amount, mem_mng->getFreeMemory());
-            mem_mng->writeToCache(file->getID(), mountpoint, mem_bw_amt);
-        }
-
-        double disk_bw_amt = amount - mem_bw_amt;
+        double disk_bw_amt = n_bytes - mem_bw_amt;
         if (disk_bw_amt > 0) {
             mem_mng->flush(disk_bw_amt, "");
             mem_mng->evict(disk_bw_amt - mem_mng->getFreeMemory(), "");
