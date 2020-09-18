@@ -63,7 +63,9 @@ namespace wrench {
 
         double getFreeMemory() const;
 
-        void setFreeMemory(double free_amt);
+        void releaseMemory(double released_amt);
+
+        void useAnonymousMemory(double used_amt);
 
         double getCached() const;
 

@@ -792,7 +792,8 @@ namespace wrench {
             mem_mng->readChunkFromCache(file->getID(), from_cache);
         }
 
-        mem_mng->setFreeMemory(mem_mng->getFreeMemory() - n_bytes);
+//        Anonymous used by application
+        mem_mng->useAnonymousMemory(mem_mng->getFreeMemory() - n_bytes);
     }
 
     /**
