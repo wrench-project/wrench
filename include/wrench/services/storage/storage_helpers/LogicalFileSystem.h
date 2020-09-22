@@ -10,7 +10,7 @@
 #ifndef WRENCH_LOGICALFILESYSTEM_H
 #define WRENCH_LOGICALFILESYSTEM_H
 
-#include  <stdexcept>
+#include <stdexcept>
 #include <string>
 #include <map>
 #include <set>
