@@ -46,7 +46,7 @@ namespace wrench {
 
         double thread_work = (total_work) / ((double)num_threads * this->efficiency);
         std::vector<double> work_per_threads;
-        for (int i=0; i < num_threads; i++) {
+        for (unsigned int i=0; i < num_threads; i++) {
             work_per_threads.push_back(thread_work);
         }
         return work_per_threads;
