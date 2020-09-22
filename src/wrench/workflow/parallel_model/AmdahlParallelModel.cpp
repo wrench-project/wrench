@@ -50,7 +50,7 @@ namespace wrench {
         double sequential_work = (1 - this->alpha) * total_work;
         double per_thread_parallel_work = (total_work - sequential_work) / (double)num_threads;
         std::vector<double> work_per_threads;
-        for (int i=0; i < num_threads; i++) {
+        for (unsigned int i=0; i < num_threads; i++) {
             double work = per_thread_parallel_work + (i == 0 ? sequential_work : 0.0);
             work_per_threads.push_back(work);
         }
