@@ -60,8 +60,8 @@ namespace wrench {
                 {BatchComputeServiceProperty::TASK_STARTUP_OVERHEAD,                     "0"},
                 {BatchComputeServiceProperty::HOST_SELECTION_ALGORITHM,                    "FIRSTFIT"},
                 {BatchComputeServiceProperty::TASK_SELECTION_ALGORITHM,                    "maximum_flops"},
-                {BatchComputeServiceProperty::GRID_PRE_EXECUTION_DELAY,                    "60.0"},
-                {BatchComputeServiceProperty::GRID_POST_EXECUTION_DELAY,                   "240.0"},
+                {BatchComputeServiceProperty::GRID_PRE_EXECUTION_DELAY,                    "78.0"},
+                {BatchComputeServiceProperty::GRID_POST_EXECUTION_DELAY,                   "94.0"},
 #ifdef ENABLE_BATSCHED
                 {BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "conservative_bf"},
 //                {BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "easy_bf"},
