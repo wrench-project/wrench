@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
 
     simulation->init(&argc, argv);
 
-    // Setting up the platform
+    // Pull platform from provided xml file.
     char *platform_file = argv[1];
     simulation->instantiatePlatform(platform_file);
     double pre_execution_overhead = std::stod(std::string(argv[2]));
@@ -36,7 +36,6 @@ int main(int argc, char **argv) {
 
     // Get a hostname
     std::string hostname = "DualCoreHost";
-    //std::string batchhostname = "BatchHost1";
 
     wrench::Workflow *grid_workflow;
     std::unique_ptr<wrench::Workflow> workflow_unique_ptr1;
