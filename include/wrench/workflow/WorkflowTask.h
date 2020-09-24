@@ -16,6 +16,10 @@
 
 #include "wrench/workflow/job/WorkflowJob.h"
 #include "wrench/workflow/WorkflowFile.h"
+#include "wrench/workflow/parallel_model/ParallelModel.h"
+#include "wrench/workflow/parallel_model/AmdahlParallelModel.h"
+#include "wrench/workflow/parallel_model/ConstantEfficiencyParallelModel.h"
+#include "wrench/workflow/parallel_model/CustomParallelModel.h"
 
 #include <boost/graph/adjacency_list.hpp>
 
@@ -35,7 +39,9 @@ namespace wrench {
 
         unsigned long getMaxNumCores() const;
 
-        double getParallelEfficiency() const;
+        std::shared_ptr<ParallelModel> getParallelModel();
+
+        void setParallelModel(std::shared_ptr<ParallelModel> model);
 
         double getMemoryRequirement() const;
 
@@ -235,7 +241,9 @@ namespace wrench {
              */
             WorkflowTaskExecution(double task_start) : task_start(task_start) {}
 
+
         };
+
 
         /***********************/
         /** \endcond           */
@@ -253,7 +261,7 @@ namespace wrench {
         unsigned long bytes_written = -1;  // Total bytes written in KB
         unsigned long min_num_cores;
         unsigned long max_num_cores;
-        double parallel_efficiency;
+        std::shared_ptr<ParallelModel> parallel_model;
         double memory_requirement;
         unsigned long priority = 0;        // Task priority
         unsigned long toplevel;            // 0 if entry task
@@ -263,7 +271,7 @@ namespace wrench {
         State upcoming_visible_state;      // A visible state that will become active once a WMS has process a previously sent workflow execution event
         InternalState internal_state;      // Not to be exposed to developer level
 
-        Workflow *workflow;                                   // Containing workflow
+        Workflow *workflow;                // Containing workflow
 
         std::map<std::string, WorkflowFile *> output_files;   // List of output files
         std::map<std::string, WorkflowFile *> input_files;    // List of input files
@@ -273,7 +281,6 @@ namespace wrench {
                      double t,
                      unsigned long min_num_cores,
                      unsigned long max_num_cores,
-                     double parallel_efficiency,
                      double memory_requirement);
 
         // Containing job

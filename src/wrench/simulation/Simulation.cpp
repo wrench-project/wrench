@@ -116,7 +116,7 @@ namespace wrench {
         for (i = 0; i < *argc; i++) {
             if ((not strcmp(argv[i], "--wrench-no-color")) or (not strcmp(argv[i], "--wrench-no-colors"))) {
                 TerminalOutput::disableColor();
-            } else if ((not strcmp(argv[i], "--wrench-full-log")) or (not strcmp(argv[i], "--wrench-full-logs"))) {
+            } else if ((not strcmp(argv[i], "--wrench-full-log")) or (not strcmp(argv[i], "--wrench-full-logs")) or (not strcmp(argv[i], "--wrench-log-full"))) {
                 xbt_log_control_set("root.thresh:info");
             } else if (not strcmp(argv[i], "--activate-energy")) {
                 sg_host_energy_plugin_init();

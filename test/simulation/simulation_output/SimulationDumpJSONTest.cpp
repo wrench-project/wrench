@@ -279,8 +279,8 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowExecutionJSON_test() {
 
     workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
 
-    t1 = workflow->addTask("task1", 1, 1, 1, 1.0, 0);
-    t2 = workflow->addTask("task2", 1, 1, 1, 1.0, 0);
+    t1 = workflow->addTask("task1", 1, 1, 1, 0);
+    t2 = workflow->addTask("task2", 1, 1, 1, 0);
 
     t1->setStartDate(1.0);
     t1->setEndDate(2.0);
@@ -421,8 +421,8 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
 
     workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
 
-    t1 = workflow->addTask("task1", 1, 1, 1, 1.0, 0);
-    t2 = workflow->addTask("task2", 1, 1, 1, 1.0, 0);
+    t1 = workflow->addTask("task1", 1, 1, 1, 0);
+    t2 = workflow->addTask("task2", 1, 1, 1, 0);
 
     /*
      * Two tasks run in parallel on a single host. Both use 5 out of the 10 cores.
@@ -459,8 +459,8 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
 
     workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow);
 
-    t1 = workflow->addTask("task1", 1, 1, 1, 1.0, 0);
-    t2 = workflow->addTask("task2", 1, 1, 1, 1.0, 0);
+    t1 = workflow->addTask("task1", 1, 1, 1, 0);
+    t2 = workflow->addTask("task2", 1, 1, 1, 0);
 
     /*
      * Two tasks run, one after the other on host1. task2 starts at the same time that task1 ends.
@@ -495,10 +495,10 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
 
     workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow);
 
-    t1 = workflow->addTask("task1", 1, 1, 1, 1.0, 0);
-    t2 = workflow->addTask("task2", 1, 1, 1, 1.0, 0);
-    t3 = workflow->addTask("task3", 1, 1, 1, 1.0, 0);
-    t4 = workflow->addTask("task4", 1, 1, 1, 1.0, 0);
+    t1 = workflow->addTask("task1", 1, 1, 1, 0);
+    t2 = workflow->addTask("task2", 1, 1, 1, 0);
+    t3 = workflow->addTask("task3", 1, 1, 1, 0);
+    t4 = workflow->addTask("task4", 1, 1, 1, 0);
 
     /*
      * Two hosts run two tasks each. We expect the following vertical positions to be set:
@@ -549,8 +549,8 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
 
     workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow);
 
-    t1 = workflow->addTask("task1", 1, 1, 1, 1.0, 0);
-    t2 = workflow->addTask("task2", 1, 1, 1, 1.0, 0);
+    t1 = workflow->addTask("task1", 1, 1, 1, 0);
+    t2 = workflow->addTask("task2", 1, 1, 1, 0);
 
     /*
      * An execution that has no layout because we were possibly oversubscribed. std::runtime_error should be thrown.
@@ -600,11 +600,11 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
     // Generate a workflow with two independent tasks. Both tasks each have one input file and one output file.
     std::unique_ptr<wrench::Workflow> independent_tasks_workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
 
-    t1 = independent_tasks_workflow->addTask("task1", 1.0, 1, 1, 1.0, 0);
+    t1 = independent_tasks_workflow->addTask("task1", 1.0, 1, 1, 0);
     t1->addInputFile(independent_tasks_workflow->addFile("task1_input", 1.0));
     t1->addOutputFile(independent_tasks_workflow->addFile("task1_output", 1.0));
 
-    t2 = independent_tasks_workflow->addTask("task2", 1.0, 1, 1, 1.0, 0);
+    t2 = independent_tasks_workflow->addTask("task2", 1.0, 1, 1, 0);
     t2->addInputFile(independent_tasks_workflow->addFile("task2_input", 1.0));
     t2->addOutputFile(independent_tasks_workflow->addFile("task2_output", 1.0));
 
@@ -642,7 +642,6 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
                     "max_cores": 1,
                     "memory": 0.0,
                     "min_cores": 1,
-                    "parallel_efficiency": 1.0,
                     "type": "task"
                 },
                 {
@@ -651,7 +650,6 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
                     "max_cores": 1,
                     "memory": 0.0,
                     "min_cores": 1,
-                    "parallel_efficiency": 1.0,
                     "type": "task"
                 },
                 {
@@ -693,13 +691,13 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
     // Generate a workflow with two tasks, two input files, and four output files. Both tasks use both input files and produce two output files each.
     std::unique_ptr<wrench::Workflow> two_tasks_use_all_files_workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
 
-    t1 = two_tasks_use_all_files_workflow->addTask("task1", 1.0, 1, 1, 1.0, 0);
+    t1 = two_tasks_use_all_files_workflow->addTask("task1", 1.0, 1, 1,  0);
     t1->addInputFile(two_tasks_use_all_files_workflow->addFile("input_file1", 1));
     t1->addInputFile(two_tasks_use_all_files_workflow->addFile("input_file2", 2));
     t1->addOutputFile(two_tasks_use_all_files_workflow->addFile("output_file1", 1));
     t1->addOutputFile(two_tasks_use_all_files_workflow->addFile("output_file2", 2));
 
-    t2 = two_tasks_use_all_files_workflow->addTask("task2", 1.0, 1, 1, 1.0, 0);
+    t2 = two_tasks_use_all_files_workflow->addTask("task2", 1.0, 1, 1, 0);
     for (auto &file : t1->getInputFiles()) {
         t2->addInputFile(file);
     }
@@ -757,7 +755,6 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
                     "max_cores": 1,
                     "memory": 0.0,
                     "min_cores": 1,
-                    "parallel_efficiency": 1.0,
                     "type": "task"
                 },
                 {
@@ -766,7 +763,6 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
                     "max_cores": 1,
                     "memory": 0.0,
                     "min_cores": 1,
-                    "parallel_efficiency": 1.0,
                     "type": "task"
                 },
                 {
@@ -818,22 +814,22 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
     // Generate a workflow where one task forks into two tasks, then those two tasks join into one.
     std::unique_ptr<wrench::Workflow> fork_join_workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
 
-    t1 = fork_join_workflow->addTask("task1", 1.0, 1, 1, 1.0, 0);
+    t1 = fork_join_workflow->addTask("task1", 1.0, 1, 1, 0);
     t1->addInputFile(fork_join_workflow->addFile("task1_input", 1.0));
     t1->addOutputFile(fork_join_workflow->addFile("task1_output1", 1.0));
     t1->addOutputFile(fork_join_workflow->addFile("task1_output2", 1.0));
 
-    t2 = fork_join_workflow->addTask("task2", 1.0, 1, 1, 1.0, 0);
+    t2 = fork_join_workflow->addTask("task2", 1.0, 1, 1, 0);
     t2->addInputFile(fork_join_workflow->getFileByID("task1_output1"));
     t2->addOutputFile(fork_join_workflow->addFile("task2_output1", 1.0));
     fork_join_workflow->addControlDependency(t1, t2);
 
-    t3 = fork_join_workflow->addTask("task3", 1.0, 1, 1, 1.0, 0);
+    t3 = fork_join_workflow->addTask("task3", 1.0, 1, 1, 0);
     t3->addInputFile(fork_join_workflow->getFileByID("task1_output2"));
     t3->addOutputFile(fork_join_workflow->addFile("task3_output1", 1.0));
     fork_join_workflow->addControlDependency(t1, t3);
 
-    t4 = fork_join_workflow->addTask("task4", 1.0, 1, 1, 1.0, 0);
+    t4 = fork_join_workflow->addTask("task4", 1.0, 1, 1, 0);
     t4->addInputFile(fork_join_workflow->getFileByID("task2_output1"));
     t4->addInputFile(fork_join_workflow->getFileByID("task3_output1"));
     t4->addOutputFile(fork_join_workflow->addFile("task4_output1", 1.0));
@@ -899,7 +895,6 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
                     "max_cores": 1,
                     "memory": 0.0,
                     "min_cores": 1,
-                    "parallel_efficiency": 1.0,
                     "type": "task"
                 },
                 {
@@ -908,7 +903,6 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
                     "max_cores": 1,
                     "memory": 0.0,
                     "min_cores": 1,
-                    "parallel_efficiency": 1.0,
                     "type": "task"
                 },
                 {
@@ -917,7 +911,6 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
                     "max_cores": 1,
                     "memory": 0.0,
                     "min_cores": 1,
-                    "parallel_efficiency": 1.0,
                     "type": "task"
                 },
                 {
@@ -926,7 +919,6 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
                     "max_cores": 1,
                     "memory": 0.0,
                     "min_cores": 1,
-                    "parallel_efficiency": 1.0,
                     "type": "task"
                 },
                 {
@@ -1255,6 +1247,7 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
     int argc = 1;
     auto argv = (char **)calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+//    argv[1] = strdup("--wrench-full-log");
 
     EXPECT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1276,7 +1269,7 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
     //wrench::WorkflowFile *file = new wrench::WorkflowFile("test_file", 10*GB);
     std::unique_ptr<wrench::Workflow> link_usage_workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
     wrench::WorkflowTask *single_task;
-    single_task = link_usage_workflow->addTask("dummy_task",1,1,1,1.0,8*GB);
+    single_task = link_usage_workflow->addTask("dummy_task",1,1,1,8*GB);
     single_task->addInputFile(link_usage_workflow->addFile("test_file", 10*GB));
 
 
@@ -1320,170 +1313,6 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
                         },
                         {
                             "bytes per second": 121250000.0,
-                            "time": 4.0
-                        },
-                        {
-                            "bytes per second": 121250000.0,
-                            "time": 6.0
-                        },
-                        {
-                            "bytes per second": 121250000.0,
-                            "time": 8.0
-                        },
-                        {
-                            "bytes per second": 121250000.0,
-                            "time": 10.0
-                        },
-                        {
-                            "bytes per second": 121250000.0,
-                            "time": 12.0
-                        },
-                        {
-                            "bytes per second": 121250000.0,
-                            "time": 14.0
-                        },
-                        {
-                            "bytes per second": 121250000.0,
-                            "time": 16.0
-                        },
-                        {
-                            "bytes per second": 121250000.0,
-                            "time": 18.0
-                        },
-                        {
-                            "bytes per second": 121250000.0,
-                            "time": 20.0
-                        },
-                        {
-                            "bytes per second": 121250000.0,
-                            "time": 22.0
-                        },
-                        {
-                            "bytes per second": 121250000.0,
-                            "time": 24.0
-                        },
-                        {
-                            "bytes per second": 121250000.0,
-                            "time": 26.0
-                        },
-                        {
-                            "bytes per second": 121250000.0,
-                            "time": 28.0
-                        },
-                        {
-                            "bytes per second": 121250000.0,
-                            "time": 30.0
-                        },
-                        {
-                            "bytes per second": 121250000.0,
-                            "time": 32.0
-                        },
-                        {
-                            "bytes per second": 121250000.0,
-                            "time": 34.0
-                        },
-                        {
-                            "bytes per second": 121250000.0,
-                            "time": 36.0
-                        },
-                        {
-                            "bytes per second": 121250000.0,
-                            "time": 38.0
-                        },
-                        {
-                            "bytes per second": 121250000.0,
-                            "time": 40.0
-                        },
-                        {
-                            "bytes per second": 121250000.0,
-                            "time": 42.0
-                        },
-                        {
-                            "bytes per second": 121250000.0,
-                            "time": 44.0
-                        },
-                        {
-                            "bytes per second": 121250000.0,
-                            "time": 46.0
-                        },
-                        {
-                            "bytes per second": 121250000.0,
-                            "time": 48.0
-                        },
-                        {
-                            "bytes per second": 121250000.0,
-                            "time": 50.0
-                        },
-                        {
-                            "bytes per second": 121250000.0,
-                            "time": 52.0
-                        },
-                        {
-                            "bytes per second": 121250000.0,
-                            "time": 54.0
-                        },
-                        {
-                            "bytes per second": 121250000.0,
-                            "time": 56.0
-                        },
-                        {
-                            "bytes per second": 121250000.0,
-                            "time": 58.0
-                        },
-                        {
-                            "bytes per second": 121250000.0,
-                            "time": 60.0
-                        },
-                        {
-                            "bytes per second": 121250000.0,
-                            "time": 62.0
-                        },
-                        {
-                            "bytes per second": 121250000.0,
-                            "time": 64.0
-                        },
-                        {
-                            "bytes per second": 121250000.0,
-                            "time": 66.0
-                        },
-                        {
-                            "bytes per second": 121250000.0,
-                            "time": 68.0
-                        },
-                        {
-                            "bytes per second": 121250000.0,
-                            "time": 70.0
-                        },
-                        {
-                            "bytes per second": 121250000.0,
-                            "time": 72.0
-                        },
-                        {
-                            "bytes per second": 121250000.0,
-                            "time": 74.0
-                        },
-                        {
-                            "bytes per second": 121250000.0,
-                            "time": 76.0
-                        },
-                        {
-                            "bytes per second": 121250000.0,
-                            "time": 78.0
-                        },
-                        {
-                            "bytes per second": 121250000.0,
-                            "time": 80.0
-                        },
-                        {
-                            "bytes per second": 121250000.0,
-                            "time": 82.0
-                        },
-                        {
-                            "bytes per second": 121250000.0,
-                            "time": 84.0
-                        },
-                        {
-                            "bytes per second": 121250000.0,
                             "time": 86.0
                         }
                     ],
@@ -1494,174 +1323,6 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
                         {
                             "bytes per second": 0.0,
                             "time": 0.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 2.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 4.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 6.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 8.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 10.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 12.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 14.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 16.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 18.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 20.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 22.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 24.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 26.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 28.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 30.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 32.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 34.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 36.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 38.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 40.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 42.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 44.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 46.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 48.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 50.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 52.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 54.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 56.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 58.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 60.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 62.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 64.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 66.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 68.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 70.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 72.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 74.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 76.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 78.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 80.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 82.0
-                        },
-                        {
-                            "bytes per second": 0.0,
-                            "time": 84.0
                         },
                         {
                             "bytes per second": 0.0,
@@ -1881,6 +1542,7 @@ void SimulationDumpJSONTest::do_SimulationDumpPlatformGraphJSON_test() {
     std::sort(result_json["platform"]["routes"].begin(), result_json["platform"]["routes"].end(), compareRoutes);
     std::sort(expected_json["platform"]["routes"].begin(), expected_json["platform"]["routes"].end(), compareRoutes);
 
+
     EXPECT_TRUE(result_json == expected_json);
 
     delete simulation;
@@ -1930,8 +1592,8 @@ void SimulationDumpJSONTest::do_SimulationDumpUnifiedJSON_test() {
 
     workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
 
-    t1 = workflow->addTask("task1", 1, 1, 1, 1.0, 0);
-    t2 = workflow->addTask("task2", 1, 1, 1, 1.0, 0);
+    t1 = workflow->addTask("task1", 1, 1, 1, 0);
+    t2 = workflow->addTask("task2", 1, 1, 1, 0);
 
     t1->setStartDate(1.0);
     t1->setEndDate(2.0);
@@ -2090,7 +1752,6 @@ void SimulationDumpJSONTest::do_SimulationDumpUnifiedJSON_test() {
                     "max_cores": 1,
                     "memory": 0.0,
                     "min_cores": 1,
-                    "parallel_efficiency": 1.0,
                     "type": "task"
                 },
                 {
@@ -2099,7 +1760,6 @@ void SimulationDumpJSONTest::do_SimulationDumpUnifiedJSON_test() {
                     "max_cores": 1,
                     "memory": 0.0,
                     "min_cores": 1,
-                    "parallel_efficiency": 1.0,
                     "type": "task"
                 }
             ]
