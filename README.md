@@ -32,8 +32,8 @@ users to satisfy the following requirements:
 - **CMake** - version 3.5 or higher
   
 And, one of the following:
-- **g++** - version 5.0 or higher
-- **clang** - version 3.6 or higher
+- **g++** - version 5.4 or higher
+- **clang** - version 3.8 or higher
 
 ## Dependencies
 
@@ -41,9 +41,10 @@ And, one of the following:
 
 - [SimGrid](https://framagit.org/simgrid/simgrid/-/releases) - version 3.25
 - [PugiXML](http://pugixml.org/) - version 1.8 or higher 
-- [JSON for Modern C++](https://github.com/nlohmann/json) - version 3.7.0 or higher 
+- [JSON for Modern C++](https://github.com/nlohmann/json) - version 3.9.0 or higher 
 
 ### Optional Dependencies
+
 - [Google Test](https://github.com/google/googletest) - version 1.8 or higher (only required for running test cases)
 - [Doxygen](http://www.doxygen.org) - version 1.8 or higher (only required for generating documentation)
 - [Batsched](https://gitlab.inria.fr/batsim/batsched) - only needed for batch-scheduled resource simulation
@@ -107,6 +108,12 @@ WRENCH has been funded by the National Science Foundation (NSF), and the Nationa
 [![NSF Funding 20161][nsf-20161-badge]][nsf-20161-link]
 [![NSF Funding 20162][nsf-20162-badge]][nsf-20162-link]
 ![CNRS Funding 2015][cnrs-2015-badge]
+
+---
+
+## List of Contributors via Pull Requests
+
+- @dohoangdzung: I/O with page cache simulation model (09/2020)
 
 
 [travis-badge]:             https://travis-ci.org/wrench-project/wrench.svg?branch=master
