@@ -2,9 +2,6 @@ language: cpp
 dist: focal
 
 addons:
-  apt:
-    packages:
-      - docker-ce
   sonarcloud:
     organization: "wrench"
     token:
