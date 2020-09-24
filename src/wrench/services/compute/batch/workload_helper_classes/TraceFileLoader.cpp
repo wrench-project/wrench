@@ -18,6 +18,13 @@ WRENCH_LOG_CATEGORY(wrench_core_trace_file_loader, "Log category for Trace File 
 
 namespace wrench {
 
+    /**
+     * @brief A method to generate a random username, so that generated workload
+     * traces look more realistic
+     *
+     * @param userid: numerical userid
+     * @return a generated alpha userid
+     */
     std::string generateRandomUsername(unsigned long userid) {
         //Type of random number distribution
         const char charset[] =

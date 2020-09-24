@@ -76,7 +76,7 @@ namespace wrench {
 
         void performWork(Workunit *work);
 
-        void runMulticoreComputation(double flops, double parallel_efficiency, bool simulate_computation_as_sleep);
+        void runMulticoreComputationForTask(WorkflowTask *task, bool simulate_computation_as_sleep);
 
         std::string callback_mailbox;
         unsigned long num_cores;

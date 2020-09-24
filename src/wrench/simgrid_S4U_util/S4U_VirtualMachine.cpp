@@ -20,6 +20,8 @@ WRENCH_LOG_CATEGORY(wrench_core_s4u_virtual_machine, "Log category for S4U_Virtu
 
 namespace wrench {
 
+    std::unordered_map<std::string, std::string> S4U_VirtualMachine::vm_to_pm_map;
+
     /**
      * @brief Constructor
      *
@@ -90,6 +92,8 @@ namespace wrench {
         this->vm->start();
         this->state = State::RUNNING;
         this->pm_name = pm_name;
+
+        S4U_VirtualMachine::vm_to_pm_map[this->vm_name]=  this->pm_name;
     }
 
     /**
@@ -128,6 +132,8 @@ namespace wrench {
         this->vm->shutdown();
         this->vm->destroy();
         this->pm_name = "";
+        S4U_VirtualMachine::vm_to_pm_map.erase(this->vm_name);
+
     }
 
     /**
@@ -168,6 +174,7 @@ namespace wrench {
         sg_vm_migrate(this->vm, dest_pm);
         double mig_end = simgrid::s4u::Engine::get_clock();
         this->pm_name = dest_pm_name;
+        S4U_VirtualMachine::vm_to_pm_map[this->vm_name]=  this->pm_name;
         WRENCH_INFO("%s migrated to %s in %g s", src_pm_hostname.c_str(), dest_pm_name.c_str(), mig_end - mig_sta);
     }
 
