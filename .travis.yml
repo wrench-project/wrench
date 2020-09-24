@@ -1,4 +1,5 @@
 language: cpp
+dist: focal
 
 addons:
   apt:
@@ -31,6 +32,8 @@ jobs:
       env: DIST=debian-stretch COMPILER=gcc6 batsched=off
     - name: "Debian Buster - g++-8"
       env: DIST=debian-buster COMPILER=gcc8 batsched=off
+    - name: "Debian Bullseye - g++-10"
+      env: DIST=debian-bullseye COMPILER=gcc10 batsched=off
 
     - stage: "Documentation Build and Deployment"
       name: "Ubuntu Focal - g++-9"
