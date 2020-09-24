@@ -34,15 +34,38 @@
             <prop id="ram" value="64GB" />
         </host>
 
-        <!-- A network link...-->
+        <!-- A network link -->
         <link id="network_link" bandwidth="50MBps" latency="20us"/>
+        <!-- WMSHost's local "loopback" link -->
+        <link id="loopback_WMSHost" bandwidth="1000EBps" latency="0us"/>
+        <!--CloudProviderHost's local "loopback" link -->
+        <link id="loopback_CloudProviderHost" bandwidth="1000EBps" latency="0us"/>
+        <!--CloudHost1's local "loopback" link -->
+        <link id="loopback_CloudHost1" bandwidth="1000EBps" latency="0us"/>
+        <!--CloudHost2's local "loopback" link -->
+        <link id="loopback_CloudHost2" bandwidth="1000EBps" latency="0us"/>
 
-        <!-- which connects the two hosts -->
+        <!-- The network link connects the two hosts -->
         <route src="WMSHost" dst="CloudProviderHost"> <link_ctn id="network_link"/> </route>
         <route src="WMSHost" dst="CloudHost1"> <link_ctn id="network_link"/> </route>
         <route src="WMSHost" dst="CloudHost2"> <link_ctn id="network_link"/> </route>
         <route src="CloudProviderHost" dst="CloudHost1"> <link_ctn id="network_link"/> </route>
         <route src="CloudProviderHost" dst="CloudHost2"> <link_ctn id="network_link"/> </route>
         <route src="CloudHost1" dst="CloudHost2"> <link_ctn id="network_link"/> </route>
+
+        <!-- Each loopback link connects each host to itself -->
+        <route src="WMSHost" dst="WMSHost">
+            <link_ctn id="loopback_WMSHost"/>
+        </route>
+        <route src="CloudProviderHost" dst="CloudProviderHost">
+            <link_ctn id="loopback_CloudProviderHost"/>
+        </route>
+        <route src="CloudHost1" dst="CloudHost1">
+            <link_ctn id="loopback_CloudHost1"/>
+        </route>
+        <route src="CloudHost2" dst="CloudHost2">
+            <link_ctn id="loopback_CloudHost2"/>
+        </route>
+
     </zone>
 </platform>

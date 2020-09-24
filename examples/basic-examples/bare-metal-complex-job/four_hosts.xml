@@ -28,15 +28,38 @@
             </disk>
         </host>
 
-        <!-- A network link...-->
+        <!-- A network link -->
         <link id="network_link" bandwidth="50MBps" latency="20us"/>
+        <!-- WMSHost's local "loopback" link -->
+        <link id="loopback_WMSHost" bandwidth="1000EBps" latency="0us"/>
+        <!--ComputeHost's local "loopback" link -->
+        <link id="loopback_ComputeHost" bandwidth="1000EBps" latency="0us"/>
+        <!--StorageHost1's local "loopback" link -->
+        <link id="loopback_StorageHost1" bandwidth="1000EBps" latency="0us"/>
+        <!--StorageHost2's local "loopback" link -->
+        <link id="loopback_StorageHost2" bandwidth="1000EBps" latency="0us"/>
 
-        <!-- which connects all hosts together -->
+        <!-- The same network link connects all hosts together -->
         <route src="WMSHost" dst="ComputeHost"> <link_ctn id="network_link"/> </route>
         <route src="WMSHost" dst="StorageHost1"> <link_ctn id="network_link"/> </route>
         <route src="WMSHost" dst="StorageHost2"> <link_ctn id="network_link"/> </route>
         <route src="ComputeHost" dst="StorageHost1"> <link_ctn id="network_link"/> </route>
         <route src="ComputeHost" dst="StorageHost2"> <link_ctn id="network_link"/> </route>
         <route src="StorageHost1" dst="StorageHost2"> <link_ctn id="network_link"/> </route>
+
+        <!-- Each loopback link connects each host to itself -->
+        <route src="WMSHost" dst="WMSHost">
+            <link_ctn id="loopback_WMSHost"/>
+        </route>
+        <route src="ComputeHost" dst="ComputeHost">
+            <link_ctn id="loopback_ComputeHost"/>
+        </route>
+        <route src="StorageHost1" dst="StorageHost1">
+            <link_ctn id="loopback_StorageHost1"/>
+        </route>
+        <route src="StorageHost2" dst="StorageHost2">
+            <link_ctn id="loopback_StorageHost2"/>
+        </route>
+
     </zone>
 </platform>

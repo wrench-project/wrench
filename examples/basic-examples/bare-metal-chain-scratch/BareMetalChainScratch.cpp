@@ -81,7 +81,8 @@ int main(int argc, char **argv) {
     /* Add workflow tasks */
     for (int i=0; i < num_tasks; i++) {
         /* Create a task: 10GFlop, 1 to 10 cores, 0.90 parallel efficiency, 10MB memory footprint */
-        auto task = workflow.addTask("task_" + std::to_string(i), 10000000000.0, 1, 10, 0.90, 10000000);
+        auto task = workflow.addTask("task_" + std::to_string(i), 10000000000.0, 1, 10, 10000000);
+        task->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(0.9));
     }
 
     /* Add workflow files */

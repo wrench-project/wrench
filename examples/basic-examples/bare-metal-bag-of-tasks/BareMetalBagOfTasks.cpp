@@ -24,7 +24,6 @@
  ** Example invocation of the simulator for a 10-task workflow, with no logging:
  **    ./wrench-example-bare-metal-bag-of-tasks 10 ./two_hosts.xml
  **
- ** Example invocation of the simulator for a 6-task workflow with full logging:
  ** Example invocation of the simulator for a 10-task workflow, with only WMS logging:
  **    ./wrench-example-bare-metal-bag-of-tasks 10 ./two_hosts.xml --log=custom_wms.threshold=info
  **
@@ -91,7 +90,8 @@ int main(int argc, char **argv) {
     /* Add workflow tasks and files */
     for (int i=0; i < num_tasks; i++) {
         /* Create a task: random GFlop, 1 to 10 cores, 0.90 parallel efficiency, 10MB memory footprint */
-        auto task = workflow.addTask("task_" + std::to_string(i), dist(rng), 1, 10, 0.90, 10000000);
+        auto task = workflow.addTask("task_" + std::to_string(i), dist(rng), 1, 10, 10000000);
+        task->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(0.9));
         task->addInputFile(workflow.addFile("input_" + std::to_string(i), 10000000));
         task->addOutputFile(workflow.addFile("output_" + std::to_string(i), 10000000));
     }

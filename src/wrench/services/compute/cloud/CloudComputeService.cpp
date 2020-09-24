@@ -259,6 +259,7 @@ namespace wrench {
         }
     }
 
+
     /**
      * @brief Get the compute service running on a VM, if any
      *
