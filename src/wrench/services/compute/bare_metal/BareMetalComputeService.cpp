@@ -30,6 +30,7 @@
 #include "wrench/services/helpers/HostStateChangeDetector.h"
 #include "wrench/workflow/failure_causes/JobTypeNotSupported.h"
 #include "wrench/workflow/failure_causes/HostError.h"
+#include "wrench/services/memory/MemoryManager.h"
 
 WRENCH_LOG_CATEGORY(wrench_core_bare_metal_compute_service, "Log category for BareMetalComputeService");
 
@@ -552,6 +553,16 @@ namespace wrench {
         // Set an alarm for my timely death, if necessary
         if (this->has_ttl) {
             this->death_date = S4U_Simulation::getClock() + this->ttl;
+        }
+
+        // If writeback device simulation is activated
+        if (Simulation::isWriteback()) {
+            // Start periodical flushing
+            simgrid::s4u::Disk* memory = simgrid::s4u::Host::by_name(this->getHostname())->get_disks().at(0);
+            std::shared_ptr<MemoryManager> memory_manager_ptr = MemoryManager::initAndStart(this->simulation, memory,
+                                                                                     0.4, 5, 30, this->hostname);
+            this->simulation->add(memory_manager_ptr.get());
+            memory_manager_ptr->log();
         }
 
         /** Main loop **/
