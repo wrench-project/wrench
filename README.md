@@ -113,7 +113,7 @@ WRENCH has been funded by the National Science Foundation (NSF), and the Nationa
 
 ## List of Contributors via Pull Requests
 
-- @dohoangdzung: I/O with page cache simulation model (09/2020)
+- [@dohoangdzung](https://github.com/dohoangdzung): I/O with page cache simulation model (09/2020)
 
 
 [travis-badge]:             https://travis-ci.org/wrench-project/wrench.svg?branch=master
