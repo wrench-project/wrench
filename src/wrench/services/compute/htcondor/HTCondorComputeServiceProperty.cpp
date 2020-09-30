@@ -12,7 +12,5 @@
 namespace wrench {
 
     SET_PROPERTY_NAME(HTCondorComputeServiceProperty, SUPPORTS_GRID_UNIVERSE);
-    SET_PROPERTY_NAME(HTCondorComputeServiceProperty, GRID_PRE_EXECUTION_DELAY);
-    SET_PROPERTY_NAME(HTCondorComputeServiceProperty, GRID_POST_EXECUTION_DELAY);
 
 }
