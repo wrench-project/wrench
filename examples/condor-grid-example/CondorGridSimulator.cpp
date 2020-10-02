@@ -14,7 +14,7 @@
 #include "CondorWMS.h" // WMS implementation
 #include "CondorTimestamp.h"
 
-void generatePlatform(std::string platform_file_path, int disk_speed){
+void generatePlatform(std::string platform_file_path, int disk_speed, int batch_bandwidth = 0){
 
     if (platform_file_path.empty()) {
         throw std::invalid_argument("generatePlatform() platform_file_path cannot be empty");
@@ -106,6 +106,22 @@ void generatePlatform(std::string platform_file_path, int disk_speed){
         disk3.attribute("read_bw").set_value(std::string(std::to_string(disk_speed) + "MBps").c_str());
         disk3.attribute("write_bw").set_value(std::string(std::to_string(disk_speed) + "MBps").c_str());
 
+        pugi::xml_node link0 = xml_doc.child("platform").child("zone").child("link");
+        pugi::xml_node link1 = link0.next_sibling("link");
+        pugi::xml_node link2 = link1.next_sibling("link");
+        pugi::xml_node link3 = link2.next_sibling("link");
+        pugi::xml_node link4 = link3.next_sibling("link");
+        pugi::xml_node link5 = link4.next_sibling("link");
+
+
+
+
+        //Setting two links that are between DualCoreHost (storage service) and the two batch service hosts.
+        if(batch_bandwidth>0){
+            link3.attribute("bandwidth").set_value(std::string(std::to_string(batch_bandwidth) + "MBps").c_str());
+            link4.attribute("bandwidth").set_value(std::string(std::to_string(batch_bandwidth) + "MBps").c_str());
+        }
+
         xml_doc.save_file(platform_file_path.c_str());
 
     } else {
@@ -115,13 +131,13 @@ void generatePlatform(std::string platform_file_path, int disk_speed){
 }
 
 
+
+/**
+ * ./wrench-example-condor-grid-universe [disk-speed in MBps] [Override Pre_execution overhead time in seconds] ...
+ * [Override Post_execution overhead time in seconds] [bandwidth in MBps, storage service to batch service]
+ * @return
+ */
 int main(int argc, char **argv) {
-
-    ///TODO Adding arguments for disk bandwidth.
-    ///TODO create a python program that can try multiple iterations of the simulation and records execution times from
-    ///std out
-
-
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
 
@@ -133,15 +149,24 @@ int main(int argc, char **argv) {
     int disk_speed = std::stoi(std::string(argv[1]));
     double pre_execution_overhead;
     double post_execution_overhead;
+    int batch_bandwidth;
     if(argc>2){
         pre_execution_overhead = std::stod(std::string(argv[2]));
         post_execution_overhead = std::stod(std::string(argv[3]));
     }
+    if(argc>4){
+        batch_bandwidth = std::stoi(std::string(argv[4]));
+    }
+
 
 
 
     std::string platform_file_path = "/tmp/platform.xml";
-    generatePlatform(platform_file_path, disk_speed);
+    if(argc<4){
+        generatePlatform(platform_file_path, disk_speed);
+    } else {
+        generatePlatform(platform_file_path, disk_speed, batch_bandwidth);
+    }
     simulation->instantiatePlatform(platform_file_path);
 
 
@@ -165,9 +190,6 @@ int main(int argc, char **argv) {
     //task1 = grid_workflow->addTask("grid_task1", 3050000000.0, 1, 1, 0);
     task1 = grid_workflow->addTask("grid_task1", 753350000000.0, 1, 1, 0);
     task1->addInputFile(input_file);
-
-
-
 
     // Create a Storage Service
     storage_service = simulation->add(
