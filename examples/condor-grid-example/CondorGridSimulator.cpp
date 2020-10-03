@@ -133,8 +133,9 @@ void generatePlatform(std::string platform_file_path, int disk_speed, int batch_
 
 
 /**
- * ./wrench-example-condor-grid-universe [disk-speed in MBps] [Override Pre_execution overhead time in seconds] ...
- * [Override Post_execution overhead time in seconds] [bandwidth in MBps, storage service to batch service]
+ * ./wrench-example-condor-grid-universe [disk-speed in MBps] [bandwidth in MBps, storage service to batch service] ...
+ * [Override Pre_execution overhead time in seconds] ...
+ * [Override Post_execution overhead time in seconds]
  * @return
  */
 int main(int argc, char **argv) {
@@ -151,18 +152,18 @@ int main(int argc, char **argv) {
     double post_execution_overhead;
     int batch_bandwidth;
     if(argc>2){
-        pre_execution_overhead = std::stod(std::string(argv[2]));
-        post_execution_overhead = std::stod(std::string(argv[3]));
+        batch_bandwidth = std::stoi(std::string(argv[2]));
     }
-    if(argc>4){
-        batch_bandwidth = std::stoi(std::string(argv[4]));
+    if(argc>3){
+        pre_execution_overhead = std::stod(std::string(argv[3]));
+        post_execution_overhead = std::stod(std::string(argv[4]));
     }
 
 
 
 
     std::string platform_file_path = "/tmp/platform.xml";
-    if(argc<4){
+    if(argc<3){
         generatePlatform(platform_file_path, disk_speed);
     } else {
         generatePlatform(platform_file_path, disk_speed, batch_bandwidth);
@@ -172,7 +173,7 @@ int main(int argc, char **argv) {
 
 
     wrench::WorkflowFile *input_file;
-    wrench::WorkflowTask *task1;
+    wrench::WorkflowTask *task1, *task2;
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service2 = nullptr;
@@ -190,6 +191,9 @@ int main(int argc, char **argv) {
     //task1 = grid_workflow->addTask("grid_task1", 3050000000.0, 1, 1, 0);
     task1 = grid_workflow->addTask("grid_task1", 753350000000.0, 1, 1, 0);
     task1->addInputFile(input_file);
+
+    task2 = grid_workflow->addTask("grid_task2", 753350000000.0, 1, 1, 0);
+    task2->addInputFile(input_file);
 
     // Create a Storage Service
     storage_service = simulation->add(
@@ -213,7 +217,7 @@ int main(int argc, char **argv) {
 
     wrench::BatchComputeService *batch_service = nullptr;
 
-    if(argc>2){
+    if(argc>3){
         batch_service = new wrench::BatchComputeService("BatchHost1",
                                                              {"BatchHost1", "BatchHost2"},
                                                              "/scratch",
@@ -265,14 +269,17 @@ int main(int argc, char **argv) {
 
     simulation->getOutput().dumpUnifiedJSON(grid_workflow, "/tmp/workflow_data.json", false, true, false, false, false, true, false);
     auto start_timestamps = simulation->getOutput().getTrace<wrench::CondorGridStartTimestamp>();
-    auto end_timestamps = simulation->getOutput().getTrace<wrench::CondorGridEndTimestamp>();
+    auto end_timestamp = simulation->getOutput().getTrace<wrench::CondorGridEndTimestamp>().back();
 
     for (const auto &start_timestamp : start_timestamps) {
         std::cerr << "Started: " << start_timestamp->getContent()->getDate() << std::endl;
     }
+    /**
     for (const auto &end_timestamp : end_timestamps) {
-        std::cerr << "Ended: " << end_timestamp->getContent()->getDate() << std::endl;
+
     }
+     */
+    std::cerr << "Ended: " << end_timestamp->getContent()->getDate() << std::endl;
 
     return 0;
 }
