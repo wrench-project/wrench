@@ -50,35 +50,56 @@ namespace wrench {
 
         auto htcondor_cs = *(this->getAvailableComputeServices<wrench::HTCondorComputeService>().begin());
 
-        auto task = *(this->getWorkflow()->getTasks().begin());
-        auto file = *(this->getWorkflow()->getFiles().begin());
 
         std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations;
         std::shared_ptr<wrench::StorageService> storage_service;
+
+
+        //This will need to be adjusted if there is more than one file.
+        auto file = *(this->getWorkflow()->getFiles().begin());
+
         for (const auto &ss : this->getAvailableStorageServices()) {
             storage_service = ss;
         }
 
         file_locations[file] = FileLocation::LOCATION(storage_service);
 
-        wrench::StandardJob *grid_job = job_manager->createStandardJob(
-                task, file_locations);
+
+        bool first_task = true;
 
 
-        std::map<std::string, std::string> test_service_specs;
-        test_service_specs.insert(std::pair<std::string, std::string>("universe","grid"));
-        //test_service_specs.insert(std::pair<std::string, std::string>("grid_pre_delay","50.0"));
-        //test_service_specs.insert(std::pair<std::string, std::string>("grid_post_delay","400.0"));
 
-        // Submit the 2-task job for execution
-        try {
-            job_manager->submitJob(grid_job, htcondor_cs, test_service_specs);
-        } catch (wrench::WorkflowExecutionException &e) {
-            throw std::runtime_error(e.what());
+        while (not this->getWorkflow()->isDone()) {
+
+            auto tasks = this->getWorkflow()->getReadyTasks();
+            std::map<std::string, std::string> test_service_specs;
+            test_service_specs.insert(std::pair<std::string, std::string>("universe", "grid"));
+            if(first_task){
+                first_task = false;
+                test_service_specs.insert(std::pair<std::string, std::string>("grid_start", "grid"));
+            }
+            if(tasks.size()==1){
+                test_service_specs.insert(std::pair<std::string, std::string>("grid_end", "grid"));
+            }
+
+            wrench::StandardJob *grid_job = job_manager->createStandardJob(
+                    tasks.at(0), file_locations);
+
+
+            //test_service_specs.insert(std::pair<std::string, std::string>("grid_pre_delay","50.0"));
+            //test_service_specs.insert(std::pair<std::string, std::string>("grid_post_delay","400.0"));
+
+            // Submit the 2-task job for execution
+            try {
+                job_manager->submitJob(grid_job, htcondor_cs, test_service_specs);
+            } catch (wrench::WorkflowExecutionException &e) {
+                throw std::runtime_error(e.what());
+            }
+            //Waiting for job to finish.
+            this->waitForAndProcessNextEvent();
         }
 
-        //Waiting for job to finish.
-        this->waitForAndProcessNextEvent();
+
 
         htcondor_cs->stop();
         return 0;

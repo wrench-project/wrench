@@ -353,8 +353,9 @@ namespace wrench {
         }
 
         //sleep to match real world behavior in communication lag between HTCondor and Batch service (slurm)
-        if (this->grid_execution) {
+        if (this->grid_execution_start) {
             S4U_Simulation::sleep(this->getPropertyValueAsDouble(BatchComputeServiceProperty::GRID_PRE_EXECUTION_DELAY));
+            this->grid_execution_start = false;
         }
 
         // Sanity check
@@ -437,10 +438,14 @@ namespace wrench {
      *
      */
     void BatchComputeService::submitStandardJob(StandardJob *job, const std::map<std::string, std::string> &batch_job_args) {
-
-        if(batch_job_args.find("universe") != batch_job_args.end()) {
+        if(batch_job_args.find("universe") != batch_job_args.end()){
             this->grid_execution = true;
-            //this->setProperties(this->default_property_values, {{BatchComputeServiceProperty::SUPPORTS_GRID_UNIVERSE, "true"}});
+        }
+        if(batch_job_args.find("grid_start") != batch_job_args.end()) {
+            this->grid_execution_start = true;
+        }
+        if(batch_job_args.find("grid_end") != batch_job_args.end()) {
+            this->grid_execution_end = true;
         }
         /**
          * Problem here was just overwriting properties with default because I was switching them one at a time. Also was removing any set when creating service.
@@ -1282,9 +1287,10 @@ namespace wrench {
         this->finished_standard_job_executors.clear();
 
         //sleep to match real world behavior in communication lag between HTCondor and Batch service (slurm)
-        if(this->grid_execution) {
+        //This flag should only be active for last grid job in sequence.
+        if(this->grid_execution_end) {
             S4U_Simulation::sleep(this->getPropertyValueAsDouble(BatchComputeServiceProperty::GRID_POST_EXECUTION_DELAY));
-            this->grid_execution = false;
+            this->grid_execution_end = false;
         }
 
         if (not executor_on_the_list) {
