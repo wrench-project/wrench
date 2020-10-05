@@ -282,7 +282,7 @@ namespace wrench {
                 inactive_list.erase(inactive_list.begin() + i);
                 i--;
             } else if (evicted < amount && evicted + blk->getSize() > amount) {
-                blk->setSize(blk->getSize() - amount - evicted);
+                blk->setSize(blk->getSize() - amount + evicted);
                 // done eviction
                 evicted = amount;
                 break;
