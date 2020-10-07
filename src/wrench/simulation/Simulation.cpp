@@ -806,6 +806,10 @@ namespace wrench {
 
         std::string hostname = getHostName();
 
+        unique_disk_sequence_number += 1;
+        int temp_unique_sequence_number = unique_disk_sequence_number;
+        this->getOutput().addTimestampDiskWriteStart(hostname, mountpoint, n_bytes, temp_unique_sequence_number);
+
         MemoryManager *mem_mng = this->getMemoryManagerByHost(hostname);
 
         double remaining_dirty = mem_mng->getDirtyRatio() * mem_mng->getAvailableMemory() - mem_mng->getDirty();
@@ -818,16 +822,18 @@ namespace wrench {
             mem_mng->writeToCache(file->getID(), mountpoint, mem_bw_amt);
         }
 
-        double disk_bw_amt = n_bytes - mem_bw_amt;
-        if (disk_bw_amt > 0) {
-            mem_mng->flush(disk_bw_amt, "");
-            mem_mng->evict(disk_bw_amt - mem_mng->getFreeMemory(), "");
+        double remaining = n_bytes - mem_bw_amt;
+        // if dirty_ratio is reached, dirty data needs to be flushed to disk to write new data
+        while (remaining > 0) {
+            mem_mng->flush(remaining, "");
+            mem_mng->evict(remaining - mem_mng->getFreeMemory(), "");
 
-            mem_mng->writeToCache(file->getID(), mountpoint, std::min(mem_mng->getFreeMemory(), disk_bw_amt));
-
-            s4u_Disk *disk = MemoryManager::getDisk(mountpoint, hostname);
-            disk->write(disk_bw_amt);
+            double to_cache = std::min(mem_mng->getFreeMemory(), remaining);
+            mem_mng->writeToCache(file->getID(), mountpoint, to_cache);
+            remaining -= to_cache;
         }
+
+        this->getOutput().addTimestampDiskWriteCompletion(hostname, mountpoint, n_bytes, temp_unique_sequence_number);
     }
 
     /**
