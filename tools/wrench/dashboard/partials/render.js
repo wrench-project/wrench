@@ -40,6 +40,12 @@ const graphInfoArray = [
         "containerId": "three-d-graph-container",
         "html": threedVisualizationHtml,
         "icon": "cubes"
+    },
+    {
+        "title": "Disk Operations",
+        "containerId": "disk-operations-container",
+        "html": diskOperationsHtml,
+        "icon": ""
     }
 ]
 
