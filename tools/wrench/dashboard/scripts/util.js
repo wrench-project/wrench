@@ -54,7 +54,8 @@ function processFile(files) {
                 tasks: rawData.workflow_execution.tasks,
                 disk: rawData.disk_operations,
                 network: links,
-                contents: rawData.workflow_execution.tasks // TODO: remove
+                contents: rawData.workflow_execution.tasks, // TODO: remove
+                diskOperations: rawData.disk_operations ? rawData.disk_operations : {}
             };
 
             if (rawData.energy_consumption) {
