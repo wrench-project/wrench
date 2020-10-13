@@ -42,7 +42,7 @@ const graphInfoArray = [
         "icon": "cubes"
     },
     {
-        "title": "Disk Operations",
+        "title": "Disk I/O Operations",
         "containerId": "disk-operations-container",
         "html": diskOperationsHtml,
         "icon": ""

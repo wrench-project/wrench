@@ -30,64 +30,23 @@ const generateVerticalPositions = function(times) {
     return result
 }
 
-const formatForChart = function(readVps, writeVps, colours) {
-    const results = []
-    let counter = 0
-    console.log(readVps, writeVps)
-    readVps.forEach(function(rvp, i) {
-        const currStack = i + 1
-        rvp.forEach(function(time, j) {
-            if (results.length === 0) {
-                results.push({
-                    label: time.host,
-                    backgroundColor: colours[time.host],
-                    data: [[time.start, time.end], [0,0]], 
-                    stack: currStack
-                })
-            } else {
-                let toMinus = 0
-                if (currStack === results[counter - 1].stack) {
-                    toMinus = rvp[j-1].end
-                }
-                results.push({
-                    label: time.host,
-                    backgroundColor: colours[time.host],
-                    data: [[time.start - toMinus, time.end - toMinus],[0,0]],
-                    stack: currStack
-                })
+const populateChartArray = function(array, isReadVp, results, colours, counter) {
+    array.forEach(function (vp, i) { // array is a 2D array, the first level is each vertical position
+        const stack = i + 1
+        vp.forEach(function(time, j) { // the second level is a time within that vertical position
+            let toMinus = 0
+            if (results.length > 0 && stack === results[counter - 1].stack) { // minus the last time from the same vertical position because chart js assumes its from the last event not from 0
+                toMinus = vp[j-1].end
             }
+            results.push({
+                label: time.host,
+                backgroundColor: colours[time.host],
+                data: isReadVp ? [[time.start - toMinus, time.end - toMinus],[0,0]] : [[0,0], [time.start - toMinus, time.end - toMinus]],
+                stack
+            })
             counter++
         })
     })
-
-    counter = 0
-    for (let i = 0; i < writeVps.length; i++) {
-        const wvp = writeVps[i]
-        const currStack = i + 1
-        for (let j = 0; j < wvp.length; j++) {
-            let toMinus = 0
-            if (counter > 0 && j > 0) {
-                toMinus = wvp[j-1].end
-            }
-            const time = wvp[j]
-            const resultStack = results[counter].stack
-            if (resultStack === currStack) {
-                results[counter].data[1] = [time.start - toMinus, time.end - toMinus]
-            } else if (resultStack < currStack) {
-                while (results[counter + 1].stack != currStack) {
-                    counter++
-                }
-            } else if (resultStack > currStack) {
-                results.splice(counter, 0, {
-                    label: time.host,
-                    backgroundColor: colours[time.host],
-                    data: [[0,0], [time.start - toMinus, time.end - toMinus]],
-                    stack: currStack
-                })
-            }
-            counter++
-        }
-    }
     return results
 }
 
@@ -116,10 +75,12 @@ const generateDiskOperations = function(data) {
     }
     allReads.sort(startTimeComparator)
     allWrites.sort(startTimeComparator)
-    console.log(allReads, allWrites)
     readVps = generateVerticalPositions(allReads)
     writeVps = generateVerticalPositions(allWrites)
-    const datasets = formatForChart(readVps, writeVps, colours)
+    let datasets = populateChartArray(readVps, true, [], colours, 0)
+    datasets = populateChartArray(writeVps, false, datasets, colours, datasets.length)
+    const maxVal = Math.max(allReads[allReads.length-1].end, allWrites[allWrites.length-1].end)
+    const pluginsProperties = definePluginsProperties(true, (Math.ceil(maxVal / 100 ) * 100) + 100);
     new Chart(document.getElementById("disk-operations"), {
         type: 'horizontalBar',
         data: {
@@ -129,7 +90,7 @@ const generateDiskOperations = function(data) {
         options: {
             title: {
                 display: true,
-                text: 'Population growth (millions)'
+                text: 'Disk I/O Operations'
             },
             scales: {
                 yAxes: [{
@@ -148,7 +109,53 @@ const generateDiskOperations = function(data) {
                         labelString: 'Time (seconds)'
                     }
                 }]
-            }
+            },
+            legend: {
+                labels: {
+                    filter: function(item, chart) {
+                        let matchFoundIndex = -1
+                        for (let i = 0; i < chart.datasets.length; i++) {
+                            const chartLabel = chart.datasets[i].label
+                            if (i === item.datasetIndex) {
+                                return matchFoundIndex === -1
+                            }
+                            if (chartLabel === item.text) {
+                                matchFoundIndex = i
+                            }
+                        }
+                    }
+                }
+            },
+            tooltips: {
+                position: 'nearest',
+                mode: 'point',
+                intersect: 'false',
+                callbacks: {
+                    label: function (tooltipItem, data) {
+                        return data.datasets[tooltipItem.datasetIndex].label
+                    },
+                    afterBody: function (tooltipItem, data) {
+                        const { stack } = data.datasets[tooltipItem[0].datasetIndex]
+                        const readWrite = tooltipItem[0].yLabel
+                        let toMinus = 0
+                        for (let i = 0; i < stack - 1; i++) {
+                            toMinus += (readWrite === "Reads" ? readVps[i].length : writeVps[i].length)
+                        }
+                        toMinus += readWrite === "Writes" ? allReads.length : 0
+                        const vpIndex = tooltipItem[0].datasetIndex - toMinus
+                        const { bytes } = readWrite === "Reads" ? readVps[stack-1][vpIndex] : writeVps[stack-1][vpIndex]
+
+                        let [start, end] = tooltipItem[0].xLabel.split(",")
+                        start = start.replace("[","")
+                        start = start.trim()
+                        end = end.replace("]", "")
+                        end = end.trim()
+
+                        return `${bytes} bytes read\nDuration: ${end - start}`
+                    }
+                }
+            },
+            plugins: pluginsProperties
         }
     });
 }
