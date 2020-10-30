@@ -55,14 +55,19 @@ namespace wrench {
         std::shared_ptr<wrench::StorageService> storage_service;
 
 
-        //This will need to be adjusted if there is more than one file.
-        auto file = *(this->getWorkflow()->getFiles().begin());
-
+        //Only set up for one storage service
         for (const auto &ss : this->getAvailableStorageServices()) {
             storage_service = ss;
         }
 
-        file_locations[file] = FileLocation::LOCATION(storage_service);
+        //Loop through files and indicate they are stored on the storage service.
+        for( auto &file : this->getWorkflow()->getFiles()){
+            file_locations[file] = FileLocation::LOCATION(storage_service);
+        }
+
+
+
+
 
 
         bool first_task = true;
@@ -83,14 +88,15 @@ namespace wrench {
             }
 
             wrench::StandardJob *grid_job = job_manager->createStandardJob(
-                    tasks.at(0), file_locations);
-
+                    tasks, file_locations);
+            //printf("Submitting job with %lu tasks\n",tasks.size());
 
             //test_service_specs.insert(std::pair<std::string, std::string>("grid_pre_delay","50.0"));
             //test_service_specs.insert(std::pair<std::string, std::string>("grid_post_delay","400.0"));
 
             // Submit the 2-task job for execution
             try {
+                //printf("Submitting job with %i tasks\n",);
                 job_manager->submitJob(grid_job, htcondor_cs, test_service_specs);
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error(e.what());
