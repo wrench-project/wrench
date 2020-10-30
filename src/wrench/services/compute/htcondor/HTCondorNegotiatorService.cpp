@@ -123,10 +123,9 @@ namespace wrench {
                     }
                 } else {
                     if (service_specific_arguments["universe"].compare("grid") == 0) {
+                        auto num_tasks = std::to_string((int) std::min(standard_job->getNumTasks(),this->grid_universe_batch_service->getNumHosts()));
 
-                        //instead of erasing here, going to iterate through.
-                        //service_specific_arguments.erase("universe");
-                        service_specific_arguments.insert(std::pair<std::string, std::string>("-N", "1"));
+                        service_specific_arguments.insert(std::pair<std::string, std::string>("-N", num_tasks));
                         service_specific_arguments.insert(std::pair<std::string, std::string>("-c", "1"));
                         service_specific_arguments.insert(std::pair<std::string, std::string>("-t", "9999"));
 

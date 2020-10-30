@@ -48,7 +48,7 @@ void generatePlatform(std::string platform_file_path, int disk_speed, int batch_
                              "          <prop id=\"mount\" value=\"/scratch\"/>\n"
                              "      </disk>\n"
                              "  </host>\n"
-                             "  <host id=\"BatchHost1\" speed=\"3050000000f\" core=\"10\">\n"
+                             "  <host id=\"BatchHost1\" speed=\"1666666666f\" core=\"10\">\n"
                              "      <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">\n"
                              "          <prop id=\"size\" value=\"100GB\"/>\n"
                              "          <prop id=\"mount\" value=\"/\"/>\n"
@@ -58,7 +58,7 @@ void generatePlatform(std::string platform_file_path, int disk_speed, int batch_
                              "          <prop id=\"mount\" value=\"/scratch\"/>\n"
                              "      </disk>\n"
                              "  </host>\n"
-                             "  <host id=\"BatchHost2\" speed=\"3050000000f\" core=\"10\">\n"
+                             "  <host id=\"BatchHost2\" speed=\"1666666666f\" core=\"10\">\n"
                              "    <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">\n"
                              "        <prop id=\"size\" value=\"100GB\"/>\n"
                              "        <prop id=\"mount\" value=\"/\"/>\n"
@@ -118,8 +118,10 @@ void generatePlatform(std::string platform_file_path, int disk_speed, int batch_
 
         //Setting two links that are between DualCoreHost (storage service) and the two batch service hosts.
         if(batch_bandwidth>0){
+            link2.attribute("bandwidth").set_value(std::string(std::to_string(batch_bandwidth) + "MBps").c_str());
             link3.attribute("bandwidth").set_value(std::string(std::to_string(batch_bandwidth) + "MBps").c_str());
             link4.attribute("bandwidth").set_value(std::string(std::to_string(batch_bandwidth) + "MBps").c_str());
+            link5.attribute("bandwidth").set_value(std::string(std::to_string(batch_bandwidth) + "MBps").c_str());
         }
 
         xml_doc.save_file(platform_file_path.c_str());
@@ -151,12 +153,16 @@ int main(int argc, char **argv) {
     double pre_execution_overhead;
     double post_execution_overhead;
     int batch_bandwidth;
+    bool diamond_exec = false;
     if(argc>2){
         batch_bandwidth = std::stoi(std::string(argv[2]));
     }
     if(argc>3){
         pre_execution_overhead = std::stod(std::string(argv[3]));
         post_execution_overhead = std::stod(std::string(argv[4]));
+    }
+    if(argc==6){
+        diamond_exec = true;
     }
 
 
@@ -172,8 +178,8 @@ int main(int argc, char **argv) {
 
 
 
-    wrench::WorkflowFile *input_file;
-    wrench::WorkflowTask *task1, *task2;
+    wrench::WorkflowFile *input_file1, *output_file1, *input_file2, *output_file2, *input_file3, *output_file3, *input_file4, *output_file4;
+    wrench::WorkflowTask *task1, *task2, *task3, *task4;
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service2 = nullptr;
@@ -186,14 +192,44 @@ int main(int argc, char **argv) {
     workflow_unique_ptr1 = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
     grid_workflow = workflow_unique_ptr1.get();
 
-    input_file = grid_workflow->addFile("input_file", 10.0);
+    input_file1 = grid_workflow->addFile("input_file1", 10000000000.0);
+    output_file1 = grid_workflow->addFile("output_file1", 10000000000.0);
+
+
     //task1 = grid_workflow->addTask("grid_task1", 87867450000.0, 1, 1, 0);
     //task1 = grid_workflow->addTask("grid_task1", 3050000000.0, 1, 1, 0);
-    task1 = grid_workflow->addTask("grid_task1", 753350000000.0, 1, 1, 0);
-    task1->addInputFile(input_file);
 
-    task2 = grid_workflow->addTask("grid_task2", 753350000000.0, 1, 1, 0);
-    task2->addInputFile(input_file);
+    task1 = grid_workflow->addTask("grid_task1", 500000000000.0, 1, 1, 0);
+    task1->addInputFile(input_file1);
+    task1->addOutputFile(output_file1);
+    if(diamond_exec){
+        input_file2 = grid_workflow->addFile("input_file2", 10000000000.0);
+        output_file2 = grid_workflow->addFile("output_file2", 10000000000.0);
+        input_file3 = grid_workflow->addFile("input_file3", 10000000000.0);
+        output_file3 = grid_workflow->addFile("output_file3", 10000000000.0);
+        input_file4 = grid_workflow->addFile("input_file4", 10000000000.0);
+        output_file4 = grid_workflow->addFile("output_file4", 10000000000.0);
+
+        task2 = grid_workflow->addTask("grid_task2", 500000000000.0, 1, 1, 0);
+        task2->addInputFile(input_file2);
+        task2->addOutputFile(output_file2);
+        task3 = grid_workflow->addTask("grid_task3", 500000000000.0, 1, 1, 0);
+        task3->addInputFile(input_file3);
+        task3->addOutputFile(output_file3);
+        task4 = grid_workflow->addTask("grid_task4", 500000000000.0, 1, 1, 0);
+        task4->addInputFile(input_file4);
+        task4->addOutputFile(output_file4);
+
+
+        grid_workflow->addControlDependency(task1, task2);
+        grid_workflow->addControlDependency(task1, task3);
+        grid_workflow->addControlDependency(task3, task4);
+        grid_workflow->addControlDependency(task2, task4);
+    }
+
+
+
+
 
     // Create a Storage Service
     storage_service = simulation->add(
@@ -262,7 +298,15 @@ int main(int argc, char **argv) {
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Staging the input_file on the storage service
-    simulation->stageFile(input_file, storage_service);
+    simulation->stageFile(input_file1, storage_service);
+
+    if(diamond_exec){
+        simulation->stageFile(input_file2, storage_service);
+        simulation->stageFile(input_file3, storage_service);
+        simulation->stageFile(input_file4, storage_service);
+    }
+
+
 
     // Running a "run a single task" simulation
     simulation->launch();
@@ -272,14 +316,14 @@ int main(int argc, char **argv) {
     auto end_timestamp = simulation->getOutput().getTrace<wrench::CondorGridEndTimestamp>().back();
 
     for (const auto &start_timestamp : start_timestamps) {
-        std::cerr << "Started: " << start_timestamp->getContent()->getDate() << std::endl;
+        std::cout << "Started: " << start_timestamp->getContent()->getDate() << std::endl;
     }
     /**
     for (const auto &end_timestamp : end_timestamps) {
 
     }
      */
-    std::cerr << "Ended: " << end_timestamp->getContent()->getDate() << std::endl;
+    std::cout << "Ended: " << end_timestamp->getContent()->getDate() << std::endl;
 
     return 0;
 }
