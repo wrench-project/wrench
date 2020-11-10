@@ -105,8 +105,6 @@ namespace wrench {
             this->waitForAndProcessNextEvent();
         }
 
-
-
         htcondor_cs->stop();
         return 0;
     }
