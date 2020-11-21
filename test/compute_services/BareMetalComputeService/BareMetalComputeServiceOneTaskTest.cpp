@@ -70,7 +70,7 @@ protected:
         task->addInputFile(input_file);
         task->addOutputFile(output_file);
 
-        // Create a one-host platform file
+        // Create a platform file
         std::string xml = "<?xml version='1.0'?>"
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "

@@ -158,7 +158,8 @@ namespace wrench {
 
             /* Wait for a workflow execution event, which should be a failure
              * Note that this does not use the higher-level waitForAndProcessNextEvent()
-             * method, but instead calls the lower-level waitForNextExecutionEvent() method */
+             * method, but instead calls the lower-level waitForNextExecutionEvent() method and
+             * then process the event manually */
             WRENCH_INFO("Waiting for the next event");
             
             try {
@@ -195,35 +196,5 @@ namespace wrench {
         WRENCH_INFO("Workflow execution complete");
         return 0;
     }
-
-    /**
-     * @brief Process a standard job completion event
-     *
-     * @param event: the event
-     */
-    void TwoTasksAtATimeBatchWMS::processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent> event) {
-        /* Retrieve the job that this event is for */
-        auto job = event->standard_job;
-        /* Retrieve the job's first (and in our case only) task */
-        auto task = job->getTasks().at(0);WRENCH_INFO("Notified that a standard job has completed task %s",
-                                                      task->getID().c_str());
-    }
-
-    /**
-     * @brief Process a standard job failure event
-     *
-     * @param event: the event
-     */
-    void TwoTasksAtATimeBatchWMS::processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent> event) {
-        /* Retrieve the job that this event is for */
-        auto job = event->standard_job;
-        /* Retrieve the job's first (and in our case only) task */
-        auto task = job->getTasks().at(0);
-        /* Print some error message */
-        WRENCH_INFO("Notified that a standard job has failed for task %s with error %s",
-                    task->getID().c_str(),
-                    event->failure_cause->toString().c_str());
-    }
-
 
 }
