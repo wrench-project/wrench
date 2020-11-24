@@ -138,7 +138,7 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create a 2-task job
-        wrench::StandardJob *two_task_job = job_manager->createStandardJob(
+        auto two_task_job = job_manager->createStandardJob(
                 {this->test->task1},
                 {},
                 {std::make_tuple(this->test->input_file,
@@ -412,7 +412,7 @@ private:
 
         auto htcondor_cs = *(this->getAvailableComputeServices<wrench::HTCondorComputeService>().begin());
         // Create a 2-task job
-        wrench::StandardJob *two_task_job = job_manager->createStandardJob(
+        auto two_task_job = job_manager->createStandardJob(
                 {this->test->task1}, {},
                 {std::make_tuple(this->test->input_file,
                                  wrench::FileLocation::LOCATION(htcondor_cs->getLocalStorageService()),

@@ -119,7 +119,7 @@ private:
         auto file_registry_service = this->getAvailableFileRegistryService();
 
         // Create a pilot job
-        wrench::PilotJob *pilot_job = job_manager->createPilotJob();
+        auto pilot_job = job_manager->createPilotJob();
 
         // Submit a pilot job
         try {

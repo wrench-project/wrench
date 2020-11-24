@@ -27,7 +27,7 @@ namespace wrench {
      * @param job: the job that wasn't supported
      * @param compute_service: the compute service that did not support it
      */
-    JobTypeNotSupported::JobTypeNotSupported(WorkflowJob *job, std::shared_ptr<ComputeService> compute_service) {
+    JobTypeNotSupported::JobTypeNotSupported(std::shared_ptr<WorkflowJob> job, std::shared_ptr<ComputeService> compute_service) {
         this->job = job;
         this->compute_service = compute_service;
     }
@@ -36,7 +36,7 @@ namespace wrench {
      * @brief Getter
      * @return the job
      */
-    WorkflowJob *JobTypeNotSupported::getJob() {
+    std::shared_ptr<WorkflowJob> JobTypeNotSupported::getJob() {
         return this->job;
     }
 

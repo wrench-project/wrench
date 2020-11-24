@@ -123,7 +123,7 @@ private:
 
         // Submit them in order
         for (auto const & t : tasks) {
-            wrench::StandardJob *j = job_manager->createStandardJob(t, {});
+            auto j = job_manager->createStandardJob(t, {});
             std::map<std::string, std::string> cs_specific_args;
             cs_specific_args.insert(std::make_pair(t->getID(), "Host1:1"));
             job_manager->submitJob(j, this->test->cs, cs_specific_args);
@@ -149,8 +149,8 @@ private:
                 throw std::runtime_error("Unexpected execution event: " + event->toString());
             }
 
-            wrench::StandardJob *job = std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)->standard_job;
-            wrench::WorkflowTask *task = *(job->getTasks().begin());
+            auto job = std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)->standard_job;
+            auto task = *(job->getTasks().begin());
             double start_time = task->getStartDate();
             double end_time = task->getEndDate();
             times.insert(std::make_pair(task, std::make_tuple(start_time, end_time)));
@@ -273,7 +273,7 @@ private:
 
         // Submit them in order
         for (auto const & t : tasks) {
-            wrench::StandardJob *j = job_manager->createStandardJob(t, {});
+            auto j = job_manager->createStandardJob(t, {});
             std::map<std::string, std::string> cs_specific_args;
             cs_specific_args.insert(std::make_pair(t->getID(), ""));
             job_manager->submitJob(j, this->test->cs, cs_specific_args);
@@ -294,7 +294,7 @@ private:
                 throw std::runtime_error("Unexpected execution event: " + event->toString());
             }
 
-            wrench::StandardJob *job = real_event->standard_job;
+            auto job = real_event->standard_job;
             wrench::WorkflowTask *task = *(job->getTasks().begin());
             double start_time = task->getStartDate();
             double end_time = task->getEndDate();
@@ -407,7 +407,7 @@ private:
 
         // Submit them in order
         for (auto const & t : tasks) {
-            wrench::StandardJob *j = job_manager->createStandardJob(t, {});
+            auto j = job_manager->createStandardJob(t, {});
             std::map<std::string, std::string> cs_specific_args;
             cs_specific_args.insert(std::make_pair(t->getID(), ""));
             job_manager->submitJob(j, this->test->cs, cs_specific_args);
@@ -428,7 +428,7 @@ private:
                 throw std::runtime_error("Unexpected execution event: " + event->toString());
             }
 
-            wrench::StandardJob *job = real_event->standard_job;
+            auto job = real_event->standard_job;
             wrench::WorkflowTask *task = *(job->getTasks().begin());
             double start_time = task->getStartDate();
             double end_time = task->getEndDate();

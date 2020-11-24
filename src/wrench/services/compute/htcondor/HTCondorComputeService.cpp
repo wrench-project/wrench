@@ -114,7 +114,7 @@ namespace wrench {
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
      */
-    void HTCondorComputeService::submitStandardJob(StandardJob *job,
+    void HTCondorComputeService::submitStandardJob(std::shared_ptr<StandardJob> job,
                                                    const std::map<std::string, std::string> &service_specific_args) {
 
         serviceSanityCheck();
@@ -161,7 +161,7 @@ namespace wrench {
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
      */
-    void HTCondorComputeService::submitPilotJob(PilotJob *job,
+    void HTCondorComputeService::submitPilotJob(std::shared_ptr<PilotJob>job,
                                                 const std::map<std::string, std::string> &service_specific_args) {
         serviceSanityCheck();
 
@@ -204,7 +204,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void HTCondorComputeService::terminateStandardJob(StandardJob *job) {
+    void HTCondorComputeService::terminateStandardJob(std::shared_ptr<StandardJob>job) {
         throw std::runtime_error("HTCondorComputeService::terminateStandardJob(): Not implemented yet!");
     }
 
@@ -214,7 +214,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void HTCondorComputeService::terminatePilotJob(PilotJob *job) {
+    void HTCondorComputeService::terminatePilotJob(std::shared_ptr<PilotJob>job) {
         throw std::runtime_error("HTCondorComputeService::terminatePilotJob(): Not implemented yet!");
     }
 
@@ -317,7 +317,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void HTCondorComputeService::processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
+    void HTCondorComputeService::processSubmitStandardJob(const std::string &answer_mailbox, std::shared_ptr<StandardJob>job,
                                                           const std::map<std::string, std::string> &service_specific_args) {
 
         WRENCH_INFO("Asked to run a standard job with %ld tasks", job->getNumTasks());
@@ -356,7 +356,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void HTCondorComputeService::processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job,
+    void HTCondorComputeService::processSubmitPilotJob(const std::string &answer_mailbox, std::shared_ptr<PilotJob>job,
                                                        const std::map<std::string, std::string> &service_specific_args) {
 
         WRENCH_INFO("Asked to run a pilot job");

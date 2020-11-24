@@ -425,7 +425,7 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        wrench::StandardJob *job = nullptr;
+        std::shared_ptr<wrench::StandardJob> job = nullptr;
 
         // Create a job with nullptr task (and no file copies)
         try {
@@ -973,7 +973,7 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create a job
-        wrench::StandardJob *job = job_manager->createStandardJob(test->task, {});
+        auto job = job_manager->createStandardJob(test->task, {});
 
         // Submit the job
         job_manager->submitJob(job, test->compute_service);
@@ -1089,7 +1089,7 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create a job
-        wrench::StandardJob *job = job_manager->createStandardJob(
+        auto job = job_manager->createStandardJob(
                 {test->task},
                 {{test->input_file,  wrench::FileLocation::LOCATION((test->storage_service1))},
                  {test->output_file, wrench::FileLocation::LOCATION(
@@ -1244,7 +1244,7 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create a job
-        wrench::StandardJob *job = job_manager->createStandardJob({},
+        auto job = job_manager->createStandardJob({},
                                                                   {}, //changed this since we don't have default storage now
                                                                   {std::make_tuple(test->input_file,
                                                                                    wrench::FileLocation::LOCATION(
@@ -1376,7 +1376,7 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create a job
-        wrench::StandardJob *job = job_manager->createStandardJob({},
+        auto job = job_manager->createStandardJob({},
                                                                   {}, //changed this since we don't have default storage now
                                                                   {std::make_tuple(test->input_file,
                                                                                    wrench::FileLocation::LOCATION(
@@ -1502,7 +1502,7 @@ private:
 //                                           wrench::FileLocation::LOCATION(test->storage_service1));
 
         // Create a job (that doesn't say where the file should come from!)
-        wrench::StandardJob *job = job_manager->createStandardJob({test->task},
+        auto job = job_manager->createStandardJob({test->task},
                                                                   {},
                                                                   {},
                                                                   {},
@@ -1627,7 +1627,7 @@ private:
         wrench::WorkflowTask *task_big = this->getWorkflow()->addTask("task2", 3600, 2, 2, 2048);
 
         // Create a job
-        wrench::StandardJob *job = job_manager->createStandardJob({task_big},
+        auto job = job_manager->createStandardJob({task_big},
                                                                   {},
                                                                   {}, {}, {});
         // Submit the job
@@ -1743,7 +1743,7 @@ private:
         wrench::WorkflowTask *task_big = this->getWorkflow()->addTask("task2", 3600, 2, 2, 2048);
 
         // Create a job
-        wrench::StandardJob *job = job_manager->createStandardJob({task_big},
+        auto job = job_manager->createStandardJob({task_big},
                                                                   {},
                                                                   {}, {}, {});
         // Submit the job
@@ -1856,7 +1856,7 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        wrench::StandardJob *job = nullptr;
+        std::shared_ptr<wrench::StandardJob> job = nullptr;
 
         // Shutdown the service
         test->compute_service->stop();
@@ -1968,7 +1968,7 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        wrench::StandardJob *job = nullptr;
+        std::shared_ptr<wrench::StandardJob> job = nullptr;
 
         // Suspend the service
         test->compute_service->suspend();

@@ -54,7 +54,7 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    void ComputeService::submitJob(WorkflowJob *job, const std::map<std::string, std::string> &service_specific_args) {
+    void ComputeService::submitJob(std::shared_ptr<WorkflowJob> job, const std::map<std::string, std::string> &service_specific_args) {
 
         if (job == nullptr) {
             throw std::invalid_argument("ComputeService::submitJob(): invalid argument");
@@ -65,11 +65,11 @@ namespace wrench {
         try {
             switch (job->getType()) {
                 case WorkflowJob::STANDARD: {
-                    this->submitStandardJob((StandardJob *) job, service_specific_args);
+                    this->submitStandardJob(std::dynamic_pointer_cast<StandardJob>(job), service_specific_args);
                     break;
                 }
                 case WorkflowJob::PILOT: {
-                    this->submitPilotJob((PilotJob *) job, service_specific_args);
+                    this->submitPilotJob(std::dynamic_pointer_cast<PilotJob>(job), service_specific_args);
                     break;
                 }
             }
@@ -87,7 +87,7 @@ namespace wrench {
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
      */
-    void ComputeService::terminateJob(WorkflowJob *job) {
+    void ComputeService::terminateJob(std::shared_ptr<WorkflowJob> job) {
 
         if (job == nullptr) {
             throw std::invalid_argument("ComputeService::terminateJob(): invalid argument");
@@ -98,11 +98,11 @@ namespace wrench {
         try {
             switch (job->getType()) {
                 case WorkflowJob::STANDARD: {
-                    this->terminateStandardJob((StandardJob *) job);
+                    this->terminateStandardJob(std::dynamic_pointer_cast<StandardJob>(job));
                     break;
                 }
                 case WorkflowJob::PILOT: {
-                    this->terminatePilotJob((PilotJob *) job);
+                    this->terminatePilotJob(std::dynamic_pointer_cast<PilotJob>(job));
                     break;
                 }
             }

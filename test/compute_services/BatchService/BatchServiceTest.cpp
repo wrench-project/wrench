@@ -276,8 +276,8 @@ private:
 
         wrench::WorkflowTask *task1;
         wrench::WorkflowTask *task2;
-        wrench::StandardJob *job1;
-        wrench::StandardJob *job2;
+        std::shared_ptr<wrench::StandardJob> job1;
+        std::shared_ptr<wrench::StandardJob> job2;
 
         // Submit job1 that should start right away
         {
@@ -476,7 +476,7 @@ private:
 
             // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
 
-            wrench::StandardJob *job = job_manager->createStandardJob(
+            auto job = job_manager->createStandardJob(
                     {task},
                     {
                             {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
@@ -638,8 +638,7 @@ private:
         }
 
         // Create a Standard Job with only the tasks
-        wrench::StandardJob *standard_job_1;
-        standard_job_1 = job_manager->createStandardJob(tasks, {});
+        auto standard_job_1 = job_manager->createStandardJob(tasks, {});
 
         // Create the batch-specific argument
         batch_job_args["-N"] = std::to_string(2); // Number of nodes/tasks
@@ -663,8 +662,7 @@ private:
         }
 
         // Create a Standard Job with only the tasks
-        wrench::StandardJob *standard_job_2;
-        standard_job_2 = job_manager->createStandardJob(tasks, {});
+        auto standard_job_2 = job_manager->createStandardJob(tasks, {});
 
         // Create the batch-specific argument
         batch_job_args.clear();
@@ -802,15 +800,7 @@ private:
 
         {
             // Create a pilot job that needs 1 host, 1 code, 0 bytes of RAM and 30 seconds
-            wrench::PilotJob *pilot_job = job_manager->createPilotJob();
-            // Forgetting the job right-away for coverage
-            job_manager->forgetJob(pilot_job);
-            // Forgetting the job again, which is wrong,for coverage
-            try {
-                job_manager->forgetJob(pilot_job);
-                throw std::runtime_error("Should not be able to forget already forgotten pilot job");
-            } catch (std::invalid_argument &e) {
-            }
+            auto pilot_job = job_manager->createPilotJob();
             // Re-creating it
             pilot_job = job_manager->createPilotJob();
 
@@ -820,11 +810,11 @@ private:
             bogus_batch_job_args["-c"] = "4"; //number of cores per node
 
             // Coverage
-            ((wrench::WorkflowJob *) pilot_job)->getPriority();
+            pilot_job->getPriority();
 
             // Submit a pilot job with bogus batch jobs
             try {
-                job_manager->submitJob((wrench::WorkflowJob *) pilot_job, this->test->compute_service,
+                job_manager->submitJob(pilot_job, this->test->compute_service,
                                        bogus_batch_job_args);
                 throw std::runtime_error("Should not be able to submit a pilot job with bogus arguments");
             } catch (std::invalid_argument &e) {
@@ -841,21 +831,11 @@ private:
 
             // Submit a pilot job
             try {
-                job_manager->submitJob((wrench::WorkflowJob *) pilot_job, this->test->compute_service, batch_job_args);
+                job_manager->submitJob(pilot_job, this->test->compute_service, batch_job_args);
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error(
                         "Exception: " + std::string(e.what())
                 );
-            }
-
-            // Trying to forget the job right now, which is wrong
-            try {
-                job_manager->forgetJob(pilot_job);
-                throw std::runtime_error("Shouldn't be able to forget a running/pending pilot job");
-            } catch (wrench::WorkflowExecutionException &e) {
-                if (not std::dynamic_pointer_cast<wrench::NotAllowed>(e.getCause())) {
-                    throw std::runtime_error("Unexpected failure cause: " + e.getCause()->toString());
-                }
             }
 
             // Wait for a workflow execution event (pilot job started)
@@ -878,9 +858,6 @@ private:
             if (not std::dynamic_pointer_cast<wrench::PilotJobExpiredEvent>(event)) {
                 throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
-
-            // Forget the job!
-            job_manager->forgetJob(pilot_job);
 
         }
 
@@ -981,7 +958,7 @@ private:
 
             // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
 
-            wrench::StandardJob *job = job_manager->createStandardJob(
+            auto job = job_manager->createStandardJob(
                     {task},
                     {
                             {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
@@ -1024,7 +1001,7 @@ private:
 
         {
             // Create a pilot job that needs 1 host, 1 code, 0 bytes of RAM, and 30 seconds
-            wrench::PilotJob *pilot_job = job_manager->createPilotJob();
+            auto pilot_job = job_manager->createPilotJob();
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "1";
@@ -1033,7 +1010,7 @@ private:
 
             // Submit a pilot job
             try {
-                job_manager->submitJob((wrench::WorkflowJob *) pilot_job, this->test->compute_service, batch_job_args);
+                job_manager->submitJob(pilot_job, this->test->compute_service, batch_job_args);
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error(
                         "Exception: " + std::string(e.what())
@@ -1156,7 +1133,7 @@ private:
 
             // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
 
-            wrench::StandardJob *job = job_manager->createStandardJob(
+            auto job = job_manager->createStandardJob(
                     {task},
                     {
                             {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
@@ -1287,7 +1264,7 @@ private:
 
             // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
 
-            wrench::StandardJob *job = job_manager->createStandardJob(
+            auto job = job_manager->createStandardJob(
                     {task},
                     {
                             {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
@@ -1409,7 +1386,7 @@ private:
 
             // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
 
-            wrench::StandardJob *job = job_manager->createStandardJob(
+            auto job = job_manager->createStandardJob(
                     {task},
                     {
                             {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
@@ -1551,7 +1528,7 @@ private:
 
         {
             // Create a pilot job that needs 1 host, 1 core, 0 bytes of RAM, and 90 seconds
-            wrench::PilotJob *pilot_job = job_manager->createPilotJob();
+            auto pilot_job = job_manager->createPilotJob();
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "1";
@@ -1560,7 +1537,7 @@ private:
 
             // Submit a pilot job
             try {
-                job_manager->submitJob((wrench::WorkflowJob *) pilot_job, this->test->compute_service, batch_job_args);
+                job_manager->submitJob(pilot_job, this->test->compute_service, batch_job_args);
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error(
                         "Exception: " + std::string(e.what())
@@ -1692,7 +1669,7 @@ private:
             task2->addOutputFile(this->getWorkflow()->getFileByID("output_file_2"));
 
             // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
-            wrench::StandardJob *job = job_manager->createStandardJob(
+            auto job = job_manager->createStandardJob(
                     {task},
                     {
                             {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
@@ -1721,7 +1698,7 @@ private:
                 );
             }
 
-            wrench::StandardJob *job1 = job_manager->createStandardJob(
+            auto job1 = job_manager->createStandardJob(
                     {task1},
                     {
                             {*(task1->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
@@ -1750,7 +1727,7 @@ private:
                 );
             }
 
-            wrench::StandardJob *job2 = job_manager->createStandardJob(
+            auto job2 = job_manager->createStandardJob(
                     {task2},
                     {
                             {*(task2->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
@@ -1914,7 +1891,7 @@ private:
             unsigned long num_hosts_in_platform = 4;
             unsigned long repetition = num_tasks / (num_cores_in_each_task * num_hosts_in_platform);
             std::vector<wrench::WorkflowTask *> tasks = {};
-            std::vector<wrench::StandardJob *> jobs = {};
+            std::vector<std::shared_ptr<wrench::StandardJob>> jobs = {};
             for (int i = 0; i < num_tasks; i++) {
                 tasks.push_back(this->getWorkflow()->addTask("task" + std::to_string(i), 59, num_cores_in_each_task,
                                                              num_cores_in_each_task, 0));
@@ -2073,16 +2050,16 @@ private:
             //Create another sequential task that lasts one min and requires 10 cores
             wrench::WorkflowTask *task4 = this->getWorkflow()->addTask("task4", 600, 10, 10, 0);
 
-            wrench::StandardJob *job = job_manager->createStandardJob(
+            auto job = job_manager->createStandardJob(
                     {task1}, {}, {}, {}, {});
 
-            wrench::StandardJob *job2 = job_manager->createStandardJob(
+            auto job2 = job_manager->createStandardJob(
                     {task2}, {}, {}, {}, {});
 
-            wrench::StandardJob *job3 = job_manager->createStandardJob(
+            auto job3 = job_manager->createStandardJob(
                     {task3}, {}, {}, {}, {});
 
-            wrench::StandardJob *job4 = job_manager->createStandardJob(
+            auto job4 = job_manager->createStandardJob(
                     {task4}, {}, {}, {}, {});
 
             std::map<std::string, std::string> batch_job_args;
@@ -2178,7 +2155,7 @@ private:
         {
             int num_tasks = 20;
             std::vector<wrench::WorkflowTask *> tasks = {};
-            std::vector<wrench::StandardJob *> jobs = {};
+            std::vector<std::shared_ptr<wrench::StandardJob>> jobs = {};
             for (int i = 0; i < num_tasks; i++) {
                 tasks.push_back(this->getWorkflow()->addTask("task" + std::to_string(i), 59, 1, 1, 0));
                 jobs.push_back(job_manager->createStandardJob(
@@ -2326,7 +2303,7 @@ private:
 
         {
             // Create a pilot job that needs 1 host, 1 core, 0 bytes of RAM, and 90 seconds
-            wrench::PilotJob *pilot_job = job_manager->createPilotJob();
+            auto pilot_job = job_manager->createPilotJob();
 
             // Create a sequential task that lasts one min and requires 2 cores
             wrench::WorkflowTask *task = this->getWorkflow()->addTask("task", 60, 2, 2, 0);
@@ -2342,7 +2319,7 @@ private:
 
             // Submit a pilot job
             try {
-                job_manager->submitJob((wrench::WorkflowJob *) pilot_job, this->test->compute_service,
+                job_manager->submitJob(pilot_job, this->test->compute_service,
                                        pilot_batch_job_args);
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error(
@@ -2362,7 +2339,7 @@ private:
             }
 
             // Create a StandardJob with some pre-copies and post-deletions
-            wrench::StandardJob *job = job_manager->createStandardJob(
+            auto job = job_manager->createStandardJob(
                     {task}, {{file1, wrench::FileLocation::LOCATION(this->test->storage_service1)}}, {}, {}, {});
 
             try {
@@ -2497,7 +2474,7 @@ private:
 
         {
             // Create a pilot job that needs 1 host, 1 core, 0 bytes of RAM, and 90 seconds
-            wrench::PilotJob *pilot_job = job_manager->createPilotJob();
+            auto pilot_job = job_manager->createPilotJob();
 
             // Create a sequential task that lasts one min and requires 2 cores
             wrench::WorkflowTask *task = this->getWorkflow()->addTask("task", 60, 2, 2, 0);
@@ -2511,7 +2488,7 @@ private:
 
             // Submit a pilot job
             try {
-                job_manager->submitJob((wrench::WorkflowJob *) pilot_job, this->test->compute_service,
+                job_manager->submitJob(pilot_job, this->test->compute_service,
                                        pilot_batch_job_args);
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error(
@@ -2531,7 +2508,7 @@ private:
             }
 
             // Create a StandardJob with some pre-copies and post-deletions
-            wrench::StandardJob *job = job_manager->createStandardJob(
+            auto job = job_manager->createStandardJob(
                     {task},
                     {
                             {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
@@ -2658,7 +2635,7 @@ private:
 
         {
             // Create a pilot job that needs 1 host, 1 core, 0 bytes of RAM, and 90 seconds
-            wrench::PilotJob *pilot_job = job_manager->createPilotJob();
+            auto pilot_job = job_manager->createPilotJob();
 
             // Create a sequential task that lasts one min and requires 5 cores
             wrench::WorkflowTask *task = this->getWorkflow()->addTask("task", 60, 5, 5, 0);
@@ -2672,7 +2649,7 @@ private:
 
             // Submit a pilot job
             try {
-                job_manager->submitJob((wrench::WorkflowJob *) pilot_job, this->test->compute_service,
+                job_manager->submitJob(pilot_job, this->test->compute_service,
                                        pilot_batch_job_args);
             } catch (wrench::WorkflowExecutionException &e) {
                 throw std::runtime_error(
@@ -2692,7 +2669,7 @@ private:
             }
 
             // Create a StandardJob with some pre-copies and post-deletions
-            wrench::StandardJob *job = job_manager->createStandardJob(
+            auto job = job_manager->createStandardJob(
                     {task},
                     {
                             {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
@@ -2809,13 +2786,13 @@ private:
         {
             int num_standard_jobs = 10;
             int each_task_time = 60; //in seconds
-            std::vector<wrench::StandardJob *> jobs;
+            std::vector<std::shared_ptr<wrench::StandardJob>> jobs;
             std::vector<wrench::WorkflowTask *> tasks;
             for (int i = 0; i < num_standard_jobs; i++) {
                 // Create a sequential task that lasts for random minutes and requires 2 cores
                 wrench::WorkflowTask *task = this->getWorkflow()->addTask("task" + std::to_string(i), each_task_time, 2,
                                                                           2, 0);
-                wrench::StandardJob *job = job_manager->createStandardJob(
+                auto job = job_manager->createStandardJob(
                         {task}, {}, {}, {}, {});
                 tasks.push_back(task);
                 jobs.push_back(job);
@@ -2948,7 +2925,7 @@ private:
 
             // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
 
-            wrench::StandardJob *job = job_manager->createStandardJob(
+            auto job = job_manager->createStandardJob(
                     {task},
                     {
                             {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
@@ -3092,7 +3069,7 @@ private:
         }
 
         // Submit them individually
-        wrench::StandardJob *jobs[3];
+        std::shared_ptr<wrench::StandardJob> jobs[3];
 
         for (int i = 0; i < 3; i++) {
             jobs[i] = job_manager->createStandardJob({tasks[i]}, {}, {}, {}, {});

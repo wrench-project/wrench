@@ -10,13 +10,11 @@
 #ifndef WRENCH_PILOTJOB_H
 #define WRENCH_PILOTJOB_H
 
-
+//#include "wrench/services/compute/ComputeService.h"
 #include "wrench/workflow/job/WorkflowJob.h"
-#include "wrench/services/compute/ComputeService.h"
 
 namespace wrench {
 
-    class ComputeService;
 
     /***********************/
     /** \cond DEVELOPER    */

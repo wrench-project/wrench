@@ -109,7 +109,7 @@ private:
             wrench::WorkflowTask *task2 = this->getWorkflow()->addTask(cs->getName() + "task2", 118, 1, 1, 0);
             wrench::WorkflowTask *task3 = this->getWorkflow()->addTask(cs->getName() + "task3", 59, 1, 1, 0);
             wrench::WorkflowTask *task4 = this->getWorkflow()->addTask(cs->getName() + "task4", 59, 1, 1, 0);
-            wrench::StandardJob *job;
+            std::shared_ptr<wrench::StandardJob> job;
 
             double start_time = wrench::Simulation::getCurrentSimulatedDate();
 

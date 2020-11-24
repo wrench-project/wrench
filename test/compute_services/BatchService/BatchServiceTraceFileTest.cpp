@@ -146,9 +146,9 @@ private:
                 }
 //          std::cerr << "SUBMITTING " << "sub="<< sub_time << "num_nodes=" << num_nodes << " id="<<id << " flops="<<flops << " rflops="<<requested_flops << " ram="<<requested_ram << "\n";
                 // TODO: Should we use the "requested_ram" instead of 0 below?
-                wrench::WorkflowTask *task = this->getWorkflow()->addTask(username + "_" + std::to_string(counter++), flops, min_num_cores, max_num_cores, ram);
+                auto task = this->getWorkflow()->addTask(username + "_" + std::to_string(counter++), flops, min_num_cores, max_num_cores, ram);
 
-                wrench::StandardJob *standard_job = job_manager->createStandardJob(
+                auto standard_job = job_manager->createStandardJob(
                         {task},
                         {},
                         {},
@@ -462,8 +462,7 @@ private:
         }
 
         // Create a Standard Job with only the tasks
-        wrench::StandardJob *standard_job_2_nodes;
-        standard_job_2_nodes = job_manager->createStandardJob(tasks, {});
+        auto standard_job_2_nodes = job_manager->createStandardJob(tasks, {});
 
         // Create the batch-specific argument
         batch_job_args["-N"] = std::to_string(2); // Number of nodes/tasks
@@ -486,10 +485,8 @@ private:
                                                          num_cores, num_cores, ram));
         }
 
-
         // Create a Standard Job with only the tasks
-        wrench::StandardJob *standard_job_4_nodes;
-        standard_job_4_nodes = job_manager->createStandardJob(tasks, {});
+        auto standard_job_4_nodes = job_manager->createStandardJob(tasks, {});
 
         // Create the batch-specific argument
         batch_job_args.clear();
@@ -832,8 +829,7 @@ private:
         }
 
         // Create a Standard Job with only the tasks
-        wrench::StandardJob *standard_job_2_nodes;
-        standard_job_2_nodes = job_manager->createStandardJob(tasks, {});
+        auto standard_job_2_nodes = job_manager->createStandardJob(tasks, {});
 
         // Create the batch-specific argument
         batch_job_args["-N"] = std::to_string(2);     // Number of nodes/tasks
@@ -996,8 +992,7 @@ private:
         }
 
         // Create a Standard Job with only the tasks
-        wrench::StandardJob *standard_job_2_nodes;
-        standard_job_2_nodes = job_manager->createStandardJob(tasks, {});
+        auto standard_job_2_nodes = job_manager->createStandardJob(tasks, {});
 
         // Create the batch-specific argument
         batch_job_args["-N"] = std::to_string(2);     // Number of nodes/tasks
@@ -1186,8 +1181,7 @@ private:
         }
 
         // Create a Standard Job with only the tasks
-        wrench::StandardJob *standard_job_2_nodes;
-        standard_job_2_nodes = job_manager->createStandardJob(tasks, {});
+        auto standard_job_2_nodes = job_manager->createStandardJob(tasks, {});
 
         // Create the batch-specific argument
         batch_job_args["-N"] = std::to_string(2); // Number of nodes/tasks
@@ -1212,8 +1206,7 @@ private:
 
 
         // Create a Standard Job with only the tasks
-        wrench::StandardJob *standard_job_4_nodes;
-        standard_job_4_nodes = job_manager->createStandardJob(tasks, {});
+        auto standard_job_4_nodes = job_manager->createStandardJob(tasks, {});
 
         // Create the batch-specific argument
         batch_job_args.clear();

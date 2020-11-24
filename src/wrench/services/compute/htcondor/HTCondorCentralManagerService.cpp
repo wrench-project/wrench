@@ -83,7 +83,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void HTCondorCentralManagerService::submitStandardJob(
-            StandardJob *job,
+            std::shared_ptr<StandardJob> job,
             const std::map<std::string, std::string> &service_specific_args) {
 
         serviceSanityCheck();
@@ -131,7 +131,7 @@ namespace wrench {
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
      */
-    void HTCondorCentralManagerService::submitPilotJob(PilotJob *job,
+    void HTCondorCentralManagerService::submitPilotJob(std::shared_ptr<PilotJob> job,
                                                        const std::map<std::string, std::string> &service_specific_args) {
         serviceSanityCheck();
 
@@ -174,7 +174,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void HTCondorCentralManagerService::terminateStandardJob(StandardJob *job) {
+    void HTCondorCentralManagerService::terminateStandardJob(std::shared_ptr<StandardJob> job) {
         throw std::runtime_error("HTCondorCentralManagerService::terminateStandardJob(): Not implemented yet!");
     }
 
@@ -184,7 +184,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void HTCondorCentralManagerService::terminatePilotJob(PilotJob *job) {
+    void HTCondorCentralManagerService::terminatePilotJob(std::shared_ptr<PilotJob> job) {
         throw std::runtime_error("HTCondorCentralManagerService::terminatePilotJob(): Not implemented yet!");
     }
 
@@ -338,7 +338,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void HTCondorCentralManagerService::processSubmitStandardJob(
-            const std::string &answer_mailbox, StandardJob *job,
+            const std::string &answer_mailbox, std::shared_ptr<StandardJob> job,
             std::map<std::string, std::string> &service_specific_args) {
 
         this->pending_jobs.push_back(std::make_tuple(job, service_specific_args));
@@ -362,7 +362,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void HTCondorCentralManagerService::processSubmitPilotJob(
-            const std::string &answer_mailbox, PilotJob *job,
+            const std::string &answer_mailbox, std::shared_ptr<PilotJob> job,
             std::map<std::string, std::string> &service_specific_args) {
 
         this->pending_jobs.push_back(std::make_tuple(job, service_specific_args));
@@ -383,7 +383,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void HTCondorCentralManagerService::processPilotJobStarted(wrench::PilotJob *job) {
+    void HTCondorCentralManagerService::processPilotJobStarted(std::shared_ptr<PilotJob> job) {
         // Forward the notification
         S4U_Mailbox::dputMessage(job->popCallbackMailbox(),
                                  new ComputeServicePilotJobStartedMessage(
@@ -399,7 +399,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void HTCondorCentralManagerService::processPilotJobCompletion(wrench::PilotJob *job) {
+    void HTCondorCentralManagerService::processPilotJobCompletion(std::shared_ptr<PilotJob> job) {
         // Forward the notification
         S4U_Mailbox::dputMessage(job->popCallbackMailbox(),
                                  new ComputeServicePilotJobExpiredMessage(
@@ -415,7 +415,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void HTCondorCentralManagerService::processStandardJobCompletion(StandardJob *job) {
+    void HTCondorCentralManagerService::processStandardJobCompletion(std::shared_ptr<StandardJob> job) {
         WRENCH_INFO("A standard job has completed: %s", job->getName().c_str());
         std::string callback_mailbox = job->popCallbackMailbox();
 
@@ -443,7 +443,7 @@ namespace wrench {
      * @param scheduled_jobs: list of scheduled jobs upon negotiator cycle completion
      */
     void HTCondorCentralManagerService::processNegotiatorCompletion(
-            std::vector<wrench::WorkflowJob *> &scheduled_jobs) {
+            std::vector<std::shared_ptr<WorkflowJob>> &scheduled_jobs) {
 
         if (scheduled_jobs.empty()) {
             this->resources_unavailable = true;

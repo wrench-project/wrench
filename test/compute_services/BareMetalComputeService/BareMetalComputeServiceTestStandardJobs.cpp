@@ -180,7 +180,7 @@ private:
         auto file_registry_service = this->getAvailableFileRegistryService();
 
         // Create a 2-task job
-        wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {}, {},
+        auto two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {}, {},
                                                                            {}, {});
 
         // Submit the 2-task job for execution
@@ -401,7 +401,7 @@ private:
         auto file_registry_service = this->getAvailableFileRegistryService();
 
         // Create a 2-task job
-        wrench::StandardJob *two_task_job = job_manager->createStandardJob(
+        auto two_task_job = job_manager->createStandardJob(
                 {this->test->task1, this->test->task2}, {},
                 {std::make_tuple(this->test->input_file,
                                  wrench::FileLocation::LOCATION(this->test->storage_service),
@@ -526,7 +526,7 @@ private:
         auto file_registry_service = this->getAvailableFileRegistryService();
 
         // Create a 2-task job
-        wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task3, this->test->task4}, {},
+        auto two_task_job = job_manager->createStandardJob({this->test->task3, this->test->task4}, {},
                                                                            {std::make_tuple(this->test->input_file,
                                                                                             wrench::FileLocation::LOCATION(this->test->storage_service),
                                                                                             wrench::FileLocation::SCRATCH)},
@@ -650,7 +650,7 @@ private:
         auto file_registry_service = this->getAvailableFileRegistryService();
 
         // Create a 2-task job
-        wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task5, this->test->task6}, {},
+        auto two_task_job = job_manager->createStandardJob({this->test->task5, this->test->task6}, {},
                                                                            {std::make_tuple(this->test->input_file,
                                                                                             wrench::FileLocation::LOCATION(this->test->storage_service),
                                                                                             wrench::FileLocation::SCRATCH)},
@@ -884,7 +884,7 @@ private:
         // create and submit another 2-task job for execution
         // service-specific args format testing: "hostname", "" <- that's an empty string
         // both tasks should run in parallel, use 4 cores each, thus oversubscribing
-        wrench::StandardJob *two_task_job_2 = job_manager->createStandardJob({this->test->task7, this->test->task8}, {},
+        auto two_task_job_2 = job_manager->createStandardJob({this->test->task7, this->test->task8}, {},
                                                                              {std::make_tuple(this->test->input_file,
                                                                                               wrench::FileLocation::LOCATION(this->test->storage_service),
                                                                                               wrench::FileLocation::SCRATCH)},
@@ -1012,7 +1012,7 @@ private:
         auto file_registry_service = this->getAvailableFileRegistryService();
 
         // Create a 2-task job
-        wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {},
+        auto two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {},
                                                                            {std::make_tuple(this->test->input_file,
                                                                                    wrench::FileLocation::LOCATION(this->test->storage_service),
                                                                                    wrench::FileLocation::SCRATCH)},
@@ -1135,7 +1135,7 @@ private:
         auto file_registry_service = this->getAvailableFileRegistryService();
 
         // Create a 2-task job
-        wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {}, {},
+        auto two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {}, {},
                                                                            {}, {});
 
         // Try to terminate it now (which is stupid)
@@ -1252,7 +1252,7 @@ private:
         auto file_registry_service = this->getAvailableFileRegistryService();
 
         // Create a 2-task job
-        wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {},
+        auto two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {},
                                                                            {std::make_tuple(this->test->input_file,
                                                                                    wrench::FileLocation::LOCATION(this->test->storage_service),
                                                                                    wrench::FileLocation::SCRATCH)},
@@ -1376,7 +1376,7 @@ private:
         auto file_registry_service = this->getAvailableFileRegistryService();
 
         // Create a 2-task job
-        wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {},
+        auto two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {},
                                                                            {std::make_tuple(this->test->input_file,
                                                                                             wrench::FileLocation::LOCATION(this->test->storage_service),
                                                                                             wrench::FileLocation::SCRATCH)},
@@ -1511,7 +1511,7 @@ private:
         auto file_registry_service = this->getAvailableFileRegistryService();
 
         // Create a 2-task job
-        wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {}, {},
+        auto two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {}, {},
                                                                            {}, {});
 
         // Shutdown the storage service
