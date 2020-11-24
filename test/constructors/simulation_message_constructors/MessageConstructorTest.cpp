@@ -41,7 +41,7 @@ protected:
         network_proximity_daemon = std::shared_ptr<wrench::NetworkProximityDaemon>((wrench::NetworkProximityDaemon *)(1234), [](void *ptr){});
         standard_job = (wrench::StandardJob *)((void *)malloc(1024));
         standard_job_shared_ptr =  static_cast< std::shared_ptr<wrench::StandardJob>>(standard_job);
-        batch_job_shared_ptr = std::shared_ptr<wrench::BatchJob>(new wrench::BatchJob(std::shared_ptr<wrench::WorkflowJob>(workflow_job),1,1,1,1,"user",1,1));
+        batch_job_shared_ptr = std::shared_ptr<wrench::BatchJob>(new wrench::BatchJob(standard_job_shared_ptr,1,1,1,1,"user",1,1));
         pilot_job = (wrench::PilotJob *)((void *)malloc(1024));
         pilot_job_shared_ptr =  static_cast< std::shared_ptr<wrench::PilotJob>>(pilot_job);
         failure_cause = std::shared_ptr<wrench::FileNotFound>(new wrench::FileNotFound(file, location), [](void *ptr){});
