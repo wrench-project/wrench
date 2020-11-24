@@ -392,7 +392,7 @@ private:
         }
 
         try {
-            job_manager->submitJob(std::shared_ptr<wrench::WorkflowJob>((wrench::WorkflowJob *) (1234)), nullptr, {});
+            job_manager->submitJob(std::shared_ptr<wrench::WorkflowJob>((wrench::WorkflowJob *) (1234), [](void *ptr){}), nullptr, {});
             throw std::runtime_error("Should not be able to submit a job with a nullptr compute service");
         } catch (std::invalid_argument &e) {
         }
