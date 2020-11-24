@@ -91,8 +91,7 @@ namespace wrench {
     double BatchJob::getMemoryRequirement() {
         std::shared_ptr<WorkflowJob> workflow_job = this->job;
         double memory_requirement = 0.0;
-        if (workflow_job->getType() == WorkflowJob::STANDARD) {
-            auto sjob = std::dynamic_pointer_cast<StandardJob>(workflow_job);
+        if (auto sjob = std::dynamic_pointer_cast<StandardJob>(workflow_job)) {
             for (auto const &t : sjob->getTasks()) {
                 double ram = t->getMemoryRequirement();
                 memory_requirement = (memory_requirement < ram ? ram : memory_requirement);

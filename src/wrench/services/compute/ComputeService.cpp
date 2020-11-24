@@ -63,15 +63,10 @@ namespace wrench {
         assertServiceIsUp();
 
         try {
-            switch (job->getType()) {
-                case WorkflowJob::STANDARD: {
-                    this->submitStandardJob(std::dynamic_pointer_cast<StandardJob>(job), service_specific_args);
-                    break;
-                }
-                case WorkflowJob::PILOT: {
-                    this->submitPilotJob(std::dynamic_pointer_cast<PilotJob>(job), service_specific_args);
-                    break;
-                }
+            if (auto sjob = std::dynamic_pointer_cast<StandardJob>(job)) {
+                this->submitStandardJob(sjob, service_specific_args);
+            } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
+                this->submitPilotJob(pjob, service_specific_args);
             }
         } catch (WorkflowExecutionException &e) {
             throw;
@@ -96,15 +91,10 @@ namespace wrench {
         assertServiceIsUp();
 
         try {
-            switch (job->getType()) {
-                case WorkflowJob::STANDARD: {
-                    this->terminateStandardJob(std::dynamic_pointer_cast<StandardJob>(job));
-                    break;
-                }
-                case WorkflowJob::PILOT: {
-                    this->terminatePilotJob(std::dynamic_pointer_cast<PilotJob>(job));
-                    break;
-                }
+            if (auto sjob = std::dynamic_pointer_cast<StandardJob>(job)) {
+                this->terminateStandardJob(sjob);
+            } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
+                this->terminatePilotJob(pjob);
             }
         } catch (WorkflowExecutionException &e) {
             throw;

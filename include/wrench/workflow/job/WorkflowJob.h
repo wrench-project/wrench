@@ -35,18 +35,18 @@ namespace wrench {
 
     public:
 
-        /** @brief Job types */
-        enum Type {
-            /** @brief A standard job that can be submitted directly to a ComputeService for execution */
-            STANDARD,
-            /** @brief A pilot job that can be submitted to a ComputeService and that, once started, will act as a ComputeService
-             * (likely a BareMetalComputeService) with an expiration date */
-            PILOT
-        };
+//        /** @brief Job types */
+//        enum Type {
+//            /** @brief A standard job that can be submitted directly to a ComputeService for execution */
+//            STANDARD,
+//            /** @brief A pilot job that can be submitted to a ComputeService and that, once started, will act as a ComputeService
+//             * (likely a BareMetalComputeService) with an expiration date */
+//            PILOT
+//        };
 
-        Type getType();
+//        Type getType();
 
-        std::string getTypeAsString();
+//        std::string getTypeAsString();
 
         std::string getName();
 
@@ -78,7 +78,7 @@ namespace wrench {
 
         friend class JobManager;
 
-        WorkflowJob(Type type);
+        WorkflowJob();
 
         unsigned long getNewUniqueNumber();
 
@@ -89,8 +89,6 @@ namespace wrench {
         std::stack<std::string> callback_mailbox_stack;
         /** @brief The workflow this job belong to */
         Workflow *workflow;
-        /** @brief The job's type */
-        Type type;
         /** @brief The job's name */
         std::string name;
         /** @brief The date at which the job was last submitted */

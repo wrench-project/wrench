@@ -825,7 +825,6 @@ private:
             batch_job_args["-t"] = "1"; //time in minutes
             batch_job_args["-c"] = "4"; //number of cores per node
 
-            pilot_job->getTypeAsString(); // coverage
             pilot_job->getState(); // coverage
             pilot_job->getPriority(); // coverage
 
