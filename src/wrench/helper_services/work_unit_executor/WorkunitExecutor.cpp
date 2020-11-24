@@ -61,7 +61,7 @@ namespace wrench {
             std::string callback_mailbox,
             std::shared_ptr<Workunit> workunit,
             std::shared_ptr<StorageService> scratch_space,
-            StandardJob *job,
+            std::shared_ptr<StandardJob> job,
             double thread_startup_overhead,
             bool simulate_computation_as_sleep) :
             Service(hostname, "workunit_executor", "workunit_executor") {
@@ -618,7 +618,7 @@ namespace wrench {
      * @brief Retrieve the job the WorkunitExecutor is working for
      * @return a job
      */
-    StandardJob *WorkunitExecutor::getJob() {
+    std::shared_ptr<StandardJob> WorkunitExecutor::getJob() {
         return this->job;
     }
 

@@ -392,7 +392,7 @@ private:
         }
 
         try {
-            job_manager->submitJob((wrench::WorkflowJob *) (1234), nullptr, {});
+            job_manager->submitJob(std::shared_ptr<wrench::WorkflowJob>((wrench::WorkflowJob *) (1234)), nullptr, {});
             throw std::runtime_error("Should not be able to submit a job with a nullptr compute service");
         } catch (std::invalid_argument &e) {
         }
@@ -400,12 +400,6 @@ private:
         try {
             job_manager->terminateJob(nullptr);
             throw std::runtime_error("Should not be able to terminate a nullptr job");
-        } catch (std::invalid_argument &e) {
-        }
-
-        try {
-            job_manager->forgetJob(nullptr);
-            throw std::runtime_error("Should not be able to forget a nullptr job");
         } catch (std::invalid_argument &e) {
         }
 
@@ -488,7 +482,7 @@ private:
         }
 
         // Create a standard job
-        wrench::StandardJob *job = job_manager->createStandardJob(this->getWorkflow()->getTasks(), {});
+        auto job = job_manager->createStandardJob(this->getWorkflow()->getTasks(), {});
 
         // Try to submit a standard job to the wrong service
         try {
@@ -649,7 +643,7 @@ private:
         t3->setPriority(42);
 
         // Create a standard job
-        wrench::StandardJob *job = job_manager->createStandardJob(this->getWorkflow()->getTasks(), {});
+        auto job = job_manager->createStandardJob(this->getWorkflow()->getTasks(), {});
         job->getMinimumRequiredNumCores(); // coverage
         job->getPriority(); // coverage
 

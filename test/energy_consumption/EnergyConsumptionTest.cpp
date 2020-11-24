@@ -163,7 +163,7 @@ private:
             wrench::WorkflowTask *task = this->getWorkflow()->addTask("task1", 10000000000, 1, 1, 1.0);
 
             // Create a StandardJob
-            wrench::StandardJob *job = job_manager->createStandardJob(
+            auto job = job_manager->createStandardJob(
                     task,
                     {
                     });
@@ -371,7 +371,7 @@ private:
             wrench::WorkflowTask *task = this->getWorkflow()->addTask("task1", 10000000000, 1, 1, 1.0);
 
             // Create a StandardJob
-            wrench::StandardJob *job = job_manager->createStandardJob(
+            auto job = job_manager->createStandardJob(
                     task,
                     {
                     });
@@ -567,7 +567,7 @@ private:
             wrench::WorkflowTask *task = this->getWorkflow()->addTask("task1", 10000000000, 1, 1, 1.0);
 
             // Create a StandardJob
-            wrench::StandardJob *job = job_manager->createStandardJob(
+            auto job = job_manager->createStandardJob(
                     task,
                     {
                     });
@@ -879,7 +879,7 @@ private:
             wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 10000000000, 1, 1, 1.0);
 
             // Create a StandardJob
-            wrench::StandardJob *job1 = job_manager->createStandardJob(
+            auto job1 = job_manager->createStandardJob(
                     task1,
                     {
                     });
@@ -888,7 +888,7 @@ private:
             wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task2", 10000000000, 1, 1, 1.0);
 
             // Create a StandardJob
-            wrench::StandardJob *job2 = job_manager->createStandardJob(
+            auto job2 = job_manager->createStandardJob(
                     task2,
                     {
                     });

@@ -198,7 +198,7 @@ private:
         auto vm_name = dynamically_created_compute_service->createVM(4, 10);
         auto vm_cs = dynamically_created_compute_service->startVM(vm_name);
 
-        wrench::StandardJob *one_task_jobs[5];
+        std::shared_ptr<wrench::StandardJob> one_task_jobs[5];
         int job_index = 0;
         for (auto task : tasks) {
             try {
@@ -240,13 +240,6 @@ private:
         for (auto & j : one_task_jobs) {
             if (j->getNumCompletedTasks() != 1) {
                 throw std::runtime_error("A job with one completed task should say it has one completed task");
-            }
-        }
-
-        {
-            // Try to forget the completed jobs
-            for (auto & j : one_task_jobs) {
-                job_manager->forgetJob(j);
             }
         }
 

@@ -113,7 +113,7 @@ private:
         this->test->task->addInputFile(this->test->file_2);
         this->test->task->addInputFile(this->test->file_3);
         this->test->task->addInputFile(this->test->xl_file);
-        wrench::StandardJob *job1 = job_manager->createStandardJob(this->test->task,
+        auto job1 = job_manager->createStandardJob(this->test->task,
                 {{this->test->file_1, wrench::FileLocation::LOCATION(this->test->storage_service)},
                  {this->test->file_2, wrench::FileLocation::LOCATION(this->test->storage_service)},
                  {this->test->file_3, wrench::FileLocation::LOCATION(this->test->storage_service)},

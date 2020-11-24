@@ -139,7 +139,7 @@ private:
         // Run ready tasks with defined scheduler implementation
         unsigned int job_count = 0;
         for (const auto &task_map : ready_clustered_tasks) {
-          wrench::StandardJob *job = job_manager->createStandardJob(task_map.second, {}, {}, {}, {});
+          auto job = job_manager->createStandardJob(task_map.second, {}, {}, {}, {});
           job_manager->submitJob(job, this->test->compute_service);
           job_count++;
         }
@@ -281,7 +281,7 @@ private:
 
         // Run ready tasks with defined scheduler implementation
         for (auto task : ready_tasks) {
-          wrench::StandardJob *job = job_manager->createStandardJob(task, {});
+          auto job = job_manager->createStandardJob(task, {});
           job_manager->submitJob(job, this->test->compute_service);
         }
 

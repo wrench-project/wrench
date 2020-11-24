@@ -128,7 +128,7 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    void BareMetalComputeService::submitStandardJob(StandardJob *job,
+    void BareMetalComputeService::submitStandardJob(std::shared_ptr<StandardJob> job,
                                                     const std::map<std::string, std::string> &service_specific_args) {
 
         assertServiceIsUp();
@@ -242,7 +242,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void
-    BareMetalComputeService::submitPilotJob(PilotJob *job,
+    BareMetalComputeService::submitPilotJob(std::shared_ptr<PilotJob> job,
                                             const std::map<std::string, std::string> &service_specific_args) {
 
         assertServiceIsUp();
@@ -367,7 +367,7 @@ namespace wrench {
             std::map<std::string, std::string> property_list,
             std::map<std::string, double> messagepayload_list,
             double ttl,
-            PilotJob *pj,
+            std::shared_ptr<PilotJob> pj,
             std::string suffix, std::shared_ptr<StorageService> scratch_space) : ComputeService(hostname,
                                                                                                 "bare_metal" + suffix,
                                                                                                 "bare_metal" + suffix,
@@ -428,7 +428,7 @@ namespace wrench {
             std::map<std::string, std::string> property_list,
             std::map<std::string, double> messagepayload_list,
             double ttl,
-            PilotJob *pj) {
+            std::shared_ptr<PilotJob> pj) {
 
         if (ttl < 0) {
             throw std::invalid_argument(
@@ -695,7 +695,7 @@ namespace wrench {
 
             std::string picked_host;
 
-            StandardJob *job = wu->getJob();
+            std::shared_ptr<StandardJob> job = wu->getJob();
             std::string target_host;
             unsigned long target_num_cores;
             double required_ram;
@@ -905,7 +905,7 @@ namespace wrench {
  * @param cause: the failure cause
  */
     void
-    BareMetalComputeService::failRunningStandardJob(StandardJob *job, std::shared_ptr<FailureCause> cause) {
+    BareMetalComputeService::failRunningStandardJob(std::shared_ptr<StandardJob> job, std::shared_ptr<FailureCause> cause) {
 
         WRENCH_INFO("Failing running job %s", job->getName().c_str());
 
@@ -929,7 +929,7 @@ namespace wrench {
 * @brief terminate a running standard job
 * @param job: the job
 */
-    void BareMetalComputeService::terminateRunningStandardJob(StandardJob *job,
+    void BareMetalComputeService::terminateRunningStandardJob(std::shared_ptr<StandardJob> job,
                                                               BareMetalComputeService::JobTerminationCause termination_cause) {
 
         /** Kill all relevant work unit executors */
@@ -1073,7 +1073,7 @@ namespace wrench {
  * @throw WorkflowExecutionException
  * @throw std::runtime_error
  */
-    void BareMetalComputeService::terminateStandardJob(StandardJob *job) {
+    void BareMetalComputeService::terminateStandardJob(std::shared_ptr<StandardJob> job) {
 
         assertServiceIsUp();
 
@@ -1118,7 +1118,7 @@ namespace wrench {
 
     void BareMetalComputeService::processWorkunitExecutorCompletion(std::shared_ptr<WorkunitExecutor> workunit_executor,
                                                                     std::shared_ptr<Workunit> workunit) {
-        StandardJob *job = workunit_executor->getJob();
+        std::shared_ptr<StandardJob> job = workunit_executor->getJob();
 
         // Get the scratch files that executor may have generated
         for (auto &f : workunit_executor->getFilesStoredInScratch()) {
@@ -1217,7 +1217,7 @@ namespace wrench {
     void BareMetalComputeService::processWorkunitExecutorFailure(std::shared_ptr<WorkunitExecutor> workunit_executor,
                                                                  std::shared_ptr<Workunit> workunit,
                                                                  std::shared_ptr<FailureCause> cause) {
-        StandardJob *job = workunit_executor->getJob();
+        std::shared_ptr<StandardJob> job = workunit_executor->getJob();
 
         // Get the scratch files that executor may have generated
         for (auto &f : workunit_executor->getFilesStoredInScratch()) {
@@ -1248,7 +1248,7 @@ namespace wrench {
      */
     void BareMetalComputeService::forgetWorkunitExecutor(std::shared_ptr<WorkunitExecutor> workunit_executor) {
 
-        StandardJob *job = workunit_executor->getJob();
+        std::shared_ptr<StandardJob> job = workunit_executor->getJob();
         std::shared_ptr<WorkunitExecutor> found_it;
         for (auto const &wue : this->workunit_executors[job]) {
             if (wue == workunit_executor) {
@@ -1270,7 +1270,7 @@ namespace wrench {
  * @param job: the job to terminate
  * @param answer_mailbox: the mailbox to which the answer message should be sent
  */
-    void BareMetalComputeService::processStandardJobTerminationRequest(StandardJob *job,
+    void BareMetalComputeService::processStandardJobTerminationRequest(std::shared_ptr<StandardJob> job,
                                                                        const std::string &answer_mailbox) {
 
         // If the job doesn't exit, we reply right away
@@ -1322,7 +1322,7 @@ namespace wrench {
      * @param service_specific_arguments: the service-specific arguments
      * @return true if the job can run
      */
-    bool BareMetalComputeService::jobCanRun(StandardJob *job,
+    bool BareMetalComputeService::jobCanRun(std::shared_ptr<StandardJob> job,
                                             std::map<std::string, std::string> &service_specific_arguments) {
 
         for (auto t : job->getTasks()) {
@@ -1379,7 +1379,7 @@ namespace wrench {
  *
  */
     void BareMetalComputeService::processSubmitStandardJob(
-            const std::string &answer_mailbox, StandardJob *job,
+            const std::string &answer_mailbox, std::shared_ptr<StandardJob> job,
             std::map<std::string, std::string> &service_specific_arguments) {
         WRENCH_INFO("Asked to run a standard job with %ld tasks", job->getNumTasks());
 
@@ -1458,7 +1458,7 @@ namespace wrench {
  * @throw std::runtime_error
  */
     void BareMetalComputeService::processSubmitPilotJob(const std::string &answer_mailbox,
-                                                        PilotJob *job,
+                                                        std::shared_ptr<PilotJob> job,
                                                         std::map<std::string, std::string> service_specific_args) {
         WRENCH_INFO("Asked to run a pilot job");
 
@@ -1606,7 +1606,7 @@ namespace wrench {
  *
  * @throw std::runtime_error
  */
-    void BareMetalComputeService::terminatePilotJob(PilotJob *job) {
+    void BareMetalComputeService::terminatePilotJob(std::shared_ptr<PilotJob> job) {
         throw std::runtime_error(
                 "BareMetalComputeService::terminatePilotJob(): not implemented because BareMetalComputeService never supports pilot jobs");
     }
@@ -1623,7 +1623,7 @@ namespace wrench {
 
         WRENCH_INFO("Handling a WorkunitExecutor crash!");
         // Get the scratch files that executor may have generated
-        StandardJob *job = workunit_executor->getJob();
+        std::shared_ptr<StandardJob> job = workunit_executor->getJob();
         for (auto &f : workunit_executor->getFilesStoredInScratch()) {
             if (this->files_in_scratch.find(job) == this->files_in_scratch.end()) {
                 this->files_in_scratch.insert(std::make_pair(job, (std::set<WorkflowFile *>) {}));

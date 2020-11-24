@@ -346,7 +346,7 @@ private:
 
             // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
 
-            wrench::StandardJob *job = job_manager->createStandardJob(
+            auto job = job_manager->createStandardJob(
                     {task},
                     {
                             {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
@@ -520,7 +520,7 @@ private:
 
             // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
 
-            wrench::StandardJob *job = job_manager->createStandardJob(
+            auto job = job_manager->createStandardJob(
                     {task},
                     {
                             {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
@@ -585,7 +585,7 @@ private:
 
             // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
 
-            wrench::StandardJob *job = job_manager->createStandardJob(
+            auto job = job_manager->createStandardJob(
                     {task},
                     {
                             {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
@@ -746,7 +746,7 @@ private:
 
             // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
 
-            wrench::StandardJob *job = job_manager->createStandardJob(
+            auto job = job_manager->createStandardJob(
                     {task},
                     {
                             {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
@@ -781,7 +781,7 @@ private:
 
             // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
 
-            wrench::StandardJob *job1 = job_manager->createStandardJob(
+            auto job1 = job_manager->createStandardJob(
                     {task1},
                     {
                             {*(task1->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
@@ -813,7 +813,7 @@ private:
 
             // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
 
-            wrench::StandardJob *job2 = job_manager->createStandardJob(
+            auto job2 = job_manager->createStandardJob(
                     {task2},
                     {
                             {*(task2->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},

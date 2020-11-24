@@ -503,7 +503,7 @@ private:
         auto vm_cs = cs->startVM(vm_name);
 
         // Create a 2-task job
-        wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {},
+        auto two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {},
                                                                            {std::make_tuple(this->test->input_file,
                                                                                             wrench::FileLocation::LOCATION(this->test->storage_service),
                                                                                             wrench::FileLocation::SCRATCH)},
@@ -613,7 +613,7 @@ private:
         auto cs = *(this->getAvailableComputeServices<wrench::VirtualizedClusterComputeService>().begin());
 
         // Create a 2-task job
-        wrench::StandardJob *two_task_job = job_manager->createStandardJob(
+        auto two_task_job = job_manager->createStandardJob(
                 {this->test->task1, this->test->task2}, {},
                 {std::make_tuple(this->test->input_file,
                                  wrench::FileLocation::LOCATION(this->test->storage_service),
@@ -1036,7 +1036,7 @@ private:
         }
 
         // Create a one-task job
-        wrench::StandardJob *job = job_manager->createStandardJob(this->test->task1,
+        auto job = job_manager->createStandardJob(this->test->task1,
                                                                   {std::make_pair(this->test->input_file,
                                                                                   wrench::FileLocation::LOCATION(this->test->storage_service)),
                                                                    std::make_pair(this->test->output_file1,
@@ -1112,7 +1112,7 @@ private:
         }
 
         // Submit a job and suspend the VM before that job finishes
-        wrench::StandardJob *other_job = job_manager->createStandardJob(this->test->task2,
+        auto other_job = job_manager->createStandardJob(this->test->task2,
                                                                         {std::make_pair(this->test->input_file,
                                                                                         wrench::FileLocation::LOCATION(this->test->storage_service)),
                                                                          std::make_pair(this->test->output_file2,
@@ -1262,7 +1262,7 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create a pilot job that requests 1 host, 1 code, 0 bytes, and 1 minute
-        wrench::PilotJob *pilot_job = job_manager->createPilotJob();
+        auto pilot_job = job_manager->createPilotJob();
 
         std::vector<std::tuple<std::string, std::shared_ptr<wrench::BareMetalComputeService>>> vm_list;
 
@@ -1408,7 +1408,7 @@ private:
             for (auto &vm : vm_list) {
                 cs->shutdownVM(std::get<0>(vm));
             }
-            wrench::StandardJob *job1 = job_manager->createStandardJob({this->test->task1}, {},
+            auto job1 = job_manager->createStandardJob({this->test->task1}, {},
                                                                        {std::make_tuple(this->test->input_file,
                                                                                         wrench::FileLocation::LOCATION(this->test->storage_service),
                                                                                         wrench::FileLocation::SCRATCH)},
@@ -1431,7 +1431,7 @@ private:
             throw std::runtime_error("Couldn't start VM: " + e.getCause()->toString());
         }
 
-        wrench::StandardJob *job1 = job_manager->createStandardJob({this->test->task1}, {},
+        auto job1 = job_manager->createStandardJob({this->test->task1}, {},
                                                                    {std::make_tuple(this->test->input_file,
                                                                                     wrench::FileLocation::LOCATION(this->test->storage_service),
                                                                                     wrench::FileLocation::SCRATCH)},
@@ -1646,7 +1646,7 @@ private:
         auto vm_cs = cloud_service->startVM(vm_name);
 
         // Create a job
-        wrench::StandardJob *job = job_manager->createStandardJob(
+        auto job = job_manager->createStandardJob(
                 {this->test->task1}, {},
                 {std::make_tuple(
                         this->test->input_file,
@@ -1779,7 +1779,7 @@ private:
         auto vm_cs = cloud_service->startVM(vm_name);
 
         // Create a job
-        wrench::StandardJob *job = job_manager->createStandardJob(
+        auto job = job_manager->createStandardJob(
                 {this->test->task1}, {},
                 {std::make_tuple(this->test->input_file,
                                  wrench::FileLocation::LOCATION(this->test->storage_service),
