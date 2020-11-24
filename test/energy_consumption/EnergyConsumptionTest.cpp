@@ -534,7 +534,6 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionPluginNotActiveTests_test
     delete simulation;
 
     free(argv[0]);
-    free(argv[1]);
     free(argv);
 }
 
