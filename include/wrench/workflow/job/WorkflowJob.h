@@ -32,6 +32,7 @@ namespace wrench {
      * @brief Abstraction of a job used for executing tasks in a Workflow
      */
     class WorkflowJob {
+
     public:
 
         /** @brief Job types */

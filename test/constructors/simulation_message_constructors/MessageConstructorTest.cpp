@@ -21,6 +21,7 @@
 #include "services/network_proximity/NetworkProximityMessage.h"
 #include "wrench/workflow/failure_causes/FileNotFound.h"
 #include "wrench/services/compute/batch/BatchJob.h"
+#include "wrench/managers/JobManager.h"
 
 class MessageConstructorTest : public ::testing::Test {
 protected:
@@ -38,11 +39,11 @@ protected:
         compute_service = std::shared_ptr<wrench::ComputeService>((wrench::ComputeService *)(1234), [](void *ptr){});
         network_proximity_service = std::shared_ptr<wrench::NetworkProximityService>((wrench::NetworkProximityService *)(1234), [](void *ptr){});
         network_proximity_daemon = std::shared_ptr<wrench::NetworkProximityDaemon>((wrench::NetworkProximityDaemon *)(1234), [](void *ptr){});
-        workflow_job = (wrench::WorkflowJob *)(1234);
-        standard_job = (wrench::StandardJob *)(1234);
-        batch_job = (wrench::BatchJob *)(1234);
-        batch_job_shared_ptr = std::shared_ptr<wrench::BatchJob>(new wrench::BatchJob(workflow_job,1,1,1,1,"user",1,1));
-        pilot_job = (wrench::PilotJob *)(1234);
+        standard_job = (wrench::StandardJob *)((void *)malloc(1024));
+        standard_job_shared_ptr =  static_cast< std::shared_ptr<wrench::StandardJob>>(standard_job);
+        batch_job_shared_ptr = std::shared_ptr<wrench::BatchJob>(new wrench::BatchJob(std::shared_ptr<wrench::WorkflowJob>(workflow_job),1,1,1,1,"user",1,1));
+        pilot_job = (wrench::PilotJob *)((void *)malloc(1024));
+        pilot_job_shared_ptr =  static_cast< std::shared_ptr<wrench::PilotJob>>(pilot_job);
         failure_cause = std::shared_ptr<wrench::FileNotFound>(new wrench::FileNotFound(file, location), [](void *ptr){});
     }
 
@@ -58,10 +59,13 @@ protected:
     std::shared_ptr<wrench::NetworkProximityService> network_proximity_service;
     std::shared_ptr<wrench::NetworkProximityDaemon> network_proximity_daemon;
     wrench::WorkflowJob *workflow_job;
+    std::shared_ptr<wrench::WorkflowJob> workflow_job_shared_ptr;
     wrench::StandardJob *standard_job;
+    std::shared_ptr<wrench::StandardJob> standard_job_shared_ptr;
     wrench::BatchJob *batch_job;
     std::shared_ptr<wrench::BatchJob> batch_job_shared_ptr;
     wrench::PilotJob *pilot_job;
+    std::shared_ptr<wrench::PilotJob> pilot_job_shared_ptr;
     std::shared_ptr<wrench::FileNotFound> failure_cause;
 };
 
@@ -125,70 +129,70 @@ TEST_F(MessageConstructorTest, ComputeServiceMessages) {
 
     std::map<std::string, std::string> args;
     args.insert(std::make_pair("a","b"));
-    ASSERT_NO_THROW(new wrench::ComputeServiceSubmitStandardJobRequestMessage("mailbox", standard_job, args, 666));
-    ASSERT_THROW(new wrench::ComputeServiceSubmitStandardJobRequestMessage("", standard_job, args, 666), std::invalid_argument);
+    ASSERT_NO_THROW(new wrench::ComputeServiceSubmitStandardJobRequestMessage("mailbox", standard_job_shared_ptr, args, 666));
+    ASSERT_THROW(new wrench::ComputeServiceSubmitStandardJobRequestMessage("", standard_job_shared_ptr, args, 666), std::invalid_argument);
     ASSERT_THROW(new wrench::ComputeServiceSubmitStandardJobRequestMessage("mailbox", nullptr, args, 666), std::invalid_argument);
 
-    ASSERT_NO_THROW(new wrench::ComputeServiceSubmitStandardJobAnswerMessage(standard_job, compute_service, true, nullptr, 666));
-    ASSERT_NO_THROW(new wrench::ComputeServiceSubmitStandardJobAnswerMessage(standard_job, compute_service, false, failure_cause, 666));
+    ASSERT_NO_THROW(new wrench::ComputeServiceSubmitStandardJobAnswerMessage(standard_job_shared_ptr, compute_service, true, nullptr, 666));
+    ASSERT_NO_THROW(new wrench::ComputeServiceSubmitStandardJobAnswerMessage(standard_job_shared_ptr, compute_service, false, failure_cause, 666));
     ASSERT_THROW(new wrench::ComputeServiceSubmitStandardJobAnswerMessage(nullptr, compute_service, true, nullptr, 666), std::invalid_argument);
-    ASSERT_THROW(new wrench::ComputeServiceSubmitStandardJobAnswerMessage(standard_job, nullptr, true, nullptr, 666), std::invalid_argument);
-    ASSERT_THROW(new wrench::ComputeServiceSubmitStandardJobAnswerMessage(standard_job, compute_service, true, failure_cause, 666), std::invalid_argument);
-    ASSERT_THROW(new wrench::ComputeServiceSubmitStandardJobAnswerMessage(standard_job, compute_service, false, nullptr, 666), std::invalid_argument);
+    ASSERT_THROW(new wrench::ComputeServiceSubmitStandardJobAnswerMessage(standard_job_shared_ptr, nullptr, true, nullptr, 666), std::invalid_argument);
+    ASSERT_THROW(new wrench::ComputeServiceSubmitStandardJobAnswerMessage(standard_job_shared_ptr, compute_service, true, failure_cause, 666), std::invalid_argument);
+    ASSERT_THROW(new wrench::ComputeServiceSubmitStandardJobAnswerMessage(standard_job_shared_ptr, compute_service, false, nullptr, 666), std::invalid_argument);
 
-    ASSERT_NO_THROW(new wrench::ComputeServiceStandardJobDoneMessage(standard_job, compute_service, 666));
+    ASSERT_NO_THROW(new wrench::ComputeServiceStandardJobDoneMessage(standard_job_shared_ptr, compute_service, 666));
     ASSERT_THROW(new wrench::ComputeServiceStandardJobDoneMessage(nullptr, compute_service, 666), std::invalid_argument);
-    ASSERT_THROW(new wrench::ComputeServiceStandardJobDoneMessage(standard_job, nullptr, 666), std::invalid_argument);
+    ASSERT_THROW(new wrench::ComputeServiceStandardJobDoneMessage(standard_job_shared_ptr, nullptr, 666), std::invalid_argument);
 
-    ASSERT_NO_THROW(new wrench::ComputeServiceStandardJobFailedMessage(standard_job, compute_service, failure_cause, 666));
+    ASSERT_NO_THROW(new wrench::ComputeServiceStandardJobFailedMessage(standard_job_shared_ptr, compute_service, failure_cause, 666));
     ASSERT_THROW(new wrench::ComputeServiceStandardJobFailedMessage(nullptr, compute_service, failure_cause, 666), std::invalid_argument);
-    ASSERT_THROW(new wrench::ComputeServiceStandardJobFailedMessage(standard_job, nullptr, failure_cause, 666), std::invalid_argument);
-    ASSERT_THROW(new wrench::ComputeServiceStandardJobFailedMessage(standard_job, compute_service, nullptr, 666), std::invalid_argument);
+    ASSERT_THROW(new wrench::ComputeServiceStandardJobFailedMessage(standard_job_shared_ptr, nullptr, failure_cause, 666), std::invalid_argument);
+    ASSERT_THROW(new wrench::ComputeServiceStandardJobFailedMessage(standard_job_shared_ptr, compute_service, nullptr, 666), std::invalid_argument);
 
-    ASSERT_NO_THROW(new wrench::ComputeServiceTerminateStandardJobRequestMessage("mailbox", standard_job, 666));
-    ASSERT_THROW(new wrench::ComputeServiceTerminateStandardJobRequestMessage("", standard_job, 666), std::invalid_argument);
+    ASSERT_NO_THROW(new wrench::ComputeServiceTerminateStandardJobRequestMessage("mailbox", standard_job_shared_ptr, 666));
+    ASSERT_THROW(new wrench::ComputeServiceTerminateStandardJobRequestMessage("", standard_job_shared_ptr, 666), std::invalid_argument);
     ASSERT_THROW(new wrench::ComputeServiceTerminateStandardJobRequestMessage("mailbox", nullptr, 666), std::invalid_argument);
 
-    ASSERT_NO_THROW(new wrench::ComputeServiceTerminateStandardJobAnswerMessage(standard_job, compute_service, true, nullptr, 666));
-    ASSERT_NO_THROW(new wrench::ComputeServiceTerminateStandardJobAnswerMessage(standard_job, compute_service, false, failure_cause, 666));
+    ASSERT_NO_THROW(new wrench::ComputeServiceTerminateStandardJobAnswerMessage(standard_job_shared_ptr, compute_service, true, nullptr, 666));
+    ASSERT_NO_THROW(new wrench::ComputeServiceTerminateStandardJobAnswerMessage(standard_job_shared_ptr, compute_service, false, failure_cause, 666));
     ASSERT_THROW(new wrench::ComputeServiceTerminateStandardJobAnswerMessage(nullptr, compute_service, true, nullptr, 666), std::invalid_argument);
-    ASSERT_THROW(new wrench::ComputeServiceTerminateStandardJobAnswerMessage(standard_job, nullptr, true, nullptr, 666), std::invalid_argument);
-    ASSERT_THROW(new wrench::ComputeServiceTerminateStandardJobAnswerMessage(standard_job, compute_service, true, failure_cause, 666), std::invalid_argument);
-    ASSERT_THROW(new wrench::ComputeServiceTerminateStandardJobAnswerMessage(standard_job, compute_service, false, nullptr, 666), std::invalid_argument);
+    ASSERT_THROW(new wrench::ComputeServiceTerminateStandardJobAnswerMessage(standard_job_shared_ptr, nullptr, true, nullptr, 666), std::invalid_argument);
+    ASSERT_THROW(new wrench::ComputeServiceTerminateStandardJobAnswerMessage(standard_job_shared_ptr, compute_service, true, failure_cause, 666), std::invalid_argument);
+    ASSERT_THROW(new wrench::ComputeServiceTerminateStandardJobAnswerMessage(standard_job_shared_ptr, compute_service, false, nullptr, 666), std::invalid_argument);
 
-    ASSERT_NO_THROW(new wrench::ComputeServiceSubmitPilotJobRequestMessage("mailbox", pilot_job, args, 666));
-    ASSERT_THROW(new wrench::ComputeServiceSubmitPilotJobRequestMessage("", pilot_job, args, 666), std::invalid_argument);
+    ASSERT_NO_THROW(new wrench::ComputeServiceSubmitPilotJobRequestMessage("mailbox", pilot_job_shared_ptr, args, 666));
+    ASSERT_THROW(new wrench::ComputeServiceSubmitPilotJobRequestMessage("", pilot_job_shared_ptr, args, 666), std::invalid_argument);
     ASSERT_THROW(new wrench::ComputeServiceSubmitPilotJobRequestMessage("mailbox", nullptr, args, 666), std::invalid_argument);
 
-    ASSERT_NO_THROW(new wrench::ComputeServiceSubmitPilotJobAnswerMessage(pilot_job, compute_service, true, nullptr, 666));
-    ASSERT_NO_THROW(new wrench::ComputeServiceSubmitPilotJobAnswerMessage(pilot_job, compute_service, false, failure_cause, 666));
+    ASSERT_NO_THROW(new wrench::ComputeServiceSubmitPilotJobAnswerMessage(pilot_job_shared_ptr, compute_service, true, nullptr, 666));
+    ASSERT_NO_THROW(new wrench::ComputeServiceSubmitPilotJobAnswerMessage(pilot_job_shared_ptr, compute_service, false, failure_cause, 666));
     ASSERT_THROW(new wrench::ComputeServiceSubmitPilotJobAnswerMessage(nullptr, compute_service, true, nullptr, 666), std::invalid_argument);
-    ASSERT_THROW(new wrench::ComputeServiceSubmitPilotJobAnswerMessage(pilot_job, nullptr, true, nullptr, 666), std::invalid_argument);
-    ASSERT_THROW(new wrench::ComputeServiceSubmitPilotJobAnswerMessage(pilot_job, compute_service, true, failure_cause, 666), std::invalid_argument);
-    ASSERT_THROW(new wrench::ComputeServiceSubmitPilotJobAnswerMessage(pilot_job, compute_service, false, nullptr, 666), std::invalid_argument);
+    ASSERT_THROW(new wrench::ComputeServiceSubmitPilotJobAnswerMessage(pilot_job_shared_ptr, nullptr, true, nullptr, 666), std::invalid_argument);
+    ASSERT_THROW(new wrench::ComputeServiceSubmitPilotJobAnswerMessage(pilot_job_shared_ptr, compute_service, true, failure_cause, 666), std::invalid_argument);
+    ASSERT_THROW(new wrench::ComputeServiceSubmitPilotJobAnswerMessage(pilot_job_shared_ptr, compute_service, false, nullptr, 666), std::invalid_argument);
 
-    ASSERT_NO_THROW(new wrench::ComputeServicePilotJobStartedMessage(pilot_job, compute_service, 666));
+    ASSERT_NO_THROW(new wrench::ComputeServicePilotJobStartedMessage(pilot_job_shared_ptr, compute_service, 666));
     ASSERT_THROW(new wrench::ComputeServicePilotJobStartedMessage(nullptr, compute_service, 666), std::invalid_argument);
-    ASSERT_THROW(new wrench::ComputeServicePilotJobStartedMessage(pilot_job, nullptr, 666), std::invalid_argument);
+    ASSERT_THROW(new wrench::ComputeServicePilotJobStartedMessage(pilot_job_shared_ptr, nullptr, 666), std::invalid_argument);
 
-    ASSERT_NO_THROW(new wrench::ComputeServicePilotJobExpiredMessage(pilot_job, compute_service, 666));
+    ASSERT_NO_THROW(new wrench::ComputeServicePilotJobExpiredMessage(pilot_job_shared_ptr, compute_service, 666));
     ASSERT_THROW(new wrench::ComputeServicePilotJobExpiredMessage(nullptr, compute_service, 666), std::invalid_argument);
-    ASSERT_THROW(new wrench::ComputeServicePilotJobExpiredMessage(pilot_job, nullptr, 666), std::invalid_argument);
+    ASSERT_THROW(new wrench::ComputeServicePilotJobExpiredMessage(pilot_job_shared_ptr, nullptr, 666), std::invalid_argument);
 
-    ASSERT_NO_THROW(new wrench::ComputeServicePilotJobFailedMessage(pilot_job, compute_service, 666));
+    ASSERT_NO_THROW(new wrench::ComputeServicePilotJobFailedMessage(pilot_job_shared_ptr, compute_service, 666));
     ASSERT_THROW(new wrench::ComputeServicePilotJobFailedMessage(nullptr, compute_service, 666), std::invalid_argument);
-    ASSERT_THROW(new wrench::ComputeServicePilotJobFailedMessage(pilot_job, nullptr, 666), std::invalid_argument);
+    ASSERT_THROW(new wrench::ComputeServicePilotJobFailedMessage(pilot_job_shared_ptr, nullptr, 666), std::invalid_argument);
 
-    ASSERT_NO_THROW(new wrench::ComputeServiceTerminatePilotJobRequestMessage("mailbox", pilot_job, 666));
-    ASSERT_THROW(new wrench::ComputeServiceTerminatePilotJobRequestMessage("", pilot_job, 666), std::invalid_argument);
+    ASSERT_NO_THROW(new wrench::ComputeServiceTerminatePilotJobRequestMessage("mailbox", pilot_job_shared_ptr, 666));
+    ASSERT_THROW(new wrench::ComputeServiceTerminatePilotJobRequestMessage("", pilot_job_shared_ptr, 666), std::invalid_argument);
     ASSERT_THROW(new wrench::ComputeServiceTerminatePilotJobRequestMessage("mailbox", nullptr, 666), std::invalid_argument);
 
-    ASSERT_NO_THROW(new wrench::ComputeServiceTerminatePilotJobAnswerMessage(pilot_job, compute_service, true, nullptr, 666));
-    ASSERT_NO_THROW(new wrench::ComputeServiceTerminatePilotJobAnswerMessage(pilot_job, compute_service, false, failure_cause, 666));
+    ASSERT_NO_THROW(new wrench::ComputeServiceTerminatePilotJobAnswerMessage(pilot_job_shared_ptr, compute_service, true, nullptr, 666));
+    ASSERT_NO_THROW(new wrench::ComputeServiceTerminatePilotJobAnswerMessage(pilot_job_shared_ptr, compute_service, false, failure_cause, 666));
     ASSERT_THROW(new wrench::ComputeServiceTerminatePilotJobAnswerMessage(nullptr, compute_service, true, nullptr, 666), std::invalid_argument);
-    ASSERT_THROW(new wrench::ComputeServiceTerminatePilotJobAnswerMessage(pilot_job, nullptr, true, nullptr, 666), std::invalid_argument);
-    ASSERT_THROW(new wrench::ComputeServiceTerminatePilotJobAnswerMessage(pilot_job, compute_service, true, failure_cause, 666), std::invalid_argument);
-    ASSERT_THROW(new wrench::ComputeServiceTerminatePilotJobAnswerMessage(pilot_job, compute_service, false, nullptr, 666), std::invalid_argument);
+    ASSERT_THROW(new wrench::ComputeServiceTerminatePilotJobAnswerMessage(pilot_job_shared_ptr, nullptr, true, nullptr, 666), std::invalid_argument);
+    ASSERT_THROW(new wrench::ComputeServiceTerminatePilotJobAnswerMessage(pilot_job_shared_ptr, compute_service, true, failure_cause, 666), std::invalid_argument);
+    ASSERT_THROW(new wrench::ComputeServiceTerminatePilotJobAnswerMessage(pilot_job_shared_ptr, compute_service, false, nullptr, 666), std::invalid_argument);
 
 
     ASSERT_NO_THROW(new wrench::ComputeServiceResourceInformationRequestMessage("mailbox", 666));

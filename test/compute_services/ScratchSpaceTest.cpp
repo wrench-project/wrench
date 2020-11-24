@@ -173,7 +173,7 @@ private:
         task->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
 
         // Create a StandardJob with some pre-copies
-        wrench::StandardJob *job = job_manager->createStandardJob(
+        auto job = job_manager->createStandardJob(
                 {task},
                 {},
                 {std::make_tuple(this->getWorkflow()->getFileByID("input_file"),
@@ -310,7 +310,7 @@ private:
         task2->addInputFile(this->getWorkflow()->getFileByID("input_file2"));
 
         // Create a StandardJob with SOME pre-copies from public storage to scratch
-        wrench::StandardJob *job1 = job_manager->createStandardJob(
+        auto job1 = job_manager->createStandardJob(
                 {task1},
                 {},
                 {std::make_tuple(this->getWorkflow()->getFileByID("input_file1"),
@@ -321,7 +321,7 @@ private:
 
 
         // Create a StandardJob with NO pre-copies from public storage to scratch
-        wrench::StandardJob *job2 = job_manager->createStandardJob(
+        auto job2 = job_manager->createStandardJob(
                 {task2},
                 {},
                 {std::make_tuple(this->getWorkflow()->getFileByID("input_file2"),
@@ -528,7 +528,7 @@ private:
       auto file_registry_service = this->getAvailableFileRegistryService();
 
       // Create a pilot job that requires 1 host, 1 core per host, 1 bytes of RAM per host, and 1 hour
-      wrench::PilotJob *pilot_job = job_manager->createPilotJob();
+      auto pilot_job = job_manager->createPilotJob();
 
       // Submit a pilot job
       try {
@@ -563,7 +563,7 @@ private:
       task3->addInputFile(this->getWorkflow()->getFileByID("input_file3"));
 
       // Create a StandardJob with SOME pre-copies from public storage to scratch
-      wrench::StandardJob *job1 = job_manager->createStandardJob(
+      auto job1 = job_manager->createStandardJob(
               {task1},
               {},
               {std::make_tuple(this->getWorkflow()->getFileByID("input_file1"),
@@ -573,7 +573,7 @@ private:
               {});
 
       // Create a StandardJob with SOME pre-copies from public storage to scratch
-      wrench::StandardJob *job2 = job_manager->createStandardJob(
+      auto job2 = job_manager->createStandardJob(
               {task2},
               {},
               {std::make_tuple(this->getWorkflow()->getFileByID("input_file2"),
@@ -583,7 +583,7 @@ private:
               {});
 
       // Create a StandardJob with SOME pre-copies from public storage to scratch
-      wrench::StandardJob *job3 = job_manager->createStandardJob(
+      auto job3 = job_manager->createStandardJob(
               {task3},
               {},
               {std::make_tuple(this->getWorkflow()->getFileByID("input_file3"),
@@ -760,7 +760,7 @@ private:
       //   - copies file "input" to the scratch space
       //   - runs task1 and then task2 (10 second each)
       //   - (task 2 needs "input")
-      wrench::StandardJob *job1 = job_manager->createStandardJob(
+      auto job1 = job_manager->createStandardJob(
               {task1, task2}, {},
               {std::make_tuple(file,
                                wrench::FileLocation::LOCATION(this->test->storage_service1),
@@ -770,7 +770,7 @@ private:
       // Create a second job that:
       //    - copies file "input" to the scratch space
       //    - runs task3 (1 second)
-      wrench::StandardJob *job2 = job_manager->createStandardJob(
+      auto job2 = job_manager->createStandardJob(
               {task3}, {},
               {std::make_tuple(file,
                                wrench::FileLocation::LOCATION(this->test->storage_service1),
@@ -916,7 +916,7 @@ private:
       // Create a first job that:
       //   - copies file "input" to the scratch space
       //   - runs task1
-      wrench::StandardJob *job1 = job_manager->createStandardJob(
+      auto job1 = job_manager->createStandardJob(
               {task1}, {},
               {std::make_tuple(file1,
                                wrench::FileLocation::LOCATION(this->test->storage_service1),

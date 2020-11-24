@@ -97,7 +97,7 @@ private:
         // Create 4 1-min tasks and submit them as various shaped jobs
 
         wrench::WorkflowTask *tasks[4];
-        wrench::StandardJob *jobs[4];
+        std::shared_ptr<wrench::StandardJob> jobs[4];
         for (int i=0; i < 4; i++) {
             tasks[i] = this->getWorkflow()->addTask("task" + std::to_string(i), 60, 1, 1, 0);
             jobs[i] = job_manager->createStandardJob(tasks[i], {});
@@ -264,7 +264,7 @@ private:
         unsigned int random = this->test->seed;
 
         wrench::WorkflowTask *tasks[NUM_JOBS];
-        wrench::StandardJob *jobs[NUM_JOBS];
+        std::shared_ptr<wrench::StandardJob> jobs[NUM_JOBS];
         // Create 4 1-min tasks and submit them as various shaped jobs
         for (int i=0; i < NUM_JOBS; i++) {
             random = random  * 17 + 4123451;
@@ -289,7 +289,7 @@ private:
             );
         }
 
-        std::map<std::string, std::pair<wrench::StandardJob *, double>>  actual_completion_times;
+        std::map<std::string, std::pair<std::shared_ptr<wrench::StandardJob>, double>>  actual_completion_times;
         for (int i=0; i < NUM_JOBS; i++) {
             // Wait for a workflow execution event
             std::shared_ptr<wrench::WorkflowExecutionEvent> event;
@@ -327,7 +327,7 @@ private:
 #if 0
         std::cerr << "--------------\n";
         for (auto const &i : actual_completion_times) {
-            wrench::StandardJob *job = i.second.first;
+            auto job = i.second.first;
             double completion_time = i.second.second;
             std::cerr << "- " << i.first.c_str()  <<  ":" << "\t-N:" <<
                     job->getServiceSpecificArguments()["-N"].c_str() << " -t:"<<
@@ -439,7 +439,7 @@ private:
         // Create 4 tasks and submit them as three various shaped jobs
 
         wrench::WorkflowTask *tasks[4];
-        wrench::StandardJob *jobs[4];
+        std::shared_ptr<wrench::StandardJob> jobs[4];
         for (int i=0; i < 4; i++) {
             tasks[i] = this->getWorkflow()->addTask("task" + std::to_string(i), 60, 1, 1, 0);
             jobs[i] = job_manager->createStandardJob(tasks[i], {});
@@ -607,7 +607,7 @@ private:
         auto job_manager = this->createJobManager();
 
         wrench::WorkflowTask *tasks[5];
-        wrench::StandardJob *jobs[5];
+        std::shared_ptr<wrench::StandardJob> jobs[5];
         for (int i=0; i < 5; i++) {
             tasks[i] = this->getWorkflow()->addTask("task" + std::to_string(i), 60, 1, 1, 0);
             jobs[i] = job_manager->createStandardJob(tasks[i], {});
@@ -653,7 +653,7 @@ private:
             throw std::runtime_error("Unexpected exception while submitting job");
         }
 
-        std::map<std::string, std::pair<wrench::StandardJob *, double>>  actual_completion_times;
+        std::map<std::string, std::pair<std::shared_ptr<wrench::StandardJob>, double>>  actual_completion_times;
         for (int i=0; i < num_jobs_submitted; i++) {
             // Wait for a workflow execution event
             std::shared_ptr<wrench::WorkflowExecutionEvent> event;
@@ -673,7 +673,7 @@ private:
         // Print Completion times:
         WRENCH_INFO("----------");
         for (auto const &i : actual_completion_times) {
-            wrench::StandardJob *job = i.second.first;
+            auto job = i.second.first;
             double completion_time = i.second.second;
             WRENCH_INFO("COMPLETION TIME %s (%s nodes, %s minutes): %lf",
                         i.first.c_str(),

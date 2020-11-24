@@ -97,7 +97,7 @@ private:
 
       // Create 4 tasks and submit them as various shaped jobs
       wrench::WorkflowTask *tasks[8];
-      wrench::StandardJob *jobs[8];
+      std::shared_ptr<wrench::StandardJob> jobs[8];
       for (int i=0; i < 8; i++) {
         tasks[i] = this->getWorkflow()->addTask("task" + std::to_string(i), 60, 1, 1, 0);
         jobs[i] = job_manager->createStandardJob(tasks[i], {});

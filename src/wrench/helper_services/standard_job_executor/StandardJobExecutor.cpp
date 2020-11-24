@@ -68,7 +68,7 @@ namespace wrench {
     StandardJobExecutor::StandardJobExecutor(Simulation *simulation,
                                              std::string callback_mailbox,
                                              std::string hostname,
-                                             StandardJob *job,
+                                             std::shared_ptr<StandardJob> job,
                                              std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
                                              std::shared_ptr<StorageService> scratch_space,
                                              bool part_of_pilot_job,
@@ -1012,7 +1012,7 @@ namespace wrench {
      * @brief Get the executor's job
      * @return a standard job
      */
-    StandardJob *StandardJobExecutor::getJob() {
+    std::shared_ptr<StandardJob> StandardJobExecutor::getJob() {
         return this->job;
     }
 

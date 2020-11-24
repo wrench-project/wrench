@@ -401,7 +401,7 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    void CloudComputeService::submitStandardJob(StandardJob *job,
+    void CloudComputeService::submitStandardJob(std::shared_ptr<StandardJob> job,
                                                 const std::map<std::string, std::string> &service_specific_args) {
 
         assertServiceIsUp();
@@ -435,7 +435,7 @@ namespace wrench {
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
      */
-    void CloudComputeService::submitPilotJob(PilotJob *job, const std::map<std::string, std::string> &service_specific_args) {
+    void CloudComputeService::submitPilotJob(std::shared_ptr<PilotJob> job, const std::map<std::string, std::string> &service_specific_args) {
 
         assertServiceIsUp();
 
@@ -466,7 +466,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void CloudComputeService::terminateStandardJob(StandardJob *job) {
+    void CloudComputeService::terminateStandardJob(std::shared_ptr<StandardJob> job) {
         throw std::runtime_error("CloudComputeService::terminateStandardJob(): Not implemented!");
     }
 
@@ -474,7 +474,7 @@ namespace wrench {
      * @brief non-implemented
      * @param job: a pilot job to (supposedly) terminate
      */
-    void CloudComputeService::terminatePilotJob(PilotJob *job) {
+    void CloudComputeService::terminatePilotJob(std::shared_ptr<PilotJob> job) {
         throw std::runtime_error(
                 "CloudComputeService::terminatePilotJob(): not implemented because CloudComputeService never supports pilot jobs");
     }
@@ -1193,7 +1193,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void CloudComputeService::processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
+    void CloudComputeService::processSubmitStandardJob(const std::string &answer_mailbox, std::shared_ptr<StandardJob> job,
                                                        std::map<std::string, std::string> &service_specific_args) {
 
         if (not this->supportsStandardJobs()) {
@@ -1219,7 +1219,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void CloudComputeService::processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job,
+    void CloudComputeService::processSubmitPilotJob(const std::string &answer_mailbox, std::shared_ptr<PilotJob> job,
                                                     std::map<std::string, std::string> &service_specific_args) {
 
         if (not this->supportsPilotJobs()) {

@@ -342,8 +342,6 @@ private:
         wrench::WorkflowTask *task_too_many_cores = this->getWorkflow()->addTask("task_too_many_cores", 3600, 20, 20, 0);
         task_too_many_cores->addInputFile(this->getWorkflow()->getFileByID("input_file"));
         task_too_many_cores->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
-//        // Forget the previous job!
-        job_manager->forgetJob(job);
 
         // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
         job = job_manager->createStandardJob(
@@ -388,9 +386,6 @@ private:
         task_too_much_ram->addInputFile(this->getWorkflow()->getFileByID("input_file"));
         task_too_much_ram->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
 
-        // Forget the previous job!
-        job_manager->forgetJob(job);
-
         // Create a StandardJob
         job = job_manager->createStandardJob(
                 {task_too_much_ram},
@@ -429,10 +424,6 @@ private:
         }
 
         // Finally do one that works
-
-        // Forget the previous job!
-        job_manager->forgetJob(job);
-
         this->getWorkflow()->removeTask(task_too_much_ram);
         task = this->getWorkflow()->addTask("task", 3600, 1, 1, 0);
         task->addInputFile(this->getWorkflow()->getFileByID("input_file"));
@@ -490,8 +481,6 @@ private:
         if (!msg) {
             throw std::runtime_error("Unexpected '" + message->getName() + "' message");
         }
-
-        job_manager->forgetJob(job);
 
         return 0;
     }
@@ -591,7 +580,7 @@ private:
             task->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
 
             // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
-            wrench::StandardJob *job = job_manager->createStandardJob(
+            auto job = job_manager->createStandardJob(
                     {task},
                     {
                             {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
@@ -792,7 +781,7 @@ private:
 
             // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
 
-            wrench::StandardJob *job = job_manager->createStandardJob(
+            auto job = job_manager->createStandardJob(
                     {task},
                     {
                             {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
@@ -973,7 +962,7 @@ private:
 
             // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
 
-            wrench::StandardJob *job = job_manager->createStandardJob(
+            auto job = job_manager->createStandardJob(
                     {task},
                     {
                             {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
@@ -1166,7 +1155,7 @@ private:
 
             // Create a BOGUS StandardJob (just for testing)
             try {
-                wrench::StandardJob *job = job_manager->createStandardJob(
+                auto job = job_manager->createStandardJob(
                         {t1, t2, t4},
                         {},
                         {},
@@ -1178,7 +1167,7 @@ private:
 
 
             // Create a StandardJob
-            wrench::StandardJob *job = job_manager->createStandardJob(
+            auto job = job_manager->createStandardJob(
                     {t1, t2, t3, t4},
                     {},
                     {},
@@ -1334,7 +1323,7 @@ private:
         task->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
 
         // Create a StandardJob
-        wrench::StandardJob *job = job_manager->createStandardJob(
+        auto job = job_manager->createStandardJob(
                 task,
                 {
                         {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
@@ -1647,7 +1636,7 @@ private:
         task->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
 
         // Create a StandardJob
-        wrench::StandardJob *job = job_manager->createStandardJob(
+        auto job = job_manager->createStandardJob(
                 task,
                 {
                         {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
@@ -1805,7 +1794,7 @@ private:
             task2->addInputFile(this->getWorkflow()->getFileByID("input_file"));
 
             // Create a StandardJob with both tasks
-            wrench::StandardJob *job = job_manager->createStandardJob(
+            auto job = job_manager->createStandardJob(
                     {task1, task2},
                     {
                             {this->getWorkflow()->getFileByID("input_file"),  wrench::FileLocation::LOCATION(
@@ -1899,7 +1888,7 @@ private:
             task2->addInputFile(this->getWorkflow()->getFileByID("input_file"));
 
             // Create a StandardJob with both tasks
-            wrench::StandardJob *job = job_manager->createStandardJob(
+            auto job = job_manager->createStandardJob(
                     {task1, task2},
                     {
                             {this->getWorkflow()->getFileByID("input_file"),  wrench::FileLocation::LOCATION(
@@ -1998,7 +1987,7 @@ private:
             task3->addInputFile(this->getWorkflow()->getFileByID("input_file"));
 
             // Create a StandardJob with all three tasks
-            wrench::StandardJob *job = job_manager->createStandardJob(
+            auto job = job_manager->createStandardJob(
                     {task1, task2, task3},
                     {
                             {this->getWorkflow()->getFileByID("input_file"),  wrench::FileLocation::LOCATION(
@@ -2195,7 +2184,7 @@ public:
             task2->addInputFile(this->getWorkflow()->getFileByID("input_file"));
 
             // Create a StandardJob with both tasks
-            wrench::StandardJob *job = job_manager->createStandardJob(
+            auto job = job_manager->createStandardJob(
                     {task1, task2},
                     {
                             {this->getWorkflow()->getFileByID("input_file"),  wrench::FileLocation::LOCATION(
@@ -2293,7 +2282,7 @@ public:
             task2->addInputFile(this->getWorkflow()->getFileByID("input_file"));
 
             // Create a StandardJob with both tasks
-            wrench::StandardJob *job = job_manager->createStandardJob(
+            auto job = job_manager->createStandardJob(
                     {task1, task2, task3, task4},
                     {
                             {this->getWorkflow()->getFileByID("input_file"),  wrench::FileLocation::LOCATION(
@@ -2485,7 +2474,7 @@ private:
             task2->addOutputFile(this->getWorkflow()->getFileByID("output_file2"));
 
             // Create a StandardJob with both tasks
-            wrench::StandardJob *job = job_manager->createStandardJob(
+            auto job = job_manager->createStandardJob(
                     {task1, task2, task3, task4},
 //                {task1},
                     {
@@ -2643,7 +2632,7 @@ private:
             task2->addOutputFile(this->getWorkflow()->getFileByID("output_file2"));
 
             // Create a StandardJob with both tasks
-            wrench::StandardJob *job = job_manager->createStandardJob(
+            auto job = job_manager->createStandardJob(
                     {task1, task2, task3, task4},
                     {
                             {this->getWorkflow()->getFileByID("input_file"),   wrench::FileLocation::LOCATION(
@@ -2813,7 +2802,7 @@ private:
 //          task1->addOutputFile(workflow->getFileByID("output_file"));
 
                 // Create a StandardJob with both tasks
-                wrench::StandardJob *job = job_manager->createStandardJob(
+                auto job = job_manager->createStandardJob(
 //                {task1, task2, task3, task4},
                         {task1, task3},
 //                {task1},
@@ -3011,7 +3000,7 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create a StandardJob
-        wrench::StandardJob *job = job_manager->createStandardJob(
+        auto job = job_manager->createStandardJob(
                 {},
                 {},
                 {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(

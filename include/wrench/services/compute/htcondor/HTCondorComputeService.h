@@ -53,10 +53,10 @@ namespace wrench {
         /** \cond DEVELOPER   **/
         /***********************/
 
-        void submitStandardJob(StandardJob *job,
+        void submitStandardJob(std::shared_ptr<StandardJob> job,
                                const std::map<std::string, std::string> &service_specific_arguments) override;
 
-        void submitPilotJob(PilotJob *job, const std::map<std::string, std::string> &service_specific_arguments) override;
+        void submitPilotJob(std::shared_ptr<PilotJob> job, const std::map<std::string, std::string> &service_specific_arguments) override;
 
         std::shared_ptr<StorageService> getLocalStorageService() const;
 
@@ -73,9 +73,9 @@ namespace wrench {
 
         ~HTCondorComputeService() override;
 
-        void terminateStandardJob(StandardJob *job) override;
+        void terminateStandardJob(std::shared_ptr<StandardJob> job) override;
 
-        void terminatePilotJob(PilotJob *job) override;
+        void terminatePilotJob(std::shared_ptr<PilotJob> job) override;
 
         /***********************/
         /** \endcond          **/
@@ -86,10 +86,10 @@ namespace wrench {
 
         bool processNextMessage();
 
-        void processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
+        void processSubmitStandardJob(const std::string &answer_mailbox, std::shared_ptr<StandardJob>job,
                                       const std::map<std::string, std::string> &service_specific_args);
 
-        void processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job,
+        void processSubmitPilotJob(const std::string &answer_mailbox, std::shared_ptr<PilotJob>job,
                                    const std::map<std::string, std::string> &service_specific_args);
 
         void terminate();
