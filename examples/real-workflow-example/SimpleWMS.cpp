@@ -128,7 +128,6 @@ namespace wrench {
       auto job = event->standard_job;
       WRENCH_INFO("Notified that a standard job has failed (all its tasks are back in the ready state)");
       WRENCH_INFO("CauseType: %s", event->failure_cause->toString().c_str());
-      this->job_manager->forgetJob(job);
       WRENCH_INFO("As a SimpleWMS, I abort as soon as there is a failure");
       this->abort = true;
     }
