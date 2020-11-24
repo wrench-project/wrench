@@ -121,7 +121,7 @@ namespace wrench {
             }
 
             /* Create the job  */
-            StandardJob *standard_job;
+            std::shared_ptr<StandardJob> standard_job;
             if (ready_task2) {
                 standard_job = job_manager->createStandardJob({ready_task1, ready_task2}, file_locations);
             } else {
