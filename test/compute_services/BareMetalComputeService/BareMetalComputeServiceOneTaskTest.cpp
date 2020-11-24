@@ -815,12 +815,6 @@ private:
                                                    {test->output_file, wrench::FileLocation::LOCATION(
                                                            test->storage_service1, "/disk1")}});
 
-        // Get the job type as a string
-        std::string job_type_as_string = job->getTypeAsString();
-        if (job_type_as_string != "Standard") {
-            throw std::runtime_error("Job type as a string should be 'Standard'");
-        }
-
         // Submit the job
         job_manager->submitJob(job, test->compute_service);
 

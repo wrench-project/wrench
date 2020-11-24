@@ -53,8 +53,14 @@ namespace wrench {
      * @return the message
      */
     std::string JobTypeNotSupported::toString() {
+        std::string job_type = "unknown";
+        if (std::dynamic_pointer_cast<StandardJob>(this->job)) {
+            job_type = "'standard'";
+        } else if (std::dynamic_pointer_cast<PilotJob>(this->job)) {
+            job_type = "'pilot'";
+        }
         return "Compute service " + this->compute_service->getName() + " on host " +
-               this->compute_service->getHostname() + " does not support jobs of type " + this->job->getTypeAsString();
+               this->compute_service->getHostname() + " does not support jobs of type " + job_type;
     }
 
 }
