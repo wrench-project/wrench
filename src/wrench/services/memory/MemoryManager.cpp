@@ -130,7 +130,7 @@ namespace wrench {
 
     double MemoryManager::getEvictableMemory() {
         double sum = 0;
-        for (int i = 0; i < inactive_list.size(); i++) {
+        for (unsigned int i = 0; i < inactive_list.size(); i++) {
             sum += inactive_list[i]->getSize();
         }
         return sum;
@@ -189,7 +189,7 @@ namespace wrench {
             io_ptrs.push_back(disk->write_async(it->second));
         }
 
-        for (int i = 0; i < io_ptrs.size(); i++) {
+        for (unsigned int i = 0; i < io_ptrs.size(); i++) {
             io_ptrs[i]->wait();
         }
 
@@ -268,7 +268,7 @@ namespace wrench {
 
         double evicted = 0;
 
-        for (int i = 0; i < inactive_list.size(); i++) {
+        for (unsigned int i = 0; i < inactive_list.size(); i++) {
 
             Block *blk = inactive_list.at(i);
 
@@ -332,7 +332,7 @@ namespace wrench {
         std::string mnt_pt = "";
 
         // Calculate dirty cached data
-        for (int i = 0; i < inactive_list.size(); i++) {
+        for (unsigned int i = 0; i < inactive_list.size(); i++) {
             Block *blk = inactive_list.at(i);
             if (blk->getFileId().compare(filename) == 0) {
 
@@ -352,7 +352,7 @@ namespace wrench {
         }
 
         // Calculate clean cached data
-        for (int i = 0; i < active_list.size(); i++) {
+        for (unsigned int i = 0; i < active_list.size(); i++) {
             Block *blk = active_list.at(i);
             if (blk->getFileId().compare(filename) == 0) {
 
@@ -398,7 +398,7 @@ namespace wrench {
         double clean_reaccessed = 0;
         double read = 0;
 
-        for (int i = 0; i < inactive_list.size(); i++) {
+        for (unsigned int i = 0; i < inactive_list.size(); i++) {
 
             if (read >= amount) {
                 break;
@@ -436,7 +436,7 @@ namespace wrench {
             }
         }
 
-        for (int i = 0; i < active_list.size(); i++) {
+        for (unsigned int i = 0; i < active_list.size(); i++) {
 
             if (read >= amount) {
                 break;
@@ -521,12 +521,12 @@ namespace wrench {
     void MemoryManager::balanceLruLists() {
 
         double inactive_size = 0;
-        for (int i=0; i < inactive_list.size(); i++) {
+        for (unsigned int i=0; i < inactive_list.size(); i++) {
             inactive_size += inactive_list[i]->getSize();
         }
 
         double active_size = 0;
-        for (int i=0; i < active_list.size(); i++) {
+        for (unsigned int i=0; i < active_list.size(); i++) {
             active_size += active_list[i]->getSize();
         }
 
@@ -535,7 +535,7 @@ namespace wrench {
             double to_move_amt = (active_size - inactive_size) / 2;
             double moved_amt = 0;
 
-            for (int i = 0; i < active_list.size(); i++) {
+            for (unsigned int i = 0; i < active_list.size(); i++) {
                 Block *blk = active_list.at(i);
 
                 // move the whole block
@@ -569,13 +569,13 @@ namespace wrench {
 
         double amt = 0;
 
-        for (int i = 0; i < inactive_list.size(); i++) {
+        for (unsigned int i = 0; i < inactive_list.size(); i++) {
             if (inactive_list[i]->getFileId().compare(filename) == 0) {
                 amt += inactive_list[i]->getSize();
             }
         }
 
-        for (int i = 0; i < active_list.size(); i++) {
+        for (unsigned int i = 0; i < active_list.size(); i++) {
             if (active_list[i]->getFileId().compare(filename) == 0) {
                 amt += active_list[i]->getSize();
             }
@@ -593,12 +593,12 @@ namespace wrench {
 
         std::vector<Block *> block_list;
 
-        for (int i = 0; i < inactive_list.size(); i++) {
+        for (unsigned int i = 0; i < inactive_list.size(); i++) {
             if (inactive_list[i]->getFileId().compare(filename) == 0) {
                 block_list.push_back(new Block(inactive_list[i]));
             }
         }
-        for (int i = 0; i < active_list.size(); i++) {
+        for (unsigned int i = 0; i < active_list.size(); i++) {
             if (active_list[i]->getFileId().compare(filename) == 0) {
                 block_list.push_back(new Block(active_list[i]));
             }
@@ -647,7 +647,7 @@ namespace wrench {
         fprintf(log_file, "time, total_mem, dirty, cache, used_mem\n");
 
         double start = this->time_log.at(0);
-        for (int i=0; i<this->time_log.size(); i++) {
+        for (unsigned int i=0; i<this->time_log.size(); i++) {
             fprintf(log_file, "%lf, %lf, %lf, %lf, %lf\n",
                     this->time_log.at(i) - start,
                     total / 1000000.0,
