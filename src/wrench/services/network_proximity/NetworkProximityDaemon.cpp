@@ -196,7 +196,7 @@ namespace wrench {
     bool NetworkProximityDaemon::processNextMessage(double timeout) {
 
         // Wait for a message
-        std::shared_ptr<SimulationMessage> message = nullptr;
+        std::unique_ptr<SimulationMessage> message = nullptr;
 
         try {
             message = S4U_Mailbox::getMessage(this->mailbox_name, timeout);
@@ -210,7 +210,7 @@ namespace wrench {
 
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
 
-        if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
+        if (auto msg = dynamic_cast<ServiceStopDaemonMessage*>(message.get())) {
             // This is Synchronous
             try {
                 S4U_Mailbox::putMessage(msg->ack_mailbox,
@@ -221,7 +221,7 @@ namespace wrench {
             }
             return false;
 
-        } else if (auto msg = std::dynamic_pointer_cast<NextContactDaemonAnswerMessage>(message)) {
+        } else if (auto msg = dynamic_cast<NextContactDaemonAnswerMessage*>(message.get())) {
 
             this->next_host_to_send = msg->next_host_to_send;
             this->next_daemon_to_send = msg->next_daemon_to_send;
@@ -229,7 +229,7 @@ namespace wrench {
 
             return true;
 
-        } else if (auto msg = std::dynamic_pointer_cast<NetworkProximityTransferMessage>(message)) {
+        } else if (auto msg = dynamic_cast<NetworkProximityTransferMessage*>(message.get())) {
 
             return true;
 

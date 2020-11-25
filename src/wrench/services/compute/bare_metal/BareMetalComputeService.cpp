@@ -212,14 +212,14 @@ namespace wrench {
         }
 
         // Get the answer
-        std::shared_ptr<SimulationMessage> message = nullptr;
+        std::unique_ptr<SimulationMessage> message = nullptr;
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw WorkflowExecutionException(cause);
         }
 
-        if (auto msg = std::dynamic_pointer_cast<ComputeServiceSubmitStandardJobAnswerMessage>(message)) {
+        if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobAnswerMessage*>(message.get())) {
             // If no success, throw an exception
             if (not msg->success) {
                 throw WorkflowExecutionException(msg->failure_cause);
@@ -261,7 +261,7 @@ namespace wrench {
         }
 
         // Wait for a reply
-        std::shared_ptr<SimulationMessage> message = nullptr;
+        std::unique_ptr<SimulationMessage> message = nullptr;
 
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
@@ -269,7 +269,7 @@ namespace wrench {
             throw WorkflowExecutionException(cause);
         }
 
-        if (auto msg = std::dynamic_pointer_cast<ComputeServiceSubmitPilotJobAnswerMessage>(message)) {
+        if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobAnswerMessage*>(message.get())) {
             // If no success, throw an exception
             if (not msg->success) {
                 throw WorkflowExecutionException(msg->failure_cause);
@@ -802,13 +802,13 @@ namespace wrench {
         }
 
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
-        if (auto msg = std::dynamic_pointer_cast<HostHasTurnedOnMessage>(message)) {
+        if (auto msg = dynamic_cast<HostHasTurnedOnMessage*>(message.get())) {
             // Do nothing, just wake up
             return true;
-        } else if (auto msg = std::dynamic_pointer_cast<HostHasChangedSpeedMessage>(message)) {
+        } else if (auto msg = dynamic_cast<HostHasChangedSpeedMessage*>(message.get())) {
             // Do nothing, just wake up
             return true;
-        } else if (auto msg = std::dynamic_pointer_cast<HostHasTurnedOffMessage>(message)) {
+        } else if (auto msg = dynamic_cast<HostHasTurnedOffMessage*>(message.get())) {
             // If all hosts being off should not cause the service to terminate, then nevermind
             if (this->getPropertyValueAsString(
                     BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN) == "false") {
@@ -830,7 +830,7 @@ namespace wrench {
                 return false;
             }
 
-        } else if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
+        } else if (auto msg = dynamic_cast<ServiceStopDaemonMessage*>(message.get())) {
 
             this->terminate(false);
 
@@ -844,29 +844,29 @@ namespace wrench {
             }
             return false;
 
-        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceSubmitStandardJobRequestMessage>(message)) {
+        } else if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobRequestMessage*>(message.get())) {
             processSubmitStandardJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
             return true;
-        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceSubmitPilotJobRequestMessage>(message)) {
+        } else if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobRequestMessage*>(message.get())) {
             processSubmitPilotJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
             return true;
-        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceResourceInformationRequestMessage>(message)) {
+        } else if (auto msg = dynamic_cast<ComputeServiceResourceInformationRequestMessage*>(message.get())) {
             processGetResourceInformation(msg->answer_mailbox);
             return true;
 
-        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceTerminateStandardJobRequestMessage>(message)) {
+        } else if (auto msg = dynamic_cast<ComputeServiceTerminateStandardJobRequestMessage*>(message.get())) {
             processStandardJobTerminationRequest(msg->job, msg->answer_mailbox);
             return true;
 
-        } else if (auto msg = std::dynamic_pointer_cast<WorkunitExecutorDoneMessage>(message)) {
+        } else if (auto msg = dynamic_cast<WorkunitExecutorDoneMessage*>(message.get())) {
             processWorkunitExecutorCompletion(msg->workunit_executor, msg->workunit);
             return true;
 
-        } else if (auto msg = std::dynamic_pointer_cast<WorkunitExecutorFailedMessage>(message)) {
+        } else if (auto msg = dynamic_cast<WorkunitExecutorFailedMessage*>(message.get())) {
             processWorkunitExecutorFailure(msg->workunit_executor, msg->workunit, msg->cause);
             return true;
 
-        } else if (auto msg = std::dynamic_pointer_cast<ServiceHasCrashedMessage>(message)) {
+        } else if (auto msg = dynamic_cast<ServiceHasCrashedMessage*>(message.get())) {
             auto service = msg->service;
             auto workunit_executor = std::dynamic_pointer_cast<WorkunitExecutor>(service);
             if (not workunit_executor) {
@@ -1090,14 +1090,14 @@ namespace wrench {
         }
 
         // Get the answer
-        std::shared_ptr<SimulationMessage> message = nullptr;
+        std::unique_ptr<SimulationMessage> message = nullptr;
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw WorkflowExecutionException(cause);
         }
 
-        if (auto msg = std::dynamic_pointer_cast<ComputeServiceTerminateStandardJobAnswerMessage>(message)) {
+        if (auto msg = dynamic_cast<ComputeServiceTerminateStandardJobAnswerMessage*>(message.get())) {
             // If no success, throw an exception
             if (not msg->success) {
                 throw WorkflowExecutionException(msg->failure_cause);

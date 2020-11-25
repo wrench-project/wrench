@@ -263,8 +263,7 @@ namespace wrench {
 
             // Receive the first chunk
             auto msg = S4U_Mailbox::getMessage(mailbox);
-            if (auto file_content_chunk_msg =
-                    std::dynamic_pointer_cast<StorageServiceFileContentChunkMessage>(msg)) {
+            if (auto file_content_chunk_msg = dynamic_cast<StorageServiceFileContentChunkMessage*>(msg.get())) {
                 done = file_content_chunk_msg->last_chunk;
             } else {
                 throw std::runtime_error("FileTransferThread::receiveFileFromNetwork() : Received an unexpected [" +
@@ -283,7 +282,7 @@ namespace wrench {
                     // Wait for the comm to finish
                     msg = req->wait();
                     if (auto file_content_chunk_msg =
-                            std::dynamic_pointer_cast<StorageServiceFileContentChunkMessage>(msg)) {
+                            dynamic_cast<StorageServiceFileContentChunkMessage*>(msg.get())) {
                         done = file_content_chunk_msg->last_chunk;
                     } else {
                         throw std::runtime_error(
@@ -448,7 +447,7 @@ namespace wrench {
         }
 
         // Wait for a reply to the request
-        std::shared_ptr<SimulationMessage> message = nullptr;
+        std::unique_ptr<SimulationMessage> message = nullptr;
 
         try {
             message = S4U_Mailbox::getMessage(request_answer_mailbox, this->network_timeout);
@@ -457,7 +456,7 @@ namespace wrench {
         }
 
 
-        if (auto msg = std::dynamic_pointer_cast<StorageServiceFileReadAnswerMessage>(message)) {
+        if (auto msg = dynamic_cast<StorageServiceFileReadAnswerMessage*>(message.get())) {
             // If it's not a success, throw an exception
             if (not msg->success) {
                 throw msg->failure_cause;
@@ -481,7 +480,7 @@ namespace wrench {
                 // Receive the first chunk
                 auto msg = S4U_Mailbox::getMessage(mailbox_that_should_receive_file_content);
                 if (auto file_content_chunk_msg =
-                        std::dynamic_pointer_cast<StorageServiceFileContentChunkMessage>(msg)) {
+                        dynamic_cast<StorageServiceFileContentChunkMessage*>(msg.get())) {
                     done = file_content_chunk_msg->last_chunk;
                 } else {
                     throw std::runtime_error("FileTransferThread::downloadFileFromStorageService(): Received an unexpected [" +
@@ -501,7 +500,7 @@ namespace wrench {
                     // Wait for the comm to finish
                     msg = req->wait();
                     if (auto file_content_chunk_msg =
-                            std::dynamic_pointer_cast<StorageServiceFileContentChunkMessage>(msg)) {
+                            dynamic_cast<StorageServiceFileContentChunkMessage*>(msg.get())) {
                         done = file_content_chunk_msg->last_chunk;
                     } else {
                         throw std::runtime_error("FileTransferThread::downloadFileFromStorageService(): Received an unexpected [" +

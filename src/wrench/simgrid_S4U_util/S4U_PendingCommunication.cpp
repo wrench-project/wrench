@@ -31,7 +31,7 @@ namespace wrench {
      *
      * @throw std::shared_ptr<NetworkError>
      */
-    std::shared_ptr<SimulationMessage> S4U_PendingCommunication::wait() {
+    std::unique_ptr<SimulationMessage> S4U_PendingCommunication::wait() {
 
         try {
             if (this->comm_ptr->get_state() != simgrid::s4u::Activity::State::FINISHED) {
