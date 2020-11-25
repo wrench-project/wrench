@@ -774,7 +774,7 @@ namespace wrench {
         MemoryManager *mem_mng = getMemoryManagerByHost(hostname);
         std::vector<Block*> file_blocks = mem_mng->getCachedBlocks(file->getID());
         long cached_amt = 0;
-        for (int i = 0; i< file_blocks.size(); i++) {
+        for (unsigned int i = 0; i< file_blocks.size(); i++) {
             cached_amt += file_blocks[i]->getSize();
         }
 
