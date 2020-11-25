@@ -150,7 +150,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     bool BandwidthMeterService::processNextMessage(double timeout) {
-        std::shared_ptr<SimulationMessage> message = nullptr;
+        std::unique_ptr<SimulationMessage> message = nullptr;
 
         try {
             message = S4U_Mailbox::getMessage(this->mailbox_name, timeout);
@@ -160,7 +160,7 @@ namespace wrench {
 
         WRENCH_INFO("Bandwidth Meter got a %s message", message->getName().c_str());
 
-        if (std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
+        if (dynamic_cast<ServiceStopDaemonMessage*>(message.get())) {
             // There shouldn't be any need to clean any state up
             return false;
         }
