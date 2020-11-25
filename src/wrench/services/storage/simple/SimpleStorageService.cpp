@@ -154,7 +154,7 @@ namespace wrench {
 
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
 
-        if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
+        if (auto msg = dynamic_cast<ServiceStopDaemonMessage*>(message.get())) {
             try {
                 S4U_Mailbox::putMessage(msg->ack_mailbox,
                                         new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
@@ -164,7 +164,7 @@ namespace wrench {
             }
             return false;
 
-        } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFreeSpaceRequestMessage>(message)) {
+        } else if (auto msg = dynamic_cast<StorageServiceFreeSpaceRequestMessage*>(message.get())) {
             std::map<std::string, double> free_space;
 
             for (auto const &mp : this->file_systems) {
@@ -179,10 +179,10 @@ namespace wrench {
                                     SimpleStorageServiceMessagePayload::FREE_SPACE_ANSWER_MESSAGE_PAYLOAD)));
             return true;
 
-        } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFileDeleteRequestMessage>(message)) {
+        } else if (auto msg = dynamic_cast<StorageServiceFileDeleteRequestMessage*>(message.get())) {
             return processFileDeleteRequest(msg->file, msg->location, msg->answer_mailbox);
 
-        } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFileLookupRequestMessage>(message)) {
+        } else if (auto msg = dynamic_cast<StorageServiceFileLookupRequestMessage*>(message.get())) {
             auto fs = this->file_systems[msg->location->getMountPoint()].get();
             bool file_found = fs->isFileInDirectory(msg->file, msg->location->getAbsolutePathAtMountPoint());
 
@@ -194,17 +194,17 @@ namespace wrench {
                                     SimpleStorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
             return true;
 
-        } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFileWriteRequestMessage>(message)) {
+        } else if (auto msg = dynamic_cast<StorageServiceFileWriteRequestMessage*>(message.get())) {
             return processFileWriteRequest(msg->file, msg->location, msg->answer_mailbox, msg->buffer_size);
 
-        } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFileReadRequestMessage>(message)) {
+        } else if (auto msg = dynamic_cast<StorageServiceFileReadRequestMessage*>(message.get())) {
             return processFileReadRequest(msg->file, msg->location, msg->answer_mailbox,
                                           msg->mailbox_to_receive_the_file_content, msg->buffer_size);
 
-        } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFileCopyRequestMessage>(message)) {
+        } else if (auto msg = dynamic_cast<StorageServiceFileCopyRequestMessage*>(message.get())) {
             return processFileCopyRequest(msg->file, msg->src, msg->dst, msg->answer_mailbox);
 
-        } else if (auto msg = std::dynamic_pointer_cast<FileTransferThreadNotificationMessage>(message)) {
+        } else if (auto msg = dynamic_cast<FileTransferThreadNotificationMessage*>(message.get())) {
             return processFileTransferThreadNotification(
                     msg->file_transfer_thread,
                     msg->file,

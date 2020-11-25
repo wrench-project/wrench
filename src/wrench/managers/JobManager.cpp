@@ -556,7 +556,7 @@ namespace wrench {
 
     bool JobManager::processNextMessage() {
 
-        std::shared_ptr<SimulationMessage> message = nullptr;
+        std::unique_ptr<SimulationMessage> message = nullptr;
         try {
             message = S4U_Mailbox::getMessage(this->mailbox_name);
         } catch (std::shared_ptr<NetworkError> &cause) {
@@ -571,19 +571,19 @@ namespace wrench {
 
         WRENCH_INFO("Job Manager got a %s message", message->getName().c_str());
 
-        if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
+        if (auto msg = dynamic_cast<ServiceStopDaemonMessage*>(message.get())) {
             // There shouldn't be any need to clean up any state
             return false;
-        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceStandardJobDoneMessage>(message)) {
+        } else if (auto msg = dynamic_cast<ComputeServiceStandardJobDoneMessage*>(message.get())) {
             processStandardJobCompletion(msg->job, msg->compute_service);
             return true;
-        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceStandardJobFailedMessage>(message)) {
+        } else if (auto msg = dynamic_cast<ComputeServiceStandardJobFailedMessage*>(message.get())) {
             processStandardJobFailure(msg->job, msg->compute_service, msg->cause);
             return true;
-        } else if (auto msg = std::dynamic_pointer_cast<ComputeServicePilotJobStartedMessage>(message)) {
+        } else if (auto msg = dynamic_cast<ComputeServicePilotJobStartedMessage*>(message.get())) {
             processPilotJobStart(msg->job, msg->compute_service);
             return true;
-        } else if (auto msg = std::dynamic_pointer_cast<ComputeServicePilotJobExpiredMessage>(message)) {
+        } else if (auto msg = dynamic_cast<ComputeServicePilotJobExpiredMessage*>(message.get())) {
             processPilotJobExpiration(msg->job, msg->compute_service);
             return true;
         } else {

@@ -88,7 +88,7 @@ private:
         // Get the message
         auto message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
 
-        if (not std::dynamic_pointer_cast<wrench::ComputeThreadDoneMessage>(message)) {
+        if (not dynamic_cast<wrench::ComputeThreadDoneMessage*>(message.get())) {
             throw std::runtime_error("Didn't receive the expected ComputeThreadDoneMessage message");
         }
 
