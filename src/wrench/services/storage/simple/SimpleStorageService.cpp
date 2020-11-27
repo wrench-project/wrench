@@ -24,6 +24,7 @@
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/simulation/SimulationTimestampTypes.h"
 #include "wrench/services/storage/storage_helpers/FileLocation.h"
+#include "wrench/services/memory/MemoryManager.h"
 
 WRENCH_LOG_CATEGORY(wrench_core_simple_storage_service,
 "Log category for Simple Storage Service");
@@ -120,6 +121,16 @@ namespace wrench {
                       std::to_string(fs.second->getFreeSpace()) + "/" +
                       std::to_string(fs.second->getTotalCapacity()) + " Bytes";
             WRENCH_INFO("%s", message.c_str())
+        }
+
+        // If writeback device simulation is activated
+        if (Simulation::isWriteback()) {
+            // Start periodical flushing
+            simgrid::s4u::Disk* memory = simgrid::s4u::Host::by_name(this->getHostname())->get_disks().at(0);
+            std::shared_ptr<MemoryManager> memory_manager_ptr = MemoryManager::initAndStart(this->simulation, memory,
+                                                                                            0.4, 5, 30, this->hostname);
+            this->simulation->add(memory_manager_ptr.get());
+//            memory_manager_ptr->log();
         }
 
         /** Main loop **/

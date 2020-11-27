@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<adag name="pipeline" jobCount="1" fileCount="0" childCount="0">
+<!-- part 1: list of all referenced files (may be empty) -->
+<!-- part 2: definition of all jobs (at least one) -->
+  <job id="task01" namespace="pipeline" name="task01" memory="75000000000" runtime="0.110" cores="1">
+    <uses file="file1.dat" link="input" type="data"  size="75000000000"/>
+    <uses file="file2.dat" link="output" type="data" size="75000000000"/>
+  </job>
+  <job id="task02" namespace="pipeline" name="task02" memory="75000000000" runtime="0.110" cores="1">
+    <uses file="file2.dat" link="input" type="data"  size="75000000000"/>
+    <uses file="file3.dat" link="output" type="data" size="75000000000"/>
+  </job>
+  <job id="task03" namespace="pipeline" name="task03" memory="75000000000" runtime="0.110" cores="1">
+    <uses file="file3.dat" link="input" type="data"  size="75000000000"/>
+    <uses file="file4.dat" link="output" type="data" size="75000000000"/>
+  </job>
+<!--&lt;!&ndash; part 3: list of control-flow dependencies (may be empty)&ndash;&gt;-->
+<!--  <child ref="task02">-->
+<!--    <parent ref="task01"/>-->
+<!--  </child>-->
+<!--  <child ref="task03">-->
+<!--    <parent ref="task02"/>-->
+<!--  </child>-->
+</adag>
