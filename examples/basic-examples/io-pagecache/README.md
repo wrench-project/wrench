@@ -7,7 +7,7 @@ do some computations, then write the output to a file. The output of a task is t
 the following task.
 
 ## 1. Single-threaded
- - How to run: run `wrench-example-bare-metal-chain 1 <input_size_in_gb> <cpu_time_in_sec> 
+ - How to run: run `wrench-example-io-pagecache-single 1 <input_size_in_gb> <cpu_time_in_sec> 
  single_host.xml --single`. Run with `--writeback` to enable writeback strategy with page cache.
  - Output log files are exported to the directories: `single/original/` if run 
  without `--writeback` option, or `single/pagecache` with the option. 
@@ -17,3 +17,8 @@ the following task.
  the use of page cache as in the single-threaded simulator.
  - Output log files are exported to the directories: `multi/original/` if run 
   without `--writeback` option, or `multi/pagecache` with the option.
+  
+## 3. NFS
+- How to run: run script `run_nfs.sh`. 
+- Output log files are exported to the directories: `nfs/original/` if run 
+without `--writeback` option, or `nfs/pagecache` with the option.

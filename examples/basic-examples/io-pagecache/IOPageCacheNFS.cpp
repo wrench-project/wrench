@@ -186,7 +186,7 @@ int main(int argc, char **argv) {
     }
 
     simulation.getOutput().dumpUnifiedJSON(workflow,
-                                           "remote/" + sub_dir + "/dump_" + to_string(no_pipelines) + ".json");
+                                           "nfs/" + sub_dir + "/dump_" + to_string(no_pipelines) + ".json");
 
     return 0;
 }
