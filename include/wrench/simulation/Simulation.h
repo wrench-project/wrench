@@ -135,8 +135,9 @@ namespace wrench {
                                                     std::string write_mount_point);
         void writeToDisk(double num_bytes, std::string hostname, std::string mount_point);
 
-        void readWithMemoryCache(WorkflowFile *file, double n_bytes, std::string mountpoint);
-        void writeWithMemoryCache(WorkflowFile *file, double n_bytes, std::string mountpoint);
+        void readWithMemoryCache(WorkflowFile *file, double n_bytes, std::shared_ptr<FileLocation> location);
+        void writebackWithMemoryCache(WorkflowFile *file, double n_bytes, std::shared_ptr<FileLocation> location, bool is_dirty);
+        void writeThroughWithMemoryCache(WorkflowFile *file, double n_bytes, std::shared_ptr<FileLocation> location);
         MemoryManager* getMemoryManagerByHost(std::string hostname);
 
         static double getMemoryCapacity();
