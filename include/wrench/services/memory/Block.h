@@ -6,13 +6,15 @@
 #define WRENCH_BLOCK_H
 
 #include <string>
+#include "wrench/services/storage/storage_helpers/FileLocation.h"
 
 namespace wrench {
 
     class Block {
 
     public:
-        Block(std::string fid, std::string mount_point, double sz, double last_access, bool is_dirty, double dirty_time);
+        Block(std::string fid, std::shared_ptr<FileLocation> location, double sz,
+                     double last_access, bool is_dirty, double dirty_time);
 
         Block(Block *blk);
 
@@ -22,7 +24,7 @@ namespace wrench {
 
         std::string getMountpoint();
 
-        void setMountpoint(std::string mountpoint);
+//        void setMountpoint(std::string mountpoint);
 
         double getSize() const;
 
@@ -40,11 +42,14 @@ namespace wrench {
 
         void setDirtyTime(double time);
 
+        const std::shared_ptr<FileLocation> &getLocation() const;
+
         Block* split(double remaining);
 
     private:
         std::string file_id;
-        std::string mountpoint;
+//        std::string mountpoint;
+        std::shared_ptr<FileLocation> location;
         double size;
         double last_access;
         bool dirty;
