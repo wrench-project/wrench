@@ -37,9 +37,13 @@ namespace wrench {
         static std::shared_ptr<FileLocation> LOCATION(std::shared_ptr<StorageService> ss);
 
         static std::shared_ptr<FileLocation> LOCATION(std::shared_ptr<StorageService> ss,
+                std::shared_ptr<StorageService> server_ss);
+
+        static std::shared_ptr<FileLocation> LOCATION(std::shared_ptr<StorageService> ss,
                                                       std::string absolute_path);
 
         std::shared_ptr<StorageService> getStorageService();
+        std::shared_ptr<StorageService> getServerStorageService();
         std::string getMountPoint();
         std::string getAbsolutePathAtMountPoint();
         std::string getFullAbsolutePath();
@@ -78,6 +82,7 @@ namespace wrench {
                 storage_service(ss), mount_point(mp), absolute_path_at_mount_point(apamp) { }
 
         std::shared_ptr<StorageService> storage_service;
+        std::shared_ptr<StorageService> server_storage_service;
         std::string mount_point;
         std::string absolute_path_at_mount_point;
 
