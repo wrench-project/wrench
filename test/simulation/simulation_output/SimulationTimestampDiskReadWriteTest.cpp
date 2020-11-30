@@ -161,6 +161,20 @@ void SimulationTimestampDiskReadWriteTest::do_SimulationTimestampDiskReadWriteBa
     ASSERT_EQ(10, diskread_timestamps.size());
     ASSERT_EQ(5, diskwrite_timestamps.size());
 
+    diskread_timestamps.front()->getContent()->getBytes();
+    diskread_timestamps.front()->getContent()->getCounter();
+    diskread_timestamps.front()->getContent()->getDate();
+    diskread_timestamps.front()->getContent()->getEndpoint();
+    diskread_timestamps.front()->getContent()->getHostname();
+    diskread_timestamps.front()->getContent()->getMount();
+
+    diskwrite_timestamps.front()->getContent()->getBytes();
+    diskwrite_timestamps.front()->getContent()->getCounter();
+    diskwrite_timestamps.front()->getContent()->getDate();
+    diskwrite_timestamps.front()->getContent()->getEndpoint();
+    diskwrite_timestamps.front()->getContent()->getHostname();
+    diskwrite_timestamps.front()->getContent()->getMount();
+
 
     delete simulation;
     free(argv[0]);
