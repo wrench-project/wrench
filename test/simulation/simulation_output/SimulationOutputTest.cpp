@@ -116,7 +116,17 @@ private:
 
     int main() {
 
-      // do nothing
+        try {
+            this->simulation->getOutput().addTimestampTaskStart(nullptr);
+            this->simulation->getOutput().addTimestampTaskCompletion(nullptr);
+            this->simulation->getOutput().addTimestampTaskTermination(nullptr);
+            this->simulation->getOutput().addTimestampTaskFailure(nullptr);
+            throw std::runtime_error("Should have caught exception!");
+        } catch (std::exception &ignore) {
+
+        }
+
+        // do nothing
 
       return 0;
     }
