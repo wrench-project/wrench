@@ -36,6 +36,8 @@ public:
 
     void do_TerminateStandardJobsTest_test();
 
+    void do_TerminatePilotJobsTest_test();
+
     void do_TwoStandardJobSubmissionTest_test();
 
     void do_MultipleStandardTaskTest_test();
@@ -583,6 +585,127 @@ void BatchServiceTest::do_TerminateStandardJobsTest_test() {
 }
 
 
+/**********************************************************************/
+/**  PILOT JOB TERMINATION TEST                                   **/
+/**********************************************************************/
+
+class TerminateOnePilotJobSubmissionTestWMS : public wrench::WMS {
+public:
+    TerminateOnePilotJobSubmissionTestWMS(BatchServiceTest *test,
+                                             const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                             std::string hostname) :
+            wrench::WMS(nullptr, nullptr, compute_services, {}, {}, nullptr, hostname,
+                        "test") {
+        this->test = test;
+    }
+
+private:
+    BatchServiceTest *test;
+
+    int main() {
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+        auto pjob1 = job_manager->createPilotJob();
+        auto pjob2 = job_manager->createPilotJob();
+
+            std::map<std::string, std::string> batch_job_args;
+            batch_job_args["-N"] = "4";
+            batch_job_args["-t"] = "5"; //time in minutes
+            batch_job_args["-c"] = "10"; //number of cores per node
+            try {
+                job_manager->submitJob(pjob1, this->test->compute_service, batch_job_args);
+                job_manager->submitJob(pjob2, this->test->compute_service, batch_job_args);
+            } catch (wrench::WorkflowExecutionException &e) {
+                throw std::runtime_error(
+                        "Exception: " + std::string(e.what())
+                );
+            }
+
+        this->simulation->sleep(1);
+
+        // Terminate job 2 (which is pending)
+        job_manager->terminateJob(pjob2);
+        // Terminate job 1 (which is running)
+        job_manager->terminateJob(pjob1);
+
+        if (pjob1->getState() != wrench::PilotJob::State::TERMINATED) {
+            throw std::runtime_error("Pilot job #1's state should be TERMINATED (instead: " + std::to_string(pjob1->getState()) + ")");
+        }
+        if (pjob2->getState() != wrench::PilotJob::State::TERMINATED) {
+            throw std::runtime_error("Pilot job #2's state should be TERMINATED (instead: " + std::to_string(pjob2->getState()) + ")");
+        }
+
+        return 0;
+    }
+};
+
+#ifdef ENABLE_BATSCHED
+TEST_F(BatchServiceTest, TerminateStandardJobsTest)
+#else
+
+TEST_F(BatchServiceTest, TerminatePilotJobsTest)
+#endif
+{
+    DO_TEST_WITH_FORK(do_TerminatePilotJobsTest_test);
+}
+
+void BatchServiceTest::do_TerminatePilotJobsTest_test() {
+    // Create and initialize a simulation
+    auto simulation = new wrench::Simulation();
+    int argc = 1;
+    auto argv = (char **) calloc(1, sizeof(char *));
+    argv[0] = strdup("batch_service_test");
+
+    ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+    // Setting up the platform
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    // Get a hostname
+    std::string hostname = "Host1";
+
+    // Create a Storage Service
+    ASSERT_NO_THROW(storage_service1 = simulation->add(
+            new wrench::SimpleStorageService(hostname, {"/disk1"})));
+
+    // Create a Storage Service
+    ASSERT_NO_THROW(storage_service2 = simulation->add(
+            new wrench::SimpleStorageService(hostname, {"/disk2"})));
+
+
+    // Create a Batch Service
+    ASSERT_NO_THROW(compute_service = simulation->add(
+            new wrench::BatchComputeService(hostname, {"Host1", "Host2", "Host3", "Host4"},
+                                            {})));
+
+    simulation->add(new wrench::FileRegistryService(hostname));
+
+    // Create a WMS
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    ASSERT_NO_THROW(wms = simulation->add(
+            new TerminateOneStandardJobSubmissionTestWMS(
+                    this, {compute_service}, hostname)));
+
+    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+
+    // Create two workflow files
+    wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
+    wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
+
+    // Staging the input_file on the storage service
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+
+    // Running a "run a single task" simulation
+    // Note that in these tests the WMS creates workflow tasks, which a user would
+    // of course not be likely to do
+    ASSERT_NO_THROW(simulation->launch());
+
+    delete simulation;
+
+    free(argv[0]);
+    free(argv);
+}
 
 
 
@@ -1264,30 +1387,14 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
+        // Standard Job
         {
             // Create a sequential task that lasts one min and requires 2 cores
             wrench::WorkflowTask *task = this->getWorkflow()->addTask("task", 50, 2, 12,  0);
-            task->addInputFile(this->getWorkflow()->getFileByID("input_file"));
-            task->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
 
             // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
 
-            auto job = job_manager->createStandardJob(
-                    {task},
-                    {
-                            {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
-                                    this->test->storage_service1)},
-                            {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(
-                                    this->test->storage_service1)}
-                    },
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
-                            this->getWorkflow()->getFileByID("input_file"),
-                            wrench::FileLocation::LOCATION(this->test->storage_service1),
-                            wrench::FileLocation::LOCATION(this->test->storage_service2))},
-                    {},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(
-                            this->getWorkflow()->getFileByID("input_file"),
-                            wrench::FileLocation::LOCATION(this->test->storage_service2))});
+            auto job = job_manager->createStandardJob(task,{});
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "1";
@@ -1308,6 +1415,30 @@ private:
             this->getWorkflow()->removeTask(task);
         }
 
+        // Pilot Job
+        {
+            // Create a PilotJob with some pre-copies and post-deletions (not useful, but this is testing after all)
+
+            auto job = job_manager->createPilotJob();
+
+            std::map<std::string, std::string> batch_job_args;
+            batch_job_args["-N"] = "1";
+            batch_job_args["-t"] = "2"; //time in minutes
+            batch_job_args["-c"] = "12"; //number of cores per node, which is too many!
+
+            try {
+                job_manager->submitJob(job, this->test->compute_service, batch_job_args);
+                throw std::runtime_error("Job Submission should have generated an exception");
+            } catch (wrench::WorkflowExecutionException &e) {
+                auto cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
+                if (not cause) {
+                    throw std::runtime_error("Got an expected exception but unexpected failure cause: " +
+                                             e.getCause()->toString() + " (expected: NotEnoughResources)");
+                }
+            }
+
+        }
+
         return 0;
     }
 };
@@ -1319,9 +1450,10 @@ TEST_F(BatchServiceTest, InsufficientCoresJobSubmissionTest) {
 void BatchServiceTest::do_InsufficientCoresTaskTest_test() {
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
-    int argc = 1;
-    char **argv = (char **) calloc(1, sizeof(char *));
+    int argc = 2;
+    char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("batch_service_test");
+    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
