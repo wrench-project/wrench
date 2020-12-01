@@ -1021,10 +1021,11 @@ namespace wrench {
         // Check that the job can be admitted in terms of resources:
         //      - number of nodes,
         //      - number of cores per host
-        //      - RAM
+        //      - RAM (only for standard jobs)
         unsigned long requested_hosts = job->getRequestedNumNodes();
         unsigned long requested_num_cores_per_host = job->getRequestedCoresPerNode();
 
+        // Standard job check
         if (auto sjob = std::dynamic_pointer_cast<StandardJob>(job->getWorkflowJob())) {
 
             double required_ram_per_host = job->getMemoryRequirement();
@@ -1051,25 +1052,29 @@ namespace wrench {
                     return;
                 }
             }
+
+        } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job->getWorkflowJob())) { // Pilot job check
+
+            // Same as above, but no RAM check
+            if ((requested_hosts > this->available_nodes_to_cores.size()) or
+                (requested_num_cores_per_host >
+                 Simulation::getHostNumCores(this->available_nodes_to_cores.begin()->first))) {
+                S4U_Mailbox::dputMessage(answer_mailbox,
+                                         new ComputeServiceSubmitPilotJobAnswerMessage(
+                                                 std::dynamic_pointer_cast<PilotJob>(job->getWorkflowJob()),
+                                                 this->getSharedPtr<BatchComputeService>(),
+                                                 false,
+                                                 std::shared_ptr<FailureCause>(
+                                                         new NotEnoughResources(
+                                                                 job->getWorkflowJob(),
+                                                                 this->getSharedPtr<BatchComputeService>())),
+                                                 this->getMessagePayloadValue(
+                                                         BatchComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
+                return;
+            }
         }
 
-        if ((requested_hosts > this->available_nodes_to_cores.size()) or
-            (requested_num_cores_per_host >
-             Simulation::getHostNumCores(this->available_nodes_to_cores.begin()->first))) {
-            S4U_Mailbox::dputMessage(answer_mailbox,
-                                     new ComputeServiceSubmitPilotJobAnswerMessage(
-                                             std::dynamic_pointer_cast<PilotJob>(job->getWorkflowJob()),
-                                             this->getSharedPtr<BatchComputeService>(),
-                                             false,
-                                             std::shared_ptr<FailureCause>(
-                                                     new NotEnoughResources(
-                                                             job->getWorkflowJob(),
-                                                             this->getSharedPtr<BatchComputeService>())),
-                                             this->getMessagePayloadValue(
-                                                     BatchComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
-            return;
-        }
-
+        // SUCCESS!
         if (auto sjob = std::dynamic_pointer_cast<StandardJob>(job->getWorkflowJob())) {
 
             S4U_Mailbox::dputMessage(answer_mailbox,
