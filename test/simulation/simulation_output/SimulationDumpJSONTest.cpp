@@ -39,6 +39,7 @@ public:
     void do_SimulationDumpPlatformGraphJSON_test();
     void do_SimulationDumpPlatformGraphJSONBrokenRouting_test();
     void do_SimulationDumpLinkUsageJSON_test();
+    void do_SimulationDumpDiskOperationsJSON_test();
     void do_SimulationDumpUnifiedJSON_test();
 
 protected:
@@ -115,25 +116,25 @@ protected:
 
         // 3 host platform with full routing but not all connections specified
         std::string xml3_broken = "<?xml version='1.0'?>"
-                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
-                           "<platform version=\"4.1\"> "
-                           "   <zone id=\"AS0\" routing=\"Full\"> "
-                           "       <host id=\"host1\" speed=\"1f\" core=\"10\"> "
-                           "         <prop id=\"ram\" value=\"10B\"/>"
-                           "       </host>"
-                           "       <host id=\"host2\" speed=\"1f\" core=\"20\"> "
-                           "          <prop id=\"ram\" value=\"20B\"/> "
-                           "       </host> "
-                           "       <host id=\"host3\" speed=\"1f\" core=\"20\"> "
-                           "          <prop id=\"ram\" value=\"20B\"/> "
-                           "       </host> "
-                           "       <link id=\"1\" bandwidth=\"1Gbps\" latency=\"1us\"/>"
-                           "       <link id=\"2\" bandwidth=\"1Gbps\" latency=\"1us\"/>"
-                           "       <link id=\"3\" bandwidth=\"1Gbps\" latency=\"1us\"/>"
-                           "       <route src=\"host1\" dst=\"host2\"> <link_ctn id=\"1\"/> </route>"
-                           "       <route src=\"host2\" dst=\"host3\"> <link_ctn id=\"2\"/> </route>"
-                           "   </zone> "
-                           "</platform>";
+                                  "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                                  "<platform version=\"4.1\"> "
+                                  "   <zone id=\"AS0\" routing=\"Full\"> "
+                                  "       <host id=\"host1\" speed=\"1f\" core=\"10\"> "
+                                  "         <prop id=\"ram\" value=\"10B\"/>"
+                                  "       </host>"
+                                  "       <host id=\"host2\" speed=\"1f\" core=\"20\"> "
+                                  "          <prop id=\"ram\" value=\"20B\"/> "
+                                  "       </host> "
+                                  "       <host id=\"host3\" speed=\"1f\" core=\"20\"> "
+                                  "          <prop id=\"ram\" value=\"20B\"/> "
+                                  "       </host> "
+                                  "       <link id=\"1\" bandwidth=\"1Gbps\" latency=\"1us\"/>"
+                                  "       <link id=\"2\" bandwidth=\"1Gbps\" latency=\"1us\"/>"
+                                  "       <link id=\"3\" bandwidth=\"1Gbps\" latency=\"1us\"/>"
+                                  "       <route src=\"host1\" dst=\"host2\"> <link_ctn id=\"1\"/> </route>"
+                                  "       <route src=\"host2\" dst=\"host3\"> <link_ctn id=\"2\"/> </route>"
+                                  "   </zone> "
+                                  "</platform>";
         FILE *platform_file3_broken = fopen(platform_file_path3_broken.c_str(), "w");
         fprintf(platform_file3_broken, "%s", xml3_broken.c_str());
         fclose(platform_file3_broken);
@@ -200,6 +201,33 @@ protected:
         fprintf(platform_file5, "%s", xml5.c_str());
         fclose(platform_file5);
 
+        // platform for Disk Operations
+        std::string xml6 = "<?xml version='1.0'?>"
+                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                           "<platform version=\"4.1\"> "
+                           "   <zone id=\"AS0\" routing=\"Full\"> "
+                           "       <host id=\"host1\" speed=\"1f\" core=\"1\"> "
+                           "         <disk id=\"large_disk\" read_bw=\"1MBps\" write_bw=\"1MBps\">"
+                           "                            <prop id=\"size\" value=\"5000GiB\"/>"
+                           "                            <prop id=\"mount\" value=\"/\"/>"
+                           "         </disk>"
+                           "       </host>"
+                           "       <host id=\"host2\" speed=\"1f\" core=\"2\"> "
+                           "          <disk id=\"large_disk1\" read_bw=\"2MBps\" write_bw=\"2MBps\">"
+                           "                            <prop id=\"size\" value=\"5000GiB\"/>"
+                           "                            <prop id=\"mount\" value=\"/\"/>"
+                           "       </disk>"
+                           "       </host>"
+                           "       <link id=\"1\" bandwidth=\"1000Tbps\" latency=\"1us\"/>"
+                           "       <route src=\"host1\" dst=\"host2\"> <link_ctn id=\"1\"/> </route>"
+                           "       <route src=\"host1\" dst=\"host1\"> <link_ctn id=\"1\"/> </route>"
+                           "       <route src=\"host2\" dst=\"host2\"> <link_ctn id=\"1\"/> </route>"
+                           "   </zone> "
+                           "</platform>";
+        FILE *platform_file6 = fopen(platform_file_path6.c_str(), "w");
+        fprintf(platform_file6, "%s", xml6.c_str());
+        fclose(platform_file6);
+
         workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
     }
 
@@ -209,11 +237,13 @@ protected:
     std::string platform_file_path3_broken = UNIQUE_TMP_PATH_PREFIX + "platform3_broken.xml";
     std::string platform_file_path4 = UNIQUE_TMP_PATH_PREFIX + "platform4.xml";
     std::string platform_file_path5 = UNIQUE_TMP_PATH_PREFIX + "platform5.xml";
+    std::string platform_file_path6 = UNIQUE_TMP_PATH_PREFIX + "platform6.xml";
     std::string execution_data_json_file_path = UNIQUE_TMP_PATH_PREFIX + "workflow_data.json";
     std::string workflow_graph_json_file_path = UNIQUE_TMP_PATH_PREFIX + "workflow_graph_data.json";
     std::string energy_consumption_data_file_path = UNIQUE_TMP_PATH_PREFIX + "energy_consumption.json";
     std::string platform_graph_json_file_path = UNIQUE_TMP_PATH_PREFIX + "platform_graph.json";
     std::string link_usage_json_file_path = UNIQUE_TMP_PATH_PREFIX + "link_usage.json";
+    std::string disk_operations_json_file_path = UNIQUE_TMP_PATH_PREFIX + "disk_operations.json";
     std::string unified_json_file_path = UNIQUE_TMP_PATH_PREFIX + "unified_output.json";
     std::unique_ptr<wrench::Workflow> workflow;
 
@@ -538,7 +568,7 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
     )"_json;
 
 
-   EXPECT_NO_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(workflow.get(), execution_data_json_file_path, true));
+    EXPECT_NO_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(workflow.get(), execution_data_json_file_path, true));
 
     json_file = std::ifstream("host_utilization_layout.json");
     nlohmann::json result_json3;
@@ -1198,9 +1228,9 @@ bool compareRoutes(const nlohmann::json &lhs, const nlohmann::json &rhs) {
 class SimulationOutputDumpLinkUsageTestWMS : public wrench::WMS {
 public:
     SimulationOutputDumpLinkUsageTestWMS(SimulationDumpJSONTest *test,
-    std::string &hostname,
-    const std::set<std::shared_ptr<wrench::StorageService>> &storage_services) :
-    wrench::WMS(nullptr, nullptr, {}, storage_services, {}, nullptr, hostname, "test") {
+                                         std::string &hostname,
+                                         const std::set<std::shared_ptr<wrench::StorageService>> &storage_services) :
+            wrench::WMS(nullptr, nullptr, {}, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -1235,7 +1265,7 @@ private:
 };
 
 TEST_F(SimulationDumpJSONTest, SimulationDumpLinkUsageTest) {
-DO_TEST_WITH_FORK(do_SimulationDumpLinkUsageJSON_test);
+    DO_TEST_WITH_FORK(do_SimulationDumpLinkUsageJSON_test);
 }
 
 bool compareLinkname(const nlohmann::json &lhs, const nlohmann::json &rhs) {
@@ -1347,6 +1377,139 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
     free(argv[0]);
     free(argv);
 }
+
+
+
+
+/**********************************************************************/
+/**            SimulationDumpDiskOperationsJSONTest                  **/
+/**********************************************************************/
+
+/*
+ * Testing the basic functionality of the SimulationTimestampDiskReadWrite class.
+ * This test ensures that SimulationTimestampDiskReadWriteStart, SimulationTimestampDiskReadWriteFailure,
+ * and SimulationTimestampDiskReadWriteCompletion objects are added to their respective simulation
+ * traces at the appropriate times.
+ */
+class SimulationDumpDiskOperationsTestWMS : public wrench::WMS {
+public:
+    SimulationDumpDiskOperationsTestWMS(SimulationDumpJSONTest *test,
+                                        const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                        const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                                        std::shared_ptr<wrench::FileRegistryService> file_registry_service,
+                                        std::string &hostname) :
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, file_registry_service, hostname, "test") {
+        this->test = test;
+    }
+
+private:
+    SimulationDumpJSONTest *test;
+
+    int main() {
+
+        auto ss = this->getAvailableStorageServices();
+        auto ss1 = *(ss.begin());
+        auto ss2 = *(++ss.begin());
+
+        if (ss1->getHostname() == "host2") {
+            auto tmp = ss1;
+            ss1 = ss2;
+            ss2 = tmp;
+        }
+
+        auto file_1 = this->getWorkflow()->addFile("file_1", 1.00*1000*1000);
+
+        wrench::StorageService::writeFile(file_1, wrench::FileLocation::LOCATION(ss1));
+        wrench::StorageService::writeFile(file_1, wrench::FileLocation::LOCATION(ss2));
+        wrench::StorageService::readFile(file_1, wrench::FileLocation::LOCATION(ss1));
+        return 0;
+
+    }
+};
+
+TEST_F(SimulationDumpJSONTest, SimulationDumpDiskOperationsTest) {
+    DO_TEST_WITH_FORK(do_SimulationDumpDiskOperationsJSON_test);
+}
+
+void SimulationDumpJSONTest::do_SimulationDumpDiskOperationsJSON_test(){
+    auto simulation = new wrench::Simulation();
+    int argc = 1;
+    auto argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
+
+    ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path6));
+
+    std::string host1 = "host1";
+    std::string host2 = "host2";
+
+    std::shared_ptr<wrench::StorageService> ss1;
+    std::shared_ptr<wrench::StorageService> ss2;
+
+    ASSERT_NO_THROW(ss1 = simulation->add(new wrench::SimpleStorageService(host1, {"/"},
+                                                                           {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "400000"}})));
+
+    ASSERT_NO_THROW(ss2 = simulation->add(new wrench::SimpleStorageService(host2, {"/"},
+                                                                           {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "infinity"}})));
+
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    ASSERT_NO_THROW(wms = simulation->add(new SimulationDumpDiskOperationsTestWMS(
+            this, {}, {ss1,  ss2}, nullptr, host1
+    )));
+
+    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
+
+    simulation->getOutput().enableDiskTimestamps(true);
+
+    ASSERT_NO_THROW(simulation->launch());
+
+    EXPECT_THROW(simulation->getOutput().dumpDiskOperationsJSON(""), std::invalid_argument);
+
+    EXPECT_NO_THROW(simulation->getOutput().dumpDiskOperationsJSON(this->disk_operations_json_file_path));
+    //simulation->getOutput().dumpUnifiedJSON(workflow.get(), "energy_unified.json", false, true, true, true, false);
+
+    // Performing programmatic checks of the JSON output
+    std::ifstream json_file(disk_operations_json_file_path);
+    nlohmann::json result_json;
+    json_file >> result_json;
+
+    std::cerr << result_json << "\n";
+
+    for (auto const &operation : (std::vector<std::string>){"reads"}) {
+        ASSERT_EQ(result_json["host1"]["/"][operation].size(), 3);
+
+        for (int i = 0; i < 3; i++) {
+            int num_bytes = (int) result_json["host1"]["/"][operation][i]["bytes"];
+            double duration = (double) result_json["host1"]["/"][operation][i]["end"] -
+                              (double) result_json["host1"]["/"][operation][i]["start"];
+            if (i < 2) {
+                ASSERT_EQ(num_bytes, 400000);
+                ASSERT_TRUE(std::abs<double>(duration -0.4) < 0.0001);
+            } else {
+                ASSERT_EQ(num_bytes, 200000);
+                ASSERT_TRUE(std::abs<double>(duration -0.2) < 0.0001);
+            }
+        }
+    }
+
+    for (auto const &operation : (std::vector<std::string>){"writes"}) {
+        ASSERT_EQ(result_json["host2"]["/"][operation].size(), 1);
+
+        int num_bytes = (int) result_json["host2"]["/"][operation][0]["bytes"];
+        double duration = (double) result_json["host2"]["/"][operation][0]["end"] -
+                          (double) result_json["host2"]["/"][operation][0]["start"];
+        ASSERT_EQ(num_bytes, 1000000);
+        ASSERT_TRUE(std::abs<double>(duration - 0.5) < 0.0001);
+
+//        std::cerr << "---> " << num_bytes << "  " << duration << "\n";
+    }
+
+    delete simulation;
+    free(argv[0]);
+    free(argv);
+}
+
 
 /**********************************************************************/
 /**         SimulationDumpPlatformGraphJSONTest                      **/

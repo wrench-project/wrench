@@ -69,7 +69,7 @@ protected:
 };
 
 /**********************************************************************/
-/**            SimulationTimestampDiskReadWriteTestBasic                      **/
+/**            SimulationTimestampDiskReadWriteTestBasic             **/
 /**********************************************************************/
 
 /*
