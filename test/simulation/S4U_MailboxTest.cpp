@@ -226,7 +226,7 @@ void S4U_MailboxTest::do_AsynchronousCommunication_test() {
     auto *simulation = new wrench::Simulation();
 
     int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
+    auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("s4u_mailbox_test");
 
     simulation->init(&argc, argv);

@@ -172,7 +172,7 @@ void FailureDetectorHostFailuresTest::do_FailureDetectorForSleeperTest_test() {
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
     int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
+    auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("failure_test");
 
 
@@ -292,7 +292,7 @@ void FailureDetectorHostFailuresTest::do_FailureDetectorForComputerTest_test() {
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
     int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
+    auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("failure_test");
 
 
