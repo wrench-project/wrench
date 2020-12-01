@@ -643,7 +643,7 @@ private:
 };
 
 #ifdef ENABLE_BATSCHED
-TEST_F(BatchServiceTest, TerminateStandardJobsTest)
+TEST_F(BatchServiceTest, TerminatePilotJobsTest)
 #else
 
 TEST_F(BatchServiceTest, TerminatePilotJobsTest)
@@ -945,7 +945,11 @@ private:
     }
 };
 
+#ifdef ENABLE_BATSCHED
+TEST_F(BatchServiceTest, DISABLED_StandardJobFailureTest) {
+#else
 TEST_F(BatchServiceTest, StandardJobFailureTest) {
+#endif
     DO_TEST_WITH_FORK(do_StandardJobFailureTest_test);
 }
 
