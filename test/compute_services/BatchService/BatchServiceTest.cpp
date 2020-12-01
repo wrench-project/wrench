@@ -30,6 +30,8 @@ public:
 
     void do_BogusSetupTest_test();
 
+    void do_JobTypeNotSupportedTest_test();
+
     void do_OneStandardJobTaskTest_test();
 
     void do_TerminateStandardJobsTest_test();
@@ -254,6 +256,140 @@ void BatchServiceTest::do_BogusSetupTest_test() {
 }
 
 /**********************************************************************/
+/**  JOB TYPE NOT SUPPORTED                                          **/
+/**********************************************************************/
+
+class JobTypeNotSupportedTestWMS : public wrench::WMS {
+public:
+    JobTypeNotSupportedTestWMS(BatchServiceTest *test,
+                                    const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                    std::string hostname) :
+            wrench::WMS(nullptr, nullptr, compute_services, {}, {}, nullptr, hostname,
+                        "test") {
+        this->test = test;
+    }
+
+private:
+    BatchServiceTest *test;
+
+    int main() {
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+        auto bs_does_not_support_standard = *(this->getAvailableComputeServices<wrench::BatchComputeService>().begin());
+        auto bs_does_not_support_pilot = *(++this->getAvailableComputeServices<wrench::BatchComputeService>().begin());
+
+        if (bs_does_not_support_standard->supportsStandardJobs()) {
+            auto tmp  = bs_does_not_support_standard;
+            bs_does_not_support_standard = bs_does_not_support_pilot;
+            bs_does_not_support_pilot = tmp;
+        }
+
+        {
+            // Create a sequential task that lasts one min and requires 2 cores
+            auto task = this->getWorkflow()->addTask("task", 60, 2, 2, 0);
+
+            // Create a StandardJob
+            auto job = job_manager->createStandardJob(task, {});
+
+            std::map<std::string, std::string> batch_job_args;
+            batch_job_args["-N"] = "2";
+            batch_job_args["-t"] = "5"; //time in minutes
+            batch_job_args["-c"] = "4"; //number of cores per node
+
+            try {
+                job_manager->submitJob(job, bs_does_not_support_standard, batch_job_args);
+                throw std::runtime_error("Should have gotten an exception as Standard Jobs are not supported");
+            } catch (wrench::WorkflowExecutionException &e) {
+                auto cause = e.getCause();
+                auto real_cause = std::dynamic_pointer_cast<wrench::JobTypeNotSupported>(cause);
+                if (not real_cause)  {
+                    throw std::runtime_error("Should have gotten a JobTypeNotSupported error cause as Standard Jobs are not supported (instead got a " + cause->toString() + " error cause");
+                }
+            }
+        }
+
+        {
+            // Create a Pilot
+            auto job = job_manager->createPilotJob();
+
+            std::map<std::string, std::string> batch_job_args;
+            batch_job_args["-N"] = "2";
+            batch_job_args["-t"] = "5"; //time in minutes
+            batch_job_args["-c"] = "4"; //number of cores per node
+
+            try {
+                job_manager->submitJob(job, bs_does_not_support_pilot, batch_job_args);
+                throw std::runtime_error("Should have gotten an exception as Pilot Jobs are not supported");
+            } catch (wrench::WorkflowExecutionException &e) {
+                auto cause = e.getCause();
+                auto real_cause = std::dynamic_pointer_cast<wrench::JobTypeNotSupported>(cause);
+                if (not real_cause)  {
+                    throw std::runtime_error("Should have gotten a JobTypeNotSupported error cause as Pilot Jobs are not supported (instead got a " + cause->toString() + " error cause");
+                }
+            }
+        }
+
+
+
+        return 0;
+    }
+};
+
+TEST_F(BatchServiceTest, JobTypeNotSupportedTest) {
+    DO_TEST_WITH_FORK(do_JobTypeNotSupportedTest_test);
+}
+
+void BatchServiceTest::do_JobTypeNotSupportedTest_test() {
+    // Create and initialize a simulation
+    auto simulation = new wrench::Simulation();
+    int argc = 1;
+    auto argv = (char **) calloc(1, sizeof(char *));
+    argv[0] = strdup("batch_service_test");
+
+    ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+    // Setting up the platform
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    // Get a hostname
+    std::string hostname = "Host1";
+
+    std::shared_ptr<wrench::BatchComputeService> cs1, cs2;
+
+    // Create a Batch Service that does not support Standard Jobs
+    ASSERT_NO_THROW(cs1 = simulation->add(
+            new wrench::BatchComputeService(hostname, {"Host1", "Host2", "Host3", "Host4"}, "",
+                                            {{wrench::BatchComputeServiceProperty::BATSCHED_LOGGING_MUTED, "true"},
+                                             {wrench::BatchComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"},
+                                             {wrench::BatchComputeServiceProperty::SUPPORTS_PILOT_JOBS, "true"}}
+            )));
+
+    // Create a Batch Service that does not support Pilot Jobs
+    ASSERT_NO_THROW(cs2 = simulation->add(
+            new wrench::BatchComputeService(hostname, {"Host1", "Host2", "Host3", "Host4"}, "",
+                                            {{wrench::BatchComputeServiceProperty::BATSCHED_LOGGING_MUTED, "true"},
+                                             {wrench::BatchComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"},
+                                             {wrench::BatchComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}}
+            )));
+
+    // Create a WMS
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    ASSERT_NO_THROW(wms = simulation->add(
+            new JobTypeNotSupportedTestWMS(
+                    this, {cs1, cs2}, hostname)));
+
+    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+
+    ASSERT_NO_THROW(simulation->launch());
+
+    delete simulation;
+
+    free(argv[0]);
+    free(argv);
+}
+
+/**********************************************************************/
 /**  STANDARD JOB TERMINATION TEST                                   **/
 /**********************************************************************/
 
@@ -445,6 +581,10 @@ void BatchServiceTest::do_TerminateStandardJobsTest_test() {
     free(argv[0]);
     free(argv);
 }
+
+
+
+
 
 /**********************************************************************/
 /**  ONE STANDARD JOB SUBMISSION TASK SIMULATION TEST ON ONE HOST    **/
