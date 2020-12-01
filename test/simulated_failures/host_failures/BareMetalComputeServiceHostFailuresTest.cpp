@@ -181,7 +181,7 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceOneFailu
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
     int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
+    auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("failure_test");
 
 
@@ -298,7 +298,7 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceOneFailu
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
     int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
+    auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("failure_test");
 
 
@@ -431,7 +431,7 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceRandomFa
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
     int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
+    auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("failure_test");
 
     simulation->init(&argc, argv);
@@ -534,7 +534,7 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceFailureO
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
     int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
+    auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("failure_test");
 
 

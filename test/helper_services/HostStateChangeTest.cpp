@@ -129,7 +129,7 @@ void HostStateChangeDetectorServiceTest::do_StateChangeDetection_test() {
     auto *simulation = new wrench::Simulation();
 
     int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
+    auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("test");
 
     simulation->init(&argc, argv);

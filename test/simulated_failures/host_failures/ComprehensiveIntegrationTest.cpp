@@ -410,7 +410,7 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(st
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
     int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
+    auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("failure_test");
 
     this->faulty_map = args;
