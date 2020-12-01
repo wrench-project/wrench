@@ -206,7 +206,7 @@ void BatchServiceFCFSTest::do_SimpleFCFS_test() {
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
     int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
+    auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("batch_service_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -391,7 +391,7 @@ void BatchServiceFCFSTest::do_SimpleFCFSQueueWaitTimePrediction_test() {
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
     int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
+    auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("batch_service_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -498,7 +498,7 @@ void BatchServiceFCFSTest::do_BrokenQueueWaitTimePrediction_test() {
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
     int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
+    auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("batch_service_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));

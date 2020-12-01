@@ -201,7 +201,7 @@ void StandardJobExecutorHostFailuresTest::do_StandardJobExecutorOneFailureCausin
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
     int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
+    auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("failure_test");
 
 
@@ -334,7 +334,7 @@ void StandardJobExecutorHostFailuresTest::do_StandardJobExecutorOneFailureCausin
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
     int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
+    auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("failure_test");
 
 
@@ -492,7 +492,7 @@ void StandardJobExecutorHostFailuresTest::do_StandardJobExecutorRandomFailures_t
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
     int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
+    auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("failure_test");
 
     simulation->init(&argc, argv);

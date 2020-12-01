@@ -298,7 +298,7 @@ bool compareLinks(const nlohmann::json &lhs, const nlohmann::json &rhs) {
 /**********************************************************************/
 void SimulationDumpJSONTest::do_SimulationDumpWorkflowExecutionJSON_test() {
     int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
+    auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
     std::unique_ptr<wrench::Simulation> simulation = std::unique_ptr<wrench::Simulation>(new wrench::Simulation());
@@ -438,7 +438,7 @@ TEST_F(SimulationDumpJSONTest, SimulationDumpWorkflowExecutionJSONTest) {
 /**********************************************************************/
 void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_test() {
     int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
+    auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
     std::unique_ptr<wrench::Simulation> simulation = std::unique_ptr<wrench::Simulation>(new wrench::Simulation());
@@ -615,7 +615,7 @@ TEST_F(SimulationDumpJSONTest, SimulationSearchForHostUtilizationGraphLayoutTest
 
 void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
     int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
+    auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
     std::unique_ptr<wrench::Simulation> simulation = std::unique_ptr<wrench::Simulation>(new wrench::Simulation());

@@ -117,7 +117,7 @@ void ScratchSpaceTest::do_BogusScratchSpace_test() {
   // Create and initialize a simulation
   auto simulation = new wrench::Simulation();
   int argc = 1;
-  auto argv = (char **) calloc(1, sizeof(char *));
+  auto argv = (char **) calloc(argc, sizeof(char *));
   argv[0] = strdup("unit_test");
 
   ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -220,7 +220,7 @@ void ScratchSpaceTest::do_SimpleScratchSpace_test() {
   // Create and initialize a simulation
   auto simulation = new wrench::Simulation();
   int argc = 1;
-  auto argv = (char **) calloc(1, sizeof(char *));
+  auto argv = (char **) calloc(argc, sizeof(char *));
   argv[0] = strdup("unit_test");
 
   ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -429,7 +429,7 @@ void ScratchSpaceTest::do_ScratchSpaceFailure_test() {
   // Create and initialize a simulation
   auto simulation = new wrench::Simulation();
   int argc = 1;
-  auto argv = (char **) calloc(1, sizeof(char *));
+  auto argv = (char **) calloc(argc, sizeof(char *));
   argv[0] = strdup("unit_test");
 
   ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -659,7 +659,7 @@ void ScratchSpaceTest::do_PilotJobScratchSpace_test() {
   // Create and initialize a simulation
   auto simulation = new wrench::Simulation();
   int argc = 1;
-  auto argv = (char **) calloc(1, sizeof(char *));
+  auto argv = (char **) calloc(argc, sizeof(char *));
   argv[0] = strdup("unit_test");
 
   ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -809,7 +809,7 @@ void ScratchSpaceTest::do_RaceConditionTest_test() {
   // Create and initialize a simulation
   auto *simulation = new wrench::Simulation();
   int argc = 1;
-  auto argv = (char **) calloc(1, sizeof(char *));
+  auto argv = (char **) calloc(argc, sizeof(char *));
   argv[0] = strdup("unit_test");
 
   ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -1024,7 +1024,7 @@ void ScratchSpaceTest::do_PartitionsTest_test() {
   // Create and initialize a simulation
   auto *simulation = new wrench::Simulation();
   int argc = 1;
-  auto argv = (char **) calloc(1, sizeof(char *));
+  auto argv = (char **) calloc(argc, sizeof(char *));
   argv[0] = strdup("unit_test");
 
   ASSERT_NO_THROW(simulation->init(&argc, argv));

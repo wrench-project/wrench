@@ -149,7 +149,7 @@ TEST_F(SimulationTimestampFileWriteTest, SimulationTimestampFileWriteBasicTest) 
 void SimulationTimestampFileWriteTest::do_SimulationTimestampFileWriteBasic_test(){
     auto simulation = new wrench::Simulation();
     int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
+    auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
