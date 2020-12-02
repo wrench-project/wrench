@@ -107,7 +107,7 @@ int main(int argc, char **argv) {
 
     if (argc < 4) {
         std::cerr << "Usage: " << argv[0]
-                  << "<file_size_gb> <cpu_time_sec> <xml_platform_file> [--log=custom_wms.threshold=info]"
+                  << " <file_size_gb> <cpu_time_sec> <xml_platform_file> [--log=custom_wms.threshold=info]"
                   << std::endl;
         exit(1);
     }
@@ -168,8 +168,8 @@ int main(int argc, char **argv) {
     }
     std::cerr << "Simulation done!" << std::endl;
 
-    std::string sub_dir = "original/";
-    for (int i = 0; i <= argc; i++) {
+    std::string sub_dir = "original_";
+    for (int i = 0; i < argc; i++) {
         if (not strcmp(argv[i], "--writeback")) {
             sub_dir = "pagecache/";
             break;
@@ -177,10 +177,10 @@ int main(int argc, char **argv) {
     }
 
     export_output_single(simulation.getOutput(), num_task,
-                         "single/" + sub_dir + to_string(file_size_gb) + "gb_sim_time.csv");
+                         "output_single_" + sub_dir + to_string(file_size_gb) + "gb_sim_time.csv");
 
     simulation.getMemoryManagerByHost("host01")->export_log(
-            "single/" + sub_dir + to_string(file_size_gb) + "gb_sim_mem.csv");
+            "output_single_" + sub_dir + to_string(file_size_gb) + "gb_sim_mem.csv");
 
     return 0;
 }
