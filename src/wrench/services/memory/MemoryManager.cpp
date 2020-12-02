@@ -590,11 +590,17 @@ namespace wrench {
     }
 
     void MemoryManager::export_log(std::string filename) {
+        std::cerr << "IN EXPORT LOG: " + filename + "\n";
         FILE *log_file = fopen(filename.c_str(), "w");
         fprintf(log_file, "time, total_mem, dirty, cache, used_mem\n");
+        std::cerr << "HERE\n";
+        std::cerr << "---> <" << (this->time_log.empty()) << "\n";
+        std::cerr << "---> <" << this->time_log.size() << "\n";
 
         double start = this->time_log.at(0);
+        std::cerr << "HERE\n";
         for (unsigned int i=0; i<this->time_log.size(); i++) {
+            std::cerr << "I = " << i << "\n";
             fprintf(log_file, "%lf, %lf, %lf, %lf, %lf\n",
                     this->time_log.at(i) - start,
                     total / 1000000.0,
