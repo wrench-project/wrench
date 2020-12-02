@@ -33,6 +33,7 @@ namespace wrench {
         std::vector<double> cached_log;
         std::vector<double> free_log;
 
+
         MemoryManager(s4u_Disk *memory, double dirty_ratio, int interval, int expired_time, std::string hostname);
 
         int main() override;
