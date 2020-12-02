@@ -196,8 +196,8 @@ set(SOURCE_FILES
         src/wrench/helper_services/work_unit_executor/WorkunitExecutor.cpp
         src/wrench/logging/TerminalOutput.cpp
         src/wrench/managers/DataMovementManager.cpp
-        src/wrench/managers/EnergyMeterService.cpp
-        src/wrench/managers/BandwidthMeterService.cpp
+        src/wrench/services/metering/EnergyMeterService.cpp
+        src/wrench/services/metering/BandwidthMeterService.cpp
         src/wrench/managers/JobManager.cpp
         src/wrench/managers/JobManagerMessage.cpp
         src/wrench/managers/JobManagerMessage.h
@@ -395,10 +395,11 @@ set(TEST_FILES
         test/energy_consumption/EnergyConsumptionTest.cpp
         test/simulation/simulation_output/SimulationDumpJSONTest.cpp
         test/compute_services/HTCondorServiceTest.cpp
-        src/wrench/managers/EnergyMeterService.cpp
-        src/wrench/managers/BandwidthMeterService.cpp
-        include/wrench/managers/EnergyMeterService.h
-        include/wrench/managers/BandwidthMeterService.h
+        src/wrench/services/metering/EnergyMeterService.cpp
+        src/wrench/services/metering/BandwidthMeterService.cpp
+        include/wrench/services/metering/EnergyMeterService.h
+        include/wrench/services/metering/BandwidthMeterService.h
+        test/bandwith_metering/BandwidthMeterServiceTest.cpp
         test/simulated_failures/host_failures/ServiceStartReStartTest.cpp
         test/simulated_failures/host_failures/ComprehensiveIntegrationTest.cpp
         test/simulated_failures/host_failures/FailureDetectorHostFailuresTest.cpp
