@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2020. The WRENCH Team.
+ * Copyright (c) 2017-2019. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -7,35 +7,37 @@
  * (at your option) any later version.
  */
 
-#include "wrench/managers/BandwidthMeterService.h"
+#include "wrench/services/metering/EnergyMeterService.h"
 #include <wrench/wms/WMS.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench-dev.h>
 
 #define EPSILON 0.0001
 
-WRENCH_LOG_CATEGORY(wrench_core_bandwidth_meter, "Log category for Link Bandwidth Meter");
+WRENCH_LOG_CATEGORY(wrench_core_energy_meter, "Log category for Energy Meter");
 
 namespace wrench {
+
     /**
      * @brief Constructor
      *
      * @param hostname: the hostname on which the service should start
-     * @param measurement_periods: the measurement period for each monitored link
+     * @param measurement_periods: the measurement period for each metered host
      */
-    BandwidthMeterService::BandwidthMeterService(const std::string hostname, const std::map<std::string, double> &measurement_periods) :
-            Service(hostname, "bandwidth_meter", "bandwidth_meter") {
+    EnergyMeterService::EnergyMeterService(const std::string hostname, const std::map<std::string, double> &measurement_periods) :
+            Service(hostname, "energy_meter", "energy_meter") {
+
         if (measurement_periods.empty()) {
-            throw std::invalid_argument("BandwidthMeter::BandwidthMeter(): no host to meter!");
+            throw std::invalid_argument("EnergyMeter::EnergyMeter(): no host to meter!");
         }
 
         for (auto &h : measurement_periods) {
             if (not S4U_Simulation::hostExists(h.first)) {
-                throw std::invalid_argument("BandwidthMeter::BandwidthMeter(): unknown host " + h.first);
+                throw std::invalid_argument("EnergyMeter::EnergyMeter(): unknown host " + h.first);
             }
-            if (h.second < 0.01) {
+            if (h.second < 1.0) {
                 throw std::invalid_argument(
-                        "BandwidthMeter::BandwidthMeter(): measurement period must be at least 0.01 second (host " + h.first +
+                        "EnergyMeter::EnergyMeter(): measurement period must be at least 1 second (host " + h.first +
                         ")");
             }
             this->measurement_periods[h.first] = h.second;
@@ -47,42 +49,43 @@ namespace wrench {
      * @brief Constructor
      *
      * @param hostname: the name of the host on which this service is running
-     * @param linknames: the list of metered links, as link ids
+     * @param hostnames: the list of metered hosts, as hostnames
      * @param measurement_period: the measurement period
      */
-    BandwidthMeterService::BandwidthMeterService(const std::string hostname, const std::vector<std::string> &linknames,
+    EnergyMeterService::EnergyMeterService(const std::string hostname, const std::vector<std::string> &hostnames,
                                            double measurement_period) :
-            Service(hostname, "bandwidth_meter", "bandwidth_meter") {
-        if (linknames.empty()) {
-            throw std::invalid_argument("BandwidthMeter::BandwidthMeter(): no host to meter!");
+            Service(hostname, "energy_meter", "energy_meter") {
+
+        if (hostnames.empty()) {
+            throw std::invalid_argument("EnergyMeter::EnergyMeter(): no host to meter!");
         }
-        if (measurement_period < 0.01) {
-            throw std::invalid_argument("BandwidthMeter::BandwidthMeter(): measurement period must be at least 0.01 second");
+        if (measurement_period < 1) {
+            throw std::invalid_argument("EnergyMeter::EnergyMeter(): measurement period must be at least 1 second");
         }
 
-        for (auto const &l : linknames) {
-            if (not S4U_Simulation::linkExists(l)) {
-                throw std::invalid_argument("BandwidthMeter::BandwidthMeter(): unknown link " + l);
+        for (auto const &h : hostnames) {
+            if (not S4U_Simulation::hostExists(h)) {
+                throw std::invalid_argument("EnergyMeter::EnergyMeter(): unknown host " + h);
             }
-            this->measurement_periods[l] = measurement_period;
-            this->time_to_next_measurement[l] = 0.0;  // We begin by taking a measurement
+            this->measurement_periods[h] = measurement_period;
+            this->time_to_next_measurement[h] = 0.0;  // We begin by taking a measurement
         }
     }
 
     /**
-     * @brief Kill the bandwidth meter (brutally terminate the daemon)
+     * @brief Kill the energy meter (brutally terminate the daemon)
      */
-    void BandwidthMeterService::kill() {
+    void EnergyMeterService::kill() {
         this->killActor();
     }
 
     /**
-     * @brief Stop the bandwidth meter
+     * @brief Stop the energy meter
      *
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
      */
-    void BandwidthMeterService::stop() {
+    void EnergyMeterService::stop() {
         try {
             S4U_Mailbox::putMessage(this->mailbox_name, new ServiceStopDaemonMessage("", 0.0));
         } catch (std::shared_ptr<NetworkError> &cause) {
@@ -91,16 +94,14 @@ namespace wrench {
     }
 
     /**
-     * @brief Main method of the daemon that implements the BandwidthMeter
+     * @brief Main method of the daemon that implements the EnergyMeter
      * @return 0 on success
      */
-    int BandwidthMeterService::main() {
+    int EnergyMeterService::main() {
+
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
 
-        WRENCH_INFO("New Bandwidth Meter Manager starting (%s) and monitoring links", this->mailbox_name.c_str());
-        for (auto const &l : this->measurement_periods) {
-            WRENCH_INFO("  - %s", l.first.c_str());
-        }
+        WRENCH_INFO("New Energy Meter Manager starting (%s)", this->mailbox_name.c_str());
 
         /** Main loop **/
         while (true) {
@@ -124,16 +125,16 @@ namespace wrench {
                 }
             }
 
-            // Update time-to-next-measurement for all links
-            for (auto &l : this->time_to_next_measurement) {
-                l.second = std::max<double>(0, l.second - (Simulation::getCurrentSimulatedDate() - before));
+            // Update time-to-next-measurement for all hosts
+            for (auto &h : this->time_to_next_measurement) {
+                h.second = std::max<double>(0, h.second - (Simulation::getCurrentSimulatedDate() - before));
             }
 
             // Take measurements
-            for (auto &l : this->time_to_next_measurement) {
-                if (l.second < EPSILON) {
-                    this->simulation->getLinkUsage(l.first, true);
-                    this->time_to_next_measurement[l.first] = this->measurement_periods[l.first];
+            for (auto &h : this->time_to_next_measurement) {
+                if (h.second < EPSILON) {
+                    this->simulation->getEnergyConsumed(h.first, true);
+                    this->time_to_next_measurement[h.first] = this->measurement_periods[h.first];
                 }
             }
         }
@@ -149,7 +150,8 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    bool BandwidthMeterService::processNextMessage(double timeout) {
+    bool EnergyMeterService::processNextMessage(double timeout) {
+
         std::shared_ptr<SimulationMessage> message = nullptr;
 
         try {
@@ -158,15 +160,15 @@ namespace wrench {
             return true;
         }
 
-        WRENCH_INFO("Bandwidth Meter got a %s message", message->getName().c_str());
+        WRENCH_INFO("Energy Meter got a %s message", message->getName().c_str());
 
         if (std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
             // There shouldn't be any need to clean any state up
             return false;
         }
 
-        throw std::runtime_error("BandwidthMeter::waitForNextMessage(): Unexpected [" + message->getName() + "] message");
+        throw std::runtime_error("EnergyMeter::waitForNextMessage(): Unexpected [" + message->getName() + "] message");
+
     }
 
-     
 };
