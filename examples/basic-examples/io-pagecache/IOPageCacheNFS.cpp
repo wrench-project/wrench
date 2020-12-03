@@ -36,7 +36,7 @@
 
 wrench::Workflow *workflow_multithread(int num_pipes, int num_tasks, int core_per_task,
                                        long flops, long file_size, long mem_required) {
-    wrench::Workflow *workflow = new wrench::Workflow();
+    auto workflow = new wrench::Workflow();
 
     for (int i = 0; i < num_pipes; i++) {
 
@@ -107,7 +107,7 @@ int main(int argc, char **argv) {
 
     if (argc < 5) {
         std::cerr << "Usage: " << argv[0]
-                  << " <num_tasks> <file_size_gb> <cpu_time_sec> <xml_platform_file> [--log=custom_wms.threshold=info]"
+                  << " <num_tasks> <file_size_gb> <cpu_time_sec> <xml_platform_file> [--writeback] [--log=custom_wms.threshold=info]"
                   << std::endl;
         exit(1);
     }
@@ -141,7 +141,7 @@ int main(int argc, char **argv) {
     }
 
     /* Declare a workflow */
-    wrench::Workflow *workflow = workflow_multithread(no_pipelines, num_task, 1, cpu_time_sec * 1000000000,
+    auto workflow = workflow_multithread(no_pipelines, num_task, 1, cpu_time_sec * 1000000000,
                                                    file_size_gb * 1000000000, mem_req_gb * 1000000000);
 
     std::cerr << "Instantiating a SimpleStorageService on storage_host..." << std::endl;
@@ -188,5 +188,5 @@ int main(int argc, char **argv) {
     simulation.getOutput().dumpUnifiedJSON(workflow,
                                            "nfs/" + sub_dir + "/dump_" + to_string(no_pipelines) + ".json");
 
-    return 0;
+    exit(0);
 }
