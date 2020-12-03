@@ -105,11 +105,6 @@ int main(int argc, char **argv) {
     wrench::Simulation simulation;
     simulation.init(&argc, argv);
 
-    if (not wrench::Simulation::isWriteback()) {
-        std::cerr << "This simulator must be invoked with --writeback\n";
-        exit(1);
-    }
-
     if (argc < 4) {
         std::cerr << "Usage: " << argv[0]
                   << " <file_size_gb> <cpu_time_sec> <xml_platform_file> --writeback [--log=custom_wms.threshold=info]"
@@ -174,11 +169,8 @@ int main(int argc, char **argv) {
     std::cerr << "Simulation done!" << std::endl;
 
     std::string sub_dir = "original_";
-    for (int i = 0; i < argc; i++) {
-        if (not strcmp(argv[i], "--writeback")) {
-            sub_dir = "pagecache/";
-            break;
-        }
+    if (wrench::Simulation::isWriteback()) {
+            sub_dir = "pagecache_";
     }
 
     {
@@ -187,7 +179,7 @@ int main(int argc, char **argv) {
         std::cerr << "Written output to file " + filename << "\n";
     }
 
-    {
+    if (wrench::Simulation::isWriteback()) {
         std::string filename = "output_single_" + sub_dir + to_string(file_size_gb) + "gb_sim_mem.csv";
         simulation.getMemoryManagerByHost("host01")->export_log(filename);
         std::cerr << "Written output to file " + filename << "\n";
