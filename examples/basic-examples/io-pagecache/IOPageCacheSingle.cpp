@@ -100,14 +100,19 @@ void export_output_single(wrench::SimulationOutput output, int num_tasks, std::s
 
 int main(int argc, char **argv) {
 
-    int num_task = 3;
+    int num_tasks = 3;
 
     wrench::Simulation simulation;
     simulation.init(&argc, argv);
 
+    if (not wrench::Simulation::isWriteback()) {
+        std::cerr << "This simulator must be invoked with --writeback\n";
+        exit(1);
+    }
+
     if (argc < 4) {
         std::cerr << "Usage: " << argv[0]
-                  << " <file_size_gb> <cpu_time_sec> <xml_platform_file> [--log=custom_wms.threshold=info]"
+                  << " <file_size_gb> <cpu_time_sec> <xml_platform_file> --writeback [--log=custom_wms.threshold=info]"
                   << std::endl;
         exit(1);
     }
@@ -133,7 +138,7 @@ int main(int argc, char **argv) {
     simulation.instantiatePlatform(argv[3]);
 
     /* Declare a workflow */
-    wrench::Workflow *workflow = generate_workflow(1, num_task, 1, cpu_time_sec * 1000000000,
+    wrench::Workflow *workflow = generate_workflow(1, num_tasks, 1, cpu_time_sec * 1000000000,
                                                       file_size_gb * 1000000000, mem_req_gb * 1000000000);
 
     std::cerr << "Instantiating a SimpleStorageService on host01..." << std::endl;
@@ -176,11 +181,17 @@ int main(int argc, char **argv) {
         }
     }
 
-    export_output_single(simulation.getOutput(), num_task,
-                         "output_single_" + sub_dir + to_string(file_size_gb) + "gb_sim_time.csv");
+    {
+        std::string filename = "output_single_" + sub_dir + to_string(file_size_gb) + "gb_sim_time.csv";
+        export_output_single(simulation.getOutput(), num_tasks, filename);
+        std::cerr << "Written output to file " + filename << "\n";
+    }
 
-    simulation.getMemoryManagerByHost("host01")->export_log(
-            "output_single_" + sub_dir + to_string(file_size_gb) + "gb_sim_mem.csv");
+    {
+        std::string filename = "output_single_" + sub_dir + to_string(file_size_gb) + "gb_sim_mem.csv";
+        simulation.getMemoryManagerByHost("host01")->export_log(filename);
+        std::cerr << "Written output to file " + filename << "\n";
+    }
 
-    return 0;
+    exit(0);
 }

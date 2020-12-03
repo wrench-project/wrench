@@ -14,6 +14,8 @@ namespace wrench {
 
     class MemoryManager : public Service {
 
+    public:
+
     private:
         s4u_Disk *memory;
         double dirty_ratio;
