@@ -148,6 +148,7 @@ namespace wrench {
             std::cout << "     (requires host pstate definitions in XML platform description file)\n";
             std::cout << "   --help-simgrid: show full help on general Simgrid command-line arguments\n";
             std::cout << "   --help-wrench: displays this help message\n";
+            std::cout << "   --writeback: Activate the memory manager feature\n";
             std::cerr << "\n";
         }
 
