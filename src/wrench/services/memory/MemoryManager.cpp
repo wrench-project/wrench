@@ -29,7 +29,6 @@ namespace wrench {
         free = total;
         dirty = 0;
         cached = 0;
-        std::cerr << "CONSTRUCTOR " << this->time_log.size()  << "\n";
     }
 
     /**

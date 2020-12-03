@@ -44,7 +44,7 @@
 
 
 wrench::Workflow *generate_workflow(int num_pipes, int num_tasks, int core_per_task,
-                                       long flops, long file_size, long mem_required) {
+                                    long flops, long file_size, long mem_required) {
     wrench::Workflow *workflow = new wrench::Workflow();
 
     for (int i = 0; i < num_pipes; i++) {
@@ -203,18 +203,23 @@ int main(int argc, char **argv) {
     }
     std::cerr << "Simulation done!" << std::endl;
 
-    std::string sub_dir = "original/";
-    for (int i = 0; i <= argc; i++) {
-        if (not strcmp(argv[i], "--writeback")) {
-            sub_dir = "pagecache/";
-            break;
-        }
+    std::string sub_dir = "original_";
+    if (wrench::Simulation::isWriteback()) {
+        sub_dir = "pagecache_";
     }
 
-    simulation.getOutput().dumpUnifiedJSON(workflow,
-                                           "multi/" + sub_dir + "/dump_" + to_string(no_pipelines) + ".json");
-    export_output_multi(simulation.getOutput(), workflow->getNumberOfTasks(), "multi/" + sub_dir + "timestamp_multi_sim_.csv");
-//        simulation.getMemoryManagerByHost("host01")->export_log("multi/" + sub_dir + to_string(no_pipelines) + "_sim_mem.csv");
+    {
+        std::string filename =  "multi_" + sub_dir + "dump_" + to_string(no_pipelines) + ".json";
+        simulation.getOutput().dumpUnifiedJSON(workflow, filename);
+        std::cerr << "Written output to file " + filename << "\n";
+    }
 
-    return 0;
+    {
+        std::string filename = "multi_" + sub_dir + "timestamp_multi_sim_.csv";
+        export_output_multi(simulation.getOutput(), workflow->getNumberOfTasks(), filename);
+        std::cerr << "Written output to file " + filename << "\n";
+//        simulation.getMemoryManagerByHost("host01")->export_log("multi/" + sub_dir + to_string(no_pipelines) + "_sim_mem.csv");
+    }
+
+    exit(0);
 }
