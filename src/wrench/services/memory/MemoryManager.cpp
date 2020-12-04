@@ -71,7 +71,7 @@ namespace wrench {
             double amt = pdflush();
             double end_time = S4U_Simulation::getClock();
             if (amt > 0) { WRENCH_INFO("Periodically flushed %lf MB in %lf, %lf MB dirty data left",
-                    amt / 1000000, end_time - start_time, this->dirty / 1000000)
+                                       amt / 1000000, end_time - start_time, this->dirty / 1000000)
             }
 
             if (end_time - start_time < interval) {
@@ -233,19 +233,27 @@ namespace wrench {
 
         double flushed = 0;
 
-        for (auto blk : list) {
-            if (!blk->isDirty()) continue;
-            if (S4U_Simulation::getClock() - blk->getDirtyTime() >= expired_time) {
-
-                blk->setDirty(false);
-                flushed += blk->getSize();
-
-                s4u_Disk *disk = getDisk(blk->getLocation()->getMountPoint(), this->hostname);
-                disk->write(blk->getSize());
-
-                this->dirty -= blk->getSize();
-                flushed += blk->getSize();
+        while(true) {
+            this->acquireDaemonLock();
+            Block *block_to_deal_with = nullptr;
+            for (auto blk : list) {
+                if (!blk->isDirty()) continue;
+                if (S4U_Simulation::getClock() - blk->getDirtyTime() < expired_time) continue;
+                block_to_deal_with = blk;
+                break;
             }
+            this->releaseDaemonLock();
+            if (block_to_deal_with == nullptr) break;
+
+            block_to_deal_with->setDirty(false);
+            flushed += block_to_deal_with->getSize();
+
+            s4u_Disk *disk = getDisk(block_to_deal_with->getLocation()->getMountPoint(), this->hostname);
+            disk->write(block_to_deal_with->getSize());
+
+            this->dirty -= block_to_deal_with->getSize();
+            flushed += block_to_deal_with->getSize();
+
         }
 
         return flushed;
@@ -271,6 +279,7 @@ namespace wrench {
     double MemoryManager::evict(double amount, std::string excluded_filename) {
 
         if (amount <= 0) return 0;
+
 
         double evicted = 0;
 
@@ -300,6 +309,7 @@ namespace wrench {
 
         cached -= evicted;
         free += evicted;
+
 
         return evicted;
     }
@@ -437,7 +447,7 @@ namespace wrench {
      * @param amount: amount of data written
      */
     void MemoryManager::writebackToCache(std::string filename, std::shared_ptr<FileLocation> location,
-                                     double amount, bool is_dirty) {
+                                         double amount, bool is_dirty) {
 
         this->addToCache(filename, location, amount, is_dirty);
         memory->write(amount);
