@@ -218,7 +218,7 @@ void BareMetalComputeServiceTestStandardJobs::do_UnsupportedStandardJobs_test() 
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
     int argc = 1;
-    char **argv = (char **) calloc(1, sizeof(char *));
+    char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -326,7 +326,7 @@ void BareMetalComputeServiceTestStandardJobs::do_BogusNumCores_test() {
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
     int argc = 1;
-    char **argv = (char **) calloc(1, sizeof(char *));
+    char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -450,7 +450,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoSingleCoreTasks_test() {
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
     int argc = 1;
-    char **argv = (char **) calloc(1, sizeof(char *));
+    char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -576,7 +576,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase1_test() {
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
     int argc = 1;
-    char **argv = (char **) calloc(1, sizeof(char *));
+    char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -714,7 +714,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase2_test() {
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
     int argc = 1;
-    char **argv = (char **) calloc(1, sizeof(char *));
+    char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -937,7 +937,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase3_test() {
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
     int argc = 1;
-    char **argv = (char **) calloc(1, sizeof(char *));
+    char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -1054,7 +1054,7 @@ void BareMetalComputeServiceTestStandardJobs::do_JobTermination_test() {
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
     int argc = 1;
-    auto **argv = (char **) calloc(1, sizeof(char *));
+    auto **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -1170,7 +1170,7 @@ void BareMetalComputeServiceTestStandardJobs::do_NonSubmittedJobTermination_test
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
     int argc = 1;
-    auto **argv = (char **) calloc(1, sizeof(char *));
+    auto **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -1292,7 +1292,7 @@ void BareMetalComputeServiceTestStandardJobs::do_CompletedJobTermination_test() 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
     int argc = 1;
-    auto **argv = (char **) calloc(1, sizeof(char *));
+    auto **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -1428,7 +1428,7 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownComputeServiceWhileJobI
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
     int argc = 1;
-    auto **argv = (char **) calloc(1, sizeof(char *));
+    auto **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -1555,7 +1555,7 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownStorageServiceBeforeJob
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
     int argc = 1;
-    auto **argv = (char **) calloc(1, sizeof(char *));
+    auto **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));

@@ -124,7 +124,7 @@ namespace wrench {
         }
 
         // If writeback device simulation is activated
-        if (Simulation::isWriteback()) {
+        if (Simulation::isPageCachingEnabled()) {
             // Start periodical flushing
             simgrid::s4u::Disk* memory = simgrid::s4u::Host::by_name(this->getHostname())->get_disks().at(0);
             std::shared_ptr<MemoryManager> memory_manager_ptr = MemoryManager::initAndStart(this->simulation, memory,

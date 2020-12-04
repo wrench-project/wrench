@@ -169,7 +169,7 @@ int main(int argc, char **argv) {
     std::cerr << "Simulation done!" << std::endl;
 
     std::string sub_dir = "original_";
-    if (wrench::Simulation::isWriteback()) {
+    if (wrench::Simulation::isPageCachingEnabled()) {
             sub_dir = "pagecache_";
     }
 
@@ -179,7 +179,7 @@ int main(int argc, char **argv) {
         std::cerr << "Written output to file " + filename << "\n";
     }
 
-    if (wrench::Simulation::isWriteback()) {
+    if (wrench::Simulation::isPageCachingEnabled()) {
         std::string filename = "output_single_" + sub_dir + to_string(file_size_gb) + "gb_sim_mem.csv";
         simulation.getMemoryManagerByHost("host01")->export_log(filename);
         std::cerr << "Written output to file " + filename << "\n";
