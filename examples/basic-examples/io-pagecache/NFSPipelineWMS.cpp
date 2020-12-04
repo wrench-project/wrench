@@ -85,7 +85,7 @@ namespace wrench {
                 std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> post_file_copies;
 
                 for (auto input_file : ready_task->getInputFiles()) {
-                    if (Simulation::isWriteback()) {
+                    if (Simulation::isPageCachingEnabled()) {
                         file_locations[input_file] = FileLocation::LOCATION(this->client_storage_service, this->server_storage_service);
                     } else {
                         file_locations[input_file] = FileLocation::LOCATION(this->server_storage_service);
@@ -93,7 +93,7 @@ namespace wrench {
 
                 }
                 for (auto output_file : ready_task->getOutputFiles()) {
-                    if (Simulation::isWriteback()) {
+                    if (Simulation::isPageCachingEnabled()) {
                         file_locations[output_file] = FileLocation::LOCATION(this->server_storage_service, this->server_storage_service);
                     } else {
                         file_locations[output_file] = FileLocation::LOCATION(this->server_storage_service);

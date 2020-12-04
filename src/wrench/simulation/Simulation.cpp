@@ -39,7 +39,7 @@ namespace wrench {
 
     int Simulation::unique_disk_sequence_number = 0;
 
-    bool Simulation::writeback = false;
+    bool Simulation::pagecache_enabled = false;
 
     /**
      * \cond
@@ -128,8 +128,8 @@ namespace wrench {
                 simgrid_help_requested = true;
             } else if (not strcmp(argv[i], "--version")) {
                 version_requested = true;
-            } else if (not strcmp(argv[i], "--writeback")) {
-                writeback = true;
+            } else if (not strcmp(argv[i], "--pagecache")) {
+                pagecache_enabled = true;
             } else {
                 cleanedup_args.emplace_back(argv[i]);
             }
@@ -148,7 +148,7 @@ namespace wrench {
             std::cout << "     (requires host pstate definitions in XML platform description file)\n";
             std::cout << "   --help-simgrid: show full help on general Simgrid command-line arguments\n";
             std::cout << "   --help-wrench: displays this help message\n";
-            std::cout << "   --writeback: Activate the memory manager feature\n";
+            std::cout << "   --pagecache: Activate the in-memory page caching simulation\n";
             std::cerr << "\n";
         }
 
@@ -298,8 +298,8 @@ namespace wrench {
      * Check if writeback mode is activated
      * @return
      */
-    bool Simulation::isWriteback() {
-        return writeback;
+    bool Simulation::isPageCachingEnabled() {
+        return pagecache_enabled;
     }
 
     /**

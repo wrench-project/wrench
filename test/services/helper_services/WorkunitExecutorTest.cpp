@@ -127,7 +127,7 @@ void WorkunitExecutorTest::do_WorkunitConstructor_test() {
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
     int argc = 1;
-    char **argv = (char **) calloc(1, sizeof(char *));
+    char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
@@ -412,7 +412,7 @@ void WorkunitExecutorTest::do_WorkunitExecutorConstructor_test() {
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
     int argc = 1;
-    char **argv = (char **) calloc(1, sizeof(char *));
+    char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
