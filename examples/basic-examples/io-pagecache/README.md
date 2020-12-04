@@ -1,5 +1,5 @@
-This exmaple simulator is modified to simulate pipelines with the use of page cache 
-and writeback devices.
+The example simulators in this directory are similar to the simulators in the bare-metal-bag-of-task directory, but just 
+modified to enavle the use of page cache and writeback devices.
 
 There are 3 experimental scenarios implemented. In every experiment, we run a number of 
 pipelines, each pipeline consists of 3 sequential tasks, which read an input file, 
