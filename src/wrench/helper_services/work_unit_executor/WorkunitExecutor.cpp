@@ -354,14 +354,14 @@ namespace wrench {
                     WorkflowFile *f = p.first;
                     std::shared_ptr<FileLocation> l = p.second;
 
-                    if (Simulation::isWriteback()) {
+                    if (Simulation::isPageCachingEnabled()) {
                         mem_req += f->getSize();
                     }
 
                     bool isFileRead = false;
                     try{
                         this->simulation->getOutput().addTimestampFileReadStart(f, l.get(), l->getStorageService().get(), task);
-                        if (Simulation::isWriteback() && l->getServerStorageService() != nullptr) {
+                        if (Simulation::isPageCachingEnabled() && l->getServerStorageService() != nullptr) {
                             MemoryManager *mm = simulation->getMemoryManagerByHost(S4U_Simulation::getHostName());
                             if (mm->getCachedAmount(f->getID().c_str()) < f->getSize()) {
                                 StorageService::copyFile(f,FileLocation::LOCATION(l->getServerStorageService()), l);
@@ -498,7 +498,7 @@ namespace wrench {
             }
         }
 
-        if (Simulation::isWriteback()) {
+        if (Simulation::isPageCachingEnabled()) {
             MemoryManager *mem_mng = simulation->getMemoryManagerByHost(this->getHostname());
             mem_mng->releaseMemory(mem_req);
         }
