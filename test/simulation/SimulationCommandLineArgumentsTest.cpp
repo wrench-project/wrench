@@ -141,8 +141,7 @@ void SimulationCommandLineArgumentsTest::do_versionArgument_test() {
 
     delete simulation;
     for (int i=0; i < argc; i++)
-     free(argv[i]);
-    free(argv[1]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -197,8 +196,7 @@ void SimulationCommandLineArgumentsTest::do_HelpWrenchArgument_test() {
 
     delete simulation;
     for (int i=0; i < argc; i++)
-     free(argv[i]);
-    free(argv[1]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -254,8 +252,7 @@ void SimulationCommandLineArgumentsTest::do_HelpSimGridArgument_test() {
 
     delete simulation;
     for (int i=0; i < argc; i++)
-     free(argv[i]);
-    free(argv[1]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -285,8 +282,7 @@ void SimulationCommandLineArgumentsTest::do_HelpArgument_test() {
 
     delete simulation;
     for (int i=0; i < argc; i++)
-     free(argv[i]);
-    free(argv[1]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -354,8 +350,7 @@ void SimulationCommandLineArgumentsTest::do_NoColorArgument_test() {
 
     delete simulation;
     for (int i=0; i < argc; i++)
-     free(argv[i]);
-    free(argv[1]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -420,8 +415,7 @@ void SimulationCommandLineArgumentsTest::do_FullLogArgument_test(std::string arg
 
     delete simulation;
     for (int i=0; i < argc; i++)
-     free(argv[i]);
-    free(argv[1]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -459,7 +453,6 @@ void SimulationCommandLineArgumentsTest::do_ActivateEnergyArgument_test() {
 
     delete simulation;
     for (int i=0; i < argc; i++)
-     free(argv[i]);
-    free(argv[1]);
+        free(argv[i]);
     free(argv);
 }
