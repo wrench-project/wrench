@@ -412,6 +412,7 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(st
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("failure_test");
+//    argv[1] = strdup("--wrench-full-log");
 
     this->faulty_map = args;
 
@@ -421,9 +422,11 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(st
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Create Storage Services
+    WRENCH_INFO("CREATE ON STORAGEHOST1");
     if (args.find("storage1") != args.end()) {
         this->storage_service1 = simulation->add(new wrench::SimpleStorageService("StorageHost1", {"/"}));
     }
+    WRENCH_INFO("CREATE ON STORAGEHOST2");
     if (args.find("storage2") != args.end()) {
         this->storage_service2 = simulation->add(new wrench::SimpleStorageService("StorageHost2", {"/"}));
     }
