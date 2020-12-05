@@ -20,6 +20,9 @@
 
 #include <algorithm>
 
+WRENCH_LOG_CATEGORY(bandwidth_meter_service_test, "Log category for BandwidthMeterServiceTest");
+
+
 /**********************************************************************/
 /**                    BandwidthMeterServiceTest                     **/
 /**********************************************************************/
@@ -199,6 +202,8 @@ void BandwidthMeterServiceTest::do_BandwidthMeterCreationDestruction_test() {
     for (auto const &file : link_usage_workflow->getInputFiles()) {
         simulation->stageFile(file, client_storage_service);
     }
+
+    EXPECT_NO_THROW(simulation->launch());
 
     delete simulation;
     for (int i=0; i < argc; i++)

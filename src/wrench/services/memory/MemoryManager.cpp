@@ -22,7 +22,7 @@ namespace wrench {
      */
     MemoryManager::MemoryManager(s4u_Disk *memory, double dirty_ratio,
                                  int interval, int expired_time, std::string hostname) :
-            Service(hostname, "periodic_flush_" + hostname, "periodic_flush_" + hostname),
+            Service(hostname, "page_cache_manager_" + hostname, "page_cache_manager_" + hostname),
             memory(memory), dirty_ratio(dirty_ratio), interval(interval), expired_time(expired_time) {
 
         total = S4U_Simulation::getHostMemoryCapacity(hostname);
@@ -141,6 +141,7 @@ namespace wrench {
      */
     double MemoryManager::flushLruList(std::vector<Block *> &list, double amount, std::string excluded_filename) {
 
+        WRENCH_INFO("IN FLUSHLRULIST(): AMOUNT=%lf", amount);
         if (amount <= 0) return 0;
         double flushed = 0;
 
@@ -201,6 +202,7 @@ namespace wrench {
     double MemoryManager::flush(double amount, std::string excluded_filename) {
         if (amount <= 0) return 0;
 
+        WRENCH_INFO("IN FLUSH()");
         double flushed_inactive = flushLruList(inactive_list, amount, excluded_filename);
 
         double flushed_active = 0;
@@ -224,6 +226,7 @@ namespace wrench {
      */
     double MemoryManager::flushExpiredData(std::vector<Block *> &list) {
 
+        WRENCH_INFO("IN  FLUSHEXPIREDDATA()");
         double flushed = 0;
 
         while(true) {
@@ -258,6 +261,7 @@ namespace wrench {
      * @return flushed amount
      */
     double MemoryManager::pdflush() {
+        WRENCH_INFO("IN  PDFLUSH()");
         double flushed = 0;
         flushed += flushExpiredData(inactive_list);
         flushed += flushExpiredData(active_list);
