@@ -156,7 +156,7 @@ void JobManagerTest::do_JobManagerConstructorTest_test() {
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
     int argc = 1;
-    char **argv = (char **) calloc(1, sizeof(char *));
+    char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
@@ -179,7 +179,8 @@ void JobManagerTest::do_JobManagerConstructorTest_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -333,7 +334,7 @@ void JobManagerTest::do_JobManagerCreateJobTest_test() {
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
     int argc = 1;
-    char **argv = (char **) calloc(1, sizeof(char *));
+    char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
@@ -356,7 +357,8 @@ void JobManagerTest::do_JobManagerCreateJobTest_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -416,7 +418,7 @@ void JobManagerTest::do_JobManagerSubmitJobTest_test() {
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
     int argc = 1;
-    char **argv = (char **) calloc(1, sizeof(char *));
+    char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
@@ -440,7 +442,8 @@ void JobManagerTest::do_JobManagerSubmitJobTest_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -549,7 +552,7 @@ void JobManagerTest::do_JobManagerResubmitJobTest_test() {
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
     int argc = 1;
-    char **argv = (char **) calloc(1, sizeof(char *));
+    char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
@@ -591,7 +594,8 @@ void JobManagerTest::do_JobManagerResubmitJobTest_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -701,7 +705,7 @@ void JobManagerTest::do_JobManagerTerminateJobTest_test() {
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
     int argc = 1;
-    char **argv = (char **) calloc(1, sizeof(char *));
+    char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
@@ -729,6 +733,7 @@ void JobManagerTest::do_JobManagerTerminateJobTest_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }

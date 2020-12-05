@@ -57,7 +57,7 @@ void LogicalFileSystemTest::do_BasicTests() {
     auto workflow = new wrench::Workflow();
 
     int argc = 1;
-    char **argv = (char **) calloc(1, sizeof(char *));
+    char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -86,6 +86,7 @@ void LogicalFileSystemTest::do_BasicTests() {
     ASSERT_THROW(fs1->reserveSpace(file, "/files/"), std::invalid_argument);
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }

@@ -145,7 +145,8 @@ void ServiceReStartHostFailuresTest::do_StartServiceOnDownHostTest_test() {
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }
 
@@ -235,7 +236,8 @@ void ServiceReStartHostFailuresTest::do_ServiceRestartTest_test() {
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }
 

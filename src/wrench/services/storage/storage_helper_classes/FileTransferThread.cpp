@@ -273,7 +273,7 @@ namespace wrench {
 
             try {
 
-                if (Simulation::isWriteback()) {
+                if (Simulation::isPageCachingEnabled()) {
                     simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->log();
 //                    simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->fincore();
                 }
@@ -285,7 +285,7 @@ namespace wrench {
 
                     // In NFS, write to cache only if the current host not the server host where the file is stored
                     // If the current host is file server, write to disk directly
-                    if (Simulation::isWriteback()) {
+                    if (Simulation::isPageCachingEnabled()) {
 
                         bool write_locally = location->getServerStorageService() == nullptr ;
 
@@ -313,7 +313,7 @@ namespace wrench {
                 }
 
                 // I/O for the last chunk
-                if (Simulation::isWriteback()) {
+                if (Simulation::isPageCachingEnabled()) {
                     simulation->writeThroughWithMemoryCache(file, msg->payload, location);
                 } else {
 //                     Write to disk
@@ -321,7 +321,7 @@ namespace wrench {
                                             location->getMountPoint());
                 }
 
-                if (Simulation::isWriteback()) {
+                if (Simulation::isPageCachingEnabled()) {
                     simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->log();
 //                    simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->fincore();
                 }
@@ -358,14 +358,14 @@ namespace wrench {
                 // Sending a zero-byte file is really sending a 1-byte file
                 double remaining = std::max<double>(1, file->getSize());
 
-                if (Simulation::isWriteback()) {
+                if (Simulation::isPageCachingEnabled()) {
                     simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->log();
                 }
 
                 while (remaining > 0) {
                     double chunk_size = std::min<double>(this->buffer_size, remaining);
 
-                    if (Simulation::isWriteback()) {
+                    if (Simulation::isPageCachingEnabled()) {
                         simulation->readWithMemoryCache(file, chunk_size, location);
                     } else {
                         WRENCH_INFO("Reading %s bytes from disk", std::to_string(chunk_size).c_str());
@@ -384,7 +384,7 @@ namespace wrench {
                                                            this->file,
                                                            (unsigned long)chunk_size, (remaining <= 0)));
                 }
-                if (Simulation::isWriteback()) {
+                if (Simulation::isPageCachingEnabled()) {
                     simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->log();
 //                    simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->fincore();
                 }
@@ -540,7 +540,7 @@ namespace wrench {
 //                    WRENCH_INFO("Downloaded of %f of file  %s from location %s",
 //                                msg->payload, file->getID().c_str(), src_location->toString().c_str());
                     // Do the I/O
-                    if (Simulation::isWriteback()) {
+                    if (Simulation::isPageCachingEnabled()) {
                         simulation->writebackWithMemoryCache(file, msg->payload, dst_location, false);
                     } else {
                         // Write to disk
@@ -560,7 +560,7 @@ namespace wrench {
                     }
                 }
                 // Do the I/O for the last chunk
-                if (Simulation::isWriteback()) {
+                if (Simulation::isPageCachingEnabled()) {
                     simulation->writebackWithMemoryCache(file, msg->payload, dst_location, false);
                 } else {
                     // Write to disk

@@ -116,6 +116,7 @@ namespace wrench {
         std::shared_ptr<StorageService> startNewService(StorageService *service);
         std::shared_ptr<NetworkProximityService> startNewService(NetworkProximityService *service);
         std::shared_ptr<FileRegistryService> startNewService(FileRegistryService *service);
+        std::shared_ptr<MemoryManager> startNewService(MemoryManager *service);
 
         static double getCurrentSimulatedDate();
 
@@ -148,7 +149,7 @@ namespace wrench {
         static std::vector<std::string> getLinknameList();
         static double getLinkUsage(std::string linkname);
         static double getLinkBandwidth(std::string linkname);
-        static bool isWriteback();
+        static bool isPageCachingEnabled();
 
         /***********************/
         /** \endcond           */
@@ -199,7 +200,7 @@ namespace wrench {
 
         unsigned int on_state_change_callback_id;
 
-        static bool writeback;
+        static bool pagecache_enabled;
     };
 
 };

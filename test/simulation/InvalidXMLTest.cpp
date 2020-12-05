@@ -64,7 +64,8 @@ void InvalidXMLTest::do_InvalidXML_test() {
     ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::invalid_argument);
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 

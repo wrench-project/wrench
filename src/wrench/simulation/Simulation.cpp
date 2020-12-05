@@ -39,7 +39,7 @@ namespace wrench {
 
     int Simulation::unique_disk_sequence_number = 0;
 
-    bool Simulation::writeback = false;
+    bool Simulation::pagecache_enabled = false;
 
     /**
      * \cond
@@ -128,8 +128,8 @@ namespace wrench {
                 simgrid_help_requested = true;
             } else if (not strcmp(argv[i], "--version")) {
                 version_requested = true;
-            } else if (not strcmp(argv[i], "--writeback")) {
-                writeback = true;
+            } else if (not strcmp(argv[i], "--pagecache")) {
+                pagecache_enabled = true;
             } else {
                 cleanedup_args.emplace_back(argv[i]);
             }
@@ -148,7 +148,7 @@ namespace wrench {
             std::cout << "     (requires host pstate definitions in XML platform description file)\n";
             std::cout << "   --help-simgrid: show full help on general Simgrid command-line arguments\n";
             std::cout << "   --help-wrench: displays this help message\n";
-            std::cout << "   --writeback: Activate the memory manager feature\n";
+            std::cout << "   --pagecache: Activate the in-memory page caching simulation\n";
             std::cerr << "\n";
         }
 
@@ -298,8 +298,8 @@ namespace wrench {
      * Check if writeback mode is activated
      * @return
      */
-    bool Simulation::isWriteback() {
-        return writeback;
+    bool Simulation::isPageCachingEnabled() {
+        return pagecache_enabled;
     }
 
     /**
@@ -776,7 +776,7 @@ namespace wrench {
         int temp_unique_sequence_number = unique_disk_sequence_number;
         this->getOutput().addTimestampDiskReadStart(hostname, location->getMountPoint(), n_bytes, temp_unique_sequence_number);
 
-        MemoryManager *mem_mng = getMemoryManagerByHost(hostname);
+        auto mem_mng = getMemoryManagerByHost(hostname);
         std::vector<Block*> file_blocks = mem_mng->getCachedBlocks(file->getID());
         long cached_amt = 0;
         for (unsigned int i = 0; i< file_blocks.size(); i++) {
@@ -1270,6 +1270,32 @@ namespace wrench {
         service->simulation = this;
         std::shared_ptr<FileRegistryService> shared_ptr = std::shared_ptr<FileRegistryService>(service);
         this->file_registry_services.insert(shared_ptr);
+        shared_ptr->start(shared_ptr, true, false); // Daemonized, no auto-restart
+
+        return shared_ptr;
+    }
+
+    /**
+     * @brief Starts a new memory manager service during execution (i.e., one that was not passed to Simulation::add() before
+     *        Simulation::launch() was called). The simulation takes ownership of
+     *        the reference and will call the destructor.
+     * @param service: An instance of a service
+     * @return A pointer to the service instance
+     * @throw std::invalid_argument
+     * @throw std::runtime_error
+     */
+    std::shared_ptr<MemoryManager> Simulation::startNewService(MemoryManager *service) {
+        if (service == nullptr) {
+            throw std::invalid_argument("Simulation::startNewService(): invalid argument (nullptr service)");
+        }
+
+        if (not this->is_running) {
+            throw std::runtime_error("Simulation::startNewService(): simulation is not running yet");
+        }
+
+        service->simulation = this;
+        std::shared_ptr<MemoryManager> shared_ptr = std::shared_ptr<MemoryManager>(service);
+        this->memory_managers.insert(shared_ptr);
         shared_ptr->start(shared_ptr, true, false); // Daemonized, no auto-restart
 
         return shared_ptr;

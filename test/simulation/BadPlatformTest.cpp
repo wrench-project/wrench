@@ -148,7 +148,8 @@ void BadPlatformTest::do_badPlatformFileTest_test() {
     ASSERT_THROW(simulation->instantiatePlatform("/bogus"), std::invalid_argument);
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -190,7 +191,8 @@ void BadPlatformTest::do_badPlatformTest_test(std::string xml) {
     ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::invalid_argument);
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 

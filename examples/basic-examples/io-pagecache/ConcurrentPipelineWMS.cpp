@@ -85,27 +85,12 @@ namespace wrench {
                     file_locations[output_file] = FileLocation::LOCATION(storage_service);
                 }
 
-                std::map<std::string, std::string> compute_args;
-                compute_args[ready_task->getID()] = "1"; // 1 core per task
-
                 /* Create the job  */
                 auto standard_job = job_manager->createStandardJob(ready_task, file_locations);
 
-                // Create service-specific arguments
-                std::map<std::string, std::string> batch_service_args;
-
-                //   The job will run no longer than 1 hour
-                batch_service_args["-t"] = "60";
-
-                //   The job will run on 1 compute node
-                batch_service_args["-N"] = "1";
-
-                //   The job will use 1 core on each compute node
-                batch_service_args["-c"] = "1";
-
                 /* Submit the job to the compute service */
                 WRENCH_INFO("Submitting the job to the compute service");
-                job_manager->submitJob(standard_job, compute_service, compute_args);
+                job_manager->submitJob(standard_job, compute_service);
             }
 
             /* Wait for a workflow execution event and process it. In this case we know that

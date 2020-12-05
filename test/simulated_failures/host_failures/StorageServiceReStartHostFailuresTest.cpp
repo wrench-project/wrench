@@ -205,7 +205,8 @@ void StorageServiceReStartHostFailuresTest::do_StorageServiceRestartTest_test() 
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }
 
