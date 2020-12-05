@@ -48,7 +48,6 @@ namespace wrench {
 
         std::shared_ptr<MemoryManager> memory_manager_ptr = std::shared_ptr<MemoryManager>(
                 new MemoryManager(memory, dirty_ratio, interval, expired_time, hostname));
-
         memory_manager_ptr->simulation = simulation;
 
         try {

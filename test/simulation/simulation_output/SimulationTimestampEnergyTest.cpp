@@ -147,8 +147,8 @@ void SimulationTimestampEnergyTest::do_SimulationTimestampPstateSet_test() {
     ASSERT_EQ("host1", ts3->getContent()->getHostname());
 
     delete simulation;
-    free(argv[0]);
-    free(argv[1]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -236,8 +236,8 @@ void SimulationTimestampEnergyTest::do_SimulationTimestampEnergyConsumption_test
     ASSERT_DOUBLE_EQ(400.0, ts2->getContent()->getConsumption());
 
     delete simulation;
-    free(argv[0]);
-    free(argv[1]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -417,8 +417,8 @@ void SimulationTimestampEnergyTest::do_EnergyMeterSingleMeasurementPeriod_test()
     }
 
     delete simulation;
-    free(argv[0]);
-    free(argv[1]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -544,7 +544,7 @@ void SimulationTimestampEnergyTest::do_EnergyMeterMultipleMeasurementPeriod_test
     }
 
     delete simulation;
-    free(argv[0]);
-    free(argv[1]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }

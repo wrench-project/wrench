@@ -229,7 +229,8 @@ void BatchServiceTest::do_BatchTraceFileReplayTest_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -316,7 +317,8 @@ void BatchServiceTest::do_BatchTraceFileReplayTestWithFailedJob_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -415,7 +417,8 @@ void BatchServiceTest::do_WorkloadTraceFileTestSWFBatchServiceShutdown_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -777,7 +780,8 @@ void BatchServiceTest::do_WorkloadTraceFileTestSWF_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -943,7 +947,8 @@ void BatchServiceTest::do_WorkloadTraceFileRequestedTimesSWF_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -1107,7 +1112,8 @@ void BatchServiceTest::do_WorkloadTraceFileDifferentTimeOriginSWF_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -1684,7 +1690,8 @@ void BatchServiceTest::do_WorkloadTraceFileTestJSON_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -1831,6 +1838,7 @@ void BatchServiceTest::do_GetQueueState_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }

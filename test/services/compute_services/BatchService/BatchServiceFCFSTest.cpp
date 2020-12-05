@@ -236,7 +236,8 @@ void BatchServiceFCFSTest::do_SimpleFCFS_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -422,7 +423,8 @@ void BatchServiceFCFSTest::do_SimpleFCFSQueueWaitTimePrediction_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -529,6 +531,7 @@ void BatchServiceFCFSTest::do_BrokenQueueWaitTimePrediction_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }

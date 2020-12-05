@@ -86,6 +86,7 @@ void LogicalFileSystemTest::do_BasicTests() {
     ASSERT_THROW(fs1->reserveSpace(file, "/files/"), std::invalid_argument);
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }

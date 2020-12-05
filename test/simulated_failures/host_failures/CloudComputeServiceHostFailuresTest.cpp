@@ -236,7 +236,8 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJob_tes
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }
 
@@ -391,7 +392,8 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJobFoll
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }
 
@@ -554,7 +556,8 @@ void CloudServiceHostFailuresTest::do_CloudServiceRandomFailures_test() {
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }
 

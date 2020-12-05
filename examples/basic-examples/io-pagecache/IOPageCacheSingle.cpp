@@ -107,7 +107,7 @@ int main(int argc, char **argv) {
 
     if (argc < 4) {
         std::cerr << "Usage: " << argv[0]
-                  << " <file_size_gb> <cpu_time_sec> <xml_platform_file> --writeback [--log=custom_wms.threshold=info]"
+                  << " <file_size_gb> <cpu_time_sec> <xml_platform_file> --pagecache [--log=custom_wms.threshold=info]"
                   << std::endl;
         exit(1);
     }

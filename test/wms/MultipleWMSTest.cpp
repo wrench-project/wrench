@@ -224,7 +224,8 @@ void MultipleWMSTest::do_deferredWMSStartOneWMS_test() {
     ASSERT_GT(wrench::Simulation::getCurrentSimulatedDate(), 100);
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }
 
@@ -290,6 +291,7 @@ void MultipleWMSTest::do_deferredWMSStartTwoWMS_test() {
     ASSERT_GT(wrench::Simulation::getCurrentSimulatedDate(), 1000);
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }

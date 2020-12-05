@@ -247,7 +247,8 @@ void WMSTest::do_DefaultHandlerWMS_test() {
 
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -452,6 +453,7 @@ void WMSTest::do_CustomHandlerWMS_test() {
 
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }

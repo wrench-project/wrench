@@ -139,7 +139,8 @@ void ScratchSpaceTest::do_BogusScratchSpace_test() {
 
   delete simulation;
 
-  free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
   free(argv);
 }
 
@@ -272,7 +273,8 @@ void ScratchSpaceTest::do_SimpleScratchSpace_test() {
 
   delete simulation;
 
-  free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
   free(argv);
 }
 
@@ -496,7 +498,8 @@ void ScratchSpaceTest::do_ScratchSpaceFailure_test() {
 
   delete simulation;
 
-  free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
   free(argv);
 }
 
@@ -712,7 +715,8 @@ void ScratchSpaceTest::do_PilotJobScratchSpace_test() {
 
   delete simulation;
 
-  free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
   free(argv);
 }
 
@@ -852,7 +856,8 @@ void ScratchSpaceTest::do_RaceConditionTest_test() {
   ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
-  free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
   free(argv);
 }
 
@@ -1078,6 +1083,7 @@ void ScratchSpaceTest::do_PartitionsTest_test() {
   ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
-  free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
   free(argv);
 }
