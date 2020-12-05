@@ -56,25 +56,39 @@ void LogicalFileSystemTest::do_BasicTests() {
     auto simulation = new wrench::Simulation();
     auto workflow = new wrench::Workflow();
 
-    int argc = 1;
+    int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
     // set up the platform
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
+    ASSERT_THROW(new  wrench::LogicalFileSystem("Host", nullptr, "/"), std::invalid_argument);
+
+    // Create two Storage Services
+    std::shared_ptr<wrench::SimpleStorageService> storage_service1, storage_service2;
+    ASSERT_NO_THROW(storage_service1 = simulation->add(
+            new wrench::SimpleStorageService("Host", {"/"})));
+    ASSERT_NO_THROW(storage_service2 = simulation->add(
+            new wrench::SimpleStorageService("Host", {"/"})));
+
     // Create a Logical File System
-    auto fs1 = new wrench::LogicalFileSystem("Host", "ss1", "/");
+    auto fs1 = new wrench::LogicalFileSystem("Host", storage_service1.get(), "/");
     fs1->init();
 
+    // Attempt to create a redundant Logical File System
+    auto fs1_bogus = new wrench::LogicalFileSystem("Host", storage_service2.get(), "/");
+    try {
+        fs1_bogus->init();
+        throw std::runtime_error("Initializing a redundant file system should have thrown");
+    } catch (std::invalid_argument &e) {
+        //  ignored
+    }
 
-    auto fs2 = new wrench::LogicalFileSystem("Host", "ss2", "/");
-    ASSERT_THROW(fs2->init(), std::invalid_argument);
-
-    auto fs3 = new wrench::LogicalFileSystem("Host", "ss1", "/tmp"); // coverage
-    fs3->init();
+    ASSERT_THROW(new wrench::LogicalFileSystem("Host", storage_service1.get(), "/bogus"), std::invalid_argument);
 
     fs1->createDirectory(("/foo"));
     fs1->removeAllFilesInDirectory("/foo");
@@ -87,6 +101,6 @@ void LogicalFileSystemTest::do_BasicTests() {
 
     delete simulation;
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
