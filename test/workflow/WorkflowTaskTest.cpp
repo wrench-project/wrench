@@ -453,6 +453,7 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
     ASSERT_STREQ(t6_failed_execution.execution_host.c_str(), "ExecutionHost");
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }

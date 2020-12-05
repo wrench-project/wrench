@@ -220,7 +220,8 @@ void WMSOptimizationsTest::do_staticOptimization_test() {
   }
 
   delete simulation;
-  free(argv[0]);
+  for (int i=0; i < argc; i++)
+     free(argv[i]);
   free(argv);
 }
 
@@ -358,6 +359,7 @@ void WMSOptimizationsTest::do_dynamicOptimization_test() {
   ASSERT_GT(trace[2]->getContent()->getTask()->getStartDate(), trace[1]->getContent()->getTask()->getStartDate());
 
   delete simulation;
-  free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
   free(argv);
 }

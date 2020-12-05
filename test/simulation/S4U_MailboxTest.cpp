@@ -248,6 +248,7 @@ void S4U_MailboxTest::do_AsynchronousCommunication_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }

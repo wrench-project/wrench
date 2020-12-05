@@ -204,7 +204,7 @@ int main(int argc, char **argv) {
     std::cerr << "Simulation done!" << std::endl;
 
     std::string sub_dir = "original_";
-    if (wrench::Simulation::isWriteback()) {
+    if (wrench::Simulation::isPageCachingEnabled()) {
         sub_dir = "pagecache_";
     }
 

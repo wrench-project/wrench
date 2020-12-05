@@ -314,6 +314,7 @@ void SimulationTimestampFileReadTest::do_SimulationTimestampFileReadBasic_test()
                                  task), std::invalid_argument);
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
