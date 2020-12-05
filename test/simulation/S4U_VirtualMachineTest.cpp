@@ -190,7 +190,8 @@ void S4U_VirtualMachineTest::do_basic_Test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }
 

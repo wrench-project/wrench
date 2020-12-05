@@ -304,7 +304,8 @@ void WorkunitExecutorTest::do_WorkunitConstructor_test() {
                                           post_file_copies, cleanup_file_deletions), std::invalid_argument);
     }
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }
 
@@ -462,7 +463,8 @@ void WorkunitExecutorTest::do_WorkunitExecutorConstructor_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }
 

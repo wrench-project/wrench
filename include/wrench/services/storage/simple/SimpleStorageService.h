@@ -10,10 +10,11 @@
 #ifndef WRENCH_SIMPLESTORAGESERVICE_H
 #define WRENCH_SIMPLESTORAGESERVICE_H
 
-#include <wrench/services/storage/storage_helpers/FileTransferThread.h>
+#include "wrench/services/storage/storage_helpers/FileTransferThread.h"
 #include "wrench/services/storage/StorageService.h"
 #include "SimpleStorageServiceProperty.h"
 #include "SimpleStorageServiceMessagePayload.h"
+#include "wrench/services/memory/MemoryManager.h"
 #include "wrench/simgrid_S4U_util/S4U_PendingCommunication.h"
 
 namespace wrench {
@@ -136,6 +137,8 @@ namespace wrench {
         std::set <std::shared_ptr<FileTransferThread>> running_file_transfer_threads;
 
         void validateProperties();
+
+        std::shared_ptr<MemoryManager> memory_manager;
 
     };
 

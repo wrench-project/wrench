@@ -309,7 +309,8 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }
 
@@ -467,7 +468,8 @@ void NetworkProximityTest::do_CompareNetworkProximity_Test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }
 
@@ -648,7 +650,8 @@ void NetworkProximityTest::do_VivaldiConverge_Test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }
 
@@ -825,6 +828,7 @@ void NetworkProximityTest::do_ValidateProperties_Test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }

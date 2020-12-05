@@ -300,7 +300,8 @@ void SimpleStorageServicePerformanceTest::do_ConcurrentFileCopies_test(double bu
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }
 
@@ -411,6 +412,7 @@ void SimpleStorageServicePerformanceTest::do_FileRead_test(double buffer_size) {
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }
