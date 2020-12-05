@@ -46,12 +46,15 @@ namespace wrench {
                                                                double dirty_ratio, int interval, int expired_time,
                                                                std::string hostname) {
 
-        return simulation->add(new MemoryManager(memory, dirty_ratio, interval, expired_time, hostname));
+        auto memory_manager = simulation->add(new MemoryManager(memory, dirty_ratio, interval, expired_time, hostname));
+        memory_manager->start(memory_manager, true, false);
+        return memory_manager;
     }
 
     int MemoryManager::main() {
 
-        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);WRENCH_INFO(
+        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
+        WRENCH_INFO(
                 "Periodic Flush starting with interval = %d , expired time = %d",
                 this->interval, this->expired_time);
 
