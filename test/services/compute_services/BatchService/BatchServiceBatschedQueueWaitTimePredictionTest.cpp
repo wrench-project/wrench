@@ -306,7 +306,8 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobBrokenEstimateW
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -480,7 +481,8 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobBasicEstimateWa
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -706,7 +708,8 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobEstimateWaiting
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -981,7 +984,8 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobLittleComplexEs
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 

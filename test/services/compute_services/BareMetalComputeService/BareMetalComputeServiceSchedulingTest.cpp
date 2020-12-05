@@ -232,7 +232,8 @@ void BareMetalComputeServiceTestScheduling::do_RAMPressure_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -366,7 +367,8 @@ void BareMetalComputeServiceTestScheduling::do_LoadBalancing1_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -500,6 +502,7 @@ void BareMetalComputeServiceTestScheduling::do_LoadBalancing2_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }

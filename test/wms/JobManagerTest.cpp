@@ -179,7 +179,8 @@ void JobManagerTest::do_JobManagerConstructorTest_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -356,7 +357,8 @@ void JobManagerTest::do_JobManagerCreateJobTest_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -440,7 +442,8 @@ void JobManagerTest::do_JobManagerSubmitJobTest_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -591,7 +594,8 @@ void JobManagerTest::do_JobManagerResubmitJobTest_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -729,6 +733,7 @@ void JobManagerTest::do_JobManagerTerminateJobTest_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }

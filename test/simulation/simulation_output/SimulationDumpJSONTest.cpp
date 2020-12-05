@@ -425,7 +425,8 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowExecutionJSON_test() {
 
     EXPECT_TRUE(result_json == expected_json);
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -597,7 +598,8 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
 
     //EXPECT_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(workflow.get(), execution_data_json_file_path, true), std::runtime_error);
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 
 }
@@ -1206,8 +1208,8 @@ void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
     EXPECT_TRUE(expected_json == result_json);
 
     delete simulation;
-    free(argv[0]);
-    free(argv[1]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -1374,7 +1376,8 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
     EXPECT_TRUE(expected_json_link_usage == result_json);
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -1506,7 +1509,8 @@ void SimulationDumpJSONTest::do_SimulationDumpDiskOperationsJSON_test(){
     }
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -1709,7 +1713,8 @@ void SimulationDumpJSONTest::do_SimulationDumpPlatformGraphJSON_test() {
     EXPECT_TRUE(result_json == expected_json);
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -2097,7 +2102,7 @@ void SimulationDumpJSONTest::do_SimulationDumpUnifiedJSON_test() {
     */
 
     delete simulation;
-    free(argv[0]);
-    free(argv[1]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }

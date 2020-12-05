@@ -315,7 +315,8 @@ void FileRegistryTest::do_FileRegistry_Test() {
 
   delete simulation;
 
-  free(argv[0]);
+  for (int i=0; i < argc; i++)
+     free(argv[i]);
   free(argv);
 }
 /**********************************************************************/
@@ -486,6 +487,7 @@ void FileRegistryTest::do_lookupEntry_Test() {
 
   delete simulation;
 
-  free(argv[0]);
+  for (int i=0; i < argc; i++)
+     free(argv[i]);
   free(argv);
 }

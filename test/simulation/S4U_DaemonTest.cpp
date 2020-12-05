@@ -194,7 +194,8 @@ void S4U_DaemonTest::do_basic_Test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }
 
@@ -269,7 +270,8 @@ void S4U_DaemonTest::do_noCleanup_Test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }
 

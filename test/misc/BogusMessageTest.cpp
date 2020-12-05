@@ -242,6 +242,7 @@ void BogusMessageTest::do_BogusMessage_Test(std::string service_type) {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }

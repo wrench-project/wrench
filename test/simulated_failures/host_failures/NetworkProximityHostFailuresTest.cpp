@@ -219,7 +219,8 @@ void NetworkProximityHostFailuresTest::do_HostFailures_Test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }
 

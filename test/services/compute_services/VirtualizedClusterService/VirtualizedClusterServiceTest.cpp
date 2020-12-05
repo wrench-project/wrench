@@ -202,7 +202,8 @@ void VirtualizedClusterServiceTest::do_ConstructorTest_test() {
                  std::invalid_argument);
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -450,7 +451,8 @@ void VirtualizedClusterServiceTest::do_StandardJobTaskTest_test() {
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -578,7 +580,8 @@ void VirtualizedClusterServiceTest::do_StandardJobTaskWithCustomVMNameTest_test(
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -749,7 +752,8 @@ void VirtualizedClusterServiceTest::do_VMMigrationTest_test() {
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }
 
@@ -861,7 +865,8 @@ void VirtualizedClusterServiceTest::do_NumCoresTest_test() {
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }
 
@@ -968,7 +973,8 @@ void VirtualizedClusterServiceTest::do_StopAllVMsTest_test() {
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }
 
@@ -1222,7 +1228,8 @@ void VirtualizedClusterServiceTest::do_ShutdownVMTest_test() {
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }
 
@@ -1348,7 +1355,8 @@ void VirtualizedClusterServiceTest::do_ShutdownVMAndThenShutdownServiceTest_test
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }
 
@@ -1505,7 +1513,8 @@ void VirtualizedClusterServiceTest::do_SubmitToVMTest_test() {
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }
 
@@ -1609,7 +1618,8 @@ void VirtualizedClusterServiceTest::do_VMStartShutdownStartShutdown_test() {
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }
 
@@ -1741,7 +1751,8 @@ void VirtualizedClusterServiceTest::do_VMShutdownWhileJobIsRunning_test() {
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }
 
@@ -1875,7 +1886,8 @@ void VirtualizedClusterServiceTest::do_VMComputeServiceStopWhileJobIsRunning_tes
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }
 

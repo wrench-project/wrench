@@ -255,7 +255,8 @@ void BatchServiceTest::do_BogusSetupTest_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -389,7 +390,8 @@ void BatchServiceTest::do_JobTypeNotSupportedTest_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -582,7 +584,8 @@ void BatchServiceTest::do_TerminateStandardJobsTest_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -705,7 +708,8 @@ void BatchServiceTest::do_TerminatePilotJobsTest_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -862,7 +866,8 @@ void BatchServiceTest::do_OneStandardJobTaskTest_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -1007,7 +1012,8 @@ void BatchServiceTest::do_StandardJobFailureTest_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -1183,7 +1189,8 @@ void BatchServiceTest::do_TwoStandardJobSubmissionTest_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -1334,7 +1341,8 @@ void BatchServiceTest::do_PilotJobTaskTest_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }
 
@@ -1509,7 +1517,8 @@ void BatchServiceTest::do_StandardPlusPilotJobTaskTest_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -1648,7 +1657,8 @@ void BatchServiceTest::do_InsufficientCoresTaskTest_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -1770,7 +1780,8 @@ void BatchServiceTest::do_noArgumentsJobSubmissionTest_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -1918,7 +1929,8 @@ void BatchServiceTest::do_StandardJobTimeOutTaskTest_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -2044,7 +2056,8 @@ void BatchServiceTest::do_PilotJobTimeOutTaskTest_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -2272,7 +2285,8 @@ void BatchServiceTest::do_BestFitTaskTest_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -2430,7 +2444,8 @@ void BatchServiceTest::do_FirstFitTaskTest_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -2693,7 +2708,8 @@ void BatchServiceTest::do_RoundRobinTask_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -2864,7 +2880,8 @@ void BatchServiceTest::do_StandardJobInsidePilotJobTimeOutTaskTest_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }
 
@@ -3025,7 +3042,8 @@ void BatchServiceTest::do_StandardJobInsidePilotJobSucessTaskTest_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }
 
@@ -3175,7 +3193,8 @@ void BatchServiceTest::do_InsufficientCoresInsidePilotJobTaskTest_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }
 
@@ -3309,7 +3328,8 @@ void BatchServiceTest::do_MultipleStandardTaskTest_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }
 
@@ -3455,7 +3475,8 @@ void BatchServiceTest::do_DifferentBatchAlgorithmsSubmissionTest_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }
 
@@ -3580,6 +3601,7 @@ void BatchServiceTest::do_ShutdownWithPendingRunningJobsTest_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }

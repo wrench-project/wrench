@@ -140,7 +140,8 @@ void SimulationCommandLineArgumentsTest::do_versionArgument_test() {
     ASSERT_GE(linecount, 2);
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv[1]);
     free(argv);
 }
@@ -195,7 +196,8 @@ void SimulationCommandLineArgumentsTest::do_HelpWrenchArgument_test() {
     ASSERT_LE(linecount, 15);
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv[1]);
     free(argv);
 }
@@ -251,7 +253,8 @@ void SimulationCommandLineArgumentsTest::do_HelpSimGridArgument_test() {
     ASSERT_LE(linecount, 300);
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv[1]);
     free(argv);
 }
@@ -281,7 +284,8 @@ void SimulationCommandLineArgumentsTest::do_HelpArgument_test() {
     ASSERT_EQ(!strcmp(argv[1], "--help"), 1);
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv[1]);
     free(argv);
 }
@@ -349,7 +353,8 @@ void SimulationCommandLineArgumentsTest::do_NoColorArgument_test() {
 
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv[1]);
     free(argv);
 }
@@ -414,7 +419,8 @@ void SimulationCommandLineArgumentsTest::do_FullLogArgument_test(std::string arg
     xbt_log_control_set("root.thresh:critical");
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv[1]);
     free(argv);
 }
@@ -452,7 +458,8 @@ void SimulationCommandLineArgumentsTest::do_ActivateEnergyArgument_test() {
     simulation->launch();
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv[1]);
     free(argv);
 }
