@@ -770,6 +770,7 @@ namespace wrench {
      */
     void Simulation::readWithMemoryCache(WorkflowFile *file, double n_bytes, std::shared_ptr<FileLocation> location) {
 
+        WRENCH_INFO("IN READ WITH MEMORY CACHE");
         std::string hostname = getHostName();
 
         unique_disk_sequence_number += 1;
@@ -786,6 +787,7 @@ namespace wrench {
         double from_disk = std::min(n_bytes, file->getSize() - cached_amt);
         double from_cache = n_bytes - from_disk;
 
+        WRENCH_INFO("IN  READ WITH MEMORY CACHE 10: %lf", n_bytes + from_disk - mem_mng->getFreeMemory() - mem_mng->getEvictableMemory());
         mem_mng->flush(n_bytes + from_disk - mem_mng->getFreeMemory() - mem_mng->getEvictableMemory(),
                        file->getID());
         mem_mng->evict(n_bytes + from_disk - mem_mng->getFreeMemory(), file->getID());
