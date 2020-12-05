@@ -156,6 +156,7 @@ void MemoryManagerTest::do_MemoryManagerChainOfTasksTest_test() {
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_task_test");
     argv[1] = strdup("--pagecache");
+//    argv[2] = strdup("--wrench-full-log");
 
     ASSERT_THROW(simulation->launch(), std::runtime_error);
 
