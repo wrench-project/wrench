@@ -50,7 +50,7 @@ namespace wrench {
         try {
             for (auto mp : mount_points) {
                 this->file_systems[mp] = std::unique_ptr<LogicalFileSystem>(
-                        new LogicalFileSystem(this->getHostname(), this->getName(), mp));
+                        new LogicalFileSystem(this->getHostname(), this, mp));
             }
         } catch (std::invalid_argument &e) {
             throw;
