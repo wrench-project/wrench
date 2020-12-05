@@ -116,6 +116,7 @@ namespace wrench {
         std::shared_ptr<StorageService> startNewService(StorageService *service);
         std::shared_ptr<NetworkProximityService> startNewService(NetworkProximityService *service);
         std::shared_ptr<FileRegistryService> startNewService(FileRegistryService *service);
+        std::shared_ptr<MemoryManager> startNewService(MemoryManager *service);
 
         static double getCurrentSimulatedDate();
 
