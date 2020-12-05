@@ -11,9 +11,9 @@ function populateWorkflowTaskDataTable(data, tableID = null, label = null) {
     const tdClass = "task-details-td";
 
     let labels = label ? label : {
-        read: {display: true, label: "Read Input"},
-        compute: {display: true, label: "Computation"},
-        write: {display: true, label: "Write Output"},
+        read: {display: true, label: "Reading Input"},
+        compute: {display: true, label: "Performing Computation"},
+        write: {display: true, label: "Writing Output"},
     };
 
     let tableContents = `
@@ -39,13 +39,13 @@ function populateWorkflowTaskDataTable(data, tableID = null, label = null) {
                     <td></td>`;
 
     if (labels.read.display) {
-        tableContents += `<td colspan="3" class="text-center ${tdClass}">` + labels.read.label + `</td>`;
+        tableContents += `<td colspan="3" class="text-center ${tdClass}" style="color: #44AA99 !important">` + labels.read.label + `</td>`;
     }
     if (labels.compute.display) {
-        tableContents += `<td colspan="3" class="text-center ${tdClass}">` + labels.compute.label + `</td>`;
+        tableContents += `<td colspan="3" class="text-center ${tdClass}" style="color: #E69F00 !important">` + labels.compute.label + `</td>`;
     }
     if (labels.write.display) {
-        tableContents += `<td colspan="3" class="text-center ${tdClass}">` + labels.write.label + `</td>`;
+        tableContents += `<td colspan="3" class="text-center ${tdClass}" style="color: #0072B2 !important">` + labels.write.label + `</td>`;
     }
 
     tableContents += `                  
@@ -122,37 +122,46 @@ function populateWorkflowTaskDataTable(data, tableID = null, label = null) {
         if (labels.read.display) {
             tr.append("td")
                 .html(read_start)
-                .attr("class", tdClass);
+                .attr("class", tdClass)
+                .attr("style", 'color: #44AA99 !important');
             tr.append("td")
                 .html(read_end)
-                .attr("class", tdClass);
+                .attr("class", tdClass)
+                .attr("style", 'color: #44AA99 !important');
             tr.append("td")
                 .html(read_duration)
-                .attr("class", tdClass);
+                .attr("class", tdClass)
+                .attr("style", 'color: #44AA99 !important');
         }
 
         if (labels.compute.display) {
             tr.append("td")
                 .html(compute_start)
-                .attr("class", tdClass);
+                .attr("class", tdClass)
+                .attr("style", 'color: #E69F00 !important');
             tr.append("td")
                 .html(compute_end)
-                .attr("class", tdClass);
+                .attr("class", tdClass)
+                .attr("style", 'color: #E69F00 !important');
             tr.append("td")
                 .html(compute_duration)
-                .attr("class", tdClass);
+                .attr("class", tdClass)
+                .attr("style", 'color: #E69F00 !important');
         }
 
         if (labels.write.display) {
             tr.append("td")
                 .html(write_start)
-                .attr("class", tdClass);
+                .attr("class", tdClass)
+                .attr("style", 'color: #0072B2 !important');
             tr.append("td")
                 .html(write_end)
-                .attr("class", tdClass);
+                .attr("class", tdClass)
+                .attr("style", 'color: #0072B2 !important');
             tr.append("td")
                 .html(write_duration)
-                .attr("class", tdClass);
+                .attr("class", tdClass)
+                .attr("style", 'color: #0072B2 !important');
         }
 
         tr.append("td")
