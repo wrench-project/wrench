@@ -94,9 +94,10 @@ function getOverallWorkflowMetrics(data) {
         }
     }
 
-    for (let key in metrics) {
-        let div = d3.select(`#${tableContainer}`)
+    let div = d3.select(`#${tableContainer}`);
+    div.html("");
 
+    for (let key in metrics) {
         let currMetric = metrics[key]
         let value = currMetric.value
         let display = currMetric.display
@@ -104,13 +105,15 @@ function getOverallWorkflowMetrics(data) {
         if (unit === undefined) {
             unit = ''
         }
-        div.append('div')
-            .html('' +
-                '<div class="content">' +
-                '  ' + display + '' +
-                '  <div class="header">' + value + unit + '</div>' +
-                '</div>')
-            .attr('class', 'item summary')
-            .attr('style', 'padding-left: 1em !important');
+        if (value > 0) {
+            div.append('div')
+                .html('' +
+                    '<div class="content">' +
+                    '  ' + display + '' +
+                    '  <div class="header">' + value + unit + '</div>' +
+                    '</div>')
+                .attr('class', 'item summary')
+                .attr('style', 'padding-left: 1em !important');
+        }
     }
 }
