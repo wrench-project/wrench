@@ -40,26 +40,18 @@ protected:
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"TwoCoreHost\" speed=\"1f\" core=\"2\"> "
                           "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"30000MB\"/>"
+                          "             <prop id=\"size\" value=\"30000GB\"/>"
                           "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
                           "       </host> "
                           "       <host id=\"OneCoreHost\" speed=\"1f\" core=\"1\"> "
                           "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"30000MB\"/>"
+                          "             <prop id=\"size\" value=\"30000GB\"/>"
                           "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
-                          "       </host> "
-                          "       <host id=\"RAMHost\" speed=\"1f\" core=\"1\" > "
-                          "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"30000MB\"/>"
-                          "             <prop id=\"mount\" value=\"/\"/>"
-                          "          </disk>"
-                          "         <prop id=\"ram\" value=\"1024B\" />"
                           "       </host> "
                           "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
                           "       <route src=\"TwoCoreHost\" dst=\"OneCoreHost\"> <link_ctn id=\"1\"/> </route>"
-                          "       <route src=\"RAMHost\" dst=\"OneCoreHost\"> <link_ctn id=\"1\"/> </route>"
                           "   </zone> "
                           "</platform>";
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
@@ -156,7 +148,7 @@ void MemoryManagerTest::do_MemoryManagerChainOfTasksTest_test() {
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_task_test");
     argv[1] = strdup("--pagecache");
-//    argv[2] = strdup("--wrench-full-log");
+    //argv[2] = strdup("--wrench-full-log");
 
     ASSERT_THROW(simulation->launch(), std::runtime_error);
 
@@ -187,9 +179,9 @@ void MemoryManagerTest::do_MemoryManagerChainOfTasksTest_test() {
 
     auto task1 = workflow->addTask("task1", 100.0, 1, 1, 0.0);
     auto task2 = workflow->addTask("task2", 200.0, 1, 1, 0.0);
-    auto task1_input = workflow->addFile("task1_input", 100*1000.00*1000.00);
-    auto task1_output = workflow->addFile("task1_output", 100*1000.00*1000.00);
-    auto task2_output = workflow->addFile("task2_output", 100*1000.00*1000.00);
+    auto task1_input = workflow->addFile("task1_input", 1*1000.00*1000.00*1000.00);
+    auto task1_output = workflow->addFile("task1_output", 1*1000.00*1000.00*1000.00);
+    auto task2_output = workflow->addFile("task2_output", 1*1000.00*1000.00*1000.00);
 
     task1->addInputFile(task1_input);
     task1->addOutputFile(task1_output);
