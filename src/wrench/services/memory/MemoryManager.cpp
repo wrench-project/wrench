@@ -46,16 +46,7 @@ namespace wrench {
                                                                double dirty_ratio, int interval, int expired_time,
                                                                std::string hostname) {
 
-        std::shared_ptr<MemoryManager> memory_manager_ptr = std::shared_ptr<MemoryManager>(
-                new MemoryManager(memory, dirty_ratio, interval, expired_time, hostname));
-
-        memory_manager_ptr->simulation = simulation;
-        try {
-            memory_manager_ptr->start(memory_manager_ptr, true, false); // Daemonized, no auto-restart
-        } catch (std::shared_ptr<HostError> &e) {
-            throw;
-        }
-        return memory_manager_ptr;
+        return simulation->add(new MemoryManager(memory, dirty_ratio, interval, expired_time, hostname));
     }
 
     int MemoryManager::main() {
