@@ -21,7 +21,7 @@ class HostStateChangeDetectorServiceTest : public ::testing::Test {
 public:
 
 
-    void do_StateChangeDetection_test();
+    void do_StateChangeDetection_test(bool notify_when_speed_change);
 
 protected:
     HostStateChangeDetectorServiceTest() {
@@ -54,15 +54,17 @@ class HostStateChangeDetectorTestWMS : public wrench::WMS {
 
 public:
     HostStateChangeDetectorTestWMS(HostStateChangeDetectorServiceTest *test,
-                                     std::string hostname) :
+                                     std::string hostname, bool notify_when_speed_change) :
             wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
+        this->notify_when_speed_change = notify_when_speed_change;
     }
 
 
 private:
 
     HostStateChangeDetectorServiceTest *test;
+    bool notify_when_speed_change;
 
     int main() {
 
@@ -70,7 +72,7 @@ private:
         std::vector<std::string> hosts;
         hosts.push_back("Host2");
         auto ssd = std::shared_ptr<wrench::HostStateChangeDetector>(
-                new wrench::HostStateChangeDetector(this->hostname, hosts, true, true, true,
+                new wrench::HostStateChangeDetector(this->hostname, hosts, true, true, this->notify_when_speed_change,
                 this->getSharedPtr<wrench::WMS>(), this->mailbox_name, {}));
         ssd->simulation = this->simulation;
         ssd->start(ssd, true, false);
@@ -100,16 +102,18 @@ private:
             throw std::runtime_error("Did not get the expected 'host has turned on' message");
         }
 
-        wrench::Simulation::sleep(10);
-        this->simulation->setPstate("Host2", 0);
+        if (this->notify_when_speed_change) {
+            wrench::Simulation::sleep(10);
+            this->simulation->setPstate("Host2", 0);
 
-        try {
-            message = wrench::S4U_Mailbox::getMessage(this->mailbox_name, 10);
-        } catch (std::shared_ptr<wrench::NetworkError> &e) {
-            throw std::runtime_error("Did not get a message before the timeout");
-        }
-        if (not std::dynamic_pointer_cast<wrench::HostHasChangedSpeedMessage>(message)) {
-            throw std::runtime_error("Did not get the expected 'host has changed speed' message");
+            try {
+                message = wrench::S4U_Mailbox::getMessage(this->mailbox_name, 10);
+            } catch (std::shared_ptr<wrench::NetworkError> &e) {
+                throw std::runtime_error("Did not get a message before the timeout");
+            }
+            if (not std::dynamic_pointer_cast<wrench::HostHasChangedSpeedMessage>(message)) {
+                throw std::runtime_error("Did not get the expected 'host has changed speed' message");
+            }
         }
 
         ssd->kill(); // coverage
@@ -120,10 +124,11 @@ private:
 };
 
 TEST_F(HostStateChangeDetectorServiceTest, StateChangeDetectionTest) {
-    DO_TEST_WITH_FORK(do_StateChangeDetection_test);
+    DO_TEST_WITH_FORK_ONE_ARG(do_StateChangeDetection_test, true);
+    DO_TEST_WITH_FORK_ONE_ARG(do_StateChangeDetection_test, false);
 }
 
-void HostStateChangeDetectorServiceTest::do_StateChangeDetection_test() {
+void HostStateChangeDetectorServiceTest::do_StateChangeDetection_test(bool notify_when_speed_change) {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
@@ -138,7 +143,7 @@ void HostStateChangeDetectorServiceTest::do_StateChangeDetection_test() {
     simulation->instantiatePlatform(platform_file_path);
 
     // Create the WMS
-    auto  wms = simulation->add(new HostStateChangeDetectorTestWMS(this,"Host1"));
+    auto  wms = simulation->add(new HostStateChangeDetectorTestWMS(this,"Host1", notify_when_speed_change));
 
     // Create a bogus workflow
     auto workflow =  std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
