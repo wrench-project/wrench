@@ -254,7 +254,7 @@ void ParallelModelTest::do_CustomParallelModelTest_test() {
     task->setParallelModel(wrench::ParallelModel::CUSTOM(
             [] (double work, unsigned long num_threads) {
                 std::vector<double> works;
-                for (int i=0; i < num_threads; i++) {
+                for (unsigned int i=0; i < num_threads; i++) {
                     double thread_work = (i+1) * 10.0;
                     works.push_back(thread_work);
                 }

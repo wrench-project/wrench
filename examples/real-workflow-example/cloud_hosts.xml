@@ -11,16 +11,36 @@
             </disk>
         </host>
 
-        <link id="1" bandwidth="125MBps" latency="100us"/>
+        <!-- A network link -->
+        <link id="network_link" bandwidth="125MBps" latency="100us"/>
+        <!-- Tremblay's local "loopback" link...-->
+        <link id="loopback_Tremblay" bandwidth="1000EBps" latency="0us"/>
+        <!-- Jupiter's local "loopback" link...-->
+        <link id="loopback_Jupiter" bandwidth="1000EBps" latency="0us"/>
+        <!-- Fafard's local "loopback" link...-->
+        <link id="loopback_Fafard" bandwidth="1000EBps" latency="0us"/>
 
+        <!-- The network link connects all hosts together -->
         <route src="Tremblay" dst="Jupiter">
-            <link_ctn id="1"/>
+            <link_ctn id="network_link"/>
         </route>
         <route src="Fafard" dst="Tremblay">
-            <link_ctn id="1"/>
+            <link_ctn id="network_link"/>
         </route>
         <route src="Fafard" dst="Jupiter">
-            <link_ctn id="1"/>
+            <link_ctn id="network_link"/>
         </route>
+
+        <!-- Each loopback link connects each host to itself -->
+        <route src="Tremblay" dst="Tremblay">
+            <link_ctn id="loopback_Tremblay"/>
+        </route>
+        <route src="Jupiter" dst="Jupiter">
+            <link_ctn id="loopback_Jupiter"/>
+        </route>
+        <route src="Fafard" dst="Fafard">
+            <link_ctn id="loopback_Fafard"/>
+        </route>
+        
     </zone>
 </platform>

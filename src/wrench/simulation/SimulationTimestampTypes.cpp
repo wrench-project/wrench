@@ -30,6 +30,14 @@ namespace wrench {
     }
 
     /**
+     * @brief Set the date recorded for this timestamp
+     * @param date: the date of this timestamp
+     */
+    void SimulationTimestampType::setDate(double date) {
+        this->date = date;
+    }
+
+    /**
      * @brief Constructor
      */
     SimulationTimestampPair::SimulationTimestampPair() : endpoint(nullptr) {
@@ -659,6 +667,7 @@ namespace wrench {
  * @param hostname: hostname being read from
  * @param mount: mountpoint of disk
  * @param bytes: number of bytes read
+ * @param counter: An integer ID
  */
     SimulationTimestampDiskRead::SimulationTimestampDiskRead(std::string hostname,
                                                              std::string mount,

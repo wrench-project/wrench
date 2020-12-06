@@ -16,6 +16,9 @@
 
 namespace wrench {
 
+    /**
+     * @brief A class that defines an Amdahl's Law-based parallel task performance model.
+     */
     class AmdahlParallelModel : public ParallelModel {
 
     public:

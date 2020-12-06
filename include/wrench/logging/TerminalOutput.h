@@ -91,6 +91,7 @@ namespace wrench {
         static void endThisProcessColor();
 
         static void disableColor();
+
         static void disableLog();
 
         /***********************/
