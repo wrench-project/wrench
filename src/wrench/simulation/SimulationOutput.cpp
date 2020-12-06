@@ -27,6 +27,7 @@
 #include <string>
 #include <unordered_set>
 
+#define DBL_EQUAL(x,y) (std::abs<double>((x) - (y)) < 0.1)
 
 WRENCH_LOG_CATEGORY(wrench_core_simulation_output, "Log category for Simulation Output");
 
@@ -144,6 +145,7 @@ namespace wrench {
      * @param generate_host_utilization_layout: boolean specifying whether or not you would like a possible host utilization
      *         layout to be generated
      * @param include_disk: boolean specifying whether to include disk operation in JSON (disk timestamps must be enabled)
+     * @param include_bandwidth: boolean specifying whether to include link bandwidth measurements in JSON
      */
     void SimulationOutput::dumpUnifiedJSON(Workflow *workflow, std::string file_path,
                                            bool include_platform,
@@ -1266,6 +1268,7 @@ namespace wrench {
      *                  {
      *                   "bytes": <double>,
      *                   "end": <double>,
+     *                   "failed": <double>,
      *                   "start": <double>
      *                  },
      *                  {
@@ -1276,6 +1279,7 @@ namespace wrench {
      *                 {
      *                  "bytes": <double>,
      *                  "end": <double>,
+     *                  "failed": <double>,
      *                  "start": <double>
      *                  },
      *                  {
@@ -1324,6 +1328,8 @@ namespace wrench {
             }
         }
 
+
+
         for(auto & host : hostnames) {
             std::set<std::string> mounts;
             if(!read_start_timestamps.empty()){
@@ -1366,21 +1372,43 @@ namespace wrench {
 
                     }
                 }
+
                 nlohmann::json disk_reads;
                 for (auto const &r : reads) {
                     nlohmann::json disk_read = nlohmann::json::object({{"start", std::get<0>(r)},
                                                                        {"end", std::get<1>(r)},
-                                                                       {"bytes",std::get<2>(r)}});
+                                                                       {"bytes",std::get<2>(r)},
+                                                                       {"failed", "-1"}});
                     disk_reads.push_back(disk_read);
+                }
+                if(!read_failure_timestamps.empty()){
+                    for (auto & timestamp : read_failure_timestamps) {
+                        for (auto & disk_read : disk_reads){
+                            if(timestamp->getContent()->getDate() == disk_read["end"] && timestamp->getContent()->getEndpoint()->getDate() == disk_read["start"]){
+                                disk_read["failed"] = "1";
+                            }
+                        }
+                    }
                 }
 
                 nlohmann::json disk_writes;
                 for (auto const &w : writes) {
                     nlohmann::json disk_write = nlohmann::json::object({{"start", std::get<0>(w)},
                                                                         {"end", std::get<1>(w)},
-                                                                        {"bytes",std::get<2>(w)}});
+                                                                        {"bytes",std::get<2>(w)},
+                                                                        {"failed", "-1"}});
                     disk_writes.push_back(disk_write);
                 }
+                if(!write_failure_timestamps.empty()){
+                    for (auto & timestamp : write_failure_timestamps) {
+                        for (auto & disk_write : disk_writes){
+                            if(timestamp->getContent()->getDate() == disk_write["end"] && timestamp->getContent()->getEndpoint()->getDate() == disk_write["start"]){
+                                disk_write["failed"] = "1";
+                            }
+                        }
+                    }
+                }
+
                 disk_operations_json[host][mount]["reads"] = disk_reads;
                 disk_operations_json[host][mount]["writes"] = disk_writes;
             }
@@ -1452,9 +1480,9 @@ namespace wrench {
                 for (const auto &link_usage_timestamp : this->getTrace<SimulationTimestampLinkUsage>()) {
                     if (link->get_name() == link_usage_timestamp->getContent()->getLinkname()) {
                         datum["link_usage_trace"].push_back({
-                                                                         {"time",   link_usage_timestamp->getDate()},
-                                                                         {"bytes per second", link_usage_timestamp->getContent()->getUsage()}
-                                                                 });
+                                                                    {"time",   link_usage_timestamp->getDate()},
+                                                                    {"bytes per second", link_usage_timestamp->getContent()->getUsage()}
+                                                            });
                     }
                 }
 
@@ -1671,7 +1699,7 @@ namespace wrench {
      * @param dst: the target location
      */
     void SimulationOutput::addTimestampFileCopyFailure(WorkflowFile *file, std::shared_ptr<FileLocation> src,
-                                                     std::shared_ptr<FileLocation> dst) {
+                                                       std::shared_ptr<FileLocation> dst) {
         if (this->isEnabled<SimulationTimestampFileCopyFailure>()) {
             this->addTimestamp<SimulationTimestampFileCopyFailure>(new SimulationTimestampFileCopyFailure(file, src, dst));
         }
@@ -1684,7 +1712,7 @@ namespace wrench {
      * @param dst: the target location
      */
     void SimulationOutput::addTimestampFileCopyCompletion(WorkflowFile *file, std::shared_ptr<FileLocation> src,
-                                                     std::shared_ptr<FileLocation> dst) {
+                                                          std::shared_ptr<FileLocation> dst) {
         if (this->isEnabled<SimulationTimestampFileCopyCompletion>()) {
             this->addTimestamp<SimulationTimestampFileCopyCompletion>(new SimulationTimestampFileCopyCompletion(file, src, dst));
         }
@@ -1778,16 +1806,40 @@ namespace wrench {
             this->addTimestamp<SimulationTimestampPstateSet>(new SimulationTimestampPstateSet(hostname, pstate));
         }
     }
-    
+
     /**
      * @brief Add an energy consumption timestamp
      * @param hostname: a hostname
      * @param joules: consumption in joules
      */
     void SimulationOutput::addTimestampEnergyConsumption(std::string hostname, double joules) {
-        if (this->isEnabled<SimulationTimestampEnergyConsumption>()) {
-            this->addTimestamp<SimulationTimestampEnergyConsumption>(new SimulationTimestampEnergyConsumption(hostname, joules));
+        static std::unordered_map<std::string, std::vector<SimulationTimestampEnergyConsumption*>> last_two_timestamps;
+
+        if (not this->isEnabled<SimulationTimestampEnergyConsumption>()) {
+            return;
         }
+
+        auto new_timestamp = new SimulationTimestampEnergyConsumption(hostname,joules);
+
+        // If less thant 2 time-stamp for that host, just record and add
+        if (last_two_timestamps[hostname].size()  < 2) {
+            last_two_timestamps[hostname].push_back(new_timestamp);
+            this->addTimestamp<SimulationTimestampEnergyConsumption>(new_timestamp);
+            return;
+        }
+
+        // Otherwise, check whether we can merge
+        bool can_merge = DBL_EQUAL(last_two_timestamps[hostname].at(0)->getConsumption(), last_two_timestamps[hostname].at(1)->getConsumption()) and
+                         DBL_EQUAL(last_two_timestamps[hostname].at(1)->getConsumption(), new_timestamp->getConsumption());
+
+        if (can_merge) {
+            last_two_timestamps[hostname].at(1)->setDate(new_timestamp->getDate());
+        } else {
+            last_two_timestamps[hostname][0] = last_two_timestamps[hostname][1];
+            last_two_timestamps[hostname][1] = new_timestamp;
+            this->addTimestamp<SimulationTimestampEnergyConsumption>(new_timestamp);
+        }
+
     }
 
     /**
@@ -1796,11 +1848,35 @@ namespace wrench {
      * @param bytes_per_second: link usage in bytes_per_second
      */
     void SimulationOutput::addTimestampLinkUsage(std::string linkname, double bytes_per_second) {
-        if (this->isEnabled<SimulationTimestampLinkUsage>()) {
-            this->addTimestamp<SimulationTimestampLinkUsage>(new SimulationTimestampLinkUsage(linkname, bytes_per_second));
+        static std::unordered_map<std::string, std::vector<SimulationTimestampLinkUsage*>> last_two_timestamps;
+
+        if (not this->isEnabled<SimulationTimestampLinkUsage>()) {
+            return;
         }
+
+        auto new_timestamp = new SimulationTimestampLinkUsage(linkname, bytes_per_second);
+
+        // If less thant 2 time-stamp for that link, just record and add
+        if (last_two_timestamps[linkname].size()  < 2) {
+            last_two_timestamps[linkname].push_back(new_timestamp);
+            this->addTimestamp<SimulationTimestampLinkUsage>(new_timestamp);
+            return;
+        }
+
+        // Otherwise, check whether we can merge
+        bool can_merge = DBL_EQUAL(last_two_timestamps[linkname].at(0)->getUsage(), last_two_timestamps[linkname].at(1)->getUsage()) and
+                         DBL_EQUAL(last_two_timestamps[linkname].at(1)->getUsage(), new_timestamp->getUsage());
+
+        if (can_merge) {
+            last_two_timestamps[linkname].at(1)->setDate(new_timestamp->getDate());
+        } else {
+            last_two_timestamps[linkname][0] = last_two_timestamps[linkname][1];
+            last_two_timestamps[linkname][1] = new_timestamp;
+            this->addTimestamp<SimulationTimestampLinkUsage>(new_timestamp);
+        }
+
     }
-    
+
     /**
      * @brief Enable or Disable the insertion of task-related timestamps in
      *        the simulation output (enabled by default)

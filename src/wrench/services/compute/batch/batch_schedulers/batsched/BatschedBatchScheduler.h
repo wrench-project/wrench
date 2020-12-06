@@ -77,7 +77,11 @@ namespace wrench {
 
         /**
          * @brief Method to get start time estimates
-         * @param set_of_jobs: the set of job configurations whose start times should be estimated
+         * @param set_of_jobs: the set of job configurations whose start times should 
+         * be estimated. Each job configuration is :(i) a name; (ii) a number of nodes;
+         * (iii) a number of cores per node; and (iv) an execution duration in seconds.
+         *
+         * @return a map of estimated start dates (in seconds), indexed by job configuration name
          */
         std::map<std::string, double> getStartTimeEstimates(std::set<std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs) override;
 

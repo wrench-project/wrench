@@ -18,7 +18,7 @@ set(CMAKE_CXX_STANDARD 11)
 
 # build the version number
 set(WRENCH_VERSION_MAJOR "1")
-set(WRENCH_VERSION_MINOR "7")
+set(WRENCH_VERSION_MINOR "8")
 set(WRENCH_VERSION_PATCH "0")
 set(WRENCH_VERSION_EXTRA "dev")
 
@@ -104,6 +104,8 @@ set(HEADER_FILES
         include/wrench/services/storage/simple/SimpleStorageServiceMessagePayload.h
         include/wrench/services/storage/simple/SimpleStorageServiceProperty.h
         include/wrench/services/storage/storage_helpers/FileLocation.h
+        include/wrench/services/memory/Block.h
+        include/wrench/services/memory/MemoryManager.h
         include/wrench/simgrid_S4U_util/S4U_Daemon.h
         include/wrench/simgrid_S4U_util/S4U_Mailbox.h
         include/wrench/simgrid_S4U_util/S4U_PendingCommunication.h
@@ -264,6 +266,8 @@ set(SOURCE_FILES
         src/wrench/services/storage/storage_helper_classes/FileTransferThread.cpp
         src/wrench/services/storage/storage_helper_classes/FileTransferThreadMessage.h
         src/wrench/services/storage/storage_helper_classes/LogicalFileSystem.cpp
+        src/wrench/services/memory/Block.cpp
+        src/wrench/services/memory/MemoryManager.cpp
         src/wrench/simgrid_S4U_util/S4U_Daemon.cpp
         src/wrench/simgrid_S4U_util/S4U_DaemonActor.cpp
         src/wrench/simgrid_S4U_util/S4U_DaemonActor.h

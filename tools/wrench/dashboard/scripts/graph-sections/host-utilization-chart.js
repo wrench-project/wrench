@@ -82,17 +82,24 @@ function findTaskScheduling(data, hosts) {
  * Generates the host utilization chart
  *
  * @param rawData: simulation data
+ * @param containedId: id for the chart container element
  * @param hostsList: list of host names in which compute tasks will be displayed (empty list displays all hosts)
  * @param diskHostsList: list of host names in which the disk usage will be displayed (empty list displays all hosts)
+ * @param zoom: whether to allow zoom functionality in the chart
  * @param operations: type of operations to be shown ('all', 'compute', 'io', 'write', 'read')
  */
-function generateHostUtilizationChart(rawData, hostsList = [], diskHostsList = [], zoom = true, operations = "all") {
+function generateHostUtilizationChart(rawData,
+                                      containedId = null,
+                                      hostsList = [],
+                                      diskHostsList = [],
+                                      zoom = true,
+                                      operations = "all") {
     // clean chart
     if (hostUtilizationChart !== null) {
         hostUtilizationChart.destroy();
     }
 
-    const containerId = "host-utilization-chart";
+    const containerId = containedId ? containedId : "host-utilization-chart";
     let ctx = document.getElementById(containerId);
 
     // prepare data
@@ -191,27 +198,7 @@ function generateHostUtilizationChart(rawData, hostsList = [], diskHostsList = [
     });
 
     // zoom properties
-    let pluginsProperties = {}
-    if (zoom) {
-        pluginsProperties["zoom"] = {
-            pan: {
-                enabled: true,
-                mode: 'x'
-            },
-            zoom: {
-                enabled: true,
-                mode: 'x',
-                rangeMin: {
-                    x: 0
-                },
-                rangeMax: {
-                    x: Math.ceil(zoomMaxRange)
-                },
-                threshold: 20,
-                speed: 0.05
-            }
-        }
-    }
+    let pluginsProperties = definePluginsProperties(zoom, zoomMaxRange);
 
     hostUtilizationChart = new Chart(ctx, {
         type: 'horizontalBar',

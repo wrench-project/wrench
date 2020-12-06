@@ -21,8 +21,8 @@
     <script src="public/js/d3-3d.js" type="text/javascript"></script>
     <script src="public/js/handlebars.min-v4.7.2.js" type="text/javascript"></script>
     <script type="text/javascript">
-        Handlebars.registerHelper('ifEquals', function (arg1, arg2, arg3, options) {
-            return (arg1 === arg2 || arg1 === arg3) ? options.fn(this) : options.inverse(this);
+        Handlebars.registerHelper('ifEquals', function (arg1, arg2, arg3, arg4, options) {
+            return (arg1 === arg2 || arg1 === arg3 || arg1 === arg4) ? options.fn(this) : options.inverse(this);
         });
     </script>
 </head>
@@ -110,7 +110,8 @@
                                         </div>
                                     </div>
                                 </div>
-                                {{#ifEquals containerId "overall-graph-container" "host-utilization-graph-container"}}
+                                {{#ifEquals containerId "overall-graph-container" "host-utilization-graph-container"
+                                "network-graph-container"}}
                                 <div class="item" onclick="toggleZoom('{{containerId}}');">
                                     <i class="check icon" id="dd-zoom-{{containerId}}"></i>
                                     Zoom
@@ -146,11 +147,13 @@
 <script src="partials/energy-graphs.js"></script>
 <script src="partials/3d-visualization.js"></script>
 <script src="partials/host-utilization.js"></script>
+<script src="partials/network-bandwidth-usage.js"></script>
 <script src="partials/render.js"></script>
 
 <!-- CHARTS -->
 <script src="scripts/graph-sections/gantt-chart.js" type="text/javascript"></script>
 <script src="scripts/graph-sections/host-utilization-chart.js" type="text/javascript"></script>
+<script src="scripts/graph-sections/network-bandwidth-usage.js" type="text/javascript"></script>
 
 <script src="scripts/data.js"></script>
 <script src="scripts/util.js"></script>
@@ -158,8 +161,6 @@
 <script src="scripts/graph-sections/3d-visualization.js"></script>
 <script src="scripts/graph-sections/energy-graphs.js"></script>
 <script src="scripts/graph-sections/simulation-details.js"></script>
-<script src="scripts/graph-sections/simulation-graph.js"></script>
 <script src="scripts/graph-sections/workflow-summary.js"></script>
-<script src="scripts/graph-sections/host-utilization.js"></script>
 <script src="scripts/initialize.js"></script>
 </html>
