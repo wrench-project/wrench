@@ -238,6 +238,49 @@ private:
         } catch (wrench::WorkflowExecutionException &e) {
         }
 
+        { // Test using readFiles()
+
+            // Bogus read
+            try {
+                std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>> locations;
+                locations[nullptr] = wrench::FileLocation::LOCATION(this->test->storage_service_100);
+                wrench::StorageService::readFiles(locations);
+                throw std::runtime_error("Should not be able to read nullptr file");
+            } catch (std::invalid_argument &e) {
+            }
+
+            // Read a file on a storage service
+            try {
+                std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>> locations;
+                locations[this->test->file_10] = wrench::FileLocation::LOCATION(this->test->storage_service_100);
+                wrench::StorageService::readFiles(locations);
+            } catch (wrench::WorkflowExecutionException &e) {
+                throw std::runtime_error("Should be able to read a file available on a storage service");
+            }
+
+            // Read a file on a storage service that doesn't have that file
+            try {
+                std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>> locations;
+                locations[this->test->file_100] = wrench::FileLocation::LOCATION(this->test->storage_service_100);
+                wrench::StorageService::readFiles(locations);
+                throw std::runtime_error("Should not be able to read a file unavailable a storage service");
+            } catch (wrench::WorkflowExecutionException &e) {
+            }
+        }
+
+        { // Test using writeFiles()
+
+            // Bogus write
+            try {
+                std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>> locations;
+                locations[nullptr] = wrench::FileLocation::LOCATION(this->test->storage_service_100);
+                wrench::StorageService::writeFiles(locations);
+                throw std::runtime_error("Should not be able to write nullptr file");
+            } catch (std::invalid_argument &e) {
+            }
+        }
+
+
         // Delete a file on a storage service that doesnt' have it
         try {
             wrench::StorageService::deleteFile(this->test->file_100, wrench::FileLocation::LOCATION(this->test->storage_service_100));
@@ -609,7 +652,7 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
 
     delete simulation;
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -771,7 +814,7 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopy_test() {
 
     delete simulation;
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -911,7 +954,7 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopy_test() {
 
     delete simulation;
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -1116,7 +1159,7 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopyFailures_test() {
 
     delete simulation;
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -1328,7 +1371,7 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopyFailures_test() 
 
     delete simulation;
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -1580,7 +1623,7 @@ void SimpleStorageServiceFunctionalTest::do_Partitions_test() {
 
     delete simulation;
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -1620,6 +1663,7 @@ private:
             throw std::runtime_error("Should not be able to write a nullptr file to a service");
         } catch (std::invalid_argument &e) {
         }
+
 
         try {
             wrench::StorageService::writeFile(this->test->file_500, wrench::FileLocation::LOCATION(this->test->storage_service_100, "/disk100"));
@@ -1703,7 +1747,7 @@ void SimpleStorageServiceFunctionalTest::do_FileWrite_test() {
 
     delete simulation;
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
