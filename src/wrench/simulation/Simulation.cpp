@@ -23,6 +23,8 @@
 #include "wrench/simulation/Simulation.h"
 #include "simgrid/plugins/energy.h"
 #include "wrench/simgrid_S4U_util/S4U_VirtualMachine.h"
+#include "wrench/services/memory/MemoryManager.h"
+#include "wrench/workflow/WorkflowFile.h"
 
 #ifdef MESSAGE_MANAGER
 #include <wrench/util/MessageManager.h>
@@ -36,6 +38,8 @@ WRENCH_LOG_CATEGORY(wrench_core_simulation, "Log category for Simulation");
 namespace wrench {
 
     int Simulation::unique_disk_sequence_number = 0;
+
+    bool Simulation::writeback = false;
 
     /**
      * \cond
@@ -112,7 +116,7 @@ namespace wrench {
         for (i = 0; i < *argc; i++) {
             if ((not strcmp(argv[i], "--wrench-no-color")) or (not strcmp(argv[i], "--wrench-no-colors"))) {
                 TerminalOutput::disableColor();
-            } else if ((not strcmp(argv[i], "--wrench-full-log")) or (not strcmp(argv[i], "--wrench-full-logs"))) {
+            } else if ((not strcmp(argv[i], "--wrench-full-log")) or (not strcmp(argv[i], "--wrench-full-logs")) or (not strcmp(argv[i], "--wrench-log-full"))) {
                 xbt_log_control_set("root.thresh:info");
             } else if (not strcmp(argv[i], "--activate-energy")) {
                 sg_host_energy_plugin_init();
@@ -124,6 +128,8 @@ namespace wrench {
                 simgrid_help_requested = true;
             } else if (not strcmp(argv[i], "--version")) {
                 version_requested = true;
+            } else if (not strcmp(argv[i], "--writeback")) {
+                writeback = true;
             } else {
                 cleanedup_args.emplace_back(argv[i]);
             }
@@ -195,6 +201,7 @@ namespace wrench {
             argv[*argc] = strdup("--help");
             (*argc)++;
         }
+
     }
 
     /**
@@ -285,6 +292,28 @@ namespace wrench {
 
         return usage;
     }
+
+    /**
+     * Check if writeback mode is activated
+     * @return
+     */
+    bool Simulation::isWriteback() {
+        return writeback;
+    }
+
+    /**
+     * Retrieve MemoryManager by hostname
+     * @param hostname
+     * @return
+     */
+//    MemoryManager* Simulation::getMemoryManagerByHost(std::string hostname) {
+//        for (auto mem_mng: this->memory_managers) {
+//            if (strcmp(mem_mng.get()->getHostname().c_str(), hostname.c_str()) == 0) {
+//                return mem_mng.get();
+//            }
+//        }
+//        return nullptr;
+//    }
 
     /**
      * @brief Get the list of names of all the hosts in each cluster composing the platform
@@ -567,6 +596,21 @@ namespace wrench {
     }
 
     /**
+      * @brief Add a MemoryManager to the simulation.
+      *
+      * @param service: a MemoryManager
+      *
+      * @throw std::invalid_argument
+      */
+    void Simulation::addService(std::shared_ptr<MemoryManager> memory_manager) {
+        if (memory_manager == nullptr) {
+            throw std::invalid_argument("Simulation::addService(): invalid argument (nullptr memory_manager)");
+        }
+        memory_manager->simulation = this;
+        this->memory_managers.insert(memory_manager);
+    }
+
+    /**
     * @brief Stage a copy of a file at a storage service in the root of the (unique) mount point
     *
     * @param file: a file to stage on a storage service
@@ -715,6 +759,89 @@ namespace wrench {
         }
         this->getOutput().addTimestampDiskWriteCompletion(hostname, mount_point, num_bytes,
                                                           temp_unique_sequence_number);
+    }
+
+    /**
+     * Read file locally, only available if writeback is activated.
+     * @param filename: name of the file read.
+     * @param n_bytes: amount of read data in byte.
+     * @param mountpoint: mountpoint where file is located.
+     */
+    void Simulation::readWithMemoryCache(WorkflowFile *file, double n_bytes, std::string mountpoint) {
+
+        std::string hostname = getHostName();
+
+        MemoryManager *mem_mng = getMemoryManagerByHost(hostname);
+        std::vector<Block*> file_blocks = mem_mng->getCachedBlocks(file->getID());
+        long cached_amt = 0;
+        for (int i = 0; i< file_blocks.size(); i++) {
+            cached_amt += file_blocks[i]->getSize();
+        }
+
+        double from_disk = std::min(n_bytes, file->getSize() - cached_amt);
+        double from_cache = n_bytes - from_disk;
+
+        mem_mng->flush(n_bytes + from_disk - mem_mng->getFreeMemory() - mem_mng->getEvictableMemory(),
+                file->getID());
+        mem_mng->evict(n_bytes + from_disk - mem_mng->getFreeMemory(), file->getID());
+        if (from_disk > 0) {
+            mem_mng->readToCache(file->getID(), mountpoint, from_disk, false);
+        }
+
+        if (from_cache > 0) {
+            mem_mng->readChunkFromCache(file->getID(), from_cache);
+        }
+
+//        Anonymous used by application
+        mem_mng->useAnonymousMemory(n_bytes);
+    }
+
+    /**
+     * Write a file locally, only available if writeback is activated.
+     * @param filename: name of the file written.
+     * @param n_bytes: amount of written data in byte.
+     * @param mountpoint: mount point where file is located.
+     */
+    void Simulation::writeWithMemoryCache(WorkflowFile *file, double n_bytes, std::string mountpoint) {
+
+        std::string hostname = getHostName();
+
+        MemoryManager *mem_mng = this->getMemoryManagerByHost(hostname);
+
+        double remaining_dirty = mem_mng->getDirtyRatio() * mem_mng->getAvailableMemory() - mem_mng->getDirty();
+        double mem_bw_amt = 0;
+
+        // free write to cache without forced flushing
+        if (remaining_dirty > 0) {
+            mem_mng->evict(std::min(n_bytes, remaining_dirty) - mem_mng->getFreeMemory(), "");
+            mem_bw_amt = std::min(n_bytes, mem_mng->getFreeMemory());
+            mem_mng->writeToCache(file->getID(), mountpoint, mem_bw_amt);
+        }
+
+        double disk_bw_amt = n_bytes - mem_bw_amt;
+        if (disk_bw_amt > 0) {
+            mem_mng->flush(disk_bw_amt, "");
+            mem_mng->evict(disk_bw_amt - mem_mng->getFreeMemory(), "");
+
+            mem_mng->writeToCache(file->getID(), mountpoint, std::min(mem_mng->getFreeMemory(), disk_bw_amt));
+
+            s4u_Disk *disk = MemoryManager::getDisk(mountpoint, hostname);
+            disk->write(disk_bw_amt);
+        }
+    }
+
+    /**
+     * Find a MemoryManager of a host with hostname
+     * @param hostname: name of the host
+     * @return MemoryManager of the host
+     */
+    MemoryManager *Simulation::getMemoryManagerByHost(std::string hostname) {
+        for (const auto &ptr : this->memory_managers) {
+            if (strcmp(ptr->getHostname().c_str(), hostname.c_str()) == 0) {
+                return ptr.get();
+            }
+        }
+        return nullptr;
     }
 
     /**
@@ -1171,4 +1298,5 @@ namespace wrench {
             }
         }
     }
+
 };
