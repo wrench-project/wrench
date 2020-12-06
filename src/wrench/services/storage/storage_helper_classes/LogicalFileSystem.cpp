@@ -57,8 +57,7 @@ namespace wrench {
 
         if (lfs != LogicalFileSystem::mount_points.end()) {
             if (lfs->second != this->storage_service) {
-                throw std::invalid_argument("LogicalFileSystem::init(): A FileSystem with mount point " +
-                                            this->mount_point + " at host " + this->hostname + " already exists");
+                throw std::invalid_argument("LogicalFileSystem::init(): A FileSystem with mount point " + this->mount_point + " at host " + this->hostname + " already exists");
             } else  {
                 return;
             }
