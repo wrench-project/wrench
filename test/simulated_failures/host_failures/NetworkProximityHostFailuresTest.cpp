@@ -184,7 +184,7 @@ void NetworkProximityHostFailuresTest::do_HostFailures_Test() {
     auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 

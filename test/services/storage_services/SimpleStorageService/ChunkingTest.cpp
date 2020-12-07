@@ -128,7 +128,7 @@ void SimpleStorageServiceChunkingTest::do_ChunkingTest(std::string mode) {
 
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("chunking_file_read_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 

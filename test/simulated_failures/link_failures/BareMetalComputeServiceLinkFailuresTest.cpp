@@ -179,7 +179,7 @@ void BareMetalComputeServiceLinkFailuresTest::do_ResourceInformationLinkFailure_
     auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("storage_service_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 

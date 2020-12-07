@@ -335,7 +335,7 @@ void DataMovementManagerCopyRegisterTest::do_CopyRegister_test() {
 
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("copy_register_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 

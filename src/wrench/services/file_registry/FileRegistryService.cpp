@@ -87,7 +87,7 @@ namespace wrench {
 
         if (auto msg = std::dynamic_pointer_cast<FileRegistryFileLookupAnswerMessage>(message)) {
             std::set<std::shared_ptr<FileLocation>> result = msg->locations;
-//        msg->locations.clear(); // TODO: Understand why this removes a memory leak
+//        msg->locations.clear(); // TODO: Understand why this removes a memory_manager_service leak
             return result;
         } else {
             throw std::runtime_error(

@@ -148,7 +148,7 @@ namespace wrench {
             std::cout << "     (requires host pstate definitions in XML platform description file)\n";
             std::cout << "   --help-simgrid: show full help on general Simgrid command-line arguments\n";
             std::cout << "   --help-wrench: displays this help message\n";
-            std::cout << "   --pagecache: Activate the in-memory page caching simulation\n";
+            std::cout << "   --pagecache: Activate the in-memory_manager_service page caching simulation\n";
             std::cerr << "\n";
         }
 
@@ -396,6 +396,7 @@ namespace wrench {
                     "A WMS should have been instantiated and passed to Simulation.setWMS()");
         }
 
+        // Check that every WMS has a workflow
         for (const auto &wms : this->wmses) {
             if (wms->getWorkflow() == nullptr) {
                 throw std::runtime_error(
@@ -403,6 +404,7 @@ namespace wrench {
             }
         }
 
+        // Check that WMSs can do their work
         for (auto &wms : this->wmses) {
             // Check that at least one StorageService is running (only needed if there are files in the workflow),
             if (not wms->workflow->getFiles().empty()) {
@@ -915,9 +917,9 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the memory capacity of a host given a hostname
+     * @brief Get the memory_manager_service capacity of a host given a hostname
      * @param hostname: the hostname
-     * @return a memory capacity in bytes
+     * @return a memory_manager_service capacity in bytes
      */
     double Simulation::getHostMemoryCapacity(std::string hostname) {
         return S4U_Simulation::getHostMemoryCapacity(hostname);
@@ -992,8 +994,8 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the memory capacity of the host on which the calling process is running
-     * @return a memory capacity in bytes
+     * @brief Get the memory_manager_service capacity of the host on which the calling process is running
+     * @return a memory_manager_service capacity in bytes
      */
     double Simulation::getMemoryCapacity() {
         return S4U_Simulation::getMemoryCapacity();
@@ -1276,7 +1278,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Starts a new memory manager service during execution (i.e., one that was not passed to Simulation::add() before
+     * @brief Starts a new memory_manager_service manager service during execution (i.e., one that was not passed to Simulation::add() before
      *        Simulation::launch() was called). The simulation takes ownership of
      *        the reference and will call the destructor.
      * @param service: An instance of a service
@@ -1367,6 +1369,25 @@ namespace wrench {
                 }
             }
         }
+
+        // Check that if --pagecache is passed, each host has a memory_manager_service disk
+        if (this->isPageCachingEnabled()) {
+            for (auto const &h : hostnames) {
+                bool has_memory_disk = false;
+                for (auto const &d : simgrid::s4u::Host::by_name(h)->get_disks()) {
+                    if (std::string(d->get_property("mount")) == "/memory") {
+                        has_memory_disk = true;
+                        break;
+                    }
+                }
+                if (not has_memory_disk) {
+                    throw std::invalid_argument("Simulation::platformSanityCheck(): Since --pagecache was passed, "
+                                                "each host must have a disk with mountpoint \"/memory\" (host " + h + " doesn't!)");
+                }
+            }
+        }
     }
+
+
 
 };

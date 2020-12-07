@@ -288,10 +288,10 @@ namespace wrench {
      * @brief Constructor
      *
      * @param hostname: the name of the host on which the service should be started
-     * @param compute_resources: a map of <num_cores, memory> tuples, indexed by hostname, which represents
+     * @param compute_resources: a map of <num_cores, memory_manager_service> tuples, indexed by hostname, which represents
      *        the compute resources available to this service.
      *          - use num_cores = ComputeService::ALL_CORES to use all cores available on the host
-     *          - use memory = ComputeService::ALL_RAM to use all RAM available on the host
+     *          - use memory_manager_service = ComputeService::ALL_RAM to use all RAM available on the host
      * @param scratch_space_mount_point: the compute service's scratch space's mount point ("" means none)
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
@@ -350,7 +350,7 @@ namespace wrench {
      * @brief Internal constructor
      *
      * @param hostname: the name of the host on which the service should be started
-     * @param compute_resources: a list of <hostname, num_cores, memory> tuples, which represent
+     * @param compute_resources: a list of <hostname, num_cores, memory_manager_service> tuples, which represent
      *        the compute resources available to this service
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
@@ -385,7 +385,7 @@ namespace wrench {
      * @brief Internal constructor
      *
      * @param hostname: the name of the host on which the job executor should be started
-     * @param compute_hosts:: a list of <hostname, num_cores, memory> tuples, which represent
+     * @param compute_hosts:: a list of <hostname, num_cores, memory_manager_service> tuples, which represent
      *        the compute resources available to this service
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
@@ -412,7 +412,7 @@ namespace wrench {
      * @brief Helper method called by all constructors to initiate object instance
      *
      * @param hostname: the name of the host
-     * @param compute_resources: compute_resources: a map of <num_cores, memory> pairs, indexed by hostname, which represent
+     * @param compute_resources: compute_resources: a map of <num_cores, memory_manager_service> pairs, indexed by hostname, which represent
      *        the compute resources available to this service
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
@@ -1232,7 +1232,7 @@ namespace wrench {
 
 
     /**
-     * @brief Helper function to "forget" a workunit executor (and free memory)
+     * @brief Helper function to "forget" a workunit executor (and free memory_manager_service)
      * @param workunit_executor: the workunit executor
      */
     void BareMetalComputeService::forgetWorkunitExecutor(std::shared_ptr<WorkunitExecutor> workunit_executor) {

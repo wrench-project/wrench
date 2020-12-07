@@ -52,10 +52,10 @@ namespace wrench {
      * @param callback_mailbox: the mailbox to which a reply will be sent
      * @param hostname: the name of the host on which this service will run (could be the first compute resources - see below)
      * @param job: the standard job to execute
-     * @param compute_resources: a non-empty map of <num_cores, memory> tuples, indexed by hostname, which represent
+     * @param compute_resources: a non-empty map of <num_cores, memory_manager_service> tuples, indexed by hostname, which represent
      *           the compute resources the job should execute on
      *              - If num_cores == ComputeService::ALL_CORES, then ALL the cores of the host are used
-     *              - If memory == ComputeService::ALL_RAM, then ALL the ram of the host is used
+     *              - If memory_manager_service == ComputeService::ALL_RAM, then ALL the ram of the host is used
      * @param scratch_space: the usable scratch storage space  (or nullptr if none)
      * @param part_of_pilot_job: true if the job executor is running within a pilot job
      * @param parent_pilot_job: the parent pilog job, if any
@@ -108,7 +108,7 @@ namespace wrench {
             }
         }
 
-        // Check that there is at least zero byte of memory per host, but not too many bytes
+        // Check that there is at least zero byte of memory_manager_service per host, but not too many bytes
         for (auto host : compute_resources) {
             if (std::get<1>(host.second) < 0) {
                 throw std::invalid_argument(
@@ -122,7 +122,7 @@ namespace wrench {
                             S4U_Simulation::getHostMemoryCapacity(host.first)) + " bytes of RAM");
                 }
             } else {
-                // Set the memory to the maximum
+                // Set the memory_manager_service to the maximum
                 std::get<1>(host.second) = S4U_Simulation::getHostMemoryCapacity(host.first);
             }
         }
@@ -173,7 +173,7 @@ namespace wrench {
 
         if (!enough_ram) {
             throw std::invalid_argument(
-                    "StandardJobExecutor::StandardJobExecutor(): insufficient memory resources to run the job "
+                    "StandardJobExecutor::StandardJobExecutor(): insufficient memory_manager_service resources to run the job "
                     "(max_required_ram = " + std::to_string(max_required_ram) + ")");
         }
 

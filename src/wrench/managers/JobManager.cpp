@@ -441,7 +441,7 @@ namespace wrench {
 
 #if 0
     /**
-     * @brief Forget a job (to free memory, only once a job has completed or failed)
+     * @brief Forget a job (to free memory_manager_service, only once a job has completed or failed)
      *
      * @param job: a job to forget
      *

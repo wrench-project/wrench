@@ -14,7 +14,7 @@ namespace wrench {
     /**
      * Constructor
      *
-     * @param memory: disk model used to simulate memory
+     * @param memory: disk model used to simulate memory_manager_service
      * @param dirty_ratio: dirty_ratio parameter as in the Linux kernel
      * @param interval: the interval that periodical flushing awakes in second
      * @param expired_time: the expired time of dirty data to be flushed in second
@@ -32,10 +32,10 @@ namespace wrench {
     }
 
     /**
-     * Initialize and start the memory manager
+     * Initialize and start the memory_manager_service manager
      *
      * @param simulation
-     * @param memory: disk model used to simulate memory
+     * @param memory: disk model used to simulate memory_manager_service
      * @param dirty_ratio: dirty_ratio parameter as in the Linux kernel
      * @param interval: the interval that periodical flushing awakes in milliseconds
      * @param expired_time: the expired time of dirty data to be flushed in milliseconds

@@ -215,7 +215,7 @@ void VirtualizedClusterServiceResourceAllocationTest::do_VMResourceAllocationAlg
     auto *simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("failure_test");
+    argv[0] = strdup("unit_test");
 
 
     simulation->init(&argc, argv);
