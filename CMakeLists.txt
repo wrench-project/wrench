@@ -337,7 +337,7 @@ set(TEST_FILES
         test/workflow/WorkflowParallelModelTest.cpp
         test/workflow/WorkflowLoadFromDAXTest.cpp
         test/workflow/WorkflowLoadFromJSONTest.cpp
-        test/services/memory/MemoryManagerTest.cpp
+        test/services/memory_manager_service/MemoryManagerTest.cpp
         test/services/compute_services/BareMetalComputeService/BareMetalComputeServiceOneTaskTest.cpp
         test/services/storage_services/LogicalFileSystem/LogicalFileSystemTest.cpp
         test/services/storage_services/SimpleStorageService/SimpleStorageServiceFunctionalTest.cpp

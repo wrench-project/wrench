@@ -132,7 +132,7 @@ private:
         auto ram_availabilities = this->test->cs->getPerHostAvailableMemoryCapacity();
         if ((not BareMetalComputeServiceTestScheduling::isAboutTheSame(ram_availabilities["Host1"],  500)) ||
             (not BareMetalComputeServiceTestScheduling::isAboutTheSame(ram_availabilities["Host2"], 1000))) {
-            throw std::runtime_error("Unexpected memory availabilities");
+            throw std::runtime_error("Unexpected memory_manager_service availabilities");
         }
 
 
@@ -205,7 +205,7 @@ void BareMetalComputeServiceTestScheduling::do_RAMPressure_test() {
     auto *simulation = new wrench::Simulation();
     int argc = 1;
     auto **argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 
@@ -340,7 +340,7 @@ void BareMetalComputeServiceTestScheduling::do_LoadBalancing1_test() {
     auto *simulation = new wrench::Simulation();
     int argc = 1;
     auto **argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 
@@ -475,7 +475,7 @@ void BareMetalComputeServiceTestScheduling::do_LoadBalancing2_test() {
     auto *simulation = new wrench::Simulation();
     int argc = 1;
     auto **argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 

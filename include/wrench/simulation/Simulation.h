@@ -41,7 +41,7 @@ namespace wrench {
     /**
      * @brief A class that provides basic simulation methods.  Once the simulation object has been
      *        explicitly or implicitly destroyed, then any call to the WRENCH APIs has undefied behavior (due
-     *        to memory being de-allocated).
+     *        to memory_manager_service being de-allocated).
      */
     class Simulation {
 

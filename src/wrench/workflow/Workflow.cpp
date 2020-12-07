@@ -31,7 +31,7 @@ namespace wrench {
      * @param flops: number of flops
      * @param min_num_cores: the minimum number of cores required to run the task
      * @param max_num_cores: the maximum number of cores that can be used by the task (use INT_MAX for infinity)
-     * @param memory_requirement: memory requirement (in bytes)
+     * @param memory_requirement: memory_manager_service requirement (in bytes)
      *
      * @return the WorkflowTask instance
      *
@@ -71,7 +71,7 @@ namespace wrench {
 
     /**
      * @brief Remove a file from the workflow. WARNING: this method de-allocated
-     *        memory for the file, making any pointer to the file invalid
+     *        memory_manager_service for the file, making any pointer to the file invalid
      * @param file: a file
      *
      * @throw std::invalid_argument
@@ -95,7 +95,7 @@ namespace wrench {
 
     /**
      * @brief Remove a task from the workflow. WARNING: this method de-allocated
-     *        memory for the task, making any pointer to the task invalid
+     *        memory_manager_service for the task, making any pointer to the task invalid
      *
      * @param task: a task
      *

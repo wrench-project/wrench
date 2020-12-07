@@ -202,7 +202,7 @@ void BogusMessageTest::do_BogusMessage_Test(std::string service_type) {
     auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("file_registry_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 

@@ -340,7 +340,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowExecutionJSON_test() {
                         "cores": 20,
                         "flop_rate": 1.0,
                         "hostname": "host2",
-                        "memory": 20.0
+                        "memory_manager_service": 20.0
                     },
                     "failed": -1.0,
                     "num_cores_allocated": 10,
@@ -363,7 +363,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowExecutionJSON_test() {
                         "cores": 10,
                         "flop_rate": 1.0,
                         "hostname": "host1",
-                        "memory": 10.0
+                        "memory_manager_service": 10.0
                     },
                     "failed": -1.0,
                     "num_cores_allocated": 8,
@@ -386,7 +386,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowExecutionJSON_test() {
                         "cores": 20,
                         "flop_rate": 1.0,
                         "hostname": "host2",
-                        "memory": 20.0
+                        "memory_manager_service": 20.0
                     },
                     "failed": -1.0,
                     "num_cores_allocated": 20,
@@ -672,7 +672,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
                     "flops": 1.0,
                     "id": "task1",
                     "max_cores": 1,
-                    "memory": 0.0,
+                    "memory_manager_service": 0.0,
                     "min_cores": 1,
                     "type": "task"
                 },
@@ -680,7 +680,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
                     "flops": 1.0,
                     "id": "task2",
                     "max_cores": 1,
-                    "memory": 0.0,
+                    "memory_manager_service": 0.0,
                     "min_cores": 1,
                     "type": "task"
                 },
@@ -785,7 +785,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
                     "flops": 1.0,
                     "id": "task1",
                     "max_cores": 1,
-                    "memory": 0.0,
+                    "memory_manager_service": 0.0,
                     "min_cores": 1,
                     "type": "task"
                 },
@@ -793,7 +793,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
                     "flops": 1.0,
                     "id": "task2",
                     "max_cores": 1,
-                    "memory": 0.0,
+                    "memory_manager_service": 0.0,
                     "min_cores": 1,
                     "type": "task"
                 },
@@ -925,7 +925,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
                     "flops": 1.0,
                     "id": "task1",
                     "max_cores": 1,
-                    "memory": 0.0,
+                    "memory_manager_service": 0.0,
                     "min_cores": 1,
                     "type": "task"
                 },
@@ -933,7 +933,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
                     "flops": 1.0,
                     "id": "task2",
                     "max_cores": 1,
-                    "memory": 0.0,
+                    "memory_manager_service": 0.0,
                     "min_cores": 1,
                     "type": "task"
                 },
@@ -941,7 +941,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
                     "flops": 1.0,
                     "id": "task3",
                     "max_cores": 1,
-                    "memory": 0.0,
+                    "memory_manager_service": 0.0,
                     "min_cores": 1,
                     "type": "task"
                 },
@@ -949,7 +949,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
                     "flops": 1.0,
                     "id": "task4",
                     "max_cores": 1,
-                    "memory": 0.0,
+                    "memory_manager_service": 0.0,
                     "min_cores": 1,
                     "type": "task"
                 },
@@ -1616,7 +1616,7 @@ void SimulationDumpJSONTest::do_SimulationDumpPlatformGraphJSON_test() {
                                 "cores": 10,
                                 "flop_rate": 1.0,
                                 "id": "host1",
-                                "memory": 10.0,
+                                "memory_manager_service": 10.0,
                                 "type": "host"
                     },
                     {
@@ -1624,7 +1624,7 @@ void SimulationDumpJSONTest::do_SimulationDumpPlatformGraphJSON_test() {
                                 "cores": 20,
                                 "flop_rate": 1.0,
                                 "id": "host2",
-                                "memory": 20.0,
+                                "memory_manager_service": 20.0,
                                 "type": "host"
                     },
                     {
@@ -1632,7 +1632,7 @@ void SimulationDumpJSONTest::do_SimulationDumpPlatformGraphJSON_test() {
                                 "cores": 20,
                                 "flop_rate": 1.0,
                                 "id": "host3",
-                                "memory": 20.0,
+                                "memory_manager_service": 20.0,
                                 "type": "host"
                     },
                     {
@@ -1819,7 +1819,7 @@ void SimulationDumpJSONTest::do_SimulationDumpUnifiedJSON_test() {
                     "cores": 10,
                     "flop_rate": 1.0,
                     "id": "host1",
-                    "memory": 10.0,
+                    "memory_manager_service": 10.0,
                     "type": "host"
                 },
                 {
@@ -1827,7 +1827,7 @@ void SimulationDumpJSONTest::do_SimulationDumpUnifiedJSON_test() {
                     "cores": 20,
                     "flop_rate": 1.0,
                     "id": "host2",
-                    "memory": 20.0,
+                    "memory_manager_service": 20.0,
                     "type": "host"
                 },
                 {
@@ -1849,7 +1849,7 @@ void SimulationDumpJSONTest::do_SimulationDumpUnifiedJSON_test() {
                         "cores": 20,
                         "flop_rate": 1.0,
                         "hostname": "host2",
-                        "memory": 20.0
+                        "memory_manager_service": 20.0
                     },
                     "failed": -1.0,
                     "num_cores_allocated": 10,
@@ -1872,7 +1872,7 @@ void SimulationDumpJSONTest::do_SimulationDumpUnifiedJSON_test() {
                         "cores": 10,
                         "flop_rate": 1.0,
                         "hostname": "host1",
-                        "memory": 10.0
+                        "memory_manager_service": 10.0
                     },
                     "failed": -1.0,
                     "num_cores_allocated": 8,
@@ -1895,7 +1895,7 @@ void SimulationDumpJSONTest::do_SimulationDumpUnifiedJSON_test() {
                         "cores": 20,
                         "flop_rate": 1.0,
                         "hostname": "host2",
-                        "memory": 20.0
+                        "memory_manager_service": 20.0
                     },
                     "failed": -1.0,
                     "num_cores_allocated": 20,
@@ -1918,7 +1918,7 @@ void SimulationDumpJSONTest::do_SimulationDumpUnifiedJSON_test() {
                     "flops": 1.0,
                     "id": "task1",
                     "max_cores": 1,
-                    "memory": 0.0,
+                    "memory_manager_service": 0.0,
                     "min_cores": 1,
                     "type": "task"
                 },
@@ -1926,7 +1926,7 @@ void SimulationDumpJSONTest::do_SimulationDumpUnifiedJSON_test() {
                     "flops": 1.0,
                     "id": "task2",
                     "max_cores": 1,
-                    "memory": 0.0,
+                    "memory_manager_service": 0.0,
                     "min_cores": 1,
                     "type": "task"
                 }
