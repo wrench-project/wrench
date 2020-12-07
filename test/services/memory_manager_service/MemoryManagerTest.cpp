@@ -65,23 +65,23 @@ protected:
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"TwoCoreHost\" speed=\"1f\" core=\"2\"> "
+                          "          <disk id=\"memory\" read_bw=\"1000MBps\" write_bw=\"1000MBps\">"
+                          "             <prop id=\"size\" value=\"30000GB\"/>"
+                          "             <prop id=\"mount\" value=\"/memory\"/>"
+                          "          </disk>"
                           "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                           "             <prop id=\"size\" value=\"30000GB\"/>"
                           "             <prop id=\"mount\" value=\"/\"/>"
-                          "          </disk>"
-                          "          <disk id=\"memory\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"30000GB\"/>"
-                          "             <prop id=\"mount\" value=\"/memory\"/>"
                           "          </disk>"
                           "       </host> "
                           "       <host id=\"OneCoreHost\" speed=\"1f\" core=\"1\"> "
+                          "          <disk id=\"memory\" read_bw=\"1000MBps\" write_bw=\"1000MBps\">"
+                          "             <prop id=\"size\" value=\"30000GB\"/>"
+                          "             <prop id=\"mount\" value=\"/memory\"/>"
+                          "          </disk>"
                           "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                           "             <prop id=\"size\" value=\"30000GB\"/>"
                           "             <prop id=\"mount\" value=\"/\"/>"
-                          "          </disk>"
-                          "          <disk id=\"memory\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"30000GB\"/>"
-                          "             <prop id=\"mount\" value=\"/memory\"/>"
                           "          </disk>"
                           "       </host> "
                           "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
@@ -208,11 +208,11 @@ TEST_F(MemoryManagerTest, MemoryManagerChainOfTask) {
 void MemoryManagerTest::do_MemoryManagerChainOfTasksTest_test() {
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
-    int argc =3;
+    int argc =2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_task_test");
     argv[1] = strdup("--pagecache");
-    argv[2] = strdup("--wrench-full-log");
+//    argv[2] = strdup("--wrench-full-log");
 
     ASSERT_THROW(simulation->launch(), std::runtime_error);
 
