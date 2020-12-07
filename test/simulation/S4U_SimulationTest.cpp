@@ -15,6 +15,9 @@
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
 
+WRENCH_LOG_CATEGORY(s4u_simulation_test, "Log category for S4U_SimulationTest");
+
+
 class S4U_SimulationTest : public ::testing::Test {
 
 public:
@@ -35,6 +38,16 @@ protected:
                           "       <host id=\"Host1\" speed=\"1f\" core=\"10\"> "
                           "         <prop id=\"ram\" value=\"1024B\"/> "
                           "         <prop id=\"foo\" value=\"bar\"/> "
+                          "          <disk id=\"large_disk0\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "             <prop id=\"size\" value=\"30000GB\"/>"
+                          "             <prop id=\"mount\" value=\"/tmp\"/>"
+                          "          </disk>"
+                          "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "             <prop id=\"size\" value=\"30000GB\"/>"
+                          "          </disk>"
+                          "          <disk id=\"no_capacity\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "             <prop id=\"mount\" value=\"/no_capacity\"/>"
+                          "          </disk>"
                           "       </host> "
                           "       <host id=\"Host2\" speed=\"1f\" core=\"10\"/> "
                           "       <host id=\"Host3\" speed=\"1f\" core=\"10\"/> "
@@ -161,6 +174,55 @@ private:
             throw std::runtime_error("Shouldn't not be able to get property from bogus host");
         } catch (std::invalid_argument &e) {}
 
+        // DISKS
+        try {
+            wrench::S4U_Simulation::getDisks("bogus");
+            throw std::runtime_error("Getting disks for a bogus host should have thrown");
+        } catch (std::invalid_argument &e) {}
+
+        try {
+            auto disks = wrench::S4U_Simulation::getDisks("Host1");
+            if (disks.size() != 3) {
+                throw std::runtime_error("Should have gotten three disks");
+            }
+        } catch (std::exception &e) {
+            throw std::runtime_error("Getting disks for a non-bogus host should not have thrown");
+        }
+
+        try {
+            wrench::S4U_Simulation::hostHasMountPoint("bogus","/");
+            throw std::runtime_error("Checking mountpoint existence for a bogus host should have thrown");
+        } catch (std::invalid_argument &e) {}
+
+        try {
+            wrench::S4U_Simulation::hostHasMountPoint("Host1","/");
+        } catch (std::invalid_argument &e) {
+            throw std::runtime_error("Checking mountpoint existence for a non-bogus host should not have thrown");
+        }
+
+        try {
+            wrench::S4U_Simulation::getDiskCapacity("bogus","/");
+            throw std::runtime_error("Getting disk capacity for a bogus host should have thrown");
+        } catch (std::invalid_argument &e) {}
+
+        try {
+            wrench::S4U_Simulation::getDiskCapacity("Host1","/");
+        } catch (std::invalid_argument &e) {
+            throw std::runtime_error("Getting disk capacity for a non-bogus host should not have thrown");
+        }
+
+        try {
+            wrench::S4U_Simulation::getDiskCapacity("Host1","/no_capacity");
+        } catch (std::invalid_argument &e) {
+            throw std::runtime_error("Getting disk capacity for a disk with no capacity capacity should not have thrown");
+        }
+
+        try {
+            wrench::S4U_Simulation::getDiskCapacity("Host1","/bogus");
+            throw std::runtime_error("Getting disk capacity for bogus mountpoint should have thrown");
+        } catch (std::invalid_argument &e) {
+        }
+
         return 0;
     }
 };
@@ -176,6 +238,7 @@ void S4U_SimulationTest::do_basicAPI_Test() {
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+//    argv[1] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
