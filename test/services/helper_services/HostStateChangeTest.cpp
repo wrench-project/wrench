@@ -54,7 +54,7 @@ class HostStateChangeDetectorTestWMS : public wrench::WMS {
 
 public:
     HostStateChangeDetectorTestWMS(HostStateChangeDetectorServiceTest *test,
-                                     std::string hostname, bool notify_when_speed_change) :
+                                   std::string hostname, bool notify_when_speed_change) :
             wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
         this->notify_when_speed_change = notify_when_speed_change;
@@ -73,7 +73,7 @@ private:
         hosts.push_back("Host2");
         auto ssd = std::shared_ptr<wrench::HostStateChangeDetector>(
                 new wrench::HostStateChangeDetector(this->hostname, hosts, true, true, this->notify_when_speed_change,
-                this->getSharedPtr<wrench::WMS>(), this->mailbox_name, {}));
+                                                    this->getSharedPtr<wrench::WMS>(), this->mailbox_name, {}));
         ssd->simulation = this->simulation;
         ssd->start(ssd, true, false);
 
@@ -84,10 +84,10 @@ private:
         try {
             message = wrench::S4U_Mailbox::getMessage(this->mailbox_name, 10);
         } catch (std::shared_ptr<wrench::NetworkError> &e) {
-           throw std::runtime_error("Did not get a message before the timeout");
+            throw std::runtime_error("Did not get a message before the timeout");
         }
         if (not std::dynamic_pointer_cast<wrench::HostHasTurnedOffMessage>(message)) {
-           throw std::runtime_error("Did not get the expected 'host has turned off' message");
+            throw std::runtime_error("Did not get the expected 'host has turned off' message");
         }
 
         wrench::Simulation::sleep(10);
@@ -102,9 +102,11 @@ private:
             throw std::runtime_error("Did not get the expected 'host has turned on' message");
         }
 
+        wrench::Simulation::sleep(10);
+        this->simulation->setPstate("Host2", 0);
+        wrench::Simulation::sleep(10);
+
         if (this->notify_when_speed_change) {
-            wrench::Simulation::sleep(10);
-            this->simulation->setPstate("Host2", 0);
 
             try {
                 message = wrench::S4U_Mailbox::getMessage(this->mailbox_name, 10);
@@ -136,6 +138,8 @@ void HostStateChangeDetectorServiceTest::do_StateChangeDetection_test(bool notif
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("test");
+//    argv[1] = strdup("--wrench-log-full");
+
 
     simulation->init(&argc, argv);
 
