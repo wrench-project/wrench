@@ -85,7 +85,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the memory requirement
+     * @brief Get the memory_manager_service requirement
      * @return a size in bytes
      */
     double BatchJob::getMemoryRequirement() {

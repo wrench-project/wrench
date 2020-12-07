@@ -43,7 +43,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Clean up messages for a given mailbox (so as to free up memory)
+     * @brief Clean up messages for a given mailbox (so as to free up memory_manager_service)
      * @param mailbox: the mailbox name
      */
     void MessageManager::cleanUpMessages(const std::string &mailbox) {
@@ -57,7 +57,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Clean up all the messages that MessageManager has stored (so as to free up memory)
+     * @brief Clean up all the messages that MessageManager has stored (so as to free up memory_manager_service)
      */
     void MessageManager::cleanUpAllMessages() {
         for (auto m : mailbox_messages) {

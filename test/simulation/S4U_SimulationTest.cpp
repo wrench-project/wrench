@@ -124,16 +124,16 @@ private:
         // Memory capacity
         double m = wrench::S4U_Simulation::getMemoryCapacity();
         if (std::abs(m - 1024) > 0.001) {
-            throw std::runtime_error("Got wrong memory capacity for curent host (" + std::to_string(m) + " instead of 1024)");
+            throw std::runtime_error("Got wrong memory_manager_service capacity for curent host (" + std::to_string(m) + " instead of 1024)");
         }
         m = wrench::S4U_Simulation::getHostMemoryCapacity("Host1");
         if (std::abs(m - 1024) > 0.001) {
-            throw std::runtime_error("Got wrong memory capacity for Host1 (" + std::to_string(m) + " instead of 1024)");
+            throw std::runtime_error("Got wrong memory_manager_service capacity for Host1 (" + std::to_string(m) + " instead of 1024)");
         }
 
         try {
             wrench::S4U_Simulation::getHostMemoryCapacity("Bogus");
-            throw std::runtime_error("Shouldn't not be able to get memory capacity for a bogus host");
+            throw std::runtime_error("Shouldn't not be able to get memory_manager_service capacity for a bogus host");
         } catch (std::invalid_argument &e) {}
 
         // on/off
@@ -150,7 +150,7 @@ private:
         // generic property
         std::string p = wrench::S4U_Simulation::getHostProperty("Host1", "foo");
         if (p != "bar") {
-            throw std::runtime_error("Got wrong memory property value for current host ('" + p + "' instead of 'bar')");
+            throw std::runtime_error("Got wrong memory_manager_service property value for current host ('" + p + "' instead of 'bar')");
         }
         try {
             wrench::S4U_Simulation::getHostProperty("Host1", "stuff");
@@ -175,7 +175,7 @@ void S4U_SimulationTest::do_basicAPI_Test() {
     auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("file_registry_test");
+    argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
 

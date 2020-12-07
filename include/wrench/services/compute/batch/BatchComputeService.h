@@ -36,15 +36,15 @@ namespace wrench {
      *        controls access to their resource via a batch queue.
      *
      *        In the current implementation of
-     *        this service, like for many of its real-world counterparts, memory
+     *        this service, like for many of its real-world counterparts, memory_manager_service
      *        partitioning among jobs onq the same host is not handled.  When multiple jobs share hosts,
      *        which can happen when jobs require only a few cores per host and can thus
      *        be co-located on the same hosts in a non-exclusive fashion,
      *        each job simply runs as if it had access to the
      *        full RAM of each compute host it is scheduled on. The simulation of these
-     *        memory contended scenarios is thus, for now, not realistic as there is no simulation
+     *        memory_manager_service contended scenarios is thus, for now, not realistic as there is no simulation
      *        of the effects
-     *        of memory sharing (e.g., swapping).
+     *        of memory_manager_service sharing (e.g., swapping).
      */
     class BatchComputeService : public ComputeService {
 

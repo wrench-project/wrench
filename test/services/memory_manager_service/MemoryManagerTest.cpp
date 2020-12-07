@@ -23,7 +23,7 @@ public:
     std::shared_ptr<wrench::StorageService> storage_service2 = nullptr;
     std::shared_ptr<wrench::BareMetalComputeService> compute_service = nullptr;
 
-
+    void do_MemoryManagerBadSetupTest_test();
     void do_MemoryManagerChainOfTasksTest_test();
 
 protected:
@@ -34,7 +34,7 @@ protected:
         workflow = workflow_unique_ptr.get();
 
         // Create a platform file
-        std::string xml = "<?xml version='1.0'?>"
+        std::string bad_xml = "<?xml version='1.0'?>"
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
@@ -54,18 +54,82 @@ protected:
                           "       <route src=\"TwoCoreHost\" dst=\"OneCoreHost\"> <link_ctn id=\"1\"/> </route>"
                           "   </zone> "
                           "</platform>";
+        FILE *bad_platform_file = fopen(bad_platform_file_path.c_str(), "w");
+        fprintf(bad_platform_file, "%s", bad_xml.c_str());
+        fclose(bad_platform_file);
+
+
+        // Create a platform file
+        std::string xml = "<?xml version='1.0'?>"
+                          "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                          "<platform version=\"4.1\"> "
+                          "   <zone id=\"AS0\" routing=\"Full\"> "
+                          "       <host id=\"TwoCoreHost\" speed=\"1f\" core=\"2\"> "
+                          "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "             <prop id=\"size\" value=\"30000GB\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"memory\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "             <prop id=\"size\" value=\"30000GB\"/>"
+                          "             <prop id=\"mount\" value=\"/memory\"/>"
+                          "          </disk>"
+                          "       </host> "
+                          "       <host id=\"OneCoreHost\" speed=\"1f\" core=\"1\"> "
+                          "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "             <prop id=\"size\" value=\"30000GB\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"memory\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "             <prop id=\"size\" value=\"30000GB\"/>"
+                          "             <prop id=\"mount\" value=\"/memory\"/>"
+                          "          </disk>"
+                          "       </host> "
+                          "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
+                          "       <route src=\"TwoCoreHost\" dst=\"OneCoreHost\"> <link_ctn id=\"1\"/> </route>"
+                          "   </zone> "
+                          "</platform>";
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
 
     }
 
+    std::string bad_platform_file_path = UNIQUE_TMP_PATH_PREFIX + "bas_platform.xml";
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
     std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
     wrench::Workflow *workflow;
 
 };
 
+
+/**********************************************************************/
+/** BAD SETUP TEST                                                   **/
+/**********************************************************************/
+
+TEST_F(MemoryManagerTest, BadSetup) {
+    DO_TEST_WITH_FORK(do_MemoryManagerBadSetupTest_test)
+}
+
+void MemoryManagerTest::do_MemoryManagerBadSetupTest_test() {
+    // Create and initialize a simulation
+    auto simulation = new wrench::Simulation();
+    int argc = 2;
+    char **argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
+    argv[1] = strdup("--pagecache");
+//    argv[2] = strdup("--wrench-full-log");
+
+    simulation->init(&argc, argv);
+
+    // Setting up the platform
+    ASSERT_THROW(simulation->instantiatePlatform(bad_platform_file_path), std::invalid_argument);
+
+    delete simulation;
+
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
 
 
 /**********************************************************************/
@@ -144,11 +208,11 @@ TEST_F(MemoryManagerTest, MemoryManagerChainOfTask) {
 void MemoryManagerTest::do_MemoryManagerChainOfTasksTest_test() {
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
-    int argc = 2;
+    int argc =3;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_task_test");
     argv[1] = strdup("--pagecache");
-//    argv[2] = strdup("--wrench-full-log");
+    argv[2] = strdup("--wrench-full-log");
 
     ASSERT_THROW(simulation->launch(), std::runtime_error);
 
@@ -157,7 +221,6 @@ void MemoryManagerTest::do_MemoryManagerChainOfTasksTest_test() {
     // Setting up the platform
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
-    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
 
     // Get a hostname
     std::string hostname = "TwoCoreHost";
