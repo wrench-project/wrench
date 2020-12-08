@@ -206,7 +206,7 @@ namespace wrench {
             dst->updateTopLevel();
 
             /* Update state */
-            if (dst->getState() == WorkflowTask::State::NOT_READY) {
+            if ((dst->getState() == WorkflowTask::State::NOT_READY) and (dst->getInternalState() == WorkflowTask::InternalState::TASK_NOT_READY)) {
                 bool ready = true;
                 for (auto const &p :  dst->getParents()) {
                     if (p->getState() != WorkflowTask::State::COMPLETED) {
@@ -215,6 +215,7 @@ namespace wrench {
                     }
                 }
                 if (ready) {
+                    dst->setInternalState(WorkflowTask::InternalState::TASK_READY);
                     dst->setState(WorkflowTask::State::READY);
                 }
             }
