@@ -95,7 +95,10 @@ private:
         // Testing bad constructor invocations
         try {
             this->createBandwidthMeter({}, TWO_SECOND_PERIOD);
-            this->createBandwidthMeter(linknames, 0.005);
+            auto bogus_linknames = linknames;
+            this->createBandwidthMeter(linknames, 0.0001);
+            bogus_linknames.push_back("bogus_link");
+            this->createBandwidthMeter(bogus_linknames, 5.0);
             throw std::runtime_error("Bad invocation of simple constructor should have thrown");
         } catch (std::invalid_argument &e) {
             // expected
@@ -114,9 +117,9 @@ private:
             }
             this->createBandwidthMeter(measurement_periods);
             measurement_periods.clear();
-            measurement_periods["foo"] = 0.1;
+            measurement_periods["bogus_link"] = 0.1;
             this->createBandwidthMeter(measurement_periods);
-            throw std::runtime_error("Bad invocation of complext constructor should have thrown");
+            throw std::runtime_error("Bad invocation of complex constructor should have thrown");
         } catch (std::invalid_argument &e) {
             // expected
         }
