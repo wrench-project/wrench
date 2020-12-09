@@ -153,7 +153,7 @@ function determineFailedOrTerminatedPoint(d) {
     }
 }
 
-const toFiveDecimalPlaces = d3.format('.5f')
+const toFiveDecimalPlaces = d3.format('.3f')
 
 function findDuration(data, id, section) {
     for (var i = 0; i < data.length; i++) {

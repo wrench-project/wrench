@@ -26,13 +26,14 @@
 #include <wrench/workflow//failure_causes/NoScratchSpace.h>
 #include "ComputeThread.h"
 #include "wrench/simulation/Simulation.h"
-
+#include <wrench/services/memory/MemoryManager.h>
 #include "wrench/logging/TerminalOutput.h"
 #include <wrench/services/compute/ComputeService.h>
 #include <wrench/workflow/failure_causes/FileNotFound.h>
 #include <wrench/workflow/failure_causes/NetworkError.h>
 #include <wrench/workflow/failure_causes/FatalFailure.h>
 #include <wrench/workflow/failure_causes/ComputeThreadHasDied.h>
+#include <wrench/services/memory/MemoryManager.h>
 
 
 WRENCH_LOG_CATEGORY(wrench_core_workunit_executor, "Log category for Multicore Workunit Executor");
@@ -283,6 +284,8 @@ namespace wrench {
     void
     WorkunitExecutor::performWork(Workunit *work) {
 
+        double mem_req = 0;
+
         /** Perform all pre file copies operations */
         for (auto file_copy : work->pre_file_copies) {
             WorkflowFile *file = std::get<0>(file_copy);
@@ -351,9 +354,26 @@ namespace wrench {
                     WorkflowFile *f = p.first;
                     std::shared_ptr<FileLocation> l = p.second;
 
+                    if (Simulation::isPageCachingEnabled()) {
+                        mem_req += f->getSize();
+                    }
+
+                    bool isFileRead = false;
                     try{
                         this->simulation->getOutput().addTimestampFileReadStart(f, l.get(), l->getStorageService().get(), task);
-                        StorageService::readFile(f, l);
+                        if (Simulation::isPageCachingEnabled() && l->getServerStorageService() != nullptr) {
+                            MemoryManager *mm = simulation->getMemoryManagerByHost(S4U_Simulation::getHostName());
+                            if (mm->getCachedAmount(f->getID().c_str()) < f->getSize()) {
+                                StorageService::copyFile(f,FileLocation::LOCATION(l->getServerStorageService()), l);
+                                isFileRead = true;
+                            }
+                        }
+                        if (not isFileRead) {
+                            StorageService::readFile(f, l);
+                        }
+//                        this->simulation->getOutput().addTimestampFileReadStart(f, l.get(), l->getStorageService().get(), task);
+//                        StorageService::readFile(f, l);
+
                     } catch (WorkflowExecutionException &e) {
                         this->simulation->getOutput().addTimestampFileReadFailure(f, l.get(), l->getStorageService().get(), task);
                         throw;
@@ -365,6 +385,7 @@ namespace wrench {
                 this->failure_timestamp_should_be_generated = true;
                 throw;
             }
+            WRENCH_INFO("Reading done")
 
             // Run the task's computation (which can be multicore)
             WRENCH_INFO("Executing task %s (%lf flops) on %ld cores (%s)", task->getID().c_str(), task->getFlops(),
@@ -416,6 +437,7 @@ namespace wrench {
                 this->failure_timestamp_should_be_generated = true;
                 throw;
             }
+            WRENCH_INFO("Writing done")
 
             WRENCH_DEBUG("Setting the internal state of %s to TASK_COMPLETED", task->getID().c_str());
             task->setInternalState(WorkflowTask::InternalState::TASK_COMPLETED);
@@ -474,6 +496,11 @@ namespace wrench {
                     throw;
                 }
             }
+        }
+
+        if (Simulation::isPageCachingEnabled()) {
+            MemoryManager *mem_mng = simulation->getMemoryManagerByHost(this->getHostname());
+            mem_mng->releaseMemory(mem_req);
         }
 
     }

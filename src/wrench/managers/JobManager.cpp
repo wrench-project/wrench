@@ -90,8 +90,8 @@ namespace wrench {
      *
      * @param tasks: a list of tasks (which must be either READY, or children of COMPLETED tasks or
      *                                   of tasks also included in the standard job)
-     * @param file_locations: a map that specifies locations where input/output files should be read/written.
-     *         When unspecified, it is assumed that the ComputeService's scratch storage space will be used.
+     * @param file_locations: a map that specifies locations where input/output files, if any, should be read/written.
+     *         When empty, it is assumed that the ComputeService's scratch storage space will be used.
      * @param pre_file_copies: a vector of tuples that specify which file copy operations should be completed
      *                         before task executions begin. The ComputeService::SCRATCH constant can be
      *                         used to mean "the scratch storage space of the ComputeService".
@@ -191,8 +191,8 @@ namespace wrench {
      *
      * @param tasks: a list of tasks  (which must be either READY, or children of COMPLETED tasks or
      *                                   of tasks also included in the list)
-     * @param file_locations: a map that specifies locations where files should be read/written.
-     *                        When unspecified, it is assumed that the ComputeService's scratch storage space will be used.
+     * @param file_locations: a map that specifies locations where files, if any, should be read/written.
+     *                        When empty, it is assumed that the ComputeService's scratch storage space will be used.
      *
      * @return the standard job
      *
@@ -441,7 +441,7 @@ namespace wrench {
 
 #if 0
     /**
-     * @brief Forget a job (to free memory, only once a job has completed or failed)
+     * @brief Forget a job (to free memory_manager_service, only once a job has completed or failed)
      *
      * @param job: a job to forget
      *

@@ -164,7 +164,7 @@ function generateHostUtilizationChart(rawData,
                     let index = 0;
                     for (let i = 0; i < diskMounts[mount].reads.length; i++) {
                         let operation = diskMounts[mount].reads[i];
-                        ingestData(data.datasets[i], operation.start, operation.end, "#77dd91", "read");
+                        ingestData(data.datasets[i], operation.start, operation.end, "#44AA99", "read");
                     }
                 }
 
@@ -174,7 +174,7 @@ function generateHostUtilizationChart(rawData,
                     fillEmptyValues(data.datasets, diskMounts[mount].writes.length, data.labels);
                     for (let i = 0; i < diskMounts[mount].writes.length; i++) {
                         let operation = diskMounts[mount].writes[i];
-                        ingestData(data.datasets[i], operation.start, operation.end, "#8bb7e2", "write");
+                        ingestData(data.datasets[i], operation.start, operation.end, "#88CCEE", "write");
                     }
                 }
             });
@@ -190,7 +190,7 @@ function generateHostUtilizationChart(rawData,
                 fillEmptyValues(data.datasets, coreTasks.length, data.labels, percentage = 1.2);
                 for (let i = 0; i < coreTasks.length; i++) {
                     let task = coreTasks[i];
-                    ingestData(data.datasets[i], task.compute.start, task.compute.end, task.color || "#f7daad", task.task_id);
+                    ingestData(data.datasets[i], task.compute.start, task.compute.end, task.color || "#DDCC77", task.task_id);
                     zoomMaxRange = Math.max(zoomMaxRange, task.compute.end);
                 }
             });

@@ -155,7 +155,7 @@ TEST_F(SimulationTimestampTaskTest, SimulationTimestampTaskBasicTest) {
 void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test(){
     auto simulation = new wrench::Simulation();
     int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
+    auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -264,7 +264,8 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test(){
     ASSERT_THROW(simulation->getOutput().addTimestampTaskTermination(nullptr), std::invalid_argument);
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -343,7 +344,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
     int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
+    auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -475,7 +476,8 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
     ASSERT_GT(failed_task_completion_date_1, failed_task_start_date_2);
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -534,7 +536,7 @@ TEST_F(SimulationTimestampTaskTest, SimulationTimestampTaskTerminateAndFailTest)
 void SimulationTimestampTaskTest::do_SimulationTimestampTaskTerminateAndFail_test() {
     auto simulation = new wrench::Simulation();
     int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
+    auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -599,6 +601,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskTerminateAndFail_tes
     ASSERT_EQ(std::floor(failed_task_failure->getDate()), 20);
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
