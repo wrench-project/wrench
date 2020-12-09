@@ -469,6 +469,7 @@ private:
                 throw std::runtime_error("Got expected exception, but unexpected failure cause: " +
                                          e.getCause()->toString() + "(Expected: FunctionalityNotAvailable)");
             }
+            e.getCause()->toString(); // coverage
             if (cause->getService() != this->test->compute_service) {
                 throw std::runtime_error("Got expected exception and cause type, but compute service is wrong");
             }
