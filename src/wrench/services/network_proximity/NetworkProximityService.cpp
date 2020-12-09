@@ -35,7 +35,7 @@ namespace wrench {
      * @brief Destructor
      */
     NetworkProximityService::~NetworkProximityService() {
-        this->default_property_values.clear(); // To avoid memory leaks
+        this->default_property_values.clear(); // To avoid memory_manager_service leaks
         this->network_daemons.clear();
     }
 

@@ -142,7 +142,8 @@ void ParallelModelTest::do_AdmdahlParallelModelTest_test() {
     }
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -208,7 +209,8 @@ void ParallelModelTest::do_ConstantEfficiencyParallelModelTest_test() {
     }
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -279,6 +281,7 @@ void ParallelModelTest::do_CustomParallelModelTest_test() {
     }
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
