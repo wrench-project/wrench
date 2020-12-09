@@ -2,42 +2,49 @@ const graphInfoArray = [
     {
         "title": "Simulation Metrics",
         "containerId": "overall-metrics-table-container",
+        "menuHtml": false,
         "html": workflowSummaryHtml,
         "icon": "chart pie"
     },
     {
         "title": "Gantt Chart",
         "containerId": "overall-graph-container",
+        "menuHtml": simulationGraphMenuHtml,
         "html": simulationGraphHtml,
         "icon": "sitemap"
     },
     {
         "title": "Simulation Details",
         "containerId": "task-details-table-container",
+        "menuHtml": false,
         "html": simulationDetailsHtml,
         "icon": "table"
     },
     {
         "title": "Host Utilization",
         "containerId": "host-utilization-graph-container",
+        "menuHtml": false,
         "html": hostUtilizationHtml,
         "icon": "chart bar"
     },
     {
         "title": "Network Bandwidth Usage",
         "containerId": "network-graph-container",
+        "menuHtml": networkBandwidthMenuHtml,
         "html": networkBandwidthHtml,
         "icon": "tachometer alternate"
     },
     {
         "title": "Energy Consumption",
         "containerId": "energy-graph",
+        "menuHtml": false,
         "html": energyGraphsHtml,
         "icon": "lightbulb"
     },
     {
         "title": "3D Visualization",
         "containerId": "three-d-graph-container",
+        "menuHtml": false,
         "html": threedVisualizationHtml,
         "icon": "cubes"
     }

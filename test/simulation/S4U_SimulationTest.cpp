@@ -15,6 +15,9 @@
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
 
+WRENCH_LOG_CATEGORY(s4u_simulation_test, "Log category for S4U_SimulationTest");
+
+
 class S4U_SimulationTest : public ::testing::Test {
 
 public:
@@ -35,6 +38,16 @@ protected:
                           "       <host id=\"Host1\" speed=\"1f\" core=\"10\"> "
                           "         <prop id=\"ram\" value=\"1024B\"/> "
                           "         <prop id=\"foo\" value=\"bar\"/> "
+                          "          <disk id=\"large_disk0\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "             <prop id=\"size\" value=\"30000GB\"/>"
+                          "             <prop id=\"mount\" value=\"/tmp\"/>"
+                          "          </disk>"
+                          "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "             <prop id=\"size\" value=\"30000GB\"/>"
+                          "          </disk>"
+                          "          <disk id=\"no_capacity\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "             <prop id=\"mount\" value=\"/no_capacity\"/>"
+                          "          </disk>"
                           "       </host> "
                           "       <host id=\"Host2\" speed=\"1f\" core=\"10\"/> "
                           "       <host id=\"Host3\" speed=\"1f\" core=\"10\"/> "
@@ -124,16 +137,16 @@ private:
         // Memory capacity
         double m = wrench::S4U_Simulation::getMemoryCapacity();
         if (std::abs(m - 1024) > 0.001) {
-            throw std::runtime_error("Got wrong memory capacity for curent host (" + std::to_string(m) + " instead of 1024)");
+            throw std::runtime_error("Got wrong memory_manager_service capacity for curent host (" + std::to_string(m) + " instead of 1024)");
         }
         m = wrench::S4U_Simulation::getHostMemoryCapacity("Host1");
         if (std::abs(m - 1024) > 0.001) {
-            throw std::runtime_error("Got wrong memory capacity for Host1 (" + std::to_string(m) + " instead of 1024)");
+            throw std::runtime_error("Got wrong memory_manager_service capacity for Host1 (" + std::to_string(m) + " instead of 1024)");
         }
 
         try {
             wrench::S4U_Simulation::getHostMemoryCapacity("Bogus");
-            throw std::runtime_error("Shouldn't not be able to get memory capacity for a bogus host");
+            throw std::runtime_error("Shouldn't not be able to get memory_manager_service capacity for a bogus host");
         } catch (std::invalid_argument &e) {}
 
         // on/off
@@ -150,7 +163,7 @@ private:
         // generic property
         std::string p = wrench::S4U_Simulation::getHostProperty("Host1", "foo");
         if (p != "bar") {
-            throw std::runtime_error("Got wrong memory property value for current host ('" + p + "' instead of 'bar')");
+            throw std::runtime_error("Got wrong memory_manager_service property value for current host ('" + p + "' instead of 'bar')");
         }
         try {
             wrench::S4U_Simulation::getHostProperty("Host1", "stuff");
@@ -160,6 +173,55 @@ private:
             wrench::S4U_Simulation::getHostProperty("Bogus", "stuff");
             throw std::runtime_error("Shouldn't not be able to get property from bogus host");
         } catch (std::invalid_argument &e) {}
+
+        // DISKS
+        try {
+            wrench::S4U_Simulation::getDisks("bogus");
+            throw std::runtime_error("Getting disks for a bogus host should have thrown");
+        } catch (std::invalid_argument &e) {}
+
+        try {
+            auto disks = wrench::S4U_Simulation::getDisks("Host1");
+            if (disks.size() != 3) {
+                throw std::runtime_error("Should have gotten three disks");
+            }
+        } catch (std::exception &e) {
+            throw std::runtime_error("Getting disks for a non-bogus host should not have thrown");
+        }
+
+        try {
+            wrench::S4U_Simulation::hostHasMountPoint("bogus","/");
+            throw std::runtime_error("Checking mountpoint existence for a bogus host should have thrown");
+        } catch (std::invalid_argument &e) {}
+
+        try {
+            wrench::S4U_Simulation::hostHasMountPoint("Host1","/");
+        } catch (std::invalid_argument &e) {
+            throw std::runtime_error("Checking mountpoint existence for a non-bogus host should not have thrown");
+        }
+
+        try {
+            wrench::S4U_Simulation::getDiskCapacity("bogus","/");
+            throw std::runtime_error("Getting disk capacity for a bogus host should have thrown");
+        } catch (std::invalid_argument &e) {}
+
+        try {
+            wrench::S4U_Simulation::getDiskCapacity("Host1","/");
+        } catch (std::invalid_argument &e) {
+            throw std::runtime_error("Getting disk capacity for a non-bogus host should not have thrown");
+        }
+
+        try {
+            wrench::S4U_Simulation::getDiskCapacity("Host1","/no_capacity");
+        } catch (std::invalid_argument &e) {
+            throw std::runtime_error("Getting disk capacity for a disk with no capacity capacity should not have thrown");
+        }
+
+        try {
+            wrench::S4U_Simulation::getDiskCapacity("Host1","/bogus");
+            throw std::runtime_error("Getting disk capacity for bogus mountpoint should have thrown");
+        } catch (std::invalid_argument &e) {
+        }
 
         return 0;
     }
@@ -174,8 +236,9 @@ void S4U_SimulationTest::do_basicAPI_Test() {
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
     int argc = 1;
-    char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("file_registry_test");
+    char **argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
+//    argv[1] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -199,6 +262,7 @@ void S4U_SimulationTest::do_basicAPI_Test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }

@@ -112,7 +112,7 @@ namespace wrench {
      * @brief Create a BareMetalComputeService VM (balances load on execution hosts)
      *
      * @param num_cores: the number of cores for the VM
-     * @param ram_memory: the VM's RAM memory capacity
+     * @param ram_memory: the VM's RAM memory_manager_service capacity
      * @param property_list: a property list for the BareMetalComputeService that will run on the VM ({} means "use all defaults")
      * @param messagepayload_list: a message payload list for the BareMetalComputeService that will run on the VM ({} means "use all defaults")
      *
@@ -132,7 +132,7 @@ namespace wrench {
      * @brief Create a BareMetalComputeService VM (balances load on execution hosts)
      *
      * @param num_cores: the number of cores for the VM
-     * @param ram_memory: the VM's RAM memory capacity
+     * @param ram_memory: the VM's RAM memory_manager_service capacity
      * @param desired_vm_name: the VM's desired name ("" means "pick a name for me")
      * @param property_list: a property list for the BareMetalComputeService that will run on the VM ({} means "use all defaults")
      * @param messagepayload_list: a message payload list for the BareMetalComputeService that will run on the VM ({} means "use all defaults")
@@ -155,7 +155,7 @@ namespace wrench {
         }
         if (ram_memory == ComputeService::ALL_RAM) {
             throw std::invalid_argument(
-                    "CloudComputeService::createVM(): the VM's memory requirement cannot be ComputeService::ALL_RAM");
+                    "CloudComputeService::createVM(): the VM's memory_manager_service requirement cannot be ComputeService::ALL_RAM");
         }
 
         assertServiceIsUp();
@@ -707,7 +707,7 @@ namespace wrench {
      *
      * @param answer_mailbox: the mailbox to which the answer message should be sent
      * @param requested_num_cores: the number of cores the service can use
-     * @param requested_ram: the VM's RAM memory capacity
+     * @param requested_ram: the VM's RAM memory_manager_service capacity
      * @param desired_vm_name: the desired VM name ("" means "pick a name for me")
      * @param property_list: a property list for the BareMetalComputeService that will run on the VM ({} means "use all defaults")
      * @param messagepayload_list: a message payload list for the BareMetalComputeService that will run on the VM ({} means "use all defaults")

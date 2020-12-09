@@ -197,8 +197,8 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJob_tes
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
     int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("failure_test");
+    auto argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
 
 
     simulation->init(&argc, argv);
@@ -236,7 +236,8 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJob_tes
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }
 
@@ -352,8 +353,8 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJobFoll
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
     int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("failure_test");
+    auto argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
 
 
     simulation->init(&argc, argv);
@@ -391,7 +392,8 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJobFoll
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }
 
@@ -514,8 +516,8 @@ void CloudServiceHostFailuresTest::do_CloudServiceRandomFailures_test() {
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
     int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("failure_test");
+    auto argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
 
 
     simulation->init(&argc, argv);
@@ -554,7 +556,8 @@ void CloudServiceHostFailuresTest::do_CloudServiceRandomFailures_test() {
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }
 
