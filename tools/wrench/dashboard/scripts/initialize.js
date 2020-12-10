@@ -43,10 +43,10 @@ function initialize() {
             data.contents = prepareData(data.contents); // TODO: remove
             data.tasks = prepareData(data.tasks);
 
-            generateGanttChart(data);
-            generateHostUtilizationChart(data);
-            generateBandwidthUsage(data);
-
+            generateGanttChart(data)
+            generateHostUtilizationChart(data)
+            generateBandwidthUsage(data)
+            generateDiskOperations(data.diskOperations)
             populateWorkflowTaskDataTable(data.contents)
             getOverallWorkflowMetrics(data.contents)
             generate3dGraph(data.contents, true, true)
