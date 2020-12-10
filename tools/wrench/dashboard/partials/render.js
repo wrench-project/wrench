@@ -47,6 +47,12 @@ const graphInfoArray = [
         "menuHtml": false,
         "html": threedVisualizationHtml,
         "icon": "cubes"
+    },
+    {
+        "title": "Disk I/O Operations",
+        "containerId": "disk-operations-container",
+        "html": diskOperationsHtml,
+        "icon": ""
     }
 ]
 
