@@ -14,5 +14,6 @@
 
 // Convenient macro to generate a platform file path unique to every user
 #define UNIQUE_TMP_PATH_PREFIX ("/tmp/" + std::to_string(getuid()) + "_")
+#define UNIQUE_PREFIX (std::to_string(getuid()) + "_")
 
 #endif //WRENCH_UNIQUEPLATFORMFILEPATH_H
