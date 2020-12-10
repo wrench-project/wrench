@@ -41,7 +41,7 @@ protected:
                                          " 0 1\n"
                                          " 100 0";
 
-        std::string trace_file_name = "host.trace";
+        std::string trace_file_name = UNIQUE_PREFIX + "host.trace";
         std::string trace_file_path = "/tmp/"+trace_file_name;
 
         FILE *trace_file = fopen(trace_file_path.c_str(), "w");
