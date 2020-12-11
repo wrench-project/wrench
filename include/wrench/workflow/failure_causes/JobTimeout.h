@@ -31,16 +31,16 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        JobTimeout(WorkflowJob *job);
+        JobTimeout(std::shared_ptr<WorkflowJob> job);
         /***********************/
         /** \endcond           */
         /***********************/
 
-        WorkflowJob *getJob();
+        std::shared_ptr<WorkflowJob> getJob();
         std::string toString();
 
     private:
-        WorkflowJob *job;
+        std::shared_ptr<WorkflowJob> job;
     };
 
 

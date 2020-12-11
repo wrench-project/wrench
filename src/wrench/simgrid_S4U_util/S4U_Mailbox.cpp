@@ -41,7 +41,7 @@ namespace wrench {
      * @throw std::shared_ptr<NetworkError>
      *
      */
-    std::shared_ptr<SimulationMessage> S4U_Mailbox::getMessage(std::string mailbox_name) {
+    std::unique_ptr<SimulationMessage> S4U_Mailbox::getMessage(std::string mailbox_name) {
         WRENCH_DEBUG("Getting a message from mailbox_name '%s'", mailbox_name.c_str());
         auto mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
         SimulationMessage *msg = nullptr;
@@ -57,7 +57,7 @@ namespace wrench {
 #endif
 
         WRENCH_DEBUG("Received a '%s' message from mailbox_name %s", msg->getName().c_str(), mailbox_name.c_str());
-        return std::shared_ptr<SimulationMessage>(msg);
+        return std::unique_ptr<SimulationMessage>(msg);
     }
 
     /**
@@ -69,7 +69,7 @@ namespace wrench {
      *
      * @throw std::shared_ptr<NetworkError>
      */
-    std::shared_ptr<SimulationMessage> S4U_Mailbox::getMessage(std::string mailbox_name, double timeout) {
+    std::unique_ptr<SimulationMessage> S4U_Mailbox::getMessage(std::string mailbox_name, double timeout) {
 
         if (timeout < 0) {
             return S4U_Mailbox::getMessage(mailbox_name);
@@ -97,7 +97,7 @@ namespace wrench {
 
         WRENCH_DEBUG("Received a '%s' message from mailbox_name '%s'", msg->getName().c_str(), mailbox_name.c_str());
 
-        return std::shared_ptr<SimulationMessage>(msg);
+        return std::unique_ptr<SimulationMessage>(msg);
     }
 
     /**

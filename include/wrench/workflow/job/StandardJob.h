@@ -8,8 +8,8 @@
  */
 
 
-#ifndef WRENCH_MULTITASKJOB_H
-#define WRENCH_MULTITASKJOB_H
+#ifndef WRENCH_STANDARDJOB_H
+#define WRENCH_STANDARDJOB_H
 
 
 #include <map>
@@ -18,7 +18,7 @@
 
 #include "WorkflowJob.h"
 
-#include "wrench/services/storage/StorageService.h"
+#include "wrench/services/storage/storage_helpers/FileLocation.h"
 
 namespace wrench {
 
@@ -89,7 +89,6 @@ namespace wrench {
 
         friend class StandardJobExecutor;
         friend class BareMetalComputeService;
-
         void incrementNumCompletedTasks();
 
         friend class JobManager;

@@ -210,7 +210,7 @@ private:
             }
         }
 
-        wrench::StandardJob *one_task_jobs[5];
+        std::shared_ptr<wrench::StandardJob> one_task_jobs[5];
         int job_index = 0;
         for (auto task : tasks) {
             try {
@@ -230,13 +230,6 @@ private:
                 throw std::runtime_error(e.what());
             }
 
-            // Try to forget this job, which should NOT be fine
-            try {
-                job_manager->forgetJob(one_task_jobs[job_index]);
-                throw std::runtime_error("Should not be able to forget a pending/running job");
-            } catch (wrench::WorkflowExecutionException &e) {
-            }
-
             // Get the job's service-specific arguments (coverage)
             one_task_jobs[job_index]->getServiceSpecificArguments();
 
@@ -250,7 +243,7 @@ private:
         }
 
         // Try to create and submit a job with tasks that are pending, which should fail
-        wrench::StandardJob *bogus_job = job_manager->createStandardJob({*(tasks.begin())}, {}, {}, {}, {});
+        auto bogus_job = job_manager->createStandardJob({*(tasks.begin())}, {}, {}, {}, {});
         try {
             job_manager->submitJob(bogus_job, vm_cs);
             throw std::runtime_error("Should not be able to create a job with PENDING tasks");
@@ -282,17 +275,12 @@ private:
 
         {
             // Try to create and submit a job with tasks that are completed, which should fail
-            wrench::StandardJob *bogus_job = job_manager->createStandardJob({*(++tasks.begin())}, {}, {}, {}, {});
+            auto bogus_job = job_manager->createStandardJob({*(++tasks.begin())}, {}, {}, {}, {});
             try {
                 job_manager->submitJob(bogus_job, vm_cs);
                 throw std::runtime_error("Should not be able to create a job with PENDING tasks");
             } catch (std::invalid_argument &e) {
             }
-        }
-
-        // Try to forget the completed jobs
-        for (auto &one_task_job : one_task_jobs) {
-            job_manager->forgetJob(one_task_job);
         }
 
         // For coverage,
@@ -339,7 +327,7 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
     int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
+    auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
 
@@ -440,7 +428,8 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }
 

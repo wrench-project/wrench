@@ -102,7 +102,7 @@ namespace wrench {
             }
 
             // Create a Standard Job with only the tasks
-            StandardJob *standard_job;
+            std::shared_ptr<StandardJob> standard_job;
             try {
                 standard_job = job_manager->createStandardJob(to_submit, {});
             } catch (std::invalid_argument &e) {

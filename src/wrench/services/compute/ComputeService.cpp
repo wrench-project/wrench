@@ -54,7 +54,7 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    void ComputeService::submitJob(WorkflowJob *job, const std::map<std::string, std::string> &service_specific_args) {
+    void ComputeService::submitJob(std::shared_ptr<WorkflowJob> job, const std::map<std::string, std::string> &service_specific_args) {
 
         if (job == nullptr) {
             throw std::invalid_argument("ComputeService::submitJob(): invalid argument");
@@ -63,15 +63,10 @@ namespace wrench {
         assertServiceIsUp();
 
         try {
-            switch (job->getType()) {
-                case WorkflowJob::STANDARD: {
-                    this->submitStandardJob((StandardJob *) job, service_specific_args);
-                    break;
-                }
-                case WorkflowJob::PILOT: {
-                    this->submitPilotJob((PilotJob *) job, service_specific_args);
-                    break;
-                }
+            if (auto sjob = std::dynamic_pointer_cast<StandardJob>(job)) {
+                this->submitStandardJob(sjob, service_specific_args);
+            } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
+                this->submitPilotJob(pjob, service_specific_args);
             }
         } catch (WorkflowExecutionException &e) {
             throw;
@@ -87,7 +82,7 @@ namespace wrench {
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
      */
-    void ComputeService::terminateJob(WorkflowJob *job) {
+    void ComputeService::terminateJob(std::shared_ptr<WorkflowJob> job) {
 
         if (job == nullptr) {
             throw std::invalid_argument("ComputeService::terminateJob(): invalid argument");
@@ -96,15 +91,10 @@ namespace wrench {
         assertServiceIsUp();
 
         try {
-            switch (job->getType()) {
-                case WorkflowJob::STANDARD: {
-                    this->terminateStandardJob((StandardJob *) job);
-                    break;
-                }
-                case WorkflowJob::PILOT: {
-                    this->terminatePilotJob((PilotJob *) job);
-                    break;
-                }
+            if (auto sjob = std::dynamic_pointer_cast<StandardJob>(job)) {
+                this->terminateStandardJob(sjob);
+            } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
+                this->terminatePilotJob(pjob);
             }
         } catch (WorkflowExecutionException &e) {
             throw;
@@ -427,14 +417,14 @@ namespace wrench {
         }
 
         // Get the reply
-        std::shared_ptr<SimulationMessage> message = nullptr;
+        std::unique_ptr<SimulationMessage> message = nullptr;
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw WorkflowExecutionException(cause);
         }
 
-        if (auto msg = std::dynamic_pointer_cast<ComputeServiceResourceInformationAnswerMessage>(message)) {
+        if (auto msg = dynamic_cast<ComputeServiceResourceInformationAnswerMessage*>(message.get())) {
             return msg->info;
 
         } else {

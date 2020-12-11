@@ -10,8 +10,8 @@
 #ifndef WRENCH_WMS_H
 #define WRENCH_WMS_H
 
-#include <wrench/managers/EnergyMeterService.h>
-#include <wrench/managers/BandwidthMeterService.h>
+#include <wrench/services/metering/EnergyMeterService.h>
+#include <wrench/services/metering/BandwidthMeterService.h>
 #include "wrench/services/Service.h"
 #include "wrench/wms/DynamicOptimization.h"
 #include "wrench/wms/StaticOptimization.h"

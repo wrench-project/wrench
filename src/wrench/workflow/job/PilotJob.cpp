@@ -17,7 +17,7 @@ namespace wrench {
      * @param workflow: a workflow
      */
     PilotJob::PilotJob(Workflow *workflow) :
-            WorkflowJob(WorkflowJob::PILOT), state(PilotJob::State::NOT_SUBMITTED) {
+            WorkflowJob(), state(PilotJob::State::NOT_SUBMITTED) {
 
       this->workflow = workflow;
       this->name = "pilot_job_" + std::to_string(WorkflowJob::getNewUniqueNumber());

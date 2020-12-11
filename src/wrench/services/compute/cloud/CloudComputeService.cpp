@@ -99,7 +99,7 @@ namespace wrench {
                         this->getMessagePayloadValue(
                                 CloudComputeServiceMessagePayload::GET_EXECUTION_HOSTS_REQUEST_MESSAGE_PAYLOAD)));
 
-        if (auto msg = std::dynamic_pointer_cast<CloudComputeServiceGetExecutionHostsAnswerMessage>(answer_message)) {
+        if (auto msg = dynamic_cast<CloudComputeServiceGetExecutionHostsAnswerMessage*>(answer_message.get())) {
             return msg->execution_hosts;
         } else {
             throw std::runtime_error(
@@ -112,7 +112,7 @@ namespace wrench {
      * @brief Create a BareMetalComputeService VM (balances load on execution hosts)
      *
      * @param num_cores: the number of cores for the VM
-     * @param ram_memory: the VM's RAM memory capacity
+     * @param ram_memory: the VM's RAM memory_manager_service capacity
      * @param property_list: a property list for the BareMetalComputeService that will run on the VM ({} means "use all defaults")
      * @param messagepayload_list: a message payload list for the BareMetalComputeService that will run on the VM ({} means "use all defaults")
      *
@@ -132,7 +132,7 @@ namespace wrench {
      * @brief Create a BareMetalComputeService VM (balances load on execution hosts)
      *
      * @param num_cores: the number of cores for the VM
-     * @param ram_memory: the VM's RAM memory capacity
+     * @param ram_memory: the VM's RAM memory_manager_service capacity
      * @param desired_vm_name: the VM's desired name ("" means "pick a name for me")
      * @param property_list: a property list for the BareMetalComputeService that will run on the VM ({} means "use all defaults")
      * @param messagepayload_list: a message payload list for the BareMetalComputeService that will run on the VM ({} means "use all defaults")
@@ -155,7 +155,7 @@ namespace wrench {
         }
         if (ram_memory == ComputeService::ALL_RAM) {
             throw std::invalid_argument(
-                    "CloudComputeService::createVM(): the VM's memory requirement cannot be ComputeService::ALL_RAM");
+                    "CloudComputeService::createVM(): the VM's memory_manager_service requirement cannot be ComputeService::ALL_RAM");
         }
 
         assertServiceIsUp();
@@ -171,7 +171,7 @@ namespace wrench {
                         this->getMessagePayloadValue(
                                 CloudComputeServiceMessagePayload::CREATE_VM_REQUEST_MESSAGE_PAYLOAD)));
 
-        if (auto msg = std::dynamic_pointer_cast<CloudComputeServiceCreateVMAnswerMessage>(answer_message)) {
+        if (auto msg = dynamic_cast<CloudComputeServiceCreateVMAnswerMessage*>(answer_message.get())) {
             if (not msg->success) {
                 throw WorkflowExecutionException(msg->failure_cause);
             } else {
@@ -209,7 +209,7 @@ namespace wrench {
                         this->getMessagePayloadValue(
                                 CloudComputeServiceMessagePayload::SHUTDOWN_VM_REQUEST_MESSAGE_PAYLOAD)));
 
-        if (auto msg = std::dynamic_pointer_cast<CloudComputeServiceShutdownVMAnswerMessage>(answer_message)) {
+        if (auto msg = dynamic_cast<CloudComputeServiceShutdownVMAnswerMessage*>(answer_message.get())) {
             if (not msg->success) {
                 throw WorkflowExecutionException(msg->failure_cause);
             }
@@ -248,7 +248,7 @@ namespace wrench {
                         this->getMessagePayloadValue(
                                 CloudComputeServiceMessagePayload::START_VM_REQUEST_MESSAGE_PAYLOAD)));
 
-        if (auto msg = std::dynamic_pointer_cast<CloudComputeServiceStartVMAnswerMessage>(answer_message)) {
+        if (auto msg = dynamic_cast<CloudComputeServiceStartVMAnswerMessage*>(answer_message.get())) {
             if (not msg->success) {
                 throw WorkflowExecutionException(msg->failure_cause);
             }
@@ -305,7 +305,7 @@ namespace wrench {
                         this->getMessagePayloadValue(
                                 CloudComputeServiceMessagePayload::SUSPEND_VM_REQUEST_MESSAGE_PAYLOAD)));
 
-        if (auto msg = std::dynamic_pointer_cast<CloudComputeServiceSuspendVMAnswerMessage>(answer_message)) {
+        if (auto msg = dynamic_cast<CloudComputeServiceSuspendVMAnswerMessage*>(answer_message.get())) {
             if (not msg->success) {
                 throw WorkflowExecutionException(msg->failure_cause);
             }
@@ -342,7 +342,7 @@ namespace wrench {
                         this->getMessagePayloadValue(
                                 CloudComputeServiceMessagePayload::RESUME_VM_REQUEST_MESSAGE_PAYLOAD)));
 
-        if (auto msg = std::dynamic_pointer_cast<CloudComputeServiceResumeVMAnswerMessage>(answer_message)) {
+        if (auto msg = dynamic_cast<CloudComputeServiceResumeVMAnswerMessage*>(answer_message.get())) {
             if (not msg->success) {
                 throw WorkflowExecutionException(msg->failure_cause);
             }
@@ -380,7 +380,7 @@ namespace wrench {
                         this->getMessagePayloadValue(
                                 CloudComputeServiceMessagePayload::DESTROY_VM_REQUEST_MESSAGE_PAYLOAD)));
 
-        if (auto msg = std::dynamic_pointer_cast<CloudComputeServiceDestroyVMAnswerMessage>(answer_message)) {
+        if (auto msg = dynamic_cast<CloudComputeServiceDestroyVMAnswerMessage*>(answer_message.get())) {
             if (not msg->success) {
                 throw WorkflowExecutionException(msg->failure_cause);
             }
@@ -401,7 +401,7 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    void CloudComputeService::submitStandardJob(StandardJob *job,
+    void CloudComputeService::submitStandardJob(std::shared_ptr<StandardJob> job,
                                                 const std::map<std::string, std::string> &service_specific_args) {
 
         assertServiceIsUp();
@@ -415,7 +415,7 @@ namespace wrench {
                         this->getMessagePayloadValue(
                                 ComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
 
-        if (auto msg = std::dynamic_pointer_cast<ComputeServiceSubmitStandardJobAnswerMessage>(answer_message)) {
+        if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobAnswerMessage*>(answer_message.get())) {
             // If no success, throw an exception
             if (not msg->success) {
                 throw WorkflowExecutionException(msg->failure_cause);
@@ -435,7 +435,7 @@ namespace wrench {
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
      */
-    void CloudComputeService::submitPilotJob(PilotJob *job, const std::map<std::string, std::string> &service_specific_args) {
+    void CloudComputeService::submitPilotJob(std::shared_ptr<PilotJob> job, const std::map<std::string, std::string> &service_specific_args) {
 
         assertServiceIsUp();
 
@@ -447,7 +447,7 @@ namespace wrench {
                         answer_mailbox, job, service_specific_args, this->getMessagePayloadValue(
                                 CloudComputeServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
 
-        if (auto msg = std::dynamic_pointer_cast<ComputeServiceSubmitPilotJobAnswerMessage>(answer_message)) {
+        if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobAnswerMessage*>(answer_message.get())) {
             // If no success, throw an exception
             if (not msg->success) {
                 throw WorkflowExecutionException(msg->failure_cause);
@@ -466,7 +466,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void CloudComputeService::terminateStandardJob(StandardJob *job) {
+    void CloudComputeService::terminateStandardJob(std::shared_ptr<StandardJob> job) {
         throw std::runtime_error("CloudComputeService::terminateStandardJob(): Not implemented!");
     }
 
@@ -474,7 +474,7 @@ namespace wrench {
      * @brief non-implemented
      * @param job: a pilot job to (supposedly) terminate
      */
-    void CloudComputeService::terminatePilotJob(PilotJob *job) {
+    void CloudComputeService::terminatePilotJob(std::shared_ptr<PilotJob> job) {
         throw std::runtime_error(
                 "CloudComputeService::terminatePilotJob(): not implemented because CloudComputeService never supports pilot jobs");
     }
@@ -618,7 +618,7 @@ namespace wrench {
 
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
 
-        if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
+        if (auto msg = dynamic_cast<ServiceStopDaemonMessage*>(message.get())) {
             this->stopAllVMs();
             this->vm_list.clear();
             // This is Synchronous
@@ -631,47 +631,47 @@ namespace wrench {
             }
             return false;
 
-        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceResourceInformationRequestMessage>(message)) {
+        } else if (auto msg = dynamic_cast<ComputeServiceResourceInformationRequestMessage*>(message.get())) {
             processGetResourceInformation(msg->answer_mailbox);
             return true;
 
-        } else if (auto msg = std::dynamic_pointer_cast<CloudComputeServiceGetExecutionHostsRequestMessage>(message)) {
+        } else if (auto msg = dynamic_cast<CloudComputeServiceGetExecutionHostsRequestMessage*>(message.get())) {
             processGetExecutionHosts(msg->answer_mailbox);
             return true;
 
-        } else if (auto msg = std::dynamic_pointer_cast<CloudComputeServiceCreateVMRequestMessage>(message)) {
+        } else if (auto msg = dynamic_cast<CloudComputeServiceCreateVMRequestMessage*>(message.get())) {
             processCreateVM(msg->answer_mailbox, msg->num_cores, msg->ram_memory, msg->desired_vm_name, msg->property_list,
                             msg->messagepayload_list);
             return true;
 
-        } else if (auto msg = std::dynamic_pointer_cast<CloudComputeServiceShutdownVMRequestMessage>(message)) {
+        } else if (auto msg = dynamic_cast<CloudComputeServiceShutdownVMRequestMessage*>(message.get())) {
             processShutdownVM(msg->answer_mailbox, msg->vm_name);
             return true;
 
-        } else if (auto msg = std::dynamic_pointer_cast<CloudComputeServiceStartVMRequestMessage>(message)) {
+        } else if (auto msg = dynamic_cast<CloudComputeServiceStartVMRequestMessage*>(message.get())) {
             processStartVM(msg->answer_mailbox, msg->vm_name, msg->pm_name);
             return true;
 
-        } else if (auto msg = std::dynamic_pointer_cast<CloudComputeServiceSuspendVMRequestMessage>(message)) {
+        } else if (auto msg = dynamic_cast<CloudComputeServiceSuspendVMRequestMessage*>(message.get())) {
             processSuspendVM(msg->answer_mailbox, msg->vm_name);
             return true;
 
-        } else if (auto msg = std::dynamic_pointer_cast<CloudComputeServiceResumeVMRequestMessage>(message)) {
+        } else if (auto msg = dynamic_cast<CloudComputeServiceResumeVMRequestMessage*>(message.get())) {
             processResumeVM(msg->answer_mailbox, msg->vm_name);
             return true;
 
-        } else if (auto msg = std::dynamic_pointer_cast<CloudComputeServiceDestroyVMRequestMessage>(message)) {
+        } else if (auto msg = dynamic_cast<CloudComputeServiceDestroyVMRequestMessage*>(message.get())) {
             processDestroyVM(msg->answer_mailbox, msg->vm_name);
             return true;
 
-        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceSubmitStandardJobRequestMessage>(message)) {
+        } else if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobRequestMessage*>(message.get())) {
             processSubmitStandardJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
             return true;
 
-        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceSubmitPilotJobRequestMessage>(message)) {
+        } else if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobRequestMessage*>(message.get())) {
             processSubmitPilotJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
             return true;
-        } else if (auto msg = std::dynamic_pointer_cast<ServiceHasTerminatedMessage>(message)) {
+        } else if (auto msg = dynamic_cast<ServiceHasTerminatedMessage*>(message.get())) {
             if (auto bmcs = std::dynamic_pointer_cast<BareMetalComputeService>(msg->service)) {
                 processBareMetalComputeServiceTermination(bmcs, msg->exit_code);
             } else {
@@ -707,7 +707,7 @@ namespace wrench {
      *
      * @param answer_mailbox: the mailbox to which the answer message should be sent
      * @param requested_num_cores: the number of cores the service can use
-     * @param requested_ram: the VM's RAM memory capacity
+     * @param requested_ram: the VM's RAM memory_manager_service capacity
      * @param desired_vm_name: the desired VM name ("" means "pick a name for me")
      * @param property_list: a property list for the BareMetalComputeService that will run on the VM ({} means "use all defaults")
      * @param messagepayload_list: a message payload list for the BareMetalComputeService that will run on the VM ({} means "use all defaults")
@@ -1193,7 +1193,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void CloudComputeService::processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
+    void CloudComputeService::processSubmitStandardJob(const std::string &answer_mailbox, std::shared_ptr<StandardJob> job,
                                                        std::map<std::string, std::string> &service_specific_args) {
 
         if (not this->supportsStandardJobs()) {
@@ -1219,7 +1219,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void CloudComputeService::processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job,
+    void CloudComputeService::processSubmitPilotJob(const std::string &answer_mailbox, std::shared_ptr<PilotJob> job,
                                                     std::map<std::string, std::string> &service_specific_args) {
 
         if (not this->supportsPilotJobs()) {

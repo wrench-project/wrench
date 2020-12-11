@@ -37,7 +37,7 @@ namespace wrench {
     public:
 
         Workunit(
-                StandardJob *job,
+                std::shared_ptr<StandardJob> job,
                 std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> pre_file_copies,
                 WorkflowTask *task,
                 std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations,
@@ -46,12 +46,12 @@ namespace wrench {
 
         static void addDependency(std::shared_ptr<Workunit> parent, std::shared_ptr<Workunit> child);
 
-        static std::set<std::shared_ptr<Workunit>> createWorkunits(StandardJob *job);
+        static std::set<std::shared_ptr<Workunit>> createWorkunits(std::shared_ptr<StandardJob> job);
 
-        StandardJob *getJob();
+        std::shared_ptr<StandardJob> getJob();
 
         /** @brief The StandardJob this Workunit belongs to */
-        StandardJob *job;
+        std::shared_ptr<StandardJob> job;
 
         /** @brief The Workunits that depend on this Workunit */
         std::set<std::shared_ptr<Workunit>> children;

@@ -34,8 +34,8 @@ namespace wrench {
     HTCondorNegotiatorService::HTCondorNegotiatorService(
             std::string &hostname,
             std::map<std::shared_ptr<ComputeService>, unsigned long> &compute_resources,
-            std::map<WorkflowJob *, std::shared_ptr<ComputeService>> &running_jobs,
-            std::vector<std::tuple<WorkflowJob *, std::map<std::string, std::string>>> &pending_jobs,
+            std::map<std::shared_ptr<WorkflowJob>, std::shared_ptr<ComputeService>> &running_jobs,
+            std::vector<std::tuple<std::shared_ptr<WorkflowJob>, std::map<std::string, std::string>>> &pending_jobs,
             std::string &reply_mailbox)
             : Service(hostname, "htcondor_negotiator", "htcondor_negotiator"), reply_mailbox(reply_mailbox),
               compute_resources(&compute_resources), running_jobs(&running_jobs), pending_jobs(pending_jobs) {
@@ -59,8 +59,8 @@ namespace wrench {
      * @return whether the priority of the left-hand-side workflow job is higher
      */
     bool HTCondorNegotiatorService::JobPriorityComparator::operator()(
-            std::tuple<WorkflowJob *, std::map<std::string, std::string>> &lhs,
-            std::tuple<WorkflowJob *, std::map<std::string, std::string>> &rhs) {
+            std::tuple<std::shared_ptr<WorkflowJob>, std::map<std::string, std::string>> &lhs,
+            std::tuple<std::shared_ptr<WorkflowJob>, std::map<std::string, std::string>> &rhs) {
         return std::get<0>(lhs)->getPriority() > std::get<0>(rhs)->getPriority();
     }
 
@@ -76,7 +76,7 @@ namespace wrench {
         WRENCH_INFO("HTCondor Negotiator Service starting on host %s listening on mailbox_name %s",
                     this->hostname.c_str(), this->mailbox_name.c_str());
 
-        std::vector<WorkflowJob *> scheduled_jobs;
+        std::vector<std::shared_ptr<WorkflowJob>> scheduled_jobs;
 
         // sort tasks by priority
         std::sort(this->pending_jobs.begin(), this->pending_jobs.end(), JobPriorityComparator());
@@ -87,50 +87,50 @@ namespace wrench {
             auto service_specific_arguments = std::get<1>(entry);
 
             // STANDARD JOB
-            if (auto standard_job = dynamic_cast<StandardJob *>(job)) {
+            if (auto sjob = std::dynamic_pointer_cast<StandardJob>(job)) {
                 for (auto &item : *this->compute_resources) {
 
                     if (not item.first->supportsStandardJobs()) {
                         continue;
                     }
 
-                    if (item.second >= standard_job->getMinimumRequiredNumCores()) {
+                    if (item.second >= sjob->getMinimumRequiredNumCores()) {
 
-                        WRENCH_INFO("Dispatching job %s with %ld tasks", standard_job->getName().c_str(),
-                                    standard_job->getTasks().size());
+                        WRENCH_INFO("Dispatching job %s with %ld tasks", sjob->getName().c_str(),
+                                    sjob->getTasks().size());
 
-                        for (auto task : standard_job->getTasks()) {
+                        for (auto task : sjob->getTasks()) {
                             // temporary printing task IDs
                             WRENCH_INFO("    Task ID: %s", task->getID().c_str());
                         }
 
                         WRENCH_INFO("---> %lu", service_specific_arguments.size());
 
-                        standard_job->pushCallbackMailbox(this->reply_mailbox);
-                        item.first->submitStandardJob(standard_job, service_specific_arguments);
+                        sjob->pushCallbackMailbox(this->reply_mailbox);
+                        item.first->submitStandardJob(sjob, service_specific_arguments);
                         this->running_jobs->insert(std::make_pair(job, item.first));
                         scheduled_jobs.push_back(job);
-                        item.second -= standard_job->getMinimumRequiredNumCores();
+                        item.second -= sjob->getMinimumRequiredNumCores();
 
-                        WRENCH_INFO("Dispatched job %s with %ld tasks", standard_job->getName().c_str(),
-                                    standard_job->getTasks().size());
+                        WRENCH_INFO("Dispatched job %s with %ld tasks", sjob->getName().c_str(),
+                                    sjob->getTasks().size());
                         break;
                     }
                 }
 
-            } else if (auto pilot_job = dynamic_cast<PilotJob *>(job)) { // PILOT JOB
+            } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) { // PILOT JOB
 
                 for (auto &item : *this->compute_resources) {
                     if (not item.first->supportsPilotJobs()) {
                         continue;
                     }
 
-                    pilot_job->pushCallbackMailbox(this->reply_mailbox);
-                    item.first->submitPilotJob(pilot_job, service_specific_arguments);
+                    pjob->pushCallbackMailbox(this->reply_mailbox);
+                    item.first->submitPilotJob(pjob, service_specific_arguments);
                     this->running_jobs->insert(std::make_pair(job, item.first));
                     scheduled_jobs.push_back(job);
 
-                    WRENCH_INFO("Dispatched pilot job %s", pilot_job->getName().c_str());
+                    WRENCH_INFO("Dispatched pilot job %s", pjob->getName().c_str());
                     break;
                 }
             }

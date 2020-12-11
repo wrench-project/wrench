@@ -265,7 +265,7 @@ private:
     int main() {
         auto job_manager = this->createJobManager();
 
-        wrench::StandardJob *job_that_will_fail = job_manager->createStandardJob(this->test->t4,
+        auto job_that_will_fail = job_manager->createStandardJob(this->test->t4,
                                                                                  {{this->test->small_input_file,
                                                                                           wrench::FileLocation::LOCATION(this->test->storage_service)},
                                                                                   {this->test->large_input_file,
@@ -290,7 +290,7 @@ private:
             throw std::runtime_error("Job should have failed!");
         }
 
-        wrench::StandardJob *job_that_will_complete = job_manager->createStandardJob(this->test->t4,
+        auto job_that_will_complete = job_manager->createStandardJob(this->test->t4,
                                                                                      {{this->test->small_input_file,
                                                                                               wrench::FileLocation::LOCATION(this->test->backup_storage_service)},
                                                                                       {this->test->large_input_file,
@@ -301,12 +301,12 @@ private:
         this->waitForAndProcessNextEvent();
 
 
-        wrench::StandardJob *job_that_will_be_terminated = job_manager->createStandardJob(this->test->t5, {});
+        auto job_that_will_be_terminated = job_manager->createStandardJob(this->test->t5, {});
         job_manager->submitJob(job_that_will_be_terminated, this->test->compute_service);
         wrench::S4U_Simulation::sleep(10.0);
         job_manager->terminateJob(job_that_will_be_terminated);
 
-        wrench::StandardJob *job_that_will_fail_2 = job_manager->createStandardJob(this->test->t6, {});
+        auto job_that_will_fail_2 = job_manager->createStandardJob(this->test->t6, {});
         job_manager->submitJob(job_that_will_fail_2, this->test->compute_service);
         wrench::S4U_Simulation::sleep(10.0);
         this->test->compute_service->stop();
@@ -322,7 +322,7 @@ TEST_F(WorkflowTaskTest, WorkflowTaskExecutionHistoryTest) {
 void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
     auto simulation = new wrench::Simulation();
     int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
+    auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -453,6 +453,7 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
     ASSERT_STREQ(t6_failed_execution.execution_host.c_str(), "ExecutionHost");
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
