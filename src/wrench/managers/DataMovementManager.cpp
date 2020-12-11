@@ -173,7 +173,7 @@ namespace wrench {
  */
     bool DataMovementManager::processNextMessage() {
 
-        std::shared_ptr<SimulationMessage> message = nullptr;
+        std::unique_ptr<SimulationMessage> message = nullptr;
 
         try {
             message = S4U_Mailbox::getMessage(this->mailbox_name);
@@ -184,11 +184,11 @@ namespace wrench {
 
         WRENCH_INFO("Data Movement Manager got a %s message", message->getName().c_str());
 
-        if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
+        if (auto msg = dynamic_cast<ServiceStopDaemonMessage*>(message.get())) {
             // There shouldn't be any need to clean any state up
             return false;
 
-        } else if (auto msg = std::dynamic_pointer_cast<StorageServiceFileCopyAnswerMessage>(message)) {
+        } else if (auto msg = dynamic_cast<StorageServiceFileCopyAnswerMessage*>(message.get())) {
 
             // Remove the record and find the File Registry Service, if any
             DataMovementManager::CopyRequestSpecs request(msg->file, msg->src, msg->dst, nullptr);

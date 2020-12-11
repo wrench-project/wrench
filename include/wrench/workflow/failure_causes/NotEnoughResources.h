@@ -33,17 +33,17 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        NotEnoughResources(WorkflowJob *job, std::shared_ptr<ComputeService> compute_service);
+        NotEnoughResources(std::shared_ptr<WorkflowJob> job, std::shared_ptr<ComputeService> compute_service);
         /***********************/
         /** \endcond           */
         /***********************/
 
-        WorkflowJob *getJob();
+        std::shared_ptr<WorkflowJob> getJob();
         std::shared_ptr<ComputeService> getComputeService();
         std::string toString();
 
     private:
-        WorkflowJob *job;
+        std::shared_ptr<WorkflowJob> job;
         std::shared_ptr<ComputeService> compute_service;
     };
 

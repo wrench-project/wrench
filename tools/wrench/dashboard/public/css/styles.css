@@ -104,16 +104,9 @@ html, body {
     border-radius: 3px;
 }
 
-.read-col {
-    background-color: #efe8f4;
-}
-
-.compute-col {
-    background-color: #f9eedb;
-}
-
-.write-col {
-    background-color: #e2f5ff;
+.task-details-td {
+    text-align: center !important;
+    font-weight: bold;
 }
 
 .task-details-table-td {
@@ -122,10 +115,12 @@ html, body {
     font-size: 12px;
 }
 
-.task-details-table-header {
-    border-top: 1px solid #dee2e6;
-    font-size: 12px;
-    padding: 0.5em 0.2em;
+.summary, .summary .item {
+    border: 1px solid #ddd;
+    background-color: #f7f7f7;
+    border-radius: 0.5em;
+    padding: 1em !important;
+    margin-top: 0.5em;
 }
 
 .title-container {
@@ -156,14 +151,6 @@ html, body {
 td {
     word-wrap: break-word;
     word-break: break-all;
-}
-
-.overall-metrics-table-col {
-    width: 500px;
-}
-
-#overall-metrics-table {
-    text-align: center;
 }
 
 .arrow-div {

@@ -7,14 +7,12 @@
  * (at your option) any later version.
  */
 
-
 #ifndef WRENCH_JOBMANAGERMESSAGE_H
 #define WRENCH_JOBMANAGERMESSAGE_H
 
-
 #include <wrench/simulation/SimulationMessage.h>
-#include <wrench/workflow/job/StandardJob.h>
 #include "wrench/services/compute/ComputeService.h"
+#include <wrench/workflow/job/StandardJob.h>
 #include <wrench-dev.h>
 
 namespace wrench {
@@ -37,12 +35,12 @@ namespace wrench {
      */
     class JobManagerStandardJobDoneMessage : public JobManagerMessage {
     public:
-        JobManagerStandardJobDoneMessage(StandardJob *job, std::shared_ptr<ComputeService> compute_service,
+        JobManagerStandardJobDoneMessage(std::shared_ptr<StandardJob> job, std::shared_ptr<ComputeService> compute_service,
                                          std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes);
 
 
         /** @brief The job that is done */
-        StandardJob *job;
+        std::shared_ptr<StandardJob> job;
         /** @brief The compute service on which the job ran */
         std::shared_ptr<ComputeService> compute_service;
         /** @brief The necessary task state changes */
@@ -54,14 +52,14 @@ namespace wrench {
      */
     class JobManagerStandardJobFailedMessage : public JobManagerMessage {
     public:
-        JobManagerStandardJobFailedMessage(StandardJob *job, std::shared_ptr<ComputeService> compute_service,
+        JobManagerStandardJobFailedMessage(std::shared_ptr<StandardJob> job, std::shared_ptr<ComputeService> compute_service,
                                            std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes,
                                            std::set<WorkflowTask *> necessary_failure_count_increments,
                                            std::shared_ptr<FailureCause> cause);
 
 
         /** @brief The job that has failed */
-        StandardJob *job;
+        std::shared_ptr<StandardJob> job;
         /** @brief The compute service on which the job has failed */
         std::shared_ptr<ComputeService> compute_service;
         /** @brief The task state change that should be made */

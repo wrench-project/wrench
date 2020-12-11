@@ -53,7 +53,7 @@ namespace wrench {
                 Simulation *simulation,
                 std::string callback_mailbox,
                 std::string hostname,
-                StandardJob *job,
+                std::shared_ptr<StandardJob> job,
                 std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
                 std::shared_ptr<StorageService> scratch_space,
                 bool part_of_pilot_job,
@@ -64,7 +64,7 @@ namespace wrench {
 
         void kill(bool job_termination);
 
-        StandardJob *getJob();
+        std::shared_ptr<StandardJob> getJob();
         std::map<std::string, std::tuple<unsigned long, double>> getComputeResources();
 
         // Get the set of files stored in scratch space by a standardjob job
@@ -76,7 +76,7 @@ namespace wrench {
         void cleanup(bool has_returned_from_main, int return_value) override;
 
         std::string callback_mailbox;
-        StandardJob *job;
+        std::shared_ptr<StandardJob> job;
         std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
         int total_num_cores;
         double total_ram;

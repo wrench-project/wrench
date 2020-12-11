@@ -48,10 +48,10 @@ namespace wrench {
         /** \cond DEVELOPER   **/
         /***********************/
 
-        void submitStandardJob(StandardJob *job,
+        void submitStandardJob(std::shared_ptr<StandardJob> job,
                                const std::map<std::string, std::string> &service_specific_arguments) override;
 
-        void submitPilotJob(PilotJob *job, const std::map<std::string, std::string> &service_specific_arguments) override;
+        void submitPilotJob(std::shared_ptr<PilotJob> job, const std::map<std::string, std::string> &service_specific_arguments) override;
 
 
         /***********************/
@@ -64,9 +64,9 @@ namespace wrench {
 
         ~HTCondorCentralManagerService() override;
 
-        void terminateStandardJob(StandardJob *job) override;
+        void terminateStandardJob(std::shared_ptr<StandardJob> job) override;
 
-        void terminatePilotJob(PilotJob *job) override;
+        void terminatePilotJob(std::shared_ptr<PilotJob> job) override;
 
         /***********************/
         /** \endcond          **/
@@ -77,26 +77,26 @@ namespace wrench {
 
         bool processNextMessage();
 
-        void processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
+        void processSubmitStandardJob(const std::string &answer_mailbox, std::shared_ptr<StandardJob> job,
                                       std::map<std::string, std::string> &service_specific_args);
 
-        void processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job,
+        void processSubmitPilotJob(const std::string &answer_mailbox, std::shared_ptr<PilotJob> job,
                                    std::map<std::string, std::string> &service_specific_args);
 
-        void processPilotJobStarted(PilotJob *job);
+        void processPilotJobStarted(std::shared_ptr<PilotJob>job);
 
-        void processPilotJobCompletion(PilotJob *job);
+        void processPilotJobCompletion(std::shared_ptr<PilotJob>job);
 
-        void processStandardJobCompletion(StandardJob *job);
+        void processStandardJobCompletion(std::shared_ptr<StandardJob>job);
 
-        void processNegotiatorCompletion(std::vector<WorkflowJob *> &pending_jobs);
+        void processNegotiatorCompletion(std::vector<std::shared_ptr<WorkflowJob>> &pending_jobs);
 
         void terminate();
 
         /** set of compute resources **/
         std::set<ComputeService *> compute_resources;
         /** queue of pending jobs **/
-        std::vector<std::tuple<WorkflowJob *, std::map<std::string, std::string>>> pending_jobs;
+        std::vector<std::tuple<std::shared_ptr<WorkflowJob>, std::map<std::string, std::string>>> pending_jobs;
         /** whether a negotiator is dispatching jobs **/
         bool dispatching_jobs = false;
         /** whether a negotiator could not dispatch jobs **/
@@ -104,7 +104,7 @@ namespace wrench {
         /** **/
         std::map<std::shared_ptr<ComputeService>, unsigned long> compute_resources_map;
         /** running workflow jobs **/
-        std::map<WorkflowJob *, std::shared_ptr<ComputeService>> running_jobs;
+        std::map<std::shared_ptr<WorkflowJob>, std::shared_ptr<ComputeService>> running_jobs;
     };
 
 }
