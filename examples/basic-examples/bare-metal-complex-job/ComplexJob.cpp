@@ -28,7 +28,6 @@
  **    ./wrench-example-bare-metal-complex-job ./four_hosts.xml --wrench-full-log
  **/
 
-
 #include <iostream>
 #include <wrench.h>
 

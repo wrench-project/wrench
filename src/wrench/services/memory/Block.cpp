@@ -6,14 +6,15 @@
 
 namespace wrench {
 
-    Block::Block(std::string fid, std::string mount_point, double sz,
+    Block::Block(std::string fid, std::shared_ptr<FileLocation> location, double sz,
             double last_access, bool is_dirty, double dirty_time) :
-            file_id(fid), mountpoint(mount_point), size(sz),
+            file_id(fid), location(location), size(sz),
             last_access(last_access), dirty(is_dirty), dirty_time(dirty_time) {}
 
     Block::Block(Block *blk) {
         this->file_id = blk->getFileId();
-        this->mountpoint = blk->getMountpoint();
+//        this->mountpoint = blk->getMountpoint();
+        this->location = blk->getLocation();
         this->last_access = blk->getLastAccess();
         this->size = blk->getSize();
         this->dirty = blk->isDirty();
@@ -28,13 +29,13 @@ namespace wrench {
         this->file_id = fid;
     }
 
-    std::string Block::getMountpoint() {
-        return this->mountpoint;
-    }
-
-    void Block::setMountpoint(std::string mountpoint) {
-        this->mountpoint = mountpoint;
-    }
+//    std::string Block::getMountpoint() {
+//        return this->mountpoint;
+//    }
+//
+//    void Block::setMountpoint(std::string mountpoint) {
+//        this->mountpoint = mountpoint;
+//    }
 
     double Block::getSize() const {
         return this->size;
@@ -73,10 +74,14 @@ namespace wrench {
         if (remaining > this->size) remaining = this->size;
         if (remaining < 0) remaining = 0;
 
-        Block *new_blk = new Block(this->file_id, this->mountpoint, this->size - remaining, this->last_access,
+        Block *new_blk = new Block(this->file_id, this->location, this->size - remaining, this->last_access,
                                    this->dirty, this->dirty_time);
         this->size = remaining;
         return new_blk;
+    }
+
+    const std::shared_ptr<FileLocation> &Block::getLocation() const {
+        return location;
     }
 
 }

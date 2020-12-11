@@ -83,7 +83,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void HTCondorCentralManagerService::submitStandardJob(
-            StandardJob *job,
+            std::shared_ptr<StandardJob> job,
             const std::map<std::string, std::string> &service_specific_args) {
 
         serviceSanityCheck();
@@ -103,14 +103,14 @@ namespace wrench {
         }
 
         // Get the answer
-        std::shared_ptr<SimulationMessage> message = nullptr;
+        std::unique_ptr<SimulationMessage> message = nullptr;
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox);
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw WorkflowExecutionException(cause);
         }
 
-        if (auto msg = std::dynamic_pointer_cast<ComputeServiceSubmitStandardJobAnswerMessage>(message)) {
+        if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobAnswerMessage*>(message.get())) {
             // If no success, throw an exception
             if (not msg->success) {
                 throw WorkflowExecutionException(msg->failure_cause);
@@ -131,7 +131,7 @@ namespace wrench {
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
      */
-    void HTCondorCentralManagerService::submitPilotJob(PilotJob *job,
+    void HTCondorCentralManagerService::submitPilotJob(std::shared_ptr<PilotJob> job,
                                                        const std::map<std::string, std::string> &service_specific_args) {
         serviceSanityCheck();
 
@@ -150,14 +150,14 @@ namespace wrench {
         }
 
         // Get the answer
-        std::shared_ptr<SimulationMessage> message = nullptr;
+        std::unique_ptr<SimulationMessage> message = nullptr;
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox);
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw WorkflowExecutionException(cause);
         }
 
-        if (auto msg = std::dynamic_pointer_cast<ComputeServiceSubmitPilotJobAnswerMessage>(message)) {
+        if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobAnswerMessage*>(message.get())) {
             // If no success, throw an exception
             if (not msg->success) {
                 throw WorkflowExecutionException(msg->failure_cause);
@@ -174,7 +174,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void HTCondorCentralManagerService::terminateStandardJob(StandardJob *job) {
+    void HTCondorCentralManagerService::terminateStandardJob(std::shared_ptr<StandardJob> job) {
         throw std::runtime_error("HTCondorCentralManagerService::terminateStandardJob(): Not implemented yet!");
     }
 
@@ -184,7 +184,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void HTCondorCentralManagerService::terminatePilotJob(PilotJob *job) {
+    void HTCondorCentralManagerService::terminatePilotJob(std::shared_ptr<PilotJob> job) {
         throw std::runtime_error("HTCondorCentralManagerService::terminatePilotJob(): Not implemented yet!");
     }
 
@@ -285,7 +285,7 @@ namespace wrench {
 
         WRENCH_DEBUG("HTCondor Central Manager got a [%s] message", message->getName().c_str());
 
-        if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
+        if (auto msg = dynamic_cast<ServiceStopDaemonMessage*>(message.get())) {
             this->terminate();
             // This is Synchronous
             try {
@@ -299,27 +299,27 @@ namespace wrench {
             }
             return false;
 
-        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceSubmitStandardJobRequestMessage>(message)) {
+        } else if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobRequestMessage*>(message.get())) {
             processSubmitStandardJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
             return true;
 
-        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceSubmitPilotJobRequestMessage>(message)) {
+        } else if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobRequestMessage*>(message.get())) {
             processSubmitPilotJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
             return true;
 
-        } else if (auto msg = std::dynamic_pointer_cast<ComputeServicePilotJobStartedMessage>(message)) {
+        } else if (auto msg = dynamic_cast<ComputeServicePilotJobStartedMessage*>(message.get())) {
             processPilotJobStarted(msg->job);
             return true;
 
-        } else if (auto msg = std::dynamic_pointer_cast<ComputeServicePilotJobExpiredMessage>(message)) {
+        } else if (auto msg = dynamic_cast<ComputeServicePilotJobExpiredMessage*>(message.get())) {
             processPilotJobCompletion(msg->job);
             return true;
 
-        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceStandardJobDoneMessage>(message)) {
+        } else if (auto msg = dynamic_cast<ComputeServiceStandardJobDoneMessage*>(message.get())) {
             processStandardJobCompletion(msg->job);
             return true;
 
-        } else if (auto msg = std::dynamic_pointer_cast<NegotiatorCompletionMessage>(message)) {
+        } else if (auto msg = dynamic_cast<NegotiatorCompletionMessage*>(message.get())) {
             processNegotiatorCompletion(msg->scheduled_jobs);
             return true;
 
@@ -338,7 +338,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void HTCondorCentralManagerService::processSubmitStandardJob(
-            const std::string &answer_mailbox, StandardJob *job,
+            const std::string &answer_mailbox, std::shared_ptr<StandardJob> job,
             std::map<std::string, std::string> &service_specific_args) {
 
         this->pending_jobs.push_back(std::make_tuple(job, service_specific_args));
@@ -362,7 +362,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void HTCondorCentralManagerService::processSubmitPilotJob(
-            const std::string &answer_mailbox, PilotJob *job,
+            const std::string &answer_mailbox, std::shared_ptr<PilotJob> job,
             std::map<std::string, std::string> &service_specific_args) {
 
         this->pending_jobs.push_back(std::make_tuple(job, service_specific_args));
@@ -383,7 +383,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void HTCondorCentralManagerService::processPilotJobStarted(wrench::PilotJob *job) {
+    void HTCondorCentralManagerService::processPilotJobStarted(std::shared_ptr<PilotJob> job) {
         // Forward the notification
         S4U_Mailbox::dputMessage(job->popCallbackMailbox(),
                                  new ComputeServicePilotJobStartedMessage(
@@ -399,7 +399,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void HTCondorCentralManagerService::processPilotJobCompletion(wrench::PilotJob *job) {
+    void HTCondorCentralManagerService::processPilotJobCompletion(std::shared_ptr<PilotJob> job) {
         // Forward the notification
         S4U_Mailbox::dputMessage(job->popCallbackMailbox(),
                                  new ComputeServicePilotJobExpiredMessage(
@@ -415,7 +415,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void HTCondorCentralManagerService::processStandardJobCompletion(StandardJob *job) {
+    void HTCondorCentralManagerService::processStandardJobCompletion(std::shared_ptr<StandardJob> job) {
         WRENCH_INFO("A standard job has completed: %s", job->getName().c_str());
         std::string callback_mailbox = job->popCallbackMailbox();
 
@@ -443,7 +443,7 @@ namespace wrench {
      * @param scheduled_jobs: list of scheduled jobs upon negotiator cycle completion
      */
     void HTCondorCentralManagerService::processNegotiatorCompletion(
-            std::vector<wrench::WorkflowJob *> &scheduled_jobs) {
+            std::vector<std::shared_ptr<WorkflowJob>> &scheduled_jobs) {
 
         if (scheduled_jobs.empty()) {
             this->resources_unavailable = true;

@@ -14,6 +14,8 @@ namespace wrench {
 
     class MemoryManager : public Service {
 
+    public:
+
     private:
         s4u_Disk *memory;
         double dirty_ratio;
@@ -32,6 +34,7 @@ namespace wrench {
         std::vector<double> dirty_log;
         std::vector<double> cached_log;
         std::vector<double> free_log;
+
 
         MemoryManager(s4u_Disk *memory, double dirty_ratio, int interval, int expired_time, std::string hostname);
 
@@ -67,7 +70,7 @@ namespace wrench {
 
         void useAnonymousMemory(double used_amt);
 
-        double getCached() const;
+        double getTotalCachedAmount() const;
 
         double getDirty() const;
 
@@ -79,13 +82,14 @@ namespace wrench {
 
         double evict(double amount, std::string excluded_filename);
 
-        simgrid::s4u::IoPtr readToCache(std::string filename, std::string mount_point, double amount, bool async);
-
-        simgrid::s4u::IoPtr readFromCache(std::string filename, bool async);
+        simgrid::s4u::IoPtr readToCache(std::string filename, std::shared_ptr<FileLocation> location,
+                double amount, bool async);
 
         void readChunkFromCache(std::string filename, double amount);
 
-        void writeToCache(std::string filename, std::string mnt_pt, double amount);
+        void writebackToCache(std::string filename, std::shared_ptr<FileLocation> location, double amount, bool is_dirty);
+
+        void addToCache(std::string filename, std::shared_ptr<FileLocation> location, double amount, bool is_dirty);
 
         double getCachedAmount(std::string filename);
 

@@ -33,8 +33,8 @@ namespace wrench {
 		class S4U_Mailbox {
 
 		public:
-				static std::shared_ptr<SimulationMessage> getMessage(std::string mailbox);
-				static std::shared_ptr<SimulationMessage> getMessage(std::string mailbox, double timeout);
+				static std::unique_ptr<SimulationMessage> getMessage(std::string mailbox);
+				static std::unique_ptr<SimulationMessage> getMessage(std::string mailbox, double timeout);
 				static void putMessage(std::string mailbox, SimulationMessage *m);
 				static void dputMessage(std::string mailbox_name, SimulationMessage *msg);
 				static std::shared_ptr<S4U_PendingCommunication> iputMessage(std::string mailbox_name, SimulationMessage *msg);

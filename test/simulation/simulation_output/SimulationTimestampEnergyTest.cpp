@@ -147,8 +147,8 @@ void SimulationTimestampEnergyTest::do_SimulationTimestampPstateSet_test() {
     ASSERT_EQ("host1", ts3->getContent()->getHostname());
 
     delete simulation;
-    free(argv[0]);
-    free(argv[1]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -195,7 +195,7 @@ void SimulationTimestampEnergyTest::do_SimulationTimestampEnergyConsumption_test
     auto simulation = new wrench::Simulation();
     int argc = 2;
     auto argv = (char **)calloc(argc, sizeof(char *));
-    argv[0] = strdup("simulation_timestamp_energy_consumption_test");
+    argv[0] = strdup("unit_test");
     argv[1] = strdup("--activate-energy");
 
     EXPECT_NO_THROW(simulation->init(&argc, argv));
@@ -236,8 +236,8 @@ void SimulationTimestampEnergyTest::do_SimulationTimestampEnergyConsumption_test
     ASSERT_DOUBLE_EQ(400.0, ts2->getContent()->getConsumption());
 
     delete simulation;
-    free(argv[0]);
-    free(argv[1]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -325,7 +325,7 @@ void SimulationTimestampEnergyTest::do_EnergyMeterSingleMeasurementPeriod_test()
     auto simulation = new wrench::Simulation();
     int argc = 2;
     auto argv = (char **)calloc(argc, sizeof(char *));
-    argv[0] = strdup("energy_meter_single_measurement_period_test");
+    argv[0] = strdup("unit_test");
     argv[1] = strdup("--activate-energy");
 
     EXPECT_NO_THROW(simulation->init(&argc, argv));
@@ -417,8 +417,8 @@ void SimulationTimestampEnergyTest::do_EnergyMeterSingleMeasurementPeriod_test()
     }
 
     delete simulation;
-    free(argv[0]);
-    free(argv[1]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -467,7 +467,7 @@ void SimulationTimestampEnergyTest::do_EnergyMeterMultipleMeasurementPeriod_test
     auto simulation = new wrench::Simulation();
     int argc = 2;
     auto argv = (char **)calloc(argc, sizeof(char *));
-    argv[0] = strdup("energy_meter_multiple_measurement_period_test");
+    argv[0] = strdup("unit_test");
     argv[1] = strdup("--activate-energy");
 
     EXPECT_NO_THROW(simulation->init(&argc, argv));
@@ -544,7 +544,7 @@ void SimulationTimestampEnergyTest::do_EnergyMeterMultipleMeasurementPeriod_test
     }
 
     delete simulation;
-    free(argv[0]);
-    free(argv[1]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
