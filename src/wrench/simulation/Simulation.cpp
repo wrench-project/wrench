@@ -817,6 +817,7 @@ namespace wrench {
 
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
+
         this->getOutput().addTimestampDiskWriteStart(hostname, location->getMountPoint(), n_bytes, temp_unique_sequence_number);
 
         MemoryManager *mem_mng = this->getMemoryManagerByHost(hostname);
