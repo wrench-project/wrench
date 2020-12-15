@@ -13,6 +13,7 @@
 
 #include "CondorWMS.h" // WMS implementation
 #include "CondorTimestamp.h"
+#include "wrench/tools/pegasus/PegasusWorkflowParser.h"
 
 void generatePlatform(std::string platform_file_path,
                       int disk_speed,
@@ -169,6 +170,8 @@ int main(int argc, char **argv) {
     bool ten_split = false;
     bool join_merge_join_merge = false;
     bool three_four_split = false;
+    bool seismology = false;
+    bool seismology_500 = false;
 
     if(argc>2){
         batch_bandwidth = std::stoi(std::string(argv[2]));
@@ -193,6 +196,10 @@ int main(int argc, char **argv) {
         join_merge_join_merge = true;
     } else if (argc==7 && std::stod(std::string(argv[6]))==6) {
         three_four_split = true;
+    } else if (argc==7 && std::stod(std::string(argv[6]))==7) {
+        seismology = true;
+    } else if (argc==7 && std::stod(std::string(argv[6]))==8) {
+        seismology_500 = true;
     }
 
 
@@ -338,7 +345,6 @@ int main(int argc, char **argv) {
         output_file11 = grid_workflow->addFile("output_file11", 10000000000.0);
         input_file12 = grid_workflow->addFile("input_file12", 10000000000.0);
         output_file12 = grid_workflow->addFile("output_file12", 10000000000.0);
-
 
         task2 = grid_workflow->addTask("grid_task2", 500000000000.0, 1, 1, 0);
         task2->addInputFile(input_file2);
@@ -531,7 +537,6 @@ int main(int argc, char **argv) {
         input_file17 = grid_workflow->addFile("input_file17", 10000000000.0);
         output_file17 = grid_workflow->addFile("output_file17", 10000000000.0);
 
-
         task2 = grid_workflow->addTask("grid_task2", 500000000000.0, 1, 1, 0);
         task2->addInputFile(input_file2);
         task2->addOutputFile(output_file2);
@@ -613,11 +618,11 @@ int main(int argc, char **argv) {
         grid_workflow->addControlDependency(task14, task17);
         grid_workflow->addControlDependency(task15, task17);
         grid_workflow->addControlDependency(task16, task17);
+    } else if (seismology) {
+        grid_workflow = wrench::PegasusWorkflowParser::createWorkflowFromJSON("seismology.json", "10000000000f", false);
+    } else if (seismology_500) {
+        grid_workflow = wrench::PegasusWorkflowParser::createWorkflowFromJSON("seismology_500.json", "10000000000f", false);
     }
-
-
-
-
 
     // Create a Storage Service
     storage_service = simulation->add(
@@ -686,8 +691,12 @@ int main(int argc, char **argv) {
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Staging the input_file on the storage service
-    simulation->stageFile(input_file1, storage_service);
 
+    for (auto const &f : grid_workflow->getInputFiles()) {
+        simulation->stageFile(f, storage_service);
+    }
+
+    /**
     if(diamond_exec){
         simulation->stageFile(input_file2, storage_service);
         simulation->stageFile(input_file3, storage_service);
@@ -745,7 +754,10 @@ int main(int argc, char **argv) {
         simulation->stageFile(input_file15, storage_service);
         simulation->stageFile(input_file16, storage_service);
         simulation->stageFile(input_file17, storage_service);
+    } else if (seismology) {
+
     }
+     **/
 
 
     // Running a "run a single task" simulation
