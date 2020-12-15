@@ -1,0 +1,364 @@
+{
+  "name": "seismology-0",
+  "description": "Trace generated with wrench-pegasus-parser.py from http://wrench-project.org",
+  "createdAt": "2020-12-09T23:11:56.757373Z",
+  "schemaVersion": "1.0",
+  "wms": {
+    "name": "Pegasus",
+    "version": "4.9.3",
+    "url": "http://pegasus.isi.edu"
+  },
+  "author": {
+    "name": "cc",
+    "email": "wkoch530@gmail.com"
+  },
+  "workflow": {
+    "executedAt": "20201127T200855+0000",
+    "machines": [
+      {
+        "system": "linux",
+        "architecture": "x86_64",
+        "release": "4.15.0-106-generic",
+        "nodeName": "wrench-htcondor-1",
+        "memory": 131795968,
+        "cpu": {
+          "count": 48,
+          "speed": 1200,
+          "vendor": "GenuineIntel"
+        }
+      },
+      {
+        "system": "linux",
+        "architecture": "x86_64",
+        "release": "4.15.0-106-generic",
+        "nodeName": "wrench-htcondor-4",
+        "memory": 131795964,
+        "cpu": {
+          "count": 48,
+          "speed": 1201,
+          "vendor": "GenuineIntel"
+        }
+      },
+      {
+        "system": "linux",
+        "architecture": "x86_64",
+        "release": "4.15.0-106-generic",
+        "nodeName": "wrench-htcondor-5",
+        "memory": 131795964,
+        "cpu": {
+          "count": 48,
+          "speed": 1257,
+          "vendor": "GenuineIntel"
+        }
+      }
+    ],
+    "jobs": [
+      {
+        "name": "sG1IterDecon_ID0000001",
+        "type": "compute",
+        "runtime": 1.998,
+        "parents": [
+          "stage_in_remote_local_0_0"
+        ],
+        "files": [
+          {
+            "link": "input",
+            "name": "egf-sbc-ci-_ldsp.lht",
+            "size": 0
+          },
+          {
+            "link": "input",
+            "name": "mshock-sbc-ci-_ldsp.lht",
+            "size": 0
+          },
+          {
+            "link": "output",
+            "name": "sbc-ci-_ldsp.lht_iter_g1.stf",
+            "size": 0
+          }
+        ],
+        "avgCPU": 70.5205,
+        "arguments": [
+          "mshock-sbc-ci-_ldsp.lht",
+          "egf-sbc-ci-_ldsp.lht"
+        ],
+        "machine": "wrench-htcondor-5",
+        "priority": 20
+      },
+      {
+        "name": "sG1IterDecon_ID0000002",
+        "type": "compute",
+        "runtime": 1.579,
+        "parents": [
+          "stage_in_remote_local_0_0"
+        ],
+        "files": [
+          {
+            "link": "input",
+            "name": "mshock-d03-xt-_ldsp.lht",
+            "size": 0
+          },
+          {
+            "link": "input",
+            "name": "egf-d03-xt-_ldsp.lht",
+            "size": 0
+          },
+          {
+            "link": "output",
+            "name": "d03-xt-_ldsp.lht_iter_g1.stf",
+            "size": 0
+          }
+        ],
+        "avgCPU": 68.2711,
+        "arguments": [
+          "mshock-d03-xt-_ldsp.lht",
+          "egf-d03-xt-_ldsp.lht"
+        ],
+        "machine": "wrench-htcondor-4",
+        "priority": 20
+      },
+      {
+        "name": "sG1IterDecon_ID0000003",
+        "type": "compute",
+        "runtime": 0.906,
+        "parents": [
+          "stage_in_remote_local_0_0"
+        ],
+        "files": [
+          {
+            "link": "input",
+            "name": "mshock-f49a-ta-_ldsp.lht",
+            "size": 0
+          },
+          {
+            "link": "input",
+            "name": "egf-f49a-ta-_ldsp.lht",
+            "size": 0
+          },
+          {
+            "link": "output",
+            "name": "f49a-ta-_ldsp.lht_iter_g1.stf",
+            "size": 0
+          }
+        ],
+        "avgCPU": 64.128,
+        "arguments": [
+          "mshock-f49a-ta-_ldsp.lht",
+          "egf-f49a-ta-_ldsp.lht"
+        ],
+        "machine": "wrench-htcondor-4",
+        "priority": 20
+      },
+      {
+        "name": "sG1IterDecon_ID0000004",
+        "type": "compute",
+        "runtime": 2.655,
+        "parents": [
+          "stage_in_remote_local_0_0"
+        ],
+        "files": [
+          {
+            "link": "input",
+            "name": "mshock-858a-ta-_ldsp.lht",
+            "size": 0
+          },
+          {
+            "link": "input",
+            "name": "egf-858a-ta-_ldsp.lht",
+            "size": 0
+          },
+          {
+            "link": "output",
+            "name": "858a-ta-_ldsp.lht_iter_g1.stf",
+            "size": 0
+          }
+        ],
+        "avgCPU": 79.548,
+        "arguments": [
+          "mshock-858a-ta-_ldsp.lht",
+          "egf-858a-ta-_ldsp.lht"
+        ],
+        "machine": "wrench-htcondor-5",
+        "priority": 20
+      },
+      {
+        "name": "sG1IterDecon_ID0000005",
+        "type": "compute",
+        "runtime": 0.853,
+        "parents": [
+          "stage_in_remote_local_0_0"
+        ],
+        "files": [
+          {
+            "link": "input",
+            "name": "egf-tixi-iu-00_ldsp.lht",
+            "size": 0
+          },
+          {
+            "link": "input",
+            "name": "mshock-tixi-iu-00_ldsp.lht",
+            "size": 0
+          },
+          {
+            "link": "output",
+            "name": "tixi-iu-00_ldsp.lht_iter_g1.stf",
+            "size": 0
+          }
+        ],
+        "avgCPU": 53.1067,
+        "arguments": [
+          "mshock-tixi-iu-00_ldsp.lht",
+          "egf-tixi-iu-00_ldsp.lht"
+        ],
+        "machine": "wrench-htcondor-4",
+        "priority": 20
+      },
+      {
+        "name": "wrapper_siftSTFByMisfit_ID0000006",
+        "type": "compute",
+        "runtime": 0.354,
+        "parents": [
+          "sG1IterDecon_ID0000003",
+          "sG1IterDecon_ID0000002",
+          "stage_in_remote_local_1_0",
+          "sG1IterDecon_ID0000005",
+          "sG1IterDecon_ID0000004",
+          "sG1IterDecon_ID0000001"
+        ],
+        "files": [
+          {
+            "link": "input",
+            "name": "f49a-ta-_ldsp.lht_iter_g1.stf",
+            "size": 0
+          },
+          {
+            "link": "input",
+            "name": "pysacio.py",
+            "size": 0
+          },
+          {
+            "link": "input",
+            "name": "pytutil.py",
+            "size": 0
+          },
+          {
+            "link": "input",
+            "name": "sbc-ci-_ldsp.lht_iter_g1.stf",
+            "size": 0
+          },
+          {
+            "link": "input",
+            "name": "858a-ta-_ldsp.lht_iter_g1.stf",
+            "size": 0
+          },
+          {
+            "link": "input",
+            "name": "d03-xt-_ldsp.lht_iter_g1.stf",
+            "size": 0
+          },
+          {
+            "link": "input",
+            "name": "siftSTFByMisfit",
+            "size": 0
+          },
+          {
+            "link": "input",
+            "name": "tixi-iu-00_ldsp.lht_iter_g1.stf",
+            "size": 0
+          },
+          {
+            "link": "output",
+            "name": "good-fits.tar.gz",
+            "size": 0
+          }
+        ],
+        "avgCPU": 9.887,
+        "arguments": [
+          "sbc-ci-_ldsp.lht_iter_g1.stf",
+          "d03-xt-_ldsp.lht_iter_g1.stf",
+          "f49a-ta-_ldsp.lht_iter_g1.stf",
+          "858a-ta-_ldsp.lht_iter_g1.stf",
+          "tixi-iu-00_ldsp.lht_iter_g1.stf"
+        ],
+        "machine": "wrench-htcondor-4",
+        "priority": 30
+      },
+      {
+        "name": "create_dir_seismology_0_local",
+        "type": "auxiliary",
+        "runtime": 2.041,
+        "parents": [],
+        "files": [],
+        "priority": 800
+      },
+      {
+        "name": "stage_in_remote_local_1_0",
+        "type": "transfer",
+        "runtime": 4.116,
+        "parents": [
+          "create_dir_seismology_0_local"
+        ],
+        "files": [],
+        "avgCPU": 3.5714,
+        "arguments": [
+          "--threads",
+          "2"
+        ],
+        "machine": "wrench-htcondor-1",
+        "priority": 700
+      },
+      {
+        "name": "stage_in_remote_local_0_0",
+        "type": "transfer",
+        "runtime": 4.111,
+        "parents": [
+          "create_dir_seismology_0_local"
+        ],
+        "files": [],
+        "avgCPU": 4.7434,
+        "arguments": [
+          "--threads",
+          "2"
+        ],
+        "machine": "wrench-htcondor-1",
+        "priority": 700
+      },
+      {
+        "name": "stage_out_local_local_1_0",
+        "type": "transfer",
+        "runtime": 2.125,
+        "parents": [
+          "wrapper_siftSTFByMisfit_ID0000006"
+        ],
+        "files": [],
+        "avgCPU": 5.8353,
+        "arguments": [
+          "--threads",
+          "2"
+        ],
+        "machine": "wrench-htcondor-1",
+        "priority": 900
+      },
+      {
+        "name": "register_local_1_0",
+        "type": "auxiliary",
+        "runtime": 0.364,
+        "parents": [
+          "stage_out_local_local_1_0"
+        ],
+        "files": [],
+        "avgCPU": 229.9451,
+        "arguments": [
+          "--conf",
+          "/home/cc/seismology-workflow/submit/cc/pegasus/seismology/run0002/pegasus.17094983419388532163.properties",
+          "-v",
+          "--insert",
+          "/home/cc/seismology-workflow/submit/cc/pegasus/seismology/run0002/00/00/register_local_1_0.in"
+        ],
+        "machine": "wrench-htcondor-1",
+        "priority": 50
+      }
+    ],
+    "makespan": 1553.0
+  }
+}
