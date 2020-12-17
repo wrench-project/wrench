@@ -45,9 +45,27 @@ add_executable(wrench-example-io-pagecache-nfs ${SOURCE_FILES})
 
 if (ENABLE_BATSCHED)
     find_library(ZMQ_LIBRARY NAMES zmq)
-    target_link_libraries(wrench-example-io-pagecache-nfs wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY} ${ZMQ_LIBRARY})
+    target_link_libraries(wrench-example-io-pagecache-nfs wrenchpegasusworkflowparser wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY} ${ZMQ_LIBRARY})
 else()
-    target_link_libraries(wrench-example-io-pagecache-nfs wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY})
+    target_link_libraries(wrench-example-io-pagecache-nfs wrenchpegasusworkflowparser wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY})
 endif()
 
 install(TARGETS wrench-example-io-pagecache-nfs DESTINATION bin)
+
+#============================================================
+set(SOURCE_FILES
+        ConcurrentPipelineWMS.h
+        ConcurrentPipelineWMS.cpp
+        IOPageCacheNighres.cpp
+        )
+
+add_executable(wrench-example-io-pagecache-nighres ${SOURCE_FILES})
+
+if (ENABLE_BATSCHED)
+    find_library(ZMQ_LIBRARY NAMES zmq)
+    target_link_libraries(wrench-example-io-pagecache-nighres wrenchpegasusworkflowparser wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY} ${ZMQ_LIBRARY})
+else()
+    target_link_libraries(wrench-example-io-pagecache-nighres wrenchpegasusworkflowparser wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY})
+endif()
+
+install(TARGETS wrench-example-io-pagecache-nighres DESTINATION bin)
