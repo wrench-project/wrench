@@ -313,7 +313,13 @@ namespace wrench {
 
                 // I/O for the last chunk
                 if (Simulation::isPageCachingEnabled()) {
-                    simulation->writeThroughWithMemoryCache(file, msg->payload, location);
+                    bool write_locally = location->getServerStorageService() == nullptr ;
+
+                    if (write_locally) {
+                        simulation->writebackWithMemoryCache(file, msg->payload, location, true);
+                    } else {
+                        simulation->writeThroughWithMemoryCache(file, msg->payload, location);
+                    }
                 } else {
 //                     Write to disk
                     simulation->writeToDisk(msg->payload, location->getStorageService()->hostname,
