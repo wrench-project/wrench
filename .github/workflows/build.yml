@@ -36,13 +36,13 @@ jobs:
         run: |
           docker pull wrenchproject/wrench-build:${DIST}-${COMPILER};
           docker run -m 4g -d -t --name=wrench wrenchproject/wrench-build:${DIST}-${COMPILER} bash;
-          docker exec -it wrench git clone https://github.com/wrench-project/wrench;
+          docker exec wrench git clone https://github.com/wrench-project/wrench;
           # if not the master branch, switch to branch
           if [[ "GITHUB_REF" != "refs/heads/master" ]]; then
-            docker exec -w /home/wrench/wrench -it wrench git checkout ${GITHUB_REF};
+            docker exec -w /home/wrench/wrench wrench git checkout ${GITHUB_REF};
           fi
-          docker exec -it wrench mkdir wrench/build;
+          docker exec wrench mkdir wrench/build;
           # build and test wrench
-          docker exec -w /home/wrench/wrench/build -it wrench cmake -DENABLE_BATSCHED=${batsched} -DCMAKE_VERBOSE_MAKEFILE=ON ..;
-          docker exec -w /home/wrench/wrench/build -it wrench make all unit_tests;
-          docker exec -w /home/wrench/wrench/build -it wrench ./unit_tests;
+          docker exec -w /home/wrench/wrench/build wrench cmake -DENABLE_BATSCHED=${batsched} -DCMAKE_VERBOSE_MAKEFILE=ON ..;
+          docker exec -w /home/wrench/wrench/build wrench make all unit_tests;
+          docker exec -w /home/wrench/wrench/build wrench ./unit_tests;
