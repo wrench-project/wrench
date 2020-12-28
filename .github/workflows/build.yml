@@ -20,6 +20,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Install Dependencies
         run: |
+          sudo apt-get update
           sudo apt-get -y install $COMPILER
           sudo apt-get -y install pkg-config git cmake cmake-data doxygen doxygen-doc doxygen-latex doxygen-gui graphviz libboost-all-dev wget sudo curl lcov
           # install SimGrid
