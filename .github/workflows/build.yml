@@ -21,13 +21,28 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Configure Docker
+        run: |
+          sudo apt-get update
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+          sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+          sudo apt-get update
+          sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+
+      - name: Source Build and Test
         env:
           DIST: ${{ matrix.DIST }}
           COMPILER: ${{ matrix.COMPILER }}
           batsched: ${{ matrix.batsched }}
         run: |
-          env
-
-      - name: Source Build and Test
-        run: |
-          echo test
+          docker pull wrenchproject/wrench-build:${DIST}-${COMPILER};
+          docker run -m 4g -d -t --name=wrench wrenchproject/wrench-build:${DIST}-${COMPILER} bash;
+          docker exec -it wrench git clone https://github.com/wrench-project/wrench;
+          # if not the master branch, switch to branch
+          if [[ "GITHUB_REF" != "refs/heads/master" ]]; then
+            docker exec -w /home/wrench/wrench -it wrench git checkout ${GITHUB_REF};
+          fi
+          docker exec -it wrench mkdir wrench/build;
+          # build and test wrench
+          docker exec -w /home/wrench/wrench/build -it wrench cmake -DENABLE_BATSCHED=${batsched} -DCMAKE_VERBOSE_MAKEFILE=ON ..;
+          docker exec -w /home/wrench/wrench/build -it wrench make all unit_tests;
+          docker exec -w /home/wrench/wrench/build -it wrench ./unit_tests;
