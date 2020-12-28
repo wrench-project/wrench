@@ -9,14 +9,15 @@ jobs:
       matrix:
         include:
           - build: "Ubuntu Xenial - g++-5"
-            DIST: ubuntu-xenial
-            COMPILER: gcc5
-            batsched: off
+            env:
+              DIST: ubuntu-xenial
+              COMPILER: gcc5
+              batsched: off
           - build: "Ubuntu Bionic - g++-7"
-            DIST: ubuntu-bionic
-            COMPILER: gcc7
-            batsched: off
-
+            env:
+              DIST: ubuntu-bionic
+              COMPILER: gcc7
+              batsched: off
 
     steps:
       - uses: actions/checkout@v2
@@ -30,4 +31,6 @@ jobs:
 
       - name: Source Build and Test
         run: |
-          env
+          docker pull wrenchproject/wrench-build:${DIST}-${COMPILER};
+          docker run -m 4g -d -t --name=wrench wrenchproject/wrench-build:${DIST}-${COMPILER} bash;
+          docker exec -it wrench git clone https://github.com/wrench-project/wrench;
