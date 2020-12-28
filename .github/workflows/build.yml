@@ -22,16 +22,11 @@ jobs:
       - uses: actions/checkout@v2
       - name: Configure Docker
         env:
-          DIST: ${{ DIST }}
-          COMPILER: ${{ COMPILER }}
-          batsched: ${{ batsched }}
+          DIST: ${{ matrix.DIST }}
+          COMPILER: ${{ matrix.COMPILER }}
+          batsched: ${{ matrix.batsched }}
         run: |
           env
-#          sudo apt-get update
-#          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-#          sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-#          sudo apt-get update
-#          sudo apt-get install -y docker-ce docker-ce-cli containerd.io
 
       - name: Source Build and Test
         run: |
