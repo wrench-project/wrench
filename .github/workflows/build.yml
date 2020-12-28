@@ -18,6 +18,11 @@ jobs:
             COMPILER: gcc7
             batsched: off
 
+          - build: "Ubuntu Focal - g++-9"
+            DIST: ubuntu-focal
+            COMPILER: gcc9
+            batsched: off
+
     steps:
       - uses: actions/checkout@v2
       - name: Configure Docker
@@ -46,3 +51,32 @@ jobs:
           docker exec -w /home/wrench/wrench/build wrench cmake -DENABLE_BATSCHED=${batsched} -DCMAKE_VERBOSE_MAKEFILE=ON ..;
           docker exec -w /home/wrench/wrench/build wrench make all unit_tests;
           docker exec -w /home/wrench/wrench/build wrench ./unit_tests;
+
+      - name: Documentation Build and Deployment
+        env:
+          DIST: ${{ matrix.DIST }}
+          COMPILER: ${{ matrix.COMPILER }}
+          batsched: ${{ matrix.batsched }}
+          TOKEN_GITHUB: ${{ secrets.TOKEN_GITHUB }}
+        run: |
+          if [[ "$DIST" == "ubuntu-focal" && "$COMPILER" == "gcc9" && "$batsched" == "off" ]]; then
+            docker exec -w /home/wrench/wrench/build wrench cmake -DENABLE_BATSCHED=${batsched} -DCMAKE_VERBOSE_MAKEFILE=ON ..;
+            docker exec -w /home/wrench/wrench/build wrench make doc;
+            docker cp wrench:/home/wrench/wrench/docs .;
+            cp -R ./docs/wrench-doc $HOME/gh-pages-to-deploy;
+            echo "Starting to update gh-pages"
+            #copy data we're interested in to other place
+            git config --global user.email "actions@github.com"
+            git config --global user.name "GitHub Actions"
+            #using token clone gh-pages branch
+            git clone --quiet --branch=gh-pages https://${TOKEN_GITHUB}@github.com/wrench-project/wrench.git gh-pages > /dev/null;
+            #go into directory and copy data we're interested in to that directory
+            cd gh-pages;
+            cp -Rf $HOME/gh-pages-to-deploy/* .;
+            touch .nojekyll;
+            #add, commit and push files
+            git add -f .;
+            git diff-index --quiet HEAD || git commit -m "Travis build $TRAVIS_BUILD_NUMBER";
+            git push -fq origin gh-pages > /dev/null;
+            echo "Done updating gh-pages.";
+          fi
