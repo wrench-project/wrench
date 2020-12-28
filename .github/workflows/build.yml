@@ -4,24 +4,32 @@ on: [ push ]
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         include:
-          - os: ubuntu-20.04
-            COMPILER: gcc
-            LINKER: gcc
+          - build: "Ubuntu Xenial - g++-5"
+            DIST: ubuntu-xenial
+            COMPILER: gcc5
+            batsched: off
+          - build: "Ubuntu Bionic - g++-7"
+            DIST: ubuntu-bionic
+            COMPILER: gcc7
+            batsched: off
 
-          - os: ubuntu-18.04
-            COMPILER: gcc
-            LINKER: gcc
 
     steps:
       - uses: actions/checkout@v2
-      - name: Install Dependencies
+      - name: Configure Docker
         run: |
           sudo apt-get update
-          sudo apt-get -y install $COMPILER
-          sudo apt-get -y install pkg-config git cmake cmake-data doxygen doxygen-doc doxygen-latex doxygen-gui graphviz libboost-all-dev wget sudo curl lcov
-          # install SimGrid
-          wget https://framagit.org/simgrid/simgrid/uploads/0365f13697fb26eae8c20fc234c5af0e/SimGrid-3.25.tar.gz && tar -xf SimGrid-3.25.tar.gz && cd SimGrid-3.25 && cmake . && make && sudo make install && cd .. && rm -rf SimGrid-3.25*
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+          sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+          sudo apt-get update
+          sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+
+      - name: Source Build and Test
+        run: |
+          echo $DIST
+          echo $COMPILER
+          echo $batsched
