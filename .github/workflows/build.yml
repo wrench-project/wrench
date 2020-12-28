@@ -22,16 +22,21 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Configure Docker
+        env:
+          DIST: ${{ env.DIST }}
+          COMPILER: ${{ env.COMPILER }}
+          batsched: ${{ env.batsched }}
         run: |
           env
-          sudo apt-get update
-          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-          sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-          sudo apt-get update
-          sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+#          sudo apt-get update
+#          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+#          sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+#          sudo apt-get update
+#          sudo apt-get install -y docker-ce docker-ce-cli containerd.io
 
       - name: Source Build and Test
         run: |
-          docker pull wrenchproject/wrench-build:${DIST}-${COMPILER};
-          docker run -m 4g -d -t --name=wrench wrenchproject/wrench-build:${DIST}-${COMPILER} bash;
-          docker exec -it wrench git clone https://github.com/wrench-project/wrench;
+#          docker pull wrenchproject/wrench-build:${DIST}-${COMPILER};
+#          docker run -m 4g -d -t --name=wrench wrenchproject/wrench-build:${DIST}-${COMPILER} bash;
+#          docker exec -it wrench git clone https://github.com/wrench-project/wrench;
+           echo ""
