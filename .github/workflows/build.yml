@@ -8,14 +8,6 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: macos-11.0
-            COMPILER: clang
-            LINKER: clang
-
-          - os: macos-10.15
-            COMPILER: clang
-            LINKER: clang
-
           - os: ubuntu-20.04
             COMPILER: gcc
             LINKER: gcc
@@ -26,3 +18,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      - name: Install Dependencies
+        run: |
+          apt-get -y install $COMPILER
+          apt-get -y install pkg-config git cmake cmake-data doxygen doxygen-doc doxygen-latex doxygen-gui graphviz libboost-all-dev wget sudo curl lcov
+          # install SimGrid
+          wget https://framagit.org/simgrid/simgrid/uploads/0365f13697fb26eae8c20fc234c5af0e/SimGrid-3.25.tar.gz && tar -xf SimGrid-3.25.tar.gz && cd SimGrid-3.25 && cmake . && make && sudo make install && cd .. && rm -rf SimGrid-3.25*
