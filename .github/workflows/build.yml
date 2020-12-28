@@ -9,25 +9,29 @@ jobs:
       matrix:
         include:
           - build: "Ubuntu Xenial - g++-5"
-            env:
-              DIST: ubuntu-xenial
-              COMPILER: gcc5
-              batsched: off
+            DIST: ubuntu-xenial
+            COMPILER: gcc5
+            batsched: off
+
           - build: "Ubuntu Bionic - g++-7"
-            env:
-              DIST: ubuntu-bionic
-              COMPILER: gcc7
-              batsched: off
+            DIST: ubuntu-bionic
+            COMPILER: gcc7
+            batsched: off
 
     steps:
       - uses: actions/checkout@v2
       - name: Configure Docker
         env:
-          DIST: ${{ env.DIST }}
-          COMPILER: ${{ env.COMPILER }}
-          batsched: ${{ env.batsched }}
+          DIST: ${{ DIST }}
+          COMPILER: ${{ COMPILER }}
+          batsched: ${{ batsched }}
         run: |
           env
+#          sudo apt-get update
+#          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+#          sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+#          sudo apt-get update
+#          sudo apt-get install -y docker-ce docker-ce-cli containerd.io
 
       - name: Source Build and Test
         run: |
