@@ -1,0 +1,28 @@
+name: Build
+
+on: [ push ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: macos-11.0
+              COMPILER: clang
+              LINKER: clang
+
+          - os: macos-10.15
+              COMPILER: clang
+              LINKER: clang
+
+          - os: ubuntu-20.04
+              COMPILER: gcc
+              LINKER: gcc
+
+          - os: ubuntu-18.04
+              COMPILER: gcc
+              LINKER: gcc
+
+    steps:
+      - uses: actions/checkout@v2
