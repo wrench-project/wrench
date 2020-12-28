@@ -30,6 +30,4 @@ jobs:
 
       - name: Source Build and Test
         run: |
-          echo $DIST
-          echo $COMPILER
-          echo $batsched
+          env
