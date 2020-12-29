@@ -39,7 +39,7 @@ And, one of the following:
 
 ### Required Dependencies 
 
-- [SimGrid](https://framagit.org/simgrid/simgrid/-/releases) - version 3.25
+- [SimGrid](https://framagit.org/simgrid/simgrid/-/releases) - version 3.25 or higher
 - [PugiXML](http://pugixml.org/) - version 1.8 or higher 
 - [JSON for Modern C++](https://github.com/nlohmann/json) - version 3.9.0 or higher 
 
