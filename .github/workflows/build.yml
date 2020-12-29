@@ -43,7 +43,7 @@ jobs:
           docker run -m 4g -d -t --name=wrench wrenchproject/wrench-build:${DIST}-${COMPILER} bash;
           docker exec wrench git clone https://github.com/wrench-project/wrench;
           # if not the master branch, switch to branch
-          if [[ "GITHUB_REF" != "refs/heads/master" ]]; then
+          if [[ "$GITHUB_REF" != "refs/heads/master" ]]; then
             docker exec -w /home/wrench/wrench wrench git checkout ${GITHUB_REF};
           fi
           docker exec wrench mkdir wrench/build;
@@ -76,7 +76,21 @@ jobs:
             touch .nojekyll;
             #add, commit and push files
             git add -f .;
-            git diff-index --quiet HEAD || git commit -m "Travis build $TRAVIS_BUILD_NUMBER";
+            git diff-index --quiet HEAD || git commit -m "GitHub build $GITHUB_RUN_NUMBER";
             git push -fq origin gh-pages > /dev/null;
             echo "Done updating gh-pages.";
+          fi
+
+      - name: Code Coverage
+        env:
+          DIST: ${{ matrix.DIST }}
+          COMPILER: ${{ matrix.COMPILER }}
+          batsched: ${{ matrix.batsched }}
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        run: |
+          if [[ "$DIST" == "ubuntu-focal" && "$COMPILER" == "gcc9" && "$batsched" == "off" ]]; then
+            docker exec -w /home/wrench/wrench/build wrench lcov --directory . --capture --output-file coverage.info;
+            docker exec -w /home/wrench/wrench/build wrench lcov --remove coverage.info '*/test/*' '*/examples/*' '*/include/*' --output-file coverage.info;
+            docker cp wrench:/home/wrench/wrench/build/coverage.info .;
+            bash <(curl -s https://codecov.io/bash) -f coverage.info -t ${CODECOV_TOKEN};
           fi
