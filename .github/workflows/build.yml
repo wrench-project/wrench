@@ -18,9 +18,39 @@ jobs:
             COMPILER: gcc7
             batsched: off
 
+          - build: "Ubuntu Bionic - g++-7 (batsched)"
+            DIST: ubuntu-bionic
+            COMPILER: gcc7-batsched
+            batsched: on
+
+          - build: "Ubuntu Bionic - clang-9"
+            DIST: ubuntu-bionic
+            COMPILER: clang9
+            batsched: off
+
           - build: "Ubuntu Focal - g++-9"
             DIST: ubuntu-focal
             COMPILER: gcc9
+            batsched: off
+
+          - build: "Ubuntu Focal - clang-10"
+            DIST: ubuntu-focal
+            COMPILER: clang10
+            batsched: off
+
+          - build: "Debian Stretch - g++-6"
+            DIST: debian-stretch
+            COMPILER: gcc6
+            batsched: off
+
+          - build: "Debian Buster - g++-8"
+            DIST: debian-buster
+            COMPILER: gcc8
+            batsched: off
+
+          - build: "Debian Bullseye - g++-10"
+            DIST: debian-bullseye
+            COMPILER: gcc10
             batsched: off
 
     steps:
@@ -94,3 +124,11 @@ jobs:
             docker cp wrench:/home/wrench/wrench/build/coverage.info .;
             bash <(curl -s https://codecov.io/bash) -f coverage.info -t ${CODECOV_TOKEN};
           fi
+
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_CHANNEL: github
+          SLACK_ICON: https://github.com/wrench-project.png?size=48
+          SLACK_USERNAME: wrench-builds
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
