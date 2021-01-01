@@ -74,7 +74,8 @@ jobs:
           docker exec wrench git clone https://github.com/wrench-project/wrench;
           # if not the master branch, switch to branch
           if [[ "$GITHUB_REF" != "refs/heads/master" ]]; then
-            docker exec -w /home/wrench/wrench wrench git checkout ${GITHUB_REF};
+            BRANCH_NAME==$(echo ${GITHUB_REF} | sed 's/refs\/heads\///g')
+            docker exec -w /home/wrench/wrench wrench git checkout ${BRANCH_NAME};
           fi
           docker exec wrench mkdir wrench/build;
           # build and test wrench
