@@ -27,7 +27,7 @@ namespace wrench {
      *
      * @param vm_name: the name of the VM
      * @param num_cores: the number of cores the VM can use
-     * @param ram_memory: the VM RAM memory capacity
+     * @param ram_memory: the VM RAM memory_manager_service capacity
      * @param property_list: a property list ({} means use all defaults)
      * @param messagepayload_list: a message payload list ({} means use all defaults)
      */
@@ -63,8 +63,8 @@ namespace wrench {
     }
 
     /**
-    * @brief Get the memory consumption
-    * @return the memory consumption
+    * @brief Get the memory_manager_service consumption
+    * @return the memory_manager_service consumption
     */
     double S4U_VirtualMachine::getMemory() {
         return this->ram_memory;

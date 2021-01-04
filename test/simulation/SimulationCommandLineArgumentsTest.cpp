@@ -140,8 +140,8 @@ void SimulationCommandLineArgumentsTest::do_versionArgument_test() {
     ASSERT_GE(linecount, 2);
 
     delete simulation;
-    free(argv[0]);
-    free(argv[1]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -195,8 +195,8 @@ void SimulationCommandLineArgumentsTest::do_HelpWrenchArgument_test() {
     ASSERT_LE(linecount, 15);
 
     delete simulation;
-    free(argv[0]);
-    free(argv[1]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -213,7 +213,7 @@ void SimulationCommandLineArgumentsTest::do_HelpSimGridArgument_test() {
     auto *simulation = new wrench::Simulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("unit_tests");
+    argv[0] = strdup("unit_test");
     argv[1] = strdup("--help-simgrid");
 
     pid_t pid = fork();
@@ -251,8 +251,8 @@ void SimulationCommandLineArgumentsTest::do_HelpSimGridArgument_test() {
     ASSERT_LE(linecount, 300);
 
     delete simulation;
-    free(argv[0]);
-    free(argv[1]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -281,8 +281,8 @@ void SimulationCommandLineArgumentsTest::do_HelpArgument_test() {
     ASSERT_EQ(!strcmp(argv[1], "--help"), 1);
 
     delete simulation;
-    free(argv[0]);
-    free(argv[1]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -349,8 +349,8 @@ void SimulationCommandLineArgumentsTest::do_NoColorArgument_test() {
 
 
     delete simulation;
-    free(argv[0]);
-    free(argv[1]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -414,8 +414,8 @@ void SimulationCommandLineArgumentsTest::do_FullLogArgument_test(std::string arg
     xbt_log_control_set("root.thresh:critical");
 
     delete simulation;
-    free(argv[0]);
-    free(argv[1]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -452,7 +452,7 @@ void SimulationCommandLineArgumentsTest::do_ActivateEnergyArgument_test() {
     simulation->launch();
 
     delete simulation;
-    free(argv[0]);
-    free(argv[1]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }

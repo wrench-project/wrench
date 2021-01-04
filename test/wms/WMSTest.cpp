@@ -104,8 +104,8 @@ private:
         auto vm_cs = cloud->startVM(vm_name);
 
         // Get a "STANDARD JOB COMPLETION" event (default handler)
-        wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 10.0, 1, 1, 0);
-        wrench::StandardJob *job1 = job_manager->createStandardJob(task1, {});
+        auto task1 = this->getWorkflow()->addTask("task1", 10.0, 1, 1, 0);
+        auto job1 = job_manager->createStandardJob(task1, {});
         job_manager->submitJob(job1, vm_cs);
         this->waitForAndProcessNextEvent();
 
@@ -113,7 +113,7 @@ private:
 
         // Get a "PILOT JOB STARTED" event (default handler)
         // This pilot job takes the whole machine!
-        wrench::PilotJob *job2 = job_manager->createPilotJob();
+        auto job2 = job_manager->createPilotJob();
         job_manager->submitJob(job2, batch, {{"-N", "1"}, {"-t", "50"}, {"-c", "4"}});
         this->waitForAndProcessNextEvent();
 
@@ -127,7 +127,7 @@ private:
         }
 
         // Submit another pilot job, which won't be running for a while
-        wrench::PilotJob *job2_1 = job_manager->createPilotJob();
+        auto job2_1 = job_manager->createPilotJob();
         job_manager->submitJob(job2_1, batch, {{"-N", "1"}, {"-t", "50"}, {"-c", "4"}});
         // Get the list of pending pilot jobs
         auto pending_pilot_jobs = job_manager->getPendingPilotJobs();
@@ -140,7 +140,7 @@ private:
 
         // Get a "STANDARD JOB FAILED" and "PILOT JOB EXPIRED" event (default handler)
         wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task2", 100.0, 1, 1, 0);
-        wrench::StandardJob *job3 = job_manager->createStandardJob(task2, {});
+        auto job3 = job_manager->createStandardJob(task2, {});
         job_manager->submitJob(job3, job2->getComputeService());
         this->waitForAndProcessNextEvent();
         this->waitForAndProcessNextEvent();
@@ -187,7 +187,7 @@ void WMSTest::do_DefaultHandlerWMS_test() {
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
     int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
+    auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -224,7 +224,7 @@ void WMSTest::do_DefaultHandlerWMS_test() {
 
 
     // Create a WMS
-    auto *workflow = new wrench::Workflow();
+    auto workflow = new wrench::Workflow();
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new TestDefaultHandlerWMS(this,  {cs_cloud, cs_batch}, {storage_service1, storage_service2}, hostname1)));
@@ -247,7 +247,8 @@ void WMSTest::do_DefaultHandlerWMS_test() {
 
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -292,7 +293,7 @@ private:
         auto vm_cs = cloud->startVM(vm_name);
 
         wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 10.0, 1, 1, 0);
-        wrench::StandardJob *job1 = job_manager->createStandardJob(task1, {});
+        auto job1 = job_manager->createStandardJob(task1, {});
         job_manager->submitJob(job1, vm_cs);
         this->waitForAndProcessNextEvent();
         if (this->counter != 1) {
@@ -301,7 +302,7 @@ private:
 
 
         // Get a "PILOT JOB STARTED" event (default handler)
-        wrench::PilotJob *job2 = job_manager->createPilotJob();
+        auto job2 = job_manager->createPilotJob();
         job_manager->submitJob(job2, this->test->cs_batch, {{"-N","1"},{"-c","1"},{"-t","2"}});
         this->waitForAndProcessNextEvent();
         if (this->counter != 2) {
@@ -310,7 +311,7 @@ private:
 
         // Get a "STANDARD JOB FAILED" and "PILOT JOB EXPIRED" event (default handler)
         wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task2", 200.0, 1, 1, 0);
-        wrench::StandardJob *job3 = job_manager->createStandardJob(task2, {});
+        auto job3 = job_manager->createStandardJob(task2, {});
         job_manager->submitJob(job3, job2->getComputeService());
         this->waitForAndProcessNextEvent();
         if (this->counter != 3) {
@@ -395,7 +396,7 @@ void WMSTest::do_CustomHandlerWMS_test() {
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
     int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
+    auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -452,6 +453,7 @@ void WMSTest::do_CustomHandlerWMS_test() {
 
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }

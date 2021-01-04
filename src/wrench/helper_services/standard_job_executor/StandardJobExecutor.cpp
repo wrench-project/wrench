@@ -52,10 +52,10 @@ namespace wrench {
      * @param callback_mailbox: the mailbox to which a reply will be sent
      * @param hostname: the name of the host on which this service will run (could be the first compute resources - see below)
      * @param job: the standard job to execute
-     * @param compute_resources: a non-empty map of <num_cores, memory> tuples, indexed by hostname, which represent
+     * @param compute_resources: a non-empty map of <num_cores, memory_manager_service> tuples, indexed by hostname, which represent
      *           the compute resources the job should execute on
      *              - If num_cores == ComputeService::ALL_CORES, then ALL the cores of the host are used
-     *              - If memory == ComputeService::ALL_RAM, then ALL the ram of the host is used
+     *              - If memory_manager_service == ComputeService::ALL_RAM, then ALL the ram of the host is used
      * @param scratch_space: the usable scratch storage space  (or nullptr if none)
      * @param part_of_pilot_job: true if the job executor is running within a pilot job
      * @param parent_pilot_job: the parent pilog job, if any
@@ -68,7 +68,7 @@ namespace wrench {
     StandardJobExecutor::StandardJobExecutor(Simulation *simulation,
                                              std::string callback_mailbox,
                                              std::string hostname,
-                                             StandardJob *job,
+                                             std::shared_ptr<StandardJob> job,
                                              std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
                                              std::shared_ptr<StorageService> scratch_space,
                                              bool part_of_pilot_job,
@@ -108,7 +108,7 @@ namespace wrench {
             }
         }
 
-        // Check that there is at least zero byte of memory per host, but not too many bytes
+        // Check that there is at least zero byte of memory_manager_service per host, but not too many bytes
         for (auto host : compute_resources) {
             if (std::get<1>(host.second) < 0) {
                 throw std::invalid_argument(
@@ -122,7 +122,7 @@ namespace wrench {
                             S4U_Simulation::getHostMemoryCapacity(host.first)) + " bytes of RAM");
                 }
             } else {
-                // Set the memory to the maximum
+                // Set the memory_manager_service to the maximum
                 std::get<1>(host.second) = S4U_Simulation::getHostMemoryCapacity(host.first);
             }
         }
@@ -173,7 +173,7 @@ namespace wrench {
 
         if (!enough_ram) {
             throw std::invalid_argument(
-                    "StandardJobExecutor::StandardJobExecutor(): insufficient memory resources to run the job "
+                    "StandardJobExecutor::StandardJobExecutor(): insufficient memory_manager_service resources to run the job "
                     "(max_required_ram = " + std::to_string(max_required_ram) + ")");
         }
 
@@ -627,20 +627,20 @@ namespace wrench {
 
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
 
-        if (auto msg = std::dynamic_pointer_cast<HostHasTurnedOnMessage>(message)) {
+        if (auto msg = dynamic_cast<HostHasTurnedOnMessage*>(message.get())) {
             // Do nothing, just wake up
             return true;
-        } else if (auto msg = std::dynamic_pointer_cast<HostHasChangedSpeedMessage>(message)) {
+        } else if (auto msg = dynamic_cast<HostHasChangedSpeedMessage*>(message.get())) {
             // Do nothing, just wake up
             return true;
-        } else if (auto msg = std::dynamic_pointer_cast<WorkunitExecutorDoneMessage>(message)) {
+        } else if (auto msg = dynamic_cast<WorkunitExecutorDoneMessage*>(message.get())) {
             processWorkunitExecutorCompletion(msg->workunit_executor, msg->workunit);
             return true;
-        } else if (auto msg = std::dynamic_pointer_cast<WorkunitExecutorFailedMessage>(message)) {
+        } else if (auto msg = dynamic_cast<WorkunitExecutorFailedMessage*>(message.get())) {
             processWorkunitExecutorFailure(msg->workunit_executor, msg->workunit, msg->cause);
             return false; // We should exit since we've killed everything
 
-        } else if (auto msg = std::dynamic_pointer_cast<ServiceHasCrashedMessage>(message)) {
+        } else if (auto msg = dynamic_cast<ServiceHasCrashedMessage*>(message.get())) {
             auto service = msg->service;
             auto workunit_executor = std::dynamic_pointer_cast<WorkunitExecutor>(service);
             if (not workunit_executor) {
@@ -1012,7 +1012,7 @@ namespace wrench {
      * @brief Get the executor's job
      * @return a standard job
      */
-    StandardJob *StandardJobExecutor::getJob() {
+    std::shared_ptr<StandardJob> StandardJobExecutor::getJob() {
         return this->job;
     }
 

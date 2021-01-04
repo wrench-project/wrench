@@ -510,9 +510,9 @@ namespace wrench {
     }
 
 /**
- * @brief Get the memory capacity of a host given a hostname
+ * @brief Get the memory_manager_service capacity of a host given a hostname
  * @param hostname: the name of the host
- * @return a memory capacity in bytes
+ * @return a memory_manager_service capacity in bytes
  */
     double S4U_Simulation::getHostMemoryCapacity(std::string hostname) {
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
@@ -523,20 +523,20 @@ namespace wrench {
     }
 
 /**
- * @brief Get the memory capacity of the current host
- * @return a memory capacity in bytes
+ * @brief Get the memory_manager_service capacity of the current host
+ * @return a memory_manager_service capacity in bytes
  */
     double S4U_Simulation::getMemoryCapacity() {
         return getHostMemoryCapacity(simgrid::s4u::Host::current());
     }
 
 /**
- * @brief Get the memory capacity of a S4U host
+ * @brief Get the memory_manager_service capacity of a S4U host
  * @param host: the host
- * @return a memory capacity in bytes
+ * @return a memory_manager_service capacity in bytes
  */
     double S4U_Simulation::getHostMemoryCapacity(simgrid::s4u::Host *host) {
-        std::set<std::string> tags = {"mem", "Mem", "MEM", "ram", "Ram", "RAM", "memory", "Memory", "MEMORY"};
+        std::set<std::string> tags = {"mem", "Mem", "MEM", "ram", "Ram", "RAM", "memory_manager_service", "Memory", "MEMORY"};
         double capacity_value = S4U_Simulation::DEFAULT_RAM;
 
         for (auto const &tag : tags) {
@@ -545,14 +545,14 @@ namespace wrench {
                 if (capacity_value != S4U_Simulation::DEFAULT_RAM) {
                     throw std::invalid_argument(
                             "S4U_Simulation::getHostMemoryCapacity(): Host '" + std::string(host->get_cname()) +
-                            "' has multiple memory capacity specifications");
+                            "' has multiple memory_manager_service capacity specifications");
                 }
                 try {
                     capacity_value = UnitParser::parse_size(capacity_string);
                 } catch (std::invalid_argument &e) {
                     throw std::invalid_argument(
                             "S4U_Simulation::getHostMemoryCapacity(): Host '" + std::string(host->get_cname()) +
-                            "'has invalid memory capacity specification '" + tag + ":" +
+                            "'has invalid memory_manager_service capacity specification '" + tag + ":" +
                             std::string(capacity_string) + "'");
                 }
             }

@@ -90,7 +90,7 @@ namespace wrench {
                                        new AlarmWMSDeferredStartMessage(0), "wms_start");
 
             // Wait for a message
-            std::shared_ptr<SimulationMessage> message = nullptr;
+            std::unique_ptr<SimulationMessage> message = nullptr;
 
             try {
                 message = S4U_Mailbox::getMessage(this->mailbox_name);
@@ -102,7 +102,7 @@ namespace wrench {
                 std::runtime_error("Got a NULL message... Likely this means the WMS cannot be started. Aborting!");
             }
 
-            if (auto msg = std::dynamic_pointer_cast<AlarmWMSDeferredStartMessage>(message)) {
+            if (auto msg = dynamic_cast<AlarmWMSDeferredStartMessage*>(message.get())) {
                 // The WMS can be started
             } else {
                 throw std::runtime_error("WMS::checkDeferredStart(): Unexpected " + message->getName() + " message");

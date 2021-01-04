@@ -1,4 +1,4 @@
-[![Build Status][travis-badge]][travis-link]
+[![Build Status][build-badge]][build-link]
 [![GitHub Release][release-badge]][release-link]
 [![License: LGPL v3][license-badge]](LICENSE.md)
 [![Coverage Status][codecov-badge]][codecov-link]
@@ -25,25 +25,26 @@ More information and Documentation: [WRENCH Project Website](http://wrench-proje
 
 ## Prerequisites
 
-WRENCH is fully developed in C++. The code follows the C++11 standard, and thus older 
-compilers tend to fail the compilation process. Therefore, we strongly recommend
-users to satisfy the following requirements:
+WRENCH is fully developed in C++. The code follows the **C++14** standard, and thus 
+older compilers tend to fail the compilation process. Therefore, we strongly 
+recommend users to satisfy the following requirements:
 
 - **CMake** - version 3.5 or higher
   
 And, one of the following:
-- **g++** - version 5.0 or higher
-- **clang** - version 3.6 or higher
+- **g++** - version 5.4 or higher
+- **clang** - version 3.8 or higher
 
 ## Dependencies
 
 ### Required Dependencies 
 
-- [SimGrid](https://framagit.org/simgrid/simgrid/-/releases) - version 3.25
+- [SimGrid](https://framagit.org/simgrid/simgrid/-/releases) - version 3.25 or higher
 - [PugiXML](http://pugixml.org/) - version 1.8 or higher 
-- [JSON for Modern C++](https://github.com/nlohmann/json) - version 3.7.0 or higher 
+- [JSON for Modern C++](https://github.com/nlohmann/json) - version 3.9.0 or higher 
 
 ### Optional Dependencies
+
 - [Google Test](https://github.com/google/googletest) - version 1.8 or higher (only required for running test cases)
 - [Doxygen](http://www.doxygen.org) - version 1.8 or higher (only required for generating documentation)
 - [Batsched](https://gitlab.inria.fr/batsim/batsched) - only needed for batch-scheduled resource simulation
@@ -98,6 +99,12 @@ it provides a recent and general overview on the framework.
 }
 ```
 
+## List of Contributors via Pull Requests
+
+| User | Description | 
+| --- | --- |
+| [@dohoangdzung](https://github.com/dohoangdzung) | I/O with page cache simulation model (09/2020) |
+
 ## Funding Support
 
 WRENCH has been funded by the National Science Foundation (NSF), and the National Center for Scientific Research (CNRS).
@@ -108,9 +115,8 @@ WRENCH has been funded by the National Science Foundation (NSF), and the Nationa
 [![NSF Funding 20162][nsf-20162-badge]][nsf-20162-link]
 ![CNRS Funding 2015][cnrs-2015-badge]
 
-
-[travis-badge]:             https://travis-ci.org/wrench-project/wrench.svg?branch=master
-[travis-link]:              https://travis-ci.org/wrench-project/wrench
+[build-badge]:              https://github.com/wrench-project/wrench/workflows/Build/badge.svg
+[build-link]:               https://github.com/wrench-project/wrench/actions
 [license-badge]:            https://img.shields.io/badge/License-LGPL%20v3-blue.svg
 [codecov-badge]:            https://codecov.io/gh/wrench-project/wrench/branch/master/graph/badge.svg
 [codecov-link]:             https://codecov.io/gh/wrench-project/wrench
