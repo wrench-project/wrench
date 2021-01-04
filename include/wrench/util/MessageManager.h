@@ -25,7 +25,7 @@ namespace wrench {
     /***********************/
 
     /**
-     * @brief A helper class that manages messages (in terms of memory deallocation to avoid leaks when
+     * @brief A helper class that manages messages (in terms of memory_manager_service deallocation to avoid leaks when
      *        a message was sent but never received)
      */
 

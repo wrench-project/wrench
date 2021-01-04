@@ -7,10 +7,8 @@
  * (at your option) any later version.
  */
 
-#include <wrench/workflow/job/StandardJob.h>
 #include <wrench/workflow/WorkflowTask.h>
-#include <wrench/workflow/Workflow.h>
-#include <iostream>
+#include <wrench/workflow/job/StandardJob.h>
 #include "wrench/services/compute/workunit_executor/Workunit.h"
 #include <wrench-dev.h>
 
@@ -29,7 +27,7 @@ namespace wrench {
     * @param cleanup_file_deletions: a vector of file deletion actions to perform last
     */
     Workunit::Workunit(
-            StandardJob *job,
+            std::shared_ptr<StandardJob> job,
             std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> pre_file_copies,
             WorkflowTask *task,
             std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations,
@@ -114,7 +112,7 @@ namespace wrench {
      * @param job: the job
      * @return A set of work units
      */
-    std::set<std::shared_ptr<Workunit>> Workunit::createWorkunits(StandardJob *job) {
+    std::set<std::shared_ptr<Workunit>> Workunit::createWorkunits(std::shared_ptr<StandardJob> job) {
 
         std::shared_ptr<Workunit> pre_file_copies_work_unit = nullptr;
         std::vector<std::shared_ptr<Workunit>> task_work_units;
@@ -226,7 +224,7 @@ namespace wrench {
      * @brief Retrieve the standard job this workunit belongs to
      * @return a standard job
      */
-    StandardJob *Workunit::getJob() {
+    std::shared_ptr<StandardJob> Workunit::getJob() {
         return this->job;
     }
 

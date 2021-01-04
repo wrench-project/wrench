@@ -113,7 +113,7 @@ private:
         this->test->task->addInputFile(this->test->file_2);
         this->test->task->addInputFile(this->test->file_3);
         this->test->task->addInputFile(this->test->xl_file);
-        wrench::StandardJob *job1 = job_manager->createStandardJob(this->test->task,
+        auto job1 = job_manager->createStandardJob(this->test->task,
                 {{this->test->file_1, wrench::FileLocation::LOCATION(this->test->storage_service)},
                  {this->test->file_2, wrench::FileLocation::LOCATION(this->test->storage_service)},
                  {this->test->file_3, wrench::FileLocation::LOCATION(this->test->storage_service)},
@@ -148,7 +148,7 @@ TEST_F(SimulationTimestampFileReadTest, SimulationTimestampFileReadBasicTest) {
 void SimulationTimestampFileReadTest::do_SimulationTimestampFileReadBasic_test(){
     auto simulation = new wrench::Simulation();
     int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
+    auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -314,6 +314,7 @@ void SimulationTimestampFileReadTest::do_SimulationTimestampFileReadBasic_test()
                                  task), std::invalid_argument);
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }

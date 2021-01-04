@@ -118,12 +118,12 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL    */
         /***********************/
-        void submitStandardJob(StandardJob *job, const std::map<std::string, std::string> &service_specific_args) override;
+        void submitStandardJob(std::shared_ptr<StandardJob> job, const std::map<std::string, std::string> &service_specific_args) override;
 
-        void submitPilotJob(PilotJob *job, const std::map<std::string, std::string> &service_specific_args) override;
+        void submitPilotJob(std::shared_ptr<PilotJob> job, const std::map<std::string, std::string> &service_specific_args) override;
 
-        void terminateStandardJob(StandardJob *job) override;
-        void terminatePilotJob(PilotJob *job) override;
+        void terminateStandardJob(std::shared_ptr<StandardJob> job) override;
+        void terminatePilotJob(std::shared_ptr<PilotJob> job) override;
 
         void validateProperties();
 
@@ -169,10 +169,10 @@ namespace wrench {
 
         virtual void processDestroyVM(const std::string &answer_mailbox, const std::string &vm_name);
 
-        virtual void processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
+        virtual void processSubmitStandardJob(const std::string &answer_mailbox, std::shared_ptr<StandardJob> job,
                                               std::map<std::string, std::string> &service_specific_args);
 
-        virtual void processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job,
+        virtual void processSubmitPilotJob(const std::string &answer_mailbox, std::shared_ptr<PilotJob> job,
                                            std::map<std::string, std::string> &service_specific_args);
 
         virtual void processBareMetalComputeServiceTermination(std::shared_ptr<BareMetalComputeService> cs, int exit_code);

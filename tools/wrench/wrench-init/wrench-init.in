@@ -597,7 +597,7 @@ def _write_simple_scheduler(project_dir, compute_service):
             '      file_locations.insert(std::make_pair(f, wrench::FileLocation::LOCATION(default_storage_service)));',
             '    }',
             '',
-            '    wrench::WorkflowJob *job = (wrench::WorkflowJob *) this->getJobManager()->createStandardJob(task, file_locations);',
+            '    auto job = this->getJobManager()->createStandardJob(task, file_locations);',
             '    std::map<std::string, std::string> batch_job_args;',
             '    batch_job_args["-N"] = "1";',
             '    batch_job_args["-t"] = "2000000"; //time in minutes',

@@ -27,7 +27,7 @@ namespace wrench {
         WRENCH_INFO("Starting!");
         while (true) {
 
-            StandardJob *job = nullptr;
+            std::shared_ptr<StandardJob> job = nullptr;
 
             // Wait for the workflow execution event
             WRENCH_INFO("Waiting for job completion...");
@@ -58,7 +58,7 @@ namespace wrench {
                 this->getWorkflow()->removeTask(t);
             }
 
-            this->job_manager->forgetJob(job);
+//            this->job_manager->forgetJob(job);
         }
 
     }

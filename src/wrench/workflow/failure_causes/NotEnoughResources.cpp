@@ -23,7 +23,7 @@ namespace wrench {
      * @param job: the job that could not be executed (or nullptr if no job was involved)
      * @param compute_service: the compute service that didn't have enough cores or ram
      */
-    NotEnoughResources::NotEnoughResources(WorkflowJob *job, std::shared_ptr<ComputeService> compute_service) {
+    NotEnoughResources::NotEnoughResources(std::shared_ptr<WorkflowJob> job, std::shared_ptr<ComputeService> compute_service) {
         this->job = job;
         this->compute_service = compute_service;
     }
@@ -32,7 +32,7 @@ namespace wrench {
      * @brief Getter
      * @return the job
      */
-    WorkflowJob *NotEnoughResources::getJob() {
+    std::shared_ptr<WorkflowJob> NotEnoughResources::getJob() {
         return this->job;
     }
 

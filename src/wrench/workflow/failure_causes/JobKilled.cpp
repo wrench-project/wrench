@@ -24,7 +24,7 @@ namespace wrench {
     * @param job: the job that could not be executed
     * @param compute_service: the compute service that didn't have enough cores
     */
-    JobKilled::JobKilled(WorkflowJob *job, std::shared_ptr<ComputeService> compute_service) {
+    JobKilled::JobKilled(std::shared_ptr<WorkflowJob> job, std::shared_ptr<ComputeService> compute_service) {
         this->job = job;
         this->compute_service = compute_service;
     }
@@ -33,7 +33,7 @@ namespace wrench {
      * @brief Getter
      * @return the job
      */
-    WorkflowJob *JobKilled::getJob() {
+    std::shared_ptr<WorkflowJob> JobKilled::getJob() {
         return this->job;
     }
 

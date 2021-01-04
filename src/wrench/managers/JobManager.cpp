@@ -46,7 +46,14 @@ namespace wrench {
      * @brief Destructor, which kills the daemon (and clears all the jobs)
      */
     JobManager::~JobManager() {
-        this->jobs.clear();
+        this->pending_standard_jobs.clear();
+        this->running_standard_jobs.clear();
+        this->completed_standard_jobs.clear();
+        this->failed_standard_jobs.clear();
+
+        this->pending_pilot_jobs.clear();
+        this->running_pilot_jobs.clear();
+        this->completed_pilot_jobs.clear();
     }
 
     /**
@@ -54,7 +61,14 @@ namespace wrench {
      */
     void JobManager::kill() {
         this->killActor();
-        this->jobs.clear();
+        this->pending_standard_jobs.clear();
+        this->running_standard_jobs.clear();
+        this->completed_standard_jobs.clear();
+        this->failed_standard_jobs.clear();
+
+        this->pending_pilot_jobs.clear();
+        this->running_pilot_jobs.clear();
+        this->completed_pilot_jobs.clear();
     }
 
     /**
@@ -76,8 +90,8 @@ namespace wrench {
      *
      * @param tasks: a list of tasks (which must be either READY, or children of COMPLETED tasks or
      *                                   of tasks also included in the standard job)
-     * @param file_locations: a map that specifies locations where input/output files should be read/written.
-     *         When unspecified, it is assumed that the ComputeService's scratch storage space will be used.
+     * @param file_locations: a map that specifies locations where input/output files, if any, should be read/written.
+     *         When empty, it is assumed that the ComputeService's scratch storage space will be used.
      * @param pre_file_copies: a vector of tuples that specify which file copy operations should be completed
      *                         before task executions begin. The ComputeService::SCRATCH constant can be
      *                         used to mean "the scratch storage space of the ComputeService".
@@ -91,11 +105,11 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    StandardJob *JobManager::createStandardJob(std::vector<WorkflowTask *> tasks,
-                                               std::map<WorkflowFile *, std::shared_ptr<FileLocation> > file_locations,
-                                               std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> pre_file_copies,
-                                               std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> post_file_copies,
-                                               std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  >> cleanup_file_deletions) {
+    std::shared_ptr<StandardJob> JobManager::createStandardJob(std::vector<WorkflowTask *> tasks,
+                                                               std::map<WorkflowFile *, std::shared_ptr<FileLocation> > file_locations,
+                                                               std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> pre_file_copies,
+                                                               std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> post_file_copies,
+                                                               std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  >> cleanup_file_deletions) {
 
         // Do a sanity check of everything (looking for nullptr)
         for (auto t : tasks) {
@@ -164,13 +178,12 @@ namespace wrench {
             }
         }
 
-        StandardJob *raw_ptr = new StandardJob(this->wms->getWorkflow(), tasks, file_locations, pre_file_copies,
-                                               post_file_copies,
-                                               cleanup_file_deletions);
-        std::unique_ptr<WorkflowJob> job = std::unique_ptr<StandardJob>(raw_ptr);
+        auto job = std::shared_ptr<StandardJob>(new StandardJob(this->wms->getWorkflow(), tasks, file_locations, pre_file_copies,
+                                                                post_file_copies,
+                                                                cleanup_file_deletions));
 
-        this->jobs.insert(std::make_pair(raw_ptr, std::move(job)));
-        return raw_ptr;
+        this->new_standard_jobs.insert(job);
+        return job;
     }
 
     /**
@@ -178,15 +191,15 @@ namespace wrench {
      *
      * @param tasks: a list of tasks  (which must be either READY, or children of COMPLETED tasks or
      *                                   of tasks also included in the list)
-     * @param file_locations: a map that specifies locations where files should be read/written.
-     *                        When unspecified, it is assumed that the ComputeService's scratch storage space will be used.
+     * @param file_locations: a map that specifies locations where files, if any, should be read/written.
+     *                        When empty, it is assumed that the ComputeService's scratch storage space will be used.
      *
      * @return the standard job
      *
      * @throw std::invalid_argument
      */
-    StandardJob *JobManager::createStandardJob(std::vector<WorkflowTask *> tasks,
-                                               std::map<WorkflowFile *, std::shared_ptr<FileLocation> > file_locations) {
+    std::shared_ptr<StandardJob> JobManager::createStandardJob(std::vector<WorkflowTask *> tasks,
+                                                               std::map<WorkflowFile *, std::shared_ptr<FileLocation> > file_locations) {
         if (tasks.empty()) {
             throw std::invalid_argument("JobManager::createStandardJob(): Invalid arguments (empty tasks argument!)");
         }
@@ -205,7 +218,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    StandardJob *
+    std::shared_ptr<StandardJob>
     JobManager::createStandardJob(WorkflowTask *task,
                                   std::map<WorkflowFile *, std::shared_ptr<FileLocation> > file_locations) {
 
@@ -225,11 +238,10 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    PilotJob *JobManager::createPilotJob() {
-        auto raw_ptr = new PilotJob(this->wms->workflow);
-        auto job = std::unique_ptr<PilotJob>(raw_ptr);
-        this->jobs[raw_ptr] = std::move(job);
-        return raw_ptr;
+    std::shared_ptr<PilotJob> JobManager::createPilotJob() {
+        auto job = std::shared_ptr<PilotJob>(new PilotJob(this->wms->workflow));
+        this->new_pilot_jobs.insert(job);
+        return job;
     }
 
 
@@ -255,7 +267,7 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw WorkflowExecutionException
      */
-    void JobManager::submitJob(WorkflowJob *job, std::shared_ptr<ComputeService> compute_service,
+    void JobManager::submitJob(std::shared_ptr<WorkflowJob> job, std::shared_ptr<ComputeService> compute_service,
                                std::map<std::string, std::string> service_specific_args) {
 
         if ((job == nullptr) || (compute_service == nullptr)) {
@@ -268,50 +280,44 @@ namespace wrench {
 
         std::map<WorkflowTask *, WorkflowTask::State> original_states;
 
-
         // Update the job state and insert it into the pending list
-        switch (job->getType()) {
-            case WorkflowJob::STANDARD: {
-
-                auto sjob = (StandardJob*) job;
-                // Do a sanity check on task states
-                for (auto t : sjob->tasks) {
-                    if ((t->getState() == WorkflowTask::State::COMPLETED) or
-                        (t->getState() == WorkflowTask::State::PENDING)) {
-                        throw std::invalid_argument("JobManager()::submitJob(): task " + t->getID() +
-                                                    " cannot be submitted as part of a standard job because its state is " +
-                                                    WorkflowTask::stateToString(t->getState()));
-                    }
+        if (auto sjob =std::dynamic_pointer_cast<StandardJob>(job)) {
+            // Do a sanity check on task states
+            for (auto t : sjob->tasks) {
+                if ((t->getState() == WorkflowTask::State::COMPLETED) or
+                    (t->getState() == WorkflowTask::State::PENDING)) {
+                    throw std::invalid_argument("JobManager()::submitJob(): task " + t->getID() +
+                                                " cannot be submitted as part of a standard job because its state is " +
+                                                WorkflowTask::stateToString(t->getState()));
                 }
-
-                // Modify task states
-                sjob->state = StandardJob::PENDING;
-                for (auto t : sjob->tasks) {
-                    original_states.insert(std::make_pair(t, t->getState()));
-                    t->setState(WorkflowTask::State::PENDING);
-                }
-
-                // Do a sanity check on use of scratch space, and replace scratch space by the compute
-                // Service's scratch space
-                for (auto fl : sjob->file_locations) {
-                    if ((fl.second == FileLocation::SCRATCH) and (not compute_service->hasScratch())) {
-                        throw std::invalid_argument("JobManager():submitJob(): file location for file " +
-                        fl.first->getID() + " is scratch  space, but the compute service to which this "+
-                        "job is being submitted to doesn't have any!");
-                    }
-                    if (fl.second == FileLocation::SCRATCH) {
-                        sjob->file_locations[fl.first] = FileLocation::LOCATION(compute_service->getScratch());
-                    }
-                }
-
-                this->pending_standard_jobs.insert((StandardJob *) job);
-                break;
             }
-            case WorkflowJob::PILOT: {
-                ((PilotJob *) job)->state = PilotJob::PENDING;
-                this->pending_pilot_jobs.insert((PilotJob *) job);
-                break;
+
+            // Modify task states
+            sjob->state = StandardJob::PENDING;
+            for (auto t : sjob->tasks) {
+                original_states.insert(std::make_pair(t, t->getState()));
+                t->setState(WorkflowTask::State::PENDING);
             }
+
+            // Do a sanity check on use of scratch space, and replace scratch space by the compute
+            // Service's scratch space
+            for (auto fl : sjob->file_locations) {
+                if ((fl.second == FileLocation::SCRATCH) and (not compute_service->hasScratch())) {
+                    throw std::invalid_argument("JobManager():submitJob(): file location for file " +
+                                                fl.first->getID() + " is scratch  space, but the compute service to which this "+
+                                                "job is being submitted to doesn't have any!");
+                }
+                if (fl.second == FileLocation::SCRATCH) {
+                    sjob->file_locations[fl.first] = FileLocation::LOCATION(compute_service->getScratch());
+                }
+            }
+
+            this->new_standard_jobs.erase(sjob);
+            this->pending_standard_jobs.insert(sjob);
+        } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
+            pjob->state = PilotJob::PENDING;
+            this->new_pilot_jobs.erase(pjob);
+            this->pending_pilot_jobs.insert(pjob);
         }
 
         // Submit the job to the service
@@ -325,39 +331,29 @@ namespace wrench {
 
             // "Undo" everything
             job->popCallbackMailbox();
-            switch (job->getType()) {
-                case WorkflowJob::STANDARD: {
-                    ((StandardJob *) job)->state = StandardJob::NOT_SUBMITTED;
-                    for (auto t : ((StandardJob *) job)->tasks) {
-                        t->setState(original_states[t]);
-                    }
-                    this->pending_standard_jobs.erase((StandardJob *) job);
-                    break;
+            if (auto sjob = std::dynamic_pointer_cast<StandardJob>(job)) {
+                sjob->state = StandardJob::NOT_SUBMITTED;
+                for (auto t : sjob->tasks) {
+                    t->setState(original_states[t]);
                 }
-                case WorkflowJob::PILOT: {
-                    ((PilotJob *) job)->state = PilotJob::NOT_SUBMITTED;
-                    this->pending_pilot_jobs.erase((PilotJob *) job);
-                    break;
-                }
+                this->pending_standard_jobs.erase(sjob);
+            } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
+                pjob->state = PilotJob::NOT_SUBMITTED;
+                this->pending_pilot_jobs.erase(pjob);
             }
             throw;
         } catch (std::invalid_argument &e) {
             // "Undo" everything
             job->popCallbackMailbox();
-            switch (job->getType()) {
-                case WorkflowJob::STANDARD: {
-                    ((StandardJob *) job)->state = StandardJob::NOT_SUBMITTED;
-                    for (auto t : ((StandardJob *) job)->tasks) {
-                        t->setState(original_states[t]);
-                    }
-                    this->pending_standard_jobs.erase((StandardJob *) job);
-                    break;
+            if (auto sjob  = std::dynamic_pointer_cast<StandardJob>(job)) {
+                sjob->state = StandardJob::NOT_SUBMITTED;
+                for (auto t : sjob->tasks) {
+                    t->setState(original_states[t]);
                 }
-                case WorkflowJob::PILOT: {
-                    ((PilotJob *) job)->state = PilotJob::NOT_SUBMITTED;
-                    this->pending_pilot_jobs.erase((PilotJob *) job);
-                    break;
-                }
+                this->pending_standard_jobs.erase(sjob);
+            } else if (auto pjob  = std::dynamic_pointer_cast<PilotJob>(job)) {
+                pjob->state = PilotJob::NOT_SUBMITTED;
+                this->pending_pilot_jobs.erase(pjob);
             }
             throw;
         }
@@ -372,7 +368,7 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    void JobManager::terminateJob(WorkflowJob *job) {
+    void JobManager::terminateJob(std::shared_ptr<WorkflowJob> job) {
         if (job == nullptr) {
             throw std::invalid_argument("JobManager::terminateJob(): invalid argument");
         }
@@ -388,9 +384,9 @@ namespace wrench {
             throw;
         }
 
-        if (job->getType() == WorkflowJob::STANDARD) {
-            ((StandardJob *) job)->state = StandardJob::State::TERMINATED;
-            for (auto task : ((StandardJob *) job)->tasks) {
+        if (auto sjob = std::dynamic_pointer_cast<StandardJob>(job)) {
+            sjob->state = StandardJob::State::TERMINATED;
+            for (auto task : sjob->tasks) {
                 switch (task->getInternalState()) {
                     case WorkflowTask::TASK_NOT_READY:
                         task->setState(WorkflowTask::State::NOT_READY);
@@ -408,7 +404,7 @@ namespace wrench {
                 }
             }
             // Make second pass to fix NOT_READY states
-            for (auto task : ((StandardJob *) job)->tasks) {
+            for (auto task : sjob->tasks) {
                 if (task->getState() == WorkflowTask::State::NOT_READY) {
                     bool ready = true;
                     for (auto parent : task->getWorkflow()->getTaskParents(task)) {
@@ -421,8 +417,8 @@ namespace wrench {
                     }
                 }
             }
-        } else if (job->getType() == WorkflowJob::PILOT) {
-            ((PilotJob *) job)->state = PilotJob::State::TERMINATED;
+        } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
+            pjob->state = PilotJob::State::TERMINATED;
         }
 
     }
@@ -431,7 +427,7 @@ namespace wrench {
      * @brief Get the list of currently running pilot jobs
      * @return a set of pilot jobs
      */
-    std::set<PilotJob *> JobManager::getRunningPilotJobs() {
+    std::set<std::shared_ptr<PilotJob>> JobManager::getRunningPilotJobs() {
         return this->running_pilot_jobs;
     }
 
@@ -439,12 +435,13 @@ namespace wrench {
      * @brief Get the list of currently pending pilot jobs
      * @return a set of pilot jobs
      */
-    std::set<PilotJob *> JobManager::getPendingPilotJobs() {
+    std::set<std::shared_ptr<PilotJob> > JobManager::getPendingPilotJobs() {
         return this->pending_pilot_jobs;
     }
 
+#if 0
     /**
-     * @brief Forget a job (to free memory, only once a job has completed or failed)
+     * @brief Forget a job (to free memory_manager_service, only once a job has completed or failed)
      *
      * @param job: a job to forget
      *
@@ -464,18 +461,18 @@ namespace wrench {
 
         if (job->getType() == WorkflowJob::STANDARD) {
 
-            if ((this->pending_standard_jobs.find((StandardJob *) job) != this->pending_standard_jobs.end()) ||
-                (this->running_standard_jobs.find((StandardJob *) job) != this->running_standard_jobs.end())) {
+            if ((this->pending_standard_jobs.find((std::shared_ptr<StandardJob> ) job) != this->pending_standard_jobs.end()) ||
+                (this->running_standard_jobs.find((std::shared_ptr<StandardJob> ) job) != this->running_standard_jobs.end())) {
                 std::string msg = "Job cannot be forgotten because it is pending or running";
                 throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new NotAllowed(job->getParentComputeService(), msg)));
             }
-            if (this->completed_standard_jobs.find((StandardJob *) job) != this->completed_standard_jobs.end()) {
-                this->completed_standard_jobs.erase((StandardJob *) job);
+            if (this->completed_standard_jobs.find((std::shared_ptr<StandardJob> ) job) != this->completed_standard_jobs.end()) {
+                this->completed_standard_jobs.erase((std::shared_ptr<StandardJob> ) job);
                 this->jobs.erase(job);
                 return;
             }
-            if (this->failed_standard_jobs.find((StandardJob *) job) != this->failed_standard_jobs.end()) {
-                this->failed_standard_jobs.erase((StandardJob *) job);
+            if (this->failed_standard_jobs.find((std::shared_ptr<StandardJob> ) job) != this->failed_standard_jobs.end()) {
+                this->failed_standard_jobs.erase((std::shared_ptr<StandardJob> ) job);
                 this->jobs.erase(job);
                 return;
             }
@@ -488,12 +485,12 @@ namespace wrench {
         }
 
         if (job->getType() == WorkflowJob::PILOT) {
-            if ((this->pending_pilot_jobs.find((PilotJob *) job) != this->pending_pilot_jobs.end()) ||
-                (this->running_pilot_jobs.find((PilotJob *) job) != this->running_pilot_jobs.end())) {
+            if ((this->pending_pilot_jobs.find((std::shared_ptr<PilotJob> ) job) != this->pending_pilot_jobs.end()) ||
+                (this->running_pilot_jobs.find((std::shared_ptr<PilotJob> ) job) != this->running_pilot_jobs.end())) {
                 std::string msg = "Job cannot be forgotten because it is running or pending";
                 throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new NotAllowed(job->getParentComputeService(), msg)));
             }
-            if (this->completed_pilot_jobs.find((PilotJob *) job) != this->completed_pilot_jobs.end()) {
+            if (this->completed_pilot_jobs.find((std::shared_ptr<PilotJob> ) job) != this->completed_pilot_jobs.end()) {
                 this->jobs.erase(job);
                 return;
             }
@@ -506,6 +503,8 @@ namespace wrench {
         }
 
     }
+#endif
+
 
     /**
      * @brief Main method of the daemon that implements the JobManager
@@ -517,7 +516,35 @@ namespace wrench {
 
         WRENCH_INFO("New Job Manager starting (%s)", this->mailbox_name.c_str());
 
-        while (processNextMessage()) { }
+        while (processNextMessage()) {
+
+            {
+                // Clean up completed standard jobs if need be
+                std::vector<std::shared_ptr<StandardJob>> to_clean_up;
+                for (auto const &j : this->completed_standard_jobs) {
+                    if (j.use_count() == 1) {
+                        to_clean_up.push_back(j);
+                    }
+                }
+                for (auto const &j : to_clean_up) {
+                    this->completed_standard_jobs.erase(j);
+                }
+            }
+
+            {
+                // Clean up completed pilot jobs if need be
+                std::vector<std::shared_ptr<PilotJob>> to_clean_up;
+                for (auto const &j : this->completed_pilot_jobs) {
+                    if (j.use_count() == 1) {
+                        to_clean_up.push_back(j);
+                    }
+                }
+                for (auto const &j : to_clean_up) {
+                    this->completed_pilot_jobs.erase(j);
+                }
+            }
+
+        }
 
         return 0;
     }
@@ -529,7 +556,7 @@ namespace wrench {
 
     bool JobManager::processNextMessage() {
 
-        std::shared_ptr<SimulationMessage> message = nullptr;
+        std::unique_ptr<SimulationMessage> message = nullptr;
         try {
             message = S4U_Mailbox::getMessage(this->mailbox_name);
         } catch (std::shared_ptr<NetworkError> &cause) {
@@ -544,19 +571,19 @@ namespace wrench {
 
         WRENCH_INFO("Job Manager got a %s message", message->getName().c_str());
 
-        if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
+        if (auto msg = dynamic_cast<ServiceStopDaemonMessage*>(message.get())) {
             // There shouldn't be any need to clean up any state
             return false;
-        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceStandardJobDoneMessage>(message)) {
+        } else if (auto msg = dynamic_cast<ComputeServiceStandardJobDoneMessage*>(message.get())) {
             processStandardJobCompletion(msg->job, msg->compute_service);
             return true;
-        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceStandardJobFailedMessage>(message)) {
+        } else if (auto msg = dynamic_cast<ComputeServiceStandardJobFailedMessage*>(message.get())) {
             processStandardJobFailure(msg->job, msg->compute_service, msg->cause);
             return true;
-        } else if (auto msg = std::dynamic_pointer_cast<ComputeServicePilotJobStartedMessage>(message)) {
+        } else if (auto msg = dynamic_cast<ComputeServicePilotJobStartedMessage*>(message.get())) {
             processPilotJobStart(msg->job, msg->compute_service);
             return true;
-        } else if (auto msg = std::dynamic_pointer_cast<ComputeServicePilotJobExpiredMessage>(message)) {
+        } else if (auto msg = dynamic_cast<ComputeServicePilotJobExpiredMessage*>(message.get())) {
             processPilotJobExpiration(msg->job, msg->compute_service);
             return true;
         } else {
@@ -570,7 +597,7 @@ namespace wrench {
      * @param job: the job that completed
      * @param compute_service: the compute service on which the job was executed
      */
-    void JobManager::processStandardJobCompletion(StandardJob *job, std::shared_ptr<ComputeService> compute_service) {
+    void JobManager::processStandardJobCompletion(std::shared_ptr<StandardJob> job, std::shared_ptr<ComputeService> compute_service) {
 
         // update job state
         job->state = StandardJob::State::COMPLETED;
@@ -672,7 +699,7 @@ namespace wrench {
      * @param compute_service: the compute service on which the job has failed
      * @param failure_cause: the cause of the failure
      */
-    void JobManager::processStandardJobFailure(StandardJob *job, std::shared_ptr<ComputeService> compute_service, std::shared_ptr<FailureCause> cause) {
+    void JobManager::processStandardJobFailure(std::shared_ptr<StandardJob> job, std::shared_ptr<ComputeService> compute_service, std::shared_ptr<FailureCause> cause) {
 
         // update job state
         job->state = StandardJob::State::FAILED;
@@ -761,7 +788,7 @@ namespace wrench {
      * @param job: the pilot job that started
      * @param compute_service: the compute service on which it started
      */
-    void JobManager::processPilotJobStart(PilotJob *job, std::shared_ptr<ComputeService> compute_service) {
+    void JobManager::processPilotJobStart(std::shared_ptr<PilotJob> job, std::shared_ptr<ComputeService> compute_service) {
         // update job state
         job->state = PilotJob::State::RUNNING;
 
@@ -780,7 +807,7 @@ namespace wrench {
      * @param job: the pilot job that expired
      * @param compute_service: the compute service on which it was running
      */
-    void JobManager::processPilotJobExpiration(PilotJob *job, std::shared_ptr<ComputeService> compute_service) {
+    void JobManager::processPilotJobExpiration(std::shared_ptr<PilotJob> job, std::shared_ptr<ComputeService> compute_service) {
         // update job state
         job->state = PilotJob::State::EXPIRED;
 
