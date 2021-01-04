@@ -164,7 +164,12 @@ TEST_F(WorkflowTest, ControlDependency) {
     workflow->removeControlDependency(t2,t3);  // removes something
     workflow->removeControlDependency(t1,t2);  // nope (data depencency)
     ASSERT_EQ(true, workflow->pathExists(t1,t2));
+    ASSERT_THROW(workflow->removeControlDependency(nullptr,t4), std::invalid_argument);
+    ASSERT_THROW(workflow->removeControlDependency(t1,nullptr), std::invalid_argument);
     workflow->removeControlDependency(t1,t4);  // nope (nothing)
+    auto new_task = workflow->addTask("new_task", 1.0, 1, 1, 0);
+    workflow->addControlDependency(t1, new_task);
+    workflow->removeControlDependency(t1, new_task);
 }
 
 TEST_F(WorkflowTest, WorkflowTaskThrow) {
@@ -184,7 +189,7 @@ TEST_F(WorkflowTest, WorkflowTaskThrow) {
     ASSERT_THROW(workflow->removeTask(nullptr), std::invalid_argument);
     workflow->removeTask(t1);
 
-    wrench::Workflow *bogus_workflow = new wrench::Workflow();
+    auto bogus_workflow = new wrench::Workflow();
     wrench::WorkflowTask *bogus = bogus_workflow->addTask("bogus", 100.0, 1, 1, 0.0);
     ASSERT_THROW(bogus->setParallelModel(wrench::ParallelModel::AMDAHL(-2.0)), std::invalid_argument);
     ASSERT_THROW(bogus->setParallelModel(wrench::ParallelModel::AMDAHL(2.0)), std::invalid_argument);

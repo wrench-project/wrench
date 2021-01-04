@@ -36,10 +36,10 @@ namespace wrench {
      */
     class NegotiatorCompletionMessage : public HTCondorCentralManagerServiceMessage {
     public:
-        NegotiatorCompletionMessage(std::vector<WorkflowJob *> scheduled_jobs, double payload);
+        NegotiatorCompletionMessage(std::vector<std::shared_ptr<WorkflowJob>> scheduled_jobs, double payload);
 
         /** @brief List of scheduled jobs */
-        std::vector<WorkflowJob *> scheduled_jobs;
+        std::vector<std::shared_ptr<WorkflowJob>> scheduled_jobs;
     };
 
     /***********************/

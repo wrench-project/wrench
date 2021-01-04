@@ -12,14 +12,14 @@ users to satisfy the following requirements:
 - **CMake** - version 3.5 or higher
   
 And, one of the following:
-- **g++** - version 5.0 or higher
-- **clang** - version 3.6 or higher
+- **g++** - version 5.4 or higher
+- **clang** - version 3.8 or higher
 
 ## Required Dependencies ##                  {#install-prerequisites-dependencies}
 
 - [SimGrid](https://simgrid.org/) -- version 3.25
 - [PugiXML](http://pugixml.org/) -- version 1.8 or higher
-- [JSON for Modern C++](https://github.com/nlohmann/json) -- version 3.7.0 or higher 
+- [JSON for Modern C++](https://github.com/nlohmann/json) -- version 3.9.0 or higher 
 
 ## Optional Dependencies ##                  {#install-prerequisites-opt-dependencies}
 

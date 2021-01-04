@@ -36,15 +36,15 @@ namespace wrench {
      *        controls access to their resource via a batch queue.
      *
      *        In the current implementation of
-     *        this service, like for many of its real-world counterparts, memory
+     *        this service, like for many of its real-world counterparts, memory_manager_service
      *        partitioning among jobs onq the same host is not handled.  When multiple jobs share hosts,
      *        which can happen when jobs require only a few cores per host and can thus
      *        be co-located on the same hosts in a non-exclusive fashion,
      *        each job simply runs as if it had access to the
      *        full RAM of each compute host it is scheduled on. The simulation of these
-     *        memory contended scenarios is thus, for now, not realistic as there is no simulation
+     *        memory_manager_service contended scenarios is thus, for now, not realistic as there is no simulation
      *        of the effects
-     *        of memory sharing (e.g., swapping).
+     *        of memory_manager_service sharing (e.g., swapping).
      */
     class BatchComputeService : public ComputeService {
 
@@ -146,22 +146,22 @@ namespace wrench {
         static unsigned long parseUnsignedLongServiceSpecificArgument(std::string key, const std::map<std::string, std::string> &args);
 
         // helper function
-        void submitWorkflowJob(WorkflowJob *job, const std::map<std::string, std::string> &batch_job_args);
+        void submitWorkflowJob(std::shared_ptr<WorkflowJob> job, const std::map<std::string, std::string> &batch_job_args);
 
         //submits a standard job
-        void submitStandardJob(StandardJob *job, const std::map<std::string, std::string> &batch_job_args) override;
+        void submitStandardJob(std::shared_ptr<StandardJob> job, const std::map<std::string, std::string> &batch_job_args) override;
 
         //submits a standard job
-        void submitPilotJob(PilotJob *job, const std::map<std::string, std::string> &batch_job_args) override;
+        void submitPilotJob(std::shared_ptr<PilotJob> job, const std::map<std::string, std::string> &batch_job_args) override;
 
         // helper function
-        void terminateWorkflowJob(WorkflowJob *job);
+        void terminateWorkflowJob(std::shared_ptr<WorkflowJob> job);
 
         // terminate a standard job
-        void terminateStandardJob(StandardJob *job) override;
+        void terminateStandardJob(std::shared_ptr<StandardJob> job) override;
 
         // terminate a pilot job
-        void terminatePilotJob(PilotJob *job) override;
+        void terminatePilotJob(std::shared_ptr<PilotJob> job) override;
 
         std::vector<std::tuple<std::string, double, double, double, double, unsigned int, std::string>> workload_trace;
         std::shared_ptr<WorkloadTraceFileReplayer> workload_trace_replayer;
@@ -252,13 +252,13 @@ namespace wrench {
 
         void processGetResourceInformation(const std::string &answer_mailbox);
 
-        void processStandardJobCompletion(std::shared_ptr<StandardJobExecutor> executor, StandardJob *job);
+        void processStandardJobCompletion(std::shared_ptr<StandardJobExecutor> executor, std::shared_ptr<StandardJob> job);
 
         void processStandardJobFailure(std::shared_ptr<StandardJobExecutor> executor,
-                                       StandardJob *job,
+                                       std::shared_ptr<StandardJob> job,
                                        std::shared_ptr<FailureCause> cause);
 
-        void terminateRunningStandardJob(StandardJob *job);
+        void terminateRunningStandardJob(std::shared_ptr<StandardJob> job);
 
 
         //Terminate the batch service (this is usually for pilot jobs when they act as a batch service)
@@ -271,37 +271,37 @@ namespace wrench {
         void failCurrentStandardJobs();
 
         //Process the pilot job completion
-        void processPilotJobCompletion(PilotJob *job);
+        void processPilotJobCompletion(std::shared_ptr<PilotJob> job);
 
         //Process standardjob timeout
-        void processStandardJobTimeout(StandardJob *job);
+        void processStandardJobTimeout(std::shared_ptr<StandardJob> job);
 
         //process standard job termination request
-        void processStandardJobTerminationRequest(StandardJob *job, std::string answer_mailbox);
+        void processStandardJobTerminationRequest(std::shared_ptr<StandardJob> job, std::string answer_mailbox);
 
         //process pilot job termination request
-        void processPilotJobTerminationRequest(PilotJob *job, std::string answer_mailbox);
+        void processPilotJobTerminationRequest(std::shared_ptr<PilotJob> job, std::string answer_mailbox);
 
         // process a batch job tiemout event
         void processAlarmJobTimeout(std::shared_ptr<BatchJob>job);
 
         //Process pilot job timeout
-        void processPilotJobTimeout(PilotJob *job);
+        void processPilotJobTimeout(std::shared_ptr<PilotJob> job);
 
         //free up resources
         void freeUpResources(std::map<std::string, std::tuple<unsigned long, double>> resources);
 
         //send call back to the pilot job submitters
-        void sendPilotJobExpirationNotification(PilotJob *job);
+        void sendPilotJobExpirationNotification(std::shared_ptr<PilotJob> job);
 
         //send call back to the standard job submitters
-        void sendStandardJobFailureNotification(StandardJob *job, std::string job_id, std::shared_ptr<FailureCause> cause);
+        void sendStandardJobFailureNotification(std::shared_ptr<StandardJob> job, std::string job_id, std::shared_ptr<FailureCause> cause);
 
         // process a job submission
         void processJobSubmission(std::shared_ptr<BatchJob>job, std::string answer_mailbox);
 
         //start a job
-        void startJob(std::map<std::string, std::tuple<unsigned long, double>>, WorkflowJob *,
+        void startJob(std::map<std::string, std::tuple<unsigned long, double>>, std::shared_ptr<WorkflowJob> ,
                       std::shared_ptr<BatchJob>, unsigned long, unsigned long, unsigned long);
 
 

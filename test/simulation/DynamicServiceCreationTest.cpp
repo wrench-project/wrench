@@ -198,7 +198,7 @@ private:
         auto vm_name = dynamically_created_compute_service->createVM(4, 10);
         auto vm_cs = dynamically_created_compute_service->startVM(vm_name);
 
-        wrench::StandardJob *one_task_jobs[5];
+        std::shared_ptr<wrench::StandardJob> one_task_jobs[5];
         int job_index = 0;
         for (auto task : tasks) {
             try {
@@ -243,13 +243,6 @@ private:
             }
         }
 
-        {
-            // Try to forget the completed jobs
-            for (auto & j : one_task_jobs) {
-                job_manager->forgetJob(j);
-            }
-        }
-
         return 0;
     }
 };
@@ -263,7 +256,7 @@ void DynamicServiceCreationTest::do_getReadyTasksTest_test() {
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
     int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
+    auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
 
@@ -311,7 +304,8 @@ void DynamicServiceCreationTest::do_getReadyTasksTest_test() {
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 

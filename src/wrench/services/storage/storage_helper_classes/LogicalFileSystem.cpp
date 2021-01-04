@@ -15,18 +15,21 @@ WRENCH_LOG_CATEGORY(wrench_core_logical_file_system, "Log category for Logical F
 
 namespace wrench {
 
-    std::map<std::string, std::string> LogicalFileSystem::mount_points;
+    std::map<std::string, StorageService*> LogicalFileSystem::mount_points;
 
     /**
      * @brief Constructor
      * @param hostname: the host on which the file system is located
-     * @param ss_name: the storage service this file system is for
+     * @param storage_service: the storage service this file system is for
      * @param mount_point: the mount point
      */
-    LogicalFileSystem::LogicalFileSystem(std::string hostname, std::string ss_name, std::string mount_point) {
+    LogicalFileSystem::LogicalFileSystem(std::string hostname, StorageService *storage_service, std::string mount_point) {
 
         mount_point = FileLocation::sanitizePath("/" + mount_point + "/");
 
+        if  (storage_service == nullptr) {
+            throw std::invalid_argument("LogicalFileSystem::LogicalFileSystem(): nullptr storage_service argument");
+        }
         // Check validity
         if (not S4U_Simulation::hostHasMountPoint(hostname, mount_point)) {
             throw std::invalid_argument("LogicalFileSystem::LogicalFileSystem(): Host " +
@@ -34,7 +37,7 @@ namespace wrench {
         }
 
         this->hostname = hostname;
-        this->ss_name = ss_name;
+        this->storage_service = storage_service;
         this->mount_point = mount_point;
         this->content["/"] = {};
         this->total_capacity = S4U_Simulation::getDiskCapacity(hostname, mount_point);
@@ -50,15 +53,18 @@ namespace wrench {
     void LogicalFileSystem::init() {
         // Check uniqueness
 
-        if (LogicalFileSystem::mount_points.find(this->hostname +  ":" + this->mount_point)
-            != LogicalFileSystem::mount_points.end()) {
-            if (LogicalFileSystem::mount_points[this->hostname +  ":" + this->mount_point] != this->ss_name) {
-                throw std::invalid_argument("LogicalFileSystem::init(): A FileSystem with mount point " +
-                this->mount_point + " at host " + this->hostname + " already exists");
+        auto lfs =  LogicalFileSystem::mount_points.find(this->hostname +  ":" + this->mount_point);
+
+        if (lfs != LogicalFileSystem::mount_points.end()) {
+            if (lfs->second != this->storage_service) {
+                throw std::invalid_argument("LogicalFileSystem::init(): A FileSystem with mount point " + this->mount_point + " at host " + this->hostname + " already exists");
+            } else  {
+                return;
             }
+        }  else {
+            LogicalFileSystem::mount_points[this->hostname + ":" + this->mount_point] = this->storage_service;
+            this->initialized = true;
         }
-        LogicalFileSystem::mount_points[this->hostname + ":" + this->mount_point] = this->ss_name;
-        this->initialized = true;
     }
 
 /**
