@@ -193,6 +193,8 @@ int main(int argc, char **argv) {
         simulation.stageFile(f, storage_service);
     }
 
+    double start = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+
     /* Launch the simulation. This call only returns when the simulation is complete. */
     std::cerr << "Launching the Simulation..." << std::endl;
     try {
@@ -202,11 +204,17 @@ int main(int argc, char **argv) {
         return 1;
     }
     std::cerr << "Simulation done!" << std::endl;
+    double end = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
-    std::string sub_dir = "original_";
+    std::string sub_dir = "original";
     if (wrench::Simulation::isPageCachingEnabled()) {
-        sub_dir = "pagecache_";
+        sub_dir = "pagecache";
     }
+
+    std::string timelog_filename =  "multi/run_time_" + sub_dir + ".csv";
+    FILE *time_log_file = fopen(timelog_filename.c_str(), "a");
+    fprintf(time_log_file, "%d,%lf\n", no_pipelines, (end - start)/ 1000);
+    fclose(time_log_file);
 
     {
         std::string filename =  "multi_" + sub_dir + "dump_" + to_string(no_pipelines) + ".json";
