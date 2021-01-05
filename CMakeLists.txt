@@ -131,8 +131,6 @@ set(HEADER_FILES
         include/wrench/wms/StaticOptimization.h
         include/wrench/wms/WMS.h
         include/wrench/wms/scheduler/PilotJobScheduler.h
-        include/wrench/wms/scheduler/PilotJobScheduler.h
-        include/wrench/wms/scheduler/StandardJobScheduler.h
         include/wrench/wms/scheduler/StandardJobScheduler.h
         include/wrench/workflow/Workflow.h
         include/wrench/workflow/WorkflowFile.h
