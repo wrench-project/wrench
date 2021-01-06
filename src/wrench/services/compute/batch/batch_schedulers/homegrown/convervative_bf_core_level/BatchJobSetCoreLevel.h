@@ -1,0 +1,8 @@
+//
+// Created by Henri Casanova on 1/5/21.
+//
+
+#ifndef WRENCH_BATCHJOBSETCORELEVEL_H
+#define WRENCH_BATCHJOBSETCORELEVEL_H
+
+#endif //WRENCH_BATCHJOBSETCORELEVEL_H
