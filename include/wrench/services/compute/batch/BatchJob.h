@@ -36,9 +36,19 @@ namespace wrench {
         std::map<std::string, std::tuple<unsigned long, double>> getResourcesAllocated();
         void setAllocatedResources(std::map<std::string, std::tuple<unsigned long, double>> resources);
 
+        void setAllocatedNodeIndices(std::vector<int> indices) {
+            this->allocated_node_indices = indices;
+        }
+
+        std::vector<int> getAllocatedNodeIndices() {
+            return this->allocated_node_indices;
+        }
+
     private:
 
         friend class CONSERVATIVEBFBatchScheduler;
+        friend class CONSERVATIVEBFBatchSchedulerCoreLevel;
+
         u_int32_t conservative_bf_start_date;           // Field used by CONSERVATIVE_BF
         u_int32_t conservative_bf_expected_end_date;    // Field used by CONSERVATIVE_BF
 
@@ -52,6 +62,8 @@ namespace wrench {
         double ending_time_stamp;
         double arrival_time_stamp;
         std::map<std::string, std::tuple<unsigned long, double>> resources_allocated;
+
+        std::vector<int> allocated_node_indices;
 
     public:
         // Variables below are for the BatSim-style CVS output log file (only ifdef ENABLED_BATSCHED)
