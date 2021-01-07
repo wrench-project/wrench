@@ -30,11 +30,12 @@ namespace wrench {
          * @brief The batch scheduling algorithm. Can be:
          *    - If ENABLE_BATSCHED is set to off / not set:
          *      - "fcfs": First Come First Serve
-         *      - "conservative_bf": a home-grown implementation of FCFS with conservative backfilling, which only  allocates resources at the node level
+         *      - "conservative_bf": a home-grown implementation of FCFS with conservative backfilling, which only allocates resources at the node level (i.e., two jobs can never run on the same node even if that node has enough cores to support both jobs)
          *    - If ENABLE_BATSCHED is set to on:
          *      - whatever scheduling algorithm is supported by Batsched
          *        (by default: "conservative_bf", other options include
          *        "easy_bf" and "easy_bf_fast")
+         *      - These only allocate resources at the node level (i.e., two jobs can never run on the same node even if that node has enough cores to support both jobs)
          *
          **/
         DECLARE_PROPERTY_NAME(BATCH_SCHEDULING_ALGORITHM);
