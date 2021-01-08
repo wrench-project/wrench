@@ -27,7 +27,7 @@
 #include "services/compute/batch/workload_helper_classes/WorkloadTraceFileReplayer.h"
 #include "batch_schedulers/homegrown/fcfs/FCFSBatchScheduler.h"
 #include "batch_schedulers/homegrown/conservative_bf/CONSERVATIVEBFBatchScheduler.h"
-#include "batch_schedulers/homegrown/convervative_bf_core_level/CONSERVATIVEBFBatchSchedulerCoreLevel.h"
+#include "batch_schedulers/homegrown/conservative_bf_core_level/CONSERVATIVEBFBatchSchedulerCoreLevel.h"
 #include "batch_schedulers/batsched/BatschedBatchScheduler.h"
 #include "wrench/workflow/failure_causes/JobTypeNotSupported.h"
 #include "wrench/workflow/failure_causes/FunctionalityNotAvailable.h"
