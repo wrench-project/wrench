@@ -1005,7 +1005,7 @@ private:
                 throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
 
-#if 0
+#if 1
             // Get predictions for scalability measures
             std::set<std::tuple<std::string,unsigned long,unsigned long, double>> set_of_jobs = {
                     (std::tuple<std::string, unsigned long, unsigned long, double>) {"testing_job1_" + std::to_string(i), 1, 10, 60},
