@@ -256,7 +256,9 @@ private:
         wrench::Simulation::getLinkUsage("1");
 
         // For coverage
-        auto links = wrench::Simulation::getRoute("DualCoreHost", "QuadCoreHost");
+        std::string src_host = "DualCoreHost";
+        std::string dst_host = "QuadCoreHost";
+        auto links = wrench::Simulation::getRoute(src_host, dst_host);
         if ((links.size() != 1) || (*links.begin() != "1")) {
             throw std::runtime_error("Invalid route between hosts returned");
         }

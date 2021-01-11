@@ -849,7 +849,7 @@ namespace wrench {
      * @param dst_host: dst hostname
      * @return a vector of link names
      */
-    std::vector<std::string> S4U_Simulation::getRoute(std::string src_host, std::string dst_host) {
+    std::vector<std::string> S4U_Simulation::getRoute(std::string &src_host, std::string &dst_host) {
         simgrid::s4u::Host *src, *dst;
         try {
             src = simgrid::s4u::Host::by_name(src_host);
