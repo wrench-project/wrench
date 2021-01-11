@@ -843,8 +843,35 @@ namespace wrench {
         return false;
     }
 
+    /**
+     * @brief Get the list of link names on the route between two hosts
+     * @param src_host: src hostname
+     * @param dst_host: dst hostname
+     * @return a vector of link names
+     */
+    std::vector<std::string> S4U_Simulation::getRoute(std::string src_host, std::string dst_host) {
+        simgrid::s4u::Host *src, *dst;
+        try {
+            src = simgrid::s4u::Host::by_name(src_host);
+        } catch (std::exception &e) {
+            throw std::invalid_argument("S4U_Simulation::getRoute(): Unknown host " + src_host);
+        }
+        try {
+            dst = simgrid::s4u::Host::by_name(dst_host);
+        } catch (std::exception &e) {
+            throw std::invalid_argument("S4U_Simulation::getRoute(): Unknown host " + dst_host);
+        }
+        std::vector<simgrid::s4u::Link *> links;
+        src->route_to(dst, links, nullptr);
+        std::vector<std::string> to_return;
+        for (auto const &l : links) {
+            to_return.push_back(l->get_name());
+        }
+        return to_return;
+    }
 
-/**
+
+    /**
  * @brief Gets the capacity of a disk attached to some host for a given mount point
  * @param hostname: the host's name
  * @param mount_point: the mount point (e.g.,  "/home")
