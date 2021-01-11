@@ -254,6 +254,14 @@ private:
         wrench::Simulation::getLinknameList();
         wrench::Simulation::getLinkBandwidth("1");
         wrench::Simulation::getLinkUsage("1");
+
+        // For coverage
+        auto links = wrench::Simulation::getRoute("DualCoreHost", "QuadCoreHost");
+        if ((links.size() != 1) || (*links.begin() != "1")) {
+            throw std::runtime_error("Invalid route between hosts returned");
+        }
+
+
         // Wait for workflow execution events
         for (auto const & task : tasks) {
             std::shared_ptr<wrench::WorkflowExecutionEvent> event;
@@ -311,8 +319,6 @@ private:
 
         data_movement_manager->kill();
         job_manager->kill();
-
-
 
         return 0;
     }
