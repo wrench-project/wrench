@@ -315,6 +315,17 @@ void BatchServiceTest::do_BatchTraceFileReplayTestWithFailedJob_test() {
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
 
+    // Access task completion task stamps
+
+    auto trace = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>();
+    for (auto const &ts : trace) {
+        auto task = ts->getContent()->getTask();
+        auto host = task->getExecutionHost();
+        auto num_cores = task->getNumCoresAllocated();
+        WRENCH_INFO("%s: %s %lu", task->getID(), host.c_str(), num_cores);
+    }
+
+
     delete simulation;
 
     for (int i=0; i < argc; i++)
