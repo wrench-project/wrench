@@ -113,7 +113,7 @@ namespace wrench {
         /**
          * @brief Path to a to-be-generated Batsim-style CSV trace file (e.g. for b3atch schedule visualization purposes).
          *      - If ENABLE_BATSCHED is set to off or not set: ignored
-         *      - If ENABLE_BATSCHED is set to on: The trace file is generated in CVS format as follows:
+         *      - If ENABLE_BATSCHED is set to on: The trace file is generated in CSV format as follows:
          *          allocated_processors,consumed_energy,execution_time,finish_time,job_id,metadata,
          *          requested_number_of_processors,requested_time,starting_time,stretch,submission_time,success,
          *          turnaround_time,waiting_time,workload_name

@@ -137,6 +137,8 @@ namespace wrench {
         // Memory leak: workflow
         // Not clear how to fix this since we can't delete it until all tasks are completed...
         // And yet when we get here there are still running tasks...
+        // AND: some users may want to inspect these tasks anyway! So perhaps we really don't want to
+        // clear RAM
         return 0;
     }
 

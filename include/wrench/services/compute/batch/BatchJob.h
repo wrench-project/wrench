@@ -66,7 +66,7 @@ namespace wrench {
         std::vector<int> allocated_node_indices;
 
     public:
-        // Variables below are for the BatSim-style CVS output log file (only ifdef ENABLED_BATSCHED)
+        // Variables below are for the BatSim-style CSV output log file (only ifdef ENABLED_BATSCHED)
         /** @brief The meta-data field for BatSim-style CSV output */
         std::string csv_metadata;
         /** @brief The allocated processors field for BatSim-style CSV output */
