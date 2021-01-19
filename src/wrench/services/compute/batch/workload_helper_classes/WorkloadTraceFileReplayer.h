@@ -28,6 +28,9 @@ namespace wrench {
     class WorkloadTraceFileReplayer : public WMS {
 
     public:
+
+        ~WorkloadTraceFileReplayer() { std::cerr << "IN WORKFLOW TRACE FILE DESTRUCTOR!\n"; }
+
         WorkloadTraceFileReplayer(std::string hostname,
                                   std::shared_ptr<BatchComputeService> batch_service,
                                   unsigned long num_cores_per_node,
@@ -36,6 +39,8 @@ namespace wrench {
         );
 
     private:
+        std::shared_ptr<Workflow> workflow;
+
         std::vector<std::tuple<std::string, double, double, double, double, unsigned int, std::string>> &workload_trace;
         std::shared_ptr<BatchComputeService> batch_service;
         unsigned long num_cores_per_node;

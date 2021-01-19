@@ -49,15 +49,15 @@ namespace wrench {
         std::shared_ptr<JobManager> job_manager = this->createJobManager();
 
         // Create and handle a bogus workflow
-        auto workflow = new Workflow();
-        this->addWorkflow(workflow);
+        this->workflow = std::shared_ptr<Workflow>(new Workflow());
+        this->addWorkflow(this->workflow.get());
 
         // Create the dual WMS that will just receive workflow execution events so that I don't have to
         std::shared_ptr<WorkloadTraceFileReplayerEventReceiver> event_receiver = std::shared_ptr<WorkloadTraceFileReplayerEventReceiver>(
                 new WorkloadTraceFileReplayerEventReceiver(this->hostname, job_manager));
 
         // Start the WorkloadTraceFileReplayerEventReceiver
-        event_receiver->addWorkflow(workflow, S4U_Simulation::getClock());
+        event_receiver->addWorkflow(workflow.get(), S4U_Simulation::getClock());
         event_receiver->simulation = this->simulation;
         event_receiver->start(event_receiver, true, false); // Daemonized, no auto-restart
 
