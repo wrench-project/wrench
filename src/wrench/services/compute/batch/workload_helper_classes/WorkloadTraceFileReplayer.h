@@ -29,8 +29,6 @@ namespace wrench {
 
     public:
 
-        ~WorkloadTraceFileReplayer() { std::cerr << "IN WORKFLOW TRACE FILE DESTRUCTOR!\n"; }
-
         WorkloadTraceFileReplayer(std::string hostname,
                                   std::shared_ptr<BatchComputeService> batch_service,
                                   unsigned long num_cores_per_node,
