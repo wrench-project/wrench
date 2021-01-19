@@ -197,7 +197,7 @@ void BatchServiceTest::do_BatchTraceFileReplayTest_test() {
 
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
-    int argc = 2;
+    int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 //    argv[1] = strdup("--wrench-full-log");
