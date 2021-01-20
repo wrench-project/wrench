@@ -130,6 +130,7 @@ namespace wrench {
         friend class WorkloadTraceFileReplayer;
         friend class FCFSBatchScheduler;
         friend class CONSERVATIVEBFBatchScheduler;
+        friend class CONSERVATIVEBFBatchSchedulerCoreLevel;
         friend class BatschedBatchScheduler;
 
         BatchComputeService(const std::string hostname,
@@ -227,7 +228,7 @@ namespace wrench {
 
         };
 #else
-        std::set<std::string> scheduling_algorithms = {"fcfs", "conservative_bf",
+        std::set<std::string> scheduling_algorithms = {"fcfs", "conservative_bf", "conservative_bf_core_level"
         };
 
         //Batch queue ordering options

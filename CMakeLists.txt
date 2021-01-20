@@ -131,8 +131,6 @@ set(HEADER_FILES
         include/wrench/wms/StaticOptimization.h
         include/wrench/wms/WMS.h
         include/wrench/wms/scheduler/PilotJobScheduler.h
-        include/wrench/wms/scheduler/PilotJobScheduler.h
-        include/wrench/wms/scheduler/StandardJobScheduler.h
         include/wrench/wms/scheduler/StandardJobScheduler.h
         include/wrench/workflow/Workflow.h
         include/wrench/workflow/WorkflowFile.h
@@ -227,6 +225,11 @@ set(SOURCE_FILES
         src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/CONSERVATIVEBFBatchScheduler.h
         src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/NodeAvailabilityTimeLine.cpp
         src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/NodeAvailabilityTimeLine.h
+        src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf_core_level/BatchJobSetCoreLevel.h
+        src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf_core_level/CONSERVATIVEBFBatchSchedulerCoreLevel.cpp
+        src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf_core_level/CONSERVATIVEBFBatchSchedulerCoreLevel.h
+        src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf_core_level/CoreAvailabilityTimeLine.cpp
+        src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf_core_level/CoreAvailabilityTimeLine.h
         src/wrench/services/compute/batch/batch_schedulers/homegrown/fcfs/FCFSBatchScheduler.cpp
         src/wrench/services/compute/batch/batch_schedulers/homegrown/fcfs/FCFSBatchScheduler.h
         src/wrench/services/compute/batch/workload_helper_classes/TraceFileLoader.cpp

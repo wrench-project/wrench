@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,6 @@
 
 #include "wrench/simulation/Simulation.h"
 #include "wrench/services/compute/ComputeServiceMessage.h"
-//#include "wrench/services/compute/ComputeService.h"
 #include "wrench/services/compute/cloud/CloudComputeServiceProperty.h"
 #include "wrench/services/compute/cloud/CloudComputeServiceMessagePayload.h"
 #include "wrench/simgrid_S4U_util/S4U_VirtualMachine.h"
@@ -35,12 +34,11 @@ namespace wrench {
      *        in VM instances.
      */
     class CloudComputeService : public ComputeService {
-
     private:
         std::map<std::string, std::string> default_property_values = {
-                {CloudComputeServiceProperty::SUPPORTS_PILOT_JOBS,         "false"},
-                {CloudComputeServiceProperty::SUPPORTS_STANDARD_JOBS,      "false"},
-                {CloudComputeServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS, "0.0"},
+                {CloudComputeServiceProperty::SUPPORTS_PILOT_JOBS,              "false"},
+                {CloudComputeServiceProperty::SUPPORTS_STANDARD_JOBS,           "false"},
+                {CloudComputeServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS,      "0.0"},
                 {CloudComputeServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM, "best-fit-ram-first"}
         };
 
@@ -62,7 +60,7 @@ namespace wrench {
                 {CloudComputeServiceMessagePayload::RESUME_VM_REQUEST_MESSAGE_PAYLOAD,            1024},
                 {CloudComputeServiceMessagePayload::RESUME_VM_ANSWER_MESSAGE_PAYLOAD,             1024},
                 {CloudComputeServiceMessagePayload::DESTROY_VM_REQUEST_MESSAGE_PAYLOAD,           1024},
-                {CloudComputeServiceMessagePayload::DESTROY_VM_ANSWER_MESSAGE_PAYLOAD,           1024},
+                {CloudComputeServiceMessagePayload::DESTROY_VM_ANSWER_MESSAGE_PAYLOAD,            1024},
                 {CloudComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD,  1024},
                 {CloudComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,   1024},
                 {CloudComputeServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,     1024},
@@ -97,6 +95,8 @@ namespace wrench {
 
         virtual std::shared_ptr<BareMetalComputeService> getVMComputeService(const std::string &vm_name);
 
+        virtual std::string getVMPhysicalHostname(const std::string &vm_name);
+
         virtual void suspendVM(const std::string &vm_name);
 
         virtual void resumeVM(const std::string &vm_name);
@@ -104,9 +104,10 @@ namespace wrench {
         virtual void destroyVM(const std::string &vm_name);
 
         virtual bool isVMRunning(const std::string &vm_name);
-        virtual bool isVMSuspended(const std::string &vm_name);
-        virtual bool isVMDown(const std::string &vm_name);
 
+        virtual bool isVMSuspended(const std::string &vm_name);
+
+        virtual bool isVMDown(const std::string &vm_name);
 
 
         std::vector<std::string> getExecutionHosts();
@@ -118,11 +119,14 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL    */
         /***********************/
-        void submitStandardJob(std::shared_ptr<StandardJob> job, const std::map<std::string, std::string> &service_specific_args) override;
+        void submitStandardJob(std::shared_ptr<StandardJob> job,
+                               const std::map<std::string, std::string> &service_specific_args) override;
 
-        void submitPilotJob(std::shared_ptr<PilotJob> job, const std::map<std::string, std::string> &service_specific_args) override;
+        void submitPilotJob(std::shared_ptr<PilotJob> job,
+                            const std::map<std::string, std::string> &service_specific_args) override;
 
         void terminateStandardJob(std::shared_ptr<StandardJob> job) override;
+
         void terminatePilotJob(std::shared_ptr<PilotJob> job) override;
 
         void validateProperties();
@@ -158,8 +162,8 @@ namespace wrench {
                                      std::map<std::string, double> messagepayload_list
         );
 
-
-        virtual void processStartVM(const std::string &answer_mailbox, const std::string &vm_name, const std::string &pm_name);
+        virtual void
+        processStartVM(const std::string &answer_mailbox, const std::string &vm_name, const std::string &pm_name);
 
         virtual void processShutdownVM(const std::string &answer_mailbox, const std::string &vm_name);
 
@@ -175,7 +179,8 @@ namespace wrench {
         virtual void processSubmitPilotJob(const std::string &answer_mailbox, std::shared_ptr<PilotJob> job,
                                            std::map<std::string, std::string> &service_specific_args);
 
-        virtual void processBareMetalComputeServiceTermination(std::shared_ptr<BareMetalComputeService> cs, int exit_code);
+        virtual void
+        processBareMetalComputeServiceTermination(std::shared_ptr<BareMetalComputeService> cs, int exit_code);
 
         void stopAllVMs();
 
