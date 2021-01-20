@@ -26,7 +26,8 @@
 #include "wrench/workflow/job/PilotJob.h"
 #include "services/compute/batch/workload_helper_classes/WorkloadTraceFileReplayer.h"
 #include "batch_schedulers/homegrown/fcfs/FCFSBatchScheduler.h"
-#include "services/compute/batch/batch_schedulers/homegrown/conservative_bf/CONSERVATIVEBFBatchScheduler.h"
+#include "batch_schedulers/homegrown/conservative_bf/CONSERVATIVEBFBatchScheduler.h"
+#include "batch_schedulers/homegrown/conservative_bf_core_level/CONSERVATIVEBFBatchSchedulerCoreLevel.h"
 #include "batch_schedulers/batsched/BatschedBatchScheduler.h"
 #include "wrench/workflow/failure_causes/JobTypeNotSupported.h"
 #include "wrench/workflow/failure_causes/FunctionalityNotAvailable.h"
@@ -193,6 +194,8 @@ namespace wrench {
             this->scheduler = std::unique_ptr<BatchScheduler>(new FCFSBatchScheduler(this));
         } else if (batch_scheduling_alg == "conservative_bf") {
             this->scheduler = std::unique_ptr<BatchScheduler>(new CONSERVATIVEBFBatchScheduler(this));
+        } else if (batch_scheduling_alg == "conservative_bf_core_level") {
+            this->scheduler = std::unique_ptr<BatchScheduler>(new CONSERVATIVEBFBatchSchedulerCoreLevel(this));
         }
 #endif
 
@@ -1409,116 +1412,116 @@ namespace wrench {
 
 
         if (auto sjob = std::dynamic_pointer_cast<StandardJob>(workflow_job)) {
-                WRENCH_INFO("Creating a StandardJobExecutor for a standard job on %ld nodes with %ld cores per node",
-                            num_nodes_allocated, cores_per_node_asked_for);
-                // Create a standard job executor
-                std::shared_ptr<StandardJobExecutor> executor = std::shared_ptr<StandardJobExecutor>(
-                        new StandardJobExecutor(
-                                this->simulation,
-                                this->mailbox_name,
-                                std::get<0>(*resources.begin()),
-                                sjob,
-                                resources,
-                                this->getScratch(),
-                                false,
-                                nullptr,
-                                {{StandardJobExecutorProperty::TASK_STARTUP_OVERHEAD,
-                                         this->getPropertyValueAsString(
-                                                 BatchComputeServiceProperty::TASK_STARTUP_OVERHEAD)},
-                                 {StandardJobExecutorProperty::SIMULATE_COMPUTATION_AS_SLEEP,
-                                         this->getPropertyValueAsString(
-                                                 BatchComputeServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP)},
-                                 {StandardJobExecutorProperty::TASK_SELECTION_ALGORITHM,
-                                         this->getPropertyValueAsString(
-                                                 BatchComputeServiceProperty::TASK_SELECTION_ALGORITHM)}
-                                },
-                                {}));
-                executor->start(executor, true, false); // Daemonized, no auto-restart
-                batch_job->setBeginTimestamp(S4U_Simulation::getClock());
-                batch_job->setEndingTimestamp(S4U_Simulation::getClock() + allocated_time);
-                this->running_standard_job_executors.insert(executor);
+            WRENCH_INFO("Creating a StandardJobExecutor for a standard job on %ld nodes with %ld cores per node",
+                        num_nodes_allocated, cores_per_node_asked_for);
+            // Create a standard job executor
+            std::shared_ptr<StandardJobExecutor> executor = std::shared_ptr<StandardJobExecutor>(
+                    new StandardJobExecutor(
+                            this->simulation,
+                            this->mailbox_name,
+                            std::get<0>(*resources.begin()),
+                            sjob,
+                            resources,
+                            this->getScratch(),
+                            false,
+                            nullptr,
+                            {{StandardJobExecutorProperty::TASK_STARTUP_OVERHEAD,
+                                     this->getPropertyValueAsString(
+                                             BatchComputeServiceProperty::TASK_STARTUP_OVERHEAD)},
+                             {StandardJobExecutorProperty::SIMULATE_COMPUTATION_AS_SLEEP,
+                                     this->getPropertyValueAsString(
+                                             BatchComputeServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP)},
+                             {StandardJobExecutorProperty::TASK_SELECTION_ALGORITHM,
+                                     this->getPropertyValueAsString(
+                                             BatchComputeServiceProperty::TASK_SELECTION_ALGORITHM)}
+                            },
+                            {}));
+            executor->start(executor, true, false); // Daemonized, no auto-restart
+            batch_job->setBeginTimestamp(S4U_Simulation::getClock());
+            batch_job->setEndingTimestamp(S4U_Simulation::getClock() + allocated_time);
+            this->running_standard_job_executors.insert(executor);
 
 //          this->running_jobs.insert(std::move(batch_job_ptr));
-                this->timeslots.push_back(batch_job->getEndingTimestamp());
-                //remember the allocated resources for the job
-                batch_job->setAllocatedResources(resources);
+            this->timeslots.push_back(batch_job->getEndingTimestamp());
+            //remember the allocated resources for the job
+            batch_job->setAllocatedResources(resources);
 
-                SimulationMessage *msg =
-                        new AlarmJobTimeOutMessage(batch_job, 0);
+            SimulationMessage *msg =
+                    new AlarmJobTimeOutMessage(batch_job, 0);
 
-                std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(this->simulation,
-                                                                              batch_job->getEndingTimestamp(),
-                                                                              this->hostname,
-                                                                              this->mailbox_name, msg,
-                                                                              "batch_standard");
-                standard_job_alarms[sjob->getName()] = alarm_ptr;
-
-
-                return;
-            } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(workflow_job)) {
-                WRENCH_INFO("Allocating %ld nodes with %ld cores per node to a pilot job for %lu seconds",
-                            num_nodes_allocated, cores_per_node_asked_for, allocated_time);
-
-                std::vector<std::string> nodes_for_pilot_job = {};
-                for (auto r : resources) {
-                    nodes_for_pilot_job.push_back(std::get<0>(r));
-                }
-                std::string host_to_run_on = nodes_for_pilot_job[0];
-
-                //set the ending timestamp of the batchjob (pilotjob)
-
-                // Create and launch a compute service for the pilot job
-                // (We use a TTL for user information purposes, but an alarm will take care of this)
-                std::shared_ptr<ComputeService> cs = std::shared_ptr<ComputeService>(
-                        new BareMetalComputeService(host_to_run_on,
-                                                    resources,
-                                                    {{BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"},
-                                                     {BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS,    "false"}},
-                                                    {},
-                                                    allocated_time, pjob, "pilot_job", getScratch()
-                        ));
-                cs->simulation = this->simulation;
-                pjob->setComputeService(cs);
-
-                try {
-                    cs->start(cs, true, false); // Daemonized, no auto-restart
-                    batch_job->setBeginTimestamp(S4U_Simulation::getClock());
-                    double ending_timestamp = S4U_Simulation::getClock() + (double)allocated_time;
-                    batch_job->setEndingTimestamp(ending_timestamp);
-                } catch (std::runtime_error &e) {
-                    throw;
-                }
-
-                // Put the job in the running queue
-//          this->running_jobs.insert(std::move(batch_job_ptr));
-                this->timeslots.push_back(batch_job->getEndingTimestamp());
-
-                //remember the allocated resources for the job
-                batch_job->setAllocatedResources(resources);
+            std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(this->simulation,
+                                                                          batch_job->getEndingTimestamp(),
+                                                                          this->hostname,
+                                                                          this->mailbox_name, msg,
+                                                                          "batch_standard");
+            standard_job_alarms[sjob->getName()] = alarm_ptr;
 
 
-                // Send the "Pilot job has started" callback
-                // Note the getCallbackMailbox instead of the popCallbackMailbox, because
-                // there will be another callback upon termination.
-                S4U_Mailbox::dputMessage(pjob->getCallbackMailbox(),
-                                         new ComputeServicePilotJobStartedMessage(
-                                                 pjob, this->getSharedPtr<BatchComputeService>(),
-                                                 this->getMessagePayloadValue(
-                                                         BatchComputeServiceMessagePayload::PILOT_JOB_STARTED_MESSAGE_PAYLOAD)));
+            return;
+        } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(workflow_job)) {
+            WRENCH_INFO("Allocating %ld nodes with %ld cores per node to a pilot job for %lu seconds",
+                        num_nodes_allocated, cores_per_node_asked_for, allocated_time);
 
-                SimulationMessage *msg =
-                        new AlarmJobTimeOutMessage(batch_job, 0);
-
-                std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(this->simulation,
-                                                                              batch_job->getEndingTimestamp(),
-                                                                              host_to_run_on,
-                                                                              this->mailbox_name, msg,
-                                                                              "batch_pilot");
-
-                this->pilot_job_alarms[pjob->getName()] = alarm_ptr;
-
-                return;
+            std::vector<std::string> nodes_for_pilot_job = {};
+            for (auto r : resources) {
+                nodes_for_pilot_job.push_back(std::get<0>(r));
             }
+            std::string host_to_run_on = nodes_for_pilot_job[0];
+
+            //set the ending timestamp of the batchjob (pilotjob)
+
+            // Create and launch a compute service for the pilot job
+            // (We use a TTL for user information purposes, but an alarm will take care of this)
+            std::shared_ptr<ComputeService> cs = std::shared_ptr<ComputeService>(
+                    new BareMetalComputeService(host_to_run_on,
+                                                resources,
+                                                {{BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"},
+                                                 {BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS,    "false"}},
+                                                {},
+                                                allocated_time, pjob, "pilot_job", getScratch()
+                    ));
+            cs->simulation = this->simulation;
+            pjob->setComputeService(cs);
+
+            try {
+                cs->start(cs, true, false); // Daemonized, no auto-restart
+                batch_job->setBeginTimestamp(S4U_Simulation::getClock());
+                double ending_timestamp = S4U_Simulation::getClock() + (double)allocated_time;
+                batch_job->setEndingTimestamp(ending_timestamp);
+            } catch (std::runtime_error &e) {
+                throw;
+            }
+
+            // Put the job in the running queue
+//          this->running_jobs.insert(std::move(batch_job_ptr));
+            this->timeslots.push_back(batch_job->getEndingTimestamp());
+
+            //remember the allocated resources for the job
+            batch_job->setAllocatedResources(resources);
+
+
+            // Send the "Pilot job has started" callback
+            // Note the getCallbackMailbox instead of the popCallbackMailbox, because
+            // there will be another callback upon termination.
+            S4U_Mailbox::dputMessage(pjob->getCallbackMailbox(),
+                                     new ComputeServicePilotJobStartedMessage(
+                                             pjob, this->getSharedPtr<BatchComputeService>(),
+                                             this->getMessagePayloadValue(
+                                                     BatchComputeServiceMessagePayload::PILOT_JOB_STARTED_MESSAGE_PAYLOAD)));
+
+            SimulationMessage *msg =
+                    new AlarmJobTimeOutMessage(batch_job, 0);
+
+            std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(this->simulation,
+                                                                          batch_job->getEndingTimestamp(),
+                                                                          host_to_run_on,
+                                                                          this->mailbox_name, msg,
+                                                                          "batch_pilot");
+
+            this->pilot_job_alarms[pjob->getName()] = alarm_ptr;
+
+            return;
+        }
     }
 
 /**

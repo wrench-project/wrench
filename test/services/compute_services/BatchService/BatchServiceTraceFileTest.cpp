@@ -200,6 +200,7 @@ void BatchServiceTest::do_BatchTraceFileReplayTest_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -314,6 +315,7 @@ void BatchServiceTest::do_BatchTraceFileReplayTestWithFailedJob_test() {
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
+
 
     delete simulation;
 
@@ -554,6 +556,7 @@ void BatchServiceTest::do_WorkloadTraceFileTestSWF_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -777,6 +780,17 @@ void BatchServiceTest::do_WorkloadTraceFileTestSWF_test() {
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
+
+
+    // Access task completion task stamps
+    auto trace = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>();
+    for (auto const &ts : trace) {
+        auto task = ts->getContent()->getTask();
+        auto host = task->getExecutionHost();
+        auto workflow = task->getWorkflow();
+        auto num_cores = task->getNumCoresAllocated();
+        WRENCH_INFO("%s: %s %lu", task->getID().c_str(), host.c_str(), num_cores);
+    }
 
     delete simulation;
 

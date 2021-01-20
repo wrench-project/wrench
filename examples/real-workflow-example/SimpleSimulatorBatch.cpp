@@ -113,7 +113,8 @@ int main(int argc, char **argv) {
     /* Add the batch service to the simulation, catching a possible exception */
     try {
         auto batch_service = simulation.add(new wrench::BatchComputeService(
-                batch_front_end_host, hostname_list, "", {},
+                batch_front_end_host, hostname_list, "",
+                {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"}},
                 {{wrench::BatchComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 2048}}));
         compute_services.insert(batch_service);
     } catch (std::invalid_argument &e) {

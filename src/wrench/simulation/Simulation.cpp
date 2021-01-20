@@ -243,6 +243,16 @@ namespace wrench {
     }
 
     /**
+     * @brief Get the list of link names on the route between two hosts
+     * @param src_host: src hostname
+     * @param dst_host: dst hostname
+     * @return a vector of link names
+     */
+    std::vector<std::string> Simulation::getRoute(std::string &src_host, std::string &dst_host) {
+        return S4U_Simulation::getRoute(src_host, dst_host);
+    }
+
+    /**
      * @brief Get the list of names of all the links in the platform
      *
      * @return a vector of link names
