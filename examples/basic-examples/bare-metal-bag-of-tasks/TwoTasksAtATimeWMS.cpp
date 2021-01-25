@@ -55,7 +55,10 @@ namespace wrench {
         /* Set the logging output to GREEN */
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
 
-        WRENCH_INFO("WMS starting on host %s", Simulation::getHostName().c_str());
+        WRENCH_INFO("WMS starting on host %s at time %lf",
+                    Simulation::getHostName().c_str(),
+                    Simulation::getCurrentSimulatedDate());
+        
         WRENCH_INFO("About to execute a workflow with %lu tasks", this->getWorkflow()->getNumberOfTasks());
 
         /* Create a job manager so that we can create/submit jobs */
