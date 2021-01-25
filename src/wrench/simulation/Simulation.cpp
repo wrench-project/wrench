@@ -148,7 +148,8 @@ namespace wrench {
             std::cout << "     (requires host pstate definitions in XML platform description file)\n";
             std::cout << "   --help-simgrid: show full help on general Simgrid command-line arguments\n";
             std::cout << "   --help-wrench: displays this help message\n";
-            std::cout << "   --pagecache: Activate the in-memory_manager_service page caching simulation\n";
+            std::cout << "   --pagecache: Activate the in-memory_manager_service page caching simulation (which then";
+            std::cout << "                requires that all hosts in the platform have a disk mounted at '/memory')\n";
             std::cerr << "\n";
         }
 
