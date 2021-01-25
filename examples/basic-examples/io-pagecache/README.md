@@ -22,3 +22,7 @@ the following task.
 - How to run: run script `run_nfs.sh`. 
 - Output log files are exported to the directories: `nfs/original/` if run 
 without `--pagecache` option, or `nfs/pagecache` with the option.
+
+## 4. Nighres application
+- How to run: run script `run_nighres.sh`. 
+- Output log files are exported to the directories: `nighres/`.
