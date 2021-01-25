@@ -205,6 +205,7 @@ namespace wrench {
      * @return flushed amount
      */
     double MemoryManager::flush(double amount, std::string excluded_filename) {
+        WRENCH_INFO("flush(): AMOUNT = %lf", amount);
         if (amount <= 0) return 0;
 
         double flushed_inactive = flushLruList(inactive_list, amount, excluded_filename);
