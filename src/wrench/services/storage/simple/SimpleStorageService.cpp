@@ -27,7 +27,7 @@
 #include "wrench/services/memory/MemoryManager.h"
 
 WRENCH_LOG_CATEGORY(wrench_core_simple_storage_service,
-"Log category for Simple Storage Service");
+                    "Log category for Simple Storage Service");
 
 namespace wrench {
 
@@ -125,9 +125,23 @@ namespace wrench {
 
         // If writeback device simulation is activated
         if (Simulation::isPageCachingEnabled()) {
-            // Start periodical flushing
-            simgrid::s4u::Disk* memory = simgrid::s4u::Host::by_name(this->getHostname())->get_disks().at(0);
-            this->memory_manager = MemoryManager::initAndStart(this->simulation, memory,0.4, 5, 30, this->hostname);
+            //  Find the "memory" disk (we know there is one)
+            auto host = simgrid::s4u::Host::by_name(this->getHostname());
+            simgrid::s4u::Disk *memory_disk = nullptr;
+            for (auto const &d : host->get_disks()) {
+                // Get the disk's mount point
+                const char *p = d->get_property("mount");
+                if (!p) {
+                    continue;
+                }
+                if (!strcmp(p, "/memory")) {
+                    memory_disk = d;
+                    break;
+                }
+            }
+
+            // Start periodical flushing via a memory manager
+            this->memory_manager = MemoryManager::initAndStart(this->simulation, memory_disk,0.4, 5, 30, this->hostname);
 //            memory_manager_ptr->log();
         }
 
