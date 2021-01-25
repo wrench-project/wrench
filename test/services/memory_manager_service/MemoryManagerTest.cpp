@@ -40,13 +40,13 @@ protected:
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"TwoCoreHost\" speed=\"1f\" core=\"2\"> "
                           "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"30000GB\"/>"
+                          "             <prop id=\"size\" value=\"1.5GB\"/>"
                           "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
                           "       </host> "
                           "       <host id=\"OneCoreHost\" speed=\"1f\" core=\"1\"> "
                           "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"30000GB\"/>"
+                          "             <prop id=\"size\" value=\"1.5GB\"/>"
                           "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
                           "       </host> "
@@ -70,13 +70,13 @@ protected:
                           "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
                           "          <disk id=\"memory\" read_bw=\"1000MBps\" write_bw=\"1000MBps\">"
-                          "             <prop id=\"size\" value=\"30000GB\"/>"
+                          "             <prop id=\"size\" value=\"30GB\"/>"
                           "             <prop id=\"mount\" value=\"/memory\"/>"
                           "          </disk>"
                           "       </host> "
                           "       <host id=\"OneCoreHost\" speed=\"1f\" core=\"1\"> "
                           "          <disk id=\"memory\" read_bw=\"1000MBps\" write_bw=\"1000MBps\">"
-                          "             <prop id=\"size\" value=\"30000GB\"/>"
+                          "             <prop id=\"size\" value=\"30GB\"/>"
                           "             <prop id=\"mount\" value=\"/memory\"/>"
                           "          </disk>"
                           "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
@@ -154,47 +154,27 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        auto task1 = this->getWorkflow()->getTaskByID("task1");
-        auto task2 = this->getWorkflow()->getTaskByID("task2");
-        auto task1_input = this->getWorkflow()->getFileByID("task1_input");
-        auto task1_output = this->getWorkflow()->getFileByID("task1_output");
-        auto task2_output = this->getWorkflow()->getFileByID("task2_output");
+        while (not this->getWorkflow()->isDone()) {
 
-        // Create job1
-        auto job1 = job_manager->createStandardJob(
-                this->getWorkflow()->getTaskByID("task1"),
-                {{task1_input,  wrench::FileLocation::LOCATION((test->storage_service1))},
-                 {task1_output, wrench::FileLocation::LOCATION(test->storage_service1)}});
-        // Submit the job
-        job_manager->submitJob(job1, test->compute_service);
+            // Create job
+            auto task = *(this->getWorkflow()->getReadyTasks().begin());
+            auto job = job_manager->createStandardJob(
+                    task,
+                    {{*(task->getInputFiles().begin()), wrench::FileLocation::LOCATION((test->storage_service1))},
+                     {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(test->storage_service1)}});
+            // Submit the job
+            job_manager->submitJob(job, test->compute_service);
 
-        // Wait for the workflow execution event
-        std::shared_ptr<wrench::WorkflowExecutionEvent> event1 = this->getWorkflow()->waitForNextExecutionEvent();
-        if (std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event1)) {
-            // do nothing
-        } else if (auto real_event = std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event1)) {
-            throw std::runtime_error("Unexpected job failure: " +
-                                     real_event->failure_cause->toString());
-        } else {
-            throw std::runtime_error("Unexpected workflow execution event: " + event1->toString());
-        }
-
-        auto job2 = job_manager->createStandardJob(
-                this->getWorkflow()->getTaskByID("task2"),
-                {{task1_output,  wrench::FileLocation::LOCATION((test->storage_service1))},
-                 {task2_output, wrench::FileLocation::LOCATION(test->storage_service1)}});
-        // Submit the job
-        job_manager->submitJob(job2, test->compute_service);
-
-        // Wait for the workflow execution event
-        std::shared_ptr<wrench::WorkflowExecutionEvent> event2 = this->getWorkflow()->waitForNextExecutionEvent();
-        if (std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event2)) {
-            // do nothing
-        } else if (auto real_event = std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event2)) {
-            throw std::runtime_error("Unexpected job failure: " +
-                                     real_event->failure_cause->toString());
-        } else {
-            throw std::runtime_error("Unexpected workflow execution event: " + event2->toString());
+            // Wait for the workflow execution event
+            std::shared_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
+            if (std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
+                // do nothing
+            } else if (auto real_event = std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event)) {
+                throw std::runtime_error("Unexpected job failure: " +
+                                         real_event->failure_cause->toString());
+            } else {
+                throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
+            }
         }
 
         return 0;
@@ -239,17 +219,15 @@ void MemoryManagerTest::do_MemoryManagerChainOfTasksTest_test() {
 
     // Create a Workflow
     auto workflow = new wrench::Workflow();
-
-    auto task1 = workflow->addTask("task1", 100.0, 1, 1, 0.0);
-    auto task2 = workflow->addTask("task2", 200.0, 1, 1, 0.0);
-    auto task1_input = workflow->addFile("task1_input", 1*1000.00*1000.00*1000.00);
-    auto task1_output = workflow->addFile("task1_output", 1*1000.00*1000.00*1000.00);
-    auto task2_output = workflow->addFile("task2_output", 1*1000.00*1000.00*1000.00);
-
-    task1->addInputFile(task1_input);
-    task1->addOutputFile(task1_output);
-    task2->addInputFile(task1_output);
-    task2->addOutputFile(task2_output);
+    auto previous_output_file = workflow->addFile("task0_input", 1*1000.00*1000.00*1000.00);
+    int num_tasks = 100;
+    for (int i=0; i < num_tasks; i++) {
+        auto task = workflow->addTask("task" + std::to_string(i), 100.0, 1, 1, 0.0);
+        auto output_file = workflow->addFile("task" + std::to_string(i) + "_output", 1*1000.00*1000.00*1000.00);
+        task->addOutputFile(output_file);
+        task->addInputFile(previous_output_file);
+        previous_output_file = output_file;
+    }
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -263,7 +241,7 @@ void MemoryManagerTest::do_MemoryManagerChainOfTasksTest_test() {
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
     // Staging the input_file on storage service #1
-    ASSERT_NO_THROW(simulation->stageFile(task1_input, storage_service1));
+    ASSERT_NO_THROW(simulation->stageFile(workflow->getFileByID("task0_input"), storage_service1));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
