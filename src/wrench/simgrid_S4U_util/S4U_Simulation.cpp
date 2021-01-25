@@ -824,7 +824,7 @@ namespace wrench {
         try {
             host = simgrid::s4u::Host::by_name(hostname);
         } catch (std::exception &e) {
-            throw std::invalid_argument("S4U_Simulation::getDisks(): Unknown host " + hostname);
+            throw std::invalid_argument("S4U_Simulation::hostHasMountPoint(): Unknown host " + hostname);
         }
 
         std::set<std::string> mount_points;
