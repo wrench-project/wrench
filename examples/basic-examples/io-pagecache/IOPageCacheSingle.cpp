@@ -43,7 +43,7 @@
  */
 
 wrench::Workflow *generate_workflow(int num_pipes, int num_tasks, int core_per_task,
-                                       long flops, long file_size, long mem_required) {
+                                    long flops, long file_size, long mem_required) {
     wrench::Workflow *workflow = new wrench::Workflow();
 
     for (int i = 0; i < num_pipes; i++) {
@@ -134,7 +134,7 @@ int main(int argc, char **argv) {
 
     /* Declare a workflow */
     wrench::Workflow *workflow = generate_workflow(1, num_tasks, 1, cpu_time_sec * 1000000000,
-                                                      file_size_gb * 1000000000, mem_req_gb * 1000000000);
+                                                   file_size_gb * 1000000000, mem_req_gb * 1000000000);
 
     std::cerr << "Instantiating a SimpleStorageService on host01..." << std::endl;
     auto storage_service = simulation.add(new wrench::SimpleStorageService(
@@ -170,7 +170,7 @@ int main(int argc, char **argv) {
 
     std::string sub_dir = "original_";
     if (wrench::Simulation::isPageCachingEnabled()) {
-            sub_dir = "pagecache_";
+        sub_dir = "pagecache_";
     }
 
     {

@@ -435,15 +435,21 @@ errors.
 
 # Finding information and interacting with hardware resources {#wrench-102-WMS-hardware}
 
-The `wrench::Simulation` class provides many member functions to discover information
-about the (simulated) hardware platform and interact with it. Some of these
-member functions are static, but others are not. The `wrench:WMS` class includes a
-`simulation` object. Thus, the WMS can call member functions on the `this->simulation`
-object. For instance, this fragment of code shows how a WMS can check that
-a host exists (given a hostname) and, if so, set its `pstate` (power state) 
-to the highest possible setting. 
+The `wrench::Simulation` class provides many member functions to discover
+information about the (simulated) hardware platform and interact with it. It
+also provides 
+other useful information about the simulation itself, such
+as the current simulation date.
+Some of these member functions are static,
+but others are not. The `wrench:WMS` class includes a `simulation` object.
+Thus, the WMS can call member functions on the `this->simulation` object.
+For instance, this fragment of code shows how a WMS can figure out the
+current simulated date and then check that a host
+exists (given a hostname) and, if so, set its `pstate` (power state) to the
+highest possible setting.
 
 ~~~~~~~~~~~~~{.cpp}
+auto now = wrench::Simulation::getCurrentSimulatedDate();
 if (wrench::Simulation::doesHostExist("SomeHost"))  {
   this->simulation->setPstate("SomeHost", wrench::Simulation::getNumberofPstates("SomeHost")-1);
 }
