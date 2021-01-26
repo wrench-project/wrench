@@ -41,7 +41,8 @@ namespace wrench {
             storage_services,
             {}, nullptr,
             hostname,
-            "two-tasks-at-a-time") {}
+            "two-tasks-at-a-time") {
+    }
 
     /**
      * @brief main method of the TwoTasksAtATimeWMS daemon
@@ -72,9 +73,9 @@ namespace wrench {
         while (not this->getWorkflow()->isDone()) {
 
             /* Get the ready tasks */
-            auto ready_tasks = this->getWorkflow()->getReadyTasks();
+            std::vector<WorkflowTask *> ready_tasks = this->getWorkflow()->getReadyTasks();
 
-            /* Sort them by flops */
+            /* Sort them by increasing flops */
             std::sort(ready_tasks.begin(), ready_tasks.end(),
                       [](const WorkflowTask *t1, const WorkflowTask  *t2) -> bool {
 
@@ -114,8 +115,8 @@ namespace wrench {
             /* Then, we create the "service-specific arguments" that make it possible to configure
              * the way in which tasks in a job can run on the compute service */
             std::map<std::string, std::string> service_specific_args;
-            service_specific_args[cheap_ready_task->getID()] = "4";
-            service_specific_args[expensive_ready_task->getID()] = "6";
+            service_specific_args[cheap_ready_task->getID()] = "4"; // 4 cores, run on any host
+            service_specific_args[expensive_ready_task->getID()] = "6"; // 6 cores, run on any host
 
             WRENCH_INFO("Submitting the job, asking for %s cores for task %s, and "
                         "%s cores for task %s",

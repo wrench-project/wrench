@@ -60,7 +60,7 @@ namespace wrench {
         /* Create a job manager so that we can create/submit jobs */
         auto job_manager = this->createJobManager();
 
-        /* Get the first available bare-metal compute service and storage servic  */
+        /* Get the first available bare-metal compute service and storage service  */
         auto compute_service = *(this->getAvailableComputeServices<BareMetalComputeService>().begin());
         auto storage_service = *(this->getAvailableStorageServices().begin());
 
@@ -68,7 +68,7 @@ namespace wrench {
          * kept in the compute service's scratch place, and only the final output
          * file is written back to the storage service at host WMSHost. However,
          * files stored in the compute service's scratch space are erased
-         * after the job that created them has completed. So we ave the run
+         * after the job that created them has completed. So we have to run
          * the entire workflow as a single multi-task job! */
 
         /* First, we need to create a map of file locations, stating for each file
