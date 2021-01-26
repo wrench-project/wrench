@@ -67,7 +67,7 @@ int main(int argc, char **argv) {
     /* Declare a workflow */
     wrench::Workflow workflow;
 
-    /* Add the workflow task an files */
+    /* Add the workflow task and files */
     auto task = workflow.addTask("task", 10000000000.0, 1, 10, 10000000);
     task->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(0.9));
     task->addInputFile(workflow.addFile("infile_1", 100000000));
