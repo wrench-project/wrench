@@ -31,7 +31,7 @@
 #include "wrench/workflow/failure_causes/JobTypeNotSupported.h"
 #include "wrench/workflow/failure_causes/HostError.h"
 
-WRENCH_LOG_CATEGORY(wrench_core_bare_metal_compute_service, "Log category for BareMetalComputeService");
+WRENCH_LOG_CATEGORY(wrench_core_bare_metal_compute_service, "Log category for bare_metal");
 
 
 namespace wrench {
@@ -143,7 +143,7 @@ namespace wrench {
             }
             if (not found) {
                 throw std::invalid_argument(
-                        "BareMetalComputeService::submitStandardJob(): Service-specific argument provided for task with ID '" +
+                        "bare_metal::submitStandardJob(): Service-specific argument provided for task with ID '" +
                         arg.first + "' but there is no task with such ID in the job");
             }
         }
@@ -278,7 +278,7 @@ namespace wrench {
 
         } else {
             throw std::runtime_error(
-                    "BareMetalComputeService::submitPilotJob(): Received an unexpected [" + message->getName() +
+                    "bare_metal::submitPilotJob(): Received an unexpected [" + message->getName() +
                     "] message!");
         }
     }
@@ -431,7 +431,7 @@ namespace wrench {
 
         if (ttl < 0) {
             throw std::invalid_argument(
-                    "BareMetalComputeService::initiateInstance(): invalid TTL value (must be >0)");
+                    "bare_metal::initiateInstance(): invalid TTL value (must be >0)");
         }
 
         // Set default and specified properties
@@ -447,7 +447,7 @@ namespace wrench {
         // Check that there is at least one core per host and that hosts have enough cores
         if (compute_resources.empty()) {
             throw std::invalid_argument(
-                    "BareMetalComputeService::initiateInstance(): the resource list is empty");
+                    "bare_metal::initiateInstance(): the resource list is empty");
         }
         for (auto host : compute_resources) {
 
@@ -458,18 +458,18 @@ namespace wrench {
                 available_cores = S4U_Simulation::getHostNumCores(hname);
             } catch (std::runtime_error &e) {
                 throw std::invalid_argument(
-                        "BareMetalComputeService::initiateInstance(): Host '" + hname + "' does not exist");
+                        "bare_metal::initiateInstance(): Host '" + hname + "' does not exist");
             }
             if (requested_cores == ComputeService::ALL_CORES) {
                 requested_cores = available_cores;
             }
             if (requested_cores == 0) {
                 throw std::invalid_argument(
-                        "BareMetalComputeService::BareMetalComputeService(): at least 1 core should be requested");
+                        "bare_metal::bare_metal(): at least 1 core should be requested");
             }
             if (requested_cores > available_cores) {
                 throw std::invalid_argument(
-                        "BareMetalComputeService::BareMetalComputeService(): host " + hname + "only has " +
+                        "bare_metal::bare_metal(): host " + hname + "only has " +
                         std::to_string(available_cores) + " cores but " +
                         std::to_string(requested_cores) + " are requested");
             }
@@ -478,7 +478,7 @@ namespace wrench {
             double available_ram = S4U_Simulation::getHostMemoryCapacity(hname);
             if (requested_ram < 0) {
                 throw std::invalid_argument(
-                        "BareMetalComputeService::BareMetalComputeService(): requested ram should be non-negative");
+                        "bare_metal::bare_metal(): requested ram should be non-negative");
             }
 
             if (requested_ram == ComputeService::ALL_RAM) {
@@ -487,7 +487,7 @@ namespace wrench {
 
             if (requested_ram > available_ram) {
                 throw std::invalid_argument(
-                        "BareMetalComputeService::BareMetalComputeService(): host " + hname + "only has " +
+                        "bare_metal::bare_metal(): host " + hname + "only has " +
                         std::to_string(available_ram) + " bytes of RAM but " +
                         std::to_string(requested_ram) + " are requested");
             }
@@ -562,7 +562,7 @@ namespace wrench {
 
         }
 
-        WRENCH_INFO("BareMetalComputeService on host %s terminating cleanly!", S4U_Simulation::getHostName().c_str());
+        WRENCH_INFO("bare_metal on host %s terminating cleanly!", S4U_Simulation::getHostName().c_str());
         return this->exit_code;
     }
 
@@ -733,7 +733,7 @@ namespace wrench {
             } catch (std::shared_ptr<HostError> &e) {
                 // This is an error on the target host!!
                 throw std::runtime_error(
-                        "BareMetalComputeService::dispatchReadyWorkunits(): got a host error on the target host - this shouldn't happen");
+                        "bare_metal::dispatchReadyWorkunits(): got a host error on the target host - this shouldn't happen");
             }
 
 
@@ -970,7 +970,7 @@ namespace wrench {
 
                 case WorkflowTask::InternalState::TASK_RUNNING:
                     throw std::runtime_error(
-                            "BareMetalComputeService::terminateRunningStandardJob(): task state shouldn't be 'RUNNING'"
+                            "bare_metal::terminateRunningStandardJob(): task state shouldn't be 'RUNNING'"
                             "after a WorkUnitExecutor was killed!");
                 case WorkflowTask::InternalState::TASK_FAILED:
                     // Making failed task READY again!!!
@@ -979,7 +979,7 @@ namespace wrench {
 
                 default:
                     throw std::runtime_error(
-                            "BareMetalComputeService::terminateRunningStandardJob(): unexpected task state");
+                            "bare_metal::terminateRunningStandardJob(): unexpected task state");
             }
         }
 
@@ -1093,7 +1093,7 @@ namespace wrench {
             }
         } else {
             throw std::runtime_error(
-                    "BareMetalComputeService::terminateStandardJob(): Received an unexpected [" +
+                    "bare_metal::terminateStandardJob(): Received an unexpected [" +
                     message->getName() + "] message!");
         }
     }
@@ -1147,7 +1147,7 @@ namespace wrench {
                 if (child->task != nullptr) {
                     if (child->task->getInternalState() != WorkflowTask::InternalState::TASK_READY) {
                         throw std::runtime_error(
-                                "BareMetalComputeService::processWorkunitExecutorCompletion(): Weird task state " +
+                                "bare_metal::processWorkunitExecutorCompletion(): Weird task state " +
                                 std::to_string(child->task->getInternalState()) + " for task " +
                                 child->task->getID());
                     }
@@ -1246,7 +1246,7 @@ namespace wrench {
         }
         if (found_it == nullptr) {
             throw std::runtime_error(
-                    "BareMetalComputeService::processWorkunitExecutorCompletion(): Couldn't find workunit executor");
+                    "bare_metal::processWorkunitExecutorCompletion(): Couldn't find workunit executor");
         }
         this->workunit_executors[job].erase(found_it);
 
@@ -1467,7 +1467,7 @@ namespace wrench {
         }
 
         throw std::runtime_error(
-                "BareMetalComputeService::processSubmitPilotJob(): We shouldn't be here! (fatal)");
+                "bare_metal::processSubmitPilotJob(): We shouldn't be here! (fatal)");
     }
 
 /**
@@ -1597,7 +1597,7 @@ namespace wrench {
  */
     void BareMetalComputeService::terminatePilotJob(std::shared_ptr<PilotJob> job) {
         throw std::runtime_error(
-                "BareMetalComputeService::terminatePilotJob(): not implemented because BareMetalComputeService never supports pilot jobs");
+                "bare_metal::terminatePilotJob(): not implemented because bare_metal never supports pilot jobs");
     }
 
 

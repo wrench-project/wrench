@@ -76,9 +76,9 @@ namespace wrench {
         double ram_memory;
         /** @brief The desired name for the VM ("" means "pick for me") */
         std::string desired_vm_name;
-        /** @brief A property list for the BareMetalComputeService that will run on the VM ({} means "use all defaults") */
+        /** @brief A property list for the bare_metal that will run on the VM ({} means "use all defaults") */
         std::map<std::string, std::string> property_list;
-        /** @brief A message payload list for the BareMetalComputeService that will run on the VM ({} means "use all defaults") */
+        /** @brief A message payload list for the bare_metal that will run on the VM ({} means "use all defaults") */
         std::map<std::string, double> messagepayload_list;
     };
 
