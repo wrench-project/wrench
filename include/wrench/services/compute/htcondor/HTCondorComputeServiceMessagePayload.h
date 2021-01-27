@@ -15,7 +15,7 @@
 namespace wrench {
 
     /**
-     * @brief Configurable message payloads for an HTCondorService
+     * @brief Configurable message payloads for an htcondor
      */
     class HTCondorComputeServiceMessagePayload : public ComputeServiceMessagePayload {
 

@@ -35,7 +35,6 @@ namespace wrench {
         if (job_id <= 0 || num_nodes == 0 || cores_per_node == 0) {
             throw std::invalid_argument(
                     "BatchJob::BatchJob(): either jobid (" + std::to_string(job_id) +
-                    "), time_in_minutes (" + std::to_string(time_in_minutes) +
                     "), num_nodes (" + std::to_string(num_nodes) +
                     "), cores_per_node (" + std::to_string(cores_per_node) +
                     ") is less than or equal to zero"

@@ -40,7 +40,7 @@ namespace wrench {
 //            /** @brief A standard job that can be submitted directly to a ComputeService for execution */
 //            STANDARD,
 //            /** @brief A pilot job that can be submitted to a ComputeService and that, once started, will act as a ComputeService
-//             * (likely a BareMetalComputeService) with an expiration date */
+//             * (likely a bare_metal) with an expiration date */
 //            PILOT
 //        };
 
