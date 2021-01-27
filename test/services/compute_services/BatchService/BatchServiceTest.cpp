@@ -308,6 +308,7 @@ private:
             } catch (wrench::WorkflowExecutionException &e) {
                 auto cause = e.getCause();
                 auto real_cause = std::dynamic_pointer_cast<wrench::JobTypeNotSupported>(cause);
+                real_cause->toString();
                 if (not real_cause)  {
                     throw std::runtime_error("Should have gotten a JobTypeNotSupported error cause as Standard Jobs are not supported (instead got a " + cause->toString() + " error cause");
                 }
@@ -329,6 +330,7 @@ private:
             } catch (wrench::WorkflowExecutionException &e) {
                 auto cause = e.getCause();
                 auto real_cause = std::dynamic_pointer_cast<wrench::JobTypeNotSupported>(cause);
+                real_cause->toString();
                 if (not real_cause)  {
                     throw std::runtime_error("Should have gotten a JobTypeNotSupported error cause as Pilot Jobs are not supported (instead got a " + cause->toString() + " error cause");
                 }
