@@ -178,7 +178,7 @@ namespace wrench {
         //alarms for pilot jobs (only one pilot job alarm)
         std::map<std::string,std::shared_ptr<Alarm>> pilot_job_alarms;
 
-        /* Resources information in BatchService */
+        /* Resources information in batch */
         unsigned long total_num_of_nodes;
         unsigned long num_cores_per_node;
         std::map<std::string, unsigned long> nodes_to_cores_map;
@@ -186,7 +186,7 @@ namespace wrench {
         std::map<std::string, unsigned long> available_nodes_to_cores;
         std::map<unsigned long, std::string> host_id_to_names;
         std::vector<std::string> compute_hosts;
-        /* End Resources information in BatchService */
+        /* End Resources information in batch */
 
         // Vector of standard job executors
         std::set<std::shared_ptr<StandardJobExecutor>> running_standard_job_executors;

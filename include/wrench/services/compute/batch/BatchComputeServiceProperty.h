@@ -78,8 +78,8 @@ namespace wrench {
          * (see https://github.com/oar-team/batsim), in which case is must have the ".json" extension).
          * The jobs in the trace whose node/host/processor/core requirements exceed the capacity
          * of the batch service will simply be capped at that capacity. Job submission times in the trace files
-         * are relative to the BatchService's start time (i.e., all jobs in the trace files will be replayed
-         * assuming that the BatchService starts at time zero). Note that in the BATSIM JSON format, the trace does not
+         * are relative to the batch's start time (i.e., all jobs in the trace files will be replayed
+         * assuming that the batch starts at time zero). Note that in the BATSIM JSON format, the trace does not
          * contains requested vs. actual trace runtimes, and to all requested runtimes are 100% accurate.
          */
         DECLARE_PROPERTY_NAME(SIMULATED_WORKLOAD_TRACE_FILE);

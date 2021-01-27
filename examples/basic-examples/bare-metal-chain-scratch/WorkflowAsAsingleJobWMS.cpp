@@ -11,7 +11,7 @@
  ** A Workflow Management System (WMS) implementation that operates as follows:
  **  - While the workflow is not done, repeat:
  **    - Pick a ready task if any
- **    - Submit it to the first available BareMetalComputeService as a job in a way that
+ **    - Submit it to the first available bare_metal as a job in a way that
  **       - Uses 5 cores
  **       - Reads the input file from the StorageService
  **       - Writes the output file from the StorageService

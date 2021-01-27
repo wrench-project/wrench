@@ -726,7 +726,7 @@ namespace wrench {
 
                         default:
                             throw std::runtime_error(
-                                    "BareMetalComputeService::terminateRunningStandardJob(): unexpected task state");
+                                    "bare_metal::terminateRunningStandardJob(): unexpected task state");
 
                     }
                 }

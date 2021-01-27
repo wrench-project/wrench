@@ -559,7 +559,7 @@ namespace wrench {
             } catch (std::shared_ptr<HostError> &e) {
                 this->releaseDaemonLock();
                 throw std::runtime_error(
-                        "BareMetalComputeService::dispatchReadyWorkunits(): got a host error on the target host - this shouldn't happen");
+                        "bare_metal::dispatchReadyWorkunits(): got a host error on the target host - this shouldn't happen");
             }
 
             // Start a failure detector for this workunit executor (which will send me a message in case the
@@ -755,7 +755,7 @@ namespace wrench {
                     }
                     if (!found_it) {
                         throw std::runtime_error(
-                                "BareMetalComputeService::processWorkCompletion(): couldn't find non-ready child in non-ready set!");
+                                "bare_metal::processWorkCompletion(): couldn't find non-ready child in non-ready set!");
                     }
 
                 }

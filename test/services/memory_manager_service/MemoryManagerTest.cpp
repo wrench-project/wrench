@@ -190,7 +190,7 @@ void MemoryManagerTest::do_MemoryManagerChainOfTasksTest_test() {
     auto simulation = new wrench::Simulation();
     int argc =2;
     char **argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("one_task_test");
+    argv[0] = strdup("unit_test");
     argv[1] = strdup("--pagecache");
 //    argv[2] = strdup("--wrench-full-log");
 

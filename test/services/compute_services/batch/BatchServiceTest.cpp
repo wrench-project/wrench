@@ -9,8 +9,6 @@
 
 #include <wrench-dev.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
-#include <wrench/simulation/SimulationMessage.h>
-#include "helper_services/standard_job_executor/StandardJobExecutorMessage.h"
 #include <gtest/gtest.h>
 #include <wrench/services/compute/batch/BatchComputeService.h>
 #include <wrench/services/compute/batch/BatchComputeServiceMessage.h>
@@ -212,7 +210,7 @@ void BatchServiceTest::do_BogusSetupTest_test() {
     auto simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("batch_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -352,7 +350,7 @@ void BatchServiceTest::do_JobTypeNotSupportedTest_test() {
     auto simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("batch_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -538,7 +536,7 @@ void BatchServiceTest::do_TerminateStandardJobsTest_test() {
     auto simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("batch_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -662,7 +660,7 @@ void BatchServiceTest::do_TerminatePilotJobsTest_test() {
     auto simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("batch_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -819,7 +817,7 @@ void BatchServiceTest::do_OneStandardJobTaskTest_test() {
     auto simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("batch_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -965,7 +963,7 @@ void BatchServiceTest::do_StandardJobFailureTest_test() {
     auto simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("batch_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1144,7 +1142,7 @@ void BatchServiceTest::do_TwoStandardJobSubmissionTest_test() {
     auto simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("batch_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1292,7 +1290,7 @@ void BatchServiceTest::do_PilotJobTaskTest_test() {
     auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("batch_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1470,7 +1468,7 @@ void BatchServiceTest::do_StandardPlusPilotJobTaskTest_test() {
     auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("batch_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1610,7 +1608,7 @@ void BatchServiceTest::do_InsufficientCoresTaskTest_test() {
     auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("batch_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1734,7 +1732,7 @@ void BatchServiceTest::do_noArgumentsJobSubmissionTest_test() {
     auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("batch_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1883,7 +1881,7 @@ void BatchServiceTest::do_StandardJobTimeOutTaskTest_test() {
     auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("batch_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -2010,7 +2008,7 @@ void BatchServiceTest::do_PilotJobTimeOutTaskTest_test() {
     auto *simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("batch_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -2233,7 +2231,7 @@ void BatchServiceTest::do_BestFitTaskTest_test() {
     auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("batch_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -2392,7 +2390,7 @@ void BatchServiceTest::do_FirstFitTaskTest_test() {
     auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("batch_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -2656,7 +2654,7 @@ void BatchServiceTest::do_RoundRobinTask_test() {
     auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("batch_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -2835,7 +2833,7 @@ void BatchServiceTest::do_StandardJobInsidePilotJobTimeOutTaskTest_test() {
     auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("batch_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -2996,7 +2994,7 @@ void BatchServiceTest::do_StandardJobInsidePilotJobSucessTaskTest_test() {
     auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("batch_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -3147,7 +3145,7 @@ void BatchServiceTest::do_InsufficientCoresInsidePilotJobTaskTest_test() {
     auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("batch_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -3282,7 +3280,7 @@ void BatchServiceTest::do_MultipleStandardTaskTest_test() {
     auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("batch_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -3426,7 +3424,7 @@ void BatchServiceTest::do_DifferentBatchAlgorithmsSubmissionTest_test() {
     auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("batch_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -3574,7 +3572,7 @@ void BatchServiceTest::do_ShutdownWithPendingRunningJobsTest_test() {
     auto simulation = new wrench::Simulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("batch_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
