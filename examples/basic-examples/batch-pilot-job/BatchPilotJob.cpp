@@ -97,9 +97,10 @@ int main(int argc, char **argv) {
 
     /* Instantiate a batch compute service, and add it to the simulation.
      * A wrench::BatchComputeService is an abstraction of a compute service that corresponds
-     * to a batch that responds to VM creating requests, and each VM exposes a "bare-metal" compute service.
+     * to a batch scheduled cluster, which responds to job submission requests by placing them
+     * in a batch queue, and granting them exclusive access to compute resources.
      * This particular service is started on BatchProviderHost, uses BatchHost1 and BatchHost2
-     * as hardware resources, and has scratch storage space.
+     * as hardware resources, and has no scratch storage space (mount point argument = "").
      * This means that tasks running on this service will access data only from remote storage services. */
     std::cerr << "Instantiating a BatchComputeService on BatchHeadNode..." << std::endl;
     std::vector<std::string> batch_nodes = {"BatchNode1", "BatchNode2"};
