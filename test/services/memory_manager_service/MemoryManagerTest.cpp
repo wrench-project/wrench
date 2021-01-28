@@ -38,13 +38,13 @@ protected:
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
-                          "       <host id=\"TwoCoreHost\" speed=\"1f\" core=\"2\"> "
+                          "       <host id=\"TwoCoreHost\" speed=\"100f\" core=\"2\"> "
                           "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                           "             <prop id=\"size\" value=\"1.5GB\"/>"
                           "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
                           "       </host> "
-                          "       <host id=\"OneCoreHost\" speed=\"1f\" core=\"1\"> "
+                          "       <host id=\"OneCoreHost\" speed=\"100f\" core=\"1\"> "
                           "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                           "             <prop id=\"size\" value=\"1.5GB\"/>"
                           "             <prop id=\"mount\" value=\"/\"/>"
@@ -59,24 +59,24 @@ protected:
         fclose(bad_platform_file);
 
 
-        // Create a platform file
+        // Create a VALID platform file
         std::string xml = "<?xml version='1.0'?>"
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
-                          "       <host id=\"TwoCoreHost\" speed=\"1f\" core=\"2\"> "
+                          "       <host id=\"TwoCoreHost\" speed=\"1000f\" core=\"2\"> "
                           "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                           "             <prop id=\"size\" value=\"30000GB\"/>"
                           "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
                           "          <disk id=\"memory\" read_bw=\"1000MBps\" write_bw=\"1000MBps\">"
-                          "             <prop id=\"size\" value=\"30GB\"/>"
+                          "             <prop id=\"size\" value=\"1.5GB\"/>"
                           "             <prop id=\"mount\" value=\"/memory\"/>"
                           "          </disk>"
                           "       </host> "
-                          "       <host id=\"OneCoreHost\" speed=\"1f\" core=\"1\"> "
+                          "       <host id=\"OneCoreHost\" speed=\"100f\" core=\"1\"> "
                           "          <disk id=\"memory\" read_bw=\"1000MBps\" write_bw=\"1000MBps\">"
-                          "             <prop id=\"size\" value=\"30GB\"/>"
+                          "             <prop id=\"size\" value=\"1.5GB\"/>"
                           "             <prop id=\"mount\" value=\"/memory\"/>"
                           "          </disk>"
                           "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
@@ -219,11 +219,11 @@ void MemoryManagerTest::do_MemoryManagerChainOfTasksTest_test() {
 
     // Create a Workflow
     auto workflow = new wrench::Workflow();
-    auto previous_output_file = workflow->addFile("task0_input", 1*1000.00*1000.00*1000.00);
+    auto previous_output_file = workflow->addFile("task0_input", 10*1000.00*1000.00*1000.00);
     int num_tasks = 100;
     for (int i=0; i < num_tasks; i++) {
         auto task = workflow->addTask("task" + std::to_string(i), 100.0, 1, 1, 0.0);
-        auto output_file = workflow->addFile("task" + std::to_string(i) + "_output", 1*1000.00*1000.00*1000.00);
+        auto output_file = workflow->addFile("task" + std::to_string(i) + "_output", 10*1000.00*1000.00*1000.00);
         task->addOutputFile(output_file);
         task->addInputFile(previous_output_file);
         previous_output_file = output_file;
