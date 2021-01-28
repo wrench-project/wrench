@@ -186,6 +186,7 @@ private:
                 wrench::S4U_Mailbox::getMessage(this->test->wms2->mailbox_name);
                 throw std::runtime_error("Should have gotten a NetworkError");
             } catch (std::shared_ptr<wrench::NetworkError> &e) {
+                e->toString();
             }
 
             // Two synchronous recv, network failure
@@ -198,6 +199,8 @@ private:
                 wrench::S4U_Mailbox::getMessage(this->test->wms2->mailbox_name);
                 throw std::runtime_error("Should have gotten a NetworkError");
             } catch (std::shared_ptr<wrench::NetworkError> &e) {
+                e->toString();
+                e->getMailbox();
             }
 
             // One asynchronous recv, network failure
@@ -207,6 +210,8 @@ private:
                 pending_recv->wait();
                 throw std::runtime_error("Should have gotten a NetworkError");
             } catch (std::shared_ptr<wrench::NetworkError> &e) {
+                e->toString();
+                e->getMailbox();
             }
 
         }

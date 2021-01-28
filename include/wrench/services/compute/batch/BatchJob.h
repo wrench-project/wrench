@@ -11,7 +11,7 @@ namespace wrench {
 
     /**
      * @brief A batch job, which encapsulates a WorkflowJob and additional information
-     *        used by a BatchService
+     *        used by a batch
      */
     class BatchJob {
     public:
