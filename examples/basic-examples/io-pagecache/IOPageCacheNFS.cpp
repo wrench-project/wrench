@@ -151,7 +151,7 @@ int main(int argc, char **argv) {
     auto client_storage_service = simulation.add(new wrench::SimpleStorageService(
             "compute_host", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "100000000"}}, {}));
 
-    std::cerr << "Instantiating a BareMetalComputeService on compute_host..." << std::endl;
+    std::cerr << "Instantiating a bare_metal on compute_host..." << std::endl;
     auto baremetal_service = simulation.add(new wrench::BareMetalComputeService(
             "compute_host", {"compute_host"}, "", {}, {}));
 

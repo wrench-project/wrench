@@ -209,7 +209,7 @@ namespace wrench {
 
                 if (auto virtualized_cluster = dynamic_cast<VirtualizedClusterComputeService *>(cs)) {
                     // for cloud services, we must create/start VMs, each of which
-                    // is a BareMetalComputeService. Right now, we greedily use the whole Cloud!
+                    // is a bare_metal. Right now, we greedily use the whole Cloud!
 
                     for (auto const &host : virtualized_cluster->getExecutionHosts()) {
                         unsigned long num_cores = Simulation::getHostNumCores(host);
