@@ -220,7 +220,7 @@ void MemoryManagerTest::do_MemoryManagerChainOfTasksTest_test() {
     // Create a Workflow
     auto workflow = new wrench::Workflow();
     auto previous_output_file = workflow->addFile("task0_input", 10*1000.00*1000.00*1000.00);
-    int num_tasks = 100;
+    int num_tasks = 10;
     for (int i=0; i < num_tasks; i++) {
         auto task = workflow->addTask("task" + std::to_string(i), 100.0, 1, 1, 0.0);
         auto output_file = workflow->addFile("task" + std::to_string(i) + "_output", 10*1000.00*1000.00*1000.00);
