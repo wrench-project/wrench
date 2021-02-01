@@ -17,6 +17,10 @@
 
 WRENCH_LOG_CATEGORY(memory_manager_test, "Log category for MemoryManager test");
 
+#define GB (1000.0*1000.0*1000.0)
+#define RAM_SIZE  32
+#define FILE_SIZE 20
+
 class MemoryManagerTest : public ::testing::Test {
 public:
     std::shared_ptr<wrench::StorageService> storage_service1 = nullptr;
@@ -70,13 +74,13 @@ protected:
                           "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
                           "          <disk id=\"memory\" read_bw=\"1000MBps\" write_bw=\"1000MBps\">"
-                          "             <prop id=\"size\" value=\"1.5GB\"/>"
+                          "             <prop id=\"size\" value=\""+std::to_string(RAM_SIZE)+"GB\"/>"
                           "             <prop id=\"mount\" value=\"/memory\"/>"
                           "          </disk>"
                           "       </host> "
                           "       <host id=\"OneCoreHost\" speed=\"100f\" core=\"1\"> "
                           "          <disk id=\"memory\" read_bw=\"1000MBps\" write_bw=\"1000MBps\">"
-                          "             <prop id=\"size\" value=\"1.5GB\"/>"
+                          "             <prop id=\"size\" value=\""+std::to_string(RAM_SIZE)+"GB\"/>"
                           "             <prop id=\"mount\" value=\"/memory\"/>"
                           "          </disk>"
                           "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
@@ -207,7 +211,9 @@ void MemoryManagerTest::do_MemoryManagerChainOfTasksTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname, {"/"},
+                {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "100000000.0"}},
+                {})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -219,11 +225,11 @@ void MemoryManagerTest::do_MemoryManagerChainOfTasksTest_test() {
 
     // Create a Workflow
     auto workflow = new wrench::Workflow();
-    auto previous_output_file = workflow->addFile("task0_input", 10*1000.00*1000.00*1000.00);
+    auto previous_output_file = workflow->addFile("task0_input", FILE_SIZE * GB);
     int num_tasks = 10;
     for (int i=0; i < num_tasks; i++) {
         auto task = workflow->addTask("task" + std::to_string(i), 100.0, 1, 1, 0.0);
-        auto output_file = workflow->addFile("task" + std::to_string(i) + "_output", 10*1000.00*1000.00*1000.00);
+        auto output_file = workflow->addFile("task" + std::to_string(i) + "_output", FILE_SIZE * GB);
         task->addOutputFile(output_file);
         task->addInputFile(previous_output_file);
         previous_output_file = output_file;
