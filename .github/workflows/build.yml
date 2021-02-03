@@ -8,11 +8,6 @@ jobs:
     strategy:
       matrix:
         include:
-          - build: "Ubuntu Xenial - g++-5"
-            DIST: ubuntu-xenial
-            COMPILER: gcc5
-            batsched: off
-
           - build: "Ubuntu Bionic - g++-7"
             DIST: ubuntu-bionic
             COMPILER: gcc7
