@@ -17,6 +17,10 @@
 
 WRENCH_LOG_CATEGORY(memory_manager_test, "Log category for MemoryManager test");
 
+#define GB (1000.0*1000.0*1000.0)
+#define RAM_SIZE  32
+#define FILE_SIZE 20
+
 class MemoryManagerTest : public ::testing::Test {
 public:
     std::shared_ptr<wrench::StorageService> storage_service1 = nullptr;
@@ -38,13 +42,13 @@ protected:
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
-                          "       <host id=\"TwoCoreHost\" speed=\"1f\" core=\"2\"> "
+                          "       <host id=\"TwoCoreHost\" speed=\"100f\" core=\"2\"> "
                           "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                           "             <prop id=\"size\" value=\"1.5GB\"/>"
                           "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
                           "       </host> "
-                          "       <host id=\"OneCoreHost\" speed=\"1f\" core=\"1\"> "
+                          "       <host id=\"OneCoreHost\" speed=\"100f\" core=\"1\"> "
                           "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                           "             <prop id=\"size\" value=\"1.5GB\"/>"
                           "             <prop id=\"mount\" value=\"/\"/>"
@@ -59,24 +63,24 @@ protected:
         fclose(bad_platform_file);
 
 
-        // Create a platform file
+        // Create a VALID platform file
         std::string xml = "<?xml version='1.0'?>"
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
-                          "       <host id=\"TwoCoreHost\" speed=\"1f\" core=\"2\"> "
+                          "       <host id=\"TwoCoreHost\" speed=\"1000f\" core=\"2\"> "
                           "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                           "             <prop id=\"size\" value=\"30000GB\"/>"
                           "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
                           "          <disk id=\"memory\" read_bw=\"1000MBps\" write_bw=\"1000MBps\">"
-                          "             <prop id=\"size\" value=\"30GB\"/>"
+                          "             <prop id=\"size\" value=\""+std::to_string(RAM_SIZE)+"GB\"/>"
                           "             <prop id=\"mount\" value=\"/memory\"/>"
                           "          </disk>"
                           "       </host> "
-                          "       <host id=\"OneCoreHost\" speed=\"1f\" core=\"1\"> "
+                          "       <host id=\"OneCoreHost\" speed=\"100f\" core=\"1\"> "
                           "          <disk id=\"memory\" read_bw=\"1000MBps\" write_bw=\"1000MBps\">"
-                          "             <prop id=\"size\" value=\"30GB\"/>"
+                          "             <prop id=\"size\" value=\""+std::to_string(RAM_SIZE)+"GB\"/>"
                           "             <prop id=\"mount\" value=\"/memory\"/>"
                           "          </disk>"
                           "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
@@ -188,11 +192,11 @@ TEST_F(MemoryManagerTest, MemoryManagerChainOfTask) {
 void MemoryManagerTest::do_MemoryManagerChainOfTasksTest_test() {
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
-    int argc =2;
+    int argc =3;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--pagecache");
-//    argv[2] = strdup("--wrench-full-log");
+    argv[2] = strdup("--wrench-full-log");
 
     ASSERT_THROW(simulation->launch(), std::runtime_error);
 
@@ -207,7 +211,9 @@ void MemoryManagerTest::do_MemoryManagerChainOfTasksTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+            new wrench::SimpleStorageService(hostname, {"/"},
+                {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "100000000.0"}},
+                {})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -219,11 +225,11 @@ void MemoryManagerTest::do_MemoryManagerChainOfTasksTest_test() {
 
     // Create a Workflow
     auto workflow = new wrench::Workflow();
-    auto previous_output_file = workflow->addFile("task0_input", 1*1000.00*1000.00*1000.00);
-    int num_tasks = 100;
+    auto previous_output_file = workflow->addFile("task0_input", FILE_SIZE * GB);
+    int num_tasks = 10;
     for (int i=0; i < num_tasks; i++) {
         auto task = workflow->addTask("task" + std::to_string(i), 100.0, 1, 1, 0.0);
-        auto output_file = workflow->addFile("task" + std::to_string(i) + "_output", 1*1000.00*1000.00*1000.00);
+        auto output_file = workflow->addFile("task" + std::to_string(i) + "_output", FILE_SIZE * GB);
         task->addOutputFile(output_file);
         task->addInputFile(previous_output_file);
         previous_output_file = output_file;

@@ -31,10 +31,12 @@ namespace wrench {
             Service(hostname, "page_cache_manager_" + hostname, "page_cache_manager_" + hostname),
             memory(memory), dirty_ratio(dirty_ratio), interval(interval), expired_time(expired_time) {
 
-        total = S4U_Simulation::getHostMemoryCapacity(hostname);
-        free = total;
-        dirty = 0;
-        cached = 0;
+        // Get RAM disk size
+        this->total = S4U_Simulation::getDiskCapacity(hostname, "/memory");
+//        this->total = S4U_Simulation::getHostMemoryCapacity(hostname);
+        this->free = total;
+        this->dirty = 0;
+        this->cached = 0;
     }
 
     /**
@@ -205,7 +207,6 @@ namespace wrench {
      * @return flushed amount
      */
     double MemoryManager::flush(double amount, std::string excluded_filename) {
-        WRENCH_INFO("flush(): AMOUNT = %lf", amount);
         if (amount <= 0) return 0;
 
         double flushed_inactive = flushLruList(inactive_list, amount, excluded_filename);
