@@ -1382,7 +1382,7 @@ namespace wrench {
             }
         }
 
-        // Check that if --pagecache is passed, each host has a memory_manager_service disk
+        // Check that if --pagecache is passed, each host has a "/memory" disk
         if (this->isPageCachingEnabled()) {
             for (auto const &h : hostnames) {
                 bool has_memory_disk = false;
@@ -1399,7 +1399,5 @@ namespace wrench {
             }
         }
     }
-
-
 
 };
