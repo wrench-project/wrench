@@ -33,7 +33,6 @@ namespace wrench {
 
         // Get RAM disk size
         this->total = S4U_Simulation::getDiskCapacity(hostname, "/memory");
-//        this->total = S4U_Simulation::getHostMemoryCapacity(hostname);
         this->free = total;
         this->dirty = 0;
         this->cached = 0;
