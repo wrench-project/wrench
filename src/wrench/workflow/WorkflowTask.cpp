@@ -241,9 +241,7 @@ namespace wrench {
 
     /**
      * @brief Get a task internal state as a string
-     *
      * @param state: the internal state
-     *
      * @return an internal state as a string
      */
     std::string WorkflowTask::stateToString(WorkflowTask::InternalState state) {

@@ -21,6 +21,8 @@ And, one of the following:
 - [PugiXML](http://pugixml.org/) -- version 1.8 or higher
 - [JSON for Modern C++](https://github.com/nlohmann/json) -- version 3.9.0 or higher 
 
+(See the troubleshooting section below if encountering difficulties installing dependencies)
+
 ## Optional Dependencies ##                  {#install-prerequisites-opt-dependencies}
 
 - [Google Test](https://github.com/google/googletest) -- version 1.8 or higher (only required for running tests)
