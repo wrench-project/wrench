@@ -36,10 +36,18 @@ namespace wrench {
         std::map<std::string, std::tuple<unsigned long, double>> getResourcesAllocated();
         void setAllocatedResources(std::map<std::string, std::tuple<unsigned long, double>> resources);
 
+        /** 
+         * @brief Set the indices of the allocated nodes
+         * @param indices: a list of indices
+         */
         void setAllocatedNodeIndices(std::vector<int> indices) {
             this->allocated_node_indices = indices;
         }
 
+        /** 
+         * @brief Get the indices of allocated nodes
+         * @return a list of indices
+         */
         std::vector<int> getAllocatedNodeIndices() {
             return this->allocated_node_indices;
         }
