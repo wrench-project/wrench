@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,13 +20,13 @@ namespace wrench {
     class Simulation;
 
     class ComputeService;
+
     class CloudComputeService;
 
     /**
      * @brief A  virtualized cluster-based compute service
      */
     class VirtualizedClusterComputeService : public CloudComputeService {
-
     private:
         std::map<std::string, std::string> default_property_values = {
                 {VirtualizedClusterComputeServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS, "0.0"}
@@ -51,10 +51,10 @@ namespace wrench {
 
     public:
         VirtualizedClusterComputeService(const std::string &hostname,
-                                  std::vector<std::string> &execution_hosts,
-                                  std::string scratch_space_mount_point,
-                                  std::map<std::string, std::string> property_list = {},
-                                  std::map<std::string, double> messagepayload_list = {});
+                                         std::vector<std::string> &execution_hosts,
+                                         std::string scratch_space_mount_point,
+                                         std::map<std::string, std::string> property_list = {},
+                                         std::map<std::string, double> messagepayload_list = {});
 
         /***********************/
         /** \cond DEVELOPER    */
@@ -62,12 +62,10 @@ namespace wrench {
 
         using CloudComputeService::startVM;
 
-        virtual std::shared_ptr<BareMetalComputeService> startVM(const std::string &vm_name, const std::string &pm_name);
+        virtual std::shared_ptr<BareMetalComputeService>
+        startVM(const std::string &vm_name, const std::string &pm_name);
 
         virtual void migrateVM(const std::string &vm_name, const std::string &dest_pm_hostname);
-
-        std::string getVMPhysicalHostname(const std::string &vm_name);
-
 
         /***********************/
         /** \endcond          **/
@@ -83,7 +81,7 @@ namespace wrench {
 
         int main() override;
 
-        virtual bool processNextMessage() override;
+        bool processNextMessage() override;
 
         virtual void processMigrateVM(const std::string &answer_mailbox,
                                       const std::string &vm_name,

@@ -36,8 +36,8 @@ public:
 protected:
 
     SimulationOutputTest() {
-      // Create the simplest workflow
-      workflow = new wrench::Workflow();
+        // Create the simplest workflow
+        workflow = new wrench::Workflow();
 
 //      // Create the files
 //      input_file = workflow->addFile("input_file", 10.0);
@@ -76,20 +76,20 @@ protected:
 //
 //      workflow->addControlDependency(task4, task5);
 
-      // Create a platform file
-      std::string xml = "<?xml version='1.0'?>"
-                        "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
-                        "<platform version=\"4.1\"> "
-                        "   <zone id=\"AS0\" routing=\"Full\"> "
-                        "       <host id=\"DualCoreHost\" speed=\"1f\" core=\"2\"/> "
-                        "       <host id=\"QuadCoreHost\" speed=\"1f\" core=\"4\"/> "
-                        "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
-                        "       <route src=\"DualCoreHost\" dst=\"QuadCoreHost\"> <link_ctn id=\"1\"/> </route>"
-                        "   </zone> "
-                        "</platform>";
-      FILE *platform_file = fopen(platform_file_path.c_str(), "w");
-      fprintf(platform_file, "%s", xml.c_str());
-      fclose(platform_file);
+        // Create a platform file
+        std::string xml = "<?xml version='1.0'?>"
+                          "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                          "<platform version=\"4.1\"> "
+                          "   <zone id=\"AS0\" routing=\"Full\"> "
+                          "       <host id=\"DualCoreHost\" speed=\"1f\" core=\"2\"/> "
+                          "       <host id=\"QuadCoreHost\" speed=\"1f\" core=\"4\"/> "
+                          "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
+                          "       <route src=\"DualCoreHost\" dst=\"QuadCoreHost\"> <link_ctn id=\"1\"/> </route>"
+                          "   </zone> "
+                          "</platform>";
+        FILE *platform_file = fopen(platform_file_path.c_str(), "w");
+        fprintf(platform_file, "%s", xml.c_str());
+        fclose(platform_file);
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
@@ -103,11 +103,11 @@ class EmptySimulationOutputWMS : public wrench::WMS {
 
 public:
     EmptySimulationOutputWMS(SimulationOutputTest *test,
-                                      const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                      const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                                      std::string &hostname) :
+                             const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                             const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                             std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
-      this->test = test;
+        this->test = test;
     }
 
 private:
@@ -116,48 +116,59 @@ private:
 
     int main() {
 
-      // do nothing
+        try {
+            this->simulation->getOutput().addTimestampTaskStart(nullptr);
+            this->simulation->getOutput().addTimestampTaskCompletion(nullptr);
+            this->simulation->getOutput().addTimestampTaskTermination(nullptr);
+            this->simulation->getOutput().addTimestampTaskFailure(nullptr);
+            throw std::runtime_error("Should have caught exception!");
+        } catch (std::exception &ignore) {
 
-      return 0;
+        }
+
+        // do nothing
+
+        return 0;
     }
 };
 
 TEST_F(SimulationOutputTest, EmptySimulationOutputTest) {
-  DO_TEST_WITH_FORK(do_emptyTrace_test);
+    DO_TEST_WITH_FORK(do_emptyTrace_test);
 }
 
 void SimulationOutputTest::do_emptyTrace_test() {
 
-  // Create and initialize a simulation
-  auto *simulation = new wrench::Simulation();
-  int argc = 1;
-  auto argv = (char **) calloc(1, sizeof(char *));
-  argv[0] = strdup("unit_test");
+    // Create and initialize a simulation
+    auto *simulation = new wrench::Simulation();
+    int argc = 1;
+    auto argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
 
-  ASSERT_NO_THROW(simulation->init(&argc, argv));
+    ASSERT_NO_THROW(simulation->init(&argc, argv));
 
-  // Setting up the platform
-  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+    // Setting up the platform
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
-  // Get a hostname
-  std::string hostname = wrench::Simulation::getHostnameList()[0];
+    // Get a hostname
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
 
-  // Create a WMS
-  std::shared_ptr<wrench::WMS> wms = nullptr;;
-  ASSERT_NO_THROW(wms = simulation->add(
-          new EmptySimulationOutputWMS(this, {}, {}, hostname)));
+    // Create a WMS
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    ASSERT_NO_THROW(wms = simulation->add(
+            new EmptySimulationOutputWMS(this, {}, {}, hostname)));
 
-  ASSERT_NO_THROW(wms->addWorkflow(workflow));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
-  ASSERT_NO_THROW(simulation->launch());
+    ASSERT_NO_THROW(simulation->launch());
 
-  // Get the number of task completions
-  std::vector<wrench::SimulationTimestamp<wrench::SimulationTimestampTaskCompletion> *> trace;
-  trace = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>();
-  ASSERT_EQ(0, trace.size());
+    // Get the number of task completions
+    std::vector<wrench::SimulationTimestamp<wrench::SimulationTimestampTaskCompletion> *> trace;
+    trace = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>();
+    ASSERT_EQ(0, trace.size());
 
-  delete simulation;
-  free(argv[0]);
-  free(argv);
+    delete simulation;
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
 }

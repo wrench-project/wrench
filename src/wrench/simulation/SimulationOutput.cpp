@@ -209,7 +209,7 @@ namespace wrench {
         j["execution_host"] = {
                 {"hostname", w.hostname},
                 {"flop_rate", w.host_flop_rate},
-                {"memory", w.host_memory},
+                {"memory_manager_service", w.host_memory},
                 {"cores", w.host_num_cores}
         };
 
@@ -454,7 +454,7 @@ namespace wrench {
       *                     "cores": <unsigned_long>,
       *                     "flop_rate": <double>,
       *                     "hostname": <string>,
-      *                     "memory": <double>
+      *                     "memory_manager_service": <double>
       *                },
       *                "failed": <double>,
       *                "num_cores_allocated": <unsigned_long>,
@@ -577,7 +577,7 @@ namespace wrench {
                                                                                  {"hostname", current_task_execution.execution_host},
                                                                                  {"flop_rate", Simulation::getHostFlopRate(
                                                                                          current_task_execution.execution_host)},
-                                                                                 {"memory", Simulation::getHostMemoryCapacity(
+                                                                                 {"memory_manager_service", Simulation::getHostMemoryCapacity(
                                                                                          current_task_execution.execution_host)},
                                                                                  {"cores", Simulation::getHostNumCores(
                                                                                          current_task_execution.execution_host)}
@@ -699,7 +699,7 @@ namespace wrench {
      *                  flops: <double>,
      *                  min_cores: <unsigned_long>,
      *                  max_cores: <unsigned_long>,
-     *                  memory: <double>,
+     *                  memory_manager_service: <double>,
      *              },
      *              {
      *                  type: <"file">,
@@ -743,7 +743,7 @@ namespace wrench {
                                        {"flops",               task->getFlops()},
                                        {"min_cores",           task->getMinNumCores()},
                                        {"max_cores",           task->getMaxNumCores()},
-                                       {"memory",              task->getMemoryRequirement()}
+                                       {"memory_manager_service",              task->getMemoryRequirement()}
                                });
         }
 
@@ -955,7 +955,7 @@ namespace wrench {
      *                type: <"host">,
      *                id: <string>,
      *              flop_rate: <double (flops per second)>,
-     *              memory: <double (bytes)>,
+     *              memory_manager_service: <double (bytes)>,
      *              cores: <unsigned_long>
      *           },
      *           {
@@ -1032,7 +1032,7 @@ namespace wrench {
                                                               {"id",         host->get_name()},
                                                               {"cluster_id", host_to_cluster[host->get_name()]},
                                                               {"flop_rate",  host->get_speed()},
-                                                              {"memory",     Simulation::getHostMemoryCapacity(
+                                                              {"memory_manager_service",     Simulation::getHostMemoryCapacity(
                                                                       host->get_name())},
                                                               {"cores",      host->get_core_count()}
                                                       });

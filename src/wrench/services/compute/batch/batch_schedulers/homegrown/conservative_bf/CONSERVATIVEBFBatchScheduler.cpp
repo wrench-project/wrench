@@ -81,7 +81,7 @@ namespace wrench {
             }
 
             // Get the workflow job associated to the picked batch job
-            WorkflowJob *workflow_job = batch_job->getWorkflowJob();
+            std::shared_ptr<WorkflowJob> workflow_job = batch_job->getWorkflowJob();
 
             // Find on which resources to actually run the job
             unsigned long cores_per_node_asked_for = batch_job->getRequestedCoresPerNode();
@@ -224,7 +224,8 @@ namespace wrench {
      * @param num_nodes: number of nodes
      * @param cores_per_node: number of cores per node
      * @param ram_per_node: amount of RAM
-     * @return
+     * @return a host:<core,RAM> map
+     *
      */
     std::map<std::string, std::tuple<unsigned long, double>>
     CONSERVATIVEBFBatchScheduler::scheduleOnHosts(unsigned long num_nodes, unsigned long cores_per_node, double ram_per_node) {

@@ -41,7 +41,7 @@ namespace wrench {
     /**
      * @brief A class that provides basic simulation methods.  Once the simulation object has been
      *        explicitly or implicitly destroyed, then any call to the WRENCH APIs has undefied behavior (due
-     *        to memory being de-allocated).
+     *        to memory_manager_service being de-allocated).
      */
     class Simulation {
 
@@ -96,7 +96,10 @@ namespace wrench {
         /** \cond DEVELOPER    */
         /***********************/
         double getEnergyConsumed(const std::string &hostname, bool record_as_time_stamp);
-        double getLinkUsage(const std::string &linkname, bool  record_as_time_stamp);
+
+        static std::vector<std::string> getRoute(std::string &src_host, std::string &dst_host);
+
+        double getLinkUsage(const std::string &link_name, bool  record_as_time_stamp);
         std::map<std::string, double> getEnergyConsumed(const std::vector<std::string> &hostnames, bool record_as_time_stamps);
 
         static bool doesHostExist(std::string hostname);
@@ -116,6 +119,7 @@ namespace wrench {
         std::shared_ptr<StorageService> startNewService(StorageService *service);
         std::shared_ptr<NetworkProximityService> startNewService(NetworkProximityService *service);
         std::shared_ptr<FileRegistryService> startNewService(FileRegistryService *service);
+        std::shared_ptr<MemoryManager> startNewService(MemoryManager *service);
 
         static double getCurrentSimulatedDate();
 
@@ -135,8 +139,9 @@ namespace wrench {
                                                     std::string write_mount_point);
         void writeToDisk(double num_bytes, std::string hostname, std::string mount_point);
 
-        void readWithMemoryCache(WorkflowFile *file, double n_bytes, std::string mountpoint);
-        void writeWithMemoryCache(WorkflowFile *file, double n_bytes, std::string mountpoint);
+        void readWithMemoryCache(WorkflowFile *file, double n_bytes, std::shared_ptr<FileLocation> location);
+        void writebackWithMemoryCache(WorkflowFile *file, double n_bytes, std::shared_ptr<FileLocation> location, bool is_dirty);
+        void writeThroughWithMemoryCache(WorkflowFile *file, double n_bytes, std::shared_ptr<FileLocation> location);
         MemoryManager* getMemoryManagerByHost(std::string hostname);
 
         static double getMemoryCapacity();
@@ -147,7 +152,7 @@ namespace wrench {
         static std::vector<std::string> getLinknameList();
         static double getLinkUsage(std::string linkname);
         static double getLinkBandwidth(std::string linkname);
-        static bool isWriteback();
+        static bool isPageCachingEnabled();
 
         /***********************/
         /** \endcond           */
@@ -198,7 +203,7 @@ namespace wrench {
 
         unsigned int on_state_change_callback_id;
 
-        static bool writeback;
+        static bool pagecache_enabled;
     };
 
 };

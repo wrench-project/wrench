@@ -83,7 +83,7 @@ int main(int argc, char **argv) {
 
     /* Add workflow tasks  and files */
     for (int i=0; i < num_tasks; i++) {
-        /* Create a task: increasing GFlop, 1 to 10 cores, 0.90 parallel efficiency, 10MB memory footprint */
+        /* Create a task: increasing GFlop, 1 to 10 cores, 0.90 parallel efficiency, 10MB memory_manager_service footprint */
         auto task = workflow.addTask("task_" + std::to_string(i), (100 + i * 500) * TFLOP,
                 1, 10, 1000);
         task->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(0.9));
@@ -107,7 +107,8 @@ int main(int argc, char **argv) {
 
     /* Instantiate a batch compute service, and add it to the simulation.
      * A wrench::BatchComputeService is an abstraction of a compute service that corresponds
-     * to a batch that responds to VM creating requests, and each VM exposes a "bare-metal" compute service.
+     * to a batch scheduled cluster, which responds to job submission requests by placing them
+     * in a batch queue, and granting them exclusive access to compute resources.
      * This particular service is started on BatchProviderHost, uses BatchHost1 and BatchHost2
      * as hardware resources, and has no scratch storage space (mount point argument = "").
      * This means that tasks running on this service will access data only from remote storage services. */

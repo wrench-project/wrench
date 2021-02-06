@@ -1,6 +1,12 @@
-//
-// Created by Dzung Do on 2020-08-03.
-//
+/**
+ * Copyright (c) 2017. The WRENCH Team.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ */
 
 #ifndef WRENCH_MEMORYMANAGER_H
 #define WRENCH_MEMORYMANAGER_H
@@ -12,7 +18,17 @@
 
 namespace wrench {
 
+    /***********************/
+    /** \cond INTERNAL    */
+    /***********************/
+
+    /**
+     * @brief A class that implemnets a MemoryManager service to simulate Linux in-memory 
+     * page caching for I/O operations
+     */
     class MemoryManager : public Service {
+
+    public:
 
     private:
         s4u_Disk *memory;
@@ -32,6 +48,7 @@ namespace wrench {
         std::vector<double> dirty_log;
         std::vector<double> cached_log;
         std::vector<double> free_log;
+
 
         MemoryManager(s4u_Disk *memory, double dirty_ratio, int interval, int expired_time, std::string hostname);
 
@@ -59,7 +76,7 @@ namespace wrench {
 
         double getDirtyRatio() const;
 
-        void setDirtyRatio(double dirtyRatio);
+        void setDirtyRatio(double dirty_ratio);
 
         double getFreeMemory() const;
 
@@ -67,7 +84,7 @@ namespace wrench {
 
         void useAnonymousMemory(double used_amt);
 
-        double getCached() const;
+        double getTotalCachedAmount() const;
 
         double getDirty() const;
 
@@ -79,13 +96,14 @@ namespace wrench {
 
         double evict(double amount, std::string excluded_filename);
 
-        simgrid::s4u::IoPtr readToCache(std::string filename, std::string mount_point, double amount, bool async);
-
-        simgrid::s4u::IoPtr readFromCache(std::string filename, bool async);
+        simgrid::s4u::IoPtr readToCache(std::string filename, std::shared_ptr<FileLocation> location,
+                double amount, bool async);
 
         void readChunkFromCache(std::string filename, double amount);
 
-        void writeToCache(std::string filename, std::string mnt_pt, double amount);
+        void writebackToCache(std::string filename, std::shared_ptr<FileLocation> location, double amount, bool is_dirty);
+
+        void addToCache(std::string filename, std::shared_ptr<FileLocation> location, double amount, bool is_dirty);
 
         double getCachedAmount(std::string filename);
 
@@ -97,6 +115,9 @@ namespace wrench {
 
         void export_log(std::string filename);
 
+        /***********************/
+        /** \endcond          */
+        /***********************/
     };
 
 }

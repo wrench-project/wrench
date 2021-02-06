@@ -64,7 +64,7 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     StandardJobExecutorDoneMessage::StandardJobExecutorDoneMessage(
-            StandardJob *job,
+            std::shared_ptr<StandardJob> job,
             std::shared_ptr<StandardJobExecutor> executor,
             double payload) :
             StandardJobExecutorMessage("STANDARD_JOB_COMPLETED", payload) {
@@ -80,7 +80,7 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     StandardJobExecutorFailedMessage::StandardJobExecutorFailedMessage(
-            StandardJob *job,
+            std::shared_ptr<StandardJob> job,
             std::shared_ptr<StandardJobExecutor> executor,
             std::shared_ptr<FailureCause> cause,
             double payload) :

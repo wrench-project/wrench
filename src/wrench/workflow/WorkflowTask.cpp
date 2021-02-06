@@ -30,7 +30,7 @@ namespace wrench {
      * @param min_cores: the minimum number of cores required for running the task
      * @param max_cores: the maximum number of cores that the task can use (infinity: ULONG_MAX)
      * @param spec: the multi-core parallel performance model
-     * @param memory_requirement: memory requirement in bytes
+     * @param memory_requirement: memory_manager_service requirement in bytes
      */
     WorkflowTask::WorkflowTask(const std::string id, const double flops, const unsigned long min_num_cores,
                                const unsigned long max_num_cores,
@@ -146,9 +146,9 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the memory requirement of the task
+     * @brief Get the memory_manager_service requirement of the task
      *
-     * @return a memory requirement (in bytes)
+     * @return a memory_manager_service requirement (in bytes)
      */
     double WorkflowTask::getMemoryRequirement() const {
         return this->memory_requirement;
@@ -241,9 +241,7 @@ namespace wrench {
 
     /**
      * @brief Get a task internal state as a string
-     *
      * @param state: the internal state
-     *
      * @return an internal state as a string
      */
     std::string WorkflowTask::stateToString(WorkflowTask::InternalState state) {

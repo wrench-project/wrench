@@ -39,7 +39,7 @@ namespace wrench {
 
     int Simulation::unique_disk_sequence_number = 0;
 
-    bool Simulation::writeback = false;
+    bool Simulation::pagecache_enabled = false;
 
     /**
      * \cond
@@ -128,8 +128,8 @@ namespace wrench {
                 simgrid_help_requested = true;
             } else if (not strcmp(argv[i], "--version")) {
                 version_requested = true;
-            } else if (not strcmp(argv[i], "--writeback")) {
-                writeback = true;
+            } else if (not strcmp(argv[i], "--pagecache")) {
+                pagecache_enabled = true;
             } else {
                 cleanedup_args.emplace_back(argv[i]);
             }
@@ -148,6 +148,8 @@ namespace wrench {
             std::cout << "     (requires host pstate definitions in XML platform description file)\n";
             std::cout << "   --help-simgrid: show full help on general Simgrid command-line arguments\n";
             std::cout << "   --help-wrench: displays this help message\n";
+            std::cout << "   --pagecache: Activate the in-memory_manager_service page caching simulation (which then";
+            std::cout << "                requires that all hosts in the platform have a disk mounted at '/memory')\n";
             std::cerr << "\n";
         }
 
@@ -242,6 +244,16 @@ namespace wrench {
     }
 
     /**
+     * @brief Get the list of link names on the route between two hosts
+     * @param src_host: src hostname
+     * @param dst_host: dst hostname
+     * @return a vector of link names
+     */
+    std::vector<std::string> Simulation::getRoute(std::string &src_host, std::string &dst_host) {
+        return S4U_Simulation::getRoute(src_host, dst_host);
+    }
+
+    /**
      * @brief Get the list of names of all the links in the platform
      *
      * @return a vector of link names
@@ -273,21 +285,21 @@ namespace wrench {
     /**
      * @brief Obtains the current link bandwidth usage on a link and will add SimulationTimestampLinkUsage to
      *        simulation output if record_as_time_stamp is set to true
-     * @param linkname: the link name
+     * @param link_name: the link name
      * @param record_as_time_stamp: bool signaling whether or not to record a SimulationTimestampLinkUsage object
      * @return current bandwidth usage in Bps
      * @throws std::invalid_argument
      */
-    double Simulation::getLinkUsage(const std::string &linkname, bool record_as_time_stamp) {
-        if (linkname.empty()) {
-            throw std::invalid_argument("Simulation::getLinkUsage() requires a valid linkname");
+    double Simulation::getLinkUsage(const std::string &link_name, bool record_as_time_stamp) {
+        if (link_name.empty()) {
+            throw std::invalid_argument("Simulation::getLinkUsage() requires a valid link name");
         }
 
         double time_now = getCurrentSimulatedDate();
-        double usage = S4U_Simulation::getLinkUsage(linkname);
+        double usage = S4U_Simulation::getLinkUsage(link_name);
 
         if (record_as_time_stamp) {
-            this->getOutput().addTimestampLinkUsage(linkname, usage);
+            this->getOutput().addTimestampLinkUsage(link_name, usage);
         }
 
         return usage;
@@ -297,8 +309,8 @@ namespace wrench {
      * Check if writeback mode is activated
      * @return
      */
-    bool Simulation::isWriteback() {
-        return writeback;
+    bool Simulation::isPageCachingEnabled() {
+        return pagecache_enabled;
     }
 
     /**
@@ -395,6 +407,7 @@ namespace wrench {
                     "A WMS should have been instantiated and passed to Simulation.setWMS()");
         }
 
+        // Check that every WMS has a workflow
         for (const auto &wms : this->wmses) {
             if (wms->getWorkflow() == nullptr) {
                 throw std::runtime_error(
@@ -402,6 +415,7 @@ namespace wrench {
             }
         }
 
+        // Check that WMSs can do their work
         for (auto &wms : this->wmses) {
             // Check that at least one StorageService is running (only needed if there are files in the workflow),
             if (not wms->workflow->getFiles().empty()) {
@@ -740,9 +754,9 @@ namespace wrench {
     /**
      * @brief Wrapper enabling timestamps for disk writes
      *
-     * @param num_bytes - number of bytes written
-     * @param hostname - hostname to write to
-     * @param mount_point - mount point of disk to write to
+     * @param num_bytes: number of bytes written
+     * @param hostname: name of the host to write to
+     * @param mount_point: mount point of the disk to write to at the host
      *
      * @throw invalid_argument
      */
@@ -762,19 +776,24 @@ namespace wrench {
     }
 
     /**
-     * Read file locally, only available if writeback is activated.
-     * @param filename: name of the file read.
-     * @param n_bytes: amount of read data in byte.
-     * @param mountpoint: mountpoint where file is located.
+     * @brief Read file locally, only available if writeback is activated.
+     *
+     * @param file: workflow file
+     * @param n_bytes: number of read bytes
+     * @param location: file location
      */
-    void Simulation::readWithMemoryCache(WorkflowFile *file, double n_bytes, std::string mountpoint) {
+    void Simulation::readWithMemoryCache(WorkflowFile *file, double n_bytes, std::shared_ptr<FileLocation> location) {
 
         std::string hostname = getHostName();
 
-        MemoryManager *mem_mng = getMemoryManagerByHost(hostname);
+        unique_disk_sequence_number += 1;
+        int temp_unique_sequence_number = unique_disk_sequence_number;
+        this->getOutput().addTimestampDiskReadStart(hostname, location->getMountPoint(), n_bytes, temp_unique_sequence_number);
+
+        auto mem_mng = getMemoryManagerByHost(hostname);
         std::vector<Block*> file_blocks = mem_mng->getCachedBlocks(file->getID());
         long cached_amt = 0;
-        for (int i = 0; i< file_blocks.size(); i++) {
+        for (unsigned int i = 0; i< file_blocks.size(); i++) {
             cached_amt += file_blocks[i]->getSize();
         }
 
@@ -782,10 +801,10 @@ namespace wrench {
         double from_cache = n_bytes - from_disk;
 
         mem_mng->flush(n_bytes + from_disk - mem_mng->getFreeMemory() - mem_mng->getEvictableMemory(),
-                file->getID());
+                       file->getID());
         mem_mng->evict(n_bytes + from_disk - mem_mng->getFreeMemory(), file->getID());
         if (from_disk > 0) {
-            mem_mng->readToCache(file->getID(), mountpoint, from_disk, false);
+            mem_mng->readToCache(file->getID(), location, from_disk, false);
         }
 
         if (from_cache > 0) {
@@ -794,46 +813,90 @@ namespace wrench {
 
 //        Anonymous used by application
         mem_mng->useAnonymousMemory(n_bytes);
+
+        this->getOutput().addTimestampDiskReadCompletion(hostname, location->getMountPoint(), n_bytes, temp_unique_sequence_number);
     }
 
     /**
-     * Write a file locally, only available if writeback is activated.
-     * @param filename: name of the file written.
-     * @param n_bytes: amount of written data in byte.
-     * @param mountpoint: mount point where file is located.
+     * @brief Write a file locally with writeback strategy, only available if writeback is activated.
+     *
+     * @param file: workflow file
+     * @param n_bytes: number of written bytes
+     * @param location: file location
+     * @param is_dirty: true or false
      */
-    void Simulation::writeWithMemoryCache(WorkflowFile *file, double n_bytes, std::string mountpoint) {
+    void Simulation::writebackWithMemoryCache(WorkflowFile *file, double n_bytes, std::shared_ptr<FileLocation> location, bool is_dirty) {
 
         std::string hostname = getHostName();
 
+        unique_disk_sequence_number += 1;
+        int temp_unique_sequence_number = unique_disk_sequence_number;
+
+        this->getOutput().addTimestampDiskWriteStart(hostname, location->getMountPoint(), n_bytes, temp_unique_sequence_number);
+
         MemoryManager *mem_mng = this->getMemoryManagerByHost(hostname);
 
-        double remaining_dirty = mem_mng->getDirtyRatio() * mem_mng->getAvailableMemory() - mem_mng->getDirty();
+        double remaining_dirty = 0;
+        if (is_dirty) {
+            remaining_dirty = mem_mng->getDirtyRatio() * mem_mng->getAvailableMemory() - mem_mng->getDirty();
+        } else {
+            remaining_dirty = mem_mng->getAvailableMemory();
+        }
+
         double mem_bw_amt = 0;
 
         // free write to cache without forced flushing
         if (remaining_dirty > 0) {
             mem_mng->evict(std::min(n_bytes, remaining_dirty) - mem_mng->getFreeMemory(), "");
             mem_bw_amt = std::min(n_bytes, mem_mng->getFreeMemory());
-            mem_mng->writeToCache(file->getID(), mountpoint, mem_bw_amt);
+            mem_mng->writebackToCache(file->getID(), location, mem_bw_amt, is_dirty);
         }
 
-        double disk_bw_amt = n_bytes - mem_bw_amt;
-        if (disk_bw_amt > 0) {
-            mem_mng->flush(disk_bw_amt, "");
-            mem_mng->evict(disk_bw_amt - mem_mng->getFreeMemory(), "");
+        double remaining = n_bytes - mem_bw_amt;
+        // if dirty_ratio is reached, dirty data needs to be flushed to disk to write new data
+        while (remaining > 0) {
+            mem_mng->flush(remaining, "");
+            mem_mng->evict(remaining - mem_mng->getFreeMemory(), "");
 
-            mem_mng->writeToCache(file->getID(), mountpoint, std::min(mem_mng->getFreeMemory(), disk_bw_amt));
-
-            s4u_Disk *disk = MemoryManager::getDisk(mountpoint, hostname);
-            disk->write(disk_bw_amt);
+            double to_cache = std::min(mem_mng->getFreeMemory(), remaining);
+            mem_mng->writebackToCache(file->getID(), location, to_cache, is_dirty);
+            remaining -= to_cache;
         }
+
+        this->getOutput().addTimestampDiskWriteCompletion(hostname, location->getMountPoint(), n_bytes, temp_unique_sequence_number);
     }
 
     /**
-     * Find a MemoryManager of a host with hostname
+     * @brief Write-through a file locally, only available if writeback is activated.
+     *
+     * @param file: workflow file
+     * @param n_bytes: number of written bytes
+     * @param location: file location
+     */
+    void Simulation::writeThroughWithMemoryCache(WorkflowFile *file, double n_bytes, std::shared_ptr<FileLocation> location) {
+
+        std::string hostname = getHostName();
+
+        unique_disk_sequence_number += 1;
+        int temp_unique_sequence_number = unique_disk_sequence_number;
+        this->getOutput().addTimestampDiskWriteStart(hostname, location->getMountPoint(), n_bytes, temp_unique_sequence_number);
+
+        MemoryManager *mem_mng = this->getMemoryManagerByHost(hostname);
+
+        // Write to disk
+        this->writeToDisk(n_bytes, hostname, location->getMountPoint());
+
+        mem_mng->evict(n_bytes - mem_mng->getFreeMemory(), "");
+        mem_mng->addToCache(file->getID(), location, n_bytes, false);
+
+        this->getOutput().addTimestampDiskWriteCompletion(hostname, location->getMountPoint(), n_bytes, temp_unique_sequence_number);
+    }
+
+    /**
+     * @brief Find MemoryManager running on a host based on hostname
+     *
      * @param hostname: name of the host
-     * @return MemoryManager of the host
+     * @return pointer to the memory manager running on the host (or nullptr)
      */
     MemoryManager *Simulation::getMemoryManagerByHost(std::string hostname) {
         for (const auto &ptr : this->memory_managers) {
@@ -846,6 +909,7 @@ namespace wrench {
 
     /**
      * @brief Wrapper for S4U_Simulation hostExists()
+     *
      * @param hostname - name of host being queried
      * @return boolean of existence
      */
@@ -855,6 +919,7 @@ namespace wrench {
 
     /**
      * @brief Wrapper for S4U_Simulation linkExists()
+     *
      * @param linkname - name of link being queried
      * @return boolean of existence
      */
@@ -871,9 +936,9 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the memory capacity of a host given a hostname
+     * @brief Get the memory_manager_service capacity of a host given a hostname
      * @param hostname: the hostname
-     * @return a memory capacity in bytes
+     * @return a memory_manager_service capacity in bytes
      */
     double Simulation::getHostMemoryCapacity(std::string hostname) {
         return S4U_Simulation::getHostMemoryCapacity(hostname);
@@ -948,8 +1013,8 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the memory capacity of the host on which the calling process is running
-     * @return a memory capacity in bytes
+     * @brief Get the memory_manager_service capacity of the host on which the calling process is running
+     * @return a memory_manager_service capacity in bytes
      */
     double Simulation::getMemoryCapacity() {
         return S4U_Simulation::getMemoryCapacity();
@@ -1232,6 +1297,32 @@ namespace wrench {
     }
 
     /**
+     * @brief Starts a new memory_manager_service manager service during execution (i.e., one that was not passed to Simulation::add() before
+     *        Simulation::launch() was called). The simulation takes ownership of
+     *        the reference and will call the destructor.
+     * @param service: An instance of a service
+     * @return A pointer to the service instance
+     * @throw std::invalid_argument
+     * @throw std::runtime_error
+     */
+    std::shared_ptr<MemoryManager> Simulation::startNewService(MemoryManager *service) {
+        if (service == nullptr) {
+            throw std::invalid_argument("Simulation::startNewService(): invalid argument (nullptr service)");
+        }
+
+        if (not this->is_running) {
+            throw std::runtime_error("Simulation::startNewService(): simulation is not running yet");
+        }
+
+        service->simulation = this;
+        std::shared_ptr<MemoryManager> shared_ptr = std::shared_ptr<MemoryManager>(service);
+        this->memory_managers.insert(shared_ptr);
+        shared_ptr->start(shared_ptr, true, false); // Daemonized, no auto-restart
+
+        return shared_ptr;
+    }
+
+    /**
      * @brief Checks that the platform is well defined
      * @throw std::invalid_argument
      */
@@ -1294,6 +1385,23 @@ namespace wrench {
                     throw std::invalid_argument("Simulation::platformSanityCheck(): For now, disks must have equal "
                                                 "read and write bandwidth (offending disk: " +
                                                 h + ":" + d->get_property("mount"));
+                }
+            }
+        }
+
+        // Check that if --pagecache is passed, each host has a "/memory" disk
+        if (this->isPageCachingEnabled()) {
+            for (auto const &h : hostnames) {
+                bool has_memory_disk = false;
+                for (auto const &d : simgrid::s4u::Host::by_name(h)->get_disks()) {
+                    if (std::string(d->get_property("mount")) == "/memory") {
+                        has_memory_disk = true;
+                        break;
+                    }
+                }
+                if (not has_memory_disk) {
+                    throw std::invalid_argument("Simulation::platformSanityCheck(): Since --pagecache was passed, "
+                                                "each host must have a disk with mountpoint \"/memory\" (host " + h + " doesn't!)");
                 }
             }
         }
